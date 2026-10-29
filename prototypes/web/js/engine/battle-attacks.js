@@ -39,6 +39,44 @@ defineBullets({
   forgeShout:{step:forgeWorkStep,draw:drawForgeWork},
 });
 
+/* 빙의 선택 기능 전용. 예고 때 정한 여백과 끝선을 공격 내내 그대로 쓴다. */
+defineAttacks({
+  hauntedSweep:{dur:145,
+    prepare(){return {kind:'sweep',gap:B.round%2?0.25:0.66,half:0.16,side:B.round%2?1:-1};},
+    tick(t){if(t===0)B.bullets.push({k:'hauntedSweep',t:0,life:145,...B.attackPlan});}},
+  hauntedBeans:{dur:175,
+    prepare(){const gap=B.round%2?0.3:0.7;return {kind:'beans',gap,half:0.18,dots:[0.08,0.22,0.36,0.5,0.64,0.78,0.92].filter(u=>Math.abs(u-gap)>0.24)};},
+    tick(t){if(t===0||t===40||t===80)for(const u of B.attackPlan.dots)B.bullets.push({k:'hauntedBean',u,t:0,life:90});}},
+  hauntedRoll:{dur:140,
+    prepare(){return {kind:'roll',side:B.round%2?-1:1,depth:0.62};},
+    tick(t){if(t===0)B.bullets.push({k:'hauntedRoll',t:0,grow:70,hold:38,back:30,...B.attackPlan});}},
+});
+defineBullets({
+  hauntedSweep:{
+    step(b){b.t++;if(b.t>b.life){b.dead=1;return;}
+      const u=b.side>0?-0.05+1.1*b.t/b.life:1.05-1.1*b.t/b.life;
+      if(Math.abs(B.px-(BOX.x+u*BOX.w))<11&&Math.abs((B.py-BOX.y)/BOX.h-b.gap)>b.half-5/BOX.h)bHitMe();},
+    draw(c,b){const x=BOX.x+(b.side>0?-0.05+1.1*b.t/b.life:1.05-1.1*b.t/b.life)*BOX.w;
+      const top=BOX.y+(b.gap-b.half)*BOX.h,bot=BOX.y+(b.gap+b.half)*BOX.h;
+      brush(c,[[x,BOX.y],[x-b.side*4,top]],12,INK);brush(c,[[x,bot],[x-b.side*4,BOX.y+BOX.h]],12,INK);
+      for(let y=BOX.y+6;y<BOX.y+BOX.h;y+=12)if(y<top-4||y>bot+4)brush(c,[[x,y],[x-b.side*14,y+4]],2,INK,0.65);
+    }},
+  hauntedBean:{
+    step(b){b.t++;if(b.t>b.life){b.dead=1;return;}
+      b.v=-0.08+1.16*(b.t/b.life)**1.5;
+      const p=coverPoint(b);if(Math.hypot(p.x-B.px,p.y-B.py)<9)bHitMe();},
+    draw(c,b){const p=coverPoint(b);blob(c,p.x,p.y,4,3.5,INK);blob(c,p.x-1,p.y-1,1,1,'#f7f4ed');}},
+  hauntedRoll:{
+    step(b){b.t++;const g=b.grow,h=g+b.hold,end=h+b.back;if(b.t>end){b.dead=1;return;}
+      b.d=b.depth*(b.t<=g?b.t/g:b.t<=h?1:1-(b.t-h)/b.back);
+      if(b.side<0?B.px<BOX.x+b.d*BOX.w+4:B.px>BOX.x+(1-b.d)*BOX.w-4)bHitMe();},
+    draw(c,b){const d=(b.d||0)*BOX.w,x=b.side<0?BOX.x:BOX.x+BOX.w-d,edge=b.side<0?x+d:x;
+      c.save();c.fillStyle='rgba(29,24,20,.8)';c.fillRect(x,BOX.y,d,BOX.h);c.restore();
+      blob(c,edge,BOX.y+BOX.h/2,7,BOX.h/2,INK);
+      for(let y=BOX.y+6;y<BOX.y+BOX.h;y+=12)brush(c,[[edge-5,y],[edge+5,y+4]],2,'#f7f4ed',0.6);
+    }},
+});
+
 /* 골렘 시험판 전용. 기존 공격과 탄은 건드리지 않는다. */
 defineAttacks({
   golemPillar:{dur:105,tick(t){if(t===0){

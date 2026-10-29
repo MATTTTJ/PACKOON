@@ -5,10 +5,11 @@
    상대 {name, calmLabel, intro, howto?, npc?, dodge?(피하기만 하는 시험: 버틸 공격 수), bonkText?(dodge 시작 때 연장을 뺏기는 글),
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
-         cover?:엄폐물, calmAction?:{amount:행동 진정량}, placeGift?:꼭대기에 얹을 선물 id,
+         cover?:엄폐물, calmAction?:{amount:행동 진정량, kind?:'return'}, placeGift?:꼭대기에 얹을 선물 id,
          forgeTrial?:{sequence:부위 id 순서, repeatText:두 번째 바퀴 대사},
+         possession?:{order:빙의 순서, attacks:부위별 시험판 공격, travel:불 이동 시간, wait:도착 뒤 대피 시간}, partPose?(id):그려진 부위 좌표,
          headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표,
-         draw(c):수묵 그림, onWin(B)?:이겼을 때 보상 (B.loot 에 넣고 B.bonus 에 글)} */
+         draw(c):수묵 그림, onWin(B)?:이겼을 때 보상, onCalm(B)?:달랬을 때 보상 (B.loot 에 넣고 B.bonus 에 글)} */
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
 let B=null,inkOn=false,LW=800,LH=450,BOX={x:250,y:262,w:300,h:160},EY=118;const BDPR=2;
 let paper=null;
@@ -16,6 +17,7 @@ let paper=null;
    공격 종류(atk)와 예고 글(tell)은 지역 코드에서 받아 합친다. 순서는 표 순서 */
 function tableParts(boss,extra){return TABLES.BOSS_PARTS[boss].map(p=>Object.assign({},p,extra[p.id]));}
 function blayout(){
+  const hand=B&&B.E.possession?{u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h}:null;
   const r=$('battle').getBoundingClientRect();const tall=r.height>0&&r.width/r.height<1.25;
   if(tall){LW=600;LH=600;BOX={x:150,y:330,w:300,h:190};EY=168;}else{LW=800;LH=450;BOX={x:250,y:262,w:300,h:160};EY=112;}
   bcv.width=LW*BDPR;bcv.height=LH*BDPR;
@@ -24,7 +26,8 @@ function blayout(){
   for(let i=0;i<260;i++){const x=hash(i*3.1)*LW,y=hash(i*7.7)*LH,l=8+hash(i*1.3)*30,a=hash(i*5.9)*Math.PI;
     p.strokeStyle='rgba(120,96,64,'+(0.05+hash(i*2.2)*0.07).toFixed(3)+')';p.lineWidth=1;p.beginPath();p.moveTo(x,y);p.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);p.stroke();}
   const g=p.createRadialGradient(LW/2,LH/2,LH*0.3,LW/2,LH/2,LH*0.85);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(90,60,30,.18)');p.fillStyle=g;p.fillRect(0,0,LW,LH);
-  if(B){B.px=clamp(B.px,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py,BOX.y+8,BOX.y+BOX.h-8);}
+  if(B){if(hand){B.px=BOX.x+hand.u*BOX.w;B.py=BOX.y+hand.v*BOX.h;}
+    B.px=clamp(B.px,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py,BOX.y+8,BOX.y+BOX.h-8);}
 }
 addEventListener('resize',()=>{if(B)blayout();});
 
@@ -46,11 +49,13 @@ function startBattle(kind,onEnd){
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
   if(E.cover){B.covers=[];B.round=0;addCover(0.5,0.43);}
   if(E.forgeTrial){B.forgeNext=null;B.handShown=false;B.handShow=0;}
+  if(E.possession){B.round=0;B.possession={from:'core',to:'core'};}
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
   const gm=$('goalM');gm.querySelector('b').textContent='전투';gm.querySelector('span').textContent=E.dodge?'연장 없이 피하기만! 화면을 끌거나 십자 버튼으로 피하자.':'붉은 표식 위에서 치기. 화면을 끌거나 십자 버튼으로 피하자.';
   if(E.cover)gm.querySelector('span').textContent='돌 아래 여백에 손을 숨기자. 공격 뒤에는 표식 치기 또는 소원 돌 바로 놓기.';
   if(E.forgeTrial)gm.querySelector('span').textContent='먹선이 생기면 작업대 밖으로! 풀무는 낮은 바람막이 뒤, 호통은 부채꼴 양옆으로.';
+  if(E.possession)gm.querySelector('span').textContent='불이 옮겨 간 헌물의 공격을 읽자. 공격 뒤에는 되치기 또는 물건 집기 → 윤곽에서 치기로 돌려놓기.';
 }
 function setPadLabels(on){
   const j=document.querySelector('#pad [data-k="jump"]'),a=document.querySelector('#pad [data-k="atk"]');
@@ -97,6 +102,12 @@ function damageCover(r){
 }
 function openCalmAction(){
   if(!B.E.calmAction)return;
+  if(B.E.calmAction.kind==='return'){
+    // 놓친 물건은 보따리에서 빠지지 않고 바닥에 남아 다음 차례에도 집을 수 있다.
+    if(!B.returnItem)B.returnItem={u:B.round%2?0.14:0.86,v:0.86,homeU:B.round%2?0.7:0.3,homeV:0.65};
+    Object.assign(B.returnItem,{t:240,active:true,held:false});
+    B.msg+=' / 물건 위에서 '+HITKEY+'로 집고, 빈 윤곽에서 한 번 더 눌러 돌려놓기.';return;
+  }
   const u=B.mark?(B.mark.x>BOX.x+BOX.w/2?0.14:0.86):(B.round%2?0.86:0.14);
   B.calmStone={u,v:0.8,t:150};
   B.msg+=' / 기울어진 돌 위에서 '+HITKEY+': 바로 놓기.';
@@ -111,6 +122,14 @@ function chooseAttack(){
     const b=B.forgeNext||{k:p.atk,u:B.survived===3?0.74:0.35,tell:120,hold:28};
     b.t=0;b.preview=false;B.forgeNext=null;B.bullets.push(b);return;
   }
+  if(B.E.possession){
+    const rule=B.E.possession,order=rule.order,start=(order.indexOf(B.possession.to)+1)%order.length;
+    const id=Array.from({length:order.length},(_,i)=>order[(start+i)%order.length]).find(id=>{const p=part(id);return !p.broken&&(!p.core||!coreHidden());});
+    const p=part(id);B.round++;B.possession={from:B.possession.to,to:id};
+    if(B.returnItem){B.returnItem.active=false;B.returnItem.held=false;}
+    B.returnEcho=null;B.cur=p;B.last=p;B.st='tell';B.t=rule.travel+rule.wait;B.hitThis=false;
+    const attack=bAttackDef(p);B.attackPlan=attack.prepare?attack.prepare():null;B.msg=p.tell;return;
+  }
   const L=bLiving();let o=L.filter(p=>p!==B.last);if(!o.length)o=L;
   const p=o[Math.floor(Math.random()*o.length)];B.cur=p;B.last=p;B.st='tell';B.t=42;B.msg=p.tell;B.hitThis=false;
 }
@@ -119,10 +138,11 @@ function openMark(){
   if(p.core&&coreHidden()){B.mark=null;B.msg=B.E.coreHidden;return;}
   let x,y,n=0;do{x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+26+Math.random()*(BOX.h-52);n++;}while(Math.hypot(x-B.px,y-B.py)<70&&n<12);
   if(B.E.markPosition){const pos=B.E.markPosition(p);if(pos){x=pos.x;y=pos.y;}}
-  const life=B.E.calmAction?150:120;
+  const life=B.E.calmAction?(B.E.calmAction.kind==='return'?240:150):120;
   B.mark={x,y,t:life,max:life,part:p};B.msg=jo(p.name,'에','에')+' 빈틈! 붉은 표식 위에서 '+HITKEY+'를 누르자.';
 }
-function attackTick(p){ATTACKS[p.atk].tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
+function bAttackDef(p){const mode=B.E.possession;return ATTACKS[(mode&&mode.attacks&&mode.attacks[p.id])||p.atk];}
+function attackTick(p){bAttackDef(p).tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
 function bHitMe(){
   if(B.inv>0||B.st==='end')return;G.hp--;B.inv=60;B.hits++;B.hitThis=true;refreshHud();bSplash(B.px,B.py,'#b4432a');
   if(G.hp<=0)bEnd('lose');
@@ -132,6 +152,16 @@ function bStrike(){
   if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.cool>0)return;
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
   B.cool=16;B.swing=12;
+  const r=B.returnItem;
+  if(r&&r.active&&B.st==='open'){
+    const source=coverPoint(r),home=coverPoint({u:r.homeU,v:r.homeV});
+    if(r.held&&Math.hypot(home.x-B.px,home.y-B.py)<26){
+      B.returnItem=null;B.mark=null;B.returnEcho={u:r.homeU,v:r.homeV,t:60};
+      B.calm=Math.min(100,B.calm+B.E.calmAction.amount);B.msg='장터 물건을 제자리에 놓았다. 도깨비도 옆 물건을 따라 돌려놓는다.';
+      B.st='idle';B.t=60;renderBHud();if(B.calm>=100)bEnd('calm');return;
+    }
+    if(!r.held&&Math.hypot(source.x-B.px,source.y-B.py)<26){r.held=true;B.msg='물건을 집었다. 빈 윤곽으로 옮겨 '+HITKEY+'를 한 번 더 누르자.';return;}
+  }
   if(B.calmStone){const s=coverPoint(B.calmStone);
     if(Math.hypot(s.x-B.px,s.y-B.py)<26){
       B.calmStone=null;B.mark=null;B.calm=Math.min(100,B.calm+B.E.calmAction.amount);
@@ -142,6 +172,7 @@ function bStrike(){
   const m=B.mark;
   if(m&&Math.hypot(m.x-B.px,m.y-B.py)<26){
     B.calmStone=null;
+    if(B.returnItem){B.returnItem.active=false;B.returnItem.held=false;}
     const p=m.part;const dmg=(G.sharp&&!B.E.npc)?2:1;p.hp=Math.max(0,p.hp-dmg);p.shake=16;bSplash(m.x,m.y);B.mark=null;
     if(p.hp<=0)breakPart(p);else B.msg=jo(p.name,'을','를')+' 쳤다! 내구도가 깎였다.';
     renderBHud();
@@ -157,8 +188,10 @@ function breakPart(p){
 function bEnd(result){
   if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.calmStone=null;B.bullets=[];
   if(B.E.forgeTrial){B.forgeNext=null;B.handShow=0;}
+  if(B.E.possession){B.returnItem=null;B.returnEcho=null;B.attackPlan=null;}
   B.msg=result==='win'?B.E.win:result==='calm'?B.E.calmWin:result==='flee'?'일단 물러나자.':B.E.lose;
   if(result==='calm'){learn('calm:'+B.kind);if(B.E.calmGift)B.loot.push(B.E.calmGift);}
+  if(result==='calm'&&B.E.onCalm)B.E.onCalm(B);
   if(result==='win'&&B.E.onWin)B.E.onWin(B);
   renderBHud();
 }
@@ -168,6 +201,7 @@ function bStep(){
   if(B.handShow>0){if(--B.handShow===0){B.msg=B.handMsg;openGift();}return;}
   B.time++;if(B.inv>0)B.inv--;if(B.cool>0)B.cool--;if(B.swing>0)B.swing--;
   if(B.covers)B.covers.forEach(r=>{if(r.flash>0)r.flash--;});
+  if(B.returnEcho&&--B.returnEcho.t<=0)B.returnEcho=null;
   if(B.st!=='end'&&B.st!=='giftPlace'){
     let dx=0,dy=0;
     if(keys['arrowleft']||keys['a']||touch.left)dx-=1;if(keys['arrowright']||keys['d']||touch.right)dx+=1;
@@ -184,12 +218,15 @@ function bStep(){
       if(--B.t<=0){if(B.E.dodge&&!B.noTool){B.st='bonk';B.t=120;B.noTool=true;B.bonk=34;B.msg=B.E.bonkText;B.toolFly={x:B.px+10,y:B.py-12,vx:-3.2,vy:-5.5,rot:0};renderBHud();}else{B.st='idle';B.t=20;}}break;
     case 'bonk':if(B.t===60)B.msg='연장을 놓쳤다! 이번엔 피하기만 해야 한다.';if(--B.t<=0){B.st='idle';B.t=20;B.toolFly=null;}break;
     case 'idle':if(--B.t<=0)chooseAttack();break;
-    case 'tell':if(--B.t<=0){B.st='atk';B.atkT=0;B.atkDur=ATTACKS[B.cur.atk].dur;}break;
-    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover)B.st='settle';else{B.st='open';openMark();}}break;
+    case 'tell':if(--B.t<=0){B.st='atk';B.atkT=0;B.atkDur=bAttackDef(B.cur).dur;}break;
+    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover||B.E.possession)B.st='settle';else{B.st='open';openMark();}}break;
     case 'settle':if(!B.bullets.length){B.st='open';openMark();openCalmAction();}break;
     case 'giftPlace':if(--B.t<=0){B.giftPlace=null;bEnd('calm');}break;
     case 'clear':if(!B.bullets.length){B.survived++;B.msg=(B.hitThis?'아야… 그래도 버텼다. ':'잘 피했다! ')+'('+B.survived+'/'+B.E.dodge+')';renderBHud();if(B.survived>=B.E.dodge)bEnd('win');else{B.st='idle';B.t=40;}}break;
-    case 'open':if(B.calmStone&&--B.calmStone.t<=0)B.calmStone=null;if(B.mark&&--B.mark.t<=0){B.mark=null;B.msg='빈틈이 닫혔다.';}if(!B.mark&&!B.calmStone&&!B.bullets.length){B.st='idle';B.t=36;}break;
+    case 'open':
+      if(B.returnItem&&B.returnItem.active&&--B.returnItem.t<=0){B.returnItem.active=false;B.returnItem.held=false;}
+      if(B.calmStone&&--B.calmStone.t<=0)B.calmStone=null;if(B.mark&&--B.mark.t<=0){B.mark=null;B.msg='빈틈이 닫혔다.';}
+      if(!B.mark&&!B.calmStone&&!(B.returnItem&&B.returnItem.active)&&!B.bullets.length){B.st='idle';B.t=36;}break;
     case 'end':if(--B.t<=0)showResult();return;
   }
   const X1=BOX.x,X2=BOX.x+BOX.w,Y1=BOX.y,Y2=BOX.y+BOX.h;
@@ -293,6 +330,7 @@ function bDraw(){
   c.restore();
   if(B.E.cover)drawGolemAim(c);
   if(B.E.forgeTrial)drawForgeVoice(c);
+  if(B.E.possession)drawPossession(c);
   // 글귀
   c.fillStyle=INK;c.textAlign='center';c.textBaseline='alphabetic';c.font='17px "Gowun Batang", "Batang", serif';
   const msg=B.msg||'';const maxW=LW-60;
@@ -304,8 +342,10 @@ function bDraw(){
   c.save();c.beginPath();c.rect(BOX.x,BOX.y,BOX.w,BOX.h);c.clip();
   if(B.E.cover)drawBattleCover(c);
   if(B.E.forgeTrial){drawForgeBench(c);if(B.forgeNext)drawForgeWork(c,B.forgeNext);}
+  if(B.E.possession)drawPossessedAttack(c);
   for(const b of B.bullets)BULLETS[b.k].draw(c,b);
   if(B.calmStone)drawWishStone(c);
+  if(B.returnItem||B.returnEcho)drawReturnedObject(c);
   if(B.mark){const m=B.mark;const pulse=1+Math.sin(B.time*0.25)*0.08;c.save();c.translate(m.x,m.y);c.scale(pulse,pulse);
     c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.arc(0,0,20,-Math.PI/2,-Math.PI/2+Math.PI*2*(m.t/m.max));c.stroke();
     c.fillStyle='rgba(180,67,42,.16)';c.beginPath();c.arc(0,0,17,0,Math.PI*2);c.fill();
