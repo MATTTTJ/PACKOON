@@ -50,6 +50,19 @@ Rg.arcsEnabled=()=>{
   return enabled;
 };
 
+/* PA-43: 옛 배치와 저장은 classic 쪽에 남긴다. 공급은 기존 마가목 넷에 하나를 더한다. */
+if(!CLASSIC){
+  const oldState=Rg.newState;
+  Rg.newState=()=>{
+    const s=oldState();
+    s.pickups=[{id:'shelter_straw',zone:'shelter',x:330,y:GROUND,item:'jip',got:false},
+      ...[['slope',420,GROUND],['slope',900,150],['shore',880,GROUND],['slope',1265,150],['island',2140,108]].map(([zone,x,y],i)=>
+        ({id:'slope_rowan_'+i,zone,x,y,item:'magamok',got:false}))];
+    s.digs=s.digs.map((d,i)=>({...d,id:'shelter_vine_'+i,zone:i===2?'snow':'shelter',x:i===2?1360:d.x}));
+    return s;
+  };
+}
+
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({
   darae_vine:P=>{P(3,12,3,2,'#6b5a3a');P(5,10,3,2,'#7a6a42');P(7,8,3,2,'#6b5a3a');P(9,6,3,2,'#7a6a42');P(11,4,2,2,'#6b5a3a');P(4,7,3,2,'#7fa860');P(10,9,3,2,'#7fa860');},
