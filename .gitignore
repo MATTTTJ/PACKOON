@@ -11,3 +11,5 @@ desktop.ini
 
 qa-run/
 qa-audio/
+# 헤드리스 시험 흔적
+.integration-qa/

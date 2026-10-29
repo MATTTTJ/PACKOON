@@ -15,7 +15,7 @@
 <main>
   <header class="masthead">
     <div><p class="eyebrow">너구리 보부상 · 음악실</p><h1>이름의 노래</h1><p class="subtitle">짧은 선율이 낙엽 숲과 장터, 얼어붙은 호수를 지나갑니다. 같은 악보와 합성 음색으로 웹에서 듣고 Godot용 WAV를 만듭니다.</p></div>
-    <span class="tag">PA-43 · 사운드 1단계</span>
+    <span class="tag">PA-43 · 사운드 2단계</span>
   </header>
   <div class="layout">
     <section class="player" id="playerPanel" aria-label="음악 재생기">
@@ -47,8 +47,9 @@
     </section>
   </div>
   <section class="sfx-section" aria-labelledby="sfxHeading"><div class="library-head"><h2 id="sfxHeading">효과음 팔레트</h2><span class="count" id="sfxCount">—</span></div><p class="sfx-intro">어택·몸통·잔향을 겹친 합성음입니다. 음악을 재생하는 동안에도 하나씩 들어 볼 수 있습니다.</p><div id="sfxGroups" class="sfx-groups"><p class="loading">악보 폴더를 읽으면 효과음이 표시됩니다.</p></div></section>
-  <footer class="footer">모든 선율은 새로 작곡한 초안입니다. 곡 전환과 구역 배치는 다음 단계에서 게임에 연결합니다. 탭을 떠나면 재생을 멈추고, 돌아와 이어 듣습니다. 음량과 켜기·끄기는 게임 연결 시 기존 Sound 설정을 따릅니다.</footer>
+  <footer class="footer">모든 선율은 새로 작곡한 초안입니다. 도입부는 한 번 흐르고 반복부로 이어집니다. 경치와 엔딩은 한 번만 재생합니다. 탭을 떠나면 멈추고 돌아와 이어 듣습니다. 게임에서는 기존 Sound의 켜기·끄기와 별도 음악 음량을 따릅니다.</footer>
 </main>
+<script src="js/data/music-data.js"></script>
 <script src="js/engine/music.js"></script>
 <script>
 'use strict';
@@ -79,7 +80,7 @@
     ui.trackName.textContent=t.name;ui.trackUse.textContent=t.use||'';
     ui.meter.textContent=t.jangdan+' · '+t.meter.join('/');
     ui.tempo.textContent='♩ = '+t.tempo+' BPM';
-    ui.duration.textContent=fmt(trackSeconds(t))+' · '+(t.loop?'반복':'한 번 재생');
+    ui.duration.textContent=fmt(trackSeconds(t))+' · '+(t.loop?'도입 '+t.intro.end+' + 반복 '+(t.loop.end-t.loop.start)+'마디':'한 번 재생');
     ui.total.textContent=fmt(trackSeconds(t));ui.mode.textContent=t.mode||'—';
     ui.voices.textContent=t.voices.map(v=>instrumentName(v.instrument)).filter((x,i,a)=>a.indexOf(x)===i).join(' · ');
     ui.form.textContent=(t.sections||[]).map(s=>s.name+' ('+(s.from+1)+'–'+s.to+'마디)').join(' → ')||t.measures+'마디';
@@ -125,7 +126,10 @@
   }
   async function loadHTTP(){
     const ticket=++loadTicket;
-    if(location.protocol==='file:'){ui.sourceHelp.open=true;ui.trackName.textContent='악보 폴더를 골라 주세요';ui.trackUse.textContent='design/data/music 폴더를 한 번 고르면 이 페이지에서 모든 곡을 들을 수 있습니다.';ui.trackList.replaceChildren();status('아래 ‘악보 폴더 고르기’에서 design/data/music을 선택하세요.');return;}
+    if(location.protocol==='file:'){
+      if(window.PackoonAudioData){const d=window.PackoonAudioData;install(d.score,d.instruments,d.sfx);return;}
+      ui.sourceHelp.open=true;ui.trackName.textContent='악보 폴더를 골라 주세요';ui.trackUse.textContent='design/data/music 폴더를 한 번 고르면 이 페이지에서 모든 곡을 들을 수 있습니다.';ui.trackList.replaceChildren();status('아래 ‘악보 폴더 고르기’에서 design/data/music을 선택하세요.');return;
+    }
     try{status('악보와 음색을 읽고 있습니다.');const values=await Promise.all(['music','instruments','sfx'].map(async name=>{const response=await fetch('../../design/data/music/'+name+'.json',{cache:'no-cache'});if(!response.ok)throw new Error(name+'.json: HTTP '+response.status);return response.json();}));if(ticket===loadTicket)install(...values);}
     catch(error){if(ticket!==loadTicket)return;ui.sourceHelp.open=true;ui.trackName.textContent='악보를 읽지 못했습니다';status(error.message+' · 악보 폴더를 직접 고를 수 있습니다.',true);}
   }

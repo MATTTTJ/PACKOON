@@ -153,7 +153,7 @@ function changeZone(to,arrival={}){
   G.cam=clamp(G.px-W*.42,0,Math.max(0,z.w-W));
   suppressHeldInputs();sparks.length=0;shakeT=0;lastNear=null;blockedEdge=null;Vfx.clear();
   zoneFade=Vfx.reducedMotion?0:TABLES.TUNING.zone_transition_frames;
-  Sound.travel();return true;
+  Sound.playSfx(arrival.sound||'zone_travel');return true;
 }
 function zoneEdge(){
   const z=zoneDef();if(!z)return false;
@@ -193,7 +193,7 @@ function tryInteract(){
   if(kind==='npc'){learn('met:'+p.id);p.talk();}
   else if(kind==='doors'){
     if(!pathOpen(p)){toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
-    changeZone(p.to,{x:p.toX,y:p.toY});
+    changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});
   }else if(kind==='vistas')startVista(p);
   else if(kind==='stamps')findStamp(p);
   else if(kind==='examines'){
@@ -220,7 +220,7 @@ function findStamp(s){
   // 문구는 notebook.csv의 알게되는키로 연결한다. 위치와 발견 방식만 지역이 정한다.
   const found=G.f.stampsFound||(G.f.stampsFound={});found[expansionKey(s.id)]=true;
   G.f.stampCount=stampCount();G.f.stampsByRegion=G.f.stampsByRegion||{};G.f.stampsByRegion[REG.id]=stampCount(REG.id);
-  learn(s.note,true);Vfx.burst(s.x,s.y??fieldGround());Sound.item();
+  learn(s.note,true);Vfx.burst(s.x,s.y??fieldGround());Sound.playSfx('stamp_found');
   toast('아빠의 도장이다. 수첩에 그날 이야기가 보인다.');return true;
 }
 function drawZoneObjects(){
@@ -247,7 +247,7 @@ function startVista(p){
   const hidden=[document.querySelector('.hud'),$('pad'),$('dlg'),$('prompt'),$('toast'),$('bossbar')].map(e=>[e,e.hidden]);
   hidden.forEach(([e])=>e.hidden=true);
   vistaMode={p,tick:0,hidden};vistaCaption.textContent=(first&&p.thought?p.thought+'\n':'')+'아무 키나 화면을 누르면 돌아간다';vistaCaption.hidden=false;
-  Sound.ambience(p.sound||'wind');
+  Sound.playSfx('scenery_open');Sound.ambience(p.sound||'wind');
 }
 function endVista(){
   if(!vistaMode)return;

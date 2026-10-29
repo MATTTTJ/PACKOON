@@ -139,6 +139,7 @@ function openCalmAction(){
   B.msg+=' / '+(B.E.calmAction.prompt||'기울어진 돌 위에서')+' '+HITKEY+': '+(B.E.calmAction.kind==='knot'?'매듭 풀기.':'바로 놓기.');
 }
 function chooseAttack(){
+  Sound.playSfx('battle_warn');
   if(B.E.cover){B.round++;B.calmStone=null;}
   if(B.E.forgeTrial){
     const seq=B.E.forgeTrial.sequence,p=B.parts.find(p=>p.id===seq[B.survived%seq.length]);
@@ -241,12 +242,14 @@ function bStrike(){
     if(B.returnItem){B.returnItem.active=false;B.returnItem.held=false;}
     if(B.warm)B.warm.ice=null;
     const p=m.part;const dmg=(G.sharp&&!B.E.npc)?2:1;p.hp=Math.max(0,p.hp-dmg);p.shake=16;bSplash(m.x,m.y);B.mark=null;
+    if(p.hp>0)Sound.playSfx('battle_hit');
     if(p.hp<=0)breakPart(p);else B.msg=jo(p.name,'을','를')+' 쳤다! 내구도가 깎였다.';
     renderBHud();
   }else{B.msg=m?'조금 더 가까이! 손이 표식 안에 들어가야 맞는다.':'아직 빈틈이 없다. 피하면서 붉은 표식을 기다리자.';}
 }
 function breakPart(p){
   p.broken=true;
+  if(!p.core)Sound.playSfx('battle_part_break');
   if(B.warm&&p.id==='body')B.warm.width=B.E.warmPath.wideWidth;
   if(p.mat&&!p.core)B.loot.push(p.mat);
   if(p.core){if(p.mat)B.loot.push(p.mat);bEnd('win');return;}
@@ -255,6 +258,7 @@ function breakPart(p){
 }
 function bEnd(result){
   if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.calmStone=null;B.bullets=[];
+  if(result==='win'||result==='calm')Sound.playSfx(result==='calm'?'battle_soothe':'battle_victory');
   if(B.E.forgeTrial){B.forgeNext=null;B.handShow=0;}
   if(B.E.possession){B.returnItem=null;B.returnEcho=null;B.attackPlan=null;}
   if(B.E.vinePath)B.vinePath=null;

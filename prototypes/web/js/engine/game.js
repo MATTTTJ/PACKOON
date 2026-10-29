@@ -1,5 +1,70 @@
 'use strict';
 /* 시작 화면, 끝 화면, 게임 루프, 부팅. 화면 글은 지역의 cover 에서 읽는다 */
+// 음악은 진행 상태를 읽기만 한다. 타이머·보상·저장용 G.f에는 관여하지 않는다.
+const GameMusic=(()=>{
+  const player=PackoonMusic.createPlayer({...PackoonAudioData,sampleRate:22050});
+  PackoonMusic.attachSound(Sound,player);
+  const ids=new Set(PackoonAudioData.score.tracks.map(t=>t.id));
+  const bosses={kudzu:'boss_kudzu',golem:'boss_golem',dokkaebi:'boss_dokkaebi',gangcheol:'boss_steel',musoe:'trial_iron'};
+  const scenery={galchamgol:'scenery_danpunggol',dolneomeo:'scenery_dolneomeo',jangteo:'scenery_market',yeongsan:'scenery_yeongsan'};
+  let owner=null,region=null,scene=null,requested=undefined,pending=false,duck=1,requestCount=0;
+  const history=[],warnings=new Set();
+  function valid(value,fallback){
+    const id=typeof value==='function'?value(G,zoneDef()):value;
+    if(!id)return fallback;
+    if(ids.has(id))return id;
+    if(!warnings.has(id)){warnings.add(id);console.warn('없는 음악 id:',id);}
+    return fallback;
+  }
+  function regionTrack(){
+    const fallback={galchamgol:'danpunggol',dolneomeo:'dolneomeo',jangteo:G.f.night?'market_night':'market_day',yeongsan:G.f.spring?'yeongsan_spring':'yeongsan'}[G.region]||'theme';
+    return valid(zoneDef()?.music,valid(REG.music,fallback));
+  }
+  function selection(){
+    if(G.ended&&!REG.next)return {id:'ending',kind:'ending'};
+    if(B&&!B.result)return {id:valid(B.E.music,bosses[B.kind]||regionTrack()),kind:'battle'};
+    // 장단의 예약 반주만 들린다. 이야기 훅이 있어도 장단 위에 BGM을 겹치지 않는다.
+    const mg=openMinigame();
+    if(mg?.id==='rhythm')return {id:null,kind:'rhythm'};
+    const story=scene||(open('dlg')?dlgMusic:null);
+    if(story)return {id:valid(story,regionTrack()),kind:'story'};
+    if(vistaMode)return {id:valid(vistaMode.p.music,scenery[G.region]||'scenery_danpunggol'),kind:'scenery'};
+    if(mg)return {id:valid(mg.music,'minigame'),kind:'minigame'};
+    if(brewing||craftHands)return {id:'crafting',kind:'crafting'};
+    if(!G.started)return {id:TitleScreen.isOpen()?'title':'theme',kind:'title'};
+    return {id:regionTrack(),kind:'region'};
+  }
+  function update(){
+    if(!G||!REG)return;
+    if(owner!==G||region!==G.region){owner=G;region=G.region;scene=null;requested=undefined;pending=false;requestCount++;}
+    const target=selection();
+    // 대화·손맛·환경음을 살리되 BGM과 효과음의 사용자 음량은 각각 유지한다.
+    const factor=open('dlg')||vistaMode||brewing||!!craftHands?0.72:1;
+    if(factor!==duck){duck=factor;player.setDucking(duck,.18);}
+    if(target.id===requested&&!pending)return;
+    if(!target.id){requestCount++;player.stop(.12);requested=null;pending=false;return;}
+    if(!Sound.enabled||!Sound.context||Sound.context.state!=='running'||document.hidden||!player.getState().unlocked){
+      // 음소거 중 장면이 바뀌면 옛 곡의 자동 재개도 취소한다.
+      if(requested!==target.id){requestCount++;player.stop(.025);requested=target.id;}
+      pending=true;return;
+    }
+    requested=target.id;pending=false;const ticket=++requestCount;
+    const row={id:target.id,kind:target.kind,region:G.region,zone:G.zone,audioTime:Sound.context.currentTime};
+    history.push(row);if(history.length>80)history.shift();
+    player.play(target.id,{crossfade:['battle','scenery'].includes(target.kind)?.35:1.5}).then(ok=>{
+      if(!ok&&ticket===requestCount)pending=true;
+    }).catch(error=>{console.error('음악 재생 실패:',error);});
+  }
+  function setScene(id){update();scene=id||null;update();}
+  function reset(){scene=null;dlgMusic=null;requested=undefined;pending=false;requestCount++;}
+  function getState(){return {...player.getState(),desired:selection(),duck,history:history.slice(),diagnostics:player.getDiagnostics()};}
+  // Sound의 trusted 입력 처리와 resume Promise가 끝난 뒤 아직 잠긴 곡을 다시 요청한다.
+  addEventListener('pointerdown',()=>setTimeout(update,0),true);
+  addEventListener('keydown',()=>setTimeout(update,0),true);
+  addEventListener('packoon-sound-change',()=>setTimeout(update,0));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(update,0);});
+  return {update,setScene,reset,getState,player};
+})();
 function fillCover(){
   const C=REG.cover;
   $('regionTag').textContent=REG.name;$('regionSub').textContent='엄마의 약을 찾아 네 지역을 잇는 여행';
@@ -37,6 +102,7 @@ function showEnd(){
 }
 /* 화면과 상태를 지금 G 에 맞춘다 */
 function resetScreens(){
+  GameMusic.reset();
   resetFieldModes();REG=REGIONS[G.region];prepareZones(G,REG);fillCover();closePanels();
   $('endScreen').hidden=true;$('titleScreen').hidden=G.started;
   lastGoal='';lastTool='';lastNear=null;refreshHud();refreshSaveUI();
@@ -51,6 +117,7 @@ let last=0,acc=0;
 function loop(t){
   if(!last)last=t;acc+=Math.min(100,t-last);last=t;
   while(acc>=1000/60){step();bStep();acc-=1000/60;}
+  GameMusic.update();
   if(B&&!$('battle').hidden)bDraw();else draw();requestAnimationFrame(loop);
 }
 /* 주소 뒤 ?region=<id> 로 그 지역부터 시작할 수 있다 (앞 지역은 마친 것으로 친다). 없으면 첫 지역 */
