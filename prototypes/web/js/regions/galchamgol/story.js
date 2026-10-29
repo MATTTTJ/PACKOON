@@ -596,6 +596,9 @@ if(!CLASSIC){
     get greeting(){return G.f.galWheelDone?'개울 소리가 달라졌구나. 네가 방아를 고쳤지?\n그 소리도 집에 전하마.':G.tool==='sickle'?'낫을 받았구나. 물레방아 물길의 덩굴도 걷겠네.\n네 엄마가 찧던 마을 곡식도 다시 빻을 수 있을 게다.':'매듭이 단단하니 날기 좋구나.\n멈춘 물레방아는 개울 오른쪽에 있단다.';}};
   const hubMagpie={id:magpie.id,name:magpie.name,x:480,draw:magpie.draw,talk:magpie.talk};
   Object.defineProperty(hubMagpie,'greeting',{get:()=>magpie.greeting});
+  // 물레방아를 다 고칠 때까지 까치는 물레방아 곁에 앉아 함께 고친다.
+  const wheelMagpie={id:magpie.id,name:magpie.name,x:1120,draw:magpie.draw,talk:magpie.talk};
+  Object.defineProperty(wheelMagpie,'greeting',{get:()=>magpie.greeting});
   const brothers={id:'squirrel_brothers',name:'다람쥐 형제',x:620,draw:picture('brothers'),talk:brothersTalk,
     greeting:'형: 큰 것부터 번갈아!\n동생: 겨울에는 한 바구니에서!'};
   const chick={id:'lost_chick',name:'꺼병이',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
@@ -747,7 +750,7 @@ if(!CLASSIC){
   // 집에서 묶은 보자기를 들고 대장간 거점으로 날아온다. 같은 id라 만남은 한 번만 센다.
   for(const [zone,list] of Object.entries(Rg.expWanderers))if(Rg.zones?.[zone]){
     Object.defineProperty(Rg.zones[zone],'wanderers',{configurable:true,get:()=>
-      zone==='village'?(done('old_magpie')?[]:list):zone==='forge'?(done('old_magpie')?[hubMagpie,...list]:list):list});
+      zone==='village'?(!done('old_magpie')?list:G.f.galWheelDone?[]:[wheelMagpie]):zone==='forge'?(done('old_magpie')&&G.f.galWheelDone?[hubMagpie,...list]:list):list});
     Rg.zones[zone].examines=Rg.expExamines[zone];
   }
   // 주연 NPC 목록은 그대로다. 이 객체들은 E로 만지는 작업 자리이며 인물·만남 수에 더하지 않는다.
