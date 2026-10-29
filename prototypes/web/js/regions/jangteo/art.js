@@ -21,6 +21,12 @@ Rg.art={
     M(ox,oy,f,-7,-2,5,2,Gy);M(ox,oy,f,2,-2,5,2,Gy);},
   /* 엿방울: 여우 엿장수. 엿판을 메고 큰 가위를 든다 */
   fox(ox,oy,f){const Or='#d9733a',Dk='#a8502a',Wt='#f6efe2',K='#1a1410';const clip=Math.floor(G.anim/16)%2;
+    if(Rg.arcs()&&night()&&!G.boss.dead&&ctx.canvas===cv){
+      // 대화 초상은 그대로, 필드에서는 실제로 엿수레 밑에 웅크린다.
+      const x=ox+29+(Math.floor(G.anim/8)%2),y=oy-3;
+      R(x-4,y-3,8,3,Or);R(x-5,y-5,2,2,Or);R(x+3,y-5,2,2,Or);
+      R(x-3,y-2,1,1,K);R(x+2,y-2,1,1,K);return;
+    }
     M(ox,oy,f,-12,-8,6,4,Or);M(ox,oy,f,-14,-7,3,3,Wt);
     M(ox,oy,f,-5,-15,9,13,Or);M(ox,oy,f,-2,-12,4,8,Wt);
     M(ox,oy,f,-3,-23,9,8,Or);M(ox,oy,f,-4,-26,3,4,Or);M(ox,oy,f,3,-26,3,4,Or);M(ox,oy,f,-3,-25,1,2,Dk);M(ox,oy,f,4,-25,1,2,Dk);
@@ -36,7 +42,10 @@ Rg.props={
     R(x-46,GROUND-28,14,9,'#f2e6cc');R(x-45,GROUND-25,12,1,'#b4432a');
     R(x+2,GROUND-64,8,22,'#7a6a5a');R(x+1,GROUND-66,10,3,'#5a4a3a');
     const t=G.anim;for(let i=0;i<5;i++){const k=(t*0.6+i*22)%110;R(x+4+Math.sin((t+i*40)*0.04)*5,GROUND-70-k,6-k/30,4,'rgba(255,255,255,'+(0.75-k/150).toFixed(2)+')');}
-    R(x+16,GROUND-12,14,12,'#9b5b3a');R(x+15,GROUND-14,16,2,'#e6b54a');},
+    R(x+16,GROUND-12,14,12,'#9b5b3a');R(x+15,GROUND-14,16,2,'#e6b54a');
+    if(Rg.arcs()&&night()&&G.f.steamDone&&!G.f.jangteoArcsMorak3){
+      R(x-15,GROUND-8,12,7,'#6f8c68');R(x-11,GROUND-10,4,3,'#8ca883');R(x-10,GROUND-8,2,7,'#d8c9a6');
+    }},
   /* 엿 수레 */
   yeotcart(n){const x=n.x-cam;R(x+14,GROUND-16,30,10,'#8a5a2b');R(x+14,GROUND-18,30,2,'#c9a06a');
     for(let i=0;i<5;i++)R(x+16+i*6,GROUND-22,4,4,i%2?'#e6b54a':'#d9a441');

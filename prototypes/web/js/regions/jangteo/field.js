@@ -84,6 +84,7 @@ Rg.faint=()=>{G.px=Math.max(60,G.px-80);toast('눈길에 미끄러져 물러났�
 /* 도깨비를 이기거나 달래면 훔쳐 간 설 제수가 돌아온다. 눈홍시는 보따리로 */
 Rg.bossDie=calm=>{
   G.boss.dead=true;addItem('nunhongsi',1);
+  if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
   diary('j_boss','창고를 털던 범인은 낡은 빗자루·키·멍석에 깃든 헌물 도깨비였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':''));
   toast('눈홍시를 되찾았다! 시루로 홍시 약떡을 찌자');refreshGoal();
 };

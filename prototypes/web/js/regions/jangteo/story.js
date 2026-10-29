@@ -7,6 +7,59 @@ const Rg=REGIONS.jangteo;
 const MG=TABLES.MINIGAMES;
 const night=()=>G.f.night;
 
+/* [시험판] 선택한 사연만 연다. 거래·가공·창고 지키기는 기존 조건을 따른다.
+   지역 간 기억: nalDTalk는 읽기만, jangteoArcsNal3는 영산에서 읽을 수 있다. */
+function arcScene(flag,text,lines,after){
+  G.f[flag]=true;diary(flag,text);talk(lines,after);
+}
+function morakNight(){
+  arcScene('jangteoArcsMorak2','모락은 멀리 떠난 새끼에게 보낼 설 떡을 따로 싸 두었다. 정작 자기 저녁은 아직이었다.',[
+    ['모락','먹고 해, 먹고! 어, 이 보자기는 따로야.'],
+    ['너구리','누구 거예요?'],
+    ['모락','멀리 간 우리 새끼 줄 설 떡이야!'],
+    ['너구리','모락은요?'],
+    ['모락','내 저녁? 어이쿠, 그걸 잊었네!']
+  ]);
+}
+function yeotNight(){
+  arcScene('jangteoArcsYeot2','엿방울은 작년 그믐 밤 도깨비에게 엿가위를 빼앗겼다. 낮에 치던 가위는 빌린 것이었다.',[
+    ['엿방울',G.boss.dead?'어라, 도깨비가 갔다고? 이제 수레 밖에 있어도 되겠네~':'쉿, 꼬마야. 수레 밑에 있는 건 비밀이야~'],
+    ['너구리','가위는요?'],
+    ['엿방울','작년 그믐에 도깨비가 내 엿가위를 가져갔지 뭐야.'],
+    ['엿방울','지금 건 빌린 거야. 내 가위면 소리가 더 찰진데~']
+  ]);
+}
+function yeotReturn(){
+  arcScene('jangteoArcsYeotReturned','돌려받은 헌물 사이에서 엿방울의 엿가위를 찾았다. 제 가위로 치는 장단을 함께 맞춰 보기로 했다.',[
+    ['너구리','돌려받은 헌물에 이게 있었어요.'],
+    ['엿방울','어라, 내 엿가위! 자, 제 소리가 나는지 들어 볼까~']
+  ],()=>openRhythm(false));
+}
+function bueongLedger(){
+  arcScene('jangteoArcsBueong2','부엉 영감의 옛 장부에 날쌘의 줄이 있었다. 상단 물건을 잃었을 때 아빠가 대신 물어 준 기록이었다.',[
+    ['부엉 영감','(장부를 한 장 넘겨 오래된 줄을 짚는다.)'],
+    ['부엉 영감','날쌘. 상단 물건을 잃은 날의 기록이다.'],
+    ['너구리','그 옆은 아빠예요?'],
+    ['부엉 영감','그래. 네 아빠가 대신 물어 주었다.']
+  ]);
+}
+function nalLedger(){
+  arcScene('jangteoArcsNal3','날쌘은 부엉 영감이 있는 숙소를 피했다. 장부 이야기는 꺼내지 말라고 했다.',[
+    ['너구리',G.f.nalDTalk?'돌너머에선 안 숨었잖아요.':'왜 숙소에서 떨어져 있어요?'],
+    ['날쌘','누가 숨어? 여기서도 장사 잘돼.'],
+    ['너구리','장부에 있던데요.'],
+    ['날쌘','…장부 얘기 하지 마라. 팥이나 봐.']
+  ]);
+}
+function bueongPromise(){
+  arcScene('jangteoArcsBueong3','날쌘은 그 일 뒤 상단을 떠났다. 부엉 영감은 남이 갚은 줄도 지우지 않는다고 했다.',[
+    ['부엉 영감','(장부를 넘기다 날쌘의 줄에 손을 멈춘다.)'],
+    ['부엉 영감','날쌘은 그 뒤 상단을 떠났다.'],
+    ['너구리','다 갚은 줄인데요?'],
+    ['부엉 영감','셈은 맞아야 한다. 남이 갚은 줄도 지우진 않는다.']
+  ]);
+}
+
 /* ---------- 작은 미니게임 창 만들기 (돌너머 돌 쌓기와 같은 모양) ---------- */
 function makePanel(id,title,btn){
   const p=el('div','forge');p.id=id;p.hidden=true;
@@ -105,20 +158,27 @@ function finishSteam(){
   toast('잔칫날의 시루가 깨어났다! 쌀가루 2 + 팥 1 → 팥시루떡');refreshHud();
   const lines=[['모락','허허, 바로 그거야! 떡은 김이 반이지!'],['너구리','시루가 따뜻해졌어. 이제 떡을 찔 수 있겠다!']];
   if(G.rel.morak.v>=2&&!F.morakTaught){F.morakTaught=true;learn('morak:memiltteok');addItem('memil_powder',1);
-    lines.push(['모락','시루에 메밀가루 두 됫박이면 메밀떡이지! 한 됫박은 내가 얹어 줄게.'],
-      ['모락','할머니들 말로는 도깨비가 메밀을 좋아한대. 밤마다 장터 물건이 사라지니, 메밀떡 좀 챙겨 둬 봐!']);}
+    lines.push(['모락',Rg.arcs()?'메밀가루 둘로 메밀떡을 쪄! 하나는 내가 줄게.':'시루에 메밀가루 두 됫박이면 메밀떡이지! 한 됫박은 내가 얹어 줄게.'],
+      ['모락',Rg.arcs()?'도깨비는 메밀을 좋아한대. 메밀떡도 챙겨 둬!':'할머니들 말로는 도깨비가 메밀을 좋아한대. 밤마다 장터 물건이 사라지니, 메밀떡 좀 챙겨 둬 봐!']);}
+  if(Rg.arcs()&&!F.jangteoArcsMorak1){
+    F.jangteoArcsMorak1=true;diary('jangteoArcsMorak1','모락과 김을 올렸다. 지난가을 아빠도 여기서 떡을 먹고, 아이를 두고 왔다고 했단다.');
+    lines.push(['모락','지난가을 아빠도 떡 먹었지. 아이를 두고 왔다더라.'],['모락','이번엔 그 아이한테 김을 가르쳤네. 먹고 해, 먹고!']);
+  }
   talk(lines);
 }
 function talkMorak(){
   const F=G.f;
   if(!F.morakMet){F.morakMet=true;ledger('morak','모락','쌀가루 3','시루를 깨움');
-    talk([['모락','어서 와, 꼬마야! 아이고, 설 대목에 우리 맷돌이 쩍 갈라져서 정신이 없네.'],
-      ['모락','쌀가루가 모자라 떡을 못 찌네. 세 됫박만 갈아다 주면 김 올리는 법을 가르쳐 줄게!'],
-      ['모락','쌀은 엿방울한테 가 봐! 엿 고고 남은 게 있을 거야. 그걸 맷돌에 갈면 되지!']],()=>{if(has('ssal_powder',3))morakGive();});
+    talk([['모락',Rg.arcs()?'어서 와, 꼬마야! 설 대목에 맷돌이 쩍 갈라졌지 뭐야!':'어서 와, 꼬마야! 아이고, 설 대목에 우리 맷돌이 쩍 갈라져서 정신이 없네.'],
+      ['모락',Rg.arcs()?'쌀가루 세 됫박이면 김 다루는 법을 알려 줄게!':'쌀가루가 모자라 떡을 못 찌네. 세 됫박만 갈아다 주면 김 올리는 법을 가르쳐 줄게!'],
+      ['모락',Rg.arcs()?'쌀은 엿방울한테! 받아서 맷돌에 갈면 돼.':'쌀은 엿방울한테 가 봐! 엿 고고 남은 게 있을 거야. 그걸 맷돌에 갈면 되지!']],()=>{if(has('ssal_powder',3))morakGive();});
     return;
   }
   if(!F.morakPowder){if(has('ssal_powder',3))morakGive();else talk([['모락','쌀가루 세 됫박만 부탁해, 꼬마야! 엿방울한테 쌀을 구해서 맷돌에 갈아 오면 돼!']]);return;}
   if(!F.steamDone){talk([['모락','자, 다시 해 보자! 부채질은 조금씩, 김은 고르게!',[{t:'다시 아궁이 앞에 앉는다',go:openSteam},{t:'조금 이따가요',go:null}]]]);return;}
+  if(Rg.arcs()&&night()&&!F.jangteoArcsMorak2){
+    talk([['모락','먹고 해, 먹고! 가게 닫기 전에 한 입 먹을래?',[{t:'따로 싼 떡을 본다',go:morakNight},{t:'다음에 올게요',go:null}]]]);return;
+  }
   talk([['모락','허허, 꼬마야! 시루로 떡 좀 쪄 봤어? 떡은 김이 반인 거 알지?']]);
 }
 function morakGive(){
@@ -127,9 +187,9 @@ function morakGive(){
     clue('j1','모락','모락: "네 엄마 떡 솜씨야 이 장터에서도 알아줬지! 그런데 네 아빠는 엄마 얘기만 나오면 딴소리를 하더라."');
     diary('j_morak','떡집 모락은 엄마를 알았다. 엄마는 이 장터에서도 떡 잘하기로 유명했단다. 아빠는 왜 엄마 얘기만 나오면 말을 돌렸을까.');
     talk([['모락','고맙다, 꼬마야! 보따리 속 맷돌로 갈아 왔구나?'],['모락','어이쿠, 그 시루! 금빛 테 두른 거 말이야. 어디서 났어?'],
-      ['너구리','엄마 시루예요.'],['모락','아하, 너희 엄마 거였구나! 네 엄마 떡 솜씨야 이 장터에서도 알아줬지!'],
-      ['모락','그런데 네 아빠는 엄마 얘기만 나오면 딴소리를 하더라. 이상하지?'],
-      ['모락','시루를 깨우려면 김부터 다룰 줄 알아야지! 아궁이 앞으로 와. 내가 가르쳐 줄게.']],openSteam);
+      ['너구리','엄마 시루예요.'],['모락',Rg.arcs()?'네 엄마 떡 솜씨는 장터에서도 유명하지!':'아하, 너희 엄마 거였구나! 네 엄마 떡 솜씨야 이 장터에서도 알아줬지!'],
+      ['모락',Rg.arcs()?'네 아빠는 엄마 얘기만 나오면 말을 돌리더라.':'그런데 네 아빠는 엄마 얘기만 나오면 딴소리를 하더라. 이상하지?'],
+      ['모락',Rg.arcs()?'아궁이로 와! 김을 고르게 올려 시루를 깨워 보자!':'시루를 깨우려면 김부터 다룰 줄 알아야지! 아궁이 앞으로 와. 내가 가르쳐 줄게.']],openSteam);
   }},{t:'아직은 안 줄래',go:null}]]]);
 }
 
@@ -262,6 +322,27 @@ function finishRhythm(){
   if(rh.reward){F.yeotDone=true;ledgerDone('yeotbang');addItem('ssal',8);
     lines.push(['엿방울',high?'얼쑤, 장단 좀 아는걸? 내 흥을 다 돋우네!':'흥은 좀 덜 났지만, 쌀 준다는 말은 안 바꾸지!'],['엿방울','자, 엿 고고 남은 쌀 여덟 되! 이건 약속한 네 몫이야.']);}
   rel('yeotbang',high?MG.rhythm_high_relation:MG.rhythm_relation);
+  if(Rg.arcs()){
+    if(!F.jangteoArcsYeot1){
+      F.jangteoArcsYeot1=true;diary('jangteoArcsYeot1','엿방울의 장단에 맞췄다. 빌린 가위라 손에 덜 익는다고 했다. 쌀 여덟 되는 그대로 받았다.');
+      lines.push(['엿방울','빌린 가위도 엿장수 마음대로지~']);
+    }
+    if(F.jangteoArcsYeotReturned&&!F.jangteoArcsYeot3&&high){
+      const paid=F.yeotHigh||knows('yeotbang:high');
+      F.jangteoArcsYeot3=true;F.yeotHigh=true;
+      // 옛 저장에서 이미 받은 엿(먹거나 선물한 경우도 포함)은 다시 주지 않는다.
+      if(!paid){
+        addItem('dad_yeot',1);learn('yeotbang:high');
+        clue('j2','엿방울','아빠는 아들 주려고 엿을 샀다가, 끝내 못 가져가고 엿방울에게 맡겨 두었다.');
+      }
+      diary('jangteoArcsYeot3',paid?'제 엿가위로 치니 엿방울의 흥이 올랐다. 전에 받은 엿이 아빠가 맡긴 내 몫이었다고 다시 말해 주었다.':'제 엿가위로 치니 엿방울의 흥이 올랐다. 아빠가 나 주려고 사서 맡겨 둔 엿을 꺼냈다.');
+      lines.push(['엿방울',paid?'얼쑤, 제 가위 소리가 돌아왔네~':'얼쑤, 이 소리지! 흥 난 김에 맡아 둔 엿도 꺼내야겠네~'],
+        ['엿방울',paid?'네 아빠가 맡긴 엿은 전에 줬지? 그건 네 몫이었어.':'네 아빠가 아들 주려고 맡긴 엿이야.']);
+    }else if(!F.jangteoArcsYeot3){
+      lines.push(['엿방울',F.jangteoArcsYeotReturned?'제 가위 소리에 맞춰 보자~ 다섯 번 맞추면 나도 흥이 나겠지!':'내 엿가위는 따로 있지~ 밤에 오면 얘기해 줄게.']);
+    }
+    talk(lines);return;
+  }
   if(high&&!F.yeotHigh){F.yeotHigh=true;addItem('dad_yeot',1);learn('yeotbang:high');
     clue('j2','엿방울','아빠는 아들 주려고 엿을 샀다가, 끝내 못 가져가고 엿방울에게 맡겨 두었다.');
     diary('j_yeot','장단을 맞췄더니 엿방울이 숨겨 둔 가락엿을 꺼냈다. 아빠가 나 주려고 샀다가 끝내 못 가져가고 맡긴 엿이다.');
@@ -273,25 +354,32 @@ function talkYeot(){
   const F=G.f;
   if(!F.yeotMet){F.yeotMet=true;ledger('yeotbang','엿방울','솔방울 5','쌀');
     talk([['엿방울','엿 사려, 엿! 어라, 불부터 살려야겠네.'],
-      ['엿방울','엿 고느라 불을 오래 땠더니 솔방울이 동났네. 뒷산 소나무 숲에서 다섯 개만 주워 올래?'],
-      ['엿방울','대신 남은 쌀 여덟 되를 줄게. 덤? 그야 엿장수 마음이지. 흥만 나면 또 모르고!']],()=>{if(has('solbang',5))yeotTrade();});
+      ['엿방울',Rg.arcs()?'뒷산 솔방울 다섯 개면 불을 살리지~':'엿 고느라 불을 오래 땠더니 솔방울이 동났네. 뒷산 소나무 숲에서 다섯 개만 주워 올래?'],
+      ['엿방울',Rg.arcs()?'쌀 여덟 되랑 바꾸자~ 덤은 엿장수 마음이지!':'대신 남은 쌀 여덟 되를 줄게. 덤? 그야 엿장수 마음이지. 흥만 나면 또 모르고!']],()=>{if(has('solbang',5))yeotTrade();});
     return;
   }
   if(!F.yeotDone){if(has('solbang',5))yeotTrade();else talk([['엿방울','꼬마 보부상, 솔방울 다섯 개면 돼. 뒷산 소나무 숲에 가 봐.']]);return;}
+  if(Rg.arcs()){
+    const c=[];
+    if(night()&&!F.jangteoArcsYeot2)c.push({t:'밤의 엿수레를 살핀다',go:yeotNight});
+    if(F.jangteoArcsYeot2&&(F.jangteoArcsScissorsFound||G.boss.dead)&&!F.jangteoArcsYeotReturned)c.push({t:'돌려받은 헌물에서 엿가위를 꺼낸다',go:yeotReturn});
+    c.push({t:'엿가위 장단을 맞춘다',go:()=>openRhythm(false)},{t:'그만두기',go:null});
+    talk([['엿방울',F.jangteoArcsYeotReturned?'내 가위 소리 들으러 왔어? 엿장수 마음대로 쳐 볼까~':'엿 사려, 엿! 꼬마 보부상, 무슨 일이야?',c]]);return;
+  }
   if(!F.yeotHigh){talk([['엿방울','장단 한 번 더? 여덟 번 중 다섯 번만 맞춰 봐. 흥이 나면 꺼낼 게 있다니까.',[{t:'엿가위 장단을 맞춘다',go:()=>openRhythm(false)},{t:'그만두기',go:null}]]]);return;}
   talk([['엿방울','엿 사려, 엿! 어라, 내 흥 돋우던 꼬마 보부상이네?']]);
 }
 function yeotTrade(){
-  talk([['엿방울','어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되, 어때?',[{t:'솔방울 5개를 건넨다',go:()=>{
+  talk([['엿방울',Rg.arcs()?'솔방울 다섯 개랑 쌀 여덟 되, 바꿀래?':'어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되, 어때?',[{t:'솔방울 5개를 건넨다',go:()=>{
     takeItem('solbang',5);
-    talk([['엿방울','좋아, 불부터 올리고! 엿 고는 동안 내 가위 소리에 장단 맞춰 볼래?']],()=>openRhythm(true));
+    talk([['엿방울',Rg.arcs()?'불부터 올리고! 가위 장단도 맞춰 볼래?':'좋아, 불부터 올리고! 엿 고는 동안 내 가위 소리에 장단 맞춰 볼래?']],()=>openRhythm(true));
   }},{t:'아직은 안 줄래',go:null}]]]);
 }
 
 /* ---------- 날쌘 (다시 만남): 설 대목 팥 ---------- */
 function talkNal(){
   if(!G.f.nalJTalk){G.f.nalJTalk=true;ledger('nal_jangteo','날쌘','쌀가루 1 (또는 메밀가루 1)','팥');
-    talk([['날쌘','또 왔냐, 꼬마 보부상. 설 고사떡엔 팥이 꼭 들어가니, 이 대목엔 귀한 몸이지.']],nalMenu);}
+    talk([['날쌘',Rg.arcs()?'또 왔냐. 설 고사떡엔 팥이지. 이 대목엔 귀하거든?':'또 왔냐, 꼬마 보부상. 설 고사떡엔 팥이 꼭 들어가니, 이 대목엔 귀한 몸이지.']],nalMenu);}
   else nalMenu();
 }
 function nalMenu(){
@@ -301,8 +389,11 @@ function nalMenu(){
     if(has('memil_powder'))c.push({t:'메밀가루를 내민다 (팥 2)',go:()=>nalTrade('memil_powder')});
     if(!F.nalJBluff)c.push({t:'허세 부리기: "흥, 팥 한 되가 뭐 그리 귀해!"',go:nalBluff});
   }
+  if(Rg.arcs()&&night()&&F.jangteoArcsBueong2&&!F.jangteoArcsNal3)c.push({t:'숙소를 피하는 까닭을 묻는다',go:nalLedger});
   c.push({t:'그만두기',go:null});
-  talk([['날쌘',F.nalJDone?'팥 아껴 쓰고 고사떡 잘 쪄라. 부엉 영감은 팥 빛깔까지 따지니까.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니겠지? 뭘 내놓을 테냐?':'쌀가루 한 됫박엔 팥 한 되. 메밀가루면 두 되 쳐주지. 뭘 낼 테냐?',c]]);
+  const line=Rg.arcs()?(F.nalJDone?'팥 아껴 써. 부엉 영감은 빛깔까지 따지거든.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니네? 뭘 바꿀 건데?':'쌀가루 하나면 팥 하나. 메밀가루면 둘. 뭘 낼 건데?'):
+    F.nalJDone?'팥 아껴 쓰고 고사떡 잘 쪄라. 부엉 영감은 팥 빛깔까지 따지니까.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니겠지? 뭘 내놓을 테냐?':'쌀가루 한 됫박엔 팥 한 되. 메밀가루면 두 되 쳐주지. 뭘 낼 테냐?';
+  talk([['날쌘',line,c]]);
 }
 function nalTrade(id){
   const F=G.f;takeItem(id,1);F.nalJDone=true;ledgerDone('nal_jangteo');
@@ -316,7 +407,7 @@ function nalBluff(){G.f.nalJBluff=true;rel('nal',1);
 /* ---------- 숙소 마루: 쉬면 낮과 밤이 바뀐다 ---------- */
 function restMaru(){
   const toNight=!night();
-  talk([['너구리',toNight?'(숙소 마루에서 해가 지기를 기다렸다. 장터에 하나둘 등불이 켜진다.)':'(마루에서 한숨 자고 나니 날이 밝았다.)']],()=>{
+  talk([['너구리',toNight?(Rg.arcs()?'(마루에서 기다리니 해가 졌다. 등불이 켜진다.)':'(숙소 마루에서 해가 지기를 기다렸다. 장터에 하나둘 등불이 켜진다.)'):'(마루에서 한숨 자고 나니 날이 밝았다.)']],()=>{
     G.f.night=toNight;learn('maru:rest');toast(toNight?'밤이 되었다':'아침이 되었다');refreshGoal();});
 }
 
@@ -326,12 +417,19 @@ function talkBueong(){
   if(!night()){learn('bueong:night');
     talk([['부엉 영감','(처마 밑에서 꾸벅꾸벅 졸고 있다.)'],['너구리','(낮엔 주무시네. 숙소 마루에서 해 질 때까지 쉬자.)']]);return;}
   if(!F.bueongNight){F.bueongNight=true;F.bueongMet=true;learn('bueong:rule');ledger('bueong','부엉 영감','팥시루떡 1','아빠가 맡긴 짐');
-    talk([['부엉 영감','부엉. 그 모자, 장부에 오른 너구리의 것이로구나. 네가 그 녀석 아들이냐.'],
-      ['부엉 영감','녀석이 짐을 맡겼다. 보부상단에 맡긴 물건은 보부상에게만 내준다. 규칙이다.'],
-      ['부엉 영감','보부상단 설 고사에 팥시루떡을 올려라. 정식 보부상으로 인정하고 신표를 내주마.']],()=>{if(has('patsirutteok'))bueongGive();});
+    talk([['부엉 영감',Rg.arcs()?'부엉. 그 모자 주인의 아들이냐.':'부엉. 그 모자, 장부에 오른 너구리의 것이로구나. 네가 그 녀석 아들이냐.'],
+      ['부엉 영감',Rg.arcs()?'아빠 짐은 보부상에게만 내준다. 상단 규칙이다.':'녀석이 짐을 맡겼다. 보부상단에 맡긴 물건은 보부상에게만 내준다. 규칙이다.'],
+      ['부엉 영감',Rg.arcs()?'설 고사에 팥시루떡을 올려라. 보부상 신표를 내주마.':'보부상단 설 고사에 팥시루떡을 올려라. 정식 보부상으로 인정하고 신표를 내주마.']],()=>{if(has('patsirutteok'))bueongGive();});
     return;
   }
   if(!F.bueongDone){if(has('patsirutteok'))bueongGive();else talk([['부엉 영감','쌀가루 두 됫박에 팥 한 되다. 시루에 쪄서 팥시루떡을 가져오너라.']]);return;}
+  if(Rg.arcs()){
+    const c=[];
+    if(!F.jangteoArcsBueong2)c.push({t:'오래된 장부를 본다',go:bueongLedger});
+    else if(F.jangteoArcsNal3&&!F.jangteoArcsBueong3)c.push({t:'날쌘의 줄을 다시 본다',go:bueongPromise});
+    c.push({t:'그만두기',go:null});
+    talk([['부엉 영감',G.boss.dead?'제 몫을 했구나. 장부에 적어 두마.':'밤에 숙소 창고 문 앞을 지켜라.',c]]);return;
+  }
   if(!G.boss.dead){talk([['부엉 영감','그믐 밤엔 헌것들이 들썩인다. 밤에 숙소 창고 문 앞을 지켜라.']]);return;}
   talk([['부엉 영감','수고했다. 제 몫을 하는 보부상이로구나. 장부에 적어 두마.']]);
 }
@@ -341,6 +439,15 @@ function bueongGive(){
     addItem('sinpyo',1);addItem('dad_memo',1);
     clue('j3','아빠의 메모','아빠가 숙소에 맡긴 짐 속 메모: "글자는 \'되돌림\'이었다. 값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산."');
     diary('j_memo','보부상 신표를 받았다. 아빠의 짐 속에 메모가 있었다. 아빠가 읽은 글자는 \'되돌림\'. "값은 이미 치러졌다. 이번엔 내가 치른다." 누가, 무슨 값을 치렀다는 걸까.');
+    if(Rg.arcs()){
+      F.jangteoArcsBueong1=true;diary('jangteoArcsBueong1','부엉 영감이 장부에 표시하고 신표를 내주었다. 아빠가 맡긴 짐도 몇 달째 보관하고 있었다.');
+      talk([['부엉 영감','(고사떡을 올리고 장부를 한 장 넘긴다.)'],
+        ['부엉 영감','신표와 아빠 짐이다. 보관 값은 안 받으마.'],
+        ['너구리','(짐 속에 아빠 메모가 있다.)\n"글자는 \'되돌림\'이었다."'],
+        ['너구리','"값은 이미 치러졌다.\n이번엔 내가 치른다. 북쪽 영산."'],
+        ['부엉 영감','오늘 밤 창고를 지켜라. 물건이 자꾸 사라진다.']
+      ],()=>{toast('숙소 창고를 지키자');refreshGoal();});return;
+    }
     talk([['부엉 영감','붉은 팥이 제대로 들었구나. 고사상에 올릴 만하다.'],['부엉 영감','(부엉 영감이 고사상에 떡을 올리고 장부에 내 이름을 적는다.)'],
       ['부엉 영감','이제 너도 보부상단 식구다. 신표를 받아라.'],['부엉 영감','이건 그 녀석이 맡긴 짐이다. 받아라.'],
       ['너구리','(짐 속에 접힌 종이가 있다. 아빠 글씨다.)'],
@@ -370,18 +477,40 @@ Rg.startDokkaebi=()=>{
 
 /* ---------- 끝: 홍시 약떡을 까치 편에 보내기 ---------- */
 Rg.sendMedicine=()=>{
+  if(Rg.arcs()&&G.f.jangteoArcsMorak2&&!G.f.jangteoArcsMorak3){
+    talk([['너구리','엄마 드릴 홍시 약떡, 다 됐다!',[{t:'모락의 떡도 함께 보낸다',go:()=>{
+      // 별도 소지품·추가 재료 없이 모락이 자기 떡을 보탠다. 약떡은 기존처럼 하나만 소비한다.
+      G.f.hongsiMade=true;G.f.jangteoArcsMorak3=true;
+      diary('j_end','눈홍시와 쌀가루로 홍시 약떡을 쪘다. 엄마가 동네에 떡을 돌리던 시루로, 이번엔 엄마를 위한 떡을 쪘다.');
+      talk([['모락','내 떡도 하나 얹어 보내자!\n네 엄마도 설 떡 드셔야지.'],
+        ['너구리','(까치가 떡을 문다.)\n엄마 시루로 쪘다고 전해 줘.']
+      ],()=>{
+        takeItem('hongsi_tteok',1);
+        // 날아간 직후 답장이 오지 않도록 시간 경과를 밝힌 짧은 후일담으로 마무리한다.
+        talk([['너구리','(한참 뒤, 까치가 떡집으로 돌아왔다.)'],
+          ['너구리','(엄마처럼 날개를 볼에 대고 끄덕인다.)'],
+          ['모락','허허, 맛있게 드셨네!\n우리 새끼 떡도 보내야지!']
+        ],()=>{
+          diary('jangteoArcsMorak3','모락의 떡도 약떡과 함께 보냈다. 돌아온 까치가 엄마의 몸짓을 흉내 내자 모락도 웃었다.');endGame();
+        });
+      });
+    }},{t:'약떡만 보낸다',go:sendMedicine}]]]);return;
+  }
+  sendMedicine();
+};
+function sendMedicine(){
   G.f.hongsiMade=true;
   diary('j_end','눈홍시와 쌀가루로 홍시 약떡을 쪘다. 엄마가 동네에 떡을 돌리던 시루로, 이번엔 엄마를 위한 떡을 쪘다.');
   talk([['너구리','엄마 드릴 홍시 약떡, 다 됐다!'],['너구리','(숙소 처마의 까치가 내려와 떡 보자기를 물었다.)'],['너구리','엄마한테 전해 줘. 엄마 시루로 쪘다고.']],()=>{
     takeItem('hongsi_tteok',1);endGame();
   });
-};
+}
 
 /* ---------- NPC (npcs.csv 의 id). x 는 필드 위치 ---------- */
 Rg.npcs=[
   {id:'morak',name:'모락',x:360,talk:talkMorak,draw:Rg.art.bear,props:Rg.props.tteokjip},
   {id:'yeotbang',name:'엿방울',x:640,talk:talkYeot,draw:Rg.art.fox,props:Rg.props.yeotcart},
-  {id:'nal',name:'날쌘',x:960,talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
+  {id:'nal',name:'날쌘',get x(){return Rg.arcs()&&night()&&G.f.jangteoArcsBueong2?900:960;},talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
   {id:'maru',name:'숙소 마루',x:1070,prompt:'숙소 마루에서 쉬기',talk:restMaru,draw:()=>{},props:Rg.props.maru},
   {id:'bueong',name:'부엉 영감',x:1190,talk:talkBueong,draw:Rg.art.owl},
 ];
