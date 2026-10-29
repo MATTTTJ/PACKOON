@@ -29,6 +29,7 @@ const Rg=defineRegion('dolneomeo',{
       dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false},
     rel:{kkubeogi:{t:'호감',v:0},dolsoe:{t:'신뢰',v:0},ppuri:{t:'의리',v:0},nal:{t:'경멸',v:0}},
   }),
+  weather:()=>Vfx.setWeather('frost'),
   onStart(){
     diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 우리를 내려다본다. 서리다래는 돌산 절벽에 있다고 했다.');
     toast('마을 어귀의 동물들에게 말을 걸어 보자');

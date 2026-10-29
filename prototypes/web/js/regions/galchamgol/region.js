@@ -31,6 +31,8 @@ const Rg=defineRegion('galchamgol',{
     /* 호감 축: 책의 물품 장부에 이 순서로 나온다 */
     rel:{dodam:{t:'호감',v:0},musoe:{t:'의리',v:0},nal:{t:'경멸',v:0},toad:{t:'호감',v:0}},
   }),
+  weather:()=>Vfx.setWeather('maple'),
+  weatherFront(){if(G.boss.dead){const x=2348-cam;if(x<W+20){R(x,GROUND-26,2,26,'#6b4423');R(x-8,GROUND-26,18,8,'#c9a27a');R(x+6,GROUND-24,2,4,'#6b4423');}}},
   onStart(){
     diary('start','단풍골에 도착했다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 아빠의 마지막 편지에 적힌 곳이 여기다.');
     toast('도토리를 줍고, 마을 동물들에게 말을 걸어 보자');
