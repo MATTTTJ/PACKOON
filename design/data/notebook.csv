@@ -101,3 +101,21 @@ legend_fruit,yeongsan,전설의 열매,물건,나,got:legend_fruit,처음 얻을
 legend_fruit,yeongsan,전설의 열매,물건,아빠,,처음부터,영산 신목의 열매. 봄에만 열린다.,제안,
 legend_fruit,yeongsan,전설의 열매,물건,아빠,got:legend_fruit,처음 얻을 때,(그림 옆에 나중에 덧쓴 글씨) 여기다.,제안,
 dad_stamps_galchamgol,galchamgol,젊은 아빠의 그날,도장,아빠,stamp:galchamgol:example,예시 도장을 찾았을 때,개울을 건너기 전 여기서 신발의 흙을 털었다.,제안,PA-43 예시 · 다음 지역 작업에서 교체
+jeolgu,galchamgol,엄마의 절구,물건,나,habit:jeolgu,가보로 처음 가공했을 때,엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.,확정,PA-43 크래프팅
+maetdol,dolneomeo,증조할아버지의 맷돌,물건,나,habit:maetdol,가보로 처음 가공했을 때,증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.,확정,PA-43 크래프팅
+siru,jangteo,잔칫날의 시루,물건,나,habit:siru,가보로 처음 가공했을 때,잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.,확정,PA-43 크래프팅
+yakyeon,yeongsan,아빠의 약연,물건,나,habit:yakyeon,가보로 처음 가공했을 때,아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.,확정,PA-43 크래프팅
+sesame_salt,galchamgol,깨소금,물건,나,recipe:sesame_salt,숨은 가공법을 직접 찾아 만들었을 때,깨와 소금을 함께 찧으니 깨소금이 됐다. 엄마가 밥상에 놓던 냄새다.,확정,PA-43 크래프팅
+mung_batter,jangteo,녹두 빈대떡 반죽,물건,나,recipe:mung_batter,숨은 가공법을 직접 찾아 만들었을 때,녹두에 참기름을 더해 갈았다. 장터에서 먹던 빈대떡 반죽이 됐다.,확정,PA-43 크래프팅
+rainbow_tteok,yeongsan,무지개떡,물건,나,recipe:rainbow_tteok,숨은 가공법을 직접 찾아 만들었을 때,단풍골 가루에 장터 팥과 영산 열매를 포갰다. 세 계절이 한 떡이 됐다.,확정,PA-43 크래프팅
+ssanghwa,yeongsan,쌍화 약재,물건,나,recipe:ssanghwa,숨은 가공법을 직접 찾아 만들었을 때,"칡뿌리와 겨우살이, 대추를 함께 갈았다. 아빠의 약연에서 새 향이 났다.",확정,PA-43 크래프팅
+salt,galchamgol,소금,물건,나,got:salt,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+sesame,galchamgol,깨,물건,나,got:sesame,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+sesame_oil,dolneomeo,참기름,물건,나,got:sesame_oil,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+mung,jangteo,녹두,물건,나,got:mung,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+honey,jangteo,꿀,물건,나,got:honey,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+jujube,yeongsan,대추,물건,나,got:jujube,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+acorn_jelly,galchamgol,도토리묵,물건,나,got:acorn_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+memil_jelly,dolneomeo,메밀묵,물건,나,got:memil_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+yakgwa,jangteo,약과,물건,나,got:yakgwa,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+magamok_tea,yeongsan,마가목차,물건,나,got:magamok_tea,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅

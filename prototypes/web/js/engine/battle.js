@@ -360,19 +360,28 @@ function openGift(){
   const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0);
   if(!ids.length)g.appendChild(el('span','small','건넬 물건이 없다.'));
   ids.forEach(id=>{const b=el('button','gift');b.type='button';b.appendChild(icon(id));b.appendChild(el('span',null,ITEMS[id].n+' ×'+G.inv[id]));
+    const taste=tasteOf(B.kind,id);
+    if(taste&&knows('like:'+B.kind+':'+id))b.appendChild(el('span','small',taste.kind));
     b.onclick=()=>giveGift(id);g.appendChild(b);});
   $('bGiftMenu').hidden=false;
 }
 function closeGift(){$('bGiftMenu').hidden=true;if(B)B.paused=false;}
 function giveGift(id){
   if(!B||!B.paused||B.st==='end'||!has(id))return;
+  const taste=tasteOf(B.kind,id);
+  if(taste&&taste.kind==='싫어함'){
+    $('bGiftHint').textContent=taste.line+' 물건은 보따리에 그대로 두었다.';return;
+  }
   const after={...G.inv,[id]:G.inv[id]-1};
   if(progressShortage(after)>progressShortage(G.inv)){
     $('bGiftHint').textContent='이건 아직 쓸 데가 있어. 다른 걸 건네자.';return;
   }
-  takeItem(id,1);const v=B.E.likes[id];if(v)learn('like:'+B.kind+':'+id);
+  // 기존 선물의 진정수치가 우선이다. 새 가공품의 효과만 맛 표에서 더한다.
+  const effect=taste&&taste.effect.match(/^calm:(\d+)$/);
+  takeItem(id,1);const v=B.E.likes[id]||(effect?+effect[1]:0);
+  if(v||(taste&&['아주 좋아함','좋아함'].includes(taste.kind)))learn('like:'+B.kind+':'+id);
   B.calm=Math.min(100,B.calm+(v||8));
-  B.msg=v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
+  B.msg=taste?taste.line:v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
   if(v&&B.E.vinePath)B.scentKnot={u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h,t:90};
   if(B.warm&&id==='dokkaebibul')B.warm.fire=180;
   closeGift();renderBHud();

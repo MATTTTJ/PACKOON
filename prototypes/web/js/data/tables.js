@@ -289,6 +289,90 @@ const TABLES={
    "r": 4,
    "kind": "귀한 것",
    "d": "아빠와 함께 약연을 돌려 간 약. 엄마의 둔갑과 말을 되돌린다."
+  },
+  "salt": {
+   "n": "소금",
+   "r": 0,
+   "kind": "재료",
+   "d": "작은 종지에 담은 굵은 소금. 채집으로는 얻지 못한다."
+  },
+  "sesame": {
+   "n": "깨",
+   "r": 1,
+   "kind": "재료",
+   "d": "고소한 볶은 깨. 절구에 찧으면 향이 더 난다. 교환으로만 얻는다."
+  },
+  "sesame_oil": {
+   "n": "참기름",
+   "r": 1,
+   "kind": "재료",
+   "d": "작은 병에 담은 참기름. 묵이나 반죽에 고소한 향을 더한다. 교환으로만 얻는다."
+  },
+  "mung": {
+   "n": "녹두",
+   "r": 1,
+   "kind": "재료",
+   "d": "설 장터에서 건너온 녹두. 맷돌에 갈아 반죽을 만든다. 교환으로만 얻는다."
+  },
+  "honey": {
+   "n": "꿀",
+   "r": 1,
+   "kind": "재료",
+   "d": "작은 단지에 담은 겨울 꿀. 약과를 빚을 때 쓴다. 교환으로만 얻는다."
+  },
+  "jujube": {
+   "n": "대추",
+   "r": 1,
+   "kind": "재료",
+   "d": "산막에서 말린 붉은 대추. 약연에서 지역 재료와 함께 간다. 교환으로만 얻는다."
+  },
+  "acorn_jelly": {
+   "n": "도토리묵",
+   "r": 1,
+   "kind": "먹을거리",
+   "d": "단풍골 도토리로 빚은 말랑한 묵. 도담은 숲 냄새가 난다고 한다."
+  },
+  "sesame_salt": {
+   "n": "깨소금",
+   "r": 1,
+   "kind": "재료",
+   "d": "소금과 깨를 함께 찧었다. 엄마가 밥상 끝에 놓던 고소한 가루다."
+  },
+  "memil_jelly": {
+   "n": "메밀묵",
+   "r": 1,
+   "kind": "먹을거리",
+   "d": "돌너머 메밀의 구수한 맛에 참기름 향을 더한 묵."
+  },
+  "mung_batter": {
+   "n": "녹두 빈대떡 반죽",
+   "r": 1,
+   "kind": "재료",
+   "d": "설 장터 녹두를 곱게 갈아 기름을 섞은 반죽. 모락이 부쳐 먹는 맛을 안다."
+  },
+  "yakgwa": {
+   "n": "약과",
+   "r": 1,
+   "kind": "먹을거리",
+   "d": "꿀을 넣어 빚고 시루에 익힌 집안식 약과. 설 장터의 달콤한 냄새가 난다."
+  },
+  "rainbow_tteok": {
+   "n": "무지개떡",
+   "r": 1,
+   "kind": "먹을거리",
+   "d": "단풍골 가루와 장터 팥, 영산 열매를 포갠 떡. 지나온 세 계절이 한 조각에 들었다."
+  },
+  "magamok_tea": {
+   "n": "마가목차",
+   "r": 1,
+   "kind": "먹을거리",
+   "d": "영산의 빨간 열매에 말린 대추를 더한 차. 손에 쥐면 온기가 돈다."
+  },
+  "ssanghwa": {
+   "n": "쌍화 약재",
+   "r": 1,
+   "kind": "재료",
+   "d": "남쪽 칡뿌리와 겨울 산의 겨우살이, 대추를 함께 갈았다. 건네기 좋은 향긋한 약재다."
   }
  },
  "BOSS_PARTS": {
@@ -437,6 +521,26 @@ const TABLES={
     },
     "out": "powder",
     "n": 1
+   },
+   {
+    "need": {
+     "powder": 1,
+     "salt": 1
+    },
+    "out": "acorn_jelly",
+    "n": 1,
+    "optional": true
+   },
+   {
+    "need": {
+     "sesame": 1,
+     "salt": 1
+    },
+    "out": "sesame_salt",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:sesame_salt"
    }
   ],
   "maetdol": [
@@ -460,6 +564,26 @@ const TABLES={
     },
     "out": "ssal_powder",
     "n": 1
+   },
+   {
+    "need": {
+     "memil_powder": 1,
+     "sesame_oil": 1
+    },
+    "out": "memil_jelly",
+    "n": 1,
+    "optional": true
+   },
+   {
+    "need": {
+     "mung": 1,
+     "sesame_oil": 1
+    },
+    "out": "mung_batter",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:mung_batter"
    }
   ],
   "siru": [
@@ -485,6 +609,27 @@ const TABLES={
     },
     "out": "hongsi_tteok",
     "n": 1
+   },
+   {
+    "need": {
+     "ssal_powder": 1,
+     "honey": 1
+    },
+    "out": "yakgwa",
+    "n": 1,
+    "optional": true
+   },
+   {
+    "need": {
+     "powder": 1,
+     "pat": 1,
+     "magamok": 1
+    },
+    "out": "rainbow_tteok",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:rainbow_tteok"
    }
   ],
   "yakyeon": [
@@ -494,8 +639,295 @@ const TABLES={
     },
     "out": "doerim_yak",
     "n": 1
+   },
+   {
+    "need": {
+     "magamok": 1,
+     "jujube": 1
+    },
+    "out": "magamok_tea",
+    "n": 1,
+    "optional": true
+   },
+   {
+    "need": {
+     "root": 1,
+     "gyeousari": 1,
+     "jujube": 1
+    },
+    "out": "ssanghwa",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:ssanghwa"
    }
   ]
+ },
+ "CRAFT": {
+  "jeolgu": {
+   "habit": "엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.",
+   "habitKey": "habit:jeolgu",
+   "fail": "절구가 헛돌았다. 엄마도 이 조합은 안 찧었겠지. 재료는 그대로 챙겼다.",
+   "steps": 3,
+   "intervalMs": 650,
+   "windowMs": 280,
+   "restMs": 800,
+   "steamMs": 0,
+   "dragPx": 0,
+   "turnDegrees": 0
+  },
+  "maetdol": {
+   "habit": "증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.",
+   "habitKey": "habit:maetdol",
+   "fail": "맷돌이 꿈쩍도 안 한다. 증조할아버지도 이건 안 갈았겠지. 재료는 그대로 챙겼다.",
+   "steps": 4,
+   "intervalMs": 0,
+   "windowMs": 0,
+   "restMs": 0,
+   "steamMs": 0,
+   "dragPx": 0,
+   "turnDegrees": 90
+  },
+  "siru": {
+   "habit": "잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.",
+   "habitKey": "habit:siru",
+   "fail": "시루에서 김만 새어 나왔다. 잔칫날에도 이런 떡은 없었지. 재료는 그대로 챙겼다.",
+   "steps": 1,
+   "intervalMs": 0,
+   "windowMs": 350,
+   "restMs": 0,
+   "steamMs": 1200,
+   "dragPx": 0,
+   "turnDegrees": 0
+  },
+  "yakyeon": {
+   "habit": "아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.",
+   "habitKey": "habit:yakyeon",
+   "fail": "약연 바퀴가 덜컥 멎었다. 아빠가 고개를 젓는 것 같다. 재료는 그대로 챙겼다.",
+   "steps": 4,
+   "intervalMs": 0,
+   "windowMs": 0,
+   "restMs": 0,
+   "steamMs": 0,
+   "dragPx": 24,
+   "turnDegrees": 0
+  }
+ },
+ "TASTES": {
+  "dodam": {
+   "acorn_jelly": {
+    "kind": "아주 좋아함",
+    "line": "도토리가 이렇게 말랑해졌네! 한 입만 더!",
+    "effect": "none"
+   },
+   "sesame_salt": {
+    "kind": "좋아함",
+    "line": "고소해! 도토리랑 같이 숨겨 둬야지.",
+    "effect": "none"
+   }
+  },
+  "nal": {
+   "yakgwa": {
+    "kind": "좋아함",
+    "line": "제법 빚었네. 팔 건 아니고, 내가 먹으려고.",
+    "effect": "none"
+   },
+   "sesame_salt": {
+    "kind": "아주 좋아함",
+    "line": "흥, 길에서 밥 먹을 때 딱이겠네.",
+    "effect": "none"
+   }
+  },
+  "musoe": {
+   "rice": {
+    "kind": "좋아함",
+    "line": "…마침 출출하던 참이다.",
+    "effect": "none"
+   },
+   "acorn_jelly": {
+    "kind": "아주 좋아함",
+    "line": "…손 많이 갔겠네. 잠깐 앉아라.",
+    "effect": "calm:50"
+   },
+   "sesame_salt": {
+    "kind": "좋아함",
+    "line": "밥에 얹으면 되겠군. 잘 빻았다.",
+    "effect": "calm:35"
+   }
+  },
+  "toad": {
+   "magamok_tea": {
+    "kind": "아주 좋아함",
+    "line": "허허, 찻잔에 산 냄새가 담겼구나.",
+    "effect": "none"
+   },
+   "ssanghwa": {
+    "kind": "좋아함",
+    "line": "한데 갈았어도 저마다 향이 남았네.",
+    "effect": "none"
+   }
+  },
+  "dolsoe": {
+   "memil_jelly": {
+    "kind": "아주 좋아함",
+    "line": "매끈하구나. 잘 갈았어.",
+    "effect": "none"
+   },
+   "sesame_salt": {
+    "kind": "좋아함",
+    "line": "손끝에도 고소한 냄새가 배겠네.",
+    "effect": "none"
+   }
+  },
+  "ppuri": {
+   "memil_jelly": {
+    "kind": "아주 좋아함",
+    "line": "메밀 향이 곧군. 정성을 받겠다.",
+    "effect": "none"
+   },
+   "yakgwa": {
+    "kind": "그저 그럼",
+    "line": "정갈하게 빚었군. 마음은 받겠다.",
+    "effect": "none"
+   }
+  },
+  "kkubeogi": {
+   "acorn_jelly": {
+    "kind": "아주 좋아함",
+    "line": "말랑해서… 졸면서도 먹겠어…",
+    "effect": "none"
+   },
+   "memil_jelly": {
+    "kind": "좋아함",
+    "line": "이건… 숨겨 두고… 천천히…",
+    "effect": "none"
+   }
+  },
+  "yeotbang": {
+   "yakgwa": {
+    "kind": "아주 좋아함",
+    "line": "어이쿠, 내 엿도 긴장하겠는걸!",
+    "effect": "none"
+   },
+   "ssanghwa": {
+    "kind": "싫어함",
+    "line": "에구, 쓴 건 사양! 네가 잘 챙겨 둬.",
+    "effect": "none"
+   }
+  },
+  "morak": {
+   "mung_batter": {
+    "kind": "아주 좋아함",
+    "line": "잘 갈았네! 넓게 한 장 부쳐야겠다!",
+    "effect": "none"
+   },
+   "rainbow_tteok": {
+    "kind": "좋아함",
+    "line": "허허, 떡 한 조각에 온 길이 다 들었네!",
+    "effect": "none"
+   }
+  },
+  "bueong": {
+   "rainbow_tteok": {
+    "kind": "아주 좋아함",
+    "line": "층을 흐트러뜨리지 않았군. 솜씨가 좋다.",
+    "effect": "none"
+   },
+   "yakgwa": {
+    "kind": "좋아함",
+    "line": "장부는 덮고 먹어야겠군. 손에 묻겠다.",
+    "effect": "none"
+   }
+  },
+  "salgeumi": {
+   "magamok_tea": {
+    "kind": "아주 좋아함",
+    "line": "따, 따뜻해… 여기서 같이 마셔도 돼?",
+    "effect": "none"
+   },
+   "sesame_salt": {
+    "kind": "그저 그럼",
+    "line": "고소한 냄새네… 마음은 고마워.",
+    "effect": "none"
+   }
+  },
+  "dad": {
+   "acorn_jelly": {
+    "kind": "아주 좋아함",
+    "line": "(묵을 한 입 먹고, 내 손을 꼭 잡는다.)",
+    "effect": "none"
+   },
+   "rainbow_tteok": {
+    "kind": "아주 좋아함",
+    "line": "(떡의 층을 짚다가, 내 어깨를 감싼다.)",
+    "effect": "none"
+   },
+   "ssanghwa": {
+    "kind": "좋아함",
+    "line": "(향을 맡고 고개를 끄덕인다. 내 손을 덮는다.)",
+    "effect": "none"
+   }
+  },
+  "sangun": {
+   "magamok_tea": {
+    "kind": "아주 좋아함",
+    "line": "네가 지나온 산의 향이구나. 잘 받으마.",
+    "effect": "none"
+   },
+   "ssanghwa": {
+    "kind": "좋아함",
+    "line": "여러 향이 한데 머무는구나. 잠시 쉬어라.",
+    "effect": "none"
+   }
+  },
+  "kudzu": {
+   "acorn_jelly": {
+    "kind": "좋아함",
+    "line": "도토리 향에 덩굴이 느슨해진다.",
+    "effect": "calm:50"
+   },
+   "magamok_tea": {
+    "kind": "좋아함",
+    "line": "따뜻한 김을 따라 칡잎이 펼쳐진다.",
+    "effect": "calm:50"
+   }
+  },
+  "golem": {
+   "memil_jelly": {
+    "kind": "좋아함",
+    "line": "메밀 향을 맡은 돌무더기가 천천히 내려앉는다.",
+    "effect": "calm:40"
+   },
+   "sesame_salt": {
+    "kind": "그저 그럼",
+    "line": "돌무더기가 고소한 향을 잠깐 맡는다.",
+    "effect": "none"
+   }
+  },
+  "dokkaebi": {
+   "mung_batter": {
+    "kind": "아주 좋아함",
+    "line": "메밀도 좋지만 녹두도 좋지! 얼른 부치자!",
+    "effect": "calm:60"
+   },
+   "rainbow_tteok": {
+    "kind": "좋아함",
+    "line": "색도 맛도 층층이네! 내 몫도 있지?",
+    "effect": "calm:60"
+   }
+  },
+  "gangcheol": {
+   "magamok_tea": {
+    "kind": "아주 좋아함",
+    "line": "찻김의 온기에 강철이의 긴 몸이 풀린다.",
+    "effect": "calm:60"
+   },
+   "ssanghwa": {
+    "kind": "좋아함",
+    "line": "약재 향을 맡은 강철이가 긴 숨을 내쉰다.",
+    "effect": "calm:60"
+   }
+  }
  },
  "NOTES": [
   {
@@ -1151,6 +1583,166 @@ const TABLES={
     }
    ],
    "name": "젊은 아빠의 그날"
+  },
+  {
+   "id": "jeolgu",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.",
+     "when": "habit:jeolgu"
+    }
+   ],
+   "name": "엄마의 절구"
+  },
+  {
+   "id": "maetdol",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.",
+     "when": "habit:maetdol"
+    }
+   ],
+   "name": "증조할아버지의 맷돌"
+  },
+  {
+   "id": "siru",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.",
+     "when": "habit:siru"
+    }
+   ],
+   "name": "잔칫날의 시루"
+  },
+  {
+   "id": "yakyeon",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.",
+     "when": "habit:yakyeon"
+    }
+   ],
+   "name": "아빠의 약연"
+  },
+  {
+   "id": "sesame_salt",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "깨와 소금을 함께 찧으니 깨소금이 됐다. 엄마가 밥상에 놓던 냄새다.",
+     "when": "recipe:sesame_salt"
+    }
+   ]
+  },
+  {
+   "id": "mung_batter",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "녹두에 참기름을 더해 갈았다. 장터에서 먹던 빈대떡 반죽이 됐다.",
+     "when": "recipe:mung_batter"
+    }
+   ]
+  },
+  {
+   "id": "rainbow_tteok",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "단풍골 가루에 장터 팥과 영산 열매를 포갰다. 세 계절이 한 떡이 됐다.",
+     "when": "recipe:rainbow_tteok"
+    }
+   ]
+  },
+  {
+   "id": "ssanghwa",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "칡뿌리와 겨우살이, 대추를 함께 갈았다. 아빠의 약연에서 새 향이 났다.",
+     "when": "recipe:ssanghwa"
+    }
+   ]
+  },
+  {
+   "id": "salt",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "sesame",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "sesame_oil",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "mung",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "honey",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "jujube",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "acorn_jelly",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "memil_jelly",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "yakgwa",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "magamok_tea",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": []
   }
  ],
  "MINIGAMES": {
