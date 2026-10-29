@@ -1,0 +1,18 @@
+﻿보스,부위id,부위,내구도,핵심,공격,부수면,부순뒤변화,상태
+kudzu,arm,덩굴손,3,,틈이 하나 있는 가시 줄이 위에서 내려옴,vine,,확정
+kudzu,root,뿌리,3,,바닥 점선 예고 후 가시가 솟음,root,,확정
+kudzu,core,칡의 심,4,O,손을 조준한 씨앗,kflower,전투 승리. 다른 부위를 하나 이상 꺾어야 드러남,확정
+musoe,hammer,망치질,3,,세로 줄 예고 후 망치가 내려침,,,확정
+musoe,bellows,풀무,3,,물결치며 날아오는 불똥,,,확정
+musoe,core,호통,3,O,세 갈래로 퍼지는 고함,,,확정
+golem,leg,다리,,,,mud,주저앉아 머리가 낮아짐,제안
+golem,arm,팔,,,휩쓸기,stonedust,휩쓸기 공격이 사라짐,제안
+golem,head,머리,,O,,mossy_eye,전투 종료,제안
+dokkaebi,broom,빗자루,3,,상자 바닥을 좌우로 쓸고 지나감. 쓸리지 않은 줄 하나로 피함,broom_sal,,제안
+dokkaebi,ki,키,3,,콩을 까불러 위로 흩뿌렸다가 떨어뜨림,kong,콩 비가 사라짐,제안
+dokkaebi,meongseok,멍석,3,,상자 한쪽 끝부터 말려 들어와 피할 자리가 좁아짐,jip,말기 공격이 사라짐,제안
+dokkaebi,core,도깨비불,4,O,손을 느리게 따라오는 푸른 불,dokkaebibul,전투 종료. 다른 부위를 하나 이상 부숴야 드러남,제안
+gangcheol,mouth,입,3,,서리 숨: 상자 위쪽부터 얼어붙는 띠가 내려옴,frost_whisker,서리 숨이 사라짐,제안
+gangcheol,body,몸통,4,,상자를 휘감아 조이며 피할 자리가 좁아짐,ice_scale,조이기가 사라지고 상자가 넓어짐,제안
+gangcheol,tail,꼬리,3,,고드름을 흩뿌리는 꼬리 내려치기,icicle,,제안
+gangcheol,core,머리,5,O,손을 노리는 눈보라 소용돌이,broken_orb,전투 종료. 몸통을 부숴야 드러남,제안

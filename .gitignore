@@ -1,0 +1,10 @@
+# Claude Code 개인 설정
+.claude/settings.local.json
+
+# 운영체제
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# 엑셀이 열어 둔 파일의 잠금 파일
+~$*
