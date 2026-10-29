@@ -124,7 +124,7 @@ Rg.step=()=>{
   Rg.arcsEnabled();
   stepSalg();
   if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT)Rg.startGangcheol();
-  if(has('doerim_yak')&&!G.f.yakDone)Rg.goHome();
+  if(has('doerim_yak')&&!G.f.yakDone){G.f.yakDone=true;Rg.offerReturnPrep();}
 };
 Rg.onHit=()=>{};
 Rg.faint=()=>{G.px=Math.max(60,G.px-90);toast('눈보라에 밀려 물러났다');};
@@ -149,7 +149,7 @@ if(!CLASSIC){
   const sign=(x,y)=>a().door(x,y);
   const stepCommon=()=>{
     Rg.arcsEnabled();
-    if(has('doerim_yak')&&!G.f.yakDone)Rg.goHome();
+    if(has('doerim_yak')&&!G.f.yakDone){G.f.yakDone=true;Rg.offerReturnPrep();}
   };
   // 전환 전 화면은 한 장만 보관한다. 구역 코드가 바뀌거나 새 게임이면 버린다.
   const image=document.createElement('canvas');image.width=W;image.height=H;

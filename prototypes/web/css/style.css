@@ -42,6 +42,7 @@ h1 span{color:var(--gold)}
 .goal b{font-family:var(--ui);font-weight:normal;color:var(--dan);font-size:.85em;margin-right:6px}
 .hud-btns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;pointer-events:auto;max-width:65%}
 .hud #btnSound,.hud #btnVolume{position:relative;z-index:21;visibility:visible}
+.shell:has(>.panel:not([hidden])) .hud #btnSound,.shell:has(>.panel:not([hidden])) .hud #btnVolume{visibility:hidden;pointer-events:none}
 .chipbtn{font-family:var(--ui);font-size:clamp(11px,1.45vw,14px);background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:4px;padding:3px 10px;cursor:pointer;touch-action:manipulation}
 .chipbtn:hover{background:#fff6e0}
 button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -54,9 +55,9 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .prompt{position:absolute;transform:translate(-50%,-100%);background:var(--hanji);color:var(--meok);font-size:clamp(10px,1.35vw,13px);padding:3px 9px;border-radius:12px;border:1px solid var(--meok);white-space:nowrap;cursor:pointer;touch-action:manipulation;font-family:var(--ui)}
 .prompt::after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);border:5px solid transparent;border-bottom:0;border-top-color:var(--meok)}
 .toast{position:absolute;top:22%;left:50%;transform:translateX(-50%);background:rgba(26,19,15,.9);color:var(--hanji);padding:6px 14px;border-radius:4px;font-size:clamp(11px,1.6vw,15px);border-left:3px solid var(--gold);max-width:84%;text-align:center;pointer-events:none}
-.vista-caption{position:absolute;left:0;right:0;bottom:0;padding:8px 12px 6px;background:rgba(26,19,15,.86);color:#fff3cf;pointer-events:none;font-family:var(--display);line-height:1.5}
-.vista-thought{margin:0 0 3px;font-size:clamp(13px,1.8vw,18px);white-space:pre-line}
-.vista-return{margin:0;text-align:right;font-family:var(--ui);font-size:clamp(10px,1.25vw,12px)}
+.vista-caption{position:absolute;left:0;right:0;bottom:0;color:#fff3cf;pointer-events:none;font-family:var(--display);line-height:1.5}
+.vista-thought{margin:0;padding:8px 12px 6px;background:rgba(26,19,15,.86);font-size:clamp(13px,1.8vw,18px);white-space:pre-line}
+.vista-return{width:max-content;max-width:100%;margin:0 0 0 auto;padding:3px 10px 4px;background:rgba(26,19,15,.78);text-align:right;font-family:var(--ui);font-size:clamp(10px,1.25vw,12px)}
 
 /* 대화 시트 */
 .dialog{position:absolute;left:2.5%;right:2.5%;bottom:3.5%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(8px,1.6vw,16px);align-items:start;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;padding:clamp(8px,1.6vw,16px);box-shadow:0 6px 0 rgba(0,0,0,.35);cursor:pointer;z-index:5}

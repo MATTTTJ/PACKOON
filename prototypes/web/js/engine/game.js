@@ -47,16 +47,21 @@ const GameMusic=(()=>{
     const factor=open('dlg')||vistaMode||brewing||!!craftHands?0.72:1;
     if(factor!==duck){duck=factor;player.setDucking(duck,.18);}
     const travelling=player.getState().travel;
-    // 다음 지역의 시작 화면은 길 위 간주를 끊지 않는다. 대화·전투는 기존 장면곡을 우선한다.
-    if(travelling&&['region','title'].includes(target.kind))return;
-    if(travelTo&&['region','title'].includes(target.kind)){
+    // 도착 대화·패널·경치는 길 위 간주를 지우지 않는다. 전투와 장단은 먼저 들려주고 끝난 뒤 한 번 잇는다.
+    const sceneFirst=['battle','rhythm','ending'].includes(target.kind);
+    if(travelling&&!sceneFirst)return;
+    if(travelTo&&!sceneFirst){
       if(!Sound.enabled||!Sound.context||Sound.context.state!=='running'||document.hidden||!player.getState().unlocked)return;
       const destination=travelTo;travelTo=null;requested=destination;pending=false;const ticket=++requestCount;
       history.push({id:destination,kind:'travel',region:G.region,zone:G.zone,audioTime:Sound.context.currentTime});
-      player.travel(destination).then(ok=>{if(!ok&&ticket===requestCount)pending=true;}).catch(error=>{console.error('간주 재생 실패:',error);});
+      player.travel(destination).then(ok=>{if(!ok&&ticket===requestCount){travelTo=destination;requested=undefined;pending=true;}}).catch(error=>{console.error('간주 재생 실패:',error);});
       return;
     }
-    if(travelling||travelTo){travelTo=null;requested=undefined;}
+    if(sceneFirst){
+      if(target.kind==='ending')travelTo=null;
+      else if(travelling)travelTo=travelling.to;
+      if(travelling)requested=undefined;
+    }
     if(target.id===requested&&!pending)return;
     if(!target.id){requestCount++;player.stop(.12);requested=null;pending=false;return;}
     if(!Sound.enabled||!Sound.context||Sound.context.state!=='running'||document.hidden||!player.getState().unlocked){

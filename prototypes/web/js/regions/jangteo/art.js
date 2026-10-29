@@ -278,14 +278,25 @@ function townVista(midCam,t,inn=false){
   for(let row=0;row<4;row++){
     const step=47+row*9,off=Math.round(offset*(.45+row*.16)),base=142+row*22;
     for(let i=Math.floor(off/step)-2;i<Math.floor(off/step)+W/step+4;i++){
-      const x=i*step-off+Math.round(hash(i+row*31)*12),y=base-Math.round(hash(i*5+row*17)*11),w=29+row*5,h=13+row*3;
+      const seed=i*17+row*47,shape=Math.floor(hash(seed+9)*4);
+      const x=i*step-off+Math.round(hash(i+row*31)*12),y=base-Math.round(hash(i*5+row*17)*11),
+        w=23+row*5+Math.floor(hash(seed+3)*13),h=10+row*3+Math.floor(hash(seed+7)*8);
       const lane=230+Math.round(Math.sin((y-125)*.047)*75)-offset%39;
       if(Math.abs(x+w/2-lane)<16+row*4)continue;
       P(x,y,w,h,n()?(row%2?'#51515d':'#5d5156'):(row%2?'#b3a18a':'#b8a38b'));
       P(x-3,y-4,w+6,5,n()?'#26384c':'#647987');P(x+1,y-6,w-2,2,n()?'#97acbd':'#faf7ed');
       P(x-5,y-2,5,1,n()?'#8fa5b6':'#f3f5ef');P(x+w,y-2,5,1,n()?'#8fa5b6':'#f3f5ef');
-      P(x+5,y-8,w-10,2,n()?'#647f94':'#dce8e8');P(x+8,y-10,w-16,2,n()?'#647f94':'#dce8e8');
-      for(let k=0;k<3;k++){P(x+4+k*(8+row),y+4,4,4+row,n()?'#e6b774':'#e2d6b9');if(n()&&k===1)P(x+5+k*(8+row),y+5,2,2,'#ffe0a0');}
+      if(shape===0){
+        // 낮고 둥근 초가. 기와 지붕 사이에 지붕 선과 색을 달리 둔다.
+        P(x-2,y-7,w+4,4,n()?'#766955':'#b7a879');P(x+3,y-10,w-6,3,n()?'#92836a':'#d4c9a5');
+        P(x+1,y-8,w-2,1,n()?'#baae8b':'#f1e9ce');
+      }else{
+        const rise=shape===1?4:shape===2?8:11;
+        for(let ry=0;ry<rise;ry+=2){const inset=3+Math.floor(ry*(shape===3?.7:1.2));P(x+inset,y-6-ry,w-inset*2,2,n()?'#536d84':'#bed0d8');}
+        if(shape===3){P(x+w-10,y-15,3,10,n()?'#394457':'#7c8790');P(x+w-12,y-16,7,2,n()?'#8d9eac':'#f4f0df');}
+      }
+      const windows=w<30?2:3;
+      for(let k=0;k<windows;k++){const wx=x+4+k*Math.floor((w-8)/windows);P(wx,y+4,4,Math.min(4+row,h-5),n()?'#e6b774':'#e2d6b9');if(n()&&k===1)P(wx+1,y+5,2,2,'#ffe0a0');}
       if((i+row)%4===1){P(x+1,y+h-5,w-2,3,n()?'#965543':'#b94e43');P(x+3,y+h-5,w-6,1,n()?'#cf9660':'#dfa26b');}
       if((i+row)%3===0){lantern(x+w+3,y+3,1);}
       if(!n()&&(i+row)%6===0){P(x+8,y-13,3,8,'#93836f');smoke(x+8,y-18,i);}

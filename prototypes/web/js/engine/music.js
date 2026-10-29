@@ -445,7 +445,7 @@
           session.enteredLoop = true;
           clockEvent('intro-loop', { id: session.id, when: session.when, previousBufferEnd: session.lastEnd, fromFrame: session.frame, toFrame: session.frame, sampleRate: rate, gapSeconds: session.lastEnd === undefined ? null : session.when - session.lastEnd });
         }
-        const segmentEnd = session.frame < pcm.loopStartFrame ? pcm.loopStartFrame : endFrame;
+        const segmentEnd = session.frame < pcm.loopStartFrame ? Math.min(pcm.loopStartFrame, endFrame) : endFrame;
         const length = Math.min(Math.round(chunkSeconds * rate), segmentEnd - session.frame, Math.floor((until - session.when) * rate));
         if (length < 1) break;
         const buffer = context.createBuffer(2, length, rate);
@@ -500,9 +500,19 @@
       if (!destination || request !== serial) return false;
       const next = { id: interlude, pcm: bridge, phase: 'interlude', next: { id, pcm: destination, phase: 'intro' } };
       loading = false; travelPlan.phase = 'outro';
-      if (current) { current.next = next; current.endFrame = current.pcm.loopEndFrame || current.pcm.scoreFrames; }
+      let outro = null;
+      if (current) {
+        const track = tracks.get(current.id), rate = current.pcm.sampleRate;
+        const barFrames = Math.max(1, Math.round(track.meter[0] * 4 / track.meter[1] * 60 / track.tempo * rate));
+        // 이미 예약된 버퍼를 자르지 않고 다음 마디까지만 잇는다. 긴 반복 전체를 기다리지 않는다.
+        const boundary = (Math.floor(current.frame / barFrames) + 1) * barFrames;
+        current.next = next;
+        current.endFrame = Math.min(boundary, current.pcm.loopEndFrame || current.pcm.scoreFrames);
+        outro = { queuedFrame: current.frame, cutoffFrame: current.endFrame, sampleRate: rate,
+          endsAt: current.when + (current.endFrame - current.frame) / rate };
+      }
       else queuedSession(next, context.currentTime + .035);
-      clockEvent('travel-outro', { id: current && current.id, to: id, interlude });
+      clockEvent('travel-outro', { id: current && current.id, to: id, interlude, outro });
       schedule(); startTimer(); emit(); return true;
     }
     async function play(id, settings = {}) {

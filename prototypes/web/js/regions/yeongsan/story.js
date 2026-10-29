@@ -220,6 +220,7 @@ function talkDad(){
       ['아빠','(아빠가 돌아본다. 입을 열지만 아무 소리도 나오지 않는다.)']],()=>gesture(0));return;}
   if(!F.dadDone){gesture(0);return;}
   if(!F.nameGiven){talk([['아빠','(아빠가 신목 쪽을 가리키고, 내 어깨를 두드린다.)']]);return;}
+  if(F.yakDone){returnPrep();return;}
   talk([['아빠','(아빠가 보따리 속 약연을 가리키며 고개를 끄덕인다.)']]);
 }
 
@@ -263,8 +264,19 @@ function talkSangun(){
     return;
   }
   if(!F.yakDone){makeReturningMedicine();return;}
-  talk([['산군 할아버지','셈은 맞았다. 가거라. 봄이다.']]);
+  returnPrep();
 }
+/* 되돌림 약을 만든 뒤에도 봄길과 선택 가공을 둘러볼 수 있다. 귀향은 직접 고른다. */
+function returnPrep(){
+  if(!G.f.yakDone||G.ended)return;
+  talk([['아빠','(약을 보자기에 싸고, 약연 바퀴에 남은 가루를 턴다. 내 손이 닿도록 약연을 돌려 놓는다.)'],
+    ['너구리','엄마 약은 챙겼어.\n같이 마실 것도 갈아 갈까?',[
+      {t:'아빠와 집으로 돌아간다',go:()=>Rg.goHome()},
+      {t:'보따리를 열어 약연으로 더 만든다',go:()=>{toggleBag();toast('약연에 마가목과 대추를 넣어 보자 · 돌아갈 땐 아빠나 산군에게 말 걸기');}},
+      {t:'봄이 온 호수를 조금 더 둘러본다',go:()=>toast('준비되면 아빠나 산군에게 말 걸어 집으로 돌아가기')}
+    ]]]);
+}
+Rg.offerReturnPrep=returnPrep;
 function giveName(){
   const F=G.f;if(F.nameGiven)return;
   F.nameGiven=true;ledgerDone('sangun');rel('sangun',1);learn('sangun:name');
@@ -293,7 +305,7 @@ function makeReturningMedicine(){
   G.f.yakDone=true;refreshHud();Sound.craft();
   talk([['아빠','(아빠 손을 따라 바퀴를 앞으로 굴렸다. 마지막에는 한 번 거꾸로.)'],
     ['너구리','(열매가 곱게 갈린다. 약연 바퀴에 비친 봄빛이 약에 스며든다.)'],
-    ['너구리','엄마 약이다.']],()=>Rg.goHome());
+    ['너구리','엄마 약이다.']],returnPrep);
 }
 
 /* ---------- 서리무기 전투 ---------- */
@@ -316,15 +328,20 @@ Rg.fruitFound=()=>{
   setTimeout(()=>toast('아빠가 적어 둔 "여기다."의 신목이다. 산군 할아버지에게 가자'),1600);refreshGoal();
 };
 
-/* 호숫가 까치에게 보내는 마지막 안부. 진행에 쓴 뒤 남은 열매만 건넨다. */
-Rg.homeReply='돌아온 까치가 두 날개를 둥글게 모아 가슴에 댔다. 엄마도 빨간 열매를 두 손으로 감싸고 한참 품고 있었단다.';
+/* 호숫가 까치에게 보내는 마지막 안부. 공통 발송 API가 받는 가공품과 그림을 고른다. */
+Rg.homeReply=parcel=>parcel.itemId?
+  '돌아온 까치가 두 날개를 둥글게 모아 가슴에 댔다. 엄마도 네가 만든 것을 두 손으로 감싸고 한참 품고 있었단다.':
+  '돌아온 까치가 날개로 호수 모양을 그렸다. 엄마는 네 그림을 무릎에 펴 놓고 손끝으로 물길을 따라갔단다.';
 Rg.offerHomeGift=()=>{
-  if(!G.f.shortcut||!has('magamok')||knows('home:yeongsan')||typeof sendHomeGift!=='function')return false;
-  talk([['늙은 까치','마가목이 남았구나. 엄마에게 한 알 전해 줄까?',[
-    {t:'마가목 한 알을 엄마에게 보낸다',go:()=>{
-      if(!has('magamok')||knows('home:yeongsan'))return;
-      sendHomeGift('yeongsan','magamok');
-    }},{t:'같이 돌아가서 드릴게',go:null}]]]);return true;
+  if(!G.f.shortcut||knows('home:yeongsan')||typeof sendHomeGift!=='function')return false;
+  const choices=['magamok_tea','ssanghwa'].filter(id=>has(id)).map(id=>({
+    t:ITEMS[id].n+' 하나를 엄마에게 보낸다',go:()=>{
+      if(sendHomeGift('yeongsan',id))talk([['늙은 까치','고리는 이쪽에 남겨 두마.\n네가 집에 갈 때 엄마와 함께 풀어 보렴.']]);
+    }}));
+  choices.push({t:'봄 호수 그림을 엄마에게 보낸다',go:()=>{
+    if(sendHomeGift('yeongsan',null))talk([['늙은 까치','물길도 새잎도 그렸구나.\n구겨지지 않게 보자기 안에 넣으마.']]);
+  }},{t:'같이 돌아가서 드릴게',go:null});
+  talk([['늙은 까치','남쪽으로 갈 채비를 하던 참이란다.\n만든 것이나 호수 그림을 엄마에게 먼저 전해 줄까?',choices]]);return true;
 };
 
 /* ---------- 끝: 집으로 ---------- */
@@ -402,6 +419,7 @@ Rg.goal=()=>{
   if(!G.boss.dead)return '언 호수의 서리무기와 맞서기 (부수거나 달래기)';
   if(!F.fruitGot)return '신목의 전설의 열매 따기';
   if(!F.nameGiven)return '산군 할아버지에게 셈하러 가기';
+  if(F.yakDone)return '봄길·약연 가공 더 둘러보기 · 준비되면 아빠나 산군에게 말 걸어 귀향';
   return '아빠와 손을 포개 약연 굴리기';
 };
 })();

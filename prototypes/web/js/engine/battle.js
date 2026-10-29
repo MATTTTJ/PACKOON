@@ -265,7 +265,7 @@ function bStrike(){
     if(Math.hypot(s.x-B.px,s.y-B.py)<26){
       B.warm.thaw={...B.warm.ice,t:90};
       B.warm.ice=null;B.mark=null;B.calm=Math.min(100,B.calm+B.E.calmAction.amount);
-      B.msg='얇은 얼음을 걷자 따뜻한 물이 흐른다. 강철이가 숨을 고른다.';
+      B.msg='얇은 얼음을 걷자 따뜻한 물이 흐른다. 서리무기가 숨을 고른다.';
       B.st='idle';B.t=36;renderBHud();if(B.calm>=100)bEnd('calm');return;
     }
   }
@@ -476,12 +476,12 @@ $('bResOk').onclick=()=>{
 
 /* 터치로 손 끌기 */
 let bDrag=null;
-bcv.addEventListener('pointerdown',e=>{if(!B)return;if(B.E.vinePath&&(B.paused||B.handShow>0||B.st==='end'||bDrag))return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={pointerId:e.pointerId,x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
-bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||(B.E.vinePath&&e.pointerId!==bDrag.pointerId))return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
+bcv.addEventListener('pointerdown',e=>{if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||bDrag)return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={pointerId:e.pointerId,x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
+bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||e.pointerId!==bDrag.pointerId)return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
   const speed=battleHandProfile().speed/TABLES.TUNING.battle_bare_speed;
   B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);if(B.E.vinePath)moveVine();});
-function endDrag(e){if(e&&B&&B.E.vinePath&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;if(!e)vinePointers.clear();}bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
-bcv.addEventListener('lostpointercapture',e=>{if(B&&B.E.vinePath)endDrag(e);});
+function endDrag(e){if(e&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;if(!e)vinePointers.clear();}bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
+bcv.addEventListener('lostpointercapture',endDrag);
 
 /* ---------- 전투 화면 그리기 ---------- */
 function drawTool(c,kind){

@@ -150,6 +150,19 @@ function azalea(x,y,size=1,seed=0){
     px(bx-1*size,by-4*size,3*size,7*size,'#e3a2bc');px(bx,by,1*size,1*size,'#f1d0cd');
   }
 }
+function azaleaRidge(camera,base,seed=0,height=18){
+  // 낮은 덤불이 산자락의 굴곡을 따라 이어진다. 신목 수관에는 꽃을 얹지 않는다.
+  for(let row=0;row<3;row++){
+    const step=9+row*2,offset=camera;
+    for(let i=Math.floor(offset/step)-3;i<Math.floor(offset/step)+W/step+4;i++){
+      const x=i*step-offset,u=x+camera+seed,
+        y=base-Math.abs(Math.sin(u*.009))*height-Math.abs(Math.sin(u*.0037))*height*.42+row*5+hash(i+row*19)*3;
+      const size=.32+row*.075+hash(i*11+seed+row*37)*.07;
+      px(x-5,y-5,step+3,6,row===0?'#aa7395':row===1?'#c181a4':'#d391ae');
+      azalea(x,y,size,i*13+seed+row*29);
+    }
+  }
+}
 function mist(camera,y,bloom=false){
   for(let i=0;i<7;i++){
     const x=((i*79-camera*.23)%530+530)%530-65;
@@ -206,7 +219,7 @@ A.back=zone=>{
   mountains(Math.round(cam*.17),151,38,pink()?'#ad99b4':'#506783',109);
   mountains(Math.round(cam*.28),179,22,pink()?'#8797a3':'#748fa5',384);
   mist(cam,142,pink());birds(cam,49,pink());
-  if(pink())for(let i=0;i<8;i++)azalea(i*67-(cam*.24)%67,166+i%3*6,.45,i*13);
+  if(pink())azaleaRidge(Math.round(cam*.28),179,384,22);
   ground(zone);
 };
 A.scenery=zone=>{
@@ -331,7 +344,7 @@ A.springLayers=[
   {speed:.05,draw:c=>{
     mountains(c,119,24,'#c5abc0',33);mountains(c,135,18,'#b39fb7',180);
     px(0,141,W,99,'#a9bbc8');for(let i=0;i<22;i++)px(i*23-c*.25,147+i%6*8,17,1,'#d8d6df');
-    for(let i=0;i<11;i++)azalea(i*43-c*.35,134+i%3*4,.42,i*9);
+    azaleaRidge(c,135,180,18);
   }},
   {speed:.08,draw:c=>{mist(c,146,true);birds(c,58,true);}},
   {speed:.12,draw:c=>{

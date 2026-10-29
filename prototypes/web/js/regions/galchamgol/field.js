@@ -100,8 +100,8 @@ Rg.step=()=>{
   if(!G.boss.dead&&G.barrier.cut&&G.px>KUDZU_AT)Rg.startKudzu();
   if(G.drop){const d=G.drop;d.vy=Math.min(4,d.vy+0.15);d.y=Math.min(GROUND-3,d.y+d.vy);
     if(Math.abs(d.x-G.px)<12&&G.py>d.y-6){G.drop=null;addItem('meoru',1);
-      clue('h1','아빠의 수첩','수첩 속 아빠의 해머루 그림 옆에 나중에 덧쓴 글씨: "여기도 아니다."');
-      diary('meoru','해머루를 붓으로 그리려고 아빠의 수첩을 펼쳤다. 아빠의 해머루 그림 옆에, 처음 볼 땐 몰랐던 덧쓴 글씨가 있었다. "여기도 아니다."');
+      clue('h1','아빠의 수첩','젊은 아빠가 수첩의 해머루 그림 옆에 적은 글씨: "여기도 아니다."');
+      diary('meoru','해머루를 붓으로 그리려고 아빠의 수첩을 펼쳤다. 젊은 아빠가 그림 옆에 적어 둔 글씨를 다시 읽었다. "여기도 아니다." 아빠도 이 열매를 보고 더 북쪽으로 갔구나.');
       ledger('toad','두꺼비 할멈','해머루 1','엄마의 병을 늦추는 약');
       setTimeout(()=>toast('수첩의 아빠 그림 옆에 글씨가 있다… 두꺼비 할멈에게 가져가자'),1600);refreshGoal();}}
 };

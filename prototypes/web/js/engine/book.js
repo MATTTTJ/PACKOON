@@ -35,10 +35,11 @@ function renderChildNotes(body,section){
 function childNoteSection(line){return line.when?.startsWith('habit:')?'손버릇':line.when?.startsWith('recipe:')?'숨은 가공법':'관찰';}
 function renderMomNote(body){
   const stage=G.f.momNoteRestored?0:(G.f.momNoteFade||0),paper=el('div','mom-note');
-  paper.dataset.fade=stage;paper.setAttribute('role','img');paper.setAttribute('aria-label','엄마가 겨우 써 준 쪽지. '+MOM_NOTE.join(' '));
+  const recipient=G.f.momNoteRestored&&G.f.newName?G.f.newName:'＿＿＿',lines=[recipient+'에게',...MOM_NOTE];
+  paper.dataset.fade=stage;paper.setAttribute('role','img');paper.setAttribute('aria-label','엄마가 겨우 써 준 쪽지. '+lines.join(' '));
   paper.appendChild(el('small',null,G.f.momNoteRestored?'다시 또렷해진 엄마의 글씨':'출발하는 날, 엄마가 건넨 한 장'));
   let index=0;
-  for(const text of MOM_NOTE){const line=el('p');for(const ch of text){
+  for(const text of lines){const line=el('p');for(const ch of text){
     const glyph=el('span',null,ch);glyph.setAttribute('aria-hidden','true');
     const wear=(index++*7+3)%11;glyph.style.opacity=stage===0?'1':String(Math.max(.08,1-stage*(.15+wear*.025)));line.appendChild(glyph);
   }paper.appendChild(line);}
@@ -46,7 +47,7 @@ function renderMomNote(body){
   body.appendChild(el('p','small',stage?'길을 옮길 때마다 글씨가 조금씩 흐려졌다. 엄마가 건넨 마음은 남아 있다.':'접힌 자리에 엄마 손때가 남아 있다.'));
   // 흐려짐은 그림 연출뿐이다. 쪽지 내용을 다시 읽을 수 있다.
   const transcript=el('details','mom-transcript');transcript.appendChild(el('summary',null,'쪽지 글 다시 읽기'));
-  MOM_NOTE.forEach(text=>transcript.appendChild(el('p',null,text)));body.appendChild(transcript);
+  lines.forEach(text=>transcript.appendChild(el('p',null,text)));body.appendChild(transcript);
 }
 function renderBook(){
   document.querySelectorAll('#bookTabs button').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===bookTab);b.textContent=BOOK_TABS[b.dataset.tab];});
