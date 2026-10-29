@@ -14,38 +14,121 @@ function makePanel(id,title,btn){
 }
 
 /* ---------- 모락 (반달가슴곰 떡집): 김 올리기 ---------- */
-/* 김 올리기: 부채질(누르기)로 불을 올리면 김이 따라 오른다. 김을 금빛 칸에 맞춰 두면 잦아들던 게 차오른다. 너무 세면 멈출 뿐 깎이지 않는다 (임시 규칙) */
+/* 김 올리기 (제안): 금빛 칸 누적 5초. 위태로워도 3초간 회복할 수 있고 쌓인 시간은 깎이지 않는다.
+   후반 외풍은 한 번만. 실패는 같은 키/버튼으로 재시작하며 물건·호감·진행 보상 규칙은 그대로 둔다. */
 const steamP=makePanel('steam','떡집 아궁이 · 김 올리기','부채질');
-const sm={fire:0,steam:0,prog:0,over:false,band:[55,80],cool:0};
+const sm={fire:0,steam:0,prog:0,band:[55,80],cool:0,t:0,danger:0,close:false,
+  state:'playing',wind:0,windDone:false,voice:'',voiceCool:0,lastLine:''};
 const scv=$('steamCv'),sx=scv.getContext('2d');
-function openSteam(){Object.assign(sm,{fire:10,steam:0,prog:0,over:false,cool:0});$('steamHint').textContent='부채질로 불을 조금씩 올리자. 김이 금빛 칸에 머물면 시루가 데워진다.';steamP.hidden=false;drawSteam();}
+const steamLines={
+  start:['자, 부채는 조금씩! 김을 보렴.','급할수록 불은 살살 다루자.','떡은 김이 반이야. 해 보자!'],
+  good:['허허, 김이 참 곱게도 오른다!','그래, 그 김으로 떡이 익는다.','좋다! 대목 일손 하나 늘었네.'],
+  high:['어이쿠, 뚜껑 뜬다! 부채 쉬어.','김이 넘친다! 잠깐 쉬어라.','그만 부쳐도 돼. 김부터 보자.'],
+  low:['불씨 잦아든다! 한 번 부쳐라.','아궁이 식겠다. 살살 부쳐 봐.','불씨만 살리자. 조금씩 부쳐.'],
+  wind:['외풍이다! 불씨 좀 살펴다오.','찬바람 드네. 부채질 조금만!'],
+  fail:['괜찮다! 다시 불 지피면 되지.','허허, 떡집 불은 다시 살리면 돼.','손해 볼 것 없다. 다시 해 보자.'],
+  close:['휴, 불씨 살렸네! 제법인걸.','아슬아슬했지? 그래도 잘 쪘다!'],
+  success:['허허, 이 김이면 떡이 잘 익지!','좋다! 떡 찌는 손이 다 됐네.']
+};
+function steamSay(kind){
+  if(sm.voice===kind&&sm.voiceCool>0)return;
+  if(sm.voiceCool>0&&kind==='good')return;
+  const choices=steamLines[kind].filter(s=>s!==sm.lastLine);
+  sm.lastLine=choices[Math.floor(Math.random()*choices.length)];sm.voice=kind;sm.voiceCool=150;
+  $('steamHint').textContent='모락: “'+sm.lastLine+'”';
+}
+// 김 올리기 전용 합성음. AudioContext 생성은 steamHit의 사용자 입력에서만 허용한다.
+// 공통 sound.js로 옮길 때 이 함수와 ctx/enabled 상태만 떼어 내면 된다.
+const steamAudio={ctx:null,enabled:true};
+function steamSound(kind,userInput=false){
+  if(!steamAudio.enabled)return;
+  try{
+    if(!steamAudio.ctx){if(!userInput)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;steamAudio.ctx=new AC();}
+    const a=steamAudio.ctx;if(a.state==='suspended'){if(userInput)a.resume().catch(()=>{});return;}
+    if(a.state!=='running')return;
+    const now=a.currentTime,duration=kind==='fan'?0.16:kind==='lid'?0.08:0.12;
+    const gain=a.createGain();gain.gain.setValueAtTime(0.0001,now);
+    gain.gain.exponentialRampToValueAtTime(kind==='lid'?0.035:0.025,now+0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001,now+duration);gain.connect(a.destination);
+    let source;
+    if(kind==='fan'){
+      const buffer=a.createBuffer(1,Math.ceil(a.sampleRate*duration),a.sampleRate),data=buffer.getChannelData(0);
+      for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
+      source=a.createBufferSource();source.buffer=buffer;
+      const filter=a.createBiquadFilter();filter.type='lowpass';filter.frequency.value=900;source.connect(filter);filter.connect(gain);
+    }else{
+      source=a.createOscillator();source.type=kind==='lid'?'triangle':'sine';
+      source.frequency.setValueAtTime(kind==='lid'?420:150,now);
+      source.frequency.exponentialRampToValueAtTime(kind==='lid'?170:65,now+duration);source.connect(gain);
+    }
+    source.onended=()=>{source.disconnect();gain.disconnect();};source.start(now);source.stop(now+duration);
+  }catch(_){/* 소리를 쓸 수 없는 환경에서도 계속 진행한다. */}
+}
+const steamMute=el('button','btn');steamMute.type='button';steamMute.textContent='김 올리기 소리 끄기';
+steamMute.setAttribute('aria-pressed','true');steamMute.onclick=()=>{
+  steamAudio.enabled=!steamAudio.enabled;steamMute.textContent='김 올리기 소리 '+(steamAudio.enabled?'끄기':'켜기');
+  steamMute.setAttribute('aria-pressed',String(steamAudio.enabled));
+};steamP.appendChild(steamMute);
+function openSteam(){
+  Object.assign(sm,{fire:25,steam:0,prog:0,cool:0,t:0,danger:0,close:false,state:'playing',wind:0,windDone:false,voice:'',voiceCool:0});
+  $('steamBtn').innerHTML='부채질 <kbd>Space · J</kbd>';
+  $('steamPips').textContent='금빛 칸에 모두 5초 · 칸 밖에서도 쌓인 시간은 그대로';
+  steamP.hidden=false;steamSay('start');drawSteam();
+}
 function drawSteam(){
   const c=sx,Wc=320,Hc=120;c.fillStyle='#efe3c8';c.fillRect(0,0,Wc,Hc);
   // 아궁이와 불
   c.fillStyle='#6e5b4b';c.fillRect(20,60,90,50);c.fillStyle='#2a1a10';c.fillRect(36,78,58,32);
-  const fh=6+sm.fire*0.24;for(let i=0;i<5;i++){c.fillStyle=['#ff7b2e','#ffb347','#e8551f'][(i+Math.floor(G.anim/5))%3];c.fillRect(40+i*11,110-fh-((i*7)%5),8,fh);}
+  const fh=sm.fire*0.3;for(let i=0;i<5;i++){c.fillStyle=['#ff7b2e','#ffb347','#e8551f'][(i+Math.floor(sm.t/5))%3];c.fillRect(40+i*11,110-fh-((i*7)%5),8,fh);}
   // 시루와 김
   c.fillStyle='#9b5b3a';c.fillRect(30,40,70,22);c.fillStyle='#e6b54a';c.fillRect(28,38,74,4);
-  const n=Math.floor(sm.steam/12);for(let i=0;i<n;i++){const k=(G.anim*0.8+i*14)%40;c.fillStyle='rgba(255,255,255,'+(0.8-k/60).toFixed(2)+')';c.fillRect(40+((i*13)%50)+Math.sin((G.anim+i*30)*0.05)*4,34-k,8,5);}
+  const lift=sm.steam>80?Math.abs(Math.sin(sm.t*0.5))*((sm.steam-80)/3):0;
+  c.fillStyle='#6e4630';c.fillRect(27,33-lift,76,5);c.fillRect(59,29-lift,12,4);
+  const n=Math.floor(sm.steam/10);for(let i=0;i<n;i++){const k=(sm.t*(sm.steam>80?1.6:0.8)+i*14)%40;c.fillStyle='rgba(255,255,255,'+(0.8-k/60).toFixed(2)+')';c.fillRect(32+((i*13)%66)+Math.sin((sm.t+i*30)*0.05)*4+(sm.wind? k*0.5:0),30-k,sm.steam>80?12:8,5);}
+  if(sm.wind){c.fillStyle='#839da2';for(let i=0;i<3;i++)c.fillRect((sm.t*3+i*38)%115,50+i*9,18,1);}
   // 김 막대
   const bx=140,bw=160,by=30;c.fillStyle='#3a2a20';c.fillRect(bx,by,bw,16);c.fillStyle='rgba(220,165,69,.7)';c.fillRect(bx+bw*sm.band[0]/100,by,bw*(sm.band[1]-sm.band[0])/100,16);
   c.fillStyle='#f4efe4';c.fillRect(bx+bw*Math.min(100,sm.steam)/100-2,by-4,4,24);
-  c.fillStyle='#2a2019';c.font='12px "Gowun Dodum", sans-serif';c.fillText('김',bx,by-8);
+  c.fillStyle='#2a2019';c.font='12px "Gowun Dodum", sans-serif';c.fillText(sm.wind?'김 · 외풍!':'김 · 금빛 칸에 맞추기',bx,by-8);
   // 데워진 정도
-  c.fillStyle='#d8c9a6';c.fillRect(bx,by+40,bw,10);c.fillStyle='#b4432a';c.fillRect(bx,by+40,bw*sm.prog/100,10);c.fillStyle='#2a2019';c.fillText('시루가 데워진 정도',bx,by+68);
-  $('steamPips').innerHTML='';
+  c.fillStyle='#d8c9a6';c.fillRect(bx,60,bw,10);c.fillStyle='#b7852f';c.fillRect(bx,60,bw*sm.prog/100,10);c.fillStyle='#2a2019';c.fillText('고른 김 '+(sm.prog/20).toFixed(1)+' / 5초',bx,86);
+  c.fillStyle='#d8c9a6';c.fillRect(bx,94,bw,5);c.fillStyle=sm.danger>90?'#b4432a':'#71824e';c.fillRect(bx,94,bw*(1-sm.danger/180),5);
+  c.fillStyle='#2a2019';c.fillText(sm.state==='failed'?'다시 해 보자!':sm.danger?'불·김 회복 여유':'불씨 '+Math.round(sm.fire)+' · 남은 '+Math.ceil((1800-sm.t)/60)+'초',bx,115);
 }
 function steamStep(){
-  sm.fire=Math.max(0,sm.fire-0.32);sm.steam+=(sm.fire-sm.steam)*0.035;if(sm.cool>0)sm.cool--;
+  if(steamP.hidden||sm.state!=='playing')return;
+  sm.t++;if(sm.voiceCool>0)sm.voiceCool--;
+  if(!sm.windDone&&sm.prog>=65){sm.windDone=true;sm.wind=90;steamSay('wind');}
+  sm.fire=Math.max(0,sm.fire-0.32-(sm.wind?0.20:0));sm.steam+=(sm.fire-sm.steam)*0.035;
+  if(sm.wind>0)sm.wind--;if(sm.cool>0)sm.cool--;
   const inBand=sm.steam>=sm.band[0]&&sm.steam<=sm.band[1];
-  if(inBand&&sm.prog<100){sm.prog=Math.min(100,sm.prog+0.55);if(sm.prog>=100){$('steamHint').textContent='김이 고르게 올랐다!';setTimeout(finishSteam,500);}}
-  if(sm.steam>90&&!sm.over){sm.over=true;$('steamHint').textContent='모락: "아이고, 너무 세다! 떡이 설겠어. 부채를 쉬어라."';}
-  if(sm.steam<sm.band[1]&&sm.over){sm.over=false;$('steamHint').textContent='그렇지, 그대로. 김이 칸 안에 머물게.';}
+  const danger=sm.steam>94||(sm.t>300&&sm.fire<8);
+  sm.danger=Math.max(0,Math.min(180,sm.danger+(danger?1:-3)));if(sm.danger>90)sm.close=true;
+  if(inBand)sm.prog=Math.min(100,sm.prog+100/300);
+  if(sm.prog>=100){
+    sm.state='won';sm.cool=0;steamSay(sm.close?'close':'success');$('steamPips').textContent='금빛 칸 5초 완료!';
+    // 프레임으로 마무리를 기다려 재시작 뒤에 이전 판 타이머가 남지 않게 한다.
+  }else if(sm.danger>=180||sm.t>=1800){
+    sm.state='failed';steamSay('fail');$('steamPips').textContent='물건·호감은 그대로 · 부채질 버튼으로 바로 다시 하기';
+    $('steamBtn').innerHTML='다시 불 지피기 <kbd>Space · J</kbd>';
+  }else if(!sm.wind){
+    if(sm.steam>82||sm.fire>92)steamSay('high');
+    else if(sm.t>120&&sm.fire<35)steamSay('low');
+    else if(inBand)steamSay('good');
+  }
+  if(sm.t%36===0&&sm.steam>40)steamSound(sm.steam>82?'lid':'bubble');
   drawSteam();
 }
-function steamHit(){if(sm.cool>0||sm.prog>=100)return;sm.cool=6;sm.fire=Math.min(100,sm.fire+12);}
+function steamHit(){
+  if(steamP.hidden)return;
+  if(sm.state==='failed'){openSteam();steamSound('fan',true);return;}
+  if(sm.state!=='playing'||sm.cool>0)return;
+  sm.cool=6;sm.fire=Math.min(100,sm.fire+12);steamSound('fan',true);
+}
 $('steamBtn').addEventListener('pointerdown',e=>{e.preventDefault();steamHit();});scv.addEventListener('pointerdown',e=>{e.preventDefault();steamHit();});
-defineMinigame({id:'steam',step:steamStep,hit:steamHit});
+defineMinigame({id:'steam',step:()=>{
+  if(sm.state==='won'){sm.cool++;if(sm.cool>=45)finishSteam();return;}steamStep();
+},hit:steamHit});
 function finishSteam(){
   if(steamP.hidden)return;steamP.hidden=true;const F=G.f;
   F.steamDone=true;awaken('siru');ledgerDone('morak');rel('morak',1);learn('morak:steam');
