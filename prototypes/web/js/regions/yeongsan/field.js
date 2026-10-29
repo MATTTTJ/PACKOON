@@ -128,4 +128,129 @@ Rg.bringSpring=()=>{
   toast('봄이 왔다! 신목에 열매가 열렸다');refreshGoal();
 };
 Rg.SLOPE_X=SLOPE_X;Rg.TREE_X=TREE_X;
+
+/* ---------- PA-43: 침묵을 지나 봄으로. 구역 API만 쓰는 지역 확장 ---------- */
+if(!CLASSIC){
+  Rg.startZone='shelter';
+  const a=()=>Rg.expArt;
+  const snowGate=()=>!!G.f.seolpi;
+  const ledgeGate=()=>!!G.f.shortcut;
+  const snowReason='눈이 허리까지 찬다. 산막의 날쌘에게 설피를 엮어 달라고 하자.';
+  const iceReason='발 디딜 틈이 안 보인다. 비탈의 살금이에게 길을 물어보자.';
+  const sign=(x,y)=>a().door(x,y);
+  const stepCommon=()=>{
+    Rg.arcsEnabled();
+    if(has('doerim_yak')&&!G.f.yakDone)Rg.goHome();
+  };
+  // 전환 전 화면은 한 장만 보관한다. 구역 코드가 바뀌거나 새 게임이면 버린다.
+  const image=document.createElement('canvas');image.width=W;image.height=H;
+  const imageCtx=image.getContext('2d');
+  let lastZone=null,lastOwner=null,zoom=0,zoomOut=false;
+  const order=['shelter','snow','slope','shore','island'];
+  function back(id){
+    if(lastOwner!==G){lastOwner=G;lastZone=id;zoom=0;}
+    if(lastZone!==id){
+      imageCtx.drawImage(cv,0,0);zoom=Vfx.reducedMotion?0:TABLES.TUNING.zone_transition_frames;
+      zoomOut=order.indexOf(id)<order.indexOf(lastZone);lastZone=id;
+    }
+    a().back(id);
+  }
+  function front(){
+    if(Vfx.reducedMotion){zoom=0;return;}
+    if(!zoom)return;
+    const t=1-zoom/TABLES.TUNING.zone_transition_frames;
+    const scale=1+(zoomOut?-.16:.16)*t;
+    ctx.save();ctx.globalAlpha=(1-t)*.65;ctx.translate(W/2,H/2);ctx.scale(scale,scale);
+    ctx.drawImage(image,-W/2,-H/2);ctx.restore();zoom--;
+  }
+  function platforms(id){
+    // 땅 → 중간 발판 → 높은 턱. 놓쳐도 같은 눈밭에 내려선다.
+    const p=[{x:950,y:150,w:72},{x:1020,y:108,w:92},
+      {x:1480,y:150,w:94},{x:1570,y:108,w:110},{x:1680,y:108,w:160},
+      {x:1980,y:150,w:90},{x:2070,y:108,w:112}];
+    if(id==='snow')p.push({x:1840,y:108,w:210});
+    if(id==='shore')p.push({x:1910,y:150,w:100},{x:2000,y:108,w:110});
+    if(id==='island')p.push({x:2180,y:150,w:112});
+    if(id==='slope')p.push({x:835,y:150,w:130},{x:1200,y:150,w:130});
+    return p;
+  }
+  const content=(id,kind)=>Rg.expContent?.[kind]?.[id]||[];
+  function zone(id,npcs,exits,doors=[]){return {
+    w:2600,startX:70,ground:GROUND,npcs,platforms:platforms(id),exits,doors,
+    drawBack:()=>back(id),drawScenery:()=>{
+      a().scenery(id);
+      fieldItems('pickups').filter(p=>p.item==='magamok').forEach(p=>drawRowan(p.x));
+      if(id==='island')drawCoil();
+      if(id==='shore'){
+        const x=2360-cam;
+        R(x,GROUND,240,H-GROUND,G.f.spring?'#739cae':'#c4dce8');
+        if(!G.f.spring)for(let i=0;i<6;i++){
+          R(x+i*42,GROUND+3,28,1,'#edf5f6');R(x+14+i*42,GROUND+8,2,10,'#91b1c7');
+        }
+        else for(let i=0;i<8;i++)R(x+i*32,GROUND+7+i%3*5,16,1,'#c6e1e7');
+      }
+    },
+    drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:Rg.onPickup,
+    onHit:Rg.onHit,faint:Rg.faint,
+    weather:Rg.weather,weatherFront:front,ambient:()=>Rg.stepDadPose?.(),
+    step:stepCommon,
+    get examines(){return content(id,'examines');},
+    get wanderers(){return content(id,'wanderers');},
+    get stamps(){return content(id,'stamps');},
+  };}
+  Rg.zones={
+    shelter:zone('shelter',['nal'],{right:{to:'snow',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y)}},[
+      {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,draw:sign,drawBlocked:(x,y)=>a().blockedSnow(x,y)},
+      {x:1860,to:'shore',toX:680,label:'능선 안쪽 호숫가로',need:ledgeGate,reason:'멀리 본 능선이다. 살금이에게 안쪽 길을 물어보자.',draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
+    ]),
+    snow:zone('snow',[],{left:'shelter',right:'slope'},[
+      {x:2000,y:108,to:'shore',toX:2020,toY:108,label:'바라보던 능선 속으로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
+      {x:180,to:'shelter',toX:1500,label:'눈 굴을 나와 산막으로',draw:sign},
+    ]),
+    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y)}},[
+      {x:2320,to:'shore',toX:170,label:'바위턱을 디뎌 호숫가로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
+    ]),
+    shore:zone('shore',['dad'],{left:'slope'},[
+      {x:680,to:'shelter',toX:1860,label:'능선 안쪽으로 산막에 돌아가기',need:ledgeGate,reason:iceReason,draw:sign},
+      {x:2020,y:108,to:'snow',toX:2000,toY:108,label:'별을 보던 능선으로',need:ledgeGate,reason:iceReason,draw:sign},
+      {x:2320,to:'island',toX:160,get label(){return G.f.spring?'작은 배로 신목 섬에':'언 호수를 걸어 신목 섬에';},
+        need:()=>!!G.f.dadDone,reason:'아빠가 기다리고 있다. 먼저 호숫가에서 말을 걸어 보자.',draw:sign},
+    ]),
+    island:zone('island',['sangun'],{},[
+      {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 아빠 곁으로':'얼음길로 호숫가에 돌아가기';},draw:sign},
+    ]),
+  };
+  Rg.zones.snow.step=()=>{
+    stepCommon();
+    if(G.f.seolpi)G.f.ySnowTrail=Math.max(G.f.ySnowTrail||180,Math.round(G.px));
+  };
+  Rg.zones.slope.step=()=>{stepCommon();stepSalg();};
+  // 겨울에는 오른쪽 얼음길로 걸어 나간다. 봄에는 같은 길이 물에 잠겨 배로만 건넌다.
+  Rg.zones.shore.exits.right={to:'island',toX:160,
+    need:()=>!G.f.spring&&!!G.f.dadDone,
+    reason:'아빠를 먼저 만나자. 봄에 얼음이 풀리면 선착장의 배로 건넌다.'};
+  Rg.zones.shore.maxX=()=>G.f.spring?2340:2584;
+  Rg.zones.island.exits.left={to:'shore',toX:2584,need:()=>!G.f.spring,
+    reason:'얼음길이 물에 잠겼다. 오른쪽 선착장에서 배를 타자.'};
+  Rg.zones.island.step=()=>{
+    stepCommon();
+    if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT)Rg.startGangcheol();
+  };
+  Rg.zones.island.maxX=()=>G.f.sangunMet?2584:BOSS_AT-30;
+  // 겨울에는 얼음길, 봄에는 배로 같은 선착장을 잇는다.
+  // 호수는 이동 문 너머에 두므로 해빙 뒤 물 위를 걷지 않는다.
+  const oldSpring=Rg.bringSpring;
+  Rg.bringSpring=()=>{
+    oldSpring();
+    const fruit=G.pickups[G.pickups.length-1];fruit.id='island_legend_fruit';fruit.zone='island';
+    diary('y_boat','얼음이 녹자 묶어 두었던 작은 배가 떴다. 섬 서쪽 선착장에서 아빠가 있는 호숫가로 돌아갈 수 있다.');
+  };
+  Rg.zones.snow.vistas=[{id:'snow_ridge',x:1600,y:108,from:0,to:640,sound:'wind',draw:sign,
+    thought:'저만큼 걸어왔구나.\n엄마도 저 불빛 너머에 있겠지.',diary:'눈길 능선에서 지나온 고을의 불빛을 보았다. 산 안쪽으로 이어지는 바위턱도 보인다.',
+    get layers(){return a().ridgeLayers;}}];
+  Rg.zones.island.vistas=[{id:'spring_tree',x:2430,from:0,to:640,sound:'water',draw:sign,
+    get thought(){return G.f.spring?'물이 흐른다.\n엄마한테도 이 소리 들려주고 싶다.':'꽃눈이 꼭 닫혀 있네.\n아직 봄을 기다리나 봐.';},
+    diary:'신목 곁에서 호수를 바라봤다. 겨울을 견딘 가지마다 꽃눈이 있다.',
+    get layers(){return G.f.spring?a().springLayers:a().winterLayers||a().ridgeLayers;}}];
+}
 })();

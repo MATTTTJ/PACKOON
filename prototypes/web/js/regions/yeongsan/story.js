@@ -28,6 +28,13 @@ function talkNal(){
 }
 function nalMenu(){
   const F=G.f;
+  if(!CLASSIC&&F.nalYDone){
+    const c=[];
+    if(!F.yCraftJujube)c.push({t:'다래 덩굴로 대추를 바꾼다',go:craftJujube});
+    if(arcs()&&!F.yArcsNal4)c.push({t:'아빠를 어떻게 알아?',go:nalArc});
+    c.push({t:'산길로 간다',go:null});
+    talk([['날쌘',F.shortcut?'눈신에 눈이 꽉 붙었네. 털고 가. 안쪽 길도 이제 알겠지.':'설피 끈 단단히 매. 눈 굴에서는 네 발자국을 따라 돌아오면 돼.',c]]);return;
+  }
   if(F.nalYDone){
     if(arcs()){
       const c=[];
@@ -42,6 +49,20 @@ function nalMenu(){
     talk([['날쌘',vineOK()&&bindOK()?'다 모았네. 이리 줘.':!vineOK()?'산막 옆 덤불을 낫으로 베 봐. 다래 덩굴이 나와.':'짚 하나면 돼. 산막 처마 밑에서 한 줌 빼 와.',c]]);return;
   }
   talk([['날쌘',vineOK()&&bindOK()?'재료는 다 모았군. 이리 내봐.':!vineOK()?'산막 옆 눈 덮인 덤불을 봐라. 네 낫으로 베면 다래 덩굴이 나와.':'짚 하나만 가져와라. 산막 처마 밑 짚단에서 한 줌 빼면 돼.',c]]);
+}
+/* trades.csv t_craft_jujube: 설피를 받은 뒤 남은 덩굴 하나로 대추 둘. */
+function craftJujube(){
+  if(CLASSIC||!G.f.seolpi||G.f.yCraftJujube)return;
+  ledger('t_craft_jujube','날쌘','다래 덩굴 1','대추 2');
+  if(!has('darae_vine')){
+    talk([['날쌘','대추 말려 뒀어. 덩굴 하나만 바꾸자.\n산막 옆이나 눈 굴 끝 덤불을 베 봐.']]);return;
+  }
+  talk([['날쌘','남은 덩굴로 배를 묶어 둘 참이야.\n덩굴 하나에 말린 대추 둘, 어때?',[
+    {t:'바꾼다',go:()=>{
+      if(G.f.yCraftJujube||!has('darae_vine'))return;
+      takeItem('darae_vine',1);addItem('jujube',2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
+      talk([['날쌘','잘 말렸지? 약연을 쓸 수 있게 되면\n마가목이랑 같이 갈아 봐.']]);
+    }},{t:'지금은 놔둘게',go:null}]]]);
 }
 function nalTrade(){
   const F=G.f;
@@ -111,10 +132,10 @@ function salgTrade(){
         ['살금이','이, 이무기가 호수를 휘감아서 봄이 안 와…',salgArcChoices()]]);
       toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();return;
     }
-    clue('y1','살금이','"봄마다 호숫가에 너구리 하나가 와서 신목만 바라봐. 말은 못 하더라."');
-    diary('y_salg','살금이가 얼어붙은 비탈의 지름길을 알려 주었다. 봄마다 호숫가에 말 못 하는 너구리가 와서 신목만 바라본다고 한다.');
+    clue('y1','살금이',CLASSIC?'"봄마다 호숫가에 너구리 하나가 와서 신목만 바라봐. 말은 못 하더라."':'"가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라."');
+    diary('y_salg',CLASSIC?'살금이가 얼어붙은 비탈의 지름길을 알려 주었다. 봄마다 호숫가에 말 못 하는 너구리가 와서 신목만 바라본다고 한다.':'살금이가 얼어붙은 비탈의 지름길을 알려 주었다. 가을부터 호숫가에 말 못 하는 너구리가 머물렀다고 한다.');
     talk([['살금이','고, 고마워…'],['살금이','어, 얼어붙은 비탈 있지? 왼쪽 바위턱을 디디면 호숫가로 올라갈 수 있어.'],
-      ['살금이','봄마다 호숫가에 너구리 하나가 와. 신목만 바라보는데… 말은 못 하더라.'],
+      ['살금이',CLASSIC?'봄마다 호숫가에 너구리 하나가 와. 신목만 바라보는데… 말은 못 하더라.':'가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라.'],
       ['살금이','지, 지금은 이무기가 호수에 똬리를 틀고 있어. 그 녀석 때문에 봄이 안 와…']],()=>{toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();});
   }},{t:'아직은 안 줄래',go:null}]]]);
 }
@@ -268,7 +289,7 @@ Rg.startGangcheol=()=>{
 };
 /* 전설의 열매를 따면 수첩의 아빠 그림 옆 글씨가 보인다 (notes.js 의 got:legend_fruit) */
 Rg.fruitFound=()=>{
-  if(arcs()){
+  if(arcs()||!CLASSIC){
     diary('y_fruit','전설의 열매를 수첩에 그렸다. 아빠의 "여기다."는 젊은 시절 이 신목을 찾아와 적은 메모다.');
     setTimeout(()=>toast('아빠가 적어 둔 "여기다."의 신목이다. 산군 할아버지에게 가자'),1600);refreshGoal();return;
   }
@@ -280,9 +301,13 @@ Rg.fruitFound=()=>{
 Rg.goHome=()=>{
   G.f.yakDone=true;
   diary('y_end','아빠와 함께 약연을 굴려 되돌림 약을 만들었다. 이제 집으로 간다.');
-  talk([['너구리','(아빠와 손을 포개 약연을 굴렸다. 연분홍빛 되돌림 약이 나왔다.)'],
+  const lines=[['너구리','(아빠와 손을 포개 약연을 굴렸다. 연분홍빛 되돌림 약이 나왔다.)'],
     ['아빠','(아빠가 내 어깨를 두드리고 남쪽을 가리킨다. 집이다.)'],
-    ['너구리','가자, 아빠. 엄마한테.']],()=>endGame());
+    ['너구리','가자, 아빠. 엄마한테.']];
+  if(!CLASSIC&&stampCount()>=12)lines.push(
+    ['너구리','(수첩의 열두 도장 위로 아빠 손이 멈췄다.\n빈손으로 돌아온 젊은 날의 길이다.)'],
+    ['아빠','(아빠가 내 발 옆에 발을 나란히 놓는다.\n이번에는 둘이서 돌아간다.)']);
+  talk(lines,()=>endGame());
 };
 /* 끝 화면: 엄마가 지어 준 새 이름을 적는다 (제안). 이름은 이 브라우저 화면에서만 쓴다 */
 Rg.endExtra=box=>{
@@ -305,6 +330,11 @@ Rg.npcs=[
   {id:'dad',name:'아빠',x:1740,talk:talkDad,draw:Rg.art.dad},
   {id:'sangun',name:'산군 할아버지',x:1920,talk:talkSangun,draw:Rg.art.tiger},
 ];
+if(!CLASSIC){
+  const zones={nal:'shelter',salgeumi:'slope',dad:'shore',sangun:'island'};
+  for(const n of Rg.npcs)n.zone=zones[n.id];
+  delete Rg.npcs[0].props; // 확장 산막은 지역 배경이 그린다.
+}
 
 /* ---------- 지금 할 일 ---------- */
 Rg.goal=()=>{
@@ -321,10 +351,199 @@ Rg.goal=()=>{
   if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매 건네기 (귀를 세울 때는 멈추기)':'비탈의 마가목 열매 따기 ('+m+'/3)';}
   if(!F.dadMet)return '얼어붙은 비탈을 지나 호숫가로';
   if(!F.dadDone)return '아빠의 몸짓 읽기 (아빠에게 다시 말 걸기)';
-  if(!F.sangunMet)return '호숫가의 산군 할아버지 찾아가기';
+  if(!F.sangunMet)return CLASSIC?'호숫가의 산군 할아버지 찾아가기':'호숫가 선착장에서 얼음길을 건너 신목 섬의 산군 할아버지 만나기';
   if(!G.boss.dead)return '언 호수의 강철이와 맞서기 (부수거나 달래기)';
   if(!F.fruitGot)return '신목의 전설의 열매 따기';
   if(!F.nameGiven)return '산군 할아버지에게 셈하러 가기';
   return '보따리를 열고 아빠의 약연에 전설의 열매 넣기';
+};
+})();
+
+/* PA-43 · 영산의 선택 만남. 필수 교환과 독립이며 거절하면 물건도 기록도 바뀌지 않는다. */
+(()=>{
+if(CLASSIC)return;
+const Rg=REGIONS.yeongsan;
+const draw=kind=>(x,y,d)=>Rg.expArt[kind](x,y,d);
+const done=(id,flag,key,text)=>()=>{
+  if(!finishWanderer(id))return;
+  G.f[flag]=true;diary(key,text);
+};
+function bearSong(){
+  talk([
+    ['너구리','잘 자. 바람은 굴 밖에 두고.\n잘 자. 눈은 내가 밟고 갈게.'],
+    ['아기 곰','엄마는 같은 데를 두 번씩 불러 주곤 해.\n그다음엔 말도 발소리도 점점 작아지거든.',[
+      {t:'작은 목소리로 한 번 더 부른다',go:()=>bearSleep(false)},
+      {t:'발끝으로 살짝 박자를 맞춘다',go:()=>bearSleep(true)}
+    ]]
+  ]);
+}
+function bearSleep(beat){
+  talk([
+    ['아기 곰',beat?
+      '그 소린 눈 위보다 네 보따리에 톡톡 해 줘.\n그럼 굴 안까지 안 울려. 응. 지금이 좋아.':
+      '두 번째는 바람 소리보다 조금 작아졌네.\n귀를 기울여 듣다 보니 눈이 저절로 감겨.'],
+    ['아기 곰','눈이 녹기 전에 또 깨면 자꾸 밖을 보게 돼.\n굴 안에선 바람이 나를 부르는 것 같거든.'],
+    ['아기 곰','입구 가지에 털을 걸어 둘게. 자는 곰 표지야.\n다시 지나갈 땐 나 대신 그 털만 보고 가 줘.']
+  ],done('y_bear_lullaby','yBearQuiet','y_bear_lullaby','이른 봄인 줄 알고 깬 아기 곰에게 자장가를 불러 주었다. 소리와 박자를 낮추니 곰이 잠들었다. 굴 앞 나뭇가지에 걸린 털이 조용히 지나가라는 표지가 됐다.'));
+}
+function talkBear(){
+  talk([
+    ['아기 곰','굴 안에 햇빛이 들어와서 봄인 줄 알았어.\n마른 풀을 밀치고 나왔는데 발이 푹 빠졌지.'],
+    ['아기 곰','엄마는 아직 자. 옆에 도로 누워 봤는데\n눈만 말똥말똥해. 굴 밖 바람이 자꾸 들려.'],
+    ['아기 곰','엄마 깨우면 또 너무 일찍 일어났다고 할 거야.\n작은 목소리로 내가 다시 잘 노래를 해 줄래?',[
+      {t:'작은 목소리로 자장가를 부른다',go:bearSong},
+      {t:'지금은 조용히 지나간다',go:null}
+    ]]
+  ]);
+}
+function crowMap(){
+  talk([
+    ['너구리','(눈 위에 눈앞의 능선 셋을 나란히 그린다.\n선 아래 골짜기엔 불빛만 한 작은 점을 찍는다.)'],
+    ['길 잃은 까마귀','내가 날아온 데를 위에서 보면 늘 같은 산이야.\n어디부터 짚으면 우리 집이랑 맞춰 볼 수 있지?',[
+      {t:'골짜기의 작은 불빛부터 짚는다',go:()=>crowHome(false)},
+      {t:'뾰족한 능선의 방향부터 짚는다',go:()=>crowHome(true)}
+    ]]
+  ]);
+}
+function crowHome(ridge){
+  talk([
+    ['길 잃은 까마귀',ridge?
+      '우리 집에선 저 뾰족한 봉우리가 왼쪽이었어.\n그 선을 따라 내려가면 네가 찍은 점이구나.':
+      '불빛 위로 뾰족한 봉우리가 왼쪽에 있네.\n우리 집에서도 저렇게 보여. 저 골짜기였어.'],
+    ['길 잃은 까마귀','난 아래로 가면 되겠네. 넌 높은 데도 봐 둬.\n위쪽 이정표 뒤에 작은 발자국 무늬가 있어.'],
+    ['길 잃은 까마귀','눈이 쌓여도 거기만 패여 있어 부리로 털었지.\n네가 그린 지도는 바람 불기 전에 외워 둘게.']
+  ],done('y_crow_direction','yCrowMap','y_crow_direction','눈 위에 능선을 그려 까마귀와 집 방향을 짚었다. 까마귀는 높은 이정표 뒤의 발자국 무늬를 알려 주었다.'));
+}
+function talkCrow(){
+  talk([
+    ['길 잃은 까마귀','먹이를 찾으러 넘은 산이 어느 산이었지?\n눈이 한번 쏟아지니 내가 온 자국이 다 지워졌어.'],
+    ['길 잃은 까마귀','집 아래 골짜기엔 밤에도 불빛이 있어.\n여기선 별이랑 섞여 보여서 자꾸 위로 날게 돼.'],
+    ['길 잃은 까마귀','넌 걸어 올라오면서 골짜기를 봤겠구나.\n네 눈높이에서 보이는 산 모양을 알려 줄래?',[
+      {t:'눈 위에 낮은 골짜기를 그린다',go:crowMap},
+      {t:'조금 더 둘러보고 온다',go:null}
+    ]]
+  ]);
+}
+function otterWait(){
+  talk([
+    ['너구리','(수달 옆에 앉아 미끄러운 자리에 발을 댄다.\n검은 물 위로 찌의 동그란 물결이 번져 간다.)'],
+    ['낚시하는 수달','움직였다. 아니. 내 손이 줄을 당긴 거네.\n찌만 보니까 자꾸 뭐가 잡힌 것처럼 보여.',[
+      {t:'구멍 안쪽 물결을 더 살펴본다',go:()=>otterWater(false)},
+      {t:'줄 잡은 손을 눈 위에 내려놓는다',go:()=>otterWater(true)}
+    ]]
+  ]);
+}
+function otterWater(still){
+  talk([
+    ['낚시하는 수달',still?
+      '손이 멈추니 물결도 가라앉는구나. 저기 봐.\n은빛 꼬리가 있어. 먹이보다도 작은 녀석이네.':
+      '얼음 아래서 물결이 하나 더 오네. 저기 봐.\n작은 꼬리가 물을 차고 있어. 아직 새끼구나.'],
+    ['낚시하는 수달','(수달이 줄을 천천히 풀어 먹이를 내려놓는다.\n은빛 꼬리가 돌고 어두운 물속으로 스며든다.)'],
+    ['낚시하는 수달','낚싯줄만 보던 호수를 네 덕에 좀 넓게 봤어.\n봄엔 구멍이 트인 이 물길로 작은 배가 다녀.']
+  ],done('y_otter_wait','yOtterWait','y_otter_wait','수달 옆에서 기다리니 얼음 아래 어린 물고기가 보였다. 수달은 줄을 풀어 주었다. 겨울의 낚시 구멍은 봄에 배가 다니는 물길과 이어진다.'));
+}
+function talkOtter(){
+  talk([
+    ['낚시하는 수달','쉿. 방금 찌가 움직였어. 이번엔 큰 녀석…\n내 꼬리였구나. 미끄러져서 줄을 건드렸네.'],
+    ['낚시하는 수달','겨울엔 이 작은 구멍으로만 호수를 보게 돼.\n얼음 밑에선 물이 어느 쪽으로 흐르고 있을까?'],
+    ['낚시하는 수달','잠깐 앉아 볼래? 잡혔나 싶으면 자꾸 서둘러.\n옆에서 같이 물을 보면 손이 덜 바쁠 것 같아.',[
+      {t:'수달 옆에서 물속을 기다려 본다',go:otterWait},
+      {t:'다음에 앉을게',go:null}
+    ]]
+  ]);
+}
+function magpieKnot(){
+  talk([
+    ['너구리','(까치가 날개로 누르는 동안 짐끈을 잡는다.\n짧은 끝과 긴 끝이 남아 보자기 위에 눕는다.)'],
+    ['늙은 까치','날다가 안 풀리고 받는 쪽에선 쉽게 열려야지.\n어느 끝에 고리를 남기면 부리로 물기 좋을까?',[
+      {t:'밖으로 나온 긴 끝에 고리를 만든다',go:()=>magpieLoop(true)},
+      {t:'매듭 안쪽의 짧은 끝을 접는다',go:()=>magpieLoop(false)}
+    ]]
+  ]);
+}
+function magpieLoop(outside){
+  talk([
+    ['늙은 까치',outside?
+      '그래. 밖으로 나온 고리를 부리로 쏙 물면 돼.\n반대쪽 끝은 안에 넣어 두니 날개에 안 걸리고.':
+      '그 고리는 짐 밑에 눌려 부리가 안 닿겠구나.\n이렇게 바깥으로 돌려 볼까? 됐다. 잘 잡히네.'],
+    ['늙은 까치','묶을 때 손만 생각하면 받는 쪽이 애를 먹어.\n눈에 젖은 끈은 꽁꽁 얼면 더 안 풀린단다.'],
+    ['늙은 까치','네 보따리에도 집에서 잡을 고리를 남겨 둬.\n추워서 손이 굳어도 엄마가 함께 풀 수 있게.']
+  ],done('y_magpie_knot','yParcelKnot','y_magpie_knot','늙은 까치의 젖은 짐끈을 함께 묶었다. 가져가는 동안 풀리지 않고 받는 쪽에서는 쉽게 풀리는 고리를 배웠다. 집에 돌아가면 엄마도 쉽게 풀 수 있겠다.'));
+}
+function talkMagpie(){
+  const earlier=Object.keys(G.f.wanderersDone||{}).some(k=>!k.startsWith('yeongsan:')&&/magpie|kkachi/.test(k));
+  const sent=['galchamgol','dolneomeo','jangteo'].some(id=>knows('home:'+id));
+  const memory=earlier?'아래 마을에서 만난 그 작은 보부상이구나.\n나도 눈을 피해 산막을 돌다가 여기까지 왔네.':sent?
+    '네가 만든 것을 남쪽으로 날랐었지. 기억난다.\n그 보자기엔 고소한 냄새가 오래 남았더구나.':
+    '아랫마을 짐을 나르다가 여기서 쉬는 중이야.\n눈을 피해 산막을 돌다 보니 꽤 높이 올라왔네.';
+  talk([
+    ['늙은 까치',memory],
+    ['늙은 까치','눈에 젖은 짐끈이 자꾸 풀려 발에 걸리는구나.\n부리로 한쪽을 물면 다른 끝이 도망가 버려.'],
+    ['늙은 까치','혼자 물고 묶느라 보자기만 더 적셔 버렸네.\n여기 앉아서 이 끝을 잠깐 잡아 주겠니?',[
+      {t:'짐끈 한쪽을 함께 잡는다',go:magpieKnot},
+      {t:'나중에 도울게',go:null}
+    ]]
+  ]);
+}
+const examine=(id,x,label,text)=>({id,x,label,text});
+const examines={
+  shelter:[
+    {...examine('y_hut_bindings',250,'산막의 매듭 살펴보기',''),get text(){return G.f.seolpi?
+      '내 설피와 같은 매듭이다.\n이젠 어느 끈을 당겨야 풀리는지 알겠다.':
+      '문 안쪽에 납작한 나무테가 걸려 있다.\n발보다 넓네. 저걸 신으면 눈이 덜 꺼질까?';}},
+    {...examine('y_hut_post',1100,'닳은 문설주 살펴보기',''),get text(){return G.f.yBearQuiet?
+      '굴 쪽 나뭇가지에 곰 털이 걸려 있다.\n여기서는 설피도 살살 디뎌야지.':
+      '문설주 위쪽까지 손때가 묻었다.\n젊은 아빠는 저 위에도 손이 닿았겠지?';}},
+    examine('y_hut_smoke',2100,'낮게 흐르는 연기 살펴보기','굴뚝 연기가 산 아래로 낮게 흐른다.\n바람도 따뜻한 쪽으로 가고 싶은가 보다.')
+  ],
+  snow:[
+    {...examine('y_snow_tunnel',250,'눈 터널 안 들여다보기',''),get text(){return G.f.seolpi?
+      '설피로 다진 바닥 위에 눈 지붕이 남았다.\n내가 지나간 자리만 파랗게 이어진다.':
+      '눈 밑에 가지가 둥근 지붕처럼 엉켰다.\n발이 빠지지 않으면 안쪽까지 가 볼 텐데.';}},
+    {...examine('y_snow_map',1100,'눈 위의 선 살펴보기',''),get text(){return G.f.yCrowMap?
+      '까마귀와 그린 낮은 골짜기다.\n별을 따라 그리면 하늘로 가 버리겠지.':
+      '눈 위로 날개 끝이 쓸고 간 자국이 있다.\n까만 깃 하나는 산 아래를 향한다.';}},
+    examine('y_snow_sign',2100,'낡은 이정표 살펴보기','기둥에 가로줄이 여럿 새겨져 있다.\n해마다 눈이 어디까지 왔는지 재 둔 걸까?')
+  ],
+  slope:[
+    examine('y_slope_rowan',250,'마가목 밑 살펴보기','빨간 열매 밑에 작은 발자국이 모였다.\n눈 속에서도 새들이 이 나무를 찾았구나.'),
+    {...examine('y_slope_hole',1100,'얼음 구멍 가장자리 살펴보기',''),get text(){return G.f.yOtterWait?
+      '작은 꼬리가 사라진 물길이다.\n구멍보다 호수가 훨씬 크다는 걸 이제 봤다.':
+      '얼음 가장자리만 젖어 있다.\n수달이 꼬리로 자꾸 눈을 닦아 낸 자리다.';}},
+    {...examine('y_slope_hoof',2100,'가느다란 발 디딤 살펴보기',''),get text(){return G.f.shortcut?
+      '살금이 발굽이 닿았던 좁은 돌턱이다.\n내 발도 옆으로 놓으니 꼭 맞는다.':
+      '반들반들한 비탈 옆에 마른 돌이 보인다.\n고라니 발자국은 저기로 돌아갔네.';}}
+  ],
+  shore:[
+    {...examine('y_shore_boat',250,'호숫가 작은 배 살펴보기',''),get text(){return G.f.spring?
+      '얼음에 붙었던 배가 물 위에 떴다.\n겨울에 걸어간 길로 이젠 노를 저어 가네.':
+      '배 밑까지 얼음이 꼭 붙잡고 있다.\n뱃전의 녹은 자국은 봄마다 생긴 걸까?';}},
+    examine('y_shore_bowl',1100,'열매 놓였던 돌 살펴보기','돌의 오목한 곳에 마가목 씨가 남았다.\n바람에도 굴러가지 않는 작은 그릇이네.'),
+    examine('y_shore_prints',2100,'크기가 같은 발자국 살펴보기','바위 무늬는 닳았고 옆 눈자국은 새것이다.\n같은 발이 아주 먼 날을 건너 다시 왔구나.')
+  ],
+  island:[
+    examine('y_tree_rope',250,'섬 입구의 금줄 살펴보기','섬 입구에 느슨하게 걸린 금줄이 있다.\n눈 밑에서도 하얀 종이술 끝이 보인다.'),
+    {...examine('y_tree_root',1100,'신목 뿌리 살펴보기',''),get text(){return G.f.spring?
+      '뿌리 사이로 물이 졸졸 흐른다.\n산이 작게 말하는 소리 같다.':
+      '얼음 밑으로도 뿌리가 뻗어 있다.\n이 나무는 겨울에도 호수를 붙들고 있었네.';}},
+    {...examine('y_tree_bud',2100,'신목 가지 올려다보기',''),get text(){return G.f.spring?
+      '꽃잎 한 장이 보따리 끈에 걸렸다.\n엄마한테 보여 줄 때까지 남아 있을까?':
+      '빈 가지 끝에 단단한 겨울눈이 있다.\n나뭇가지도 손을 꼭 쥐고 봄을 기다리네.';}}
+  ]
+};
+const stamp=(id,x,y)=>({id,x,y,note:'stamp:yeongsan:'+id,draw:(sx,sy)=>Rg.expArt.stamp(sx,sy)});
+Rg.expContent={
+  wanderers:{
+    shelter:[{id:'y_bear_lullaby',name:'아기 곰',x:650,draw:draw('drawBear'),talk:talkBear,
+      get greeting(){return G.f.spring?'봄이네… 이번엔 정말 깨어도 돼?\n너 말고 물이 먼저 노래해 줬어.':'음냐… 눈은 네가 밟고…\n나는 조금만 더 잘게.';}}],
+    snow:[{id:'y_crow_direction',name:'길 잃은 까마귀',x:750,draw:draw('drawCrow'),talk:talkCrow,
+      greeting:'집 방향을 알았으니 바람만 좀 잦아들면 돼.\n네가 그린 골짜기는 눈이 덮여도 기억할게.'}],
+    slope:[{id:'y_otter_wait',name:'낚시하는 수달',x:1250,draw:draw('drawOtter'),talk:talkOtter,
+      get greeting(){return G.f.spring?'구멍이 호수만큼 커졌네.\n이젠 배 위에서 기다려야겠다.':'오늘은 작은 꼬리 하나를 봤으니 됐어.\n다음 큰 물결까지 조금 더 앉아 있을래.';}}],
+    shore:[{id:'y_magpie_knot',name:'늙은 까치',x:500,draw:draw('drawMagpie'),talk:talkMagpie,
+      greeting:'이쪽 끝을 당기면 풀리지. 기억했니?\n돌아갈 땐 네 손도 조금은 덜 시리겠구나.'}]
+  },
+  examines,
+  stamps:{shelter:[stamp('hut_post',1040,108)],snow:[stamp('snow_sign',1780,108)],shore:[stamp('shore_rock',2130,192)]}
 };
 })();

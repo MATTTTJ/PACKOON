@@ -119,3 +119,6 @@ acorn_jelly,galchamgol,도토리묵,물건,나,got:acorn_jelly,처음 얻을 때
 memil_jelly,dolneomeo,메밀묵,물건,나,got:memil_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
 yakgwa,jangteo,약과,물건,나,got:yakgwa,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
 magamok_tea,yeongsan,마가목차,물건,나,got:magamok_tea,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+y_stamp_hut,yeongsan,젊은 아빠의 그날 · 산막,도장,아빠,stamp:yeongsan:hut_post,산막 문설주의 도장을 찾았을 때,부를 준다는 열매가 산 위에 있다기에 산막에서 짐을 고쳐 맸다. 빈 보따리를 무겁게 채워 돌아올 줄 알았다.,제안,PA-43 [개발자 결정]
+y_stamp_snow,yeongsan,젊은 아빠의 그날 · 눈길,도장,아빠,stamp:yeongsan:snow_sign,눈길 이정표의 도장을 찾았을 때,이정표 위 눈을 털고 발바닥 무늬를 남겼다. 부자가 되어 내려올 길도 이쪽일 것이라 생각했다.,제안,PA-43 [개발자 결정]
+y_stamp_shore,yeongsan,젊은 아빠의 그날 · 호숫가,도장,아빠,stamp:yeongsan:shore_rock,호숫가 바위의 도장을 찾았을 때,부를 주는 열매가 아니었다. 되찾을 것이 없던 나는 빈손으로 돌아갔다. 그래도 신목이 있는 자리는 수첩에 적어 두었다.,제안,PA-43 [개발자 결정]

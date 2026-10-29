@@ -1743,6 +1743,45 @@ const TABLES={
    "region": "yeongsan",
    "kind": "item",
    "lines": []
+  },
+  {
+   "id": "y_stamp_hut",
+   "region": "yeongsan",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "부를 준다는 열매가 산 위에 있다기에 산막에서 짐을 고쳐 맸다. 빈 보따리를 무겁게 채워 돌아올 줄 알았다.",
+     "when": "stamp:yeongsan:hut_post"
+    }
+   ],
+   "name": "젊은 아빠의 그날 · 산막"
+  },
+  {
+   "id": "y_stamp_snow",
+   "region": "yeongsan",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "이정표 위 눈을 털고 발바닥 무늬를 남겼다. 부자가 되어 내려올 길도 이쪽일 것이라 생각했다.",
+     "when": "stamp:yeongsan:snow_sign"
+    }
+   ],
+   "name": "젊은 아빠의 그날 · 눈길"
+  },
+  {
+   "id": "y_stamp_shore",
+   "region": "yeongsan",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "부를 주는 열매가 아니었다. 되찾을 것이 없던 나는 빈손으로 돌아갔다. 그래도 신목이 있는 자리는 수첩에 적어 두었다.",
+     "when": "stamp:yeongsan:shore_rock"
+    }
+   ],
+   "name": "젊은 아빠의 그날 · 호숫가"
   }
  ],
  "MINIGAMES": {
