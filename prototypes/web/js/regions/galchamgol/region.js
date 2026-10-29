@@ -1,21 +1,21 @@
 'use strict';
-/* 갈참골 (1지역, 늦가을): 지역 정보, 처음 상태, 아이템, 채집, 깨어나는 가보(엄마의 절구).
+/* 단풍골 (1지역, 늦가을): 지역 정보, 처음 상태, 아이템, 채집, 깨어나는 가보(엄마의 절구).
    원본 표: design/data/regions.csv · items.csv · trades.csv · npcs.csv (id가 같다)
    이 지역의 나머지: art.js(동물 그림), field.js(배경·장애물), enemies.js(전투), story.js(대화·진행) */
 (()=>{
 const Rg=defineRegion('galchamgol',{
-  order:1,name:'갈참골',
+  order:1,name:'단풍골',
   world:2400,startX:70,
   platforms:[{x:330,y:160,w:64},{x:690,y:150,w:72},{x:990,y:158,w:60},{x:1310,y:150,w:66}],
   clueTotal:6,
   gatherDiary:['gather','흙을 살살 달래 가며 뿌리를 캤다. 서두르면 뿌리가 다친다고 엄마가 그랬다.'],
   cover:{
-    tag:'갈참골 체험판',sub:'엄마의 약을 찾아 떠난 첫 마을',ready:'갈참골로 떠날 준비',
-    title:{kicker:'프롤로그',head:'갈참골로 가는 길',start:'갈참골로 떠나기',body:[
+    tag:'단풍골 체험판',sub:'엄마의 약을 찾아 떠난 첫 마을',ready:'단풍골로 떠날 준비',
+    title:{kicker:'프롤로그',head:'단풍골로 가는 길',start:'단풍골로 떠나기',body:[
       '엄마가 내 이름을 잊어 가고 있다. 처음엔 둔갑을 못 하게 되더니, 요즘은 말이 자꾸 끊긴다.',
-      '아빠는 소문 속 만병통치약을 찾아 떠났고, 석 달째 소식이 없다. 마지막 편지에는 이렇게 적혀 있었다. "갈참골을 지나 북쪽으로 간다."',
+      '아빠는 소문 속 만병통치약을 찾아 떠났고, 석 달째 소식이 없다. 마지막 편지에는 이렇게 적혀 있었다. "단풍골을 지나 북쪽으로 간다."',
       '나는 부엌의 살림 도구를 보따리에 싸고, 아빠의 보부상 모자를 썼다.']},
-    end:{kicker:'갈참골 체험판 완료',head:'북쪽 길이 열렸다',body:[
+    end:{kicker:'단풍골 체험판 완료',head:'북쪽 길이 열렸다',body:[
       '두꺼비 할멈이 해머루로 달인 약을 까치 편에 집으로 보냈다. 엄마의 병을 고치지는 못해도, 조금은 늦출 수 있을 것이다.',
       '아빠는 북쪽으로 갔다. 나도 간다.']},
   },
@@ -32,17 +32,17 @@ const Rg=defineRegion('galchamgol',{
     rel:{dodam:{t:'호감',v:0},musoe:{t:'의리',v:0},nal:{t:'경멸',v:0},toad:{t:'호감',v:0}},
   }),
   onStart(){
-    diary('start','갈참골에 도착했다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 아빠의 마지막 편지에 적힌 곳이 여기다.');
+    diary('start','단풍골에 도착했다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 아빠의 마지막 편지에 적힌 곳이 여기다.');
     toast('도토리를 줍고, 마을 동물들에게 말을 걸어 보자');
   },
   next:'dolneomeo',
-  /* ?region=dolneomeo 처럼 뒤 지역부터 바로 시작할 때, 갈참골을 이렇게 마친 것으로 친다 (확인용 바로가기) */
+  /* ?region=dolneomeo 처럼 뒤 지역부터 바로 시작할 때, 단풍골을 이렇게 마친 것으로 친다 (확인용 바로가기) */
   finish(g){
     g.tool='sickle';g.sharp=false;g.inv={rice:1,acorn:2,root:1,kflower:1};
     ['acorn','root','ssari','kkoe','meoru','kflower','powder','coal','vine'].forEach(id=>g.learned.push('got:'+id));
     ['dodam','nal','musoe','toad'].forEach(id=>g.learned.push('met:'+id));g.learned.push('fight:musoe','fight:kudzu');
-    ['d1','n1','m1','m2','t1','h1'].forEach(id=>g.clues.push({id,who:'갈참골',text:'갈참골에서 찾은 단서 (바로가기로 시작해서 내용은 비어 있다)'}));
-    g.diary.push({id:'skip_galchamgol',text:'(갈참골은 바로가기로 건너뛰었다.)'});
+    ['d1','n1','m1','m2','t1','h1'].forEach(id=>g.clues.push({id,who:'단풍골',text:'단풍골에서 찾은 단서 (바로가기로 시작해서 내용은 비어 있다)'}));
+    g.diary.push({id:'skip_galchamgol',text:'(단풍골은 바로가기로 건너뛰었다.)'});
     Object.assign(g.f,{dodamDone:true,musoeDone:true,nalDone:true,toadMet:true});
     g.boss.dead=true;g.barrier.cut=true;g.ended=true;
   },

@@ -1,5 +1,5 @@
 'use strict';
-/* 갈참골 동물들의 도트 그림과 곁에 놓인 소품. (ox, oy)는 발밑, f 는 바라보는 방향 */
+/* 단풍골 동물들의 도트 그림과 곁에 놓인 소품. (ox, oy)는 발밑, f 는 바라보는 방향 */
 (()=>{
 const Rg=REGIONS.galchamgol;
 Rg.art={

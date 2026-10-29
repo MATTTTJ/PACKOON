@@ -1,5 +1,5 @@
 'use strict';
-/* 갈참골 진행: NPC 대화와 교환, 무쇠의 대장간 미니게임, 전투 시작과 결과, 지금 할 일.
+/* 단풍골 진행: NPC 대화와 교환, 무쇠의 대장간 미니게임, 전투 시작과 결과, 지금 할 일.
    흐름은 design/narrative/galchamgol-scenario.md, 교환은 design/data/trades.csv */
 (()=>{
 const Rg=REGIONS.galchamgol;
@@ -16,7 +16,7 @@ function talkDodam(){
   }else talk([['도담','당산나무는 마을 맨 끝이야. 칡덩굴 조심하고!']]);
 }
 function dodamDad(next){
-  clue('d1','도담','몇 달 전 보부상 너구리가 갈참골에서 도토리 가루를 바꿔 갔다. 북쪽으로 간다고 했다.');
+  clue('d1','도담','몇 달 전 보부상 너구리가 단풍골에서 도토리 가루를 바꿔 갔다. 북쪽으로 간다고 했다.');
   rel('dodam',1);
   talk([['도담','아! 그 모자, 보부상 아저씨 거랑 똑같다!'],['도담','몇 달 전에 여기서 도토리 가루를 잔뜩 바꿔 갔어. 북쪽으로 간다던데? 엄청 급해 보였어.']],next);
 }
@@ -183,7 +183,7 @@ Rg.npcs=[
 Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
-  if(G.ended)return '갈참골 체험판 완료';
+  if(G.ended)return '단풍골 체험판 완료';
   if(!F.dodamTalk)return '마을 어귀의 다람쥐 도담에게 말 걸기';
   const ac=G.inv.acorn||0;
   const powderStep=()=>has('powder')?null:(ac<3?'도토리 줍기 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개 넣어 빻기');
