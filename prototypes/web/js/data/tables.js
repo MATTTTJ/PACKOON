@@ -718,6 +718,11 @@ const TABLES={
      "who": "me",
      "text": "겨울잠 둥지에 쓸 마른 억새를 좋아한다.",
      "when": "kkubeogi:eoksae"
+    },
+    {
+     "who": "me",
+     "text": "지난가을 아빠가 둥지 곁에서 “미안하다… 그 겨울에 내가 없어서…”라고 했단다. 꾸벅이가 잊기 전에 내 기록에 맡겼다.",
+     "when": "dolneomeo:arcs-kkubeogi"
     }
    ]
   },

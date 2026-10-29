@@ -31,6 +31,7 @@ kflower,galchamgol,칡꽃,물건,나,got:kflower,처음 얻을 때,(items.csv �
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:sleep,졸 때 말을 걸었을 때,늘 존다. 졸 때 말을 걸면 잠꼬대만 한다.,제안,
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:awake,고개를 들 때 말을 걸어 깨웠을 때,꾸벅꾸벅 졸다가 고개를 드는 잠깐에만 말이 통한다.,제안,
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:eoksae,억새를 건넸을 때,겨울잠 둥지에 쓸 마른 억새를 좋아한다.,제안,
+kkubeogi,dolneomeo,꾸벅이,동물,나,dolneomeo:arcs-kkubeogi,시험판에서 꾸벅이에게 맡은 말을 적었을 때,지난가을 아빠가 둥지 곁에서 “미안하다… 그 겨울에 내가 없어서…”라고 했단다. 꾸벅이가 잊기 전에 내 기록에 맡겼다.,제안,[시험판] arcs=1 선택 장면
 dolsoe,dolneomeo,돌쇠 할배,동물,아빠,,처음부터,"돌너머 석수 두더지. ""돌이 마음을 알아야 돈다."" 할배한테 배운 말.",제안,
 dolsoe,dolneomeo,돌쇠 할배,동물,나,met:dolsoe,처음 말을 걸 때,눈이 침침해져서 이제 돌을 손끝으로만 읽는다.,제안,
 dolsoe,dolneomeo,돌쇠 할배,동물,나,dolsoe:tea,결명자 차를 드렸을 때,결명자 차를 드리면 눈이 밝아진다며 마음을 연다.,제안,

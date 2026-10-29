@@ -8,6 +8,101 @@ const MG=TABLES.MINIGAMES;
 
 const pick=lines=>lines[Math.floor(Math.random()*lines.length)];
 
+/* ---------- 인물 사연 시험판: 기존 진행과 보상은 아래 선택지 밖에서도 그대로 열린다 ---------- */
+function arcScene(key,lines,record,after){
+  talk(lines,()=>{
+    G.f[key]=true;diary(key,record);
+    if(after)after();
+  });
+}
+function arcMenu(name,say,normal,choices){
+  talk([[name,say,[{t:'하던 이야기 계속하기',go:normal},...choices,{t:'다음에 이야기할게요',go:null}]]]);
+}
+function talkKkuArc(){
+  const F=G.f;
+  if(!Rg.arcs()||!F.kkuDone)return talkKku();
+  if(!F.dolneomeo_arc_kku2){
+    arcMenu('꾸벅이','잊기 전에… 맡길 말이 있어어…',talkKku,[{t:'무슨 말인데?',go:()=>arcScene('dolneomeo_arc_kku2',[
+      ['꾸벅이','봄에 깨면… 들은 말도 잊어버려어…'],
+      ['꾸벅이','지난가을… 네 아빠가 둥지 곁에서 잤어어…'],
+      ['꾸벅이','잠결에 들었어… “미안하다…”'],
+      ['꾸벅이','“그 겨울에 내가 없어서…” 그랬어어…'],
+      ['꾸벅이','내가 잊기 전에… 너한테 맡길게에…']
+    ],'꾸벅이가 지난가을 둥지 곁에서 들은 아빠의 말을 맡겼다. “미안하다… 그 겨울에 내가 없어서…”')}]);return;
+  }
+  if(!F.dolneomeo_arc_kku3){
+    arcMenu('꾸벅이','그 말… 기억해 줄 거지이…?',talkKku,[{t:'내 기록에 적어 둘게',go:()=>arcScene('dolneomeo_arc_kku3',[
+      ['너구리','내가 적어 둘게.'],
+      ['너구리','(아빠의 옛 메모 옆, 내 기록에 적었다.)'],
+      ['꾸벅이','그래애… 이제 자도 되겠다아…']
+    ],'꾸벅이에게 맡은 말을 내 기록에 적었다. 꾸벅이는 안심하고 잠들었다.',()=>learn('dolneomeo:arcs-kkubeogi'))}]);return;
+  }
+  talkKku();
+}
+function talkDolsoeArc(){
+  const F=G.f;
+  if(!Rg.arcs()||!F.dolsoeTea)return talkDolsoe();
+  const c=[];
+  if(!F.dolneomeo_arc_dolsoe1)c.push({t:'꼭대기 돌은 누가 올렸어요?',go:()=>arcScene('dolneomeo_arc_dolsoe1',[
+    ['돌쇠 할배','(할배가 꼭대기 돌을 손끝으로 감싼다.)'],
+    ['돌쇠 할배','먼저 간 할멈이 올린 돌이란다.'],
+    ['돌쇠 할배','손끝마저 무뎌질까 봐, 날마다 만져 본다.'],
+    ['돌쇠 할배','밑을 단단히 괴면, 작은 돌도 안 떨어지지.']
+  ],'돌쇠 할배는 먼저 간 아내의 소원 돌을 지킨다. 손끝 감각마저 흐려질까 봐 날마다 돌을 만진다고 했다.')});
+  else if(F.golemCalm&&knows('like:golem:story_stone')&&!F.dolneomeo_arc_dolsoe2)c.push({t:'아빠의 돌을 올렸어요',go:()=>arcScene('dolneomeo_arc_dolsoe2',[
+    ['너구리','아빠의 돌, 대신 올렸어요.'],
+    ['돌쇠 할배','(할배가 내 손을 가만히 짚는다.)'],
+    ['돌쇠 할배','지난가을엔 네 아빠 손이 자꾸 떨렸지.'],
+    ['돌쇠 할배','돌을 몇 번이고 놓쳐서, 내가 맡아 뒀단다.'],
+    ['돌쇠 할배','손이 네 아비를 닮았구나. 고맙다.']
+  ],'아빠가 떨리는 손으로 못 올린 돌을 대신 올렸다. 돌쇠 할배가 내 손을 짚고 고맙다고 했다.')});
+  else if(F.dolneomeo_arc_dolsoe2&&!F.dolneomeo_arc_dolsoe3)c.push({t:'엄마 몫도 올려도 돼요?',go:()=>arcScene('dolneomeo_arc_dolsoe3',[
+    ['너구리','엄마 몫도 올려도 돼요?'],
+    ['돌쇠 할배','이리 오너라. 밑을 받쳐 주마.'],
+    ['너구리','(마당의 작은 돌을 골라, 할배 돌탑에 얹었다.)'],
+    ['너구리','엄마, 약 보낼게.'],
+    ['돌쇠 할배','돌은 마음을 알아야 선다.']
+  ],'돌쇠 할배가 받쳐 준 돌탑에 엄마 몫의 돌을 얹었다. 약을 만들어 보내 드리자.')});
+  if(c.length)return arcMenu('돌쇠 할배','손끝으로 짚어 보겠느냐.',talkDolsoe,c);
+  talkDolsoe();
+}
+function talkPpuriArc(){
+  const F=G.f;
+  // 필수 교환과 기존 석이버섯 보상은 사연 메뉴보다 먼저 처리한다.
+  if(!Rg.arcs()||!F.ppuriMet||(!F.ppuriPassed&&has('memil_powder'))||(F.golemCalm&&!F.seogiTold))return talkPpuri();
+  const c=[];
+  if(!F.dolneomeo_arc_ppuri1)c.push({t:'왜 꼭 장승제를 올려요?',go:()=>arcScene('dolneomeo_arc_ppuri1',[
+    ['뿔이','규칙이다. 길을 살피고 열어야 한다.'],
+    ['뿔이','내 아버지도 여기 장승지기였다.'],
+    ['뿔이','폭설에 길을 열었다가 짐꾼이 떨어졌지.'],
+    ['뿔이','다시는 그런 일이 생기면 안 된다.']
+  ],'뿔이의 아버지도 장승지기였다. 폭설에 길을 열었다가 짐꾼이 떨어진 뒤, 뿔이는 길을 여는 조건을 지킨다.')});
+  else if(!F.dolneomeo_arc_ppuri2)c.push({t:'아빠도 이 길로 갔어요?',go:()=>arcScene('dolneomeo_arc_ppuri2',[
+    ['너구리','아빠 찾으러 왔어요. 이 길로 갔어요?'],
+    ['뿔이','그 모자… 지난가을 그 너구리의 아이였나.'],
+    ['뿔이','사흘을 눈 속에 세워 뒀다. 급하다는데도.'],
+    ['뿔이','기침을 하면서도 한 번도 화를 안 냈다.'],
+    ['뿔이','난 길만 살폈지. 기다리는 이는 못 봤다.']
+  ],'뿔이는 지난가을 아빠를 사흘 동안 눈 속에서 기다리게 했다. 아빠는 기침을 하면서도 한 번도 화를 내지 않았다고 한다.')});
+  else if(F.ppuriPassed&&!F.dolneomeo_arc_ppuri3)c.push({t:'아빠는 어느 길로 갔어요?',go:()=>arcScene('dolneomeo_arc_ppuri3',[
+    ['뿔이','금줄 너머 납작한 바위가 보이나.'],
+    ['뿔이','그 옆으로 곧장 가면 성황당이다.'],
+    ['뿔이','네 아빠가 지나간 지름길이다.'],
+    ['너구리','알려 줘서 고마워요.'],
+    ['뿔이',G.boss.dead?'돌무더기도 잠잠해졌군. 그래도 발밑을 살펴라.':'돌무더기는 아직 깨어 있다. 거긴 조심해라.']
+  ],'뿔이가 아빠가 지나간 지름 바위를 알려 줬다. 금줄 너머 납작한 바위 옆길이다. 성황당 돌무더기는 따로 지나야 한다.')});
+  if(c.length)return arcMenu('뿔이','묻고 싶은 게 있나.',talkPpuri,c);
+  talkPpuri();
+}
+function nalSickle(){
+  const lines=[['날쌘','그 낫…'],['날쌘','…아직 그 자루네.'],['너구리','아빠 거예요.']];
+  // 앞 지역의 기존 표시를 읽기만 한다. 다른 지역 시험판의 플래그 이름을 가정하지 않는다.
+  if(G.f.nalDone&&knows('nal:bluff-paid'))lines.push(['날쌘','숯더러 촌구석 물건이라더니. 잘 벼렸네.']);
+  else lines.push(['날쌘','날은 잘 벼렸네.']);
+  lines.push(['날쌘','됐어. 낫은 넣고, 바꿀 물건이나 꺼내.']);
+  arcScene('dolneomeo_arc_nal2',lines,'날쌘은 아빠의 낫을 보고 하던 말을 멈췄다. 낡은 자루를 알아보는 듯했지만 더 말하지 않았다.');
+}
+
 /* ---------- 꾸벅이 (고슴도치): 고개를 들 때 맞춰 말 걸기 ---------- */
 function talkKku(){
   const F=G.f;F.kkuTalk=true;
@@ -17,13 +112,19 @@ function talkKku(){
     if(!G.clues.some(c=>c.id==='k1')){
       clue('k1','꾸벅이','꾸벅이의 잠꼬대: 보부상 아저씨가 할배네서 겨울을 날 것처럼 굴더니, 글자 하나를 읽고는 그날 밤 떠났다.');
       talk([['꾸벅이','쿨… 쿨…'],['꾸벅이','보부상 아저씨… 할배네서 겨울이라도 날 줄 알았는데…'],['꾸벅이','글자 하나 읽더니… 그날 밤 떠났어… 쿨…'],['너구리','(잠꼬대네. 고개 들 때 다시 말 걸자.)']]);
-    }else talk([['꾸벅이',pick(['쿨… 둥지는… 폭신해야…','으음… 아직 꿈꾸는 중이야…','하암… 조금만 더…'])],['너구리','(코가 씰룩하네. 곧 고개 들겠다.)']]);
+    }else talk([['꾸벅이',pick(['쿨… 둥지는… 폭신해야…','으음… 아직 꿈꾸는 중이야…','하암… 조금만 더…'])],['너구리',Rg.arcs()?(F.dolneomeo_arc_kku3?'(푹 자. 맡긴 말은 적어 뒀어.)':'(고개 들 때 다시 말 걸자.)'):'(코가 씰룩하네. 곧 고개 들겠다.)']]);
     return;
   }
   Sound.stone('wake');
   if(!F.kkuAwake){F.kkuAwake=true;rel('kkubeogi',1);learn('kkubeogi:awake');
+    if(Rg.arcs()){F.dolneomeo_arc_kku1=true;diary('dolneomeo_arc_kku1','꾸벅이가 고개를 들 때 말을 걸었다. 겨울잠 둥지에 깔 억새가 모자란다고 했다.');}
     ledger('kkubeogi','꾸벅이','마른 억새 3','서리다래가 있는 곳');
-    talk([['꾸벅이','어, 어…? 안 잤어… 진짜야…'],['꾸벅이','처음 보는 꼬마네… 그 모자, 어디서 봤더라… 하암…'],
+    talk(Rg.arcs()?[
+      ['꾸벅이','어, 어…? 안 잤어어… 진짜야아…'],
+      ['꾸벅이','그 모자… 어디서 봤더라아…'],
+      ['꾸벅이','둥지에 깔 마른 억새… 세 단만 줄래에…?'],
+      ['꾸벅이','들판에서 낫으로 베면 돼애…']
+    ]:[['꾸벅이','어, 어…? 안 잤어… 진짜야…'],['꾸벅이','처음 보는 꼬마네… 그 모자, 어디서 봤더라… 하암…'],
       ['꾸벅이','겨울잠 둥지에 깔 억새가 모자라… 들판에서 하얗게 센 걸로 세 단만 베어다 줄래…?'],
       ['꾸벅이','그럼 내가 아는 거 다 알려 줄게… 쿨…']],()=>{if(has('eoksae',3))kkuTrade();});
     return;
@@ -59,6 +160,7 @@ function nalMenu(){
     if(has('gyeousari',2))c.push({t:'겨우살이 2개를 내민다 (결명자 1)',go:()=>nalTrade('gyeousari')});
     if(!F.nalDBluff)c.push({t:'허세 부리기: "칡꽃? 단풍골엔 흔한데."',go:nalBluff});
   }
+  if(Rg.arcs()&&G.tool==='sickle'&&!F.dolneomeo_arc_nal2)c.push({t:'아빠의 낫을 보여 준다',go:nalSickle});
   c.push({t:'그만두기',go:null});
   const say=F.nalDDone?'결명자는 눈 밝히는 약재야. 돌쇠 할배한테 차로 달여 드려 봐. 쓸 만한 거래였지?'
     :(has('kflower')||has('gyeousari',2))?'어디, 뭘 내놓을 건데?':'빈손으로 흥정하게? 칡꽃이 없으면 높은 가지에 달린 겨우살이 두 개라도 따 와.';
@@ -103,11 +205,23 @@ function dolsoeTea(){
     const F=G.f;takeItem('gyeolmyeongja',1);F.dolsoeTea=true;rel('dolsoe',1);learn('dolsoe:tea');
     ledger('dolsoe','돌쇠 할배','결명자 1','맷돌을 깨움');
     diary('d_dolsoe','돌쇠 할배가 보따리 속 맷돌의 자개 발자국을 손끝으로 더듬더니, 우리 집안 맷돌이라는 걸 알아봤다.');
-    talk([['돌쇠 할배','눈이 좀 밝아지는구나. 고맙다.'],['돌쇠 할배','보따리를 이리 줘 보거라.'],
+    const lines=Rg.arcs()?[
+      ['돌쇠 할배','고맙다. 맷돌도 이리 줘 보거라.'],
+      ['돌쇠 할배','(할배가 자개 발자국을 손끝으로 더듬는다.)'],
+      ['돌쇠 할배','네 집안 맷돌이구나. 4대째 내려온 게지.'],
+      ['돌쇠 할배','“돌이 마음을 알아야 돈다.” 아빠한테 들었니?'],
+      ['돌쇠 할배','탑 꼭대기가 가운데 올 때, 돌 세 개를 얹거라.']
+    ]:[['돌쇠 할배','눈이 좀 밝아지는구나. 고맙다.'],['돌쇠 할배','보따리를 이리 줘 보거라.'],
       ['돌쇠 할배','(할배가 맷돌 윗돌의 자개 발자국을 손끝으로 천천히 더듬는다.)'],
       ['돌쇠 할배','이 자개 발자국… 그 녀석 집안 맷돌이구나. 4대째 내려온 게지.'],
       ['돌쇠 할배','"돌이 마음을 알아야 돈다." 네 아빠도 그 말을 하더냐. 내가 가르쳐 주었지.'],
-      ['돌쇠 할배','돌 마음부터 읽어 보거라. 저 돌탑 꼭대기가 가운데 올 때, 돌을 하나씩 세 개 얹으면 된다.']],openStack);
+      ['돌쇠 할배','돌 마음부터 읽어 보거라. 저 돌탑 꼭대기가 가운데 올 때, 돌을 하나씩 세 개 얹으면 된다.']];
+    if(Rg.arcs())lines.push(['돌쇠 할배','배워 보겠느냐.',[
+      {t:'돌 쌓기를 배운다',go:openStack},
+      {t:'꼭대기 돌 이야기를 듣는다',go:talkDolsoeArc},
+      {t:'조금 이따가요',go:null}
+    ]]);
+    talk(lines,Rg.arcs()?null:openStack);
   }},{t:'아직은 안 드릴래',go:null}]]]);
 }
 
@@ -198,17 +312,23 @@ defineMinigame({id:'stack',step:stackStep,hit:stackHit});
 function finishStack(){
   panel.hidden=true;const F=G.f;const perfect=st.miss===0;
   F.stackDone=true;awaken('maetdol');learn('dolsoe:stack');ledgerDone('dolsoe');rel('dolsoe',perfect?MG.stack_perfect_relation:MG.stack_relation);
-  clue('s1','돌쇠 할배','아빠도 돌쇠 할배에게 약연 바퀴의 낯선 글자를 읽어 달라고 했다. 할배는 글자 하나만 읽어 주었고, 아빠는 그날 밤 떠났다.');
+  clue('s1','돌쇠 할배',Rg.arcs()?'돌쇠 할배가 지난가을 아빠에게 읽어 준 약연의 글자는 “되돌림”이었다. 아빠는 그날 밤 떠났다.':'아빠도 돌쇠 할배에게 약연 바퀴의 낯선 글자를 읽어 달라고 했다. 할배는 글자 하나만 읽어 주었고, 아빠는 그날 밤 떠났다.');
   diary('d_maetdol','돌탑에 돌 세 개를 얹었다. 그 순간 보따리 속 맷돌에서 우웅, 낮은 소리가 났다. 증조할아버지의 맷돌이 깨어났다.');
   toast('증조할아버지의 맷돌이 깨어났다! 메밀 3 → 메밀가루 1');refreshHud();
-  const lines=[['돌쇠 할배',perfect?'하나도 안 떨어뜨렸구나. 네 아빠보다 낫다.':'됐다. 돌이 네 손을 알아보았구나.'],
+  const lines=Rg.arcs()?[
+    ['돌쇠 할배','됐다. 맷돌이 네 손을 알아보는구나.'],
+    ['돌쇠 할배','네 아빠도 지난가을 약연을 들고 왔었지.'],
+    ['돌쇠 할배','(할배가 약연 바퀴의 글자를 손끝으로 짚는다.)'],
+    ['돌쇠 할배','“되돌림.” 그렇게 읽어 줬더니 그날 밤 떠났단다.']
+  ]:[['돌쇠 할배',perfect?'하나도 안 떨어뜨렸구나. 네 아빠보다 낫다.':'됐다. 돌이 네 손을 알아보았구나.'],
     ['너구리','(맷돌이 따뜻하네! 이제 메밀을 갈아 보자.)'],
     ['돌쇠 할배','네 아빠도 여기 왔었지. 약연 바퀴에 새겨진 낯선 글자를 읽어 달라더구나.'],
     ['돌쇠 할배','글자 하나만 읽어 주었단다. 녀석은 그날 밤 짐을 싸서 떠났지.'],
     ['돌쇠 할배','무슨 글자였느냐고? 아직 네가 들을 때는 아니란다.']];
   if(G.rel.dolsoe.v>=2&&!F.stoneGiven){F.stoneGiven=true;addItem('story_stone',1);
     diary('d_stone','돌쇠 할배가 아빠의 돌을 내주었다. 아빠가 성황당에 올리려다 끝내 못 올린 소원 돌이다.');
-    lines.push(['돌쇠 할배','참, 이 돌도 가져가거라.'],['돌쇠 할배','네 아빠가 소원을 적은 돌이란다. 성황당에 올리려다 끝내 못 올리고 두고 갔지.'],['돌쇠 할배','네가 대신 올려 주려무나.']);}
+    if(Rg.arcs())lines.push(['돌쇠 할배','아빠가 못 올린 소원 돌이다. 받아 두거라.'],['돌쇠 할배','성황당에 대신 올려 주겠니.']);
+    else lines.push(['돌쇠 할배','참, 이 돌도 가져가거라.'],['돌쇠 할배','네 아빠가 소원을 적은 돌이란다. 성황당에 올리려다 끝내 못 올리고 두고 갔지.'],['돌쇠 할배','네가 대신 올려 주려무나.']);}
   talk(lines);
 }
 
@@ -216,7 +336,11 @@ function finishStack(){
 function talkPpuri(){
   const F=G.f;
   if(!F.ppuriMet){F.ppuriMet=true;ledger('ppuri','뿔이','메밀가루 1','돌산 길 통과');
-    talk([['뿔이','멈춰라. 장승제를 올리기 전에는 돌산에 오를 수 없다.'],['뿔이','성황당 돌무더기가 밤마다 움직인다. 산이 노한 것이다.'],
+    talk(Rg.arcs()?[
+      ['뿔이','멈춰라. 장승제 전에는 돌산에 못 오른다.'],
+      ['뿔이','규칙이다. 돌무더기가 움직여 길이 위험하다.'],
+      ['뿔이','메밀전을 부칠 메밀가루 하나가 필요하다.']
+    ]:[['뿔이','멈춰라. 장승제를 올리기 전에는 돌산에 오를 수 없다.'],['뿔이','성황당 돌무더기가 밤마다 움직인다. 산이 노한 것이다.'],
       ['뿔이','장승제에 올릴 메밀전이 필요하다. 메밀가루 하나를 가져와라. 그게 원칙이다.']],()=>{if(has('memil_powder'))ppuriTrade();});
     return;
   }
@@ -267,10 +391,10 @@ Rg.sendMedicine=()=>{
 
 /* ---------- NPC (npcs.csv 의 id). x 는 필드 위치 ---------- */
 Rg.npcs=[
-  {id:'kkubeogi',name:'꾸벅이',x:320,talk:talkKku,draw:Rg.art.hedgehog,props:Rg.props.nest},
+  {id:'kkubeogi',name:'꾸벅이',x:320,talk:talkKkuArc,draw:Rg.art.hedgehog,props:Rg.props.nest},
   {id:'nal',name:'날쌘',x:820,talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
-  {id:'dolsoe',name:'돌쇠 할배',x:1150,talk:talkDolsoe,draw:Rg.art.mole,props:Rg.props.yard},
-  {id:'ppuri',name:'뿔이',x:1560,talk:talkPpuri,draw:Rg.art.goat},
+  {id:'dolsoe',name:'돌쇠 할배',x:1150,talk:talkDolsoeArc,draw:Rg.art.mole,props:Rg.props.yard},
+  {id:'ppuri',name:'뿔이',x:1560,talk:talkPpuriArc,draw:Rg.art.goat},
 ];
 
 /* ---------- 지금 할 일 ---------- */
