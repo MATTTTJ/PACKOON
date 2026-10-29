@@ -205,8 +205,9 @@ function battleMusoe(){
     if(res==='lose'||res==='flee'){talk([['무쇠','아직 멀었다. 숨 고르고 다시 와라.']]);return;}
     const perfect=res==='win'&&info.hits===0;
     G.f.musoeTested=true;rel('musoe',(res==='calm'||perfect)?2:1);ledger('musoe','무쇠','숯 1','아빠가 맡긴 낫');
+    if(typeof grantTool==='function')grantTool('pickaxe');
     diary('test',res==='calm'?'무쇠 아저씨에게 먹을 것을 건네 마음을 풀었다. 아빠도 이렇게 했을까.':'무쇠 아저씨가 꿀밤으로 연장부터 빼앗고 덤볐다. 끝까지 피해서 시험을 통과했다.');
-    talk([['무쇠',res==='calm'?'…됐다. 배부터 채웠으니 고집은 그만 부리마.':perfect?'허, 한 대도 안 맞았군. 그 녀석 아들 맞다.':'끝까지 버티는 건 네 아비를 닮았군.'],['무쇠','연장 도로 가져가라. 어른 앞에선 내려놓고.'],['무쇠','의리는 지켜야지. 낫은 내주마.'],['무쇠','다만 녹이 슬었다. 벼릴 숯이 마침 떨어졌으니 가져와라.']],()=>{if(has('coal'))talkMusoe();});
+    talk([['무쇠',res==='calm'?'…됐다. 배부터 채웠으니 고집은 그만 부리마.':perfect?'허, 한 대도 안 맞았군. 그 녀석 아들 맞다.':'끝까지 버티는 건 네 아비를 닮았군.'],['무쇠','연장은 도로 가져가라. 이 곡괭이도 덤이다.\n돌 만날 때 써라.'],['무쇠','의리는 지켜야지. 낫은 내주마.'],['무쇠','다만 녹이 슬었다. 벼릴 숯이 마침 떨어졌으니 가져와라.']],()=>{if(has('coal'))talkMusoe();});
   }));
 }
 
@@ -251,7 +252,8 @@ function drawForge(){
   forgeHeatLabel.textContent=forge.phase==='cold'?'식었다 · 다시 달구기 (숯 추가 소모 없음)':
     forge.phase==='done'?'벼리기 끝!'+(forge.edge>=MG.forge_bonus_edges?' · 무쇠의 인정 +'+MG.forge_bonus_relation:''):
     '남은 열 '+Math.ceil(forge.heat)+'% · '+(edge?'아슬아슬! 금빛 칸에서 치면 큰 불똥':'빛이 남아 있으면 성공 · 금빛 칸은 식기 직전')+(forge.miss>=MG.forge_help_misses?' · 천천히 식도록 도움':'');
-  $('fstrike').innerHTML=(forge.phase==='cold'?'다시 달구기':forge.phase==='done'?'벼리기 끝':'내려치기')+' <kbd>Space · J</kbd>';
+  $('fstrike').innerHTML=(forge.phase==='cold'?'다시 달구기':forge.phase==='done'?'벼리기 끝':forge.wait>0?'다시 달구는 중':'내려치기')+' <kbd>Space · J</kbd>';
+  $('fstrike').disabled=forge.wait>0||forge.phase==='done';
   $('fpips').innerHTML=Array.from({length:MG.forge_hits},(_,i)=>'<span class="pip'+(i<forge.hits?' on':'')+'"></span>').join('');
   const c=forgeCanvas.getContext('2d');if(!c)return;
   c.clearRect(0,0,520,110);c.fillStyle='#29231f';c.fillRect(0,0,520,110);
@@ -322,6 +324,7 @@ function finishForge(){
 
 /* ---------- 두꺼비 할멈 (약재상) ---------- */
 function talkToad(){
+  if(G.diary.some(d=>d.id==='end')){toadFarewell();return;}
   if(Rg.arcsEnabled()&&G.f.galArcToad1){toadFarewell();return;}
   if(has('meoru')){
     talk(Rg.arcsEnabled()?
@@ -335,7 +338,7 @@ function talkToad(){
         diary('galArcToad1','두꺼비 할멈이 해머루로 엄마의 병을 늦추는 약을 지어 까치 편에 보냈다.');
         toadFarewell();return;
       }
-      endGame();
+      toadFarewell();
     });
     return;
   }
@@ -353,10 +356,31 @@ function talkToad(){
 }
 function toadFarewell(){
   const F=G.f,c=[{t:'북쪽으로 떠난다',go:endGame}];
-  if(!F.galArcToad2&&G.rel.toad.v>=1)c.push({t:'엄마도 이 길을 갔는지 묻는다',go:toadWinter});
-  if(F.galArcToad2&&!F.galArcToad3)c.push({t:'떠나기 전에 인사를 드린다',go:toadWrap});
+  if(Rg.arcsEnabled()&&!F.galArcToad2&&G.rel.toad.v>=1)c.push({t:'엄마도 이 길을 갔는지 묻는다',go:toadWinter});
+  if(Rg.arcsEnabled()&&F.galArcToad2&&!F.galArcToad3)c.push({t:'떠나기 전에 인사를 드린다',go:toadWrap});
+  if(!knows('home:'+Rg.id))for(const item of ['acorn_jelly','sesame_salt'])if(has(item))
+    c.push({t:ITEMS[item].n+'을 까치 편에 보낸다',go:()=>galSendHome(item)});
   c.push({t:'마을을 좀 더 둘러본다',go:null});
   talk([['두꺼비 할멈','북쪽으로 갈 채비는 됐니?',c]]);
+}
+// 새 엔진과 합치기 전에도 기존 가공품 배달로 한 번만 보낸다. 약 배달과는 별개다.
+const homeReplies={
+  acorn_jelly:'빈 묵 그릇에 엄마가 늘 쓰던 나무숟가락이 얹혀 돌아왔다. 숟가락 손잡이를 쥐어 봤다.',
+  sesame_salt:'엄마가 깨소금 종지를 두 손으로 감싸 코끝에 댔다고, 까치가 날개를 모아 보여 주었다.'
+};
+Rg.homeReply=homeReplies.acorn_jelly;
+function galSendHome(item){
+  if(knows('home:'+Rg.id)||!has(item))return;
+  Rg.homeReply=homeReplies[item];
+  if(typeof sendHomeGift==='function'){sendHomeGift(Rg.id,item);return;}
+  if(typeof sendCraftHome==='function'){
+    sendCraftHome(item);
+    const entry=G.diary.find(d=>d.id==='home:'+Rg.id);
+    if(entry){
+      entry.text=ITEMS[item].n+' 하나를 까치 편에 집으로 보냈다. '+Rg.homeReply;
+      talk([['너구리',ITEMS[item].n+' 하나야. 엄마한테 내가 만들었다고 전해 줘.'],['너구리',Rg.homeReply]]);
+    }
+  }
 }
 function toadWinter(){
   if(!G.f.galArcToad1||G.rel.toad.v<1)return;
@@ -401,7 +425,7 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '단풍골 체험판 완료';
-  if(Rg.arcsEnabled()&&F.galArcToad1)return '두꺼비 할멈에게 인사하고 북쪽으로 떠나기';
+  if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '두꺼비 할멈에게 인사하고 북쪽으로 떠나기';
   if(!F.dodamTalk)return '마을 어귀의 다람쥐 도담에게 말 걸기';
   const ac=G.inv.acorn||0;
   const powderStep=()=>has('powder')?null:(ac<3?'도토리 줍기 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개 넣어 빻기');
@@ -423,15 +447,96 @@ Rg.goal=()=>{
 
 /* PA-43: 첫 가을의 길손과 조사. classic은 위의 지도와 대사를 그대로 쓴다. */
 if(!CLASSIC){
+  /* 채집의 왕복 바늘과 절구의 손동작을 짧게 재사용한다. 소모품·실패 비용은 없다.
+     진행한 손동작만 G.f에 둬서 중단·저장 뒤 같은 자리에서 이어 할 수 있다. */
+  const hp=el('section');hp.id='galHands';hp.hidden=true;
+  hp.setAttribute('role','dialog');hp.setAttribute('aria-label','함께 손쓰기');
+  hp.style.cssText='position:absolute;inset:8% 6%;z-index:7;padding:18px;background:#f2dfb8;color:#493822;border:3px solid #805b36;overflow:auto;text-align:center';
+  const ht=el('h2'),hh=el('p'),hc=el('canvas'),hm=el('div'),hz=el('span'),hn=el('span'),hs=el('p'),hb=el('button','btn primary'),hl=el('button','btn','왼쪽 바구니'),hr=el('button','btn','오른쪽 바구니'),hx=el('button','btn','잠깐 쉬기');
+  hc.width=400;hc.height=120;hc.style.cssText='width:100%;max-width:600px;image-rendering:pixelated';
+  hm.style.cssText='position:relative;height:20px;background:#b29b73;margin:12px 0';
+  hz.style.cssText='position:absolute;top:0;height:100%;background:#78925b';
+  hn.style.cssText='position:absolute;top:-3px;width:4px;height:26px;background:#49301d';
+  hm.append(hz,hn);hb.id='galHandsHit';hx.id='galHandsClose';hl.id='galHandsLeft';hr.id='galHandsRight';
+  for(const b of [hb,hl,hr,hx])b.type='button';
+  hp.append(ht,hh,hc,hm,hs,hb,hl,hr,hx);$('shell').appendChild(hp);
+  let hand=null;
+  function hands(title,kind,steps,commit,sort=false){
+    if(hand||G.ended)return;
+    const saved=G.f.galHandsProgress?.[kind]||0;
+    hand={owner:G,kind,steps,commit,sort,hits:Math.min(saved,steps.length-1),pos:0,dir:1,miss:0,cool:0};
+    hp.dataset.kind=kind;ht.textContent=title;
+    // 조작은 실제 입력 이름으로 안내한다. 움직임 줄이기에서는 바늘을 가운데 둔다.
+    hh.textContent=sort?'큰 것부터 양쪽에 번갈아 놓자. 바구니를 누르거나 '+HITKEY+'로 놓기.':'밝은 자리에서 '+HITKEY+' · 놓쳐도 그대로, 쉬었다 이어 해도 돼.';
+    hb.textContent=sort?'다음 바구니에 놓기'+(TOUCH?'':' · J / Space'):'손 맞추기'+(TOUCH?'':' · J / Space');
+    hl.hidden=hr.hidden=!sort;hm.hidden=sort;hp.hidden=false;releaseInputs();drawHands();
+  }
+  function closeHands(){hp.hidden=true;hand=null;releaseInputs();}
+  function handHit(side){
+    const a=hand;if(!a||a.owner!==G||G.region!==Rg.id){closeHands();return;}
+    if(a.cool>0)return;
+    a.cool=MG.gather_cooldown;
+    if(a.sort&&side!==undefined&&side!==a.hits%2){hh.textContent='이번에는 '+(a.hits%2?'오른쪽':'왼쪽')+' 바구니. 한쪽에만 큰 게 쌓이지 않게.';return;}
+    const width=MG.gather_root_width+(a.miss>=MG.gather_help_misses?MG.gather_help_width:0);
+    if(!a.sort&&!Vfx.reducedMotion&&Math.abs(a.pos-50)>width/2){
+      a.miss++;hh.textContent='손을 잠깐 멈추자. 밝은 자리에서 다시 맞추면 돼.';drawHands();return;
+    }
+    Sound.gather(true);a.hits++;
+    (G.f.galHandsProgress||(G.f.galHandsProgress={}))[a.kind]=a.hits;
+    if(a.hits===a.steps.length){
+      delete G.f.galHandsProgress[a.kind];const commit=a.commit;closeHands();commit();refreshHud();return;
+    }
+    a.pos=0;a.dir=1;drawHands();
+  }
+  hb.onclick=()=>handHit();hl.onclick=()=>handHit(0);hr.onclick=()=>handHit(1);hx.onclick=closeHands;
+  hp.addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key===' ')&&e.target instanceof HTMLButtonElement){
+      e.preventDefault();e.stopPropagation();if(!e.repeat)e.target.click();
+    }
+  });
+  function drawHands(){
+    const a=hand;if(!a)return;
+    hs.textContent=(a.hits+1)+' / '+a.steps.length+' · '+a.steps[a.hits];
+    const width=MG.gather_root_width+(a.miss>=MG.gather_help_misses?MG.gather_help_width:0);
+    hz.style.left=(50-width/2)+'%';hz.style.width=width+'%';hn.style.left=a.pos+'%';
+    hp.dataset.pos=a.pos;hp.dataset.hits=a.hits;hp.dataset.target=width;
+    const c=hc.getContext('2d');c.clearRect(0,0,400,120);c.fillStyle='#d3bd90';c.fillRect(0,88,400,32);
+    const box=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
+    if(a.sort){
+      for(let i=0;i<2;i++){box(65+i*230,65,45,24,'#9d7041');box(62+i*230,62,51,5,'#65452b');}
+      for(let i=0;i<a.steps.length;i++){const placed=i<a.hits,x=placed?78+(i%2)*230+(i>1?12:0):175+i*14,y=placed?57:72;box(x,y,9,10,'#b37b3c');box(x-1,y-2,11,4,'#65452b');}
+    }else if(a.kind.startsWith('lamp')){
+      box(173,20,54,65,'#6c6947');box(179,26,42,50,'#c2b374');
+      for(let i=0;i<=a.hits;i++){const x=194+(i%2)*15,y=37+Math.floor(i/2)*19;box(x-3,y-3,8,8,'#e5db80');box(x,y,2,2,'#fff7b7');}
+      box(140,73,30,8,'#94633e');box(147,68,13,5,'#bf915c');
+    }else if(a.kind==='magpie'){
+      box(135,55,130,32,'#8d6354');box(145,47,110,8,'#bb8b6c');box(196,45,7,44,'#ecd7a7');box(186,39,27,7,'#ecd7a7');
+    }else{
+      c.strokeStyle='#79512c';c.lineWidth=6;c.beginPath();c.arc(200,51,37,0,Math.PI*2);c.stroke();
+      for(let i=0;i<6;i++){const p=i*Math.PI/3;c.beginPath();c.moveTo(200,51);c.lineTo(200+Math.cos(p)*37,51+Math.sin(p)*37);c.stroke();}
+      box(155,91,92,5,'#668886');
+      for(let i=a.hits;i<a.steps.length;i++)box(148+i*22,91,12,4,'#a66d37');
+    }
+    // 도구를 쥐지 않은 너구리 앞발. 맞춘 뒤에는 잡을 자리가 하나씩 옮겨진다.
+    box(113+a.hits*9,84,22,12,'#926a44');box(112+a.hits*9,80,24,7,'#b58957');
+    box(264-a.hits*9,84,22,12,'#926a44');box(263-a.hits*9,80,24,7,'#b58957');
+  }
+  defineMinigame({id:hp.id,hit:()=>handHit(),step:()=>{
+    const a=hand;if(!a)return;
+    if(a.owner!==G||G.region!==Rg.id){closeHands();return;}
+    if(a.cool>0)a.cool--;
+    a.pos=Vfx.reducedMotion?50:clamp(a.pos+a.dir*MG.gather_root_speed,0,100);
+    if(a.pos===100)a.dir=-1;else if(a.pos===0)a.dir=1;drawHands();
+  }});
   const done=id=>!!G.f.wanderersDone?.['galchamgol:'+id];
   const picture=name=>(x,y,f)=>Rg.expArt[name](x,y,f);
-  const visit=id=>Object.hasOwn(G.f.examineVisits||{},'galchamgol:'+id);
   function magpieTalk(){
     talk([['늙은 까치','약방에 들렀다 집집마다 돌아가려던 참이란다.\n개울바람에 빈 약보자기까지 펄럭이는구나.'],
       ['늙은 까치','무거운 짐은 날개로 들지만, 매듭은 발로 묶지.\n바람에 자꾸 풀리니 잠깐 누가 눌러 주면 좋겠는데.'],
       ['너구리','내가 잡을게요.\n엄마 약도 이 보자기에 싸나요?'],
       ['늙은 까치','그래. 할멈이 약을 달이면 내가 집으로 나르지.\n네가 길에 있어도 약은 집에 닿을 거란다.',[
-        {t:'두 손으로 보자기를 눌러 드린다',go:()=>talk([
+        {t:'두 손으로 보자기를 눌러 드린다',go:()=>hands('까치의 약보자기','magpie',[
+          '보자기 왼쪽 귀를 누른다','반대쪽 귀도 겹쳐 잡는다','까치가 묶을 손잡이를 남긴다'],()=>talk([
           ['너구리','(바람이 빠져나갈 틈을 남겨 두고 누른다.)\n이렇게 잡으면 매듭이 보이겠죠?'],
           ['늙은 까치','잘 잡았다. 납작하게 싸야 날다가도 안 흔들려.\n이 매듭은 손잡이처럼 남겨 두고.'],
           ['늙은 까치','물레방아 옆 함지박도 물살만 잘 받으면 뜬단다.\n개울 위 당산나무를 봐 두렴. 나중에 그리 갈 테니.'],
@@ -439,10 +544,10 @@ if(!CLASSIC){
         ],()=>{
           diary('galExpMagpie','늙은 까치가 약보자기를 묶는 동안 두 손으로 눌러 드렸다. 약은 까치가 집으로 나른다. 나는 당산나무로 가는 길을 살핀다.');
           finishWanderer('old_magpie');
-        })},{t:'바람이 잦아들면 도와드릴게요',go:null}]]]);
+        }))},{t:'바람이 잦아들면 도와드릴게요',go:null}]]]);
   }
   function brothersTalk(){
-    const sorted=visit('forge_share');
+    const sorted=G.f.galExpBrothersSorted;
     if(G.f.galExpBrothersAsked&&sorted){
       talk([['다람쥐 형제','형: 큰 것부터 번갈아 놓으니 양쪽이 비슷하네.\n동생: 내 몫이 적다고만 생각했는데!'],
         ['너구리','한 바구니에 담고,\n겨울에 같이 먹으면?'],
@@ -454,14 +559,21 @@ if(!CLASSIC){
       });return;
     }
     if(G.f.galExpBrothersAsked){
-      talk([['다람쥐 형제','동생: 우린 아직 큰 도토리를 서로 세고 있어.\n형: 오른쪽 낮은 평상에서 같이 나눠 주기로 했잖아!']]);return;
+      talk([['다람쥐 형제','동생: 우린 아직 큰 도토리를 서로 세고 있어.\n형: 오른쪽 낮은 평상에서 같이 나눠 주기로 했잖아!']],shareBaskets);return;
     }
     talk([['다람쥐 형제','형: 내가 일곱 번을 오갔으니 큰 도토리는 내 몫이지.\n동생: 내가 낙엽을 걷어 찾았잖아!'],
       ['너구리','겨울 먹을 거야?\n작은 것만 한쪽에 몰렸네.'],
       ['다람쥐 형제','형: 큰 건 몇 알 안 되는데, 둘 다 욕심이 나서.\n동생: 도담처럼 묻어 놓고 잊을까 봐 더 그래.'],
       ['다람쥐 형제','오른쪽 낮은 평상으로 바구니를 옮겨 둘게.\n어떻게 나누면 좋을지 같이 봐 줄래?',[
-        {t:'같이 고르게 나눠 보자',go:()=>{G.f.galExpBrothersAsked=true;if(G.f.examineVisits)delete G.f.examineVisits['galchamgol:forge_share'];toast('오른쪽 낮은 평상의 도토리 바구니를 살펴보자');}},
+        {t:'같이 고르게 나눠 보자',go:()=>{G.f.galExpBrothersAsked=true;toast('오른쪽 낮은 평상에서 바구니를 나누자 · E');}},
         {t:'다음에 같이 보자',go:null}]]]);
+  }
+  function shareBaskets(){
+    if(!G.f.galExpBrothersAsked){brothersTalk();return;}
+    if(G.f.galExpBrothersSorted){brothersTalk();return;}
+    hands('형제와 도토리 나누기','brothers',['제일 큰 알은 왼쪽','다음 큰 알은 오른쪽','작은 알도 왼쪽','마지막 알은 오른쪽'],()=>{
+      G.f.galExpBrothersSorted=true;brothersTalk();
+    },true);
   }
   function chickTalk(){
     if(G.f.galExpChickWith&&G.f.galExpChickX>=2090){
@@ -471,6 +583,7 @@ if(!CLASSIC){
         ['꺼병이','고마워, 천천히 걷는 보부상!\n물이 반짝이는 쪽으로 가면 약방이야. 엄마가 그랬어.']
       ],()=>{
         diary('galExpChick','도토리를 따라오다 길을 잃은 꺼병이와 물가까지 걸었다. 갈대 너머 어미의 대답을 듣고 제 길을 찾았다. 내 발소리도 작아졌다.');
+        if(typeof grantNickname==='function')grantNickname('gal_quiet_steps','사뿐발 보부상','꺼병이');
         finishWanderer('lost_chick');
       });return;
     }
@@ -483,14 +596,120 @@ if(!CLASSIC){
         {t:'여기서 기다려. 길부터 살필게',go:null}]]]);
   }
   const magpie={id:'old_magpie',name:'늙은 까치',x:820,draw:picture('magpie'),talk:magpieTalk,
-    get greeting(){return G.tool==='sickle'?'낫을 받았구나. 당산나무 길도 이제 닿겠네.\n나는 약보자기를 챙겨 약방으로 가마.':'매듭이 단단해서 날기 좋구나.\n대장간 마당에서 바람을 좀 더 보고 가마.';}};
+    get greeting(){return G.f.galWheelDone?'개울 소리가 달라졌구나. 네가 방아를 고쳤지?\n그 소리도 집에 전하마.':G.tool==='sickle'?'낫을 받았구나. 물레방아 물길의 덩굴도 걷겠네.\n네 엄마가 찧던 마을 곡식도 다시 빻을 수 있을 게다.':'매듭이 단단하니 날기 좋구나.\n멈춘 물레방아는 개울 오른쪽에 있단다.';}};
   const hubMagpie={id:magpie.id,name:magpie.name,x:480,draw:magpie.draw,talk:magpie.talk};
   Object.defineProperty(hubMagpie,'greeting',{get:()=>magpie.greeting});
   const brothers={id:'squirrel_brothers',name:'다람쥐 형제',x:620,draw:picture('brothers'),talk:brothersTalk,
     greeting:'형: 큰 것부터 번갈아!\n동생: 겨울에는 한 바구니에서!'};
   const chick={id:'lost_chick',name:'꺼병이',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
     greeting:'이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!'};
-  Rg.expWanderers={village:[magpie],forge:[brothers],forest:[chick],marsh:[],hill:[]};
+  function wheelStage(){
+    if(G.f.galWheelDone)return 5;
+    if((G.f.galWheelStage||0)>=4)return 4;
+    return G.f.galWheelSpoke&&G.f.galWheelAxle?3:G.f.galWheelSpoke?2:G.f.galWheelStage||0;
+  }
+  function wheelTalk(){
+    const F=G.f,stage=wheelStage();
+    if(F.galWheelDone){
+      talk([['너구리','쿵, 쿵, 쿵… 한 번 쉬고.\n엄마가 절구 찧던 소리랑 같네.'],
+        ['늙은 까치','방아가 돌아가니 네 엄마 몫도 줄겠구나.\n다시 올 땐 빈 보따리로 쉬어 가렴.'],
+        ['너구리','엄마, 이제 마을 곡식은 같이 빻아요.',[
+          {t:'물소리에 맞춰 절구 손버릇을 해 본다',go:()=>hands('엄마의 절구 박자','wheel_revisit',[
+            '가볍게 한 번','두 번, 힘을 빼고','세 번, 이제 한 번 쉰다'],()=>{
+              diary('galWheelReturn','돌아와 물레방아 소리에 맞춰 엄마의 절구 손짓을 해 봤다. 세 번 찧고 한 번 쉬는 버릇이 물소리에도 맞았다.');
+              talk([['너구리','손이 먼저 쉬네.\n엄마가 하던 대로.']]);
+            })},{t:'소리만 듣고 간다',go:null}]]]);return;
+    }
+    if(stage===0){
+      talk([['너구리','살이 빠지고 굴대도 갈라졌네.\n물만 흘러가고 있어.'],
+        ['늙은 까치','네 엄마가 아프고 나서 멈췄지.\n그동안 마을 곡식을 네 엄마 혼자 절구에 찧었단다.'],
+        ['너구리','혼자요? …이번엔 같이 고쳐요.'],
+        ['늙은 까치','나는 마른 낙엽을 물어낼 테니 물받이를 비워 주렴.\n살은 참나무 숲 낮은 가지에, 굴대는 형제네 평상에 있단다.',[
+          {t:'물받이 낙엽부터 함께 걷는다',go:()=>hands('물레방아 물받이 비우기','wheel_leaves',[
+            '물받이 위 낙엽을 모은다','젖은 낙엽은 옆 물로 뺀다','막힌 물구멍을 드러낸다'],()=>{
+              F.galWheelStage=1;diary('galWheelStart','엄마가 아프고 나서 멈춘 물레방아를 고치기로 했다. 그동안 엄마 혼자 마을 곡식을 절구에 찧었다. 까치와 물받이를 비웠다.');
+              talk([['늙은 까치','물구멍이 보이는구나.\n나는 여기서 받치마. 길에서 부품을 만나면 챙겨 오렴.']]);
+            })},{t:'어디가 고장 났는지 보고 간다',go:null}]]]);return;
+    }
+    if(stage<3){
+      talk([['너구리',F.galWheelAxle?'굴대는 개울 받침에 왔어.\n참나무 숲 입구의 낮은 가지에서 살만 찾자.':!F.galWheelSpoke?'빠진 살은 참나무 숲 입구의 낮은 가지.\n굵은 굴대는 대장간 길 형제네 평상에서 같이 들자.':'살은 가져왔어.\n대장간 길 형제네 평상에서 굴대를 함께 들자.']]);return;
+    }
+    if(stage===3){
+      talk([['너구리','살도 굴대도 다 왔어요.'],['늙은 까치','형제는 밑에서 받치고 나는 쐐기를 잡으마.\n넌 살을 굴대 홈에 맞춰 주렴.',[
+        {t:'받쳐 주는 손에 맞춰 조립한다',go:()=>hands('함께 물레방아 맞추기','wheel_fit',[
+          '굴대의 홈을 위로 돌린다','빠진 살을 홈에 끼운다','까치가 잡은 쐐기를 밀어 넣는다'],()=>{
+            F.galWheelStage=4;diary('galWheelFit','형제가 굴대를 받치고 까치가 쐐기를 잡았다. 숲에서 되찾은 살을 끼우니 물레방아가 다시 한 몸이 됐다.');
+            talk([['너구리','이제 물만 돌리면 돼.'],['늙은 까치','위 물길의 덩굴을 낫으로 걷어야 한단다.\n무쇠에게 받은 낫을 가져오렴.']]);
+          })},{t:'조금 쉬고 맞춘다',go:null}]]]);return;
+    }
+    if(G.tool!=='sickle'){
+      talk([['너구리','물길 위를 마른 칡이 막았네.'],['늙은 까치','날쌘에게 숯을 바꿔 무쇠에게 가져가렴.\n낫을 받으면 이 덩굴도 걷을 수 있지.']]);return;
+    }
+    talk([['너구리','낫으로 덩굴부터 걷을게요.'],['늙은 까치','수문은 조금씩 열렴.\n내가 물을 볼 테니 넌 손잡이를 잡아.',[
+      {t:'덩굴을 걷고 수문을 함께 연다',go:()=>hands('물레방아에 물 돌리기','wheel_water',[
+        '낫으로 마른 덩굴을 걷는다','수문 손잡이를 조금 올린다','첫 물을 받으면 손을 놓는다'],()=>{
+          F.galWheelStage=5;F.galWheelDone=true;
+          if(typeof grantNickname==='function')grantNickname('gal_water_hands','물소리 보부상','늙은 까치');
+          diary('galWheelDone','물레방아를 고쳐 마을에 방아 소리가 돌아왔다. 방아 공이가 세 번 내려갔다가 쉬었다. 엄마가 절구 찧던 손버릇에 내 손도 맞춰 움직였다.');
+          talk([['너구리','돌아요! …쿵, 쿵, 쿵.'],['늙은 까치','그러고 한 번 쉬지.\n네 엄마 손도 꼭 저랬단다.'],['너구리','(공이를 쥐던 손을 펴고, 한 박자 쉰다.)'],['늙은 까치','물소리를 돌려줬으니, 물소리 보부상이구나.\n집으로 갈 때 이 소리도 전하마.']]);
+        })},{t:'물소리를 먼저 들어 본다',go:null}]]]);
+  }
+  function wheelSpoke(){
+    const F=G.f;
+    if(F.galWheelSpoke){talk([['너구리','이 가지에 물레방아 살이 걸려 있었지.\n끝에 빗금이 남아 있었어.']]);return;}
+    if(!F.galWheelStage){talk([['너구리','나뭇가지에 긴 나무 살이 걸렸네.\n집 앞 물레방아에서 본 빗금인데.']]);return;}
+    talk([['너구리','물레방아 살이다.\n물에 떠내려가다 가지에 걸렸구나.',[
+      {t:'가지가 내려올 때 두 손으로 받는다',go:()=>hands('가지에 걸린 물레방아 살','wheel_spoke',[
+        '낮은 가지를 살짝 당긴다','걸린 살 끝을 받친다','살을 비틀지 않고 빼낸다'],()=>{
+          F.galWheelSpoke=true;F.galWheelStage=wheelStage();
+          diary('galWheelSpoke','숲 입구의 낮은 가지에서 물레방아 살을 받았다. 물에 쓸려도 끝의 빗금은 남아 있었다.');
+          talk([['너구리',F.galWheelAxle?'굴대도 개울 받침에 왔지.\n물레방아로 돌아가자.':'굴대는 형제네 평상이라고 했어.\n대장간 길로 나가며 들르자.']]);
+        })},{t:'먼저 가지 모양을 살핀다',go:null}]]]);
+  }
+  function wheelAxle(){
+    const F=G.f;
+    if(!F.galExpBrothersSorted){shareBaskets();return;}
+    if(!done('squirrel_brothers')){brothersTalk();return;}
+    if(F.galWheelAxle){talk([['다람쥐 형제','형: 굴대는 물레방아 받침에 올려 뒀어.\n동생: 셋이 드니 하나도 안 무거웠지?']]);return;}
+    if(!F.galWheelStage){talk([['다람쥐 형제','형: 이 통나무는 물레방아 굴대야.\n동생: 누가 고치러 온대? 개울에 물어보자.']]);return;}
+    talk([['다람쥐 형제','형: 무쇠 아저씨가 깎아 둔 굴대야.\n동생: 우린 둘이 들어도 한쪽이 자꾸 처져.'],
+      ['너구리','내가 가운데를 들게.\n아까 도토리처럼 양쪽을 맞추자.',[
+        {t:'형제와 굴대 무게를 나눠 든다',go:()=>hands('셋이 굴대 들기','wheel_axle',[
+          '형이 드는 쪽을 함께 받친다','동생 쪽도 같은 높이로 든다','까치가 가리킨 받침에 내려놓는다'],()=>{
+            F.galWheelAxle=true;F.galWheelStage=wheelStage();
+            diary('galWheelAxle','형제와 굴대를 나눠 들었다. 형제가 개울까지 함께 옮겨 받침에 올렸다.');
+            talk([['다람쥐 형제',F.galWheelSpoke?'형: 굴대는 개울 받침에 왔어.\n동생: 살도 찾았으니 이제 끼우자!':'형: 우린 개울에서 굴대를 받치고 있을게.\n동생: 네 살이 오면 끼우기만 하면 돼!']]);
+          })},{t:'손 놓을 자리를 먼저 본다',go:null}]]]);
+  }
+  function lanternTalk(){
+    const F=G.f;
+    if(F.galLanternLit){talk([['너구리','불빛이 처마 아래로 모였네.'],['두꺼비 할멈','문을 열어 뒀으니 아침이면 갈대로 돌아가겠지.\n또 올 때는 빈 등롱만 살펴 주렴.']]);return;}
+    if(F.galLanternCount>=3){
+      talk([['너구리','세 마리 다 왔어요.'],['두꺼비 할멈','뚜껑은 닫지 마렴.\n들어앉을 자리만 내어 주면 된단다.',[
+        {t:'반딧불이 든 등롱을 처마에 건다',go:()=>hands('약방에 반딧불 등불 달기','lamp_hang',[
+          '갈대 잎을 등롱 밑에 깐다','등롱 고리를 처마에 건다','입구는 열린 채로 놓아둔다'],()=>{
+            F.galLanternLit=true;finishWanderer('reed_fireflies');
+            diary('galLanternLit','늪의 반딧불을 등롱에 잠깐 불러 약방 처마를 밝혔다. 입구는 열어 두었다. 밤마다 반딧불로 방을 밝혀 주던 엄마가 생각났다.');
+            talk([['너구리','엄마도 이렇게 방을 밝혀 줬는데.'],['두꺼비 할멈','…네 엄마도 이 불빛을 한참 보았지.\n너를 안고 이 길을 지날 때.'],['너구리','오늘은 내가 달아 줄게요.']]);
+          })},{t:'먼저 불빛을 보고 있는다',go:null}]]]);return;
+    }
+    talk([['두꺼비 할멈','약재를 추려야 하는데 처마가 어둡구나.\n늪의 반딧불에게 잠깐 빛을 빌려 볼까.'],
+      ['너구리','잡아 와요?'],['두꺼비 할멈','아니, 빈 등롱을 내밀렴. 앉으면 같이 오는 거지.\n낮은 갈대, 돌 위, 처마 아래에 한 마리씩 있단다.',[
+        {t:'빈 등롱을 들고 갈대로 간다',go:()=>{F.galLanternAsked=true;toast('왼쪽 갈대, 가운데 디딤돌 위, 약재 선반 옆 불빛 · E');}},
+        {t:'약 이야기부터 할게요',go:talkToad}]]]);
+  }
+  function inviteFirefly(i){
+    const F=G.f;
+    if(!F.galLanternAsked){lanternTalk();return;}
+    if(F['galLanternFly'+i]){talk([['너구리','여기 앉던 반딧불은 등롱에 있어.\n다른 데도 둘러보자.']]);return;}
+    hands('반딧불에게 자리 내어 주기','lamp_'+i,['불빛 아래로 등롱을 받친다','가만히 손을 펴 앉을 곳을 보인다'],()=>{
+      F['galLanternFly'+i]=true;F.galLanternCount=[0,1,2].filter(n=>F['galLanternFly'+n]).length;
+      talk([['너구리',F.galLanternCount===3?'다 왔네.\n처마에 등롱을 걸자.':'앉았다. 꽉 쥐지는 않을게.\n다음 불빛도 찾아보자.']]);
+    });
+  }
+  const fireflies={id:'reed_fireflies',name:'반딧불',x:1760,draw:(x,y)=>Rg.expArt.marker(x,y),talk:lanternTalk,
+    greeting:'등롱 입구로 작은 빛이 드나든다.\n잡아 두지 않아도 환하네.'};
+  Rg.expWanderers={village:[magpie],forge:[brothers],forest:[chick],marsh:[fireflies],hill:[]};
   function examine(id,x,label,read,y){
     return {id,x,label,...(y===undefined?{}:{y}),get text(){return read();}};
   }
@@ -499,11 +718,12 @@ if(!CLASSIC){
       examine('village_home',95,'열린 방문 들여다보기',()=> '엄마가 이불 끝을 꼭 쥐고 잔다.\n문은 조금 열어 두자. 개울 소리가 들리게.'),
       examine('village_well',440,'우물 두레박 살펴보기',()=>G.tool==='sickle'?
         '두레박 줄과 낫 자루에 같은 손때가 묻었다.\n엄마, 이제 덩굴도 걷을 수 있어.':'두레박은 내려갈 때 가볍고 올라올 때 무겁다.\n엄마는 물부터 다 쓰고 떠나라고 했는데.'),
-      examine('village_wheel',1050,'물레방아 물길 살펴보기',()=> '낙엽이 물받이에 걸려 물레방아가 멈췄다.\n옆으로 흐르는 물은 함지박을 밀 만큼 세네.')],
+      examine('village_wheel',990,'물레방아 물길 살펴보기',()=>G.f.galWheelDone?
+        '쿵, 쿵, 쿵. 나무 공이도 한 번 쉬네.\n엄마는 혼자 이 소리를 다 내셨구나.':'빠진 살 사이로 물만 새네. 굴대도 갈라졌다.\n엄마가 아프고 나서 멈췄다고 했지.')],
     forge:[
       examine('forge_sign',230,'갈림길 팻말 읽기',()=> '왼쪽은 집과 개울, 오른쪽은 참나무 숲.\n숯 냄새를 따라가면 무쇠 아저씨가 있겠다.'),
       examine('forge_charcoal',1860,'식힌 숯가마 살펴보기',()=> '재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 아저씨 불씨도 여기서 시작했겠지.'),
-      examine('forge_share',810,'낮은 평상 살펴보기',()=>G.f.galExpBrothersAsked?
+      examine('forge_share',870,'낮은 평상 살펴보기',()=>G.f.galExpBrothersSorted?
         '큰 도토리부터 양쪽 바구니에 번갈아 놓았다.\n작은 것도 나눠 담으니 높이가 비슷해졌다.':'빈 바구니 두 개가 나란히 놓였다.\n작은 발 둘이 서기 딱 좋은 낮은 평상이다.')],
     forest:[
       examine('forest_root',280,'드러난 뿌리 살펴보기',()=> '칡은 나무를 타고, 참나무는 땅을 붙든다.\n뿌리 밑 흙은 곡괭이가 들어갈 만큼 무르네.'),
@@ -528,6 +748,15 @@ if(!CLASSIC){
       zone==='village'?(done('old_magpie')?[]:list):zone==='forge'?(done('old_magpie')?[hubMagpie,...list]:list):list});
     Rg.zones[zone].examines=Rg.expExamines[zone];
   }
+  // 주연 NPC 목록은 그대로다. 이 객체들은 E로 만지는 작업 자리이며 인물·만남 수에 더하지 않는다.
+  const work=(id,x,label,talk,y=GROUND)=>({id:'gal_work_'+id,name:label,x,y,prompt:label,talk,
+    draw:(sx,sy)=>{if(id==='wheel')Rg.expArt.marker(sx,sy);}});
+  Rg.zones.village.npcs.push(work('wheel',1050,'물레방아 함께 고치기',wheelTalk));
+  Rg.zones.forge.npcs.push(work('baskets',810,'평상에서 도토리 나누기 · 굴대 함께 들기',wheelAxle));
+  Rg.zones.forest.npcs.push(work('spoke',450,'낮은 가지의 물레방아 살 받기',wheelSpoke));
+  Rg.zones.marsh.npcs.push(work('fly_reeds',520,'갈대의 반딧불에게 등롱 내밀기',()=>inviteFirefly(0)),
+    work('fly_stone',1030,'디딤돌 위 불빛에 등롱 내밀기',()=>inviteFirefly(1),158),
+    work('fly_shelf',1450,'선반 옆 불빛에 등롱 내밀기',()=>inviteFirefly(2)));
   Rg.expStep=()=>{
     if(G.zone!=='forest'||!G.f.galExpChickWith||done('lost_chick'))return;
     if(G.f.galExpChickArrived){G.f.galExpChickX=2090;return;}
@@ -546,7 +775,7 @@ if(!CLASSIC){
   Rg.goal=()=>{
     const F=G.f;
     if(!G.started||G.ended)return oldGoal();
-    if(Rg.arcsEnabled()&&F.galArcToad1)return '약을 보냈다 · 할멈께 인사하고 북쪽으로 떠나기';
+    if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '약을 보냈다 · 할멈께 인사하고 북쪽으로 떠나기';
     if(!F.dodamTalk)return '참나무 숲의 도담 찾아가기 · 대장간 길 오른쪽';
     if(F.dodamDone&&!F.musoeMet)return '대장간 길로 돌아가 무쇠에게 낫 묻기';
     if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠의 시험 통과하기 · 다시 말 걸기';

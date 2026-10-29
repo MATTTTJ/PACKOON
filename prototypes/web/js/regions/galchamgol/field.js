@@ -143,7 +143,12 @@ if(!CLASSIC){
     s.digs.forEach((d,i)=>Object.assign(d,{id:'gal_dig_'+i,zone:digs[i][0],x:digs[i][1]}));
     s.barrier.x=2420;s.mobs=[];return s;
   };
-  const commonStep=()=>{Rg.expStep?.();};
+  const commonStep=()=>{
+    Rg.expStep?.();
+    // Reuse the mortar's wooden beat near the repaired mill; do not replace the zone music.
+    if(G.zone==='village'&&G.f.galWheelDone&&Math.abs(G.px-1050)<W*.6&&G.anim%120===0)
+      Sound.playSfx('mortar',{gain:.25});
+  };
   const basic=(id,w,platforms)=>({w,startX:70,ground:GROUND,platforms,npcs:[],
     drawBack:()=>A.back(id),drawScenery:()=>A.scenery(id),
     drawFront:()=>A.front(id),weather:()=>Vfx.setWeather('maple'),
@@ -161,7 +166,7 @@ if(!CLASSIC){
         path(1710,'hill',180,'물 건너 당산나무 쪽으로',{travel:'depth',need:cutPath,
           reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',draw:A.treeDoor,drawBlocked:blocked})],
       vistas:[{id:'stream',x:930,from:0,to:140,draw:A.streamDoor,sound:'water',
-        thought:'낙엽도 집을 떠나네.\n엄마 약도 이 물길처럼 잘 갔으면.',
+        thought:'낙엽이 앞서 가네.\n저 큰 나무까지 가는 걸까?',
         diary:'물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.',layers:A.vistaStream}],
     },
     forge:{...basic('forge',2600,[{x:320,y:160,w:85},{x:400,y:126,w:80},
@@ -204,7 +209,7 @@ if(!CLASSIC){
         {id:'gal_cut_vine',x:340,y:GROUND,item:'vine',got:false}],
       stamps:[{id:'roots',x:2140,note:'stamp:galchamgol:roots',label:'당산나무 뿌리의 발자국 살피기'}],
       vistas:[{id:'home',x:2380,y:126,from:0,to:160,draw:A.marker,sound:'wind',
-        thought:'저 지붕이 우리 집이야.\n엄마, 한 번만 더 보고 갈게.',
+        thought:'우리 집 지붕이다.\n엄마, 나 여기까지 왔어.',
         diary:'당산나무 언덕에서 집을 돌아봤다. 골짜기의 단풍 사이로 우리 집 초가지붕이 보였다.',layers:A.vistaHill}],
       drawScenery:()=>{A.scenery('hill');Rg.drawScenery();},
       drawActors:drawBoss,onHit:oldHit,

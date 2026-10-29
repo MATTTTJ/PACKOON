@@ -55,12 +55,24 @@ if(!CLASSIC){
       px(x,h,2,H-h,color);
     }
   }
-  function tree(x,y,scale=1,color=C.ember,dark=false){
+  function tree(x,y,scale=1,color=C.ember,dark=false,shape=0){
     x=Math.round(x);y=Math.round(y);
     const q=(a,b,w,h,c)=>px(x+a*scale,y+b*scale,w*scale,h*scale,c);
     q(-3,-53,6,53,dark?'#46362f':C.bark);q(-13,-43,12,3,C.bark);q(1,-34,15,3,C.bark);
-    q(-23,-72,43,15,color);q(-31,-62,59,18,color);q(-25,-44,47,12,color);
-    q(-13,-78,23,8,color);q(-20,-69,17,4,dark?'#76503d':'#e99849');
+    if(shape===1){
+      // A windward oak has a low crown, a long left fork and an open right shoulder.
+      q(-27,-63,27,15,color);q(-36,-55,38,15,color);q(-22,-44,38,12,color);
+      q(0,-72,23,14,color);q(8,-61,24,15,color);q(-19,-65,18,5,color);
+      q(2,-46,18,3,C.bark);q(-27,-57,14,3,dark?'#76503d':'#e99849');
+    }else if(shape===2){
+      // A taller, sparsely leafed tree leaves its fork visible between two leaf clusters.
+      q(-10,-77,19,15,color);q(-20,-68,32,13,color);q(-28,-55,24,12,color);
+      q(9,-60,22,16,color);q(-12,-39,31,11,color);q(-14,-55,15,3,C.bark);
+      q(-5,-73,11,3,dark?'#76503d':'#e99849');q(-20,-43,12,3,color);
+    }else{
+      q(-23,-72,43,15,color);q(-31,-62,59,18,color);q(-25,-44,47,12,color);
+      q(-13,-78,23,8,color);q(-20,-69,17,4,dark?'#76503d':'#e99849');
+    }
     q(9,-55,18,3,dark?'#684334':'#ac4b32');q(-29,-53,13,2,dark?'#684334':'#ac4b32');
     q(-17,-74,3,2,'#edb660');q(7,-66,4,2,'#edb660');q(-22,-47,3,2,'#edb660');
   }
@@ -69,7 +81,7 @@ if(!CLASSIC){
     for(let u=start-s;u<start+W+s*2;u+=s){
       const a=hash(u+11),x=u-cam*par;
       tree(x,177+Math.floor(a*11),.65+a*.25,
-        dark?['#966245','#9f7047','#815139'][Math.floor(a*3)]:['#d37b3e','#bc6139','#df9748'][Math.floor(a*3)],dark);
+        dark?['#966245','#9f7047','#815139'][Math.floor(a*3)]:['#d37b3e','#bc6139','#df9748'][Math.floor(a*3)],dark,Math.floor(hash(u+73)*3));
     }
   }
   function ground(marsh=false){
@@ -81,15 +93,19 @@ if(!CLASSIC){
       if(a>.8)px(x-Math.floor(cam)%4,GROUND+8+Math.floor(a*14),2,1,marsh?'#353e36':'#503828');
     }
   }
-  function house(x,y=GROUND,s=1,lit=false){
+  function house(x,y=GROUND,s=1,lit=false,shape=0){
     const q=(a,b,w,h,c)=>px(x+a*s,y+b*s,w*s,h*s,c);
     q(0,-27,48,27,'#d3b18a');q(2,-24,44,22,'#c7a17b');q(0,-27,3,27,C.bark);q(45,-27,3,27,C.bark);
     q(19,-19,12,19,'#5c4031');q(22,-17,7,17,lit?'#e8b46c':'#332b2b');
     q(6,-20,9,8,'#f0ddba');q(10,-20,1,8,'#9d7950');q(6,-16,9,1,'#9d7950');
-    q(-6,-32,60,7,'#a87b43');q(-4,-38,56,6,'#c39350');q(1,-43,46,5,'#d8ad64');q(10,-47,28,4,'#e7c17b');
-    for(let i=0;i<8;i++)q(-1+i*7,-36,1,10,'#b38545');
+    const e=shape===1?5:shape===2?-3:0;
+    q(-6-e,-32,60+e*2,7,'#a87b43');q(-4-e,-38,56+e*2,6,'#c39350');
+    q(1-e,-43,46+e*2,5,'#d8ad64');q(10-e,-47,28+e*2,4,'#e7c17b');
+    for(let i=0;i<8;i++)q(-1-e+i*(7+e/4),-36,1,10,'#b38545');
     q(-9,-26,66,2,'#765337');q(15,0,21,2,'#876b4e');
     q(36,-54,4,9,'#88715b');q(33,-55,10,2,'#aa8a64');
+    if(shape===1){q(-20,-19,20,19,'#b99368');q(-24,-24,26,5,'#bc8b49');q(-20,-28,19,4,'#d6ac65');q(-14,-13,7,13,'#5d4632');}
+    if(shape===2){q(33,-18,10,8,lit?'#e1b369':'#ead5af');q(37,-18,1,8,'#95734e');q(33,-14,10,1,'#95734e');q(50,-9,9,9,'#78553c');q(49,-11,11,3,'#4f3b2e');}
   }
   function fence(x,y=GROUND,n=4){
     for(let i=0;i<n;i++){px(x+i*13,y-15,2,15,'#80603d');px(x+i*13-1,y-17,4,2,'#9d7c4d');}
@@ -102,6 +118,8 @@ if(!CLASSIC){
     px(x,y-39,1,27,'#c9ad7b');px(x-4,y-17,9,6,'#a27547');px(x-3,y-19,7,2,'#d1ae72');
   }
   function wheel(x,y=GROUND){
+    const stage=G.f.galWheelStage||0,working=!!G.f.galWheelDone;
+    const phase=working&&!Vfx.reducedMotion?G.anim*Math.PI/240:0;
     px(x-47,y-2,104,11,'#5c847f');px(x-40,y+2,32,1,'#b5c5a7');px(x+7,y+5,39,1,'#b5c5a7');
     px(x+18,y-54,39,4,'#8d643a');px(x+25,y-50,4,48,'#5b4130');
     // Stepped rim and spokes keep the large wheel on the same pixel grid as the stream.
@@ -111,11 +129,39 @@ if(!CLASSIC){
       px(x+xx-1,cy+yy-1,3,3,'#855833');
     }
     for(let i=0;i<8;i++){
-      const a=i*Math.PI/4;
+      if(!working&&stage<4&&(i===1||i===5))continue;
+      const a=i*Math.PI/4+phase;
       for(let r=0;r<24;r+=2)px(x+Math.round(Math.cos(a)*r),cy+Math.round(Math.sin(a)*r),2,2,'#a07646');
       px(x+Math.round(Math.cos(a)*26)-3,cy+Math.round(Math.sin(a)*26)-2,6,4,'#6e4a30');
     }
     px(x-3,cy-3,6,6,'#4a3428');px(x-1,cy-1,2,2,'#d1ab6b');
+    // A loose axle waits on trestles until the neighbours lift it into place.
+    if(G.f.galWheelAxle&&stage<4&&!working){px(x-52,y-11,6,11,'#67482f');px(x-23,y-11,6,11,'#67482f');px(x-56,y-14,44,5,'#a78350');px(x-54,y-13,39,1,'#d4ad6b');}
+    if(working){
+      const shift=Vfx.reducedMotion?0:Math.floor(G.anim/5)%8;
+      for(let i=0;i<5;i++){px(x+18,cy-22+i*7+shift,3,4,'#c1d2ae');px(x-23+i*11,y+8+(i%2),7,1,'#bcd0ae');}
+    }
+    if(stage>=4||working){
+      // The wheel's shaft drives a wooden pounder; the player's heirloom stays in the bundle.
+      const lift=!working||Vfx.reducedMotion?0:Math.max(0,Math.round(Math.sin(phase*2)*7));
+      px(x+34,y-26,4,26,'#694a30');px(x+33,y-29-lift,42,4,'#9b7645');
+      px(x+68,y-25-lift,4,15,'#a4804e');px(x+62,y-11,16,11,'#77715b');px(x+65,y-12,10,3,'#3e3f35');
+      // Brief drawn sound strokes remain legible when sound is switched off.
+      if(working&&!lift){px(x+62,y-18,2,3,'#dec690');px(x+76,y-17,2,3,'#dec690');}
+    }
+  }
+  function farAir(dusk=false){
+    // Low autumn vapour separates the two ridgelines without covering footholds.
+    for(let i=0;i<6;i++){
+      const x=((i*113+22-Math.floor(cam*.14))%720+720)%720-110,y=118+i%3*6;
+      px(x,y,74+i%2*21,2,dusk?'#b79287':'#d8b89a');
+      px(x+17,y+3,51+i%2*12,1,dusk?'#b79287':'#d8b89a');
+    }
+    const drift=Vfx.reducedMotion?0:Math.floor(G.anim/22)%620;
+    for(let i=0;i<4;i++){
+      const x=((64+i*15-drift-Math.floor(cam*.06))%620+620)%620-50,y=58+i%3*6;
+      px(x,y,3,1,'#a08378');px(x+3,y+1,2,1,'#a08378');px(x+5,y,3,1,'#a08378');
+    }
   }
   function basket(x,y=GROUND){
     px(x-9,y-10,18,8,'#b58a51');px(x-8,y-4,16,4,'#92703f');
@@ -157,16 +203,18 @@ if(!CLASSIC){
     sky(zone==='hill'||zone==='marsh');
     ridge(.1,zone==='marsh'?'#877377':'#bd8e83',116,17,.009);
     ridge(.23,zone==='marsh'?'#7c766e':'#aa7964',141,16,.014);
+    farAir(zone==='hill'||zone==='marsh');
     woods(.45,zone==='forest'||zone==='marsh');
     if(zone==='village'){
       // The hill is first seen across the wheel's water, long before its path opens.
       const x=1530-cam*.35;px(x-3,91,6,44,'#6b5340');px(x-23,77,42,19,'#bd7944');px(x-14,68,30,14,'#d28c4b');
-      house(70-cam);house(220-cam,GROUND,.8);well(440-cam);wheel(900-cam);
+      house(70-cam);house(220-cam,GROUND,.8,false,2);well(440-cam);
+      house(1098-cam,GROUND,.78,false,1);wheel(1050-cam);
       for(const x of [330,590,1200,1560,1980,2320])if(visible(x-cam)){
         fence(x-cam,GROUND,3);if(x!==590)basket(x-cam+53);
       }
     }else if(zone==='forge'){
-      house(1010-cam,GROUND,1.65);px(1030-cam,GROUND-31,30,31,'#352b26');
+      house(1010-cam,GROUND,1.65,false,1);px(1030-cam,GROUND-31,30,31,'#352b26');
       px(1048-cam,GROUND-40,10,9,'#dda25f');px(1051-cam,GROUND-37,4,6,'#ffe1a0');
       // Bellows charcoal and split wood belong beside the working forge.
       for(const u of [450,820,1230,1760,2120,2410]){const x=u-cam;if(!visible(x))continue;
@@ -175,7 +223,8 @@ if(!CLASSIC){
       fence(1500-cam,GROUND,6);px(1535-cam,GROUND-29,73,5,'#a2573b');px(1541-cam,GROUND-33,61,4,'#c2804c');
       px(1540-cam,GROUND-24,3,24,'#5a3c2a');px(1600-cam,GROUND-24,3,24,'#5a3c2a');
     }else if(zone==='forest'){
-      for(const u of [180,550,1040,1420,1910,2390,2700])tree(u-cam,GROUND,1.4,u%3?'#c57a38':'#ab5735');
+      for(const [i,u] of [180,550,1040,1420,1910,2390,2700].entries())
+        tree(u-cam,GROUND,1.1+hash(u+15)*.48,i%3?'#c57a38':'#ab5735',false,i%3);
       basket(660-cam);basket(740-cam);
       // This high oak supports the actual upper path and its weathered knot.
       tree(2250-cam,GROUND,1.8,'#b96738');
@@ -185,7 +234,7 @@ if(!CLASSIC){
       for(let i=0;i<14;i++){const x=((i*43-Math.floor(cam*.7))%620+620)%620-80;
         px(x,176+i%4*4,21+i%3*8,1,'#9fb092');}
       for(const u of [160,470,800,1090,1370,1850,2140,2340])reeds(u-cam);
-      house(1574-cam,GROUND,1.3,true);fence(1510-cam,GROUND,3);
+      house(1574-cam,GROUND,1.3,true,2);fence(1510-cam,GROUND,3);
       for(const u of [980,1200,1910]){const x=u-cam;px(x-21,GROUND-5,42,5,'#9d7950');px(x-24,GROUND-6,48,1,'#c3a278');}
     }else if(zone==='hill'){
       treeHollow(180-cam);smallShrine(1510-cam);
@@ -209,10 +258,16 @@ if(!CLASSIC){
         for(let i=0;i<14;i++){let x=740+i*31-cam;px(x,GROUND+15+i%3*4,15,1,'#88aaa0');leaf(x+11,GROUND+13+i%2*8,['#dba448','#d0753d','#a85834'][i%3]);}}
       // The door leaves a small view of bedding; no new family portrait or names.
       const x=70-cam;px(x+22,GROUND-16,8,16,'#49372e');px(x+22,GROUND-8,7,4,'#cbad7b');px(x+23,GROUND-9,4,2,'#8c8070');
-      // The visible jam explains why the large wheel stands still while the side stream runs.
+      // Leaves, missing spokes and the axle show three separate causes of the stopped mill.
       px(956-cam,138,107,4,'#8e6b42');px(957-cam,138,104,1,'#9ca889');
       px(998-cam,142,3,50,'#745536');px(1059-cam,142,3,50,'#745536');
-      for(let i=0;i<5;i++)leaf(1037+i*4-cam,137+i%2*2,['#b86a38','#d39a43','#9f5836'][i%3]);
+      if(!G.f.galWheelStage)for(let i=0;i<5;i++)leaf(1037+i*4-cam,137+i%2*2,['#b86a38','#d39a43','#9f5836'][i%3]);
+      else px(1038-cam,140,24,1,'#c7cdb0');
+      if(G.f.galWheelDone){
+        const fall=Vfx.reducedMotion?0:Math.floor(G.anim/5)%7;
+        px(1030-cam,142,3,19,'#89aba0');
+        for(let i=0;i<3;i++)px(1030-cam,142+i*6+fall,2,3,'#c6d7b8');
+      }
     }
     if(zone==='forge'){
       for(let i=0;i<3;i++){const x=1008-cam+i*9;px(x,GROUND-90-i*8,5,3,'#d3b9a0');px(x+2,GROUND-95-i*8,4,3,'#d3b9a0');}
@@ -221,9 +276,18 @@ if(!CLASSIC){
       // The siblings' low sorting board holds their own winter stores.
       const bx=810-cam;px(bx-28,GROUND-10,57,4,'#ae8550');px(bx-25,GROUND-6,4,6,'#755332');px(bx+21,GROUND-6,4,6,'#755332');
       basket(bx-13,GROUND-10);basket(bx+14,GROUND-10);
-      if(G.f.galExpBrothersAsked)for(let i=0;i<4;i++){
-        const xx=bx-18+(i%2)*26+(i>1?6:0),yy=GROUND-24;
-        px(xx,yy,4,4,'#bc8648');px(xx-1,yy-1,6,2,'#68482e');
+      for(let side=0;side<2;side++){
+        const count=G.f.galExpBrothersSorted?4:side===0?6:2;
+        for(let i=0;i<count;i++){
+          const xx=bx-18+side*27+(i%3)*5,yy=GROUND-24-Math.floor(i/3)*4;
+          px(xx,yy,4,4,'#bc8648');px(xx-1,yy-1,6,2,'#68482e');
+        }
+      }
+      if(!G.f.galWheelAxle){
+        // The replacement axle rests on the low shelf beneath the sorting baskets.
+        px(bx-26,GROUND-6,52,6,'#987347');px(bx-24,GROUND-5,48,1,'#c8a269');
+        px(bx-26,GROUND-6,3,6,'#694a30');px(bx+23,GROUND-6,3,6,'#694a30');
+        px(bx+13,GROUND-6,2,6,'#6c4f32');
       }
       const kx=1860-cam;
       px(kx-22,GROUND-19,44,19,'#87745a');px(kx-17,GROUND-25,34,6,'#9b8767');px(kx-11,GROUND-29,22,4,'#ad9672');
@@ -238,6 +302,13 @@ if(!CLASSIC){
       px(rx-26,GROUND-4,15,3,'#775237');px(rx+12,GROUND-8,20,4,'#775237');px(rx+27,GROUND-4,11,3,'#775237');
       px(rx-14,GROUND-7,12,1,'#ae7a44');px(rx+15,GROUND-7,12,1,'#ae7a44');
       px(rx-8,GROUND-3,11,3,'#453326');px(rx-5,GROUND-4,6,1,'#a48050');
+      if(!G.f.galWheelSpoke){
+        // Floodwater left a mill spoke across a low fork, within reach from level ground.
+        const sx=450-cam;
+        px(sx-17,GROUND-31,4,31,'#725038');px(sx-29,GROUND-27,16,3,'#725038');
+        px(sx-25,GROUND-24,48,5,'#bd945d');px(sx-23,GROUND-23,43,1,'#dfba7d');
+        for(let i=0;i<3;i++){px(sx+11+i*3,GROUND-24,1,2,'#725032');px(sx+12+i*3,GROUND-22,1,2,'#725032');}
+      }
       // A trail rope hangs from living forks, pointing inward toward the sacred tree.
       const gx=1180-cam;
       for(const dx of [-31,31]){px(gx+dx,147,3,45,'#735239');px(gx+dx-8,146,19,3,'#735239');
@@ -255,6 +326,23 @@ if(!CLASSIC){
       for(let i=-12;i<15;i+=9){px(hx+i,148,1,6,'#cbb180');px(hx+i-2,154,5,11,'#8d9564');px(hx+i-4,160,8,4,'#a9aa70');}
       for(let i=-10;i<14;i+=13){px(hx+i-4,181,9,10,'#9b7044');px(hx+i-5,179,11,3,'#604630');px(hx+i-2,184,2,4,'#c0935a');}
       Rg.expArt.marker(2180-cam,GROUND);
+      // A reed-framed open lantern gives the gathered fireflies somewhere to rest.
+      const lx=1644-cam,lit=!!G.f.galLanternLit,count=G.f.galLanternCount||0;
+      px(lx,146,1,10,'#a78a56');px(lx-8,155,17,2,'#ad8b50');
+      px(lx-7,157,15,19,lit?'#b4a56b':'#655f46');
+      px(lx-7,157,1,19,'#d1b67b');px(lx+7,157,1,19,'#d1b67b');px(lx-8,176,17,2,'#8e7345');
+      for(let i=0;i<(lit?3:count);i++){
+        const xx=lx-4+i*4,yy=162+i%2*7;
+        if(lit)px(xx-1,yy-1,4,4,'#c8c888');px(xx,yy,2,2,lit?'#fff0a6':'#c0c782');
+      }
+      if(lit){px(lx-12,165,2,1,'#d6cc92');px(lx+12,160,2,1,'#d6cc92');px(1622-cam,GROUND-3,38,2,'#b4aa6e');}
+      for(const [i,wx,y] of [[0,520,GROUND],[1,1030,158],[2,1450,GROUND]]){
+        if(G.f['galLanternFly'+i])continue;
+        const x=wx-cam,glow=Vfx.reducedMotion?true:Math.floor(G.anim/24+i)%3!==0;
+        px(x-3,y-17,1,17,'#94905b');px(x-7,y-15,5,1,'#a9a06a');
+        if(glow){px(x-5,y-23,9,7,'#8b9568');px(x-2,y-21,3,3,'#fff0a6');}
+        px(x-5,y-21,3,1,'#d1d0a0');px(x+2,y-20,3,1,'#d1d0a0');px(x-1,y-23,1,2,'#45533b');
+      }
       for(let i=0;i<18;i++){
         const wx=80+i*129,x=wx-cam;if(!visible(x,8))continue;
         const phase=Vfx.reducedMotion?i%4:Math.floor(G.anim/18+i)%4;
@@ -299,6 +387,7 @@ if(!CLASSIC){
   }
   function vistaStreamSky(){
     vistaSky();ridge(1,'#b59a96',112,14,.01);
+    farAir();
     for(let i=0;i<5;i++){const x=12+i*92-cam;px(x,119+i%2*3,81,2,'#e5c8aa');px(x+16,122+i%2*3,53,1,'#e5c8aa');}
     // Its broad forked crown matches the sacred oak reached through the hollow.
     const tx=330-cam;
@@ -311,9 +400,9 @@ if(!CLASSIC){
   function vistaStreamVillage(){
     ridge(1,'#aa8b69',149,10,.017);
     house(39-cam,159,.85,true);fence(84-cam,160,4);
-    house(174-cam,147,.43);house(381-cam,155,.62,true);
+    house(174-cam,147,.43,false,2);house(381-cam,155,.62,true,1);
     // The wheel belongs to a small mill, with a race bringing the stream to its top.
-    house(278-cam,159,.84);wheel(260-cam,175);
+    house(278-cam,159,.84,false,1);wheel(260-cam,175);
     px(283-cam,129,48,3,'#9d784e');px(322-cam,131,4,28,'#795b3e');px(284-cam,129,38,1,'#bdc3a0');
     // A jar terrace and bank steps make the three households different at a glance.
     for(let i=0;i<3;i++){const x=137+i*9-cam,y=160;
@@ -347,6 +436,7 @@ if(!CLASSIC){
   }
   function vistaHillSky(){
     vistaSky(true);ridge(1,'#9f7d87',112,22,.009);
+    farAir(true);
     for(let i=0;i<4;i++){const x=16+i*124-cam;px(x,107+i*5,83,2,'#dba08f');px(x+12,110+i*5,61,1,'#dba08f');}
   }
   function vistaHillValley(){
@@ -356,11 +446,11 @@ if(!CLASSIC){
     ridge(1,'#bd9069',168,13,.021);
     for(let i=0;i<22;i++){
       const x=i*31+Math.floor(hash(i*71)*13)-cam,y=169+Math.floor(hash(i+17)*13);
-      tree(x,y,.22+hash(i+2)*.15,['#ce8546','#a96846','#df9d51'][i%3]);
+      tree(x,y,.22+hash(i+2)*.15,['#ce8546','#a96846','#df9d51'][i%3],false,i%3);
     }
     // The winding water carries the eye from the near bank to home's lit paper window.
     for(let yy=139;yy<203;yy+=2){const x=184-cam+Math.round(Math.sin(yy*.043)*33);px(x,yy,5+Math.floor((yy-139)/5),2,'#d9bb8e');}
-    house(165-cam,165,.45,true);house(236-cam,172,.29);house(107-cam,177,.28);
+    house(165-cam,165,.45,true);house(236-cam,172,.29,false,2);house(107-cam,177,.28,false,1);
     px(175-cam,157,3,5,'#f8ce85');px(167-cam,156,3,3,'#ffe3a3');px(196-cam,161,2,14,'#9a7254');
     for(let i=0;i<4;i++)px(169-cam+i*2,145-i*3,3,2,'#cdb39a');
     const x=263-cam,y=180;
