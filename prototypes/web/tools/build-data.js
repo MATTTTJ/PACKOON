@@ -13,17 +13,28 @@ const t=name=>read(path.join(DATA,name+'.csv')).rows;
 const fail=msg=>{console.error('변환 실패: '+msg);process.exit(1);};
 
 const items=t('items'),bosses=t('bosses'),parts=t('boss_parts'),heirlooms=t('heirlooms'),notebook=t('notebook');
+const regionIds=new Set(t('regions').map(r=>r.id));
 /* 이름 → id (가공법·진정수치 칸은 사람이 읽는 이름으로 적혀 있다) */
 const byName=Object.fromEntries(items.map(r=>[r['이름'],r.id]));
 const idOf=(name,where)=>{const id=byName[name.trim()];if(!id)fail(where+': 아이템 이름 "'+name.trim()+'"을(를) items.csv 에서 찾지 못했다');return id;};
 
 /* 아이템: 레어도 단계(1~5)는 게임 안에서 0부터 센다 */
 const ITEMS={};
+// 같은 지역·완료표시·묶음에 속한 물건은 대체재다. 묶음을 생략하면 각각 필요하다.
+const PROGRESS=[],progressByKey={};
 for(const r of items){
   const lv=parseInt(r['레어도단계'],10);if(!(lv>=1&&lv<=5))fail('items.csv '+r.id+': 레어도단계가 1~5 가 아니다 ("'+r['레어도단계']+'")');
   if(!r['설명'])fail('items.csv '+r.id+': 설명이 비어 있다');
   if(!['재료','먹을거리','도구','귀한 것'].includes(r['종류']))fail('items.csv '+r.id+': 종류는 재료·먹을거리·도구·귀한 것 중 하나여야 한다');
   ITEMS[r.id]={n:r['이름'],r:lv-1,kind:r['종류'],d:r['설명']};
+  for(const entry of (r['진행보호']||'').split('·').map(x=>x.trim()).filter(Boolean)){
+    const m=entry.match(/^([a-z_]+):([A-Za-z_]+):([1-9]\d*)(?::([a-z_]+))?$/);
+    if(!m||!regionIds.has(m[1])||!Number.isSafeInteger(+m[3]))fail('items.csv '+r.id+': 진행보호 형식·지역·수량을 확인한다');
+    const [,region,done,n,group=r.id]=m,key=region+':'+done+':'+group;
+    let goal=progressByKey[key];
+    if(!goal){goal={region,done,options:[]};progressByKey[key]=goal;PROGRESS.push(goal);}
+    goal.options.push({[r.id]:+n});
+  }
 }
 /* NPC·지역 이름은 대사 안에도 적혀 있어 코드에 둔다 (표만 바꾸면 대사가 따라오지 않는다) */
 /* 보스 부위: 표 순서 그대로. 공격 종류와 예고 글은 지역 코드에 있다 */
@@ -143,7 +154,7 @@ for(const id of ['root','ssari','kkoe','eoksae','seogi','darae_vine']){
   requireValue(width>0&&width+MINIGAMES.gather_help_width<=MINIGAMES.gather_zone_span&&MINIGAMES.gather_zone_start+MINIGAMES.gather_zone_span<=100,'minigames.csv: '+id+' 채집 판정 범위가 막대를 벗어난다');
 }
 
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,NOTES,MINIGAMES,TUNING},null,1)+";\n";
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,NOTES,MINIGAMES,TUNING,PROGRESS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

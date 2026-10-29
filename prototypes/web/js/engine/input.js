@@ -19,7 +19,16 @@ addEventListener('keydown',e=>{
   if(first)onPress(k);
 });
 addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
-addEventListener('blur',()=>{for(const k in keys)keys[k]=false;touch.left=touch.right=false;});
+function releaseInputs(){
+  for(const k in keys)keys[k]=false;
+  for(const k in touch)touch[k]=false;
+  jumpQ=atkQ=false;
+  document.querySelectorAll('#pad .on').forEach(b=>b.classList.remove('on'));
+  if(typeof endDrag==='function')endDrag();
+}
+addEventListener('blur',releaseInputs);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInputs();});
+addEventListener('pointercancel',releaseInputs);
 
 function onPress(k){
   if(k==='m'){Sound.toggle();return;}

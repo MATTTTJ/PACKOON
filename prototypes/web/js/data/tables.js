@@ -1284,5 +1284,193 @@ const TABLES={
   "field_hit_width": 22,
   "field_dig_padding": 6,
   "save_interval": 30000
- }
+ },
+ "PROGRESS": [
+  {
+   "region": "galchamgol",
+   "done": "dodamDone",
+   "options": [
+    {
+     "powder": 1
+    }
+   ]
+  },
+  {
+   "region": "galchamgol",
+   "done": "nalDone",
+   "options": [
+    {
+     "powder": 1
+    }
+   ]
+  },
+  {
+   "region": "galchamgol",
+   "done": "nalDone",
+   "options": [
+    {
+     "root": 1
+    }
+   ]
+  },
+  {
+   "region": "galchamgol",
+   "done": "musoeDone",
+   "options": [
+    {
+     "coal": 1
+    }
+   ]
+  },
+  {
+   "region": "galchamgol",
+   "done": "ended",
+   "options": [
+    {
+     "meoru": 1
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "nalDDone",
+   "options": [
+    {
+     "kflower": 1
+    },
+    {
+     "gyeousari": 2
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "kkuDone",
+   "options": [
+    {
+     "eoksae": 3
+    }
+   ]
+  },
+  {
+   "region": "yeongsan",
+   "done": "seolpi",
+   "options": [
+    {
+     "eoksae": 2
+    },
+    {
+     "jip": 1
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "ppuriPassed",
+   "options": [
+    {
+     "memil_powder": 1
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "nalJDone",
+   "options": [
+    {
+     "memil_powder": 1
+    },
+    {
+     "ssal_powder": 1
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "dolsoeTea",
+   "options": [
+    {
+     "gyeolmyeongja": 1
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "yakMade",
+   "options": [
+    {
+     "darae_yak": 1
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "yeotDone",
+   "options": [
+    {
+     "solbang": 5
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "morakPowder",
+   "options": [
+    {
+     "ssal_powder": 3
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "bueongDone",
+   "options": [
+    {
+     "patsirutteok": 1
+    }
+   ]
+  },
+  {
+   "region": "yeongsan",
+   "done": "seolpi",
+   "options": [
+    {
+     "broom_sal": 1
+    },
+    {
+     "darae_vine": 2
+    }
+   ]
+  },
+  {
+   "region": "yeongsan",
+   "done": "shortcut",
+   "options": [
+    {
+     "kong": 2
+    },
+    {
+     "magamok": 3
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "hongsiMade",
+   "options": [
+    {
+     "hongsi_tteok": 1
+    }
+   ]
+  },
+  {
+   "region": "yeongsan",
+   "done": "yakDone",
+   "options": [
+    {
+     "doerim_yak": 1
+    }
+   ]
+  }
+ ]
 };

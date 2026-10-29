@@ -2,7 +2,7 @@
 /* 짧은 합성음. 로드할 때는 무음이며 첫 실제 키/포인터 입력에서만 컨텍스트를 만든다.
    when은 AudioContext.currentTime과 같은 초 단위. group은 한 게임의 소리를 함께 끊는 용도. */
 const Sound=(()=>{
-  let ctx=null,master=null,attempted=false,enabled=true,volume='low';
+  let ctx=null,master=null,attempted=false,enabled=true,volume='low',resuming=null,resumeEffect=null;
   const storageKey='packoon-sound-v1';
   try{const saved=JSON.parse(localStorage.getItem(storageKey));
     if(saved&&typeof saved.enabled==='boolean')enabled=saved.enabled;
@@ -20,7 +20,12 @@ const Sound=(()=>{
     if(!e.isTrusted)return;
     if(!attempted){attempted=true;const AC=window.AudioContext||window.webkitAudioContext;
       if(AC)try{ctx=new AC();master=ctx.createGain();master.gain.value=enabled?(volume==='high'?0.8:0.4):0;master.connect(ctx.destination);}catch(_){} }
-    if(ctx&&ctx.state==='suspended')ctx.resume().catch(()=>{});
+    if(ctx&&ctx.state==='suspended'&&!resuming){
+      resuming=ctx.resume().then(()=>{
+        const next=resumeEffect;resumeEffect=null;
+        if(next&&enabled&&ctx.state==='running')effect(next.key,next.cool,next.make);
+      }).catch(()=>{resumeEffect=null;}).finally(()=>{resuming=null;});
+    }
   }
   addEventListener('pointerdown',unlock,true);addEventListener('keydown',unlock,true);
   function group(){
@@ -31,10 +36,10 @@ const Sound=(()=>{
       voices.forEach(s=>{try{s.stop();}catch(_){} });voices.clear();out.disconnect();
     }};
   }
-  function play(when,duration,volume,freq,endFreq,type,g,noise=false,filterType='highpass',attack=0.003){
+  function play(when,duration,voiceVolume,freq,endFreq,type,g,noise=false,filterType='highpass',attack=0.003){
     if(!ctx||!enabled||ctx.state!=='running'||(g&&g.stopped))return;
     const t=Math.max(when,ctx.currentTime),amp=ctx.createGain();
-    amp.gain.setValueAtTime(0.0001,t);amp.gain.exponentialRampToValueAtTime(Math.max(0.0001,volume),t+attack);amp.gain.exponentialRampToValueAtTime(0.0001,t+duration);
+    amp.gain.setValueAtTime(0.0001,t);amp.gain.exponentialRampToValueAtTime(Math.max(0.0001,voiceVolume),t+attack);amp.gain.exponentialRampToValueAtTime(0.0001,t+duration);
     amp.connect(g?g.out:master);
     let s;
     if(noise){s=ctx.createBufferSource();const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate);
@@ -57,7 +62,8 @@ const Sound=(()=>{
   const last=new Map();let lastEffect=-Infinity,pending=null;
   const priority={footstep:0,steam:1,paper:2,panel:3,tab:3,jump:4,land:4,swing:4,gather:5,forge:5,stone:5,yeongsan:5,item:6,exchange:7,craft:8,travel:9};
   function effect(key,cool,make){
-    if(!ctx||!enabled||ctx.state!=='running')return;
+    if(!ctx||!enabled)return;
+    if(ctx.state!=='running'){if(resuming)resumeEffect={key,cool,make};return;}
     const now=ctx.currentTime;
     if(now-lastEffect<0.018||now-(last.get(key)??-Infinity)<cool)return;
     // 대화 선택 직후의 교환처럼 한 입력에서 겹치는 소리는 중요한 것 하나만 낸다.
