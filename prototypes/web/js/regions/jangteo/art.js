@@ -79,11 +79,33 @@ function sky(offset=0){
     for(let i=0;i<4;i++){const x=((i*143-offset*.025)%550+550)%550-70;P(x,47+i%2*13,48,2,'#f2f5f3');P(x+12,44+i%2*13,24,3,'#f2f5f3');}
   }
 }
+function farAir(offset=0){
+  // 지붕보다 먼 김과 골짜기 안개. 착지할 곳과는 겹치지 않는다.
+  const shift=Math.round(offset*.14),fog=n()?'rgba(163,182,196,.10)':'rgba(246,247,232,.40)';
+  for(let i=-1;i<5;i++){
+    const x=i*151-shift%151,yy=115+(i+6)%3*7;
+    P(x,yy,112,2,fog);P(x+21,yy-2,68,2,fog);
+    for(let j=0;j<4;j++)P(x+64+Math.round(Math.sin(j+i)*5),139-j*8,5+j*3,5,n()?'rgba(154,174,194,.16)':'rgba(250,246,222,.44)');
+  }
+  if(!n())for(let i=0;i<5;i++){
+    const x=((106+i*13-Math.round(offset*.055))%470+470)%470-30,y=69+Math.abs(i-2)*4;
+    P(x-3,y,3,1,'#849398');P(x,y+1,2,1,'#849398');P(x+2,y,3,1,'#849398');
+  }
+}
 function lantern(x,y,size=1,lit=n()){
   P(x,y-6,1,7,'#73503c');
   if(lit){P(x-6*size,y-2,13*size,13*size,'rgba(242,169,76,.08)');P(x-3*size,y,7*size,8*size,'#e6974b');P(x-2*size,y+1,5*size,6*size,'#ffcc79');P(x-1,y+2,2,4,'#ffe7ab');}
   else{P(x-3*size,y,7*size,8*size,'#b64e42');P(x-2*size,y+1,5*size,2*size,'#d97757');}
   P(x-2*size,y-1,5*size,1,'#65433b');P(x-2*size,y+8*size,5*size,1,'#65433b');P(x,y+9*size,1,3,'#b95743');
+}
+function drawWorkLantern(x,y,lit=false){
+  // x,y는 상호작용 자리의 발밑. 불을 붙일 종이등은 손 닿는 높이에 건다.
+  P(x+9,y-39,3,39,'#725743');P(x-5,y-40,17,3,'#90704f');P(x-6,y-37,1,6,'#bfa172');
+  if(lit){P(x-17,y-33,26,28,'rgba(245,180,79,.12)');P(x-12,y-29,17,19,'rgba(255,202,116,.12)');}
+  lantern(x-6,y-30,1.4,lit);
+  if(!lit){P(x-8,y-27,5,6,'#716761');P(x-7,y-26,1,4,'#aaa18c');}
+  else{P(x-8,y-26,4,1,'#fff4c6');P(x-7,y-25,2,4,'#fff4c6');}
+  P(x+6,y-3,9,3,tone().snow);
 }
 function tileRoof(x,y,w,depth=15,snow=true){
   const t=tone();P(x+8,y-5,w-16,5,t.tile);P(x+2,y,w-4,depth,t.tile);P(x-4,y+depth-2,w+8,4,t.tile);
@@ -91,11 +113,19 @@ function tileRoof(x,y,w,depth=15,snow=true){
   P(x-8,y+depth-5,8,3,t.tile);P(x+w,y+depth-5,8,3,t.tile);
   if(snow){P(x+9,y-6,w-18,2,t.snow);P(x+2,y-1,9,2,t.snow);P(x+w-11,y-1,9,2,t.snow);P(x-6,y+depth-6,7,1,t.snow);P(x+w,y+depth-6,7,1,t.snow);}
 }
-function house(x,y,w=84,h=37,lit=n(),roofColor){
+function house(x,y,w=84,h=37,lit=n(),roofColor,variant=0){
   const t=tone();P(x,y,w,h,t.wall);P(x+4,y+3,w-8,3,t.wood);
-  for(let j=0;j<3;j++){const wx=x+9+j*Math.floor((w-18)/3);P(wx,y+11,14,17,lit?'#d69750':'#e5d8b8');P(wx+6,y+11,1,17,t.wood);P(wx,y+18,14,1,t.wood);}
+  const count=variant%3===1?2:3;
+  for(let j=0;j<count;j++){const wx=x+9+j*Math.floor((w-18)/count),hh=Math.min(17,h-14);P(wx,y+11,14,hh,lit?'#d69750':'#e5d8b8');P(wx+6,y+11,1,hh,t.wood);P(wx,y+18,14,1,t.wood);}
   P(x+1,y+5,3,h-5,t.wood);P(x+w-4,y+5,3,h-5,t.wood);P(x,y+h-3,w,3,t.wood);
-  tileRoof(x-5,y-15,w+10,15);if(roofColor)P(x+10,y-19,w-20,2,roofColor);
+  if(variant%3===2){
+    // 낮은 초가지붕은 기와집 사이의 형태와 재료를 바꾼다.
+    P(x+10,y-20,w-20,5,n()?'#776851':'#bd9c62');P(x-1,y-15,w+2,9,n()?'#75604b':'#c3a267');P(x-7,y-6,w+14,5,n()?'#5e5147':'#ac8a57');
+    for(let j=4;j<w;j+=8)P(x+j,y-14,1,10,n()?'#8a775b':'#dbc187');
+    P(x+11,y-21,w-22,2,t.snow);P(x-4,y-7,w+8,2,t.snow);
+  }else tileRoof(x-5,y-15,w+10,variant%3===1?12:15);
+  if(roofColor)P(x+10,y-19,w-20,2,roofColor);
+  if(variant%2){P(x+w-15,y+h-12,10,9,n()?'#76604e':'#b28c60');P(x+w-16,y+h-13,12,2,t.wood);}
 }
 function smoke(x,y,seed=0){
   for(let j=0;j<7;j++){const xx=x+Math.round(Math.sin(j*.75+seed)*4),yy=y-j*6,alpha=(.65-j*.07).toFixed(2);P(xx,yy,4+j,4,n()?'rgba(143,158,177,'+alpha+')':'rgba(250,247,231,'+alpha+')');P(xx+2,yy-3,3+j,3,n()?'rgba(143,158,177,'+alpha+')':'rgba(250,247,231,'+alpha+')');}
@@ -112,8 +142,14 @@ function distantTown(offset,base=164,scale=1){
 }
 function pine(x,y,h=86,foreground=false){
   const trunk=n()?'#2d343c':'#6c5141',leaf=n()?(foreground?'#112d32':'#24454b'):(foreground?'#34564d':'#4d6b61');
-  P(x-3,y-h+23,6,h-23,trunk);P(x-8,y-10,16,10,trunk);
-  for(let k=0;k<4;k++){const yy=y-h+k*17,ww=18+k*13;P(x-ww/2,yy,ww,8,leaf);P(x-ww/2+5,yy-4,ww-10,5,leaf);P(x-ww/2+4,yy-4,ww-8,2,tone().snow);P(x-ww/2+1,yy+7,ww-2,2,n()?'#173a3e':'#37594f');}
+  const seed=Math.round(h),lean=(seed%3-1)*5;
+  P(x-3,y-h+22,6,h-22,trunk);P(x+lean-3,y-h+15,6,Math.round(h*.49),trunk);P(x-8,y-10,16,10,trunk);
+  for(let k=0;k<4;k++){
+    const yy=y-h+k*Math.round(h*.16),ww=24+k*10+(seed+k*7)%15,cx=x+lean+(k%2?-8:7),left=cx-ww/2;
+    P(left,yy,ww,7,leaf);P(left+5,yy-5,ww-11,6,leaf);P(left+11,yy-8,Math.max(8,ww-28),4,leaf);
+    P(Math.min(x,cx),yy+7,Math.abs(cx-x)+4,3,trunk);P(left+3,yy-4,Math.round(ww*.42),2,tone().snow);P(left+ww-11,yy-1,8,2,tone().snow);
+    P(left+1,yy+6,ww-2,2,n()?'#173a3e':'#37594f');
+  }
 }
 function flag(x,y,h=64){
   P(x,y-h,3,h,'#69503f');P(x-3,y-h+4,9,2,'#4d382f');P(x+3,y-h+5,23,19,n()?'#8a4745':'#bd5547');P(x+5,y-h+7,18,2,'#deae73');P(x+10,y-h+11,3,8,'#f3ddac');P(x+6,y-h+14,12,2,'#f3ddac');P(x+20,y-h+22,6,3,tone().sky);P(x-6,y-4,16,4,'#807c78');P(x-7,y-5,18,2,tone().snow);
@@ -146,6 +182,7 @@ function snowGround(id){
 }
 function drawBack(id){
   sky(cam);steppedRidge(Math.round(cam*.08),116,22,tone().mount,1);steppedRidge(Math.round(cam*.19),137,15,n()?'#34445a':'#b2c1c9',4);
+  farAir(cam);
   distantTown(Math.round(cam*.32),173,1);
   if(id==='pine'){for(let wx=Math.floor(cam/112)*112-112;wx<cam+W+112;wx+=112)pine(wx-cam,GROUND,62+Math.round(hash(wx)*25));}
   snowGround(id);
@@ -165,7 +202,7 @@ function drawPlatforms(id){
 function drawScenery(id){
   const t=tone();
   if(id==='entrance'){
-    for(let wx=160;wx<2800;wx+=175){const x=wx-cam;if(x<-100||x>W+100)continue;if((wx-160)%350===0)house(x,GROUND-38,82,38);else{bundle(x,GROUND,wx);flag(x+38,GROUND,42);}}
+    for(let wx=160,i=0;wx<2800;wx+=175,i++){const x=wx-cam;if(x<-110||x>W+110)continue;if(i%2===0){const h=32+(i%4)*5;house(x,GROUND-h,72+(i%3)*11,h,n(),undefined,i/2);}else{bundle(x,GROUND,wx);flag(x+38,GROUND,39+i%3*8);}}
     jangseung(125-cam,GROUND,1);jangseung(242-cam,GROUND,-1);flag(720-cam,GROUND,96);
     // 연줄이 낮은 상자에서 처마로 이어져 안전한 첫 오르기를 알린다.
     if(!G.f.jxKiteFreed){const kx=1200-cam;P(kx-5,89,10,12,'#795444');P(kx-8,92,16,6,'#795444');P(kx-1,88,2,14,'#795444');P(kx-6,93,12,4,'#efe1bb');P(kx-4,90,8,10,'#efe1bb');P(kx-1,90,2,10,'#b75745');P(kx-4,94,8,2,'#bc5946');
@@ -189,7 +226,7 @@ function drawScenery(id){
     if(!n()){for(let j=0;j<5;j++){P(ax+6+j*23,GROUND-45,21,45,j%2?'#a76650':'#b69572');P(ax+7+j*23,GROUND-46,19,2,t.snow);}}
     else{P(ax+4,GROUND-4,116,3,'#b6b9b4');lantern(ax+12,GROUND-61);lantern(ax+111,GROUND-61);}
   }else if(id==='inn'){
-    for(let wx=100;wx<2800;wx+=165){const x=wx-cam;if(x<-100||x>W+100)continue;if(wx<650||wx>1450){house(x,GROUND-40,94,40);bundle(x+113,GROUND,wx);}}
+    for(let wx=100,i=0;wx<2800;wx+=165,i++){const x=wx-cam;if(x<-110||x>W+110)continue;if(wx<650||wx>1450){const h=34+i%3*7;house(x,GROUND-h,76+i%4*8,h,n(),undefined,i);bundle(x+113,GROUND,wx);}}
     const x=760-cam;house(x,GROUND-69,460,69);tileRoof(x-9,GROUND-93,478,23);P(x+39,GROUND-77,382,4,t.wood);
     for(let j=0;j<7;j++){P(x+22+j*65,GROUND-67,5,67,t.wood);P(x+22+j*65,GROUND-65,2,63,n()?'#96715c':'#d2ac7c');}
     P(x+93,GROUND-8,278,8,'#82604c');P(x+93,GROUND-10,278,2,'#ba9470');for(let j=0;j<8;j++)P(x+99+j*34,GROUND-7,1,6,'#4e3a35');
@@ -206,7 +243,7 @@ function drawScenery(id){
     const x=2410-cam;P(x-20,96,340,96,n()?'#53616f':'#929eaa');P(x-25,102,345,90,n()?'#53616f':'#929eaa');P(x-19,94,339,3,t.snow);P(x-11,109,4,57,n()?'#3a4b5d':'#798d9a');
     for(let j=0;j<5;j++)P(x+21+j*3,118+j*3,2,1,'#817a73');P(x-4,91,9,3,'#9b8770');
   }else if(id==='warehouse'){
-    for(let wx=120,i=0;wx<2800;wx+=190,i++){const x=wx-cam;if(x<-130||x>W+130)continue;house(x,GROUND-49,113,49,false);P(x+12,GROUND-36,89,33,n()?'#51464a':'#8c6c51');for(let j=0;j<8;j++)P(x+15+j*11,GROUND-34,1,29,t.wood);bundle(x+138,GROUND,i);}
+    for(let wx=120,i=0;wx<2800;wx+=190,i++){const x=wx-cam;if(x<-130||x>W+130)continue;const w=95+i%3*9,h=42+i%3*7;house(x,GROUND-h,w,h,false,undefined,i);P(x+12,GROUND-36,w-24,33,n()?'#51464a':'#8c6c51');for(let j=0;j<(w-24)/11;j++)P(x+15+j*11,GROUND-34,1,29,t.wood);bundle(x+138,GROUND,i);}
     const x=2320-cam;house(x-64,GROUND-60,128,60,false);P(x-22,GROUND-42,44,42,'#2c2c35');P(x-1,GROUND-42,2,42,'#776154');P(x-8,GROUND-24,16,3,'#b19c73');
     if(n()&&!G.boss.dead){P(x-18,GROUND-29,3,3,'#89cbd3');P(x+13,GROUND-36,4,4,'#acdce0');P(x-16,GROUND-25,1,2,'#d7e7d7');}
     if(G.boss.dead){bundle(x-44,GROUND,1);bundle(x+43,GROUND,0);P(x+48,GROUND-19,1,15,'#bfa172');P(x+45,GROUND-7,7,5,'#ad8b54');}
@@ -263,13 +300,13 @@ function townVista(midCam,t,inn=false){
 }
 const pineVista=[
   {speed:.035,draw:c=>sky(c)},
-  {speed:.11,draw:c=>{steppedRidge(c,103,21,n()?'#2c3c57':'#9ab4c4',2);steppedRidge(Math.round(c*.7),121,14,n()?'#3c4d63':'#bfd0d7',5);P(0,128,W,4,n()?'#506070':'#d3ddd9');}},
+  {speed:.11,draw:c=>{steppedRidge(c,103,21,n()?'#2c3c57':'#9ab4c4',2);steppedRidge(Math.round(c*.7),121,14,n()?'#3c4d63':'#bfd0d7',5);P(0,128,W,4,n()?'#506070':'#d3ddd9');farAir(c);}},
   {speed:.34,draw:(c,t)=>townVista(c,t)},
   {speed:.72,draw:c=>{const q=Math.round(c*.08)%24;pine(-17-q,225,157,true);pine(425-q,237,146,true);P(0,216,W,9,n()?'#263f4b':'#99aead');P(0,216,W,2,tone().snow);for(let i=0;i<8;i++)P(i*61-c%61,216,28,2,n()?'#d6e0df':'#fff9ec');}}
 ];
 const innVista=[
   {speed:.025,draw:c=>sky(c)},
-  {speed:.10,draw:c=>{steppedRidge(c,109,22,n()?'#2e405b':'#a5bccc',3);steppedRidge(c,132,10,n()?'#42536a':'#c3d0d6',7);distantTown(c,159,1);}},
+  {speed:.10,draw:c=>{steppedRidge(c,109,22,n()?'#2e405b':'#a5bccc',3);steppedRidge(c,132,10,n()?'#42536a':'#c3d0d6',7);farAir(c);distantTown(c,159,1);}},
   {speed:.30,draw:(c,t)=>townVista(c,t,true)},
   {speed:.68,draw:c=>{
     // 고드름 아래 한 칸 빈 마루: 같은 지붕이 낮에는 흰빛, 밤에는 등빛을 받는다.
@@ -293,5 +330,5 @@ function wanderer(kind,x,y,f=1){
     p(-7,-17,12,14,'#293b44');p(-5,-13,7,10,'#e9e3d1');p(-3,-24,10,9,'#2b3c42');p(5,-21,6,2,'#97794b');p(3,-22,1,1,'#f9e9bb');p(-11,-12,5,18,'#263b49');p(-8,-10,3,12,'#557384');p(-5,-2,2,3,'#5c4c3b');p(2,-2,2,3,'#5c4c3b');p(-5,-16,10,2,'#ad7051');p(6,-12,8,6,'#998267');p(8,-13,4,2,'#d2bd8c');
   }
 }
-Rg.expArt={drawBack,drawScenery,drawFront,pineVista,innVista,wanderer,lantern,flag,pine,tileRoof};
+Rg.expArt={drawBack,drawScenery,drawFront,pineVista,innVista,wanderer,lantern,drawWorkLantern,flag,pine,tileRoof};
 })();

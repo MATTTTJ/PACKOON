@@ -11,7 +11,7 @@ const Rg=defineRegion('jangteo',{
   cover:{
     tag:'큰 장터 체험판',sub:'설 대목, 붉은 등불의 장터',ready:'큰 장터로 들어갈 준비',go:'큰 장터로',
     title:{kicker:'셋째 마을',head:'큰 장터',start:'큰 장터로 들어가기',body:[
-      '돌산을 넘자 붉은 등불이 줄지어 걸린 큰 장터가 나왔다. 설을 앞둔 대목이라 눈 속에서도 사람과 짐승이 북적인다.',
+      '돌산을 넘자 붉은 등불이 줄지어 걸린 큰 장터가 나왔다. 설을 앞둔 대목이라 눈 속에서도 장꾼과 길손이 북적인다.',
       '그런데 장터 사람들 얼굴이 어둡다. 밤마다 물건이 없어지고, 설 제사상에 올릴 눈홍시까지 사라졌다고 한다.',
       '아빠가 보부상 숙소에 짐을 맡겨 두었다는 이야기를 들었다. 아빠는 약연의 글자 하나를 읽고 여기로 왔을까.']},
     end:{kicker:'큰 장터 체험판 완료',head:'북쪽 영산으로',body:[
@@ -93,12 +93,16 @@ const record=(id,text)=>diary('jx_'+id,text);
 
 function kiteChild(){
   if(G.f.jxKiteFreed){
+    if(!G.f.jxKiteReeled){
+      Rg.handWork('kite',()=>{G.f.jxKiteReeled=true;kiteChild();});return;
+    }
     talk([
       ['연 아이','살았다, 내 방패연!\n줄은 천천히 감을게. 또 처마에 걸리면 곤란하니까.'],
       ['너구리','꼬리를 길게 달았네.\n저 멀리서도 네 연인 줄 알겠어.'],
       ['연 아이','설에 집으로 오는 동생한테 보이려고!\n저 붉은 차일 뒤로 오면 우리 좌판이거든.'],
       ['연 아이','고마워, 연 건져 준 보부상!\n기와가 이어진 쪽으로 가면 장터 지붕길이야.']
-    ],()=>{G.f.jxKiteDone=true;record('kite','설에 돌아오는 동생에게 보이려고 날린 연을 내려 줬다. 아이가 붉은 차일 뒤 지붕길을 알려 줬다.');finishWanderer('j_kite');});
+    ],()=>{G.f.jxKiteDone=true;record('kite','설에 돌아오는 동생에게 보이려고 날린 연을 내려 줬다. 아이와 연줄을 감고 붉은 차일 뒤 지붕길을 배웠다.');finishWanderer('j_kite');
+      if(typeof grantNickname==='function')grantNickname('jangteo_kite','연 건지는 손','연 아이');});
     return;
   }
   if(G.f.jxKiteStarted){
@@ -115,31 +119,20 @@ function kiteChild(){
 }
 
 function yutElders(){
-  const finish=(together)=>talk([
-    ['윷놀이 노인들',together?'콩 말 위에 돌 말도 얹었구먼!\n둘이 함께 들어오니 빈자리가 금세 찼어.':'콩 말이 먼저 들어왔네!\n돌 말은 내가 몰고 올 테니 한 판 더 앉게.'],
-    ['윷놀이 노인들','한 판 같이 앉아 줘서 고맙다.\n깃대 밑 돌도 봐라. 옛 보부상이 발도장을 남겼어.']
-  ],()=>{record('yut','설 윷판에서 식구들 몫의 콩 말과 돌 말을 움직였다. 깃대 밑 돌에 옛 보부상의 발도장이 있다고 한다.');finishWanderer('j_yut');});
-  const end=(takeShort)=>{G.f.jxYutChoice=takeShort?'inside':'outside';talk([
-    ['윷놀이 노인들',takeShort?'안으로 돌아가는 길을 골랐구먼!\n길이 짧아도 먼저 지나간 말을 잘 살펴야 하지.':'바깥으로 크게 도는구먼!\n한 칸 더 걷는 동안 다른 말이 길을 비켜 주겠어.'],
-    ['윷놀이 노인들','이번엔 도로구먼. 콩을 한 칸 보내도 되고,\n돌을 보내 콩 말과 함께 가도 되지. 어느 말을 고를까?',[
-      {t:'돌 말을 보내 함께 간다',go:()=>{G.f.jxYutTogether=true;finish(true);}},
-      {t:'콩 말을 먼저 보낸다',go:()=>{G.f.jxYutTogether=false;finish(false);}}
-    ]]
-  ]);};
   talk([
-    ['윷놀이 노인들','한 자리 비었네. 털 묻은 방석 좀 당겨 앉게.\n객지에 나간 새끼들 오기 전에 손부터 풀어야지.'],
-    ['너구리','이 말은 왜 콩이에요?\n옆에는 조약돌도 있는데.'],
-    ['윷놀이 노인들','식구마다 좋아하는 걸 말로 삼았지.\n콩 말 주인은 장날마다 콩자반부터 찾거든.'],
-    ['윷놀이 노인들','윷을 굴리니 개로구먼. 두 칸 갈 수 있어.\n갈림목의 콩 말을 어느 길로 보낼까?',[
-      {t:'안으로 돌아가는 길',go:()=>end(true)},
-      {t:'바깥으로 넓게 도는 길',go:()=>end(false)},
-      {t:'이번 판은 구경할게요',go:null}
+    ['윷놀이 노인들','한 자리 비었네. 방석 당겨 앉게.\n객지 나간 새끼들 오기 전에 손부터 풀어야지.'],
+    ['너구리','콩이랑 돌이 말이에요?'],
+    ['윷놀이 노인들','식구들 좋아하는 걸로 골랐지.\n자네는 콩 네 알, 우리는 돌 네 개. 모두 들이면 이겨.'],
+    ['윷놀이 노인들','윷은 직접 던지고 말도 골라 보게.\n이기든 지든 한 판 놀면 쌀 한 되 얹어 주지.',[
+      {t:'윷판 앞에 앉는다',go:()=>Rg.playYut()},
+      {t:'이번엔 구경할게요',go:null}
     ]]
   ]);
 }
 
 function babyBoar(){
   if(G.f.jxBoarScent2){
+    if(!G.f.jxBoarBed){Rg.handWork('snow',()=>{G.f.jxBoarBed=true;babyBoar();});return;}
     talk([
       ['새끼 멧돼지','이 냄새야! 솔잎 아래 마른 풀이 있어.\n아까 엄마랑 여기서 쉬었어.'],
       ['너구리','눈 묻은 솔가지는 치워 둘게.\n바람은 바위가 막아 주네.'],
@@ -174,7 +167,7 @@ function oldMagpie(){
         ['늙은 까치','눈 오는 날엔 김부터 눈에 들어오지.\n따뜻한 밥을 짓는 집이 저기 있다고.'],
         ['늙은 까치',G.awake.includes('siru')?'보따리에서도 따뜻한 김 냄새가 나는구나.\n이제 자네도 누굴 먹일 줄 아는 보부상이네.':'숙소 마루 끝에서 한번 바라보렴.\n고드름 너머 지붕이 낮은 산처럼 이어진단다.'],
         ['늙은 까치','밤엔 거리의 좌판을 접어 둔단다.\n그 뒤 틈길로 오면 이 처마까지 금방 돌아와.']
-      ],()=>{G.f.jxMagpieRest=true;record('magpie','숙소 처마에서 까치와 발을 녹이며 지붕 위 김을 봤다. 밤에 좌판이 접히면 뒤편 골목으로 숙소에 돌아올 수 있다.');finishWanderer('j_magpie');startVista(Rg.zones.inn.vistas[0]);})},
+      ],()=>{G.f.jxMagpieRest=true;record('magpie','숙소 처마에서 까치와 지붕 위 김을 봤다. 밤에는 등불 꾸러미를 함께 풀기로 했다.');finishWanderer('j_magpie');startVista(Rg.zones.inn.vistas[0]);})},
       {t:'길을 조금 더 둘러볼게요',go:null}
     ]]
   ]);
@@ -184,7 +177,7 @@ Rg.expEncounters={
   wanderers:{
     entrance:[{id:'j_kite',name:'연 아이',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
     street:[{id:'j_yut',name:'윷놀이 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 김 냄새가 나네.\n시루까지 깨어났으니 설 준비가 한결 든든하겠어.':'콩 말 주인이 오면 네 자리 얘기도 하마.\n다음엔 더 큰 방석을 펴 두지.';}}],
-    inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:oldMagpie,draw:draw('magpie'),get greeting(){return G.awake.includes('siru')?'고드름은 그대로인데 네 보따리에선 김이 나네.\n엄마 시루가 깨어난 모양이구나.':'마루 끝에 앉아 보렴.\n밤 지붕에는 집마다 작은 등이 달린단다.';}}],
+    inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:oldMagpie,draw:draw('magpie'),get greeting(){return G.f.night?(G.f.jxLanternDone?'자네가 단 등을 따라 밤 길손들이 돌아왔네.\n아침에 떡 김 올라오면 다시 떠나겠지.':'밤이 됐구나. 오른쪽 등불 꾸러미를 풀어 보게.\n꺼진 골목에 같이 등을 달자.'):G.f.jxLanternDone?'밤새 등 따라 찾아온 길손들이 쉬고 갔네.\n이번엔 내가 남쪽으로 날아갈 차례야.':'밤에 다시 오게. 오른쪽에 등불 꾸러미를 놔둘게.\n길손들이 숙소를 찾게 불을 밝혀 주자.';}}],
     pine:[{id:'j_boar',name:'새끼 멧돼지',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
     warehouse:[]
   },

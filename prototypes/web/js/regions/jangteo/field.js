@@ -144,6 +144,37 @@ if(!CLASSIC){
     },
   });
   const E=Rg.expEncounters;
+  Rg.lanternPoints=[
+    {id:'porch',zone:'inn',x:1380,y:GROUND},
+    {id:'gate',zone:'inn',x:2000,y:GROUND},
+    {id:'alley',zone:'street',x:2250,y:GROUND},
+    {id:'pine',zone:'pine',x:450,y:GROUND},
+  ];
+  // getter를 다시 읽어도 같은 대상을 찾도록 활동 오브젝트는 한 번만 만든다.
+  const lanterns=Rg.lanternPoints.map(p=>({
+    ...p,id:'j_lantern_'+p.id,
+    get name(){return G.f.jxLanterns?.[p.id]?'불 켠 등':'빈 등걸이';},
+    get prompt(){return G.f.jxLanterns?.[p.id]?'등불 아래 살펴보기':'등걸이에 등 달기';},
+    draw:(x,y)=>Rg.expArt.drawWorkLantern(x,y,!!G.f.jxLanterns?.[p.id]),
+    talk:()=>Rg.lanternAction(p.id),
+  }));
+  const nightLanterns=zone=>night()?lanterns.filter(p=>p.zone===zone):[];
+  const yutBoard={id:'j_yut_board',name:'윷판',prompt:'윷놀이 시작·이어 하기',x:1960,y:GROUND,
+    draw(x,y){
+      R(x-15,y-4,30,4,'#c2a576');R(x-13,y-5,26,1,'#ead4a2');
+      for(let i=0;i<4;i++)R(x-11+i*7,y-3,2,1,'#785c43');
+      R(x-8,y-8,4,3,'#c6b691');R(x+4,y-8,4,3,'#936c46');
+    },
+    talk:()=>Rg.playYut(),
+  };
+  const lanternBundle={id:'j_lantern_bundle',name:'등불 꾸러미',prompt:'까치와 등불 꾸러미 풀기',x:1610,y:GROUND,
+    draw(x,y){
+      R(x-9,y-10,18,10,'#91704f');R(x-7,y-13,14,4,'#c3a26f');
+      R(x-1,y-12,2,12,'#dfc88e');R(x-4,y-14,8,2,'#69523b');
+      Rg.expArt.lantern(x+6,y-18,1,false);
+    },
+    talk:()=>Rg.lanternTalk(),
+  };
   Rg.zones={
     entrance:{...common('entrance'),name:'장터 입구',w:2600,npcs:['nal'],
       platforms:[...stairs(1040),...stairs(1980)],
@@ -166,7 +197,7 @@ if(!CLASSIC){
         {x:2180,to:'pine',toX:70,label:'굴뚝 뒤 소나무 숲으로',draw:peg},
         {x:2040,to:'inn',toX:1510,label:'접힌 좌판 사이, 숙소 지름길',need:night,reason:'낮에는 좌판이 골목을 막는다. 밤이면 접힌다.',draw:peg,drawBlocked:shutter},
         {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'입구의 아이가 연을 풀면 처마길을 알려 준다.',draw:peg}],
-      wanderers:E.wanderers.street,examines:E.examines.street,
+      get wanderers(){return [...E.wanderers.street,yutBoard,...nightLanterns('street')];},examines:E.examines.street,
     },
     inn:{...common('inn'),name:'보부상 숙소',w:2600,npcs:['bueong','maru'],
       platforms:[...stairs(1160),{x:1340,y:96,w:100},...stairs(1590,128),{x:1770,y:128,w:200},...stairs(2220)],
@@ -176,10 +207,10 @@ if(!CLASSIC){
         {x:1120,to:'inn',toX:660,label:'숙소 마당으로',draw:peg},
         {x:1510,to:'street',toX:2040,label:'밤 골목으로 돌아가기',need:night,reason:'낮에는 장터 좌판이 길을 막는다. 왼쪽 큰길로 돌아가자.',draw:peg,drawBlocked:shutter},
         {x:2130,to:'warehouse',toX:280,label:'마루에서 보았던 푸른 창고문 안으로',need:needWarehouse,reason:warehouseReason,draw:gate}],
-      wanderers:E.wanderers.inn,examines:E.examines.inn,
+      get wanderers(){return [...E.wanderers.inn,lanternBundle,...nightLanterns('inn')];},examines:E.examines.inn,
       stamps:[{id:'pillar',x:1280,y:128,note:'stamp:jangteo:pillar',draw:glint}],
       vistas:[{id:'icicles',x:1850,y:128,from:0,to:420,sound:'wind',draw:peg,
-        thought:'고드름마다 지붕이 거꾸로 매달렸네.\n저 푸른 문은 어디로 이어질까.',
+        thought:'고드름 속 지붕이다.\n저 푸른 문도 가 보고 싶어.',
         diary:'숙소 마루에서 고드름 너머 장터 지붕을 보았다. 처마 사이로 창고의 푸른 문이 보인다.',layers:Rg.expArt.innVista}],
     },
     pine:{...common('pine'),name:'뒷산 솔숲',w:2800,npcs:[],
@@ -188,10 +219,10 @@ if(!CLASSIC){
       doors:[{x:70,to:'street',toX:2180,label:'떡집 굴뚝을 향해 내려가기',draw:peg},
         {x:2480,y:96,to:'street',toX:2650,toY:96,label:'등불 아래 장터 지붕으로',need:()=>!!G.f.jxKiteDone,reason:'처마길은 입구 아이에게 연을 돌려준 뒤 알려 달라고 하자.',draw:peg}],
       exits:{left:{to:'street',toX:2180}},
-      get wanderers(){return night()?E.wanderers.pine:[];},examines:E.examines.pine,
+      get wanderers(){return night()?[...E.wanderers.pine,...nightLanterns('pine')]:[];},examines:E.examines.pine,
       stamps:[{id:'rock',x:2410,y:96,note:'stamp:jangteo:rock',draw:glint}],
       vistas:[{id:'lantern_river',x:2570,y:96,from:0,to:420,sound:'wind',draw:peg,
-        get thought(){return night()?'등불이 강물처럼 흘러.\n엄마 방에도 하나 걸어 드릴까.':'깃발 아래서 김이 올라오네.\n아까 그 떡집이다.';},
+        get thought(){return night()?'등불이 쭉 이어졌네.\n엄마 방에도 달아 드릴까.':'깃발 아래서 김이 올라오네.\n아까 그 떡집이다.';},
         diary:'뒷산 솔숲 꼭대기에서 장터를 내려다봤다. 굴뚝과 깃발이 길을 가리키고, 밤이면 등불이 강물처럼 이어진다.',layers:Rg.expArt.pineVista}],
     },
     warehouse:{...common('warehouse'),name:'창고 뒷길',w:2600,npcs:[],
