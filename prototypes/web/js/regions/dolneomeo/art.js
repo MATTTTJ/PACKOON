@@ -65,14 +65,19 @@ function cairn(x,y,height=22,seed=0,frost=true){const count=Math.max(3,Math.floo
 function gatePost(x,y,tall=false){const h=tall?54:47;px(x-5,y-h,11,h,'#796d58');px(x-6,y-h-4,13,5,'#4b4e46');px(x-5,y-h-4,12,1,P.frost);px(x-3,y-h+8,2,3,'#293736');px(x+2,y-h+8,2,3,'#293736');px(x-2,y-h+16,5,1,'#293736');px(x-3,y-h+15,1,2,'#293736');px(x+3,y-h+15,1,2,'#293736');px(x-1,y-h+24,3,14,'#5e5b4b');px(x-4,y-h,9,2,'#a2765e');}
 function frostGround(){px(0,GROUND,W,H-GROUND,P.earth);px(0,GROUND,W,2,'#a7b8b4');px(0,GROUND+2,W,2,'#748580');const off=Math.floor(cam);for(let x=-(off%7);x<W;x+=7){const v=hash(x+off+9);if(v<.62)px(x,GROUND-1,2,1,v<.28?P.frost:'#d0ddd6');if(v>.75)px(x+2,GROUND+7+Math.floor(v*17),3,1,'#3d4d4c');}}
 function backdrop(zone){bands(['#bfcdd3','#cbd8d9','#dce1da','#a4b7bd'],[54,49,59,63]);const keep=cam;cam=Math.round(keep*.08);ridge('#a3b6be',131,44,113,480);cam=Math.round(keep*.17);ridge('#829aa6',151,49,82,720);cam=Math.round(keep*.31);ridge('#657f89',177,39,53,140);cam=keep;
+  // 골짜기 안개는 능선보다 조금 빨리 흐른다. 가까운 발판은 덮지 않는다.
+  for(let i=0;i<4;i++){const x=mod(i*143-cam*.24,572)-120,y=150+(i%2)*9;px(x,y,136,3,'#a9bfbd');px(x+21,y-2,83,2,'#bbcdca');px(x+12,y+3,104,1,'#9fb8b7');}
+  const wing=Vfx.reducedMotion?0:Math.floor(G.anim/24)%2;
+  for(let i=0;i<5;i++){const x=mod(58+i*18-cam*.055+(Vfx.reducedMotion?0:G.anim*.035),490)-40,y=52+Math.abs(i-2)*4;px(x,y,2,1,'#7a959c');px(x-3,y-1-wing,3,1,'#7a959c');px(x+2,y-1-wing,3,1,'#7a959c');}
   // 절벽 위 경치가 고갯길과 마을에서 먼저 보인다.
   const distant=Math.round(312-mod(cam*.09,100));px(distant,93,23,5,'#a4b0b1');px(distant+5,88,14,5,'#aab7b6');px(distant+11,83,3,5,'#e7ece4');
-  if(zone==='field'){for(let i=0;i<8;i++){const x=mod(i*64-cam*.46,512)-52;pine(x,188,.75);}}
+  if(zone==='field'){for(let i=0;i<8;i++){const x=mod(i*64-cam*.46,512)-52;pine(x,188,.55+(i%3)*.13);}}
   if(zone==='shrine'){for(let i=0;i<11;i++){const x=mod(i*47-cam*.4,517)-45;cairn(x,184,G.f.dolMemory?.zone===zone?8+i%3*3:15+i%4*5,i+4);}}
   frostGround();
 }
 function wall(x,y,width){for(let j=0;j<width;j+=17){stone(x+j,y,16,7,j,true);stone(x+j+6,y-7,15,6,j+1,true);}}
-function house(x,y,wide=false){const w=wide?80:59;px(x,y-38,w,38,'#9a9e8d');px(x+5,y-34,w-10,31,'#bec0a9');px(x-6,y-41,w+12,6,'#505e5d');px(x-11,y-43,w+22,3,'#e0e6d9');for(let j=0;j<6;j++){px(x-5+j*3,y-45-j, w+10-j*6,2,j%2?'#7e8677':'#6c776d');}px(x+7,y-25,13,14,'#57645a');px(x+8,y-24,11,1,'#d9c794');px(x+13,y-23,1,11,'#aab190');px(x+8,y-18,11,1,'#aab190');px(x+w-24,y-24,16,24,'#586057');px(x+w-22,y-22,12,22,'#6c6c5d');px(x+w-20,y-18,1,14,'#9b9b7e');px(x+6,y-50,3,13,'#66736e');}
+function house(x,y,wide=false,variant=0){const w=(wide?80:59)+[0,-7,6][variant%3],h=34+(variant%3)*4,roof=5+variant%3;px(x,y-h,w,h,'#9a9e8d');px(x+5,y-h+4,w-10,h-7,'#bec0a9');px(x-6,y-h-3,w+12,6,'#505e5d');px(x-11,y-h-5,w+22,3,'#e0e6d9');for(let j=0;j<roof;j++){px(x-5+j*3,y-h-7-j,w+10-j*6,2,j%2?'#7e8677':'#6c776d');}px(x+7,y-25,13,14,'#57645a');px(x+8,y-24,11,1,'#d9c794');px(x+13,y-23,1,11,'#aab190');px(x+8,y-18,11,1,'#aab190');px(x+w-24,y-24,16,24,'#586057');px(x+w-22,y-22,12,22,'#6c6c5d');px(x+w-20,y-18,1,14,'#9b9b7e');px(x+6,y-h-12,3,13,'#66736e');if(variant%2){px(x+w+3,y-17,2,17,'#6e715c');px(x+w-1,y-19,11,3,'#a3a17e');}}
+function smoke(x,y,seed){const t=Vfx.reducedMotion?0:Math.floor(G.anim/18);for(let i=0;i<4;i++){const rise=(t+i*7)%29,sway=Math.round(Math.sin((rise+seed)*.15)*3);px(x+sway,y-rise,7+i%2*3,2,'#c7d3cd');px(x+sway+2,y-rise-2,4,2,'#c7d3cd');}}
 function hearth(x,y,warm=true){stone(x-16,y,32,5,1,false);px(x-12,y-7,24,5,'#555f59');px(x-9,y-7,18,2,'#76796a');px(x-7,y-6,14,3,'#444b45');if(warm){px(x-5,y-5,3,1,'#ba8d62');px(x+2,y-4,2,1,'#b17c55');}px(x-14,y-9,5,3,'#929788');px(x+9,y-9,5,3,'#929788');}
 function scenery(zone,fixtures={}){const sx=x=>Math.round(x-cam);const visible=(x,margin=80)=>x>cam-margin&&x<cam+W+margin;
   // 낮은 돌담은 뒤쪽 장식이다. 실제 발판의 흰 윗면은 지역 필드에서 따로 그린다.
@@ -80,12 +85,12 @@ function scenery(zone,fixtures={}){const sx=x=>Math.round(x-cam);const visible=(
   if(zone==='gate'){
     const gx=fixtures.gateX??1650;gatePost(sx(gx-23),GROUND,true);gatePost(sx(gx+23),GROUND,false);
     const pole=sx(gx);if(!G.f.ppuriPassed){px(pole-19,GROUND-35,38,1,'#d5c59d');for(let i=0;i<5;i++)px(pole-16+i*8,GROUND-34,2,5,i%2?'#f0e8ce':'#9d5d48');}
-    for(const x of [180,820,1300,1790,2380])if(visible(x))pine(sx(x),GROUND,1.15);
+    for(const x of [180,820,1300,1790,2380])if(visible(x))pine(sx(x),GROUND,.92+hash(x)*.43);
     if(visible(1020))wall(sx(980),GROUND-3,75);
     if(visible(940)){const x=sx(925);stone(x-12,GROUND,24,9,0);px(x-5,GROUND-16,12,6,'#a89c79');px(x-6,GROUND-12,14,1,'#d0c29c');px(x-3,GROUND-16,1,10,'#685f47');}
     if(visible(2170)){const x=sx(2170);stone(x-24,GROUND,16,30,0);stone(x+22,GROUND,18,22,1);px(x-18,GROUND-28,6,23,'#5d716c');px(x-7,GROUND-4,24,3,'#6b7a76');px(x+4,GROUND-6,10,3,'#8e9a90');}
   }else if(zone==='village'){
-    for(const x of [220,1020,1640,2240])if(visible(x,110))house(sx(x),GROUND-2,x===1020);
+    for(const [i,x] of [220,1020,1640,2240].entries())if(visible(x,110)){house(sx(x),GROUND-2,x===1020,i);smoke(sx(x+7),GROUND-55-i%3*4,i*9);}
     for(const x of [430,1320,2020,2590])if(visible(x))wall(sx(x),GROUND-2,83);
     const mx=sx(fixtures.millX??1160);stone(mx-29,GROUND,58,36);px(mx-25,GROUND-40,50,5,'#a6b0a7');px(mx-23,GROUND-41,46,1,P.frost);px(mx-2,GROUND-48,4,8,'#746f57');px(mx-4,GROUND-50,8,3,'#746f57');px(mx+17,GROUND-46,2,6,'#5a5f50');
     const ax=sx(fixtures.workshopX??1080);px(ax-25,GROUND-5,48,5,'#5e665c');px(ax-17,GROUND-14,31,9,'#85918a');px(ax-15,GROUND-15,27,2,'#c4cdc1');px(ax+1,GROUND-24,2,9,'#645b47');px(ax-2,GROUND-26,8,3,'#a5b3ab');
@@ -94,17 +99,17 @@ function scenery(zone,fixtures={}){const sx=x=>Math.round(x-cam);const visible=(
     if(visible(2290))hearth(sx(2290),GROUND);
   }else if(zone==='field'){
     for(let x=100;x<3000;x+=9){if(!visible(x,3))continue;const h=3+Math.floor(hash(x)*4);px(sx(x),GROUND-h,1,h,'#a09c7d');if(hash(x+1)>.8)px(sx(x)-1,GROUND-h,3,1,'#d9d9c1');}
-    for(const x of [410,1260,2190])if(visible(x))pine(sx(x),GROUND,1.4);
+    for(const x of [410,1260,2190])if(visible(x))pine(sx(x),GROUND,1.08+hash(x+3)*.55);
     const nx=sx(fixtures.nestX??1510);px(nx-22,GROUND-5,44,5,'#8d876a');px(nx-19,GROUND-8,38,3,'#bab18b');px(nx-15,GROUND-11,30,3,'#d8cfaa');
     for(const x of [720,1730,2570])if(visible(x))wall(sx(x),GROUND-2,62);
   }else if(zone==='cliff'){
     for(let x=60;x<3100;x+=124){if(!visible(x))continue;const h=20+Math.floor(hash(x)*19);stone(sx(x),GROUND,35,h,Math.floor(x/124));px(sx(x)+4,GROUND-h+3,19,1,P.frost);}
-    for(const x of [210,1120,2010,2680])if(visible(x))pine(sx(x),GROUND,1.15);
+    for(const x of [210,1120,2010,2680])if(visible(x))pine(sx(x),GROUND,.84+hash(x+9)*.58);
     const dx=sx(fixtures.daraeX??2780);px(dx-2,96,2,19,'#5f6950');px(dx-16,103,18,2,'#5f6950');px(dx,109,19,2,'#5f6950');px(dx-18,100,4,2,'#8a9d6b');px(dx+15,106,5,2,'#8a9d6b');
     if(visible(1440)){const x=sx(1460),done=G.f.dolneomeo_frog_warm;hearth(x+15,GROUND);stone(x+(done?-21:-3),GROUND,23,4,0,false);px(x+(done?-18:0),GROUND-4,15,1,'#bea882');px(x-48,GROUND-29,8,29,'#5e716e');px(x-48,GROUND-31,12,3,'#a1b2a5');px(x-42,GROUND-25,1,11,'#c5d7d3');px(x-43,GROUND-15,3,2,'#d9e4de');px(x-45,GROUND-1,8,1,'#8baaaa');}
   }else if(zone==='shrine'){
     for(let x=60;x<3100;x+=61){if(!visible(x))continue;cairn(sx(x),GROUND,G.f.dolMemory?.zone===zone?8+Math.floor(hash(x)*10):15+Math.floor(hash(x)*24),Math.floor(x/61));}
-    for(const x of [240,880,1510,2510])if(visible(x))pine(sx(x),GROUND,1.5);
+    for(const x of [240,880,1510,2510])if(visible(x))pine(sx(x),GROUND,1.16+hash(x+11)*.61);
     const cx=sx(fixtures.shrineX??2400);px(cx-27,GROUND-7,54,7,'#6e7b77');px(cx-22,GROUND-17,44,10,'#8a9790');px(cx-17,GROUND-19,34,2,P.frost);px(cx-18,GROUND-41,3,24,'#726653');px(cx+15,GROUND-41,3,24,'#726653');px(cx-25,GROUND-43,50,4,'#4c605c');px(cx-29,GROUND-45,58,2,P.frost);px(cx-20,GROUND-47,40,2,'#75867b');px(cx-12,GROUND-49,24,2,'#a4b0a0');
   }
 }
@@ -130,6 +135,69 @@ function shrineNear(){px(0,205,W,20,'#526763');for(let x=-20;x<W+35;x+=24){const
 function drawBlocked(x,y){px(x-15,y-38,3,38,'#7a7058');px(x+12,y-38,3,38,'#7a7058');px(x-16,y-34,32,3,'#b19b70');px(x-13,y-25,26,2,'#cbb786');for(let i=0;i<5;i++)px(x-11+i*5,y-32,2,5,i%2?'#ece7cd':'#9d5d48');stone(x-11,y,22,8,0);}
 function drawDepthGate(x,y,spread=0){gatePost(x-24-spread,y,true);gatePost(x+24+spread,y,false);px(x-13,y-1,26,2,'#bdcbb9');px(x-9,y-5,18,1,'#a8bba7');px(x-5,y-8,10,1,'#8ca69b');}
 function drawMemoryBridge(x,y,w){for(let i=0;i<w;i+=19){stone(x+i,y,18,6,i,false);if(i%38===0){px(x+i+7,y,4,18,'#8e9690');px(x+i+4,y+16,10,3,'#7e8984');}}px(x-2,y-8,w+4,2,'#a1aaa1');for(let i=0;i<w;i+=38)px(x+i+6,y-17,3,18,'#919c93');}
+function drawRestoredBridge(x,y,w){
+  for(let i=0;i<w;i+=19){const width=Math.min(18,w-i);if(width<6){px(x+i,y+2,width,5,P.stone);continue;}stone(x+i,y+7,width,7,i,true);px(x+i+4,y+2,Math.min(7,width-5),1,'#b29c81');if(i%38===0){px(x+i+7,y+7,4,GROUND-y-7,'#687b77');px(x+i+4,GROUND-4,10,4,'#7e8c82');}}
+  px(x,y,w,2,P.frost); // 실제 발판의 흰 윗면은 끊김 없이 보인다.
+}
+function drawBridgeWork(x,y){
+  const stage=G.f.dolBridgeStage||0;
+  for(let i=0;i<5;i++){const sx=x-68+i*43;stone(sx,y,15,7,i,false);if(stage>0)stone(sx+3,y-7,10,6,i+1,false);if(stage>1){px(sx+5,y-27,4,14,'#73857d');px(sx+2,y-29,11,3,'#9caa9b');}}
+  if(stage<3){for(let i=0;i<5-stage;i++){const sx=x+28+i*12;stone(sx,y-(i%2)*5,11,5,i,false);px(sx+3,y-3-(i%2)*5,4,1,'#bca68b');}px(x-24,y-2,17,2,'#998d6e');px(x-17,y-14,2,12,'#867a5e');px(x-20,y-16,8,3,'#b7c5bb');}
+  if(stage>=3){px(x-34,y-4,10,3,'#bcb58d');px(x-32,y-7,7,3,'#d6cba0');}
+}
+function drawBridgeWorkMarker(x,y){stone(x-9,y,18,11,0,false);px(x-6,y-9,12,2,'#d8d4b5');px(x-4,y-6,7,1,'#88765e');px(x-4,y-4,10,1,'#88765e');}
+function drawBridgeSurvey(x,y,seen){const col=seen?'#adbc98':'#f1ddb3';px(x-7,y-6,14,1,col);px(x-8,y-5,1,5,col);px(x+7,y-5,1,5,col);px(x-4,y-12,8,1,col);px(x-3,y-13,6,1,col);if(!seen){px(x,y-18,1,3,col);px(x-2,y-16,5,1,col);}}
+
+/* 판정 막대는 story.js가 그린다. 여기서는 손을 쓰는 대상만 바꾼다. */
+Rg.drawStoneTask=(c,task,st)=>{
+  const title=task?.title||'';
+  if(!/돌집|등짐|잠자리|바람막이|복원|살피기/.test(title))return false;
+  c.save();c.beginPath();c.rect(0,30,320,94);c.clip();
+  const q=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
+  const block=(x,y,w,h,col='#8b9586')=>{q(x,y,w,h,col);q(x+2,y+1,w-4,2,'#ccd1b5');q(x+1,y+h-2,w-2,2,'#687467');};
+  const n=Math.min(st.hits,3),shift=st.settle?st.land*13:Math.sin(st.phase)*24;
+  const hand=(x,y,f=1)=>{q(x,y,18*f,6,'#89775f');q(x+12*f,y-3,8*f,7,'#bca07c');q(x+16*f,y-5,3*f,8,'#d0b28b');};
+  q(0,30,320,94,'#efe3c8');
+  q(0,115,320,9,'#c6bfa2');q(0,115,320,2,'#a8ad8e');
+  if(title.includes('돌집')){
+    q(112,73,96,43,'#a8aa8b');q(129,82,62,34,'#736f55');
+    if(n>0){block(108,107,28,9);block(184,107,28,9);}
+    if(n>1){block(121,82,13,25);block(187,82,13,25);block(121,73,79,9);}
+    if(n>2){block(139,93,8,8,'#b7c5ac');q(141,93,2,2,'#f9e9b6');}
+    block(140+shift,45,39,12,'#9aa793');hand(107+shift,52);hand(213+shift,52,-1);
+    q(64,96,18,20,'#75634f');q(66,91,14,10,'#927c60');q(78,97,7,4,'#d1aa87');q(77,94,2,2,'#323c32');
+  }else if(title.includes('등짐')){
+    q(139,65,45,51,'#8e7d5a');q(136,66,51,4,'#b5a27a');
+    const sy=n>0?94:70;block(143,sy,36,16,'#818a7d');
+    for(let i=0;i<7;i++)q(140+i*6,n>1?52:96,2,n>1?22:18,i%2?'#d7c79b':'#b4ab78');
+    if(n>2){q(155,54,3,62,'#d4c09b');q(137,90,50,3,'#d4c09b');q(157,89,7,7,'#796a4c');}
+    hand(113+shift,100);hand(205+shift,100,-1);q(231,78,12,38,'#c5bea0');q(229,61,4,22,'#ded1af');q(236,59,4,24,'#ded1af');
+  }else if(title.includes('잠자리')){
+    q(42,114,74,4,'#8daeb0');q(51,112,52,2,'#d4dfcd');
+    block(196,68,55,48,'#a4a98c');q(201,74,44,42,'#777e65');
+    if(n>0)block(124,109,15,7);const rx=n>1?164:119+shift;
+    block(rx,101,55,14,'#a39c76');q(rx+5,101,44,2,'#cfb583');
+    if(n>1){q(rx+13,94,1,5,'#e5c795');q(rx+37,93,1,6,'#e5c795');}
+    const fx=n>2?rx+24:68;q(fx-10,n>2?90:106,20,9,'#879b72');q(fx-8,n>2?85:101,5,7,'#a5b18a');q(fx+3,n>2?85:101,5,7,'#a5b18a');
+    hand(87+shift,103);hand(174+shift,103,-1);
+  }else if(title.includes('바람막이')){
+    for(let j=0;j<4;j++){block(161,54+j*15,26,14);block(215,54+j*15,26,14);}
+    q(189,57,23,58,'#bfc7b2');for(let i=0;i<3;i++)q(58,65+i*13,86,1,'#b6c2b2');
+    for(let i=0;i<n;i++)block(187,99-i*15,29,15);
+    block(178+shift,40,39,12,'#a7ad91');hand(144+shift,49);hand(242+shift,49,-1);
+    q(266,97,15,13,'#415955');q(270,91,12,9,'#415955');q(280,97,10,3,'#aca889');q(274,95,2,2,'#e9e8c8');
+  }else{
+    q(54,115,215,8,'#8ba9a4');for(let i=0;i<3;i++)q(76+i*65,119,31,1,'#d4dfca');
+    block(63,89,36,26);block(225,89,36,26);
+    for(let i=0;i<3;i++){
+      const x=97+i*43,y=82-(i===1?8:0);if(i<n)block(x,y,42,13,'#9ca68e');
+      else{q(x,y,42,1,'#c8bfa1');q(x,y,1,13,'#c8bfa1');q(x+41,y,1,13,'#c8bfa1');}
+    }
+    if(n>1){q(74,75,5,14,'#a9b399');q(245,75,5,14,'#a9b399');}
+    block(137+shift,43,43,13,'#a6af95');hand(102+shift,52);hand(219+shift,52,-1);
+  }
+  c.restore();return true;
+};
 function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.round(y),f,a,b,w,h,c);if(kind==='hare'||kind==='rabbit'||kind==='porter'){
   q(-7,-20,13,19,'#c4c1ad');q(-5,-24,9,10,'#ded7bc');q(-5,-37,3,14,'#d7d1b9');q(0,-39,3,15,'#d7d1b9');q(-4,-35,1,9,'#ab9e8e');q(1,-37,1,10,'#ab9e8e');q(3,-22,1,2,'#35423e');q(5,-19,3,2,'#938979');q(-9,-16,3,11,'#908c72');q(-12,-18,4,14,'#8b7c5d');q(-13,-18,6,2,'#bbaa7c');q(-7,-2,5,2,'#767764');q(2,-2,5,2,'#767764');q(7,-20,2,20,'#6b735f');q(-8,-21,15,2,'#776d55');
   const helped=!!G.f.dolneomeo_pack_help,heavy=helped?-10:-24,reeds=helped?-23:-11;
@@ -141,7 +209,7 @@ function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.ro
 }else{
   q(-7,-14,14,11,'#344b52');q(-4,-11,9,7,'#e2e4d3');q(2,-20,8,9,'#344b52');q(8,-17,6,2,'#b8b798');q(7,-19,1,1,'#eef1d9');q(-15,-7,10,3,'#344b52');q(-18,-6,4,2,'#71878a');q(-4,-4,1,4,'#75775f');q(3,-4,1,4,'#75775f');q(-7,-12,4,6,'#627b80');
 }}
-Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawMemoryBridge,drawWanderer,
+Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawMemoryBridge,drawRestoredBridge,drawBridgeWork,drawBridgeWorkMarker,drawBridgeSurvey,drawWanderer,
   cliffLayers:[{speed:.04,draw:cliffSky},{speed:.14,draw:cliffFar},{speed:.4,draw:cliffSea},{speed:.83,draw:cliffNear}],
   shrineLayers:[{speed:.04,draw:shrineSky},{speed:.16,draw:shrineFar},{speed:.43,draw:shrineMid},{speed:.86,draw:shrineNear}],
 };
