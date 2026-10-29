@@ -5,17 +5,21 @@
 (()=>{
 const Rg=REGIONS.dolneomeo;
 
+const pick=lines=>lines[Math.floor(Math.random()*lines.length)];
+
 /* ---------- 꾸벅이 (고슴도치): 고개를 들 때 맞춰 말 걸기 ---------- */
 function talkKku(){
   const F=G.f;F.kkuTalk=true;
   if(!Rg.kkuAwakeNow()){
+    Sound.stone('sleep');
     learn('kkubeogi:sleep');
     if(!G.clues.some(c=>c.id==='k1')){
       clue('k1','꾸벅이','꾸벅이의 잠꼬대: 보부상 아저씨가 할배네서 겨울을 날 것처럼 굴더니, 글자 하나를 읽고는 그날 밤 떠났다.');
       talk([['꾸벅이','쿨… 쿨…'],['꾸벅이','…보부상 아저씨… 할배네서 겨울 날 것처럼 굴더니…'],['꾸벅이','…글자 하나 읽고는… 그날 밤 떠났어… 쿨…'],['너구리','(잠꼬대다. 고개를 들 때 말을 걸어야 깨울 수 있겠다.)']]);
-    }else talk([['꾸벅이','쿨… 쿨…'],['너구리','(고개를 들 때 말을 걸어 보자.)']]);
+    }else talk([['꾸벅이',pick(['쿨… 둥지는… 폭신하게…','으음… 아직 꿈속인데…','하암… 조금만 더…'])],['너구리','(코가 씰룩하면 곧 고개를 들겠다.)']]);
     return;
   }
+  Sound.stone('wake');
   if(!F.kkuAwake){F.kkuAwake=true;rel('kkubeogi',1);learn('kkubeogi:awake');
     ledger('kkubeogi','꾸벅이','마른 억새 3','서리다래가 있는 곳');
     talk([['꾸벅이','…어, 어? 안 잤어. 진짜야.'],['꾸벅이','너 처음 보는 너구리네. 그 모자, 어디서 봤더라… 하암.'],
@@ -44,7 +48,7 @@ function kkuTrade(){
 /* ---------- 날쌘 (다시 만남): 돌투성이 마을이라 칡꽃 향이 귀하다 ---------- */
 function talkNal(){
   if(!G.f.nalDTalk){G.f.nalDTalk=true;ledger('nal_dolneomeo','날쌘','칡꽃 1 (또는 겨우살이 2)','결명자');
-    talk([['날쌘','또 만났네, 꼬마 보부상. 여긴 돌밖에 없어서 장사가 영 시원찮아.'],['날쌘','…잠깐. 그 보따리에서 나는 향, 갈참골 칡꽃이지? 여기선 그게 귀한 몸이야.']],nalMenu);}
+    talk([['날쌘','또 만났네, 꼬마 보부상. 여긴 돌밖에 없어서 장사가 영 시원찮아.'],['날쌘','…잠깐. 그 보따리에서 나는 향, 단풍골 칡꽃이지? 여기선 그게 귀한 몸이야.']],nalMenu);}
   else nalMenu();
 }
 function nalMenu(){
@@ -52,7 +56,7 @@ function nalMenu(){
   if(!F.nalDDone){
     if(has('kflower'))c.push({t:'칡꽃을 내민다 (결명자 2)',go:()=>nalTrade('kflower')});
     if(has('gyeousari',2))c.push({t:'겨우살이 2개를 내민다 (결명자 1)',go:()=>nalTrade('gyeousari')});
-    if(!F.nalDBluff)c.push({t:'허세 부리기: "칡꽃이 다 뭐야, 갈참골엔 흔해 빠졌는데"',go:nalBluff});
+    if(!F.nalDBluff)c.push({t:'허세 부리기: "칡꽃이 다 뭐야, 단풍골엔 흔해 빠졌는데"',go:nalBluff});
   }
   c.push({t:'그만두기',go:null});
   const say=F.nalDDone?'결명자는 눈 밝히는 약재야. 눈 침침한 영감님한테 차로 달여 드리면 좋아하겠지.'
@@ -64,13 +68,13 @@ function nalTrade(id){
   takeItem(id,id==='kflower'?1:2);F.nalDDone=true;ledgerDone('nal_dolneomeo');
   const n=(id==='kflower'?2:1)+(F.nalDBluff?1:0);
   addItem('gyeolmyeongja',n);learn('nal:dolneomeo');
-  diary('d_nal','갈참골에서는 흔하던 '+(id==='kflower'?'칡꽃을':'겨우살이를')+' 날쌘이 결명자와 바꿔 주었다. 같은 물건도 마을마다 값이 다르다.');
+  diary('d_nal','단풍골에서는 흔하던 '+(id==='kflower'?'칡꽃을':'겨우살이를')+' 날쌘이 결명자와 바꿔 주었다. 같은 물건도 마을마다 값이 다르다.');
   talk(F.nalDBluff?[['날쌘','흔해 빠졌다더니 냄새는 기가 막히네. 자, 결명자. 덤까지 얹었다.'],['날쌘','날쌘이 짠돌이란 소리는 못 듣지.']]
     :[['날쌘','거래 성립. 결명자 '+n+'개.'],['날쌘','눈 밝히는 약재야. 쓸 데가 있을걸.']]);
 }
 function nalBluff(){
   G.f.nalDBluff=true;rel('nal',1);
-  talk([['너구리','흥, 칡꽃이 다 뭐야. 갈참골엔 흔해 빠졌는데.'],['날쌘','흔해 빠졌다고? …허, 촌놈 허세는 여전하네.'],['날쌘','좋아. 거래하면 덤으로 하나 더 얹어 주지.']],nalMenu);
+  talk([['너구리','흥, 칡꽃이 다 뭐야. 단풍골엔 흔해 빠졌는데.'],['날쌘','흔해 빠졌다고? …허, 촌놈 허세는 여전하네.'],['날쌘','좋아. 거래하면 덤으로 하나 더 얹어 주지.']],nalMenu);
 }
 
 /* ---------- 돌쇠 할배 (두더지 석수) ---------- */
@@ -110,30 +114,81 @@ function dolsoeTea(){
 const panel=el('div','forge');panel.id='stack';panel.hidden=true;
 panel.innerHTML='<h2>돌 쌓기 · 돌의 마음 읽기</h2><canvas id="stackCv" width="320" height="140" style="display:block;width:min(100%,360px);height:auto;margin:0 auto;image-rendering:pixelated;background:#efe3c8;border:2px solid var(--meok);border-radius:3px;touch-action:none"></canvas><div class="pips" id="spips"></div><div class="fhint" id="shint"></div><button class="btn primary strike" id="sstrike" type="button">돌 얹기 <kbd>Space · J</kbd></button>';
 $('shell').appendChild(panel);
-const st={t:0,hits:0,miss:0,cool:0,zone:0.2,shake:0};
+panel.insertBefore(el('p','fhint','붉은 꼭대기가 금빛 가운데에 오면 얹자. 세 개면 된다.'),$('spips'));
+$('shint').setAttribute('aria-live','polite');
+const st={phase:.9,hits:0,miss:0,cool:0,zone:.2,settle:0,land:0,edge:0,fall:null,warned:false,done:false};
 const scv=$('stackCv'),sx=scv.getContext('2d');
-const sway=()=>Math.sin(st.t*(0.045+st.hits*0.014));
-function openStack(){Object.assign(st,{t:0,hits:0,miss:0,cool:0,zone:0.2,shake:0});$('shint').textContent='돌탑이 흔들린다. 꼭대기가 금빛 가운데에 설 때 얹자. 세 개면 된다.';panel.hidden=false;drawStack();}
+const sway=()=>Math.sin(st.phase);
+const stackAmp=()=>42+st.hits*15;
+const stackAdvice={
+  start:['손끝에 힘 빼고, 기다려라.','돌도 숨을 고른다. 천천히.','가운데 서면 살며시 놓거라.'],
+  good:['그래. 돌이 네 손을 아는구나.','잘 놓았다. 다음 돌도 천천히.','허허. 제자리를 찾았구나.'],
+  danger:['기운다고 겁먹을 것 없다.','돌이 돌아올 때를 기다려라.','손은 가만히. 돌이 온다.'],
+  edge:['허허… 버텼구나. 힘 빼거라.','휴… 돌도 놀랐겠다. 괜찮다.','아슬했구나. 그래도 섰다.'],
+  miss:['괜찮다. 이 돌로 다시 해라.','돌은 안 다친다. 다시 놓거라.','서두를 것 없다. 다시 해 보자.']
+};
+function stackSay(kind,extra=''){$('shint').textContent='돌쇠 할배: “'+pick(stackAdvice[kind])+'”'+extra;}
+function openStack(){
+  Object.assign(st,{phase:.9,hits:0,miss:0,cool:0,zone:.2,settle:0,land:0,edge:0,fall:null,warned:false,done:false});
+  stackSay('start');panel.hidden=false;drawStack();
+}
+function stackStone(x,y,w,angle,color){
+  const c=sx;c.save();c.translate(Math.round(x),y+10);c.rotate(angle);
+  c.fillStyle=color;c.fillRect(-w/2,-10,w,12);c.fillStyle='rgba(255,255,255,.35)';c.fillRect(-w/2+2,-9,w-4,2);c.restore();
+}
 function drawStack(){
-  const c=sx,Wc=320,Hc=140,cx=Wc/2,base=Hc-16,amp=58;
+  const c=sx,Wc=320,Hc=140,cx=Wc/2,base=Hc-16,amp=stackAmp();
   c.fillStyle='#efe3c8';c.fillRect(0,0,Wc,Hc);
   c.fillStyle='rgba(220,165,69,.35)';c.fillRect(cx-st.zone*amp,8,st.zone*amp*2,base-8);
   c.fillStyle='#8a8680';c.fillRect(cx-46,base,92,10);c.fillStyle='#6a6660';c.fillRect(cx-46,base+8,92,2);
-  const lean=sway()+(st.shake?Math.sin(st.shake*1.3)*0.25:0);
+  const recovery=st.settle/42;
+  const blend=st.settle?Math.max(0,1-st.settle/12):1;
+  const lean=st.land*(1-blend)+sway()*blend+Math.sin(st.settle*.45)*recovery*.12;
   const n=st.hits+2;
-  for(let i=0;i<=n;i++){const k=i/(n+1);const x=cx+lean*amp*k*k-(i===n?0:0);const y=base-12-i*14;const w=40-i*3;
-    c.fillStyle=i===n?'#b4432a':['#9a9690','#8a8680','#aeaaa4'][i%3];c.fillRect(Math.round(x-w/2),y,w,12);
-    c.fillStyle='rgba(255,255,255,.35)';c.fillRect(Math.round(x-w/2)+2,y+1,w-4,2);}
+  for(let i=0;i<=n;i++){
+    const k=i/n,x=cx+lean*amp*k*k,y=base-12-i*14,w=40-i*3;
+    const tilt=i===n?st.edge*recovery*(.65+Math.sin(st.settle*.24)*.35):lean*k*.055;
+    stackStone(x,y-(i===n?recovery*6:0),w,tilt,i===n?'#b4432a':['#9a9690','#8a8680','#aeaaa4'][i%3]);
+  }
+  if(st.fall){const f=st.fall,t=f.age;stackStone(f.x+f.dir*t*2,f.y-t*1.6+t*t*.15,30,f.dir*t*.2,'#b4432a');}
+  // 꼭대기와 같은 비율의 금빛 범위와 바늘로 남은 여유를 보여 준다.
+  c.fillStyle='#c9b997';c.fillRect(80,5,160,3);c.fillStyle='#dca545';c.fillRect(cx-st.zone*80,4,st.zone*160,5);
+  c.fillStyle='#b4432a';c.fillRect(cx+lean*80-2,3,4,7);
+  c.fillStyle='#5a4030';c.font='10px sans-serif';c.textAlign='center';
+  c.fillText(st.settle?(st.edge?'삐걱… 버틴다!':'탁… 자리 잡는 중'):st.fall?'또 얹으면 된다':Math.abs(sway())<=st.zone?'지금, 살며시!':'가운데를 기다려',cx,23);
   $('spips').innerHTML=[0,1,2].map(i=>'<span class="pip'+(i<st.hits?' on':'')+'"></span>').join('');
+  $('sstrike').disabled=st.cool>0||st.done;
 }
-function stackStep(){st.t++;if(st.cool>0)st.cool--;if(st.shake>0)st.shake--;drawStack();}
+function stackStep(){
+  if(panel.hidden||st.done)return;
+  if(st.cool>0)st.cool--;
+  st.phase+=.04+st.hits*.014;
+  if(st.settle>0){
+    st.settle--;
+    if(st.settle===0){
+      if(st.hits>=3){st.done=true;finishStack();return;}
+      stackSay(st.edge?'edge':'good');
+    }
+  }
+  if(st.fall&&++st.fall.age>=24)st.fall=null;
+  // 한 단계에서 한 번만 훈수해 성공/실패 대사를 곧바로 덮지 않는다.
+  if(!st.cool&&!st.fall&&!st.warned&&Math.abs(sway())>.92){st.warned=true;stackSay('danger');}
+  drawStack();
+}
 function stackHit(){
-  if(st.cool>0||st.hits>=3)return;st.cool=14;
-  if(Math.abs(sway())<=st.zone){st.hits++;$('shint').textContent=['탁. 돌이 자리를 잡았다.','탁. 돌탑이 숨을 고른다.','…탁.'][st.hits-1];
-    if(st.hits>=3){drawStack();setTimeout(finishStack,420);}}
-  else{st.miss++;st.shake=24;
-    if(st.miss>=2){st.zone=0.34;$('shint').textContent='돌쇠 할배: "서두르지 마라. 돌이 가운데 설 때를 기다려." (가운데가 넓어졌다)';}
-    else $('shint').textContent='와르르… 돌이 미끄러졌다. 꼭대기가 가운데 올 때를 노리자.';}
+  if(panel.hidden||st.cool>0||st.hits>=3||st.done)return;
+  const lean=sway(),distance=Math.abs(lean);
+  if(distance<=st.zone){
+    st.land=lean;
+    st.edge=distance>=st.zone*.65?Math.sign(lean)*.32:0;
+    st.hits++;st.settle=st.edge?42:24;st.cool=st.settle;st.warned=false;
+    stackSay(st.edge?'edge':'good');Sound.stone(st.edge?'edge':'tap');
+  }else{
+    const n=st.hits+2;st.fall={x:160+lean*stackAmp(),y:124-12-n*14,dir:Math.sign(lean),age:0};
+    st.miss++;st.cool=14;st.warned=true;Sound.stone('fall');
+    if(st.miss>=2)st.zone=.34;
+    stackSay('miss',st.miss>=2?' 금빛 가운데가 넓어졌다.':'');
+  }
   drawStack();
 }
 $('sstrike').addEventListener('pointerdown',e=>{e.preventDefault();stackHit();});
@@ -204,7 +259,7 @@ Rg.startGolem=()=>{
 Rg.sendMedicine=()=>{
   G.f.yakMade=true;
   diary('d_end','깨어난 맷돌로 서리다래를 갈아 약즙을 만들었다. 이번에는 내 손으로 만든 약이다. 까치가 물고 남쪽으로 날아갔다.');
-  talk([['너구리','서리다래 약즙이다. 이번엔 내 손으로 만들었다.'],['너구리','(휘파람을 불자 장승 위에 앉아 있던 까치가 내려왔다.)'],['너구리','까치야, 엄마한테 부탁해. 남쪽 갈참골 너머, 우리 집이야.']],()=>{
+  talk([['너구리','서리다래 약즙이다. 이번엔 내 손으로 만들었다.'],['너구리','(휘파람을 불자 장승 위에 앉아 있던 까치가 내려왔다.)'],['너구리','까치야, 엄마한테 부탁해. 남쪽 단풍골 너머, 우리 집이야.']],()=>{
     takeItem('darae_yak',1);endGame();
   });
 };

@@ -22,11 +22,11 @@ function gatherStep(){
 function gStrike(){
   if(gat.cool>0||!gat.cfg||gat.hits>=gat.cfg.hits)return;gat.cool=12;
   if(gat.pos>=gat.zone[0]&&gat.pos<=gat.zone[1]){
-    gat.hits++;
+    Sound.gather(true);gat.hits++;
     if(gat.hits>=gat.cfg.hits){drawGather();setTimeout(finishGather,300);return;}
     $('ghint').textContent=gat.cfg.ok[gat.hits-1]||'좋아!';setZone();
   }else{
-    gat.miss++;
+    Sound.gather(false);gat.miss++;
     $('ghint').innerHTML='<b>'+gat.cfg.miss+'</b>'+(gat.miss===2?' (무른 자리가 넓어졌다)':'');
     if(gat.miss===2)setZone();
   }
@@ -34,7 +34,7 @@ function gStrike(){
 }
 function finishGather(){
   const d=gat.d,id=d.item;$('gather').hidden=true;d.done=true;d.busy=false;
-  const perfect=gat.miss===0;spark(d.x,GROUND-4);
+  const perfect=gat.miss===0;Vfx.gather(d.x,GROUND-4);
   addItem(id,perfect?2:1);
   if(perfect)setTimeout(()=>toast('흠집 하나 없이 캐냈다! '+ITEMS[id].n+' ×2'),700);
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);

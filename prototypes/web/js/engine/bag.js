@@ -1,8 +1,8 @@
 'use strict';
 /* 패널(보따리·책) 열고 닫기, 보따리 + 가보 가공대 */
-function closePanels(){if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;$('notebook').hidden=true;}
-function toggleBag(){const o=$('bag').hidden;closePanels();if(o){selItem=null;lastOut=null;pouchMsg='';renderBag();$('bag').hidden=false;$('bagBody').scrollTop=0;}}
-function toggleBook(){const o=$('book').hidden;closePanels();if(o){renderBook();$('book').hidden=false;}}
+function closePanels(){if(['bag','book','notebook'].some(id=>!$(id).hidden))Sound.panel(false);if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;$('notebook').hidden=true;}
+function toggleBag(){const o=$('bag').hidden;closePanels();if(o){Sound.panel(true);bagKind='전체';selItem=null;lastOut=null;pouchMsg='';renderBag();$('bag').hidden=false;$('bagBody').scrollTop=0;}}
+function toggleBook(){const o=$('book').hidden;closePanels();if(o){Sound.panel(true);renderBook();$('book').hidden=false;}}
 $('btnBag').onclick=()=>{if(G.started&&!G.ended&&!open('dlg')&&!openMinigame())toggleBag();};
 $('btnBook').onclick=()=>{if(G.started&&!open('dlg')&&!openMinigame())toggleBook();};
 $('bagClose').onclick=closePanels;$('bookClose').onclick=closePanels;
@@ -20,6 +20,15 @@ const knownRecipes=t=>(RECIPES[t]||[]).filter(r=>!r.know||knows(r.know));
 function awaken(t){if(!isAwake(t))G.awake.push(t);}
 const pouch={tool:'jeolgu',items:[]};
 let selItem=null,pouchMsg='',lastOut=null,brewing=false;
+const BAG_KINDS=['전체','재료','먹을거리','도구','귀한 것'];
+let bagKind='전체';
+function selectBagKind(kind){
+  if(!BAG_KINDS.includes(kind))return;
+  if(bagKind!==kind)Sound.tab();
+  bagKind=kind;selItem=null;renderBag();$('bagBody').scrollTop=0;
+  const tab=document.querySelector('#bagBody .bag-tab[aria-pressed="true"]');if(tab)tab.focus({preventScroll:true});
+}
+function cycleBagKind(step){selectBagKind(BAG_KINDS[(BAG_KINDS.indexOf(bagKind)+step+BAG_KINDS.length)%BAG_KINDS.length]);}
 function pouchCount(){const c={};pouch.items.forEach(i=>c[i]=(c[i]||0)+1);return c;}
 function matchRecipe(){const c=pouchCount(),ck=Object.keys(c);if(!isAwake(pouch.tool))return null;for(const r of knownRecipes(pouch.tool)){const k=Object.keys(r.need);if(ck.length===k.length&&k.every(x=>c[x]===r.need[x]))return r;}return null;}
 function returnPouch(){if(!pouch.items.length)return;pouch.items.forEach(id=>{G.inv[id]=(G.inv[id]||0)+1;});pouch.items=[];refreshHud();}
@@ -35,7 +44,7 @@ function putIn(id){
   pouch.items.push(id);lastOut=null;pouchMsg=liveHint();refreshHud();renderBag(true);
 }
 function takeOut(i){if(brewing)return;const id=pouch.items.splice(i,1)[0];if(!id)return;G.inv[id]=(G.inv[id]||0)+1;lastOut=null;pouchMsg=liveHint();refreshHud();renderBag();}
-function switchTool(t){if(brewing||t===pouch.tool)return;returnPouch();pouch.tool=t;lastOut=null;pouchMsg='';renderBag();}
+function switchTool(t){if(brewing||t===pouch.tool)return;Sound.tab();returnPouch();pouch.tool=t;lastOut=null;pouchMsg='';renderBag();}
 function craft(){
   if(brewing||!pouch.items.length)return;
   const r=matchRecipe();const box=document.querySelector('#bagBody .pouch');
@@ -49,7 +58,7 @@ function craft(){
   document.querySelectorAll('#bagBody .inslot').forEach(x=>x.classList.add('sucked'));
   const btn=$('craftBtn');if(btn)btn.disabled=true;
   setTimeout(()=>{
-    brewing=false;addItem(r.out,r.n);lastOut=r.out;
+    Sound.craft();brewing=false;addItem(r.out,r.n);lastOut=r.out;
     pouchMsg=ITEMS[r.out].n+' '+r.n+'개가 보따리로 들어갔다.';
     const fk='crafted_'+tool;
     if(!G.f[fk]){G.f[fk]=true;if(HEIR[tool].firstCraft)diary(fk,HEIR[tool].firstCraft);}
@@ -59,23 +68,28 @@ function craft(){
 function renderBag(pop){
   const body=$('bagBody');const sc=body.scrollTop;body.innerHTML='';
   body.appendChild(el('div','sub','소지품'));
-  const items=Object.keys(G.inv).filter(k=>G.inv[k]>0);
+  const filters=el('div','bag-tabs');filters.setAttribute('role','group');filters.setAttribute('aria-label','소지품 종류');
+  BAG_KINDS.forEach(kind=>{const b=el('button','bag-tab',kind);b.type='button';b.setAttribute('aria-pressed',kind===bagKind);
+    b.onclick=()=>selectBagKind(kind);filters.appendChild(b);});
+  body.appendChild(filters);body.appendChild(el('div','small bag-key-hint','Q · 이전 종류 / R · 다음 종류'));
+  const items=Object.keys(G.inv).filter(k=>G.inv[k]>0&&(bagKind==='전체'||ITEMS[k].kind===bagKind));
   const grid=el('div','bag-grid');
   /* 칸은 12개부터, 물건 종류가 많으면 한 줄(6칸)씩 늘어난다. 가진 물건이 안 보이는 일이 없게 */
   const slots=Math.max(12,Math.ceil(items.length/6)*6);
   for(let i=0;i<slots;i++){
     const id=items[i];const b=el('button','slot'+(id&&selItem===id?' sel':''));b.type='button';
-    if(id){b.appendChild(icon(id));b.appendChild(el('span','n',G.inv[id]));const dot=el('span','dot');dot.style.background=RCOL[ITEMS[id].r];b.appendChild(dot);
-      b.setAttribute('aria-label',ITEMS[id].n+' '+G.inv[id]+'개');
+    if(id){b.appendChild(icon(id));b.appendChild(el('span','n',G.inv[id]));b.appendChild(rarityIcon(ITEMS[id].r));
+      b.setAttribute('aria-label',ITEMS[id].n+' '+G.inv[id]+'개 · '+RAR[ITEMS[id].r]);
       b.onclick=()=>{if(selItem===id)putIn(id);else{selItem=id;renderBag();}};}
     else{b.disabled=true;b.setAttribute('aria-label','빈 칸');}
     grid.appendChild(b);
   }
   body.appendChild(grid);
+  if(!items.length)body.appendChild(el('div','small bag-empty',bagKind==='전체'?'보따리가 비어 있다.':'이 종류의 소지품이 없다.'));
   const d=el('div','detail');
   if(selItem&&has(selItem)){
     const id=selItem;d.appendChild(icon(id));const info=el('div','info');
-    const name=el('b',null,ITEMS[id].n);const ch=el('span','chip',RAR[ITEMS[id].r]);ch.style.background=RCOL[ITEMS[id].r];name.appendChild(ch);info.appendChild(name);
+    const name=el('b',null,ITEMS[id].n);const ch=el('span','chip');ch.appendChild(rarityIcon(ITEMS[id].r));ch.appendChild(el('span',null,RAR[ITEMS[id].r]));name.appendChild(ch);info.appendChild(name);
     info.appendChild(el('div',null,ITEMS[id].d));
     const row=el('div','row');
     const put=el('button','btn primary',HEIR[pouch.tool].short+'에 넣기');put.type='button';put.onclick=()=>putIn(id);row.appendChild(put);

@@ -1,5 +1,5 @@
 'use strict';
-/* 갈참골 진행: NPC 대화와 교환, 무쇠의 대장간 미니게임, 전투 시작과 결과, 지금 할 일.
+/* 단풍골 진행: NPC 대화와 교환, 무쇠의 대장간 미니게임, 전투 시작과 결과, 지금 할 일.
    흐름은 design/narrative/galchamgol-scenario.md, 교환은 design/data/trades.csv */
 (()=>{
 const Rg=REGIONS.galchamgol;
@@ -16,7 +16,7 @@ function talkDodam(){
   }else talk([['도담','당산나무는 마을 맨 끝이야. 칡덩굴 조심하고!']]);
 }
 function dodamDad(next){
-  clue('d1','도담','몇 달 전 보부상 너구리가 갈참골에서 도토리 가루를 바꿔 갔다. 북쪽으로 간다고 했다.');
+  clue('d1','도담','몇 달 전 보부상 너구리가 단풍골에서 도토리 가루를 바꿔 갔다. 북쪽으로 간다고 했다.');
   rel('dodam',1);
   talk([['도담','아! 그 모자, 보부상 아저씨 거랑 똑같다!'],['도담','몇 달 전에 여기서 도토리 가루를 잔뜩 바꿔 갔어. 북쪽으로 간다던데? 엄청 급해 보였어.']],next);
 }
@@ -71,7 +71,7 @@ function talkMusoe(){
   }else if(!F.musoeTested&&!F.musoeDone){
     talk([['무쇠','숨은 골랐냐? 낫을 쥘 자격, 다시 보여 봐라.',[{t:'다시 덤빈다',go:battleMusoe},{t:'조금 이따가요',go:null}]]]);
   }else if(!F.musoeDone){
-    if(has('coal'))talk([['무쇠','숯이군. 좋다, 불 올린다.'],['무쇠','빨갛게 달았을 때 내려쳐라. 박자 놓치면 쇠가 운다.']],openForge);
+    if(has('coal'))talk([['무쇠','숯이군. 좋다, 불 올린다.'],['무쇠','주황빛 남았을 때 쳐라. 식으면 다시 달구면 돼.']],openForge);
     else talk([['무쇠','숯. 숯이 없으면 쇠도 없다.'],['무쇠','물레방아 쪽 날쌘이 녀석이 숯을 쟁여 놨을 거다.']]);
   }else talk([['무쇠','낫은 손에 익었냐. 네 아빠는 그 낫으로 덩굴을 잘도 쳐냈지.']]);
 }
@@ -91,30 +91,94 @@ function battleMusoe(){
   }));
 }
 
-/* 대장간: 쇠가 가장 빨갈 때 세 번 내려치는 타이밍 미니게임 */
-const forge={pos:0,dir:1,hits:0,miss:0,zone:[42,58],cool:0};
-function openForge(){Object.assign(forge,{pos:0,dir:1,hits:0,miss:0,zone:[42,58],cool:0});$('forgeTitle').textContent='대장간 · 아빠의 낫 벼리기';$('forge').hidden=false;$('fhint').textContent='쇠가 가장 빨갛게 달았을 때 내려친다. 세 번이면 된다.';drawForge();}
+/* 대장간: 식기 전 세 번 벼린다. 놓쳐도 횟수·숯은 그대로, 같은 버튼으로 다시 달군다. */
+const forge={heat:100,hits:0,miss:0,edge:0,phase:'cold',wait:0,impact:0,particles:[]};
+const forgeWords={
+  start:['쇠빛부터 봐라. 손에 힘 빼고.','급할 것 없다. 쇠부터 살펴라.','내가 불 볼 테니, 넌 망치 들어.'],
+  good:['그래. 힘 말고 박자로 쳐라.','제법이군. 한 번 더 가자.','허, 망치 쥔 꼴은 봐줄 만해.'],
+  danger:['거기, 주황빛 꺼지기 전에 쳐!','다 식는다. 지금 내려쳐라.','망설이지 마라. 아직 먹힌다.'],
+  fail:['식었군. 다시 달궈. 숯은 됐다.','괜찮다. 쇠야 다시 달구면 돼.','낫은 내준다. 다시 해 봐라.'],
+  edge:['휴… 딱 맞췄군. 간도 크다.','허, 식기 직전에 살려 냈구나.','좋다. 네 아비도 그렇게 쳤지.']
+};
+let forgeCanvas,forgeHeatLabel;
+function forgeSay(kind){
+  const lines=forgeWords[kind],last=forge.lastLine;
+  const choices=lines.filter(t=>t!==last);
+  forge.lastLine=choices[Math.floor(Math.random()*choices.length)];
+  $('fhint').textContent='무쇠: “'+forge.lastLine+'”';
+}
+function forgeFloor(){return forge.miss>=2?10:22;}
+function prepareForge(){
+  if(forgeCanvas)return;
+  forgeCanvas=el('canvas');forgeCanvas.width=520;forgeCanvas.height=110;
+  forgeCanvas.style.cssText='width:100%;height:clamp(65px,13vh,110px);display:block;border-radius:3px';
+  forgeCanvas.setAttribute('aria-label','모루 위에서 빨강, 주황, 거무스름하게 식는 쇠와 망치');
+  $('forge').insertBefore(forgeCanvas,$('fbar'));
+  forgeHeatLabel=el('div');forgeHeatLabel.style.cssText='font-size:.9em;min-height:1.4em';
+  $('forge').insertBefore(forgeHeatLabel,$('fbar'));
+  $('fhint').setAttribute('aria-live','polite');
+}
+function openForge(){
+  prepareForge();
+  Object.assign(forge,{heat:100,hits:0,miss:0,edge:0,phase:'hot',wait:0,impact:0,particles:[],warned:false,owner:G});
+  $('forgeTitle').textContent='대장간 · 아빠의 낫 벼리기';$('forge').hidden=false;
+  forgeSay('start');drawForge();
+}
 function drawForge(){
-  $('fzone').style.left=forge.zone[0]+'%';$('fzone').style.width=(forge.zone[1]-forge.zone[0])+'%';
-  $('fmark').style.left=forge.pos+'%';
+  const floor=forgeFloor(),edge=forge.phase==='hot'&&forge.heat<=floor+14;
+  $('fbar').style.background='linear-gradient(90deg,#302c2b '+floor+'%,#d67a2d '+(floor+14)+'%,#d74425 100%)';
+  $('fzone').style.left=floor+'%';$('fzone').style.width='14%';
+  $('fmark').style.left=forge.heat+'%';
+  forgeHeatLabel.textContent=forge.phase==='cold'?'식었다 · 다시 달구기 (숯 추가 소모 없음)':
+    forge.phase==='done'?'벼리기 끝!'+(forge.edge>=2?' · 무쇠의 인정 +1':''):
+    '남은 열 '+Math.ceil(forge.heat)+'% · '+(edge?'아슬아슬! 금빛 칸에서 치면 큰 불똥':'빛이 남아 있으면 성공 · 금빛 칸은 식기 직전')+(forge.miss>=2?' · 천천히 식도록 도움':'');
+  $('fstrike').innerHTML=(forge.phase==='cold'?'다시 달구기':forge.phase==='done'?'벼리기 끝':'내려치기')+' <kbd>Space · J</kbd>';
   $('fpips').innerHTML=[0,1,2].map(i=>'<span class="pip'+(i<forge.hits?' on':'')+'"></span>').join('');
+  const c=forgeCanvas.getContext('2d');if(!c)return;
+  c.clearRect(0,0,520,110);c.fillStyle='#29231f';c.fillRect(0,0,520,110);
+  c.save();
+  const kick=forge.impact?Math.sin(forge.impact*2)*forge.impact/5:edge?Math.sin(forge.heat*3):0;
+  c.translate(kick,0);
+  c.fillStyle='#514a43';c.fillRect(195,74,130,12);c.fillRect(230,86,60,12);c.fillRect(216,98,88,8);
+  const h=Math.max(0,Math.min(1,(forge.heat-floor)/(100-floor)));
+  const color=forge.heat<floor?'#45403c':h>.45?'rgb(225,'+Math.round(60+(1-h)*70)+',37)':'rgb('+Math.round(110+h*240)+','+Math.round(65+h*110)+',38)';
+  c.shadowColor=color;c.shadowBlur=forge.heat>=floor?8+h*16:0;c.fillStyle=color;
+  c.fillRect(210,62,100,10);c.fillRect(305,57,20,8);c.shadowBlur=0;
+  c.save();c.translate(285,forge.impact?35+forge.impact:23);c.rotate(forge.impact?-.35:-.8);
+  c.fillStyle='#92633f';c.fillRect(-3,-4,7,44);c.fillStyle='#b4aca0';c.fillRect(-19,-12,37,18);c.restore();
+  forge.particles.forEach(p=>{c.globalAlpha=p.life/p.max;c.fillStyle=p.color;c.fillRect(p.x,p.y,p.size,p.size);});
+  c.restore();
 }
 function forgeStep(){
-  forge.pos+=forge.dir*(1.3+forge.hits*0.35);
-  if(forge.pos>=100){forge.pos=100;forge.dir=-1;}if(forge.pos<=0){forge.pos=0;forge.dir=1;}
-  if(forge.cool>0)forge.cool--;
+  if(forge.owner!==G||$('forge').hidden)return;
+  if(forge.impact>0)forge.impact--;
+  forge.particles=forge.particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.13;return --p.life>0;});
+  if(forge.wait>0){
+    if(--forge.wait===0){
+      if(forge.phase==='done'){finishForge();return;}
+      forge.phase='hot';forge.heat=100;
+    }
+  }else if(forge.phase==='hot'){
+    const floor=forgeFloor();forge.heat=Math.max(0,forge.heat-(forge.miss>=2?.32:.43));
+    if(forge.heat<floor){forge.phase='cold';forge.heat=0;forge.miss++;forgeSay('fail');}
+    else if(forge.heat<=floor+14&&!forge.warned){forge.warned=true;forgeSay('danger');}
+  }
   drawForge();
 }
 function strike(){
-  if(forge.cool>0||forge.hits>=3)return;forge.cool=14;
-  if(forge.pos>=forge.zone[0]&&forge.pos<=forge.zone[1]){
-    forge.hits++;$('fhint').textContent=['쾅! 불꽃이 튄다.','쾅! 날이 서기 시작한다.','쾅!'][forge.hits-1];
-    if(forge.hits>=3){drawForge();setTimeout(finishForge,380);}
-  }else{
-    forge.miss++;
-    if(forge.miss>=2){forge.zone=[32,68];$('fhint').textContent='무쇠: "급하다. 가운데, 제일 빨갈 때다." (판정이 넓어졌다)';}
-    else $('fhint').textContent='팅… 박자가 어긋났다. 가운데 빛나는 곳을 노리자.';
+  if($('forge').hidden||forge.owner!==G||forge.wait>0||forge.hits>=3)return;
+  if(forge.phase==='cold'){
+    Sound.forge('cold');forge.phase='hot';forge.heat=100;forge.warned=false;forgeSay('start');drawForge();return;
   }
+  const edge=forge.heat<=forgeFloor()+14;
+  forge.hits++;if(edge)forge.edge++;
+  Sound.forge(edge?'edge':'hit');forgeSay(edge?'edge':'good');
+  forge.impact=edge?20:10;
+  for(let i=0;i<(edge?38:12);i++){
+    const life=18+Math.random()*16;
+    forge.particles.push({x:260,y:62,vx:(Math.random()-.5)*(edge?12:6),vy:-2-Math.random()*(edge?6:3),life,max:life,size:edge?3:2,color:i%3?'#ffc45c':'#fff2b0'});
+  }
+  forge.phase=forge.hits>=3?'done':'reheat';forge.wait=forge.hits>=3?36:30;forge.warned=false;
   drawForge();
 }
 $('fstrike').addEventListener('pointerdown',e=>{e.preventDefault();strike();});
@@ -122,10 +186,12 @@ $('fstrike').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault
 $('fbar').addEventListener('pointerdown',e=>{e.preventDefault();strike();});
 defineMinigame({id:'forge',step:forgeStep,hit:strike});
 function finishForge(){
+  if(forge.owner!==G||G.f.musoeDone||forge.hits<3)return;
   $('forge').hidden=true;
   takeItem('coal',1);
   let sharp=false;if(has('coal')){takeItem('coal',1);sharp=true;}
   G.tool='sickle';G.sharp=sharp;G.f.musoeDone=true;learn('musoe:forge');ledgerDone('musoe');rel('musoe',1);
+  if(forge.edge>=2)rel('musoe',1);
   diary('sickle','아빠의 낫을 받았다. 손잡이에 아빠 손때가 묻어 있다.');
   clue('m2','무쇠','아빠는 대장간에서 사흘을 묵으며 밤마다 낡은 장부만 들여다봤다.');
   toast('아빠의 낫을 얻었다!'+(sharp?' 날이 더 날카롭다':''));
@@ -183,7 +249,7 @@ Rg.npcs=[
 Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
-  if(G.ended)return '갈참골 체험판 완료';
+  if(G.ended)return '단풍골 체험판 완료';
   if(!F.dodamTalk)return '마을 어귀의 다람쥐 도담에게 말 걸기';
   const ac=G.inv.acorn||0;
   const powderStep=()=>has('powder')?null:(ac<3?'도토리 줍기 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개 넣어 빻기');

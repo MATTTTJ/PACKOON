@@ -92,7 +92,27 @@ function drawCairn(){const b=G.boss;const x=b.x-cam;if(x<-60||x>W+60)return;
   R(x-8,GROUND-46-breathe,16,1,'#5a8a3a');
   R(x-7,GROUND-35-breathe,5,2,'#3a3430');R(x+2,GROUND-35-breathe,5,2,'#3a3430');
 }
-Rg.drawActors=()=>{drawCairn();};
+function drawKkuCue(){
+  const n=Rg.npcs.find(n=>n.id==='kkubeogi');if(!n)return;
+  const x=n.x-cam;if(x<-30||x>W+30)return;
+  const stir=Rg.kkuStirNow(),awake=Rg.kkuAwakeNow();
+  const f=G.px<n.x?-1:1;
+  if(stir>0){
+    // 원래 그림 위에 작은 코 움직임과 따뜻한 숨결만 겹친다.
+    const twitch=Math.floor(stir*8)%2;
+    M(x,GROUND,f,8,-4-twitch,2,1,'#2b1d14');
+    M(x,GROUND,f,12,-8-Math.floor(stir*3),2,1,'#d9b892');
+    M(x,GROUND,f,-8,-18,3,1,'#d9b892');
+    if(stir>.5)M(x,GROUND,f,-3,-20,3,1,'#d9b892');
+  }
+  if(Math.abs(G.px-n.x)>64||(!stir&&!awake))return;
+  ctx.save();ctx.font='10px sans-serif';ctx.textAlign='center';
+  const text=awake?'…어? 불렀어?':stir>.5?'…으음…':'코가 씰룩…';
+  const width=ctx.measureText(text).width+10;
+  ctx.fillStyle=awake?'#f5e7bb':'#e9e0cf';ctx.fillRect(x-width/2,GROUND-43,width,14);
+  ctx.fillStyle='#5a4030';ctx.fillText(text,x,GROUND-33);ctx.restore();
+}
+Rg.drawActors=()=>{drawCairn();drawKkuCue();};
 
 /* 서리 내림 */
 const frost=Array.from({length:30},()=>({x:Math.random()*W,y:Math.random()*H,s:0.15+Math.random()*0.3,p:Math.random()*6}));

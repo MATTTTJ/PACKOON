@@ -74,21 +74,44 @@ Rg.drawDig=(d,x)=>{if(d.item!=='darae_vine')return false;
 
 /* 눈 / 봄 꽃잎 */
 const fall=Array.from({length:34},(_,i)=>({x:Math.random()*W,y:Math.random()*H,s:0.25+Math.random()*0.4,p:Math.random()*6}));
-Rg.ambient=()=>{for(const l of fall){l.y+=l.s;l.p+=0.025;l.x+=Math.sin(l.p)*0.35-(spring()?0.2:0.05);if(l.y>H){l.y=-3;l.x=Math.random()*W;}if(l.x<-3)l.x=W+2;}};
+Rg.ambient=()=>{if(Rg.stepDadPose)Rg.stepDadPose();for(const l of fall){l.y+=l.s;l.p+=0.025;l.x+=Math.sin(l.p)*0.35-(spring()?0.2:0.05);if(l.y>H){l.y=-3;l.x=Math.random()*W;}if(l.x<-3)l.x=W+2;}};
 Rg.drawFront=()=>{for(const l of fall)R(l.x,l.y,2,Math.sin(l.p)>0?2:1,spring()?(l.p%2<1?'#f4a8c0':'#fcd0de'):'#ffffff');
   if(!spring()){ctx.fillStyle='rgba(20,28,70,.12)';ctx.fillRect(0,0,W,H);}};
 
 /* ---------- 진행 ---------- */
+/* 예고는 항상 36프레임, 귀가 선 뒤에도 12프레임은 멈출 여유가 있다.
+   가까워져도 풀 뜯는 시간만 조금 달라진다. 옛 저장에는 이 상태를 덧붙인다. */
+Rg.salgAlert=()=>!!G.salg&&G.salg.phase==='alert';
+function stepSalg(){
+  const s=G.salg;if(G.f.salgDone)return;
+  if(!s.phase){s.phase='graze';s.timer=108;s.risk=0;s.tick=0;}
+  s.tick++;
+  const d=Math.abs(s.x-G.px),moving=Math.abs(G.vx)>.2;
+  if(s.startle>0){s.startle--;if(!s.startle){s.phase='graze';s.timer=114;s.risk=0;}return;}
+  if(s.x>s.home)s.x=Math.max(s.home,s.x-.25);
+  if(d>=190)return;
+  if(!s.greeted){s.greeted=true;Rg.salgSay('start');}
+  if(!s.arrived&&d<30){s.arrived=true;Rg.salgSay('good');}
+  if(s.phase==='graze'&&s.timer%28===0)Sound.yeongsan('grass');
+  if(s.phase==='warn'&&moving)s.lastMove=s.tick;
+  if(s.phase==='alert'){
+    s.age++;
+    if(moving&&d<150){s.lastMove=s.tick;if(s.age>12)s.risk++;}
+    else if(!moving){
+      if(!s.relief&&s.lastMove&&s.tick-s.lastMove<=2){s.relief=true;Rg.salgSay('relief');Sound.yeongsan('relief');}
+      s.risk=Math.max(0,s.risk-2);
+    }
+    if(s.risk>=12){s.startle=60;s.x=Math.min(s.home+80,s.x+60);s.risk=0;s.arrived=false;
+      learn('salgeumi:alert');Rg.salgSay('scare');Sound.yeongsan('scare');return;}
+  }
+  if(--s.timer>0)return;
+  if(s.phase==='graze'){s.phase='warn';s.timer=36;Rg.salgSay('cue');Sound.yeongsan('cue');}
+  else if(s.phase==='warn'){s.phase='alert';s.timer=52;s.age=0;s.risk=0;s.relief=false;}
+  else {s.phase='graze';s.timer=d<100?90+Math.floor(Math.random()*31):108;s.risk=0;}
+}
 Rg.maxX=()=>!G.f.seolpi?SNOW_X-6:!G.f.shortcut?SLOPE_X-12:!G.f.sangunMet?BOSS_AT-30:2330;
 Rg.step=()=>{
-  /* 살금이: 귀를 세웠을 때 가까이에서 움직이면 놀라 달아났다가, 천천히 제자리로 온다 */
-  const s=G.salg;
-  if(!G.f.salgDone){
-    const d=s.x-G.px;
-    if(s.startle>0)s.startle--;
-    else if(d>0&&d<150&&Rg.salgAlert()&&Math.abs(G.vx)>0.2){s.startle=60;s.x=Math.min(s.home+80,s.x+60);learn('salgeumi:alert');toast('살금이가 놀라 달아났다! 귀를 세울 때는 멈추자');}
-    else if(s.x>s.home)s.x=Math.max(s.home,s.x-0.25);
-  }
+  stepSalg();
   if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT)Rg.startGangcheol();
   if(has('doerim_yak')&&!G.f.yakDone)Rg.goHome();
 };

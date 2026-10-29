@@ -11,7 +11,7 @@ const Rg=defineRegion('dolneomeo',{
   cover:{
     tag:'돌너머 마을 체험판',sub:'첫서리 내린 돌담 마을',ready:'돌너머 마을로 들어갈 준비',go:'돌너머 마을로',
     title:{kicker:'둘째 마을',head:'돌너머 마을',start:'돌너머 마을로 들어가기',body:[
-      '갈참골을 지나 북쪽으로 사흘을 걸었다. 밤새 첫서리가 내려 돌담마다 하얗게 소금을 뿌린 것 같다.',
+      '단풍골을 지나 북쪽으로 사흘을 걸었다. 밤새 첫서리가 내려 돌담마다 하얗게 소금을 뿌린 것 같다.',
       '해머루 약은 엄마의 병을 조금 늦췄을 뿐이다. 두꺼비 할멈은 돌산 절벽의 서리다래라면 한 번 더 늦출 수 있을 거라고 했다.',
       '아빠도 이 길을 지났을 것이다. 보따리 속 맷돌이 오늘따라 무겁다.']},
     end:{kicker:'돌너머 마을 체험판 완료',head:'큰 장터로 가는 길',body:[
@@ -29,6 +29,7 @@ const Rg=defineRegion('dolneomeo',{
       dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false},
     rel:{kkubeogi:{t:'호감',v:0},dolsoe:{t:'신뢰',v:0},ppuri:{t:'의리',v:0},nal:{t:'경멸',v:0}},
   }),
+  weather:()=>Vfx.setWeather('frost'),
   onStart(){
     diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 우리를 내려다본다. 서리다래는 돌산 절벽에 있다고 했다.');
     toast('마을 어귀의 동물들에게 말을 걸어 보자');

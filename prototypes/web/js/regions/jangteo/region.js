@@ -29,6 +29,8 @@ const Rg=defineRegion('jangteo',{
       dokCalm:false,hongsiMade:false},
     rel:{morak:{t:'호감',v:0},yeotbang:{t:'흥',v:0},bueong:{t:'의리',v:0},nal:{t:'경멸',v:0}},
   }),
+  weather:()=>Vfx.setWeather(G.f.night?'market-night':'market-day'),
+  weatherFront(){if(G.f.night)R(0,0,W,H,'rgba(10,14,40,.18)');},
   onStart(){
     diary('j_start','큰 장터에 왔다. 붉은 등불과 떡 찌는 김. 그런데 밤마다 장터 물건이 없어진다고 한다. 아빠가 보부상 숙소에 맡긴 짐이 있다.');
     toast('보부상 숙소와 떡집을 찾아보자');

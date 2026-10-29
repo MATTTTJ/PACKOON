@@ -5,6 +5,15 @@
 (()=>{
 const Rg=REGIONS.yeongsan;
 
+const SALG_LINES={
+  start:['귀, 귀가 서면 잠깐 멈춰 줘.','나, 난 발소리에 놀라… 살살 와.'],
+  cue:['자, 잠깐. 무슨 소리 났어…','어… 풀 소리가 끊겼네.'],
+  good:['응… 그렇게 살살 와 줘.','이, 이만큼 오니 덜 무섭네.'],
+  scare:['히익! 까, 깜짝이야…','자, 잠깐! 발소리가…!'],
+  relief:['휴… 조, 조금만 늦었어도.','휴… 멈춰 줘서 다행이야.'],
+};
+Rg.salgSay=kind=>{const a=SALG_LINES[kind];toast('살금이: '+a[Math.floor(Math.random()*a.length)]);};
+
 /* ---------- 날쌘 (마지막 만남): 설피 ---------- */
 const vineOK=()=>has('darae_vine',2)||has('broom_sal');
 const bindOK=()=>has('jip')||has('eoksae',2);
@@ -60,19 +69,30 @@ function salgTrade(){
 
 /* ---------- 아빠: 몸짓 읽기 (틀려도 아빠가 다시 해 보인다) ---------- */
 const GESTURES=[
-  {act:'(아빠가 자기 입을 가리키고, 천천히 고개를 젓는다.)',
-   opts:[['말을… 못 한다는 거야?',1],['배가 고프다는 거야?',0],['조용히 하라는 거야?',0]],after:'(아빠가 고개를 끄덕인다.)'},
-  {act:'(아빠가 나를 가리키고, 두 손을 모아 아주 작은 것을 감싸 안는 시늉을 한다. 그리고 가슴을 쓸어내린다.)',
-   opts:[['나를 안아 주겠다는 거야?',0],['내가… 아기였을 때 이야기야?',1],['추워서 그래?',0]],after:'(아빠의 눈이 젖는다. 고개를 끄덕인다.)'},
-  {act:'(아빠가 품에서 낡은 종이 한 장을 꺼내, 두 손으로 내민다.)',
-   opts:[['…나한테 주는 거야?',1],['버리라는 거야?',0]],after:null},
+  {pose:'mouth',reply:'nod',act:'(아빠가 내 눈을 맞춘다. 자기 입을 짚고, 천천히 고개를 젓는다. 입을 열어도 소리가 나지 않는다.)',
+   opts:[['말을… 못 한다는 거야?',1],['배가 고프다는 거야?',0],['조용히 하라는 거야?',0]],after:'(아빠가 깊이 끄덕인다. 잘 알아들었다는 듯 내 어깨를 살며시 두드린다.)'},
+  {pose:'cradle',reply:'heart',act:'(아빠가 나를 가리킨다. 두 팔로 작은 아기를 안듯 감싸고, 조심조심 흔든다. 그러고는 가슴에 손을 얹는다.)',
+   opts:[['나를 안아 주겠다는 거야?',0],['내가… 아기였을 때 이야기야?',1],['추워서 그래?',0]],after:'(아빠의 눈이 젖는다. 작게 끄덕이고, 가슴에 얹은 손을 내 손 위에 포갠다.)'},
+  {pose:'paper',reply:'offer',act:'(아빠가 품에서 낡은 종이 한 장을 꺼낸다. 글씨가 내 쪽을 향하도록 돌려, 두 손으로 내민다.)',
+   opts:[['…나한테 주는 거야?',1],['버리라는 거야?',0]],after:'(아빠가 눈웃음을 짓는다. 내 손을 펴서 장부를 얹고, 손끝을 가만히 감싸 준다.)'},
 ];
+function dadPose(act){Rg.dadPose={act,tick:0,owner:G};}
+/* 대화 중에도 도는 ambient에서 초상을 다시 그린다. 판정 시간제한은 없다. */
+Rg.stepDadPose=()=>{
+  const p=Rg.dadPose;if(!p)return;if(p.owner!==G){Rg.dadPose=null;return;}p.tick++;
+  if(p.tick%6===0&&!$('dlg').hidden&&$('dlgWho').textContent==='아빠'){
+    const face=$('dlgFace');face.replaceChildren(portrait('아빠'));
+  }
+};
+const RETRIES=['(아빠가 살며시 고개를 젓는다. 괜찮다는 듯 손을 펴고, 다시 천천히 해 보인다.)',
+  '(아빠가 작게 고개를 젓고 눈웃음을 짓는다. 내 눈을 맞춘 뒤, 몸짓을 하나씩 다시 보여 준다.)',
+  '(아빠가 내 손등을 토닥인다. 서두르지 말라는 듯 손바닥을 낮추고, 다시 해 보인다.)'];
 function gesture(i){
-  const g=GESTURES[i];
+  const g=GESTURES[i];dadPose(g.pose);
   talk([['아빠',g.act,g.opts.map(([t,ok])=>({t,go:()=>{
-    if(!ok){talk([['아빠','(아빠가 고개를 젓고, 다시 천천히 해 보인다.)']],()=>gesture(i));return;}
+    if(!ok){dadPose('retry');talk([['아빠',RETRIES[Math.floor(Math.random()*RETRIES.length)]]],()=>gesture(i));return;}
     const next=()=>i+1<GESTURES.length?gesture(i+1):dadLedger();
-    if(g.after)talk([['아빠',g.after]],next);else next();
+    dadPose(g.reply);Sound.yeongsan('dad');talk([['아빠',g.after]],next);
   }}))]]);
 }
 function dadLedger(){
@@ -83,7 +103,7 @@ function dadLedger(){
     ['너구리','(엄마의 글씨) "제 둔갑과 말을 드립니다. 아이의 숨을 주세요."'],
     ['너구리','(그 아래, 아빠의 글씨) "말 하나 더함."'],
     ['너구리','…엄마가. 나 때문에.'],
-    ['아빠','(아빠가 내 손을 꼭 잡는다. 그리고 호숫가 신목 쪽의 커다란 그림자를 가리킨다.)']],()=>refreshGoal());
+    ['아빠','(아빠가 내 손을 꼭 잡는다. 그리고 호숫가 신목 쪽의 커다란 그림자를 가리킨다.)']],()=>{Rg.dadPose=null;refreshGoal();});
 }
 function talkDad(){
   const F=G.f;

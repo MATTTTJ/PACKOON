@@ -5,6 +5,8 @@ const Rg=REGIONS.dolneomeo;
 /* 꾸벅이는 졸다가 잠깐씩 고개를 든다. 고개를 든 동안에만 말이 통한다 */
 const NOD=200,AWAKE=56;
 Rg.kkuAwakeNow=()=>(G.anim%NOD)<AWAKE;
+/* 판정은 그대로 두고, 고개 들기 직전 32프레임의 기척만 필드에 알려 준다. */
+Rg.kkuStirNow=()=>Math.max(0,(G.anim%NOD-(NOD-32))/32);
 Rg.art={
   hedgehog(ox,oy,f){const Sp='#6b5038',Sd='#4a3626',Fc='#d9b892',K='#2b1d14';const awake=Rg.kkuAwakeNow();const dn=awake?0:2;
     M(ox,oy,f,-10,-11,15,10,Sp);M(ox,oy,f,-12,-8,3,6,Sp);

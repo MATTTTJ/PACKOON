@@ -12,6 +12,7 @@ let jumpQ=false,atkQ=false;
 const isLeft=()=>keys['arrowleft']||keys['a']||touch.left;
 const isRight=()=>keys['arrowright']||keys['d']||touch.right;
 addEventListener('keydown',e=>{
+  if(e.target instanceof HTMLElement&&(e.target.matches('input,textarea,select')||e.target.isContentEditable))return;
   const k=e.key.toLowerCase();
   if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
   const first=!keys[k];keys[k]=true;
@@ -21,6 +22,7 @@ addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;touch.left=touch.right=false;});
 
 function onPress(k){
+  if(k==='m'){Sound.toggle();return;}
   if(!G.started||G.ended)return;
   if(B){
     if(!$('bResult').hidden){if(k==='enter'||k==='e'||k===' ')$('bResOk').click();return;}
@@ -38,6 +40,7 @@ function onPress(k){
   if(k==='i'){toggleBag();return;}
   if(k==='b'){toggleBook();return;}
   if(k==='n'){toggleNote();return;}
+  if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
   if(open('bag')||open('book')||open('notebook'))return;
   if(k===' '||k==='w'||k==='arrowup')jumpQ=true;
   if(k==='j'||k==='x')atkQ=true;

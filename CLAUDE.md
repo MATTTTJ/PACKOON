@@ -5,7 +5,7 @@
 ## 먼저 읽을 문서
 
 - `design/gdd/neoguri-concept.md` — 기획 전체. 각 항목이 **확정 / 제안 / 미정**으로 구분되어 있다.
-- `design/narrative/galchamgol-scenario.md` — 첫 지역 갈참골 시나리오와 NPC.
+- `design/narrative/galchamgol-scenario.md` — 첫 지역 단풍골 시나리오와 NPC.
 - `design/narrative/dolneomeo-scenario.md` — 두 번째 지역 돌너머 마을의 진행 흐름 (제안).
 - `design/narrative/jangteo-scenario.md` — 세 번째 지역 큰 장터의 진행 흐름 (제안).
 - `design/narrative/yeongsan-scenario.md` — 마지막 지역 북쪽 영산과 엔딩 (제안).

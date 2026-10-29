@@ -16,6 +16,7 @@ function faint(){
 
 let shakeT=0;
 function doHit(){
+  Vfx.slash();
   const f=G.face,x1=f>0?G.px+2:G.px-24,x2=x1+22;const dmg=G.sharp?2:1;
   for(const d of G.digs){if(!d.done&&!d.busy&&d.x>x1-6&&d.x<x2+6&&G.onGround){openGather(d);return;}}
   REG.onHit(x1,x2,dmg,f);
@@ -25,20 +26,25 @@ function spark(x,y){for(let i=0;i<8;i++)sparks.push({x,y,vx:(Math.random()-.5)*2
 
 function step(){
   if(toastT>0){toastT--;if(toastT===0)$('toast').hidden=true;}
+  Vfx.update();
   const mg=openMinigame();if(mg){mg.step();return;}
-  if(REG.ambient)REG.ambient();
+  if(REG.ambient)REG.ambient();   // 지역 진행 로직(예: 영산 아빠 몸짓)도 여기서 돈다. 날씨가 있어도 늘 부른다
   if(paused())return;
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
   G.vx=ax*(G.attackT>0&&G.onGround?0.7:1.7);if(ax)G.face=ax>0?1:-1;
-  if(jumpQ&&G.onGround){G.vy=-5.4;G.onGround=false;}jumpQ=false;
+  if(jumpQ&&G.onGround){Sound.jump();G.vy=-5.4;G.onGround=false;}jumpQ=false;
   G.vy=Math.min(6,G.vy+0.32);
+  const wasGrounded=G.onGround,prevX=G.px;
   const prevY=G.py;G.px+=G.vx;G.py+=G.vy;
   G.px=clamp(G.px,16,REG.maxX());
   G.onGround=false;
   if(G.py>=GROUND){G.py=GROUND;G.vy=0;G.onGround=true;}
   else if(G.vy>=0){for(const p of REG.platforms){if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
-  if(atkQ&&G.attackT<=0)G.attackT=18;atkQ=false;
+  Vfx.feet();
+  if(!wasGrounded&&G.onGround)Sound.land();
+  if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
+  if(atkQ&&G.attackT<=0){Sound.swing();G.attackT=18;}atkQ=false;
   if(G.attackT>0){G.attackT--;if(G.attackT===9)doHit();}
   if(G.hurtT>0)G.hurtT--;
   for(const a of G.pickups){if(!a.got&&Math.abs(a.x-G.px)<10&&Math.abs(a.y-G.py)<16){a.got=true;addItem(a.item,1);if(REG.onPickup)REG.onPickup(a);}}
@@ -80,18 +86,19 @@ function drawRaccoonAt(ox,oy,f,st,attackT,tool){
   const ex=hx+dx*10,ey=hy+dy*10,px=-dy*f,py=dx*f;
   if(tool==='sickle'){for(let i=0;i<6;i++){const k=i/5;R(ex+px*(i*0.9)+dx*(k*k*4),ey+py*(i*0.9)+dy*(k*k*4),2,2,'#d8dde2');}}
   else{for(let i=-3;i<=3;i++)R(ex+px*i,ey+py*i,2,2,i===3||i===-3?'#7d8389':'#9aa0a6');}
-  if(attackT>4&&attackT<13){ctx.strokeStyle='rgba(255,246,220,.6)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(Math.round(hx),Math.round(hy),12,f>0?-1.4:Math.PI-0.6,f>0?0.6:Math.PI+1.4);ctx.stroke();}
+  if(!Vfx.reducedMotion&&attackT>4&&attackT<13){for(let i=0;i<12;i++){const a=-1.4+i*.18;R(hx+f*Math.cos(a)*12,hy+Math.sin(a)*12,1,1,'#ecdcb4');}}
 }
 function drawRaccoon(){
-  if(G.hurtT>0&&Math.floor(G.hurtT/4)%2)return;
+  if(!Vfx.reducedMotion&&G.hurtT>0&&Math.floor(G.hurtT/4)%2)return;
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
   R(G.px-cam-7,GROUND,14,1,'rgba(40,24,14,.35)');
   drawRaccoonAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool());
 }
 
 function draw(){
-  cam=Math.round(G.cam)+(shakeT?(shakeT%2?1:-1):0);
+  cam=Math.round(G.cam)+(shakeT&&!Vfx.reducedMotion?(shakeT%2?1:-1):0);
   REG.drawBack();
+  Vfx.draw('back');
   drawLogs();
   if(REG.drawScenery)REG.drawScenery();
   drawDigs();
@@ -99,8 +106,8 @@ function draw(){
   drawNpcs();
   if(REG.drawActors)REG.drawActors();
   drawRaccoon();
-  for(const s of sparks)R(s.x-cam,s.y,1,1,'#fff3b0');
-  if(REG.drawFront)REG.drawFront();
+  if(!Vfx.reducedMotion)for(const s of sparks)R(s.x-cam,s.y,1,1,'#fff3b0');
+  Vfx.front();
   updateOverlay();
 }
 let lastNear=null;
