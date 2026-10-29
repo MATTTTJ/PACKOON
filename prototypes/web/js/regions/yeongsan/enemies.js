@@ -67,12 +67,8 @@ function drawGangcheol(c){
 defineEnemies({
   gangcheol:{name:'강철이',calmLabel:'진정',coreNeeds:'body',
     intro:'호수를 휘감은 이무기가 고개를 든다. 숨결마다 서리가 내린다.',
-    parts:[
-      {id:'mouth',name:'입',hp:3,atk:'frostBreath',mat:'frost_whisker',tell:'강철이가 서리 숨을 들이마신다…'},
-      {id:'body',name:'몸통',hp:4,atk:'coil',mat:'ice_scale',tell:'똬리가 조여 든다…'},
-      {id:'tail',name:'꼬리',hp:3,atk:'icicleTail',mat:'icicle',tell:'꼬리가 높이 치켜든다…'},
-      {id:'core',name:'머리',hp:5,atk:'blizzard',mat:'broken_orb',core:true,tell:'눈보라가 소용돌이친다…'}],
-    likes:{dokkaebibul:100,patsirutteok:60},likeText:'강철이가 잠시 숨을 멈춘다.',
+    parts:tableParts('gangcheol',{mouth:{atk:'frostBreath',tell:'강철이가 서리 숨을 들이마신다…'},body:{atk:'coil',tell:'똬리가 조여 든다…'},tail:{atk:'icicleTail',tell:'꼬리가 높이 치켜든다…'},core:{atk:'blizzard',tell:'눈보라가 소용돌이친다…'}}),
+    likes:TABLES.CALM.gangcheol,likeText:'강철이가 잠시 숨을 멈춘다.',
     likeTexts:{dokkaebibul:'꺼지지 않는 도깨비불씨를 건넸다. 강철이가 그 온기에 눈을 감는다.',
       patsirutteok:'붉은 팥떡을 내밀자 강철이가 움찔 물러난다. 서리가 조금 걷혔다.'},
     coreHidden:'머리가 똬리 속에 파묻혀 있다. 몸통을 먼저 풀어야 한다.',

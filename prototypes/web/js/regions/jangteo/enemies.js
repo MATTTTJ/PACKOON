@@ -71,12 +71,8 @@ function drawDokkaebi(c){
 defineEnemies({
   dokkaebi:{name:'헌물 도깨비',calmLabel:'진정',
     intro:'창고 구석의 낡은 빗자루와 키와 멍석이 들썩이더니, 푸른 불이 깃든다.',
-    parts:[
-      {id:'broom',name:'빗자루',hp:3,atk:'broomSweep',mat:'broom_sal',tell:'빗자루가 바닥을 쓸 채비를 한다…'},
-      {id:'ki',name:'키',hp:3,atk:'beans',mat:'kong',tell:'키가 콩을 까불러 올린다…'},
-      {id:'meongseok',name:'멍석',hp:3,atk:'roll',mat:'jip',tell:'멍석이 끝에서부터 말려 든다…'},
-      {id:'core',name:'도깨비불',hp:4,atk:'wisp',mat:'dokkaebibul',core:true,tell:'도깨비불이 손을 노려본다…'}],
-    likes:{memiltteok:100,dad_yeot:100},likeText:'도깨비가 좋아한다.',
+    parts:tableParts('dokkaebi',{broom:{atk:'broomSweep',tell:'빗자루가 바닥을 쓸 채비를 한다…'},ki:{atk:'beans',tell:'키가 콩을 까불러 올린다…'},meongseok:{atk:'roll',tell:'멍석이 끝에서부터 말려 든다…'},core:{atk:'wisp',tell:'도깨비불이 손을 노려본다…'}}),
+    likes:TABLES.CALM.dokkaebi,likeText:'도깨비가 좋아한다.',
     likeTexts:{memiltteok:'메밀떡 냄새에 도깨비가 덩실덩실 춤을 춘다. "메밀이다, 메밀!"',
       dad_yeot:'아빠가 맡긴 엿을 건넸다. 도깨비가 엿가락을 소중히 끌어안는다. 돌려줄 생각은 없어 보인다.'},
     coreHidden:'도깨비불이 헌물 뒤에 숨어 있다. 빗자루나 키, 멍석을 먼저 부수자.',

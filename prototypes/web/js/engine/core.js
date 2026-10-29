@@ -15,10 +15,10 @@ const TOUCH=matchMedia('(pointer:coarse)').matches;
 const HITKEY=TOUCH?'치기 버튼':'J 키';
 
 /* ---------- 등록소 ---------- */
-/* 아이템: id는 design/data/items.csv 의 id와 같다.
-   {n:이름, r:레어도 단계(0부터), d:설명(수첩에 내가 적는 글), eat:먹으면 오르는 체력(선택)} */
+/* 아이템: n(이름)·r(레어도 단계, 0부터)·d(설명)는 design/data/items.csv 에서 만든 js/data/tables.js 가 넣는다.
+   코드는 게임 전용 칸만 더한다 (eat:먹으면 오르는 체력) */
 const ITEMS={};
-function defineItems(map){Object.assign(ITEMS,map);}
+function defineItems(map){for(const k in map)ITEMS[k]=Object.assign(ITEMS[k]||{},map[k]);}   // 칸별로 합친다
 /* 손에 드는 연장 {n:이름, d:설명} */
 const TOOLS={};
 function defineTools(map){Object.assign(TOOLS,map);}

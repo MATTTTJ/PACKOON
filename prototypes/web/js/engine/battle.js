@@ -9,6 +9,9 @@
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
 let B=null,inkOn=false,LW=800,LH=450,BOX={x:250,y:262,w:300,h:160},EY=118;const BDPR=2;
 let paper=null;
+/* 부위의 id·이름·내구도·부수면 얻는 것·핵심 여부는 design/data/boss_parts.csv (js/data/tables.js) 에서,
+   공격 종류(atk)와 예고 글(tell)은 지역 코드에서 받아 합친다. 순서는 표 순서 */
+function tableParts(boss,extra){return TABLES.BOSS_PARTS[boss].map(p=>Object.assign({},p,extra[p.id]));}
 function blayout(){
   const r=$('battle').getBoundingClientRect();const tall=r.height>0&&r.width/r.height<1.25;
   if(tall){LW=600;LH=600;BOX={x:150,y:330,w:300,h:190};EY=168;}else{LW=800;LH=450;BOX={x:250,y:262,w:300,h:160};EY=112;}
