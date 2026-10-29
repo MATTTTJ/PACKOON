@@ -83,7 +83,7 @@ defineEnemies({
     likes:TABLES.CALM.gangcheol,likeText:'강철이가 잠시 숨을 멈춘다.',
     likeTexts:{dokkaebibul:'꺼지지 않는 도깨비불씨를 건넸다. 강철이가 그 온기에 눈을 감는다.',
       patsirutteok:'붉은 팥떡을 내밀자 강철이가 움찔 물러난다. 서리가 조금 걷혔다.'},
-    coreHidden:'머리가 똬리 속에 파묻혀 있다. 몸통을 먼저 풀어야 한다.',
+    coreHidden:'머리가 똬리 속에 숨어 있다. 몸통을 먼저 부수면 머리가 드러난다.',
     coreShown:'똬리가 풀려 온기 길이 넓어졌다! 이제 머리를 노릴 수 있다.',
     calmWin:'강철이가 서리를 거두고, 따뜻한 남쪽 바다를 향해 천천히 날아오른다.',calmGift:'frost_whisker',
     win:'여의주에 금이 가자 강철이가 호수를 놓고 물러난다.',

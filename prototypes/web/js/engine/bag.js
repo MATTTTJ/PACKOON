@@ -53,16 +53,19 @@ function craft(){
     if(box){box.classList.remove('fizzle');void box.offsetWidth;box.classList.add('fizzle');}
     const m=$('benchMsg');if(m)m.textContent=pouchMsg;return;
   }
-  brewing=true;const tool=pouch.tool;pouch.items=[];
+  // 재료와 결과·첫 가공 기록은 같은 입력에서 확정한다. 타이머는 연출만 마무리한다.
+  brewing=true;const tool=pouch.tool,owner=G,region=G.region;pouch.items=[];
+  addItem(r.out,r.n);
+  const fk='crafted_'+tool;
+  if(!G.f[fk]){G.f[fk]=true;if(HEIR[tool].firstCraft)diary(fk,HEIR[tool].firstCraft);}
   if(box)box.classList.add('brew');
   document.querySelectorAll('#bagBody .inslot').forEach(x=>x.classList.add('sucked'));
   const btn=$('craftBtn');if(btn)btn.disabled=true;
   setTimeout(()=>{
-    Sound.craft();brewing=false;addItem(r.out,r.n);lastOut=r.out;
+    brewing=false;if(G!==owner||G.region!==region)return;
+    Sound.craft();lastOut=r.out;
     pouchMsg=ITEMS[r.out].n+' '+r.n+'개가 보따리로 들어갔다.';
-    const fk='crafted_'+tool;
-    if(!G.f[fk]){G.f[fk]=true;if(HEIR[tool].firstCraft)diary(fk,HEIR[tool].firstCraft);}
-    renderBag();
+    if(open('bag'))renderBag();
   },matchMedia('(prefers-reduced-motion: reduce)').matches?60:760);
 }
 function renderBag(pop){

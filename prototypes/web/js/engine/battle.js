@@ -163,7 +163,7 @@ function chooseAttack(){
     const help=Math.min(3,Math.floor(B.hits/2)),arm=B.parts.find(q=>q.id==='arm');
     B.vinePath={u:0.5,v:0.65,width:78+(arm.broken?24:0)+help*12,dragging:false,locked:false};
     B.t=110+help*18;
-    if(!B.pathLesson){B.pathLesson=true;B.t+=90;B.msg='고리 위에서 '+HITKEY+'를 누른 채 좌우로 이동하고 놓자. 그 자리가 피할 길이 된다.';}
+    if(!B.pathLesson){B.pathLesson=true;B.t+=90;B.msg='고리 위에서 '+jo(HITKEY,'을','를')+' 누른 채 좌우로 이동하고 놓자. 그 자리가 피할 길이 된다.';}
   }
   if(B.E.warmPath){prepareWarmPath();B.t=80;}
 }
@@ -195,7 +195,7 @@ function openMark(){
   let x,y,n=0;do{x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+26+Math.random()*(BOX.h-52);n++;}while(Math.hypot(x-B.px,y-B.py)<70&&n<12);
   if(B.E.markPosition){const pos=B.E.markPosition(p);if(pos){x=pos.x;y=pos.y;}}
   const life=B.warm?180:B.E.calmAction?(B.E.calmAction.kind==='return'?240:150):120;
-  B.mark={x,y,t:life,max:life,part:p};B.msg=jo(p.name,'에','에')+' 빈틈! 붉은 표식 위에서 '+HITKEY+'를 누르자.';
+  B.mark={x,y,t:life,max:life,part:p};B.msg=jo(p.name,'에','에')+' 빈틈! 붉은 표식 위에서 '+jo(HITKEY,'을','를')+' 누르자.';
 }
 function bAttackDef(p){const mode=B.E.possession||B.E.warmPath;return ATTACKS[(mode&&mode.attacks&&mode.attacks[p.id])||p.atk];}
 function attackTick(p){bAttackDef(p).tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
@@ -218,7 +218,7 @@ function bStrike(){
       B.calm=Math.min(100,B.calm+B.E.calmAction.amount);B.msg='장터 물건을 제자리에 놓았다. 도깨비도 옆 물건을 따라 돌려놓는다.';
       B.st='idle';B.t=60;renderBHud();if(B.calm>=100)bEnd('calm');return;
     }
-    if(!r.held&&Math.hypot(source.x-B.px,source.y-B.py)<26){r.held=true;B.msg='물건을 집었다. 빈 윤곽으로 옮겨 '+HITKEY+'를 한 번 더 누르자.';return;}
+    if(!r.held&&Math.hypot(source.x-B.px,source.y-B.py)<26){r.held=true;B.msg='물건을 집었다. 빈 윤곽으로 옮겨 '+jo(HITKEY,'을','를')+' 한 번 더 누르자.';return;}
   }
   if(B.warm&&B.warm.ice){const s=coverPoint(B.warm.ice);
     if(Math.hypot(s.x-B.px,s.y-B.py)<26){
@@ -288,7 +288,7 @@ function bStep(){
   if(B.toolFly){const f=B.toolFly;f.vy+=0.25;f.x+=f.vx;f.y+=f.vy;f.rot+=0.32;}
   for(const f of B.fx){f.x+=f.vx;f.y+=f.vy;f.vx*=0.9;f.vy*=0.9;f.t--;}B.fx=B.fx.filter(f=>f.t>0);
   switch(B.st){
-    case 'intro':if(B.t===50&&B.E.howto)B.msg='공격을 피하면 붉은 표식이 뜬다. 손을 그 위로 옮겨 '+HITKEY+'를 누르자!';
+    case 'intro':if(B.t===50&&B.E.howto)B.msg='공격을 피하면 붉은 표식이 뜬다. 손을 그 위로 옮겨 '+jo(HITKEY,'을','를')+' 누르자!';
       if(--B.t<=0){if(B.E.dodge&&!B.noTool){B.st='bonk';B.t=120;B.noTool=true;B.bonk=34;B.msg=B.E.bonkText;B.toolFly={x:B.px+10,y:B.py-12,vx:-3.2,vy:-5.5,rot:0};renderBHud();}else{B.st='idle';B.t=20;}}break;
     case 'bonk':if(B.t===60)B.msg='연장을 놓쳤다! 이번엔 피하기만 해야 한다.';if(--B.t<=0){B.st='idle';B.t=20;B.toolFly=null;}break;
     case 'idle':if(--B.t<=0)chooseAttack();break;
@@ -310,6 +310,45 @@ function bStep(){
 }
 
 /* 선물 (달래기) */
+/* 남은 교환·약에 필요한 물건은 items.csv의 진행보호와 가공법으로 계산한다.
+   완제품부터 확보한 뒤 부족분만 재료로 풀고, 대체재 조합 중 부족 수량이 가장 적은 쪽을 고른다. */
+function progressShortage(inv){
+  const goals=TABLES.PROGRESS.filter(g=>REGIONS[g.region].order>=REG.order&&
+    !(g.done==='ended'?(g.region===G.region&&G.ended):G.f[g.done]));
+  const recipes=Object.values(RECIPES).flat();
+  function shortage(need){
+    const stock={...inv};let missing=0;
+    // 모든 목표의 완제품을 먼저 떼어 두어 같은 물건을 두 번 세지 않는다.
+    let pending={};
+    for(const [id,n] of Object.entries(need)){
+      const used=Math.min(stock[id]||0,n);stock[id]=(stock[id]||0)-used;
+      if(n>used)pending[id]=n-used;
+    }
+    while(Object.keys(pending).length){
+      const next={};
+      for(const [id,n] of Object.entries(pending)){
+        const r=recipes.find(r=>r.out===id);
+        if(!r){missing+=n;continue;}
+        const batches=Math.ceil(n/r.n);
+        for(const [item,count] of Object.entries(r.need))next[item]=(next[item]||0)+count*batches;
+      }
+      pending={};
+      for(const [id,n] of Object.entries(next)){
+        const used=Math.min(stock[id]||0,n);stock[id]=(stock[id]||0)-used;
+        if(n>used)pending[id]=n-used;
+      }
+    }
+    return missing;
+  }
+  function choose(i,need){
+    if(i===goals.length)return shortage(need);
+    return Math.min(...goals[i].options.map(option=>{
+      const next={...need};for(const id in option)next[id]=(next[id]||0)+option[id];
+      return choose(i+1,next);
+    }));
+  }
+  return choose(0,{});
+}
 function openGift(){
   if(!B||B.handShow>0||B.st==='end'||B.st==='giftPlace'||!$('bResult').hidden)return;
   if(B.E.forgeTrial&&!B.handShown){
@@ -317,6 +356,7 @@ function openGift(){
   }
   if(B.E.vinePath)bDrag=null;
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
+  $('bGiftHint').textContent='좋아하는 걸 주면 마음이 누그러진다. 건넨 물건은 돌아오지 않는다.';
   const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0);
   if(!ids.length)g.appendChild(el('span','small','건넬 물건이 없다.'));
   ids.forEach(id=>{const b=el('button','gift');b.type='button';b.appendChild(icon(id));b.appendChild(el('span',null,ITEMS[id].n+' ×'+G.inv[id]));
@@ -325,6 +365,11 @@ function openGift(){
 }
 function closeGift(){$('bGiftMenu').hidden=true;if(B)B.paused=false;}
 function giveGift(id){
+  if(!B||!B.paused||B.st==='end'||!has(id))return;
+  const after={...G.inv,[id]:G.inv[id]-1};
+  if(progressShortage(after)>progressShortage(G.inv)){
+    $('bGiftHint').textContent='이건 아직 쓸 데가 있어. 다른 걸 건네자.';return;
+  }
   takeItem(id,1);const v=B.E.likes[id];if(v)learn('like:'+B.kind+':'+id);
   B.calm=Math.min(100,B.calm+(v||8));
   B.msg=v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
@@ -376,7 +421,7 @@ let bDrag=null;
 bcv.addEventListener('pointerdown',e=>{if(!B)return;if(B.E.vinePath&&(B.paused||B.handShow>0||B.st==='end'||bDrag))return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={pointerId:e.pointerId,x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
 bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||(B.E.vinePath&&e.pointerId!==bDrag.pointerId))return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
   B.px=clamp(B.px+dx,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy,BOX.y+8,BOX.y+BOX.h-8);if(B.E.vinePath)moveVine();});
-const endDrag=e=>{if(B&&B.E.vinePath&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;};bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
+function endDrag(e){if(e&&B&&B.E.vinePath&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;if(!e)vinePointers.clear();}bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
 bcv.addEventListener('lostpointercapture',e=>{if(B&&B.E.vinePath)endDrag(e);});
 
 /* ---------- 전투 화면 그리기 ---------- */

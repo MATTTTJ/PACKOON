@@ -295,6 +295,11 @@ body.in-battle .dpad .pbtn{width:54px;height:54px}
 body.in-battle .pbtn.v{display:grid}
 body.in-battle .pbtn.talk{visibility:hidden}
 body.in-battle .hud,body.in-battle .prompt{visibility:hidden}
+/* 소리 조절은 별도 윗줄에 두어 체력과 진정 표시를 가리지 않는다. */
+body.in-battle .hud-btns{max-width:none;flex-wrap:nowrap}
+body.in-battle .hud-btns .chipbtn{display:none}
+body.in-battle .hud-btns #btnSound,body.in-battle .hud-btns #btnVolume{display:block;height:32px;min-height:32px}
+body.in-battle .b-top{top:calc(2.5% + 40px)}
 .acts{display:grid;grid-template-columns:auto auto;grid-template-areas:"talk talk" "jump atk";gap:12px;justify-items:center;align-items:center}
 .acts .talk{grid-area:talk;justify-self:end}
 .acts .jump{grid-area:jump}

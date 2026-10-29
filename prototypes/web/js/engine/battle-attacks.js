@@ -167,7 +167,7 @@ defineAttacks({
   }}},
   golemThrow:{dur:135,tick(t){if(t===0){
     const eye=B.E.headPose();
-    B.bullets.push({k:'golemThrow',x:eye.x,y:eye.y,tx:B.px,ty:B.py,t:0,tell:38});
+    B.bullets.push({k:'golemThrow',sx:eye.x,sy:eye.y,x:eye.x,y:eye.y,tx:B.px,ty:B.py,t:0,tell:38});
   }}},
 });
 defineBullets({

@@ -133,8 +133,8 @@ function drawWishStone(c){
   c.fillStyle=near?RED:INK;c.textAlign='center';c.font='12px "Gowun Dodum", sans-serif';c.fillText((TOUCH?'치기':HITKEY)+' · 바로 놓기',p.x,p.y+32);c.restore();
 }
 function drawGolemAim(c){
-  const shot=B.bullets.find(b=>b.k==='golemThrow'&&b.t<=b.tell);
-  if(shot)brush(c,[[shot.x,shot.y],[shot.tx,shot.ty]],1.7,INK,0.55);
+  const shot=B.bullets.find(b=>b.k==='golemThrow'&&!b.dead);
+  if(shot)brush(c,[[shot.sx,shot.sy],[shot.tx,shot.ty]],1.7,INK,0.55);
   else if(B.st==='tell'&&B.cur.atk==='golemThrow'){const p=B.E.headPose();brush(c,[[p.x,p.y],[B.px,B.py]],1.3,INK,0.45);}
   if(B.mark&&B.mark.part.id==='head'){
     const p=B.E.headPose();brush(c,[[p.x,p.y+20],[B.mark.x,B.mark.y-22]],1,INK,0.18);

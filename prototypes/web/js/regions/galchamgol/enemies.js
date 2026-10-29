@@ -71,13 +71,13 @@ defineEnemies({
   /* 무쇠는 피하기만 하는 시험이라 핵심 부위를 쓰지 않는다 (표의 '호통' 핵심 표시를 끔. 켜면 그림에 가려짐 표시가 생긴다) */
   musoe:{name:'무쇠',calmLabel:'마음',npc:true,dodge:6,
     forgeTrial:{sequence:['hammer','bellows','core'],repeatText:'"아까 배운 대로!"'},
-    intro:'[시험판] "아, 아저씨! 갑자기 왜 이래요!" 먹선이 생기면 작업 자리에서 손을 빼자.',
-    bonkText:'"어린 녀석이 어른한테 연장을 들이대?" 딱! 꿀밤이 날아왔다.',
+    intro:'[시험판] "아저씨, 왜 이래요!" 먹선이 생기면 작업 자리에서 손을 빼자.',
+    bonkText:'"어른 앞에서 연장 들이대지 마라!" 딱! 꿀밤이 날아왔다.',
     parts:tableParts('musoe',{hammer:{atk:'forgeHammer',tell:'모루 위 세로 먹줄! 내려치기 전에 그 칸을 비워라.'},bellows:{atk:'forgeWind',tell:'가는 붓선이 바람길을 그린다. 오른쪽 낮은 판 아래 쉼터로!'},core:{atk:'forgeShout',tell:'입 앞 먹선이 부푼다. 부채꼴 양옆으로 손을 빼라.',core:false}}),
-    likes:TABLES.CALM.musoe,likeText:'"…출출하던 참이었다." 무쇠의 어깨가 조금 내려간다.',
+    likes:TABLES.CALM.musoe,likeText:'"…마침 출출하던 참이다." 무쇠의 어깨가 조금 내려간다.',
     coreHidden:'',
     coreShown:'무쇠의 고집이 흔들린다. 이제 고집을 노릴 수 있다!',
-    calmWin:'무쇠가 망치를 내려놓는다. "…됐다. 녀석을 꼭 닮았구나."',
+    calmWin:'무쇠가 망치를 내려놓는다. "…됐다. 네 아비를 꼭 닮았군."',
     win:'끝까지 버텨 냈다! 무쇠가 망치를 내려놓는다.',
     lose:'무쇠의 기세에 밀려 대장간 밖으로 굴러 나왔다.',
     /* 맞은 횟수에 따라 덤: 0대면 숯, 1~2대면 주먹밥 (bosses.csv 비고) */

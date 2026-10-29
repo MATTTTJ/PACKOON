@@ -1129,5 +1129,348 @@ const TABLES={
    ],
    "dadDrawing": true
   }
+ ],
+ "MINIGAMES": {
+  "forge_heat": 100,
+  "forge_hits": 3,
+  "forge_help_misses": 2,
+  "forge_floor": 22,
+  "forge_help_floor": 10,
+  "forge_edge_width": 14,
+  "forge_cooling": 0.43,
+  "forge_help_cooling": 0.32,
+  "forge_reheat_wait": 30,
+  "forge_finish_wait": 36,
+  "forge_bonus_edges": 2,
+  "forge_relation": 1,
+  "forge_bonus_relation": 1,
+  "stack_phase": 0.9,
+  "stack_hits": 3,
+  "stack_zone": 0.2,
+  "stack_help_zone": 0.34,
+  "stack_help_misses": 2,
+  "stack_amplitude": 42,
+  "stack_amplitude_gain": 15,
+  "stack_speed": 0.04,
+  "stack_speed_gain": 0.014,
+  "stack_warning": 0.92,
+  "stack_edge_ratio": 0.65,
+  "stack_edge_lean": 0.32,
+  "stack_edge_wait": 42,
+  "stack_hit_wait": 24,
+  "stack_miss_wait": 14,
+  "stack_relation": 1,
+  "stack_perfect_relation": 2,
+  "steam_fire_start": 25,
+  "steam_band_min": 55,
+  "steam_band_max": 80,
+  "steam_max": 100,
+  "steam_target_frames": 300,
+  "steam_time_limit": 1800,
+  "steam_wind_at": 65,
+  "steam_wind_frames": 90,
+  "steam_fire_decay": 0.32,
+  "steam_wind_decay": 0.2,
+  "steam_steam_follow": 0.035,
+  "steam_danger_steam": 94,
+  "steam_low_grace": 300,
+  "steam_danger_fire": 8,
+  "steam_danger_limit": 180,
+  "steam_danger_recovery": 3,
+  "steam_close_at": 90,
+  "steam_fan_cooldown": 6,
+  "steam_fan_power": 12,
+  "steam_finish_wait": 45,
+  "steam_high_steam": 82,
+  "steam_high_fire": 92,
+  "steam_low_hint_after": 120,
+  "steam_low_fire": 35,
+  "steam_voice_cooldown": 150,
+  "steam_relation": 1,
+  "rhythm_notes": 8,
+  "rhythm_good": 0.18,
+  "rhythm_perfect": 0.075,
+  "rhythm_scroll_speed": 145,
+  "rhythm_bonus_hits": 5,
+  "rhythm_start_delay": 0.15,
+  "rhythm_subbeat": 0.22,
+  "rhythm_intro_beats": 6,
+  "rhythm_parts": 3,
+  "rhythm_normal_gap": 0.66,
+  "rhythm_late_gap": 0.55,
+  "rhythm_normal_last": 5,
+  "rhythm_late_hint_delay": 0.2,
+  "rhythm_finish_delay": 0.65,
+  "rhythm_cooldown": 0.12,
+  "rhythm_resume_delay": 0.3,
+  "rhythm_combo": 3,
+  "rhythm_relation": 1,
+  "rhythm_high_relation": 2,
+  "rhythm_note_one": 1.32,
+  "rhythm_note_two": 1.98,
+  "rhythm_note_three": 2.64,
+  "rhythm_note_four": 3.3,
+  "rhythm_note_five": 3.96,
+  "rhythm_note_six": 4.62,
+  "rhythm_note_seven": 5.17,
+  "rhythm_note_eight": 5.72,
+  "salg_graze": 108,
+  "salg_return_graze": 114,
+  "salg_moving": 0.2,
+  "salg_return_speed": 0.25,
+  "salg_active_distance": 190,
+  "salg_arrival_distance": 30,
+  "salg_grass_interval": 28,
+  "salg_risk_distance": 150,
+  "salg_grace": 12,
+  "salg_relief_frames": 2,
+  "salg_recovery": 2,
+  "salg_risk_limit": 12,
+  "salg_startle_frames": 60,
+  "salg_max_retreat": 80,
+  "salg_retreat": 60,
+  "salg_warning_frames": 36,
+  "salg_alert_frames": 52,
+  "salg_near_distance": 100,
+  "salg_near_graze": 90,
+  "salg_near_random": 31,
+  "dad_steps": 3,
+  "gather_help_misses": 2,
+  "gather_help_width": 12,
+  "gather_zone_start": 10,
+  "gather_zone_span": 80,
+  "gather_speed_gain": 0.3,
+  "gather_cooldown": 12,
+  "gather_finish_wait": 300,
+  "gather_yield": 1,
+  "gather_perfect_yield": 2,
+  "gather_root_hits": 3,
+  "gather_root_width": 18,
+  "gather_root_speed": 1.5,
+  "gather_ssari_hits": 1,
+  "gather_ssari_width": 14,
+  "gather_ssari_speed": 2.2,
+  "gather_kkoe_hits": 1,
+  "gather_kkoe_width": 14,
+  "gather_kkoe_speed": 2.4,
+  "gather_eoksae_hits": 2,
+  "gather_eoksae_width": 18,
+  "gather_eoksae_speed": 1.8,
+  "gather_seogi_hits": 1,
+  "gather_seogi_width": 12,
+  "gather_seogi_speed": 2.4,
+  "gather_darae_vine_hits": 2,
+  "gather_darae_vine_width": 18,
+  "gather_darae_vine_speed": 1.8
+ },
+ "TUNING": {
+  "kkubeogi_cycle": 200,
+  "kkubeogi_awake": 56,
+  "kkubeogi_cue": 32,
+  "field_move_speed": 1.7,
+  "field_swing_speed": 0.7,
+  "field_jump_velocity": -5.4,
+  "field_gravity": 0.32,
+  "field_fall_speed": 6,
+  "field_pickup_x": 10,
+  "field_pickup_y": 16,
+  "field_talk_distance": 30,
+  "field_dig_ahead": 12,
+  "field_dig_distance": 16,
+  "field_swing_frames": 18,
+  "field_swing_hit_at": 9,
+  "field_hit_front": 2,
+  "field_hit_back": 24,
+  "field_hit_width": 22,
+  "field_dig_padding": 6,
+  "save_interval": 30000
+ },
+ "PROGRESS": [
+  {
+   "region": "galchamgol",
+   "done": "dodamDone",
+   "options": [
+    {
+     "powder": 1
+    }
+   ]
+  },
+  {
+   "region": "galchamgol",
+   "done": "nalDone",
+   "options": [
+    {
+     "powder": 1
+    }
+   ]
+  },
+  {
+   "region": "galchamgol",
+   "done": "nalDone",
+   "options": [
+    {
+     "root": 1
+    }
+   ]
+  },
+  {
+   "region": "galchamgol",
+   "done": "musoeDone",
+   "options": [
+    {
+     "coal": 1
+    }
+   ]
+  },
+  {
+   "region": "galchamgol",
+   "done": "ended",
+   "options": [
+    {
+     "meoru": 1
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "nalDDone",
+   "options": [
+    {
+     "kflower": 1
+    },
+    {
+     "gyeousari": 2
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "kkuDone",
+   "options": [
+    {
+     "eoksae": 3
+    }
+   ]
+  },
+  {
+   "region": "yeongsan",
+   "done": "seolpi",
+   "options": [
+    {
+     "eoksae": 2
+    },
+    {
+     "jip": 1
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "ppuriPassed",
+   "options": [
+    {
+     "memil_powder": 1
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "nalJDone",
+   "options": [
+    {
+     "memil_powder": 1
+    },
+    {
+     "ssal_powder": 1
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "dolsoeTea",
+   "options": [
+    {
+     "gyeolmyeongja": 1
+    }
+   ]
+  },
+  {
+   "region": "dolneomeo",
+   "done": "yakMade",
+   "options": [
+    {
+     "darae_yak": 1
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "yeotDone",
+   "options": [
+    {
+     "solbang": 5
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "morakPowder",
+   "options": [
+    {
+     "ssal_powder": 3
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "bueongDone",
+   "options": [
+    {
+     "patsirutteok": 1
+    }
+   ]
+  },
+  {
+   "region": "yeongsan",
+   "done": "seolpi",
+   "options": [
+    {
+     "broom_sal": 1
+    },
+    {
+     "darae_vine": 2
+    }
+   ]
+  },
+  {
+   "region": "yeongsan",
+   "done": "shortcut",
+   "options": [
+    {
+     "kong": 2
+    },
+    {
+     "magamok": 3
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "hongsiMade",
+   "options": [
+    {
+     "hongsi_tteok": 1
+    }
+   ]
+  },
+  {
+   "region": "yeongsan",
+   "done": "yakDone",
+   "options": [
+    {
+     "doerim_yak": 1
+    }
+   ]
+  }
  ]
 };

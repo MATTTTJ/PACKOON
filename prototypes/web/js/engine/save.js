@@ -15,6 +15,8 @@ function readSave(){
 function writeSave(quiet){
   if(!G||busyForSave()){if(!quiet)toast('대화나 전투가 끝난 뒤에 저장할 수 있다');return false;}
   returnPouch();   // 가공대에 올려 둔 물건은 보따리로 돌려 놓고 저장
+  // 저장 주기를 유지하면서 실제로 반환한 재료·소지품·버튼을 화면에도 반영한다.
+  if(open('bag')){pouchMsg='';renderBag();}
   try{localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,at:Date.now(),G}));}
   catch(_){if(!quiet)toast('이 브라우저에서는 저장할 수 없다');return false;}
   if(!quiet)toast('저장했다');
@@ -71,4 +73,4 @@ function startOrConfirm(){
   disarm(b);startGame();
 }
 /* 자동 저장 */
-setInterval(()=>{if(G&&G.started&&!G.ended&&!busyForSave())writeSave(true);},30000);
+setInterval(()=>{if(G&&G.started&&!G.ended&&!busyForSave())writeSave(true);},TABLES.TUNING.save_interval);
