@@ -7,6 +7,12 @@ function fillCover(){
   $('titleKicker').textContent=C.title.kicker;$('titleHead').textContent=C.title.head;
   const tb=$('titleBody');tb.innerHTML='';C.title.body.forEach(t=>tb.appendChild(el('p',null,t)));
   $('btnStart').textContent=C.title.start;
+  /* 개발용: 지역마다 버튼. 누르면 그 지역부터 새로 시작하고 주소에도 남겨 새로고침해도 그 지역에서 시작한다 */
+  const dp=$('devPick');dp.innerHTML='';
+  regionList().forEach(r=>{const b=el('button',null,r.order+' '+r.name);b.type='button';b.setAttribute('aria-pressed',r===REG);
+    b.onclick=()=>{G=newGame(r.id);resetScreens();
+      try{const u=new URL(location.href);u.searchParams.set('region',r.id);history.replaceState(null,'',u);}catch(_){}};
+    dp.appendChild(b);});
   $('endKicker').textContent=C.end.kicker;$('endHead').textContent=C.end.head;
   const eb=$('endBody');eb.innerHTML='';C.end.body.forEach(t=>eb.appendChild(el('p',null,t)));
 }
@@ -34,7 +40,8 @@ function resetScreens(){
   lastGoal='';lastTool='';lastNear=null;refreshHud();
 }
 $('btnStart').onclick=startGame;
-$('btnRestart').onclick=()=>{G=newGame();resetScreens();};
+$('btnRestart').onclick=()=>{G=newGame();resetScreens();
+  try{const u=new URL(location.href);u.searchParams.delete('region');history.replaceState(null,'',u);}catch(_){}};
 /* 다음 지역으로: 보따리·연장·책·호감은 그대로 가지고 간다 */
 $('btnNext').onclick=()=>{if(!REGIONS[REG.next])return;enterRegion(G,REGIONS[REG.next]);resetScreens();};
 $('btnBookEnd').onclick=()=>{bookTab='clues';renderBook();$('book').hidden=false;$('endScreen').hidden=true;
