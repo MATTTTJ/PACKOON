@@ -32,6 +32,7 @@ const Rg=defineRegion('jangteo',{
   weather:()=>Vfx.setWeather(G.f.night?'market-night':'market-day'),
   weatherFront(){if(G.f.night)R(0,0,W,H,'rgba(10,14,40,.18)');},
   onStart(){
+    Rg.arcs();
     diary('j_start','큰 장터에 왔다. 붉은 등불과 떡 찌는 김. 그런데 밤마다 장터 물건이 없어진다고 한다. 아빠가 보부상 숙소에 맡긴 짐이 있다.');
     toast('보부상 숙소와 떡집을 찾아보자');
   },
@@ -53,6 +54,13 @@ const Rg=defineRegion('jangteo',{
     ['쓰러진 횟수',G.f.faints],
   ],
 });
+
+/* [시험판] 저장에 없는 플래그는 거짓으로 읽는다. 다른 지역의 상태는 바꾸지 않는다. */
+Rg.arcs=()=>{
+  const ARCS=/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
+  if(ARCS&&G&&G.f)G.f.arcs=true;
+  return ARCS;
+};
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({
