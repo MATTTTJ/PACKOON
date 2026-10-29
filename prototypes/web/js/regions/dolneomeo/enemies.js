@@ -37,15 +37,15 @@ function drawGolem(c){
 
 defineEnemies({
   golem:{name:'돌 골렘',calmLabel:'진정',
-    intro:'성황당 돌무더기가 우르르 일어서 절벽 길을 막는다.',
-    parts:tableParts('golem',{leg:{atk:'spike',tell:'돌다리가 땅을 구르려 한다…'},arm:{atk:'sweep',tell:'돌팔이 크게 휘둘러진다…'},head:{atk:'seed',tell:'머리의 눈돌이 번뜩인다…'}}),
+    intro:'성황당 돌무더기가 우르르 일어나 절벽 길을 막는다.',
+    parts:tableParts('golem',{leg:{atk:'spike',tell:'돌 골렘이 발을 구르려 한다…'},arm:{atk:'sweep',tell:'돌팔을 크게 휘두르려 한다…'},head:{atk:'seed',tell:'머리의 눈돌이 번뜩인다…'}}),
     likes:TABLES.CALM.golem,likeText:'돌무더기가 잠시 숨을 고른다.',
-    likeTexts:{story_stone:'아빠가 올리다 만 소원 돌을 건넸다. 돌 골렘이 그 돌을 가만히 내려다본다.'},
+    likeTexts:{story_stone:'아빠가 못 올린 소원 돌을 건넸다. 돌 골렘이 가만히 내려다본다.'},
     coreHidden:'머리가 너무 높다. 다리나 팔을 먼저 무너뜨리자.',
     coreShown:'돌 골렘이 휘청인다! 이제 머리를 노릴 수 있다.',
-    calmWin:'소원 돌이 꼭대기에 올라앉자, 돌 골렘이 스르르 내려앉아 다시 성황당이 된다.',
-    win:'눈돌이 빠지며 돌 골렘이 무너져 내린다.',
-    lose:'돌 골렘에게 밀려 장승 앞까지 굴러 내려왔다.',
+    calmWin:'소원 돌이 꼭대기에 놓이자 돌 골렘이 스르르 내려앉는다. 다시 성황당 돌무더기로 돌아왔다.',
+    win:'눈돌이 빠지자 돌 골렘이 와르르 무너진다.',
+    lose:'돌 골렘에게 밀려 장승 앞까지 데굴데굴 굴러 내려왔다.',
     draw:drawGolem},
 });
 })();
