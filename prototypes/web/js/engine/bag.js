@@ -65,8 +65,8 @@ function renderBag(pop){
   const slots=Math.max(12,Math.ceil(items.length/6)*6);
   for(let i=0;i<slots;i++){
     const id=items[i];const b=el('button','slot'+(id&&selItem===id?' sel':''));b.type='button';
-    if(id){b.appendChild(icon(id));b.appendChild(el('span','n',G.inv[id]));const dot=el('span','dot');dot.style.background=RCOL[ITEMS[id].r];b.appendChild(dot);
-      b.setAttribute('aria-label',ITEMS[id].n+' '+G.inv[id]+'개');
+    if(id){b.appendChild(icon(id));b.appendChild(el('span','n',G.inv[id]));b.appendChild(rarityIcon(ITEMS[id].r));
+      b.setAttribute('aria-label',ITEMS[id].n+' '+G.inv[id]+'개 · '+RAR[ITEMS[id].r]);
       b.onclick=()=>{if(selItem===id)putIn(id);else{selItem=id;renderBag();}};}
     else{b.disabled=true;b.setAttribute('aria-label','빈 칸');}
     grid.appendChild(b);
@@ -75,7 +75,7 @@ function renderBag(pop){
   const d=el('div','detail');
   if(selItem&&has(selItem)){
     const id=selItem;d.appendChild(icon(id));const info=el('div','info');
-    const name=el('b',null,ITEMS[id].n);const ch=el('span','chip',RAR[ITEMS[id].r]);ch.style.background=RCOL[ITEMS[id].r];name.appendChild(ch);info.appendChild(name);
+    const name=el('b',null,ITEMS[id].n);const ch=el('span','chip');ch.appendChild(rarityIcon(ITEMS[id].r));ch.appendChild(el('span',null,RAR[ITEMS[id].r]));name.appendChild(ch);info.appendChild(name);
     info.appendChild(el('div',null,ITEMS[id].d));
     const row=el('div','row');
     const put=el('button','btn primary',HEIR[pouch.tool].short+'에 넣기');put.type='button';put.onclick=()=>putIn(id);row.appendChild(put);

@@ -80,12 +80,17 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .slot .n{position:absolute;right:4px;bottom:2px;font-size:.9em;font-variant-numeric:tabular-nums}
 .slot.sel{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
 .slot[disabled]{cursor:default;opacity:.45}
-.slot .dot{position:absolute;left:5px;top:5px;width:6px;height:6px;border-radius:50%}
+.slot canvas.rarity-mark{position:absolute;right:2px;top:2px}
 .sub{font-family:var(--display);font-size:1.05em;margin:14px 0 6px}
 .detail{margin-top:12px;border-top:1px dashed #c7b48c;padding-top:10px;display:flex;gap:12px;align-items:flex-start}
 .detail canvas{width:52px;height:52px;image-rendering:pixelated;flex:none;background:var(--hanji-2);border-radius:4px}
 .detail .info{min-width:0;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-.chip{display:inline-block;font-size:.78em;padding:0 6px;border-radius:2px;color:#fff;margin-left:6px;vertical-align:middle;font-weight:normal}
+.chip{display:inline-flex;align-items:center;gap:3px;font-size:.78em;padding:1px 5px;border-radius:2px;color:var(--meok);background:var(--hanji-2);margin-left:6px;vertical-align:middle;font-weight:normal;white-space:nowrap}
+.slot canvas.rarity-mark,.detail canvas.rarity-mark{width:16px;height:16px;image-rendering:pixelated;pointer-events:none;background:none;border-radius:0;flex:none}
+.rarity-gold{filter:drop-shadow(0 0 2px #e8ac2873);animation:rarity-glow 3.6s ease-in-out infinite}
+@keyframes rarity-glow{0%,100%{filter:drop-shadow(0 0 1px #e8ac2852)}50%{filter:drop-shadow(0 0 3px #e8ac2899) brightness(1.12)}}
+@media (min-width:600px){.slot canvas.rarity-mark,.detail canvas.rarity-mark{width:24px;height:24px}}
+@media (prefers-reduced-motion:reduce){.rarity-gold{animation:none}}
 .btn{font-family:var(--ui);font-size:clamp(13px,1.5vw,15px);background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:4px;padding:6px 14px;cursor:pointer;min-height:38px;touch-action:manipulation}
 .btn:hover{background:#fff6e0}
 .btn.primary{background:var(--dan);color:#fff6e8;border-color:#5a1d10}
