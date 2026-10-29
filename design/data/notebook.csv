@@ -124,3 +124,6 @@ acorn_jelly,galchamgol,도토리묵,물건,나,got:acorn_jelly,처음 얻을 때
 memil_jelly,dolneomeo,메밀묵,물건,나,got:memil_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
 yakgwa,jangteo,약과,물건,나,got:yakgwa,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
 magamok_tea,yeongsan,마가목차,물건,나,got:magamok_tea,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
+dad_stamp_jangteo_flag,jangteo,젊은 아빠의 그날 · 장터 깃대,도장,아빠,stamp:jangteo:flag,장터 깃대 밑 도장을 찾았을 때,부를 준다는 열매를 찾으러 북쪽으로 간다. 장터 깃발에 길을 물으니 바람만 대답했다.,제안,PA-43 큰 장터 확장 · 개발자 결정
+dad_stamp_jangteo_pillar,jangteo,젊은 아빠의 그날 · 숙소 기둥,도장,아빠,stamp:jangteo:pillar,숙소 기둥의 도장을 찾았을 때,부자가 되어 돌아오겠다며 묵은 숙소다. 새벽 길을 서두르다 기둥에 젖은 발을 짚었다.,제안,PA-43 큰 장터 확장 · 개발자 결정
+dad_stamp_jangteo_rock,jangteo,젊은 아빠의 그날 · 솔숲 바위,도장,아빠,stamp:jangteo:rock,솔숲 큰 바위의 도장을 찾았을 때,보배가 열린다는 산은 아직 멀다. 바위에서 장터를 내려다보니 등불 하나도 빈손으로 꺼지지는 않았다.,제안,PA-43 큰 장터 확장 · 개발자 결정

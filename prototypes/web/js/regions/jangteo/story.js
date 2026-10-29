@@ -389,11 +389,31 @@ function nalMenu(){
     if(has('memil_powder'))c.push({t:'메밀가루를 내민다 (팥 2)',go:()=>nalTrade('memil_powder')});
     if(!F.nalJBluff)c.push({t:'허세 부리기: "흥, 팥 한 되가 뭐 그리 귀해!"',go:nalBluff});
   }
+  if(!CLASSIC){
+    if(!F.jxCraftMarket)c.push({t:'솔방울로 떡 재료 바꾸기',go:marketCraftTrade});
+    if(F.nalJDone)c.push({t:'고사떡에 쓸 팥 다시 구하기',go:()=>{
+      const id=has('memil_powder')?'memil_powder':'ssal_powder';
+      if(!has(id)){talk([['날쌘','쌀가루 하나, 아니면 메밀가루 하나.\n엿방울한테 쌀을 받아 맷돌에 갈아 와.']]);return;}
+      talk([['날쌘','떡을 다른 데 썼냐? 다시 바꾸면 되지.\n지난번이랑 같은 셈이다.',[
+        {t:ITEMS[id].n+' 1로 팥 바꾸기',go:()=>nalTrade(id)},{t:'다음에',go:null}]]]);
+    }});
+  }
   if(Rg.arcs()&&night()&&F.jangteoArcsBueong2&&!F.jangteoArcsNal3)c.push({t:'숙소를 피하는 까닭을 묻는다',go:nalLedger});
   c.push({t:'그만두기',go:null});
   const line=Rg.arcs()?(F.nalJDone?'팥 아껴 써. 부엉 영감은 빛깔까지 따지거든.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니네? 뭘 바꿀 건데?':'쌀가루 하나면 팥 하나. 메밀가루면 둘. 뭘 낼 건데?'):
     F.nalJDone?'팥 아껴 쓰고 고사떡 잘 쪄라. 부엉 영감은 팥 빛깔까지 따지니까.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니겠지? 뭘 내놓을 테냐?':'쌀가루 한 됫박엔 팥 한 되. 메밀가루면 두 되 쳐주지. 뭘 낼 테냐?';
   talk([['날쌘',line,c]]);
+}
+/* 수량은 trades.csv t_craft_market 그대로. 엿방울의 필수 몫을 먼저 남긴다. */
+function marketCraftTrade(){
+  const enough=has('solbang',G.f.yeotDone?3:8);
+  talk([['날쌘',enough?'솔방울 셋이면 꿀, 참기름, 녹두, 팥.\n하나씩 묶어 주지. 한 번만이다.':'엿방울한테 줄 다섯은 남겨 둬.\n솔숲에서 셋을 더 주워 오면 떡 재료랑 바꾸자.',
+    enough?[{t:'솔방울 3개와 바꾼다',go:()=>{
+      if(G.f.jxCraftMarket||!has('solbang',G.f.yeotDone?3:8))return;
+      takeItem('solbang',3);for(const id of ['honey','sesame_oil','mung','pat'])addItem(id,1);
+      G.f.jxCraftMarket=true;ledger('t_craft_market','날쌘','솔방울 3','떡 재료 묶음');ledgerDone('t_craft_market');
+      talk([['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n엄마한테 보낼 건 네가 골라.']]);
+    }},{t:'다음에',go:null}]:[{t:'알겠어',go:null}]]]);
 }
 function nalTrade(id){
   const F=G.f;takeItem(id,1);F.nalJDone=true;ledgerDone('nal_jangteo');
@@ -408,7 +428,12 @@ function nalBluff(){G.f.nalJBluff=true;rel('nal',1);
 function restMaru(){
   const toNight=!night();
   talk([['너구리',toNight?(Rg.arcs()?'(마루에서 기다리니 해가 졌다. 등불이 켜진다.)':'(숙소 마루에서 해가 지기를 기다렸다. 장터에 하나둘 등불이 켜진다.)'):'(마루에서 한숨 자고 나니 날이 밝았다.)']],()=>{
-    G.f.night=toNight;learn('maru:rest');toast(toNight?'밤이 되었다':'아침이 되었다');refreshGoal();});
+    G.f.night=toNight;learn('maru:rest');
+    if(!CLASSIC){
+      // 잠든 사이 바람이 새 솔방울을 떨어뜨린다. 고정 id를 되살려 저장 중복을 만들지 않는다.
+      for(const a of G.pickups)if(a.zone==='pine'&&a.item==='solbang')a.got=false;
+      toast(toNight?'밤이 되었다. 좌판이 접히고 골목이 열렸다.':'아침이 되었다. 솔숲에 새 솔방울이 떨어졌다.');
+    }else toast(toNight?'밤이 되었다':'아침이 되었다');refreshGoal();});
 }
 
 /* ---------- 부엉 영감 (보부상단 접장): 밤에만 깨어 있다 ---------- */
@@ -515,6 +540,26 @@ Rg.npcs=[
   {id:'bueong',name:'부엉 영감',x:1190,talk:talkBueong,draw:Rg.art.owl},
 ];
 
+if(!CLASSIC){
+  Rg.npcs=Rg.npcs.map(n=>{
+    const place={morak:['street',1380,110],yeotbang:['street',720,GROUND],nal:['entrance',430,GROUND],maru:['inn',1080,GROUND],bueong:['inn',920,GROUND]}[n.id];
+    const p=Object.defineProperties({},Object.getOwnPropertyDescriptors(n));
+    Object.defineProperty(p,'x',{value:place[1],writable:true,enumerable:true,configurable:true});
+    p.zone=place[0];p.y=place[2];
+    if(n.id==='morak')p.props=null; // 떡집 실내는 확장 배경에서 발판 높이에 맞춰 그린다.
+    if(n.id==='yeotbang')p.talk=()=>{
+      if(!G.f.yeotDone){n.talk();return;}
+      talk([['엿방울','불쏘시개는 늘 필요하지~\n솔방울을 더 주우면 쌀도 더 바꿔 줄게.',[
+        {t:'가위 장단과 이야기',go:n.talk},
+        {t:'솔방울 5개로 쌀 8개 더 구하기',go:()=>{
+          if(!has('solbang',5)){talk([['엿방울','솔방울 다섯 개면 쌀 여덟 되야~\n솔숲이 비었으면 숙소에서 쉬었다 가.']]);return;}
+          takeItem('solbang',5);addItem('ssal',8);talk([['엿방울','자, 쌀 여덟 되. 떡도 또 찌면 되지~\n솜씨가 서툴러도 굶길 순 없잖아.']]);
+        }},{t:'다음에',go:null}]]]);
+    };
+    return p;
+  });
+}
+
 /* ---------- 지금 할 일 ---------- */
 Rg.goal=()=>{
   const F=G.f;
@@ -534,11 +579,12 @@ Rg.goal=()=>{
       const sb=G.inv.solbang||0;
       return sb>=5?'엿방울에게 솔방울 건네기':'뒷산 소나무 숲에서 솔방울 줍기 ('+sb+'/5)';
     }
-    if(!has('pat'))return '숙소 앞 날쌘에게 팥 구하기';
+    if(!has('pat'))return CLASSIC?'숙소 앞 날쌘에게 팥 구하기':'장터 입구 날쌘에게 팥 구하기';
     if((G.inv.ssal_powder||0)<2)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루 갈기';
     return '보따리를 열고 시루에 쌀가루 2와 팥 1 넣어 찌기';
   }
   if(!G.boss.dead)return toNight('숙소 창고 문 앞을 지키기');
+  if(!CLASSIC&&has('hongsi_tteok'))return '숙소 처마의 까치에게 홍시 약떡 보내기';
   if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루 갈기';
   return '보따리를 열고 시루에 눈홍시와 쌀가루 넣어 홍시 약떡 찌기';
 };
