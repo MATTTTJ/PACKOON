@@ -22,7 +22,8 @@ const ITEMS={};
 for(const r of items){
   const lv=parseInt(r['레어도단계'],10);if(!(lv>=1&&lv<=5))fail('items.csv '+r.id+': 레어도단계가 1~5 가 아니다 ("'+r['레어도단계']+'")');
   if(!r['설명'])fail('items.csv '+r.id+': 설명이 비어 있다');
-  ITEMS[r.id]={n:r['이름'],r:lv-1,d:r['설명']};
+  if(!['재료','먹을거리','도구','귀한 것'].includes(r['종류']))fail('items.csv '+r.id+': 종류는 재료·먹을거리·도구·귀한 것 중 하나여야 한다');
+  ITEMS[r.id]={n:r['이름'],r:lv-1,kind:r['종류'],d:r['설명']};
 }
 /* NPC·지역 이름은 대사 안에도 적혀 있어 코드에 둔다 (표만 바꾸면 대사가 따라오지 않는다) */
 /* 보스 부위: 표 순서 그대로. 공격 종류와 예고 글은 지역 코드에 있다 */

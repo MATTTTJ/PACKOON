@@ -38,6 +38,7 @@ function onPress(k){
   if(k==='i'){toggleBag();return;}
   if(k==='b'){toggleBook();return;}
   if(k==='n'){toggleNote();return;}
+  if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
   if(open('bag')||open('book')||open('notebook'))return;
   if(k===' '||k==='w'||k==='arrowup')jumpQ=true;
   if(k==='j'||k==='x')atkQ=true;
