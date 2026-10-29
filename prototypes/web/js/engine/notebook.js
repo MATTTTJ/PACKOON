@@ -9,7 +9,8 @@
      'like:<상대>:<아이템>' 전투에서 좋아하는 선물, 'core:<상대>' 핵심 부위가 드러남, 'calm:<상대>' 달래서 끝냄
    - 지역 기믹은 지역 코드가 learn('<키>') 를 부른다 */
 const NOTES={};
-function defineNotes(region,list){list.forEach(e=>{NOTES[e.id]=Object.assign({region},e);});}
+/* 같은 쪽(예: 여러 지역에 나오는 날쌘)이 다시 오면 줄만 이어 붙인다. 쪽은 처음 정의한 지역에 놓인다 */
+function defineNotes(region,list){list.forEach(e=>{if(NOTES[e.id])NOTES[e.id].lines.push(...e.lines);else NOTES[e.id]=Object.assign({region},e);});}
 const knows=k=>G.learned.includes(k);
 function noteName(e){return e.name||(e.kind==='item'?ITEMS[e.id].n:(ENEMIES[e.id]&&!npcFind(e.id)?ENEMIES[e.id].name:npcName(e.id)));}
 function npcFind(id){for(const r of regionList()){const n=(r.npcs||[]).find(n=>n.id===id);if(n)return n;}return null;}

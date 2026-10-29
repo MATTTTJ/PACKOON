@@ -11,15 +11,17 @@ $('bagClose').onclick=closePanels;$('bookClose').onclick=closePanels;
 const HEIR={};
 function defineHeirlooms(map){Object.assign(HEIR,map);}
 /* 가공법: 그 가보가 깨어나는 지역 파일이 넣는다. RECIPES[가보]=[{need:{아이템:개수}, out:만들어지는 것, n:개수}]
-   가공법은 가보가 깨어난 뒤(G.awake 에 들어간 뒤)에만 쓰인다. 깨우기는 awaken(가보) */
+   가공법은 가보가 깨어난 뒤(G.awake 에 들어간 뒤)에만 쓰인다. 깨우기는 awaken(가보).
+   know:'<키>' 가 있는 가공법은 learn('<키>') 로 따로 배운 뒤에만 쓰인다 (예: 모락에게 배우는 메밀떡) */
 const RECIPES={};
 function defineRecipes(map){for(const k in map)RECIPES[k]=(RECIPES[k]||[]).concat(map[k]);}
 const isAwake=t=>G.awake.includes(t);
+const knownRecipes=t=>(RECIPES[t]||[]).filter(r=>!r.know||knows(r.know));
 function awaken(t){if(!isAwake(t))G.awake.push(t);}
 const pouch={tool:'jeolgu',items:[]};
 let selItem=null,pouchMsg='',lastOut=null,brewing=false;
 function pouchCount(){const c={};pouch.items.forEach(i=>c[i]=(c[i]||0)+1);return c;}
-function matchRecipe(){const c=pouchCount(),ck=Object.keys(c);if(!isAwake(pouch.tool))return null;for(const r of RECIPES[pouch.tool]||[]){const k=Object.keys(r.need);if(ck.length===k.length&&k.every(x=>c[x]===r.need[x]))return r;}return null;}
+function matchRecipe(){const c=pouchCount(),ck=Object.keys(c);if(!isAwake(pouch.tool))return null;for(const r of knownRecipes(pouch.tool)){const k=Object.keys(r.need);if(ck.length===k.length&&k.every(x=>c[x]===r.need[x]))return r;}return null;}
 function returnPouch(){if(!pouch.items.length)return;pouch.items.forEach(id=>{G.inv[id]=(G.inv[id]||0)+1;});pouch.items=[];refreshHud();}
 function liveHint(){
   if(!pouch.items.length)return '';
@@ -59,7 +61,9 @@ function renderBag(pop){
   body.appendChild(el('div','sub','소지품'));
   const items=Object.keys(G.inv).filter(k=>G.inv[k]>0);
   const grid=el('div','bag-grid');
-  for(let i=0;i<12;i++){
+  /* 칸은 12개부터, 물건 종류가 많으면 한 줄(6칸)씩 늘어난다. 가진 물건이 안 보이는 일이 없게 */
+  const slots=Math.max(12,Math.ceil(items.length/6)*6);
+  for(let i=0;i<slots;i++){
     const id=items[i];const b=el('button','slot'+(id&&selItem===id?' sel':''));b.type='button';
     if(id){b.appendChild(icon(id));b.appendChild(el('span','n',G.inv[id]));const dot=el('span','dot');dot.style.background=RCOL[ITEMS[id].r];b.appendChild(dot);
       b.setAttribute('aria-label',ITEMS[id].n+' '+G.inv[id]+'개');
@@ -116,7 +120,7 @@ function renderBag(pop){
   bench.appendChild(out);wrap.appendChild(bench);
   const msg=el('div','bench-msg',pouchMsg||(awake?(Hr.prompt||'넣을 것을 골라 보자.'):'쓰는 법을 아직 모른다. 무엇을 넣으면 반응할까?'));msg.id='benchMsg';wrap.appendChild(msg);
   const rl=el('div','recipes');
-  if(awake)(RECIPES[pouch.tool]||[]).forEach(rc=>{const it=el('span','recipe');it.appendChild(el('span',null,'아는 쓰는 법 ·'));
+  if(awake)knownRecipes(pouch.tool).forEach(rc=>{const it=el('span','recipe');it.appendChild(el('span',null,'아는 쓰는 법 ·'));
     Object.keys(rc.need).forEach(k=>{it.appendChild(icon(k));it.appendChild(el('span',null,ITEMS[k].n+' ×'+rc.need[k]));});
     it.appendChild(el('span',null,'→'));it.appendChild(icon(rc.out));it.appendChild(el('span',null,ITEMS[rc.out].n));rl.appendChild(it);});
   else rl.appendChild(el('span',null,'아직 깨어나지 않은 가보다. 넣어 보는 건 자유다.'));
