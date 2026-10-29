@@ -81,6 +81,7 @@ const heldTool=()=>G.tool;
 function has(id,n){return (G.inv[id]||0)>=(n||1);}
 function addItem(id,n){
   G.inv[id]=(G.inv[id]||0)+n;
+  Vfx.item(id,n);
   if(learn('got:'+id,true)&&NOTES[id])toast('수첩에 붓으로 그렸다 · '+ITEMS[id].n);
   else toast('+ '+ITEMS[id].n+(n>1?' ×'+n:''));
   refreshHud();
@@ -89,7 +90,7 @@ function takeItem(id,n){G.inv[id]=(G.inv[id]||0)-n;if(G.inv[id]<=0)delete G.inv[
 function diary(id,text){if(G.diary.some(d=>d.id===id))return;G.diary.push({id,text});}
 function clue(id,who,text){if(G.clues.some(c=>c.id===id))return;G.clues.push({id,who,text});setTimeout(()=>toast('아빠 단서를 찾았다 ('+G.clues.length+'/'+clueTotalSoFar()+')'),900);}
 function ledger(id,npc,want,give){if(!G.ledger[id])G.ledger[id]={npc,want,give,done:false};}
-function ledgerDone(id){if(G.ledger[id])G.ledger[id].done=true;}
+function ledgerDone(id){if(G.ledger[id]){if(!G.ledger[id].done)Vfx.burst(G.px,G.py-12);G.ledger[id].done=true;}}
 function rel(id,d){G.rel[id].v+=d;}
 
 let toastT=0;

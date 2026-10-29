@@ -34,7 +34,7 @@ function gStrike(){
 }
 function finishGather(){
   const d=gat.d,id=d.item;$('gather').hidden=true;d.done=true;d.busy=false;
-  const perfect=gat.miss===0;spark(d.x,GROUND-4);
+  const perfect=gat.miss===0;Vfx.gather(d.x,GROUND-4);
   addItem(id,perfect?2:1);
   if(perfect)setTimeout(()=>toast('흠집 하나 없이 캐냈다! '+ITEMS[id].n+' ×2'),700);
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);

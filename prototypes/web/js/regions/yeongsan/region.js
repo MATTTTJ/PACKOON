@@ -29,6 +29,8 @@ const Rg=defineRegion('yeongsan',{
       dadMet:false,dadDone:false,sangunMet:false,spring:false,fruitGot:false,nameGiven:false,yakDone:false,newName:''},
     rel:{salgeumi:{t:'호감',v:0},sangun:{t:'외경',v:0},nal:{t:'경멸',v:0}},
   }),
+  weather:()=>Vfx.setWeather(G.f.spring?'petal':'snow'),
+  weatherFront(){if(!G.f.spring)R(0,0,W,H,'rgba(20,28,70,.12)');},
   onStart(){
     diary('y_start','영산에 왔다. 눈이 허리까지 쌓였다. 산막에 불빛이 보인다.');
     toast('산막의 불빛 쪽으로 가 보자');
