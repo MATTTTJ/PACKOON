@@ -9,8 +9,22 @@ const {read}=require('./csv.js');
 const ROOT=path.resolve(__dirname,'../../..');
 const DATA=path.join(ROOT,'design/data');
 const OUT=path.join(ROOT,'prototypes/web/js/data/tables.js');
-const t=name=>read(path.join(DATA,name+'.csv')).rows;
 const fail=msg=>{console.error('변환 실패: '+msg);process.exit(1);};
+const t=name=>{
+  const file=path.join(DATA,name+'.csv'),source=fs.readFileSync(file,'utf8');
+  if(source.charCodeAt(0)!==0xFEFF)fail(name+'.csv: UTF-8 BOM이 필요하다');
+  const {head,rows}=read(file);
+  if(head.length!==new Set(head).size)fail(name+'.csv: 머리줄 이름이 겹친다');
+  if(head.includes('id')){
+    const ids=new Set();
+    for(const r of rows){
+      if(!/^[a-z][a-z0-9_]*$/.test(r.id)||ids.has(r.id))fail(name+'.csv: 잘못되거나 겹치는 id '+r.id);
+      ids.add(r.id);
+    }
+  }
+  for(const r of rows)if(r['상태']&&!['확정','제안','미정'].includes(r['상태']))fail(name+'.csv: 상태는 확정/제안/미정이어야 한다');
+  return rows;
+};
 
 const items=t('items'),bosses=t('bosses'),parts=t('boss_parts'),heirlooms=t('heirlooms'),notebook=t('notebook');
 const regionIds=new Set(t('regions').map(r=>r.id));
@@ -52,26 +66,80 @@ for(const r of bosses){
   for(const part of s.split('·')){const m=part.trim().match(/^(.+?)\s+(\d+)$/);if(!m)fail('bosses.csv '+r.id+': 진정수치 "'+part.trim()+'"은 "이름 숫자" 모양이어야 한다');CALM[r.id][idOf(m[1],'bosses.csv '+r.id+' 진정수치')]=+m[2];}
 }
 /* 가공법: "쌀가루 2 + 팥 1 → 팥시루떡 1 · 메밀가루 2 → 메밀떡 1" */
-const RECIPES={};
+const RECIPES={},CRAFT={};
 for(const r of heirlooms){
   const s=(r['가공법']||'').trim();if(!s)continue;RECIPES[r.id]=[];
-  for(const rec of s.split('·')){
-    const [lhs,rhs]=rec.split('→');if(!rhs)fail('heirlooms.csv '+r.id+': 가공법 "'+rec.trim()+'"에 → 가 없다');
-    const amt=x=>{const m=x.trim().match(/^(.+?)\s+(\d+)$/);if(!m)fail('heirlooms.csv '+r.id+': "'+x.trim()+'"은 "이름 숫자" 모양이어야 한다');return [idOf(m[1],'heirlooms.csv '+r.id+' 가공법'),+m[2]];};
-    const need={};for(const x of lhs.split('+')){const [id,n]=amt(x);need[id]=n;}
-    const [out,n]=amt(rhs);RECIPES[r.id].push({need,out,n});
+  const hidden=(r['숨은가공품']||'').split('·').map(x=>x.trim()).filter(Boolean);
+  const optional=(r['선택가공품']||'').split('·').map(x=>x.trim()).filter(Boolean);
+  const profile={habit:r['손버릇기록'],habitKey:r['손버릇키'],fail:r['틀린조합반응']};
+  if(!profile.habit||profile.habitKey!=='habit:'+r.id||!profile.fail)fail('heirlooms.csv '+r.id+': 손버릇 기록·키·틀린 조합 반응을 확인한다');
+  for(const [key,col]of Object.entries({steps:'손맛횟수',intervalMs:'손맛간격ms',windowMs:'손맛여유ms',restMs:'손맛쉼ms',steamMs:'손맛김ms',dragPx:'손맛끌기px',turnDegrees:'손맛회전도'})){
+    if(!/^\d+$/.test(r[col])||!Number.isSafeInteger(+r[col]))fail('heirlooms.csv '+r.id+': '+col+'은 0 이상의 정수여야 한다');
+    profile[key]=+r[col];
   }
+  if(profile.steps<1||profile.steps>8)fail('heirlooms.csv '+r.id+': 손맛횟수는 1~8이어야 한다');
+  if(r.id==='jeolgu'&&(!(profile.intervalMs>0)||profile.windowMs>profile.intervalMs||profile.restMs<profile.intervalMs))fail('heirlooms.csv jeolgu: 박자 간격·여유·쉼을 확인한다');
+  if(r.id==='siru'&&profile.steamMs<=profile.windowMs)fail('heirlooms.csv siru: 김이 오르는 시각은 판정 여유보다 커야 한다');
+  if(r.id==='yakyeon'&&profile.dragPx<=0)fail('heirlooms.csv yakyeon: 손맛끌기px는 0보다 커야 한다');
+  if(r.id==='maetdol'&&(profile.turnDegrees<=0||profile.turnDegrees>180))fail('heirlooms.csv maetdol: 손맛회전도는 1~180도여야 한다');
+  CRAFT[r.id]=profile;
+  const outputs=new Set(),combinations=new Set();
+  for(const rec of s.split('·')){
+    const sides=rec.split('→'),[lhs,rhs]=sides;if(sides.length!==2||!lhs.trim()||!rhs.trim())fail('heirlooms.csv '+r.id+': 가공법 "'+rec.trim()+'"의 → 양쪽을 확인한다');
+    const amt=x=>{const m=x.trim().match(/^(.+?)\s+([1-9]\d*)$/);if(!m||!Number.isSafeInteger(+m[2]))fail('heirlooms.csv '+r.id+': "'+x.trim()+'"은 "이름 양의정수" 모양이어야 한다');return [idOf(m[1],'heirlooms.csv '+r.id+' 가공법'),+m[2]];};
+    const need={};for(const x of lhs.split('+')){const [id,n]=amt(x);if(need[id])fail('heirlooms.csv '+r.id+': 한 가공법에 재료가 겹친다 '+id);need[id]=n;}
+    if(Object.values(need).reduce((sum,n)=>sum+n,0)>3)fail('heirlooms.csv '+r.id+': 재료가 가공대 세 칸을 넘는다');
+    const [out,n]=amt(rhs),signature=Object.keys(need).sort().map(id=>id+':'+need[id]).join(',');
+    if(outputs.has(out)||combinations.has(signature))fail('heirlooms.csv '+r.id+': 겹치는 결과 또는 조합 '+out);
+    outputs.add(out);combinations.add(signature);
+    const recipe={need,out,n};
+    if(optional.includes(out)){
+      recipe.optional=true;
+      if(ITEMS[out].r>Math.max(...Object.keys(need).map(id=>ITEMS[id].r)))fail('heirlooms.csv '+r.id+': 선택 가공은 레어도를 올리지 않는다 '+out);
+    }
+    if(hidden.includes(out)){recipe.hidden=true;recipe.discover='recipe:'+out;}
+    RECIPES[r.id].push(recipe);
+  }
+  for(const id of hidden)if(!outputs.has(id))fail('heirlooms.csv '+r.id+': 숨은가공품이 가공법에 없다 '+id);
+  for(const id of optional)if(!outputs.has(id))fail('heirlooms.csv '+r.id+': 선택가공품이 가공법에 없다 '+id);
+  for(const id of hidden)if(!optional.includes(id))fail('heirlooms.csv '+r.id+': 숨은 가공품은 선택 가공품이어야 한다 '+id);
 }
 /* 아빠의 보부상 수첩: 쪽마다 줄을 표 순서대로. "(items.csv 의 설명)" 줄은 게임이 물건 설명으로 채운다 */
 const NOTES=[];const byId={};
 for(const r of notebook){
   let e=byId[r['쪽id']];
-  if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':'animal',lines:[]};NOTES.push(e);}
+  if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':'animal',lines:[]};if(CRAFT[e.id])e.name=r['대상'];NOTES.push(e);}
   if(r['비고'].includes('아빠 그림 있음'))e.dadDrawing=true;
   if(r['내용']==='(items.csv 의 설명)')continue;
   const l={who:r['쓴이']==='아빠'?'dad':'me',text:r['내용']};if(r['알게되는키'])l.when=r['알게되는키'];e.lines.push(l);
 }
-for(const e of NOTES)if(e.kind==='item'&&!ITEMS[e.id])fail('notebook.csv '+e.id+': 물건 쪽인데 items.csv 에 없다');
+for(const e of NOTES)if(e.kind==='item'&&!ITEMS[e.id]&&!CRAFT[e.id])fail('notebook.csv '+e.id+': 물건 쪽인데 items.csv 또는 heirlooms.csv 에 없다');
+for(const [tool,c]of Object.entries(CRAFT))if(!NOTES.some(e=>e.id===tool&&e.lines.some(l=>l.when===c.habitKey)))fail('notebook.csv: 손버릇 기록이 없다 '+tool);
+for(const recipe of Object.values(RECIPES).flat().filter(r=>r.hidden))if(!NOTES.some(e=>e.id===recipe.out&&e.lines.some(l=>l.when===recipe.discover)))fail('notebook.csv: 숨은 가공법 발견 기록이 없다 '+recipe.out);
+
+/* 좋아하는 맛: 인물·물건 한 쌍에 반응 하나. 효과는 기존 진정수치와 별도로 새 선물에만 쓴다. */
+const TASTES={},npcIds=new Set(t('npcs').map(r=>r.id)),bossIds=new Set(bosses.map(r=>r.id));
+for(const r of t('tastes')){
+  const who=r['누가'],item=r['무엇'],kind=r['반응종류'],line=r['반응대사'],effect=r['효과'];
+  if(!npcIds.has(who)&&!bossIds.has(who))fail('tastes.csv '+r.id+': NPC·보스 id가 아니다 '+who);
+  if(!ITEMS[item])fail('tastes.csv '+r.id+': 물건 id가 없다 '+item);
+  if(!['아주 좋아함','좋아함','그저 그럼','싫어함'].includes(kind)||!line)fail('tastes.csv '+r.id+': 반응 종류·대사를 확인한다');
+  if(!/^(?:none|calm:(?:[1-9]\d?|100))$/.test(effect))fail('tastes.csv '+r.id+': 효과는 none / calm:1~100이어야 한다');
+  if(effect.startsWith('calm:')&&(!bossIds.has(who)||!['아주 좋아함','좋아함'].includes(kind)))fail('tastes.csv '+r.id+': 진정 효과는 전투 상대가 좋아하는 맛에만 쓴다');
+  if(TASTES[who]&&TASTES[who][item])fail('tastes.csv '+r.id+': 인물·물건 조합이 겹친다');
+  (TASTES[who]||(TASTES[who]={}))[item]={kind,line,effect};
+}
+for(const id of npcIds){const n=Object.keys(TASTES[id]||{}).length;if(n<2||n>3)fail('tastes.csv: NPC마다 맛 반응이 2~3개 필요하다 '+id);}
+for(const id of bossIds)if(Object.keys(TASTES[id]||{}).length<2)fail('tastes.csv: 전투 상대마다 맛 반응이 2개 이상 필요하다 '+id);
+/* 새 선택 교환은 현재 지역 코드에 연결하지 않고 목록·수량만 검증한다. */
+for(const r of t('trades').filter(r=>r.id.startsWith('t_craft_'))){
+  if(!regionIds.has(r['지역'])||!npcIds.has(r.NPC))fail('trades.csv '+r.id+': 지역·NPC id를 확인한다');
+  for(const col of ['원하는것','주는것'])for(const entry of r[col].split('+')){
+    const m=entry.trim().match(/^(.+?)\s+([1-9]\d*)$/);
+    if(!m||!Number.isSafeInteger(+m[2]))fail('trades.csv '+r.id+': '+col+'은 이름 양의정수 모양이어야 한다');
+    idOf(m[1],'trades.csv '+r.id+' '+col);
+  }
+}
 
 /* 수치 표는 한 줄에 값 하나. 필수 id는 웹이 쓰는 계약이며 기본 수치를 복사해 두지 않는다. */
 function numericTable(name,label,required){
@@ -154,7 +222,7 @@ for(const id of ['root','ssari','kkoe','eoksae','seogi','darae_vine']){
   requireValue(width>0&&width+MINIGAMES.gather_help_width<=MINIGAMES.gather_zone_span&&MINIGAMES.gather_zone_start+MINIGAMES.gather_zone_span<=100,'minigames.csv: '+id+' 채집 판정 범위가 막대를 벗어난다');
 }
 
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,NOTES,MINIGAMES,TUNING,PROGRESS},null,1)+";\n";
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}
