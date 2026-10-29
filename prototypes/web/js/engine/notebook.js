@@ -57,8 +57,8 @@ function drawingFor(e,dad){
 }
 
 let noteTab='animal';
-function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;}}
-document.querySelectorAll('#noteTabs button').forEach(b=>b.onclick=()=>{noteTab=b.dataset.tab;renderNotebook();$('noteBody').scrollTop=0;});
+function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){Sound.panel(true);renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;}}
+document.querySelectorAll('#noteTabs button').forEach(b=>b.onclick=()=>{if(noteTab!==b.dataset.tab)Sound.tab();noteTab=b.dataset.tab;renderNotebook();$('noteBody').scrollTop=0;});
 $('btnNote').onclick=()=>{if(G.started&&!open('dlg')&&!openMinigame())toggleNote();};
 $('noteClose').onclick=closePanels;
 function renderNotebook(){

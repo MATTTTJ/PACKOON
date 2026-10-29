@@ -37,38 +37,6 @@ function steamSay(kind){
   sm.lastLine=choices[Math.floor(Math.random()*choices.length)];sm.voice=kind;sm.voiceCool=150;
   $('steamHint').textContent='모락: “'+sm.lastLine+'”';
 }
-// 김 올리기 전용 합성음. AudioContext 생성은 steamHit의 사용자 입력에서만 허용한다.
-// 공통 sound.js로 옮길 때 이 함수와 ctx/enabled 상태만 떼어 내면 된다.
-const steamAudio={ctx:null,enabled:true};
-function steamSound(kind,userInput=false){
-  if(!steamAudio.enabled)return;
-  try{
-    if(!steamAudio.ctx){if(!userInput)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;steamAudio.ctx=new AC();}
-    const a=steamAudio.ctx;if(a.state==='suspended'){if(userInput)a.resume().catch(()=>{});return;}
-    if(a.state!=='running')return;
-    const now=a.currentTime,duration=kind==='fan'?0.16:kind==='lid'?0.08:0.12;
-    const gain=a.createGain();gain.gain.setValueAtTime(0.0001,now);
-    gain.gain.exponentialRampToValueAtTime(kind==='lid'?0.035:0.025,now+0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001,now+duration);gain.connect(a.destination);
-    let source;
-    if(kind==='fan'){
-      const buffer=a.createBuffer(1,Math.ceil(a.sampleRate*duration),a.sampleRate),data=buffer.getChannelData(0);
-      for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
-      source=a.createBufferSource();source.buffer=buffer;
-      const filter=a.createBiquadFilter();filter.type='lowpass';filter.frequency.value=900;source.connect(filter);filter.connect(gain);
-    }else{
-      source=a.createOscillator();source.type=kind==='lid'?'triangle':'sine';
-      source.frequency.setValueAtTime(kind==='lid'?420:150,now);
-      source.frequency.exponentialRampToValueAtTime(kind==='lid'?170:65,now+duration);source.connect(gain);
-    }
-    source.onended=()=>{source.disconnect();gain.disconnect();};source.start(now);source.stop(now+duration);
-  }catch(_){/* 소리를 쓸 수 없는 환경에서도 계속 진행한다. */}
-}
-const steamMute=el('button','btn');steamMute.type='button';steamMute.textContent='김 올리기 소리 끄기';
-steamMute.setAttribute('aria-pressed','true');steamMute.onclick=()=>{
-  steamAudio.enabled=!steamAudio.enabled;steamMute.textContent='김 올리기 소리 '+(steamAudio.enabled?'끄기':'켜기');
-  steamMute.setAttribute('aria-pressed',String(steamAudio.enabled));
-};steamP.appendChild(steamMute);
 function openSteam(){
   Object.assign(sm,{fire:25,steam:0,prog:0,cool:0,t:0,danger:0,close:false,state:'playing',wind:0,windDone:false,voice:'',voiceCool:0});
   $('steamBtn').innerHTML='부채질 <kbd>Space · J</kbd>';
@@ -116,14 +84,14 @@ function steamStep(){
     else if(sm.t>120&&sm.fire<35)steamSay('low');
     else if(inBand)steamSay('good');
   }
-  if(sm.t%36===0&&sm.steam>40)steamSound(sm.steam>82?'lid':'bubble');
+  if(sm.t%36===0&&sm.steam>40)Sound.steam(sm.steam>82?'lid':'bubble');
   drawSteam();
 }
 function steamHit(){
   if(steamP.hidden)return;
-  if(sm.state==='failed'){openSteam();steamSound('fan',true);return;}
+  if(sm.state==='failed'){openSteam();Sound.steam('fan');return;}
   if(sm.state!=='playing'||sm.cool>0)return;
-  sm.cool=6;sm.fire=Math.min(100,sm.fire+12);steamSound('fan',true);
+  sm.cool=6;sm.fire=Math.min(100,sm.fire+12);Sound.steam('fan');
 }
 $('steamBtn').addEventListener('pointerdown',e=>{e.preventDefault();steamHit();});scv.addEventListener('pointerdown',e=>{e.preventDefault();steamHit();});
 defineMinigame({id:'steam',step:()=>{
@@ -248,7 +216,7 @@ function rhMiss(n,now){if(n)n.st=2;rh.combo=0;rh.label='빗나감';rh.flashUntil
 function rhythmStep(){
   if(rh.done||rh.paused!==null)return;
   if(!rh.ready){
-    if(!Sound.initialized&&(window.AudioContext||window.webkitAudioContext))return;
+    if(!Sound.initialized)return;
     if(!Sound.context||Sound.context.state==='running')rhStart();else return;
   }
   const now=rhNow();rhSchedule();

@@ -129,9 +129,9 @@ function drawStack(){
 function stackStep(){st.t++;if(st.cool>0)st.cool--;if(st.shake>0)st.shake--;drawStack();}
 function stackHit(){
   if(st.cool>0||st.hits>=3)return;st.cool=14;
-  if(Math.abs(sway())<=st.zone){st.hits++;$('shint').textContent=['탁. 돌이 자리를 잡았다.','탁. 돌탑이 숨을 고른다.','…탁.'][st.hits-1];
+  if(Math.abs(sway())<=st.zone){Sound.stone(true);st.hits++;$('shint').textContent=['탁. 돌이 자리를 잡았다.','탁. 돌탑이 숨을 고른다.','…탁.'][st.hits-1];
     if(st.hits>=3){drawStack();setTimeout(finishStack,420);}}
-  else{st.miss++;st.shake=24;
+  else{Sound.stone(false);st.miss++;st.shake=24;
     if(st.miss>=2){st.zone=0.34;$('shint').textContent='돌쇠 할배: "서두르지 마라. 돌이 가운데 설 때를 기다려." (가운데가 넓어졌다)';}
     else $('shint').textContent='와르르… 돌이 미끄러졌다. 꼭대기가 가운데 올 때를 노리자.';}
   drawStack();

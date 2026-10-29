@@ -108,10 +108,10 @@ function forgeStep(){
 function strike(){
   if(forge.cool>0||forge.hits>=3)return;forge.cool=14;
   if(forge.pos>=forge.zone[0]&&forge.pos<=forge.zone[1]){
-    forge.hits++;$('fhint').textContent=['쾅! 불꽃이 튄다.','쾅! 날이 서기 시작한다.','쾅!'][forge.hits-1];
+    Sound.forge(true);forge.hits++;$('fhint').textContent=['쾅! 불꽃이 튄다.','쾅! 날이 서기 시작한다.','쾅!'][forge.hits-1];
     if(forge.hits>=3){drawForge();setTimeout(finishForge,380);}
   }else{
-    forge.miss++;
+    Sound.forge(false);forge.miss++;
     if(forge.miss>=2){forge.zone=[32,68];$('fhint').textContent='무쇠: "급하다. 가운데, 제일 빨갈 때다." (판정이 넓어졌다)';}
     else $('fhint').textContent='팅… 박자가 어긋났다. 가운데 빛나는 곳을 노리자.';
   }

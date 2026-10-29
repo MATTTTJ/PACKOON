@@ -31,14 +31,17 @@ function step(){
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
   G.vx=ax*(G.attackT>0&&G.onGround?0.7:1.7);if(ax)G.face=ax>0?1:-1;
-  if(jumpQ&&G.onGround){G.vy=-5.4;G.onGround=false;}jumpQ=false;
+  if(jumpQ&&G.onGround){Sound.jump();G.vy=-5.4;G.onGround=false;}jumpQ=false;
   G.vy=Math.min(6,G.vy+0.32);
+  const wasGrounded=G.onGround,prevX=G.px;
   const prevY=G.py;G.px+=G.vx;G.py+=G.vy;
   G.px=clamp(G.px,16,REG.maxX());
   G.onGround=false;
   if(G.py>=GROUND){G.py=GROUND;G.vy=0;G.onGround=true;}
   else if(G.vy>=0){for(const p of REG.platforms){if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
-  if(atkQ&&G.attackT<=0)G.attackT=18;atkQ=false;
+  if(!wasGrounded&&G.onGround)Sound.land();
+  if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
+  if(atkQ&&G.attackT<=0){Sound.swing();G.attackT=18;}atkQ=false;
   if(G.attackT>0){G.attackT--;if(G.attackT===9)doHit();}
   if(G.hurtT>0)G.hurtT--;
   for(const a of G.pickups){if(!a.got&&Math.abs(a.x-G.px)<10&&Math.abs(a.y-G.py)<16){a.got=true;addItem(a.item,1);if(REG.onPickup)REG.onPickup(a);}}

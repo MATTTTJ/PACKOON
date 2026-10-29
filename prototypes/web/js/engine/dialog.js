@@ -11,11 +11,11 @@ function showLine(){
   if(L[2]){
     $('dlgNext').hidden=true;
     L[2].forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.textContent=c.t;
-      b.onclick=e=>{e.stopPropagation();$('dlg').hidden=true;dlgQ=[];dlgEnd=null;if(c.go)c.go();};ch.appendChild(b);});
+      b.onclick=e=>{e.stopPropagation();Sound.paper();$('dlg').hidden=true;dlgQ=[];dlgEnd=null;if(c.go)c.go();};ch.appendChild(b);});
     setTimeout(()=>{const f=ch.querySelector('button');if(f&&matchMedia('(pointer:fine)').matches)f.focus();},0);
   }else $('dlgNext').hidden=false;
 }
-function advance(){if($('dlgChoices').children.length)return;showLine();}
+function advance(){if($('dlgChoices').children.length)return;Sound.paper();showLine();}
 $('dlg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')advance();});
 
 /* 지역의 NPC: {id, name, x, talk(), draw(x,y,방향), props(npc)?, prompt?(말 걸기 대신 쓸 안내 글, 예: 숙소 마루에서 쉬기)} */

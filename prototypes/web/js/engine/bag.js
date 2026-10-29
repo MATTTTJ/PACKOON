@@ -1,8 +1,8 @@
 'use strict';
 /* 패널(보따리·책) 열고 닫기, 보따리 + 가보 가공대 */
-function closePanels(){if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;$('notebook').hidden=true;}
-function toggleBag(){const o=$('bag').hidden;closePanels();if(o){bagKind='전체';selItem=null;lastOut=null;pouchMsg='';renderBag();$('bag').hidden=false;$('bagBody').scrollTop=0;}}
-function toggleBook(){const o=$('book').hidden;closePanels();if(o){renderBook();$('book').hidden=false;}}
+function closePanels(){if(['bag','book','notebook'].some(id=>!$(id).hidden))Sound.panel(false);if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;$('notebook').hidden=true;}
+function toggleBag(){const o=$('bag').hidden;closePanels();if(o){Sound.panel(true);bagKind='전체';selItem=null;lastOut=null;pouchMsg='';renderBag();$('bag').hidden=false;$('bagBody').scrollTop=0;}}
+function toggleBook(){const o=$('book').hidden;closePanels();if(o){Sound.panel(true);renderBook();$('book').hidden=false;}}
 $('btnBag').onclick=()=>{if(G.started&&!G.ended&&!open('dlg')&&!openMinigame())toggleBag();};
 $('btnBook').onclick=()=>{if(G.started&&!open('dlg')&&!openMinigame())toggleBook();};
 $('bagClose').onclick=closePanels;$('bookClose').onclick=closePanels;
@@ -24,6 +24,7 @@ const BAG_KINDS=['전체','재료','먹을거리','도구','귀한 것'];
 let bagKind='전체';
 function selectBagKind(kind){
   if(!BAG_KINDS.includes(kind))return;
+  if(bagKind!==kind)Sound.tab();
   bagKind=kind;selItem=null;renderBag();$('bagBody').scrollTop=0;
   const tab=document.querySelector('#bagBody .bag-tab[aria-pressed="true"]');if(tab)tab.focus({preventScroll:true});
 }
@@ -43,7 +44,7 @@ function putIn(id){
   pouch.items.push(id);lastOut=null;pouchMsg=liveHint();refreshHud();renderBag(true);
 }
 function takeOut(i){if(brewing)return;const id=pouch.items.splice(i,1)[0];if(!id)return;G.inv[id]=(G.inv[id]||0)+1;lastOut=null;pouchMsg=liveHint();refreshHud();renderBag();}
-function switchTool(t){if(brewing||t===pouch.tool)return;returnPouch();pouch.tool=t;lastOut=null;pouchMsg='';renderBag();}
+function switchTool(t){if(brewing||t===pouch.tool)return;Sound.tab();returnPouch();pouch.tool=t;lastOut=null;pouchMsg='';renderBag();}
 function craft(){
   if(brewing||!pouch.items.length)return;
   const r=matchRecipe();const box=document.querySelector('#bagBody .pouch');
@@ -57,7 +58,7 @@ function craft(){
   document.querySelectorAll('#bagBody .inslot').forEach(x=>x.classList.add('sucked'));
   const btn=$('craftBtn');if(btn)btn.disabled=true;
   setTimeout(()=>{
-    brewing=false;addItem(r.out,r.n);lastOut=r.out;
+    Sound.craft();brewing=false;addItem(r.out,r.n);lastOut=r.out;
     pouchMsg=ITEMS[r.out].n+' '+r.n+'개가 보따리로 들어갔다.';
     const fk='crafted_'+tool;
     if(!G.f[fk]){G.f[fk]=true;if(HEIR[tool].firstCraft)diary(fk,HEIR[tool].firstCraft);}

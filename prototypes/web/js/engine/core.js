@@ -60,6 +60,7 @@ function baseState(){return{
 /* 지역에 들어간다. 지역의 newState() 가운데 inv 는 보따리에 더하고, rel 은 처음 만나는 NPC만 넣고,
    f(진행 표시)는 합친다. 나머지(필드에 놓인 것)는 새 지역 것으로 바꾼다 */
 function enterRegion(g,r){
+  if(g===G&&g.region&&g.region!==r.id)Sound.travel();
   const ns=r.newState();
   for(const k in ns){
     if(k==='inv'){for(const i in ns.inv)g.inv[i]=(g.inv[i]||0)+ns.inv[i];}
@@ -80,6 +81,7 @@ const heldTool=()=>G.tool;
 
 function has(id,n){return (G.inv[id]||0)>=(n||1);}
 function addItem(id,n){
+  if(n>0)Sound.item();
   G.inv[id]=(G.inv[id]||0)+n;
   if(learn('got:'+id,true)&&NOTES[id])toast('수첩에 붓으로 그렸다 · '+ITEMS[id].n);
   else toast('+ '+ITEMS[id].n+(n>1?' ×'+n:''));
@@ -89,7 +91,7 @@ function takeItem(id,n){G.inv[id]=(G.inv[id]||0)-n;if(G.inv[id]<=0)delete G.inv[
 function diary(id,text){if(G.diary.some(d=>d.id===id))return;G.diary.push({id,text});}
 function clue(id,who,text){if(G.clues.some(c=>c.id===id))return;G.clues.push({id,who,text});setTimeout(()=>toast('아빠 단서를 찾았다 ('+G.clues.length+'/'+clueTotalSoFar()+')'),900);}
 function ledger(id,npc,want,give){if(!G.ledger[id])G.ledger[id]={npc,want,give,done:false};}
-function ledgerDone(id){if(G.ledger[id])G.ledger[id].done=true;}
+function ledgerDone(id){if(G.ledger[id]&&!G.ledger[id].done){Sound.exchange();G.ledger[id].done=true;}}
 function rel(id,d){G.rel[id].v+=d;}
 
 let toastT=0;

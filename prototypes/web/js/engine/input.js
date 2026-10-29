@@ -12,6 +12,7 @@ let jumpQ=false,atkQ=false;
 const isLeft=()=>keys['arrowleft']||keys['a']||touch.left;
 const isRight=()=>keys['arrowright']||keys['d']||touch.right;
 addEventListener('keydown',e=>{
+  if(e.target instanceof HTMLElement&&(e.target.matches('input,textarea,select')||e.target.isContentEditable))return;
   const k=e.key.toLowerCase();
   if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
   const first=!keys[k];keys[k]=true;
@@ -21,6 +22,7 @@ addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;touch.left=touch.right=false;});
 
 function onPress(k){
+  if(k==='m'){Sound.toggle();return;}
   if(!G.started||G.ended)return;
   if(B){
     if(!$('bResult').hidden){if(k==='enter'||k==='e'||k===' ')$('bResOk').click();return;}
