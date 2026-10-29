@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>너구리 보부상</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <div class="brand"><h1>너구리 <span>보부상</span></h1><span class="tag" id="regionTag"></span></div>
+    <p id="regionSub"></p>
+  </header>
+
+  <div class="shell" id="shell">
+    <div class="stage" id="stage">
+      <canvas id="cv" width="400" height="225" aria-label="게임 화면"></canvas>
+      <div class="hud">
+        <div class="hud-left">
+          <div class="status"><div class="hearts" id="hearts"></div><div class="tool" id="toolLabel"></div></div>
+          <div class="goal" id="goal" hidden></div>
+        </div>
+        <div class="hud-btns">
+          <button class="chipbtn" id="btnBag" type="button">보따리 <kbd>I</kbd></button>
+          <button class="chipbtn" id="btnBook" type="button">책 <kbd>B</kbd></button>
+        </div>
+      </div>
+      <div class="bossbar" id="bossbar" hidden><span id="bossName"></span><div class="track"><div class="fill" id="bossfill"></div></div></div>
+      <div class="prompt" id="prompt" hidden></div>
+      <div class="toast" id="toast" hidden></div>
+      <div class="battle" id="battle" hidden>
+        <canvas id="bcv" aria-label="전투 화면"></canvas>
+        <div class="b-top">
+          <div class="b-enemy"><div class="b-name" id="bName"></div><div class="b-parts" id="bParts"></div></div>
+          <div class="b-me">
+            <div class="hearts" id="bHearts"></div>
+            <div class="b-calm"><span id="bCalmLabel">진정</span><div class="track"><div class="fill" id="bCalm"></div></div></div>
+            <div class="b-btns"><button class="bbtn" id="bHit" type="button">치기 <kbd>J</kbd></button><button class="bbtn" id="bGift" type="button">선물 <kbd>K</kbd></button><button class="bbtn" id="bFlee" type="button">물러나기</button></div>
+          </div>
+        </div>
+        <div class="b-gift" id="bGiftMenu" hidden>
+          <div class="b-gift-head"><span>무엇을 건넬까?</span><button class="x" id="bGiftClose" type="button" aria-label="닫기">×</button></div>
+          <span class="small" id="bGiftHint">좋아하는 걸 주면 마음이 누그러진다. 건넨 물건은 돌아오지 않는다.</span>
+          <div class="b-gift-grid" id="bGiftGrid"></div>
+        </div>
+        <div class="b-result" id="bResult" hidden>
+          <div class="b-card"><div class="kicker" id="bResKick"></div><h2 id="bResTitle"></h2><p id="bResText"></p><div class="b-loot" id="bLoot"></div><button class="btn primary" id="bResOk" type="button">계속</button></div>
+        </div>
+      </div>
+      <div class="ink" id="ink" hidden><span id="inkText">전투</span></div>
+    </div>
+
+    <div class="pad" id="pad" aria-label="터치 조작">
+      <div class="pad-top">
+        <div class="goal-m" id="goalM"><b>지금 할 일</b><span></span></div>
+        <button class="chipbtn" data-k="bag" type="button">보따리</button>
+        <button class="chipbtn" data-k="book" type="button">책</button>
+      </div>
+      <div class="pad-main">
+        <div class="dpad"><button class="pbtn v" data-k="up" type="button" aria-label="위">▲</button><button class="pbtn" data-k="left" type="button" aria-label="왼쪽">◀</button><button class="pbtn v" data-k="down" type="button" aria-label="아래">▼</button><button class="pbtn" data-k="right" type="button" aria-label="오른쪽">▶</button></div>
+        <div class="acts">
+          <button class="pbtn talk" data-k="talk" id="padTalk" type="button">말걸기</button>
+          <button class="pbtn jump" data-k="jump" type="button">점프</button>
+          <button class="pbtn atk" data-k="atk" type="button">휘두르기</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog" id="dlg" hidden>
+      <div class="face" id="dlgFace"></div>
+      <div class="dbody">
+        <div class="who" id="dlgWho"></div>
+        <div class="text" id="dlgText"></div>
+        <div class="choices" id="dlgChoices"></div>
+        <div class="next" id="dlgNext">눌러서 계속 · <kbd>E</kbd></div>
+      </div>
+    </div>
+
+    <div class="panel" id="bag" hidden>
+      <div class="grip"></div>
+      <div class="panel-head"><h2>보따리</h2><button class="x" id="bagClose" type="button" aria-label="닫기">×</button></div>
+      <div class="panel-body" id="bagBody"></div>
+    </div>
+
+    <div class="panel" id="book" hidden>
+      <div class="grip"></div>
+      <div class="panel-head"><h2>너구리의 책</h2><button class="x" id="bookClose" type="button" aria-label="닫기">×</button></div>
+      <div class="tabs" role="tablist" id="bookTabs">
+        <button role="tab" data-tab="diary" type="button">일기</button>
+        <button role="tab" data-tab="clues" type="button">아빠 단서</button>
+        <button role="tab" data-tab="dex" type="button">도감</button>
+        <button role="tab" data-tab="ledger" type="button">물품 장부</button>
+      </div>
+      <div class="panel-body" id="bookBody"></div>
+    </div>
+
+    <div class="forge" id="forge" hidden>
+      <h2 id="forgeTitle"></h2>
+      <div class="bar" id="fbar"><div class="zone" id="fzone"></div><div class="mark" id="fmark"></div></div>
+      <div class="pips" id="fpips"></div>
+      <div class="fhint" id="fhint"></div>
+      <button class="btn primary strike" id="fstrike" type="button">내려치기 <kbd>Space · J</kbd></button>
+    </div>
+
+    <div class="forge gather" id="gather" hidden>
+      <h2 id="gTitle">칡뿌리 캐기</h2>
+      <div class="bar soil" id="gbar"><div class="zone" id="gzone"></div><div class="mark" id="gmark"></div></div>
+      <div class="pips" id="gpips"></div>
+      <div class="fhint" id="ghint"></div>
+      <button class="btn primary strike" id="gstrike" type="button">캐기</button>
+    </div>
+
+    <div class="cover" id="titleScreen">
+      <div class="cover-card">
+        <div class="kicker" id="titleKicker"></div>
+        <h2 id="titleHead"></h2>
+        <div class="cover-body" id="titleBody"></div>
+        <div class="row"><button class="btn primary" id="btnStart" type="button"></button></div>
+        <div class="meta how-keys">←→ 이동 · Space 점프 · J 휘두르기 · E 말걸기 · I 보따리 · B 책</div>
+        <div class="meta how-touch">아래 버튼으로 움직이고, 동물 근처에서 말걸기를 누르세요. 휴대폰을 가로로 돌리면 화면이 커집니다.</div>
+      </div>
+    </div>
+
+    <div class="cover" id="endScreen" hidden>
+      <div class="cover-card">
+        <div class="kicker" id="endKicker"></div>
+        <h2 id="endHead"></h2>
+        <div class="cover-body" id="endBody"></div>
+        <div class="stats" id="endStats"></div>
+        <div class="row"><button class="btn" id="btnBookEnd" type="button">너구리의 책 보기</button><button class="btn primary" id="btnRestart" type="button">처음부터</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="keys">
+    <span><kbd>←</kbd><kbd>→</kbd> 또는 <kbd>A</kbd><kbd>D</kbd> 이동</span>
+    <span><kbd>Space</kbd> 점프</span>
+    <span><kbd>J</kbd> 휘두르기 (채집·전투)</span>
+    <span><kbd>E</kbd> 말걸기·대화 넘기기</span>
+    <span><kbd>I</kbd> 보따리</span>
+    <span><kbd>B</kbd> 너구리의 책</span>
+  </div>
+</div>
+
+<!-- 빌드 없이 차례대로 읽는다. 순서: 공통 엔진 → 공통 데이터 → 지역 → 시작(game.js) -->
+<script src="js/engine/core.js"></script>
+<script src="js/engine/input.js"></script>
+<script src="js/engine/dialog.js"></script>
+<script src="js/engine/gather.js"></script>
+<script src="js/engine/icons.js"></script>
+<script src="js/engine/field.js"></script>
+<script src="js/engine/hud.js"></script>
+<script src="js/engine/bag.js"></script>
+<script src="js/engine/book.js"></script>
+<script src="js/engine/battle-ink.js"></script>
+<script src="js/engine/battle.js"></script>
+<script src="js/engine/battle-attacks.js"></script>
+<script src="js/data/common.js"></script>
+<!-- 지역 1: 갈참골. 지역을 더할 때는 그 지역 폴더의 파일을 이 아래에 같은 모양으로 덧붙인다 -->
+<script src="js/regions/galchamgol/region.js"></script>
+<script src="js/regions/galchamgol/art.js"></script>
+<script src="js/regions/galchamgol/field.js"></script>
+<script src="js/regions/galchamgol/enemies.js"></script>
+<script src="js/regions/galchamgol/story.js"></script>
+<script src="js/engine/game.js"></script>
+</body>
+</html>
