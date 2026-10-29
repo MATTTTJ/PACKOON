@@ -55,12 +55,8 @@ const Rg=defineRegion('jangteo',{
   ],
 });
 
-/* [시험판] 저장에 없는 플래그는 거짓으로 읽는다. 다른 지역의 상태는 바꾸지 않는다. */
-Rg.arcs=()=>{
-  const ARCS=/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
-  if(ARCS&&G&&G.f)G.f.arcs=true;
-  return ARCS;
-};
+/* 사연 설정은 새 게임·저장 복원 때 정한 공통 판정을 따른다. */
+Rg.arcs=arcsEnabled;
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({

@@ -5,12 +5,8 @@
 const Rg=REGIONS.galchamgol;
 const MG=TABLES.MINIGAMES;
 
-/* [시험판] 저장을 읽은 뒤에도 판단한다. 다른 지역은 galArcNal1을 읽어 첫 거래를 기억할 수 있다. */
-Rg.arcsEnabled=()=>{
-  const ARCS=/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
-  if(ARCS)G.f.arcs=true;
-  return ARCS;
-};
+/* 사연 설정은 새 게임·저장 복원 때 정한 공통 판정을 따른다. */
+Rg.arcsEnabled=arcsEnabled;
 function arcScene(flag,lines,entry,apply,next){
   if(!Rg.arcsEnabled()||G.f[flag])return;
   const owner=G;
