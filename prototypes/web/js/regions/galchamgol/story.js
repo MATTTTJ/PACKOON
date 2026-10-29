@@ -50,10 +50,11 @@ function nalTrade(){
   if(!(has('powder')&&has('root'))){talk([['날쌘','빈손으로 흥정하는 건 보부상 실례야. 도토리 가루 하나, 칡뿌리 하나. 그럼 숯 줄게.'],['날쌘','칡뿌리? 반짝이는 흙더미를 곡괭이로 파 봐. 보부상이 그것도 몰라?']]);return;}
   takeItem('powder',1);takeItem('root',1);G.f.nalDone=true;ledgerDone('nal');
   const extra=G.rel.nal.v>0;
-  addItem('coal',extra?2:1);
+  addItem('coal',extra?2:1);if(extra)learn('nal:bluff-paid');
   talk(extra?[['날쌘','자, 진짜 숯이다. 덤으로 하나 더.'],['날쌘','다신 촌구석이라고 하지 마라. 알았지?']]:[['날쌘','거래 성립. 숯 하나.'],['날쌘','무쇠 영감한테 가져가려고? 그 영감 까다로워.']]);
 }
 function nalYakyeon(){
+  learn('nal:yakyeon');
   clue('n1','날쌘','날쌘은 약연을 보더니 "네 아빠 거잖아"라며 받지 않았다. 떠돌이 보부상들도 아빠를 안다.');
   talk([['날쌘','…야, 이거 네 아빠 거잖아.'],['날쌘','보부상이 남의 집 가업 물건 받으면 그날로 장사 끝이야. 도로 넣어 둬.'],['날쌘','네 아빠는… 아니다. 갈 길이나 가.']]);
 }
@@ -124,7 +125,7 @@ function finishForge(){
   $('forge').hidden=true;
   takeItem('coal',1);
   let sharp=false;if(has('coal')){takeItem('coal',1);sharp=true;}
-  G.tool='sickle';G.sharp=sharp;G.f.musoeDone=true;ledgerDone('musoe');rel('musoe',1);
+  G.tool='sickle';G.sharp=sharp;G.f.musoeDone=true;learn('musoe:forge');ledgerDone('musoe');rel('musoe',1);
   diary('sickle','아빠의 낫을 받았다. 손잡이에 아빠 손때가 묻어 있다.');
   clue('m2','무쇠','아빠는 대장간에서 사흘을 묵으며 밤마다 낡은 장부만 들여다봤다.');
   toast('아빠의 낫을 얻었다!'+(sharp?' 날이 더 날카롭다':''));

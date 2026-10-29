@@ -9,13 +9,14 @@ const Rg=REGIONS.dolneomeo;
 function talkKku(){
   const F=G.f;F.kkuTalk=true;
   if(!Rg.kkuAwakeNow()){
+    learn('kkubeogi:sleep');
     if(!G.clues.some(c=>c.id==='k1')){
       clue('k1','꾸벅이','꾸벅이의 잠꼬대: 보부상 아저씨가 할배네서 겨울을 날 것처럼 굴더니, 글자 하나를 읽고는 그날 밤 떠났다.');
       talk([['꾸벅이','쿨… 쿨…'],['꾸벅이','…보부상 아저씨… 할배네서 겨울 날 것처럼 굴더니…'],['꾸벅이','…글자 하나 읽고는… 그날 밤 떠났어… 쿨…'],['너구리','(잠꼬대다. 고개를 들 때 말을 걸어야 깨울 수 있겠다.)']]);
     }else talk([['꾸벅이','쿨… 쿨…'],['너구리','(고개를 들 때 말을 걸어 보자.)']]);
     return;
   }
-  if(!F.kkuAwake){F.kkuAwake=true;rel('kkubeogi',1);
+  if(!F.kkuAwake){F.kkuAwake=true;rel('kkubeogi',1);learn('kkubeogi:awake');
     ledger('kkubeogi','꾸벅이','마른 억새 3','서리다래가 있는 곳');
     talk([['꾸벅이','…어, 어? 안 잤어. 진짜야.'],['꾸벅이','너 처음 보는 너구리네. 그 모자, 어디서 봤더라… 하암.'],
       ['꾸벅이','나 겨울잠 둥지를 지어야 하는데 억새가 모자라. 들판의 하얗게 센 억새 세 단만 베어다 줄래?'],
@@ -31,7 +32,7 @@ function talkKku(){
 }
 function kkuTrade(){
   talk([['꾸벅이','오, 억새다! 줄 거지?',[{t:'마른 억새 3단을 건넨다',go:()=>{
-    takeItem('eoksae',3);G.f.kkuDone=true;ledgerDone('kkubeogi');rel('kkubeogi',1);
+    takeItem('eoksae',3);G.f.kkuDone=true;ledgerDone('kkubeogi');rel('kkubeogi',1);learn('kkubeogi:eoksae');
     diary('d_kku','꾸벅이에게 억새를 주고 들었다. 서리다래는 돌산 절벽 바위턱에 있다. 성황당 돌무더기가 밤마다 움직인 뒤로, 장승지기 뿔이가 돌산 길을 닫았다.');
     const lines=[['꾸벅이','와, 폭신폭신하다… 고마워.'],['꾸벅이','서리다래 말이지? 돌산 절벽 바위턱에 열려. 첫서리를 맞아야 달아지거든.'],
       ['꾸벅이','근데 성황당 돌무더기가 밤마다 움직인 뒤로, 장승지기 뿔이가 돌산 길을 닫아 버렸어.']];
@@ -62,7 +63,7 @@ function nalTrade(id){
   const F=G.f;
   takeItem(id,id==='kflower'?1:2);F.nalDDone=true;ledgerDone('nal_dolneomeo');
   const n=(id==='kflower'?2:1)+(F.nalDBluff?1:0);
-  addItem('gyeolmyeongja',n);
+  addItem('gyeolmyeongja',n);learn('nal:dolneomeo');
   diary('d_nal','갈참골에서는 흔하던 '+(id==='kflower'?'칡꽃을':'겨우살이를')+' 날쌘이 결명자와 바꿔 주었다. 같은 물건도 마을마다 값이 다르다.');
   talk(F.nalDBluff?[['날쌘','흔해 빠졌다더니 냄새는 기가 막히네. 자, 결명자. 덤까지 얹었다.'],['날쌘','날쌘이 짠돌이란 소리는 못 듣지.']]
     :[['날쌘','거래 성립. 결명자 '+n+'개.'],['날쌘','눈 밝히는 약재야. 쓸 데가 있을걸.']]);
@@ -94,7 +95,7 @@ function talkDolsoe(){
 }
 function dolsoeTea(){
   talk([['돌쇠 할배','…이 냄새는 결명자로구나.',[{t:'결명자 차를 달여 드린다',go:()=>{
-    const F=G.f;takeItem('gyeolmyeongja',1);F.dolsoeTea=true;rel('dolsoe',1);
+    const F=G.f;takeItem('gyeolmyeongja',1);F.dolsoeTea=true;rel('dolsoe',1);learn('dolsoe:tea');
     ledger('dolsoe','돌쇠 할배','결명자 1','맷돌을 깨움');
     diary('d_dolsoe','돌쇠 할배가 보따리 속 맷돌의 자개 발자국을 손끝으로 더듬더니, 우리 집안 맷돌이라는 걸 알아봤다.');
     talk([['돌쇠 할배','…눈이 좀 밝아지는구나. 고맙다.'],['돌쇠 할배','그 보따리, 이리 줘 보거라.'],
@@ -140,7 +141,7 @@ scv.addEventListener('pointerdown',e=>{e.preventDefault();stackHit();});
 defineMinigame({id:'stack',step:stackStep,hit:stackHit});
 function finishStack(){
   panel.hidden=true;const F=G.f;const perfect=st.miss===0;
-  F.stackDone=true;awaken('maetdol');ledgerDone('dolsoe');rel('dolsoe',perfect?2:1);
+  F.stackDone=true;awaken('maetdol');learn('dolsoe:stack');ledgerDone('dolsoe');rel('dolsoe',perfect?2:1);
   clue('s1','돌쇠 할배','아빠도 돌쇠 할배에게 약연 바퀴의 낯선 글자를 읽어 달라고 했다. 할배는 글자 하나만 읽어 주었고, 아빠는 그날 밤 떠났다.');
   diary('d_maetdol','돌탑에 돌 세 개를 얹었다. 그 순간 보따리 속 맷돌에서 우웅, 낮은 소리가 났다. 증조할아버지의 맷돌이 깨어났다.');
   toast('증조할아버지의 맷돌이 깨어났다! 메밀 3 → 메밀가루 1');refreshHud();
@@ -168,7 +169,7 @@ function talkPpuri(){
     else talk([['뿔이','메밀가루. 원칙은 원칙이다.'],['뿔이','메밀은 거둔 밭에 떨어져 있다. 갈 도구가 없다면… 그건 네 사정이다.']]);
     return;
   }
-  if(F.golemCalm&&!F.seogiTold){F.seogiTold=true;rel('ppuri',1);Rg.addSeogiSpot();
+  if(F.golemCalm&&!F.seogiTold){F.seogiTold=true;rel('ppuri',1);Rg.addSeogiSpot();learn('ppuri:seogi');
     diary('d_seogi','돌 골렘을 달랬다는 말에 뿔이가 석이버섯 자리를 알려 주었다. 절벽 아래 백 년 바위다.');
     talk([['뿔이','돌무더기를 부수지 않고 달랬다고?'],['뿔이','…의리를 아는 녀석이구나. 하나 알려 주마.'],['뿔이','절벽 아래 백 년 바위에 석이버섯이 붙어 있다. 아무한테나 안 알려 주는 자리다.']]);
     return;

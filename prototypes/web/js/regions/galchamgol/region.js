@@ -8,7 +8,6 @@ const Rg=defineRegion('galchamgol',{
   world:2400,startX:70,
   platforms:[{x:330,y:160,w:64},{x:690,y:150,w:72},{x:990,y:158,w:60},{x:1310,y:150,w:66}],
   clueTotal:6,
-  dex:['acorn','root','ssari','kkoe','meoru','kflower'],
   gatherDiary:['gather','흙을 살살 달래 가며 뿌리를 캤다. 서두르면 뿌리가 다친다고 엄마가 그랬다.'],
   cover:{
     tag:'갈참골 체험판',sub:'엄마의 약을 찾아 떠난 첫 마을',ready:'갈참골로 떠날 준비',
@@ -40,7 +39,8 @@ const Rg=defineRegion('galchamgol',{
   /* ?region=dolneomeo 처럼 뒤 지역부터 바로 시작할 때, 갈참골을 이렇게 마친 것으로 친다 (확인용 바로가기) */
   finish(g){
     g.tool='sickle';g.sharp=false;g.inv={rice:1,acorn:2,root:1,kflower:1};
-    Rg.dex.forEach(id=>g.dex[id]=true);
+    ['acorn','root','ssari','kkoe','meoru','kflower','powder','coal','vine'].forEach(id=>g.learned.push('got:'+id));
+    ['dodam','nal','musoe','toad'].forEach(id=>g.learned.push('met:'+id));g.learned.push('fight:musoe','fight:kudzu');
     ['d1','n1','m1','m2','t1','h1'].forEach(id=>g.clues.push({id,who:'갈참골',text:'갈참골에서 찾은 단서 (바로가기로 시작해서 내용은 비어 있다)'}));
     g.diary.push({id:'skip_galchamgol',text:'(갈참골은 바로가기로 건너뛰었다.)'});
     Object.assign(g.f,{dodamDone:true,musoeDone:true,nalDone:true,toadMet:true});
@@ -48,7 +48,6 @@ const Rg=defineRegion('galchamgol',{
   },
   endStats:()=>[
     ['아빠 단서',G.clues.length+'/'+Rg.clueTotal],
-    ['도감',Object.keys(G.dex).length+'/'+Rg.dex.length],
     ['날쌘과의 경멸',G.rel.nal.v],
     ['쓰러진 횟수',G.f.faints],
   ],
@@ -62,7 +61,7 @@ defineItems({
   coal:{n:'숯',r:1,d:'참나무를 구워 만든 숯. 대장간 불의 밥.'},
   ssari:{n:'싸리버섯',r:2,d:'싸리 빗자루처럼 가늘게 갈라진 버섯. 가을 참나무 숲에 난다.'},
   kkoe:{n:'꾀꼬리버섯',r:2,d:'꾀꼬리 깃털처럼 노란 버섯. 은은한 살구 향이 난다.'},
-  meoru:{n:'해머루',r:3,d:'당산나무 꼭대기에만 열리는 머루. 해를 머금은 듯 알이 따뜻하다.',dad:'여기도 아니다.'},
+  meoru:{n:'해머루',r:3,d:'당산나무 꼭대기에만 열리는 머루. 해를 머금은 듯 알이 따뜻하다.'},
   vine:{n:'칡 줄기',r:1,d:'엉킨 칡의 덩굴손에서 얻은 질긴 줄기. 끈이나 바구니를 엮기 좋다.'},
   kflower:{n:'칡꽃',r:3,d:'엉킨 칡의 심에서 핀 보랏빛 꽃. 달큰한 향이 오래 남는다.'},
 });

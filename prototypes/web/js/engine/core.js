@@ -16,7 +16,7 @@ const HITKEY=TOUCH?'치기 버튼':'J 키';
 
 /* ---------- 등록소 ---------- */
 /* 아이템: id는 design/data/items.csv 의 id와 같다.
-   {n:이름, r:레어도 단계(0부터), d:설명, eat:먹으면 오르는 체력(선택), dad:도감의 아빠 메모(선택)} */
+   {n:이름, r:레어도 단계(0부터), d:설명(수첩에 내가 적는 글), eat:먹으면 오르는 체력(선택)} */
 const ITEMS={};
 function defineItems(map){Object.assign(ITEMS,map);}
 /* 손에 드는 연장 {n:이름, d:설명} */
@@ -42,9 +42,8 @@ const RCOL=['#9c8f78','#5f8a3a','#3f84b5','#8e4fc2','#d29a12'];
 let REG=null;   // 지금 지역
 let G;          // 게임 상태 (저장·복원되는 것은 여기에만 둔다)
 const regionList=()=>Object.values(REGIONS).sort((a,b)=>a.order-b.order);
-/* 지금 지역까지 지나온 지역들. 단서·도감 개수는 이 지역들을 모두 더해 센다 */
+/* 지금 지역까지 지나온 지역들. 아빠 단서 개수는 이 지역들을 모두 더해 센다 */
 const regionsSoFar=()=>regionList().filter(r=>r.order<=REG.order);
-const dexSoFar=()=>regionsSoFar().flatMap(r=>r.dex);
 const clueTotalSoFar=()=>regionsSoFar().reduce((s,r)=>s+r.clueTotal,0);
 function npcName(id){for(const r of regionList()){const n=(r.npcs||[]).find(n=>n.id===id);if(n)return n.name;}return id;}
 
@@ -55,7 +54,7 @@ function baseState(){return{
   hp:5,maxhp:5,attackT:0,hurtT:0,cam:0,
   inv:{},tool:'pick',sharp:false,
   awake:Object.keys(HEIR).filter(k=>HEIR[k].awakeAtStart),   // 깨어난 가보
-  clues:[],diary:[],dex:{},ledger:{},rel:{},f:{faints:0},
+  clues:[],diary:[],learned:[],ledger:{},rel:{},f:{faints:0},   // learned: 수첩에 적힌 것 (notebook.js)
 };}
 /* 지역에 들어간다. 지역의 newState() 가운데 inv 는 보따리에 더하고, rel 은 처음 만나는 NPC만 넣고,
    f(진행 표시)는 합친다. 나머지(필드에 놓인 것)는 새 지역 것으로 바꾼다 */
@@ -81,7 +80,7 @@ const heldTool=()=>G.tool;
 function has(id,n){return (G.inv[id]||0)>=(n||1);}
 function addItem(id,n){
   G.inv[id]=(G.inv[id]||0)+n;
-  if(dexSoFar().includes(id)&&!G.dex[id]){G.dex[id]=true;toast('도감에 붓으로 그렸다 · '+ITEMS[id].n);}
+  if(learn('got:'+id,true)&&NOTES[id])toast('수첩에 붓으로 그렸다 · '+ITEMS[id].n);
   else toast('+ '+ITEMS[id].n+(n>1?' ×'+n:''));
   refreshHud();
 }

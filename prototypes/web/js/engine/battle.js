@@ -31,7 +31,7 @@ function inkTransition(text,sx,cb){
 }
 /* onEnd(결과, {hits}) 결과는 'win' | 'calm' | 'lose' | 'flee' */
 function startBattle(kind,onEnd){
-  const E=ENEMIES[kind];
+  const E=ENEMIES[kind];learn('fight:'+kind);
   closePanels();$('dlg').hidden=true;
   B={kind,E,parts:E.parts.map(p=>Object.assign({},p,{max:p.hp,broken:false,shake:0})),calm:0,
     px:0,py:0,inv:0,st:'intro',t:90,cur:null,last:null,mark:null,bullets:[],fx:[],cool:0,swing:0,atkT:0,atkDur:0,
@@ -99,12 +99,12 @@ function breakPart(p){
   if(p.mat&&!p.core)B.loot.push(p.mat);
   if(p.core){if(p.mat)B.loot.push(p.mat);bEnd('win');return;}
   B.msg=B.E.npc?jo(p.name,'의','의')+' 기세를 꺾었다!':jo(p.name,'이','가')+' 부러졌다! '+(p.mat?ITEMS[p.mat].n+' 획득.':'');
-  if(B.parts.filter(q=>!q.core).filter(q=>q.broken).length===1)setTimeout(()=>{if(B&&B.st!=='end')B.msg=B.E.coreShown;},1300);
+  if(B.parts.filter(q=>!q.core).filter(q=>q.broken).length===1){learn('core:'+B.kind);setTimeout(()=>{if(B&&B.st!=='end')B.msg=B.E.coreShown;},1300);}
 }
 function bEnd(result){
   if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.bullets=[];
   B.msg=result==='win'?B.E.win:result==='calm'?B.E.calmWin:result==='flee'?'일단 물러나자.':B.E.lose;
-  if(result==='calm'&&B.E.calmGift)B.loot.push(B.E.calmGift);
+  if(result==='calm'){learn('calm:'+B.kind);if(B.E.calmGift)B.loot.push(B.E.calmGift);}
   if(result==='win'&&B.E.onWin)B.E.onWin(B);
   renderBHud();
 }
@@ -150,7 +150,7 @@ function openGift(){
 }
 function closeGift(){$('bGiftMenu').hidden=true;if(B)B.paused=false;}
 function giveGift(id){
-  takeItem(id,1);const v=B.E.likes[id];
+  takeItem(id,1);const v=B.E.likes[id];if(v)learn('like:'+B.kind+':'+id);
   B.calm=Math.min(100,B.calm+(v||8));
   B.msg=v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
   closeGift();renderBHud();
