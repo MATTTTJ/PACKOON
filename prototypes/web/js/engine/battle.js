@@ -6,6 +6,7 @@
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
          cover?:엄폐물, calmAction?:{amount:행동 진정량}, placeGift?:꼭대기에 얹을 선물 id,
+         forgeTrial?:{sequence:부위 id 순서, repeatText:두 번째 바퀴 대사},
          headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표,
          draw(c):수묵 그림, onWin(B)?:이겼을 때 보상 (B.loot 에 넣고 B.bonus 에 글)} */
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
@@ -44,10 +45,12 @@ function startBattle(kind,onEnd){
   document.body.classList.add('in-battle');$('battle').hidden=false;
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
   if(E.cover){B.covers=[];B.round=0;addCover(0.5,0.43);}
+  if(E.forgeTrial){B.forgeNext=null;B.handShown=false;B.handShow=0;}
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
   const gm=$('goalM');gm.querySelector('b').textContent='전투';gm.querySelector('span').textContent=E.dodge?'연장 없이 피하기만! 화면을 끌거나 십자 버튼으로 피하자.':'붉은 표식 위에서 치기. 화면을 끌거나 십자 버튼으로 피하자.';
   if(E.cover)gm.querySelector('span').textContent='돌 아래 여백에 손을 숨기자. 공격 뒤에는 표식 치기 또는 소원 돌 바로 놓기.';
+  if(E.forgeTrial)gm.querySelector('span').textContent='먹선이 생기면 작업대 밖으로! 풀무는 낮은 바람막이 뒤, 호통은 부채꼴 양옆으로.';
 }
 function setPadLabels(on){
   const j=document.querySelector('#pad [data-k="jump"]'),a=document.querySelector('#pad [data-k="atk"]');
@@ -100,6 +103,14 @@ function openCalmAction(){
 }
 function chooseAttack(){
   if(B.E.cover){B.round++;B.calmStone=null;}
+  if(B.E.forgeTrial){
+    const seq=B.E.forgeTrial.sequence,p=B.parts.find(p=>p.id===seq[B.survived%seq.length]);
+    B.cur=p;B.last=p;B.st='tell';B.t=60;B.hitThis=false;
+    B.msg=(B.survived>=seq.length?B.E.forgeTrial.repeatText+' ':'')+p.tell;
+    // 겹쳐 보인 풀무 예고에도 여기서부터 온전한 회피 시간을 준다.
+    const b=B.forgeNext||{k:p.atk,u:B.survived===3?0.74:0.35,tell:120,hold:28};
+    b.t=0;b.preview=false;B.forgeNext=null;B.bullets.push(b);return;
+  }
   const L=bLiving();let o=L.filter(p=>p!==B.last);if(!o.length)o=L;
   const p=o[Math.floor(Math.random()*o.length)];B.cur=p;B.last=p;B.st='tell';B.t=42;B.msg=p.tell;B.hitThis=false;
 }
@@ -118,7 +129,7 @@ function bHitMe(){
 }
 function bSplash(x,y,col){for(let i=0;i<9;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*2.4;B.fx.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:2+Math.random()*4,t:28,col:col||'#1d1814'});}}
 function bStrike(){
-  if(!B||B.paused||B.st==='end'||B.st==='giftPlace'||B.cool>0)return;
+  if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.cool>0)return;
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
   B.cool=16;B.swing=12;
   if(B.calmStone){const s=coverPoint(B.calmStone);
@@ -145,6 +156,7 @@ function breakPart(p){
 }
 function bEnd(result){
   if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.calmStone=null;B.bullets=[];
+  if(B.E.forgeTrial){B.forgeNext=null;B.handShow=0;}
   B.msg=result==='win'?B.E.win:result==='calm'?B.E.calmWin:result==='flee'?'일단 물러나자.':B.E.lose;
   if(result==='calm'){learn('calm:'+B.kind);if(B.E.calmGift)B.loot.push(B.E.calmGift);}
   if(result==='win'&&B.E.onWin)B.E.onWin(B);
@@ -152,6 +164,8 @@ function bEnd(result){
 }
 function bStep(){
   if(!B||B.paused||!$('bResult').hidden)return;
+  // 손을 살피는 동안 전투 시간과 탄을 함께 멈춘다. 진정 수치는 바꾸지 않는다.
+  if(B.handShow>0){if(--B.handShow===0){B.msg=B.handMsg;openGift();}return;}
   B.time++;if(B.inv>0)B.inv--;if(B.cool>0)B.cool--;if(B.swing>0)B.swing--;
   if(B.covers)B.covers.forEach(r=>{if(r.flash>0)r.flash--;});
   if(B.st!=='end'&&B.st!=='giftPlace'){
@@ -185,7 +199,10 @@ function bStep(){
 
 /* 선물 (달래기) */
 function openGift(){
-  if(!B||B.st==='end'||B.st==='giftPlace'||!$('bResult').hidden)return;
+  if(!B||B.handShow>0||B.st==='end'||B.st==='giftPlace'||!$('bResult').hidden)return;
+  if(B.E.forgeTrial&&!B.handShown){
+    B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';return;
+  }
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
   const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0);
   if(!ids.length)g.appendChild(el('span','small','건넬 물건이 없다.'));
@@ -230,7 +247,7 @@ $('bResOk').onclick=()=>{
 /* 터치로 손 끌기 */
 let bDrag=null;
 bcv.addEventListener('pointerdown',e=>{if(!B)return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
-bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.st==='end'||B.st==='giftPlace')return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
+bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace')return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
   B.px=clamp(B.px+dx,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy,BOX.y+8,BOX.y+BOX.h-8);});
 const endDrag=()=>{bDrag=null;};bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
 
@@ -243,10 +260,10 @@ function drawTool(c,kind){
   else{c.beginPath();c.moveTo(-11,-22);c.quadraticCurveTo(0,-29,11,-22);c.lineTo(11,-24.5);c.quadraticCurveTo(0,-32,-11,-24.5);c.closePath();c.fill();}
 }
 function drawPaw(c,x,y){
-  if(B.inv>0&&Math.floor(B.inv/5)%2)return;
+  if(!B.handShow&&B.inv>0&&Math.floor(B.inv/5)%2)return;
   const tool=heldTool();
   c.save();c.translate(x,y);c.scale(1.6,1.6);
-  if(!B.noTool){
+  if(!B.noTool&&!B.handShow){
     const a=B.swing>0?(-1.5+(1-B.swing/12)*2.5):-0.35;
     c.save();c.translate(5,-3);c.rotate(a);drawTool(c,tool);c.restore();
   }
@@ -258,7 +275,7 @@ function drawPaw(c,x,y){
   blob(c,0.5,3.5,4.6,3.6,'#b9a38f');
   for(let i=0;i<4;i++)blob(c,-7.2+i*4.8,-6.4+(i===0||i===3?1.4:0),1.7,1.9,'#b9a38f');
   c.strokeStyle=INK;c.lineWidth=1.3;c.beginPath();c.ellipse(0,2,9.5,8.5,0,0,Math.PI*2);c.stroke();
-  if(B.swing>0){c.strokeStyle=INK;c.lineWidth=2;c.globalAlpha=B.swing/12;c.beginPath();c.arc(4,-6,20+(12-B.swing),-1.9,0.4);c.stroke();}
+  if(B.swing>0&&!B.handShow){c.strokeStyle=INK;c.lineWidth=2;c.globalAlpha=B.swing/12;c.beginPath();c.arc(4,-6,20+(12-B.swing),-1.9,0.4);c.stroke();}
   c.restore();
 }
 function drawBonk(c){
@@ -275,6 +292,7 @@ function bDraw(){
   B.E.draw(c);
   c.restore();
   if(B.E.cover)drawGolemAim(c);
+  if(B.E.forgeTrial)drawForgeVoice(c);
   // 글귀
   c.fillStyle=INK;c.textAlign='center';c.textBaseline='alphabetic';c.font='17px "Gowun Batang", "Batang", serif';
   const msg=B.msg||'';const maxW=LW-60;
@@ -285,6 +303,7 @@ function bDraw(){
   c.save();c.fillStyle='rgba(255,252,242,.55)';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();
   c.save();c.beginPath();c.rect(BOX.x,BOX.y,BOX.w,BOX.h);c.clip();
   if(B.E.cover)drawBattleCover(c);
+  if(B.E.forgeTrial){drawForgeBench(c);if(B.forgeNext)drawForgeWork(c,B.forgeNext);}
   for(const b of B.bullets)BULLETS[b.k].draw(c,b);
   if(B.calmStone)drawWishStone(c);
   if(B.mark){const m=B.mark;const pulse=1+Math.sin(B.time*0.25)*0.08;c.save();c.translate(m.x,m.y);c.scale(pulse,pulse);
@@ -295,7 +314,8 @@ function bDraw(){
     c.save();c.font='bold 13px "Gowun Dodum", sans-serif';const tw=c.measureText(lab).width+12;const ly=m.y+(m.y>BOX.y+BOX.h-46?-44:30);
     c.fillStyle=near?RED:'rgba(255,250,238,.95)';c.strokeStyle=near?RED:INK;c.lineWidth=1.5;c.beginPath();c.rect(m.x-tw/2,ly-10,tw,20);c.fill();c.stroke();
     c.fillStyle=near?'#fff6e8':INK;c.textAlign='center';c.textBaseline='middle';c.fillText(lab,m.x,ly+1);c.restore();}
-  if(B.st!=='giftPlace')drawPaw(c,B.px,B.py);
+  if(B.handShow>0)drawOpenHands(c);
+  else if(B.st!=='giftPlace')drawPaw(c,B.px,B.py);
   for(const f of B.fx)blob(c,f.x,f.y,f.r*(f.t/28),f.r*(f.t/28),f.col,Math.min(1,f.t/14));
   c.restore();
   if(B.giftPlace)drawPlacedGift(c);

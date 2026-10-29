@@ -7,6 +7,38 @@ const ATTACKS={},BULLETS={};
 function defineAttacks(m){Object.assign(ATTACKS,m);}
 function defineBullets(m){Object.assign(BULLETS,m);}
 
+/* 무쇠 선택 기능. 작업 예고는 chooseAttack 때 시작해 tell 상태에서도 보인다. */
+defineAttacks({
+  forgeHammer:{dur:100,tick(){}},
+  forgeWind:{dur:100,tick(){}},
+  forgeShout:{dur:100,tick(){}},
+});
+function forgeShelter(x,y){
+  const p=coverPoint({u:0.74,v:0.42});
+  return Math.abs(x-p.x)<=32&&y>=p.y+12;
+}
+function forgeWorkHits(b,x,y){
+  if(b.k==='forgeHammer')return Math.abs(x-coverPoint(b).x)<=36;
+  if(b.k==='forgeWind')return !forgeShelter(x,y);
+  const apex=BOX.y-BOX.h*0.15,half=(y-apex)/(BOX.h*1.15)*BOX.w*0.38;
+  return Math.abs(x-(BOX.x+BOX.w/2))<=half;
+}
+function forgeWorkStep(b){
+  b.t++;
+  if(b.k==='forgeHammer'&&B.survived===3&&b.t===80){
+    // 예고는 아직 공격이 아니다. 이번 공격의 종료도 막지 않는다.
+    B.forgeNext={k:'forgeWind',t:0,tell:120,hold:28,preview:true};
+    B.msg='"아까 배운 대로!" 풀무 바람길도 보인다. 망치가 지나가면 오른쪽 판 뒤로 옮겨라.';
+  }
+  if(b.t>b.tell+b.hold)b.dead=1;
+  else if(b.t>b.tell&&forgeWorkHits(b,B.px,B.py))bHitMe();
+}
+defineBullets({
+  forgeHammer:{step:forgeWorkStep,draw:drawForgeWork},
+  forgeWind:{step:forgeWorkStep,draw:drawForgeWork},
+  forgeShout:{step:forgeWorkStep,draw:drawForgeWork},
+});
+
 /* 골렘 시험판 전용. 기존 공격과 탄은 건드리지 않는다. */
 defineAttacks({
   golemPillar:{dur:105,tick(t){if(t===0){
