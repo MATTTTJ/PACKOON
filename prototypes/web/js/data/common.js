@@ -1,10 +1,14 @@
 'use strict';
 /* 지역에 상관없이 쓰는 데이터: 처음부터 가진 물건, 손에 드는 연장, 집안 가보 네 개.
-   가보 원본은 design/data/heirlooms.csv. 가공법(레시피)은 가보가 깨어나는 지역 파일이 defineRecipes 로 넣는다. */
+   가보 원본은 design/data/heirlooms.csv. 가공법은 그 표의 가공법 칸에서 온다. */
 (()=>{
-defineItems({
-  rice:{n:'주먹밥',r:0,d:'엄마가 싸 준 주먹밥. 먹으면 기운이 난다.',eat:2},
-});
+/* 표(design/data/*.csv)에서 만든 것: 아이템, 가공법, 수첩. 표를 고치면 node prototypes/web/tools/build-data.js */
+defineItems(TABLES.ITEMS);
+defineItems({rice:{eat:2}});   // 게임 전용 칸
+defineRecipes(TABLES.RECIPES);
+/* 메밀떡은 시루가 깨어난 뒤에도 모락에게 따로 배워야 쓸 수 있다 (trades.csv t_morak) */
+RECIPES.siru.find(r=>r.out==='memiltteok').know='morak:memiltteok';
+for(const e of TABLES.NOTES)defineNotes(e.region,[e]);
 defineTools({
   pick:{n:'곡괭이',d:'땅을 파서 뿌리와 버섯을 캔다. 싸울 때도 쓴다.'},
   sickle:{n:'아빠의 낫',d:'무쇠가 벼려 준 아빠의 낫. 질긴 칡덩굴도 끊는다. 땅도 팔 수 있다.'},

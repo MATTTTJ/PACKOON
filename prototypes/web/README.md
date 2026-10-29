@@ -21,6 +21,16 @@
 - 그림 12장이 원본 PNG라 합쳐 약 16MB다. 처음 열 때 불러오는 동안 "가을 숲을 불러오고 있습니다"가 뜨고, 그동안에도 메뉴는 누를 수 있다.
 - 스튜디오에서 설정을 바꾸면 `scene-defaults.json`을 `assets/title/`에 다시 복사하고 `js/title/scene-data.js`의 같은 값을 맞춘다. 그림을 바꾸면 `assets/title/`의 PNG를 바꾼다.
 
+## 표(CSV)와 게임 데이터
+
+아이템(이름·레어도·설명), 보스 부위(이름·내구도·부수면 얻는 것·핵심), 달래기 진정수치, 가보 가공법, 아빠의 수첩 메모는 **`design/data/*.csv`가 유일한 원본**이다. 게임은 표에서 만든 `js/data/tables.js`를 읽는다 (더블클릭으로 열 때 브라우저가 CSV를 못 읽게 막아서, 표를 데이터 파일로 바꿔 둔다).
+
+- 표를 고친 뒤: `node prototypes/web/tools/build-data.js` (레포 맨 위 폴더에서). 외부 패키지 없이 node만 있으면 된다.
+- 맞는지만 보기: `node prototypes/web/tools/build-data.js --check` (표와 다르면 실패한다)
+- 가공법·진정수치 칸의 물건 이름이 items.csv에 없거나 모양이 틀리면 변환기가 어느 줄인지 알려 주고 멈춘다.
+- `tables.js`는 직접 고치지 않는다.
+- 코드에 남는 것: 대사, 위치, 그림, 진행 순서, 공격 종류와 예고 글, NPC·지역 이름(대사에도 적혀 있어서), 먹으면 오르는 체력 같은 게임 전용 값.
+
 ## 새 버전을 올릴 때
 
 `index.html`이 부르는 css·js 주소 끝에 `?v=20261029b` 같은 버전 표시가 붙어 있다. 파일을 고쳐 올릴 때마다 이 값을 **모두 같은 새 값**으로 바꾼다 (날짜 + 알파벳 하나면 충분하다). 안 바꾸면 GitHub Pages가 파일을 10분쯤 브라우저에 저장해 두는 탓에, 새 `index.html`과 옛 js가 섞여 검은 화면이 뜰 수 있다.
@@ -103,8 +113,7 @@ id는 `design/data/*.csv`와 같다. 지역 id는 `regions.csv`, 아이템은 `i
 ## 지역 하나 더하기
 
 1. `js/regions/<지역 id>/` 폴더를 만들고 갈참골 폴더를 본보기로 파일을 나눈다.
-   - `notes.js`: `defineNotes(id, [...])`로 아빠의 수첩 쪽 (design/data/notebook.csv 와 같은 내용)
-   - `region.js`: `defineRegion(id, {...})`로 지역 정보와 처음 상태, `defineItems` / `defineIcons` / `defineGather`, 깨어나는 가보의 `defineRecipes`
+   - `region.js`: `defineRegion(id, {...})`로 지역 정보와 처음 상태, `defineIcons`(아이콘) / `defineGather`(채집)
    - `art.js`: NPC 도트 그림과 소품
    - `field.js`: 배경, 장애물, 날씨, 휘두르기·쓰러짐 처리
    - `enemies.js`: `defineEnemies`로 전투 상대와 수묵 그림
@@ -112,7 +121,7 @@ id는 `design/data/*.csv`와 같다. 지역 id는 `regions.csv`, 아이템은 `i
 2. `index.html`의 지역 `<script>` 목록 아래에 새 파일을 같은 모양으로 덧붙인다 (`game.js`보다 위).
 3. 앞 지역의 `defineRegion`에 `next: '<새 지역 id>'`를 적는다.
 
-가보는 `awaken('<가보 id>')`로 깨운다. 깨어난 가보는 `G.awake`에 남고, 가공법(`defineRecipes`)은 깨어난 뒤에만 쓰인다. 지역 전용 미니게임 창은 돌너머의 돌 쌓기처럼 지역 파일에서 만들어 `#shell`에 붙이고 `defineMinigame`으로 등록한다.
+가보는 `awaken('<가보 id>')`로 깨운다. 깨어난 가보는 `G.awake`에 남고, 가공법은 깨어난 뒤에만 쓰인다. 지역 전용 미니게임 창은 돌너머의 돌 쌓기처럼 지역 파일에서 만들어 `#shell`에 붙이고 `defineMinigame`으로 등록한다.
 
 엔진 파일은 고치지 않아도 된다. 엔진에 없는 기능(새 공격, 새 미니게임)도 지역 파일에서 `defineAttacks` / `defineBullets` / `defineMinigame`으로 더할 수 있다. 여러 지역이 같이 쓸 것 같으면 그때 엔진으로 옮긴다.
 
