@@ -21,6 +21,7 @@ const TitleScreen=(()=>{
   function open(){
     if(scene)return;
     el.hidden=false;
+    $('btnSound').hidden=$('btnVolume').hidden=true;
     scene=createTitleScene(view,canvas,$('titleLoading'));
     mq.addEventListener('change',onReduce);
     render();
@@ -31,6 +32,7 @@ const TitleScreen=(()=>{
     scene.destroy();scene=null;
     mq.removeEventListener('change',onReduce);
     el.hidden=true;
+    $('btnSound').hidden=$('btnVolume').hidden=false;
   }
   $('tsContinue').onclick=()=>{close();loadSave();};
   $('tsNew').onclick=()=>{close();};   // 프롤로그 화면(titleScreen)이 그대로 남아 있다

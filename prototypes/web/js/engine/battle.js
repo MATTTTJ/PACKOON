@@ -144,9 +144,49 @@ function bStep(){
 }
 
 /* 선물 (달래기) */
+/* 남은 교환·약에 필요한 물건은 items.csv의 진행보호와 가공법으로 계산한다.
+   완제품부터 확보한 뒤 부족분만 재료로 풀고, 대체재 조합 중 부족 수량이 가장 적은 쪽을 고른다. */
+function progressShortage(inv){
+  const goals=TABLES.PROGRESS.filter(g=>REGIONS[g.region].order>=REG.order&&
+    !(g.done==='ended'?(g.region===G.region&&G.ended):G.f[g.done]));
+  const recipes=Object.values(RECIPES).flat();
+  function shortage(need){
+    const stock={...inv};let missing=0;
+    // 모든 목표의 완제품을 먼저 떼어 두어 같은 물건을 두 번 세지 않는다.
+    let pending={};
+    for(const [id,n] of Object.entries(need)){
+      const used=Math.min(stock[id]||0,n);stock[id]=(stock[id]||0)-used;
+      if(n>used)pending[id]=n-used;
+    }
+    while(Object.keys(pending).length){
+      const next={};
+      for(const [id,n] of Object.entries(pending)){
+        const r=recipes.find(r=>r.out===id);
+        if(!r){missing+=n;continue;}
+        const batches=Math.ceil(n/r.n);
+        for(const [item,count] of Object.entries(r.need))next[item]=(next[item]||0)+count*batches;
+      }
+      pending={};
+      for(const [id,n] of Object.entries(next)){
+        const used=Math.min(stock[id]||0,n);stock[id]=(stock[id]||0)-used;
+        if(n>used)pending[id]=n-used;
+      }
+    }
+    return missing;
+  }
+  function choose(i,need){
+    if(i===goals.length)return shortage(need);
+    return Math.min(...goals[i].options.map(option=>{
+      const next={...need};for(const id in option)next[id]=(next[id]||0)+option[id];
+      return choose(i+1,next);
+    }));
+  }
+  return choose(0,{});
+}
 function openGift(){
   if(!B||B.st==='end'||!$('bResult').hidden)return;
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
+  $('bGiftHint').textContent='좋아하는 걸 주면 마음이 누그러진다. 건넨 물건은 돌아오지 않는다.';
   const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0);
   if(!ids.length)g.appendChild(el('span','small','건넬 물건이 없다.'));
   ids.forEach(id=>{const b=el('button','gift');b.type='button';b.appendChild(icon(id));b.appendChild(el('span',null,ITEMS[id].n+' ×'+G.inv[id]));
@@ -155,6 +195,11 @@ function openGift(){
 }
 function closeGift(){$('bGiftMenu').hidden=true;if(B)B.paused=false;}
 function giveGift(id){
+  if(!B||!B.paused||B.st==='end'||!has(id))return;
+  const after={...G.inv,[id]:G.inv[id]-1};
+  if(progressShortage(after)>progressShortage(G.inv)){
+    $('bGiftHint').textContent='이건 아직 쓸 데가 있어. 다른 걸 건네자.';return;
+  }
   takeItem(id,1);const v=B.E.likes[id];if(v)learn('like:'+B.kind+':'+id);
   B.calm=Math.min(100,B.calm+(v||8));
   B.msg=v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
@@ -189,7 +234,8 @@ let bDrag=null;
 bcv.addEventListener('pointerdown',e=>{if(!B)return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
 bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.st==='end')return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
   B.px=clamp(B.px+dx,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy,BOX.y+8,BOX.y+BOX.h-8);});
-const endDrag=()=>{bDrag=null;};bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
+function endDrag(){bDrag=null;}
+bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
 
 /* ---------- 전투 화면 그리기 ---------- */
 function drawTool(c,kind){

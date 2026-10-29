@@ -2,7 +2,7 @@
 /* 시작 화면, 끝 화면, 게임 루프, 부팅. 화면 글은 지역의 cover 에서 읽는다 */
 function fillCover(){
   const C=REG.cover;
-  $('regionTag').textContent=C.tag;$('regionSub').textContent=C.sub;
+  $('regionTag').textContent=REG.name;$('regionSub').textContent='엄마의 약을 찾아 네 지역을 잇는 여행';
   cv.setAttribute('aria-label',REG.name+' 게임 화면');
   $('titleKicker').textContent=C.title.kicker;$('titleHead').textContent=C.title.head;
   const tb=$('titleBody');tb.innerHTML='';C.title.body.forEach(t=>tb.appendChild(el('p',null,t)));
