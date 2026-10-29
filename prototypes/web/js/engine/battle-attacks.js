@@ -77,6 +77,56 @@ defineBullets({
     }},
 });
 
+/* 칡 시험판 전용. 예고 중 놓은 고리의 통로를 공격이 끝날 때까지 쓴다. */
+defineAttacks({
+  kudzuVines:{dur:160,tick(t){if(t===0)B.bullets.push({k:'kudzuVines',t:0});}},
+  kudzuRoots:{dur:120,tick(t){if(t===0)B.bullets.push({k:'kudzuRoots',t:0});}},
+  kudzuSeeds:{dur:160,tick(t){if(t%52===0&&t<130){
+    B.bullets.push({k:'kudzuSeed',u:0.5,v:-0.04,tu:(B.px-BOX.x)/BOX.w,tv:(B.py-BOX.y)/BOX.h,t:0,tell:34});
+  }}},
+});
+function outsideVine(x){const g=vineBounds();return Math.abs(x-g.x)>g.w/2-8;}
+/* 붓의 둥근 끝과 가시도 안전한 여백을 침범하지 않게 잘라 그린다. */
+function clipVineDanger(c){
+  const g=vineBounds();c.beginPath();c.rect(BOX.x,BOX.y,g.x-g.w/2-BOX.x,BOX.h);
+  c.rect(g.x+g.w/2,BOX.y,BOX.x+BOX.w-g.x-g.w/2,BOX.h);c.clip();
+}
+defineBullets({
+  kudzuVines:{
+    step(b){
+      b.t++;const speed=1.65;
+      for(const delay of [0,64]){const y=BOX.y-12+(b.t-delay)*speed;
+        if(b.t>=delay&&Math.abs(B.py-y)<12&&outsideVine(B.px))bHitMe();}
+      if(BOX.y-12+(b.t-64)*speed>BOX.y+BOX.h+16)b.dead=1;
+    },
+    draw(c,b){c.save();clipVineDanger(c);
+      for(const delay of [0,64]){if(b.t<delay)continue;const y=BOX.y-12+(b.t-delay)*1.65;
+        brush(c,[[BOX.x-4,y],[BOX.x+BOX.w/2,y-3],[BOX.x+BOX.w+4,y]],10,INK);
+        for(let x=BOX.x+6;x<BOX.x+BOX.w;x+=16)brush(c,[[x,y],[x+5,y+9]],2,INK);
+      }c.restore();
+    }},
+  kudzuRoots:{
+    step(b){b.t++;if(b.t>96){b.dead=1;return;}
+      if(b.t>32&&outsideVine(B.px)&&B.py>BOX.y+BOX.h-Math.min(BOX.h,(b.t-32)*BOX.h/16)-5)bHitMe();
+    },
+    draw(c,b){if(b.t<=32)return;const h=Math.min(BOX.h,(b.t-32)*BOX.h/16);c.save();clipVineDanger(c);
+      for(let x=BOX.x+5;x<BOX.x+BOX.w;x+=15)brush(c,[[x,BOX.y+BOX.h+5],[x-4,BOX.y+BOX.h-h+12],[x+2,BOX.y+BOX.h-h]],15,INK);
+      c.restore();
+    }},
+  kudzuSeed:{
+    step(b){b.t++;
+      if(b.t<=b.tell){if(b.t===b.tell){const a=Math.atan2((b.tv-b.v)*BOX.h,(b.tu-b.u)*BOX.w);b.vx=Math.cos(a)*2;b.vy=Math.sin(a)*2;}return;}
+      b.u+=b.vx/BOX.w;b.v+=b.vy/BOX.h;const p=coverPoint(b);
+      if(Math.hypot(p.x-B.px,p.y-B.py)<11){bHitMe();b.dead=1;}
+      else if(b.u<-.08||b.u>1.08||b.v>1.12||b.v<-.15)b.dead=1;
+    },
+    draw(c,b){const p=coverPoint(b),tx=BOX.x+b.tu*BOX.w,ty=BOX.y+b.tv*BOX.h;
+      brush(c,[[BOX.x+BOX.w/2,BOX.y],[tx,ty]],1.1,INK,0.22);
+      drawVineAim(c,tx,ty,Math.min(1,b.t/b.tell),b.t<=b.tell?0.7:0.25);
+      if(b.t>b.tell){blob(c,p.x,p.y,6,6,INK);brush(c,[[p.x-3,p.y-2],[p.x+1,p.y-3]],1,'#f7f4ed');}
+    }},
+});
+
 /* 골렘 시험판 전용. 기존 공격과 탄은 건드리지 않는다. */
 defineAttacks({
   golemPillar:{dur:105,tick(t){if(t===0){
