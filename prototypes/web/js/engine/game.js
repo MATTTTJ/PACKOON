@@ -37,7 +37,7 @@ function showEnd(){
 }
 /* 화면과 상태를 지금 G 에 맞춘다 */
 function resetScreens(){
-  REG=REGIONS[G.region];fillCover();closePanels();
+  resetFieldModes();REG=REGIONS[G.region];prepareZones(G,REG);fillCover();closePanels();
   $('endScreen').hidden=true;$('titleScreen').hidden=G.started;
   lastGoal='';lastTool='';lastNear=null;refreshHud();refreshSaveUI();
 }
@@ -57,6 +57,7 @@ function loop(t){
 function boot(data){
   G=(data&&data.G&&REGIONS[data.G.region])?data.G:newGame(new URLSearchParams(location.search).get('region'));
   REG=REGIONS[G.region];
+  prepareZones(G,REG);
   fillCover();
   if(G.started)$('titleScreen').hidden=true;
   if(G.ended)showEnd();

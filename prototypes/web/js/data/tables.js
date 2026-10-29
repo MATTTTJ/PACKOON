@@ -1138,6 +1138,19 @@ const TABLES={
     }
    ],
    "dadDrawing": true
+  },
+  {
+   "id": "dad_stamps_galchamgol",
+   "region": "galchamgol",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "개울을 건너기 전 여기서 신발의 흙을 털었다.",
+     "when": "stamp:galchamgol:example"
+    }
+   ],
+   "name": "젊은 아빠의 그날"
   }
  ],
  "MINIGAMES": {
@@ -1293,7 +1306,10 @@ const TABLES={
   "field_hit_back": 24,
   "field_hit_width": 22,
   "field_dig_padding": 6,
-  "save_interval": 30000
+  "save_interval": 30000,
+  "field_interact_y": 24,
+  "zone_transition_frames": 18,
+  "vista_pan_frames": 480
  },
  "PROGRESS": [
   {

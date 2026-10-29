@@ -6,7 +6,7 @@
    - 시작 화면: 저장이 있으면 '이어서 하기'
    - 처음부터 하기 / 새로 시작: 저장이 있으면 한 번 더 눌러야 저장을 지운다 */
 const SAVE_KEY='packoon-save-v1';
-const busyForSave=()=>!!B||inkOn||open('dlg')||!!openMinigame();
+const busyForSave=()=>!!B||inkOn||!!vistaMode||zoneFade>0||open('dlg')||!!openMinigame();
 function readSave(){
   try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
     if(s&&s.v===1&&s.G&&REGIONS[s.G.region])return s;}catch(_){}

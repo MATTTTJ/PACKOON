@@ -100,3 +100,4 @@ broken_orb,yeongsan,깨진 여의주,물건,나,got:broken_orb,처음 얻을 때
 legend_fruit,yeongsan,전설의 열매,물건,나,got:legend_fruit,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음
 legend_fruit,yeongsan,전설의 열매,물건,아빠,,처음부터,영산 신목의 열매. 봄에만 열린다.,제안,
 legend_fruit,yeongsan,전설의 열매,물건,아빠,got:legend_fruit,처음 얻을 때,(그림 옆에 나중에 덧쓴 글씨) 여기다.,제안,
+dad_stamps_galchamgol,galchamgol,젊은 아빠의 그날,도장,아빠,stamp:galchamgol:example,예시 도장을 찾았을 때,개울을 건너기 전 여기서 신발의 흙을 털었다.,제안,PA-43 예시 · 다음 지역 작업에서 교체

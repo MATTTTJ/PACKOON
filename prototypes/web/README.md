@@ -125,6 +125,53 @@ id는 `design/data/*.csv`와 같다. 지역 id는 `regions.csv`, 아이템은 `i
 
 엔진 파일은 고치지 않아도 된다. 엔진에 없는 기능(새 공격, 새 미니게임)도 지역 파일에서 `defineAttacks` / `defineBullets` / `defineMinigame`으로 더할 수 있다. 여러 지역이 같이 쓸 것 같으면 그때 엔진으로 옮긴다.
 
+### 구역·경치·길손·도장 쓰는 법
+
+PA-43의 공통 엔진이다. 지역 파일에서 `Rg.zones`와 `Rg.startZone`을 선언하면 구역 방식으로 움직인다. 선언하지 않은 지역은 기존 한 구역 맵을 그대로 쓴다. 공용 상수 `CLASSIC`은 `?classic=1`일 때만 참이다. 옛 지역 정의는 남겨 두고 `if(!CLASSIC){ ... }` 안에서 확장 정의를 붙인다. 단풍골 `field.js`의 `// 예시` 블록과 `notebook.csv`의 예시 한 줄은 다음 단계에서 교체한다.
+
+```js
+if(!CLASSIC){
+  Rg.startZone='village';
+  Rg.zones={
+    village:{w:2800,startX:70,ground:GROUND,platforms:[{x:300,y:160,w:60}],
+      drawBack:drawVillage,weather:()=>Vfx.setWeather('maple'),
+      npcs:['dodam'], // REG.npcs의 id. 또는 NPC 정의에 zone:'village'를 적는다.
+      digs:[{id:'village_root',x:470,item:'root',done:false}],
+      pickups:[{id:'village_acorn',x:210,y:GROUND,item:'acorn',got:false}],
+      exits:{right:{to:'forest',need:()=>G.tool==='sickle',
+        reason:'낫으로 덩굴을 걷어야 한다.',drawBlocked:drawVines}},
+      doors:[{x:120,to:'forest',toX:160,label:'숲으로',draw:drawSign}],
+      examines:[{id:'wheel',x:620,label:'물레방아 살펴보기',
+        text:['물레방아가 멈춰 있다.','나무 틈으로 물소리가 난다.']}],
+      wanderers:[{id:'visitor',name:'길손',x:900,draw:drawVisitor,
+        talk:()=>talk([['길손','잠깐 쉬었다 갈까?',[
+          {t:'함께 쉰다',go:()=>talk([['길손','이제 좀 낫네.']],()=>finishWanderer('visitor'))},
+          {t:'먼저 갈게',go:null}]]]),greeting:'다음 길에서 또 보자.'}],
+      stamps:[{id:'root_mark',x:330,y:160,note:'stamp:galchamgol:root_mark'}],
+      vistas:[{id:'valley',x:700,from:0,to:400,sound:'wind',
+        thought:'집이 저렇게 작아 보이네.',diary:'언덕에서 집 쪽을 돌아봤다.',
+        layers:[{speed:.15,draw:drawFarHills},{speed:.5,draw:drawVillageRoofs}]}]},
+    forest:{w:2600,startX:160,npcs:[],platforms:[],drawBack:drawForest,
+      exits:{left:'village'},newState:()=>({enemies:[]}),
+      step:()=>{ /* zoneState().enemies 중 이 구역의 적만 갱신 */ },
+      drawActors:()=>{ /* 같은 상태를 그림 */ }}
+  };
+}
+```
+
+- 구역의 `w`는 화면 폭 400 이상이다. `ground`는 발이 닿는 바닥 y이며 기본은 192다. 발판·NPC·조사점은 구역 안 좌표다. NPC·길손·조사점의 `y`를 생략하면 바닥이다. `npcs`를 생략하면 NPC의 `zone`으로 거르고, NPC의 `zone`도 없으면 시작 구역에 둔다. `npcs:[]`는 아무 NPC도 두지 않는다.
+- `drawBack`, `drawScenery`, `drawActors`, `drawFront`, `weather`, `weatherFront`, `ambient`, `step`, `onHit`, `onPickup`, `drawPickup`, `drawDig`, `maxX`, `faint`, `fieldBoss`는 현재 구역 것만 부른다. 구역 방식에서는 지역의 같은 이름 함수로 자동 대체하지 않는다. 필요한 공통 그림 함수는 각 구역에서 참조한다. `goal`, `onStart`, 교환·전투 결과 함수는 계속 지역에 둔다. 전투를 여는 조건도 해당 구역의 `step`에 둔다.
+- 구역별 가변 상태는 `newState()`가 돌려주며 `zoneState()`로 읽는다. 이 함수는 순수한 초기값만 만든다. `G.digs`·`G.pickups`는 기존 저장 구조를 유지하고 `zone`으로 거른다. 구역에 선언한 채집·줍기 지점은 한 번만 복제한다. `id`는 구역 왕복과 저장 뒤에도 유지한다. 기존 `newState()`가 만든 지점이나 이후 코드에서 추가하는 지점은 `zone`이 없으면 시작 구역 소속이다. 다른 구역에 추가할 때는 `zone`도 적는다. 적의 상태·그림·갱신은 해당 구역에 함께 둔다.
+- 가장자리 출구는 문자열 또는 `{to,need,reason,drawBlocked,toX,toY}`다. x가 16 미만 또는 `w-16` 초과가 되도록 밖으로 걸으면 전환하고, 기본 도착점은 반대쪽 가장자리다. 문은 E 또는 휴대폰 말걸기 버튼으로 연다. 문 도착점은 `toX`·`toY`, 없으면 대상 구역의 시작점이다. 조건은 통과 직전에 다시 검사한다. `need`는 소비 없는 판정 함수이며 `reason`은 막힌 이유다. `drawBlocked(x,y)`에는 화면 좌표를 준다. 이동·공격 입력은 전환 때 비운다.
+- 조사·문·경치·길손·도장은 가까운 하나가 선택된다. 가로 차이는 기존 말 걸기 거리(현재 30px) 미만, 세로 차이는 `field_interact_y`(현재 24px) 미만이다. 경계와 같은 값은 제외한다. 조사 `text`는 문자열 또는 문자열 배열이며 한 번 열 때 한 칸씩 진행해 마지막에 머문다. 1~2줄은 문자열 안 줄바꿈으로 적는다.
+- 길손은 `REG.wanderers`에 `{id,zone,x,draw,talk}`로 두어도 된다. 기존 `talk()`·선택지·교환 함수를 그대로 쓴다. **사연이나 교환이 끝난 콜백에서** `finishWanderer(id)`를 부른다. 거절·취소만으로 끝내지 않는다. 다시 말하면 `greeting`을 쓴다. 완료 id는 `G.f.wanderersDone`, 전체 수는 `G.f.wandererCount`에 저장된다. `wandererCount(regionId?)`로 지역별·전체 수를 읽는다. id는 한 지역 안에서 고유해야 한다.
+- 도장은 기본적으로 E로 발견하고, `auto:true`이면 가까이 닿을 때 발견한다. 발견 전에는 `draw`를 호출하지 않아 숨긴다. 주변 단서는 지역 배경에 그린다. `note`는 `notebook.csv`의 `알게되는키`와 연결한다. 같은 형식의 행에 `종류=도장`, `쓴이=아빠`, `대상=쪽 제목`, `내용=그날 이야기`, `상태=제안`을 적고 데이터를 재생성한다. 기존 동물·물건 id를 바꾸지 않고 지역별 새 쪽id를 쓴다. 발견 때 `learn(note)`·반짝임·획득음은 한 번만 실행된다. 수첩의 도장 탭에서 읽는다. `stampCount(regionId?)`, `G.f.stampCount`, `G.f.stampsByRegion`으로 집계하며 `G.f.stampsFound`는 지역+id별 발견 기록이다. 열두 개 수집 뒤 엔딩 장면은 지역 콘텐츠 단계에서 연결한다.
+- 경치는 HUD·패드·대화를 걷고 필드·채집·전투를 멈춘다. 처음에만 `thought`와 `diary`를 보인다. `from`·`to`는 카메라 x(px)이며 `0..w-400`으로 제한한다. `t=경과 프레임/vista_pan_frames`를 0~1로 제한하고 `from+(to-from)×(3t²-2t³)`으로 이동한다. 예: 0→400의 절반 시점은 200px다. 각 원경은 `cam=반올림(카메라 x×speed)`로 그리며 `draw(cam,t)`도 받는다. 멀수록 작은 `speed`를 쓴다. 그림 함수 배열도 허용하며 생략한 속도는 `(순번+1)/겹 수`다. R/M과 정수 좌표를 쓴다.
+- 패닝은 현재 480프레임(8초) 뒤 멈춘다. 숨긴 탭에서는 경치 시간이 멈추고, 움직임 줄이기는 시작 위치의 정지 화면이다. 소리는 `wind` 또는 `water` 환경음 하나를 반복하며 돌아오면 정리한다. 다음 키·터치 한 번으로 돌아오고 그 입력은 필드에 전달하지 않는다. 경치·화면 전환 중에는 저장하지 않는다.
+- 구역·위치·조사 횟수·길손·도장·첫 경치 기록은 기존 저장 키에 함께 남는다. 구역 정보 없는 옛 저장은 시작 구역에서 기존 위치와 진행을 이어받는다. 모르는 구역 id는 시작 구역의 시작점으로 돌린다. 구역을 선언하지 않은 지역과 `?classic=1`에서는 확장 상호작용을 쓰지 않는다. 새 `G.f` 칸이 없으면 아직 발견·완료하지 않은 상태로 읽는다.
+
+수치 원본은 `tuning.csv`의 `field_interact_y`, `zone_transition_frames`, `vista_pan_frames`다. 판정은 60Hz 갱신 기준이며 전환은 현재 18프레임(0.3초), 움직임 줄이기에서는 즉시다. 구역마다 핸들러나 타이머를 등록하지 않고, 전환 때 Vfx 대기열과 필드 입자를 비운다.
+
 ### `defineRegion`에 채울 것
 
 | 이름 | 뜻 |

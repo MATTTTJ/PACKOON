@@ -127,4 +127,31 @@ Rg.bossDie=()=>{
   diary('boss','엉킨 칡이 풀렸다. 당산나무가 크게 숨을 쉬는 것 같았다.');
   toast('엉킨 칡이 풀렸다! 해머루가 떨어진다');refreshGoal();
 };
+
+// 예시: PA-43 동작 확인용. 단풍골 확장 작업 때 이 블록만 지우고 실제 구역으로 바꾼다.
+if(!CLASSIC){
+  Rg.startZone='village';
+  const oldField={};
+  for(const k of ['platforms','drawBack','drawScenery','drawActors','drawPickup','drawDig','drawFront','weather','weatherFront','ambient','maxX','step','onHit','faint','fieldBoss'])if(Rg[k])oldField[k]=Rg[k];
+  oldField.onPickup=a=>Rg.onPickup?.(a); // story.js가 나중에 등록하는 사연 훅도 그대로 쓴다.
+  const marker=(x,y)=>{R(x-1,y-24,2,24,'#6b4423');R(x-9,y-25,18,7,'#dbc28b');};
+  const bramble=(x,y)=>{for(let i=-6;i<=6;i+=4)R(x+i,y-32,3,32,'#4f7137');};
+  Rg.zones={
+    village:{...oldField,w:Rg.world,startX:Rg.startX,exits:{left:'clearing'},
+      doors:[{x:120,to:'clearing',toX:160,label:'작은 공터로',draw:marker},
+        {x:190,to:'clearing',toX:440,label:'덩굴 샛문',need:()=>G.tool==='sickle',reason:'낫이 있으면 덩굴 사이로 갈 수 있겠다.',drawBlocked:bramble}],
+      examines:[{id:'example_wheel',x:610,label:'물레방아 살펴보기',text:['물레방아가 멈춰 있다.','나무 틈으로 물 흐르는 소리만 난다.']},
+        {id:'example_sign',x:390,label:'작은 팻말 읽기',text:'마을 왼쪽 끝이나 작은 팻말에서 공터로 갈 수 있다.',draw:marker}]},
+    clearing:{w:800,startX:160,platforms:[{x:300,y:164,w:70}],npcs:[],
+      drawBack:()=>{drawSky();drawGround();},weather:()=>Vfx.setWeather('maple'),
+      exits:{right:'village',left:{to:'village',need:()=>G.tool==='sickle',reason:'낫이 있어야 이쪽 덩굴길을 지난다.',drawBlocked:bramble}},
+      doors:[{x:160,to:'village',toX:120,label:'마을로 돌아가기',draw:marker}],
+      vistas:[{id:'example_stream',x:460,from:0,to:400,thought:'여기서도 우리 집 지붕이 보이네.',diary:'공터에서 마을 쪽을 바라봤다. 지붕 너머로 개울 소리가 들렸다.',sound:'water',
+        draw:marker,layers:[{speed:.1,draw:()=>{R(0,0,W,H,'#f7dcab');R(310-cam,36,20,20,'#fff0c8');}},
+          {speed:.3,draw:()=>hills(1,'#c98a76',128,22,.01)},
+          {speed:.65,draw:()=>{hills(1,'#a8654f',160,12,.016);drawHouse(230);}},
+          {speed:1,draw:()=>{R(0,190,W,35,'#7daca6');R(65-cam,196,40,1,'#e4d8ab');}}]}],
+      stamps:[{id:'example',x:335,y:164,note:'stamp:galchamgol:example',label:'나무 옹이 살펴보기',draw:(x,y)=>{R(x-3,y-4,6,3,'#b35039');R(x-4,y-7,2,2,'#b35039');R(x,y-8,2,2,'#b35039');}}]},
+  };
+}
 })();

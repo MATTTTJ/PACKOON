@@ -4,14 +4,14 @@ const Vfx=(()=>{
   const MAX=300,particles=[],pool=Array.from({length:MAX},()=>({}));
   const motion=matchMedia('(prefers-reduced-motion: reduce)');
   const pending=[];
-  let weather='',state=null,region=null,tick=0,popWait=0,awakeCount=0,reduced=motion.matches;
+  let weather='',state=null,region=null,zone=null,tick=0,popWait=0,awakeCount=0,reduced=motion.matches;
   let wasGround=true,wasMoving=false,wasFace=1;
   const colors=['#cd6939','#df983d','#b98a44'];
   function remove(i){const p=particles[i];particles[i]=particles[particles.length-1];particles.pop();pool.push(p);}
   function clear(){while(particles.length)remove(particles.length-1);pending.length=0;popWait=0;}
   function sync(){
-    if(state===G&&region===REG)return;
-    clear();state=G;region=REG;weather='';tick=0;
+    if(state===G&&region===REG&&zone===G.zone)return;
+    clear();state=G;region=REG;zone=G.zone;weather='';tick=0;
     awakeCount=G.awake.length;wasGround=G.onGround;wasMoving=false;wasFace=G.face;
   }
   function emit(kind,x,y,vx,vy,life,color,layer='front',screen=false,item=null){
@@ -77,7 +77,7 @@ const Vfx=(()=>{
   }
   function update(){
     if(!G||!REG)return;
-    sync();if(REG.weather)REG.weather();
+    sync();fieldCall('weather');
     if(reduced!==motion.matches){
       reduced=motion.matches;
       if(reduced)for(let i=particles.length-1;i>=0;i--)if(particles[i].layer!=='effect'||particles[i].kind==='trail')remove(i);
@@ -131,6 +131,6 @@ const Vfx=(()=>{
     ctx.restore();
   }
   /* 기존 drawFront에 섞인 이정표·색조는 지역의 weatherFront로 보존한다. */
-  function front(){if(REG.weather){if(REG.weatherFront)REG.weatherFront();}else if(REG.drawFront)REG.drawFront();draw('front');draw('effect');}
+  function front(){if(fieldDef().weather)fieldCall('weatherFront');else fieldCall('drawFront');draw('front');draw('effect');}
   return {MAX,get count(){return particles.length;},get queued(){return pending.length;},get reducedMotion(){return motion.matches;},setWeather,update,draw,front,item,gather,burst,feet,slash,clear};
 })();

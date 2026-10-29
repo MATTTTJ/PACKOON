@@ -8,17 +8,20 @@ const open=id=>!$(id).hidden;
 const openMinigame=()=>MINIGAMES.find(m=>open(m.id))||null;
 
 const keys={};const touch={left:false,right:false,up:false,down:false};
+const suppressedKeys=new Set();
 let jumpQ=false,atkQ=false;
 const isLeft=()=>keys['arrowleft']||keys['a']||touch.left;
 const isRight=()=>keys['arrowright']||keys['d']||touch.right;
 addEventListener('keydown',e=>{
   if(e.target instanceof HTMLElement&&(e.target.matches('input,textarea,select')||e.target.isContentEditable))return;
   const k=e.key.toLowerCase();
+  if(suppressedKeys.has(k)){e.preventDefault();return;}
   if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
   const first=!keys[k];keys[k]=true;
   if(first)onPress(k);
 });
-addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys[k]=false;suppressedKeys.delete(k);});
+function suppressHeldInputs(){for(const k in keys)if(keys[k])suppressedKeys.add(k);releaseInputs();}
 function releaseInputs(){
   for(const k in keys)keys[k]=false;
   for(const k in touch)touch[k]=false;
@@ -27,10 +30,13 @@ function releaseInputs(){
   if(typeof endDrag==='function')endDrag();
 }
 addEventListener('blur',releaseInputs);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInputs();});
+addEventListener('blur',()=>suppressedKeys.clear());
+document.addEventListener('visibilitychange',()=>{if(document.hidden){releaseInputs();suppressedKeys.clear();}});
 addEventListener('pointercancel',releaseInputs);
 
 function onPress(k){
+  if(vistaMode){endVista();return;}
+  if(zoneFade>0)return;
   if(k==='m'){Sound.toggle();return;}
   if(!G.started||G.ended)return;
   if(B){
@@ -56,6 +62,8 @@ function onPress(k){
   if(k==='e'||k==='enter')tryTalk();
 }
 function padAction(k){
+  if(vistaMode){endVista();return;}
+  if(zoneFade>0)return;
   if(!G.started||G.ended)return;
   if(B){if(!$('bResult').hidden){if(k==='atk')$('bResOk').click();return;}if(B.paused)return;if(k==='atk')bStrike();else if(k==='jump')openGift();return;}
   if(inkOn)return;
@@ -77,4 +85,4 @@ document.querySelectorAll('#pad [data-k]').forEach(b=>{
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);
   b.addEventListener('contextmenu',e=>e.preventDefault());
 });
-$('prompt').addEventListener('click',()=>{if(open('dlg'))return;if(nearNpc())tryTalk();else atkQ=true;});
+$('prompt').addEventListener('click',()=>{if(paused())return;if(nearInteraction())tryInteract();else atkQ=true;});

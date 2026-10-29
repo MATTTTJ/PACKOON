@@ -3,6 +3,18 @@
    when은 AudioContext.currentTime과 같은 초 단위. group은 한 게임의 소리를 함께 끊는 용도. */
 const Sound=(()=>{
   let ctx=null,master=null,attempted=false,enabled=true,volume='low',resuming=null,resumeEffect=null;
+  let ambientKind=null,ambientVoice=null;
+  function ambience(kind){
+    ambientKind=kind;
+    if(ambientVoice){ambientVoice.stop();ambientVoice=null;}
+    if(!kind||!ctx||ctx.state!=='running')return;
+    const source=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();
+    const buffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),data=buffer.getChannelData(0);
+    for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
+    source.buffer=buffer;source.loop=true;filter.type='lowpass';filter.frequency.value=kind==='water'?900:320;gain.gain.value=.055;
+    source.connect(filter);filter.connect(gain);gain.connect(master);source.start();
+    ambientVoice={stop(){source.stop();source.disconnect();filter.disconnect();gain.disconnect();}};
+  }
   const storageKey='packoon-sound-v1';
   try{const saved=JSON.parse(localStorage.getItem(storageKey));
     if(saved&&typeof saved.enabled==='boolean')enabled=saved.enabled;
@@ -22,6 +34,7 @@ const Sound=(()=>{
       if(AC)try{ctx=new AC();master=ctx.createGain();master.gain.value=enabled?(volume==='high'?0.8:0.4):0;master.connect(ctx.destination);}catch(_){} }
     if(ctx&&ctx.state==='suspended'&&!resuming){
       resuming=ctx.resume().then(()=>{
+        if(ambientKind)ambience(ambientKind);
         const next=resumeEffect;resumeEffect=null;
         if(next&&enabled&&ctx.state==='running')effect(next.key,next.cool,next.make);
       }).catch(()=>{resumeEffect=null;}).finally(()=>{resuming=null;});
@@ -62,7 +75,7 @@ const Sound=(()=>{
   const last=new Map();let lastEffect=-Infinity,pending=null;
   const priority={footstep:0,steam:1,paper:2,panel:3,tab:3,jump:4,land:4,swing:4,gather:5,forge:5,stone:5,yeongsan:5,item:6,exchange:7,craft:8,travel:9};
   function effect(key,cool,make){
-    if(!ctx||!enabled)return;
+    if(!ctx||!enabled||ambientKind)return;
     if(ctx.state!=='running'){if(resuming)resumeEffect={key,cool,make};return;}
     const now=ctx.currentTime;
     if(now-lastEffect<0.018||now-(last.get(key)??-Infinity)<cool)return;
@@ -71,7 +84,7 @@ const Sound=(()=>{
     pending={key,make};
     setTimeout(()=>{
       const next=pending;pending=null;
-      if(!ctx||!enabled||ctx.state!=='running')return;
+      if(!ctx||!enabled||ambientKind||!next||ctx.state!=='running')return;
       lastEffect=ctx.currentTime;last.set(next.key,lastEffect);next.make(lastEffect);
     },0);
   }
@@ -108,5 +121,5 @@ const Sound=(()=>{
   });}
   return {get enabled(){return enabled;},get volume(){return volume;},toggle,toggleVolume,
     steam,footstep,jump,land,swing,gather,item,exchange,paper,panel,tab,craft,travel,forge,stone,yeongsan,
-    get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
+    ambience,get ambient(){return ambientKind;},get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
 })();

@@ -66,7 +66,7 @@ for(const r of heirlooms){
 const NOTES=[];const byId={};
 for(const r of notebook){
   let e=byId[r['쪽id']];
-  if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':'animal',lines:[]};NOTES.push(e);}
+  if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':r['종류']==='도장'?'stamp':'animal',lines:[]};if(e.kind==='stamp')e.name=r['대상'];NOTES.push(e);}
   if(r['비고'].includes('아빠 그림 있음'))e.dadDrawing=true;
   if(r['내용']==='(items.csv 의 설명)')continue;
   const l={who:r['쓴이']==='아빠'?'dad':'me',text:r['내용']};if(r['알게되는키'])l.when=r['알게되는키'];e.lines.push(l);
@@ -130,7 +130,8 @@ const TUNING=numericTable('tuning','분류',
     'kkubeogi_cycle kkubeogi_awake kkubeogi_cue field_move_speed field_swing_speed',
     'field_jump_velocity field_gravity field_fall_speed field_pickup_x field_pickup_y',
     'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at',
-    'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval'
+    'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval',
+    'field_interact_y zone_transition_frames vista_pan_frames'
   ].join(' '));
 /* 나눗셈·주기·배열 길이와 서로 맞물리는 판정은 실행 전에 확인한다. */
 const requireValue=(ok,message)=>{if(!ok)fail(message);};

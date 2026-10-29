@@ -13,6 +13,7 @@ const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=
 function jo(w,a,b){const c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return w+a;return w+(((c-0xAC00)%28)?a:b);}
 const TOUCH=matchMedia('(pointer:coarse)').matches;
 const HITKEY=TOUCH?'치기 버튼':'J 키';
+const CLASSIC=new URLSearchParams(location.search).get('classic')==='1';
 
 /* ---------- 등록소 ---------- */
 /* 아이템: n(이름)·r(레어도 단계, 0부터)·d(설명)는 design/data/items.csv 에서 만든 js/data/tables.js 가 넣는다.
@@ -68,7 +69,46 @@ function enterRegion(g,r){
     else if(k==='f')Object.assign(g.f,ns.f);
     else g[k]=ns[k];
   }
-  return Object.assign(g,{region:r.id,started:false,ended:false,hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0});
+  Object.assign(g,{region:r.id,started:false,ended:false,hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,zone:null,zoneStates:{}});
+  prepareZones(g,r,true);return g;
+}
+/* 구역을 선언하지 않은 지역은 기존 REG 경로를 그대로 쓴다. 지역 자체는 바꾸지 않는다. */
+const usesZones=r=>!CLASSIC&&!!r.zones&&Object.keys(r.zones).length>0;
+const firstZone=r=>r.startZone||Object.keys(r.zones)[0];
+const zoneDef=()=>usesZones(REG)?REG.zones[G.zone]:null;
+const fieldDef=()=>zoneDef()||REG;
+const fieldWidth=()=>zoneDef()?zoneDef().w:REG.world;
+const fieldGround=()=>zoneDef()?.ground??GROUND;
+const fieldPlatforms=()=>fieldDef().platforms||[];
+function fieldCall(name,...args){const f=fieldDef()[name];return typeof f==='function'?f(...args):undefined;}
+function fieldItems(name){return G[name].filter(a=>usesZones(REG)?(a.zone||firstZone(REG))===G.zone:!a.zone);}
+function fieldNpcs(){
+  const z=zoneDef();if(!z)return REG.npcs||[];
+  if(z.npcs)return z.npcs.map(n=>typeof n==='string'?(REG.npcs||[]).find(a=>a.id===n):n).filter(Boolean);
+  return (REG.npcs||[]).filter(n=>(n.zone||firstZone(REG))===G.zone);
+}
+function zoneState(){return G.zoneStates[G.zone];}
+function prepareZones(g,r,fresh=false){
+  if(!usesZones(r)){
+    if(g.zone&&r.zones&&g.zone!==firstZone(r)){g.px=r.startX;g.py=GROUND;g.cam=0;}
+    g.zone=null;return;
+  }
+  const start=firstZone(r),invalid=g.zone&&!r.zones[g.zone];
+  const old=!g.zone;
+  g.zone=r.zones[g.zone]?g.zone:start;g.zoneStates=g.zoneStates||{};
+  for(const [id,z] of Object.entries(r.zones)){
+    if(!g.zoneStates[id])g.zoneStates[id]=z.newState?z.newState():{};
+    // 선언은 한 번만 복제한다. 저장한 done/got을 보존하고 왕복할 때 추가하지 않는다.
+    for(const kind of ['digs','pickups'])for(const [i,a] of (z[kind]||[]).entries()){
+      const key=a.id||id+':'+kind+':'+i;
+      if(!g[kind].some(b=>b.id===key&&(b.zone||start)===id))g[kind].push({...a,id:key,zone:id});
+    }
+  }
+  const z=r.zones[g.zone];
+  if(fresh||invalid){g.px=z.startX??r.startX??70;g.py=z.ground??GROUND;g.cam=0;}
+  g.px=clamp(g.px,16,z.w-16);
+  if(old&&!fresh){g.vx=0;g.vy=0;}
+  g.cam=clamp(g.cam||0,0,Math.max(0,z.w-W));
 }
 /* 새 게임. id 지역부터 시작하면 앞 지역들은 그 지역의 finish(g)로 마친 것으로 친다 (확인용 바로가기) */
 function newGame(id){
@@ -96,4 +136,4 @@ function ledgerDone(id){if(G.ledger[id]&&!G.ledger[id].done){Vfx.burst(G.px,G.py
 function rel(id,d){G.rel[id].v+=d;}
 
 let toastT=0;
-function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;toastT=150;}
+function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=!!vistaMode;toastT=150;}
