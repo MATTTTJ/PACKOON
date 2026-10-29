@@ -127,6 +127,35 @@ defineBullets({
     }},
 });
 
+/* 강철이 선택 기능. 예고부터 끝까지 같은 온기 길을 비워 둔다. */
+function winterAttack(kind){return {dur:220,tick(t){
+  if(t===0&&B.E.warmPath)B.bullets.push({k:'gangcheolWinter',kind,t:0,life:220});
+}};}
+defineAttacks({
+  gangcheolFrost:winterAttack('mouth'),gangcheolCoil:winterAttack('body'),
+  gangcheolIcicles:winterAttack('tail'),gangcheolBlizzard:winterAttack('core'),
+});
+/* 그린 먹과 피격 판정에 같은 범위를 쓴다. 온기 길은 이 범위보다 우선한다. */
+function winterThreat(kind,t,x,y){
+  if(t<=30)return false;
+  const u=(x-BOX.x)/BOX.w,v=(y-BOX.y)/BOX.h;
+  if(kind==='mouth')return Math.abs(v-((t-30)%100)/80)<0.18;
+  if(kind==='body'){const depth=Math.min(0.46,(t-30)/180);return u<depth||u>1-depth;}
+  if(kind==='tail'){
+    const fall=((t-30)%80)/65;
+    return Math.abs(v-fall)<0.14&&Math.abs(u*8-Math.round(u*8))<0.2;
+  }
+  // 머리를 드러낸 뒤에도 눈보라는 남는다. 읽을 수 있는 두 띠가 회전한다.
+  const a=(t-30)*0.025,dx=(u-0.5)*BOX.w,dy=(v-0.5)*BOX.h;
+  return Math.abs(dx*Math.cos(a)+dy*Math.sin(a))<28;
+}
+defineBullets({gangcheolWinter:{
+  step(b){b.t++;if(b.t>=b.life){b.dead=1;return;}
+    if(!warmSafe(B.px,B.py)&&winterThreat(b.kind,b.t,B.px,B.py))bHitMe();
+  },
+  draw(c,b){drawWinterThreat(c,b.kind,b.t);},
+}});
+
 /* 골렘 시험판 전용. 기존 공격과 탄은 건드리지 않는다. */
 defineAttacks({
   golemPillar:{dur:105,tick(t){if(t===0){

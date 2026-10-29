@@ -228,3 +228,59 @@ function drawReturnedObject(c){
     blob(c,x,y-15,5,7,RED,0.7);marketObject(c,x,y,false);
   }
 }
+
+/* 강철이의 먹 예고. 위험 범위는 공격이 끝날 때까지 옅게 남긴다. */
+function drawWinterThreat(c,kind,t){
+  for(let y=BOX.y+6;y<BOX.y+BOX.h;y+=12)for(let x=BOX.x+6;x<BOX.x+BOX.w;x+=12){
+    if(warmSafe(x,y,10))continue;
+    blob(c,x,y,7,7,INK,0.07);
+    if(winterThreat(kind,t,x,y)){
+      if(kind==='tail')brush(c,[[x-3,y-9],[x+3,y-9],[x,y+7]],3,INK,0.9);
+      else brush(c,[[x-5,y+2],[x,y-2],[x+5,y+1]],12,INK,0.65);
+    }
+  }
+  if(kind==='mouth')for(let y=BOX.y+24;y<BOX.y+BOX.h;y+=32){
+    for(let x=BOX.x+8;x<BOX.x+BOX.w;x+=14)if(!warmSafe(x,y,10))brush(c,[[x-4,y],[x+4,y]],2,INK,0.2);
+  }
+  if(kind==='body')for(const u of [0.46,0.54])for(let y=BOX.y+8;y<BOX.y+BOX.h;y+=14){
+    const x=BOX.x+BOX.w*u;if(!warmSafe(x,y,10))brush(c,[[x,y-4],[x,y+4]],3,RED,0.6);
+  }
+  if(kind==='tail')for(let i=0;i<=8;i++)for(let y=BOX.y+12;y<BOX.y+BOX.h;y+=30){
+    const x=BOX.x+BOX.w*i/8;if(!warmSafe(x,y,10))blob(c,x,y,3,4,INK,0.4);
+  }
+}
+function drawWarmPath(c){
+  const w=B.warm;
+  if(B.st==='tell')drawWinterThreat(c,B.cur.id,0);
+  if(w.points.length){
+    // 곡선 붓질로 길을 좁히지 않도록 판정과 같은 직선에 둥근 끝을 쓴다.
+    c.save();c.strokeStyle='#faf9f5';c.lineWidth=w.width;c.lineCap='round';c.lineJoin='round';c.beginPath();
+    w.points.forEach((r,i)=>{const p=coverPoint(r);if(i)c.lineTo(p.x,p.y);else c.moveTo(p.x,p.y);});c.stroke();c.restore();
+    for(let i=1;i<w.points.length;i++){
+      const a=coverPoint(w.points[i-1]),z=coverPoint(w.points[i]);
+      for(let q=0.15;q<1;q+=0.3){const x=a.x+(z.x-a.x)*q,y=a.y+(z.y-a.y)*q;
+        brush(c,[[x-6,y+6],[x+4,y],[x-3,y-7]],1.5,INK,0.22);
+      }
+    }
+  }
+  for(const r of [w.current,w.next])if(r){const p=coverPoint(r);
+    blob(c,p.x,p.y,38,38,'#faf9f5');blob(c,p.x,p.y+4,25,11,INK,0.12);
+    for(let i=-1;i<=1;i++){const x=p.x+i*12,y=p.y-4;
+      brush(c,[[x,y],[x-5,y-10],[x+4,y-20],[x,y-28]],2,INK,0.28);
+    }
+    if(r===w.next&&B.st!=='open'){
+      brush(c,[[p.x-8,p.y+20],[p.x,p.y+26],[p.x+8,p.y+20]],2,RED,0.7);
+    }
+  }
+  if(w.ice){const p=coverPoint(w.ice),near=Math.hypot(p.x-B.px,p.y-B.py)<26;
+    brush(c,[[p.x-21,p.y+4],[p.x-8,p.y-7],[p.x+20,p.y+3],[p.x+5,p.y+12],[p.x-21,p.y+4]],2,INK,0.7);
+    brush(c,[[p.x-9,p.y],[p.x,p.y+4],[p.x+7,p.y-2]],1.5,RED);
+    c.save();c.strokeStyle=RED;c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,27,-Math.PI/2,-Math.PI/2+Math.PI*2*w.ice.t/180);c.stroke();
+    c.fillStyle=near?RED:INK;c.font='12px "Gowun Dodum", sans-serif';c.textAlign='center';c.fillText((TOUCH?'치기':'J')+' · 얼음 걷기',p.x,p.y+(w.ice.v<0.5?-29:34));c.restore();
+  }
+  if(w.thaw){const p=coverPoint(w.thaw),f=w.thaw.t/90;
+    for(let i=0;i<3;i++){const spread=18+i*8+(1-f)*15;
+      brush(c,[[p.x-spread,p.y+5+i*5],[p.x,p.y+12+i*5],[p.x+spread,p.y+5+i*5]],1.5,INK,f*0.5);
+    }
+  }
+}
