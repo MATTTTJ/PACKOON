@@ -6,15 +6,27 @@ const Rg=REGIONS.dolneomeo;
 const NOD=200,AWAKE=56;
 Rg.kkuAwakeNow=()=>(G.anim%NOD)<AWAKE;
 Rg.art={
-  hedgehog(ox,oy,f){const Sp='#6b5038',Sd='#4a3626',Fc='#d9b892',K='#2b1d14';const awake=Rg.kkuAwakeNow();const dn=awake?0:2;
+  hedgehog(ox,oy,f){const Sp='#6b5038',Sd='#4a3626',Fc='#d9b892',K='#2b1d14';const awake=Rg.kkuAwakeNow();
+    if(!awake){const breath=Math.floor((G.anim-AWAKE)/36)%2,sy=oy-breath;
+      // 얼굴과 발을 안으로 감춘 둥근 몸, 바깥으로 선 가시.
+      M(ox,sy,f,-7,-15,8,14,Sp);M(ox,sy,f,-10,-12,14,10,Sp);M(ox,sy,f,-11,-9,16,5,Sp);
+      for(let i=0;i<4;i++){const x=-9+i*4,y=-15-(i===1||i===2?1:0);
+        M(ox,sy,f,x,y,3,3,Sd);M(ox,sy,f,x+1,y-2,1,2,Sd);}
+      M(ox,sy,f,-12,-12,3,3,Sd);M(ox,sy,f,-13,-13,1,2,Sd);
+      M(ox,sy,f,-13,-7,3,3,Sd);M(ox,sy,f,-15,-6,2,1,Sd);
+      M(ox,sy,f,-11,-3,3,2,Sd);M(ox,sy,f,-13,-2,2,1,Sd);
+      M(ox,sy,f,2,-12,3,3,Sd);M(ox,sy,f,5,-13,1,2,Sd);
+      M(ox,sy,f,4,-8,2,3,Sd);M(ox,sy,f,6,-7,2,1,Sd);
+      M(ox,sy,f,-7,-11,1,2,Sd);M(ox,sy,f,-2,-13,1,2,Sd);M(ox,sy,f,1,-8,2,1,Sd);
+      M(ox,sy,f,3,-4,2,1,Fc);M(ox,sy,f,5,-4,1,1,K);
+      if(ctx.canvas===cv){   // 잠꼬대 z (대화 초상에는 안 그림)
+        const z=Math.floor(G.anim/24)%3;M(ox,oy,f,8+z,-19-z*3,3,1,'#f4f7fa');M(ox,oy,f,9+z,-18-z*3,1,1,'#f4f7fa');M(ox,oy,f,8+z,-17-z*3,3,1,'#f4f7fa');}
+      return;}
     M(ox,oy,f,-10,-11,15,10,Sp);M(ox,oy,f,-12,-8,3,6,Sp);
-    for(let i=0;i<6;i++){M(ox,oy,f,-11+i*3,-13-(i%2),2,3,Sd);}
+    for(let i=0;i<6;i++){M(ox,oy,f,-11+i*3,-12-(i%2),3,1,Sd);}
     M(ox,oy,f,-9,-9,1,1,'#8a6a4a');M(ox,oy,f,-4,-10,1,1,'#8a6a4a');M(ox,oy,f,0,-8,1,1,'#8a6a4a');
-    M(ox,oy,f,3,-8+dn,6,6,Fc);M(ox,oy,f,8,-6+dn,2,2,K);
-    if(awake){M(ox,oy,f,5,-7,1,1,K);}else{M(ox,oy,f,4,-6+dn,2,1,K);}
-    M(ox,oy,f,-6,-1,3,1,Sd);M(ox,oy,f,1,-1,3,1,Sd);
-    if(!awake&&ctx.canvas===cv){   // 잠꼬대 z (대화 초상에는 안 그림)
-const z=Math.floor(G.anim/24)%3;M(ox,oy,f,8+z,-16-z*3,3,1,'#f4f7fa');M(ox,oy,f,10+z,-15-z*3,1,1,'#f4f7fa');M(ox,oy,f,8+z,-14-z*3,3,1,'#f4f7fa');}},
+    M(ox,oy,f,3,-8,6,6,Fc);M(ox,oy,f,8,-6,2,2,K);M(ox,oy,f,5,-7,1,1,K);
+    M(ox,oy,f,-6,-1,3,1,Sd);M(ox,oy,f,1,-1,3,1,Sd);},
   goat(ox,oy,f){const Wt='#ece8de',Gy='#bdb6aa',Hn='#7a6a52',K='#2b1d14';
     M(ox,oy,f,-9,-13,14,8,Wt);M(ox,oy,f,-8,-5,2,5,Gy);M(ox,oy,f,-3,-5,2,5,Gy);M(ox,oy,f,1,-5,2,5,Gy);
     M(ox,oy,f,3,-22,6,10,Wt);M(ox,oy,f,8,-19,3,4,Wt);M(ox,oy,f,6,-19,1,1,K);M(ox,oy,f,10,-16,1,1,K);
