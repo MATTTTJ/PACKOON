@@ -17,8 +17,8 @@ function faint(){
 let shakeT=0;
 function doHit(){
   Vfx.slash();
-  const f=G.face,x1=f>0?G.px+2:G.px-24,x2=x1+22;const dmg=G.sharp?2:1;
-  for(const d of G.digs){if(!d.done&&!d.busy&&d.x>x1-6&&d.x<x2+6&&G.onGround){openGather(d);return;}}
+  const f=G.face,x1=f>0?G.px+TABLES.TUNING.field_hit_front:G.px-TABLES.TUNING.field_hit_back,x2=x1+TABLES.TUNING.field_hit_width;const dmg=G.sharp?2:1;
+  for(const d of G.digs){if(!d.done&&!d.busy&&d.x>x1-TABLES.TUNING.field_dig_padding&&d.x<x2+TABLES.TUNING.field_dig_padding&&G.onGround){openGather(d);return;}}
   REG.onHit(x1,x2,dmg,f);
 }
 const sparks=[];
@@ -32,9 +32,9 @@ function step(){
   if(paused())return;
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
-  G.vx=ax*(G.attackT>0&&G.onGround?0.7:1.7);if(ax)G.face=ax>0?1:-1;
-  if(jumpQ&&G.onGround){Sound.jump();G.vy=-5.4;G.onGround=false;}jumpQ=false;
-  G.vy=Math.min(6,G.vy+0.32);
+  G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed);if(ax)G.face=ax>0?1:-1;
+  if(jumpQ&&G.onGround){Sound.jump();G.vy=TABLES.TUNING.field_jump_velocity;G.onGround=false;}jumpQ=false;
+  G.vy=Math.min(TABLES.TUNING.field_fall_speed,G.vy+TABLES.TUNING.field_gravity);
   const wasGrounded=G.onGround,prevX=G.px;
   const prevY=G.py;G.px+=G.vx;G.py+=G.vy;
   G.px=clamp(G.px,16,REG.maxX());
@@ -44,10 +44,10 @@ function step(){
   Vfx.feet();
   if(!wasGrounded&&G.onGround)Sound.land();
   if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
-  if(atkQ&&G.attackT<=0){Sound.swing();G.attackT=18;}atkQ=false;
-  if(G.attackT>0){G.attackT--;if(G.attackT===9)doHit();}
+  if(atkQ&&G.attackT<=0){Sound.swing();G.attackT=TABLES.TUNING.field_swing_frames;}atkQ=false;
+  if(G.attackT>0){G.attackT--;if(G.attackT===TABLES.TUNING.field_swing_hit_at)doHit();}
   if(G.hurtT>0)G.hurtT--;
-  for(const a of G.pickups){if(!a.got&&Math.abs(a.x-G.px)<10&&Math.abs(a.y-G.py)<16){a.got=true;addItem(a.item,1);if(REG.onPickup)REG.onPickup(a);}}
+  for(const a of G.pickups){if(!a.got&&Math.abs(a.x-G.px)<TABLES.TUNING.field_pickup_x&&Math.abs(a.y-G.py)<TABLES.TUNING.field_pickup_y){a.got=true;addItem(a.item,1);if(REG.onPickup)REG.onPickup(a);}}
   REG.step();
   for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.vy+=0.15;if(--s.t<=0)sparks.splice(i,1);}
   if(shakeT>0)shakeT--;
@@ -111,7 +111,7 @@ function draw(){
   updateOverlay();
 }
 let lastNear=null;
-function nearDig(){if(paused())return null;for(const d of G.digs){if(!d.done&&!d.busy&&Math.abs(d.x-(G.px+G.face*12))<16)return d;}return null;}
+function nearDig(){if(paused())return null;for(const d of G.digs){if(!d.done&&!d.busy&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
 function updateOverlay(){
   const pr=$('prompt');
   const n=paused()?null:nearNpc();const dg=n?null:nearDig();

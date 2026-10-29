@@ -3,6 +3,7 @@
    깊은 눈길(설피가 있어야 지난다), 마가목 비탈, 살금이, 얼어붙은 비탈(살금이의 지름길), 호숫가, 언 호수와 신목 */
 (()=>{
 const Rg=REGIONS.yeongsan;
+const MG=TABLES.MINIGAMES;
 const SNOW_X=790;      // 깊은 눈길
 const SLOPE_X=1600;    // 얼어붙은 비탈
 const LAKE_X=1960;     // 호수
@@ -84,30 +85,30 @@ Rg.drawFront=()=>{for(const l of fall)R(l.x,l.y,2,Math.sin(l.p)>0?2:1,spring()?(
 Rg.salgAlert=()=>!!G.salg&&G.salg.phase==='alert';
 function stepSalg(){
   const s=G.salg;if(G.f.salgDone)return;
-  if(!s.phase){s.phase='graze';s.timer=108;s.risk=0;s.tick=0;}
+  if(!s.phase){s.phase='graze';s.timer=MG.salg_graze;s.risk=0;s.tick=0;}
   s.tick++;
-  const d=Math.abs(s.x-G.px),moving=Math.abs(G.vx)>.2;
-  if(s.startle>0){s.startle--;if(!s.startle){s.phase='graze';s.timer=114;s.risk=0;}return;}
-  if(s.x>s.home)s.x=Math.max(s.home,s.x-.25);
-  if(d>=190)return;
+  const d=Math.abs(s.x-G.px),moving=Math.abs(G.vx)>MG.salg_moving;
+  if(s.startle>0){s.startle--;if(!s.startle){s.phase='graze';s.timer=MG.salg_return_graze;s.risk=0;}return;}
+  if(s.x>s.home)s.x=Math.max(s.home,s.x-MG.salg_return_speed);
+  if(d>=MG.salg_active_distance)return;
   if(!s.greeted){s.greeted=true;Rg.salgSay('start');}
-  if(!s.arrived&&d<30){s.arrived=true;Rg.salgSay('good');}
-  if(s.phase==='graze'&&s.timer%28===0)Sound.yeongsan('grass');
+  if(!s.arrived&&d<MG.salg_arrival_distance){s.arrived=true;Rg.salgSay('good');}
+  if(s.phase==='graze'&&s.timer%MG.salg_grass_interval===0)Sound.yeongsan('grass');
   if(s.phase==='warn'&&moving)s.lastMove=s.tick;
   if(s.phase==='alert'){
     s.age++;
-    if(moving&&d<150){s.lastMove=s.tick;if(s.age>12)s.risk++;}
+    if(moving&&d<MG.salg_risk_distance){s.lastMove=s.tick;if(s.age>MG.salg_grace)s.risk++;}
     else if(!moving){
-      if(!s.relief&&s.lastMove&&s.tick-s.lastMove<=2){s.relief=true;Rg.salgSay('relief');Sound.yeongsan('relief');}
-      s.risk=Math.max(0,s.risk-2);
+      if(!s.relief&&s.lastMove&&s.tick-s.lastMove<=MG.salg_relief_frames){s.relief=true;Rg.salgSay('relief');Sound.yeongsan('relief');}
+      s.risk=Math.max(0,s.risk-MG.salg_recovery);
     }
-    if(s.risk>=12){s.startle=60;s.x=Math.min(s.home+80,s.x+60);s.risk=0;s.arrived=false;
+    if(s.risk>=MG.salg_risk_limit){s.startle=MG.salg_startle_frames;s.x=Math.min(s.home+MG.salg_max_retreat,s.x+MG.salg_retreat);s.risk=0;s.arrived=false;
       learn('salgeumi:alert');Rg.salgSay('scare');Sound.yeongsan('scare');return;}
   }
   if(--s.timer>0)return;
-  if(s.phase==='graze'){s.phase='warn';s.timer=36;Rg.salgSay('cue');Sound.yeongsan('cue');}
-  else if(s.phase==='warn'){s.phase='alert';s.timer=52;s.age=0;s.risk=0;s.relief=false;}
-  else {s.phase='graze';s.timer=d<100?90+Math.floor(Math.random()*31):108;s.risk=0;}
+  if(s.phase==='graze'){s.phase='warn';s.timer=MG.salg_warning_frames;Rg.salgSay('cue');Sound.yeongsan('cue');}
+  else if(s.phase==='warn'){s.phase='alert';s.timer=MG.salg_alert_frames;s.age=0;s.risk=0;s.relief=false;}
+  else {s.phase='graze';s.timer=d<MG.salg_near_distance?MG.salg_near_graze+Math.floor(Math.random()*MG.salg_near_random):MG.salg_graze;s.risk=0;}
 }
 Rg.maxX=()=>!G.f.seolpi?SNOW_X-6:!G.f.shortcut?SLOPE_X-12:!G.f.sangunMet?BOSS_AT-30:2330;
 Rg.step=()=>{

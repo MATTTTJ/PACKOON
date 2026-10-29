@@ -62,7 +62,88 @@ for(const r of notebook){
 }
 for(const e of NOTES)if(e.kind==='item'&&!ITEMS[e.id])fail('notebook.csv '+e.id+': 물건 쪽인데 items.csv 에 없다');
 
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,NOTES},null,1)+";\n";
+/* 수치 표는 한 줄에 값 하나. 필수 id는 웹이 쓰는 계약이며 기본 수치를 복사해 두지 않는다. */
+function numericTable(name,label,required){
+  const file=path.join(DATA,name+'.csv'),source=fs.readFileSync(file,'utf8');
+  if(source.charCodeAt(0)!==0xFEFF)fail(name+'.csv: UTF-8 BOM이 필요하다');
+  const {head,rows}=read(file),columns=['id',label,'값이름','값','단위','설명','상태'];
+  if(head.join(',')!==columns.join(','))fail(name+'.csv: 머리줄은 '+columns.join(',')+' 이어야 한다');
+  const keys=required.split(/\s+/),expected=new Set(keys),values={};
+  for(const [i,r] of rows.entries()){
+    const where=name+'.csv '+(i+2)+'행 '+r.id;
+    if(!/^[a-z][a-z_]*$/.test(r.id)||!expected.has(r.id))fail(where+': 알 수 없는 id');
+    if(Object.hasOwn(values,r.id))fail(where+': id 중복');
+    for(const key of columns)if(!r[key].trim())fail(where+': '+key+' 칸이 비어 있다');
+    if(!['확정','제안','미정'].includes(r['상태']))fail(where+': 상태는 확정/제안/미정이어야 한다');
+    const raw=r['값'].trim(),n=Number(raw);
+    if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw)||!Number.isFinite(n))fail(where+': 값이 유한한 숫자가 아니다');
+    if(r.id==='field_jump_velocity'?n>=0:n<0)fail(where+': 값의 부호가 올바르지 않다');
+    if(['회','개','단계','인덱스','프레임','남은 프레임','ms'].includes(r['단위'])&&!Number.isInteger(n))fail(where+': 이 단위는 정수여야 한다');
+    values[r.id]=n;
+  }
+  for(const id of keys)if(!Object.hasOwn(values,id))fail(name+'.csv: 필수 값 '+id+' 누락');
+  return values;
+}
+const MINIGAMES=numericTable('minigames','미니게임',
+  [
+    'forge_heat forge_hits forge_help_misses forge_floor forge_help_floor',
+    'forge_edge_width forge_cooling forge_help_cooling forge_reheat_wait forge_finish_wait',
+    'forge_bonus_edges forge_relation forge_bonus_relation stack_phase stack_hits',
+    'stack_zone stack_help_zone stack_help_misses stack_amplitude stack_amplitude_gain',
+    'stack_speed stack_speed_gain stack_warning stack_edge_ratio stack_edge_lean',
+    'stack_edge_wait stack_hit_wait stack_miss_wait stack_relation stack_perfect_relation',
+    'steam_fire_start steam_band_min steam_band_max steam_max steam_target_frames',
+    'steam_time_limit steam_wind_at steam_wind_frames steam_fire_decay steam_wind_decay',
+    'steam_steam_follow steam_danger_steam steam_low_grace steam_danger_fire steam_danger_limit',
+    'steam_danger_recovery steam_close_at steam_fan_cooldown steam_fan_power steam_finish_wait',
+    'steam_high_steam steam_high_fire steam_low_hint_after steam_low_fire steam_voice_cooldown',
+    'steam_relation rhythm_notes rhythm_good rhythm_perfect rhythm_scroll_speed',
+    'rhythm_bonus_hits rhythm_start_delay rhythm_subbeat rhythm_intro_beats rhythm_parts',
+    'rhythm_normal_gap rhythm_late_gap rhythm_normal_last rhythm_late_hint_delay rhythm_finish_delay',
+    'rhythm_cooldown rhythm_resume_delay rhythm_combo rhythm_relation rhythm_high_relation',
+    'rhythm_note_one rhythm_note_two rhythm_note_three rhythm_note_four rhythm_note_five',
+    'rhythm_note_six rhythm_note_seven rhythm_note_eight salg_graze salg_return_graze',
+    'salg_moving salg_return_speed salg_active_distance salg_arrival_distance salg_grass_interval',
+    'salg_risk_distance salg_grace salg_relief_frames salg_recovery salg_risk_limit',
+    'salg_startle_frames salg_max_retreat salg_retreat salg_warning_frames salg_alert_frames',
+    'salg_near_distance salg_near_graze salg_near_random dad_steps gather_help_misses',
+    'gather_help_width gather_zone_start gather_zone_span gather_speed_gain gather_cooldown',
+    'gather_finish_wait gather_yield gather_perfect_yield gather_root_hits gather_root_width',
+    'gather_root_speed gather_ssari_hits gather_ssari_width gather_ssari_speed gather_kkoe_hits',
+    'gather_kkoe_width gather_kkoe_speed gather_eoksae_hits gather_eoksae_width gather_eoksae_speed',
+    'gather_seogi_hits gather_seogi_width gather_seogi_speed gather_darae_vine_hits gather_darae_vine_width',
+    'gather_darae_vine_speed'
+  ].join(' '));
+const TUNING=numericTable('tuning','분류',
+  [
+    'kkubeogi_cycle kkubeogi_awake kkubeogi_cue field_move_speed field_swing_speed',
+    'field_jump_velocity field_gravity field_fall_speed field_pickup_x field_pickup_y',
+    'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at',
+    'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval'
+  ].join(' '));
+/* 나눗셈·주기·배열 길이와 서로 맞물리는 판정은 실행 전에 확인한다. */
+const requireValue=(ok,message)=>{if(!ok)fail(message);};
+for(const [table,values] of [['minigames',MINIGAMES],['tuning',TUNING]]){
+  for(const [id,n] of Object.entries(values)){
+    if(/_(hits|frames|wait|cooldown|cycle|cue|steps|notes|parts|interval|target_frames|danger_limit|near_random)$/.test(id))requireValue(n>0,table+'.csv '+id+': 0보다 커야 한다');
+  }
+}
+requireValue(MINIGAMES.steam_max>0&&MINIGAMES.steam_band_min<MINIGAMES.steam_band_max&&MINIGAMES.steam_band_max<=MINIGAMES.steam_max,'minigames.csv: 김 판정 범위와 상한을 확인한다');
+requireValue(MINIGAMES.steam_wind_at<=MINIGAMES.steam_max,'minigames.csv: 외풍 시작이 진행 상한보다 크다');
+requireValue(MINIGAMES.stack_zone<=1&&MINIGAMES.stack_help_zone<=1&&MINIGAMES.stack_edge_ratio<=1,'minigames.csv: 돌 쌓기 판정 비율은 1 이하여야 한다');
+requireValue(MINIGAMES.forge_help_floor<MINIGAMES.forge_heat&&MINIGAMES.forge_floor<MINIGAMES.forge_heat,'minigames.csv: 쇠 식음 경계가 재가열한 열보다 낮아야 한다');
+requireValue(MINIGAMES.rhythm_notes<=8&&MINIGAMES.rhythm_normal_last<MINIGAMES.rhythm_notes&&MINIGAMES.rhythm_bonus_hits<=MINIGAMES.rhythm_notes,'minigames.csv: 구현된 노트 수와 덤 기준을 확인한다');
+const noteKeys=['one','two','three','four','five','six','seven','eight'];
+for(let i=1;i<noteKeys.length;i++)requireValue(MINIGAMES['rhythm_note_'+noteKeys[i]]>MINIGAMES['rhythm_note_'+noteKeys[i-1]],'minigames.csv: 노트 시각은 순서대로 커져야 한다');
+requireValue(MINIGAMES.dad_steps<=3,'minigames.csv: 구현된 몸짓은 세 단계까지다');
+requireValue(TUNING.kkubeogi_awake<=TUNING.kkubeogi_cycle&&TUNING.kkubeogi_cue<=TUNING.kkubeogi_cycle,'tuning.csv: 꾸벅이 판정과 예고가 주기보다 길다');
+requireValue(TUNING.field_swing_hit_at<TUNING.field_swing_frames,'tuning.csv: 휘두르기 판정 시점이 전체 시간보다 짧아야 한다');
+for(const id of ['root','ssari','kkoe','eoksae','seogi','darae_vine']){
+  const width=MINIGAMES['gather_'+id+'_width'];
+  requireValue(width>0&&width+MINIGAMES.gather_help_width<=MINIGAMES.gather_zone_span&&MINIGAMES.gather_zone_start+MINIGAMES.gather_zone_span<=100,'minigames.csv: '+id+' 채집 판정 범위가 막대를 벗어난다');
+}
+
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,NOTES,MINIGAMES,TUNING},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

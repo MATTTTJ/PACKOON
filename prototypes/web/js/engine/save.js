@@ -71,4 +71,4 @@ function startOrConfirm(){
   disarm(b);startGame();
 }
 /* 자동 저장 */
-setInterval(()=>{if(G&&G.started&&!G.ended&&!busyForSave())writeSave(true);},30000);
+setInterval(()=>{if(G&&G.started&&!G.ended&&!busyForSave())writeSave(true);},TABLES.TUNING.save_interval);

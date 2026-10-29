@@ -3,6 +3,7 @@
    흐름은 design/narrative/galchamgol-scenario.md, 교환은 design/data/trades.csv */
 (()=>{
 const Rg=REGIONS.galchamgol;
+const MG=TABLES.MINIGAMES;
 
 /* ---------- 도담 (다람쥐) ---------- */
 function talkDodam(){
@@ -92,7 +93,7 @@ function battleMusoe(){
 }
 
 /* 대장간: 식기 전 세 번 벼린다. 놓쳐도 횟수·숯은 그대로, 같은 버튼으로 다시 달군다. */
-const forge={heat:100,hits:0,miss:0,edge:0,phase:'cold',wait:0,impact:0,particles:[]};
+const forge={heat:MG.forge_heat,hits:0,miss:0,edge:0,phase:'cold',wait:0,impact:0,particles:[]};
 const forgeWords={
   start:['쇠빛부터 봐라. 손에 힘 빼고.','급할 것 없다. 쇠부터 살펴라.','내가 불 볼 테니, 넌 망치 들어.'],
   good:['그래. 힘 말고 박자로 쳐라.','제법이군. 한 번 더 가자.','허, 망치 쥔 꼴은 봐줄 만해.'],
@@ -107,7 +108,7 @@ function forgeSay(kind){
   forge.lastLine=choices[Math.floor(Math.random()*choices.length)];
   $('fhint').textContent='무쇠: “'+forge.lastLine+'”';
 }
-function forgeFloor(){return forge.miss>=2?10:22;}
+function forgeFloor(){return forge.miss>=MG.forge_help_misses?MG.forge_help_floor:MG.forge_floor;}
 function prepareForge(){
   if(forgeCanvas)return;
   forgeCanvas=el('canvas');forgeCanvas.width=520;forgeCanvas.height=110;
@@ -120,27 +121,27 @@ function prepareForge(){
 }
 function openForge(){
   prepareForge();
-  Object.assign(forge,{heat:100,hits:0,miss:0,edge:0,phase:'hot',wait:0,impact:0,particles:[],warned:false,owner:G});
+  Object.assign(forge,{heat:MG.forge_heat,hits:0,miss:0,edge:0,phase:'hot',wait:0,impact:0,particles:[],warned:false,owner:G});
   $('forgeTitle').textContent='대장간 · 아빠의 낫 벼리기';$('forge').hidden=false;
   forgeSay('start');drawForge();
 }
 function drawForge(){
-  const floor=forgeFloor(),edge=forge.phase==='hot'&&forge.heat<=floor+14;
-  $('fbar').style.background='linear-gradient(90deg,#302c2b '+floor+'%,#d67a2d '+(floor+14)+'%,#d74425 100%)';
-  $('fzone').style.left=floor+'%';$('fzone').style.width='14%';
+  const floor=forgeFloor(),edge=forge.phase==='hot'&&forge.heat<=floor+MG.forge_edge_width;
+  $('fbar').style.background='linear-gradient(90deg,#302c2b '+floor+'%,#d67a2d '+(floor+MG.forge_edge_width)+'%,#d74425 100%)';
+  $('fzone').style.left=floor+'%';$('fzone').style.width=MG.forge_edge_width+'%';
   $('fmark').style.left=forge.heat+'%';
   forgeHeatLabel.textContent=forge.phase==='cold'?'식었다 · 다시 달구기 (숯 추가 소모 없음)':
-    forge.phase==='done'?'벼리기 끝!'+(forge.edge>=2?' · 무쇠의 인정 +1':''):
-    '남은 열 '+Math.ceil(forge.heat)+'% · '+(edge?'아슬아슬! 금빛 칸에서 치면 큰 불똥':'빛이 남아 있으면 성공 · 금빛 칸은 식기 직전')+(forge.miss>=2?' · 천천히 식도록 도움':'');
+    forge.phase==='done'?'벼리기 끝!'+(forge.edge>=MG.forge_bonus_edges?' · 무쇠의 인정 +'+MG.forge_bonus_relation:''):
+    '남은 열 '+Math.ceil(forge.heat)+'% · '+(edge?'아슬아슬! 금빛 칸에서 치면 큰 불똥':'빛이 남아 있으면 성공 · 금빛 칸은 식기 직전')+(forge.miss>=MG.forge_help_misses?' · 천천히 식도록 도움':'');
   $('fstrike').innerHTML=(forge.phase==='cold'?'다시 달구기':forge.phase==='done'?'벼리기 끝':'내려치기')+' <kbd>Space · J</kbd>';
-  $('fpips').innerHTML=[0,1,2].map(i=>'<span class="pip'+(i<forge.hits?' on':'')+'"></span>').join('');
+  $('fpips').innerHTML=Array.from({length:MG.forge_hits},(_,i)=>'<span class="pip'+(i<forge.hits?' on':'')+'"></span>').join('');
   const c=forgeCanvas.getContext('2d');if(!c)return;
   c.clearRect(0,0,520,110);c.fillStyle='#29231f';c.fillRect(0,0,520,110);
   c.save();
   const kick=forge.impact?Math.sin(forge.impact*2)*forge.impact/5:edge?Math.sin(forge.heat*3):0;
   c.translate(kick,0);
   c.fillStyle='#514a43';c.fillRect(195,74,130,12);c.fillRect(230,86,60,12);c.fillRect(216,98,88,8);
-  const h=Math.max(0,Math.min(1,(forge.heat-floor)/(100-floor)));
+  const h=Math.max(0,Math.min(1,(forge.heat-floor)/(MG.forge_heat-floor)));
   const color=forge.heat<floor?'#45403c':h>.45?'rgb(225,'+Math.round(60+(1-h)*70)+',37)':'rgb('+Math.round(110+h*240)+','+Math.round(65+h*110)+',38)';
   c.shadowColor=color;c.shadowBlur=forge.heat>=floor?8+h*16:0;c.fillStyle=color;
   c.fillRect(210,62,100,10);c.fillRect(305,57,20,8);c.shadowBlur=0;
@@ -156,21 +157,21 @@ function forgeStep(){
   if(forge.wait>0){
     if(--forge.wait===0){
       if(forge.phase==='done'){finishForge();return;}
-      forge.phase='hot';forge.heat=100;
+      forge.phase='hot';forge.heat=MG.forge_heat;
     }
   }else if(forge.phase==='hot'){
-    const floor=forgeFloor();forge.heat=Math.max(0,forge.heat-(forge.miss>=2?.32:.43));
+    const floor=forgeFloor();forge.heat=Math.max(0,forge.heat-(forge.miss>=MG.forge_help_misses?MG.forge_help_cooling:MG.forge_cooling));
     if(forge.heat<floor){forge.phase='cold';forge.heat=0;forge.miss++;forgeSay('fail');}
-    else if(forge.heat<=floor+14&&!forge.warned){forge.warned=true;forgeSay('danger');}
+    else if(forge.heat<=floor+MG.forge_edge_width&&!forge.warned){forge.warned=true;forgeSay('danger');}
   }
   drawForge();
 }
 function strike(){
-  if($('forge').hidden||forge.owner!==G||forge.wait>0||forge.hits>=3)return;
+  if($('forge').hidden||forge.owner!==G||forge.wait>0||forge.hits>=MG.forge_hits)return;
   if(forge.phase==='cold'){
-    Sound.forge('cold');forge.phase='hot';forge.heat=100;forge.warned=false;forgeSay('start');drawForge();return;
+    Sound.forge('cold');forge.phase='hot';forge.heat=MG.forge_heat;forge.warned=false;forgeSay('start');drawForge();return;
   }
-  const edge=forge.heat<=forgeFloor()+14;
+  const edge=forge.heat<=forgeFloor()+MG.forge_edge_width;
   forge.hits++;if(edge)forge.edge++;
   Sound.forge(edge?'edge':'hit');forgeSay(edge?'edge':'good');
   forge.impact=edge?20:10;
@@ -178,7 +179,7 @@ function strike(){
     const life=18+Math.random()*16;
     forge.particles.push({x:260,y:62,vx:(Math.random()-.5)*(edge?12:6),vy:-2-Math.random()*(edge?6:3),life,max:life,size:edge?3:2,color:i%3?'#ffc45c':'#fff2b0'});
   }
-  forge.phase=forge.hits>=3?'done':'reheat';forge.wait=forge.hits>=3?36:30;forge.warned=false;
+  forge.phase=forge.hits>=MG.forge_hits?'done':'reheat';forge.wait=forge.hits>=MG.forge_hits?MG.forge_finish_wait:MG.forge_reheat_wait;forge.warned=false;
   drawForge();
 }
 $('fstrike').addEventListener('pointerdown',e=>{e.preventDefault();strike();});
@@ -186,12 +187,12 @@ $('fstrike').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault
 $('fbar').addEventListener('pointerdown',e=>{e.preventDefault();strike();});
 defineMinigame({id:'forge',step:forgeStep,hit:strike});
 function finishForge(){
-  if(forge.owner!==G||G.f.musoeDone||forge.hits<3)return;
+  if(forge.owner!==G||G.f.musoeDone||forge.hits<MG.forge_hits)return;
   $('forge').hidden=true;
   takeItem('coal',1);
   let sharp=false;if(has('coal')){takeItem('coal',1);sharp=true;}
-  G.tool='sickle';G.sharp=sharp;G.f.musoeDone=true;learn('musoe:forge');ledgerDone('musoe');rel('musoe',1);
-  if(forge.edge>=2)rel('musoe',1);
+  G.tool='sickle';G.sharp=sharp;G.f.musoeDone=true;learn('musoe:forge');ledgerDone('musoe');rel('musoe',MG.forge_relation);
+  if(forge.edge>=MG.forge_bonus_edges)rel('musoe',MG.forge_bonus_relation);
   diary('sickle','아빠의 낫을 받았다. 손잡이에 아빠 손때가 묻어 있다.');
   clue('m2','무쇠','아빠는 대장간에서 사흘을 묵으며 밤마다 낡은 장부만 들여다봤다.');
   toast('아빠의 낫을 얻었다!'+(sharp?' 날이 더 날카롭다':''));

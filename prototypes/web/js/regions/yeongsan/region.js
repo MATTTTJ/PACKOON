@@ -58,7 +58,7 @@ defineIcons({
 
 /* 다래 덩굴은 낫으로 벤다 */
 defineGather({
-  darae_vine:{title:'다래 덩굴 베기',hits:2,zw:18,speed:1.8,hint:'눈 덮인 덤불 속 덩굴을 낫으로 벤다. 밝은 곳에 맞춰 두 번.',ok:['서걱, 한 줄기가 풀렸다.'],miss:'눈만 털렸다…'},
+  darae_vine:{title:'다래 덩굴 베기',hits:TABLES.MINIGAMES.gather_darae_vine_hits,zw:TABLES.MINIGAMES.gather_darae_vine_width,speed:TABLES.MINIGAMES.gather_darae_vine_speed,hint:'눈 덮인 덤불 속 덩굴을 낫으로 벤다. 밝은 곳에 맞춰 두 번.',ok:['서걱, 한 줄기가 풀렸다.'],miss:'눈만 털렸다…'},
 });
 
 /* 아빠의 약연: 산군과의 셈이 맞은 뒤 아빠와 손을 포개면 깨어난다. 가공법은 heirlooms.csv */

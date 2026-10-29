@@ -9,34 +9,34 @@ function openGather(d){
   $('gTitle').textContent=cfg.title;$('ghint').textContent=cfg.hint;$('gstrike').textContent=(cfg.hits>1?'파기':'꺾기')+(TOUCH?'':' (Space · J)');
   $('gather').hidden=false;drawGather();
 }
-function setZone(){const w=gat.cfg.zw+(gat.miss>=2?12:0);const a=10+Math.random()*(80-w);gat.zone=[a,a+w];}
+function setZone(){const w=gat.cfg.zw+(gat.miss>=TABLES.MINIGAMES.gather_help_misses?TABLES.MINIGAMES.gather_help_width:0);const a=TABLES.MINIGAMES.gather_zone_start+Math.random()*(TABLES.MINIGAMES.gather_zone_span-w);gat.zone=[a,a+w];}
 function drawGather(){
   $('gzone').style.left=gat.zone[0]+'%';$('gzone').style.width=(gat.zone[1]-gat.zone[0])+'%';$('gmark').style.left=gat.pos+'%';
   $('gpips').innerHTML=Array.from({length:gat.cfg.hits},(_,i)=>'<span class="pip'+(i<gat.hits?' on':'')+'"></span>').join('');
 }
 function gatherStep(){
-  gat.pos+=gat.dir*(gat.cfg.speed+gat.hits*0.3);
+  gat.pos+=gat.dir*(gat.cfg.speed+gat.hits*TABLES.MINIGAMES.gather_speed_gain);
   if(gat.pos>=100){gat.pos=100;gat.dir=-1;}if(gat.pos<=0){gat.pos=0;gat.dir=1;}
   if(gat.cool>0)gat.cool--;drawGather();
 }
 function gStrike(){
-  if(gat.cool>0||!gat.cfg||gat.hits>=gat.cfg.hits)return;gat.cool=12;
+  if(gat.cool>0||!gat.cfg||gat.hits>=gat.cfg.hits)return;gat.cool=TABLES.MINIGAMES.gather_cooldown;
   if(gat.pos>=gat.zone[0]&&gat.pos<=gat.zone[1]){
     Sound.gather(true);gat.hits++;
-    if(gat.hits>=gat.cfg.hits){drawGather();setTimeout(finishGather,300);return;}
+    if(gat.hits>=gat.cfg.hits){drawGather();setTimeout(finishGather,TABLES.MINIGAMES.gather_finish_wait);return;}
     $('ghint').textContent=gat.cfg.ok[gat.hits-1]||'좋아!';setZone();
   }else{
     Sound.gather(false);gat.miss++;
-    $('ghint').innerHTML='<b>'+gat.cfg.miss+'</b>'+(gat.miss===2?' (무른 자리가 넓어졌다)':'');
-    if(gat.miss===2)setZone();
+    $('ghint').innerHTML='<b>'+gat.cfg.miss+'</b>'+(gat.miss===TABLES.MINIGAMES.gather_help_misses?' (무른 자리가 넓어졌다)':'');
+    if(gat.miss===TABLES.MINIGAMES.gather_help_misses)setZone();
   }
   drawGather();
 }
 function finishGather(){
   const d=gat.d,id=d.item;$('gather').hidden=true;d.done=true;d.busy=false;
   const perfect=gat.miss===0;Vfx.gather(d.x,GROUND-4);
-  addItem(id,perfect?2:1);
-  if(perfect)setTimeout(()=>toast('흠집 하나 없이 캐냈다! '+ITEMS[id].n+' ×2'),700);
+  addItem(id,perfect?TABLES.MINIGAMES.gather_perfect_yield:TABLES.MINIGAMES.gather_yield);
+  if(perfect)setTimeout(()=>toast('흠집 하나 없이 캐냈다! '+ITEMS[id].n+' ×'+TABLES.MINIGAMES.gather_perfect_yield),700);
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);
   gat.cfg=null;
 }
