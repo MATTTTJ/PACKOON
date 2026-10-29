@@ -111,6 +111,9 @@ sesame_salt,galchamgol,깨소금,물건,나,recipe:sesame_salt,숨은 가공법�
 mung_batter,jangteo,녹두 빈대떡 반죽,물건,나,recipe:mung_batter,숨은 가공법을 직접 찾아 만들었을 때,녹두에 참기름을 더해 갈았다. 장터에서 먹던 빈대떡 반죽이 됐다.,확정,PA-43 크래프팅
 rainbow_tteok,yeongsan,무지개떡,물건,나,recipe:rainbow_tteok,숨은 가공법을 직접 찾아 만들었을 때,단풍골 가루에 장터 팥과 영산 열매를 포갰다. 세 계절이 한 떡이 됐다.,확정,PA-43 크래프팅
 ssanghwa,yeongsan,쌍화 약재,물건,나,recipe:ssanghwa,숨은 가공법을 직접 찾아 만들었을 때,"칡뿌리와 겨우살이, 대추를 함께 갈았다. 아빠의 약연에서 새 향이 났다.",확정,PA-43 크래프팅
+dolneomeo_jangseung,dolneomeo,장승 뒤 도장,도장,아빠,stamp:dolneomeo:jangseung,장승 뒤 발바닥 도장을 찾았을 때,장승 뒤에서 짚신을 고쳤다. 부를 준다는 열매가 북쪽에 있다니 고개 하나쯤은 더 넘을 수 있다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날
+dolneomeo_mill_base,dolneomeo,맷돌 받침돌 도장,도장,아빠,stamp:dolneomeo:mill_base,맷돌 받침돌의 발바닥 도장을 찾았을 때,돌쇠 어른께 돌을 배웠다. 부자가 되면 돌가루쯤은 털고 살 줄 알았는데 손끝에서 돌 냄새가 안 빠진다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날
+dolneomeo_cliff_crack,dolneomeo,절벽 바위 틈 도장,도장,아빠,stamp:dolneomeo:cliff_crack,절벽 바위 틈의 발바닥 도장을 찾았을 때,구름 아래 마을이 좁쌀만 하다. 부자가 되어 돌아올 길을 잊을까 바위 틈에 발바닥을 찍어 둔다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날
 salt,galchamgol,소금,물건,나,got:salt,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
 sesame,galchamgol,깨,물건,나,got:sesame,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅
 sesame_oil,dolneomeo,참기름,물건,나,got:sesame_oil,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅

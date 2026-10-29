@@ -1695,6 +1695,45 @@ const TABLES={
    ]
   },
   {
+   "id": "dolneomeo_jangseung",
+   "region": "dolneomeo",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "장승 뒤에서 짚신을 고쳤다. 부를 준다는 열매가 북쪽에 있다니 고개 하나쯤은 더 넘을 수 있다.",
+     "when": "stamp:dolneomeo:jangseung"
+    }
+   ],
+   "name": "장승 뒤 도장"
+  },
+  {
+   "id": "dolneomeo_mill_base",
+   "region": "dolneomeo",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "돌쇠 어른께 돌을 배웠다. 부자가 되면 돌가루쯤은 털고 살 줄 알았는데 손끝에서 돌 냄새가 안 빠진다.",
+     "when": "stamp:dolneomeo:mill_base"
+    }
+   ],
+   "name": "맷돌 받침돌 도장"
+  },
+  {
+   "id": "dolneomeo_cliff_crack",
+   "region": "dolneomeo",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "구름 아래 마을이 좁쌀만 하다. 부자가 되어 돌아올 길을 잊을까 바위 틈에 발바닥을 찍어 둔다.",
+     "when": "stamp:dolneomeo:cliff_crack"
+    }
+   ],
+   "name": "절벽 바위 틈 도장"
+  },
+  {
    "id": "salt",
    "region": "galchamgol",
    "kind": "item",

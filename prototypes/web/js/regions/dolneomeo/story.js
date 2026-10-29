@@ -85,12 +85,12 @@ function talkPpuriArc(){
     ['뿔이','난 길만 살폈지. 기다리는 이는 못 봤다.']
   ],'뿔이는 지난가을 아빠를 사흘 동안 눈 속에서 기다리게 했다. 아빠는 기침을 하면서도 한 번도 화를 내지 않았다고 한다.')});
   else if(F.ppuriPassed&&!F.dolneomeo_arc_ppuri3)c.push({t:'아빠는 어느 길로 갔어요?',go:()=>arcScene('dolneomeo_arc_ppuri3',[
-    ['뿔이','금줄 너머 납작한 바위가 보이나.'],
-    ['뿔이','그 옆으로 곧장 가면 성황당이다.'],
+    ['뿔이',CLASSIC?'금줄 너머 납작한 바위가 보이나.':'마을 끝, 높은 돌계단이 보이나.'],
+    ['뿔이',CLASSIC?'그 옆으로 곧장 가면 성황당이다.':'돌계단 안쪽 길은 성황당으로 곧장 간다.'],
     ['뿔이','네 아빠가 지나간 지름길이다.'],
     ['너구리','알려 줘서 고마워요.'],
     ['뿔이',G.boss.dead?'돌무더기도 잠잠해졌군. 그래도 발밑을 살펴라.':'돌무더기는 아직 깨어 있다. 거긴 조심해라.']
-  ],'뿔이가 아빠가 지나간 지름 바위를 알려 줬다. 금줄 너머 납작한 바위 옆길이다. 성황당 돌무더기는 따로 지나야 한다.')});
+  ],CLASSIC?'뿔이가 아빠가 지나간 지름 바위를 알려 줬다. 금줄 너머 납작한 바위 옆길이다. 성황당 돌무더기는 따로 지나야 한다.':'뿔이가 아빠가 지나간 마을 끝 돌계단 안쪽 길을 알려 줬다. 성황당 돌무더기는 따로 지나야 한다.')});
   if(c.length)return arcMenu('뿔이','묻고 싶은 게 있나.',talkPpuri,c);
   talkPpuri();
 }
@@ -161,6 +161,20 @@ function nalMenu(){
     if(!F.nalDBluff)c.push({t:'허세 부리기: "칡꽃? 단풍골엔 흔한데."',go:nalBluff});
   }
   if(Rg.arcs()&&G.tool==='sickle'&&!F.dolneomeo_arc_nal2)c.push({t:'아빠의 낫을 보여 준다',go:nalSickle});
+  if(!CLASSIC&&!F.dolneomeo_craft_oil)c.push({t:'여분 억새 한 단을 참기름과 바꾼다',go:()=>{
+    // t_craft_oil: 꾸벅이 둥지 몫을 먼저 남긴다. 거절에는 소비가 없다.
+    if(!has('eoksae',F.kkuDone?1:4)){
+      talk([['날쌘',F.kkuDone?'억새 한 단은 있어야지.\n밭에 남은 마른 걸 베어 와.':'둥지에 쓸 세 단은 남겨 둬.\n그 밖에 한 단 더 있으면 바꾸자.']]);return;
+    }
+    talk([['날쌘','병을 감쌀 억새가 필요해.\n한 단 주면 참기름 한 병이다.',[
+      {t:'여분 억새 한 단을 건넨다',go:()=>{
+        if(G.f.dolneomeo_craft_oil||!has('eoksae',G.f.kkuDone?1:4))return;
+        takeItem('eoksae',1);addItem('sesame_oil',1);G.f.dolneomeo_craft_oil=true;
+        diary('dolneomeo_craft_oil','날쌘에게 여분 억새를 주고 참기름을 받았다. 병을 억새로 감싸니 돌길에서도 부딪는 소리가 작아졌다.');
+        talk([['날쌘','이걸로 병끼리 안 부딪겠네.\n기름은 네가 쓸 데에 써.']]);
+      }},{t:'지금은 챙겨 둘래',go:null}
+    ]]]);
+  }});
   c.push({t:'그만두기',go:null});
   const say=F.nalDDone?'결명자는 눈 밝히는 약재야. 돌쇠 할배한테 차로 달여 드려 봐. 쓸 만한 거래였지?'
     :(has('kflower')||has('gyeousari',2))?'어디, 뭘 내놓을 건데?':'빈손으로 흥정하게? 칡꽃이 없으면 높은 가지에 달린 겨우살이 두 개라도 따 와.';
@@ -422,4 +436,166 @@ Rg.goal=()=>{
   if(!F.daraePicked)return '절벽 바위턱의 서리다래 따기';
   return '보따리를 열고 맷돌에 서리다래 넣어 약즙 만들기';
 };
+})();
+
+/* PA-43 [개발자 결정] 돌에 새긴 소원. 선택 만남은 필수 교환·가보·출구 조건에 쓰지 않는다. */
+(()=>{
+if(CLASSIC)return;
+const Rg=REGIONS.dolneomeo;
+const drawGuest=kind=>(x,y,f)=>Rg.expansionArt.drawWanderer(kind,x,y,f);
+const finish=(id,record,flag)=>()=>{
+  if(flag)G.f[flag]=true;
+  finishWanderer(id);diary('wanderer:dolneomeo:'+id,record);
+};
+
+function helpHare(){
+  talk([
+    ['산토끼 짐꾼','돌쇠 어른 댁에 숫돌을 지고 가는 길이야.\n첫서리만 오면 이 끈이 자꾸 미끄러져.'],
+    ['산토끼 짐꾼','숫돌은 꼭대기에, 억새는 밑에 묶었거든.\n걸을 때마다 등짐이 나보다 먼저 고개를 넘어.'],
+    ['너구리','무거운 걸 아래로 내려 볼까요?\n제가 이쪽을 잡을게요.'],
+    ['산토끼 짐꾼','그럼 잠깐 같이 들어 주겠니?\n길바닥에 내려놓고 끈부터 풀자.',[
+      {t:'등짐을 받치고 숫돌을 아래로 옮긴다',go:()=>talk([
+        ['너구리','(짐꾼과 등짐을 내려놓았다.\n숫돌을 등에 붙이고 억새는 위로 올렸다.)'],
+        ['산토끼 짐꾼','어이쿠, 등이 한결 가볍네.\n짐은 그대로인데 걷는 게 다르구나.'],
+        ['산토끼 짐꾼','장승 뒤 받침을 살펴봐. 낡은 발바닥 자국이 있어.\n우리 아버지도 길짐승들이 남긴 길표랬지.'],
+        ['산토끼 짐꾼','고개 안쪽 돌다리는 지금은 무너졌어.\n없는 길로 성큼 내딛지는 마라.']
+      ],finish('dol_hare','산토끼 짐꾼의 숫돌을 등 가까이 낮춰 묶었다. 짐꾼이 장승 뒤 길표와 무너진 옛 돌다리를 알려 줬다.','dolneomeo_pack_help'))},
+      {t:'지금은 길부터 살펴볼게요',go:null}
+    ]]
+  ]);
+}
+
+function stoneChoice(kind){
+  const flat=kind==='flat';
+  talk([
+    ['너구리',flat?'(마당에서 주운 납작돌을 내밀었다.\n꼬마의 반짝돌과 바꾸었다.)':'(마당에서 주운 줄무늬 돌을 내밀었다.\n꼬마의 반짝돌과 바꾸었다.)'],
+    ['꼬마 두더지',flat?'납작해서 내 돌집 문이 되겠다!\n반짝돌은 네 손에도 잘 어울리네.':'이건 줄마다 길이 하나씩 있네!\n반짝돌은 네 손에도 잘 어울리네.'],
+    ['꼬마 두더지','할배가 버린 돌에도 쓸 데가 있댔어.\n맷돌 받침은 옛 돌다리에서 가져온 거래.'],
+    ['너구리','(반짝돌은 꼬마 돌집 창가에 놓았다.\n둘이 바꾼 돌이 한 집에 나란히 섰다.)']
+  ],()=>{
+    G.f.dolneomeo_mole_pebble=kind;
+    finish('dol_mole','꼬마 두더지와 마당의 돌을 바꿨다. 꼬마는 내 돌로 돌집을 꾸몄고, 반짝돌은 창가에 나란히 놓았다. 맷돌 받침은 옛 돌다리의 돌이라고 한다.')();
+  });
+}
+function meetMole(){
+  talk([
+    ['꼬마 두더지','이 돌 봐! 씻으니까 별이 나왔어.\n돌쇠 할배 마당에는 이런 돌이 많아.'],
+    ['꼬마 두더지','나는 돌집을 짓는데 문이랑 담이 비었어.\n이 반짝돌은 예쁘지만 자꾸 굴러가.'],
+    ['너구리','저 납작한 건 문이 되겠네.\n줄무늬 돌은 담으로 쓰고.'],
+    ['꼬마 두더지','네가 고른 돌이랑 바꿀래.\n여기 마당에 있는 걸 골라도 돼!',[
+      {t:'납작한 돌과 바꾼다',go:()=>stoneChoice('flat')},
+      {t:'줄무늬 돌과 바꾼다',go:()=>stoneChoice('stripe')},
+      {t:'돌집을 좀 더 구경한다',go:null}
+    ]]
+  ]);
+}
+
+function warmFrog(){
+  talk([
+    ['움츠린 개구리','돌 틈에서 겨울잠을 자려 했는데…\n고드름 녹은 물이 등을 적셨어.'],
+    ['움츠린 개구리','석수들이 두고 간 화로는 식어 가고.\n저 넓적한 돌만 아직 온기가 남았네.'],
+    ['너구리','이 돌, 미지근해.\n젖은 자리 말고 이 위로 올라올래?'],
+    ['움츠린 개구리','다리에 힘이 안 들어가네.\n돌을 내 쪽으로 밀어 주겠니?',[
+      {t:'따뜻한 돌을 밀어 건넨다',go:()=>talk([
+        ['너구리','(식은 화로 옆 돌을 두 손으로 밀었다.\n개구리가 천천히 배를 붙인다.)'],
+        ['움츠린 개구리','아… 배부터 좀 풀린다.\n겨울 들기 전에 자리를 잘못 잡았어.'],
+        ['움츠린 개구리','위쪽 갈라진 바위는 비도 바람도 안 들어.\n안쪽에 붉은 발자국도 하나 있어.'],
+        ['너구리','(마른 틈 쪽으로 돌을 바짝 붙여 줬다.\n개구리가 다리를 접고 눈을 감는다.)']
+      ],finish('dol_frog','절벽 화로 곁의 온기 남은 돌을 개구리에게 밀어 줬다. 물이 스미지 않는 높은 바위 틈에 붉은 발자국이 있단다.','dolneomeo_frog_warm'))},
+      {t:'화로 옆을 먼저 둘러본다',go:null}
+    ]]
+  ]);
+}
+
+function restMagpie(){
+  // 다른 지역 기록은 읽기만 한다. 바로가기를 실제 배달 기억으로 바꾸지 않는다.
+  const home=knows('home:galchamgol');
+  const delivered=G.diary.some(d=>d.id==='end'||d.id==='galArcToad1');
+  talk([
+    ['늙은 까치',home?'네가 싸 준 먹을거리 냄새를 기억하지.\n이번에는 돌 냄새가 보따리에 배었구나.':delivered?'남쪽 약방에서 보던 그 모자로구나.\n여기까지 오느라 발바닥이 시리겠다.':'꼬마 보부상이로구나.\n돌길은 발바닥보다 무릎을 먼저 쉬게 해.'],
+    ['늙은 까치','마을 아랫집 처마까지는 바람이 순해.\n이 고개만 넘으면 날개를 접기도 어렵지.'],
+    ['너구리','그럼 여기서 쉬어.\n내가 바람 오는 쪽에 앉을게.'],
+    ['늙은 까치','저 돌담 등지고 같이 앉을까?\n급히 날아 봐야 추운 건 마찬가지야.',[
+      {t:'돌담에 기대 까치와 쉰다',go:()=>talk([
+        ['너구리','(보따리를 세우니 찬바람이 조금 잦아들었다.\n까치가 한쪽 발을 깃털 속에 넣는다.)'],
+        ['늙은 까치','돌쇠 어른도 꼭 이 자리에 앉곤 했어.\n손에 박힌 돌가루를 천천히 털면서.'],
+        ['늙은 까치','네 손에도 하얀 가루가 묻었구나.\n오늘은 돌손이라 불러야겠네.'],
+        ['너구리','돌손…\n(보따리 속 맷돌을 한 번 만져 봤다.)']
+      ],finish('dol_magpie','늙은 까치와 돌담에 기대 쉬었다. 까치는 돌가루 묻은 내 손을 보고 돌손이라는 별명을 붙여 줬다.','dolneomeo_magpie_rest'))},
+      {t:'먼저 둘러보고 올게',go:null}
+    ]]
+  ]);
+}
+
+/* 조사점마다 손에 닿는 물건을 그린다. 장식 발판과 혼동되지 않도록 모두 무릎 아래다. */
+function drawThing(kind,x,y){
+  x=Math.round(x);y=Math.round(y);
+  if(kind==='stalk'){
+    R(x-5,y-13,1,13,'#a39478');R(x+1,y-17,1,17,'#b4a58a');R(x-8,y-14,5,3,'#d3ccb6');R(x-1,y-18,5,3,'#e1dcc9');
+  }else if(kind==='cloth'){
+    R(x,y-21,2,21,'#665b4e');R(x-8,y-18,10,9,'#b3aaa0');R(x-7,y-17,7,2,'#e2d8c2');R(x-2,y-9,2,3,'#b34735');
+  }else if(kind==='bowl'){
+    R(x-8,y-5,16,4,'#605d55');R(x-6,y-2,12,2,'#454c4a');R(x-6,y-7,12,2,'#c7b99b');R(x-3,y-8,6,1,'#e6dbc0');
+  }else if(kind==='water'){
+    R(x-14,y-2,28,2,'#a1c1ca');R(x-10,y-1,20,1,'#e0edf0');R(x-15,y-4,4,4,'#687b7f');R(x+12,y-5,4,5,'#687b7f');
+  }else if(kind==='bell'){
+    R(x,y-23,1,14,'#77776a');R(x-3,y-10,7,6,'#9e9d83');R(x-4,y-5,9,2,'#cfbf8c');R(x,y-2,1,2,'#665b4e');
+  }else{
+    R(x-10,y-6,20,6,'#747f7d');R(x-8,y-8,15,3,'#9da7a1');R(x-6,y-8,6,1,'#e2ece5');R(x+5,y-4,3,3,'#698470');
+  }
+}
+const examine=(id,x,label,kind,text,y=GROUND)=>({id,x,y,label,text,draw:(sx,sy)=>drawThing(kind,sx,sy)});
+const stamp=(id,x,y)=>({id,x,y,note:'stamp:dolneomeo:'+id});
+Rg.expansionContent=()=>({
+  gate:{
+    examines:[
+      examine('frost_print',280,'서리 자국 살펴보기','stone','돌 위는 하얗고 발바닥 자리는 까맣다.\n먼저 지나간 짐꾼도 발을 비볐나 봐.'),
+      examine('gate_bell',1240,'장승 풍경 들어 보기','bell','바람이 불 때마다 얇은 쇳소리가 난다.\n산 안쪽에서도 이 소리가 들릴까?'),
+      examine('broken_bridge',2170,'무너진 다리 살펴보기','stone','받침돌만 남고 다리판은 아래로 떨어졌다.\n건너편 풀은 아직 길 모양으로 누워 있다.')
+    ],
+    wanderers:[{id:'dol_hare',name:'산토끼 짐꾼',x:940,draw:drawGuest('hare'),talk:helpHare,greeting:'낮게 묶으니 발이 편하구나.\n고개 안쪽 길은 꼭 살피고 가라.'}],
+    stamps:[stamp('jangseung',1710,156)]
+  },
+  village:{
+    examines:[
+      examine('stone_channel',360,'돌 물길 들여다보기','water','집집마다 돌 홈을 이어 물을 나눠 쓴다.\n얼지 말라고 짚도 조금 덮어 뒀네.'),
+      {...examine('mill_edge',1310,'맷돌 받침 만져 보기','stone',''),get text(){
+        return G.f.ppuriPassed?'내가 간 가루로 장승 앞 금줄이 걷혔다.\n맷돌 자개 틈에도 메밀 냄새가 남아 있다.':G.f.dolneomeo_mole_pebble?'꼬마가 말한 옛 돌다리 받침이다.\n한쪽에는 물이 닳게 한 둥근 자국이 있다.':'받침돌 한쪽만 유난히 매끈하다.\n맷돌 밑에서도 먼 길을 온 돌 냄새가 난다.';
+      }},
+      examine('warm_hearth',2290,'공동 화로 살펴보기','bowl','석수들이 일을 마치고 손을 녹이는 화로다.\n재 속 돌은 불이 꺼진 뒤에도 미지근하다.')
+    ],
+    wanderers:[
+      {id:'dol_mole',name:'꼬마 두더지',x:740,draw:drawGuest('mole'),talk:meetMole,greeting:'우리 돌집에 문이 생겼어!\n반짝돌도 이제 안 굴러가.'},
+      {id:'dol_magpie',name:'늙은 까치',x:2080,draw:drawGuest('magpie'),talk:restMagpie,greeting:'돌손, 좀 쉬어 가거라.\n담 뒤는 바람이 덜하단다.'}
+    ],
+    stamps:[stamp('mill_base',1160,156)]
+  },
+  field:{
+    examines:[
+      examine('memil_stubble',390,'메밀 그루터기 살펴보기','stalk','메밀을 거둔 자리마다 짧은 줄기가 섰다.\n돌 사이에 떨어진 알은 아직 단단하다.'),
+      examine('tied_reeds',1120,'억새 묶음 살펴보기','stalk','긴 억새는 병을 싸고 짧은 억새는 둥지에 깐다.\n꺾인 것도 버리지 않는구나.'),
+      {...examine('nest_door',1590,'둥지 앞 작은 돌 살펴보기','stone',''),get text(){return G.f.kkuDone?'내가 벤 억새 끝이 둥지 틈에서 삐져나왔다.\n바람이 불어도 안쪽은 가만하다.':'둥지 문턱에 납작돌을 비스듬히 세웠다.\n꾸벅이가 졸다가 굴러 나오지 말라고 놨나?';}}
+    ],wanderers:[],stamps:[]
+  },
+  cliff:{
+    examines:[
+      examine('silver_lichen',530,'은빛 바위 살펴보기','stone','서리 아래 이끼가 동그란 테를 그렸다.\n돌은 가만있어도 무늬가 자라는구나.'),
+      examine('frozen_trickle',1850,'얼어붙은 물줄기 살펴보기','water','물이 흐르던 홈에 가느다란 얼음이 매달렸다.\n한 방울씩 녹으면 아래 바위 틈이 젖겠다.'),
+      {...examine('dry_crack',2540,'갈라진 바위 들여다보기','stone','',112),get text(){return G.f.dolneomeo_frog_warm?'개구리가 말한 마른 바위 틈이다.\n붉은 발자국이 구름바다 쪽을 향한다.':'깊은 틈 안쪽은 서리가 하나도 없다.\n누가 비를 피해 쪼그려 앉았던 걸까?';}}
+    ],
+    wanderers:[{id:'dol_frog',name:'움츠린 개구리',x:1440,draw:drawGuest('frog'),talk:warmFrog,greeting:'배가 따뜻해졌어… 고마워.\n이번엔 마른 틈에서 잘게.'}],
+    stamps:[stamp('cliff_crack',2390,112)]
+  },
+  shrine:{
+    examines:[
+      examine('wish_cloth',380,'소원 천 살펴보기','cloth','새 천 밑에 색 바랜 천이 겹쳐 달렸다.\n같은 가지에 몇 번의 겨울이 묶였을까?'),
+      examine('grain_dish',950,'작은 제기 살펴보기','bowl','돌그릇 안에 메밀가루가 조금 남았다.\n바람이 들어도 깊은 그릇이라 안 날아간다.'),
+      {...examine('small_tower',2080,'낮은 돌탑 살펴보기','stone',''),get text(){return G.boss.dead?'큰 돌들이 내려앉아 낮은 탑을 받쳤다.\n작은 돌 하나도 굴러떨어지지 않았다.':'바람이 세도 이 낮은 탑은 흔들리지 않는다.\n밑돌 틈마다 작은 돌을 받쳐 뒀네.';}}
+    ],wanderers:[],stamps:[]
+  }
+});
+for(const [id,content] of Object.entries(Rg.expansionContent())){
+  if(Rg.zones?.[id])Object.assign(Rg.zones[id],content);
+}
+Rg.installExpansion?.();
 })();
