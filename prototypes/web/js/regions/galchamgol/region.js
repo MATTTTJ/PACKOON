@@ -27,7 +27,8 @@ const Rg=defineRegion('galchamgol',{
     mobs:[{x:1760,dir:-1,hp:2,dead:false,min:1700,max:1840,flash:0},{x:1860,dir:1,hp:2,dead:false,min:1800,max:1920,flash:0}],
     boss:{x:2180,dead:false},
     drop:null,
-    f:{dodamTalk:false,dodamDone:false,musoeMet:false,musoeDone:false,nalTalk:false,nalDone:false,toadMet:false,faints:0,musoeTested:false},
+    f:{dodamTalk:false,dodamDone:false,musoeMet:false,musoeDone:false,nalTalk:false,nalDone:false,toadMet:false,faints:0,musoeTested:false,
+      ...(/[?&]arcs=1\b/.test(location.search)?{arcs:true}:{})},
     /* 호감 축: 책의 물품 장부에 이 순서로 나온다 */
     rel:{dodam:{t:'호감',v:0},musoe:{t:'의리',v:0},nal:{t:'경멸',v:0},toad:{t:'호감',v:0}},
   }),

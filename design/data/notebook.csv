@@ -12,6 +12,7 @@ musoe,galchamgol,무쇠,동물,나,musoe:forge,대장간에서 낫을 벼렸을 
 toad,galchamgol,두꺼비 할멈,동물,아빠,,처음부터,"두꺼비 약재상. 약은 잘 짓는데, 아는 걸 다 말하지는 않는다.",제안,
 toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,엄마의 병을 고치지는 못해도 늦출 수는 있다고 했다. 무언가 알면서 말을 아낀다.,제안,
 toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,보따리 속 약연을 보더니 아직 쓸 때가 아니라고 했다.,제안,
+toad,galchamgol,두꺼비 할멈,동물,나,galchamgol:arc-toad-wrap,[시험판] 약을 보낸 뒤 엄마 이야기를 듣고 인사를 드렸을 때,내가 아기였던 겨울에 엄마가 두고 간 포대기 끈을 받았다. 할멈이 내내 간직하고 있었다.,제안,arcs=1 선택 장면 · 교환 품목이 아닌 받은 물건의 기록
 kudzu,galchamgol,엉킨 칡,동물,나,fight:kudzu,처음 맞설 때,"당산나무를 감은 칡덩굴. 덩굴손은 위에서 휩쓸고, 뿌리는 땅에서 솟는다.",제안,
 kudzu,galchamgol,엉킨 칡,동물,나,core:kudzu,핵심 부위가 드러날 때,덩굴손이나 뿌리를 하나 꺾어야 심이 드러난다.,제안,
 kudzu,galchamgol,엉킨 칡,동물,나,like:kudzu:ssari,전투에서 싸리버섯을(를) 건넸을 때,싸리버섯 향을 맡으면 덩굴이 느슨해진다.,제안,

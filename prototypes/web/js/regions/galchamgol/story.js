@@ -5,8 +5,65 @@
 const Rg=REGIONS.galchamgol;
 const MG=TABLES.MINIGAMES;
 
+/* [시험판] 저장을 읽은 뒤에도 판단한다. 다른 지역은 galArcNal1을 읽어 첫 거래를 기억할 수 있다. */
+Rg.arcsEnabled=()=>{
+  const ARCS=/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
+  if(ARCS)G.f.arcs=true;
+  return ARCS;
+};
+function arcScene(flag,lines,entry,apply,next){
+  if(!Rg.arcsEnabled()||G.f[flag])return;
+  const owner=G;
+  G.f[flag]=true;
+  if(apply)apply();
+  diary(flag,entry);
+  talk(lines,()=>{if(G===owner&&G.region===Rg.id&&next)next();});
+}
+
 /* ---------- 도담 (다람쥐) ---------- */
 function talkDodam(){
+  if(!Rg.arcsEnabled()){dodamMain();return;}
+  const F=G.f,c=[{t:F.dodamDone?'해머루 가는 길 묻기':'해머루 이야기하기',go:dodamMain}];
+  if(!F.galArcDodam1)c.push({t:'도토리 걱정을 들어 본다',go:dodamCacheAsk});
+  else if(!F.galArcDodam2&&(F.galArcDodamFound||G.pickups[F.galArcDodamCache]?.got))c.push({t:'찾은 자리를 내 여행 기록에 그린다',go:dodamCacheDraw});
+  else if(F.galArcDodam2&&F.dodamDone&&!F.galArcDodam3)c.push({t:'도담이 부르는 소리를 듣는다',go:dodamOldStory});
+  if(c.length===1){dodamMain();return;}
+  c.push({t:'다음에 이야기하자',go:null});
+  talk([['도담','어, 그러니까! 무슨 일이야?',c]]);
+}
+function dodamCacheAsk(){
+  talk([['도담','어, 그러니까, 그게 말이지!'],
+    ['도담','겨울 먹을 도토리를 묻었는데…'],['도담','어디 묻었는지 잊었어!'],
+    ['도담','같이 찾자! 해머루 자리도 알려 줄게!',[{t:'같이 찾아볼게',go:dodamCacheStart},{t:'해머루부터 물어볼게',go:dodamMain}]]]);
+}
+function dodamCacheStart(){
+  const index=G.pickups.findIndex(a=>a.item==='acorn'&&a.y===GROUND&&!a.got);
+  // 이미 전부 주웠다면 그 자리를 그려 줄 수 있다. 도토리를 다시 내거나 새로 모을 필요는 없다.
+  arcScene('galArcDodam1',index<0?
+    [['도담','어, 땅에 있던 건 다 주웠어?'],['도담','해머루는 당산나무 꼭대기야!']]:
+    [['도담','흙 묻은 도토리가 내 거야!'],['도담','해머루는 당산나무 꼭대기야!']],
+    '도담이 겨울 먹을 도토리를 묻은 자리를 잊었다. 숲에서 도토리를 찾을 때 함께 살펴보기로 했다.',
+    ()=>{G.f.galArcDodamCache=index;G.f.galArcDodamFound=index<0;});
+}
+Rg.arcCache=a=>Rg.arcsEnabled()&&G.f.galArcDodam1&&!G.f.galArcDodam2&&G.pickups[G.f.galArcDodamCache]===a;
+Rg.onPickup=a=>{
+  if(Rg.arcCache(a)){G.f.galArcDodamFound=true;toast('도담이 묻은 도토리다! 찾은 자리를 알려 주자');}
+};
+function dodamCacheDraw(){
+  if(!(G.f.galArcDodamFound||G.pickups[G.f.galArcDodamCache]?.got))return;
+  arcScene('galArcDodam2',[['너구리','여기였어. 내 기록에 그려 둘게.'],
+    ['도담','어, 그러니까… 여기에 동그라미!'],['도담','적어 두면 안 잊는구나!'],['도담','잊으면 다시 찾으면 되지!']],
+    '도담과 도토리를 찾은 자리를 내 여행 기록에 그렸다. 도담은 적어 두면 안 잊겠다며 웃었다.');
+}
+function dodamOldStory(){
+  if(!G.f.galArcDodam2||!G.f.dodamDone)return;
+  arcScene('galArcDodam3',[['도담','도토리 가루야! 이건 덤!'],['도담','참, 우리 할머니가 그랬는데!'],
+    ['도담','옛날에 너구리 하나가 왔대.'],['도담','해머루만 보고 돌아섰대!'],
+    ['너구리','언제?'],['도담','네가 태어나기도 전이래!']],
+    '도담이 도토리 가루를 덤으로 주었다. 할머니에게 들었다며 아주 옛날 해머루만 보고 돌아선 너구리 이야기를 했다.',
+    ()=>addItem('powder',1));
+}
+function dodamMain(){
   const F=G.f;
   if(!F.dodamTalk){F.dodamTalk=true;
     talk([['도담','어, 못 보던 너구리네! 잠깐, 그 모자 어디서 봤는데…'],
@@ -52,6 +109,11 @@ function nalTrade(){
   takeItem('powder',1);takeItem('root',1);G.f.nalDone=true;ledgerDone('nal');
   const extra=G.rel.nal.v>0;
   addItem('coal',extra?2:1);if(extra)learn('nal:bluff-paid');
+  if(Rg.arcsEnabled()&&extra){
+    arcScene('galArcNal1',[['날쌘','봐. 이게 제대로 된 숯이야.'],['날쌘','하나 더 얹었어. 써 봐.'],['날쌘','꼬마가 숯 보는 눈은 아직이네.']],
+      '날쌘에게 허세를 부렸더니 숯을 하나 더 얹어 주었다. 꼬마가 숯 보는 눈은 아직이라며 코웃음을 쳤다.');
+    return;
+  }
   talk(extra?[['날쌘','봐, 이게 제대로 된 숯이야. 하나 더 얹어 줄 테니 써 봐.'],['날쌘','써 보고도 촌구석 소리가 나오나 보자고.']]:[['날쌘','자, 숯 하나. 딱 맞게 바꾼 거야.'],['날쌘','무쇠 영감한테 줄 거야? 그 영감, 여간 까다로운 게 아닌데.']]);
 }
 function nalYakyeon(){
@@ -66,6 +128,35 @@ function nalBluff(){
 
 /* ---------- 무쇠 (오소리 대장장이) ---------- */
 function talkMusoe(){
+  if(!Rg.arcsEnabled()){musoeMain();return;}
+  const F=G.f,c=[{t:F.musoeDone?'낫 이야기하기':'낫과 시험 이야기하기',go:musoeMain}];
+  if(!F.musoeTested&&!F.musoeDone&&!F.galArcMusoe1)c.push({t:'아빠의 낫을 보여 달라고 한다',go:musoePromise});
+  if((F.musoeTested||F.musoeDone)&&!F.galArcMusoe2)c.push({t:'아빠가 묵던 밤 이야기를 묻는다',go:musoeNight});
+  if(F.galArcMusoe2&&!F.galArcMusoe3&&(has('coal',2)||(F.musoeDone&&G.sharp)))c.push({t:'넉넉히 챙긴 숯 이야기를 한다',go:musoeOldHandle});
+  if(c.length===1){musoeMain();return;}
+  c.push({t:'다음에 올게요',go:null});
+  talk([['무쇠','무슨 일이냐.',c]]);
+}
+function musoePromise(){
+  if(G.f.musoeTested||G.f.musoeDone)return;
+  arcScene('galArcMusoe1',[['너구리','아빠 낫, 볼 수 있어요?'],['무쇠','아직 안 된다.'],
+    ['무쇠','네 아비가 맡기며 당부했다.'],['무쇠','조심성부터 봐 달라더군.'],['무쇠','되치기는 없다. 피하는 걸 본다.']],
+    '무쇠 아저씨는 아빠가 조심성부터 봐 달라며 낫을 맡겼다고 했다. 낫은 시험을 통과한 뒤에 내준다고 한다.');
+}
+function musoeNight(){
+  if(!G.f.musoeTested&&!G.f.musoeDone)return;
+  arcScene('galArcMusoe2',[['너구리','아빠가 여기서 잤어요?'],['무쇠','지난가을. 사흘 묵었다.'],
+    ['무쇠','밤마다 뭘 들여다봤다.'],['무쇠','그 얘긴 말 말라더군.'],['무쇠','내가 벌써 반은 어겼군.']],
+    '지난가을 아빠는 대장간에서 사흘 묵으며 밤마다 무언가 들여다봤다. 무쇠 아저씨는 말하지 않기로 한 약속을 반만 깼다.',
+    ()=>clue('m2','무쇠','지난가을 아빠는 대장간에서 사흘 묵으며 밤마다 무언가 들여다봤다. 그 이야기는 하지 말라고 무쇠에게 부탁했다.'));
+}
+function musoeOldHandle(){
+  if(!G.f.galArcMusoe2||!(has('coal',2)||(G.f.musoeDone&&G.sharp)))return;
+  arcScene('galArcMusoe3',[['무쇠','숯을 넉넉히 챙겼군.'],['무쇠','이 자루 봐라. 네 아비 젊을 적 거다.'],
+    ['너구리','그때도 낫을 벼려 주셨어요?'],['무쇠','그래. 그때도 앞만 보더니.'],['너구리','이번엔 살필게요.']],
+    '무쇠 아저씨가 아빠의 젊은 시절 낫 자루를 꺼내 보여 주었다. 지난가을 맡긴 낫보다 훨씬 오래된 물건이다.');
+}
+function musoeMain(){
   const F=G.f;
   if(!F.musoeMet){F.musoeMet=true;
     talk([['무쇠','뭘 보냐. 대장간은 놀이터가 아니다.'],['무쇠','…잠깐. 그 모자.'],['무쇠','너, 그 떠돌이 너구리 아들이냐.',[{t:'우리 아빠 알아요?',go:musoe2}]]]);
@@ -79,7 +170,9 @@ function talkMusoe(){
 function musoe2(){
   clue('m1','무쇠','아빠는 무쇠에게 낫을 맡기고, 찾으러 오지 않았다.');
   diary('musoe','대장장이 무쇠 아저씨가 아빠의 모자를 알아봤다. 아빠가 맡겨 둔 낫이 있다고 한다. 그런데 갑자기 덤벼들었다.');
-  talk([['무쇠','안다. 낫을 맡기고 갔지. 금방 찾으러 온다더니 소식이 없다.'],['무쇠','주인 아니면 안 내준다. …아들이라고?'],['무쇠','말로야 누가 못 하냐. 그 낫 쥘 자격이 있는지 버텨 봐라!']],battleMusoe);
+  talk(Rg.arcsEnabled()?
+    [['무쇠','안다. 낫을 맡기고 갔다.'],['무쇠','조심성부터 보라더군. 네 아비가.'],['무쇠','되치기는 없다. 피해 봐라.']]:
+    [['무쇠','안다. 낫을 맡기고 갔지. 금방 찾으러 온다더니 소식이 없다.'],['무쇠','주인 아니면 안 내준다. …아들이라고?'],['무쇠','말로야 누가 못 하냐. 그 낫 쥘 자격이 있는지 버텨 봐라!']],battleMusoe);
 }
 function battleMusoe(){
   const n=Rg.npcs.find(n=>n.id==='musoe');
@@ -194,18 +287,29 @@ function finishForge(){
   G.tool='sickle';G.sharp=sharp;G.f.musoeDone=true;learn('musoe:forge');ledgerDone('musoe');rel('musoe',MG.forge_relation);
   if(forge.edge>=MG.forge_bonus_edges)rel('musoe',MG.forge_bonus_relation);
   diary('sickle','아빠의 낫을 받았다. 손잡이에 아빠 손때가 묻어 있다.');
-  clue('m2','무쇠','아빠는 대장간에서 사흘을 묵으며 밤마다 낡은 장부만 들여다봤다.');
+  if(!Rg.arcsEnabled())clue('m2','무쇠','아빠는 대장간에서 사흘을 묵으며 밤마다 낡은 장부만 들여다봤다.');
   toast('아빠의 낫을 얻었다!'+(sharp?' 날이 더 날카롭다':''));
   refreshHud();
-  talk([['무쇠','됐다. 네 아비 낫이다.'+(sharp?' 숯이 넉넉해서 날을 더 세웠다.':'')],['무쇠','그 녀석, 여기서 사흘 묵었다. 밤마다 낡은 장부만 보더군. 뭘 찾는지는 끝내 말 안 했다.'],['무쇠','덩굴은 그걸로 끊어라. 당산나무 앞 칡은 성질 고약하다. 조심해라.']]);
+  talk(Rg.arcsEnabled()?
+    [['무쇠','됐다. 네 아비 낫이다.'],['무쇠',sharp?'숯이 넉넉해서 날을 더 세웠다.':'덩굴은 그걸로 끊어라.'],['무쇠','당산나무 앞 칡은 조심해라.']]:
+    [['무쇠','됐다. 네 아비 낫이다.'+(sharp?' 숯이 넉넉해서 날을 더 세웠다.':'')],['무쇠','그 녀석, 여기서 사흘 묵었다. 밤마다 낡은 장부만 보더군. 뭘 찾는지는 끝내 말 안 했다.'],['무쇠','덩굴은 그걸로 끊어라. 당산나무 앞 칡은 성질 고약하다. 조심해라.']]);
 }
 
 /* ---------- 두꺼비 할멈 (약재상) ---------- */
 function talkToad(){
+  if(Rg.arcsEnabled()&&G.f.galArcToad1){toadFarewell();return;}
   if(has('meoru')){
-    talk([['두꺼비 할멈','해머루구나. …잘 익었구나.'],['두꺼비 할멈','이걸로 약을 달이면 네 엄마 병을 조금 늦출 수 있을 게다. 까치 편에 보내마.'],['두꺼비 할멈','다만 늦출 뿐이란다. 고치려면 전설의 열매가 있어야 한단다.'],['두꺼비 할멈','덩굴이 걷혔으니 북쪽 길도 열렸겠구나. 네 아빠도 그 길로 갔단다.']],()=>{
+    talk(Rg.arcsEnabled()?
+      [['두꺼비 할멈','해머루구나. 잘 익었어.'],['두꺼비 할멈','이걸로 네 엄마 약을 달이마.'],
+        ['두꺼비 할멈','까치 편에 집으로 보내 주마.'],['두꺼비 할멈','병을 늦출 뿐이란다.'],['두꺼비 할멈','고치려면 전설의 열매가 있어야 해.']]:
+      [['두꺼비 할멈','해머루구나. …잘 익었구나.'],['두꺼비 할멈','이걸로 약을 달이면 네 엄마 병을 조금 늦출 수 있을 게다. 까치 편에 보내마.'],['두꺼비 할멈','다만 늦출 뿐이란다. 고치려면 전설의 열매가 있어야 한단다.'],['두꺼비 할멈','덩굴이 걷혔으니 북쪽 길도 열렸겠구나. 네 아빠도 그 길로 갔단다.']],()=>{
       takeItem('meoru',1);ledgerDone('toad');rel('toad',1);
       diary('end','할멈이 엄마에게 약을 보내 주었다. 북쪽 길이 열렸다. 아빠, 기다려요.');
+      if(Rg.arcsEnabled()){
+        G.f.galArcToad1=true;
+        diary('galArcToad1','두꺼비 할멈이 해머루로 엄마의 병을 늦추는 약을 지어 까치 편에 보냈다.');
+        toadFarewell();return;
+      }
       endGame();
     });
     return;
@@ -221,6 +325,27 @@ function talkToad(){
       ['두꺼비 할멈','네 아빠도 그 열매를 묻더니 북쪽으로 갔단다.'],
       ['두꺼비 할멈','…그 보따리 속 약연. 그건 아직 네가 쓸 때가 아니구나.']]);
   }else talk([['두꺼비 할멈','해머루를 가져오렴. 당산나무 꼭대기란다.']]);
+}
+function toadFarewell(){
+  const F=G.f,c=[{t:'북쪽으로 떠난다',go:endGame}];
+  if(!F.galArcToad2&&G.rel.toad.v>=1)c.push({t:'엄마도 이 길을 갔는지 묻는다',go:toadWinter});
+  if(F.galArcToad2&&!F.galArcToad3)c.push({t:'떠나기 전에 인사를 드린다',go:toadWrap});
+  c.push({t:'마을을 좀 더 둘러본다',go:null});
+  talk([['두꺼비 할멈','북쪽으로 갈 채비는 됐니?',c]]);
+}
+function toadWinter(){
+  if(!G.f.galArcToad1||G.rel.toad.v<1)return;
+  arcScene('galArcToad2',[['너구리','엄마도 이 길을 갔어요?'],['두꺼비 할멈','너를 안고 지나갔지.'],
+    ['두꺼비 할멈','눈 내리던 겨울이었단다.'],['두꺼비 할멈','불가에서 너를 꼭 안고 있었어.'],
+    ['너구리','엄마가요?'],['두꺼비 할멈','늙으면 말이 느려지지… 기억은 나.']],
+    '두꺼비 할멈은 내가 아기였던 겨울, 엄마가 나를 안고 이 길을 지났다고 했다.',null,toadFarewell);
+}
+function toadWrap(){
+  if(!G.f.galArcToad2)return;
+  arcScene('galArcToad3',[['두꺼비 할멈','이 끈도 가져가렴.'],['두꺼비 할멈','그 겨울, 네 포대기에 매던 거야.'],
+    ['너구리','엄마가 두고 갔어요?'],['두꺼비 할멈','그래. 내내 간직했단다.'],['너구리','엄마한테 가져갈게요.']],
+    '두꺼비 할멈에게 그 겨울 엄마가 두고 간 포대기 끈을 받았다. 엄마에게 가져가려고 조심히 챙겼다.',
+    ()=>learn('galchamgol:arc-toad-wrap'),toadFarewell);
 }
 
 /* ---------- 엉킨 칡 전투 ---------- */
@@ -251,6 +376,7 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '단풍골 체험판 완료';
+  if(Rg.arcsEnabled()&&F.galArcToad1)return '두꺼비 할멈에게 인사하고 북쪽으로 떠나기';
   if(!F.dodamTalk)return '마을 어귀의 다람쥐 도담에게 말 걸기';
   const ac=G.inv.acorn||0;
   const powderStep=()=>has('powder')?null:(ac<3?'도토리 줍기 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개 넣어 빻기');

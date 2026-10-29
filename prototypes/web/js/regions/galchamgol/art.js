@@ -20,7 +20,9 @@ Rg.art={
 Rg.props={
   forge(n){const x=n.x-cam;R(x-34,GROUND-22,18,22,'#6e5b4b');R(x-32,GROUND-20,14,4,'#55463a');R(x-30,GROUND-34,6,14,'#5a4a3d');
     const fl=Math.floor(G.anim/6)%3;R(x-31,GROUND-12,12,6,['#ff7b2e','#ffb347','#e8551f'][fl]);R(x-29,GROUND-14,8,2,'#ffd27a');
-    R(x+14,GROUND-9,16,3,'#3b3b3b');R(x+18,GROUND-6,8,6,'#2c2c2c');},
+    R(x+14,GROUND-9,16,3,'#3b3b3b');R(x+18,GROUND-6,8,6,'#2c2c2c');
+    // 새 낫과 구분되는, 대장간에 남은 젊은 시절의 낡은 자루.
+    if(Rg.arcsEnabled()&&G.f.galArcMusoe3){R(x+15,GROUND-13,16,3,'#9c774e');R(x+17,GROUND-13,2,3,'#5a3d28');R(x+25,GROUND-12,4,1,'#c5a17b');}},
   toad(n){const x=n.x-cam;R(x+16,GROUND-12,10,12,'#7a4a2a');R(x+15,GROUND-14,12,3,'#5a361e');R(x+28,GROUND-9,8,9,'#8a5a3a');R(x+27,GROUND-11,10,2,'#5a361e');
     if(Math.floor(G.anim/18)%2){R(x+20,GROUND-20,1,3,'#f4efe4');R(x+22,GROUND-24,1,3,'#f4efe4');}else R(x+21,GROUND-22,1,4,'#f4efe4');},
 };

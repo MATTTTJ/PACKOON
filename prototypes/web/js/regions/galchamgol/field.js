@@ -56,7 +56,9 @@ Rg.drawScenery=()=>{const x=TREE_X-cam;if(x<-120||x>W+120)return;
 };
 
 /* 도토리 */
-Rg.drawPickup=(a,x,bob)=>{R(x-2,a.y-7+bob,5,2,'#6b4423');R(x-2,a.y-5+bob,5,4,'#c9894a');R(x,a.y-8+bob,1,1,'#4a2e1a');};
+Rg.drawPickup=(a,x,bob)=>{
+  if(Rg.arcCache(a)){R(x-5,a.y-3,11,3,'#7a4b2a');R(x-7,a.y-12,3,1,'#fff3b0');R(x+5,a.y-12,3,1,'#fff3b0');}
+  R(x-2,a.y-7+bob,5,2,'#6b4423');R(x-2,a.y-5+bob,5,4,'#c9894a');R(x,a.y-8+bob,1,1,'#4a2e1a');};
 
 /* ---------- 칡덩굴 장애물, 덩굴 몹, 엉킨 칡 ---------- */
 function drawBarrier(){const Bq=G.barrier;if(Bq.cut)return;const x=Bq.x-cam+(Bq.shake?(Bq.shake%2?1:-1):0);if(x<-30||x>W+30)return;

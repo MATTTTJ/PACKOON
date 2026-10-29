@@ -600,6 +600,11 @@ const TABLES={
      "who": "me",
      "text": "보따리 속 약연을 보더니 아직 쓸 때가 아니라고 했다.",
      "when": "met:toad"
+    },
+    {
+     "who": "me",
+     "text": "내가 아기였던 겨울에 엄마가 두고 간 포대기 끈을 받았다. 할멈이 내내 간직하고 있었다.",
+     "when": "galchamgol:arc-toad-wrap"
     }
    ]
   },
