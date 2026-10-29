@@ -51,6 +51,11 @@
       loopStartFrame = Math.round(start * beatsPerMeasure * secondsPerBeat * sampleRate);
       loopEndFrame = Math.round(end * beatsPerMeasure * secondsPerBeat * sampleRate);
     }
+    if (track.intro) {
+      if (track.intro.start !== 0 || !Number.isInteger(track.intro.end) || track.intro.end < 2 || track.intro.end > 8 || !track.loop || track.intro.end !== track.loop.start) {
+        throw new Error(track.id + ': 도입부는 0에서 시작하는 2~8마디이며 반복 시작과 이어져야 합니다.');
+      }
+    }
     const events = [];
     const voiceIds = new Set();
     for (const voice of track.voices) {
@@ -215,31 +220,68 @@
     const { compiled, bank, cache, left, right } = state;
     const cacheKey = [event.instrument, event.note, event.duration, event.velocity, event.seed].join('/');
     let pcm = cache.get(cacheKey);
-    if (!pcm) { pcm = renderVoice(bank.instruments[event.instrument], event.note, event.duration, event.velocity, event.seed, compiled.sampleRate); cache.set(cacheKey, pcm); }
+    if (!pcm) {
+      pcm = renderVoice(bank.instruments[event.instrument], event.note, event.duration, event.velocity, event.seed, compiled.sampleRate); cache.set(cacheKey, pcm);
+      // 음표 캐시가 곡 전체 성부 수만큼 자라지 않게 한다.
+      if (cache.size > 32) cache.delete(cache.keys().next().value);
+    }
     const angle = (event.pan + 1) * Math.PI / 4;
     const l = Math.cos(angle) * event.gain, r = Math.sin(angle) * event.gain;
     const loopLength = compiled.loopEndFrame - compiled.loopStartFrame;
     for (let i = 0; i < pcm.length; i++) {
       let at = event.frame + i;
+      // 한 번만 울리는 도입부 꼬리를 매 반복에 다시 섞지 않는다.
+      if (loopLength && event.frame < compiled.loopStartFrame && at >= compiled.loopStartFrame) break;
       if (loopLength && event.frame >= compiled.loopStartFrame && at >= compiled.loopEndFrame) at = compiled.loopStartFrame + (at - compiled.loopStartFrame) % loopLength;
       if (at < left.length) { left[at] += pcm[i] * l; right[at] += pcm[i] * r; }
     }
   }
-  function finishSong(state) {
+  function songOutput(state) {
     const { compiled, bank, left, right } = state;
     const outL = new Float32Array(left.length), outR = new Float32Array(right.length);
-    const process = createReverb(bank, compiled.sampleRate);
+    const jobs = [];
     if (compiled.loopEndFrame) {
+      // 도입부는 무음에서 시작하고, 반복부만 자기 꼬리로 리버브를 준비한다.
+      if (compiled.loopStartFrame) jobs.push({ process: createReverb(bank, compiled.sampleRate), start: 0, end: compiled.loopStartFrame, output: true });
+      const process = createReverb(bank, compiled.sampleRate);
       const warmFrames = Math.min(compiled.loopEndFrame - compiled.loopStartFrame, Math.ceil(effectsConfig(bank).reverb.warmupSeconds * compiled.sampleRate));
-      process(left, right, null, null, compiled.loopEndFrame - warmFrames, compiled.loopEndFrame);
+      jobs.push({ process, start: compiled.loopEndFrame - warmFrames, end: compiled.loopEndFrame, output: false });
+      jobs.push({ process, start: compiled.loopStartFrame, end: compiled.loopEndFrame, output: true });
+    } else jobs.push({ process: createReverb(bank, compiled.sampleRate), start: 0, end: left.length, output: true });
+    return { outL, outR, jobs };
+  }
+  function completeSong(state, outL, outR) {
+    const { compiled } = state;
+    if (compiled.loopStartFrame) {
+      // 마지막 쉼의 40ms만 반복 잔향으로 건너가 두 WAV를 붙여도 연속이다.
+      const bridge = Math.min(Math.round(compiled.sampleRate * .04), compiled.loopStartFrame, compiled.loopEndFrame - compiled.loopStartFrame);
+      for (let i = 0; i < bridge; i++) {
+        const t = i / Math.max(1, bridge - 1), mix = t * t * (3 - 2 * t);
+        const at = compiled.loopStartFrame - bridge + i, tail = compiled.loopEndFrame - bridge + i;
+        outL[at] += (outL[tail] - outL[at]) * mix; outR[at] += (outR[tail] - outR[at]) * mix;
+      }
     }
-    process(left, right, outL, outR);
     if (!compiled.loopEndFrame) {
       const fade = Math.min(Math.floor(compiled.sampleRate * 0.02), outL.length);
       for (let i = 0; i < fade; i++) { const g = i / fade; outL[i] *= g; outR[i] *= g; outL[outL.length - 1 - i] *= g; outR[outR.length - 1 - i] *= g; }
     }
     state.cache.clear();
     return { left: outL, right: outR, sampleRate: compiled.sampleRate, loopStartFrame: compiled.loopStartFrame, loopEndFrame: compiled.loopEndFrame, scoreFrames: compiled.frames };
+  }
+  function finishSong(state) {
+    const { outL, outR, jobs } = songOutput(state);
+    for (const job of jobs) job.process(state.left, state.right, job.output ? outL : null, job.output ? outR : null, job.start, job.end);
+    return completeSong(state, outL, outR);
+  }
+  async function finishSongAsync(state, options) {
+    const { outL, outR, jobs } = songOutput(state), block = Math.round(state.compiled.sampleRate * .25);
+    let lastYield = Date.now();
+    for (const job of jobs) for (let start = job.start; start < job.end; start += block) {
+      if (options.cancelled && options.cancelled()) return null;
+      job.process(state.left, state.right, job.output ? outL : null, job.output ? outR : null, start, Math.min(job.end, start + block));
+      if (Date.now() - lastYield > 12) { await new Promise(resolve => setTimeout(resolve, 0)); lastYield = Date.now(); }
+    }
+    return completeSong(state, outL, outR);
   }
   function renderSong(track, bank, options = {}) {
     const state = beginSong(track, bank, options);
@@ -255,7 +297,7 @@
       if (Date.now() - lastYield > 14) { if (options.onProgress) options.onProgress(i / state.compiled.events.length); await new Promise(resolve => setTimeout(resolve, 0)); lastYield = Date.now(); }
     }
     if (options.cancelled && options.cancelled()) return null;
-    return finishSong(state);
+    return finishSongAsync(state, options);
   }
   function renderSfx(effect, bank, options = {}) {
     const definitions = getDefinitions(bank), sampleRate = options.sampleRate || 44100;
@@ -297,17 +339,27 @@
     const score = options.score, bank = options.instruments;
     const tracks = new Map(score.tracks.map(t => [t.id, t]));
     let context = options.context || null, ownsContext = false, master = null, unlocked = false;
-    let enabled = true, volume = 0.65, serial = 0, current = null, timer = null, destroyed = false;
+    let enabled = true, volume = 0.65, ducking = 1, serial = 0, current = null, timer = null, destroyed = false;
     let loading = false, paused = false, pausedAt = 0, visibilityPaused = false, disabledPaused = false;
     const active = new Set(), cache = new Map(), sfxSources = new Set();
     const tickSeconds = 0.025, horizon = 0.3, chunkSeconds = 0.12;
+    const sampleRate = finite(options.sampleRate || 22050, 'player.sampleRate', 8000, 48000);
+    const clockEvents = [], sfxCache = new Map();
+    let peakSources = 0, ended = false;
+    const sourceCount = () => [...active].reduce((n, s) => n + s.sources.size, 0);
+    function clockEvent(type, details = {}) {
+      const item = { type, clock: context ? context.currentTime : 0, ...details };
+      clockEvents.push(item); if (clockEvents.length > 96) clockEvents.shift();
+      if (typeof options.onClock === 'function') options.onClock(item);
+    }
     function state() {
       let seconds = current ? Math.max(0, context.currentTime - current.started + current.from) : pausedAt;
       if (current && current.pcm.loopEndFrame) {
         const start = current.pcm.loopStartFrame / current.pcm.sampleRate, end = current.pcm.loopEndFrame / current.pcm.sampleRate;
         if (seconds >= end) seconds = start + (seconds - start) % (end - start);
       }
-      return { id: current ? current.id : selectedId, playing: !!current && !paused, paused, loading, currentTime: seconds, duration: selectedId && tracks.has(selectedId) ? tracks.get(selectedId).measures * tracks.get(selectedId).meter[0] * 4 / tracks.get(selectedId).meter[1] * 60 / tracks.get(selectedId).tempo : 0, enabled, volume, unlocked };
+      const track = tracks.get(current ? current.id : selectedId), loopStart = track && track.loop ? track.loop.start * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0;
+      return { id: current ? current.id : selectedId, playing: !!current && !paused, paused, loading, ended, currentTime: seconds, duration: track ? track.measures * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0, phase: track && track.loop ? seconds < loopStart ? 'intro' : 'loop' : 'once', enabled, volume, ducking, unlocked };
     }
     let selectedId = null;
     function emit() { if (typeof options.onState === 'function') options.onState(state()); }
@@ -319,7 +371,7 @@
     }
     function ensureMaster() {
       if (!context || master) return;
-      master = context.createGain(); master.gain.value = enabled ? volume : 0; master.connect(context.destination);
+      master = context.createGain(); master.gain.value = enabled ? volume * ducking : 0; master.connect(context.destination);
     }
     async function unlock(event) {
       if (destroyed) return false;
@@ -346,6 +398,12 @@
       session.sources.forEach(source => { try { source.stop(end); } catch (_) {} });
       session.cleanup = setTimeout(() => { session.sources.forEach(source => { try { source.stop(); source.disconnect(); } catch (_) {} }); session.sources.clear(); session.gain.disconnect(); active.delete(session); }, (Math.max(0.01, fade) + 0.05) * 1000);
     }
+    function discardSession(session) {
+      if (session.cleanup) clearTimeout(session.cleanup);
+      session.stopping = true;
+      session.sources.forEach(source => { try { source.stop(); source.disconnect(); } catch (_) {} });
+      session.sources.clear(); session.gain.disconnect(); active.delete(session);
+    }
     function queueSession(session, until) {
       const pcm = session.pcm, rate = pcm.sampleRate;
       const now = context.currentTime;
@@ -356,20 +414,31 @@
         session.started += skippedClock;
       }
       while (session.when < until && !session.stopping && !destroyed) {
+        if (sourceCount() >= 48) break;
         const endFrame = pcm.loopEndFrame || pcm.left.length;
         if (session.frame >= endFrame) {
-          if (pcm.loopEndFrame) session.frame = pcm.loopStartFrame;
+          if (pcm.loopEndFrame) {
+            clockEvent('loop', { id: session.id, when: session.when, previousBufferEnd: session.lastEnd, fromFrame: endFrame, toFrame: pcm.loopStartFrame, sampleRate: rate, gapSeconds: session.lastEnd === undefined ? null : session.when - session.lastEnd });
+            session.frame = pcm.loopStartFrame; session.enteredLoop = true;
+          }
           else { session.finishedAt = session.when; break; }
         }
-        const length = Math.min(Math.round(chunkSeconds * rate), endFrame - session.frame, Math.floor((until - session.when) * rate));
+        if (!session.enteredLoop && pcm.loopEndFrame && session.frame === pcm.loopStartFrame) {
+          session.enteredLoop = true;
+          clockEvent('intro-loop', { id: session.id, when: session.when, previousBufferEnd: session.lastEnd, fromFrame: session.frame, toFrame: session.frame, sampleRate: rate, gapSeconds: session.lastEnd === undefined ? null : session.when - session.lastEnd });
+        }
+        const segmentEnd = session.frame < pcm.loopStartFrame ? pcm.loopStartFrame : endFrame;
+        const length = Math.min(Math.round(chunkSeconds * rate), segmentEnd - session.frame, Math.floor((until - session.when) * rate));
         if (length < 1) break;
         const buffer = context.createBuffer(2, length, rate);
         buffer.copyToChannel(pcm.left.subarray(session.frame, session.frame + length), 0);
         buffer.copyToChannel(pcm.right.subarray(session.frame, session.frame + length), 1);
         const source = context.createBufferSource(); source.buffer = buffer; source.connect(session.gain);
         session.sources.add(source);
+        peakSources = Math.max(peakSources, sourceCount());
         source.onended = () => { session.sources.delete(source); source.disconnect(); };
         source.start(session.when);
+        session.lastEnd = session.when + buffer.duration;
         session.frame += length; session.when += length / rate;
       }
     }
@@ -377,64 +446,85 @@
       if (!context || context.state !== 'running' || !current || paused || destroyed) return;
       const session = current, now = context.currentTime;
       queueSession(session, now + horizon);
-      if (session.finishedAt && now >= session.finishedAt) { pausedAt = 0; current = null; cancelSession(session, 0.02); emit(); }
+      if (session.finishedAt && now >= session.finishedAt) {
+        pausedAt = session.pcm.left.length / session.pcm.sampleRate; ended = true; current = null; cancelSession(session, 0.02);
+        if (timer) { clearInterval(timer); timer = null; }
+        clockEvent('ended', { id: session.id, when: session.finishedAt }); emit();
+      }
     }
     function startTimer() { if (!timer) timer = setInterval(schedule, tickSeconds * 1000); }
     async function play(id, settings = {}) {
       if (destroyed) throw new Error('연주기가 닫혔습니다.');
       if (!tracks.has(id)) throw new Error('없는 곡: ' + id);
+      if (current && current.id === id && settings.fromSeconds === undefined && !paused) {
+        // A 재생 중 B를 준비하다 A로 돌아오면 늦게 끝난 B를 버린다.
+        if (loading || selectedId !== id) { serial++; selectedId = id; loading = false; emit(); }
+        return true;
+      }
       if (!unlocked || !context || context.state !== 'running') return false;
       if (!enabled) return false;
       if (typeof document !== 'undefined' && document.hidden) {
         selectedId = id; paused = true; pausedAt = 0; visibilityPaused = true; emit(); return false;
       }
       const request = ++serial;
-      selectedId = id; loading = true; emit();
+      selectedId = id; loading = true; ended = false; emit();
       let pcm = cache.get(id);
       if (!pcm) {
-        pcm = await renderSongAsync(tracks.get(id), bank, { sampleRate: 44100, cancelled: () => request !== serial || destroyed });
+        pcm = await renderSongAsync(tracks.get(id), bank, { sampleRate, cancelled: () => request !== serial || destroyed });
         if (!pcm || request !== serial || destroyed) return false;
         cache.set(id, pcm);
-        if (cache.size > 2) cache.delete(cache.keys().next().value);
+        const bytes = () => [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0);
+        while (cache.size > 2 || cache.size > 1 && bytes() > 48 * 1024 * 1024) cache.delete(cache.keys().next().value);
+      } else {
+        cache.delete(id); cache.set(id, pcm);
       }
       if (request !== serial || destroyed) return false;
       const crossfade = clamp(settings.crossfade === undefined ? 1.5 : settings.crossfade, 0.01, 4);
       const from = clamp(settings.fromSeconds || 0, 0, pcm.left.length / pcm.sampleRate - 0.001);
       const previous = current;
+      // 잦은 장면 교체에서도 이전 곡 하나만 페이드하며 나머지는 정리한다.
+      active.forEach(session => { if (session !== previous) discardSession(session); });
       const gain = context.createGain(); gain.gain.value = 0; gain.connect(master);
       const start = context.currentTime + 0.035;
-      const session = { id, pcm, gain, sources: new Set(), frame: Math.floor(from * pcm.sampleRate), when: start, started: start, from, stopping: false };
+      const session = { id, pcm, gain, sources: new Set(), frame: Math.floor(from * pcm.sampleRate), when: start, started: start, from, stopping: false, enteredLoop: from * pcm.sampleRate > pcm.loopStartFrame };
       active.add(session); current = session; paused = false; pausedAt = from; loading = false;
       gain.gain.setValueAtTime(0, context.currentTime); gain.gain.linearRampToValueAtTime(1, start + crossfade);
       if (previous) cancelSession(previous, crossfade);
+      clockEvent('play', { id, when: start, fromSeconds: from, crossfade, sampleRate: pcm.sampleRate });
       schedule(); startTimer(); emit(); return true;
     }
     function stop(fadeSeconds = 0.08) {
       serial++; loading = false;
       if (context) active.forEach(session => cancelSession(session, Math.max(0.01, fadeSeconds)));
-      current = null; paused = false; pausedAt = 0; visibilityPaused = false; disabledPaused = false;
+      current = null; paused = false; pausedAt = 0; visibilityPaused = false; disabledPaused = false; ended = false;
       if (timer) { clearInterval(timer); timer = null; }
       sfxSources.forEach(source => { try { source.stop(); } catch (_) {} }); sfxSources.clear(); emit();
+      clockEvent('stop');
     }
     function pause() {
       if (!current) return;
       pausedAt = state().currentTime; serial++; loading = false; paused = true;
       active.forEach(session => cancelSession(session, 0.025)); current = null;
       if (timer) { clearInterval(timer); timer = null; } emit();
+      clockEvent('pause', { id: selectedId, fromSeconds: pausedAt });
     }
     async function resume() { if (!paused || !selectedId) return false; return play(selectedId, { fromSeconds: pausedAt, crossfade: 0.08 }); }
-    function setVolume(value) { volume = finite(value, 'volume', 0, 1); if (master) setGain(master, enabled ? volume : 0); emit(); }
+    function setVolume(value) { volume = finite(value, 'volume', 0, 1); if (master) setGain(master, enabled ? volume * ducking : 0); emit(); }
+    function setDucking(value = 1, seconds = .15) { ducking = finite(value, 'ducking', 0, 1); if (master) setGain(master, enabled ? volume * ducking : 0, seconds); emit(); }
     function setEnabled(value) {
       const changed = enabled !== !!value; enabled = !!value;
-      if (master) setGain(master, enabled ? volume : 0);
+      if (master) setGain(master, enabled ? volume * ducking : 0);
       if (!enabled) {
         const wasLoading = loading;
+        // 숨김 때문에 멈춘 뒤 음소거해도 복귀 의도는 보존한다.
+        if (visibilityPaused && paused && selectedId) disabledPaused = true;
         if (current) { disabledPaused = true; pause(); }
         if (wasLoading) { serial++; loading = false; paused = true; pausedAt = 0; disabledPaused = true; }
         sfxSources.forEach(source => { try { source.stop(); } catch (_) {} }); sfxSources.clear();
       } else if (changed && disabledPaused) {
         disabledPaused = false;
-        if (context && context.state === 'running' && (typeof document === 'undefined' || !document.hidden)) resume().catch(() => {});
+        if (typeof document !== 'undefined' && document.hidden) visibilityPaused = true;
+        else if (context && context.state === 'running') resume().catch(() => {});
       }
       emit();
     }
@@ -442,9 +532,14 @@
       if (!unlocked || !enabled || !context || context.state !== 'running' || destroyed) return false;
       const effect = typeof idOrEffect === 'string' ? options.sfx && options.sfx.effects.find(e => e.id === idOrEffect) : idOrEffect;
       if (!effect) throw new Error('없는 효과음: ' + idOrEffect);
-      const pcm = renderSfx(effect, bank, { sampleRate: 44100 });
-      const buffer = context.createBuffer(2, pcm.left.length, pcm.sampleRate);
-      buffer.copyToChannel(pcm.left, 0); buffer.copyToChannel(pcm.right, 1);
+      if (sfxSources.size >= 12 || typeof document !== 'undefined' && document.hidden) return false;
+      let buffer = sfxCache.get(effect.id);
+      if (!buffer) {
+        const pcm = renderSfx(effect, bank, { sampleRate });
+        buffer = context.createBuffer(2, pcm.left.length, pcm.sampleRate);
+        buffer.copyToChannel(pcm.left, 0); buffer.copyToChannel(pcm.right, 1);
+        sfxCache.set(effect.id, buffer); if (sfxCache.size > 12) sfxCache.delete(sfxCache.keys().next().value);
+      }
       const source = context.createBufferSource(); source.buffer = buffer; source.connect(master); sfxSources.add(source);
       source.onended = () => { source.disconnect(); sfxSources.delete(source); }; source.start(context.currentTime + 0.01); return true;
     }
@@ -452,7 +547,7 @@
       if (typeof document === 'undefined') return;
       if (document.hidden) {
         const wasLoading = loading;
-        visibilityPaused = !!current || wasLoading;
+        visibilityPaused = !!current || wasLoading || disabledPaused;
         if (current) pause();
         if (wasLoading) { serial++; loading = false; paused = true; pausedAt = 0; emit(); }
       } else if (visibilityPaused) {
@@ -467,22 +562,25 @@
       context = next; ownsContext = false; ensureMaster(); unlocked = next.state === 'running';
     }
     function destroy() {
-      stop(0.01); destroyed = true; cache.clear();
+      stop(0.01); destroyed = true; cache.clear(); sfxCache.clear();
       if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', visibility);
       if (master) setTimeout(() => master.disconnect(), 80);
       if (ownsContext && context) context.close().catch(() => {});
     }
-    return { unlock, play, stop, pause, resume, setVolume, setEnabled, playSfx, getState: state, destroy, useContext, get context() { return context; } };
+    function getDiagnostics() { return { clockEvents: clockEvents.slice(), schedulerRunning: !!timer, sources: sourceCount(), peakSources, sessions: active.size, cachedTracks: cache.size, cacheBytes: [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0), sampleRate }; }
+    return { unlock, play, stop, pause, resume, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
   }
   function attachSound(sound, player) {
     if (!sound || !player) throw new Error('Sound와 player가 필요합니다.');
     function sync() {
       if (sound.context) player.useContext(sound.context);
-      player.setVolume(sound.volume === 'high' ? 0.8 : 0.4);
+      player.setVolume(typeof sound.bgmVolume === 'number' ? sound.bgmVolume : sound.volume === 'high' ? 0.8 : 0.4);
       player.setEnabled(sound.enabled);
     }
     function firstInput(event) {
       if (!event.isTrusted) return;
+      // 터치는 pointerdown 뒤 pointerup/click에서 사용자 활성화가 생길 수 있다.
+      if (window.navigator.userActivation && !window.navigator.userActivation.hasBeenActive) return;
       sync();
       if (sound.initialized && sound.context) player.unlock(event).catch(() => {});
     }
@@ -490,12 +588,16 @@
     if (typeof window !== 'undefined') {
       window.addEventListener('packoon-sound-change', sync);
       window.addEventListener('pointerdown', firstInput, true);
+      window.addEventListener('pointerup', firstInput, true);
+      window.addEventListener('click', firstInput, true);
       window.addEventListener('keydown', firstInput, true);
     }
     return function detach() {
       if (typeof window !== 'undefined') {
         window.removeEventListener('packoon-sound-change', sync);
         window.removeEventListener('pointerdown', firstInput, true);
+        window.removeEventListener('pointerup', firstInput, true);
+        window.removeEventListener('click', firstInput, true);
         window.removeEventListener('keydown', firstInput, true);
       }
     };

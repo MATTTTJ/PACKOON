@@ -23,8 +23,12 @@ function refreshSoundButtons(){
   $('btnVolume').textContent='음량 '+(Sound.volume==='high'?'크게':'작게');
   $('btnVolume').setAttribute('aria-pressed',String(Sound.volume==='high'));
   $('btnVolume').title='음량 크게/작게';
+  $('volumeBgm').value=Sound.bgmVolume;
+  $('volumeSfx').value=Sound.sfxVolume;
 }
 $('btnSound').onclick=()=>Sound.toggle();
 $('btnVolume').onclick=()=>Sound.toggleVolume();
+$('volumeBgm').oninput=e=>Sound.setBgmVolume(Number(e.target.value));
+$('volumeSfx').oninput=e=>Sound.setSfxVolume(Number(e.target.value));
 addEventListener('packoon-sound-change',refreshSoundButtons);
 refreshSoundButtons();
