@@ -343,7 +343,7 @@ function install(){
     }));
   }));
   shore.npcs.push(fixture('y_home_parcel','까치에게 집으로 보낼 것 묻기',570,()=>{
-    if(!G.f.spring){talk([['늙은 까치','호수 일이 끝나면 다시 들러라. 남쪽으로 갈 때 네 짐도 실어 줄게.']]);return;}
+    if(!G.f.spring){talk([['늙은 까치','호수 일이 끝나면 다시 들르렴.\n남쪽으로 갈 때 네 짐도 실어 주마.']]);return;}
     if(!Rg.offerHomeGift?.())talk([['늙은 까치','집에 갈 때 빨간 열매도 챙겨 가거라. 엄마 손에 네가 쥐여 드려도 좋지.']]);
   }));
   for(const id of ['shelter','snow','shore']){

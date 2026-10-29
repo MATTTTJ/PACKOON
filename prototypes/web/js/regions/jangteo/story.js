@@ -145,7 +145,7 @@ function yMove(p,steps,route){
 }
 Rg.yutRules={move:yMove,routes:routeChoices};
 const youngStories=[
-  '예전에 자네 아빠도 이 방석에 앉았지. 아직 보따리 끈이 새것일 때야.',
+  '예전에 네 아빠도 이 방석에 앉았지. 아직 보따리 끈이 새것일 때야.',
   '젊은 아빠는 북쪽 장날부터 물었어. 장사도 길부터 알아야 한다면서.',
   '말 하나 잡히고 입이 댓 발 나왔지. 그래도 남의 콩은 주워 줬어.',
   '그땐 부를 준다는 열매 소문이 돌았지. 아빠도 그 소문을 쫓았고.',
@@ -155,7 +155,7 @@ const youngStories=[
 function yStory(){
   const s=yg(),i=Math.min(youngStories.length-1,Math.floor((s.throws-1)/5));
   if(i>=0&&!s.heard.includes(i)){s.heard.push(i);s.story=youngStories[i];}
-  else s.story=G.f.night?'노인들: 등불이 켜지니 콩 그림자도 길어졌네. 낮에 놓친 길도 보게.':'노인들: 말부터 골라 보게. 모퉁이에 멈추면 안길로 꺾을 수 있지.';
+  else s.story=G.f.night?'노인들: 등불이 켜지니 콩 그림자도 길어졌네. 낮에 놓친 길도 보이지.':'노인들: 말부터 골라 보거라. 모퉁이에 서면 안길로 꺾을 수 있단다.';
 }
 function yPoint(node){
   if(node==='S')return [285,205];if(node==='H')return [285,172];
@@ -281,9 +281,9 @@ defineMinigame({id:'jangteoYut',hit:yHit,step(){if(yg()?.phase==='aim'&&!Vfx.red
 
 /* 밤에만 다는 등. 불빛은 길 안내이며 본길이나 출구의 조건으로 삼지 않는다. */
 Rg.lanternTalk=()=>{
-  if(!night()){talk([['늙은 까치',G.f.jxLanternDone?'밤새 등 따라 길손들이 쉬고 갔네.\n아침 떡 김이 오르니 나도 떠나야지.':'해 지면 이 꾸러미를 풀자.\n숙소와 골목의 빈 등걸이에 등을 달아 주게.']]);return;}
-  if(G.f.jxLanternDone){talk([['늙은 까치','네 등이 솔숲 입구까지 이어졌네.\n길손들도 제 잠자리를 찾았어.']]);return;}
-  talk([['늙은 까치',G.f.jxLanternStarted?'남은 등걸이도 밝혀 보자.\n숙소 둘, 거리 골목 하나, 솔숲 입구 하나야.':'밤 길손들이 숙소를 못 찾겠어.\n나는 날개로 바람을 막을 테니 네가 등을 달아 주겠나?',[
+  if(!night()){talk([['늙은 까치',G.f.jxLanternDone?'밤새 등 따라 길손들이 쉬고 갔단다.\n아침 떡 김이 오르니 나도 떠나야지.':'해 지면 이 꾸러미를 풀자꾸나.\n숙소와 골목의 빈 등걸이에 등을 달아 다오.']]);return;}
+  if(G.f.jxLanternDone){talk([['늙은 까치','네 등이 솔숲 입구까지 이어졌구나.\n길손들도 제 잠자리를 찾았단다.']]);return;}
+  talk([['늙은 까치',G.f.jxLanternStarted?'남은 등걸이도 밝혀 다오.\n숙소 둘, 거리 골목 하나, 솔숲 입구 하나란다.':'밤 길손들이 숙소를 못 찾는구나.\n등은 네가 달아 주련? 나는 높은 데서 어디가 어두운지 봐 주마.',[
     {t:'꾸러미를 풀고 등 달기',go:()=>{G.f.jxLanternStarted=true;toast('숙소 기둥·창고문 가는 길·거리 골목·솔숲 입구의 빈 등걸이. E로 등을 달자.');}},
     {t:'조금 있다 올게요',go:null}
   ]]]);
@@ -297,7 +297,7 @@ Rg.lanternAction=id=>{
     const done=Rg.lanternPoints.every(p=>lights[p.id]);
     const lines={porch:'처마 아래 짐꾼들 발이 보인다.\n눈 묻은 신을 벗고 들어오네.',gate:'창고문 가는 길이 환해졌다.\n돌아올 땐 이 등을 보고 오면 되겠다.',alley:'접힌 좌판 뒤에도 발자국이 있었네.\n저쪽이 숙소 지름길이구나.',pine:'눈 위에 작은 코 자국!\n솔숲 안에서 킁킁 소리가 나.'};
     if(done){G.f.jxLanternDone=true;diary('jx_lanterns','까치와 숙소·골목·솔숲 입구에 등을 달았다. 불빛을 따라 길손들이 돌아왔다. 솔숲 안에서 킁킁 소리가 났다.');}
-    talk([['너구리',lines[id]],...(done?[['늙은 까치','불이 이어졌네. 길손들도 한숨 놓겠어.\n날 밝으면 누가 쉬고 갔는지 얘기해 주마.']]:[])]);
+    talk([['너구리',lines[id]],...(done?[['너구리','불이 다 이어졌다.\n까치한테 알려 줘야지.']]:[])]);
   });
 };
 

@@ -253,7 +253,7 @@ if(!CLASSIC){
       };
       const key='galTravelTaught_'+(p.travel==='depthBack'?'depth':p.travel);
       if(!G.f[key])talk([['너구리',p.travel==='stream'?'함지박이 둑에 매여 있어.\n물레방아 아래까진 얕네.':p.travel==='tree'?'나무 속이 비었네.\n낮은 가지부터 디뎌 보자.':'개울에서 보던 당산나무다.\n덩굴을 걷으니 안쪽 길이 보여.'],
-        ['너구리',p.travel==='stream'?'말걸기나 E로 멈출 수 있대.\n뒤돌아보고 싶으면 왼쪽을 보자.':p.travel==='tree'?'점프로 나이테 턱을 딛자.\n떨어져도 아래는 평평해.':'이 길로 가면 나무 밑동에 닿겠어.']],()=>{G.f[key]=true;begin(p);});
+        ['너구리',p.travel==='stream'?'물살이 세면 잠깐 멈춰도 되겠지.\n뒤돌아보면 우리 마을이 보일 거야.':p.travel==='tree'?'나이테가 계단 같아.\n떨어져도 밑이 푹신하네.':'이 길로 가면 나무 밑동에 닿겠어.']],()=>{G.f[key]=true;begin(p);});
       else start();
     }
     function stop(arrive){
