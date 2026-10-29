@@ -14,9 +14,9 @@ const Rg=defineRegion('dolneomeo',{
       '단풍골을 지나 북쪽으로 사흘을 걸었다. 밤새 첫서리가 내려 돌담마다 하얗게 소금을 뿌린 것 같다.',
       '해머루 약은 엄마의 병을 조금 늦췄을 뿐이다. 두꺼비 할멈은 돌산 절벽의 서리다래라면 한 번 더 늦출 수 있을 거라고 했다.',
       '아빠도 이 길을 지났을 것이다. 보따리 속 맷돌이 오늘따라 무겁다.']},
-    end:{kicker:'돌너머 마을 체험판 완료',head:'큰 장터로 가는 길',body:[
+    get end(){return {kicker:'돌너머 마을 체험판 완료',head:'큰 장터로 가는 길',body:[
       '깨어난 맷돌로 서리다래를 갈아, 내 손으로 엄마의 약을 만들었다. 까치가 약즙 통을 물고 남쪽으로 날아갔다.',
-      '아빠는 약연의 글자 하나를 읽고 그날 밤 떠났다고 한다. 그 글자가 무엇이었을까. 큰 장터에 가면 알 수 있을지도 모른다.']},
+      Rg.arcs()?'약연의 글자는 “되돌림”이었다. 아빠는 그 말을 듣고 그날 밤 떠났다. 큰 장터에서 그 뒤의 길을 찾아보자.':'아빠는 약연의 글자 하나를 읽고 그날 밤 떠났다고 한다. 그 글자가 무엇이었을까. 큰 장터에 가면 알 수 있을지도 모른다.']}},
   },
   newState:()=>({
     pickups:[
@@ -26,11 +26,13 @@ const Rg=defineRegion('dolneomeo',{
     digs:[{x:470,item:'eoksae',done:false},{x:560,item:'eoksae',done:false},{x:760,item:'eoksae',done:false},{x:1030,item:'eoksae',done:false}],
     boss:{x:1990,dead:false},
     f:{kkuTalk:false,kkuAwake:false,kkuDone:false,ppuriMet:false,ppuriPassed:false,nalDTalk:false,nalDDone:false,nalDBluff:false,
-      dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false},
+      dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false,
+      ...(/[?&]arcs=1\b/.test(location.search)?{arcs:true}:{})},
     rel:{kkubeogi:{t:'호감',v:0},dolsoe:{t:'신뢰',v:0},ppuri:{t:'의리',v:0},nal:{t:'경멸',v:0}},
   }),
   weather:()=>Vfx.setWeather('frost'),
   onStart(){
+    if(Rg.arcs())G.f.arcs=true;
     diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 우리를 내려다본다. 서리다래는 돌산 절벽에 있다고 했다.');
     toast('마을 어귀의 동물들에게 말을 걸어 보자');
   },
@@ -51,6 +53,9 @@ const Rg=defineRegion('dolneomeo',{
     ['쓰러진 횟수',G.f.faints],
   ],
 });
+
+/* 시험판은 지역에 들어온 뒤에도 주소·저장 상태를 읽는다. 옛 저장에는 플래그가 없어도 된다. */
+Rg.arcs=()=>/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({

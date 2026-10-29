@@ -59,6 +59,11 @@ function drawCliff(){const x=CLIFF_X-cam;if(x>W+10)return;
 }
 Rg.drawBack=()=>{drawSky();drawWall(150,620);drawWall(1060,1220);drawCliff();drawGround();};
 Rg.drawScenery=()=>{jangseung(96,true);jangseung(122,false);drawTree(670);drawTree(1412);drawField(880,1010);drawField(1225,1350);drawGate();
+  if(Rg.arcs()){
+    // 지름 바위는 길을 새로 열거나 골렘을 건너뛰지 않는 표지다.
+    const x=1668-cam;R(x-14,GROUND-5,28,5,'#8a8680');R(x-11,GROUND-7,22,2,'#aeaaa4');
+    if(G.f.dolneomeo_arc_ppuri3){R(x+13,GROUND-3,4,1,'#f4f2e8');R(x+20,GROUND-3,4,1,'#f4f2e8');R(x+27,GROUND-3,4,1,'#f4f2e8');}
+  }
   const sx=2338-cam;if(G.f.yakMade&&sx<W+20){R(sx,GROUND-26,2,26,'#6b4423');R(sx-8,GROUND-26,18,8,'#c9a27a');R(sx+6,GROUND-24,2,4,'#6b4423');}};
 
 /* 줍는 것 */
@@ -122,6 +127,7 @@ Rg.drawFront=()=>{for(const l of frost)R(l.x,l.y,1,1,Math.sin(l.p)>0?'#ffffff':'
 /* ---------- 진행 ---------- */
 Rg.maxX=()=>G.f.ppuriPassed?2330:GATE_X-14;
 Rg.step=()=>{
+  if(Rg.arcs())G.f.arcs=true;
   if(!G.boss.dead&&G.f.ppuriPassed&&G.px>GOLEM_AT)Rg.startGolem();
   /* 서리다래 약즙을 만들면 까치 편에 보내고 지역이 끝난다 */
   if(has('darae_yak')&&!G.f.yakMade)Rg.sendMedicine();
@@ -137,8 +143,8 @@ Rg.bossDie=()=>{
 };
 Rg.onPickup=a=>{
   if(a.item==='seoridarae'&&!G.f.daraePicked){G.f.daraePicked=true;
-    clue('h2','아빠의 수첩','아빠의 수첩에는 서리다래가 없다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
-    diary('d_darae','서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
+    clue('h2','아빠의 수첩',Rg.arcs()?'아빠의 젊은 시절 수첩에는 서리다래 그림이 없다. 지난가을 글자를 읽고 그날 밤 떠났다는 이야기는 돌쇠 할배에게 들었다.':'아빠의 수첩에는 서리다래가 없다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
+    diary('d_darae',Rg.arcs()?'서리다래를 내 기록에 그렸다. 아빠의 젊은 시절 수첩에는 이 열매가 없다. 지난가을 급히 떠난 일과는 나눠 적어 두자.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
     setTimeout(()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'),1600);refreshGoal();}
 };
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:2120,item:'seogi',done:false});};
