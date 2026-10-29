@@ -5,29 +5,13 @@
 (()=>{
 const Rg=REGIONS.dolneomeo;
 
-/* 사용자 입력에서만 호출한다. 음원 파일 없이 낮은 돌 소리와 졸린 숨소리를 합성한다.
-   현재 프로토타입에는 소리 설정이 없다. AudioContext는 첫 말 걸기/돌 얹기까지 만들지 않는다. */
-let dolAudio;
-function dolSound(kind){
-  try{
-    const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
-    if(!dolAudio)dolAudio=new AC();
-    if(dolAudio.state==='suspended')dolAudio.resume().catch(()=>{});
-    const a=dolAudio,t=a.currentTime;
-    const notes={tap:[180,72,.12],edge:[135,52,.26],fall:[110,38,.22],sleep:[160,100,.22],wake:[240,360,.16]}[kind];
-    const o=a.createOscillator(),g=a.createGain();o.type='sine';
-    o.frequency.setValueAtTime(notes[0],t);o.frequency.exponentialRampToValueAtTime(notes[1],t+notes[2]);
-    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.09,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+notes[2]);
-    o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+notes[2]+.02);o.onended=()=>{o.disconnect();g.disconnect();};
-  }catch(_){} // 소리를 쓸 수 없어도 판정과 보상은 그대로 진행한다.
-}
 const pick=lines=>lines[Math.floor(Math.random()*lines.length)];
 
 /* ---------- 꾸벅이 (고슴도치): 고개를 들 때 맞춰 말 걸기 ---------- */
 function talkKku(){
   const F=G.f;F.kkuTalk=true;
   if(!Rg.kkuAwakeNow()){
-    dolSound('sleep');
+    Sound.stone('sleep');
     learn('kkubeogi:sleep');
     if(!G.clues.some(c=>c.id==='k1')){
       clue('k1','꾸벅이','꾸벅이의 잠꼬대: 보부상 아저씨가 할배네서 겨울을 날 것처럼 굴더니, 글자 하나를 읽고는 그날 밤 떠났다.');
@@ -35,7 +19,7 @@ function talkKku(){
     }else talk([['꾸벅이',pick(['쿨… 둥지는… 폭신하게…','으음… 아직 꿈속인데…','하암… 조금만 더…'])],['너구리','(코가 씰룩하면 곧 고개를 들겠다.)']]);
     return;
   }
-  dolSound('wake');
+  Sound.stone('wake');
   if(!F.kkuAwake){F.kkuAwake=true;rel('kkubeogi',1);learn('kkubeogi:awake');
     ledger('kkubeogi','꾸벅이','마른 억새 3','서리다래가 있는 곳');
     talk([['꾸벅이','…어, 어? 안 잤어. 진짜야.'],['꾸벅이','너 처음 보는 너구리네. 그 모자, 어디서 봤더라… 하암.'],
@@ -198,10 +182,10 @@ function stackHit(){
     st.land=lean;
     st.edge=distance>=st.zone*.65?Math.sign(lean)*.32:0;
     st.hits++;st.settle=st.edge?42:24;st.cool=st.settle;st.warned=false;
-    stackSay(st.edge?'edge':'good');dolSound(st.edge?'edge':'tap');
+    stackSay(st.edge?'edge':'good');Sound.stone(st.edge?'edge':'tap');
   }else{
     const n=st.hits+2;st.fall={x:160+lean*stackAmp(),y:124-12-n*14,dir:Math.sign(lean),age:0};
-    st.miss++;st.cool=14;st.warned=true;dolSound('fall');
+    st.miss++;st.cool=14;st.warned=true;Sound.stone('fall');
     if(st.miss>=2)st.zone=.34;
     stackSay('miss',st.miss>=2?' 금빛 가운데가 넓어졌다.':'');
   }

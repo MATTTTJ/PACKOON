@@ -92,20 +92,20 @@ function stepSalg(){
   if(d>=190)return;
   if(!s.greeted){s.greeted=true;Rg.salgSay('start');}
   if(!s.arrived&&d<30){s.arrived=true;Rg.salgSay('good');}
-  if(s.phase==='graze'&&s.timer%28===0)Rg.ySound('grass');
+  if(s.phase==='graze'&&s.timer%28===0)Sound.yeongsan('grass');
   if(s.phase==='warn'&&moving)s.lastMove=s.tick;
   if(s.phase==='alert'){
     s.age++;
     if(moving&&d<150){s.lastMove=s.tick;if(s.age>12)s.risk++;}
     else if(!moving){
-      if(!s.relief&&s.lastMove&&s.tick-s.lastMove<=2){s.relief=true;Rg.salgSay('relief');Rg.ySound('relief');}
+      if(!s.relief&&s.lastMove&&s.tick-s.lastMove<=2){s.relief=true;Rg.salgSay('relief');Sound.yeongsan('relief');}
       s.risk=Math.max(0,s.risk-2);
     }
     if(s.risk>=12){s.startle=60;s.x=Math.min(s.home+80,s.x+60);s.risk=0;s.arrived=false;
-      learn('salgeumi:alert');Rg.salgSay('scare');Rg.ySound('scare');return;}
+      learn('salgeumi:alert');Rg.salgSay('scare');Sound.yeongsan('scare');return;}
   }
   if(--s.timer>0)return;
-  if(s.phase==='graze'){s.phase='warn';s.timer=36;Rg.salgSay('cue');Rg.ySound('cue');}
+  if(s.phase==='graze'){s.phase='warn';s.timer=36;Rg.salgSay('cue');Sound.yeongsan('cue');}
   else if(s.phase==='warn'){s.phase='alert';s.timer=52;s.age=0;s.risk=0;s.relief=false;}
   else {s.phase='graze';s.timer=d<100?90+Math.floor(Math.random()*31):108;s.risk=0;}
 }

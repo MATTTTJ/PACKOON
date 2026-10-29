@@ -1,7 +1,8 @@
 'use strict';
 /* 너구리의 책: 일기, 아빠 단서, 물품 장부. 도감은 따로 여는 아빠의 보부상 수첩(notebook.js) */
 let bookTab='diary';
-document.querySelectorAll('#bookTabs button').forEach(b=>b.onclick=()=>{bookTab=b.dataset.tab;renderBook();});
+$('btnBookEnd').addEventListener('click',()=>Sound.panel(true));
+document.querySelectorAll('#bookTabs button').forEach(b=>b.onclick=()=>{if(bookTab!==b.dataset.tab)Sound.tab();bookTab=b.dataset.tab;renderBook();});
 function renderBook(){
   const total=clueTotalSoFar();   // 지나온 지역을 모두 더해 센다
   const names={diary:'일기',clues:'아빠 단서 '+G.clues.length+'/'+total,ledger:'물품 장부'};

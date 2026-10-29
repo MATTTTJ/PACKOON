@@ -22,11 +22,11 @@ function gatherStep(){
 function gStrike(){
   if(gat.cool>0||!gat.cfg||gat.hits>=gat.cfg.hits)return;gat.cool=12;
   if(gat.pos>=gat.zone[0]&&gat.pos<=gat.zone[1]){
-    gat.hits++;
+    Sound.gather(true);gat.hits++;
     if(gat.hits>=gat.cfg.hits){drawGather();setTimeout(finishGather,300);return;}
     $('ghint').textContent=gat.cfg.ok[gat.hits-1]||'좋아!';setZone();
   }else{
-    gat.miss++;
+    Sound.gather(false);gat.miss++;
     $('ghint').innerHTML='<b>'+gat.cfg.miss+'</b>'+(gat.miss===2?' (무른 자리가 넓어졌다)':'');
     if(gat.miss===2)setZone();
   }

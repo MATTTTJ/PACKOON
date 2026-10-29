@@ -5,25 +5,6 @@
 (()=>{
 const Rg=REGIONS.yeongsan;
 
-/* 이 지역의 짧은 합성음. 사용자 입력 때만 오디오를 준비한다. */
-let audio=null;
-Rg.ySound=kind=>{
-  if(!audio||audio.state!=='running')return;
-  const notes={grass:[180,130,.045],cue:[520,430,.06],scare:[680,330,.13],relief:[290,380,.14],dad:[260,320,.16]};
-  const n=notes[kind];if(!n)return;
-  const o=audio.createOscillator(),v=audio.createGain(),t=audio.currentTime;
-  o.type='sine';o.frequency.setValueAtTime(n[0],t);o.frequency.exponentialRampToValueAtTime(n[1],t+n[2]);
-  v.gain.setValueAtTime(.0001,t);v.gain.exponentialRampToValueAtTime(.025,t+.01);v.gain.exponentialRampToValueAtTime(.0001,t+n[2]);
-  o.connect(v);v.connect(audio.destination);o.start(t);o.stop(t+n[2]+.02);
-};
-function readyAudio(e){
-  if(!e.isTrusted||typeof REG==='undefined'||REG!==Rg)return;
-  try{const A=window.AudioContext||window.webkitAudioContext;if(!audio&&A)audio=new A();
-    if(audio&&audio.state==='suspended')audio.resume().catch(()=>{});
-  }catch(_){} // 소리를 쓸 수 없어도 진행한다
-}
-addEventListener('pointerdown',readyAudio,{capture:true});
-addEventListener('keydown',readyAudio,{capture:true});
 const SALG_LINES={
   start:['귀, 귀가 서면 잠깐 멈춰 줘.','나, 난 발소리에 놀라… 살살 와.'],
   cue:['자, 잠깐. 무슨 소리 났어…','어… 풀 소리가 끊겼네.'],
@@ -111,7 +92,7 @@ function gesture(i){
   talk([['아빠',g.act,g.opts.map(([t,ok])=>({t,go:()=>{
     if(!ok){dadPose('retry');talk([['아빠',RETRIES[Math.floor(Math.random()*RETRIES.length)]]],()=>gesture(i));return;}
     const next=()=>i+1<GESTURES.length?gesture(i+1):dadLedger();
-    dadPose(g.reply);Rg.ySound('dad');talk([['아빠',g.after]],next);
+    dadPose(g.reply);Sound.yeongsan('dad');talk([['아빠',g.after]],next);
   }}))]]);
 }
 function dadLedger(){

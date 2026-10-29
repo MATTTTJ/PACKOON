@@ -100,7 +100,7 @@ const forgeWords={
   fail:['식었군. 다시 달궈. 숯은 됐다.','괜찮다. 쇠야 다시 달구면 돼.','낫은 내준다. 다시 해 봐라.'],
   edge:['휴… 딱 맞췄군. 간도 크다.','허, 식기 직전에 살려 냈구나.','좋다. 네 아비도 그렇게 쳤지.']
 };
-let forgeCanvas,forgeHeatLabel,forgeAudio,forgeSoundOn=true;
+let forgeCanvas,forgeHeatLabel;
 function forgeSay(kind){
   const lines=forgeWords[kind],last=forge.lastLine;
   const choices=lines.filter(t=>t!==last);
@@ -117,31 +117,6 @@ function prepareForge(){
   forgeHeatLabel=el('div');forgeHeatLabel.style.cssText='font-size:.9em;min-height:1.4em';
   $('forge').insertBefore(forgeHeatLabel,$('fbar'));
   $('fhint').setAttribute('aria-live','polite');
-  const sound=el('button','btn','망치 소리 켜짐');sound.type='button';
-  sound.style.cssText='align-self:flex-end;padding:3px 8px;font-size:12px;min-height:28px';
-  sound.setAttribute('aria-pressed','true');
-  sound.onclick=()=>{forgeSoundOn=!forgeSoundOn;sound.textContent='망치 소리 '+(forgeSoundOn?'켜짐':'꺼짐');sound.setAttribute('aria-pressed',String(forgeSoundOn));};
-  $('forge').appendChild(sound);
-}
-/* 사용자 타격에서만 호출한다. 외부 음원 없이 비정수 배음으로 짧은 금속 울림을 낸다. */
-function forgeSound(kind){
-  if(!forgeSoundOn)return;
-  try{
-    const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
-    if(!forgeAudio||forgeAudio.state==='closed')forgeAudio=new Audio();
-    if(forgeAudio.state==='suspended')forgeAudio.resume().catch(()=>{});
-    const now=forgeAudio.currentTime,strong=kind==='edge',cold=kind==='cold';
-    [1,2.76,5.4].forEach((ratio,i)=>{
-      const osc=forgeAudio.createOscillator(),gain=forgeAudio.createGain();
-      const duration=cold?.08:strong?.55:.32;
-      osc.type='sine';osc.frequency.setValueAtTime((cold?310:730)*ratio,now);
-      gain.gain.setValueAtTime(.0001,now);
-      gain.gain.exponentialRampToValueAtTime((cold?.025:strong?.085:.06)/(i+1),now+.003);
-      gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
-      osc.connect(gain);gain.connect(forgeAudio.destination);osc.start(now);osc.stop(now+duration+.01);
-      osc.onended=()=>{osc.disconnect();gain.disconnect();};
-    });
-  }catch(_){/* 소리를 못 내도 판정과 진행은 그대로 둔다. */}
 }
 function openForge(){
   prepareForge();
@@ -193,11 +168,11 @@ function forgeStep(){
 function strike(){
   if($('forge').hidden||forge.owner!==G||forge.wait>0||forge.hits>=3)return;
   if(forge.phase==='cold'){
-    forgeSound('cold');forge.phase='hot';forge.heat=100;forge.warned=false;forgeSay('start');drawForge();return;
+    Sound.forge('cold');forge.phase='hot';forge.heat=100;forge.warned=false;forgeSay('start');drawForge();return;
   }
   const edge=forge.heat<=forgeFloor()+14;
   forge.hits++;if(edge)forge.edge++;
-  forgeSound(edge?'edge':'hit');forgeSay(edge?'edge':'good');
+  Sound.forge(edge?'edge':'hit');forgeSay(edge?'edge':'good');
   forge.impact=edge?20:10;
   for(let i=0;i<(edge?38:12);i++){
     const life=18+Math.random()*16;
