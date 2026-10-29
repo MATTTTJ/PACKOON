@@ -5,6 +5,8 @@
    상대 {name, calmLabel, intro, howto?, npc?, dodge?(피하기만 하는 시험: 버틸 공격 수), bonkText?(dodge 시작 때 연장을 뺏기는 글),
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
+         cover?:엄폐물, calmAction?:{amount:행동 진정량}, placeGift?:꼭대기에 얹을 선물 id,
+         headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표,
          draw(c):수묵 그림, onWin(B)?:이겼을 때 보상 (B.loot 에 넣고 B.bonus 에 글)} */
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
 let B=null,inkOn=false,LW=800,LH=450,BOX={x:250,y:262,w:300,h:160},EY=118;const BDPR=2;
@@ -41,9 +43,11 @@ function startBattle(kind,onEnd){
     loot:[],msg:E.intro,onEnd,paused:false,time:0,result:null,firstHit:true,hits:0,hitThis:false,survived:0,noTool:false,toolFly:null,bonk:0,bonus:''};
   document.body.classList.add('in-battle');$('battle').hidden=false;
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
+  if(E.cover){B.covers=[];B.round=0;addCover(0.5,0.43);}
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
   const gm=$('goalM');gm.querySelector('b').textContent='전투';gm.querySelector('span').textContent=E.dodge?'연장 없이 피하기만! 화면을 끌거나 십자 버튼으로 피하자.':'붉은 표식 위에서 치기. 화면을 끌거나 십자 버튼으로 피하자.';
+  if(E.cover)gm.querySelector('span').textContent='돌 아래 여백에 손을 숨기자. 공격 뒤에는 표식 치기 또는 소원 돌 바로 놓기.';
 }
 function setPadLabels(on){
   const j=document.querySelector('#pad [data-k="jump"]'),a=document.querySelector('#pad [data-k="atk"]');
@@ -72,7 +76,30 @@ function bLiving(){return B.parts.filter(p=>!p.broken);}
 function coreHidden(){const c=B.parts.find(p=>p.core);if(!c||c.broken)return false;
   if(B.E.coreNeeds)return !B.parts.find(p=>p.id===B.E.coreNeeds).broken;
   return B.parts.filter(p=>!p.core).every(p=>!p.broken);}
+/* 선택 기능. 돌의 좌표는 상자에 대한 비율이라 화면 회전에도 자리를 유지한다. */
+function coverPoint(r){return {x:BOX.x+r.u*BOX.w,y:BOX.y+r.v*BOX.h};}
+function addCover(u,v){
+  if(!B.E.cover)return;
+  if(B.covers.length>=3)B.covers.shift();
+  const r={u:clamp(u,0.14,0.86),v:clamp(v,0.28,0.62),cracked:false,blockedRound:-1,flash:0};
+  B.covers.push(r);return r;
+}
+function coverBehind(x,y){return B.E.cover&&B.covers.find(r=>{const p=coverPoint(r);return Math.abs(x-p.x)<22&&y>p.y+10;});}
+function damageCover(r){
+  r.flash=18;
+  if(r.blockedRound===B.round)return;
+  r.blockedRound=B.round;
+  if(r.cracked){B.covers=B.covers.filter(q=>q!==r);const p=coverPoint(r);bSplash(p.x,p.y);B.msg='금 간 돌이 부서졌다. 다음 돌의 자리를 보자.';}
+  else{r.cracked=true;B.msg='돌이 막았다! 금이 갔지만 이번 공격까지는 버틴다.';}
+}
+function openCalmAction(){
+  if(!B.E.calmAction)return;
+  const u=B.mark?(B.mark.x>BOX.x+BOX.w/2?0.14:0.86):(B.round%2?0.86:0.14);
+  B.calmStone={u,v:0.8,t:150};
+  B.msg+=' / 기울어진 돌 위에서 '+HITKEY+': 바로 놓기.';
+}
 function chooseAttack(){
+  if(B.E.cover){B.round++;B.calmStone=null;}
   const L=bLiving();let o=L.filter(p=>p!==B.last);if(!o.length)o=L;
   const p=o[Math.floor(Math.random()*o.length)];B.cur=p;B.last=p;B.st='tell';B.t=42;B.msg=p.tell;B.hitThis=false;
 }
@@ -80,7 +107,9 @@ function openMark(){
   const p=B.cur;
   if(p.core&&coreHidden()){B.mark=null;B.msg=B.E.coreHidden;return;}
   let x,y,n=0;do{x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+26+Math.random()*(BOX.h-52);n++;}while(Math.hypot(x-B.px,y-B.py)<70&&n<12);
-  B.mark={x,y,t:120,max:120,part:p};B.msg=jo(p.name,'에','에')+' 빈틈! 붉은 표식 위에서 '+HITKEY+'를 누르자.';
+  if(B.E.markPosition){const pos=B.E.markPosition(p);if(pos){x=pos.x;y=pos.y;}}
+  const life=B.E.calmAction?150:120;
+  B.mark={x,y,t:life,max:life,part:p};B.msg=jo(p.name,'에','에')+' 빈틈! 붉은 표식 위에서 '+HITKEY+'를 누르자.';
 }
 function attackTick(p){ATTACKS[p.atk].tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
 function bHitMe(){
@@ -89,11 +118,19 @@ function bHitMe(){
 }
 function bSplash(x,y,col){for(let i=0;i<9;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*2.4;B.fx.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:2+Math.random()*4,t:28,col:col||'#1d1814'});}}
 function bStrike(){
-  if(!B||B.paused||B.st==='end'||B.cool>0)return;
+  if(!B||B.paused||B.st==='end'||B.st==='giftPlace'||B.cool>0)return;
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
   B.cool=16;B.swing=12;
+  if(B.calmStone){const s=coverPoint(B.calmStone);
+    if(Math.hypot(s.x-B.px,s.y-B.py)<26){
+      B.calmStone=null;B.mark=null;B.calm=Math.min(100,B.calm+B.E.calmAction.amount);
+      B.msg='기울어진 소원 돌을 바로 놓았다. 골렘이 숨을 고른다.';B.st='idle';B.t=36;renderBHud();
+      if(B.calm>=100)bEnd('calm');return;
+    }
+  }
   const m=B.mark;
   if(m&&Math.hypot(m.x-B.px,m.y-B.py)<26){
+    B.calmStone=null;
     const p=m.part;const dmg=(G.sharp&&!B.E.npc)?2:1;p.hp=Math.max(0,p.hp-dmg);p.shake=16;bSplash(m.x,m.y);B.mark=null;
     if(p.hp<=0)breakPart(p);else B.msg=jo(p.name,'을','를')+' 쳤다! 내구도가 깎였다.';
     renderBHud();
@@ -107,7 +144,7 @@ function breakPart(p){
   if(B.E.coreNeeds?p.id===B.E.coreNeeds:B.parts.filter(q=>!q.core).filter(q=>q.broken).length===1){learn('core:'+B.kind);setTimeout(()=>{if(B&&B.st!=='end')B.msg=B.E.coreShown;},1300);}
 }
 function bEnd(result){
-  if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.bullets=[];
+  if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.calmStone=null;B.bullets=[];
   B.msg=result==='win'?B.E.win:result==='calm'?B.E.calmWin:result==='flee'?'일단 물러나자.':B.E.lose;
   if(result==='calm'){learn('calm:'+B.kind);if(B.E.calmGift)B.loot.push(B.E.calmGift);}
   if(result==='win'&&B.E.onWin)B.E.onWin(B);
@@ -116,7 +153,8 @@ function bEnd(result){
 function bStep(){
   if(!B||B.paused||!$('bResult').hidden)return;
   B.time++;if(B.inv>0)B.inv--;if(B.cool>0)B.cool--;if(B.swing>0)B.swing--;
-  if(B.st!=='end'){
+  if(B.covers)B.covers.forEach(r=>{if(r.flash>0)r.flash--;});
+  if(B.st!=='end'&&B.st!=='giftPlace'){
     let dx=0,dy=0;
     if(keys['arrowleft']||keys['a']||touch.left)dx-=1;if(keys['arrowright']||keys['d']||touch.right)dx+=1;
     if(keys['arrowup']||keys['w']||touch.up)dy-=1;if(keys['arrowdown']||keys['s']||touch.down)dy+=1;
@@ -133,9 +171,11 @@ function bStep(){
     case 'bonk':if(B.t===60)B.msg='연장을 놓쳤다! 이번엔 피하기만 해야 한다.';if(--B.t<=0){B.st='idle';B.t=20;B.toolFly=null;}break;
     case 'idle':if(--B.t<=0)chooseAttack();break;
     case 'tell':if(--B.t<=0){B.st='atk';B.atkT=0;B.atkDur=ATTACKS[B.cur.atk].dur;}break;
-    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else{B.st='open';openMark();}}break;
+    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover)B.st='settle';else{B.st='open';openMark();}}break;
+    case 'settle':if(!B.bullets.length){B.st='open';openMark();openCalmAction();}break;
+    case 'giftPlace':if(--B.t<=0){B.giftPlace=null;bEnd('calm');}break;
     case 'clear':if(!B.bullets.length){B.survived++;B.msg=(B.hitThis?'아야… 그래도 버텼다. ':'잘 피했다! ')+'('+B.survived+'/'+B.E.dodge+')';renderBHud();if(B.survived>=B.E.dodge)bEnd('win');else{B.st='idle';B.t=40;}}break;
-    case 'open':if(B.mark&&--B.mark.t<=0){B.mark=null;B.msg='빈틈이 닫혔다.';}if(!B.mark&&!B.bullets.length){B.st='idle';B.t=36;}break;
+    case 'open':if(B.calmStone&&--B.calmStone.t<=0)B.calmStone=null;if(B.mark&&--B.mark.t<=0){B.mark=null;B.msg='빈틈이 닫혔다.';}if(!B.mark&&!B.calmStone&&!B.bullets.length){B.st='idle';B.t=36;}break;
     case 'end':if(--B.t<=0)showResult();return;
   }
   const X1=BOX.x,X2=BOX.x+BOX.w,Y1=BOX.y,Y2=BOX.y+BOX.h;
@@ -145,7 +185,7 @@ function bStep(){
 
 /* 선물 (달래기) */
 function openGift(){
-  if(!B||B.st==='end'||!$('bResult').hidden)return;
+  if(!B||B.st==='end'||B.st==='giftPlace'||!$('bResult').hidden)return;
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
   const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0);
   if(!ids.length)g.appendChild(el('span','small','건넬 물건이 없다.'));
@@ -159,7 +199,10 @@ function giveGift(id){
   B.calm=Math.min(100,B.calm+(v||8));
   B.msg=v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
   closeGift();renderBHud();
-  if(B.calm>=100)bEnd('calm');
+  if(B.calm>=100){
+    if(B.E.placeGift===id){B.giftPlace={x:B.px,y:B.py};B.st='giftPlace';B.t=60;B.mark=null;B.calmStone=null;B.bullets=[];B.msg='아빠의 소원 돌을 손으로 꼭대기에 얹는다.';}
+    else bEnd('calm');
+  }
 }
 $('bGift').onclick=openGift;$('bHit').onclick=()=>bStrike();$('bGiftClose').onclick=closeGift;
 $('bFlee').onclick=()=>{if(B&&B.st!=='end'&&!B.paused)bEnd('flee');};
@@ -187,7 +230,7 @@ $('bResOk').onclick=()=>{
 /* 터치로 손 끌기 */
 let bDrag=null;
 bcv.addEventListener('pointerdown',e=>{if(!B)return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
-bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.st==='end')return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
+bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.st==='end'||B.st==='giftPlace')return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
   B.px=clamp(B.px+dx,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy,BOX.y+8,BOX.y+BOX.h-8);});
 const endDrag=()=>{bDrag=null;};bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
 
@@ -231,6 +274,7 @@ function bDraw(){
   c.save();c.translate(LW/2,EY);c.scale(0.84,0.84);c.translate(-LW/2,-EY);
   B.E.draw(c);
   c.restore();
+  if(B.E.cover)drawGolemAim(c);
   // 글귀
   c.fillStyle=INK;c.textAlign='center';c.textBaseline='alphabetic';c.font='17px "Gowun Batang", "Batang", serif';
   const msg=B.msg||'';const maxW=LW-60;
@@ -240,7 +284,9 @@ function bDraw(){
   // 상자
   c.save();c.fillStyle='rgba(255,252,242,.55)';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();
   c.save();c.beginPath();c.rect(BOX.x,BOX.y,BOX.w,BOX.h);c.clip();
+  if(B.E.cover)drawBattleCover(c);
   for(const b of B.bullets)BULLETS[b.k].draw(c,b);
+  if(B.calmStone)drawWishStone(c);
   if(B.mark){const m=B.mark;const pulse=1+Math.sin(B.time*0.25)*0.08;c.save();c.translate(m.x,m.y);c.scale(pulse,pulse);
     c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.arc(0,0,20,-Math.PI/2,-Math.PI/2+Math.PI*2*(m.t/m.max));c.stroke();
     c.fillStyle='rgba(180,67,42,.16)';c.beginPath();c.arc(0,0,17,0,Math.PI*2);c.fill();
@@ -249,9 +295,10 @@ function bDraw(){
     c.save();c.font='bold 13px "Gowun Dodum", sans-serif';const tw=c.measureText(lab).width+12;const ly=m.y+(m.y>BOX.y+BOX.h-46?-44:30);
     c.fillStyle=near?RED:'rgba(255,250,238,.95)';c.strokeStyle=near?RED:INK;c.lineWidth=1.5;c.beginPath();c.rect(m.x-tw/2,ly-10,tw,20);c.fill();c.stroke();
     c.fillStyle=near?'#fff6e8':INK;c.textAlign='center';c.textBaseline='middle';c.fillText(lab,m.x,ly+1);c.restore();}
-  drawPaw(c,B.px,B.py);
+  if(B.st!=='giftPlace')drawPaw(c,B.px,B.py);
   for(const f of B.fx)blob(c,f.x,f.y,f.r*(f.t/28),f.r*(f.t/28),f.col,Math.min(1,f.t/14));
   c.restore();
+  if(B.giftPlace)drawPlacedGift(c);
   drawBonk(c);
   // 붓 테두리
   const X=BOX.x,Y=BOX.y,Wd=BOX.w,Ht=BOX.h;
