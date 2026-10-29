@@ -6,7 +6,7 @@
    - 시작 화면: 저장이 있으면 '이어서 하기'
    - 처음부터 하기 / 새로 시작: 저장이 있으면 한 번 더 눌러야 저장을 지운다 */
 const SAVE_KEY='packoon-save-v1';
-const busyForSave=()=>!!B||inkOn||open('dlg')||!!openMinigame();
+const busyForSave=()=>!!B||inkOn||!!vistaMode||!!zoneMotion||zoneFade>0||open('dlg')||!!openMinigame();
 function readSave(){
   try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
     if(s&&s.v===1&&s.G&&REGIONS[s.G.region])return s;}catch(_){}
@@ -26,7 +26,7 @@ function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(_){}refreshSav
 function loadSave(){
   const s=readSave();if(!s)return false;
   TitleScreen.close();
-  G=Object.assign(baseState(),s.G);   // 나중에 생긴 칸이 빠진 옛 저장도 기본값으로 채운다
+  G=normalizeTravelRecords(Object.assign(baseState(),s.G));   // 저장 키·발견 키는 유지하고 빠진 기록 칸만 채운다
   resetScreens();if(G.ended)showEnd();
   toast('이어서 한다 · '+REGIONS[G.region].name);return true;
 }

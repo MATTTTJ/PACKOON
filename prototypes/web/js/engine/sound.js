@@ -1,112 +1,174 @@
-'use strict';
-/* 짧은 합성음. 로드할 때는 무음이며 첫 실제 키/포인터 입력에서만 컨텍스트를 만든다.
-   when은 AudioContext.currentTime과 같은 초 단위. group은 한 게임의 소리를 함께 끊는 용도. */
+﻿'use strict';
+/* JSON의 층을 합성한 버퍼를 재사용한다. 첫 실제 입력 전에는 컨텍스트를 만들지 않는다.
+   when은 AudioContext.currentTime과 같은 초 단위. group은 장단 예약음을 함께 끊는다. */
 const Sound=(()=>{
   let ctx=null,master=null,attempted=false,enabled=true,volume='low',resuming=null,resumeEffect=null;
-  const storageKey='packoon-sound-v1';
+  let bgmVolume=.4,sfxVolume=.4,ambientKind=null,ambientVoice=null,pending=null,pendingTimer=null,warmTimer=null;
+  const storageKey='packoon-sound-v1',maxVoices=24,maxCacheBytes=12*1024*1024;
+  const cache=new Map(),sources=new Set(),groups=new Set(),last=new Map();
+  let cacheBytes=0,lastEffect=-Infinity,peakVoices=0,played=0,dropped=0;
+  const clamp=value=>Math.max(0,Math.min(1,Number.isFinite(value)?value:0));
   try{const saved=JSON.parse(localStorage.getItem(storageKey));
     if(saved&&typeof saved.enabled==='boolean')enabled=saved.enabled;
     if(saved&&['low','high'].includes(saved.volume))volume=saved.volume;
+    bgmVolume=sfxVolume=volume==='high'?.8:.4;
+    if(saved&&Number.isFinite(saved.bgmVolume))bgmVolume=clamp(saved.bgmVolume);
+    if(saved&&Number.isFinite(saved.sfxVolume))sfxVolume=clamp(saved.sfxVolume);
   }catch(_){}
+  const hidden=()=>typeof document!=='undefined'&&document.hidden;
+  const ready=()=>ctx&&enabled&&ctx.state==='running'&&!hidden();
+  function stopAmbient(){if(ambientVoice){ambientVoice.stop();ambientVoice=null;}}
+  function ambience(kind){
+    ambientKind=kind;stopAmbient();
+    if(!kind||!ready())return;
+    const source=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();
+    const buffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),data=buffer.getChannelData(0);
+    let seed=0x43a0d10;
+    for(let i=0;i<data.length;i++){seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;data[i]=(seed>>>0)/2147483648-1;}
+    source.buffer=buffer;source.loop=true;filter.type='lowpass';filter.frequency.value=kind==='water'?900:320;gain.gain.value=.055;
+    source.connect(filter);filter.connect(gain);gain.connect(master);source.start();
+    ambientVoice={stop(){try{source.stop();}catch(_){}source.disconnect();filter.disconnect();gain.disconnect();}};
+  }
+  function releaseVoice(voice){
+    if(!sources.has(voice))return;
+    sources.delete(voice);if(voice.bus)voice.bus.voices.delete(voice.source);
+    voice.source.disconnect();voice.gain.disconnect();
+  }
+  function stopVoices(){
+    for(const voice of Array.from(sources)){try{voice.source.stop();}catch(_){}releaseVoice(voice);}
+    for(const bus of Array.from(groups))bus.stop();
+    pending=null;resumeEffect=null;
+    if(pendingTimer!==null){clearTimeout(pendingTimer);pendingTimer=null;}
+    if(warmTimer!==null){clearTimeout(warmTimer);warmTimer=null;}
+  }
   function settingsChanged(){
     if(master){master.gain.cancelScheduledValues(ctx.currentTime);
-      master.gain.setTargetAtTime(enabled?(volume==='high'?0.8:0.4):0,ctx.currentTime,0.008);}
-    try{localStorage.setItem(storageKey,JSON.stringify({enabled,volume}));}catch(_){}
+      master.gain.setTargetAtTime(enabled?sfxVolume:0,ctx.currentTime,.008);}
+    if(!enabled){stopVoices();stopAmbient();}else if(ambientKind&&!ambientVoice)ambience(ambientKind);
+    try{localStorage.setItem(storageKey,JSON.stringify({enabled,volume,bgmVolume,sfxVolume}));}catch(_){}
     dispatchEvent(new Event('packoon-sound-change'));
   }
   function toggle(){enabled=!enabled;settingsChanged();}
-  function toggleVolume(){volume=volume==='low'?'high':'low';settingsChanged();}
+  function toggleVolume(){volume=volume==='low'?'high':'low';bgmVolume=sfxVolume=volume==='high'?.8:.4;settingsChanged();}
+  function setBgmVolume(value){if(!Number.isFinite(value))return;bgmVolume=clamp(value);settingsChanged();}
+  function setSfxVolume(value){if(!Number.isFinite(value))return;sfxVolume=clamp(value);settingsChanged();}
+  function bufferFor(id){
+    if(cache.has(id)){const hit=cache.get(id);cache.delete(id);cache.set(id,hit);return hit.buffer;}
+    const data=globalThis.PackoonAudioData,dsp=globalThis.PackoonMusic&&globalThis.PackoonMusic.DSP;
+    if(!data||!dsp||!ctx)return null;
+    const definition=data.sfx.effects.find(effect=>effect.id===id);if(!definition)return null;
+    const pcm=dsp.renderSfx(definition,data.instruments,{sampleRate:44100});
+    const buffer=ctx.createBuffer(2,pcm.left.length,pcm.sampleRate);
+    buffer.copyToChannel(pcm.left,0);buffer.copyToChannel(pcm.right,1);
+    const bytes=pcm.left.byteLength+pcm.right.byteLength;
+    while(cache.size&&(cacheBytes+bytes>maxCacheBytes||cache.size>=32)){
+      const oldest=cache.keys().next().value;cacheBytes-=cache.get(oldest).bytes;cache.delete(oldest);
+    }
+    if(bytes<=maxCacheBytes){cache.set(id,{buffer,bytes});cacheBytes+=bytes;}
+    return buffer;
+  }
+  function warmCommon(){
+    if(warmTimer!==null||!ready())return;
+    // 첫 장단 입력 때 합성 때문에 예약 시계가 밀리지 않도록 한 소리씩 준비한다.
+    const ids=['rhythm_drum_low','rhythm_drum_high','rhythm_metal','rhythm_metal_bright','rhythm_click','rhythm_noise',
+      'footstep_leaf','jump','land','dialog_next','sickle','pickup'].filter(id=>!cache.has(id));
+    if(!ids.length)return;
+    function next(){warmTimer=null;if(!ready())return;const id=ids.shift();if(id)bufferFor(id);if(ids.length)warmTimer=setTimeout(next,0);}
+    warmTimer=setTimeout(next,0);
+  }
   function unlock(e){
-    if(!e.isTrusted)return;
+    if(!e.isTrusted||hidden())return;
+    // 터치의 사용자 활성화는 손을 뗄 때 생긴다. 그 전에 resume()하면 미해결
+    // Promise가 남아 다음 입력을 막으므로 활성화된 pointerup/click까지 기다린다.
+    const activation=window.navigator&&window.navigator.userActivation;
+    if(activation&&!activation.isActive&&(!ctx||ctx.state!=='running'))return;
     if(!attempted){attempted=true;const AC=window.AudioContext||window.webkitAudioContext;
-      if(AC)try{ctx=new AC();master=ctx.createGain();master.gain.value=enabled?(volume==='high'?0.8:0.4):0;master.connect(ctx.destination);}catch(_){} }
+      if(AC)try{ctx=new AC();master=ctx.createGain();master.gain.value=enabled?sfxVolume:0;master.connect(ctx.destination);}catch(_){} }
     if(ctx&&ctx.state==='suspended'&&!resuming){
       resuming=ctx.resume().then(()=>{
+        if(ambientKind)ambience(ambientKind);
         const next=resumeEffect;resumeEffect=null;
-        if(next&&enabled&&ctx.state==='running')effect(next.key,next.cool,next.make);
+        if(next&&ready())effect(next.key,next.cool,next.make);
+        warmCommon();dispatchEvent(new Event('packoon-sound-change'));
       }).catch(()=>{resumeEffect=null;}).finally(()=>{resuming=null;});
-    }
+    }else warmCommon();
   }
-  addEventListener('pointerdown',unlock,true);addEventListener('keydown',unlock,true);
+  addEventListener('pointerdown',unlock,true);addEventListener('pointerup',unlock,true);
+  addEventListener('click',unlock,true);addEventListener('keydown',unlock,true);
   function group(){
     if(!ctx)return null;
-    const out=ctx.createGain(),voices=new Set();out.gain.value=0.65;out.connect(master);
-    return {out,voices,stopped:false,stop(){
+    const out=ctx.createGain(),voices=new Set();out.gain.value=.65;out.connect(master);
+    const bus={out,voices,stopped:false,stop(){
       if(this.stopped)return;this.stopped=true;
-      voices.forEach(s=>{try{s.stop();}catch(_){} });voices.clear();out.disconnect();
-    }};
+      for(const voice of Array.from(sources))if(voice.bus===this){try{voice.source.stop();}catch(_){}releaseVoice(voice);}
+      voices.clear();out.disconnect();groups.delete(this);
+    }};groups.add(bus);return bus;
   }
-  function play(when,duration,voiceVolume,freq,endFreq,type,g,noise=false,filterType='highpass',attack=0.003){
-    if(!ctx||!enabled||ctx.state!=='running'||(g&&g.stopped))return;
-    const t=Math.max(when,ctx.currentTime),amp=ctx.createGain();
-    amp.gain.setValueAtTime(0.0001,t);amp.gain.exponentialRampToValueAtTime(Math.max(0.0001,voiceVolume),t+attack);amp.gain.exponentialRampToValueAtTime(0.0001,t+duration);
-    amp.connect(g?g.out:master);
-    let s;
-    if(noise){s=ctx.createBufferSource();const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate);
-      const data=b.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;s.buffer=b;
-      const filter=ctx.createBiquadFilter();filter.type=filterType;filter.frequency.value=freq;
-      s.connect(filter);filter.connect(amp);s.onended=()=>{s.disconnect();filter.disconnect();amp.disconnect();if(g)g.voices.delete(s);};
-    }else{s=ctx.createOscillator();s.type=type;s.frequency.setValueAtTime(freq,t);
-      s.frequency.exponentialRampToValueAtTime(endFreq,t+duration);s.connect(amp);
-      s.onended=()=>{s.disconnect();amp.disconnect();if(g)g.voices.delete(s);};}
-    if(g)g.voices.add(s);s.start(t);s.stop(t+duration+0.01);
+  function playSfx(id,settings={}){
+    if(!ready()||(settings.group&&settings.group.stopped))return false;
+    const buffer=bufferFor(id);if(!buffer)return false;
+    // 층은 미리 한 버퍼로 섞으므로 층 수와 관계없이 한 발음만 쓴다.
+    if(sources.size>=maxVoices){dropped++;return false;}
+    const source=ctx.createBufferSource(),gain=ctx.createGain(),bus=settings.group||null;
+    source.buffer=buffer;gain.gain.value=Number.isFinite(settings.gain)?Math.max(0,Math.min(3,settings.gain)):1;
+    source.connect(gain);gain.connect(bus?bus.out:master);
+    const voice={source,gain,bus};sources.add(voice);if(bus)bus.voices.add(source);
+    peakVoices=Math.max(peakVoices,sources.size);source.onended=()=>releaseVoice(voice);
+    source.start(Math.max(ctx.currentTime,Number.isFinite(settings.when)?settings.when:ctx.currentTime));played++;return true;
   }
-  const noise=(t,v=0.08,g)=>play(t,0.045,v,1700,1700,'sine',g,true);
-  const drum=(t,v=0.2,g,high=false)=>play(t,0.22,v,high?210:135,high?85:48,'sine',g);
-  function metal(t,v=0.1,g,bright=false){
-    [1,1.47,2.09].forEach((r,i)=>play(t,bright?0.13:0.075,v/(i+2),1850*r,1550*r,'sine',g));
-    noise(t,v*0.35,g);
-  }
-  const click=(t,v=0.08,g)=>play(t,0.025,v,950,380,'triangle',g);
+  const noise=(t,v=.08,g)=>playSfx('rhythm_noise',{when:t,group:g,gain:v/.08});
+  const drum=(t,v=.2,g,high=false)=>playSfx(high?'rhythm_drum_high':'rhythm_drum_low',{when:t,group:g,gain:v/.2});
+  const metal=(t,v=.1,g,bright=false)=>playSfx(bright?'rhythm_metal_bright':'rhythm_metal',{when:t,group:g,gain:v/.1});
+  const click=(t,v=.08,g)=>playSfx('rhythm_click',{when:t,group:g,gain:v/.08});
   // 효과음만 짧게 제한한다. 장단의 예약 재생은 이 쿨다운을 거치지 않는다.
-  const last=new Map();let lastEffect=-Infinity,pending=null;
   const priority={footstep:0,steam:1,paper:2,panel:3,tab:3,jump:4,land:4,swing:4,gather:5,forge:5,stone:5,yeongsan:5,item:6,exchange:7,craft:8,travel:9};
   function effect(key,cool,make){
-    if(!ctx||!enabled)return;
+    if(!ctx||!enabled||ambientKind||hidden())return;
     if(ctx.state!=='running'){if(resuming)resumeEffect={key,cool,make};return;}
     const now=ctx.currentTime;
-    if(now-lastEffect<0.018||now-(last.get(key)??-Infinity)<cool)return;
-    // 대화 선택 직후의 교환처럼 한 입력에서 겹치는 소리는 중요한 것 하나만 낸다.
+    if(now-lastEffect<.018||now-(last.get(key)??-Infinity)<cool)return;
     if(pending){if(priority[key]>priority[pending.key])pending={key,make};return;}
-    pending={key,make};
-    setTimeout(()=>{
-      const next=pending;pending=null;
-      if(!ctx||!enabled||ctx.state!=='running')return;
+    pending={key,make};pendingTimer=setTimeout(()=>{
+      const next=pending;pending=null;pendingTimer=null;
+      if(!ready()||ambientKind||!next)return;
       lastEffect=ctx.currentTime;last.set(next.key,lastEffect);next.make(lastEffect);
     },0);
   }
-  const tone=(t,d,v,f,end=f,type='sine')=>play(t,d,v,f,end,type);
-  const softNoise=(t,d,v,f)=>play(t,d,v,f,f,'sine',null,true,'lowpass');
-  function steam(kind){effect('steam',0.08,t=>{
-    const lid=kind==='lid',fan=kind==='fan',d=fan?0.16:lid?0.08:0.12;
-    play(t,d,lid?0.035:0.025,fan?900:lid?420:150,lid?170:65,lid?'triangle':'sine',null,fan,'lowpass',0.01);
-  });}
-  const footstep=()=>effect('footstep',0.28,t=>{softNoise(t,0.045,0.025,480);tone(t,0.055,0.025,100,65);});
-  const jump=()=>effect('jump',0.15,t=>tone(t,0.11,0.05,170,320,'triangle'));
-  const land=()=>effect('land',0.15,t=>{tone(t,0.09,0.055,125,55);softNoise(t,0.06,0.025,650);});
-  const swing=()=>effect('swing',0.16,t=>softNoise(t,0.09,0.045,1100));
-  const gather=ok=>effect('gather',0.12,t=>{tone(t,0.1,0.045,ok?360:170,ok?540:95,'triangle');softNoise(t,0.04,0.02,700);});
-  const item=()=>effect('item',0.1,t=>{tone(t,0.09,0.045,330,440);tone(t+0.055,0.12,0.03,550);});
-  const exchange=()=>effect('exchange',0.1,t=>{tone(t,0.1,0.045,330);tone(t+0.065,0.13,0.04,495);});
-  const paper=()=>effect('paper',0.07,t=>softNoise(t,0.055,0.025,950));
-  const panel=opening=>effect('panel',0.07,t=>{softNoise(t,0.07,0.025,650);tone(t,0.08,0.03,opening?210:310,opening?310:180,'triangle');});
-  const tab=()=>effect('tab',0.07,t=>tone(t,0.045,0.025,290,370,'triangle'));
-  const craft=()=>effect('craft',0.1,t=>[262,330,392].forEach((f,i)=>tone(t+i*0.06,0.17,0.04,f)));
-  const travel=()=>effect('travel',0.3,t=>{softNoise(t,0.16,0.025,700);tone(t,0.18,0.045,196,294);tone(t+0.09,0.18,0.025,392);});
-  function forge(kind){effect('forge',0.12,t=>{
-    const cold=kind==='cold'||kind===false,strong=kind==='edge';
-    const duration=cold?.08:strong?.55:.32;
-    [1,2.76,5.4].forEach((ratio,i)=>play(t,duration,(cold?.025:strong?.085:.06)/(i+1),(cold?310:730)*ratio,(cold?310:730)*ratio,'sine'));
-  });}
-  function stone(kind){effect('stone',0.12,t=>{
-    const n={tap:[180,72,.12],edge:[135,52,.26],fall:[110,38,.22],sleep:[160,100,.22],wake:[240,360,.16]}[kind===true?'tap':kind===false?'fall':kind];
-    if(n)play(t,n[2],.09,n[0],n[1],'sine',null,false,'highpass',.012);
-  });}
-  function yeongsan(kind){effect('yeongsan',0.04,t=>{
-    const n={grass:[180,130,.045],cue:[520,430,.06],scare:[680,330,.13],relief:[290,380,.14],dad:[260,320,.16]}[kind];
-    if(n)play(t,n[2],.025,n[0],n[1],'sine',null,false,'highpass',.01);
-  });}
-  return {get enabled(){return enabled;},get volume(){return volume;},toggle,toggleVolume,
+  const emit=(key,cool,id,gain=1)=>effect(key,cool,t=>playSfx(id,{when:t,gain}));
+  function footstep(){
+    const region=typeof G!=='undefined'&&G?G.region:null;
+    const id={dolneomeo:'footstep_frost',jangteo:'footstep_market',yeongsan:'footstep_snow'}[region]||'footstep_leaf';
+    emit('footstep',.28,id,.65);
+  }
+  const jump=()=>emit('jump',.15,'jump');
+  const land=()=>emit('land',.15,'land');
+  const swing=()=>emit('swing',.16,'sickle');
+  const gather=ok=>emit('gather',.12,ok?'gather':'ui_unavailable');
+  const item=()=>emit('item',.1,'pickup');
+  const exchange=()=>emit('exchange',.1,'exchange');
+  const paper=()=>emit('paper',.07,'dialog_next');
+  const panel=opening=>emit('panel',.07,opening?'bag_open':'bag_close');
+  const tab=()=>emit('tab',.07,'ui_focus');
+  const craft=()=>emit('craft',.1,'craft_complete');
+  const travel=()=>emit('travel',.3,'region_travel');
+  function steam(kind){emit('steam',.08,'steamer',kind==='fan'?.45:kind==='lid'?.65:.5);}
+  function forge(kind){emit('forge',.12,kind==='cold'||kind===false?'ui_unavailable':'forge_hit',kind==='edge'?1.15:.8);}
+  function stone(kind){
+    const id={tap:'mortar',place:'mill',edge:'stone_edge',fall:'stone_fall',sleep:'stone_sleep',wake:'stone_wake'}[kind===true?'tap':kind===false?'fall':kind];
+    if(id)emit('stone',.12,id,.75);
+  }
+  function yeongsan(kind){
+    const id={grass:'footstep_snow',cue:'ui_focus',scare:'battle_warn',relief:'battle_soothe',dad:'pickup'}[kind];
+    if(id)emit('yeongsan',.04,id,.4);
+  }
+  addEventListener('visibilitychange',()=>{
+    if(hidden()){stopVoices();stopAmbient();}
+    else{if(ambientKind)ambience(ambientKind);warmCommon();}
+  });
+  function getState(){return {initialized:attempted,enabled,bgmVolume,sfxVolume,contextState:ctx?ctx.state:null,
+    voices:sources.size,peakVoices,maxVoices,cached:cache.size,cacheBytes,maxCacheBytes,played,dropped,ambient:!!ambientVoice};}
+  return {get enabled(){return enabled;},get volume(){return volume;},get bgmVolume(){return bgmVolume;},get sfxVolume(){return sfxVolume;},
+    toggle,toggleVolume,setBgmVolume,setSfxVolume,playSfx,getState,
     steam,footstep,jump,land,swing,gather,item,exchange,paper,panel,tab,craft,travel,forge,stone,yeongsan,
-    get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
+    ambience,get ambient(){return ambientKind;},get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
 })();

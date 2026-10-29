@@ -8,3 +8,10 @@ desktop.ini
 
 # 엑셀이 열어 둔 파일의 잠금 파일
 ~$*
+
+qa-run/
+qa-audio/
+# 헤드리스 시험 흔적
+.integration-qa/
+qa-final/
+.integration-qa/

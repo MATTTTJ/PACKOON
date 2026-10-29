@@ -113,20 +113,20 @@ gather_finish_wait,채집 공통,마지막 성공 후 완료 대기,300,ms,마�
 gather_yield,채집 공통,기본 채집 수량,1,개,기본 채집 수량,제안
 gather_perfect_yield,채집 공통,실수 없는 채집 수량,2,개,실수 없는 채집 수량,제안
 gather_root_hits,칡뿌리 캐기,목표 성공 수,3,회,목표 성공 수,제안
-gather_root_width,칡뿌리 캐기,성공 판정 폭,18,%,성공 판정 폭,제안
+gather_root_width,칡뿌리 캐기,성공 판정 폭,21,%,성공 판정 폭,제안
 gather_root_speed,칡뿌리 캐기,바늘 기본 속도,1.5,%p/프레임,바늘 기본 속도,제안
 gather_ssari_hits,싸리버섯 따기,목표 성공 수,1,회,목표 성공 수,제안
-gather_ssari_width,싸리버섯 따기,성공 판정 폭,14,%,성공 판정 폭,제안
+gather_ssari_width,싸리버섯 따기,성공 판정 폭,24,%,성공 판정 폭,제안
 gather_ssari_speed,싸리버섯 따기,바늘 기본 속도,2.2,%p/프레임,바늘 기본 속도,제안
 gather_kkoe_hits,꾀꼬리버섯 따기,목표 성공 수,1,회,목표 성공 수,제안
-gather_kkoe_width,꾀꼬리버섯 따기,성공 판정 폭,14,%,성공 판정 폭,제안
+gather_kkoe_width,꾀꼬리버섯 따기,성공 판정 폭,26,%,성공 판정 폭,제안
 gather_kkoe_speed,꾀꼬리버섯 따기,바늘 기본 속도,2.4,%p/프레임,바늘 기본 속도,제안
 gather_eoksae_hits,마른 억새 베기,목표 성공 수,2,회,목표 성공 수,제안
-gather_eoksae_width,마른 억새 베기,성공 판정 폭,18,%,성공 판정 폭,제안
+gather_eoksae_width,마른 억새 베기,성공 판정 폭,21,%,성공 판정 폭,제안
 gather_eoksae_speed,마른 억새 베기,바늘 기본 속도,1.8,%p/프레임,바늘 기본 속도,제안
 gather_seogi_hits,석이버섯 떼기,목표 성공 수,1,회,목표 성공 수,제안
-gather_seogi_width,석이버섯 떼기,성공 판정 폭,12,%,성공 판정 폭,제안
+gather_seogi_width,석이버섯 떼기,성공 판정 폭,26,%,성공 판정 폭,제안
 gather_seogi_speed,석이버섯 떼기,바늘 기본 속도,2.4,%p/프레임,바늘 기본 속도,제안
 gather_darae_vine_hits,다래 덩굴 베기,목표 성공 수,2,회,목표 성공 수,제안
-gather_darae_vine_width,다래 덩굴 베기,성공 판정 폭,18,%,성공 판정 폭,제안
+gather_darae_vine_width,다래 덩굴 베기,성공 판정 폭,21,%,성공 판정 폭,제안
 gather_darae_vine_speed,다래 덩굴 베기,바늘 기본 속도,1.8,%p/프레임,바늘 기본 속도,제안

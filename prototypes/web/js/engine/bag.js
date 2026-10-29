@@ -1,6 +1,6 @@
 'use strict';
 /* 패널(보따리·책) 열고 닫기, 보따리 + 가보 가공대 */
-function closePanels(){if(['bag','book','notebook'].some(id=>!$(id).hidden))Sound.panel(false);if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;$('notebook').hidden=true;}
+function closePanels(){if(['bag','book','notebook'].some(id=>!$(id).hidden))Sound.panel(false);if(typeof finishCraftHands==='function')finishCraftHands(false);if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;$('notebook').hidden=true;}
 function toggleBag(){const o=$('bag').hidden;closePanels();if(o){Sound.panel(true);bagKind='전체';selItem=null;lastOut=null;pouchMsg='';renderBag();$('bag').hidden=false;$('bagBody').scrollTop=0;}}
 function toggleBook(){const o=$('book').hidden;closePanels();if(o){Sound.panel(true);renderBook();$('book').hidden=false;}}
 $('btnBag').onclick=()=>{if(G.started&&!G.ended&&!open('dlg')&&!openMinigame())toggleBag();};
@@ -16,7 +16,8 @@ function defineHeirlooms(map){Object.assign(HEIR,map);}
 const RECIPES={};
 function defineRecipes(map){for(const k in map)RECIPES[k]=(RECIPES[k]||[]).concat(map[k]);}
 const isAwake=t=>G.awake.includes(t);
-const knownRecipes=t=>(RECIPES[t]||[]).filter(r=>!r.know||knows(r.know));
+const availableRecipes=t=>(RECIPES[t]||[]).filter(r=>!r.know||knows(r.know));
+const knownRecipes=t=>availableRecipes(t).filter(r=>!r.hidden||knows(r.discover));
 function awaken(t){if(!isAwake(t))G.awake.push(t);}
 const pouch={tool:'jeolgu',items:[]};
 let selItem=null,pouchMsg='',lastOut=null,brewing=false;
@@ -30,12 +31,12 @@ function selectBagKind(kind){
 }
 function cycleBagKind(step){selectBagKind(BAG_KINDS[(BAG_KINDS.indexOf(bagKind)+step+BAG_KINDS.length)%BAG_KINDS.length]);}
 function pouchCount(){const c={};pouch.items.forEach(i=>c[i]=(c[i]||0)+1);return c;}
-function matchRecipe(){const c=pouchCount(),ck=Object.keys(c);if(!isAwake(pouch.tool))return null;for(const r of knownRecipes(pouch.tool)){const k=Object.keys(r.need);if(ck.length===k.length&&k.every(x=>c[x]===r.need[x]))return r;}return null;}
+function matchRecipe(){const c=pouchCount(),ck=Object.keys(c);if(!isAwake(pouch.tool))return null;for(const r of availableRecipes(pouch.tool)){const k=Object.keys(r.need);if(ck.length===k.length&&k.every(x=>c[x]===r.need[x]))return r;}return null;}
 function returnPouch(){if(!pouch.items.length)return;pouch.items.forEach(id=>{G.inv[id]=(G.inv[id]||0)+1;});pouch.items=[];refreshHud();}
 function liveHint(){
   if(!pouch.items.length)return '';
-  const h=HEIR[pouch.tool];
-  return h.live&&isAwake(pouch.tool)?h.live(pouchCount(),matchRecipe()):'무엇이 될지는 아직 모른다.';
+  if(!isAwake(pouch.tool))return '아직 잠든 가보다. 쓰는 법을 배워 오자.';
+  return matchRecipe()?'가보가 손을 기다린다. 한번 만들어 보자.':'조금 더 넣어 볼까. 맞지 않아도 재료는 돌아온다.';
 }
 function putIn(id){
   if(brewing||!has(id))return;
@@ -47,26 +48,31 @@ function takeOut(i){if(brewing)return;const id=pouch.items.splice(i,1)[0];if(!id
 function switchTool(t){if(brewing||t===pouch.tool)return;Sound.tab();returnPouch();pouch.tool=t;lastOut=null;pouchMsg='';renderBag();}
 function craft(){
   if(brewing||!pouch.items.length)return;
-  const r=matchRecipe();const box=document.querySelector('#bagBody .pouch');
+  const r=matchRecipe();
   if(!r){
-    pouchMsg=HEIR[pouch.tool].fail(pouch.items,isAwake(pouch.tool));
-    if(box){box.classList.remove('fizzle');void box.offsetWidth;box.classList.add('fizzle');}
+    const awake=isAwake(pouch.tool);
+    pouchMsg=awake?TABLES.CRAFT[pouch.tool].fail:HEIR[pouch.tool].fail(pouch.items,false);
+    returnPouch();lastOut=null;renderBag();
+    const failed=document.querySelector('#bagBody .pouch');if(failed){failed.classList.remove('fizzle');void failed.offsetWidth;failed.classList.add('fizzle');}
     const m=$('benchMsg');if(m)m.textContent=pouchMsg;return;
   }
+  // 새 선택 가공은 아직 쓰지 않은 필수 재료를 남긴다. 기존 여덟 가공법은 그대로 쓴다.
+  if(r.optional){
+    const before={...G.inv};for(const id of pouch.items)before[id]=(before[id]||0)+1;
+    const after={...G.inv,[r.out]:(G.inv[r.out]||0)+r.n};
+    if(progressShortage(after)>progressShortage(before)){
+      returnPouch();pouchMsg='이 재료는 아직 갈 길에 필요하다. 먼저 쓸 몫을 남겨 두자.';renderBag();return;
+    }
+  }
   // 재료와 결과·첫 가공 기록은 같은 입력에서 확정한다. 타이머는 연출만 마무리한다.
-  brewing=true;const tool=pouch.tool,owner=G,region=G.region;pouch.items=[];
+  brewing=true;const tool=pouch.tool;pouch.items=[];
   addItem(r.out,r.n);
   const fk='crafted_'+tool;
-  if(!G.f[fk]){G.f[fk]=true;if(HEIR[tool].firstCraft)diary(fk,HEIR[tool].firstCraft);}
-  if(box)box.classList.add('brew');
-  document.querySelectorAll('#bagBody .inslot').forEach(x=>x.classList.add('sucked'));
-  const btn=$('craftBtn');if(btn)btn.disabled=true;
-  setTimeout(()=>{
-    brewing=false;if(G!==owner||G.region!==region)return;
-    Sound.craft();lastOut=r.out;
-    pouchMsg=ITEMS[r.out].n+' '+r.n+'개가 보따리로 들어갔다.';
-    if(open('bag'))renderBag();
-  },matchMedia('(prefers-reduced-motion: reduce)').matches?60:760);
+  if(!G.f[fk]){G.f[fk]=true;diary(fk,r.optional?TABLES.CRAFT[tool].habit:HEIR[tool].firstCraft);}
+  learn(TABLES.CRAFT[tool].habitKey,true);
+  const discovered=r.hidden&&learn(r.discover,true);
+  pouchMsg='손버릇을 따라 움직여 보자.';startCraftHands(tool,r,discovered);renderBag();
+  $('craftHands')?.scrollIntoView({block:'nearest',behavior:'instant'});
 }
 function renderBag(pop){
   const body=$('bagBody');const sc=body.scrollTop;body.innerHTML='';
@@ -99,6 +105,7 @@ function renderBag(pop){
     const eat=ITEMS[id].eat;
     if(eat){const b=el('button','btn','먹기 · 체력 +'+eat);b.type='button';b.disabled=G.hp>=G.maxhp;
       b.onclick=()=>{takeItem(id,1);G.hp=Math.min(G.maxhp,G.hp+eat);refreshHud();if(!has(id))selItem=null;renderBag();};row.appendChild(b);}
+    if(isHomeCraft(id)){const b=el('button','btn','까치 편에 집으로 보내기');b.type='button';b.disabled=brewing||knows('home:'+G.region);b.onclick=()=>sendCraftHome(id);row.appendChild(b);}
     info.appendChild(row);info.appendChild(el('span','small','한 번 더 누르면 바로 고른 가보에 넣는다.'));
     d.appendChild(info);
   }else d.appendChild(el('span','small','소지품을 누르면 설명이 나오고, 한 번 더 누르면 아래에서 고른 가보에 들어간다.'));
@@ -117,8 +124,9 @@ function renderBag(pop){
   const tx=el('div','txt');tx.appendChild(el('span','state',awake?'깨어난 가보':'잠든 가보'));
   tx.appendChild(el('div','title',Hr.title));tx.appendChild(el('div','gen',Hr.gen));tx.appendChild(el('div','story',Hr.story));
   if(!awake&&Hr.hint)tx.appendChild(el('div','hint',Hr.hint));
-  card.appendChild(tx);const seal=el('span','seal','너');seal.setAttribute('aria-label','너구리 집안 낙관');card.appendChild(seal);
+  card.appendChild(tx);const seal=el('span','seal','流');seal.setAttribute('aria-label','답을 찾아 흘러가는 집의 낙관, 유');card.appendChild(seal);
   wrap.appendChild(card);
+  if(awake&&knows(TABLES.CRAFT[pouch.tool].habitKey))wrap.appendChild(el('p','craft-habit',TABLES.CRAFT[pouch.tool].habit));
   const bench=el('div','bench');
   const ins=el('div','ins');
   for(let i=0;i<3;i++){const id=pouch.items[i];const s=el('button','inslot'+(id?' full':'')+(pop&&id&&i===pouch.items.length-1?' pop':''));s.type='button';
@@ -130,18 +138,19 @@ function renderBag(pop){
   pb.appendChild(el('div','glow'));const relic=icon(pouch.tool);relic.className='relic';pb.appendChild(relic);pb.setAttribute('aria-label',Hr.title);
   [[-34,-30],[30,-34],[-40,4],[40,0],[-18,-46],[16,-48]].forEach(([dx,dy])=>{const k=el('span','spk');k.style.setProperty('--dx',dx+'px');k.style.setProperty('--dy',dy+'px');pb.appendChild(k);});
   bench.appendChild(pb);bench.appendChild(el('span','arrow','→'));
-  const r=matchRecipe();
+  const matched=matchRecipe(),r=matched&&(!matched.hidden||knows(matched.discover))?matched:null;
   const out=el('div','outslot'+(lastOut?' got':r?' ghost':''));
   if(lastOut)out.appendChild(icon(lastOut));else if(r)out.appendChild(icon(r.out));else out.textContent='?';
   out.setAttribute('aria-label',lastOut?ITEMS[lastOut].n+' 완성':r?ITEMS[r.out].n+' 예정':'결과');
   bench.appendChild(out);wrap.appendChild(bench);
   const msg=el('div','bench-msg',pouchMsg||(awake?(Hr.prompt||'넣을 것을 골라 보자.'):'쓰는 법을 아직 모른다. 무엇을 넣으면 반응할까?'));msg.id='benchMsg';wrap.appendChild(msg);
   const rl=el('div','recipes');
-  if(awake)knownRecipes(pouch.tool).forEach(rc=>{const it=el('span','recipe');it.appendChild(el('span',null,'아는 쓰는 법 ·'));
+  if(awake)knownRecipes(pouch.tool).forEach(rc=>{const it=el('button','recipe');it.type='button';it.disabled=brewing;it.onclick=()=>fillCraftRecipe(rc);it.appendChild(el('span',null,rc.hidden?'직접 찾은 맛 ·':rc.know?'귀띔으로 배운 맛 ·':'가족의 기억 ·'));
     Object.keys(rc.need).forEach(k=>{it.appendChild(icon(k));it.appendChild(el('span',null,ITEMS[k].n+' ×'+rc.need[k]));});
     it.appendChild(el('span',null,'→'));it.appendChild(icon(rc.out));it.appendChild(el('span',null,ITEMS[rc.out].n));rl.appendChild(it);});
   else rl.appendChild(el('span',null,'아직 깨어나지 않은 가보다. 넣어 보는 건 자유다.'));
   wrap.appendChild(rl);
+  renderCraftHands(wrap);
   const cb=el('button','btn primary craft',brewing?'가공 중…':'가공하기');cb.type='button';cb.id='craftBtn';cb.disabled=brewing||!pouch.items.length;cb.onclick=craft;wrap.appendChild(cb);
   body.appendChild(wrap);
 

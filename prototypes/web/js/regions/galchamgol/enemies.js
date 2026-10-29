@@ -21,7 +21,7 @@ function drawKudzu(c){
     else{const [ex,ey]=lookAt(cx,cy);blob(c,cx-17+o,cy-8,10,8,'#efe3c8');blob(c,cx+17+o,cy-8,10,8,'#efe3c8');blob(c,cx-17+ex+o,cy-8+ey,4.5,5,INK);blob(c,cx+17+ex+o,cy-8+ey,4.5,5,INK);
       brush(c,[[cx-28+o,cy-22],[cx-10+o,cy-17]],3,INK);brush(c,[[cx+28+o,cy-22],[cx+10+o,cy-17]],3,INK);}
     // 꽃눈
-    brush(c,[[cx+o,cy-40],[cx+3+o,cy-56]],4,col,core.broken?0.3:1);blob(c,cx+4+o,cy-62,8,10,col===INK?'#5a3f6a':col,core.broken?0.25:0.9);
+    brush(c,[[cx+o,cy-40],[cx+3+o,cy-56]],4,col,core.broken?0.3:1);blob(c,cx+4+o,cy-62,8,10,col,core.broken?0.25:0.9);
     if(coreHidden()){brush(c,[[cx-70,cy-20],[cx,cy+10+sway],[cx+70,cy-26]],9,INK,0.85);brush(c,[[cx-60,cy+30],[cx+10,cy-6-sway],[cx+66,cy+24]],8,INK,0.8);}
   }
 }
@@ -57,10 +57,11 @@ function drawMusoe(c){
 
 defineEnemies({
   kudzu:{name:'엉킨 칡',calmLabel:'진정',
-    intro:'칡덩굴이 당산나무를 놓지 않으려 몸부림친다.',
+    intro:'[시험판] 칡덩굴이 당산나무를 놓지 못한다. 고리를 옮겨 피할 길을 풀어 놓자.',
     howto:true,
-    parts:tableParts('kudzu',{arm:{atk:'sweep',tell:'덩굴손이 높이 치켜올라간다…'},root:{atk:'spike',tell:'땅속에서 뿌리가 꿈틀거린다…'},core:{atk:'seed',tell:'심이 씨앗을 머금는다…'}}),
-    likes:TABLES.CALM.kudzu,likeText:'버섯 향에 덩굴이 잠시 느슨해진다.',
+    vinePath:true,calmAction:{kind:'knot',amount:TABLES.CALM.kudzu.ssari/2,prompt:'느슨한 매듭 위에서',text:'느슨한 매듭을 풀었다. 칡이 당산나무를 조금 놓아준다.'},
+    parts:tableParts('kudzu',{arm:{atk:'kudzuVines',tell:'덩굴손이 가시 줄을 내린다. 고리를 놓은 흰 통로로!'},root:{atk:'kudzuRoots',tell:'먹 균열에서 뿌리가 솟는다. 풀어 둔 통로에 손을 맞추자.'},core:{atk:'kudzuSeeds',tell:'심이 손을 겨눈다. 먹점으로 씨앗을 유도하고 옆으로 빠지자.'}}),
+    likes:TABLES.CALM.kudzu,likeText:'버섯 향에 덩굴이 느슨해지며 손 쪽으로 매듭을 내민다.',
     coreHidden:'심이 덩굴 뒤에 숨어 있다. 덩굴손이나 뿌리를 먼저 꺾자.',
     coreShown:'심이 드러났다! 이제 심을 노릴 수 있다.',
     calmWin:'엉킨 칡이 스르르 풀리며 당산나무를 놓아준다.',calmGift:'kflower',
@@ -69,9 +70,10 @@ defineEnemies({
     draw:drawKudzu},
   /* 무쇠는 피하기만 하는 시험이라 핵심 부위를 쓰지 않는다 (표의 '호통' 핵심 표시를 끔. 켜면 그림에 가려짐 표시가 생긴다) */
   musoe:{name:'무쇠',calmLabel:'마음',npc:true,dodge:6,
-    intro:'"아저씨, 왜 이래요!"',
+    forgeTrial:{sequence:['hammer','bellows','core'],repeatText:'"아까 배운 대로!"'},
+    intro:'[시험판] "아저씨, 왜 이래요!" 먹선이 생기면 작업 자리에서 손을 빼자.',
     bonkText:'"어른 앞에서 연장 들이대지 마라!" 딱! 꿀밤이 날아왔다.',
-    parts:tableParts('musoe',{hammer:{atk:'slam',tell:'무쇠가 망치를 번쩍 든다…'},bellows:{atk:'ember',tell:'풀무가 크게 숨을 들이켠다…'},core:{atk:'shout',tell:'무쇠가 숨을 크게 들이쉰다…',core:false}}),
+    parts:tableParts('musoe',{hammer:{atk:'forgeHammer',tell:'모루 위 세로 먹줄! 내려치기 전에 그 칸을 비워라.'},bellows:{atk:'forgeWind',tell:'가는 붓선이 바람길을 그린다. 오른쪽 낮은 판 아래 쉼터로!'},core:{atk:'forgeShout',tell:'입 앞 먹선이 부푼다. 부채꼴 양옆으로 손을 빼라.',core:false}}),
     likes:TABLES.CALM.musoe,likeText:'"…마침 출출하던 참이다." 무쇠의 어깨가 조금 내려간다.',
     coreHidden:'',
     coreShown:'무쇠의 고집이 흔들린다. 이제 고집을 노릴 수 있다!',

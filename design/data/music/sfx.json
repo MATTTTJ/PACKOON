@@ -1,0 +1,479 @@
+{
+  "version": 1,
+  "status": "제안",
+  "units": "start·duration은 초, gain은 선형 진폭, pan은 -1(왼쪽)~1(오른쪽)",
+  "notes": "새로 합성한 소리. 각 효과는 어택·몸통·꼬리를 별도 층으로 겹친다. seed를 고정해 웹과 WAV의 노이즈를 맞춘다.",
+  "effects": [
+    {
+      "id": "footstep_leaf", "name": "낙엽 밟기", "category": "걸음", "status": "제안",
+      "duration": 0.38, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.07,"gain":0.46,"pan":-0.12,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0245,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2900,"partials":[],"fixedDuration":0.07},"seed":17},
+        {"instrument":"buk","note":"C2","start":0.012,"duration":0.08,"gain":0.27,"pan":0,"patch":{"attack":0.002,"decay":0.048,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.08},"seed":18},
+        {"instrument":"wind","note":"C4","start":0.048,"duration":0.17,"gain":0.2,"pan":0.13,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0595,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1750,"partials":[],"fixedDuration":0.17},"seed":19},
+        {"instrument":"stone","note":"G4","start":0.033,"duration":0.045,"gain":0.07,"pan":0,"patch":{"attack":0.001,"decay":0.02475,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.045},"seed":20}
+      ]
+    },
+    {
+      "id": "footstep_frost", "name": "서리 밟기", "category": "걸음", "status": "제안",
+      "duration": 0.34, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.045,"gain":0.38,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.01575,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":4100,"partials":[],"fixedDuration":0.045},"seed":118},
+        {"instrument":"stone","note":"E5","start":0.006,"duration":0.045,"gain":0.17,"pan":0,"patch":{"attack":0.001,"decay":0.02475,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.045},"seed":119},
+        {"instrument":"buk","note":"G2","start":0.014,"duration":0.08,"gain":0.19,"pan":0,"patch":{"attack":0.002,"decay":0.048,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.08},"seed":120},
+        {"instrument":"windchime","note":"A6","start":0.03,"duration":0.11,"gain":0.045,"pan":0,"patch":{"attack":0.002,"decay":0.0825,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.11},"seed":121}
+      ]
+    },
+    {
+      "id": "footstep_snow", "name": "눈 밟기", "category": "걸음", "status": "제안",
+      "duration": 0.44, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.09,"gain":0.31,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0315,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1600,"partials":[],"fixedDuration":0.09},"seed":219},
+        {"instrument":"buk","note":"C2","start":0.018,"duration":0.1,"gain":0.29,"pan":0,"patch":{"attack":0.002,"decay":0.06,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.1},"seed":220},
+        {"instrument":"wind","note":"C4","start":0.045,"duration":0.21,"gain":0.25,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0735,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":850,"partials":[],"fixedDuration":0.21},"seed":221},
+        {"instrument":"stone","note":"C4","start":0.065,"duration":0.045,"gain":0.06,"pan":0,"patch":{"attack":0.001,"decay":0.02475,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.045},"seed":222}
+      ]
+    },
+    {
+      "id": "footstep_market", "name": "장터 마루 걷기", "category": "걸음", "status": "제안",
+      "duration": 0.36, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"D4","start":0,"duration":0.06,"gain":0.36,"pan":0,"patch":{"attack":0.001,"decay":0.033,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.06},"seed":320},
+        {"instrument":"buk","note":"G2","start":0.006,"duration":0.1,"gain":0.32,"pan":0,"patch":{"attack":0.002,"decay":0.06,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.1},"seed":321},
+        {"instrument":"stone","note":"A3","start":0.028,"duration":0.085,"gain":0.13,"pan":0,"patch":{"attack":0.001,"decay":0.04675000000000001,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.085},"seed":322},
+        {"instrument":"wind","note":"C4","start":0.018,"duration":0.08,"gain":0.1,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.027999999999999997,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1100,"partials":[],"fixedDuration":0.08},"seed":323}
+      ]
+    },
+    {
+      "id": "jump", "name": "가볍게 뛰기", "category": "이동·채집", "status": "제안",
+      "duration": 0.48, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.1,"gain":0.22,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.034999999999999996,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1800,"partials":[],"fixedDuration":0.1},"seed":421},
+        {"instrument":"gayageum","note":"E4","start":0.025,"duration":0.13,"gain":0.27,"pan":-0.12,"patch":{"attack":0.002,"decay":0.091,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.13},"seed":422},
+        {"instrument":"gayageum","note":"G4","start":0.065,"duration":0.14,"gain":0.2,"pan":0.12,"patch":{"attack":0.002,"decay":0.098,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.14},"seed":423}
+      ]
+    },
+    {
+      "id": "land", "name": "발 딛기", "category": "이동·채집", "status": "제안",
+      "duration": 0.48, "gain": 0.72,
+      "layers": [
+        {"instrument":"buk","note":"C2","start":0,"duration":0.15,"gain":0.43,"pan":0,"patch":{"attack":0.002,"decay":0.09,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.15},"seed":522},
+        {"instrument":"stone","note":"C4","start":0.007,"duration":0.055,"gain":0.21,"pan":0,"patch":{"attack":0.001,"decay":0.030250000000000003,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.055},"seed":523},
+        {"instrument":"wind","note":"C4","start":0.018,"duration":0.19,"gain":0.2,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.06649999999999999,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1200,"partials":[],"fixedDuration":0.19},"seed":524}
+      ]
+    },
+    {
+      "id": "sickle", "name": "낫 휘두르기", "category": "이동·채집", "status": "제안",
+      "duration": 0.43, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.13,"gain":0.38,"pan":-0.18,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0455,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2600,"partials":[],"fixedDuration":0.13},"seed":623},
+        {"instrument":"yeot_scissors","note":"G5","start":0.055,"duration":0.065,"gain":0.14,"pan":0.15,"patch":{"attack":0.001,"decay":0.0325,"sustain":0,"release":0.04,"tail":0.09,"fixedDuration":0.065},"seed":624},
+        {"instrument":"wind","note":"C4","start":0.07,"duration":0.15,"gain":0.14,"pan":0.22,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0525,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1700,"partials":[],"fixedDuration":0.15},"seed":625}
+      ]
+    },
+    {
+      "id": "gather", "name": "줄기 채집", "category": "이동·채집", "status": "제안",
+      "duration": 0.66, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"D4","start":0,"duration":0.07,"gain":0.29,"pan":0,"patch":{"attack":0.001,"decay":0.038500000000000006,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.07},"seed":724},
+        {"instrument":"wind","note":"C4","start":0.008,"duration":0.12,"gain":0.25,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.041999999999999996,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2400,"partials":[],"fixedDuration":0.12},"seed":725},
+        {"instrument":"gayageum","note":"G4","start":0.045,"duration":0.2,"gain":0.29,"pan":0,"patch":{"attack":0.002,"decay":0.13999999999999999,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.2},"seed":726},
+        {"instrument":"windchime","note":"A5","start":0.12,"duration":0.24,"gain":0.1,"pan":0,"patch":{"attack":0.002,"decay":0.18,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.24},"seed":727}
+      ]
+    },
+    {
+      "id": "pickup", "name": "물건 줍기", "category": "이동·채집", "status": "제안",
+      "duration": 0.59, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.045,"gain":0.12,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.01575,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1500,"partials":[],"fixedDuration":0.045},"seed":825},
+        {"instrument":"gayageum","note":"E5","start":0.012,"duration":0.16,"gain":0.29,"pan":-0.12,"patch":{"attack":0.002,"decay":0.11199999999999999,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.16},"seed":826},
+        {"instrument":"gayageum","note":"A5","start":0.075,"duration":0.2,"gain":0.24,"pan":0.13,"patch":{"attack":0.002,"decay":0.13999999999999999,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.2},"seed":827},
+        {"instrument":"windchime","note":"G6","start":0.09,"duration":0.21,"gain":0.06,"pan":0,"patch":{"attack":0.002,"decay":0.1575,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.21},"seed":828}
+      ]
+    },
+    {
+      "id": "exchange", "name": "교환 성사", "category": "교환·기록", "status": "제안",
+      "duration": 0.93, "gain": 1.15,
+      "layers": [
+        {"instrument":"stone","note":"C4","start":0,"duration":0.07,"gain":0.15,"pan":0,"patch":{"attack":0.001,"decay":0.038500000000000006,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.07},"seed":926},
+        {"instrument":"gayageum","note":"C5","start":0.025,"duration":0.2,"gain":0.28,"pan":-0.17,"patch":{"attack":0.002,"decay":0.13999999999999999,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.2},"seed":927},
+        {"instrument":"gayageum","note":"E5","start":0.12,"duration":0.23,"gain":0.24,"pan":0,"patch":{"attack":0.002,"decay":0.161,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.23},"seed":928},
+        {"instrument":"gayageum","note":"G5","start":0.22,"duration":0.28,"gain":0.24,"pan":0.17,"patch":{"attack":0.002,"decay":0.196,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.28},"seed":929},
+        {"instrument":"windchime","note":"C6","start":0.29,"duration":0.34,"gain":0.1,"pan":0,"patch":{"attack":0.002,"decay":0.255,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.34},"seed":930}
+      ]
+    },
+    {
+      "id": "dialog_next", "name": "대화 넘김", "category": "교환·기록", "status": "제안",
+      "duration": 0.27, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.045,"gain":0.24,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.01575,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2400,"partials":[],"fixedDuration":0.045},"seed":1027},
+        {"instrument":"stone","note":"G5","start":0.008,"duration":0.028,"gain":0.08,"pan":0,"patch":{"attack":0.001,"decay":0.015400000000000002,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.028},"seed":1028},
+        {"instrument":"wind","note":"C4","start":0.026,"duration":0.065,"gain":0.13,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.02275,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1400,"partials":[],"fixedDuration":0.065},"seed":1029}
+      ]
+    },
+    {
+      "id": "bag_open", "name": "보따리 풀기", "category": "교환·기록", "status": "제안",
+      "duration": 0.52, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.13,"gain":0.24,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0455,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1200,"partials":[],"fixedDuration":0.13},"seed":1128},
+        {"instrument":"buk","note":"G2","start":0.028,"duration":0.08,"gain":0.11,"pan":0,"patch":{"attack":0.002,"decay":0.048,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.08},"seed":1129},
+        {"instrument":"gayageum","note":"D4","start":0.07,"duration":0.18,"gain":0.15,"pan":0,"patch":{"attack":0.002,"decay":0.126,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.18},"seed":1130},
+        {"instrument":"wind","note":"C4","start":0.08,"duration":0.18,"gain":0.13,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.063,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1700,"partials":[],"fixedDuration":0.18},"seed":1131}
+      ]
+    },
+    {
+      "id": "bag_close", "name": "보따리 여미기", "category": "교환·기록", "status": "제안",
+      "duration": 0.48, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.16,"gain":0.25,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.055999999999999994,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1300,"partials":[],"fixedDuration":0.16},"seed":1229},
+        {"instrument":"stone","note":"D4","start":0.095,"duration":0.06,"gain":0.18,"pan":0,"patch":{"attack":0.001,"decay":0.033,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.06},"seed":1230},
+        {"instrument":"buk","note":"D2","start":0.12,"duration":0.08,"gain":0.14,"pan":0,"patch":{"attack":0.002,"decay":0.048,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.08},"seed":1231}
+      ]
+    },
+    {
+      "id": "book_open", "name": "책 펼치기", "category": "교환·기록", "status": "제안",
+      "duration": 0.57, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"G4","start":0,"duration":0.04,"gain":0.11,"pan":0,"patch":{"attack":0.001,"decay":0.022000000000000002,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.04},"seed":1330},
+        {"instrument":"wind","note":"C4","start":0.012,"duration":0.11,"gain":0.24,"pan":-0.15,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0385,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":3000,"partials":[],"fixedDuration":0.11},"seed":1331},
+        {"instrument":"wind","note":"C4","start":0.07,"duration":0.18,"gain":0.17,"pan":0.15,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.063,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2100,"partials":[],"fixedDuration":0.18},"seed":1332},
+        {"instrument":"gayageum","note":"G4","start":0.115,"duration":0.16,"gain":0.09,"pan":0,"patch":{"attack":0.002,"decay":0.11199999999999999,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.16},"seed":1333}
+      ]
+    },
+    {
+      "id": "book_close", "name": "책 덮기", "category": "교환·기록", "status": "제안",
+      "duration": 0.49, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.11,"gain":0.23,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0385,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2400,"partials":[],"fixedDuration":0.11},"seed":1431},
+        {"instrument":"stone","note":"C4","start":0.075,"duration":0.075,"gain":0.24,"pan":0,"patch":{"attack":0.001,"decay":0.04125,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.075},"seed":1432},
+        {"instrument":"buk","note":"C3","start":0.09,"duration":0.09,"gain":0.13,"pan":0,"patch":{"attack":0.002,"decay":0.054,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.09},"seed":1433}
+      ]
+    },
+    {
+      "id": "mortar", "name": "절구 찧기", "category": "가공", "status": "제안",
+      "duration": 0.74, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"C3","start":0,"duration":0.055,"gain":0.27,"pan":0,"patch":{"attack":0.001,"decay":0.030250000000000003,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.055},"seed":1532},
+        {"instrument":"buk","note":"C2","start":0.007,"duration":0.2,"gain":0.41,"pan":0,"patch":{"attack":0.002,"decay":0.12,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.2},"seed":1533},
+        {"instrument":"wind","note":"C4","start":0.018,"duration":0.14,"gain":0.23,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.049,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":850,"partials":[],"fixedDuration":0.14},"seed":1534},
+        {"instrument":"stone","note":"G3","start":0.075,"duration":0.12,"gain":0.13,"pan":0,"patch":{"attack":0.001,"decay":0.066,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.12},"seed":1535}
+      ]
+    },
+    {
+      "id": "mill", "name": "맷돌 갈기", "category": "가공", "status": "제안",
+      "duration": 1.5, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.42,"gain":0.27,"pan":-0.12,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.147,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":850,"partials":[],"fixedDuration":0.42},"seed":1633},
+        {"instrument":"stone","note":"D3","start":0.04,"duration":0.16,"gain":0.15,"pan":0,"patch":{"attack":0.001,"decay":0.08800000000000001,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.16},"seed":1634},
+        {"instrument":"wind","note":"C4","start":0.28,"duration":0.43,"gain":0.25,"pan":0.14,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.1505,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1150,"partials":[],"fixedDuration":0.43},"seed":1635},
+        {"instrument":"stone","note":"A3","start":0.42,"duration":0.14,"gain":0.12,"pan":0,"patch":{"attack":0.001,"decay":0.07700000000000001,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.14},"seed":1636},
+        {"instrument":"wind","note":"C4","start":0.62,"duration":0.42,"gain":0.2,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.147,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":700,"partials":[],"fixedDuration":0.42},"seed":1637},
+        {"instrument":"stone","note":"D3","start":0.84,"duration":0.15,"gain":0.12,"pan":0,"patch":{"attack":0.001,"decay":0.0825,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.15},"seed":1638}
+      ]
+    },
+    {
+      "id": "steamer", "name": "시루 김 오름", "category": "가공", "status": "제안",
+      "duration": 1.42, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.62,"gain":0.25,"pan":-0.15,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.217,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1900,"partials":[],"fixedDuration":0.62},"seed":1734},
+        {"instrument":"water","note":"C4","start":0.045,"duration":0.6,"gain":0.18,"pan":0.13,"patch":{"attack":0.03,"release":0.12,"fixedDuration":0.6},"seed":1735},
+        {"instrument":"wind","note":"C4","start":0.37,"duration":0.65,"gain":0.19,"pan":0.16,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.22749999999999998,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2800,"partials":[],"fixedDuration":0.65},"seed":1736},
+        {"instrument":"stone","note":"E5","start":0.54,"duration":0.055,"gain":0.075,"pan":0,"patch":{"attack":0.001,"decay":0.030250000000000003,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.055},"seed":1737},
+        {"instrument":"stone","note":"G5","start":0.86,"duration":0.06,"gain":0.06,"pan":0,"patch":{"attack":0.001,"decay":0.033,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.06},"seed":1738}
+      ]
+    },
+    {
+      "id": "medicine_roller", "name": "약연 굴리기", "category": "가공", "status": "제안",
+      "duration": 1.56, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"D3","start":0,"duration":0.19,"gain":0.24,"pan":0,"patch":{"attack":0.001,"decay":0.10450000000000001,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.19},"seed":1835},
+        {"instrument":"wind","note":"C4","start":0.03,"duration":0.44,"gain":0.2,"pan":-0.12,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.154,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1000,"partials":[],"fixedDuration":0.44},"seed":1836},
+        {"instrument":"stone","note":"A3","start":0.26,"duration":0.18,"gain":0.18,"pan":0,"patch":{"attack":0.001,"decay":0.099,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.18},"seed":1837},
+        {"instrument":"wind","note":"C4","start":0.39,"duration":0.44,"gain":0.19,"pan":0.12,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.154,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1300,"partials":[],"fixedDuration":0.44},"seed":1838},
+        {"instrument":"stone","note":"D4","start":0.58,"duration":0.18,"gain":0.14,"pan":0,"patch":{"attack":0.001,"decay":0.099,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.18},"seed":1839},
+        {"instrument":"windchime","note":"D5","start":0.86,"duration":0.34,"gain":0.08,"pan":0,"patch":{"attack":0.002,"decay":0.255,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.34},"seed":1840}
+      ]
+    },
+    {
+      "id": "craft_complete", "name": "가공 마침", "category": "가공", "status": "제안",
+      "duration": 1.1, "gain": 1.15,
+      "layers": [
+        {"instrument":"stone","note":"C4","start":0,"duration":0.06,"gain":0.12,"pan":0,"patch":{"attack":0.001,"decay":0.033,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.06},"seed":1936},
+        {"instrument":"gayageum","note":"C5","start":0.055,"duration":0.24,"gain":0.25,"pan":-0.18,"patch":{"attack":0.002,"decay":0.16799999999999998,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.24},"seed":1937},
+        {"instrument":"gayageum","note":"G5","start":0.16,"duration":0.29,"gain":0.21,"pan":0.17,"patch":{"attack":0.002,"decay":0.20299999999999999,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.29},"seed":1938},
+        {"instrument":"windchime","note":"A5","start":0.27,"duration":0.42,"gain":0.12,"pan":0,"patch":{"attack":0.002,"decay":0.315,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.42},"seed":1939},
+        {"instrument":"wind","note":"C4","start":0.12,"duration":0.21,"gain":0.1,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0735,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1100,"partials":[],"fixedDuration":0.21},"seed":1940}
+      ]
+    },
+    {
+      "id": "scenery_open", "name": "경치 펼쳐짐", "category": "발견·전환", "status": "제안",
+      "duration": 2.15, "gain": 1.15,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.7,"gain":0.14,"pan":-0.25,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.24499999999999997,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1500,"partials":[],"fixedDuration":0.7},"seed":2037},
+        {"instrument":"gayageum","note":"C4","start":0.08,"duration":0.45,"gain":0.2,"pan":-0.2,"patch":{"attack":0.002,"decay":0.315,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.45},"seed":2038},
+        {"instrument":"daegeum","note":"G5","start":0.25,"duration":0.78,"gain":0.2,"pan":0.13,"patch":{"attack":0.18,"release":0.22,"fixedDuration":0.78},"seed":2039},
+        {"instrument":"windchime","note":"A6","start":0.45,"duration":0.9,"gain":0.13,"pan":0.3,"patch":{"attack":0.002,"decay":0.675,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.9},"seed":2040}
+      ]
+    },
+    {
+      "id": "stamp_found", "name": "도장 발견", "category": "발견·전환", "status": "제안",
+      "duration": 1.02, "gain": 1.15,
+      "layers": [
+        {"instrument":"stone","note":"C4","start":0,"duration":0.1,"gain":0.36,"pan":0,"patch":{"attack":0.001,"decay":0.05500000000000001,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.1},"seed":2138},
+        {"instrument":"buk","note":"C3","start":0.012,"duration":0.11,"gain":0.18,"pan":0,"patch":{"attack":0.002,"decay":0.066,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.11},"seed":2139},
+        {"instrument":"gayageum","note":"G5","start":0.13,"duration":0.26,"gain":0.21,"pan":-0.1,"patch":{"attack":0.002,"decay":0.182,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.26},"seed":2140},
+        {"instrument":"windchime","note":"C6","start":0.22,"duration":0.4,"gain":0.18,"pan":0.1,"patch":{"attack":0.002,"decay":0.30000000000000004,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.4},"seed":2141}
+      ]
+    },
+    {
+      "id": "door", "name": "문 열기", "category": "발견·전환", "status": "제안",
+      "duration": 0.89, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"D3","start":0,"duration":0.08,"gain":0.24,"pan":0,"patch":{"attack":0.001,"decay":0.044000000000000004,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.08},"seed":2239},
+        {"instrument":"wind","note":"C4","start":0.018,"duration":0.24,"gain":0.26,"pan":-0.12,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.08399999999999999,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1050,"partials":[],"fixedDuration":0.24},"seed":2240},
+        {"instrument":"stone","note":"A3","start":0.16,"duration":0.12,"gain":0.18,"pan":0,"patch":{"attack":0.001,"decay":0.066,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.12},"seed":2241},
+        {"instrument":"wind","note":"C4","start":0.27,"duration":0.27,"gain":0.13,"pan":0.12,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0945,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":650,"partials":[],"fixedDuration":0.27},"seed":2242}
+      ]
+    },
+    {
+      "id": "region_travel", "name": "다음 구역으로", "category": "발견·전환", "status": "제안",
+      "duration": 1.34, "gain": 1.15,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.36,"gain":0.2,"pan":-0.25,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.126,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1700,"partials":[],"fixedDuration":0.36},"seed":2340},
+        {"instrument":"gayageum","note":"D4","start":0.09,"duration":0.25,"gain":0.22,"pan":-0.15,"patch":{"attack":0.002,"decay":0.175,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.25},"seed":2341},
+        {"instrument":"gayageum","note":"G4","start":0.24,"duration":0.28,"gain":0.2,"pan":0.12,"patch":{"attack":0.002,"decay":0.196,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.28},"seed":2342},
+        {"instrument":"windchime","note":"A5","start":0.43,"duration":0.45,"gain":0.14,"pan":0.25,"patch":{"attack":0.002,"decay":0.3375,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.45},"seed":2343},
+        {"instrument":"wind","note":"C4","start":0.35,"duration":0.38,"gain":0.13,"pan":0.15,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.13299999999999998,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":950,"partials":[],"fixedDuration":0.38},"seed":2344}
+      ]
+    },
+    {
+      "id": "battle_warn", "name": "공격 예고", "category": "전투", "status": "제안",
+      "duration": 0.84, "gain": 1.15,
+      "layers": [
+        {"instrument":"buk","note":"C2","start":0,"duration":0.22,"gain":0.34,"pan":0,"patch":{"attack":0.002,"decay":0.132,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.22},"seed":2441},
+        {"instrument":"jing","note":"C3","start":0.018,"duration":0.38,"gain":0.19,"pan":0,"patch":{"attack":0.012,"release":0.18,"fixedDuration":0.38},"seed":2442},
+        {"instrument":"wind","note":"C4","start":0.07,"duration":0.29,"gain":0.14,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.10149999999999999,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1800,"partials":[],"fixedDuration":0.29},"seed":2443}
+      ]
+    },
+    {
+      "id": "battle_hit", "name": "맞았을 때", "category": "전투", "status": "제안",
+      "duration": 0.61, "gain": 1.15,
+      "layers": [
+        {"instrument":"stone","note":"D3","start":0,"duration":0.055,"gain":0.3,"pan":0,"patch":{"attack":0.001,"decay":0.030250000000000003,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.055},"seed":2542},
+        {"instrument":"buk","note":"D2","start":0.005,"duration":0.17,"gain":0.36,"pan":0,"patch":{"attack":0.002,"decay":0.10200000000000001,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.17},"seed":2543},
+        {"instrument":"wind","note":"C4","start":0.014,"duration":0.17,"gain":0.27,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.0595,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1600,"partials":[],"fixedDuration":0.17},"seed":2544}
+      ]
+    },
+    {
+      "id": "battle_part_break", "name": "부위 파괴", "category": "전투", "status": "제안",
+      "duration": 1.16, "gain": 1.15,
+      "layers": [
+        {"instrument":"buk","note":"C2","start":0,"duration":0.26,"gain":0.38,"pan":0,"patch":{"attack":0.002,"decay":0.156,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.26},"seed":2643},
+        {"instrument":"stone","note":"G3","start":0.008,"duration":0.11,"gain":0.3,"pan":0,"patch":{"attack":0.001,"decay":0.060500000000000005,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.11},"seed":2644},
+        {"instrument":"wind","note":"C4","start":0.016,"duration":0.28,"gain":0.3,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.098,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2300,"partials":[],"fixedDuration":0.28},"seed":2645},
+        {"instrument":"stone","note":"D4","start":0.075,"duration":0.11,"gain":0.18,"pan":0,"patch":{"attack":0.001,"decay":0.060500000000000005,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.11},"seed":2646},
+        {"instrument":"stone","note":"A4","start":0.16,"duration":0.13,"gain":0.13,"pan":0,"patch":{"attack":0.001,"decay":0.07150000000000001,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.13},"seed":2647},
+        {"instrument":"yeot_scissors","note":"G4","start":0.12,"duration":0.32,"gain":0.13,"pan":0,"patch":{"attack":0.001,"decay":0.16,"sustain":0,"release":0.04,"tail":0.09,"fixedDuration":0.32},"seed":2648}
+      ]
+    },
+    {
+      "id": "battle_soothe", "name": "진정 오름", "category": "전투", "status": "제안",
+      "duration": 1.12, "gain": 1.15,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.3,"gain":0.12,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.105,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":900,"partials":[],"fixedDuration":0.3},"seed":2744},
+        {"instrument":"gayageum","note":"D4","start":0.035,"duration":0.27,"gain":0.21,"pan":-0.17,"patch":{"attack":0.002,"decay":0.189,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.27},"seed":2745},
+        {"instrument":"daegeum","note":"G4","start":0.16,"duration":0.46,"gain":0.2,"pan":0.12,"patch":{"attack":0.07,"release":0.18,"fixedDuration":0.46},"seed":2746},
+        {"instrument":"windchime","note":"A5","start":0.26,"duration":0.38,"gain":0.12,"pan":0,"patch":{"attack":0.002,"decay":0.28500000000000003,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.38},"seed":2747}
+      ]
+    },
+    {
+      "id": "battle_victory", "name": "전투 마침", "category": "전투", "status": "제안",
+      "duration": 1.72, "gain": 1.15,
+      "layers": [
+        {"instrument":"buk","note":"C2","start":0,"duration":0.2,"gain":0.24,"pan":0,"patch":{"attack":0.002,"decay":0.12,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.2},"seed":2845},
+        {"instrument":"gayageum","note":"C5","start":0.035,"duration":0.28,"gain":0.25,"pan":-0.2,"patch":{"attack":0.002,"decay":0.196,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.28},"seed":2846},
+        {"instrument":"gayageum","note":"D5","start":0.15,"duration":0.28,"gain":0.22,"pan":-0.1,"patch":{"attack":0.002,"decay":0.196,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.28},"seed":2847},
+        {"instrument":"gayageum","note":"G5","start":0.3,"duration":0.33,"gain":0.23,"pan":0.1,"patch":{"attack":0.002,"decay":0.23099999999999998,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.33},"seed":2848},
+        {"instrument":"windchime","note":"A5","start":0.47,"duration":0.55,"gain":0.13,"pan":0.2,"patch":{"attack":0.002,"decay":0.41250000000000003,"sustain":0,"release":0.09,"tail":0.12,"fixedDuration":0.55},"seed":2849},
+        {"instrument":"daegeum","note":"C6","start":0.55,"duration":0.54,"gain":0.17,"pan":0,"patch":{"attack":0.08,"release":0.2,"fixedDuration":0.54},"seed":2850}
+      ]
+    },
+    {
+      "id": "ui_focus", "name": "메뉴 이동", "category": "화면 조작", "status": "제안",
+      "duration": 0.3, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"E5","start":0,"duration":0.032,"gain":0.12,"pan":0,"patch":{"attack":0.001,"decay":0.0176,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.032},"seed":2946},
+        {"instrument":"gayageum","note":"G5","start":0.012,"duration":0.09,"gain":0.14,"pan":0,"patch":{"attack":0.002,"decay":0.063,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.09},"seed":2947},
+        {"instrument":"wind","note":"C4","start":0.008,"duration":0.035,"gain":0.055,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.01225,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2200,"partials":[],"fixedDuration":0.035},"seed":2948}
+      ]
+    },
+    {
+      "id": "ui_confirm", "name": "메뉴 선택", "category": "화면 조작", "status": "제안",
+      "duration": 0.47, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"C5","start":0,"duration":0.035,"gain":0.13,"pan":0,"patch":{"attack":0.001,"decay":0.019250000000000003,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.035},"seed":3047},
+        {"instrument":"gayageum","note":"E5","start":0.012,"duration":0.12,"gain":0.18,"pan":-0.08,"patch":{"attack":0.002,"decay":0.08399999999999999,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.12},"seed":3048},
+        {"instrument":"gayageum","note":"G5","start":0.063,"duration":0.15,"gain":0.16,"pan":0.08,"patch":{"attack":0.002,"decay":0.105,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.15},"seed":3049}
+      ]
+    },
+    {
+      "id": "ui_cancel", "name": "돌아가기", "category": "화면 조작", "status": "제안",
+      "duration": 0.46, "gain": 0.72,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.055,"gain":0.12,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.003,"decay":0.01925,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1500,"partials":[],"fixedDuration":0.055},"seed":3148},
+        {"instrument":"gayageum","note":"G4","start":0.005,"duration":0.12,"gain":0.17,"pan":0,"patch":{"attack":0.002,"decay":0.08399999999999999,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.12},"seed":3149},
+        {"instrument":"gayageum","note":"D4","start":0.064,"duration":0.15,"gain":0.14,"pan":0,"patch":{"attack":0.002,"decay":0.105,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.15},"seed":3150}
+      ]
+    },
+    {
+      "id": "ui_unavailable", "name": "아직 할 수 없음", "category": "화면 조작", "status": "제안",
+      "duration": 0.48, "gain": 0.72,
+      "layers": [
+        {"instrument":"stone","note":"D4","start":0,"duration":0.05,"gain":0.15,"pan":0,"patch":{"attack":0.001,"decay":0.027500000000000004,"sustain":0,"release":0.025,"tail":0.06,"fixedDuration":0.05},"seed":3249},
+        {"instrument":"buk","note":"D3","start":0.018,"duration":0.09,"gain":0.12,"pan":0,"patch":{"attack":0.002,"decay":0.054,"sustain":0,"release":0.035,"tail":0.06,"fixedDuration":0.09},"seed":3250},
+        {"instrument":"gayageum","note":"C4","start":0.08,"duration":0.13,"gain":0.11,"pan":0,"patch":{"attack":0.002,"decay":0.091,"sustain":0,"release":0.06,"tail":0.08,"fixedDuration":0.13},"seed":3251}
+      ]
+    },
+    {
+      "id": "zone_travel", "name": "구역 이동", "category": "발견·전환", "status": "제안",
+      "duration": 0.62, "gain": 0.85,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.18,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.18,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":1300,"partials":[]}},
+        {"instrument":"gayageum","note":"D4","start":0.04,"duration":0.18,"gain":0.17,"pan":0,"patch":{"fixedDuration":0.18,"attack":0.002,"decay":0.099,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"gayageum","note":"G4","start":0.16,"duration":0.22,"gain":0.15,"pan":0,"patch":{"fixedDuration":0.22,"attack":0.002,"decay":0.12100000000000001,"sustain":0,"release":0.035,"tail":0.06}}
+      ]
+    },
+    {
+      "id": "drift", "name": "물길 따라 떠내려가기", "category": "발견·전환", "status": "제안",
+      "duration": 1.35, "gain": 0.85,
+      "layers": [
+        {"instrument":"water","note":"C4","start":0,"duration":0.8,"gain":0.29,"pan":0,"patch":{"fixedDuration":0.8,"attack":0.03,"release":0.25}},
+        {"instrument":"wind","note":"C4","start":0.07,"duration":0.7,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.7,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":750,"partials":[]}},
+        {"instrument":"gayageum","note":"D4","start":0.23,"duration":0.28,"gain":0.13,"pan":0,"patch":{"fixedDuration":0.28,"attack":0.002,"decay":0.15400000000000003,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"windchime","note":"A5","start":0.55,"duration":0.36,"gain":0.09,"pan":0,"patch":{"fixedDuration":0.36,"attack":0.002,"decay":0.198,"sustain":0,"release":0.035,"tail":0.06}}
+      ]
+    },
+    {
+      "id": "memory_layer", "name": "기억 층으로", "category": "발견·전환", "status": "제안",
+      "duration": 1.6, "gain": 0.85,
+      "layers": [
+        {"instrument":"windchime","note":"G5","start":0,"duration":0.85,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.85,"attack":0.002,"decay":0.4675,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"haegeum","note":"D4","start":0.08,"duration":0.9,"gain":0.18,"pan":0,"patch":{"fixedDuration":0.9,"attack":0.2,"release":0.35}},
+        {"instrument":"wind","note":"C4","start":0.15,"duration":0.9,"gain":0.11,"pan":0,"patch":{"fixedDuration":0.9,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":600,"partials":[]}},
+        {"instrument":"gayageum","note":"C4","start":0.7,"duration":0.35,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.35,"attack":0.002,"decay":0.1925,"sustain":0,"release":0.035,"tail":0.06}}
+      ]
+    },
+    {
+      "id": "depth_enter", "name": "깊이로 들어가기", "category": "발견·전환", "status": "제안",
+      "duration": 1.6, "gain": 0.85,
+      "layers": [
+        {"instrument":"jing","note":"C3","start":0,"duration":0.7,"gain":0.17,"pan":0,"patch":{"fixedDuration":0.7,"attack":0.05,"release":0.45}},
+        {"instrument":"wind","note":"C4","start":0.05,"duration":0.85,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.85,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":480,"partials":[]}},
+        {"instrument":"gayageum","note":"G3","start":0.13,"duration":0.35,"gain":0.15,"pan":0,"patch":{"fixedDuration":0.35,"attack":0.002,"decay":0.1925,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"gayageum","note":"D3","start":0.42,"duration":0.5,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.5,"attack":0.002,"decay":0.275,"sustain":0,"release":0.035,"tail":0.06}}
+      ]
+    },
+    {
+      "id": "rhythm_drum_low", "name": "장단 낮은 북", "category": "장단 반주", "status": "제안",
+      "duration": 0.36, "gain": 0.7,
+      "layers": [
+        {"instrument":"janggu_kung","note":"C3","start":0,"duration":0.24,"gain":0.34,"pan":0,"patch":{"fixedDuration":0.24,"attack":0.002,"decay":0.132,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"stone","note":"C3","start":0,"duration":0.035,"gain":0.045,"pan":0,"patch":{"fixedDuration":0.035,"attack":0.002,"decay":0.019250000000000003,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.05,"gain":0.035,"pan":0,"patch":{"fixedDuration":0.05,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":700,"partials":[]}}
+      ]
+    },
+    {
+      "id": "rhythm_drum_high", "name": "장단 높은 북", "category": "장단 반주", "status": "제안",
+      "duration": 0.3, "gain": 0.7,
+      "layers": [
+        {"instrument":"janggu_deong","note":"C3","start":0,"duration":0.2,"gain":0.27,"pan":0,"patch":{"fixedDuration":0.2,"attack":0.002,"decay":0.11000000000000001,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"janggu_deok","note":"C4","start":0,"duration":0.075,"gain":0.11,"pan":0,"patch":{"fixedDuration":0.075,"attack":0.002,"decay":0.04125,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.04,"gain":0.03,"pan":0,"patch":{"fixedDuration":0.04,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":1600,"partials":[]}}
+      ]
+    },
+    {
+      "id": "rhythm_metal", "name": "장단 엿가위", "category": "장단 반주", "status": "제안",
+      "duration": 0.22, "gain": 0.65,
+      "layers": [
+        {"instrument":"yeot_scissors","note":"C5","start":0,"duration":0.09,"gain":0.23,"pan":0,"patch":{"fixedDuration":0.09,"attack":0.002,"decay":0.0495,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"stone","note":"G5","start":0,"duration":0.04,"gain":0.08,"pan":0,"patch":{"fixedDuration":0.04,"attack":0.002,"decay":0.022000000000000002,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.045,"gain":0.045,"pan":0,"patch":{"fixedDuration":0.045,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":3200,"partials":[]}}
+      ]
+    },
+    {
+      "id": "rhythm_metal_bright", "name": "장단 밝은 엿가위", "category": "장단 반주", "status": "제안",
+      "duration": 0.32, "gain": 0.65,
+      "layers": [
+        {"instrument":"yeot_scissors","note":"C5","start":0,"duration":0.15,"gain":0.25,"pan":0,"patch":{"fixedDuration":0.15,"attack":0.002,"decay":0.0825,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"kkwaenggwari","note":"G5","start":0,"duration":0.12,"gain":0.065,"pan":0,"patch":{"fixedDuration":0.12,"attack":0.002,"decay":0.066,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.05,"gain":0.04,"pan":0,"patch":{"fixedDuration":0.05,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":3800,"partials":[]}}
+      ]
+    },
+    {
+      "id": "rhythm_click", "name": "장단 박자 목탁", "category": "장단 반주", "status": "제안",
+      "duration": 0.19, "gain": 0.55,
+      "layers": [
+        {"instrument":"stone","note":"G4","start":0,"duration":0.045,"gain":0.14,"pan":0,"patch":{"fixedDuration":0.045,"attack":0.002,"decay":0.02475,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"gayageum","note":"D5","start":0,"duration":0.05,"gain":0.08,"pan":0,"patch":{"fixedDuration":0.05,"attack":0.002,"decay":0.027500000000000004,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.025,"gain":0.025,"pan":0,"patch":{"fixedDuration":0.025,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":1800,"partials":[]}}
+      ]
+    },
+    {
+      "id": "rhythm_noise", "name": "장단 가벼운 채", "category": "장단 반주", "status": "제안",
+      "duration": 0.18, "gain": 0.55,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.045,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.045,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":2300,"partials":[]}},
+        {"instrument":"janggu_deok","note":"C4","start":0,"duration":0.065,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.065,"attack":0.002,"decay":0.035750000000000004,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"stone","note":"A5","start":0,"duration":0.025,"gain":0.025,"pan":0,"patch":{"fixedDuration":0.025,"attack":0.002,"decay":0.013750000000000002,"sustain":0,"release":0.035,"tail":0.06}}
+      ]
+    },
+    {
+      "id": "forge_hit", "name": "쇠 두드리기", "category": "미니게임", "status": "제안",
+      "duration": 0.74, "gain": 0.85,
+      "layers": [
+        {"instrument":"hammer","note":"G4","start":0,"duration":0.34,"gain":0.29,"pan":0,"patch":{"fixedDuration":0.34,"attack":0.002,"decay":0.18700000000000003,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"stone","note":"D4","start":0.006,"duration":0.08,"gain":0.11,"pan":0,"patch":{"fixedDuration":0.08,"attack":0.002,"decay":0.044000000000000004,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.07,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.07,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":2200,"partials":[]}},
+        {"instrument":"windchime","note":"G5","start":0.025,"duration":0.24,"gain":0.055,"pan":0,"patch":{"fixedDuration":0.24,"attack":0.002,"decay":0.132,"sustain":0,"release":0.035,"tail":0.06}}
+      ]
+    },
+    {
+      "id": "stone_edge", "name": "아슬아슬한 돌 쌓기", "category": "미니게임", "status": "제안",
+      "duration": 0.65, "gain": 0.85,
+      "layers": [
+        {"instrument":"stone","note":"D3","start":0,"duration":0.2,"gain":0.23,"pan":0,"patch":{"fixedDuration":0.2,"attack":0.002,"decay":0.11000000000000001,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"stone","note":"A4","start":0.055,"duration":0.11,"gain":0.08,"pan":0,"patch":{"fixedDuration":0.11,"attack":0.002,"decay":0.060500000000000005,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.15,"gain":0.07,"pan":0,"patch":{"fixedDuration":0.15,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":850,"partials":[]}}
+      ]
+    },
+    {
+      "id": "stone_fall", "name": "돌이 또르르", "category": "미니게임", "status": "제안",
+      "duration": 0.62, "gain": 0.85,
+      "layers": [
+        {"instrument":"stone","note":"D3","start":0,"duration":0.12,"gain":0.23,"pan":0,"patch":{"fixedDuration":0.12,"attack":0.002,"decay":0.066,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"stone","note":"G3","start":0.09,"duration":0.1,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.1,"attack":0.002,"decay":0.05500000000000001,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"stone","note":"C3","start":0.21,"duration":0.14,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.14,"attack":0.002,"decay":0.07700000000000001,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0.04,"duration":0.2,"gain":0.07,"pan":0,"patch":{"fixedDuration":0.2,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":1000,"partials":[]}}
+      ]
+    },
+    {
+      "id": "stone_sleep", "name": "졸음에 잠기기", "category": "미니게임", "status": "제안",
+      "duration": 0.66, "gain": 0.85,
+      "layers": [
+        {"instrument":"haegeum","note":"D3","start":0,"duration":0.3,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.3,"attack":0.025,"release":0.15}},
+        {"instrument":"wind","note":"C4","start":0.02,"duration":0.25,"gain":0.06,"pan":0,"patch":{"fixedDuration":0.25,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":500,"partials":[]}},
+        {"instrument":"gayageum","note":"A3","start":0.09,"duration":0.18,"gain":0.07,"pan":0,"patch":{"fixedDuration":0.18,"attack":0.002,"decay":0.099,"sustain":0,"release":0.035,"tail":0.06}}
+      ]
+    },
+    {
+      "id": "stone_wake", "name": "졸음 깨우기", "category": "미니게임", "status": "제안",
+      "duration": 0.62, "gain": 0.85,
+      "layers": [
+        {"instrument":"stone","note":"G4","start":0,"duration":0.09,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.09,"attack":0.002,"decay":0.0495,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"gayageum","note":"D4","start":0.025,"duration":0.15,"gain":0.15,"pan":0,"patch":{"fixedDuration":0.15,"attack":0.002,"decay":0.0825,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"gayageum","note":"G4","start":0.1,"duration":0.18,"gain":0.14,"pan":0,"patch":{"fixedDuration":0.18,"attack":0.002,"decay":0.099,"sustain":0,"release":0.035,"tail":0.06}},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.08,"gain":0.03,"pan":0,"patch":{"fixedDuration":0.08,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":1000,"partials":[]}}
+      ]
+    }
+  ]
+}

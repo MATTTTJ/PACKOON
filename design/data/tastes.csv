@@ -1,0 +1,37 @@
+﻿id,누가,무엇,반응종류,반응대사,효과,상태
+taste_dodam_acorn_jelly,dodam,acorn_jelly,아주 좋아함,도토리가 이렇게 말랑해졌네! 한 입만 더!,none,확정
+taste_dodam_sesame_salt,dodam,sesame_salt,좋아함,고소해! 도토리랑 같이 숨겨 둬야지.,none,확정
+taste_nal_yakgwa,nal,yakgwa,좋아함,"제법 빚었네. 팔 건 아니고, 내가 먹으려고.",none,확정
+taste_nal_sesame_salt,nal,sesame_salt,아주 좋아함,"흥, 길에서 밥 먹을 때 딱이겠네.",none,확정
+taste_musoe_rice,musoe,rice,좋아함,…마침 출출하던 참이다.,none,확정
+taste_musoe_acorn_jelly,musoe,acorn_jelly,아주 좋아함,…손 많이 갔겠네. 잠깐 앉아라.,calm:50,확정
+taste_musoe_sesame_salt,musoe,sesame_salt,좋아함,밥에 얹으면 되겠군. 잘 빻았다.,calm:35,확정
+taste_toad_magamok_tea,toad,magamok_tea,아주 좋아함,"허허, 찻잔에 산 냄새가 담겼구나.",none,확정
+taste_toad_ssanghwa,toad,ssanghwa,좋아함,한데 갈았어도 저마다 향이 남았네.,none,확정
+taste_dolsoe_memil_jelly,dolsoe,memil_jelly,아주 좋아함,매끈하구나. 잘 갈았어.,none,확정
+taste_dolsoe_sesame_salt,dolsoe,sesame_salt,좋아함,손끝에도 고소한 냄새가 배겠네.,none,확정
+taste_ppuri_memil_jelly,ppuri,memil_jelly,아주 좋아함,메밀 향이 곧군. 정성을 받겠다.,none,확정
+taste_ppuri_yakgwa,ppuri,yakgwa,그저 그럼,정갈하게 빚었군. 마음은 받겠다.,none,확정
+taste_kkubeogi_acorn_jelly,kkubeogi,acorn_jelly,아주 좋아함,말랑해서… 졸면서도 먹겠어…,none,확정
+taste_kkubeogi_memil_jelly,kkubeogi,memil_jelly,좋아함,이건… 숨겨 두고… 천천히…,none,확정
+taste_yeotbang_yakgwa,yeotbang,yakgwa,아주 좋아함,"어이쿠, 내 엿도 긴장하겠는걸!",none,확정
+taste_yeotbang_ssanghwa,yeotbang,ssanghwa,싫어함,"에구, 쓴 건 사양! 네가 잘 챙겨 둬.",none,확정
+taste_morak_mung_batter,morak,mung_batter,아주 좋아함,잘 갈았네! 넓게 한 장 부쳐야겠다!,none,확정
+taste_morak_rainbow_tteok,morak,rainbow_tteok,좋아함,"허허, 떡 한 조각에 온 길이 다 들었네!",none,확정
+taste_bueong_rainbow_tteok,bueong,rainbow_tteok,아주 좋아함,층을 흐트러뜨리지 않았군. 솜씨가 좋다.,none,확정
+taste_bueong_yakgwa,bueong,yakgwa,좋아함,장부는 덮고 먹어야겠군. 손에 묻겠다.,none,확정
+taste_salgeumi_magamok_tea,salgeumi,magamok_tea,아주 좋아함,"따, 따뜻해… 여기서 같이 마셔도 돼?",none,확정
+taste_salgeumi_sesame_salt,salgeumi,sesame_salt,그저 그럼,고소한 냄새네… 마음은 고마워.,none,확정
+taste_dad_acorn_jelly,dad,acorn_jelly,아주 좋아함,"(묵을 한 입 먹고, 내 손을 꼭 잡는다.)",none,확정
+taste_dad_rainbow_tteok,dad,rainbow_tteok,아주 좋아함,"(떡의 층을 짚다가, 내 어깨를 감싼다.)",none,확정
+taste_dad_ssanghwa,dad,ssanghwa,좋아함,(향을 맡고 고개를 끄덕인다. 내 손을 덮는다.),none,확정
+taste_sangun_magamok_tea,sangun,magamok_tea,아주 좋아함,네가 지나온 산의 향이구나. 잘 받으마.,none,확정
+taste_sangun_ssanghwa,sangun,ssanghwa,좋아함,여러 향이 한데 머무는구나. 잠시 쉬어라.,none,확정
+taste_kudzu_acorn_jelly,kudzu,acorn_jelly,좋아함,도토리 향에 덩굴이 느슨해진다.,calm:50,확정
+taste_kudzu_magamok_tea,kudzu,magamok_tea,좋아함,따뜻한 김을 따라 칡잎이 펼쳐진다.,calm:50,확정
+taste_golem_memil_jelly,golem,memil_jelly,좋아함,메밀 향을 맡은 돌무더기가 천천히 내려앉는다.,calm:40,확정
+taste_golem_sesame_salt,golem,sesame_salt,그저 그럼,돌무더기가 고소한 향을 잠깐 맡는다.,none,확정
+taste_dokkaebi_mung_batter,dokkaebi,mung_batter,아주 좋아함,메밀도 좋지만 녹두도 좋지! 얼른 부치자!,calm:60,확정
+taste_dokkaebi_rainbow_tteok,dokkaebi,rainbow_tteok,좋아함,색도 맛도 층층이네! 내 몫도 있지?,calm:60,확정
+taste_gangcheol_magamok_tea,gangcheol,magamok_tea,아주 좋아함,찻김의 온기에 서리무기의 긴 몸이 풀린다.,calm:60,확정
+taste_gangcheol_ssanghwa,gangcheol,ssanghwa,좋아함,약재 향을 맡은 서리무기가 긴 숨을 내쉰다.,calm:60,확정
