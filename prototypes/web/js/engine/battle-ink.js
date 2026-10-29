@@ -52,3 +52,86 @@ function drawPlacedGift(c){
   const x=f.x+(p.x-f.x)*e,y=f.y+(p.y-30-f.y)*e;
   drawPaw(c,x,y+15);blob(c,x,y,12,8,'#65625d');brush(c,[[x-8,y-3],[x+3,y-6]],2,'#f7f4ed');
 }
+
+/* 빙의 경로와 도착점은 보스 그림과 같은 좌표를 쓴다. 공격 중에도 경로를 지우지 않는다. */
+function possessionPoint(){
+  const rule=B.E.possession;
+  const t=B.st==='tell'?clamp((rule.travel+rule.wait-B.t)/rule.travel,0,1):1;
+  return possessionPathPoint(t);
+}
+function possessionPathPoint(t){
+  const s=B.possession,a=B.E.partPose(s.from),z=B.E.partPose(s.to);
+  const mx=(a.x+z.x)/2,my=Math.min(a.y,z.y)-32;
+  return {x:(1-t)**2*a.x+2*(1-t)*t*mx+t*t*z.x,y:(1-t)**2*a.y+2*(1-t)*t*my+t*t*z.y};
+}
+function drawPossession(c){
+  if(!B.cur||B.st==='end')return;
+  const z=B.E.partPose(B.possession.to);
+  brush(c,Array.from({length:17},(_,i)=>{const p=possessionPathPoint(i/16);return [p.x,p.y];}),3,RED,0.55);
+  // 도착한 헌물의 손잡이·테두리·끝선에 불의 붓결이 남는다.
+  if(B.cur.id==='broom')brush(c,[[z.x+24,z.y-70],[z.x,z.y],[z.x-20,z.y+42]],3,RED,0.65);
+  else if(B.cur.id==='ki'){
+    const pts=[];for(let i=0;i<=12;i++){const a=i*Math.PI/6;pts.push([z.x+36*Math.cos(a),z.y+24*Math.sin(a)]);}brush(c,pts,3,RED,0.65);
+  }else if(B.cur.id==='meongseok')brush(c,[[z.x-72,z.y-13],[z.x+74,z.y-13],[z.x+74,z.y+15],[z.x-72,z.y+15]],3,RED,0.65);
+  const m=B.E.markPosition(B.cur);
+  brush(c,[[z.x,z.y+18],[m.x,m.y]],1.2,INK,0.22);
+}
+function drawPossessedAttack(c){
+  const p=B.attackPlan;if(!B.cur||!['tell','atk','settle','open'].includes(B.st))return;
+  const X=BOX.x,Y=BOX.y,W=BOX.w,H=BOX.h;
+  c.save();
+  if(p){
+    c.fillStyle='rgba(29,24,20,.08)';c.fillRect(X,Y,W,H);c.fillStyle='#f7f4ed';
+    if(p.kind==='sweep'){
+      const y=Y+p.gap*H,hh=p.half*H;c.fillRect(X,y-hh,W,hh*2);
+      brush(c,[[X,y-hh],[X+W,y-hh]],1.5,RED,0.6);brush(c,[[X,y+hh],[X+W,y+hh]],1.5,RED,0.6);
+      const x=p.side>0?X+30:X+W-30;brush(c,[[x,y],[x+p.side*38,y]],2,INK,0.7);
+      brush(c,[[x+p.side*27,y-6],[x+p.side*38,y],[x+p.side*27,y+6]],2,INK,0.7);
+    }else if(p.kind==='beans'){
+      c.fillRect(X+(p.gap-p.half)*W,Y,2*p.half*W,H);
+      for(const u of p.dots){const x=X+u*W;brush(c,[[x,Y+6],[x,Y+H-5]],1,INK,0.18);blob(c,x,Y+8,5,4,INK,0.9);blob(c,x,Y+H-8,4,3,RED,0.7);}
+    }else if(p.kind==='roll'){
+      const edge=X+(p.side<0?p.depth:1-p.depth)*W;
+      c.fillRect(p.side<0?edge+9:X,Y,(1-p.depth)*W-9,H);
+      brush(c,[[edge,Y],[edge,Y+H]],2.5,RED,0.85);
+      const x=edge+(p.side<0?22:-22);brush(c,[[edge,Y+H/2],[x,Y+H/2]],2,INK,0.6);
+      brush(c,[[x+(p.side<0?-6:6),Y+H/2-5],[x,Y+H/2],[x+(p.side<0?-6:6),Y+H/2+5]],2,INK,0.6);
+    }
+  }
+  // 다음 되치기 자리를 같은 헌물의 이름과 연결해 미리 읽게 한다.
+  if(!B.mark&&B.st!=='open'){
+    const m=B.E.markPosition(B.cur);blob(c,m.x,m.y,20,20,RED,0.06);
+    c.strokeStyle=INK;c.globalAlpha=0.35;c.lineWidth=1;c.setLineDash([3,4]);c.beginPath();c.arc(m.x,m.y,20,0,Math.PI*2);c.stroke();c.setLineDash([]);
+    c.globalAlpha=0.7;c.fillStyle=INK;c.textAlign='center';c.font='11px "Gowun Dodum", sans-serif';c.fillText(B.cur.name+' 되치기',m.x,m.y+32);
+  }
+  c.restore();
+}
+/* 튕겨 나온 물건과 원래 윤곽. 치기로 집고 치기로 놓으므로 터치와 키보드가 같은 동작이다. */
+function marketObject(c,x,y,outline){
+  if(!outline)blob(c,x,y,13,8,'#f7f4ed');
+  brush(c,[[x-13,y-3],[x-9,y+7],[x+9,y+7],[x+13,y-3],[x-13,y-3]],2,INK,outline?0.4:0.9);
+  brush(c,[[x-8,y-4],[x-6,y-11],[x+6,y-11],[x+8,y-4]],2,INK,outline?0.4:0.9);
+}
+function drawReturnedObject(c){
+  const r=B.returnItem;
+  if(r){
+    const home=coverPoint({u:r.homeU,v:r.homeV}),src=coverPoint(r),p=r.held?{x:B.px,y:B.py-16}:src;
+    c.save();c.setLineDash([3,3]);marketObject(c,home.x,home.y,true);c.restore();marketObject(c,p.x,p.y,false);
+    if(r.active){
+      brush(c,[[src.x,src.y],[home.x,home.y]],1,INK,0.2);
+      const at=r.held?home:src,near=Math.hypot(at.x-B.px,at.y-B.py)<26;
+      c.save();c.strokeStyle=RED;c.lineWidth=2;c.beginPath();c.arc(at.x,at.y,23,-Math.PI/2,-Math.PI/2+Math.PI*2*r.t/240);c.stroke();
+      c.fillStyle=near?RED:INK;c.textAlign='center';c.font='12px "Gowun Dodum", sans-serif';
+      c.fillText((TOUCH?'치기':HITKEY)+(r.held?' · 돌려놓기':' · 집기'),at.x,at.y+(r.held?30:-26));c.restore();
+    }
+  }
+  if(B.returnEcho){
+    const e=B.returnEcho,home=coverPoint(e),t=1-e.t/60;
+    marketObject(c,home.x,home.y,false);
+    // 도깨비가 옆 물건도 윤곽에 맞춰 돌려놓는다.
+    const dest={x:home.x+(e.u>0.5?-38:38),y:home.y-24};
+    c.save();c.setLineDash([3,3]);marketObject(c,dest.x,dest.y,true);c.restore();
+    const x=LW/2+(dest.x-LW/2)*t,y=BOX.y-18+(dest.y-BOX.y+18)*t;
+    blob(c,x,y-15,5,7,RED,0.7);marketObject(c,x,y,false);
+  }
+}

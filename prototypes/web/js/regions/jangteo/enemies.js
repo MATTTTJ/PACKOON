@@ -1,12 +1,20 @@
 'use strict';
 /* 큰 장터 전투: 헌물 도깨비 (낡은 빗자루·키·멍석에 깃든 도깨비). 원본 표: design/data/bosses.csv · boss_parts.csv
-   부위 공격 넷은 이 지역에서 새로 만든다 (boss_parts.csv 의 공격 칸):
+   [시험판] possession 설정으로 불 이동과 헌물별 예고 공격을 켠다. 아래 기존 공격 넷은 보존한다:
    broomSweep 빗자루가 상자를 가로질러 쓸고 지나감, 쓸리지 않는 줄 하나로 피함
    beans      키로 까부른 콩이 위에서 흩어져 떨어짐
    roll       멍석이 한쪽 끝부터 말려 들어와 피할 자리가 좁아짐
    wisp       도깨비불이 손을 느리게 따라옴
    전투 화면은 흑백 + 단청 붉은색 하나라서, 도깨비불은 필드와 달리 붉게 그린다 */
 (()=>{
+/* 그림과 불 이동·되치기 연결선이 함께 쓰는 실제 헌물 위치. */
+function dokkaebiPose(id){
+  const cx=LW/2,cy=EY,hop=Math.abs(Math.sin(B.time*0.06))*6,o=shk(part(id));
+  if(id==='broom')return {x:cx-124+o,y:cy+40-hop};
+  if(id==='ki')return {x:cx+128+o,y:cy-6-hop+(B.st==='tell'&&B.cur===part('ki')?-16:0)};
+  if(id==='meongseok')return {x:cx+o,y:cy+70};
+  return {x:cx+o,y:cy-30-hop};
+}
 defineAttacks({
   broomSweep:{dur:170,tick(t,X,Y,W,Hh){if(t%56===0&&t<150){const dir=(t/56)%2?-1:1;const gh=34;const gy=Y+10+Math.random()*(Hh-gh-20);B.bullets.push({k:'sweepv',x:dir>0?X-10:X+W+10,vx:dir*2.1,gy,gh,th:12});}}},
   beans:{dur:150,tick(t,X,Y,W,Hh){if(t%36===0&&t<120){for(let i=0;i<5;i++){const x=X+16+Math.random()*(W-32);B.bullets.push({k:'bean',x,y:Y-6,vx:(Math.random()-.5)*0.6,vy:-1.4-Math.random(),t:0,tell:26,r:4});}}}},
@@ -57,27 +65,35 @@ function drawDokkaebi(c){
     for(let i=0;i<4;i++)brush(c,[[kx-30+i*16,ky-20],[kx-26+i*16,ky+22]],2,col,a*0.6);
     if(!ki.broken)for(let i=0;i<5;i++)blob(c,kx-20+i*10,ky-38-((i*7)%10)-hop,3,3,INK);}
   // 도깨비불 (가운데 위, 눈이 있는 불)
-  {const o=shk(core),col=partCol(core);const hx=cx+o,hy=cy-30-hop;const fl=Math.sin(B.time*0.25)*4;
+  {const col=partCol(core),loc=B.E.possession?possessionPoint():null;
+    const hx=loc?cx+(loc.x-cx)/0.84:cx+shk(core),hy=loc?cy+(loc.y-cy)/0.84:cy-30-hop;const fl=Math.sin(B.time*0.25)*4;
     const fire=core.broken?'rgba(29,24,20,.2)':(col===INK?RED:col);
     blob(c,hx,hy+6,30,26,fire,core.broken?1:0.75);blob(c,hx-6,hy-22+fl,14,22,fire,core.broken?1:0.55);blob(c,hx+10,hy-30-fl,8,16,fire,core.broken?1:0.45);
     if(!core.broken){const [ex,ey]=lookAt(hx,hy);blob(c,hx-11,hy+4,7,8,'#efe3c8');blob(c,hx+11,hy+4,7,8,'#efe3c8');blob(c,hx-11+ex,hy+4+ey,3.2,3.8,INK);blob(c,hx+11+ex,hy+4+ey,3.2,3.8,INK);
       brush(c,[[hx-12,hy+20],[hx-4,hy+24],[hx+4,hy+20],[hx+12,hy+24]],3,INK);
       brush(c,[[hx-8,hy-16],[hx-14,hy-30]],4,INK);}   // 뿔 하나
     else{brush(c,[[hx-16,hy+4],[hx-6,hy+6]],3,INK,0.5);brush(c,[[hx+6,hy+6],[hx+16,hy+4]],3,INK,0.5);}
-    if(coreHidden()){brush(c,[[hx-60,hy-10],[hx,hy+26],[hx+60,hy-14]],9,INK,0.8);brush(c,[[hx-50,hy+30],[hx+8,hy-2],[hx+56,hy+28]],8,INK,0.75);}
+    if(coreHidden()&&!B.E.possession){brush(c,[[hx-60,hy-10],[hx,hy+26],[hx+60,hy-14]],9,INK,0.8);brush(c,[[hx-50,hy+30],[hx+8,hy-2],[hx+56,hy+28]],8,INK,0.75);}
   }
 }
 
 defineEnemies({
   dokkaebi:{name:'헌물 도깨비',calmLabel:'진정',
-    intro:'창고 구석의 낡은 빗자루와 키와 멍석이 들썩이더니, 푸른 불이 깃든다.',
-    parts:tableParts('dokkaebi',{broom:{atk:'broomSweep',tell:'빗자루가 바닥을 쓸 채비를 한다…'},ki:{atk:'beans',tell:'키가 콩을 까불러 올린다…'},meongseok:{atk:'roll',tell:'멍석이 끝에서부터 말려 든다…'},core:{atk:'wisp',tell:'도깨비불이 손을 노려본다…'}}),
+    intro:'[시험판] 불이 옮겨 간 헌물이 공격한다. 붓 자국을 읽고 피하자. 멍석부터 부숴 보자.',
+    possession:{order:['ki','meongseok','broom','core'],attacks:{broom:'hauntedSweep',ki:'hauntedBeans',meongseok:'hauntedRoll'},travel:54,wait:114},
+    calmAction:{kind:'return',amount:TABLES.CALM.dokkaebi.memiltteok/4},
+    partPose(id){const p=dokkaebiPose(id);return {x:LW/2+(p.x-LW/2)*0.84,y:EY+(p.y-EY)*0.84};},
+    markPosition(p){const pose=this.partPose(p.id),v={broom:0.38,ki:0.3,meongseok:0.7,core:0.19}[p.id];
+      return {x:clamp(pose.x,BOX.x+28,BOX.x+BOX.w-28),y:BOX.y+BOX.h*v};},
+    parts:tableParts('dokkaebi',{broom:{atk:'broomSweep',tell:'불이 빗자루 손잡이를 탄다. 흰 줄에서 기다렸다가 쓸고 간 뒤쪽으로!'},ki:{atk:'beans',tell:'불이 키 테두리를 돈다. 콩이 떨어질 먹점 사이의 넓은 흰 여백으로!'},meongseok:{atk:'roll',tell:'불이 멍석 끝으로 스민다. 붉은 끝선 너머 흰 여백으로 미리 건너가자!'},core:{atk:'wisp',tell:'헌물에서 나온 불이 손을 느리게 따라온다. 넓게 돌아 피하자.'}}),
     likes:TABLES.CALM.dokkaebi,likeText:'도깨비가 좋아한다.',
     likeTexts:{memiltteok:'메밀떡 냄새에 도깨비가 덩실덩실 춤을 춘다. "메밀이다, 메밀!"',
       dad_yeot:'아빠가 맡긴 엿을 건넸다. 도깨비가 엿가락을 소중히 끌어안는다. 돌려줄 생각은 없어 보인다.'},
     coreHidden:'도깨비불이 헌물 뒤에 숨어 있다. 빗자루나 키, 멍석을 먼저 부수자.',
     coreShown:'도깨비불이 드러났다! 이제 불을 노릴 수 있다.',
-    calmWin:'도깨비가 훔친 설 제수를 하나하나 제자리에 돌려놓고, 눈홍시 하나를 더 얹어 놓았다.',calmGift:'nunhongsi',
+    calmWin:'도깨비가 장터 물건을 돌려놓고 눈홍시를 하나 더 얹었다. "고맙다, 고마워! 이 불씨도 가져가라!"',calmGift:'nunhongsi',
+    // PA-21: 이미 가진 불씨는 늘리지 않는다. 재료 id는 부위 표에서 읽는다.
+    onCalm(b){const id=b.parts.find(p=>p.core).mat;if(!(G.inv[id]>0)&&!b.loot.includes(id))b.loot.push(id);},
     win:'도깨비불이 꺼지자 빗자루와 키와 멍석이 털썩 주저앉는다.',
     lose:'도깨비의 장난에 창고 밖으로 내동댕이쳐졌다.',
     draw:drawDokkaebi},
