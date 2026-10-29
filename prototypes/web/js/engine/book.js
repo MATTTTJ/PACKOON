@@ -3,7 +3,7 @@
 let bookTab='diary';
 document.querySelectorAll('#bookTabs button').forEach(b=>b.onclick=()=>{bookTab=b.dataset.tab;renderBook();});
 function renderBook(){
-  const total=REG.clueTotal,DEX=REG.dex;
+  const total=clueTotalSoFar(),DEX=dexSoFar();   // 지나온 지역을 모두 더해 센다
   const names={diary:'일기',clues:'아빠 단서 '+G.clues.length+'/'+total,dex:'도감 '+Object.keys(G.dex).length+'/'+DEX.length,ledger:'물품 장부'};
   document.querySelectorAll('#bookTabs button').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===bookTab);b.textContent=names[b.dataset.tab];});
   const body=$('bookBody');body.innerHTML='';body.scrollTop=0;
@@ -34,7 +34,7 @@ function renderBook(){
     body.appendChild(g);
   }else{
     const r=document.createElement('div');r.className='rels';
-    Object.keys(G.rel).forEach(k=>{const nm=REG.npcs.find(n=>n.id===k).name;const s=document.createElement('span');s.className='rel';s.innerHTML=nm+' · <b>'+G.rel[k].t+' '+G.rel[k].v+'</b>';r.appendChild(s);});
+    Object.keys(G.rel).forEach(k=>{const nm=npcName(k);const s=document.createElement('span');s.className='rel';s.innerHTML=nm+' · <b>'+G.rel[k].t+' '+G.rel[k].v+'</b>';r.appendChild(s);});
     body.appendChild(r);
     const ids=Object.keys(G.ledger);
     if(!ids.length){note('아직 적힌 거래가 없다. 누가 무엇을 원하는지 들으면 여기에 적힌다.');return;}

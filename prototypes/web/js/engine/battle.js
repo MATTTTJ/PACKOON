@@ -4,7 +4,7 @@
 
    상대 {name, calmLabel, intro, howto?, npc?, dodge?(피하기만 하는 시험: 버틸 공격 수), bonkText?(dodge 시작 때 연장을 뺏기는 글),
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
-         likes:{아이템:진정 오름}, likeText, coreHidden, coreShown, calmWin, calmGift?, win, lose,
+         likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
          draw(c):수묵 그림, onWin(B)?:이겼을 때 보상 (B.loot 에 넣고 B.bonus 에 글)} */
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
 let B=null,inkOn=false,LW=800,LH=450,BOX={x:250,y:262,w:300,h:160},EY=118;const BDPR=2;
@@ -152,7 +152,7 @@ function closeGift(){$('bGiftMenu').hidden=true;if(B)B.paused=false;}
 function giveGift(id){
   takeItem(id,1);const v=B.E.likes[id];
   B.calm=Math.min(100,B.calm+(v||8));
-  B.msg=v?B.E.likeText:jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
+  B.msg=v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
   closeGift();renderBHud();
   if(B.calm>=100)bEnd('calm');
 }

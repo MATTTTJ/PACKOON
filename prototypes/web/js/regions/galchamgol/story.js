@@ -173,7 +173,7 @@ Rg.startKudzu=()=>{
 /* ---------- NPC (npcs.csv 의 id). x 는 필드 위치 ---------- */
 Rg.npcs=[
   {id:'dodam',name:'도담',x:300,talk:talkDodam,draw:Rg.art.squirrel},
-  {id:'nal',name:'날쌘',x:820,talk:talkNal,draw:Rg.art.weasel,props:Rg.props.nal},
+  {id:'nal',name:'날쌘',x:820,talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
   {id:'musoe',name:'무쇠',x:1110,talk:talkMusoe,draw:Rg.art.badger,props:Rg.props.forge},
   {id:'toad',name:'두꺼비 할멈',x:1430,talk:talkToad,draw:Rg.art.toad,props:Rg.props.toad},
 ];

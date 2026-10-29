@@ -15,14 +15,28 @@ function startGame(){
   REG.onStart();
   lastGoal='';refreshHud();
 }
-/* 지역을 끝낼 때 지역 코드가 부른다 */
+/* 지역을 끝낼 때 지역 코드가 부른다. REG.next 가 있으면 다음 지역 버튼이 나온다 */
 function endGame(){
   G.ended=true;
+  showEnd();refreshGoal();
+}
+function showEnd(){
   $('endStats').innerHTML=REG.endStats().map(([k,v])=>'<span>'+k+' <b>'+v+'</b></span>').join('');
-  $('endScreen').hidden=false;refreshGoal();
+  const nx=REGIONS[REG.next],b=$('btnNext');
+  b.hidden=!nx;if(nx)b.textContent=REGIONS[REG.next].cover.go||nx.name+'로';
+  $('btnRestart').className=nx?'btn':'btn primary';
+  $('endScreen').hidden=false;
+}
+/* 화면과 상태를 지금 G 에 맞춘다 */
+function resetScreens(){
+  REG=REGIONS[G.region];fillCover();closePanels();
+  $('endScreen').hidden=true;$('titleScreen').hidden=G.started;
+  lastGoal='';lastTool='';lastNear=null;refreshHud();
 }
 $('btnStart').onclick=startGame;
-$('btnRestart').onclick=()=>{G=newGame();$('endScreen').hidden=true;closePanels();$('titleScreen').hidden=false;lastGoal='';lastTool='';refreshHud();};
+$('btnRestart').onclick=()=>{G=newGame();resetScreens();};
+/* 다음 지역으로: 보따리·연장·책·호감은 그대로 가지고 간다 */
+$('btnNext').onclick=()=>{if(!REGIONS[REG.next])return;enterRegion(G,REGIONS[REG.next]);resetScreens();};
 $('btnBookEnd').onclick=()=>{bookTab='clues';renderBook();$('book').hidden=false;$('endScreen').hidden=true;
   $('bookClose').addEventListener('click',()=>{if(G.ended)$('endScreen').hidden=false;},{once:true});};
 
@@ -32,18 +46,13 @@ function loop(t){
   while(acc>=1000/60){step();bStep();acc-=1000/60;}
   if(B&&!$('battle').hidden)bDraw();else draw();requestAnimationFrame(loop);
 }
-/* 주소 뒤 ?region=<id> 로 지역을 고를 수 있다 (없으면 첫 지역) */
-function pickRegion(data){
-  const q=new URLSearchParams(location.search).get('region');
-  const id=(data&&data.G&&data.G.region)||q;
-  return REGIONS[id]||Object.values(REGIONS).sort((a,b)=>a.order-b.order)[0];
-}
+/* 주소 뒤 ?region=<id> 로 그 지역부터 시작할 수 있다 (앞 지역은 마친 것으로 친다). 없으면 첫 지역 */
 function boot(data){
-  REG=pickRegion(data);
+  G=(data&&data.G&&REGIONS[data.G.region])?data.G:newGame(new URLSearchParams(location.search).get('region'));
+  REG=REGIONS[G.region];
   fillCover();
-  G=(data&&data.G)?data.G:newGame();
   if(G.started)$('titleScreen').hidden=true;
-  if(G.ended)$('endScreen').hidden=false;
+  if(G.ended)showEnd();
   refreshHud();requestAnimationFrame(loop);
 }
 window.claude?.hot?.snapshot?.(()=>{const g=JSON.parse(JSON.stringify(G));pouch.items.forEach(id=>{g.inv[id]=(g.inv[id]||0)+1;});return {G:g};});
