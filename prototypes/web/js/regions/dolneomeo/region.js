@@ -33,6 +33,17 @@ const Rg=defineRegion('dolneomeo',{
     diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 우리를 내려다본다. 서리다래는 돌산 절벽에 있다고 했다.');
     toast('마을 어귀의 동물들에게 말을 걸어 보자');
   },
+  next:'jangteo',
+  /* 뒤 지역부터 바로 시작할 때 돌너머를 이렇게 마친 것으로 친다 (확인용 바로가기). 메밀 3은 큰 장터에서 메밀가루로 쓸 수 있다 */
+  finish(g){
+    g.inv.memil=(g.inv.memil||0)+3;g.inv.gyeolmyeongja=(g.inv.gyeolmyeongja||0)+1;g.inv.seogi=(g.inv.seogi||0)+1;
+    if(!g.awake.includes('maetdol'))g.awake.push('maetdol');
+    ['k1','s1','h2'].forEach(id=>g.clues.push({id,who:'돌너머 마을',text:'돌너머에서 찾은 단서 (바로가기로 시작해서 내용은 비어 있다)'}));
+    g.diary.push({id:'skip_dolneomeo',text:'(돌너머 마을은 바로가기로 건너뛰었다.)'});
+    ['eoksae','memil','memil_powder','gyeousari','gyeolmyeongja','seogi','seoridarae','darae_yak','story_stone'].forEach(id=>g.learned.push('got:'+id));
+    ['kkubeogi','dolsoe','ppuri'].forEach(id=>g.learned.push('met:'+id));g.learned.push('fight:golem','kkubeogi:awake','dolsoe:tea','dolsoe:stack');
+    Object.assign(g.f,{kkuDone:true,ppuriPassed:true,stackDone:true,yakMade:true});g.boss.dead=true;g.ended=true;
+  },
   endStats:()=>[
     ['아빠 단서',G.clues.length+'/'+clueTotalSoFar()],
     ['돌쇠 할배의 신뢰',G.rel.dolsoe.v],

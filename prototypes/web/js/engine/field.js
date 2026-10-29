@@ -108,7 +108,7 @@ function nearDig(){if(paused())return null;for(const d of G.digs){if(!d.done&&!d
 function updateOverlay(){
   const pr=$('prompt');
   const n=paused()?null:nearNpc();const dg=n?null:nearDig();
-  if(n){pr.hidden=false;if(lastNear!==n){pr.textContent=(TOUCH?'':'E · ')+n.name+'에게 말 걸기';lastNear=n;}pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=((GROUND-32)/H*100)+'%';}
+  if(n){pr.hidden=false;if(lastNear!==n){pr.textContent=(TOUCH?'':'E · ')+(n.prompt||n.name+'에게 말 걸기');lastNear=n;}pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=((GROUND-32)/H*100)+'%';}
   else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=TOUCH?'휘두르기로 캐기':'J · 캐기';lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
   $('padTalk').classList.toggle('ready',!!n);
