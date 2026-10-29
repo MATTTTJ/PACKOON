@@ -82,3 +82,148 @@ defineIcons({
 });
 
 /* 가공법은 heirlooms.csv. 시루는 떡집 모락의 김 올리기를 배우면 깨어나고, 메밀떡은 모락에게 따로 배운다 (data/common.js) */})();
+
+/* PA-43 큰 장터 확장. 길손은 상인 명단과 별개이며 필수 물건을 받지 않는다.
+   조사 text 접근자는 E로 조사할 때만 실행된다. 새 플래그는 큰 장터 안에서만 쓴다. */
+(()=>{
+if(CLASSIC)return;
+const Rg=REGIONS.jangteo;
+const draw=kind=>(x,y,f)=>Rg.expArt.wanderer(kind,x,y,f);
+const record=(id,text)=>diary('jx_'+id,text);
+
+function kiteChild(){
+  if(G.f.jxKiteFreed){
+    talk([
+      ['연 아이','살았다, 내 방패연!\n줄은 천천히 감을게. 또 처마에 걸리면 곤란하니까.'],
+      ['너구리','꼬리를 길게 달았네.\n저 멀리서도 네 연인 줄 알겠어.'],
+      ['연 아이','설에 집으로 오는 동생한테 보이려고!\n저 붉은 차일 뒤로 오면 우리 좌판이거든.'],
+      ['연 아이','고마워, 연 건져 준 보부상!\n기와가 이어진 쪽으로 가면 장터 지붕길이야.']
+    ],()=>{G.f.jxKiteDone=true;record('kite','설에 돌아오는 동생에게 보이려고 날린 연을 내려 줬다. 아이가 붉은 차일 뒤 지붕길을 알려 줬다.');finishWanderer('j_kite');});
+    return;
+  }
+  if(G.f.jxKiteStarted){
+    talk([['연 아이','상자 위에서 낮은 처마로 올라가 봐.\nSpace로 뛰고, 연 가까이서 E를 누르면 돼.']]);return;
+  }
+  talk([
+    ['연 아이','줄을 당길수록 더 걸려.\n설 전에 동생한테 보여 줘야 하는 연인데…'],
+    ['너구리','처마에 꼬리가 걸렸네.\n아래 상자부터 올라가 볼까?'],
+    ['연 아이','줄은 내가 느슨하게 잡고 있을게.\n연 가까이서 E로 꼬리만 살짝 빼 주겠어?',[
+      {t:'상자를 밟고 올라간다',go:()=>{G.f.jxKiteStarted=true;toast('상자 → 낮은 처마 → 연. 가까이서 E · 연 꼬리 풀기');}},
+      {t:'잠깐 둘러보고 올게',go:null}
+    ]]
+  ]);
+}
+
+function yutElders(){
+  const finish=(together)=>talk([
+    ['윷놀이 노인들',together?'콩 말 위에 돌 말도 얹었구먼!\n둘이 함께 들어오니 빈자리가 금세 찼어.':'콩 말이 먼저 들어왔네!\n돌 말은 내가 몰고 올 테니 한 판 더 앉게.'],
+    ['윷놀이 노인들','한 판 같이 앉아 줘서 고맙다.\n깃대 밑 돌도 봐라. 옛 보부상이 발도장을 남겼어.']
+  ],()=>{record('yut','설 윷판에서 식구들 몫의 콩 말과 돌 말을 움직였다. 깃대 밑 돌에 옛 보부상의 발도장이 있다고 한다.');finishWanderer('j_yut');});
+  const end=(takeShort)=>{G.f.jxYutChoice=takeShort?'inside':'outside';talk([
+    ['윷놀이 노인들',takeShort?'안으로 돌아가는 길을 골랐구먼!\n길이 짧아도 먼저 지나간 말을 잘 살펴야 하지.':'바깥으로 크게 도는구먼!\n한 칸 더 걷는 동안 다른 말이 길을 비켜 주겠어.'],
+    ['윷놀이 노인들','이번엔 도로구먼. 콩을 한 칸 보내도 되고,\n돌을 보내 콩 말과 함께 가도 되지. 어느 말을 고를까?',[
+      {t:'돌 말을 보내 함께 간다',go:()=>{G.f.jxYutTogether=true;finish(true);}},
+      {t:'콩 말을 먼저 보낸다',go:()=>{G.f.jxYutTogether=false;finish(false);}}
+    ]]
+  ]);};
+  talk([
+    ['윷놀이 노인들','한 자리 비었네. 털 묻은 방석 좀 당겨 앉게.\n객지에 나간 새끼들 오기 전에 손부터 풀어야지.'],
+    ['너구리','이 말은 왜 콩이에요?\n옆에는 조약돌도 있는데.'],
+    ['윷놀이 노인들','식구마다 좋아하는 걸 말로 삼았지.\n콩 말 주인은 장날마다 콩자반부터 찾거든.'],
+    ['윷놀이 노인들','윷을 굴리니 개로구먼. 두 칸 갈 수 있어.\n갈림목의 콩 말을 어느 길로 보낼까?',[
+      {t:'안으로 돌아가는 길',go:()=>end(true)},
+      {t:'바깥으로 넓게 도는 길',go:()=>end(false)},
+      {t:'이번 판은 구경할게요',go:null}
+    ]]
+  ]);
+}
+
+function babyBoar(){
+  if(G.f.jxBoarScent2){
+    talk([
+      ['새끼 멧돼지','이 냄새야! 솔잎 아래 마른 풀이 있어.\n아까 엄마랑 여기서 쉬었어.'],
+      ['너구리','눈 묻은 솔가지는 치워 둘게.\n바람은 바위가 막아 주네.'],
+      ['새끼 멧돼지','엄마가 찾으러 오면 여기 있을래.\n큰 바위 뒤에 이상한 발자국도 봤어.'],
+      ['새끼 멧돼지','킁킁, 이제 장터 냄새는 안 쫓아가.\n같이 천천히 걸어 줘서 고마워!']
+    ],()=>{record('boar','장터 냄새를 따라 나온 새끼 멧돼지와 솔잎 냄새를 따라 잠자리로 돌아왔다. 바람을 막는 큰 바위 뒤에 발자국이 있다.');finishWanderer('j_boar');});
+    return;
+  }
+  if(G.f.jxBoarStarted){
+    talk([['새끼 멧돼지',G.f.jxBoarScent1?'부러진 솔가지 냄새는 여기까지야.\n조금 오른쪽, 마른 솔잎을 E로 살펴봐 줄래?':'장터 냄새 말고 숲 냄새를 찾아야 해.\n오른쪽에 부러진 솔가지를 E로 살펴봐 줄래?']]);return;
+  }
+  talk([
+    ['새끼 멧돼지','달콤한 냄새만 따라왔는데 깜깜해졌어.\n집으로 가는 냄새가 안 나.'],
+    ['너구리','코에 눈이 붙었네.\n털고, 하나씩 맡아 보자.'],
+    ['새끼 멧돼지','마른 풀하고 솔잎 냄새였어.\n뛰지 말고 옆에서 같이 찾아줄래?',[
+      {t:'솔가지부터 함께 살펴본다',go:()=>{G.f.jxBoarStarted=true;toast('오른쪽의 부러진 솔가지 → 마른 솔잎. E로 냄새 살펴보기');}},
+      {t:'잠깐 길부터 살펴볼게',go:null}
+    ]]
+  ]);
+}
+
+function oldMagpie(){
+  const south=G.diary.some(e=>e.id==='end'||e.id==='d_end');
+  const earlier=Object.keys(G.f.wanderersDone||{}).some(k=>!k.startsWith('jangteo:')&&/magpie|kkachi|까치/.test(k));
+  talk([
+    ['늙은 까치',earlier?'또 만났구나. 이번엔 눈을 잔뜩 밟았네.\n나도 이 처마 밑에서 날개 좀 녹이려던 참이야.':'남쪽 오가는 까치들은 이 처마에서 쉬지.\n깊은 처마가 바람을 막아 주거든. 자네도 앉겠나?'],
+    ['너구리',south?'약 보자기는 잘 갔겠죠?\n매듭은 꼭 묶었어요.':'남쪽 단풍골 너머에 우리 집이 있어요.\n여기 앉으면 그쪽 하늘도 보일까요?'],
+    ['늙은 까치',south?'단풍골로 가는 길은 익숙하단다.\n보자기는 안쪽에 물고 날아야 바람에 풀리지 않아.':'굴뚝 김이 낮게 눕는 쪽이 남쪽이야.\n지금은 지붕에 가렸지만, 조금 높이 앉으면 보여.'],
+    ['늙은 까치','잠깐 같이 김을 보고 있을까.\n발이 녹을 동안이면 충분해.',[
+      {t:'곁에 앉아 지붕을 본다',go:()=>talk([
+        ['너구리','지붕 위에서 김이 이어지네.\n엄마 시루에서도 저렇게 났는데.'],
+        ['늙은 까치','눈 오는 날엔 김부터 눈에 들어오지.\n따뜻한 밥을 짓는 집이 저기 있다고.'],
+        ['늙은 까치',G.awake.includes('siru')?'보따리에서도 따뜻한 김 냄새가 나는구나.\n이제 자네도 누굴 먹일 줄 아는 보부상이네.':'숙소 마루 끝에서 한번 바라보렴.\n고드름 너머 지붕이 낮은 산처럼 이어진단다.'],
+        ['늙은 까치','밤엔 거리의 좌판을 접어 둔단다.\n그 뒤 틈길로 오면 이 처마까지 금방 돌아와.']
+      ],()=>{G.f.jxMagpieRest=true;record('magpie','숙소 처마에서 까치와 발을 녹이며 지붕 위 김을 봤다. 밤에 좌판이 접히면 뒤편 골목으로 숙소에 돌아올 수 있다.');finishWanderer('j_magpie');startVista(Rg.zones.inn.vistas[0]);})},
+      {t:'길을 조금 더 둘러볼게요',go:null}
+    ]]
+  ]);
+}
+
+Rg.expEncounters={
+  wanderers:{
+    entrance:[{id:'j_kite',name:'연 아이',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
+    street:[{id:'j_yut',name:'윷놀이 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 김 냄새가 나네.\n시루까지 깨어났으니 설 준비가 한결 든든하겠어.':'콩 말 주인이 오면 네 자리 얘기도 하마.\n다음엔 더 큰 방석을 펴 두지.';}}],
+    inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:oldMagpie,draw:draw('magpie'),get greeting(){return G.awake.includes('siru')?'고드름은 그대로인데 네 보따리에선 김이 나네.\n엄마 시루가 깨어난 모양이구나.':'마루 끝에 앉아 보렴.\n밤 지붕에는 집마다 작은 등이 달린단다.';}}],
+    pine:[{id:'j_boar',name:'새끼 멧돼지',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
+    warehouse:[]
+  },
+  examines:{
+    entrance:[
+      {id:'j_flag_knot',x:240,label:'장터 깃발 매듭',text:['깃발 아래 매듭은 풀기 쉽게 묶었다.\n장이 끝나면 눈 오기 전에 내려야 하니까.','돌받침 안쪽에 붉은 점이 있다.\n눈을 털면 발가락 모양이 보일까?']},
+      {id:'j_kite_tail',x:1180,y:128,label:'연 꼬리 풀기',get text(){
+        if(!G.f.jxKiteStarted)return '방패연 꼬리가 처마 못에 걸렸다.\n아래 아이에게 줄을 느슨하게 잡아 달라고 하자.';
+        G.f.jxKiteFreed=true;return ['줄이 느슨해진 사이 꼬리를 살짝 뺐다.\n연이 아이 쪽으로 사르르 내려간다.',
+          '처마에 걸렸던 꼬리를 반듯하게 폈다.\n아래에서 아이가 줄을 감고 있다.'];
+      }},
+      {id:'j_jangseung_snow',x:1680,label:'장승 코의 눈',text:'장승 코에만 눈이 안 쌓였다.\n지나가는 짐꾼들이 코를 톡 짚고 들어오나 봐.'}
+    ],
+    street:[
+      {id:'j_stall_gap',x:310,label:'좌판 사이 골목',get text(){return G.f.night?'차일을 걷고 판을 접으니 골목이 나왔다.\n낮에는 물건 밑에 감춰져 있던 길이다.':'좌판 아래로 발자국이 이어지다 끊긴다.\n장을 마치고 판을 접으면 저 안으로 갈 수 있겠다.';}},
+      {id:'j_steam_flour',x:1150,label:'쌀가루 묻은 발판',get text(){return G.awake.includes('siru')?'바닥 가루에 내 발자국도 섞였다.\n모락이랑 김을 올린 자리는 아직 따뜻하다.':'하얀 가루 사이로 큰 발자국이 오간다.\n모락이 맷돌과 아궁이를 몇 번이나 오갔을까.';}},
+      {id:'j_broken_yut',x:2130,label:'반질반질한 윷가락',text:'한쪽 윷가락만 유난히 반질반질하다.\n노인들이 자기 차례마다 소매로 문질렀나 봐.'}
+    ],
+    inn:[
+      {id:'j_inn_shoes',x:350,label:'마루 아래 신발',text:'눈 묻은 신발은 코를 바깥으로 돌려 뒀다.\n내일 갈 길을 향해 벌써 줄을 섰네.'},
+      {id:'j_inn_pillar',x:1210,label:'기둥의 키 자국',text:'기둥에 작은 금이 층층이 그어져 있다.\n짐 키를 잰 걸까, 해마다 온 아이들 키일까?'},
+      {id:'j_inn_icicle',x:1780,label:'처마 끝 고드름',text:'고드름 끝에 지붕이 거꾸로 매달렸다.\n물방울이 떨어지자 지붕도 잠깐 흔들린다.'}
+    ],
+    pine:[
+      {id:'j_pine_scent1',x:1730,label:'부러진 솔가지',get text(){
+        if(!G.f.jxBoarStarted)return '눈 아래에서 가지 하나가 부러졌다.\n진한 송진 냄새. 코끝이 얼얼하다.';
+        G.f.jxBoarScent1=true;return '솔가지를 손바닥으로 덮어 눈을 털었다.\n새끼 멧돼지가 코를 들고 마른 솔잎 쪽으로 간다.';
+      }},
+      {id:'j_pine_scent2',x:1870,label:'눈 아래 마른 솔잎',get text(){
+        if(!G.f.jxBoarScent1)return '큰 바위 밑에 마른 솔잎이 모였다.\n바람은 여기를 비켜 가는 모양이다.';
+        G.f.jxBoarScent2=true;return '마른 솔잎 아래에서 따뜻한 풀 냄새가 났다.\n새끼 멧돼지가 오른쪽 잠자리를 알아보고 뛰어간다.';
+      }},
+      {id:'j_pine_scale',x:2280,y:128,label:'큰 바위의 솔방울 비늘',text:'솔방울 비늘이 바위 틈에 차곡차곡 끼었다.\n작은 발자국 아래에는 훨씬 오래된 붉은 자국이 있다.'}
+    ],
+    warehouse:[
+      {id:'j_warehouse_rope',x:400,label:'접어 둔 좌판 끈',text:'끈 끝을 한데 묶어 바구니에 담았다.\n아침엔 이걸 풀어 다시 장을 펼치겠지.'},
+      {id:'j_warehouse_scratches',x:1230,label:'창고 문 긁힌 자리',get text(){return G.boss.dead?'긁힌 문 옆에 돌아온 물건들이 놓였다.\n아침에 찾아갈 자리가 저마다 비어 있다.':'눈 위에 빗자루 자국이 지그재그로 났다.\n청소를 했다기엔 창고 문 앞만 빙빙 돌았네.';}},
+      {id:'j_warehouse_mended',x:2470,y:128,label:'기운 멍석',get text(){return G.boss.dead?'바느질한 모서리에 눈 한 톨 안 묻었다.\n누가 멍석을 얌전히 접어 놓고 갔다.':'멍석 한 귀를 다른 색 짚으로 기웠다.\n헌것도 함부로 버리지 않는 장터구나.';}}
+    ]
+  }
+};
+})();

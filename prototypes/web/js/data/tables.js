@@ -1743,6 +1743,45 @@ const TABLES={
    "region": "yeongsan",
    "kind": "item",
    "lines": []
+  },
+  {
+   "id": "dad_stamp_jangteo_flag",
+   "region": "jangteo",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "부를 준다는 열매를 찾으러 북쪽으로 간다. 장터 깃발에 길을 물으니 바람만 대답했다.",
+     "when": "stamp:jangteo:flag"
+    }
+   ],
+   "name": "젊은 아빠의 그날 · 장터 깃대"
+  },
+  {
+   "id": "dad_stamp_jangteo_pillar",
+   "region": "jangteo",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "부자가 되어 돌아오겠다며 묵은 숙소다. 새벽 길을 서두르다 기둥에 젖은 발을 짚었다.",
+     "when": "stamp:jangteo:pillar"
+    }
+   ],
+   "name": "젊은 아빠의 그날 · 숙소 기둥"
+  },
+  {
+   "id": "dad_stamp_jangteo_rock",
+   "region": "jangteo",
+   "kind": "stamp",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "보배가 열린다는 산은 아직 멀다. 바위에서 장터를 내려다보니 등불 하나도 빈손으로 꺼지지는 않았다.",
+     "when": "stamp:jangteo:rock"
+    }
+   ],
+   "name": "젊은 아빠의 그날 · 솔숲 바위"
   }
  ],
  "MINIGAMES": {

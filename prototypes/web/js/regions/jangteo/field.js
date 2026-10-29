@@ -76,6 +76,10 @@ Rg.drawFront=()=>{for(const l of snow)R(l.x,l.y,Math.sin(l.p)>0.3?2:1,Math.sin(l
 /* ---------- 진행 ---------- */
 Rg.maxX=()=>2330;
 Rg.step=()=>{
+  // 같은 출처에서 확장 저장을 옛 구성으로 비교해도 구역 태그 때문에 채집물이 사라지지 않는다.
+  if(CLASSIC&&G.pickups.some(a=>a.zone)){
+    G.pickups=Rg.newState().pickups;G.px=60;G.py=GROUND;G.vy=0;G.cam=0;
+  }
   if(G.f.guard&&night()&&!G.boss.dead&&Math.abs(G.px-STORE_X)<24)Rg.startDokkaebi();
   if(has('hongsi_tteok')&&!G.f.hongsiMade)Rg.sendMedicine();
 };
@@ -89,4 +93,122 @@ Rg.bossDie=calm=>{
   toast('눈홍시를 되찾았다! 시루로 홍시 약떡을 찌자');refreshGoal();
 };
 Rg.STORE_X=STORE_X;
+
+/* PA-43 [개발자 결정]. 옛 장터는 위에 그대로 두고, 확장에서는 구역 안 좌표만 쓴다.
+   필수: 입구 → 거리 → 숙소(밤) → 거리/솔숲 → 시루/고사떡 → 숙소 → 창고.
+   지붕길과 밤 골목은 선택 지름길이다. 아래 눈길은 언제나 안전하게 이어진다. */
+if(!CLASSIC){
+  Rg.startZone='entrance';Rg.STORE_X=2320;
+  const originalState=Rg.newState;
+  Rg.newState=()=>{const s=originalState();s.pickups=[];s.boss.x=Rg.STORE_X;return s;};
+  const peg=(x,y)=>{R(x-1,y-17,2,17,'#6b4934');R(x-9,y-19,18,7,'#ead4a6');R(x-6,y-17,11,1,'#784b36');};
+  const glint=(x,y)=>{R(x-4,y-3,8,3,'#a85344');R(x-4,y-7,2,2,'#a85344');R(x,y-8,2,2,'#a85344');};
+  const shutter=(x,y)=>{R(x-17,y-35,34,35,'#705346');for(let i=0;i<5;i++)R(x-15+i*6,y-33,2,30,'#987459');R(x-18,y-22,36,3,'#b64e41');};
+  const gate=(x,y)=>{R(x-20,y-48,4,48,'#604635');R(x+16,y-48,4,48,'#604635');R(x-24,y-49,48,6,'#31434d');R(x-22,y-51,44,2,'#e6eaf0');if(!night()||!has('sinpyo')){R(x-16,y-23,32,3,'#ac4c43');R(x-12,y-27,24,1,'#dba56c');}};
+  const needWarehouse=()=>night()&&has('sinpyo');
+  const warehouseReason='신표를 받은 뒤, 숙소 마루에서 밤을 기다리자.';
+  const stairs=(x,top=96)=>[{x,y:160,w:80},{x:x+90,y:128,w:90},{x:x+180,y:top,w:120}];
+  const cones=(zone,coords)=>coords.map(([x,y],i)=>({id:'j_'+zone+'_fuel_'+i,x,y:y??GROUND,item:'solbang',got:false}));
+  let viewedZone=null,depthDirection=0,lastFade=0;
+  const common=id=>({ground:GROUND,startX:70,
+    drawBack(){
+      // 전경과 원경 사이의 문도 기존 구역 API로 이동한다. 지역 그리기에서만 짧게 확대한다.
+      if(viewedZone!==id){
+        depthDirection=(viewedZone==='street'&&id==='pine')||(viewedZone==='inn'&&id==='warehouse')?1:
+          (viewedZone==='pine'&&id==='street')||(viewedZone==='warehouse'&&id==='inn')?-1:0;
+        viewedZone=id;
+      }else if(zoneFade>lastFade)depthDirection=0;
+      lastFade=zoneFade;
+      const depth=zoneFade>0&&depthDirection&&!Vfx.reducedMotion;
+      ctx.save();if(depth){const z=1+depthDirection*zoneFade/(H/2);ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);}
+      Rg.expArt.drawBack(id);
+    },
+    drawScenery(){Rg.expArt.drawScenery(id);},
+    drawPickup:Rg.drawPickup,onHit:Rg.onHit,ambient:Rg.ambient,
+    weather:Rg.weather,
+    weatherFront(){Rg.expArt.drawFront?.(id);ctx.restore();},
+    faint(){G.px=Math.max(60,G.px-80);G.py=GROUND;G.vy=0;toast('눈을 털고 다시 걸었다.');},
+    step(){
+      const legacy=G.pickups.filter(a=>a.item==='solbang'&&!a.zone);
+      if(legacy.length){
+        const pine=G.pickups.filter(a=>a.zone==='pine');
+        legacy.forEach((a,i)=>{if(a.got&&pine[i])pine[i].got=true;});
+        G.pickups=G.pickups.filter(a=>a.zone||a.item!=='solbang');
+      }
+      if(has('hongsi_tteok')&&!G.f.hongsiMade&&id==='inn'&&Math.abs(G.px-1530)<45)Rg.sendMedicine();
+      if(id==='warehouse'&&G.f.guard&&night()&&!G.boss.dead&&Math.abs(G.px-Rg.STORE_X)<24)Rg.startDokkaebi();
+      if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
+        G.f.jxHubChanged=true;diary('jx_hub','시루를 깨워 돌아오니 떡집 앞 멈췄던 줄이 줄었다. 모락의 김이 골목 끝까지 번졌다.');
+        toast('떡집 앞 줄이 줄었다. 밤에는 접힌 좌판 사이로 숙소에 갈 수 있다.');
+      }
+    },
+  });
+  const E=Rg.expEncounters;
+  Rg.zones={
+    entrance:{...common('entrance'),name:'장터 입구',w:2600,npcs:['nal'],
+      platforms:[...stairs(1040),...stairs(1980)],
+      pickups:cones('entrance',[[330,192],[355,192],[380,192]]),
+      exits:{right:{to:'street',toX:60}},
+      doors:[{x:2380,to:'street',toX:160,label:'붉은 차일 아래, 장터 거리로',draw:peg},
+        {x:1310,y:96,to:'street',toX:1010,toY:96,label:'연줄을 따라 처마 건너기',need:()=>!!G.f.jxKiteDone,reason:'연을 풀어 준 뒤 아이에게 안전한 처마길을 물어보자.',draw:peg,drawBlocked:shutter}],
+      wanderers:E.wanderers.entrance,examines:E.examines.entrance,
+      stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint}],
+    },
+    street:{...common('street'),name:'장터 거리',w:2800,npcs:['morak','yeotbang'],
+      platforms:[...stairs(430),{x:610,y:96,w:510},{x:1250,y:110,w:300},...stairs(2370),{x:2550,y:96,w:180}],
+      pickups:cones('street',[[830,192],[850,192],[875,192]]),
+      exits:{left:{to:'entrance',toX:2530},right:{to:'inn',toX:60}},
+      doors:[{x:120,to:'entrance',toX:2380,label:'깃발 보이는 입구로',draw:peg},
+        {x:1180,to:'street',toX:1310,toY:110,label:'떡집 문 열기',need:()=>!night(),reason:'앞문은 닫혔다. 오른쪽에 불 켜진 옆문이 있다.',draw:peg,drawBlocked:shutter},
+        {x:1590,to:'street',toX:1490,toY:110,label:'떡집 아궁이 옆문으로',draw:peg},
+        {x:1515,y:110,to:'street',toX:1625,label:'떡집 밖으로',draw:peg},
+        {x:1010,y:96,to:'entrance',toX:1310,toY:96,label:'연이 걸렸던 처마로 돌아가기',need:()=>!!G.f.jxKiteDone,reason:'입구에서 연을 풀어 준 뒤 걸어 보자.',draw:peg},
+        {x:2180,to:'pine',toX:70,label:'굴뚝 뒤 소나무 숲으로',draw:peg},
+        {x:2040,to:'inn',toX:1510,label:'접힌 좌판 사이, 숙소 지름길',need:night,reason:'낮에는 좌판이 골목을 막는다. 밤이면 접힌다.',draw:peg,drawBlocked:shutter},
+        {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'입구의 아이가 연을 풀면 처마길을 알려 준다.',draw:peg}],
+      wanderers:E.wanderers.street,examines:E.examines.street,
+    },
+    inn:{...common('inn'),name:'보부상 숙소',w:2600,npcs:['bueong','maru'],
+      platforms:[...stairs(1160),{x:1340,y:96,w:100},...stairs(1590,128),{x:1770,y:128,w:200},...stairs(2220)],
+      pickups:cones('inn',[[420,192],[445,192],[470,192]]),
+      exits:{left:{to:'street',toX:2720},right:{to:'warehouse',toX:60,need:needWarehouse,reason:warehouseReason,drawBlocked:gate}},
+      doors:[{x:700,to:'inn',toX:850,label:'숙소 문 열기',draw:peg},
+        {x:1120,to:'inn',toX:660,label:'숙소 마당으로',draw:peg},
+        {x:1510,to:'street',toX:2040,label:'밤 골목으로 돌아가기',need:night,reason:'낮에는 장터 좌판이 길을 막는다. 왼쪽 큰길로 돌아가자.',draw:peg,drawBlocked:shutter},
+        {x:2130,to:'warehouse',toX:280,label:'마루에서 보았던 푸른 창고문 안으로',need:needWarehouse,reason:warehouseReason,draw:gate}],
+      wanderers:E.wanderers.inn,examines:E.examines.inn,
+      stamps:[{id:'pillar',x:1280,y:128,note:'stamp:jangteo:pillar',draw:glint}],
+      vistas:[{id:'icicles',x:1850,y:128,from:0,to:420,sound:'wind',draw:peg,
+        thought:'고드름마다 지붕이 거꾸로 매달렸네.\n저 푸른 문은 어디로 이어질까.',
+        diary:'숙소 마루에서 고드름 너머 장터 지붕을 보았다. 처마 사이로 창고의 푸른 문이 보인다.',layers:Rg.expArt.innVista}],
+    },
+    pine:{...common('pine'),name:'뒷산 솔숲',w:2800,npcs:[],
+      platforms:[...stairs(420),...stairs(1100),...stairs(2180),{x:2390,y:96,w:340}],
+      pickups:cones('pine',[[250,192],[280,192],[310,192],[600,96],[630,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
+      doors:[{x:70,to:'street',toX:2180,label:'떡집 굴뚝을 향해 내려가기',draw:peg},
+        {x:2480,y:96,to:'street',toX:2650,toY:96,label:'등불 아래 장터 지붕으로',need:()=>!!G.f.jxKiteDone,reason:'처마길은 입구 아이에게 연을 돌려준 뒤 알려 달라고 하자.',draw:peg}],
+      exits:{left:{to:'street',toX:2180}},
+      get wanderers(){return night()?E.wanderers.pine:[];},examines:E.examines.pine,
+      stamps:[{id:'rock',x:2410,y:96,note:'stamp:jangteo:rock',draw:glint}],
+      vistas:[{id:'lantern_river',x:2570,y:96,from:0,to:420,sound:'wind',draw:peg,
+        get thought(){return night()?'등불이 강물처럼 흘러.\n엄마 방에도 하나 걸어 드릴까.':'깃발 아래서 김이 올라오네.\n아까 그 떡집이다.';},
+        diary:'뒷산 솔숲 꼭대기에서 장터를 내려다봤다. 굴뚝과 깃발이 길을 가리키고, 밤이면 등불이 강물처럼 이어진다.',layers:Rg.expArt.pineVista}],
+    },
+    warehouse:{...common('warehouse'),name:'창고 뒷길',w:2600,npcs:[],
+      platforms:[...stairs(460),...stairs(1230),...stairs(1840),...stairs(2340)],
+      pickups:cones('warehouse',[[700,192],[725,192],[750,192]]),
+      exits:{left:{to:'inn',toX:2490}},
+      doors:[{x:280,to:'inn',toX:2130,label:'지붕 사이, 숙소 불빛으로 돌아가기',draw:gate}],
+      examines:E.examines.warehouse,
+      drawActors(){
+        const x=Rg.STORE_X-cam;R(x-38,GROUND-58,76,58,'#493d3b');R(x-44,GROUND-62,88,5,'#243b48');R(x-44,GROUND-64,88,2,'#dbe8ed');
+        R(x-15,GROUND-41,30,41,'#222f3a');R(x-2,GROUND-41,3,41,'#678393');
+        if(!G.boss.dead){R(x-24,GROUND-27,4,5,'#72b4c7');R(x+22,GROUND-18,3,5,'#a8d4d6');}
+        else{R(x-21,GROUND-11,13,10,'#9b724c');R(x+9,GROUND-13,12,12,'#d1ab67');}
+      },
+    },
+  };
+  // 길손의 조사에는 배경과 구별되는 작고 일정한 표지를 쓴다. 숨은 도장은 표지를 붙이지 않는다.
+  for(const z of Object.values(Rg.zones))for(const p of z.examines)p.draw=p.draw||((x,y)=>{R(x-2,y-6,5,4,'#caa970');R(x,y-10,1,2,'#f6ead0');});
+}
 })();
