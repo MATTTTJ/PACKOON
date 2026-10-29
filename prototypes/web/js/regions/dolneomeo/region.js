@@ -1,6 +1,6 @@
 'use strict';
 /* 돌너머 마을 (2지역, 초겨울·첫서리): 지역 정보, 처음 상태, 아이템, 채집, 깨어나는 가보(증조할아버지의 맷돌).
-   흐름은 design/narrative/dolneomeo-scenario.md (제안). 원본 표: design/data/*.csv 의 dolneomeo 줄.
+   흐름은 design/narrative/dolneomeo-scenario.md (확정 웹 흐름·개발자 결정). 원본 표: design/data/*.csv 의 dolneomeo 줄.
    수치 가운데 표에 없던 것은 웹에서 임시로 정한 값이다 (표에 '제안'으로 적어 둠) */
 (()=>{
 const Rg=defineRegion('dolneomeo',{
@@ -16,7 +16,7 @@ const Rg=defineRegion('dolneomeo',{
       '아빠도 이 길을 지났을 것이다. 보따리 속 맷돌이 오늘따라 무겁다.']},
     get end(){return {kicker:'돌너머 마을 체험판 완료',head:'큰 장터로 가는 길',body:[
       '깨어난 맷돌로 서리다래를 갈아, 내 손으로 엄마의 약을 만들었다. 까치가 약즙 통을 물고 남쪽으로 날아갔다.',
-      Rg.arcs()?'약연의 글자는 “되돌림”이었다. 아빠는 그 말을 듣고 그날 밤 떠났다. 큰 장터에서 그 뒤의 길을 찾아보자.':'아빠는 약연의 글자 하나를 읽고 그날 밤 떠났다고 한다. 그 글자가 무엇이었을까. 큰 장터에 가면 알 수 있을지도 모른다.']}},
+      '약연의 글자는 “되돌림”이었다. 아빠는 그 말을 듣고 그날 밤 떠났다. 큰 장터에서 그 뒤의 길을 찾아보자.']}},
   },
   newState:()=>({
     pickups:[
@@ -54,8 +54,9 @@ const Rg=defineRegion('dolneomeo',{
   ],
 });
 
-/* 시험판은 지역에 들어온 뒤에도 주소·저장 상태를 읽는다. 옛 저장에는 플래그가 없어도 된다. */
-Rg.arcs=()=>/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
+/* 확장판은 채택된 사연을 기본으로 연다. 클래식 비교는 주소·저장 상태를 읽는다. */
+Rg.arcs=()=>!CLASSIC||/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
+Rg.homeReply='까치가 빈 약즙 통을 물고 돌아왔다. 통에는 엄마가 접은 천이 둘러져 있었다. 까치는 엄마가 통을 두 손으로 감싸고 고개를 끄덕였다고 했다.';
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({
