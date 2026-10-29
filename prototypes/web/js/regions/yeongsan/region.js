@@ -24,8 +24,7 @@ const Rg=defineRegion('yeongsan',{
     boss:{x:2120,dead:false},
     salg:{x:1480,home:1480,startle:0},   // 살금이: 귀를 세울 때 움직이면 달아난다
     f:{nalYTalk:false,nalYDone:false,seolpi:false,salgMet:false,salgDone:false,shortcut:false,
-      dadMet:false,dadDone:false,sangunMet:false,spring:false,fruitGot:false,nameGiven:false,yakDone:false,newName:'',
-      ...(/[?&]arcs=1\b/.test(location.search)?{arcs:true}:{})},
+      dadMet:false,dadDone:false,sangunMet:false,spring:false,fruitGot:false,nameGiven:false,yakDone:false,newName:''},
     rel:{salgeumi:{t:'호감',v:0},sangun:{t:'외경',v:0},nal:{t:'경멸',v:0}},
   }),
   weather:()=>Vfx.setWeather(G.f.spring?'':'snow'),
@@ -39,12 +38,8 @@ const Rg=defineRegion('yeongsan',{
   endStats:()=>[],
 });
 
-/* 지역을 다시 시작하거나 주소 없이 저장을 이어도 시험판 여부를 그때의 G에서 읽는다. */
-Rg.arcsEnabled=()=>{
-  const enabled=/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
-  if(enabled&&G&&G.f)G.f.arcs=true;
-  return enabled;
-};
+/* 사연 설정은 새 게임·저장 복원 때 정한 공통 판정을 따른다. */
+Rg.arcsEnabled=arcsEnabled;
 
 /* PA-43: 옛 배치와 저장은 classic 쪽에 남긴다. 공급은 기존 마가목 넷에 하나를 더한다. */
 if(!CLASSIC){

@@ -14,6 +14,13 @@ function jo(w,a,b){const c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return
 const TOUCH=matchMedia('(pointer:coarse)').matches;
 const HITKEY=TOUCH?'치기 버튼':'J 키';
 const CLASSIC=new URLSearchParams(location.search).get('classic')==='1';
+/* 새 게임은 확장판 사연을 기본으로 켠다. 이어서 할 때는 저장한 선택을 유지한다.
+   classic은 사연을 쓰지 않으며, 사연 칸이 없는 옛 저장은 현재 주소의 기본값을 따른다. */
+function arcsEnabled(g=G){
+  if(CLASSIC)return false;
+  if(typeof g?.f?.arcs==='boolean')return g.f.arcs;
+  return new URLSearchParams(location.search).get('arcs')!=='0';
+}
 
 /* ---------- 등록소 ---------- */
 /* 아이템: n(이름)·r(레어도 단계, 0부터)·d(설명)는 design/data/items.csv 에서 만든 js/data/tables.js 가 넣는다.
@@ -56,7 +63,7 @@ function baseState(){return{
   hp:5,maxhp:5,attackT:0,hurtT:0,cam:0,
   inv:{},tool:'pick',sharp:false,
   awake:Object.keys(HEIR).filter(k=>HEIR[k].awakeAtStart),   // 깨어난 가보
-  clues:[],diary:[],learned:[],nicknames:[],ledger:{},rel:{},f:{faints:0},   // learned: 수첩·아이의 기록에서 공유하는 발견 키
+  clues:[],diary:[],learned:[],nicknames:[],ledger:{},rel:{},f:{faints:0,arcs:arcsEnabled(null)},   // learned: 수첩·아이의 기록에서 공유하는 발견 키
 };}
 /* 지역에 들어간다. 지역의 newState() 가운데 inv 는 보따리에 더하고, rel 은 처음 만나는 NPC만 넣고,
    f(진행 표시)는 합친다. 나머지(필드에 놓인 것)는 새 지역 것으로 바꾼다 */
@@ -142,6 +149,7 @@ function rel(id,d){G.rel[id].v+=d;}
 const MOM_NOTE=['밥 잘 먹고','아빠 만나면','손 꼭 잡고 와.','엄마가 기다릴게.'];
 function normalizeTravelRecords(g){
   g.f=g.f||{};g.nicknames=Array.isArray(g.nicknames)?g.nicknames:[];g.learned=Array.isArray(g.learned)?g.learned:[];
+  g.f.arcs=arcsEnabled(g);
   if(!Number.isFinite(g.f.momNoteFade))g.f.momNoteFade=Math.max(0,(REGIONS[g.region]?.order||1)-1);
   if(g.started&&g.f.momNoteSeen===undefined)g.f.momNoteSeen=true;
   if(g.ended&&REGIONS[g.region]&&!REGIONS[g.region].next){g.f.momNoteFade=0;g.f.momNoteRestored=true;}

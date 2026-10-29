@@ -26,8 +26,7 @@ const Rg=defineRegion('dolneomeo',{
     digs:[{x:470,item:'eoksae',done:false},{x:560,item:'eoksae',done:false},{x:760,item:'eoksae',done:false},{x:1030,item:'eoksae',done:false}],
     boss:{x:1990,dead:false},
     f:{kkuTalk:false,kkuAwake:false,kkuDone:false,ppuriMet:false,ppuriPassed:false,nalDTalk:false,nalDDone:false,nalDBluff:false,
-      dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false,
-      ...(/[?&]arcs=1\b/.test(location.search)?{arcs:true}:{})},
+      dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false},
     rel:{kkubeogi:{t:'호감',v:0},dolsoe:{t:'신뢰',v:0},ppuri:{t:'의리',v:0},nal:{t:'경멸',v:0}},
   }),
   weather:()=>Vfx.setWeather('frost'),
@@ -54,8 +53,8 @@ const Rg=defineRegion('dolneomeo',{
   ],
 });
 
-/* 확장판은 채택된 사연을 기본으로 연다. 클래식 비교는 주소·저장 상태를 읽는다. */
-Rg.arcs=()=>!CLASSIC||/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
+/* 사연 설정은 새 게임·저장 복원 때 정한 공통 판정을 따른다. */
+Rg.arcs=arcsEnabled;
 Rg.homeReply='까치가 빈 약즙 통을 물고 돌아왔다. 통에는 엄마가 접은 천이 둘러져 있었다. 까치는 엄마가 통을 두 손으로 감싸고 고개를 끄덕였다고 했다.';
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
