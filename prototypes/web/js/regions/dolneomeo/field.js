@@ -71,6 +71,7 @@ Rg.drawPickup=(a,x,bob)=>{
   if(a.item==='memil'){R(x-1,a.y-6,1,6,'#9a7a52');R(x-2,a.y-8+bob,3,2,'#2b2522');R(x,a.y-9+bob,2,2,'#3a3330');R(x+1,a.y-7,2,1,'#7a9a5a');}
   else if(a.item==='gyeousari'){R(x-5,a.y-5+bob,10,5,'#6f9a4a');R(x-3,a.y-7+bob,6,2,'#5a8a3a');R(x-2,a.y-4+bob,2,2,'#f3e28a');R(x+2,a.y-3+bob,2,2,'#f3e28a');}
   else if(a.item==='seoridarae'){R(x-4,a.y-8+bob,4,4,'#8ab86a');R(x,a.y-8+bob,4,4,'#7fa860');R(x-2,a.y-4+bob,4,4,'#6f9850');R(x-3,a.y-7+bob,1,1,'#f4fbff');R(x+1,a.y-7+bob,1,1,'#f4fbff');R(x-1,a.y-11,2,3,'#5a4a2a');}
+  else if(!CLASSIC&&a.item==='seogi'){R(x-8,a.y-10,16,10,'#8a9791');R(x-6,a.y-11,12,2,'#e0e8dc');R(x-5,a.y-8,10,6,'#414d47');R(x-2,a.y-9,4,7,'#58655b');R(x+4,a.y-12+bob,1,1,'#fff1bf');}
 };
 /* 억새 무더기와 바위의 석이버섯 */
 Rg.drawDig=(d,x)=>{
@@ -143,9 +144,238 @@ Rg.bossDie=()=>{
 };
 Rg.onPickup=a=>{
   if(a.item==='seoridarae'&&!G.f.daraePicked){G.f.daraePicked=true;
-    clue('h2','아빠의 수첩',Rg.arcs()?'아빠의 젊은 시절 수첩에는 서리다래 그림이 없다. 지난가을 글자를 읽고 그날 밤 떠났다는 이야기는 돌쇠 할배에게 들었다.':'아빠의 수첩에는 서리다래가 없다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
-    diary('d_darae',Rg.arcs()?'서리다래를 내 기록에 그렸다. 아빠의 젊은 시절 수첩에는 이 열매가 없다. 지난가을 급히 떠난 일과는 나눠 적어 두자.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
+    clue('h2','아빠의 수첩',!CLASSIC||Rg.arcs()?'아빠의 젊은 시절 수첩에는 서리다래 그림이 없다. 지난가을 글자를 읽고 그날 밤 떠났다는 이야기는 돌쇠 할배에게 들었다.':'아빠의 수첩에는 서리다래가 없다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
+    diary('d_darae',!CLASSIC||Rg.arcs()?'서리다래를 내 기록에 그렸다. 아빠의 젊은 시절 수첩에는 이 열매가 없다. 지난가을 급히 떠난 일과는 나눠 적어 두자.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
     setTimeout(()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'),1600);refreshGoal();}
 };
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:2120,item:'seogi',done:false});};
+
+// 같은 출처에서 표시 모드만 바꿔 이어 할 때도 남은 필수 재료를 숨기지 않는다.
+if(CLASSIC){
+  const originalAmbient=Rg.ambient;
+  Rg.ambient=()=>{
+    if(G?.region===Rg.id&&[...G.pickups,...G.digs].some(p=>p.zone)){
+      const originalPickups=[[900,192],[945,192],[990,192],[1240,192],[1290,192],[1335,192],[670,118],[1412,118]];
+      const extraIds=['dol_memil_extra1','dol_memil_extra2','dol_memil_extra3','dol_mistletoe_extra','dol_memory_seogi'];
+      G.f.dolExtraPointState=G.f.dolExtraPointState||{};
+      G.pickups=G.pickups.filter(p=>{if(!extraIds.includes(p.id))return true;G.f.dolExtraPointState[p.id]={got:p.got};return false;});
+      for(const p of G.pickups){
+        const index=Number(p.id?.match(/^dol_old_pickup_(\d+)$/)?.[1]);
+        if(Number.isInteger(index)&&originalPickups[index]){[p.x,p.y]=originalPickups[index];}
+        if(p.item==='seoridarae'){p.x=2236;p.y=150;}
+        delete p.zone;
+      }
+      for(const d of G.digs){const index=Number(d.id?.match(/^dol_old_dig_(\d+)$/)?.[1]);if(Number.isInteger(index))d.x=[470,560,760,1030][index]??d.x;if(d.item==='seogi')d.x=2120;delete d.zone;}
+      G.boss.x=1990;G.zone=null;G.px=G.boss.dead?2150:G.f.ppuriPassed?1790:60;G.py=GROUND;G.vy=0;G.cam=clamp(G.px-168,0,2000);delete G.f.dolMemory;
+    }
+    originalAmbient();
+  };
+}
+
+/* PA-43 · 돌에 새긴 소원.
+   확인할 경험: 먼저 본 장승 안쪽 풍경에 들어가고, 돌의 옛길을 건너 돌아온다.
+   필수 교환·보스 조건은 그대로 두며, 옛 구성은 위 정의와 CLASSIC 분기로 보존한다. */
+if(!CLASSIC){
+  const A=Rg.expansionArt;
+  const originalNewState=Rg.newState,originalStart=Rg.onStart;
+  const pickupMap=[
+    ['field',640,192],['field',690,192],['field',740,192],
+    ['field',1790,192],['field',1840,192],['field',1890,192],
+    ['village',1920,112],['field',2040,112],
+  ];
+  const digMap=[['field',510],['field',930],['field',1710],['field',2310]];
+  function placeOld(g){
+    // 확장 전 저장도 got/done을 지킨 채 옮긴다. 새 저장에서는 다시 옮기지 않는다.
+    let pi=0,di=0;
+    for(const p of g.pickups){
+      if(p.zone)continue;
+      if(p.item==='seoridarae'){Object.assign(p,{id:'dol_darae',zone:'cliff',x:2780,y:112});continue;}
+      const at=pickupMap[pi++];if(at)Object.assign(p,{id:'dol_old_pickup_'+(pi-1),zone:at[0],x:at[1],y:at[2]});
+    }
+    for(const d of g.digs){
+      if(d.zone)continue;
+      if(d.item==='seogi'){Object.assign(d,{id:'dol_seogi',zone:'cliff',x:1920});continue;}
+      const at=digMap[di++];if(at)Object.assign(d,{id:'dol_old_dig_'+(di-1),zone:at[0],x:at[1]});
+    }
+    if(g.f?.dolExtraPointState)for(const p of g.pickups){const prior=g.f.dolExtraPointState[p.id];if(prior){p.got=prior.got;delete g.f.dolExtraPointState[p.id];}}
+    g.boss.x=2400;
+  }
+  Rg.newState=()=>{const s=originalNewState();placeOld(s);return s;};
+  Rg.onStart=()=>{originalStart();placeOld(G);toast('장승 안쪽은 아직 닫혔다. 오른쪽 돌담길이 마을로 이어진다.');};
+
+  const platform=(x,y,w)=>({x,y,w});
+  const bases={
+    gate:[platform(320,164,86),platform(374,136,76),platform(1320,164,94),platform(1390,136,88),platform(1608,174,60),platform(1680,156,80),platform(2020,112,90),platform(2160,154,90)],
+    village:[platform(520,164,94),platform(588,136,80),platform(1120,156,82),platform(1790,164,80),platform(1850,138,84),platform(1910,112,92),platform(2340,164,86),platform(2410,136,90)],
+    field:[platform(260,164,100),platform(330,136,85),platform(1180,164,92),platform(1240,136,88),platform(1900,164,86),platform(1960,138,90),platform(2020,112,88)],
+    cliff:[platform(320,164,92),platform(390,136,85),platform(790,164,110),platform(860,136,90),platform(1640,164,96),platform(1710,136,92),platform(2220,166,90),platform(2280,138,90),platform(2350,112,130),platform(2500,138,96),platform(2560,112,294)],
+    shrine:[platform(280,164,84),platform(340,136,96),platform(1520,112,110),platform(1630,140,80),platform(1950,164,90),platform(2010,136,98),platform(2590,164,80),platform(2650,136,90)],
+  };
+  const memories={
+    gate:{x:1800,end:2020,y:112,bridge:[platform(1796,166,58),platform(1844,140,70),platform(1910,140,116)],
+      say:['돌에 손을 대니, 끊긴 다리가 겹쳐 보인다.\n돌탑이 지금보다 낮았을 때의 길이다.','발밑의 흰 돌부터 밟아 보자.\n떨어져도 아래 돌담길로 돌아오면 된다.']},
+    shrine:{x:1120,end:1550,y:112,bridge:[platform(1120,166,62),platform(1172,140,80),platform(1240,140,140),platform(1370,140,150)],
+      say:['낮은 돌탑 너머로 옛 다리가 이어진다.\n아빠도 젊었을 때 이 길을 걸었을까.','끝의 높은 바위에 석이버섯이 보인다.\n돌다리를 건너 흰 돌턱으로 가 보자.']},
+  };
+  function applyMemory(){
+    const m=G.f.dolMemory,z=Rg.zones[G.zone],spec=memories[G.zone];
+    if(!z)return;
+    const active=m?.zone===G.zone&&!!spec;
+    if(spec)z.platforms=active?[...bases[G.zone],...spec.bridge]:bases[G.zone];
+    if(G.zone==='cliff')z.platforms=G.boss.dead?bases.cliff:bases.cliff.filter(p=>p.x<2200);
+    if(m&&!active)delete G.f.dolMemory;
+    if(active&&!vistaMode&&Sound.ambient!=='dol-memory')Sound.ambience('dol-memory');
+    if(!active&&Sound.ambient==='dol-memory')Sound.ambience(null);
+  }
+  function memoryTalk(zone){
+    const spec=memories[zone];
+    talk(spec.say.map(s=>['너구리',s]),()=>{
+      G.f.dolMemory={zone};applyMemory();
+      diary('dol_memory_teach','소원 돌에 손을 대니 옛 돌다리가 보였다. 흰 윗면을 밟으면 건널 수 있겠다. 아래에는 지금의 돌담길이 있어 다시 올라갈 수 있다.');
+      toast('흰 돌다리를 따라 건너자. 시간은 넉넉하다.');
+    });
+  }
+  function memoryStep(){
+    applyMemory();const spec=memories[G.zone];if(!spec||G.f.dolMemory?.zone!==G.zone)return;
+    if(G.px>=spec.end&&G.py<=spec.y+1){
+      G.f['dol_memory_'+G.zone]=true;delete G.f.dolMemory;applyMemory();
+      diary('dol_memory_'+G.zone,G.zone==='gate'?'옛 다리 끝의 서리 낀 바위에 닿자 지금의 길로 돌아왔다. 바위 아래로 새 돌담길이 보인다.':'소원 돌탑이 낮았던 때의 다리를 건넜다. 지금은 높은 바위만 남았다. 돌 틈에 쉬어 간 이들의 둥근 자국이 있다.');
+      toast('옛 다리가 걷히고, 지금의 바위에 발이 닿았다.');
+    }else if(G.px<spec.x-40||G.px>spec.end+150){delete G.f.dolMemory;applyMemory();}
+  }
+  const marker=(x,y)=>{R(x-1,y-24,2,24,'#675443');R(x-11,y-25,23,7,'#e5ddc8');R(x+6,y-23,3,3,'#516b71');};
+  const memoryMark=(x,y)=>{R(x-8,y-11,16,11,'#7f8987');R(x-5,y-15,10,4,'#b1b9b3');R(x-4,y-16,8,1,'#eef1df');R(x-1,y-10,3,5,'#b78159');};
+  const blocked=(x,y)=>A.drawBlocked(x,y);
+  const permit=()=>!!G.f.ppuriPassed;
+  const calm=()=>!!G.boss.dead;
+  const gateReason='뿔이에게 메밀가루를 건네 장승제를 올려야 한다.';
+  let depthFx=null;
+  const travel=el('div');travel.id='dolDepthTravel';travel.hidden=true;travel.style.cssText='pointer-events:none';$('shell').appendChild(travel);
+  defineMinigame({id:travel.id,hit:()=>{},step:()=>{
+    if(!depthFx){travel.hidden=true;return;}
+    depthFx.tick++;
+    if(depthFx.tick>=TABLES.TUNING.zone_transition_frames){
+      const p=depthFx.door;travel.hidden=true;depthFx=null;
+      changeZone(p.to,{x:p.toX,y:p.toY});
+    }
+  }});
+  function enterDepth(p){
+    if(!pathOpen(p)){toast(p.reason);return;}
+    const image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);
+    depthFx={door:p,tick:0,image,pivot:Math.round(p.x-G.cam)};suppressHeldInputs();travel.hidden=false;
+  }
+  function specialInteract(e){
+    if(REG!==Rg||!usesZones(Rg)||paused())return;
+    const p=nearInteraction();if(!p||(!p.memory&&!p.depth))return;
+    e.preventDefault();e.stopImmediatePropagation();
+    if(e.type==='keydown')suppressedKeys.add(e.key.toLowerCase());
+    if(p.memory)memoryTalk(G.zone);else enterDepth(p);
+  }
+  addEventListener('keydown',e=>{
+    if(e.repeat||!['e','enter','arrowup'].includes(e.key.toLowerCase()))return;
+    if(e.target instanceof HTMLElement&&(e.target.matches('input,textarea,select')||e.target.isContentEditable))return;
+    specialInteract(e);
+  },true);
+  $('padTalk').addEventListener('pointerdown',specialInteract,true);
+  $('prompt').addEventListener('click',specialInteract,true);
+
+  function drawStonePlatforms(id){
+    for(const p of Rg.zones[id].platforms){const x=Math.round(p.x-cam);if(x>W||x+p.w<0)continue;
+      const remembered=G.f.dolMemory?.zone===id&&memories[id]?.bridge.includes(p);
+      if(remembered){R(x,p.y,p.w,6,'#8d9690');A.drawMemoryBridge(x,p.y,p.w);continue;}
+      R(x,p.y,p.w,6,'#737e7d');R(x,p.y,p.w,2,'#e2e9e4');R(x+2,p.y+6,p.w-4,3,'#535f60');
+      for(let k=13;k<p.w;k+=23)R(x+k,p.y+2,1,5,'#4b595b');
+    }
+  }
+  function front(id){
+    A.drawFront(id);
+    if(G.f.dolMemory?.zone===id){
+      ctx.save();ctx.globalAlpha=.66;ctx.filter='grayscale(1)';ctx.drawImage(cv,0,0);ctx.filter='none';ctx.globalAlpha=.18;R(0,0,W,H,'#d6cdb7');ctx.restore();
+      // 기억은 현재 지형 위에 겹친다. 돌아올 바닥과 발판의 흰 면은 가리지 않는다.
+      for(let i=0;i<7;i++)R((i*71+Math.round(cam*.12))%W,38+i*17,38,1,'rgba(235,229,207,.38)');
+    }
+    if(depthFx){
+      const t=depthFx.tick/TABLES.TUNING.zone_transition_frames;
+      ctx.save();ctx.imageSmoothingEnabled=false;
+      if(!Vfx.reducedMotion){const s=depthFx.door.reverse?1-.13*t:1+.18*t;ctx.translate(depthFx.pivot,H*.72);ctx.scale(s,s);ctx.drawImage(depthFx.image,-depthFx.pivot,-H*.72);ctx.setTransform(1,0,0,1,0,0);
+        const spread=Math.round(t*48);A.drawDepthGate(depthFx.pivot,GROUND,spread);}
+      ctx.globalAlpha=t;R(0,0,W,H,'#344247');ctx.restore();
+    }
+  }
+  function commonStep(id){
+    memoryStep();if(Rg.arcs())G.f.arcs=true;
+    if(!G.f.dolSeenZones)G.f.dolSeenZones={};G.f.dolSeenZones[id]=true;
+    if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>2310)Rg.startGolem();
+    if(has('darae_yak')&&!G.f.yakMade&&id==='village'&&Math.abs(G.px-2080)<42)Rg.sendMedicine();
+  }
+  function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
+    weather:()=>Vfx.setWeather('frost'),ambient:()=>{placeOld(G);Rg.ambient();applyMemory();},
+    drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);drawStonePlatforms(id);},
+    drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
+    weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),
+    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?2240:80;G.py=GROUND;G.vy=0;delete G.f.dolMemory;applyMemory();toast('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
+  };}
+  Rg.startZone='gate';
+  Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2800,[])};
+  Rg.zones.gate.exits={right:{to:'village',toX:80}};
+  Rg.zones.village.exits={left:{to:'gate',toX:2320},right:{to:'field',toX:80}};
+  Rg.zones.field.exits={left:{to:'village',toX:2720}};
+  Rg.zones.cliff.exits={right:{to:'shrine',toX:80}};
+  Rg.zones.shrine.exits={left:{to:'cliff',toX:2920}};
+  Rg.zones.gate.doors=[
+    {id:'dol_depth_gate',depth:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:(x,y)=>A.drawDepthGate(x,y),drawBlocked:blocked},
+    {id:'dol_memory_gate',memory:true,x:1800,to:'gate',toX:1800,label:'소원 돌에 손대기 · 옛 다리',draw:memoryMark},
+  ];
+  Rg.zones.village.doors=[{id:'dol_depth_shrine',depth:true,x:2440,to:'shrine',toX:100,label:'돌계단 안쪽, 성황당으로 · ↑ / E',need:permit,reason:gateReason,draw:marker,drawBlocked:blocked}];
+  Rg.zones.cliff.doors=[
+    {id:'dol_depth_back',depth:true,reverse:true,x:100,to:'gate',toX:1650,label:'장승 고갯길로 돌아가기 · E',draw:marker},
+    {id:'dol_darae_path',depth:true,x:2160,to:'cliff',toX:2240,label:'골렘이 비켜 준 다래길',need:calm,reason:'성황당 돌무더기가 절벽 위 길을 흔든다. 성황당에서 먼저 잠재우자.',draw:marker,drawBlocked:blocked},
+  ];
+  // 다래길은 발판만으로 우회하지 못하게 한다. 아래길에서 성황당 출구까지는 항상 안전하다.
+  const cliffBases=bases.cliff;
+  Rg.zones.cliff.step=()=>{Rg.zones.cliff.platforms=G.boss.dead?cliffBases:cliffBases.filter(p=>p.x<2200);commonStep('cliff');};
+  Rg.zones.shrine.doors=[
+    {id:'dol_depth_village',depth:true,reverse:true,x:100,to:'village',toX:2440,label:'돌담 마을로 돌아가기 · E',draw:marker},
+    {id:'dol_memory_shrine',memory:true,x:1120,to:'shrine',toX:1120,label:'낮은 소원 돌에 손대기 · 옛 다리',draw:memoryMark},
+    {id:'dol_after_golem',depth:true,x:2630,to:'cliff',toX:2630,toY:112,label:'아까 본 절벽 끝으로 · E',need:calm,reason:'돌무더기가 가라앉으면 절벽 끝으로 이어진다.',draw:marker,drawBlocked:blocked},
+  ];
+  // 필수 물건은 선택 발견에 기대지 않는다. 기존 여섯 알·두 가지에 정확히 +3/+1.
+  Rg.zones.field.pickups=[{id:'dol_memil_extra1',x:790,y:192,item:'memil',got:false},{id:'dol_memil_extra2',x:1940,y:192,item:'memil',got:false},{id:'dol_memil_extra3',x:1990,y:192,item:'memil',got:false}];
+  Rg.zones.gate.pickups=[{id:'dol_mistletoe_extra',x:2060,y:112,item:'gyeousari',got:false}];
+  Rg.zones.shrine.pickups=[{id:'dol_memory_seogi',x:1580,y:112,item:'seogi',got:false}];
+  Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'서리가 다 반짝여.\n엄마도 이 해를 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:marker,layers:A.cliffLayers}];
+  Rg.zones.shrine.vistas=[{id:'wishing_stones',x:1850,from:40,to:390,sound:'wind',thought:'돌마다 소원이 하나씩일까.\n엄마 몫도 놓고 가야지.',diary:'성황당 돌탑 아래에서 바람을 들었다. 작은 돌들이 서로를 받치고 있었다.',draw:marker,layers:A.shrineLayers}];
+
+  // story.js가 NPC와 콜백을 모두 등록한 뒤 한 번 호출한다.
+  Rg.installExpansion=()=>{
+    const loc={kkubeogi:['field',1510],dolsoe:['village',1080],nal:['village',1640],ppuri:['gate',610]};
+    for(const n of Rg.npcs){const at=loc[n.id];n.zone=at[0];n.x=at[1];}
+    const oldBossDie=Rg.bossDie;
+    Rg.bossDie=()=>{oldBossDie();placeOld(G);};
+    Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.id==='dol_seogi'))G.digs.push({id:'dol_seogi',zone:'cliff',x:1920,item:'seogi',done:false});};
+    Rg.startGolem=()=>{
+      G.px=2275;
+      inkTransition('전투',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
+        if(res==='win'||res==='calm'){
+          if(res==='calm'){G.f.golemCalm=true;diary('d_calm','아빠가 올리다 만 소원 돌을 성황당 꼭대기에 대신 올려 주었다. 돌 골렘이 조용히 내려앉았다.');}
+          Rg.bossDie();
+        }else{G.px=2240;G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');toast('성황당 앞에서 숨을 골랐다. 준비되면 다시 다가가자.');}
+      }));
+    };
+    Rg.sendMedicine=()=>{
+      G.f.yakMade=true;
+      diary('d_end','깨어난 맷돌로 서리다래를 갈았다. 마을 돌담의 늙은 까치에게 내가 만든 약즙을 맡겼다.');
+      talk([['너구리','까치야, 엄마 약이야.\n남쪽 단풍골 너머 우리 집으로 부탁해.'],['늙은 까치','남쪽 집으로. 단단히 묶었구나.\n다녀오마.']],()=>{takeItem('darae_yak',1);endGame();});
+    };
+    const oldGoal=Rg.goal;
+    Rg.goal=()=>{
+      if(!G.started||G.ended)return oldGoal();
+      if(has('darae_yak'))return '마을 돌담의 늙은 까치에게 약즙 맡기기 · 성황당 입구로 돌아가면 마을';
+      if(!G.f.kkuTalk)return '돌담 마을을 지나 오른쪽 메밀밭의 꾸벅이 찾아가기';
+      if(G.f.ppuriPassed&&!G.boss.dead)return '장승 사이 또는 마을 돌계단 안쪽 → 성황당 끝의 돌 골렘';
+      if(G.boss.dead&&!G.f.daraePicked)return '성황당 끝 샛길 → 절벽 위의 서리다래 · 흰 돌턱을 밟자';
+      return oldGoal();
+    };
+  };
+}
 })();
