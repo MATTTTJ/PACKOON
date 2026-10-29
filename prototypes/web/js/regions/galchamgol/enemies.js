@@ -1,5 +1,5 @@
 'use strict';
-/* 갈참골 전투: 엉킨 칡(보스)과 무쇠의 시험(NPC 전투). 원본 표: design/data/bosses.csv · boss_parts.csv */
+/* 단풍골 전투: 엉킨 칡(보스)과 무쇠의 시험(NPC 전투). 원본 표: design/data/bosses.csv · boss_parts.csv */
 (()=>{
 function drawKudzu(c){
   const cx=LW/2,cy=EY;const arm=part('arm'),root=part('root'),core=part('core');
