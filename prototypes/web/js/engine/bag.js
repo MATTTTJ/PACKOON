@@ -124,7 +124,7 @@ function renderBag(pop){
   const tx=el('div','txt');tx.appendChild(el('span','state',awake?'깨어난 가보':'잠든 가보'));
   tx.appendChild(el('div','title',Hr.title));tx.appendChild(el('div','gen',Hr.gen));tx.appendChild(el('div','story',Hr.story));
   if(!awake&&Hr.hint)tx.appendChild(el('div','hint',Hr.hint));
-  card.appendChild(tx);const seal=el('span','seal','너');seal.setAttribute('aria-label','너구리 집안 낙관');card.appendChild(seal);
+  card.appendChild(tx);const seal=el('span','seal','流');seal.setAttribute('aria-label','답을 찾아 흘러가는 집의 낙관, 유');card.appendChild(seal);
   wrap.appendChild(card);
   if(awake&&knows(TABLES.CRAFT[pouch.tool].habitKey))wrap.appendChild(el('p','craft-habit',TABLES.CRAFT[pouch.tool].habit));
   const bench=el('div','bench');

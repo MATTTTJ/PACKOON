@@ -14,6 +14,45 @@
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
 let B=null,inkOn=false,LW=800,LH=450,BOX={x:250,y:262,w:300,h:160},EY=118;const BDPR=2;
 let paper=null;
+/* 탈은 손놀림만 바꾼다. 옛 저장의 획득 목록이 없으면 맨손으로 시작한다. */
+const BATTLE_MASK_NAMES={'':'맨손',choraengi:'초랭이탈',gaksi:'각시탈'};
+const ownsBattleMask=id=>!id||(G&&Array.isArray(G.f.battleMasks)&&G.f.battleMasks.includes(id));
+function battleMask(){const id=G&&G.f.battleMask;return B&&!B.E.dodge&&!B.noTool&&ownsBattleMask(id)&&BATTLE_MASK_NAMES[id]?id:'';}
+function battleHandProfile(){
+  const id=battleMask(),prefix='battle_'+(id||'bare')+'_',t=TABLES.TUNING;
+  return {speed:t[prefix+'speed'],cooldown:t[prefix+'cooldown'],radius:t[prefix+'radius']};
+}
+function setBattleMask(id){
+  if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.E.dodge||B.noTool||!Object.hasOwn(BATTLE_MASK_NAMES,id)||!ownsBattleMask(id))return false;
+  G.f.battleMask=id;renderBattleMasks();return true;
+}
+function battleMaskKey(key){
+  if(!B||!['0','1','2'].includes(key))return false;
+  setBattleMask(key==='1'?'choraengi':key==='2'?'gaksi':'');return true;
+}
+function renderBattleMasks(){
+  if(!B)return;
+  let wrap=$('bMasks');
+  if(!wrap){
+    wrap=el('div','b-masks');wrap.id='bMasks';
+    const buttons=el('div','b-mask-buttons');buttons.setAttribute('aria-label','전투 탈');
+    Object.entries(BATTLE_MASK_NAMES).forEach(([id,name],i)=>{const button=el('button','bbtn',i+' · '+name);button.type='button';button.dataset.mask=id;
+      button.appendChild(el('small','b-mask-trait',id==='choraengi'?'빠름 · 좁음':id==='gaksi'?'느림 · 넓음':'기본 손놀림'));
+      button.onclick=()=>setBattleMask(id);buttons.appendChild(button);});
+    wrap.appendChild(buttons);const hint=el('p','small');hint.id='bMaskHint';wrap.appendChild(hint);
+    $('bHit').parentElement.parentElement.appendChild(wrap);
+  }
+  // 세로 화면에서는 공격 상자 아래 여백에 놓아 적 그림과 예고 글을 가리지 않는다.
+  const parent=TOUCH&&matchMedia('(orientation:portrait)').matches?$('battle'):$('bHit').parentElement.parentElement;
+  if(wrap.parentElement!==parent)parent.appendChild(wrap);
+  wrap.querySelectorAll('button').forEach(button=>{
+    const id=button.dataset.mask;button.disabled=!!(B.E.dodge||B.noTool||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace')||!ownsBattleMask(id);
+    button.setAttribute('aria-pressed',id===battleMask());
+  });
+  $('bMaskHint').textContent=B.E.dodge?'이번 시험은 연장 없이 피하기.':battleMask()==='choraengi'?'초랭이탈 · 빠른 손과 걸음, 좁은 되치기':battleMask()==='gaksi'?'각시탈 · 넓게 닿는 손, 느린 걸음':'맨손 · 익숙한 손놀림';
+  if(Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe')&&!B.E.dodge)$('bMaskHint').textContent+=' · 돌·얼음은 곡괭이 자동 사용';
+}
+function battlePickaxe(p){return !!(p&&!B.E.npc&&!B.noTool&&Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe')&&['stone','ice'].includes(p.material));}
 /* 부위의 id·이름·내구도·부수면 얻는 것·핵심 여부는 design/data/boss_parts.csv (js/data/tables.js) 에서,
    공격 종류(atk)와 예고 글(tell)은 지역 코드에서 받아 합친다. 순서는 표 순서 */
 function tableParts(boss,extra){return TABLES.BOSS_PARTS[boss].map(p=>Object.assign({},p,extra[p.id]));}
@@ -31,7 +70,7 @@ function blayout(){
   if(B){if(hand){B.px=BOX.x+hand.u*BOX.w;B.py=BOX.y+hand.v*BOX.h;}
     B.px=clamp(B.px,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py,BOX.y+8,BOX.y+BOX.h-8);}
 }
-addEventListener('resize',()=>{if(B)blayout();});
+addEventListener('resize',()=>{if(B){blayout();renderBattleMasks();}});
 
 /* 필드에서 전투로 넘어가는 먹물 번짐. sx 는 번지기 시작하는 가로 위치(%) */
 function inkTransition(text,sx,cb){
@@ -46,7 +85,7 @@ function startBattle(kind,onEnd){
   closePanels();$('dlg').hidden=true;
   B={kind,E,parts:E.parts.map(p=>Object.assign({},p,{max:p.hp,broken:false,shake:0})),calm:0,
     px:0,py:0,inv:0,st:'intro',t:90,cur:null,last:null,mark:null,bullets:[],fx:[],cool:0,swing:0,atkT:0,atkDur:0,
-    loot:[],msg:E.intro,onEnd,paused:false,time:0,result:null,firstHit:true,hits:0,hitThis:false,survived:0,noTool:false,toolFly:null,bonk:0,bonus:''};
+    loot:[],msg:E.intro,onEnd,paused:false,time:0,result:null,firstHit:true,hits:0,hitThis:false,survived:0,noTool:false,toolFly:null,bonk:0,bonus:'',autoToolT:0};
   document.body.classList.add('in-battle');$('battle').hidden=false;
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
   if(E.cover){B.covers=[];B.round=0;addCover(0.5,0.43);}
@@ -84,6 +123,7 @@ function renderBHud(){
   }
   $('bHearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('');
   $('bCalm').style.width=B.calm+'%';
+  renderBattleMasks();
 }
 function bLiving(){return B.parts.filter(p=>!p.broken);}
 /* 핵심 부위는 다른 부위를 하나도 못 꺾었을 때 가려져 있다. 상대에 coreNeeds:'<부위 id>' 가 있으면 그 부위를 꺾어야 드러난다 */
@@ -210,7 +250,7 @@ function bStrike(){
   if(B.E.vinePath&&B.st==='tell'){grabVine();return;}
   if(B.cool>0)return;
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
-  B.cool=16;B.swing=12;
+  B.cool=battleHandProfile().cooldown;B.swing=12;
   const r=B.returnItem;
   if(r&&r.active&&B.st==='open'){
     const source=coverPoint(r),home=coverPoint({u:r.homeU,v:r.homeV});
@@ -237,13 +277,15 @@ function bStrike(){
     }
   }
   const m=B.mark;
-  if(m&&Math.hypot(m.x-B.px,m.y-B.py)<26){
+  if(m&&Math.hypot(m.x-B.px,m.y-B.py)<battleHandProfile().radius){
     B.calmStone=null;
     if(B.returnItem){B.returnItem.active=false;B.returnItem.held=false;}
     if(B.warm)B.warm.ice=null;
-    const p=m.part;const dmg=(G.sharp&&!B.E.npc)?2:1;p.hp=Math.max(0,p.hp-dmg);p.shake=16;bSplash(m.x,m.y);B.mark=null;
+    const p=m.part,pickaxe=battlePickaxe(p),t=TABLES.TUNING;
+    const dmg=(G.sharp&&!B.E.npc?t.battle_sharp_damage:t.battle_base_damage)+(pickaxe?t.battle_pickaxe_bonus:0);
+    B.autoToolT=pickaxe?12:0;p.hp=Math.max(0,p.hp-dmg);p.shake=16;bSplash(m.x,m.y);B.mark=null;
     if(p.hp>0)Sound.playSfx('battle_hit');
-    if(p.hp<=0)breakPart(p);else B.msg=jo(p.name,'을','를')+' 쳤다! 내구도가 깎였다.';
+    if(p.hp<=0)breakPart(p);else B.msg=(pickaxe?'곡괭이로 ':'')+jo(p.name,'을','를')+' 쳤다! 내구도가 깎였다.';
     renderBHud();
   }else{B.msg=m?'조금 더 가까이! 손이 표식 안에 들어가야 맞는다.':'아직 빈틈이 없다. 피하면서 붉은 표식을 기다리자.';}
 }
@@ -274,6 +316,7 @@ function bStep(){
   // 손을 살피는 동안 전투 시간과 탄을 함께 멈춘다. 진정 수치는 바꾸지 않는다.
   if(B.handShow>0){if(--B.handShow===0){B.msg=B.handMsg;openGift();}return;}
   B.time++;if(B.inv>0)B.inv--;if(B.cool>0)B.cool--;if(B.swing>0)B.swing--;
+  if(B.autoToolT>0)B.autoToolT--;
   if(B.covers)B.covers.forEach(r=>{if(r.flash>0)r.flash--;});
   if(B.returnEcho&&--B.returnEcho.t<=0)B.returnEcho=null;
   if(B.scentKnot&&--B.scentKnot.t<=0)B.scentKnot=null;
@@ -284,7 +327,8 @@ function bStep(){
     if(keys['arrowleft']||keys['a']||touch.left)dx-=1;if(keys['arrowright']||keys['d']||touch.right)dx+=1;
     if(keys['arrowup']||keys['w']||touch.up)dy-=1;if(keys['arrowdown']||keys['s']||touch.down)dy+=1;
     if(dx&&dy){dx*=0.72;dy*=0.72;}
-    B.px=clamp(B.px+dx*2.7,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*2.7,BOX.y+8,BOX.y+BOX.h-8);
+    const speed=battleHandProfile().speed;
+    B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);
   }
   if(B.E.vinePath)moveVine();
   B.parts.forEach(p=>{if(p.shake>0)p.shake--;});
@@ -356,7 +400,7 @@ function progressShortage(inv){
 function openGift(){
   if(!B||B.handShow>0||B.st==='end'||B.st==='giftPlace'||!$('bResult').hidden)return;
   if(B.E.forgeTrial&&!B.handShown){
-    B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';return;
+    B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';renderBattleMasks();return;
   }
   if(B.E.vinePath)bDrag=null;
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
@@ -368,8 +412,9 @@ function openGift(){
     if(taste&&knows('like:'+B.kind+':'+id))b.appendChild(el('span','small',taste.kind));
     b.onclick=()=>giveGift(id);g.appendChild(b);});
   $('bGiftMenu').hidden=false;
+  renderBattleMasks();
 }
-function closeGift(){$('bGiftMenu').hidden=true;if(B)B.paused=false;}
+function closeGift(){$('bGiftMenu').hidden=true;if(B){B.paused=false;renderBattleMasks();}}
 function giveGift(id){
   if(!B||!B.paused||B.st==='end'||!has(id))return;
   const taste=tasteOf(B.kind,id);
@@ -433,7 +478,8 @@ $('bResOk').onclick=()=>{
 let bDrag=null;
 bcv.addEventListener('pointerdown',e=>{if(!B)return;if(B.E.vinePath&&(B.paused||B.handShow>0||B.st==='end'||bDrag))return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={pointerId:e.pointerId,x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
 bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||(B.E.vinePath&&e.pointerId!==bDrag.pointerId))return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
-  B.px=clamp(B.px+dx,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy,BOX.y+8,BOX.y+BOX.h-8);if(B.E.vinePath)moveVine();});
+  const speed=battleHandProfile().speed/TABLES.TUNING.battle_bare_speed;
+  B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);if(B.E.vinePath)moveVine();});
 function endDrag(e){if(e&&B&&B.E.vinePath&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;if(!e)vinePointers.clear();}bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
 bcv.addEventListener('lostpointercapture',e=>{if(B&&B.E.vinePath)endDrag(e);});
 
@@ -447,20 +493,29 @@ function drawTool(c,kind){
 }
 function drawPaw(c,x,y){
   if(!B.handShow&&B.inv>0&&Math.floor(B.inv/5)%2)return;
-  const tool=heldTool();
+  const mask=battleMask(),wide=mask==='gaksi'?1.25:mask==='choraengi'?0.82:1;
+  const near=B.mark&&Math.hypot(B.mark.x-B.px,B.mark.y-B.py)<battleHandProfile().radius;
+  const tool=B.E.dodge&&!B.noTool?heldTool():B.autoToolT>0||(near&&battlePickaxe(B.mark.part))?'pickaxe':null;
   c.save();c.translate(x,y);c.scale(1.6,1.6);
-  if(!B.noTool&&!B.handShow){
+  if(tool&&!B.noTool&&!B.handShow){
     const a=B.swing>0?(-1.5+(1-B.swing/12)*2.5):-0.35;
     c.save();c.translate(5,-3);c.rotate(a);drawTool(c,tool);c.restore();
   }
   // 손목
   blob(c,7,11,6.5,6,'#3a322b');
+  if(mask){
+    brush(c,[[2,14],[8,16],[13,11]],mask==='gaksi'?4:2,INK);
+    brush(c,[[3,13],[8,15],[12,11]],1.5,RED);
+    if(mask==='gaksi')blob(c,7,14,1.8,1.8,'#efe3c8');
+  }
+  c.save();c.scale(wide,mask==='choraengi'?1.12:1);
   // 손바닥 (오동통한 너구리 손)
   blob(c,0,2,9.5,8.5,'#4a4038');
   for(let i=0;i<4;i++)blob(c,-7.2+i*4.8,-6.2+(i===0||i===3?1.4:0),3.3,3.8,'#4a4038');
   blob(c,0.5,3.5,4.6,3.6,'#b9a38f');
   for(let i=0;i<4;i++)blob(c,-7.2+i*4.8,-6.4+(i===0||i===3?1.4:0),1.7,1.9,'#b9a38f');
   c.strokeStyle=INK;c.lineWidth=1.3;c.beginPath();c.ellipse(0,2,9.5,8.5,0,0,Math.PI*2);c.stroke();
+  c.restore();
   if(B.swing>0&&!B.handShow){c.strokeStyle=INK;c.lineWidth=2;c.globalAlpha=B.swing/12;c.beginPath();c.arc(4,-6,20+(12-B.swing),-1.9,0.4);c.stroke();}
   c.restore();
 }
@@ -498,11 +553,11 @@ function bDraw(){
   if(B.calmStone){if(B.E.calmAction.kind==='knot')drawCalmKnot(c);else drawWishStone(c);}
   if(B.scentKnot)drawScentKnot(c);
   if(B.returnItem||B.returnEcho)drawReturnedObject(c);
-  if(B.mark){const m=B.mark;const pulse=1+Math.sin(B.time*0.25)*0.08;c.save();c.translate(m.x,m.y);c.scale(pulse,pulse);
-    c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.arc(0,0,20,-Math.PI/2,-Math.PI/2+Math.PI*2*(m.t/m.max));c.stroke();
-    c.fillStyle='rgba(180,67,42,.16)';c.beginPath();c.arc(0,0,17,0,Math.PI*2);c.fill();
+  if(B.mark){const m=B.mark,radius=battleHandProfile().radius;c.save();c.translate(m.x,m.y);
+    c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.arc(0,0,radius,-Math.PI/2,-Math.PI/2+Math.PI*2*(m.t/m.max));c.stroke();
+    c.fillStyle='rgba(180,67,42,.16)';c.beginPath();c.arc(0,0,radius-3,0,Math.PI*2);c.fill();
     c.fillStyle=RED;c.font='bold 15px "Gowun Batang", serif';c.textAlign='center';c.textBaseline='middle';c.fillText(m.part.name[0],0,1);c.restore();
-    const near=Math.hypot(m.x-B.px,m.y-B.py)<26;const lab=near?(TOUCH?'지금 치기!':'지금 J!'):(TOUCH?'치기':'J');
+    const near=Math.hypot(m.x-B.px,m.y-B.py)<radius;const lab=near?(TOUCH?'지금 치기!':'지금 J!'):(TOUCH?'치기':'J');
     c.save();c.font='bold 13px "Gowun Dodum", sans-serif';const tw=c.measureText(lab).width+12;const ly=m.y+(m.y>BOX.y+BOX.h-46?-44:30);
     c.fillStyle=near?RED:'rgba(255,250,238,.95)';c.strokeStyle=near?RED:INK;c.lineWidth=1.5;c.beginPath();c.rect(m.x-tw/2,ly-10,tw,20);c.fill();c.stroke();
     c.fillStyle=near?'#fff6e8':INK;c.textAlign='center';c.textBaseline='middle';c.fillText(lab,m.x,ly+1);c.restore();}

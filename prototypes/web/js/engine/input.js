@@ -15,6 +15,8 @@ const isRight=()=>keys['arrowright']||keys['d']||touch.right;
 addEventListener('keydown',e=>{
   if(e.target instanceof HTMLElement&&(e.target.matches('input,textarea,select')||e.target.isContentEditable))return;
   const k=e.key.toLowerCase();
+  // 탈·닫기 등 실제 버튼을 키보드로 누를 때 뒤의 공격·대화 입력을 함께 실행하지 않는다.
+  if(e.target instanceof HTMLButtonElement&&(k==='enter'||k===' '))return;
   if(suppressedKeys.has(k)){e.preventDefault();return;}
   if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
   const first=!keys[k];keys[k]=true;
@@ -36,12 +38,13 @@ addEventListener('pointercancel',releaseInputs);
 
 function onPress(k){
   if(vistaMode){endVista();return;}
-  if(zoneFade>0)return;
+  if(zoneFade>0||zoneMotion)return;
   if(k==='m'){Sound.toggle();return;}
   if(!G.started||G.ended)return;
   if(B){
     if(!$('bResult').hidden){if(k==='enter'||k==='e'||k===' ')$('bResOk').click();return;}
     if(B.paused){if(k==='escape'||k==='k'||k==='c')closeGift();return;}
+    if(battleMaskKey(k))return;
     if(k==='j'||k==='x'||k===' '||k==='enter')bStrike();else if(k==='k'||k==='c')openGift();return;
   }
   if(inkOn)return;
@@ -63,7 +66,7 @@ function onPress(k){
 }
 function padAction(k){
   if(vistaMode){endVista();return;}
-  if(zoneFade>0)return;
+  if(zoneFade>0||zoneMotion)return;
   if(!G.started||G.ended)return;
   if(B){if(!$('bResult').hidden){if(k==='atk')$('bResOk').click();return;}if(B.paused)return;if(k==='atk')bStrike();else if(k==='jump')openGift();return;}
   if(inkOn)return;

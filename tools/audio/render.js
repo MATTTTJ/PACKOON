@@ -50,6 +50,12 @@ function validate(data) {
     } else assert(!track.intro, `${track.id}: one-shot must not have an intro/loop split`);
   }
   assert(!data.score.tracks.find(t => t.id === 'ending').loop, 'Ending must not loop');
+  for (const [destination, bridgeId] of Object.entries(data.score.travelInterludes || {})) {
+    assert(ids.has(destination), `Travel destination is missing: ${destination}`);
+    const bridge = data.score.tracks.find(t => t.id === bridgeId);
+    assert(bridge && !bridge.loop && !bridge.intro && bridge.measures >= 2 && bridge.measures <= 4, `${destination}: travel interlude must be a 2–4 measure one-shot`);
+    assert(bridge.voices.length === 1 && bridge.voices[0].instrument === 'gayageum', `${bridgeId}: travel interlude must be solo gayageum`);
+  }
   const effectIds = new Set();
   for (const effect of data.sfx.effects) {
     safeId(effect.id); assert(!effectIds.has(effect.id), `Duplicate SFX id ${effect.id}`); effectIds.add(effect.id);

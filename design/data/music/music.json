@@ -9344,6 +9344,70 @@
       ],
       "intro": null,
       "playback": "once"
+    },
+    {
+      "id": "road_interlude",
+      "name": "길 위의 두 마디",
+      "status": "제안",
+      "use": "지역 테마 끝과 다음 지역 도입 사이. 현재 지역곡의 음계가 모두 C·D·E·G·A여서 같은 조의 간주를 공유한다.",
+      "tempo": 96,
+      "meter": [
+        4,
+        4
+      ],
+      "jangdan": "걷는 장단",
+      "mode": "다음 지역의 평조 C·D·E·G·A",
+      "measures": 2,
+      "loop": null,
+      "intro": null,
+      "sections": [
+        {
+          "name": "첫걸음",
+          "start": 0,
+          "end": 1
+        },
+        {
+          "name": "다음 길",
+          "start": 1,
+          "end": 2
+        }
+      ],
+      "voices": [
+        {
+          "id": "walking",
+          "instrument": "gayageum",
+          "role": "선율",
+          "gain": 0.75,
+          "pan": 0,
+          "patterns": {
+            "step": [
+              "C4:1:0.7",
+              "D4:1:0.55",
+              "E4:1:0.65",
+              "G4:1:0.5"
+            ],
+            "answer": [
+              "A4:1:0.6",
+              "G4:1:0.5",
+              "D4:1:0.6",
+              "R:1"
+            ]
+          },
+          "sequence": [
+            "step",
+            "answer"
+          ]
+        }
+      ],
+      "notes": "가야금 독주 두 마디. AudioContext 시계로 이어 붙이고 다음 지역 도입은 0마디부터 시작한다."
     }
-  ]
+  ],
+  "travelInterludes": {
+    "danpunggol": "road_interlude",
+    "dolneomeo": "road_interlude",
+    "market_day": "road_interlude",
+    "market_night": "road_interlude",
+    "yeongsan": "road_interlude",
+    "yeongsan_spring": "road_interlude"
+  }
 }

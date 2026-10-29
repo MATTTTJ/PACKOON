@@ -345,7 +345,7 @@
     const tickSeconds = 0.025, horizon = 0.3, chunkSeconds = 0.12;
     const sampleRate = finite(options.sampleRate || 22050, 'player.sampleRate', 8000, 48000);
     const clockEvents = [], sfxCache = new Map();
-    let peakSources = 0, ended = false;
+    let peakSources = 0, ended = false, travelPlan = null, pausedRoute = null;
     const sourceCount = () => [...active].reduce((n, s) => n + s.sources.size, 0);
     function clockEvent(type, details = {}) {
       const item = { type, clock: context ? context.currentTime : 0, ...details };
@@ -359,7 +359,7 @@
         if (seconds >= end) seconds = start + (seconds - start) % (end - start);
       }
       const track = tracks.get(current ? current.id : selectedId), loopStart = track && track.loop ? track.loop.start * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0;
-      return { id: current ? current.id : selectedId, playing: !!current && !paused, paused, loading, ended, currentTime: seconds, duration: track ? track.measures * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0, phase: track && track.loop ? seconds < loopStart ? 'intro' : 'loop' : 'once', enabled, volume, ducking, unlocked };
+      return { id: current ? current.id : selectedId, playing: !!current && !paused, paused, loading, ended, currentTime: seconds, duration: track ? track.measures * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0, phase: track && track.loop ? seconds < loopStart ? 'intro' : 'loop' : 'once', travel: travelPlan ? { to: travelPlan.to, interlude: travelPlan.interlude, phase: travelPlan.phase } : null, enabled, volume, ducking, unlocked };
     }
     let selectedId = null;
     function emit() { if (typeof options.onState === 'function') options.onState(state()); }
@@ -385,7 +385,9 @@
       }
       ensureMaster();
       try { if (context.state === 'suspended') await context.resume(); } catch (_) { return false; }
-      unlocked = context.state === 'running'; emit(); return unlocked;
+      unlocked = context.state === 'running';
+      if (unlocked && paused && travelPlan && (typeof document === 'undefined' || !document.hidden)) await resume();
+      emit(); return unlocked;
     }
     function cancelSession(session, fade) {
       if (!session) return;
@@ -404,6 +406,16 @@
       session.sources.forEach(source => { try { source.stop(); source.disconnect(); } catch (_) {} });
       session.sources.clear(); session.gain.disconnect(); active.delete(session);
     }
+    function queuedSession(part, when) {
+      const gain = context.createGain(); gain.gain.value = 0; gain.connect(master);
+      gain.gain.setValueAtTime(0, when); gain.gain.linearRampToValueAtTime(1, when + .015);
+      const session = { id: part.id, pcm: part.pcm, gain, sources: new Set(), frame: 0, when, started: when, from: 0, stopping: false, enteredLoop: false, next: part.next || null, endFrame: part.next ? part.pcm.scoreFrames : null };
+      active.add(session); current = session; selectedId = part.id;
+      paused = false; pausedAt = 0; loading = false; ended = false;
+      if (travelPlan) { travelPlan.phase = part.phase; if (part.phase === 'intro') travelPlan = null; }
+      clockEvent('travel-' + part.phase, { id: part.id, when }); emit();
+      return session;
+    }
     function queueSession(session, until) {
       const pcm = session.pcm, rate = pcm.sampleRate;
       const now = context.currentTime;
@@ -415,8 +427,14 @@
       }
       while (session.when < until && !session.stopping && !destroyed) {
         if (sourceCount() >= 48) break;
-        const endFrame = pcm.loopEndFrame || pcm.left.length;
+        const endFrame = session.endFrame || pcm.loopEndFrame || pcm.left.length;
         if (session.frame >= endFrame) {
+          if (session.next) {
+            session.stopping = true;
+            const next = queuedSession(session.next, session.when);
+            if (!session.sources.size) { session.gain.disconnect(); active.delete(session); }
+            queueSession(next, until); return;
+          }
           if (pcm.loopEndFrame) {
             clockEvent('loop', { id: session.id, when: session.when, previousBufferEnd: session.lastEnd, fromFrame: endFrame, toFrame: pcm.loopStartFrame, sampleRate: rate, gapSeconds: session.lastEnd === undefined ? null : session.when - session.lastEnd });
             session.frame = pcm.loopStartFrame; session.enteredLoop = true;
@@ -436,9 +454,13 @@
         const source = context.createBufferSource(); source.buffer = buffer; source.connect(session.gain);
         session.sources.add(source);
         peakSources = Math.max(peakSources, sourceCount());
-        source.onended = () => { session.sources.delete(source); source.disconnect(); };
+        source.onended = () => { session.sources.delete(source); source.disconnect(); if (session.stopping && !session.cleanup && !session.sources.size) { session.gain.disconnect(); active.delete(session); } };
         source.start(session.when);
         session.lastEnd = session.when + buffer.duration;
+        if (session.next && session.frame + length >= endFrame) {
+          session.gain.gain.setValueAtTime(1, Math.max(session.when, session.lastEnd - .015));
+          session.gain.gain.linearRampToValueAtTime(0, session.lastEnd);
+        }
         session.frame += length; session.when += length / rate;
       }
     }
@@ -453,9 +475,40 @@
       }
     }
     function startTimer() { if (!timer) timer = setInterval(schedule, tickSeconds * 1000); }
+    async function loadTrack(id, request) {
+      let pcm = cache.get(id);
+      if (!pcm) {
+        pcm = await renderSongAsync(tracks.get(id), bank, { sampleRate, cancelled: () => request !== serial || destroyed });
+        if (!pcm || request !== serial || destroyed) return null;
+      }
+      cache.delete(id); cache.set(id, pcm);
+      const bytes = () => [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0);
+      while (cache.size > 2 || cache.size > 1 && bytes() > 48 * 1024 * 1024) cache.delete(cache.keys().next().value);
+      return pcm;
+    }
+    async function travel(id) {
+      if (destroyed || !tracks.has(id)) return false;
+      const interlude = score.travelInterludes && score.travelInterludes[id];
+      if (!interlude || !tracks.has(interlude)) return play(id);
+      if (travelPlan && travelPlan.to === id) return true;
+      if (!unlocked || !enabled || !context || context.state !== 'running' || typeof document !== 'undefined' && document.hidden) return false;
+      const request = ++serial;
+      travelPlan = { to: id, interlude, phase: 'preparing' }; loading = true; pausedRoute = null; emit();
+      const bridge = await loadTrack(interlude, request);
+      if (!bridge || request !== serial) return false;
+      const destination = await loadTrack(id, request);
+      if (!destination || request !== serial) return false;
+      const next = { id: interlude, pcm: bridge, phase: 'interlude', next: { id, pcm: destination, phase: 'intro' } };
+      loading = false; travelPlan.phase = 'outro';
+      if (current) { current.next = next; current.endFrame = current.pcm.loopEndFrame || current.pcm.scoreFrames; }
+      else queuedSession(next, context.currentTime + .035);
+      clockEvent('travel-outro', { id: current && current.id, to: id, interlude });
+      schedule(); startTimer(); emit(); return true;
+    }
     async function play(id, settings = {}) {
       if (destroyed) throw new Error('연주기가 닫혔습니다.');
       if (!tracks.has(id)) throw new Error('없는 곡: ' + id);
+      if (!settings.route) { travelPlan = null; pausedRoute = null; if (current) { current.next = null; current.endFrame = null; } }
       if (current && current.id === id && settings.fromSeconds === undefined && !paused) {
         // A 재생 중 B를 준비하다 A로 돌아오면 늦게 끝난 B를 버린다.
         if (loading || selectedId !== id) { serial++; selectedId = id; loading = false; emit(); }
@@ -468,16 +521,8 @@
       }
       const request = ++serial;
       selectedId = id; loading = true; ended = false; emit();
-      let pcm = cache.get(id);
-      if (!pcm) {
-        pcm = await renderSongAsync(tracks.get(id), bank, { sampleRate, cancelled: () => request !== serial || destroyed });
-        if (!pcm || request !== serial || destroyed) return false;
-        cache.set(id, pcm);
-        const bytes = () => [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0);
-        while (cache.size > 2 || cache.size > 1 && bytes() > 48 * 1024 * 1024) cache.delete(cache.keys().next().value);
-      } else {
-        cache.delete(id); cache.set(id, pcm);
-      }
+      const pcm = await loadTrack(id, request);
+      if (!pcm) return false;
       if (request !== serial || destroyed) return false;
       const crossfade = clamp(settings.crossfade === undefined ? 1.5 : settings.crossfade, 0.01, 4);
       const from = clamp(settings.fromSeconds || 0, 0, pcm.left.length / pcm.sampleRate - 0.001);
@@ -487,6 +532,7 @@
       const gain = context.createGain(); gain.gain.value = 0; gain.connect(master);
       const start = context.currentTime + 0.035;
       const session = { id, pcm, gain, sources: new Set(), frame: Math.floor(from * pcm.sampleRate), when: start, started: start, from, stopping: false, enteredLoop: from * pcm.sampleRate > pcm.loopStartFrame };
+      if (settings.route) { travelPlan = settings.route.plan; session.next = settings.route.next; session.endFrame = settings.route.endFrame; }
       active.add(session); current = session; paused = false; pausedAt = from; loading = false;
       gain.gain.setValueAtTime(0, context.currentTime); gain.gain.linearRampToValueAtTime(1, start + crossfade);
       if (previous) cancelSession(previous, crossfade);
@@ -495,6 +541,7 @@
     }
     function stop(fadeSeconds = 0.08) {
       serial++; loading = false;
+      travelPlan = null; pausedRoute = null;
       if (context) active.forEach(session => cancelSession(session, Math.max(0.01, fadeSeconds)));
       current = null; paused = false; pausedAt = 0; visibilityPaused = false; disabledPaused = false; ended = false;
       if (timer) { clearInterval(timer); timer = null; }
@@ -503,12 +550,19 @@
     }
     function pause() {
       if (!current) return;
+      pausedRoute = travelPlan ? { plan: { ...travelPlan }, next: current.next, endFrame: current.endFrame } : null;
       pausedAt = state().currentTime; serial++; loading = false; paused = true;
       active.forEach(session => cancelSession(session, 0.025)); current = null;
       if (timer) { clearInterval(timer); timer = null; } emit();
       clockEvent('pause', { id: selectedId, fromSeconds: pausedAt });
     }
-    async function resume() { if (!paused || !selectedId) return false; return play(selectedId, { fromSeconds: pausedAt, crossfade: 0.08 }); }
+    async function resume() {
+      if (!paused || !selectedId) return false;
+      const route = pausedRoute;
+      const ok = await play(selectedId, { fromSeconds: pausedAt, crossfade: 0.08, route });
+      if (ok && route && route.plan.phase === 'preparing') { const to = route.plan.to; travelPlan = null; return travel(to); }
+      return ok;
+    }
     function setVolume(value) { volume = finite(value, 'volume', 0, 1); if (master) setGain(master, enabled ? volume * ducking : 0); emit(); }
     function setDucking(value = 1, seconds = .15) { ducking = finite(value, 'ducking', 0, 1); if (master) setGain(master, enabled ? volume * ducking : 0, seconds); emit(); }
     function setEnabled(value) {
@@ -519,7 +573,7 @@
         // 숨김 때문에 멈춘 뒤 음소거해도 복귀 의도는 보존한다.
         if (visibilityPaused && paused && selectedId) disabledPaused = true;
         if (current) { disabledPaused = true; pause(); }
-        if (wasLoading) { serial++; loading = false; paused = true; pausedAt = 0; disabledPaused = true; }
+        if (wasLoading && !paused) { serial++; loading = false; paused = true; pausedAt = 0; disabledPaused = true; }
         sfxSources.forEach(source => { try { source.stop(); } catch (_) {} }); sfxSources.clear();
       } else if (changed && disabledPaused) {
         disabledPaused = false;
@@ -549,7 +603,7 @@
         const wasLoading = loading;
         visibilityPaused = !!current || wasLoading || disabledPaused;
         if (current) pause();
-        if (wasLoading) { serial++; loading = false; paused = true; pausedAt = 0; emit(); }
+        if (wasLoading && !paused) { serial++; loading = false; paused = true; pausedAt = 0; emit(); }
       } else if (visibilityPaused) {
         visibilityPaused = false;
         if (enabled && context && context.state === 'running') resume().catch(() => {});
@@ -568,7 +622,7 @@
       if (ownsContext && context) context.close().catch(() => {});
     }
     function getDiagnostics() { return { clockEvents: clockEvents.slice(), schedulerRunning: !!timer, sources: sourceCount(), peakSources, sessions: active.size, cachedTracks: cache.size, cacheBytes: [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0), sampleRate }; }
-    return { unlock, play, stop, pause, resume, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
+    return { unlock, play, travel, stop, pause, resume, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
   }
   function attachSound(sound, player) {
     if (!sound || !player) throw new Error('Sound와 player가 필요합니다.');

@@ -33,7 +33,7 @@ function finishCraftHands(redraw=true){
   const matched=h.count>=h.cfg.steps&&h.good;
   if(matched)Sound.gather(true);
   pouchMsg=voices[h.tool][matched?0:1]+' '+ITEMS[h.recipe.out].n+' '+h.recipe.n+'개 완성.'+
-    (h.discovered?' 찾은 가공법을 수첩에 적었다.':'');
+    (h.discovered?' 찾은 가공법을 너구리의 책에 적었다.':'');
   if(redraw&&open('bag'))renderBag();
 }
 function craftHandInput(direction){
@@ -143,18 +143,10 @@ document.addEventListener('visibilitychange',()=>pauseCraftHands(document.hidden
 
 /* 인물 사연과 지역 대화도 같은 표를 조회한다. 불명인 취향은 null이다. */
 function tasteOf(who,item){return TABLES.TASTES[who]?.[item]||null;}
-function isHomeCraft(item){return Object.values(RECIPES).some(list=>list.some(r=>r.optional&&r.out===item));}
+function isHomeCraft(item){return ITEMS[item]?.region===G.region&&Object.values(RECIPES).some(list=>list.some(r=>r.optional&&r.out===item));}
 function sendCraftHome(item){
-  if(brewing||!G.started||G.ended||!has(item)||!isHomeCraft(item)||knows('home:'+G.region))return;
-  returnPouch();
-  const after={...G.inv,[item]:G.inv[item]-1};
-  if(progressShortage(after)>progressShortage(G.inv)){pouchMsg='먼저 쓸 몫을 남긴 뒤 엄마에게 보내자.';renderBag();return;}
-  const key='home:'+G.region,name=ITEMS[item].n;
-  takeItem(item,1);learn(key,true);closePanels();
-  diary(key,name+' 하나를 까치 편에 집으로 보냈다. 한참 뒤 돌아온 까치가 엄마가 두 손을 포개고 볼에 댄 모습을 흉내 냈다.');
-  talk([['너구리',name+' 하나야. 엄마한테 내가 만들었다고 전해 줘.'],
-    ['너구리','(한참 뒤, 까치가 돌아와 두 날개를 포개고 볼에 댄다.)'],
-    ['너구리','엄마가 이렇게 했어? …엄마 손도 따뜻했겠다.']]);
+  if(!isHomeCraft(item)||!sendHomeGift(G.region,item))return false;
+  closePanels();talk([['너구리',ITEMS[item].n+' 하나야. 엄마한테 내가 만들었다고 전해 줘.']]);return true;
 }
 function giftTaste(who,item){
   const taste=tasteOf(who,item);if(!taste||!G||!has(item))return null;

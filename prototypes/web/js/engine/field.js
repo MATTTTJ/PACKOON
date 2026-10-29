@@ -2,7 +2,7 @@
 /* 필드: 주인공 이동과 점프, 휘두르기, 줍기, 카메라, 화면 그리는 순서.
    지역마다 다른 것(배경, 장애물, 필드 보스, 날씨)은 REG 의 함수를 부른다. 필요한 함수 목록은 README 참고 */
 
-function paused(){return !G.started||G.ended||!!B||inkOn||!!vistaMode||zoneFade>0||open('dlg')||open('bag')||open('book')||open('notebook')||!!openMinigame();}
+function paused(){return !G.started||G.ended||!!B||inkOn||!!vistaMode||!!zoneMotion||zoneFade>0||open('dlg')||open('bag')||open('book')||open('notebook')||!!openMinigame();}
 function hitPlayer(x1,x2,y1,y2){return G.px+5>x1&&G.px-5<x2&&G.py>y1&&G.py-18<y2;}
 function hurt(srcX){
   if(G.hurtT>0)return;G.hp--;G.hurtT=60;G.px+=(G.px<srcX?-16:16);G.vy=-2.6;G.onGround=false;refreshHud();
@@ -26,12 +26,15 @@ function spark(x,y){for(let i=0;i<8;i++)sparks.push({x,y,vx:(Math.random()-.5)*2
 
 function step(){
   if(vistaMode){if(!document.hidden&&!Vfx.reducedMotion)vistaMode.tick=Math.min(vistaMode.tick+1,TABLES.TUNING.vista_pan_frames);return;}
+  if(zoneMotion){stepZoneTransition();return;}
   if(zoneFade>0){zoneFade=Vfx.reducedMotion?0:zoneFade-1;return;}
   if(toastT>0){toastT--;if(toastT===0)$('toast').hidden=true;}
   Vfx.update();
   const mg=openMinigame();if(mg){mg.step();return;}
   fieldCall('ambient');   // 현재 구역의 날씨·진행만 갱신한다
   if(paused())return;
+  if(REG.order===regionList()[0].order&&!G.f.momNoteSeen){showMomNote();return;}
+  if(usesZones(REG)&&['inn','shelter'].includes(G.zone)&&deliverHomeReply())return;
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
   G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed);if(ax)G.face=ax>0?1:-1;
@@ -76,10 +79,32 @@ function drawNpcs(){for(const n of fieldNpcs()){const x=n.x-cam;if(x<-60||x>W+60
   if(n.props)n.props(n);
   n.draw(x,n.y??fieldGround(),f);}}
 
+/* 새 표시가 없는 옛 저장도 도착 지역과 기존 진행을 읽어 겉모습만 복원한다. */
+function backpackStage(){
+  const f=G.f;
+  if((REGIONS[G.region]?.order||1)>=2)f.bagReachedDolneomeo=true;
+  if(f.bueongDone&&!open('dlg'))f.bagTokenGiven=true;
+  if(f.dadDone&&!open('dlg'))f.bagDadGiven=true;
+  return f.bagDadGiven?3:f.bagTokenGiven?2:f.bagReachedDolneomeo?1:0;
+}
+function drawBackpack(ox,oy,f){
+  const stage=backpackStage();
+  if(stage===0){
+    M(ox,oy,f,-9,-18,8,9,'#d9a441');M(ox,oy,f,-8,-17,1,1,'#8a3b2a');M(ox,oy,f,-5,-14,1,1,'#8a3b2a');M(ox,oy,f,-7,-11,1,1,'#8a3b2a');M(ox,oy,f,-3,-19,3,2,'#b07d26');
+  }else if(stage===1){
+    M(ox,oy,f,-10,-19,8,12,'#99733d');M(ox,oy,f,-9,-18,6,3,'#d9bc82');M(ox,oy,f,-9,-12,6,1,'#5c412a');M(ox,oy,f,-5,-20,2,13,'#563b2b');
+  }else{
+    const dad=stage===3,top=dad?-27:-23,wood=dad?'#61462d':'#a37743';
+    M(ox,oy,f,-11,top,2,-top-3,wood);M(ox,oy,f,-4,top+1,2,-top-4,wood);
+    M(ox,oy,f,-11,top+4,9,2,'#d0a56d');M(ox,oy,f,-12,-8,11,2,wood);
+    M(ox,oy,f,-10,-20,7,11,dad?'#a28661':'#c4a064');M(ox,oy,f,-9,-18,5,1,'#e3c995');M(ox,oy,f,-7,-21,1,14,'#473526');
+    if(dad){M(ox,oy,f,-11,-13,3,2,'#d6c6a3');M(ox,oy,f,-10,-12,1,3,'#403126');}
+  }
+}
 function drawRaccoonAt(ox,oy,f,st,attackT,tool){
   const Gy='#8c8070',K='#2a211b',Wt='#efe6d6',Bl='#d9a441',T='#6f6357';
   M(ox,oy,f,-13,-9,7,4,T);M(ox,oy,f,-12,-9,1,4,K);M(ox,oy,f,-9,-9,1,4,K);
-  M(ox,oy,f,-9,-18,8,9,Bl);M(ox,oy,f,-8,-17,1,1,'#8a3b2a');M(ox,oy,f,-5,-14,1,1,'#8a3b2a');M(ox,oy,f,-7,-11,1,1,'#8a3b2a');M(ox,oy,f,-3,-19,3,2,'#b07d26');
+  drawBackpack(ox,oy,f);
   M(ox,oy,f,-3+st,-4,3,4,K);M(ox,oy,f,2-st,-4,3,4,K);
   M(ox,oy,f,-4,-12,9,8,Gy);M(ox,oy,f,0,-11,4,6,'#cfc3b2');
   M(ox,oy,f,-3,-20,10,8,Gy);M(ox,oy,f,-2,-17,9,2,K);M(ox,oy,f,4,-17,1,1,'#ffffff');M(ox,oy,f,-2,-15,8,2,Wt);M(ox,oy,f,7,-16,1,2,K);
@@ -116,6 +141,7 @@ function draw(){
   Vfx.front();
   updateOverlay();
   if(zoneFade>0){ctx.save();ctx.globalAlpha=zoneFade/TABLES.TUNING.zone_transition_frames;R(0,0,W,H,'#211d24');ctx.restore();}
+  drawZoneTransition();
 }
 let lastNear=null;
 function nearDig(){if(paused())return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
@@ -132,7 +158,7 @@ function updateOverlay(){
 }
 
 /* ---------- 확장: 구역·문·조사·길손·도장·경치 ---------- */
-let zoneFade=0,vistaMode=null,blockedEdge=null;
+let zoneFade=0,vistaMode=null,blockedEdge=null,zoneMotion=null;
 const expansionKey=id=>REG.id+':'+id;
 function zoneObjects(kind){
   if(CLASSIC)return [];
@@ -143,7 +169,7 @@ const pointNear=p=>Math.abs(p.x-G.px)<(p.distance??TABLES.TUNING.field_talk_dist
 const pathOpen=p=>!p.need||p.need();
 const exitSpec=e=>typeof e==='string'?{to:e}:e;
 function resetFieldModes(){
-  endVista();zoneFade=0;blockedEdge=null;sparks.length=0;shakeT=0;releaseInputs();suppressedKeys.clear();Vfx.clear();
+  endVista();zoneMotion=null;zoneFade=0;blockedEdge=null;sparks.length=0;shakeT=0;releaseInputs();suppressedKeys.clear();Vfx.clear();
 }
 function changeZone(to,arrival={}){
   if(!usesZones(REG)||!REG.zones[to]||paused())return false;
@@ -154,6 +180,64 @@ function changeZone(to,arrival={}){
   suppressHeldInputs();sparks.length=0;shakeT=0;lastNear=null;blockedEdge=null;Vfx.clear();
   zoneFade=Vfx.reducedMotion?0:TABLES.TUNING.zone_transition_frames;
   Sound.playSfx(arrival.sound||'zone_travel');return true;
+}
+/* 지역 전용 전환을 다음 패스에서 교체할 공통 틀. 좌표는 필드 px, frames는 CSV에서 읽은 60Hz 갱신 횟수다.
+   확대/세로 화면 넘김은 이전 그림을 보관하고, 흐름은 도착 구역에서 입력 없이 지정 좌표까지 이동한다. */
+function zoneTransition(kind,opts={}){
+  if(!['zoom','flow','climb'].includes(kind)||!opts||typeof opts!=='object'||paused())return false;
+  for(const key of ['x','y','fromX','fromY','focusX','focusY'])if(opts[key]!==undefined&&!Number.isFinite(opts[key]))return false;
+  for(const key of ['draw','onComplete'])if(opts[key]!==undefined&&typeof opts[key]!=='function')return false;
+  if(!usesZones(REG)||!REG.zones[opts.to])return false;
+  const frames=opts.frames??TABLES.TUNING.zone_transition_frames;
+  if(!Number.isInteger(frames)||frames<=0)return false;
+  const image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);
+  if(!changeZone(opts.to,{x:opts.x,y:opts.y,sound:opts.sound}))return false;
+  zoneFade=0;
+  const z=zoneDef(),end={x:G.px,y:G.py};
+  zoneMotion={kind,opts:{...opts},image,frames,tick:0,owner:G,region:G.region,zone:G.zone,end};
+  if(kind==='flow'){
+    G.px=clamp(opts.fromX??end.x,16,z.w-16);G.py=opts.fromY??end.y;
+    zoneMotion.start={x:G.px,y:G.py};
+  }
+  if(Vfx.reducedMotion)finishZoneTransition();
+  return true;
+}
+function finishZoneTransition(){
+  const m=zoneMotion;if(!m)return;
+  zoneMotion=null;
+  if(m.owner!==G||m.region!==G.region||m.zone!==G.zone)return;
+  G.px=m.end.x;G.py=m.end.y;G.vx=G.vy=G.attackT=0;G.onGround=G.py===fieldGround();
+  G.cam=clamp(G.px-W*.42,0,Math.max(0,fieldWidth()-W));
+  suppressHeldInputs();
+  if(typeof m.opts.onComplete==='function')m.opts.onComplete();
+}
+function stepZoneTransition(){
+  const m=zoneMotion;
+  if(m.owner!==G||m.region!==G.region||m.zone!==G.zone){zoneMotion=null;releaseInputs();return;}
+  if(document.hidden)return;
+  if(Vfx.reducedMotion){finishZoneTransition();return;}
+  m.tick=Math.min(m.tick+1,m.frames);
+  if(m.kind==='flow'){
+    const t=m.tick/m.frames;
+    G.px=m.start.x+(m.end.x-m.start.x)*t;G.py=m.start.y+(m.end.y-m.start.y)*t;
+    G.cam=clamp(G.px-W*.42,0,Math.max(0,fieldWidth()-W));
+  }
+  if(m.tick===m.frames)finishZoneTransition();
+}
+function drawZoneTransition(){
+  const m=zoneMotion;if(!m||Vfx.reducedMotion)return;
+  const t=m.tick/m.frames,e=t*t*(3-2*t);
+  ctx.save();
+  if(m.kind==='zoom'){
+    const x=m.opts.focusX??W/2,y=m.opts.focusY??H/2,s=1+(m.opts.reverse?-.16:.18)*e;
+    ctx.globalAlpha=1-e;ctx.translate(x,y);ctx.scale(s,s);ctx.drawImage(m.image,-x,-y);
+  }else if(m.kind==='climb'){
+    const shift=(m.opts.reverse?-1:1)*Math.round(H*e);
+    ctx.drawImage(m.image,0,shift);
+  }
+  // 장면별 그림은 지역 쪽에서 넘긴다. 공통 함수는 진행과 입력 정리만 맡는다.
+  ctx.restore();
+  if(typeof m.opts.draw==='function'){ctx.save();try{m.opts.draw(t,m.kind);}finally{ctx.restore();}}
 }
 function zoneEdge(){
   const z=zoneDef();if(!z)return false;
@@ -190,6 +274,7 @@ function interactionLabel(p){
 function tryInteract(){
   const p=nearInteraction();if(!p)return;
   const kind=interactionKind(p);
+  if(isHomeReplyPoint(p,kind)&&deliverHomeReply())return;
   if(kind==='npc'){learn('met:'+p.id);p.talk();}
   else if(kind==='doors'){
     if(!pathOpen(p)){toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
@@ -205,6 +290,11 @@ function tryInteract(){
     if(G.f.wanderersDone?.[expansionKey(p.id)])talk([[p.name||'길손',p.greeting||'길에서 또 만나자.']]);
     else p.talk();
   }
+}
+function isHomeReplyPoint(p,kind){
+  if(p.homeReply||p.rest)return true;
+  if(/magpie|kkachi|까치/.test((p.id||'')+' '+(p.name||'')))return true;
+  return kind==='npc'&&/^(maru|shelter)$/.test(p.id||'');
 }
 function finishWanderer(id){
   if(CLASSIC)return false;
@@ -237,7 +327,9 @@ function drawZoneObjects(){
 }
 const vistaCaption=el('div',null);
 vistaCaption.setAttribute('role','status');vistaCaption.hidden=true;
-vistaCaption.style.cssText='position:absolute;left:8%;right:8%;bottom:8%;text-align:center;color:#fff3cf;text-shadow:1px 1px #241f28;pointer-events:none;white-space:pre-line';
+vistaCaption.className='vista-caption';
+const vistaThought=el('p','vista-thought'),vistaReturn=el('p','vista-return');
+vistaCaption.append(vistaThought,vistaReturn);
 $('stage').appendChild(vistaCaption);
 function startVista(p){
   if(paused())return;
@@ -246,7 +338,8 @@ function startVista(p){
   closePanels();suppressHeldInputs();G.vx=G.vy=G.attackT=0;
   const hidden=[document.querySelector('.hud'),$('pad'),$('dlg'),$('prompt'),$('toast'),$('bossbar')].map(e=>[e,e.hidden]);
   hidden.forEach(([e])=>e.hidden=true);
-  vistaMode={p,tick:0,hidden};vistaCaption.textContent=(first&&p.thought?p.thought+'\n':'')+'아무 키나 화면을 누르면 돌아간다';vistaCaption.hidden=false;
+  vistaMode={p,tick:0,hidden};vistaThought.textContent=first&&p.thought?p.thought:'';vistaThought.hidden=!vistaThought.textContent;
+  vistaReturn.textContent=TOUCH?'화면을 누르면 돌아간다':'아무 키나 누르면 돌아간다';vistaCaption.hidden=false;
   Sound.playSfx('scenery_open');Sound.ambience(p.sound||'wind');
 }
 function endVista(){

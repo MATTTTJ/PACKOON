@@ -40,7 +40,8 @@ for(const r of items){
   const lv=parseInt(r['레어도단계'],10);if(!(lv>=1&&lv<=5))fail('items.csv '+r.id+': 레어도단계가 1~5 가 아니다 ("'+r['레어도단계']+'")');
   if(!r['설명'])fail('items.csv '+r.id+': 설명이 비어 있다');
   if(!['재료','먹을거리','도구','귀한 것'].includes(r['종류']))fail('items.csv '+r.id+': 종류는 재료·먹을거리·도구·귀한 것 중 하나여야 한다');
-  ITEMS[r.id]={n:r['이름'],r:lv-1,kind:r['종류'],d:r['설명']};
+  if(r['지역']!=='전체'&&!regionIds.has(r['지역']))fail('items.csv '+r.id+': 지역 id를 확인한다');
+  ITEMS[r.id]={n:r['이름'],r:lv-1,kind:r['종류'],region:r['지역'],d:r['설명']};
   for(const entry of (r['진행보호']||'').split('·').map(x=>x.trim()).filter(Boolean)){
     const m=entry.match(/^([a-z_]+):([A-Za-z_]+):([1-9]\d*)(?::([a-z_]+))?$/);
     if(!m||!regionIds.has(m[1])||!Number.isSafeInteger(+m[3]))fail('items.csv '+r.id+': 진행보호 형식·지역·수량을 확인한다');
@@ -57,6 +58,8 @@ for(const r of parts){
   const hp=parseInt(r['내구도'],10);if(!(hp>0))fail('boss_parts.csv '+r['보스']+'.'+r['부위id']+': 내구도가 숫자가 아니다');
   if(r['부수면']&&!ITEMS[r['부수면']])fail('boss_parts.csv '+r['보스']+'.'+r['부위id']+': 부수면 "'+r['부수면']+'"이 items.csv 에 없다');
   const p={id:r['부위id'],name:r['부위'],hp};if(r['부수면'])p.mat=r['부수면'];if(r['핵심']==='O')p.core=true;
+  if(!['','돌','얼음'].includes(r['재질']||''))fail('boss_parts.csv '+r['보스']+'.'+r['부위id']+': 재질은 빈칸·돌·얼음이어야 한다');
+  if(r['재질'])p.material=r['재질']==='돌'?'stone':'ice';
   (BOSS_PARTS[r['보스']]=BOSS_PARTS[r['보스']]||[]).push(p);
 }
 /* 진정수치: "싸리버섯 50 · 꾀꼬리버섯 50" */
@@ -107,11 +110,13 @@ for(const r of heirlooms){
 /* 아빠의 보부상 수첩: 쪽마다 줄을 표 순서대로. "(items.csv 의 설명)" 줄은 게임이 물건 설명으로 채운다 */
 const NOTES=[];const byId={};
 for(const r of notebook){
+  const section=r['기록갈래'];
+  if(!['아빠 수첩','관찰','손버릇','숨은 가공법'].includes(section)||(r['쓴이']==='아빠')!==(section==='아빠 수첩'))fail('notebook.csv '+r['쪽id']+': 기록갈래와 쓴이가 맞지 않는다');
   let e=byId[r['쪽id']];
   if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':r['종류']==='도장'?'stamp':'animal',lines:[]};if(e.kind==='stamp'||CRAFT[e.id])e.name=r['대상'];NOTES.push(e);}
   if(r['비고'].includes('아빠 그림 있음'))e.dadDrawing=true;
   if(r['내용']==='(items.csv 의 설명)')continue;
-  const l={who:r['쓴이']==='아빠'?'dad':'me',text:r['내용']};if(r['알게되는키'])l.when=r['알게되는키'];e.lines.push(l);
+  const l={who:r['쓴이']==='아빠'?'dad':'me',text:r['내용'],section};if(r['알게되는키'])l.when=r['알게되는키'];e.lines.push(l);
 }
 for(const e of NOTES)if(e.kind==='item'&&!ITEMS[e.id]&&!CRAFT[e.id])fail('notebook.csv '+e.id+': 물건 쪽인데 items.csv 또는 heirlooms.csv 에 없다');
 for(const [tool,c]of Object.entries(CRAFT))if(!NOTES.some(e=>e.id===tool&&e.lines.some(l=>l.when===c.habitKey)))fail('notebook.csv: 손버릇 기록이 없다 '+tool);
@@ -157,7 +162,7 @@ function numericTable(name,label,required){
     const raw=r['값'].trim(),n=Number(raw);
     if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw)||!Number.isFinite(n))fail(where+': 값이 유한한 숫자가 아니다');
     if(r.id==='field_jump_velocity'?n>=0:n<0)fail(where+': 값의 부호가 올바르지 않다');
-    if(['회','개','단계','인덱스','프레임','남은 프레임','ms'].includes(r['단위'])&&!Number.isInteger(n))fail(where+': 이 단위는 정수여야 한다');
+    if(['회','개','단계','인덱스','프레임','남은 프레임','ms','내구도'].includes(r['단위'])&&!Number.isInteger(n))fail(where+': 이 단위는 정수여야 한다');
     values[r.id]=n;
   }
   for(const id of keys)if(!Object.hasOwn(values,id))fail(name+'.csv: 필수 값 '+id+' 누락');
@@ -199,7 +204,11 @@ const TUNING=numericTable('tuning','분류',
     'field_jump_velocity field_gravity field_fall_speed field_pickup_x field_pickup_y',
     'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at',
     'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval',
-    'field_interact_y zone_transition_frames vista_pan_frames'
+    'field_interact_y zone_transition_frames vista_pan_frames',
+    'battle_bare_speed battle_bare_cooldown battle_bare_radius',
+    'battle_choraengi_speed battle_choraengi_cooldown battle_choraengi_radius',
+    'battle_gaksi_speed battle_gaksi_cooldown battle_gaksi_radius',
+    'battle_base_damage battle_sharp_damage battle_pickaxe_bonus'
   ].join(' '));
 /* 나눗셈·주기·배열 길이와 서로 맞물리는 판정은 실행 전에 확인한다. */
 const requireValue=(ok,message)=>{if(!ok)fail(message);};
@@ -218,6 +227,11 @@ for(let i=1;i<noteKeys.length;i++)requireValue(MINIGAMES['rhythm_note_'+noteKeys
 requireValue(MINIGAMES.dad_steps<=3,'minigames.csv: 구현된 몸짓은 세 단계까지다');
 requireValue(TUNING.kkubeogi_awake<=TUNING.kkubeogi_cycle&&TUNING.kkubeogi_cue<=TUNING.kkubeogi_cycle,'tuning.csv: 꾸벅이 판정과 예고가 주기보다 길다');
 requireValue(TUNING.field_swing_hit_at<TUNING.field_swing_frames,'tuning.csv: 휘두르기 판정 시점이 전체 시간보다 짧아야 한다');
+for(const mask of ['bare','choraengi','gaksi']){
+  requireValue(TUNING['battle_'+mask+'_speed']>0&&TUNING['battle_'+mask+'_radius']>3,'tuning.csv: 전투 탈 속도·되치기 반경을 확인한다');
+}
+requireValue(TUNING.battle_choraengi_speed>TUNING.battle_bare_speed&&TUNING.battle_gaksi_speed<TUNING.battle_bare_speed&&TUNING.battle_choraengi_cooldown<TUNING.battle_bare_cooldown&&TUNING.battle_gaksi_cooldown>TUNING.battle_bare_cooldown&&TUNING.battle_choraengi_radius<TUNING.battle_bare_radius&&TUNING.battle_gaksi_radius>TUNING.battle_bare_radius,'tuning.csv: 초랭이는 빠르고 좁게 각시는 느리고 넓게 유지한다');
+requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_pickaxe_bonus>0,'tuning.csv: 전투 기본 피해·날 세운 피해·곡괭이 덤을 확인한다');
 for(const id of ['root','ssari','kkoe','eoksae','seogi','darae_vine']){
   const width=MINIGAMES['gather_'+id+'_width'];
   requireValue(width>0&&width+MINIGAMES.gather_help_width<=MINIGAMES.gather_zone_span&&MINIGAMES.gather_zone_start+MINIGAMES.gather_zone_span<=100,'minigames.csv: '+id+' 채집 판정 범위가 막대를 벗어난다');
