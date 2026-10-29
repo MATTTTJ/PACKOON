@@ -4,7 +4,7 @@
 
 ## 플레이
 
-브라우저에서 바로: **https://mattttj.github.io/PACKOON/** (갈참골 → 돌너머 마을 → 큰 장터 체험판)
+브라우저에서 바로: **https://mattttj.github.io/PACKOON/** (갈참골 → 돌너머 마을 → 큰 장터 → 북쪽 영산, 엔딩까지 체험판)
 
 PC는 키보드(←→ 이동, Space 점프, J 휘두르기, E 말걸기, I 보따리, B 책), 휴대폰은 화면 버튼으로 조작한다.
 
@@ -19,4 +19,4 @@ PC는 키보드(←→ 이동, Space 점프, J 휘두르기, E 말걸기, I 보�
 | `design/gdd/neoguri-concept.md` | 기획 전체 (확정 / 제안 / 미정) |
 | `design/narrative/` | 지역별 시나리오와 엔딩 |
 | `design/data/` | 지역·NPC·교환·아이템·가보·보스 표 (엑셀로 편집하는 CSV) |
-| `prototypes/web/` | 웹 체험판 (지금은 갈참골 → 돌너머 마을 → 큰 장터). 구조와 지역 더하는 법은 그 폴더 README |
+| `prototypes/web/` | 웹 체험판 (지금은 갈참골 → 돌너머 마을 → 큰 장터 → 북쪽 영산, 엔딩까지). 구조와 지역 더하는 법은 그 폴더 README |

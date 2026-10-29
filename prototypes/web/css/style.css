@@ -365,3 +365,12 @@ body.in-battle .hud,body.in-battle .prompt{visibility:hidden}
 .note-line.dad .who{border:1px solid #b9a07a;color:#8a6a48}
 .note-line.me{color:var(--meok)}
 .note-line.me .who{background:var(--meok);color:var(--hanji)}
+
+/* 마지막 지역 끝 화면: 엄마가 지어 준 새 이름 */
+.newname{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.newname-label{font-family:var(--ui);font-size:13px;color:var(--gold);letter-spacing:.06em}
+.newname-input{font-family:var(--display);font-size:17px;padding:6px 10px;border-radius:4px;border:2px solid #6b5238;background:#f2e6cc;color:var(--meok);width:12em;max-width:100%}
+.newname-call{font-family:var(--display);font-size:clamp(18px,3vw,26px);color:var(--gold);margin:4px 0 0}
+
+/* 휴대폰 세로: 시작·끝 화면 뒤의 패드 글씨가 비쳐 제목과 겹치지 않게 */
+@media (pointer:coarse) and (orientation:portrait){.cover{background:rgba(26,19,15,.96)}}

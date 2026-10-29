@@ -31,6 +31,8 @@ function showEnd(){
   const nx=REGIONS[REG.next],b=$('btnNext');
   b.hidden=!nx;if(nx)b.textContent=REGIONS[REG.next].cover.go||nx.name+'로';
   $('btnRestart').className=nx?'btn':'btn primary';
+  /* 지역이 끝 화면에 더 넣을 것 (예: 마지막 지역의 이름 짓기) */
+  const ex=$('endExtra');ex.innerHTML='';if(REG.endExtra)REG.endExtra(ex);
   $('endScreen').hidden=false;
 }
 /* 화면과 상태를 지금 G 에 맞춘다 */
