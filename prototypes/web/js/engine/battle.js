@@ -5,7 +5,7 @@
    상대 {name, calmLabel, intro, howto?, npc?, dodge?(피하기만 하는 시험: 버틸 공격 수), bonkText?(dodge 시작 때 연장을 뺏기는 글),
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
-         cover?:엄폐물, calmAction?:{amount:행동 진정량}, placeGift?:꼭대기에 얹을 선물 id,
+         cover?:엄폐물, warmPath?:{width,wideWidth,attacks:부위별 공격}, calmAction?:{kind?,amount:행동 진정량}, placeGift?:꼭대기에 얹을 선물 id,
          headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표,
          draw(c):수묵 그림, onWin(B)?:이겼을 때 보상 (B.loot 에 넣고 B.bonus 에 글)} */
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
@@ -44,10 +44,12 @@ function startBattle(kind,onEnd){
   document.body.classList.add('in-battle');$('battle').hidden=false;
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
   if(E.cover){B.covers=[];B.round=0;addCover(0.5,0.43);}
+  if(E.warmPath)B.warm={current:{u:0.25,v:0.7},next:null,points:[],round:0,ice:null,fire:0};
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
   const gm=$('goalM');gm.querySelector('b').textContent='전투';gm.querySelector('span').textContent=E.dodge?'연장 없이 피하기만! 화면을 끌거나 십자 버튼으로 피하자.':'붉은 표식 위에서 치기. 화면을 끌거나 십자 버튼으로 피하자.';
   if(E.cover)gm.querySelector('span').textContent='돌 아래 여백에 손을 숨기자. 공격 뒤에는 표식 치기 또는 소원 돌 바로 놓기.';
+  if(E.warmPath)gm.querySelector('span').textContent='물김 길을 따라 옆 샘으로. 공격 뒤에는 붉은 표식 치기 또는 샘의 얼음 걷기.';
 }
 function setPadLabels(on){
   const j=document.querySelector('#pad [data-k="jump"]'),a=document.querySelector('#pad [data-k="atk"]');
@@ -94,6 +96,10 @@ function damageCover(r){
 }
 function openCalmAction(){
   if(!B.E.calmAction)return;
+  if(B.E.calmAction.kind==='ice'){
+    B.warm.ice={...B.warm.current,t:180};
+    B.msg+=' / 샘 위에서 '+HITKEY+': 얼음 걷기.';return;
+  }
   const u=B.mark?(B.mark.x>BOX.x+BOX.w/2?0.14:0.86):(B.round%2?0.86:0.14);
   B.calmStone={u,v:0.8,t:150};
   B.msg+=' / 기울어진 돌 위에서 '+HITKEY+': 바로 놓기.';
@@ -102,16 +108,40 @@ function chooseAttack(){
   if(B.E.cover){B.round++;B.calmStone=null;}
   const L=bLiving();let o=L.filter(p=>p!==B.last);if(!o.length)o=L;
   const p=o[Math.floor(Math.random()*o.length)];B.cur=p;B.last=p;B.st='tell';B.t=42;B.msg=p.tell;B.hitThis=false;
+  if(B.E.warmPath){prepareWarmPath();B.t=80;}
+}
+/* 온기 길은 비율 좌표로 보관한다. 판정과 그림이 같은 꺾은선을 쓴다. */
+function prepareWarmPath(){
+  const w=B.warm;w.round++;w.ice=null;
+  w.next={u:w.current.u<0.5?0.77:0.23,v:Math.floor((w.round-1)/2)%2?0.76:0.24};
+  // 같은 두 샘을 왕복하며 한곳에 머물 수 없도록 높이도 두 차례마다 바꾼다.
+  const bend=B.cur.id==='body'?w.current.u:B.cur.id==='tail'?w.next.u:0.5;
+  w.points=[w.current,{u:part('body').broken?0.5:bend,v:(w.current.v+w.next.v)/2},w.next];
+  w.width=part('body').broken?B.E.warmPath.wideWidth:B.E.warmPath.width;
+}
+function warmSafe(x,y,padding=0){
+  const w=B.warm;if(!w)return false;
+  if([w.current,w.next].some(r=>r&&Math.hypot(x-coverPoint(r).x,y-coverPoint(r).y)<=38+padding))return true;
+  for(let i=1;i<w.points.length;i++){
+    const a=coverPoint(w.points[i-1]),z=coverPoint(w.points[i]),dx=z.x-a.x,dy=z.y-a.y;
+    const q=clamp(((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy||1),0,1);
+    if(Math.hypot(x-a.x-q*dx,y-a.y-q*dy)<=w.width/2+padding)return true;
+  }
+  return false;
+}
+function finishWarmAttack(){
+  const w=B.warm;w.current=w.next; // 직전의 길도 다음 예고까지 남긴다.
 }
 function openMark(){
   const p=B.cur;
   if(p.core&&coreHidden()){B.mark=null;B.msg=B.E.coreHidden;return;}
   let x,y,n=0;do{x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+26+Math.random()*(BOX.h-52);n++;}while(Math.hypot(x-B.px,y-B.py)<70&&n<12);
   if(B.E.markPosition){const pos=B.E.markPosition(p);if(pos){x=pos.x;y=pos.y;}}
-  const life=B.E.calmAction?150:120;
+  const life=B.warm?180:B.E.calmAction?150:120;
   B.mark={x,y,t:life,max:life,part:p};B.msg=jo(p.name,'에','에')+' 빈틈! 붉은 표식 위에서 '+HITKEY+'를 누르자.';
 }
-function attackTick(p){ATTACKS[p.atk].tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
+function battleAttack(p){return ATTACKS[(B.E.warmPath&&B.E.warmPath.attacks[p.id])||p.atk];}
+function attackTick(p){battleAttack(p).tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
 function bHitMe(){
   if(B.inv>0||B.st==='end')return;G.hp--;B.inv=60;B.hits++;B.hitThis=true;refreshHud();bSplash(B.px,B.py,'#b4432a');
   if(G.hp<=0)bEnd('lose');
@@ -121,6 +151,14 @@ function bStrike(){
   if(!B||B.paused||B.st==='end'||B.st==='giftPlace'||B.cool>0)return;
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
   B.cool=16;B.swing=12;
+  if(B.warm&&B.warm.ice){const s=coverPoint(B.warm.ice);
+    if(Math.hypot(s.x-B.px,s.y-B.py)<26){
+      B.warm.thaw={...B.warm.ice,t:90};
+      B.warm.ice=null;B.mark=null;B.calm=Math.min(100,B.calm+B.E.calmAction.amount);
+      B.msg='얇은 얼음을 걷자 따뜻한 물이 흐른다. 강철이가 숨을 고른다.';
+      B.st='idle';B.t=36;renderBHud();if(B.calm>=100)bEnd('calm');return;
+    }
+  }
   if(B.calmStone){const s=coverPoint(B.calmStone);
     if(Math.hypot(s.x-B.px,s.y-B.py)<26){
       B.calmStone=null;B.mark=null;B.calm=Math.min(100,B.calm+B.E.calmAction.amount);
@@ -131,6 +169,7 @@ function bStrike(){
   const m=B.mark;
   if(m&&Math.hypot(m.x-B.px,m.y-B.py)<26){
     B.calmStone=null;
+    if(B.warm)B.warm.ice=null;
     const p=m.part;const dmg=(G.sharp&&!B.E.npc)?2:1;p.hp=Math.max(0,p.hp-dmg);p.shake=16;bSplash(m.x,m.y);B.mark=null;
     if(p.hp<=0)breakPart(p);else B.msg=jo(p.name,'을','를')+' 쳤다! 내구도가 깎였다.';
     renderBHud();
@@ -138,6 +177,7 @@ function bStrike(){
 }
 function breakPart(p){
   p.broken=true;
+  if(B.warm&&p.id==='body')B.warm.width=B.E.warmPath.wideWidth;
   if(p.mat&&!p.core)B.loot.push(p.mat);
   if(p.core){if(p.mat)B.loot.push(p.mat);bEnd('win');return;}
   B.msg=B.E.npc?jo(p.name,'의','의')+' 기세를 꺾었다!':jo(p.name,'이','가')+' 부러졌다! '+(p.mat?ITEMS[p.mat].n+' 획득.':'');
@@ -145,6 +185,7 @@ function breakPart(p){
 }
 function bEnd(result){
   if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.calmStone=null;B.bullets=[];
+  if(B.warm)B.warm.ice=null;
   B.msg=result==='win'?B.E.win:result==='calm'?B.E.calmWin:result==='flee'?'일단 물러나자.':B.E.lose;
   if(result==='calm'){learn('calm:'+B.kind);if(B.E.calmGift)B.loot.push(B.E.calmGift);}
   if(result==='win'&&B.E.onWin)B.E.onWin(B);
@@ -154,6 +195,8 @@ function bStep(){
   if(!B||B.paused||!$('bResult').hidden)return;
   B.time++;if(B.inv>0)B.inv--;if(B.cool>0)B.cool--;if(B.swing>0)B.swing--;
   if(B.covers)B.covers.forEach(r=>{if(r.flash>0)r.flash--;});
+  if(B.warm&&B.warm.fire>0)B.warm.fire--;
+  if(B.warm&&B.warm.thaw&&--B.warm.thaw.t<=0)B.warm.thaw=null;
   if(B.st!=='end'&&B.st!=='giftPlace'){
     let dx=0,dy=0;
     if(keys['arrowleft']||keys['a']||touch.left)dx-=1;if(keys['arrowright']||keys['d']||touch.right)dx+=1;
@@ -170,12 +213,12 @@ function bStep(){
       if(--B.t<=0){if(B.E.dodge&&!B.noTool){B.st='bonk';B.t=120;B.noTool=true;B.bonk=34;B.msg=B.E.bonkText;B.toolFly={x:B.px+10,y:B.py-12,vx:-3.2,vy:-5.5,rot:0};renderBHud();}else{B.st='idle';B.t=20;}}break;
     case 'bonk':if(B.t===60)B.msg='연장을 놓쳤다! 이번엔 피하기만 해야 한다.';if(--B.t<=0){B.st='idle';B.t=20;B.toolFly=null;}break;
     case 'idle':if(--B.t<=0)chooseAttack();break;
-    case 'tell':if(--B.t<=0){B.st='atk';B.atkT=0;B.atkDur=ATTACKS[B.cur.atk].dur;}break;
-    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover)B.st='settle';else{B.st='open';openMark();}}break;
-    case 'settle':if(!B.bullets.length){B.st='open';openMark();openCalmAction();}break;
+    case 'tell':if(--B.t<=0){B.st='atk';B.atkT=0;B.atkDur=battleAttack(B.cur).dur;}break;
+    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover||B.E.warmPath)B.st='settle';else{B.st='open';openMark();}}break;
+    case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';openMark();openCalmAction();}break;
     case 'giftPlace':if(--B.t<=0){B.giftPlace=null;bEnd('calm');}break;
     case 'clear':if(!B.bullets.length){B.survived++;B.msg=(B.hitThis?'아야… 그래도 버텼다. ':'잘 피했다! ')+'('+B.survived+'/'+B.E.dodge+')';renderBHud();if(B.survived>=B.E.dodge)bEnd('win');else{B.st='idle';B.t=40;}}break;
-    case 'open':if(B.calmStone&&--B.calmStone.t<=0)B.calmStone=null;if(B.mark&&--B.mark.t<=0){B.mark=null;B.msg='빈틈이 닫혔다.';}if(!B.mark&&!B.calmStone&&!B.bullets.length){B.st='idle';B.t=36;}break;
+    case 'open':if(B.warm&&B.warm.ice&&--B.warm.ice.t<=0)B.warm.ice=null;if(B.calmStone&&--B.calmStone.t<=0)B.calmStone=null;if(B.mark&&--B.mark.t<=0){B.mark=null;B.msg='빈틈이 닫혔다.';}if(!B.mark&&!B.calmStone&&!(B.warm&&B.warm.ice)&&!B.bullets.length){B.st='idle';B.t=36;}break;
     case 'end':if(--B.t<=0)showResult();return;
   }
   const X1=BOX.x,X2=BOX.x+BOX.w,Y1=BOX.y,Y2=BOX.y+BOX.h;
@@ -198,6 +241,7 @@ function giveGift(id){
   takeItem(id,1);const v=B.E.likes[id];if(v)learn('like:'+B.kind+':'+id);
   B.calm=Math.min(100,B.calm+(v||8));
   B.msg=v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
+  if(B.warm&&id==='dokkaebibul')B.warm.fire=180;
   closeGift();renderBHud();
   if(B.calm>=100){
     if(B.E.placeGift===id){B.giftPlace={x:B.px,y:B.py};B.st='giftPlace';B.t=60;B.mark=null;B.calmStone=null;B.bullets=[];B.msg='아빠의 소원 돌을 손으로 꼭대기에 얹는다.';}
@@ -286,6 +330,7 @@ function bDraw(){
   c.save();c.beginPath();c.rect(BOX.x,BOX.y,BOX.w,BOX.h);c.clip();
   if(B.E.cover)drawBattleCover(c);
   for(const b of B.bullets)BULLETS[b.k].draw(c,b);
+  if(B.warm)drawWarmPath(c);
   if(B.calmStone)drawWishStone(c);
   if(B.mark){const m=B.mark;const pulse=1+Math.sin(B.time*0.25)*0.08;c.save();c.translate(m.x,m.y);c.scale(pulse,pulse);
     c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.arc(0,0,20,-Math.PI/2,-Math.PI/2+Math.PI*2*(m.t/m.max));c.stroke();
