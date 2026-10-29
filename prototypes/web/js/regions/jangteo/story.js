@@ -82,33 +82,131 @@ function morakGive(){
 }
 
 /* ---------- 엿방울 (여우 엿장수): 엿가위 장단 ---------- */
-/* 엿가위 장단: 흘러오는 가위 소리 8개를 선에 맞춰 친다. 5개 이상이면 흥이 올라 아빠의 엿을 내준다. 못 맞춰도 쌀은 받고, 다시 할 수 있다 (임시 규칙) */
+/* 엿가위 장단 (제안): 세 박 묶음 반주와 노트가 같은 초 단위 시계를 쓴다.
+   8개 중 5개면 엿 덤. 쌀 8개와 재도전에는 판정에 따른 불이익이 없다. */
 const rhP=makePanel('rhythm','엿가위 장단','쩔꺽');
-const rh={t:0,notes:[],hits:0,done:false,cool:0,reward:false};
-const rcv=$('rhythmCv'),rx=rcv.getContext('2d');const HIT_X=64,SPEED=1.9,NOTES=8;
-function openRhythm(reward){Object.assign(rh,{t:0,hits:0,done:false,cool:0,reward,notes:Array.from({length:NOTES},(_,i)=>({x:340+i*62+(i%3===2?24:0),st:0}))});
-  $('rhythmHint').textContent='가위가 선에 닿을 때 "쩔꺽"! 장단이 맞으면 엿방울의 흥이 오른다.';rhP.hidden=false;drawRhythm();}
-function drawRhythm(){
-  const c=rx;c.fillStyle='#efe3c8';c.fillRect(0,0,320,120);
-  c.fillStyle='#e3d1ab';c.fillRect(0,46,320,30);c.fillStyle='#b4432a';c.fillRect(HIT_X-1,38,3,46);c.strokeStyle='#b4432a';c.lineWidth=2;c.beginPath();c.arc(HIT_X,61,12,0,Math.PI*2);c.stroke();
-  rh.notes.forEach(n=>{if(n.st===1||n.x<-20||n.x>340)return;const g=n.st===2?'rgba(42,32,25,.3)':'#2a2019';
-    c.fillStyle=g;c.fillRect(n.x-7,54,5,14);c.fillRect(n.x+2,54,5,14);c.fillRect(n.x-3,50,6,4);c.fillStyle=n.st===2?'rgba(42,32,25,.2)':'#7a7e84';c.fillRect(n.x-6,52,12,2);});
-  c.fillStyle='#2a2019';c.font='13px "Gowun Dodum", sans-serif';c.fillText('흥 '+rh.hits+' / '+NOTES,12,24);
-  $('rhythmPips').innerHTML=Array.from({length:NOTES},(_,i)=>'<span class="pip'+(i<rh.hits?' on':'')+'"></span>').join('');
+const rh={notes:[],hits:0,combo:0,done:true,reward:false,timer:null,bus:null};
+const rcv=$('rhythmCv'),rx=rcv.getContext('2d');
+const HIT_X=64,NOTES=8,RH_GOOD=0.18,RH_PERFECT=0.075,RH_SPEED=145;
+const rhTalk={
+  start:['엿 사려! 손보다 귀부터 열어 봐.','쌀은 챙겨 놨지. 흥 좀 내 볼까?','내 가위 따라와 봐, 덤이 달렸어!'],
+  good:['얼쑤! 엿보다 장단이 더 찰지네!','이 손맛이면 장사 접고 춤추겠어!','좋다 좋아, 덤 나갈 소리로구나!'],
+  danger:['어허, 엿 늘이듯 느긋하게 쳐!','덤이 달랑달랑! 다음 박 잡아 봐.','가위 놓쳐도 쌀은 네 몫이야!'],
+  late:['끝 두 박은 살짝 당긴다, 자!','마지막엔 잽싸게! 가위 따라와.'],
+  fail:['가위도 쉬어야지. 한 판 더 해!','쌀은 챙기고, 덤은 다시 노려 봐!','오늘 손이 쉬네? 다시 맞춰 보자!'],
+  close:['휴, 덤 나갈까 말까 했네! 가져가.','딱 다섯! 엿장수 주머니 열렸네!','아슬아슬했지? 약속한 덤 나간다!']
+};
+function rhSay(kind){const a=rhTalk[kind];return a[Math.floor(Math.random()*a.length)];}
+// WebAudio가 없는 환경에서도 판정/보상은 유지한다. 오디오가 있으면 반드시 그 시계만 쓴다.
+function rhNow(){return rh.audio?rh.audio.currentTime:performance.now()/1000;}
+function rhStop(){clearInterval(rh.timer);rh.timer=null;if(rh.bus)rh.bus.stop();rh.bus=null;}
+function openRhythm(reward){
+  rhStop();Object.assign(rh,{hits:0,combo:0,done:false,reward,ready:false,audio:null,
+    notes:[],beats:[],cursor:0,cool:-1,flashUntil:0,label:'준비',paused:null,late:false});
+  $('rhythmHint').textContent='엿방울: '+rhSay('start');
+  rhP.hidden=false;drawRhythm();
+  // 대화 완료 콜백이 입력 밖에서 실행돼도 AudioContext를 여기서 만들지 않는다.
+  if(Sound.context&&Sound.context.state==='running')rhStart();
 }
-function rhythmStep(){if(rh.done)return;rh.t++;if(rh.cool>0)rh.cool--;
-  rh.notes.forEach(n=>{n.x-=SPEED;if(n.st===0&&n.x<HIT_X-14){n.st=2;$('rhythmHint').textContent='…장단을 놓쳤다. 다음 소리!';}});
-  if(rh.notes.every(n=>n.st!==0)){rh.done=true;setTimeout(finishRhythm,500);}
-  drawRhythm();}
-function rhythmHit(){if(rh.done||rh.cool>0)return;rh.cool=8;
-  const n=rh.notes.find(n=>n.st===0&&Math.abs(n.x-HIT_X)<11);
-  if(n){n.st=1;rh.hits++;$('rhythmHint').textContent=['쩔꺽!','쩔꺽쩔꺽!','얼씨구!','좋다!','절씨구!','엿 사려~!','흥이 난다!','얼쑤!'][rh.hits-1];}
-  drawRhythm();}
+function rhStart(){
+  rh.audio=Sound.context;
+  if(rh.audio&&rh.audio.state!=='running')return;
+  rh.ready=true;rh.origin=rhNow()+0.15;rh.bus=Sound.group();
+  // 0.22초 소박 세 개씩. 끝 두 박만 0.66초에서 0.55초로 당긴다.
+  const offsets=[1.32,1.98,2.64,3.30,3.96,4.62,5.17,5.72];
+  rh.notes=offsets.map(t=>({time:rh.origin+t,st:0}));
+  const beats=[];
+  for(let i=0;i<6;i++)beats.push({time:rh.origin+i*0.22,part:i%3,cue:false});
+  offsets.forEach((t,i)=>{const gap=i<5?0.66:0.55;
+    for(let p=0;p<3;p++)beats.push({time:rh.origin+t+p*gap/3,part:p,cue:p===0});});
+  rh.beats=beats;rh.cursor=0;rh.timer=setInterval(rhSchedule,25);rhSchedule();
+}
+function rhSchedule(){
+  if(rh.done||rhP.hidden){rhStop();return;}
+  if(rh.paused!==null||!rh.ready)return;
+  if(rh.audio&&rh.audio.state!=='running')return;
+  const now=rhNow();
+  while(rh.cursor<rh.beats.length&&rh.beats[rh.cursor].time<now+0.12){
+    const b=rh.beats[rh.cursor++];if(b.time<now)continue; // 밀린 반주를 한꺼번에 재생하지 않는다.
+    Sound.drum(b.time,b.part===0?0.24:0.09,rh.bus,b.part===1);
+    if(b.cue)Sound.metal(b.time,0.12,rh.bus);
+    else Sound.click(b.time,0.045,rh.bus);
+    if(rh.combo>=3){Sound.noise(b.time,0.045,rh.bus);
+      if(b.part===0)Sound.metal(b.time,0.07,rh.bus,true);}
+  }
+}
+function drawRhythm(){
+  const c=rx,now=rh.paused===null?rhNow():rh.paused;
+  c.fillStyle='#efe3c8';c.fillRect(0,0,320,120);c.save();
+  if(now<rh.flashUntil&&rh.label==='잘 맞음')c.translate(0,-Math.sin((rh.flashUntil-now)*45)*2);
+  c.fillStyle='#e3d1ab';c.fillRect(0,46,320,30);
+  c.fillStyle='rgba(180,67,42,.15)';c.fillRect(HIT_X-RH_GOOD*RH_SPEED,40,RH_GOOD*RH_SPEED*2,42);
+  c.fillStyle='#b4432a';c.fillRect(HIT_X-1,38,3,46);c.strokeStyle='#b4432a';c.lineWidth=2;c.beginPath();c.arc(HIT_X,61,12,0,Math.PI*2);c.stroke();
+  rh.notes.forEach(n=>{const x=HIT_X+(n.time-now)*RH_SPEED;
+    if(n.st===1||x<-20||x>340)return;
+    c.fillStyle=n.st===2?'rgba(42,32,25,.3)':'#2a2019';
+    c.fillRect(x-7,54,5,14);c.fillRect(x+2,54,5,14);c.fillRect(x-3,50,6,4);
+    c.fillStyle=n.st===2?'rgba(42,32,25,.2)':'#7a7e84';c.fillRect(x-6,52,12,2);});
+  c.restore();c.font='12px "Gowun Dodum", sans-serif';c.fillStyle='#2a2019';
+  const left=rh.notes.filter(n=>n.st===0).length,need=Math.max(0,5-rh.hits);
+  c.fillText('흥 '+rh.hits+'/8 · '+(need?'덤까지 '+need+'개':'덤 나간다!'),10,17);
+  c.fillText(rh.ready?'남은 가위 '+left+' · 연속 '+rh.combo:'버튼을 누르면 준비 장단!',10,34);
+  // 5/8의 실제 덤 선. 실패해도 게이지와 보상을 깎지 않는다.
+  c.fillStyle='#d2bb8b';c.fillRect(12,92,208,10);
+  c.fillStyle=need===1&&left>0?(Math.sin(now*15)>0?'#c36a2c':'#e6b54a'):'#c36a2c';
+  c.fillRect(12,92,208*rh.hits/8,10);c.fillStyle='#713b28';c.fillRect(141,88,2,18);
+  c.fillText('덤 선',129,118);
+  c.fillStyle=rh.label==='빗나감'?'#7a6655':'#b4432a';
+  c.fillText(now<rh.flashUntil?rh.label+(rh.combo>=3?' · 얼쑤!':''):'찰칵에 맞춰!',228,99);
+  $('rhythmPips').innerHTML=rh.notes.map(n=>'<span class="pip'+(n.st===1?' on':'')+'"'+(n.st===2?' style="opacity:.3"':'')+'></span>').join('');
+}
+function rhMiss(n,now){if(n)n.st=2;rh.combo=0;rh.label='빗나감';rh.flashUntil=now+0.45;
+  $('rhythmHint').textContent='엿방울: '+rhSay('danger');}
+function rhythmStep(){
+  if(rh.done||rh.paused!==null)return;
+  if(!rh.ready){
+    if(!Sound.initialized&&(window.AudioContext||window.webkitAudioContext))return;
+    if(!Sound.context||Sound.context.state==='running')rhStart();else return;
+  }
+  const now=rhNow();rhSchedule();
+  rh.notes.forEach(n=>{if(n.st===0&&now-n.time>RH_GOOD)rhMiss(n,now);});
+  if(!rh.late&&now>=rh.notes[5].time+0.2){rh.late=true;$('rhythmHint').textContent='엿방울: '+rhSay('late');}
+  if(rh.notes.every(n=>n.st!==0)&&now>=rh.notes[7].time+0.65){rh.done=true;rhStop();finishRhythm();}
+  drawRhythm();
+}
+function rhythmHit(){
+  if(rh.done||rhP.hidden||rh.paused!==null)return;
+  if(!rh.ready){rhStart();return;}
+  if(rh.audio&&rh.audio.state!=='running')return;
+  const now=rhNow();if(now-rh.cool<0.12)return;rh.cool=now;
+  // 입력 직전에도 지난 노트를 처리해 프레임이 느려도 판정이 같도록 한다.
+  rh.notes.forEach(n=>{if(n.st===0&&now-n.time>RH_GOOD)rhMiss(n,now);});
+  const n=rh.notes.filter(n=>n.st===0).sort((a,b)=>Math.abs(a.time-now)-Math.abs(b.time-now))[0];
+  if(n&&Math.abs(n.time-now)<=RH_GOOD){
+    const perfect=Math.abs(n.time-now)<=RH_PERFECT;n.st=1;rh.hits++;rh.combo++;
+    rh.label=perfect?'잘 맞음':'맞음';rh.flashUntil=now+0.45;
+    Sound.metal(now,perfect?0.25:0.14,rh.bus,perfect);
+    $('rhythmHint').textContent='엿방울: '+rhSay(rh.hits===4?'danger':'good');
+  }else{rhMiss(null,now);Sound.click(now,0.035,rh.bus);}
+  drawRhythm();
+}
+// 다른 탭을 보는 동안 기회가 사라지지 않게 반주와 노트를 함께 멈춘다.
+document.addEventListener('visibilitychange',()=>{
+  if(rhP.hidden||rh.done||!rh.ready)return;
+  if(document.hidden){rh.paused=rhNow();rhStop();}
+  else if(rh.paused!==null){
+    const gap=rhNow()-rh.paused+0.3;rh.origin+=gap;
+    rh.notes.forEach(n=>n.time+=gap);rh.beats.forEach(b=>b.time+=gap);
+    rh.cool+=gap;rh.flashUntil+=gap;rh.paused=null;rh.bus=Sound.group();
+    rh.cursor=rh.beats.findIndex(b=>b.time>=rhNow());if(rh.cursor<0)rh.cursor=rh.beats.length;
+    rh.timer=setInterval(rhSchedule,25);rhSchedule();
+  }
+});
 $('rhythmBtn').addEventListener('pointerdown',e=>{e.preventDefault();rhythmHit();});rcv.addEventListener('pointerdown',e=>{e.preventDefault();rhythmHit();});
 defineMinigame({id:'rhythm',step:rhythmStep,hit:rhythmHit});
 function finishRhythm(){
-  if(rhP.hidden)return;rhP.hidden=true;const F=G.f;const high=rh.hits>=5;learn('yeotbang:rhythm');
-  const lines=[];
+  if(rhP.hidden)return;rhStop();rhP.hidden=true;const F=G.f;const high=rh.hits>=5;learn('yeotbang:rhythm');
+  const lines=[['엿방울',rhSay(high?(rh.hits===5?'close':'good'):'fail')]];
   if(rh.reward){F.yeotDone=true;ledgerDone('yeotbang');addItem('ssal',8);
     lines.push(['엿방울',high?'얼씨구, 장단 좀 아네! 흥이 절로 난다.':'흥이 덜 났네. 그래도 엿장수 약속은 약속이지.'],['엿방울','엿 고고 남은 쌀 여덟 되. 가져가.']);}
   rel('yeotbang',high?2:1);
