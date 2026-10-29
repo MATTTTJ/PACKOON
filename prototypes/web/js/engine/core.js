@@ -50,6 +50,7 @@ function npcName(id){for(const r of regionList()){const n=(r.npcs||[]).find(n=>n
 /* 지역에 상관없이 이어지는 상태 */
 function baseState(){return{
   started:false,ended:false,region:null,
+  runId:Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36),   // 게임 하나를 가리키는 번호 (저장 덮어쓰기 확인용)
   px:0,py:GROUND,vx:0,vy:0,face:1,onGround:true,anim:0,
   hp:5,maxhp:5,attackT:0,hurtT:0,cam:0,
   inv:{},tool:'pick',sharp:false,

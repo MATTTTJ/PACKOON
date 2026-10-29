@@ -6,7 +6,7 @@ function fillCover(){
   cv.setAttribute('aria-label',REG.name+' 게임 화면');
   $('titleKicker').textContent=C.title.kicker;$('titleHead').textContent=C.title.head;
   const tb=$('titleBody');tb.innerHTML='';C.title.body.forEach(t=>tb.appendChild(el('p',null,t)));
-  $('btnStart').textContent=C.title.start;
+  $('btnStart').textContent=C.title.start;$('btnStart').dataset.armed='';
   /* 개발용: 지역마다 버튼. 누르면 그 지역부터 새로 시작하고 주소에도 남겨 새로고침해도 그 지역에서 시작한다 */
   const dp=$('devPick');dp.innerHTML='';
   regionList().forEach(r=>{const b=el('button',null,r.order+' '+r.name);b.type='button';b.setAttribute('aria-pressed',r===REG);
@@ -24,7 +24,7 @@ function startGame(){
 /* 지역을 끝낼 때 지역 코드가 부른다. REG.next 가 있으면 다음 지역 버튼이 나온다 */
 function endGame(){
   G.ended=true;
-  showEnd();refreshGoal();
+  showEnd();refreshGoal();writeSave(true);
 }
 function showEnd(){
   $('endStats').innerHTML=REG.endStats().map(([k,v])=>'<span>'+k+' <b>'+v+'</b></span>').join('');
@@ -39,13 +39,11 @@ function showEnd(){
 function resetScreens(){
   REG=REGIONS[G.region];fillCover();closePanels();
   $('endScreen').hidden=true;$('titleScreen').hidden=G.started;
-  lastGoal='';lastTool='';lastNear=null;refreshHud();
+  lastGoal='';lastTool='';lastNear=null;refreshHud();refreshSaveUI();
 }
-$('btnStart').onclick=startGame;
-$('btnRestart').onclick=()=>{G=newGame();resetScreens();
-  try{const u=new URL(location.href);u.searchParams.delete('region');history.replaceState(null,'',u);}catch(_){}};
+$('btnStart').onclick=startOrConfirm;   // 처음부터(btnRestart)는 save.js
 /* 다음 지역으로: 보따리·연장·책·호감은 그대로 가지고 간다 */
-$('btnNext').onclick=()=>{if(!REGIONS[REG.next])return;enterRegion(G,REGIONS[REG.next]);resetScreens();};
+$('btnNext').onclick=()=>{if(!REGIONS[REG.next])return;enterRegion(G,REGIONS[REG.next]);resetScreens();writeSave(true);};
 $('btnBookEnd').onclick=()=>{bookTab='clues';renderBook();$('book').hidden=false;$('endScreen').hidden=true;
   $('bookClose').addEventListener('click',()=>{if(G.ended)$('endScreen').hidden=false;},{once:true});};
 
@@ -62,7 +60,7 @@ function boot(data){
   fillCover();
   if(G.started)$('titleScreen').hidden=true;
   if(G.ended)showEnd();
-  refreshHud();requestAnimationFrame(loop);
+  refreshHud();refreshSaveUI();requestAnimationFrame(loop);
 }
 window.claude?.hot?.snapshot?.(()=>{const g=JSON.parse(JSON.stringify(G));pouch.items.forEach(id=>{g.inv[id]=(g.inv[id]||0)+1;});return {G:g};});
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
