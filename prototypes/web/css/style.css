@@ -378,3 +378,32 @@ body.in-battle .hud,body.in-battle .prompt{visibility:hidden}
 /* 책 아래 저장·처음부터 버튼 줄 */
 .panel-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 14px;border-top:1px solid var(--hanji-2)}
 .panel-foot .small{flex:1;min-width:10em}
+
+/* 첫 화면: 타이틀 장면 (packoon-layer-studio). 장면은 16:9, 메뉴는 PC에서는 장면 위, 휴대폰 세로에서는 장면 아래 */
+.title-scene{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--night)}
+.title-view{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#342a25;border:3px solid var(--frame);border-radius:6px;box-shadow:0 0 0 1px #000,0 18px 44px rgba(0,0,0,.55);touch-action:pan-y}
+#titleCanvas{display:block;width:100%;height:100%;image-rendering:auto}
+.title-loading{position:absolute;inset:0;display:grid;place-items:center;background:#322a24;color:#f1dfbc;font-size:13px}
+.title-menu{position:absolute;left:0;right:0;bottom:5%;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;padding:0 12px}
+.title-menu>*{pointer-events:auto}
+.ts-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ts-btn{font-family:var(--ui);font-size:clamp(13px,1.6vw,16px);color:var(--hanji);background:rgba(26,19,15,.74);border:2px solid #c99a3e;border-radius:6px;padding:8px 18px;min-height:40px;cursor:pointer;touch-action:manipulation}
+.ts-btn:hover{background:rgba(42,30,22,.88)}
+.ts-btn.primary{background:var(--dan);border-color:#5a1d10;color:#fff6e8}
+.ts-btn.primary:hover{background:#c9533a}
+.ts-btn.ghost{font-size:clamp(12px,1.35vw,14px);padding:6px 12px;min-height:36px}
+.ts-btn[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.ts-meta{font-family:var(--ui);font-size:clamp(11px,1.3vw,13px);color:#fff6e8;background:rgba(26,19,15,.6);padding:2px 10px;border-radius:4px;text-align:center}
+@media (pointer:coarse) and (orientation:portrait){
+  .title-scene{background:var(--night);gap:16px}
+  .title-view{border-width:2px}
+  .title-menu{position:static;padding:0 4px;gap:10px}
+  .ts-row{flex-direction:column;width:100%;max-width:320px}
+  .ts-btn{width:100%;min-height:52px;font-size:17px}
+  .ts-btn.ghost{min-height:44px;font-size:15px}
+  .ts-meta{background:none;color:var(--dim)}
+}
+@media (pointer:coarse) and (orientation:landscape){
+  .title-scene{justify-content:center}
+  .title-view{width:min(100%, calc(100dvh * 16 / 9));border-width:2px;border-radius:4px}
+}

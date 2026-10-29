@@ -61,6 +61,8 @@ function boot(data){
   if(G.started)$('titleScreen').hidden=true;
   if(G.ended)showEnd();
   refreshHud();refreshSaveUI();requestAnimationFrame(loop);
+  /* 첫 화면: 처음 들어올 때만. 개발용 ?region= 이나 이어 붙인 상태로 열 때는 건너뛴다 */
+  if(!(data&&data.G)&&!new URLSearchParams(location.search).get('region')&&!G.started)TitleScreen.open();
 }
 window.claude?.hot?.snapshot?.(()=>{const g=JSON.parse(JSON.stringify(G));pouch.items.forEach(id=>{g.inv[id]=(g.inv[id]||0)+1;});return {G:g};});
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});

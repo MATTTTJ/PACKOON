@@ -23,6 +23,7 @@ function writeSave(quiet){
 function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(_){}refreshSaveUI();}
 function loadSave(){
   const s=readSave();if(!s)return false;
+  TitleScreen.close();
   G=Object.assign(baseState(),s.G);   // 나중에 생긴 칸이 빠진 옛 저장도 기본값으로 채운다
   resetScreens();if(G.ended)showEnd();
   toast('이어서 한다 · '+REGIONS[G.region].name);return true;
@@ -55,6 +56,7 @@ function confirmNewGame(b){
   disarm(b);clearSave();G=newGame();resetScreens();
   try{const u=new URL(location.href);u.searchParams.delete('region');history.replaceState(null,'',u);}catch(_){}
   toast('처음부터 시작한다');
+  TitleScreen.open();
 }
 $('btnNewGame').onclick=()=>confirmNewGame($('btnNewGame'));
 $('btnRestart').onclick=()=>confirmNewGame($('btnRestart'));
