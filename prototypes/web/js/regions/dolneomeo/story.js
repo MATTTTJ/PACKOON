@@ -44,7 +44,7 @@ function kkuTrade(){
 /* ---------- 날쌘 (다시 만남): 돌투성이 마을이라 칡꽃 향이 귀하다 ---------- */
 function talkNal(){
   if(!G.f.nalDTalk){G.f.nalDTalk=true;ledger('nal_dolneomeo','날쌘','칡꽃 1 (또는 겨우살이 2)','결명자');
-    talk([['날쌘','또 만났네, 꼬마 보부상. 여긴 돌밖에 없어서 장사가 영 시원찮아.'],['날쌘','…잠깐. 그 보따리에서 나는 향, 갈참골 칡꽃이지? 여기선 그게 귀한 몸이야.']],nalMenu);}
+    talk([['날쌘','또 만났네, 꼬마 보부상. 여긴 돌밖에 없어서 장사가 영 시원찮아.'],['날쌘','…잠깐. 그 보따리에서 나는 향, 단풍골 칡꽃이지? 여기선 그게 귀한 몸이야.']],nalMenu);}
   else nalMenu();
 }
 function nalMenu(){
@@ -52,7 +52,7 @@ function nalMenu(){
   if(!F.nalDDone){
     if(has('kflower'))c.push({t:'칡꽃을 내민다 (결명자 2)',go:()=>nalTrade('kflower')});
     if(has('gyeousari',2))c.push({t:'겨우살이 2개를 내민다 (결명자 1)',go:()=>nalTrade('gyeousari')});
-    if(!F.nalDBluff)c.push({t:'허세 부리기: "칡꽃이 다 뭐야, 갈참골엔 흔해 빠졌는데"',go:nalBluff});
+    if(!F.nalDBluff)c.push({t:'허세 부리기: "칡꽃이 다 뭐야, 단풍골엔 흔해 빠졌는데"',go:nalBluff});
   }
   c.push({t:'그만두기',go:null});
   const say=F.nalDDone?'결명자는 눈 밝히는 약재야. 눈 침침한 영감님한테 차로 달여 드리면 좋아하겠지.'
@@ -64,13 +64,13 @@ function nalTrade(id){
   takeItem(id,id==='kflower'?1:2);F.nalDDone=true;ledgerDone('nal_dolneomeo');
   const n=(id==='kflower'?2:1)+(F.nalDBluff?1:0);
   addItem('gyeolmyeongja',n);learn('nal:dolneomeo');
-  diary('d_nal','갈참골에서는 흔하던 '+(id==='kflower'?'칡꽃을':'겨우살이를')+' 날쌘이 결명자와 바꿔 주었다. 같은 물건도 마을마다 값이 다르다.');
+  diary('d_nal','단풍골에서는 흔하던 '+(id==='kflower'?'칡꽃을':'겨우살이를')+' 날쌘이 결명자와 바꿔 주었다. 같은 물건도 마을마다 값이 다르다.');
   talk(F.nalDBluff?[['날쌘','흔해 빠졌다더니 냄새는 기가 막히네. 자, 결명자. 덤까지 얹었다.'],['날쌘','날쌘이 짠돌이란 소리는 못 듣지.']]
     :[['날쌘','거래 성립. 결명자 '+n+'개.'],['날쌘','눈 밝히는 약재야. 쓸 데가 있을걸.']]);
 }
 function nalBluff(){
   G.f.nalDBluff=true;rel('nal',1);
-  talk([['너구리','흥, 칡꽃이 다 뭐야. 갈참골엔 흔해 빠졌는데.'],['날쌘','흔해 빠졌다고? …허, 촌놈 허세는 여전하네.'],['날쌘','좋아. 거래하면 덤으로 하나 더 얹어 주지.']],nalMenu);
+  talk([['너구리','흥, 칡꽃이 다 뭐야. 단풍골엔 흔해 빠졌는데.'],['날쌘','흔해 빠졌다고? …허, 촌놈 허세는 여전하네.'],['날쌘','좋아. 거래하면 덤으로 하나 더 얹어 주지.']],nalMenu);
 }
 
 /* ---------- 돌쇠 할배 (두더지 석수) ---------- */
@@ -204,7 +204,7 @@ Rg.startGolem=()=>{
 Rg.sendMedicine=()=>{
   G.f.yakMade=true;
   diary('d_end','깨어난 맷돌로 서리다래를 갈아 약즙을 만들었다. 이번에는 내 손으로 만든 약이다. 까치가 물고 남쪽으로 날아갔다.');
-  talk([['너구리','서리다래 약즙이다. 이번엔 내 손으로 만들었다.'],['너구리','(휘파람을 불자 장승 위에 앉아 있던 까치가 내려왔다.)'],['너구리','까치야, 엄마한테 부탁해. 남쪽 갈참골 너머, 우리 집이야.']],()=>{
+  talk([['너구리','서리다래 약즙이다. 이번엔 내 손으로 만들었다.'],['너구리','(휘파람을 불자 장승 위에 앉아 있던 까치가 내려왔다.)'],['너구리','까치야, 엄마한테 부탁해. 남쪽 단풍골 너머, 우리 집이야.']],()=>{
     takeItem('darae_yak',1);endGame();
   });
 };

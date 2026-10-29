@@ -50,7 +50,7 @@ function disarm(btn){if(btn.dataset.armed){btn.textContent=btn.dataset.prev;btn.
 $('btnContinue').onclick=()=>loadSave();
 $('btnSave').onclick=()=>writeSave(false);
 $('btnSaveHud').onclick=()=>{if(G.started)writeSave(false);};
-/* 처음부터 하기 (책 아래, 끝 화면): 저장이 있으면 한 번 더 눌러야 지우고 갈참골 처음으로 */
+/* 처음부터 하기 (책 아래, 끝 화면): 저장이 있으면 한 번 더 눌러야 지우고 단풍골 처음으로 */
 function confirmNewGame(b){
   if(readSave()&&!b.dataset.armed){arm(b,'정말요? 한 번 더 누르면 저장이 지워진다');return;}
   disarm(b);clearSave();G=newGame();resetScreens();
