@@ -204,7 +204,11 @@ Rg.startDokkaebi=()=>{
   G.px=Rg.STORE_X-30;
   inkTransition('전투',(Rg.STORE_X-G.cam)/W*100,()=>startBattle('dokkaebi',res=>{
     if(res==='win'||res==='calm'){
-      if(res==='calm'){G.f.dokCalm=true;diary('j_calm','헌물 도깨비를 부수지 않고 달랬다. 도깨비는 훔친 것을 돌려놓고 춤추듯 사라졌다.');}
+      if(res==='calm'){
+        G.f.dokCalm=true;
+        if(!has('dokkaebibul'))addItem('dokkaebibul',1);
+        diary('j_calm','헌물 도깨비를 부수지 않고 달랬다. 도깨비는 훔친 것을 돌려놓고 고맙다며 도깨비불씨를 건넨 뒤 춤추듯 사라졌다.');
+      }
       Rg.bossDie(res==='calm');
     }else{
       G.px=Rg.STORE_X-70;G.f.faints+=res==='lose'?1:0;
