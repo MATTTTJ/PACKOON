@@ -5,6 +5,7 @@
 (()=>{
 const Rg=REGIONS.yeongsan;
 const MG=TABLES.MINIGAMES;
+const arcs=()=>Rg.arcsEnabled();
 
 const SALG_LINES={
   start:['귀, 귀를 세우면 멈춰 줘.','나, 발소리에 잘 놀라… 살살 와 줘.'],
@@ -27,15 +28,33 @@ function talkNal(){
 }
 function nalMenu(){
   const F=G.f;
-  if(F.nalYDone){talk([['날쌘','설피 끈이나 단단히 매라. 눈길에서 서두르다간 푹 빠진다.']]);return;}
+  if(F.nalYDone){
+    if(arcs()){
+      const c=[];
+      if(!F.yArcsNal4)c.push({t:'아빠를 어떻게 알아?',go:nalArc});
+      c.push({t:'산길로 간다',go:null});
+      talk([['날쌘','설피 끈 단단히 매. 눈에 푹 빠지지 말고.',c]]);return;
+    }
+    talk([['날쌘','설피 끈이나 단단히 매라. 눈길에서 서두르다간 푹 빠진다.']]);return;
+  }
   const c=[];if(vineOK()&&bindOK())c.push({t:'설피 재료를 건넨다',go:nalTrade});c.push({t:'그만두기',go:null});
+  if(arcs()){
+    talk([['날쌘',vineOK()&&bindOK()?'다 모았네. 이리 줘.':!vineOK()?'산막 옆 덤불을 낫으로 베 봐. 다래 덩굴이 나와.':'짚 하나면 돼. 산막 처마 밑에서 한 줌 빼 와.',c]]);return;
+  }
   talk([['날쌘',vineOK()&&bindOK()?'재료는 다 모았군. 이리 내봐.':!vineOK()?'산막 옆 눈 덮인 덤불을 봐라. 네 낫으로 베면 다래 덩굴이 나와.':'짚 하나만 가져와라. 산막 처마 밑 짚단에서 한 줌 빼면 돼.',c]]);
 }
 function nalTrade(){
   const F=G.f;
   if(has('darae_vine',2))takeItem('darae_vine',2);else takeItem('broom_sal',1);
   if(has('jip'))takeItem('jip',1);else takeItem('eoksae',2);
-  F.nalYDone=true;F.seolpi=true;addItem('seolpi',1);ledgerDone('nal_yeongsan');learn('nal:yeongsan');
+  F.nalYDone=true;F.seolpi=true;addItem('seolpi',1);ledgerDone('nal_yeongsan');
+  if(arcs()){
+    diary('y_nal','날쌘에게 재료를 건네고 설피를 받았다. 이번에는 덤 없이 제값으로 바꿨다.');
+    talk([['날쌘','(날쌘이 덩굴로 테를 짜고 짚을 엮는다.)'],
+      ['날쌘','자, 설피. 네 아빠는 저 위 호숫가에 있어.',[
+        {t:'아빠를 어떻게 알아?',go:nalArc},{t:'산길로 간다',go:null}]]]);return;
+  }
+  learn('nal:yeongsan');
   diary('y_nal','날쌘이 설피를 엮으며 아빠와 같은 보부상단이었다고 했다. 다들 날쌘을 얕봤지만, 아빠는 끝까지 그러지 않았단다.');
   const lines=[['날쌘','(날쌘이 말없이 덩굴로 테를 짜고 짚을 엮는다.)'],['날쌘','…나도 네 아빠랑 같은 보부상단에 있었다.'],
     ['날쌘','다들 깍쟁이라고 날 얕봤지. 네 아빠는… 끝까지 그러지 않더군.']];
@@ -43,16 +62,40 @@ function nalTrade(){
   lines.push(['날쌘','가 봐라. 네 아빠, 저 위에 있다.']);
   talk(lines);
 }
+/* ④는 듣지 않아도 설피를 받는다. 앞 지역 표시는 읽기만 한다. */
+function nalArc(){
+  const F=G.f;if(!arcs()||!F.nalYDone||F.yArcsNal4)return;
+  const memory=F.nalJTalk?'장터에서도 봤지? 우연히 마주친 게 아냐.':
+    F.nalDTalk?'돌너머에서도 봤지? 우연히 마주친 게 아냐.':
+    F.nalTalk?'단풍골부터 널 앞질러 와서 지켜봤어.':'지난가을, 네 아빠가 북쪽으로 가는 걸 봤어.';
+  talk([['날쌘','나도 네 아빠랑 같은 보부상단에 있었어.'],
+    ['날쌘','내가 잃은 상단 물건값을 네 아빠가 대신 갚아 줬지.'],
+    ['날쌘','네 아빠는… 날 끝까지 얕보지 않았어.'],
+    ['날쌘',memory],['너구리','그래서 여기까지 왔어?'],
+    ['날쌘','빚 갚으러. 그래도 오늘 거래는 제값이야. 너도 보부상이잖아.']],()=>{
+      F.yArcsNal4=true;learn('nal:yeongsan');
+      diary('y_arcs_nal4','날쌘은 아빠가 대신 갚아 준 물건값을 기억하고 있었다. 내 앞에 나타난 것도 우연이 아니었다. 오늘은 나를 같은 보부상으로 대했다.');
+    });
+}
 
 /* ---------- 살금이 (고라니 산지기): 귀를 세울 때는 멈춘다 (field.js) ---------- */
 function talkSalg(){
   const F=G.f;
   if(!F.salgMet){F.salgMet=true;ledger('salgeumi','살금이','마가목 열매 3 (또는 콩 2)','호숫가 지름길');
+    if(arcs()){
+      talk([['살금이','가, 가까이 왔네. 무서운 애는 아니지?'],
+        ['살금이','겨울 끝이라… 먹을 게 없어.'],
+        ['살금이','마가목 세 알이나 콩 두 알 줄래? 지름길 알려 줄게.']],()=>{
+          F.yArcsSalg1=true;diary('y_arcs_salg1','살금이 가까이 다가가 말을 나눴다. 겨울 끝이라 굶주렸다고 한다.');
+          if(salgCan())salgTrade();
+        });return;
+    }
     talk([['살금이','(고라니가 귀를 쫑긋 세우고 몸을 떤다.)'],['살금이','…너, 무서운 애는 아니지? 겨울 끝이라 먹을 게 없어.'],
       ['살금이','비탈의 빨간 마가목 열매 세 알… 아니면 콩 두 알 줄래? 호숫가 지름길 알려 줄게.']],()=>{if(salgCan())salgTrade();});
     return;
   }
   if(!F.salgDone){if(salgCan())salgTrade();else talk([['살금이','마, 마가목 열매 세 알이면 돼. 비탈 나무에 있어… 콩 두 알도 괜찮아.']]);return;}
+  if(arcs()){salgArcMenu();return;}
   talk([['살금이','봄이 오면 좋겠다… 호숫가 풀이 제일 먼저 나거든.']]);
 }
 const salgCan=()=>has('magamok',3)||has('kong',2);
@@ -60,12 +103,50 @@ function salgTrade(){
   talk([['살금이','그, 그거 나한테 줄래?',[{t:has('magamok',3)?'마가목 열매 3을 건넨다':'콩 2를 건넨다',go:()=>{
     const F=G.f;if(has('magamok',3))takeItem('magamok',3);else takeItem('kong',2);
     F.salgDone=true;F.shortcut=true;rel('salgeumi',1);ledgerDone('salgeumi');learn('salgeumi:shortcut');
+    if(arcs()){
+      clue('y1','살금이','"가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라."');
+      diary('y_salg','살금이에게 먹을 것을 주고 비탈의 지름길을 들었다. 가을부터 호숫가에 말 못 하는 너구리가 있다고 한다.');
+      talk([['살금이','고, 고마워. 왼쪽 바위턱을 디디면 호숫가로 올라가.'],
+        ['살금이','가을부터 호숫가에 너구리 하나가 있어. 말은 못 하더라.'],
+        ['살금이','이, 이무기가 호수를 휘감아서 봄이 안 와…',salgArcChoices()]]);
+      toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();return;
+    }
     clue('y1','살금이','"봄마다 호숫가에 너구리 하나가 와서 신목만 바라봐. 말은 못 하더라."');
     diary('y_salg','살금이가 얼어붙은 비탈의 지름길을 알려 주었다. 봄마다 호숫가에 말 못 하는 너구리가 와서 신목만 바라본다고 한다.');
     talk([['살금이','고, 고마워…'],['살금이','어, 얼어붙은 비탈 있지? 왼쪽 바위턱을 디디면 호숫가로 올라갈 수 있어.'],
       ['살금이','봄마다 호숫가에 너구리 하나가 와. 신목만 바라보는데… 말은 못 하더라.'],
       ['살금이','지, 지금은 이무기가 호수에 똬리를 틀고 있어. 그 녀석 때문에 봄이 안 와…']],()=>{toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();});
   }},{t:'아직은 안 줄래',go:null}]]]);
+}
+function salgArcChoices(){
+  const F=G.f,c=[];
+  if(!F.yArcsSalg2)c.push({t:'왜 먹을 게 없어?',go:salgFoodArc});
+  if(F.yArcsSalg2&&F.dadDone&&!F.yArcsSalg3)c.push({t:'우리 아빠였어. 고마워.',go:salgThanksArc});
+  c.push({t:'길을 나선다',go:null});return c;
+}
+function salgArcMenu(){
+  talk([['살금이',G.f.yArcsSalg3?'이, 이젠 가까이 있어도 괜찮아.':
+    G.f.spring?'보, 봄이야. 호숫가에도 풀이 났어.':'호, 호숫가 풀이 나면 좋겠다…',salgArcChoices()]]);
+}
+function salgFoodArc(){
+  const F=G.f;if(!arcs()||!F.salgDone||F.yArcsSalg2)return;
+  talk([['살금이','그 너구리한테 내 걸 줘서…'],
+    ['살금이','가을부터 마가목을 갖다 뒀어. 가, 가까이는 못 가고.'],
+    ['살금이','놓고 도망쳤다가 보면… 먹었더라. 겨울 내내.']],()=>{
+      F.yArcsSalg2=true;
+      diary('y_arcs_salg2','살금이는 제 몫의 마가목을 호숫가 너구리에게 나눠 줬다. 가까이 가지 못해 멀리 놓고 돌아왔다고 한다.');
+    });
+}
+function salgThanksArc(){
+  const F=G.f;if(!arcs()||!F.salgDone||!F.yArcsSalg2||!F.dadDone||F.yArcsSalg3)return;
+  F.yArcsSalg3=true;
+  const s=G.salg;s.x+=Math.sign(G.px-s.x)*Math.min(12,Math.abs(G.px-s.x));
+  talk([['너구리','우리 아빠였어. 먹을 걸 줘서 고마워.'],
+    ['살금이','그, 그랬구나. 네 아빠였어…'],
+    ['살금이','(살금이가 귀를 내리고 한 걸음 다가온다.)'],
+    ['살금이','이, 이제 도망 안 가도 되지?']],()=>{
+      diary('y_arcs_salg3','아빠가 겨울을 난 건 살금이 덕분이었다. 고맙다고 하자 살금이가 귀를 내리고 내 곁으로 왔다.');
+    });
 }
 
 /* ---------- 아빠: 몸짓 읽기 (틀려도 아빠가 다시 해 보인다) ---------- */
@@ -121,6 +202,16 @@ function talkSangun(){
   const F=G.f;
   if(!F.dadDone){talk([['산군 할아버지','(커다란 호랑이가 눈을 감고 앉아 있다.)'],['산군 할아버지','…어린 보부상이로구나. 먼저 호숫가에서 네 아비를 만나고 오너라.']]);return;}
   if(!F.sangunMet){F.sangunMet=true;rel('sangun',1);learn('sangun:story');ledger('sangun','산군 할아버지','셈이 맞는 값','되돌림');
+    if(arcs()){
+      clue('y3','산군 할아버지','엄마는 아빠가 젊을 때 다녀온 영산 이야기를 듣고 나를 안고 혼자 왔다. 아빠는 지난가을 말을 내놓아 글로도 연락할 수 없게 됐다.');
+      diary('y_sangun','젊은 아빠는 부를 준다는 소문을 좇아 영산에 왔지만 되찾을 것이 없어 빈손으로 돌아갔다. 엄마는 그 이야기를 기억해 나를 안고 혼자 왔다. 그때 아빠는 장삿길에 있었다. 지난가을 아빠가 말을 내놓은 뒤에는 글도 쓸 수 없었다. 장부는 두 분이 값을 내놓기 전에 쓴 것이다.');
+      talk([['산군 할아버지','네 아비는 젊어서 부를 좇아 왔지. 열매는 잃은 것만 돌려준다.'],
+        ['산군 할아버지','그 이야기를 들은 어미가 널 안고 왔다. 아비는 장삿길에 있었지.'],
+        ['산군 할아버지','가장 귀한 말부터 거둔다. 어미가 네 이름부터 잊는 까닭이지.'],
+        ['산군 할아버지','말을 내놓으면 글도 못 쓴다. 장부는 그 전에 쓴 것이지.'],
+        ['산군 할아버지','지난가을 아비가 제 말을 보탰다. 어미의 것을 돌려 달라며.'],
+        ['산군 할아버지','강철이가 겨울을 붙들어 열매가 없구나. 봄이 오거든 다시 오너라.']],()=>refreshGoal());return;
+    }
     clue('y3','산군 할아버지','엄마는 아기였던 나를 살리려고 영산에 올라와, 둔갑과 말을 값으로 내놓았다. 아빠는 그걸 알고 자기 말을 더 얹었다.');
     diary('y_sangun','산군 할아버지가 엄마의 오래된 거래를 들려주었다. 숨이 다해 가던 아기였던 나를 살리려고, 엄마가 둔갑과 말을 내놓았다. 아빠는 되돌려 달라고 자기 말을 더 얹었다.');
     talk([['산군 할아버지','네가 그 아기로구나. 숨이 꺼져 가던…'],
@@ -135,6 +226,15 @@ function talkSangun(){
   if(!G.boss.dead){talk([['산군 할아버지','강철이가 호수를 놓지 않는 한 봄은 오지 않는다.']]);return;}
   if(!F.fruitGot){talk([['산군 할아버지','봄이로구나. 신목에 열매가 열렸다. 따 오너라.']]);return;}
   if(!F.nameGiven){
+    if(arcs()){
+      talk([['산군 할아버지','어미의 둔갑과 말, 둘을 돌려주려면 아비의 말 하나론 모자란다.'],
+        ['너구리','아빠 이름은요?'],
+        ['산군 할아버지','받을 수 없었다. 숨을 받은 네 것이어야 한다.'],
+        ['산군 할아버지','아비는 네게 값을 치르게 하기 싫어 돌아가지도, 끝내지도 못했다.'],
+        ['너구리','제 이름을 내면… 엄마가 나아요?'],
+        ['산군 할아버지','네 이름은 모두의 기억에서 사라진다. 그래도 내놓겠느냐?',[
+          {t:'제 이름을 드릴게요',go:giveName},{t:'…조금만 생각할게요',go:null}]]]);return;
+    }
     talk([['산군 할아버지','열매를 땄구나.'],['산군 할아버지','어미가 치른 것은 둔갑과 말, 둘이다. 되돌리려 내놓은 것은 아비의 말 하나.'],
       ['산군 할아버지','어미의 두 가지를 돌려받으려면… 값이 하나 모자라는구나.'],
       ['너구리','(보따리 속 물건으론 안 되겠지.)'],
@@ -168,6 +268,10 @@ Rg.startGangcheol=()=>{
 };
 /* 전설의 열매를 따면 수첩의 아빠 그림 옆 글씨가 보인다 (notes.js 의 got:legend_fruit) */
 Rg.fruitFound=()=>{
+  if(arcs()){
+    diary('y_fruit','전설의 열매를 수첩에 그렸다. 아빠의 "여기다."는 젊은 시절 이 신목을 찾아와 적은 메모다.');
+    setTimeout(()=>toast('아빠가 적어 둔 "여기다."의 신목이다. 산군 할아버지에게 가자'),1600);refreshGoal();return;
+  }
   diary('y_fruit','전설의 열매를 따서 붓으로 그리려고 수첩을 펼쳤다. 아빠의 그림 옆에 덧쓴 글씨가 있었다. "여기다."');
   setTimeout(()=>toast('수첩의 아빠 그림 옆에… "여기다." 산군 할아버지에게 가자'),1600);refreshGoal();
 };

@@ -112,6 +112,7 @@ function stepSalg(){
 }
 Rg.maxX=()=>!G.f.seolpi?SNOW_X-6:!G.f.shortcut?SLOPE_X-12:!G.f.sangunMet?BOSS_AT-30:2330;
 Rg.step=()=>{
+  Rg.arcsEnabled();
   stepSalg();
   if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT)Rg.startGangcheol();
   if(has('doerim_yak')&&!G.f.yakDone)Rg.goHome();

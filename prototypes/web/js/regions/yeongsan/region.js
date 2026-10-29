@@ -26,12 +26,14 @@ const Rg=defineRegion('yeongsan',{
     boss:{x:2120,dead:false},
     salg:{x:1480,home:1480,startle:0},   // 살금이: 귀를 세울 때 움직이면 달아난다
     f:{nalYTalk:false,nalYDone:false,seolpi:false,salgMet:false,salgDone:false,shortcut:false,
-      dadMet:false,dadDone:false,sangunMet:false,spring:false,fruitGot:false,nameGiven:false,yakDone:false,newName:''},
+      dadMet:false,dadDone:false,sangunMet:false,spring:false,fruitGot:false,nameGiven:false,yakDone:false,newName:'',
+      ...(/[?&]arcs=1\b/.test(location.search)?{arcs:true}:{})},
     rel:{salgeumi:{t:'호감',v:0},sangun:{t:'외경',v:0},nal:{t:'경멸',v:0}},
   }),
   weather:()=>Vfx.setWeather(G.f.spring?'petal':'snow'),
   weatherFront(){if(!G.f.spring)R(0,0,W,H,'rgba(20,28,70,.12)');},
   onStart(){
+    Rg.arcsEnabled();
     diary('y_start','영산에 왔다. 눈이 허리까지 쌓였다. 산막에 불빛이 보인다.');
     toast('산막의 불빛 쪽으로 가 보자');
   },
@@ -40,6 +42,13 @@ const Rg=defineRegion('yeongsan',{
     ['쓰러진 횟수',G.f.faints],
   ],
 });
+
+/* 지역을 다시 시작하거나 주소 없이 저장을 이어도 시험판 여부를 그때의 G에서 읽는다. */
+Rg.arcsEnabled=()=>{
+  const enabled=/[?&]arcs=1\b/.test(location.search)||!!(G&&G.f&&G.f.arcs);
+  if(enabled&&G&&G.f)G.f.arcs=true;
+  return enabled;
+};
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({
