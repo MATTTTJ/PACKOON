@@ -7,6 +7,93 @@ const ATTACKS={},BULLETS={};
 function defineAttacks(m){Object.assign(ATTACKS,m);}
 function defineBullets(m){Object.assign(BULLETS,m);}
 
+/* 무쇠 선택 기능. 작업 예고는 chooseAttack 때 시작해 tell 상태에서도 보인다. */
+defineAttacks({
+  forgeHammer:{dur:100,tick(){}},
+  forgeWind:{dur:100,tick(){}},
+  forgeShout:{dur:100,tick(){}},
+});
+function forgeShelter(x,y){
+  const p=coverPoint({u:0.74,v:0.42});
+  return Math.abs(x-p.x)<=32&&y>=p.y+12;
+}
+function forgeWorkHits(b,x,y){
+  if(b.k==='forgeHammer')return Math.abs(x-coverPoint(b).x)<=36;
+  if(b.k==='forgeWind')return !forgeShelter(x,y);
+  const apex=BOX.y-BOX.h*0.15,half=(y-apex)/(BOX.h*1.15)*BOX.w*0.38;
+  return Math.abs(x-(BOX.x+BOX.w/2))<=half;
+}
+function forgeWorkStep(b){
+  b.t++;
+  if(b.k==='forgeHammer'&&B.survived===3&&b.t===80){
+    // 예고는 아직 공격이 아니다. 이번 공격의 종료도 막지 않는다.
+    B.forgeNext={k:'forgeWind',t:0,tell:120,hold:28,preview:true};
+    B.msg='"아까 배운 대로!" 풀무 바람길도 보인다. 망치가 지나가면 오른쪽 판 뒤로 옮겨라.';
+  }
+  if(b.t>b.tell+b.hold)b.dead=1;
+  else if(b.t>b.tell&&forgeWorkHits(b,B.px,B.py))bHitMe();
+}
+defineBullets({
+  forgeHammer:{step:forgeWorkStep,draw:drawForgeWork},
+  forgeWind:{step:forgeWorkStep,draw:drawForgeWork},
+  forgeShout:{step:forgeWorkStep,draw:drawForgeWork},
+});
+
+/* 골렘 시험판 전용. 기존 공격과 탄은 건드리지 않는다. */
+defineAttacks({
+  golemPillar:{dur:105,tick(t){if(t===0){
+    const u=clamp((B.px-BOX.x)/BOX.w,0.16,0.84);
+    B.bullets.push({k:'golemPillar',u,v:0.5,t:0,tell:40,hold:30});
+  }}},
+  golemSweep:{dur:130,tick(t){if(t===0){
+    B.bullets.push({k:'golemSweep',t:0,tell:38,y:BOX.y-10,gap:B.round%2?0.08:0.72});
+  }}},
+  golemThrow:{dur:135,tick(t){if(t===0){
+    const eye=B.E.headPose();
+    B.bullets.push({k:'golemThrow',x:eye.x,y:eye.y,tx:B.px,ty:B.py,t:0,tell:38});
+  }}},
+});
+defineBullets({
+  golemPillar:{
+    step(b){b.t++;if(b.t>b.tell+b.hold){addCover(b.u,b.v);b.dead=1;}
+      else if(b.t>b.tell&&Math.abs(B.px-coverPoint(b).x)<23)bHitMe();},
+    draw(c,b){const p=coverPoint(b);
+      if(b.t<=b.tell){for(let i=0;i<5;i++)brush(c,[[p.x-14+(i%2)*7,BOX.y+i*BOX.h/5],[p.x+10,BOX.y+(i+0.5)*BOX.h/5],[p.x-9,BOX.y+(i+1)*BOX.h/5]],1.6,RED,0.65);}
+      else{brush(c,[[p.x,BOX.y+BOX.h],[p.x-4,BOX.y+10]],32,INK);brush(c,[[p.x-9,BOX.y+BOX.h],[p.x+3,BOX.y+18]],4,'#e6e2da',0.55);}
+    }},
+  golemSweep:{
+    step(b){b.t++;if(b.t<=b.tell)return;b.y+=2.4;
+      if(b.y>BOX.y+BOX.h+12){b.dead=1;return;}
+      const gap=BOX.x+b.gap*BOX.w;
+      if(Math.abs(B.py-b.y)<12&&!(B.px>gap+4&&B.px<gap+54)&&!coverBehind(B.px,B.py))bHitMe();},
+    draw(c,b){const gap=BOX.x+b.gap*BOX.w;
+      if(b.t<=b.tell){c.save();c.globalAlpha=0.1; c.fillStyle=INK;c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.fillStyle='#f7f4ed';c.fillRect(gap,BOX.y,58,BOX.h);c.restore();
+        for(const r of B.covers){const p=coverPoint(r);c.fillStyle='#f7f4ed';c.fillRect(p.x-22,p.y+10,44,BOX.y+BOX.h-p.y-10);}
+      }
+      const y=b.t<=b.tell?BOX.y+12:b.y,col=b.t<=b.tell?RED:INK;
+      // 붓질에도 안전한 여백을 남긴다.
+      const safe=[[gap,gap+58],...B.covers.map(r=>{const p=coverPoint(r);return y>p.y+10?[p.x-22,p.x+22]:[0,0];})];
+      for(let x=BOX.x;x<BOX.x+BOX.w;x+=4)if(!safe.some(([a,z])=>x>=a&&x<=z))brush(c,[[x,y],[x+3,y+1]],b.t<=b.tell?5:15,col,0.85);
+    }},
+  golemThrow:{
+    step(b){b.t++;
+      if(b.t<=b.tell){if(b.t===b.tell){const a=Math.atan2(b.ty-b.y,b.tx-b.x);b.vx=Math.cos(a)*4.2;b.vy=Math.sin(a)*4.2;}return;}
+      const ox=b.x,oy=b.y;b.x+=b.vx;b.y+=b.vy;
+      // 선분을 돌의 타원에 대조해 빠른 돌도 엄폐물을 통과하지 않게 한다.
+      for(const r of B.covers){const p=coverPoint(r),dx=b.x-ox,dy=b.y-oy;
+        const q=clamp(((p.x-ox)*dx+(p.y-oy)*dy)/(dx*dx+dy*dy),0,1);
+        if(((ox+q*dx-p.x)/31)**2+((oy+q*dy-p.y)/21)**2<=1){damageCover(r);b.dead=1;return;}
+      }
+      if(Math.hypot(b.x-B.px,b.y-B.py)<13){
+        // 비스듬한 먹선에서도 표시한 흰 엄폐 범위와 안전 판정을 맞춘다.
+        const shelter=coverBehind(B.px,B.py);if(shelter)damageCover(shelter);else bHitMe();b.dead=1;
+      }
+      else if(b.y>BOX.y+BOX.h+25||b.x<BOX.x-100||b.x>BOX.x+BOX.w+100||b.y<0)b.dead=1;
+    },
+    draw(c,b){if(b.t>b.tell){blob(c,b.x,b.y,10,8,INK);brush(c,[[b.x-5,b.y-3],[b.x+3,b.y-4]],2,'#f7f4ed');}}
+  },
+});
+
 defineAttacks({
   /* 틈이 하나 있는 가로줄이 위에서 내려온다 */
   sweep:{dur:160,tick(t,X,Y,W,Hh){if(t%52===0){const gw=58;const gx=X+14+Math.random()*(W-gw-28);B.bullets.push({k:'bar',y:Y-8,vy:1.55,gx,gw,th:9});}}},
