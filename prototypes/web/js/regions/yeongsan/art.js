@@ -74,17 +74,18 @@ function mountains(camera,base,height,col,seed){
     px(x,y,2,H-y,col);
   }
 }
-function pine(x,y,size=1,snow=true){
-  const s=size;px(x-2*s,y-43*s,4*s,43*s,'#384a4d');
+function pine(x,y,size=1,snow=true,shape=0){
+  const s=size,lean=(shape%3-1)*2;px(x-2*s,y-43*s,4*s,43*s,'#384a4d');
   for(let i=0;i<4;i++){
-    const w=(8+i*5)*s,cy=y-52*s+i*11*s;
-    px(x-w,cy,w*2,6*s,'#3b5361');px(x-w+3*s,cy-3*s,w*2-6*s,3*s,snow?'#cadce8':'#7b9a85');
+    const w=(7+i*(shape%2?4:5))*s,cy=y-(50+shape%3*3)*s+i*11*s,bx=x+lean*(3-i);
+    px(bx-w,cy,w*2,6*s,'#3b5361');px(bx-w+3*s,cy-3*s,w*2-6*s,3*s,snow?'#cadce8':'#7b9a85');
   }
 }
-function rowan(x,y){
-  px(x-2,y-48,4,48,C.bark);px(x-22,y-37,22,2,C.bark);px(x,y-45,24,2,C.bark);
+function rowan(x,y,seed=0){
+  const h=Math.round(hash(seed+7)*13),spread=Math.round(hash(seed+19)*9);
+  px(x-2,y-48-h,4,48+h,C.bark);px(x-22-spread,y-37-h,22+spread,2,C.bark);px(x,y-45-h,24-spread,2,C.bark);
   for(let i=0;i<5;i++){
-    const bx=x-22+i*10,by=y-38-(i%2)*8;
+    const bx=x-22-spread+i*(10+spread/3),by=y-38-h-(i%2)*8;
     px(bx,by-2,7,2,pink()?'#89a386':C.snow);px(bx+1,by+1,3,3,'#ce6058');px(bx+4,by+3,3,3,'#b84c4b');
   }
 }
@@ -117,24 +118,51 @@ function sacredTree(x,y,bloom){
   px(x-49,y-156,14,29,'#66514b');px(x+37,y-170,12,30,'#66514b');
   px(x-21,y-172,10,42,'#66514b');px(x+4,y-184,9,54,'#66514b');
   px(x-8,y-104,4,83,'#937367');px(x+4,y-79,3,59,'#473e40');
-  px(x-33,y-8,66,5,'#baaa7d');px(x-40,y-4,80,4,'#d6c697');
-  for(let i=0;i<7;i++){px(x-32+i*11,y-16,8,2,'#d9c8a0');px(x-30+i*11,y-14,2,7,'#f7ead8');}
+  // 늙은 느티나무의 갈라진 수피와 뿌리. 금줄은 뿌리가 아니라 줄기에 두른다.
+  for(let i=0;i<9;i++){const bx=x-11+i%4*6,by=y-95+i*9;px(bx,by,2,5+i%3,'#423c38');px(bx+2,by+2,2,3,'#a18569');}
+  px(x-33,y-8,66,5,'#78654c');px(x-40,y-4,80,4,'#a18c64');
+  px(x-17,y-43,34,3,'#b6a06c');px(x-17,y-39,34,2,'#dfce99');
+  for(let i=0;i<6;i++){px(x-17+i*6,y-44+i%2*3,6,2,'#e6d5a1');}
+  for(const dx of [-12,0,11]){px(x+dx,y-38,2,6,'#f5ead3');px(x+dx-1,y-33,4,3,'#f5ead3');px(x+dx+1,y-30,3,3,'#f5ead3');}
   if(bloom){
-    const b=[[-78,-172,66,25],[-39,-188,76,30],[15,-177,78,30],[-64,-143,59,22],[15,-148,65,24],[-10,-159,49,23]];
+    const b=[[-88,-174,58,21],[-50,-190,65,26],[2,-191,60,24],[43,-177,54,22],[-67,-149,46,17],[16,-154,65,19]];
     for(const [bx,by,bw,bh] of b){
-      px(x+bx+8,y+by,bw-16,bh,'#d88faa');px(x+bx,y+by+6,bw,bh-13,'#d88faa');
-      px(x+bx+4,y+by+3,bw-8,bh-7,'#efb1c9');
+      px(x+bx+8,y+by,bw-16,bh,'#65885a');px(x+bx,y+by+6,bw,bh-13,'#65885a');
+      px(x+bx+4,y+by+3,bw-8,bh-7,'#99b975');
       for(let j=0;j<bw-9;j+=8){
         const bump=Math.floor(hash(j+by)*5);
-        px(x+bx+j+5,y+by-2+bump,8,5,'#f8cddd');
-        px(x+bx+j+7,y+by+7+Math.floor(hash(j*8+bx)*12),3,2,'#ffe4ed');
-        px(x+bx+j+4,y+by+bh-5,5,3,'#dfa0ba');
+        px(x+bx+j+5,y+by-2+bump,7,4,'#c7d99a');
+        px(x+bx+j+7,y+by+7+Math.floor(hash(j*8+bx)*8),3,2,'#e0e5ad');
+        px(x+bx+j+4,y+by+bh-5,5,3,'#799c63');
       }
     }
   }else{
     px(x-39,y-136,32,3,'#e6edf1');px(x+6,y-149,43,3,'#e6edf1');px(x-14,y-134,20,2,'#e6edf1');
   }
   for(let i=0;i<5;i++)px(x-40+i*19,y-1,11,3,'#756452');
+}
+function azalea(x,y,size=1,seed=0){
+  // 꽃은 낮은 진달래 덤불에만 둔다. 신목의 새잎과 높이·모양을 구분한다.
+  for(let i=0;i<5;i++){
+    const bx=x+(i-2)*6*size,by=y-(9+hash(seed+i*7)*7)*size;
+    px(bx,by,1*size,y-by,'#7c645b');
+    px(bx-3*size,by-2*size,6*size,3*size,i%2?'#be7196':'#d38ba9');
+    px(bx-1*size,by-4*size,3*size,7*size,'#e3a2bc');px(bx,by,1*size,1*size,'#f1d0cd');
+  }
+}
+function mist(camera,y,bloom=false){
+  for(let i=0;i<7;i++){
+    const x=((i*79-camera*.23)%530+530)%530-65;
+    px(x,y+i%3*4,62+i%2*22,2,bloom?'#d7d5d0':'#899aaf');
+    px(x+11,y-2+i%3*4,41+i%2*16,2,bloom?'#e5dfd7':'#a0adbb');
+  }
+}
+function birds(camera,y,bloom=false){
+  const ox=255-camera*.08;
+  for(let i=0;i<(bloom?7:3);i++){
+    const x=((ox+i*17)%440+440)%440-20,by=y+Math.abs(i-3)*3;
+    px(x,by,3,1,bloom?'#7c8586':'#667a96');px(x+2,by+1,3,1,bloom?'#7c8586':'#667a96');px(x+4,by,3,1,bloom?'#7c8586':'#667a96');
+  }
 }
 function sky(camera=0,bloom=pink()){
   for(let y=0;y<H;y+=4){
@@ -177,28 +205,30 @@ A.back=zone=>{
   mountains(Math.round(cam*.07),118,36,pink()?'#c9a6bd':'#384b68',34);
   mountains(Math.round(cam*.17),151,38,pink()?'#ad99b4':'#506783',109);
   mountains(Math.round(cam*.28),179,22,pink()?'#8797a3':'#748fa5',384);
+  mist(cam,142,pink());birds(cam,49,pink());
+  if(pink())for(let i=0;i<8;i++)azalea(i*67-(cam*.24)%67,166+i%3*6,.45,i*13);
   ground(zone);
 };
 A.scenery=zone=>{
   for(let wx=120;wx<2600;wx+=230){
-    const x=wx-cam;if(x<-100||x>W+100)continue;
+    const x=wx+Math.round(hash(wx)*34)-17-cam,size=.72+hash(wx+7)*.48,shape=Math.floor(hash(wx+11)*5);if(x<-100||x>W+100)continue;
     if(zone==='shelter'){
-      if(wx%460<200){pine(x,GROUND,.85,!pink());rock(x+56,GROUND,36,14);}
-      else{rowan(x,GROUND);px(x+40,GROUND-6,28,6,'#8d7761');px(x+42,GROUND-9,24,3,'#dae4e9');}
+      if(wx%460<200){pine(x,GROUND,size,!pink(),shape);rock(x+56,GROUND,28+shape*3,12+shape*2);}
+      else{rowan(x,GROUND,wx);px(x+40,GROUND-6,28,6,'#8d7761');px(x+42,GROUND-9,24,3,'#dae4e9');}
     }else if(zone==='snow'){
-      pine(x,GROUND,1,!pink());
+      pine(x,GROUND,size,!pink(),shape);
       if(!pink()){
         const opened=(G.f.ySnowTrail||0)>wx;px(x+48,GROUND-(opened?10:29),75,opened?10:29,'#dbe7ee');
         px(x+51,GROUND-(opened?10:29),69,3,'#eff5f6');
         if(opened)for(let i=0;i<4;i++)px(x+53+i*17,GROUND-3,6,2,'#92adc4');
-      }else{px(x+48,GROUND-3,63,3,'#859b88');for(let i=0;i<5;i++)px(x+50+i*12,GROUND-5,2,2,'#e5a9c3');}
+      }else{px(x+48,GROUND-3,63,3,'#859b88');azalea(x+78,GROUND,.55,wx);}
     }else if(zone==='slope'){
       rock(x,GROUND,68,32);px(x+29,GROUND-65,22,65,pink()?'#9ba99c':'#a5c4d7');
       px(x+31,GROUND-66,18,3,'#e1edf1');
       if(G.f.shortcut)for(let i=0;i<4;i++)px(x+30+i*4,GROUND-10-i*12,8,3,'#6f6b5b');
-      rowan(x+93,GROUND);
+      rowan(x+93,GROUND,wx);
     }else{
-      if(wx<650||wx>2040){rock(x,GROUND,45,15);if(wx%460<200)pine(x+28,GROUND,.8,!pink());}
+      if(wx<650||wx>2040){rock(x,GROUND,34+shape*4,12+shape*2);if(wx%460<200)pine(x+28,GROUND,size*.8,!pink(),shape);}
       else{px(x,GROUND-3,44,3,pink()?'#9ebfc9':'#e4f0f4');if(!pink()){px(x+10,GROUND+3,2,14,'#8daabc');px(x+10,GROUND+16,13,1,'#8daabc');}}
     }
   }
@@ -249,6 +279,7 @@ A.scenery=zone=>{
   if(zone==='island'){
     const x=2236-cam;px(x-117,GROUND-4,234,9,pink()?'#93a18c':'#dce8ed');
     px(x-95,GROUND-8,190,4,pink()?'#b6bea2':'#edf3f3');sacredTree(x,GROUND,pink());
+    if(pink()){azalea(x-98,GROUND,.85,3);azalea(x+96,GROUND,.65,14);}
     boat(160-cam,GROUND+20);
     px(234-cam,GROUND-21,3,21,'#7b6a57');px(265-cam,GROUND-24,3,24,'#7b6a57');
     for(let i=0;i<7;i++)px(236-cam+i*4,GROUND-20-i%3,5,2,'#d5c397');
@@ -258,11 +289,11 @@ A.scenery=zone=>{
     for(let i=0;i<7;i++)px(1096-cam-i*4,GROUND-i*2,5,3,'#73614f');
     if(pink())for(let i=0;i<7;i++)px(1075-cam+i*7,GROUND+9+i%2*2,5,1,'#c0dbe1');
     else{px(1069-cam,GROUND-1,33,1,'#d7e8eb');px(1080-cam,GROUND+7,35,1,'#c4d9e3');}
-    // 낮게 뻗은 가지가 조사 자리까지 닿는다. 겨울눈이 같은 자리에서 꽃이 된다.
+    // 낮게 뻗은 가지가 조사 자리까지 닿는다. 겨울눈이 같은 자리에서 새잎이 된다.
     px(2100-cam,GROUND-72,129,4,'#66514b');px(2100-cam,GROUND-82,3,11,'#66514b');
-    px(2109-cam,GROUND-78,3,7,'#66514b');px(2099-cam,GROUND-85,5,4,pink()?'#f4c4d8':'#9b7c75');
-    px(2108-cam,GROUND-81,5,4,pink()?'#f4c4d8':'#9b7c75');
-    if(pink()){px(2097-cam,GROUND-86,9,3,'#f8d8e3');px(2105-cam,GROUND-83,10,3,'#f8d8e3');}
+    px(2109-cam,GROUND-78,3,7,'#66514b');px(2099-cam,GROUND-85,5,4,pink()?'#9dbb76':'#9b7c75');
+    px(2108-cam,GROUND-81,5,4,pink()?'#9dbb76':'#9b7c75');
+    if(pink()){px(2097-cam,GROUND-86,9,3,'#d1dfa1');px(2105-cam,GROUND-83,10,3,'#d1dfa1');}
   }
 };
 A.ridgeLayers=[
@@ -287,6 +318,7 @@ A.ridgeLayers=[
     }
     for(let i=0;i<6;i++)px(82+i*41-c*.55,204-i%3*3,21,1,'#788b9e');
   }},
+  {speed:.16,draw:c=>{mist(c,184,false);birds(c,104,false);}},
   {speed:.22,draw:c=>{
     px(0,211,W,14,'#263b51');for(let x=0;x<W;x+=3)px(x,206+Math.round(Math.sin((x+c)*.025)*5),3,19,'#c7dae6');
     pine(27-c*.16,223,1.2,true);pine(390-c*.13,234,1.45,true);
@@ -299,7 +331,9 @@ A.springLayers=[
   {speed:.05,draw:c=>{
     mountains(c,119,24,'#c5abc0',33);mountains(c,135,18,'#b39fb7',180);
     px(0,141,W,99,'#a9bbc8');for(let i=0;i<22;i++)px(i*23-c*.25,147+i%6*8,17,1,'#d8d6df');
+    for(let i=0;i<11;i++)azalea(i*43-c*.35,134+i%3*4,.42,i*9);
   }},
+  {speed:.08,draw:c=>{mist(c,146,true);birds(c,58,true);}},
   {speed:.12,draw:c=>{
     px(0,174,W,66,'#7eabbc');
     for(let i=0;i<48;i++){
@@ -316,13 +350,14 @@ A.springLayers=[
     const x=259-Math.round(c*.24);
     px(x-104,206,208,9,'#7d9185');px(x-90,200,180,7,'#bbc4a7');
     px(x-76,197,152,4,'#d9d0b6');sacredTree(x,201,true);
-    // 신목의 분홍빛이 물까지 닿는다. 꽃잎 사이로 열린 물길을 남긴다.
-    for(let i=0;i<54;i++){
-      const xx=((i*47+7-c*.3)%440+440)%440-20,yy=18+(i*37)%215;
-      px(xx,yy,i%5===0?3:2,1,i%3?'#f4c0d4':'#ffe2eb');
+    // 느티 새잎 아래 낮은 진달래가 핀다. 물길 위에는 꽃비 대신 버들씨 몇 점만 둔다.
+    azalea(x-100,203,.75,4);azalea(x+96,202,.6,17);
+    for(let i=0;i<9;i++){
+      const xx=((i*47+7-c*.3)%440+440)%440-20,yy=122+(i*37)%75;
+      px(xx,yy,2,1,'#f4efdb');px(xx+1,yy-1,1,1,'#fbf7e9');
     }
     px(0,219,99,6,'#a9b59d');px(0,216,75,3,'#d8cfb9');
-    for(let i=0;i<8;i++){px(8+i*10,212-i%3*3,2,6,'#789780');px(7+i*10,211-i%3*3,4,2,'#e8acc8');}
+    for(let i=0;i<8;i++){px(8+i*10,212-i%3*3,2,6,'#789780');px(7+i*10,211-i%3*3,4,2,'#b9ce86');}
   }},
 ];
 A.drawBear=(x,y,f=1)=>{
@@ -347,6 +382,13 @@ A.drawOtter=(x,y,f=1)=>{
 A.drawMagpie=(x,y,f=1)=>{
   A.drawCrow(x,y,f);M(x,y,f,-5,-14,8,6,'#e1e5e3');M(x,y,f,-13,-7,7,3,'#638291');M(x,y,f,-20,-5,9,2,'#344052');
   M(x,y,f,1,-9,9,6,'#b79e79');M(x,y,f,4,-11,2,3,'#8d735b');
+};
+A.willowSeeds=()=>{
+  const t=Vfx.reducedMotion?0:G.anim;
+  for(let i=0;i<9;i++){
+    const x=((hash(i*9+3)*W-t*.08)%W+W)%W,y=(hash(i*5+1)*H+t*.13)%H;
+    px(x,y,1,2,'#f8f2df');if(i%3===0)px(x-1,y,3,1,'#eae6d2');
+  }
 };
 A.blockedSnow=(x,y)=>{for(let i=0;i<5;i++){px(x-24+i*10,y-23-i%2*8,12,23+i%2*8,'#d8e7ef');px(x-23+i*10,y-25-i%2*8,10,3,'#f3f7f6');}};
 A.blockedIce=(x,y)=>{px(x-24,y-44,48,44,'#8badc5');px(x-22,y-46,44,4,'#dfeef3');for(let i=0;i<4;i++)px(x-14+i*9,y-37+i*6,2,12,'#c4dce6');};

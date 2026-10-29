@@ -1,5 +1,5 @@
 'use strict';
-/* 북쪽 영산 전투: 강철이 (용이 되지 못한 이무기). 원본 표: design/data/bosses.csv · boss_parts.csv
+/* 북쪽 영산 전투: 서리무기 (용이 되지 못한 이무기). 원본 표: design/data/bosses.csv · boss_parts.csv
    부위 공격 넷 (boss_parts.csv 의 공격 칸):
    frostBreath 입: 상자 위쪽부터 얼어붙는 띠가 내려옴
    coil        몸통: 양옆에서 휘감아 조여 피할 자리가 좁아짐
@@ -72,7 +72,7 @@ function drawGangcheol(c){
 }
 
 defineEnemies({
-  gangcheol:{name:'강철이',calmLabel:'진정',coreNeeds:'body',
+  gangcheol:{name:'서리무기',calmLabel:'진정',coreNeeds:'body',
     intro:'[시험판] 서리 덮인 호수에 물김이 오른다. 넓은 흰 길을 따라 옆 샘으로 건너가자.',
     warmPath:{width:76,wideWidth:100,attacks:{mouth:'gangcheolFrost',body:'gangcheolCoil',tail:'gangcheolIcicles',core:'gangcheolBlizzard'}},
     calmAction:{kind:'ice',amount:TABLES.CALM.gangcheol.patsirutteok/3},
@@ -80,13 +80,13 @@ defineEnemies({
       const v=B.warm&&B.warm.current.v<0.5?0.76:0.24;
       return {x:BOX.x+BOX.w*u,y:BOX.y+BOX.h*v};},
     parts:tableParts('gangcheol',{mouth:{atk:'frostBreath',tell:'서리 띠가 내려온다. 아래에만 머물지 말고 물김 길로 옆 샘에 가자.'},body:{atk:'coil',tell:'똬리의 멈출 선을 보자. 흰 틈을 따라 옆 샘으로 건너가자.'},tail:{atk:'icicleTail',tell:'먹점에 고드름이 떨어진다. 끊기지 않은 흰 길을 먼저 고르자.'},core:{atk:'blizzard',tell:'눈보라가 돌아온다. 물김 길과 옆 샘은 끝까지 열려 있다.'}}),
-    likes:TABLES.CALM.gangcheol,likeText:'강철이가 잠시 숨을 멈춘다.',
-    likeTexts:{dokkaebibul:'꺼지지 않는 도깨비불씨를 건넸다. 강철이가 그 온기에 눈을 감는다.',
-      patsirutteok:'붉은 팥떡을 내밀자 강철이가 움찔 물러난다. 서리가 조금 걷혔다.'},
+    likes:TABLES.CALM.gangcheol,likeText:'서리무기가 잠시 숨을 멈춘다.',
+    likeTexts:{dokkaebibul:'꺼지지 않는 도깨비불씨를 건넸다. 서리무기가 그 온기에 눈을 감는다.',
+      patsirutteok:'붉은 팥떡을 내밀자 서리무기가 움찔 물러난다. 서리가 조금 걷혔다.'},
     coreHidden:'머리가 똬리 속에 숨어 있다. 몸통을 먼저 부수면 머리가 드러난다.',
     coreShown:'똬리가 풀려 온기 길이 넓어졌다! 이제 머리를 노릴 수 있다.',
-    calmWin:'강철이가 서리를 거두고, 따뜻한 남쪽 바다를 향해 천천히 날아오른다.',calmGift:'frost_whisker',
-    win:'여의주에 금이 가자 강철이가 호수를 놓고 물러난다.',
+    calmWin:'서리무기가 서리를 거두고, 따뜻한 남쪽 바다를 향해 천천히 날아오른다.',calmGift:'frost_whisker',
+    win:'여의주에 금이 가자 서리무기가 호수를 놓고 물러난다.',
     lose:'눈보라에 휩쓸려 호숫가로 밀려났다.',
     draw:drawGangcheol},
 });

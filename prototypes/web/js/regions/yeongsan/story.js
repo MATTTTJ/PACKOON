@@ -1,11 +1,12 @@
 'use strict';
 /* 북쪽 영산 진행: 날쌘의 설피, 살금이(살금살금 다가가기), 아빠(몸짓 읽기와 장부 한 장), 산군 할아버지(엄마의 오래된 거래와 마지막 교환),
-   강철이, 전설의 열매, 약연이 깨어남, 집으로. 흐름은 design/narrative/yeongsan-scenario.md (제안).
+   서리무기, 전설의 열매, 약연이 깨어남, 집으로. 흐름은 design/narrative/yeongsan-scenario.md (제안).
    주인공의 이름은 끝까지 나오지 않는다. 끝 화면에서 엄마가 지어 준 새 이름을 플레이어가 적는다 (제안) */
 (()=>{
 const Rg=REGIONS.yeongsan;
 const MG=TABLES.MINIGAMES;
 const arcs=()=>Rg.arcsEnabled();
+const nickname=(id,text,by)=>{if(typeof grantNickname==='function')grantNickname(id,text,by);};
 
 const SALG_LINES={
   start:['귀, 귀를 세우면 멈춰 줘.','나, 발소리에 잘 놀라… 살살 와 줘.'],
@@ -69,9 +70,11 @@ function nalTrade(){
   if(has('darae_vine',2))takeItem('darae_vine',2);else takeItem('broom_sal',1);
   if(has('jip'))takeItem('jip',1);else takeItem('eoksae',2);
   F.nalYDone=true;F.seolpi=true;addItem('seolpi',1);ledgerDone('nal_yeongsan');
+  nickname('yeongsan_snow_walker','눈길 보부상','날쌘');
   if(arcs()){
     diary('y_nal','날쌘에게 재료를 건네고 설피를 받았다. 이번에는 덤 없이 제값으로 바꿨다.');
     talk([['날쌘','(날쌘이 덩굴로 테를 짜고 짚을 엮는다.)'],
+      ['날쌘','직접 챙긴 재료로 눈길까지 여네. 눈길 보부상이야.'],
       ['날쌘','자, 설피. 네 아빠는 저 위 호숫가에 있어.',[
         {t:'아빠를 어떻게 알아?',go:nalArc},{t:'산길로 간다',go:null}]]]);return;
   }
@@ -80,7 +83,7 @@ function nalTrade(){
   const lines=[['날쌘','(날쌘이 말없이 덩굴로 테를 짜고 짚을 엮는다.)'],['날쌘','…나도 네 아빠랑 같은 보부상단에 있었다.'],
     ['날쌘','다들 깍쟁이라고 날 얕봤지. 네 아빠는… 끝까지 그러지 않더군.']];
   if(has('sinpyo')){addItem('fur_tosi',1);learn('nal:tosi');lines.push(['날쌘','(보따리 끈에 매단 신표를 보더니, 날쌘이 말없이 털토시를 얹어 준다.)']);}
-  lines.push(['날쌘','가 봐라. 네 아빠, 저 위에 있다.']);
+  lines.push(['날쌘','직접 구한 재료로 눈길까지 여네. 눈길 보부상이야.'],['날쌘','가 봐라. 네 아빠, 저 위에 있다.']);
   talk(lines);
 }
 /* ④는 듣지 않아도 설피를 받는다. 앞 지역 표시는 읽기만 한다. */
@@ -124,18 +127,20 @@ function salgTrade(){
   talk([['살금이','그, 그거 나한테 줄래?',[{t:has('magamok',3)?'마가목 열매 3을 건넨다':'콩 2를 건넨다',go:()=>{
     const F=G.f;if(has('magamok',3))takeItem('magamok',3);else takeItem('kong',2);
     F.salgDone=true;F.shortcut=true;rel('salgeumi',1);ledgerDone('salgeumi');learn('salgeumi:shortcut');
+    nickname('yeongsan_soft_step','사뿐발','살금이');
     if(arcs()){
       clue('y1','살금이','"가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라."');
       diary('y_salg','살금이에게 먹을 것을 주고 비탈의 지름길을 들었다. 가을부터 호숫가에 말 못 하는 너구리가 있다고 한다.');
-      talk([['살금이','고, 고마워. 왼쪽 바위턱을 디디면 호숫가로 올라가.'],
+      talk([['살금이','발소리를 죽이고 와 줬네. 사, 사뿐발이라고 불러도 돼?'],
+        ['살금이','고, 고마워. 왼쪽 바위턱을 디디면 호숫가로 올라가.'],
         ['살금이','가을부터 호숫가에 너구리 하나가 있어. 말은 못 하더라.'],
         ['살금이','이, 이무기가 호수를 휘감아서 봄이 안 와…',salgArcChoices()]]);
       toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();return;
     }
-    clue('y1','살금이',CLASSIC?'"봄마다 호숫가에 너구리 하나가 와서 신목만 바라봐. 말은 못 하더라."':'"가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라."');
-    diary('y_salg',CLASSIC?'살금이가 얼어붙은 비탈의 지름길을 알려 주었다. 봄마다 호숫가에 말 못 하는 너구리가 와서 신목만 바라본다고 한다.':'살금이가 얼어붙은 비탈의 지름길을 알려 주었다. 가을부터 호숫가에 말 못 하는 너구리가 머물렀다고 한다.');
-    talk([['살금이','고, 고마워…'],['살금이','어, 얼어붙은 비탈 있지? 왼쪽 바위턱을 디디면 호숫가로 올라갈 수 있어.'],
-      ['살금이',CLASSIC?'봄마다 호숫가에 너구리 하나가 와. 신목만 바라보는데… 말은 못 하더라.':'가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라.'],
+    clue('y1','살금이','"가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라."');
+    diary('y_salg','살금이가 얼어붙은 비탈의 지름길을 알려 주었다. 가을부터 호숫가에 말 못 하는 너구리가 머물렀다고 한다.');
+    talk([['살금이','고, 고마워… 사, 사뿐발. 조용히 와 줘서.'],['살금이','어, 얼어붙은 비탈 있지? 왼쪽 바위턱을 디디면 호숫가로 올라갈 수 있어.'],
+      ['살금이','가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라.'],
       ['살금이','지, 지금은 이무기가 호수에 똬리를 틀고 있어. 그 녀석 때문에 봄이 안 와…']],()=>{toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();});
   }},{t:'아직은 안 줄래',go:null}]]]);
 }
@@ -231,7 +236,7 @@ function talkSangun(){
         ['산군 할아버지','가장 귀한 말부터 거둔다. 어미가 네 이름부터 잊는 까닭이지.'],
         ['산군 할아버지','말을 내놓으면 글도 못 쓴다. 장부는 그 전에 쓴 것이지.'],
         ['산군 할아버지','지난가을 아비가 제 말을 보탰다. 어미의 것을 돌려 달라며.'],
-        ['산군 할아버지','강철이가 겨울을 붙들어 열매가 없구나. 봄이 오거든 다시 오너라.']],()=>refreshGoal());return;
+        ['산군 할아버지','서리무기가 겨울을 붙들어 열매가 없구나. 봄이 오거든 다시 오너라.']],()=>refreshGoal());return;
     }
     clue('y3','산군 할아버지','엄마는 아기였던 나를 살리려고 영산에 올라와, 둔갑과 말을 값으로 내놓았다. 아빠는 그걸 알고 자기 말을 더 얹었다.');
     diary('y_sangun','산군 할아버지가 엄마의 오래된 거래를 들려주었다. 숨이 다해 가던 아기였던 나를 살리려고, 엄마가 둔갑과 말을 내놓았다. 아빠는 되돌려 달라고 자기 말을 더 얹었다.');
@@ -240,85 +245,127 @@ function talkSangun(){
       ['산군 할아버지','어미는 제 둔갑과 말을 값으로 내놓았다. 나는 네 숨을 돌려주었다.'],
       ['산군 할아버지','셈은 맞아야 한다. 이 산의 법이지. 어미가 약속한 값은 이제 거두고 있다.'],
       ['산군 할아버지','네 아비도 그 일을 알고 찾아왔다. 어미의 것을 되돌려 달라며 제 말을 더 얹었지.'],
-      ['산군 할아버지','신목의 열매는 잃은 것을 돌려준다. 허나 강철이가 호수를 휘감고 겨울을 붙드니, 봄도 열매도 오지 않는구나.'],
+      ['산군 할아버지','신목의 열매는 잃은 것을 돌려준다. 허나 서리무기가 호수를 휘감고 겨울을 붙드니, 봄도 열매도 오지 않는구나.'],
       ['산군 할아버지','봄이 오거든 다시 오너라. 그때 셈을 하자꾸나.']],()=>refreshGoal());
     return;
   }
-  if(!G.boss.dead){talk([['산군 할아버지','강철이가 호수를 놓지 않는 한 봄은 오지 않는다.']]);return;}
+  if(!G.boss.dead){talk([['산군 할아버지','서리무기가 호수를 놓지 않는 한 봄은 오지 않는다.']]);return;}
   if(!F.fruitGot){talk([['산군 할아버지','봄이로구나. 신목에 열매가 열렸다. 따 오너라.']]);return;}
   if(!F.nameGiven){
-    if(arcs()){
-      talk([['산군 할아버지','어미의 둔갑과 말, 둘을 돌려주려면 아비의 말 하나론 모자란다.'],
-        ['너구리','아빠 이름은요?'],
-        ['산군 할아버지','받을 수 없었다. 숨을 받은 네 것이어야 한다.'],
-        ['산군 할아버지','아비는 네게 값을 치르게 하기 싫어 돌아가지도, 끝내지도 못했다.'],
-        ['너구리','제 이름을 내면… 엄마가 나아요?'],
-        ['산군 할아버지','네 이름은 모두의 기억에서 사라진다. 그래도 내놓겠느냐?',[
-          {t:'제 이름을 드릴게요',go:giveName},{t:'…조금만 생각할게요',go:null}]]]);return;
-    }
-    talk([['산군 할아버지','열매를 땄구나.'],['산군 할아버지','어미가 치른 것은 둔갑과 말, 둘이다. 되돌리려 내놓은 것은 아비의 말 하나.'],
-      ['산군 할아버지','어미의 두 가지를 돌려받으려면… 값이 하나 모자라는구나.'],
-      ['너구리','(보따리 속 물건으론 안 되겠지.)'],
-      ['너구리','(엄마가 날마다 잊어 가던 것. 아침마다 부르다 멈추던 내 이름.)',[{t:'제 이름을 드릴게요',go:giveName},{t:'…조금만 생각할게요',go:null}]]]);
+    talk([['산군 할아버지','어미의 둔갑과 말, 둘을 돌려주려면 아비의 말 하나론 모자란다.'],
+      ['너구리','아빠 이름은요?'],
+      ['산군 할아버지','받을 수 없었다. 숨을 받은 네 것이어야 한다.'],
+      ['산군 할아버지','아비는 네게 값을 치르게 하기 싫어 돌아가지도, 끝내지도 못했다.'],
+      ['너구리','제 이름을 내면… 엄마가 나아요?'],
+      ['산군 할아버지','그렇다. 어미의 둔갑과 말은 돌아오고, 아비의 말은 돌아오지 않는다.'],
+      ['산군 할아버지','네 이름은 모두의 기억에서 사라진다. 그래도 내놓겠느냐?',[
+        {t:'제 이름을 드릴게요',go:giveName},{t:'…조금만 생각할게요',go:null}]]]);
     return;
   }
+  if(!F.yakDone){makeReturningMedicine();return;}
   talk([['산군 할아버지','셈은 맞았다. 가거라. 봄이다.']]);
 }
 function giveName(){
-  const F=G.f;F.nameGiven=true;ledgerDone('sangun');rel('sangun',1);learn('sangun:name');
+  const F=G.f;if(F.nameGiven)return;
+  F.nameGiven=true;ledgerDone('sangun');rel('sangun',1);learn('sangun:name');
   diary('y_name','산군 할아버지에게 내 이름을 내놓았다. 셈이 맞았다. 무언가가 가슴에서 조용히 빠져나갔다.');
   talk([['산군 할아버지','…그 이름이면 셈이 맞는다.'],
     ['너구리','(가슴에서 무언가 빠져나갔다. 내 이름… 뭐였지?)'],
-    ['아빠','(아빠가 다가와 내 손 위에 손을 포갠다. 보따리 속 약연이 따뜻하다.)']],()=>{
-    awaken('yakyeon');learn('yakyeon:awake');toast('아빠의 약연이 깨어났다! 전설의 열매 → 되돌림 약');refreshHud();});
+    ['아빠','(아빠가 다가와 약연을 내려놓는다. 내 손 위에 손을 포개자 바퀴의 글자가 빛난다.)'],
+    ['너구리','(되돌림. 따뜻해진 약연에 전설의 열매를 놓는다.)']],makeReturningMedicine);
+}
+/* 마지막 교환부터 약연 각성·가공까지 이어지는 한 장면. 가공법과 수량은 CSV를 읽는다. */
+function makeReturningMedicine(){
+  if(G.f.yakDone||!G.f.nameGiven)return;
+  const recipe=RECIPES.yakyeon.find(r=>r.out==='doerim_yak');
+  if(!recipe)return;
+  if(typeof returnPouch==='function')returnPouch();
+  if(!has(recipe.out,recipe.n)&&Object.entries(recipe.need).some(([id,n])=>!has(id,n))){
+    talk([['아빠','(아빠가 신목의 열매를 가리키고 약연 곁을 가만히 두드린다.)']]);return;
+  }
+  awaken('yakyeon');learn('yakyeon:awake');
+  if(!has(recipe.out,recipe.n)){
+    for(const [id,n] of Object.entries(recipe.need))takeItem(id,n);
+    addItem(recipe.out,recipe.n);
+  }
+  if(!G.f.crafted_yakyeon){G.f.crafted_yakyeon=true;diary('crafted_yakyeon',HEIR.yakyeon.firstCraft);}
+  learn(TABLES.CRAFT.yakyeon.habitKey,true);
+  G.f.yakDone=true;refreshHud();Sound.craft();
+  talk([['아빠','(아빠 손을 따라 바퀴를 앞으로 굴렸다. 마지막에는 한 번 거꾸로.)'],
+    ['너구리','(열매가 곱게 갈린다. 약연 바퀴에 비친 봄빛이 약에 스며든다.)'],
+    ['너구리','엄마 약이다.']],()=>Rg.goHome());
 }
 
-/* ---------- 강철이 전투 ---------- */
+/* ---------- 서리무기 전투 ---------- */
 Rg.startGangcheol=()=>{
   G.px=2000;
   inkTransition('전투',(G.boss.x-G.cam)/W*100,()=>startBattle('gangcheol',res=>{
     if(res==='win'||res==='calm'){
-      if(res==='calm')diary('y_calm','강철이를 부수지 않고 달랬다. 강철이는 서리 수염 하나를 남기고 따뜻한 남쪽 바다로 떠났다.');
+      if(res==='calm')diary('y_calm','서리무기를 부수지 않고 달랬다. 서리무기는 서리 수염 하나를 남기고 따뜻한 남쪽 바다로 떠났다.');
       Rg.bringSpring();
     }else{
       G.px=1960;G.f.faints+=res==='lose'?1:0;
-      diary('y_hint','강철이는 입으로 서리를 뿜고, 몸통으로 조여 오고, 꼬리로 고드름을 뿌린다. 머리는 몸통을 풀어야 드러난다. 따뜻한 것을 그리워한다는 말이 있다.');
+      diary('y_hint','서리무기는 입으로 서리를 뿜고, 몸통으로 조여 오고, 꼬리로 고드름을 뿌린다. 머리는 몸통을 풀어야 드러난다. 따뜻한 것을 그리워한다는 말이 있다.');
       toast('일기에 공략을 적어 두었다. 준비되면 다시 호수로');
     }
   }));
 };
 /* 전설의 열매를 따면 수첩의 아빠 그림 옆 글씨가 보인다 (notes.js 의 got:legend_fruit) */
 Rg.fruitFound=()=>{
-  if(arcs()||!CLASSIC){
-    diary('y_fruit','전설의 열매를 수첩에 그렸다. 아빠의 "여기다."는 젊은 시절 이 신목을 찾아와 적은 메모다.');
-    setTimeout(()=>toast('아빠가 적어 둔 "여기다."의 신목이다. 산군 할아버지에게 가자'),1600);refreshGoal();return;
-  }
-  diary('y_fruit','전설의 열매를 따서 붓으로 그리려고 수첩을 펼쳤다. 아빠의 그림 옆에 덧쓴 글씨가 있었다. "여기다."');
-  setTimeout(()=>toast('수첩의 아빠 그림 옆에… "여기다." 산군 할아버지에게 가자'),1600);refreshGoal();
+  diary('y_fruit','전설의 열매를 수첩에 그렸다. 아빠의 "여기다."는 젊은 시절 이 신목을 찾아와 적은 메모다.');
+  setTimeout(()=>toast('아빠가 적어 둔 "여기다."의 신목이다. 산군 할아버지에게 가자'),1600);refreshGoal();
+};
+
+/* 호숫가 까치에게 보내는 마지막 안부. 진행에 쓴 뒤 남은 열매만 건넨다. */
+Rg.homeReply='돌아온 까치가 두 날개를 둥글게 모아 가슴에 댔다. 엄마도 빨간 열매를 두 손으로 감싸고 한참 품고 있었단다.';
+Rg.offerHomeGift=()=>{
+  if(!G.f.shortcut||!has('magamok')||knows('home:yeongsan')||typeof sendHomeGift!=='function')return false;
+  talk([['늙은 까치','마가목이 남았구나. 엄마에게 한 알 전해 줄까?',[
+    {t:'마가목 한 알을 엄마에게 보낸다',go:()=>{
+      if(!has('magamok')||knows('home:yeongsan'))return;
+      sendHomeGift('yeongsan','magamok');
+    }},{t:'같이 돌아가서 드릴게',go:null}]]]);return true;
 };
 
 /* ---------- 끝: 집으로 ---------- */
 Rg.goHome=()=>{
+  if(G.f.yHomeScene||G.ended)return;
+  G.f.yHomeScene=true;
   G.f.yakDone=true;
   diary('y_end','아빠와 함께 약연을 굴려 되돌림 약을 만들었다. 이제 집으로 간다.');
-  const lines=[['너구리','(아빠와 손을 포개 약연을 굴렸다. 연분홍빛 되돌림 약이 나왔다.)'],
+  const lines=[['아빠','(아빠가 제 지게를 내려놓고 내 보따리를 옮겨 싣는다. 오래된 끈을 풀어 내 어깨에 맞게 고쳐 맨다.)'],
+    ['아빠','(등에 닿는 받침을 살피고 끈을 한 번 더 당긴다. 아빠가 양손을 놓아도 지게가 꼭 붙어 있다.)'],
     ['아빠','(아빠가 내 어깨를 두드리고 남쪽을 가리킨다. 집이다.)'],
     ['너구리','가자, 아빠. 엄마한테.']];
   if(!CLASSIC&&stampCount()>=12)lines.push(
     ['너구리','(수첩의 열두 도장 위로 아빠 손이 멈췄다.\n빈손으로 돌아온 젊은 날의 길이다.)'],
     ['아빠','(아빠가 내 발 옆에 발을 나란히 놓는다.\n이번에는 둘이서 돌아간다.)']);
-  talk(lines,()=>endGame());
+  talk(lines,()=>{G.f.yDadCarrier=true;endGame();});
 };
-/* 끝 화면: 엄마가 지어 준 새 이름을 적는다 (제안). 이름은 이 브라우저 화면에서만 쓴다 */
+/* 엄마의 절정 대사는 decisions.md 그대로. 이름은 이 브라우저의 저장에만 남는다. */
 Rg.endExtra=box=>{
   const wrap=el('div','newname');
-  /* 받침이 있으면 '아' (예: 봄별아), 없으면 '야' (예: 봄이야) */
-  const call=n=>{const p=el('p','newname-call','엄마: "'+jo(n,'아','야')+'."');wrap.innerHTML='';wrap.appendChild(p);};
-  if(G.f.newName){call(G.f.newName);box.appendChild(wrap);return;}
+  wrap.appendChild(el('p',null,'(반딧불에서 돌아온 엄마가 내 얼굴을 쓰다듬는다.)'));
+  wrap.appendChild(el('p','newname-call','엄마: "…네 얼굴은 하나도 안 잊었어. 이름만 비었지."'));
+  wrap.appendChild(el('p','newname-call','엄마: "봄에 돌아온 아이니까… 엄마가 새로 지어 줄게."'));
+  const call=(n,pause)=>{
+    const speech=el('div');speech.setAttribute('aria-live','polite');
+    speech.appendChild(el('p','newname-call','엄마: "'+n+'아."'));wrap.appendChild(speech);
+    const finish=()=>{
+      speech.appendChild(el('p','newname-call','엄마: "'+n+'아, 어서 와."'));
+      speech.appendChild(el('p','newname-call','너구리: "네, 엄마."'));
+      speech.appendChild(el('p',null,'(아빠는 말없이 웃으며 두 팔로 우리를 감싼다.)'));
+    };
+    if(pause){const owner=G;setTimeout(()=>{if(owner===G&&speech.isConnected)finish();},1000);}else finish();
+  };
+  if(G.f.newName){call(G.f.newName,false);box.appendChild(wrap);return;}
   wrap.appendChild(el('label','newname-label','엄마가 지어 준 새 이름'));
   const row=el('div','row');const inp=el('input','newname-input');inp.type='text';inp.maxLength=6;inp.placeholder='이름을 적어 주세요';inp.id='newName';
   const btn=el('button','btn primary','부르기');btn.type='button';
-  const go=()=>{const n=(inp.value||'').trim().slice(0,6);if(!n){inp.focus();return;}G.f.newName=n;call(n);};
+  const go=()=>{const n=(inp.value||'').trim().slice(0,6);if(!n){inp.focus();return;}
+    if(G.f.newName)return;G.f.newName=n;row.remove();wrap.querySelector('label').remove();call(n,true);
+    if(typeof writeSave==='function')writeSave(true);
+  };
   btn.onclick=go;inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')go();});
   row.appendChild(inp);row.appendChild(btn);wrap.appendChild(row);box.appendChild(wrap);
 };
@@ -352,10 +399,10 @@ Rg.goal=()=>{
   if(!F.dadMet)return '얼어붙은 비탈을 지나 호숫가로';
   if(!F.dadDone)return '아빠의 몸짓 읽기 (아빠에게 다시 말 걸기)';
   if(!F.sangunMet)return CLASSIC?'호숫가의 산군 할아버지 찾아가기':'호숫가 선착장에서 얼음길을 건너 신목 섬의 산군 할아버지 만나기';
-  if(!G.boss.dead)return '언 호수의 강철이와 맞서기 (부수거나 달래기)';
+  if(!G.boss.dead)return '언 호수의 서리무기와 맞서기 (부수거나 달래기)';
   if(!F.fruitGot)return '신목의 전설의 열매 따기';
   if(!F.nameGiven)return '산군 할아버지에게 셈하러 가기';
-  return '보따리를 열고 아빠의 약연에 전설의 열매 넣기';
+  return '아빠와 손을 포개 약연 굴리기';
 };
 })();
 
@@ -368,6 +415,8 @@ const done=(id,flag,key,text)=>()=>{
   if(!finishWanderer(id))return;
   G.f[flag]=true;diary(key,text);
 };
+/* 손으로 하는 짧은 행동이 끝나면 기존 인사·기록으로 잇는다. */
+const act=(id,next)=>{if(typeof Rg.playActivity==='function')Rg.playActivity(id,next);else next();};
 function bearSong(){
   talk([
     ['너구리','잘 자. 바람은 굴 밖에 두고.\n잘 자. 눈은 내가 밟고 갈게.'],
@@ -378,13 +427,13 @@ function bearSong(){
   ]);
 }
 function bearSleep(beat){
-  talk([
+  act('bear',()=>talk([
     ['아기 곰',beat?
       '그 소린 눈 위보다 네 보따리에 톡톡 해 줘.\n그럼 굴 안까지 안 울려. 응. 지금이 좋아.':
       '두 번째는 바람 소리보다 조금 작아졌네.\n귀를 기울여 듣다 보니 눈이 저절로 감겨.'],
     ['아기 곰','눈이 녹기 전에 또 깨면 자꾸 밖을 보게 돼.\n굴 안에선 바람이 나를 부르는 것 같거든.'],
     ['아기 곰','입구 가지에 털을 걸어 둘게. 자는 곰 표지야.\n다시 지나갈 땐 나 대신 그 털만 보고 가 줘.']
-  ],done('y_bear_lullaby','yBearQuiet','y_bear_lullaby','이른 봄인 줄 알고 깬 아기 곰에게 자장가를 불러 주었다. 소리와 박자를 낮추니 곰이 잠들었다. 굴 앞 나뭇가지에 걸린 털이 조용히 지나가라는 표지가 됐다.'));
+  ],done('y_bear_lullaby','yBearQuiet','y_bear_lullaby','이른 봄인 줄 알고 깬 아기 곰에게 자장가를 불러 주었다. 소리와 박자를 낮추니 곰이 잠들었다. 굴 앞 나뭇가지에 걸린 털이 조용히 지나가라는 표지가 됐다.')));
 }
 function talkBear(){
   talk([
@@ -406,13 +455,13 @@ function crowMap(){
   ]);
 }
 function crowHome(ridge){
-  talk([
+  act('crow',()=>talk([
     ['길 잃은 까마귀',ridge?
       '우리 집에선 저 뾰족한 봉우리가 왼쪽이었어.\n그 선을 따라 내려가면 네가 찍은 점이구나.':
       '불빛 위로 뾰족한 봉우리가 왼쪽에 있네.\n우리 집에서도 저렇게 보여. 저 골짜기였어.'],
     ['길 잃은 까마귀','난 아래로 가면 되겠네. 넌 높은 데도 봐 둬.\n위쪽 이정표 뒤에 작은 발자국 무늬가 있어.'],
     ['길 잃은 까마귀','눈이 쌓여도 거기만 패여 있어 부리로 털었지.\n네가 그린 지도는 바람 불기 전에 외워 둘게.']
-  ],done('y_crow_direction','yCrowMap','y_crow_direction','눈 위에 능선을 그려 까마귀와 집 방향을 짚었다. 까마귀는 높은 이정표 뒤의 발자국 무늬를 알려 주었다.'));
+  ],done('y_crow_direction','yCrowMap','y_crow_direction','눈 위에 능선을 그려 까마귀와 집 방향을 짚었다. 까마귀는 높은 이정표 뒤의 발자국 무늬를 알려 주었다.')));
 }
 function talkCrow(){
   talk([
@@ -434,13 +483,13 @@ function otterWait(){
   ]);
 }
 function otterWater(still){
-  talk([
+  act('otter',()=>talk([
     ['낚시하는 수달',still?
       '손이 멈추니 물결도 가라앉는구나. 저기 봐.\n은빛 꼬리가 있어. 먹이보다도 작은 녀석이네.':
       '얼음 아래서 물결이 하나 더 오네. 저기 봐.\n작은 꼬리가 물을 차고 있어. 아직 새끼구나.'],
     ['낚시하는 수달','(수달이 줄을 천천히 풀어 먹이를 내려놓는다.\n은빛 꼬리가 돌고 어두운 물속으로 스며든다.)'],
     ['낚시하는 수달','낚싯줄만 보던 호수를 네 덕에 좀 넓게 봤어.\n봄엔 구멍이 트인 이 물길로 작은 배가 다녀.']
-  ],done('y_otter_wait','yOtterWait','y_otter_wait','수달 옆에서 기다리니 얼음 아래 어린 물고기가 보였다. 수달은 줄을 풀어 주었다. 겨울의 낚시 구멍은 봄에 배가 다니는 물길과 이어진다.'));
+  ],done('y_otter_wait','yOtterWait','y_otter_wait','수달 옆에서 기다리니 얼음 아래 어린 물고기가 보였다. 수달은 줄을 풀어 주었다. 겨울의 낚시 구멍은 봄에 배가 다니는 물길과 이어진다.')));
 }
 function talkOtter(){
   talk([
@@ -462,13 +511,13 @@ function magpieKnot(){
   ]);
 }
 function magpieLoop(outside){
-  talk([
+  act('knot',()=>talk([
     ['늙은 까치',outside?
       '그래. 밖으로 나온 고리를 부리로 쏙 물면 돼.\n반대쪽 끝은 안에 넣어 두니 날개에 안 걸리고.':
       '그 고리는 짐 밑에 눌려 부리가 안 닿겠구나.\n이렇게 바깥으로 돌려 볼까? 됐다. 잘 잡히네.'],
     ['늙은 까치','묶을 때 손만 생각하면 받는 쪽이 애를 먹어.\n눈에 젖은 끈은 꽁꽁 얼면 더 안 풀린단다.'],
     ['늙은 까치','네 보따리에도 집에서 잡을 고리를 남겨 둬.\n추워서 손이 굳어도 엄마가 함께 풀 수 있게.']
-  ],done('y_magpie_knot','yParcelKnot','y_magpie_knot','늙은 까치의 젖은 짐끈을 함께 묶었다. 가져가는 동안 풀리지 않고 받는 쪽에서는 쉽게 풀리는 고리를 배웠다. 집에 돌아가면 엄마도 쉽게 풀 수 있겠다.'));
+  ],done('y_magpie_knot','yParcelKnot','y_magpie_knot','늙은 까치의 젖은 짐끈을 함께 묶었다. 가져가는 동안 풀리지 않고 받는 쪽에서는 쉽게 풀리는 고리를 배웠다. 집에 돌아가면 엄마도 쉽게 풀 수 있겠다.')));
 }
 function talkMagpie(){
   const earlier=Object.keys(G.f.wanderersDone||{}).some(k=>!k.startsWith('yeongsan:')&&/magpie|kkachi/.test(k));
@@ -527,7 +576,7 @@ const examines={
       '뿌리 사이로 물이 졸졸 흐른다.\n산이 작게 말하는 소리 같다.':
       '얼음 밑으로도 뿌리가 뻗어 있다.\n이 나무는 겨울에도 호수를 붙들고 있었네.';}},
     {...examine('y_tree_bud',2100,'신목 가지 올려다보기',''),get text(){return G.f.spring?
-      '꽃잎 한 장이 보따리 끈에 걸렸다.\n엄마한테 보여 줄 때까지 남아 있을까?':
+      '금줄 위 가지마다 연둣빛 새잎이 났다.\n느티나무야, 겨울에도 안 죽었구나.':
       '빈 가지 끝에 단단한 겨울눈이 있다.\n나뭇가지도 손을 꼭 쥐고 봄을 기다리네.';}}
   ]
 };

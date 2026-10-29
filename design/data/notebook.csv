@@ -87,12 +87,12 @@ dad,yeongsan,아빠,동물,나,dad:ledger,몸짓 읽기를 마쳤을 때,몸짓�
 sangun,yeongsan,산군 할아버지,동물,아빠,,처음부터,"영산의 주인, 산군 할아버지. 셈이 맞지 않으면 아무것도 내주지 않는다.",제안,,아빠 수첩
 sangun,yeongsan,산군 할아버지,동물,나,sangun:story,산군에게 엄마의 거래를 들었을 때,엄마의 오래된 거래 상대. 악하지 않다. 셈이 맞아야 할 뿐이다.,제안,,관찰
 sangun,yeongsan,산군 할아버지,동물,나,sangun:name,이름을 내놓았을 때,내 이름으로 셈을 맞췄다.,제안,,관찰
-gangcheol,yeongsan,강철이,동물,아빠,,처음부터,영산 호수의 이무기 이야기. 지나는 곳마다 추위를 몬다. 따뜻한 것을 그리워한다더라.,제안,,아빠 수첩
-gangcheol,yeongsan,강철이,동물,나,fight:gangcheol,처음 맞설 때,"호수를 휘감은 이무기. 입은 서리를 뿜고, 몸통은 조여 오고, 꼬리는 고드름을 뿌린다.",제안,,관찰
-gangcheol,yeongsan,강철이,동물,나,core:gangcheol,핵심 부위가 드러날 때,몸통을 풀어야 머리가 드러난다.,제안,,관찰
-gangcheol,yeongsan,강철이,동물,나,like:gangcheol:dokkaebibul,전투에서 도깨비불씨을(를) 건넸을 때,도깨비불씨의 온기에 눈을 감았다. 아빠 수첩에 적힌 대로다.,제안,,관찰
-gangcheol,yeongsan,강철이,동물,나,like:gangcheol:patsirutteok,전투에서 undefined을(를) 건넸을 때,붉은 팥을 꺼린다.,제안,,관찰
-gangcheol,yeongsan,강철이,동물,나,calm:gangcheol,달래서 끝냈을 때,달래면 남쪽 바다로 떠나며 서리 수염을 남긴다.,제안,,관찰
+gangcheol,yeongsan,서리무기,동물,아빠,,처음부터,영산 호수의 이무기 이야기. 지나는 곳마다 추위를 몬다. 따뜻한 것을 그리워한다더라.,제안,,아빠 수첩
+gangcheol,yeongsan,서리무기,동물,나,fight:gangcheol,처음 맞설 때,"호수를 휘감은 이무기. 입은 서리를 뿜고, 몸통은 조여 오고, 꼬리는 고드름을 뿌린다.",제안,,관찰
+gangcheol,yeongsan,서리무기,동물,나,core:gangcheol,핵심 부위가 드러날 때,몸통을 풀어야 머리가 드러난다.,제안,,관찰
+gangcheol,yeongsan,서리무기,동물,나,like:gangcheol:dokkaebibul,전투에서 도깨비불씨를 건넸을 때,도깨비불씨의 온기에 눈을 감았다. 아빠 수첩에 적힌 대로다.,제안,,관찰
+gangcheol,yeongsan,서리무기,동물,나,like:gangcheol:patsirutteok,전투에서 팥시루떡을 건넸을 때,붉은 팥을 꺼린다.,제안,,관찰
+gangcheol,yeongsan,서리무기,동물,나,calm:gangcheol,달래서 끝냈을 때,달래면 남쪽 바다로 떠나며 서리 수염을 남긴다.,제안,,관찰
 darae_vine,yeongsan,다래 덩굴,물건,나,got:darae_vine,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 magamok,yeongsan,마가목 열매,물건,나,got:magamok,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
 magamok,yeongsan,마가목 열매,물건,아빠,,처음부터,영산 비탈에 많다. 고라니가 좋아한다.,제안,,아빠 수첩
