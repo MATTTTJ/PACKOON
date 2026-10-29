@@ -4,6 +4,7 @@
    주인공의 이름은 끝까지 나오지 않는다. 끝 화면에서 엄마가 지어 준 새 이름을 플레이어가 적는다 (제안) */
 (()=>{
 const Rg=REGIONS.yeongsan;
+const MG=TABLES.MINIGAMES;
 
 const SALG_LINES={
   start:['귀, 귀를 세우면 멈춰 줘.','나, 발소리에 잘 놀라… 살살 와 줘.'],
@@ -91,7 +92,7 @@ function gesture(i){
   const g=GESTURES[i];dadPose(g.pose);
   talk([['아빠',g.act,g.opts.map(([t,ok])=>({t,go:()=>{
     if(!ok){dadPose('retry');talk([['아빠',RETRIES[Math.floor(Math.random()*RETRIES.length)]]],()=>gesture(i));return;}
-    const next=()=>i+1<GESTURES.length?gesture(i+1):dadLedger();
+    const next=()=>i+1<MG.dad_steps?gesture(i+1):dadLedger();
     dadPose(g.reply);Sound.yeongsan('dad');talk([['아빠',g.after]],next);
   }}))]]);
 }

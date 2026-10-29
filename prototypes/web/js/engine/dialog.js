@@ -19,7 +19,7 @@ function advance(){if($('dlgChoices').children.length)return;Sound.paper();showL
 $('dlg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')advance();});
 
 /* 지역의 NPC: {id, name, x, talk(), draw(x,y,방향), props(npc)?, prompt?(말 걸기 대신 쓸 안내 글, 예: 숙소 마루에서 쉬기)} */
-function nearNpc(){let best=null,bd=30;for(const n of REG.npcs){const d=Math.abs(n.x-G.px);if(d<bd){bd=d;best=n;}}return best;}
+function nearNpc(){let best=null,bd=TABLES.TUNING.field_talk_distance;for(const n of REG.npcs){const d=Math.abs(n.x-G.px);if(d<bd){bd=d;best=n;}}return best;}
 function tryTalk(){const n=nearNpc();if(!n)return;learn('met:'+n.id);n.talk();}
 
 /* 대화 초상: 캐릭터 그리기 함수를 작은 캔버스에 재사용. 이름이 NPC와 맞지 않으면 주인공 */

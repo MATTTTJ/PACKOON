@@ -4,6 +4,7 @@
    교환 연쇄: 칡꽃 → 결명자 → (돌 쌓기) 맷돌 깨어남 → 메밀가루 → 돌산 길 */
 (()=>{
 const Rg=REGIONS.dolneomeo;
+const MG=TABLES.MINIGAMES;
 
 const pick=lines=>lines[Math.floor(Math.random()*lines.length)];
 
@@ -116,10 +117,10 @@ panel.innerHTML='<h2>돌 쌓기 · 돌의 마음 읽기</h2><canvas id="stackCv"
 $('shell').appendChild(panel);
 panel.insertBefore(el('p','fhint','붉은 꼭대기가 금빛 가운데에 오면 얹자. 세 개면 된다.'),$('spips'));
 $('shint').setAttribute('aria-live','polite');
-const st={phase:.9,hits:0,miss:0,cool:0,zone:.2,settle:0,land:0,edge:0,fall:null,warned:false,done:false};
+const st={phase:MG.stack_phase,hits:0,miss:0,cool:0,zone:MG.stack_zone,settle:0,land:0,edge:0,fall:null,warned:false,done:false};
 const scv=$('stackCv'),sx=scv.getContext('2d');
 const sway=()=>Math.sin(st.phase);
-const stackAmp=()=>42+st.hits*15;
+const stackAmp=()=>MG.stack_amplitude+st.hits*MG.stack_amplitude_gain;
 const stackAdvice={
   start:['손끝에 힘 빼고 기다리거라.','돌도 숨을 고른단다. 천천히.','가운데 오면 살며시 놓거라.'],
   good:['그래. 돌이 네 손을 아는구나.','잘 놓았다. 다음 것도 천천히 하거라.','허허. 제자리를 찾았구나.'],
@@ -129,7 +130,7 @@ const stackAdvice={
 };
 function stackSay(kind,extra=''){$('shint').textContent='돌쇠 할배: “'+pick(stackAdvice[kind])+'”'+extra;}
 function openStack(){
-  Object.assign(st,{phase:.9,hits:0,miss:0,cool:0,zone:.2,settle:0,land:0,edge:0,fall:null,warned:false,done:false});
+  Object.assign(st,{phase:MG.stack_phase,hits:0,miss:0,cool:0,zone:MG.stack_zone,settle:0,land:0,edge:0,fall:null,warned:false,done:false});
   stackSay('start');panel.hidden=false;drawStack();
 }
 function stackStone(x,y,w,angle,color){
@@ -156,38 +157,38 @@ function drawStack(){
   c.fillStyle='#b4432a';c.fillRect(cx+lean*80-2,3,4,7);
   c.fillStyle='#5a4030';c.font='10px sans-serif';c.textAlign='center';
   c.fillText(st.settle?(st.edge?'삐걱… 버틴다!':'탁… 자리 잡는 중'):st.fall?'또 얹으면 된다':Math.abs(sway())<=st.zone?'지금, 살며시!':'가운데를 기다려',cx,23);
-  $('spips').innerHTML=[0,1,2].map(i=>'<span class="pip'+(i<st.hits?' on':'')+'"></span>').join('');
+  $('spips').innerHTML=Array.from({length:MG.stack_hits},(_,i)=>'<span class="pip'+(i<st.hits?' on':'')+'"></span>').join('');
   $('sstrike').disabled=st.cool>0||st.done;
 }
 function stackStep(){
   if(panel.hidden||st.done)return;
   if(st.cool>0)st.cool--;
-  st.phase+=.04+st.hits*.014;
+  st.phase+=MG.stack_speed+st.hits*MG.stack_speed_gain;
   if(st.settle>0){
     st.settle--;
     if(st.settle===0){
-      if(st.hits>=3){st.done=true;finishStack();return;}
+      if(st.hits>=MG.stack_hits){st.done=true;finishStack();return;}
       stackSay(st.edge?'edge':'good');
     }
   }
   if(st.fall&&++st.fall.age>=24)st.fall=null;
   // 한 단계에서 한 번만 훈수해 성공/실패 대사를 곧바로 덮지 않는다.
-  if(!st.cool&&!st.fall&&!st.warned&&Math.abs(sway())>.92){st.warned=true;stackSay('danger');}
+  if(!st.cool&&!st.fall&&!st.warned&&Math.abs(sway())>MG.stack_warning){st.warned=true;stackSay('danger');}
   drawStack();
 }
 function stackHit(){
-  if(panel.hidden||st.cool>0||st.hits>=3||st.done)return;
+  if(panel.hidden||st.cool>0||st.hits>=MG.stack_hits||st.done)return;
   const lean=sway(),distance=Math.abs(lean);
   if(distance<=st.zone){
     st.land=lean;
-    st.edge=distance>=st.zone*.65?Math.sign(lean)*.32:0;
-    st.hits++;st.settle=st.edge?42:24;st.cool=st.settle;st.warned=false;
+    st.edge=distance>=st.zone*MG.stack_edge_ratio?Math.sign(lean)*MG.stack_edge_lean:0;
+    st.hits++;st.settle=st.edge?MG.stack_edge_wait:MG.stack_hit_wait;st.cool=st.settle;st.warned=false;
     stackSay(st.edge?'edge':'good');Sound.stone(st.edge?'edge':'tap');
   }else{
     const n=st.hits+2;st.fall={x:160+lean*stackAmp(),y:124-12-n*14,dir:Math.sign(lean),age:0};
-    st.miss++;st.cool=14;st.warned=true;Sound.stone('fall');
-    if(st.miss>=2)st.zone=.34;
-    stackSay('miss',st.miss>=2?' 금빛 가운데가 넓어졌다.':'');
+    st.miss++;st.cool=MG.stack_miss_wait;st.warned=true;Sound.stone('fall');
+    if(st.miss>=MG.stack_help_misses)st.zone=MG.stack_help_zone;
+    stackSay('miss',st.miss>=MG.stack_help_misses?' 금빛 가운데가 넓어졌다.':'');
   }
   drawStack();
 }
@@ -196,7 +197,7 @@ scv.addEventListener('pointerdown',e=>{e.preventDefault();stackHit();});
 defineMinigame({id:'stack',step:stackStep,hit:stackHit});
 function finishStack(){
   panel.hidden=true;const F=G.f;const perfect=st.miss===0;
-  F.stackDone=true;awaken('maetdol');learn('dolsoe:stack');ledgerDone('dolsoe');rel('dolsoe',perfect?2:1);
+  F.stackDone=true;awaken('maetdol');learn('dolsoe:stack');ledgerDone('dolsoe');rel('dolsoe',perfect?MG.stack_perfect_relation:MG.stack_relation);
   clue('s1','돌쇠 할배','아빠도 돌쇠 할배에게 약연 바퀴의 낯선 글자를 읽어 달라고 했다. 할배는 글자 하나만 읽어 주었고, 아빠는 그날 밤 떠났다.');
   diary('d_maetdol','돌탑에 돌 세 개를 얹었다. 그 순간 보따리 속 맷돌에서 우웅, 낮은 소리가 났다. 증조할아버지의 맷돌이 깨어났다.');
   toast('증조할아버지의 맷돌이 깨어났다! 메밀 3 → 메밀가루 1');refreshHud();

@@ -4,6 +4,7 @@
    교환 연쇄: 솔방울 → 쌀 → (맷돌) 쌀가루 → 모락 → 시루 깨어남 → 팥시루떡 → 부엉 영감 → 신표·아빠의 메모 → 창고 지키기 */
 (()=>{
 const Rg=REGIONS.jangteo;
+const MG=TABLES.MINIGAMES;
 const night=()=>G.f.night;
 
 /* ---------- 작은 미니게임 창 만들기 (돌너머 돌 쌓기와 같은 모양) ---------- */
@@ -17,7 +18,7 @@ function makePanel(id,title,btn){
 /* 김 올리기 (제안): 금빛 칸 누적 5초. 위태로워도 3초간 회복할 수 있고 쌓인 시간은 깎이지 않는다.
    후반 외풍은 한 번만. 실패는 같은 키/버튼으로 재시작하며 물건·호감·진행 보상 규칙은 그대로 둔다. */
 const steamP=makePanel('steam','떡집 아궁이 · 김 올리기','부채질');
-const sm={fire:0,steam:0,prog:0,band:[55,80],cool:0,t:0,danger:0,close:false,
+const sm={fire:0,steam:0,prog:0,band:[MG.steam_band_min,MG.steam_band_max],cool:0,t:0,danger:0,close:false,
   state:'playing',wind:0,windDone:false,voice:'',voiceCool:0,lastLine:''};
 const scv=$('steamCv'),sx=scv.getContext('2d');
 const steamLines={
@@ -34,13 +35,13 @@ function steamSay(kind){
   if(sm.voice===kind&&sm.voiceCool>0)return;
   if(sm.voiceCool>0&&kind==='good')return;
   const choices=steamLines[kind].filter(s=>s!==sm.lastLine);
-  sm.lastLine=choices[Math.floor(Math.random()*choices.length)];sm.voice=kind;sm.voiceCool=150;
+  sm.lastLine=choices[Math.floor(Math.random()*choices.length)];sm.voice=kind;sm.voiceCool=MG.steam_voice_cooldown;
   $('steamHint').textContent='모락: “'+sm.lastLine+'”';
 }
 function openSteam(){
-  Object.assign(sm,{fire:25,steam:0,prog:0,cool:0,t:0,danger:0,close:false,state:'playing',wind:0,windDone:false,voice:'',voiceCool:0});
+  Object.assign(sm,{fire:MG.steam_fire_start,steam:0,prog:0,cool:0,t:0,danger:0,close:false,state:'playing',wind:0,windDone:false,voice:'',voiceCool:0});
   $('steamBtn').innerHTML='부채질 <kbd>Space · J</kbd>';
-  $('steamPips').textContent='금빛 칸에 모두 5초 · 칸 밖에서도 쌓인 시간은 그대로';
+  $('steamPips').textContent='금빛 칸에 모두 '+(MG.steam_target_frames/60)+'초 · 칸 밖에서도 쌓인 시간은 그대로';
   steamP.hidden=false;steamSay('start');drawSteam();
 }
 function drawSteam(){
@@ -59,47 +60,47 @@ function drawSteam(){
   c.fillStyle='#f4efe4';c.fillRect(bx+bw*Math.min(100,sm.steam)/100-2,by-4,4,24);
   c.fillStyle='#2a2019';c.font='12px "Gowun Dodum", sans-serif';c.fillText(sm.wind?'김 · 외풍!':'김 · 금빛 칸에 맞추기',bx,by-8);
   // 데워진 정도
-  c.fillStyle='#d8c9a6';c.fillRect(bx,60,bw,10);c.fillStyle='#b7852f';c.fillRect(bx,60,bw*sm.prog/100,10);c.fillStyle='#2a2019';c.fillText('고른 김 '+(sm.prog/20).toFixed(1)+' / 5초',bx,86);
-  c.fillStyle='#d8c9a6';c.fillRect(bx,94,bw,5);c.fillStyle=sm.danger>90?'#b4432a':'#71824e';c.fillRect(bx,94,bw*(1-sm.danger/180),5);
-  c.fillStyle='#2a2019';c.fillText(sm.state==='failed'?'다시 해 보자!':sm.danger?'불·김 회복 여유':'불씨 '+Math.round(sm.fire)+' · 남은 '+Math.ceil((1800-sm.t)/60)+'초',bx,115);
+  c.fillStyle='#d8c9a6';c.fillRect(bx,60,bw,10);c.fillStyle='#b7852f';c.fillRect(bx,60,bw*sm.prog/MG.steam_max,10);c.fillStyle='#2a2019';c.fillText('고른 김 '+(sm.prog/(MG.steam_max/(MG.steam_target_frames/60))).toFixed(1)+' / '+(MG.steam_target_frames/60)+'초',bx,86);
+  c.fillStyle='#d8c9a6';c.fillRect(bx,94,bw,5);c.fillStyle=sm.danger>MG.steam_close_at?'#b4432a':'#71824e';c.fillRect(bx,94,bw*(1-sm.danger/MG.steam_danger_limit),5);
+  c.fillStyle='#2a2019';c.fillText(sm.state==='failed'?'다시 해 보자!':sm.danger?'불·김 회복 여유':'불씨 '+Math.round(sm.fire)+' · 남은 '+Math.ceil((MG.steam_time_limit-sm.t)/60)+'초',bx,115);
 }
 function steamStep(){
   if(steamP.hidden||sm.state!=='playing')return;
   sm.t++;if(sm.voiceCool>0)sm.voiceCool--;
-  if(!sm.windDone&&sm.prog>=65){sm.windDone=true;sm.wind=90;steamSay('wind');}
-  sm.fire=Math.max(0,sm.fire-0.32-(sm.wind?0.20:0));sm.steam+=(sm.fire-sm.steam)*0.035;
+  if(!sm.windDone&&sm.prog>=MG.steam_wind_at){sm.windDone=true;sm.wind=MG.steam_wind_frames;steamSay('wind');}
+  sm.fire=Math.max(0,sm.fire-MG.steam_fire_decay-(sm.wind?MG.steam_wind_decay:0));sm.steam+=(sm.fire-sm.steam)*MG.steam_steam_follow;
   if(sm.wind>0)sm.wind--;if(sm.cool>0)sm.cool--;
   const inBand=sm.steam>=sm.band[0]&&sm.steam<=sm.band[1];
-  const danger=sm.steam>94||(sm.t>300&&sm.fire<8);
-  sm.danger=Math.max(0,Math.min(180,sm.danger+(danger?1:-3)));if(sm.danger>90)sm.close=true;
-  if(inBand)sm.prog=Math.min(100,sm.prog+100/300);
-  if(sm.prog>=100){
-    sm.state='won';sm.cool=0;steamSay(sm.close?'close':'success');$('steamPips').textContent='금빛 칸 5초 완료!';
+  const danger=sm.steam>MG.steam_danger_steam||(sm.t>MG.steam_low_grace&&sm.fire<MG.steam_danger_fire);
+  sm.danger=Math.max(0,Math.min(MG.steam_danger_limit,sm.danger+(danger?1:-MG.steam_danger_recovery)));if(sm.danger>MG.steam_close_at)sm.close=true;
+  if(inBand)sm.prog=Math.min(MG.steam_max,sm.prog+MG.steam_max/MG.steam_target_frames);
+  if(sm.prog>=MG.steam_max){
+    sm.state='won';sm.cool=0;steamSay(sm.close?'close':'success');$('steamPips').textContent='금빛 칸 '+(MG.steam_target_frames/60)+'초 완료!';
     // 프레임으로 마무리를 기다려 재시작 뒤에 이전 판 타이머가 남지 않게 한다.
-  }else if(sm.danger>=180||sm.t>=1800){
+  }else if(sm.danger>=MG.steam_danger_limit||sm.t>=MG.steam_time_limit){
     sm.state='failed';steamSay('fail');$('steamPips').textContent='물건·호감은 그대로 · 부채질 버튼으로 바로 다시 하기';
     $('steamBtn').innerHTML='다시 불 지피기 <kbd>Space · J</kbd>';
   }else if(!sm.wind){
-    if(sm.steam>82||sm.fire>92)steamSay('high');
-    else if(sm.t>120&&sm.fire<35)steamSay('low');
+    if(sm.steam>MG.steam_high_steam||sm.fire>MG.steam_high_fire)steamSay('high');
+    else if(sm.t>MG.steam_low_hint_after&&sm.fire<MG.steam_low_fire)steamSay('low');
     else if(inBand)steamSay('good');
   }
-  if(sm.t%36===0&&sm.steam>40)Sound.steam(sm.steam>82?'lid':'bubble');
+  if(sm.t%36===0&&sm.steam>40)Sound.steam(sm.steam>MG.steam_high_steam?'lid':'bubble');
   drawSteam();
 }
 function steamHit(){
   if(steamP.hidden)return;
   if(sm.state==='failed'){openSteam();Sound.steam('fan');return;}
   if(sm.state!=='playing'||sm.cool>0)return;
-  sm.cool=6;sm.fire=Math.min(100,sm.fire+12);Sound.steam('fan');
+  sm.cool=MG.steam_fan_cooldown;sm.fire=Math.min(MG.steam_max,sm.fire+MG.steam_fan_power);Sound.steam('fan');
 }
 $('steamBtn').addEventListener('pointerdown',e=>{e.preventDefault();steamHit();});scv.addEventListener('pointerdown',e=>{e.preventDefault();steamHit();});
 defineMinigame({id:'steam',step:()=>{
-  if(sm.state==='won'){sm.cool++;if(sm.cool>=45)finishSteam();return;}steamStep();
+  if(sm.state==='won'){sm.cool++;if(sm.cool>=MG.steam_finish_wait)finishSteam();return;}steamStep();
 },hit:steamHit});
 function finishSteam(){
   if(steamP.hidden)return;steamP.hidden=true;const F=G.f;
-  F.steamDone=true;awaken('siru');ledgerDone('morak');rel('morak',1);learn('morak:steam');
+  F.steamDone=true;awaken('siru');ledgerDone('morak');rel('morak',MG.steam_relation);learn('morak:steam');
   diary('j_siru','모락에게 김 올리는 법을 배웠다. 보따리 속 시루에 처음으로 김이 서렸다. 잔칫날의 시루가 깨어났다.');
   toast('잔칫날의 시루가 깨어났다! 쌀가루 2 + 팥 1 → 팥시루떡');refreshHud();
   const lines=[['모락','허허, 바로 그거야! 떡은 김이 반이지!'],['너구리','시루가 따뜻해졌어. 이제 떡을 찔 수 있겠다!']];
@@ -138,7 +139,7 @@ function morakGive(){
 const rhP=makePanel('rhythm','엿가위 장단','쩔꺽');
 const rh={notes:[],hits:0,combo:0,done:true,reward:false,timer:null,bus:null};
 const rcv=$('rhythmCv'),rx=rcv.getContext('2d');
-const HIT_X=64,NOTES=8,RH_GOOD=0.18,RH_PERFECT=0.075,RH_SPEED=145;
+const HIT_X=64,NOTES=MG.rhythm_notes,RH_GOOD=MG.rhythm_good,RH_PERFECT=MG.rhythm_perfect,RH_SPEED=MG.rhythm_scroll_speed;
 const rhTalk={
   start:['엿 사려, 엿! 꼬마 보부상, 가위 소리부터 들어 봐.','쌀은 네 몫으로 떼 놨지. 어디, 흥 좀 내 볼까?','내 가위에 장단 맞춰 봐. 덤이 나갈지도 모르잖아?'],
   good:['얼쑤! 엿보다 네 장단이 더 찰진데?','어라, 이러다 엿은 안 팔고 춤만 추겠네!','얼쑤, 내 흥 돋우는 솜씨 좀 봐!'],
@@ -162,14 +163,14 @@ function openRhythm(reward){
 function rhStart(){
   rh.audio=Sound.context;
   if(rh.audio&&rh.audio.state!=='running')return;
-  rh.ready=true;rh.origin=rhNow()+0.15;rh.bus=Sound.group();
+  rh.ready=true;rh.origin=rhNow()+MG.rhythm_start_delay;rh.bus=Sound.group();
   // 0.22초 소박 세 개씩. 끝 두 박만 0.66초에서 0.55초로 당긴다.
-  const offsets=[1.32,1.98,2.64,3.30,3.96,4.62,5.17,5.72];
-  rh.notes=offsets.map(t=>({time:rh.origin+t,st:0}));
+  const offsets=[MG.rhythm_note_one,MG.rhythm_note_two,MG.rhythm_note_three,MG.rhythm_note_four,MG.rhythm_note_five,MG.rhythm_note_six,MG.rhythm_note_seven,MG.rhythm_note_eight];
+  rh.notes=offsets.slice(0,NOTES).map(t=>({time:rh.origin+t,st:0}));
   const beats=[];
-  for(let i=0;i<6;i++)beats.push({time:rh.origin+i*0.22,part:i%3,cue:false});
-  offsets.forEach((t,i)=>{const gap=i<5?0.66:0.55;
-    for(let p=0;p<3;p++)beats.push({time:rh.origin+t+p*gap/3,part:p,cue:p===0});});
+  for(let i=0;i<MG.rhythm_intro_beats;i++)beats.push({time:rh.origin+i*MG.rhythm_subbeat,part:i%MG.rhythm_parts,cue:false});
+  offsets.forEach((t,i)=>{const gap=i<MG.rhythm_normal_last?MG.rhythm_normal_gap:MG.rhythm_late_gap;
+    for(let p=0;p<MG.rhythm_parts;p++)beats.push({time:rh.origin+t+p*gap/MG.rhythm_parts,part:p,cue:p===0});});
   rh.beats=beats;rh.cursor=0;rh.timer=setInterval(rhSchedule,25);rhSchedule();
 }
 function rhSchedule(){
@@ -182,7 +183,7 @@ function rhSchedule(){
     Sound.drum(b.time,b.part===0?0.24:0.09,rh.bus,b.part===1);
     if(b.cue)Sound.metal(b.time,0.12,rh.bus);
     else Sound.click(b.time,0.045,rh.bus);
-    if(rh.combo>=3){Sound.noise(b.time,0.045,rh.bus);
+    if(rh.combo>=MG.rhythm_combo){Sound.noise(b.time,0.045,rh.bus);
       if(b.part===0)Sound.metal(b.time,0.07,rh.bus,true);}
   }
 }
@@ -199,16 +200,16 @@ function drawRhythm(){
     c.fillRect(x-7,54,5,14);c.fillRect(x+2,54,5,14);c.fillRect(x-3,50,6,4);
     c.fillStyle=n.st===2?'rgba(42,32,25,.2)':'#7a7e84';c.fillRect(x-6,52,12,2);});
   c.restore();c.font='12px "Gowun Dodum", sans-serif';c.fillStyle='#2a2019';
-  const left=rh.notes.filter(n=>n.st===0).length,need=Math.max(0,5-rh.hits);
-  c.fillText('흥 '+rh.hits+'/8 · '+(need?'덤까지 '+need+'개':'덤 나간다!'),10,17);
+  const left=rh.notes.filter(n=>n.st===0).length,need=Math.max(0,MG.rhythm_bonus_hits-rh.hits);
+  c.fillText('흥 '+rh.hits+'/'+NOTES+' · '+(need?'덤까지 '+need+'개':'덤 나간다!'),10,17);
   c.fillText(rh.ready?'남은 가위 '+left+' · 연속 '+rh.combo:'버튼을 누르면 준비 장단!',10,34);
   // 5/8의 실제 덤 선. 실패해도 게이지와 보상을 깎지 않는다.
   c.fillStyle='#d2bb8b';c.fillRect(12,92,208,10);
   c.fillStyle=need===1&&left>0?(Math.sin(now*15)>0?'#c36a2c':'#e6b54a'):'#c36a2c';
-  c.fillRect(12,92,208*rh.hits/8,10);c.fillStyle='#713b28';c.fillRect(141,88,2,18);
+  c.fillRect(12,92,208*rh.hits/NOTES,10);c.fillStyle='#713b28';c.fillRect(141,88,2,18);
   c.fillText('덤 선',129,118);
   c.fillStyle=rh.label==='빗나감'?'#7a6655':'#b4432a';
-  c.fillText(now<rh.flashUntil?rh.label+(rh.combo>=3?' · 얼쑤!':''):'찰칵에 맞춰!',228,99);
+  c.fillText(now<rh.flashUntil?rh.label+(rh.combo>=MG.rhythm_combo?' · 얼쑤!':''):'찰칵에 맞춰!',228,99);
   $('rhythmPips').innerHTML=rh.notes.map(n=>'<span class="pip'+(n.st===1?' on':'')+'"'+(n.st===2?' style="opacity:.3"':'')+'></span>').join('');
 }
 function rhMiss(n,now){if(n)n.st=2;rh.combo=0;rh.label='빗나감';rh.flashUntil=now+0.45;
@@ -221,15 +222,15 @@ function rhythmStep(){
   }
   const now=rhNow();rhSchedule();
   rh.notes.forEach(n=>{if(n.st===0&&now-n.time>RH_GOOD)rhMiss(n,now);});
-  if(!rh.late&&now>=rh.notes[5].time+0.2){rh.late=true;$('rhythmHint').textContent='엿방울: '+rhSay('late');}
-  if(rh.notes.every(n=>n.st!==0)&&now>=rh.notes[7].time+0.65){rh.done=true;rhStop();finishRhythm();}
+  if(!rh.late&&now>=rh.notes[MG.rhythm_normal_last].time+MG.rhythm_late_hint_delay){rh.late=true;$('rhythmHint').textContent='엿방울: '+rhSay('late');}
+  if(rh.notes.every(n=>n.st!==0)&&now>=rh.notes[NOTES-1].time+MG.rhythm_finish_delay){rh.done=true;rhStop();finishRhythm();}
   drawRhythm();
 }
 function rhythmHit(){
   if(rh.done||rhP.hidden||rh.paused!==null)return;
   if(!rh.ready){rhStart();return;}
   if(rh.audio&&rh.audio.state!=='running')return;
-  const now=rhNow();if(now-rh.cool<0.12)return;rh.cool=now;
+  const now=rhNow();if(now-rh.cool<MG.rhythm_cooldown)return;rh.cool=now;
   // 입력 직전에도 지난 노트를 처리해 프레임이 느려도 판정이 같도록 한다.
   rh.notes.forEach(n=>{if(n.st===0&&now-n.time>RH_GOOD)rhMiss(n,now);});
   const n=rh.notes.filter(n=>n.st===0).sort((a,b)=>Math.abs(a.time-now)-Math.abs(b.time-now))[0];
@@ -237,7 +238,7 @@ function rhythmHit(){
     const perfect=Math.abs(n.time-now)<=RH_PERFECT;n.st=1;rh.hits++;rh.combo++;
     rh.label=perfect?'잘 맞음':'맞음';rh.flashUntil=now+0.45;
     Sound.metal(now,perfect?0.25:0.14,rh.bus,perfect);
-    $('rhythmHint').textContent='엿방울: '+rhSay(rh.hits===4?'danger':'good');
+    $('rhythmHint').textContent='엿방울: '+rhSay(rh.hits===MG.rhythm_bonus_hits-1?'danger':'good');
   }else{rhMiss(null,now);Sound.click(now,0.035,rh.bus);}
   drawRhythm();
 }
@@ -246,7 +247,7 @@ document.addEventListener('visibilitychange',()=>{
   if(rhP.hidden||rh.done||!rh.ready)return;
   if(document.hidden){rh.paused=rhNow();rhStop();}
   else if(rh.paused!==null){
-    const gap=rhNow()-rh.paused+0.3;rh.origin+=gap;
+    const gap=rhNow()-rh.paused+MG.rhythm_resume_delay;rh.origin+=gap;
     rh.notes.forEach(n=>n.time+=gap);rh.beats.forEach(b=>b.time+=gap);
     rh.cool+=gap;rh.flashUntil+=gap;rh.paused=null;rh.bus=Sound.group();
     rh.cursor=rh.beats.findIndex(b=>b.time>=rhNow());if(rh.cursor<0)rh.cursor=rh.beats.length;
@@ -256,11 +257,11 @@ document.addEventListener('visibilitychange',()=>{
 $('rhythmBtn').addEventListener('pointerdown',e=>{e.preventDefault();rhythmHit();});rcv.addEventListener('pointerdown',e=>{e.preventDefault();rhythmHit();});
 defineMinigame({id:'rhythm',step:rhythmStep,hit:rhythmHit});
 function finishRhythm(){
-  if(rhP.hidden)return;rhStop();rhP.hidden=true;const F=G.f;const high=rh.hits>=5;learn('yeotbang:rhythm');
-  const lines=[['엿방울',rhSay(high?(rh.hits===5?'close':'good'):'fail')]];
+  if(rhP.hidden)return;rhStop();rhP.hidden=true;const F=G.f;const high=rh.hits>=MG.rhythm_bonus_hits;learn('yeotbang:rhythm');
+  const lines=[['엿방울',rhSay(high?(rh.hits===MG.rhythm_bonus_hits?'close':'good'):'fail')]];
   if(rh.reward){F.yeotDone=true;ledgerDone('yeotbang');addItem('ssal',8);
     lines.push(['엿방울',high?'얼쑤, 장단 좀 아는걸? 내 흥을 다 돋우네!':'흥은 좀 덜 났지만, 쌀 준다는 말은 안 바꾸지!'],['엿방울','자, 엿 고고 남은 쌀 여덟 되! 이건 약속한 네 몫이야.']);}
-  rel('yeotbang',high?2:1);
+  rel('yeotbang',high?MG.rhythm_high_relation:MG.rhythm_relation);
   if(high&&!F.yeotHigh){F.yeotHigh=true;addItem('dad_yeot',1);learn('yeotbang:high');
     clue('j2','엿방울','아빠는 아들 주려고 엿을 샀다가, 끝내 못 가져가고 엿방울에게 맡겨 두었다.');
     diary('j_yeot','장단을 맞췄더니 엿방울이 숨겨 둔 가락엿을 꺼냈다. 아빠가 나 주려고 샀다가 끝내 못 가져가고 맡긴 엿이다.');
