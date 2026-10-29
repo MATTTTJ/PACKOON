@@ -8,7 +8,6 @@ const Rg=defineRegion('dolneomeo',{
   world:2400,startX:60,
   platforms:[{x:640,y:158,w:60},{x:1380,y:158,w:64},{x:2196,y:150,w:76}],
   clueTotal:3,
-  dex:['eoksae','memil','gyeousari','gyeolmyeongja','seogi','seoridarae'],
   cover:{
     tag:'돌너머 마을 체험판',sub:'첫서리 내린 돌담 마을',ready:'돌너머 마을로 들어갈 준비',go:'돌너머 마을로',
     title:{kicker:'둘째 마을',head:'돌너머 마을',start:'돌너머 마을로 들어가기',body:[
@@ -36,7 +35,6 @@ const Rg=defineRegion('dolneomeo',{
   },
   endStats:()=>[
     ['아빠 단서',G.clues.length+'/'+clueTotalSoFar()],
-    ['도감',Object.keys(G.dex).length+'/'+dexSoFar().length],
     ['돌쇠 할배의 신뢰',G.rel.dolsoe.v],
     ['쓰러진 횟수',G.f.faints],
   ],

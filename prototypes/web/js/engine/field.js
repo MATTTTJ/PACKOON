@@ -2,7 +2,7 @@
 /* 필드: 주인공 이동과 점프, 휘두르기, 줍기, 카메라, 화면 그리는 순서.
    지역마다 다른 것(배경, 장애물, 필드 보스, 날씨)은 REG 의 함수를 부른다. 필요한 함수 목록은 README 참고 */
 
-function paused(){return !G.started||G.ended||!!B||inkOn||open('dlg')||open('bag')||open('book')||!!openMinigame();}
+function paused(){return !G.started||G.ended||!!B||inkOn||open('dlg')||open('bag')||open('book')||open('notebook')||!!openMinigame();}
 function hitPlayer(x1,x2,y1,y2){return G.px+5>x1&&G.px-5<x2&&G.py>y1&&G.py-18<y2;}
 function hurt(srcX){
   if(G.hurtT>0)return;G.hp--;G.hurtT=60;G.px+=(G.px<srcX?-16:16);G.vy=-2.6;G.onGround=false;refreshHud();

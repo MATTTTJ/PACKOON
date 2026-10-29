@@ -1,6 +1,6 @@
 'use strict';
 /* 패널(보따리·책) 열고 닫기, 보따리 + 가보 가공대 */
-function closePanels(){if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;}
+function closePanels(){if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;$('notebook').hidden=true;}
 function toggleBag(){const o=$('bag').hidden;closePanels();if(o){selItem=null;lastOut=null;pouchMsg='';renderBag();$('bag').hidden=false;$('bagBody').scrollTop=0;}}
 function toggleBook(){const o=$('book').hidden;closePanels();if(o){renderBook();$('book').hidden=false;}}
 $('btnBag').onclick=()=>{if(G.started&&!G.ended&&!open('dlg')&&!openMinigame())toggleBag();};

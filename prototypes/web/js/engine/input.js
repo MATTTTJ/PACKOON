@@ -37,7 +37,8 @@ function onPress(k){
   if(k==='escape'){closePanels();return;}
   if(k==='i'){toggleBag();return;}
   if(k==='b'){toggleBook();return;}
-  if(open('bag')||open('book'))return;
+  if(k==='n'){toggleNote();return;}
+  if(open('bag')||open('book')||open('notebook'))return;
   if(k===' '||k==='w'||k==='arrowup')jumpQ=true;
   if(k==='j'||k==='x')atkQ=true;
   if(k==='e'||k==='enter')tryTalk();
@@ -49,9 +50,10 @@ function padAction(k){
   const mg=openMinigame();
   if(k==='bag'){if(!open('dlg')&&!mg)toggleBag();return;}
   if(k==='book'){if(!open('dlg')&&!mg)toggleBook();return;}
+  if(k==='note'){if(!open('dlg')&&!mg)toggleNote();return;}
   if(mg){if(k==='atk'||k==='jump')mg.hit();return;}
   if(open('dlg')){advance();return;}
-  if(open('bag')||open('book'))return;
+  if(open('bag')||open('book')||open('notebook'))return;
   if(k==='jump')jumpQ=true;else if(k==='atk')atkQ=true;else if(k==='talk')tryTalk();
 }
 document.querySelectorAll('#pad [data-k]').forEach(b=>{

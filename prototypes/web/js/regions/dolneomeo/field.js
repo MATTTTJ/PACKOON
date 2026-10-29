@@ -117,8 +117,8 @@ Rg.bossDie=()=>{
 };
 Rg.onPickup=a=>{
   if(a.item==='seoridarae'&&!G.f.daraePicked){G.f.daraePicked=true;
-    clue('h2','도감','서리다래 그림 옆에는 아빠의 그림이 없다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
-    diary('d_darae','서리다래를 붓으로 그렸다. 갈참골 도감에는 아빠의 그림이 먼저 있었는데, 여기에는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
+    clue('h2','아빠의 수첩','아빠의 수첩에는 서리다래가 없다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
+    diary('d_darae','서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
     setTimeout(()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'),1600);refreshGoal();}
 };
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:2120,item:'seogi',done:false});};

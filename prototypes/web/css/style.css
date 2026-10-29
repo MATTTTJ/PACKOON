@@ -347,3 +347,21 @@ body.in-battle .hud,body.in-battle .prompt{visibility:hidden}
 .devpick-btns button{font-family:var(--ui);font-size:13px;background:transparent;color:var(--hanji);border:1px solid #6b5238;border-radius:4px;padding:4px 10px;min-height:32px;cursor:pointer;touch-action:manipulation}
 .devpick-btns button:hover{border-color:var(--gold)}
 .devpick-btns button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+
+/* 아빠의 보부상 수첩: 아빠 글은 옅은 갈색, 내 글은 먹색 */
+.note-region{font-family:var(--display);font-size:1.05em;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--hanji-2)}
+.note-region:first-child{margin-top:2px}
+.note-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.note-card{border:1px solid #cdb98f;border-radius:4px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#f8eed8}
+.note-pics{display:flex;gap:8px;align-items:flex-end;min-height:48px}
+.note-pics canvas{height:48px;width:auto;image-rendering:pixelated}
+.note-pics canvas.dad{opacity:.55}
+.note-pics canvas.boss{height:76px;image-rendering:auto}
+.note-name{font-family:var(--display);font-size:1.05em}
+.note-lines{display:flex;flex-direction:column;gap:5px}
+.note-line{margin:0;font-family:var(--display);line-height:1.55;display:flex;gap:6px;align-items:baseline}
+.note-line .who{flex:none;font-family:var(--ui);font-size:.72em;padding:0 5px;border-radius:2px;letter-spacing:.04em}
+.note-line.dad{color:#7a5a38}
+.note-line.dad .who{border:1px solid #b9a07a;color:#8a6a48}
+.note-line.me{color:var(--meok)}
+.note-line.me .who{background:var(--meok);color:var(--hanji)}
