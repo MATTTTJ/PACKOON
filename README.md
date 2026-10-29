@@ -4,7 +4,7 @@
 
 ## 플레이
 
-브라우저에서 바로: **https://matttttj.github.io/PACKOON/** (갈참골 체험판)
+브라우저에서 바로: **https://mattttj.github.io/PACKOON/** (갈참골 체험판)
 
 PC는 키보드(←→ 이동, Space 점프, J 휘두르기, E 말걸기, I 보따리, B 책), 휴대폰은 화면 버튼으로 조작한다.
 
