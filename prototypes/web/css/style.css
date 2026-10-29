@@ -374,3 +374,7 @@ body.in-battle .hud,body.in-battle .prompt{visibility:hidden}
 
 /* 휴대폰 세로: 시작·끝 화면 뒤의 패드 글씨가 비쳐 제목과 겹치지 않게 */
 @media (pointer:coarse) and (orientation:portrait){.cover{background:rgba(26,19,15,.96)}}
+
+/* 책 아래 저장·처음부터 버튼 줄 */
+.panel-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 14px;border-top:1px solid var(--hanji-2)}
+.panel-foot .small{flex:1;min-width:10em}
