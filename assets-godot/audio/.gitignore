@@ -1,0 +1,5 @@
+# Regenerate with: node tools/audio/render.js
+bgm/
+sfx/
+manifest.json
+validation.json
