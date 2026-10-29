@@ -1,0 +1,86 @@
+'use strict';
+/* 돌너머 마을 (2지역, 초겨울·첫서리): 지역 정보, 처음 상태, 아이템, 채집, 깨어나는 가보(증조할아버지의 맷돌).
+   흐름은 design/narrative/dolneomeo-scenario.md (제안). 원본 표: design/data/*.csv 의 dolneomeo 줄.
+   수치 가운데 표에 없던 것은 웹에서 임시로 정한 값이다 (표에 '제안'으로 적어 둠) */
+(()=>{
+const Rg=defineRegion('dolneomeo',{
+  order:2,name:'돌너머 마을',
+  world:2400,startX:60,
+  platforms:[{x:640,y:158,w:60},{x:1380,y:158,w:64},{x:2196,y:150,w:76}],
+  clueTotal:3,
+  dex:['eoksae','memil','gyeousari','gyeolmyeongja','seogi','seoridarae'],
+  cover:{
+    tag:'돌너머 마을 체험판',sub:'첫서리 내린 돌담 마을',ready:'돌너머 마을로 들어갈 준비',go:'돌너머 마을로',
+    title:{kicker:'둘째 마을',head:'돌너머 마을',start:'돌너머 마을로 들어가기',body:[
+      '갈참골을 지나 북쪽으로 사흘을 걸었다. 밤새 첫서리가 내려 돌담마다 하얗게 소금을 뿌린 것 같다.',
+      '해머루 약은 엄마의 병을 조금 늦췄을 뿐이다. 두꺼비 할멈은 돌산 절벽의 서리다래라면 한 번 더 늦출 수 있을 거라고 했다.',
+      '아빠도 이 길을 지났을 것이다. 보따리 속 맷돌이 오늘따라 무겁다.']},
+    end:{kicker:'돌너머 마을 체험판 완료',head:'큰 장터로 가는 길',body:[
+      '깨어난 맷돌로 서리다래를 갈아, 내 손으로 엄마의 약을 만들었다. 까치가 약즙 통을 물고 남쪽으로 날아갔다.',
+      '아빠는 약연의 글자 하나를 읽고 그날 밤 떠났다고 한다. 그 글자가 무엇이었을까. 큰 장터에 가면 알 수 있을지도 모른다.']},
+  },
+  newState:()=>({
+    pickups:[
+      ...[900,945,990,1240,1290,1335].map(x=>({x,y:GROUND,item:'memil',got:false})),
+      {x:670,y:118,item:'gyeousari',got:false},{x:1412,y:118,item:'gyeousari',got:false},
+    ],
+    digs:[{x:470,item:'eoksae',done:false},{x:560,item:'eoksae',done:false},{x:760,item:'eoksae',done:false},{x:1030,item:'eoksae',done:false}],
+    boss:{x:1990,dead:false},
+    f:{kkuTalk:false,kkuAwake:false,kkuDone:false,ppuriMet:false,ppuriPassed:false,nalDTalk:false,nalDDone:false,nalDBluff:false,
+      dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false},
+    rel:{kkubeogi:{t:'호감',v:0},dolsoe:{t:'신뢰',v:0},ppuri:{t:'의리',v:0},nal:{t:'경멸',v:0}},
+  }),
+  onStart(){
+    diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 우리를 내려다본다. 서리다래는 돌산 절벽에 있다고 했다.');
+    toast('마을 어귀의 동물들에게 말을 걸어 보자');
+  },
+  endStats:()=>[
+    ['아빠 단서',G.clues.length+'/'+clueTotalSoFar()],
+    ['도감',Object.keys(G.dex).length+'/'+dexSoFar().length],
+    ['돌쇠 할배의 신뢰',G.rel.dolsoe.v],
+    ['쓰러진 횟수',G.f.faints],
+  ],
+});
+
+/* 아이템 (items.csv). r 은 레어도 단계 - 1. 부위 재료(mud, stonedust, mossy_eye)는 표에 단계가 없어 임시로 2 */
+defineItems({
+  eoksae:{n:'마른 억새',r:0,d:'서리 맞아 하얗게 센 억새. 겨울잠 둥지를 짓기 좋다.'},
+  memil:{n:'메밀',r:0,d:'세모난 검은 낟알. 돌밭에서도 잘 자란다.'},
+  memil_powder:{n:'메밀가루',r:1,d:'맷돌에 곱게 간 메밀. 장승제 메밀전을 부친다.'},
+  gyeousari:{n:'겨우살이',r:1,d:'겨울에도 푸른 기생 나무. 새들이 열매를 좋아한다.'},
+  gyeolmyeongja:{n:'결명자',r:2,d:'눈을 밝힌다는 약재 씨앗. 볶아서 차로 달인다.'},
+  seogi:{n:'석이버섯',r:2,d:'바위에 붙어 자라는 귀이개 모양 버섯. 백 년 바위에만 난다는 말이 있다.'},
+  seoridarae:{n:'서리다래',r:3,d:'첫서리를 맞아야 단맛이 드는 다래. 엄마의 병을 늦추는 약 재료.'},
+  darae_yak:{n:'서리다래 약즙',r:3,d:'맷돌에 간 서리다래. 까치 편에 엄마에게 보낸다.'},
+  story_stone:{n:'사연 있는 돌',r:3,d:'아빠가 성황당에 올리려다 두고 간 돌. 소원이 적혀 있다. 돌 골렘을 달래는 선물이 된다.'},
+  mud:{n:'진흙 덩이',r:1,d:'돌 골렘의 다리를 이루던 진흙. 아직 축축하다.'},
+  stonedust:{n:'돌가루',r:1,d:'돌 골렘의 팔에서 떨어진 고운 돌가루.'},
+  mossy_eye:{n:'이끼 낀 눈돌',r:1,d:'돌 골렘의 눈이던 둥근 돌. 이끼가 눈썹처럼 붙어 있다.'},
+});
+defineIcons({
+  eoksae:P=>{P(4,4,1,10,'#e8dcc0');P(7,2,1,12,'#efe6cf');P(10,3,1,11,'#e8dcc0');P(3,2,2,3,'#f6f0de');P(6,1,3,2,'#f6f0de');P(10,1,2,3,'#f6f0de');P(5,13,6,2,'#a8916a');},
+  memil:P=>{P(6,4,4,2,'#3a3330');P(5,6,6,3,'#2b2522');P(6,9,4,2,'#3a3330');P(7,11,2,2,'#2b2522');P(7,5,1,2,'#6b625c');P(9,3,3,2,'#7a9a5a');},
+  memil_powder:P=>{P(5,6,6,3,'#d8d2c6');P(6,5,4,1,'#ebe6dc');P(3,9,10,4,'#6b5a4a');P(4,13,8,1,'#4a3c30');P(4,9,8,1,'#8a7866');P(7,7,1,1,'#9a948a');},
+  gyeousari:P=>{P(7,8,2,7,'#6b5a3a');P(3,4,4,3,'#6f9a4a');P(9,3,4,3,'#6f9a4a');P(5,7,3,2,'#5a8a3a');P(9,6,3,2,'#5a8a3a');P(6,3,2,2,'#f3e28a');P(10,8,2,2,'#f3e28a');P(4,8,1,1,'#f3e28a');},
+  gyeolmyeongja:P=>{P(5,5,2,3,'#8a6a2a');P(8,4,2,3,'#9a7a32');P(10,7,2,3,'#8a6a2a');P(6,9,2,3,'#9a7a32');P(9,11,2,2,'#8a6a2a');P(3,10,2,2,'#9a7a32');P(5,5,1,1,'#c9a85a');P(8,4,1,1,'#c9a85a');},
+  seogi:P=>{P(3,5,10,6,'#4a4440');P(4,4,8,1,'#5a544e');P(5,11,6,1,'#3a3430');P(6,6,4,3,'#2e2a26');P(4,6,1,1,'#7a746e');P(11,8,1,1,'#7a746e');P(7,12,2,3,'#8a8480');},
+  seoridarae:P=>{P(7,1,2,3,'#6b5a3a');P(4,4,4,4,'#7fa860');P(8,4,4,4,'#8ab86a');P(5,8,4,4,'#7fa860');P(9,8,3,4,'#6f9850');P(5,5,1,1,'#f4fbff');P(9,5,1,1,'#f4fbff');P(6,9,1,1,'#f4fbff');P(10,9,1,1,'#f4fbff');},
+  darae_yak:P=>{P(5,2,6,2,'#8a6a3a');P(4,4,8,10,'#a8c88a');P(4,4,8,1,'#c9e0b0');P(5,6,6,7,'#7fa860');P(6,7,2,2,'#d8f0c8');P(4,13,8,1,'#5a7a40');},
+  story_stone:P=>{P(4,5,8,7,'#9a9690');P(3,7,10,4,'#8a8680');P(5,4,6,1,'#aeaaa4');P(5,7,1,3,'#2b2522');P(7,6,1,4,'#2b2522');P(9,7,1,3,'#2b2522');P(10,9,1,1,'#b4432a');P(4,12,8,1,'#6a6660');},
+  mud:P=>{P(4,7,8,5,'#6b5038');P(3,9,10,3,'#5a422e');P(5,6,4,1,'#8a6a4a');P(9,10,2,1,'#3e2c1e');},
+  stonedust:P=>{P(4,10,8,3,'#b8b2a8');P(5,8,6,2,'#c8c2b8');P(6,7,4,1,'#d8d2c8');P(3,12,10,1,'#9a948a');},
+  mossy_eye:P=>{P(4,4,8,8,'#8a8680');P(3,6,10,4,'#8a8680');P(5,6,6,4,'#d8d2c6');P(7,7,2,2,'#2b2522');P(4,3,8,2,'#6f9a4a');P(3,4,2,2,'#5a8a3a');},
+});
+
+/* 채집 (낫으로 억새 베기, 절벽의 석이버섯 떼기) */
+defineGather({
+  eoksae:{title:'마른 억새 베기',hits:2,zw:18,speed:1.8,hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 밝은 곳에 맞춰 두 번이면 한 단이 넘어간다.',ok:['서걱, 반쯤 넘어갔다.'],miss:'줄기가 꺾이기만 했다…'},
+  seogi:{title:'석이버섯 떼기',hits:1,zw:12,speed:2.4,hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 단번에 떼어 내야 찢어지지 않는다.',ok:[],miss:'가장자리가 찢어졌다…'},
+});
+
+/* 증조할아버지의 맷돌: 돌쇠 할배의 돌 쌓기를 통과하면 깨어난다 (heirlooms.csv). 쌀 → 쌀가루는 쌀이 나오는 큰 장터에서 */
+defineRecipes({maetdol:[
+  {need:{memil:3},out:'memil_powder',n:1},
+  {need:{seoridarae:1},out:'darae_yak',n:1},
+]});
+})();

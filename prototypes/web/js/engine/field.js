@@ -41,7 +41,7 @@ function step(){
   if(atkQ&&G.attackT<=0)G.attackT=18;atkQ=false;
   if(G.attackT>0){G.attackT--;if(G.attackT===9)doHit();}
   if(G.hurtT>0)G.hurtT--;
-  for(const a of G.pickups){if(!a.got&&Math.abs(a.x-G.px)<10&&Math.abs(a.y-G.py)<16){a.got=true;addItem(a.item,1);}}
+  for(const a of G.pickups){if(!a.got&&Math.abs(a.x-G.px)<10&&Math.abs(a.y-G.py)<16){a.got=true;addItem(a.item,1);if(REG.onPickup)REG.onPickup(a);}}
   REG.step();
   for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.vy+=0.15;if(--s.t<=0)sparks.splice(i,1);}
   if(shakeT>0)shakeT--;
@@ -58,6 +58,7 @@ function drawLogs(){for(const p of REG.platforms){const x=p.x-cam;if(x>W||x+p.w<
 function drawPickups(){for(const a of G.pickups){if(a.got)continue;const x=a.x-cam;if(x<-8||x>W+8)continue;const bob=Math.sin((G.anim+a.x)*0.08)>0.7?-1:0;
   REG.drawPickup(a,x,bob);}}
 function drawDigs(){for(const d of G.digs){const x=d.x-cam;if(x<-12||x>W+12)continue;
+  if(REG.drawDig&&REG.drawDig(d,x))continue;   // 지역이 직접 그리면 true
   if(d.done){R(x-6,GROUND-1,12,2,'#3e2615');continue;}
   R(x-7,GROUND-4,14,4,'#7a4b2a');R(x-5,GROUND-6,10,2,'#8b5a2b');
   if(Math.floor((G.anim+d.x)/14)%3===0){R(x-3,GROUND-10,1,1,'#fff3b0');R(x+3,GROUND-12,1,1,'#fff3b0');}else R(x,GROUND-11,1,1,'#ffe48a');}}

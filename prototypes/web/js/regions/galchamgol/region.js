@@ -36,6 +36,16 @@ const Rg=defineRegion('galchamgol',{
     diary('start','갈참골에 도착했다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 아빠의 마지막 편지에 적힌 곳이 여기다.');
     toast('도토리를 줍고, 마을 동물들에게 말을 걸어 보자');
   },
+  next:'dolneomeo',
+  /* ?region=dolneomeo 처럼 뒤 지역부터 바로 시작할 때, 갈참골을 이렇게 마친 것으로 친다 (확인용 바로가기) */
+  finish(g){
+    g.tool='sickle';g.sharp=false;g.inv={rice:1,acorn:2,root:1,kflower:1};
+    Rg.dex.forEach(id=>g.dex[id]=true);
+    ['d1','n1','m1','m2','t1','h1'].forEach(id=>g.clues.push({id,who:'갈참골',text:'갈참골에서 찾은 단서 (바로가기로 시작해서 내용은 비어 있다)'}));
+    g.diary.push({id:'skip_galchamgol',text:'(갈참골은 바로가기로 건너뛰었다.)'});
+    Object.assign(g.f,{dodamDone:true,musoeDone:true,nalDone:true,toadMet:true});
+    g.boss.dead=true;g.barrier.cut=true;g.ended=true;
+  },
   endStats:()=>[
     ['아빠 단서',G.clues.length+'/'+Rg.clueTotal],
     ['도감',Object.keys(G.dex).length+'/'+Rg.dex.length],

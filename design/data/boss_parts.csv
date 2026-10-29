@@ -5,9 +5,9 @@ kudzu,core,칡의 심,4,O,손을 조준한 씨앗,kflower,전투 승리. 다른 
 musoe,hammer,망치질,3,,세로 줄 예고 후 망치가 내려침,,,확정
 musoe,bellows,풀무,3,,물결치며 날아오는 불똥,,,확정
 musoe,core,호통,3,O,세 갈래로 퍼지는 고함,,,확정
-golem,leg,다리,,,,mud,주저앉아 머리가 낮아짐,제안
-golem,arm,팔,,,휩쓸기,stonedust,휩쓸기 공격이 사라짐,제안
-golem,head,머리,,O,,mossy_eye,전투 종료,제안
+golem,leg,다리,3,,바닥 점선 예고 후 돌기둥이 솟음 (발 구르기),mud,주저앉아 머리가 낮아짐,제안
+golem,arm,팔,3,,휩쓸기: 틈이 하나 있는 돌팔 줄이 위에서 내려옴,stonedust,휩쓸기 공격이 사라짐,제안
+golem,head,머리,4,O,손을 조준한 돌 던지기,mossy_eye,전투 승리. 다리나 팔을 하나 이상 무너뜨려야 드러남,제안
 dokkaebi,broom,빗자루,3,,상자 바닥을 좌우로 쓸고 지나감. 쓸리지 않은 줄 하나로 피함,broom_sal,,제안
 dokkaebi,ki,키,3,,콩을 까불러 위로 흩뿌렸다가 떨어뜨림,kong,콩 비가 사라짐,제안
 dokkaebi,meongseok,멍석,3,,상자 한쪽 끝부터 말려 들어와 피할 자리가 좁아짐,jip,말기 공격이 사라짐,제안

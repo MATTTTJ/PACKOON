@@ -10,18 +10,21 @@ $('bagClose').onclick=closePanels;$('bookClose').onclick=closePanels;
 /* 가보: 순서대로 가공대 탭에 나온다. 내용은 data/common.js */
 const HEIR={};
 function defineHeirlooms(map){Object.assign(HEIR,map);}
-/* 가공법: 가보가 깨어나면 그 지역이 넣는다. RECIPES[가보]=[{need:{아이템:개수}, out:만들어지는 것, n:개수}] */
+/* 가공법: 그 가보가 깨어나는 지역 파일이 넣는다. RECIPES[가보]=[{need:{아이템:개수}, out:만들어지는 것, n:개수}]
+   가공법은 가보가 깨어난 뒤(G.awake 에 들어간 뒤)에만 쓰인다. 깨우기는 awaken(가보) */
 const RECIPES={};
 function defineRecipes(map){for(const k in map)RECIPES[k]=(RECIPES[k]||[]).concat(map[k]);}
+const isAwake=t=>G.awake.includes(t);
+function awaken(t){if(!isAwake(t))G.awake.push(t);}
 const pouch={tool:'jeolgu',items:[]};
 let selItem=null,pouchMsg='',lastOut=null,brewing=false;
 function pouchCount(){const c={};pouch.items.forEach(i=>c[i]=(c[i]||0)+1);return c;}
-function matchRecipe(){const c=pouchCount(),ck=Object.keys(c);for(const r of RECIPES[pouch.tool]||[]){const k=Object.keys(r.need);if(ck.length===k.length&&k.every(x=>c[x]===r.need[x]))return r;}return null;}
+function matchRecipe(){const c=pouchCount(),ck=Object.keys(c);if(!isAwake(pouch.tool))return null;for(const r of RECIPES[pouch.tool]||[]){const k=Object.keys(r.need);if(ck.length===k.length&&k.every(x=>c[x]===r.need[x]))return r;}return null;}
 function returnPouch(){if(!pouch.items.length)return;pouch.items.forEach(id=>{G.inv[id]=(G.inv[id]||0)+1;});pouch.items=[];refreshHud();}
 function liveHint(){
   if(!pouch.items.length)return '';
   const h=HEIR[pouch.tool];
-  return h.live?h.live(pouchCount(),matchRecipe()):'무엇이 될지는 아직 모른다.';
+  return h.live&&isAwake(pouch.tool)?h.live(pouchCount(),matchRecipe()):'무엇이 될지는 아직 모른다.';
 }
 function putIn(id){
   if(brewing||!has(id))return;
@@ -35,7 +38,7 @@ function craft(){
   if(brewing||!pouch.items.length)return;
   const r=matchRecipe();const box=document.querySelector('#bagBody .pouch');
   if(!r){
-    pouchMsg=HEIR[pouch.tool].fail(pouch.items);
+    pouchMsg=HEIR[pouch.tool].fail(pouch.items,isAwake(pouch.tool));
     if(box){box.classList.remove('fizzle');void box.offsetWidth;box.classList.add('fizzle');}
     const m=$('benchMsg');if(m)m.textContent=pouchMsg;return;
   }
@@ -84,10 +87,10 @@ function renderBag(pop){
   const sr=el('div','sub-row');sr.appendChild(el('div','sub','가보로 가공하기'));sr.appendChild(el('span','small','보따리 속 가보를 고르고 소지품을 넣으면 가공된다'));wrap.appendChild(sr);
   const tabs=el('div','tooltabs');
   Object.keys(HEIR).forEach(t=>{const b=el('button','tooltab');b.type='button';b.setAttribute('aria-pressed',t===pouch.tool);
-    b.appendChild(icon(t));b.appendChild(el('span',null,HEIR[t].short));if(!RECIPES[t])b.appendChild(el('span','q','?'));
+    b.appendChild(icon(t));b.appendChild(el('span',null,HEIR[t].short));if(!isAwake(t))b.appendChild(el('span','q','?'));
     b.onclick=()=>switchTool(t);tabs.appendChild(b);});
   wrap.appendChild(tabs);
-  const Hr=HEIR[pouch.tool],awake=!!RECIPES[pouch.tool];
+  const Hr=HEIR[pouch.tool],awake=isAwake(pouch.tool);
   const card=el('div','heir'+(awake?'':' sleep'));
   const art=el('div','art');art.appendChild(icon(pouch.tool));card.appendChild(art);
   const tx=el('div','txt');tx.appendChild(el('span','state',awake?'깨어난 가보':'잠든 가보'));
@@ -113,7 +116,7 @@ function renderBag(pop){
   bench.appendChild(out);wrap.appendChild(bench);
   const msg=el('div','bench-msg',pouchMsg||(awake?(Hr.prompt||'넣을 것을 골라 보자.'):'쓰는 법을 아직 모른다. 무엇을 넣으면 반응할까?'));msg.id='benchMsg';wrap.appendChild(msg);
   const rl=el('div','recipes');
-  if(awake)RECIPES[pouch.tool].forEach(rc=>{const it=el('span','recipe');it.appendChild(el('span',null,'아는 쓰는 법 ·'));
+  if(awake)(RECIPES[pouch.tool]||[]).forEach(rc=>{const it=el('span','recipe');it.appendChild(el('span',null,'아는 쓰는 법 ·'));
     Object.keys(rc.need).forEach(k=>{it.appendChild(icon(k));it.appendChild(el('span',null,ITEMS[k].n+' ×'+rc.need[k]));});
     it.appendChild(el('span',null,'→'));it.appendChild(icon(rc.out));it.appendChild(el('span',null,ITEMS[rc.out].n));rl.appendChild(it);});
   else rl.appendChild(el('span',null,'아직 깨어나지 않은 가보다. 넣어 보는 건 자유다.'));
