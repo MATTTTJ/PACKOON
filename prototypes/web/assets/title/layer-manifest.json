@@ -1,0 +1,182 @@
+{
+  "sky": {
+    "width": 1672,
+    "height": 941,
+    "bounds": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "clouds": {
+    "width": 2172,
+    "height": 724,
+    "bounds": [
+      41,
+      197,
+      2089,
+      325
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "hills": {
+    "width": 1672,
+    "height": 941,
+    "bounds": [
+      0,
+      307,
+      1672,
+      634
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "sacred-tree": {
+    "width": 1152,
+    "height": 1366,
+    "bounds": [
+      2,
+      0,
+      1150,
+      1366
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "village": {
+    "width": 1254,
+    "height": 1254,
+    "bounds": [
+      9,
+      89,
+      1231,
+      1112
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "ground": {
+    "width": 1672,
+    "height": 941,
+    "bounds": [
+      0,
+      572,
+      1672,
+      369
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "fog": {
+    "width": 2172,
+    "height": 724,
+    "bounds": [
+      55,
+      290,
+      2067,
+      234
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "character": {
+    "width": 1312,
+    "height": 1199,
+    "bounds": [
+      36,
+      33,
+      1268,
+      1136
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "foreground": {
+    "width": 1672,
+    "height": 941,
+    "bounds": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "leaf": {
+    "width": 1295,
+    "height": 1214,
+    "bounds": [
+      289,
+      175,
+      861,
+      901
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "logo": {
+    "width": 2135,
+    "height": 736,
+    "bounds": [
+      78,
+      158,
+      1964,
+      433
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "source": "Image gen, independently regenerated"
+  },
+  "magpie": {
+    "width": 1536,
+    "height": 1024,
+    "bounds": [
+      71,
+      46,
+      1425,
+      894
+    ],
+    "alpha": [
+      0,
+      254
+    ],
+    "source": "Image gen, independently regenerated"
+  }
+}

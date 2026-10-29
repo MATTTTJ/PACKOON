@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "presetId": "packoon-approved-2026-10-29-02",
+  "config": {
+    "parallax": 15,
+    "floatAmp": 12,
+    "floatPeriod": 6,
+    "cloudSpeed": 8,
+    "fogSpeed": 43,
+    "leafCount": 28,
+    "leafSpeed": 1,
+    "wind": 18
+  },
+  "selected": "logo",
+  "isolate": false,
+  "playing": false,
+  "layers": [
+    {"id":"sky","blur":0,"depth":0.04,"opacity":1,"visible":true},
+    {"id":"clouds","blur":0,"depth":0.12,"opacity":0.7,"visible":true},
+    {"id":"hills","blur":1,"depth":0.22,"opacity":1,"visible":true},
+    {"id":"sacred-tree","blur":1,"depth":0.42,"opacity":1,"visible":true},
+    {"id":"village","blur":1.5,"depth":0.65,"opacity":1,"visible":true},
+    {"id":"magpie","blur":0,"depth":0.4,"opacity":1,"visible":false},
+    {"id":"ground","blur":0,"depth":0.2,"opacity":1,"visible":true},
+    {"id":"fog","blur":2,"depth":0.7,"opacity":0.24,"visible":true},
+    {"id":"character","blur":0,"depth":0.25,"opacity":1,"visible":true},
+    {"id":"foreground","blur":1.5,"depth":1.8,"opacity":1,"visible":true},
+    {"id":"leaf","blur":0,"depth":1.4,"opacity":0.95,"visible":true},
+    {"id":"logo","blur":0,"depth":0.3,"opacity":1,"visible":true}
+  ]
+}
