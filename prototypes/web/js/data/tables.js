@@ -1578,8 +1578,18 @@ const TABLES={
    "lines": [
     {
      "who": "dad",
-     "text": "개울을 건너기 전 여기서 신발의 흙을 털었다.",
-     "when": "stamp:galchamgol:example"
+     "text": "부를 준다는 열매를 찾으러 낫날부터 벼렸다.",
+     "when": "stamp:galchamgol:anvil"
+    },
+    {
+     "who": "dad",
+     "text": "높이 오르면 남보다 먼저 열매를 찾을 줄 알았다.",
+     "when": "stamp:galchamgol:knot"
+    },
+    {
+     "who": "dad",
+     "text": "해를 머금은 머루. 맛은 좋다. 내가 찾는 부는 여기 없다.",
+     "when": "stamp:galchamgol:roots"
     }
    ],
    "name": "젊은 아빠의 그날"

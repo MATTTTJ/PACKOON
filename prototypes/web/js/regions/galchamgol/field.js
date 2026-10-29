@@ -128,30 +128,222 @@ Rg.bossDie=()=>{
   toast('엉킨 칡이 풀렸다! 해머루가 떨어진다');refreshGoal();
 };
 
-// 예시: PA-43 동작 확인용. 단풍골 확장 작업 때 이 블록만 지우고 실제 구역으로 바꾼다.
+/* PA-43: 나뭇가지와 잘린 덩굴, 물길을 따라 풍경 안쪽으로 들어간다.
+   위치와 그림 외의 조작·시간 수치는 공통 표를 읽는다. */
 if(!CLASSIC){
   Rg.startZone='village';
-  const oldField={};
-  for(const k of ['platforms','drawBack','drawScenery','drawActors','drawPickup','drawDig','drawFront','weather','weatherFront','ambient','maxX','step','onHit','faint','fieldBoss'])if(Rg[k])oldField[k]=Rg[k];
-  oldField.onPickup=a=>Rg.onPickup?.(a); // story.js가 나중에 등록하는 사연 훅도 그대로 쓴다.
-  const marker=(x,y)=>{R(x-1,y-24,2,24,'#6b4423');R(x-9,y-25,18,7,'#dbc28b');};
-  const bramble=(x,y)=>{for(let i=-6;i<=6;i+=4)R(x+i,y-32,3,32,'#4f7137');};
-  Rg.zones={
-    village:{...oldField,w:Rg.world,startX:Rg.startX,exits:{left:'clearing'},
-      doors:[{x:120,to:'clearing',toX:160,label:'작은 공터로',draw:marker},
-        {x:190,to:'clearing',toX:440,label:'덩굴 샛문',need:()=>G.tool==='sickle',reason:'낫이 있으면 덩굴 사이로 갈 수 있겠다.',drawBlocked:bramble}],
-      examines:[{id:'example_wheel',x:610,label:'물레방아 살펴보기',text:['물레방아가 멈춰 있다.','나무 틈으로 물 흐르는 소리만 난다.']},
-        {id:'example_sign',x:390,label:'작은 팻말 읽기',text:'마을 왼쪽 끝이나 작은 팻말에서 공터로 갈 수 있다.',draw:marker}]},
-    clearing:{w:800,startX:160,platforms:[{x:300,y:164,w:70}],npcs:[],
-      drawBack:()=>{drawSky();drawGround();},weather:()=>Vfx.setWeather('maple'),
-      exits:{right:'village',left:{to:'village',need:()=>G.tool==='sickle',reason:'낫이 있어야 이쪽 덩굴길을 지난다.',drawBlocked:bramble}},
-      doors:[{x:160,to:'village',toX:120,label:'마을로 돌아가기',draw:marker}],
-      vistas:[{id:'example_stream',x:460,from:0,to:400,thought:'여기서도 우리 집 지붕이 보이네.',diary:'공터에서 마을 쪽을 바라봤다. 지붕 너머로 개울 소리가 들렸다.',sound:'water',
-        draw:marker,layers:[{speed:.1,draw:()=>{R(0,0,W,H,'#f7dcab');R(310-cam,36,20,20,'#fff0c8');}},
-          {speed:.3,draw:()=>hills(1,'#c98a76',128,22,.01)},
-          {speed:.65,draw:()=>{hills(1,'#a8654f',160,12,.016);drawHouse(230);}},
-          {speed:1,draw:()=>{R(0,190,W,35,'#7daca6');R(65-cam,196,40,1,'#e4d8ab');}}]}],
-      stamps:[{id:'example',x:335,y:164,note:'stamp:galchamgol:example',label:'나무 옹이 살펴보기',draw:(x,y)=>{R(x-3,y-4,6,3,'#b35039');R(x-4,y-7,2,2,'#b35039');R(x,y-8,2,2,'#b35039');}}]},
+  const A=Rg.expArt;
+  const oldState=Rg.newState,oldStep=Rg.step,oldHit=Rg.onHit;
+  const acorns=[['village',280,GROUND],['village',530,160],['village',1260,GROUND],
+    ['forge',330,GROUND],['forge',2050,122],['forest',350,GROUND],['forest',1120,GROUND],['forest',2250,112]];
+  const digs=[['village',600],['forest',1370],['forest',1020],['marsh',900]];
+  Rg.newState=()=>{
+    const s=oldState();
+    s.pickups.forEach((a,i)=>Object.assign(a,{id:'gal_acorn_'+i,zone:acorns[i][0],x:acorns[i][1],y:acorns[i][2]}));
+    s.digs.forEach((d,i)=>Object.assign(d,{id:'gal_dig_'+i,zone:digs[i][0],x:digs[i][1]}));
+    s.barrier.x=2420;s.mobs=[];return s;
   };
+  const commonStep=()=>{Rg.expStep?.();};
+  const basic=(id,w,platforms)=>({w,startX:70,ground:GROUND,platforms,npcs:[],
+    drawBack:()=>A.back(id),drawScenery:()=>A.scenery(id),
+    drawFront:()=>A.front(id),weather:()=>Vfx.setWeather('maple'),
+    drawPickup:Rg.drawPickup,onPickup:a=>Rg.onPickup?.(a),step:commonStep});
+  const sign=A.marker,blocked=A.blocked;
+  const path=(x,to,toX,label,extra={})=>({x,to,toX,label,draw:sign,...extra});
+  const hasSickle=()=>G.tool==='sickle';
+  const cutPath=()=>G.barrier.cut;
+  Rg.zones={
+    village:{...basic('village',2600,[{x:490,y:160,w:80},{x:565,y:126,w:80},
+      {x:1370,y:160,w:85},{x:1450,y:126,w:70},{x:1890,y:158,w:95},{x:1980,y:124,w:80}]),
+      exits:{right:{to:'forge',toX:70}},
+      doors:[path(2300,'forge',180,'대장간 길로'),
+        path(1150,'forge',380,'함지박에 올라 개울 따라가기',{travel:'stream',draw:A.streamDoor}),
+        path(1710,'hill',180,'물 건너 당산나무 쪽으로',{travel:'depth',need:cutPath,
+          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',draw:A.treeDoor,drawBlocked:blocked})],
+      vistas:[{id:'stream',x:930,from:0,to:140,draw:A.streamDoor,sound:'water',
+        thought:'낙엽도 집을 떠나네.\n엄마 약도 이 물길처럼 잘 갔으면.',
+        diary:'물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.',layers:A.vistaStream}],
+    },
+    forge:{...basic('forge',2600,[{x:320,y:160,w:85},{x:400,y:126,w:80},
+      {x:1940,y:156,w:90},{x:2030,y:122,w:85},{x:2260,y:160,w:95}]),
+      npcs:['musoe','nal'],exits:{left:{to:'village',toX:2500},right:{to:'forest',toX:70}},
+      doors:[path(180,'village',2300,'집 쪽 다리로'),path(380,'village',1150,'개울 둑길로 돌아가기'),
+        path(2380,'forest',180,'참나무 숲으로')],
+      stamps:[{id:'anvil',x:1070,note:'stamp:galchamgol:anvil',label:'모루 밑 눌린 자국 살피기'}],
+    },
+    forest:{...basic('forest',2800,[{x:410,y:160,w:100},{x:500,y:126,w:80},
+      {x:1540,y:158,w:100},{x:1710,y:152,w:85},{x:2070,y:158,w:90},{x:2160,y:124,w:75},{x:2230,y:112,w:90}]),
+      npcs:['dodam'],exits:{left:{to:'forge',toX:2480},right:{to:'marsh',toX:70}},
+      pickups:[{id:'gal_extra_acorn_1',x:410,y:GROUND,item:'acorn',got:false},
+        {id:'gal_extra_acorn_2',x:460,y:GROUND,item:'acorn',got:false},
+        {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false}],
+      doors:[path(180,'forge',2380,'대장간 거점으로'),path(2630,'marsh',180,'늪가 약방으로'),
+        path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
+          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠에게 낫을 받아 J로 걷자.',draw:A.treeDoor,drawBlocked:blocked})],
+      stamps:[{id:'knot',x:2250,y:112,note:'stamp:galchamgol:knot',label:'높은 가지 옹이 살피기'}],
+      drawActors:()=>{drawBarrier();},onHit:oldHit,
+      step:()=>{commonStep();if(G.barrier.shake>0)G.barrier.shake--;},
+    },
+    marsh:{...basic('marsh',2400,[{x:420,y:160,w:95},{x:510,y:126,w:85},
+      {x:980,y:158,w:100},{x:1070,y:124,w:75},{x:1850,y:160,w:85},{x:1935,y:126,w:75}]),
+      npcs:['toad'],exits:{left:{to:'forest',toX:2700}},
+      doors:[path(180,'forest',2630,'참나무 숲으로'),path(2040,'forge',1860,'약재 나르는 둑길로 대장간에',{need:hasSickle,
+        reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',drawBlocked:blocked})],
+      // 선반 뒤 작은 채집 무리. 전부 선택 재료이며, 필수 교환 몫은 앞 구역에 있다.
+      pickups:[],
+    },
+    hill:{...basic('hill',2600,[{x:700,y:160,w:100},{x:790,y:126,w:90},
+      {x:1120,y:158,w:110},{x:1220,y:124,w:90},{x:1470,y:158,w:95},{x:1560,y:124,w:85},
+      {x:2290,y:160,w:100},{x:2380,y:126,w:100}]),
+      exits:{left:{to:'forest',toX:2360}},
+      doors:[path(180,'hill',700,'당산나무 속으로 오르기',{travel:'tree',draw:A.treeDoor}),
+        path(700,'forest',2360,'뿌리 바깥 숲길로 돌아가기'),
+        path(2450,'village',1710,'보이던 개울 둑으로 내려가기',{travel:'depthBack',need:()=>G.boss.dead,
+          reason:'엉킨 칡이 내리막까지 움켜쥐고 있다. 나무를 풀어 주고 내려가자.',drawBlocked:blocked})],
+      pickups:[{id:'gal_extra_acorn_4',x:780,y:160,item:'acorn',got:false},
+        {id:'gal_cut_vine',x:340,y:GROUND,item:'vine',got:false}],
+      stamps:[{id:'roots',x:2140,note:'stamp:galchamgol:roots',label:'당산나무 뿌리의 발자국 살피기'}],
+      vistas:[{id:'home',x:2380,y:126,from:0,to:160,draw:A.marker,sound:'wind',
+        thought:'저 지붕이 우리 집이야.\n엄마, 한 번만 더 보고 갈게.',
+        diary:'당산나무 언덕에서 집을 돌아봤다. 골짜기의 단풍 사이로 우리 집 초가지붕이 보였다.',layers:A.vistaHill}],
+      drawScenery:()=>{A.scenery('hill');Rg.drawScenery();},
+      drawActors:drawBoss,onHit:oldHit,
+      step:()=>{commonStep();oldStep();},
+      faint:()=>{G.px=1900;G.py=GROUND;G.vy=0;G.onGround=true;toast('나무 앞 쉼터로 물러났다. 버섯 향으로 달랠 수도 있다.');},
+    },
+  };
+  // 도장은 발견 전에도 풍경 속 흔적이 보인다. 엔진의 발견 후 표시와 별도로 그린다.
+  for(const z of Object.values(Rg.zones)){
+    const scenery=z.drawScenery;
+    z.drawScenery=()=>{scenery?.();for(const s of z.stamps||[])A.stamp(s.x-cam,s.y??GROUND);};
+  }
+  installTravel();
+
+  /* 공통 엔진을 덮어쓰지 않는 지역 연출. 구역 문에서 출발하고 같은 문 API로 도착한다.
+     이동 중 저장은 일반 미니게임과 똑같이 막힌다. 중단하면 출발한 안전한 바닥으로 돌아온다. */
+  function installTravel(){
+    const panel=el('div');panel.id='galTravel';panel.hidden=true;
+    panel.style.cssText='position:absolute;inset:0;z-index:5;background:#231c1a;display:flex;flex-direction:column;justify-content:center;color:#fff0d0';
+    panel.setAttribute('role','region');panel.setAttribute('aria-label','단풍골 풍경 속 이동');
+    const canvas=el('canvas');canvas.width=W;canvas.height=H;
+    canvas.style.cssText='display:block;width:100%;min-height:0;flex:1;object-fit:contain;image-rendering:pixelated';
+    const help=el('div');help.style.cssText='flex:none;padding:3px 6px;text-align:center;font-size:clamp(11px,1.2vw,14px);white-space:pre-line';
+    const actions=el('div');actions.style.cssText='flex:none;display:flex;gap:6px;justify-content:center;padding:3px;flex-wrap:wrap';
+    const pause=el('button','btn','멈춤/계속 · E'),look=el('button','btn','뒤돌아보기 · ←'),leave=el('button','btn','돌아가기 · Esc');
+    for(const b of [pause,look,leave]){b.type='button';b.style.cssText='font-size:12px;padding:4px 7px;line-height:1.3;min-height:28px';}
+    actions.append(pause,look,leave);panel.append(canvas,help,actions);$('stage').appendChild(panel);
+    const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;let trip=null;
+    function begin(p){
+      if(!G||G.region!==Rg.id||paused())return;
+      const start=()=>{
+        if(G.region!==Rg.id)return;
+        trip={owner:G,p,tick:0,hold:false,back:false,x:112,y:GROUND,vy:0,ground:true,view:0};
+        panel.hidden=false;suppressHeldInputs();
+        if(p.travel==='stream')Sound.ambience('water');
+        pause.hidden=p.travel==='tree';look.hidden=p.travel!=='stream';
+        leave.textContent=p.travel==='tree'?'밑동으로 · Esc':'출발한 둑으로 · Esc';
+        help.textContent=p.travel==='tree'?'← → 이동 · 점프 버튼 / Space로 오르기\n밝은 구멍이 출구다. 떨어져도 바닥은 안전하다.':
+          p.travel==='stream'?'E · 멈춤/계속   ← · 뒤돌아보기\n물레방아를 지나 다음 둑으로 간다.':'아까 바라본 나무를 향해 풍경 안쪽으로 들어간다.';
+        drawTrip();
+      };
+      const key='galTravelTaught_'+(p.travel==='depthBack'?'depth':p.travel);
+      if(!G.f[key])talk([['너구리',p.travel==='stream'?'함지박이 둑에 매여 있어.\n물레방아 아래까진 얕네.':p.travel==='tree'?'나무 속이 비었네.\n낮은 가지부터 디뎌 보자.':'개울에서 보던 당산나무다.\n덩굴을 걷으니 안쪽 길이 보여.'],
+        ['너구리',p.travel==='stream'?'말걸기나 E로 멈출 수 있대.\n뒤돌아보고 싶으면 왼쪽을 보자.':p.travel==='tree'?'점프로 나이테 턱을 딛자.\n떨어져도 아래는 평평해.':'이 길로 가면 나무 밑동에 닿겠어.']],()=>{G.f[key]=true;begin(p);});
+      else start();
+    }
+    function stop(arrive){
+      const t=trip;if(!t)return;trip=null;panel.hidden=true;releaseInputs();Sound.ambience(null);
+      if(t.owner!==G||G.region!==Rg.id)return;
+      if(arrive){
+        changeZone(t.p.to,{x:t.p.toX,y:t.p.toY});
+        if(t.p.travel==='tree'){G.f.galTreeClimbed=true;diary('galTreeClimbed','빈 나무 속 나이테를 딛고 올랐다. 겨울 도토리와 바랜 소원 천 너머로 언덕이 나왔다.');}
+      }
+    }
+    pause.onclick=()=>{if(trip)trip.hold=!trip.hold;};
+    look.onclick=()=>{if(trip)trip.back=!trip.back;};leave.onclick=()=>stop(false);
+    const ledges=[{x:72,y:192,w:220},{x:150,y:158,w:80},{x:210,y:124,w:82},
+      {x:150,y:90,w:80},{x:88,y:56,w:82},{x:150,y:22,w:80},{x:210,y:-12,w:82},
+      {x:148,y:-46,w:84},{x:90,y:-80,w:84},{x:150,y:-114,w:84},{x:210,y:-148,w:90}];
+    function drawTrip(){
+      if(!trip)return;const t=trip,saved=ctx,oldCam=cam;ctx=c;cam=0;
+      try{
+        if(t.p.travel==='tree'){
+          R(0,0,W,H,'#2e211c');const off=t.view;
+          ctx.save();ctx.translate(0,-Math.round(off));
+          R(52,-200,296,430,'#70472e');R(70,-200,260,430,'#392921');
+          for(let y=-192;y<220;y+=16){R(60,y,6,11,'#b18350');R(335,y,5,11,'#4e3426');}
+          // 속살의 휘어진 결, 도토리 저장 틈, 옛 매듭이 위쪽 빛으로 이어진다.
+          for(let i=0;i<9;i++)for(let y=-200;y<225;y+=3){
+            const x=78+i*30+Math.round(Math.sin((y+i*7)/43)*8);
+            R(x,y,1,3,i%2?'#4c3428':'#51382a');
+          }
+          for(const y of [164,42,-90]){
+            R(76,y-15,14,24,'#281f1b');R(78,y-12,9,17,'#5a3c29');
+            R(79,y+3,6,3,'#c49854');R(80,y+2,4,1,'#79522f');
+          }
+          for(const [i,l] of ledges.entries()){
+            R(l.x,l.y,l.w,6,'#bc925b');R(l.x,l.y+1,l.w,1,'#dfbc7b');
+            R(l.x+5,l.y+6,l.w-10,3,'#4a3123');
+            if(i===3||i===7){R(l.x+26,l.y-5,5,4,'#b77f42');R(l.x+24,l.y-7,8,2,'#634222');}
+            if(i===5){R(290,l.y-45,2,43,'#c59b5c');R(292,l.y-43,12,26,'#d1bea0');R(296,l.y-41,2,19,'#ac7552');}
+          }
+          R(220,-194,66,45,'#f2c77f');R(226,-188,54,39,'#f8dea1');
+          drawRaccoonAt(t.x,t.y,t.x<200?1:-1,0,0,heldTool());ctx.restore();
+        }else{
+          const a=clamp(t.tick/TABLES.TUNING.vista_pan_frames,0,1);
+          if(t.p.travel==='stream'){
+            for(const layer of A.vistaStream){cam=Vfx.reducedMotion?0:Math.round((t.back?1-a:a)*140*(layer.speed??1));layer.draw(cam,Vfx.reducedMotion?0:a);}
+            R(164,182,70,7,'#6e4227');R(160,175,78,8,'#b8854c');R(166,175,66,2,'#e7b66e');
+            drawRaccoonAt(198,175,t.back?-1:1,0,0,heldTool());
+            A.magpie(Math.round(65-(Vfx.reducedMotion?0:a)*130),176);A.chick(Math.round(350-(Vfx.reducedMotion?0:a)*120),178);
+            if(Vfx.reducedMotion){ctx.globalAlpha=a;R(0,0,W,H,'#36251e');ctx.globalAlpha=1;}
+          }else{
+            A.back(t.p.travel==='depthBack'?'hill':G.zone);
+            ctx.save();
+            if(!Vfx.reducedMotion){const z=t.p.travel==='depthBack'?2-a:1+a;ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);}
+            A.treeDoor(200,192);ctx.restore();
+            ctx.globalAlpha=a;R(0,0,W,H,'#36251e');ctx.globalAlpha=1;
+          }
+        }
+      }finally{ctx=saved;cam=oldCam;}
+    }
+    defineMinigame({id:'galTravel',hit:()=>{if(trip?.p.travel==='tree'&&trip.ground){trip.vy=TABLES.TUNING.field_jump_velocity;trip.ground=false;}},step:()=>{
+      if(!trip)return;const t=trip;
+      if(t.owner!==G||G.region!==Rg.id){stop(false);return;}
+      if(document.hidden)return;
+      if(t.p.travel==='tree'){
+        const before=t.y;t.x=clamp(t.x+((isRight()?1:0)-(isLeft()?1:0))*TABLES.TUNING.field_move_speed,78,322);
+        t.vy=Math.min(TABLES.TUNING.field_fall_speed,t.vy+TABLES.TUNING.field_gravity);t.y+=t.vy;t.ground=false;
+        if(t.vy>=0)for(const l of ledges)if(t.x>l.x-3&&t.x<l.x+l.w+3&&before<=l.y&&t.y>=l.y){t.y=l.y;t.vy=0;t.ground=true;break;}
+        if(t.y>GROUND){t.y=GROUND;t.vy=0;t.ground=true;}
+        t.view=Math.min(0,t.y-140);if(t.y<=-148&&t.x>220){stop(true);return;}
+      }else if(!t.hold){
+        t.tick+=t.p.travel==='stream'&&!Vfx.reducedMotion?1:TABLES.TUNING.vista_pan_frames/TABLES.TUNING.zone_transition_frames;
+        if(t.tick>=TABLES.TUNING.vista_pan_frames){stop(true);return;}
+      }
+      drawTrip();
+    }});
+    function intercept(e){
+      if(e.target instanceof HTMLElement&&e.target.matches('input,textarea,select'))return;
+      const k=e.key?.toLowerCase();
+      if(trip){
+        if(e.repeat&&['e','arrowleft','escape'].includes(k)){e.preventDefault();e.stopImmediatePropagation();return;}
+        if(k==='escape')stop(false);
+        else if(k==='e'&&trip.p.travel==='stream')trip.hold=!trip.hold;
+        else if(k==='arrowleft'&&trip.p.travel==='stream')trip.back=!trip.back;
+        else return;
+        e.preventDefault();e.stopImmediatePropagation();return;
+      }
+      if(k&&!['e','enter','arrowup'].includes(k))return;
+      if(CLASSIC||!G||G.region!==Rg.id||paused()||e.repeat)return;
+      const p=nearInteraction();if(!p?.travel||!pathOpen(p))return;
+      e.preventDefault();e.stopImmediatePropagation();begin(p);
+    }
+    addEventListener('keydown',intercept,true);
+    $('padTalk').addEventListener('pointerdown',intercept,true);
+    $('prompt').addEventListener('click',intercept,true);
+    document.querySelector('#pad [data-k="up"]').addEventListener('pointerdown',intercept,true);
+    Rg.expTravel=()=>trip?{kind:trip.p.travel,tick:trip.tick,x:trip.x,y:trip.y,hold:trip.hold}:null;
+  }
 }
 })();
