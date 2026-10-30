@@ -107,26 +107,27 @@ gather_help_misses,채집 공통,도움 시작 실패 수,2,회,도움 시작 �
 gather_help_width,채집 공통,도움 시 판정 폭 증가,12,%p,도움 시 판정 폭 증가,제안
 gather_zone_start,채집 공통,판정 시작 최소 위치,10,%,판정 시작 최소 위치,제안
 gather_zone_span,채집 공통,판정 위치 난수 폭 기준,80,%,실제 시작 위치는 최소 위치 + 난수 × (이 값 - 판정 폭),제안
-gather_speed_gain,채집 공통,성공마다 빨라지는 속도,0.3,%p/프레임/성공,성공마다 빨라지는 속도,제안
+gather_ring_period,채집 공통,필드 채집 고리가 줄어드는 시간,48,프레임,흙더미 위 고리가 크게 시작해 가운데 원에 닿기까지,제안
+gather_just_window,채집 공통,필드 채집 딱 판정 창,7,프레임,고리가 원에 닿기 직전과 닿은 뒤 이만큼 머무는 동안 누르면 딱 (닿은 뒤 머무는 시간도 같음),제안
+gather_perfect_power,채집 공통,딱 맞춘 한 번이 파는 몫,2,몫,보통 휘두르기는 1몫. 목표 성공 수만큼 몫이 차면 캐진다,제안
 gather_cooldown,채집 공통,타격 입력 간격,12,프레임,타격 입력 간격,제안
-gather_finish_wait,채집 공통,마지막 성공 후 완료 대기,300,ms,마지막 성공 후 완료 대기,제안
 gather_yield,채집 공통,기본 채집 수량,1,개,기본 채집 수량,제안
-gather_perfect_yield,채집 공통,실수 없는 채집 수량,2,개,실수 없는 채집 수량,제안
-gather_root_hits,칡뿌리 캐기,목표 성공 수,3,회,목표 성공 수,제안
+gather_perfect_yield,채집 공통,모두 딱 맞춘 채집 수량,2,개,한 번도 빗나가지 않고 모두 딱 맞추면,제안
+gather_root_hits,칡뿌리 캐기,목표 성공 수,3,몫,보통 휘두르기로 3번 (딱이면 2번),제안
 gather_root_width,칡뿌리 캐기,성공 판정 폭,21,%,성공 판정 폭,제안
 gather_root_speed,칡뿌리 캐기,바늘 기본 속도,1.5,%p/프레임,바늘 기본 속도,제안
-gather_ssari_hits,싸리버섯 따기,목표 성공 수,1,회,목표 성공 수,제안
+gather_ssari_hits,싸리버섯 따기,목표 성공 수,2,몫,보통 2번 (딱이면 1번),제안
 gather_ssari_width,싸리버섯 따기,성공 판정 폭,24,%,성공 판정 폭,제안
 gather_ssari_speed,싸리버섯 따기,바늘 기본 속도,2.2,%p/프레임,바늘 기본 속도,제안
-gather_kkoe_hits,꾀꼬리버섯 따기,목표 성공 수,1,회,목표 성공 수,제안
+gather_kkoe_hits,꾀꼬리버섯 따기,목표 성공 수,2,몫,보통 2번 (딱이면 1번),제안
 gather_kkoe_width,꾀꼬리버섯 따기,성공 판정 폭,26,%,성공 판정 폭,제안
 gather_kkoe_speed,꾀꼬리버섯 따기,바늘 기본 속도,2.4,%p/프레임,바늘 기본 속도,제안
-gather_eoksae_hits,마른 억새 베기,목표 성공 수,2,회,목표 성공 수,제안
+gather_eoksae_hits,마른 억새 베기,목표 성공 수,2,몫,보통 2번 (딱이면 1번),제안
 gather_eoksae_width,마른 억새 베기,성공 판정 폭,21,%,성공 판정 폭,제안
 gather_eoksae_speed,마른 억새 베기,바늘 기본 속도,1.8,%p/프레임,바늘 기본 속도,제안
-gather_seogi_hits,석이버섯 떼기,목표 성공 수,1,회,목표 성공 수,제안
+gather_seogi_hits,석이버섯 떼기,목표 성공 수,2,몫,보통 2번 (딱이면 1번),제안
 gather_seogi_width,석이버섯 떼기,성공 판정 폭,26,%,성공 판정 폭,제안
 gather_seogi_speed,석이버섯 떼기,바늘 기본 속도,2.4,%p/프레임,바늘 기본 속도,제안
-gather_darae_vine_hits,다래 덩굴 베기,목표 성공 수,2,회,목표 성공 수,제안
+gather_darae_vine_hits,다래 덩굴 베기,목표 성공 수,2,몫,보통 2번 (딱이면 1번),제안
 gather_darae_vine_width,다래 덩굴 베기,성공 판정 폭,21,%,성공 판정 폭,제안
 gather_darae_vine_speed,다래 덩굴 베기,바늘 기본 속도,1.8,%p/프레임,바늘 기본 속도,제안

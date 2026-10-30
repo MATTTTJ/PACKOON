@@ -18,7 +18,7 @@ let shakeT=0;
 function doHit(){
   Vfx.slash();
   const f=G.face,x1=f>0?G.px+TABLES.TUNING.field_hit_front:G.px-TABLES.TUNING.field_hit_back,x2=x1+TABLES.TUNING.field_hit_width;const dmg=G.sharp?2:1;
-  for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&d.x>x1-TABLES.TUNING.field_dig_padding&&d.x<x2+TABLES.TUNING.field_dig_padding&&G.onGround){if(d.cache)openCache(d);else openGather(d);return;}}
+  for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&d.x>x1-TABLES.TUNING.field_dig_padding&&d.x<x2+TABLES.TUNING.field_dig_padding&&G.onGround){if(d.cache)openCache(d);else gatherHit(d);return;}}
   fieldCall('onHit',x1,x2,dmg,f);
 }
 const sparks=[];
@@ -203,7 +203,7 @@ function step(){
   Vfx.feet();
   if(!wasGrounded&&G.onGround)Sound.land();
   if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
-  if(atkQ&&G.attackT<=0){Sound.swing();G.attackT=TABLES.TUNING.field_swing_frames;}atkQ=false;
+  if(atkQ&&G.attackT<=0){Sound.swing();gatherPress();G.attackT=TABLES.TUNING.field_swing_frames;}atkQ=false;
   if(G.attackT>0){G.attackT--;if(G.attackT===TABLES.TUNING.field_swing_hit_at)doHit();}
   if(G.hurtT>0)G.hurtT--;
   fieldCall('step');
@@ -341,6 +341,7 @@ function drawFieldScene(showPlayer=true){
   fieldCall('drawScenery');
   drawZoneObjects();
   drawDigs();
+  drawGatherCue();   // 채집 고리 (gather.js)
   drawPickups();
   drawFloorDrops();
   drawNpcs();

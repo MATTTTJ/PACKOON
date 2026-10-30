@@ -75,8 +75,8 @@ defineIcons({
 
 /* 채집 (낫으로 억새 베기, 절벽의 석이버섯 떼기) */
 defineGather({
-  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,zw:TABLES.MINIGAMES.gather_eoksae_width,speed:TABLES.MINIGAMES.gather_eoksae_speed,hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 밝은 곳에 맞춰 두 번이면 한 단이 넘어간다.',ok:['서걱, 반쯤 넘어갔다.'],miss:'줄기가 꺾이기만 했다…'},
-  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,zw:TABLES.MINIGAMES.gather_seogi_width,speed:TABLES.MINIGAMES.gather_seogi_speed,hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 단번에 떼어 내야 찢어지지 않는다.',ok:[],miss:'가장자리가 찢어졌다…'},
+  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
+  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
 });
 
 /* 증조할아버지의 맷돌: 돌쇠 할배의 돌 쌓기를 통과하면 깨어난다. 가공법은 heirlooms.csv */

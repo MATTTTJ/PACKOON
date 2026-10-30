@@ -57,10 +57,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     if(missRhythm){log('장단 의도된 실패','준비 입력 한 번 뒤 모든 박자를 놓친다');await key('j');}
     while(Date.now()<end) {
       const s=await check();if(s.mg!==id){if(missRhythm){const hits=await read("document.querySelectorAll('#rhythmPips .on').length");log('장단 실패 결과',{hits,expectedHits:0,rice:s.inv.ssal||0});if(hits!==0)throw new Error('장단 전부 실패 시험에서 입력이 맞았다: '+hits);}return;}
-      if(id==='gather') {
-        const ready=await read('gat.cfg&&gat.cool===0&&gat.hits<gat.cfg.hits&&gat.pos>=gat.zone[0]+2&&gat.pos<=gat.zone[1]-2');
-        if(ready)await key('j');await wait(22);
-      }else if(id==='forge') {
+      if(id==='forge') {
         if(await read("!$('fstrike').disabled"))await click('#fstrike');await wait(90);
       }else if(id==='stack') {
         if(await read("!$('sstrike').disabled"))await key('j');await wait(85);
