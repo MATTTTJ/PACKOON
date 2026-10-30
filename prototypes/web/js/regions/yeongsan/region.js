@@ -78,7 +78,7 @@ defineIcons({
 
 /* 다래 덩굴은 낫으로 벤다 */
 defineGather({
-  darae_vine:{title:'다래 덩굴 베기',hits:TABLES.MINIGAMES.gather_darae_vine_hits,hint:'눈 덮인 덤불 속 덩굴을 낫으로 벤다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
+  darae_vine:{title:'다래 덩굴 베기',hits:TABLES.MINIGAMES.gather_darae_vine_hits,hint:'눈 덮인 덤불 속 덩굴을 낫으로 벤다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 단번에 베인다.'},
 });
 
 /* 아빠의 약연: 산군과의 셈이 맞은 뒤 아빠와 손을 포개면 깨어난다. 가공법은 heirlooms.csv */
@@ -353,7 +353,7 @@ function install(){
     }));
   }));
   shore.npcs.push(fixture('y_home_parcel','까치에게 집으로 보낼 것 묻기',570,()=>{
-    if(!G.f.spring){talk([['늙은 까치','호수 일이 끝나면 다시 들르렴.\n남쪽으로 갈 때 네 짐도 실어 주마.']]);return;}
+    if(!G.f.spring){talk([['늙은 까치','호수 일이 끝나면 다시 들르렴.\n남쪽으로 갈 때 작은 건 실어 주마.']]);return;}
     if(!Rg.offerHomeGift?.())talk([['늙은 까치','집에 갈 때 빨간 열매도 챙겨 가거라.\n엄마 손에 네가 쥐여 드려도 좋지.']]);
   }));
   for(const id of ['shelter','snow','shore']){
