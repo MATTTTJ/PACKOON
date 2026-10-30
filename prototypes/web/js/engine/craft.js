@@ -33,7 +33,7 @@ function finishCraftHands(redraw=true){
   const matched=h.count>=h.cfg.steps&&h.good;
   if(matched)Sound.gather(true);
   pouchMsg=voices[h.tool][matched?0:1]+' '+ITEMS[h.recipe.out].n+' '+h.recipe.n+'개 완성.'+
-    (h.discovered?' 찾은 가공법을 너구리의 책에 적었다.':'');
+    (h.discovered?' 찾은 가공법을 수첩에 이어 적었다.':'');
   if(redraw&&open('bag'))renderBag();
 }
 function craftHandInput(direction){

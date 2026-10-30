@@ -1,6 +1,6 @@
 'use strict';
 /* 저장: 이 기기의 브라우저(localStorage)에 게임 상태(G) 하나를 저장한다. 다른 기기·다른 브라우저와는 이어지지 않는다.
-   - 저장하기 버튼 (화면 위 버튼 줄, 너구리의 책 아래)
+   - 저장하기 버튼 (화면 위 버튼 줄, 아빠의 수첩 아래)
    - 자동 저장: 플레이 중 30초마다, 다음 지역으로 넘어갈 때, 지역을 끝냈을 때
    - 대화·전투·미니게임 중에는 저장하지 않는다 (그 상태는 G 밖에 있어서)
    - 시작 화면: 저장이 있으면 '이어서 하기'
@@ -123,7 +123,7 @@ function saveLabel(s){
   const day=d.toDateString()===now.toDateString()?'오늘':(d.getMonth()+1)+'월 '+d.getDate()+'일';
   return REGIONS[s.G.region].name+' · '+day+' '+t;
 }
-/* 저장 여부에 따라 시작 화면과 책의 버튼 글을 맞춘다 */
+/* 저장 여부에 따라 시작 화면과 수첩의 버튼 글을 맞춘다 */
 function refreshSaveUI(){
   const s=readSave();
   $('btnContinue').hidden=!s;$('saveMeta').hidden=!s;
@@ -139,7 +139,7 @@ function disarm(btn){if(btn.dataset.armed){btn.textContent=btn.dataset.prev;btn.
 $('btnContinue').onclick=()=>loadSave();
 $('btnSave').onclick=()=>writeSave(false);
 $('btnSaveHud').onclick=()=>{if(G.started)writeSave(false);};
-/* 처음부터 하기 (책 아래, 끝 화면): 저장이 있으면 한 번 더 눌러야 지우고 단풍골 처음으로 */
+/* 처음부터 하기 (수첩 아래, 끝 화면): 저장이 있으면 한 번 더 눌러야 지우고 단풍골 처음으로 */
 function confirmNewGame(b){
   if(readSave()&&!b.dataset.armed){arm(b,'정말요? 한 번 더 누르면 저장이 지워진다');return;}
   disarm(b);clearSave();G=newGame();resetScreens();

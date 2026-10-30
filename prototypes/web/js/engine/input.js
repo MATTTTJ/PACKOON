@@ -4,7 +4,7 @@
 /* {id:창 요소 id, step:매 프레임, hit:누르기} */
 const MINIGAMES=[];
 function defineMinigame(m){MINIGAMES.push(m);}
-const open=id=>!$(id).hidden;
+const open=id=>!!$(id)&&!$(id).hidden; // 없어진 패널 id(옛 'book')는 닫힌 것으로 본다
 const openMinigame=()=>MINIGAMES.find(m=>open(m.id))||null;
 
 const keys={};const touch={left:false,right:false,up:false,down:false};
@@ -59,10 +59,9 @@ function onPress(k){
   }
   if(k==='escape'){closePanels();return;}
   if(k==='i'){toggleBag();return;}
-  if(k==='b'){toggleBook();return;}
-  if(k==='n'){toggleNote();return;}
+  if(k==='n'||k==='b'){toggleNote();return;} // B 는 옛 너구리의 책 키. 이제 같은 아빠의 수첩을 연다
   if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
-  if(open('bag')||open('book')||open('notebook'))return;
+  if(open('bag')||open('notebook'))return;
   if(k==='z'){tryPickup();return;}
   if(pickupPose)return;
   if(k===' '||k==='w'||k==='arrowup')jumpQ=true;
@@ -79,11 +78,10 @@ function padAction(k){
   if(inkOn)return;
   const mg=openMinigame();
   if(k==='bag'){if(!open('dlg')&&!mg)toggleBag();return;}
-  if(k==='book'){if(!open('dlg')&&!mg)toggleBook();return;}
-  if(k==='note'){if(!open('dlg')&&!mg)toggleNote();return;}
+  if(k==='note'||k==='book'){if(!open('dlg')&&!mg)toggleNote();return;}
   if(mg){if(k==='atk'||k==='jump')mg.hit();return;}
   if(open('dlg')){if(k!=='down')advance();return;}
-  if(open('bag')||open('book')||open('notebook'))return;
+  if(open('bag')||open('notebook'))return;
   if(k==='down'){tryPickup();return;}
   if(pickupPose)return;
   if(k==='jump')jumpQ=true;else if(k==='atk')atkQ=true;else if(k==='talk')tryTalk();

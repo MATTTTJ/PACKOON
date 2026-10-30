@@ -149,10 +149,10 @@ function resetScreens(){
   lastGoal='';lastTool='';lastNear=null;refreshHud();refreshSaveUI();
 }
 $('btnStart').onclick=startOrConfirm;   // 처음부터(btnRestart)는 save.js
-/* 다음 지역으로: 보따리·연장·책·호감은 그대로 가지고 간다 */
+/* 다음 지역으로: 보따리·연장·수첩·호감은 그대로 가지고 간다 */
 $('btnNext').onclick=()=>{if(!REGIONS[REG.next])return;enterRegion(G,REGIONS[REG.next]);resetScreens();writeSave(true);};
-$('btnBookEnd').onclick=()=>{bookTab='clues';renderBook();$('book').hidden=false;$('endScreen').hidden=true;
-  $('bookClose').addEventListener('click',()=>{if(G.ended)$('endScreen').hidden=false;},{once:true});};
+$('btnBookEnd').onclick=()=>{Sound.panel(true);noteTab='clues';renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;$('endScreen').hidden=true;
+  $('noteClose').addEventListener('click',()=>{if(G.ended)$('endScreen').hidden=false;},{once:true});};
 
 let last=0,acc=0;
 function loop(t){

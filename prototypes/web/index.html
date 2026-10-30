@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap">
-<link rel="stylesheet" href="css/style.css?v=20261030nal1">
+<link rel="stylesheet" href="css/style.css?v=20261030note1">
 </head>
 <body>
 
@@ -30,7 +30,6 @@
         <div class="hud-btns">
           <button class="chipbtn" id="btnBag" type="button">보따리 <kbd>I</kbd></button>
           <button class="chipbtn" id="btnNote" type="button">수첩 <kbd>N</kbd></button>
-          <button class="chipbtn" id="btnBook" type="button">책 <kbd>B</kbd></button>
           <button class="chipbtn" id="btnMap" type="button">지도 <kbd>M</kbd></button>
           <button class="chipbtn" id="btnSound" type="button" aria-pressed="true">소리 켜짐 <kbd>V</kbd></button>
           <button class="chipbtn" id="btnVolume" type="button" aria-pressed="false">음량 작게</button>
@@ -68,7 +67,6 @@
         <div class="goal-m" id="goalM"><b>지금 할 일</b><span></span></div>
         <button class="chipbtn" data-k="bag" type="button">보따리</button>
         <button class="chipbtn" data-k="note" type="button">수첩</button>
-        <button class="chipbtn" data-k="book" type="button">책</button>
         <button class="chipbtn" data-k="map" id="padMap" type="button">지도</button>
       </div>
       <div class="pad-main">
@@ -104,30 +102,17 @@
       <div class="panel-body" id="bagBody"></div>
     </div>
 
-    <div class="panel" id="book" hidden>
+    <div class="panel" id="notebook" hidden>
       <div class="grip"></div>
-      <div class="panel-head"><h2>너구리의 책</h2><button class="x" id="bookClose" type="button" aria-label="닫기">×</button></div>
-      <div class="tabs" role="tablist" id="bookTabs">
-        <button role="tab" data-tab="diary" type="button">일기</button>
-        <button role="tab" data-tab="clues" type="button">아빠 단서</button>
-        <button role="tab" data-tab="ledger" type="button">물품 장부</button>
-      </div>
-      <div class="panel-body" id="bookBody"></div>
+      <div class="panel-head"><h2>아빠의 수첩</h2><button class="x" id="noteClose" type="button" aria-label="닫기">×</button></div>
+      <p class="note-tally" id="noteTally"></p>
+      <div class="tabs" role="tablist" aria-label="수첩 장" id="noteTabs"></div>
+      <div class="panel-body note-body" id="noteBody"></div>
       <div class="panel-foot"><button class="btn" id="btnSave" type="button">저장하기</button><button class="btn" id="btnNewGame" type="button">처음부터 하기</button><span class="small" id="saveInfo"></span></div>
       <details class="panel-foot"><summary>소리 설정</summary>
         <label>배경음 <input id="volumeBgm" type="range" min="0" max="1" step="0.05" aria-label="배경음 음량"></label>
         <label>효과음 <input id="volumeSfx" type="range" min="0" max="1" step="0.05" aria-label="효과음 음량"></label>
       </details>
-    </div>
-
-    <div class="panel" id="notebook" hidden>
-      <div class="grip"></div>
-      <div class="panel-head"><h2>아빠의 보부상 수첩</h2><button class="x" id="noteClose" type="button" aria-label="닫기">×</button></div>
-      <div class="tabs" role="tablist" id="noteTabs">
-        <button role="tab" data-tab="animal" type="button">동물</button>
-        <button role="tab" data-tab="item" type="button">물건</button>
-      </div>
-      <div class="panel-body note-body" id="noteBody"></div>
     </div>
 
     <div class="forge" id="forge" hidden>
@@ -154,7 +139,7 @@
         <div class="row"><button class="btn primary" id="btnContinue" type="button" hidden>이어서 하기</button><button class="btn primary" id="btnStart" type="button"></button></div>
         <div class="meta" id="saveMeta" hidden></div>
         <div class="devpick"><span class="devpick-label">개발용 · 이 지역부터 시작</span><div class="devpick-btns" id="devPick"></div></div>
-        <div class="meta how-keys">←→ 이동 · Space 점프 · J 휘두르기 · Z 줍기 · E 말걸기 · I 보따리 · N 수첩 · B 책<span id="mapCoverKeys"> · M 지도</span> · V 소리</div>
+        <div class="meta how-keys">←→ 이동 · Space 점프 · J 휘두르기 · Z 줍기 · E 말걸기 · I 보따리 · N·B 수첩<span id="mapCoverKeys"> · M 지도</span> · V 소리</div>
         <div class="meta how-touch">아래 버튼으로 움직이고, 동물 근처에서 말걸기를 누르세요. 휴대폰을 가로로 돌리면 화면이 커집니다.</div>
       </div>
     </div>
@@ -166,7 +151,7 @@
         <div class="cover-body" id="endBody"></div>
         <div class="stats" id="endStats"></div>
         <div id="endExtra"></div>
-        <div class="row"><button class="btn" id="btnBookEnd" type="button">너구리의 책 보기</button><button class="btn" id="btnMapEnd" type="button">지도 <kbd>M</kbd></button><button class="btn primary" id="btnRestart" type="button">처음부터</button><button class="btn primary" id="btnNext" type="button" hidden></button></div>
+        <div class="row"><button class="btn" id="btnBookEnd" type="button">아빠의 수첩 보기</button><button class="btn" id="btnMapEnd" type="button">지도 <kbd>M</kbd></button><button class="btn primary" id="btnRestart" type="button">처음부터</button><button class="btn primary" id="btnNext" type="button" hidden></button></div>
       </div>
     </div>
     <div class="title-scene" id="titleScene" hidden>
@@ -186,8 +171,7 @@
     <span><kbd>Z</kbd> 줍기</span>
     <span><kbd>E</kbd> 말걸기·대화 넘기기</span>
     <span><kbd>I</kbd> 보따리</span>
-    <span><kbd>N</kbd> 아빠의 수첩</span>
-    <span><kbd>B</kbd> 너구리의 책</span>
+    <span><kbd>N</kbd>·<kbd>B</kbd> 아빠의 수첩</span>
     <span id="mapKeyHint"><kbd>M</kbd> 지도</span>
     <span><kbd>V</kbd> 소리 켜기·끄기</span>
   </div>
@@ -195,57 +179,57 @@
 
 <!-- 새 버전을 올릴 때마다 아래 ?v= 값을 모두 같은 새 값으로 바꾼다 (브라우저가 옛 파일을 쓰지 않게). README 참고 -->
 <!-- 빌드 없이 차례대로 읽는다. 순서: 공통 엔진 → 공통 데이터 → 지역 → 시작(game.js) -->
-<script src="js/engine/core.js?v=20261030nal1"></script>
-<script src="js/engine/input.js?v=20261030nal1"></script>
-<script src="js/data/music-data.js?v=20261030nal1"></script>
-<script src="js/engine/sound.js?v=20261030nal1"></script>
-<script src="js/engine/music.js?v=20261030nal1"></script>
-<script src="js/engine/vfx.js?v=20261030nal1"></script>
-<script src="js/engine/dialog.js?v=20261030nal1"></script>
-<script src="js/engine/gather.js?v=20261030nal1"></script>
-<script src="js/engine/icons.js?v=20261030nal1"></script>
-<script src="js/engine/field.js?v=20261030nal1"></script>
-<script src="js/engine/map.js?v=20261030nal1"></script>
-<script src="js/engine/hud.js?v=20261030nal1"></script>
-<script src="js/engine/bag.js?v=20261030nal1"></script>
-<script src="js/engine/craft.js?v=20261030nal1"></script>
-<script src="js/engine/book.js?v=20261030nal1"></script>
-<script src="js/engine/notebook.js?v=20261030nal1"></script>
-<script src="js/engine/battle-ink.js?v=20261030nal1"></script>
-<script src="js/engine/battle.js?v=20261030nal1"></script>
-<script src="js/engine/battle-attacks.js?v=20261030nal1"></script>
+<script src="js/engine/core.js?v=20261030note1"></script>
+<script src="js/engine/input.js?v=20261030note1"></script>
+<script src="js/data/music-data.js?v=20261030note1"></script>
+<script src="js/engine/sound.js?v=20261030note1"></script>
+<script src="js/engine/music.js?v=20261030note1"></script>
+<script src="js/engine/vfx.js?v=20261030note1"></script>
+<script src="js/engine/dialog.js?v=20261030note1"></script>
+<script src="js/engine/gather.js?v=20261030note1"></script>
+<script src="js/engine/icons.js?v=20261030note1"></script>
+<script src="js/engine/field.js?v=20261030note1"></script>
+<script src="js/engine/map.js?v=20261030note1"></script>
+<script src="js/engine/hud.js?v=20261030note1"></script>
+<script src="js/engine/bag.js?v=20261030note1"></script>
+<script src="js/engine/craft.js?v=20261030note1"></script>
+<script src="js/engine/book.js?v=20261030note1"></script>
+<script src="js/engine/notebook.js?v=20261030note1"></script>
+<script src="js/engine/battle-ink.js?v=20261030note1"></script>
+<script src="js/engine/battle.js?v=20261030note1"></script>
+<script src="js/engine/battle-attacks.js?v=20261030note1"></script>
 <!-- 표(design/data/*.csv)에서 만든 데이터. 직접 고치지 말고 tools/build-data.js 로 다시 만든다 -->
-<script src="js/data/tables.js?v=20261030nal1"></script>
-<script src="js/data/common.js?v=20261030nal1"></script>
+<script src="js/data/tables.js?v=20261030note1"></script>
+<script src="js/data/common.js?v=20261030note1"></script>
 <!-- 지역 1: 단풍골. 지역을 더할 때는 그 지역 폴더의 파일을 이 아래에 같은 모양으로 덧붙인다 -->
-<script src="js/regions/galchamgol/region.js?v=20261030nal1"></script>
-<script src="js/regions/galchamgol/art.js?v=20261030nal1"></script>
-<script src="js/regions/galchamgol/field.js?v=20261030nal1"></script>
-<script src="js/regions/galchamgol/enemies.js?v=20261030nal1"></script>
-<script src="js/regions/galchamgol/story.js?v=20261030nal1"></script>
+<script src="js/regions/galchamgol/region.js?v=20261030note1"></script>
+<script src="js/regions/galchamgol/art.js?v=20261030note1"></script>
+<script src="js/regions/galchamgol/field.js?v=20261030note1"></script>
+<script src="js/regions/galchamgol/enemies.js?v=20261030note1"></script>
+<script src="js/regions/galchamgol/story.js?v=20261030note1"></script>
 <!-- 지역 2: 돌너머 마을 -->
-<script src="js/regions/dolneomeo/region.js?v=20261030nal1"></script>
-<script src="js/regions/dolneomeo/art.js?v=20261030nal1"></script>
-<script src="js/regions/dolneomeo/field.js?v=20261030nal1"></script>
-<script src="js/regions/dolneomeo/enemies.js?v=20261030nal1"></script>
-<script src="js/regions/dolneomeo/story.js?v=20261030nal1"></script>
+<script src="js/regions/dolneomeo/region.js?v=20261030note1"></script>
+<script src="js/regions/dolneomeo/art.js?v=20261030note1"></script>
+<script src="js/regions/dolneomeo/field.js?v=20261030note1"></script>
+<script src="js/regions/dolneomeo/enemies.js?v=20261030note1"></script>
+<script src="js/regions/dolneomeo/story.js?v=20261030note1"></script>
 <!-- 지역 3: 큰 장터 -->
-<script src="js/regions/jangteo/region.js?v=20261030nal1"></script>
-<script src="js/regions/jangteo/art.js?v=20261030nal1"></script>
-<script src="js/regions/jangteo/field.js?v=20261030nal1"></script>
-<script src="js/regions/jangteo/enemies.js?v=20261030nal1"></script>
-<script src="js/regions/jangteo/story.js?v=20261030nal1"></script>
+<script src="js/regions/jangteo/region.js?v=20261030note1"></script>
+<script src="js/regions/jangteo/art.js?v=20261030note1"></script>
+<script src="js/regions/jangteo/field.js?v=20261030note1"></script>
+<script src="js/regions/jangteo/enemies.js?v=20261030note1"></script>
+<script src="js/regions/jangteo/story.js?v=20261030note1"></script>
 <!-- 지역 4: 북쪽 영산 (마지막) -->
-<script src="js/regions/yeongsan/region.js?v=20261030nal1"></script>
-<script src="js/regions/yeongsan/art.js?v=20261030nal1"></script>
-<script src="js/regions/yeongsan/field.js?v=20261030nal1"></script>
-<script src="js/regions/yeongsan/enemies.js?v=20261030nal1"></script>
-<script src="js/regions/yeongsan/story.js?v=20261030nal1"></script>
-<script src="js/engine/save.js?v=20261030nal1"></script>
+<script src="js/regions/yeongsan/region.js?v=20261030note1"></script>
+<script src="js/regions/yeongsan/art.js?v=20261030note1"></script>
+<script src="js/regions/yeongsan/field.js?v=20261030note1"></script>
+<script src="js/regions/yeongsan/enemies.js?v=20261030note1"></script>
+<script src="js/regions/yeongsan/story.js?v=20261030note1"></script>
+<script src="js/engine/save.js?v=20261030note1"></script>
 <!-- 첫 화면 (packoon-layer-studio 타이틀 장면) -->
-<script src="js/title/scene-data.js?v=20261030nal1"></script>
-<script src="js/title/title-scene.js?v=20261030nal1"></script>
-<script src="js/title/title-screen.js?v=20261030nal1"></script>
-<script src="js/engine/game.js?v=20261030nal1"></script>
+<script src="js/title/scene-data.js?v=20261030note1"></script>
+<script src="js/title/title-scene.js?v=20261030note1"></script>
+<script src="js/title/title-screen.js?v=20261030note1"></script>
+<script src="js/engine/game.js?v=20261030note1"></script>
 </body>
 </html>

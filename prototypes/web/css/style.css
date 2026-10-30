@@ -110,7 +110,7 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 
 .tabs{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--hanji-2);overflow-x:auto}
 .tabs button{font-family:var(--display);font-size:clamp(13px,1.6vw,15px);background:none;border:none;border-bottom:3px solid transparent;padding:8px 10px;cursor:pointer;color:var(--dim);white-space:nowrap;touch-action:manipulation}
-#bookTabs button{flex:0 0 auto}
+#noteTabs button{flex:0 0 auto}
 .mom-note{max-width:30em;margin:4px auto 16px;padding:20px 24px;background:#f8efd9;border:1px solid #cdb98f;box-shadow:2px 3px 0 #d9c8a5;font-family:var(--display);color:#493829;transform:rotate(-.5deg)}
 .mom-note small{display:block;color:#745c40;margin-bottom:16px}
 .mom-note p{font-size:clamp(18px,2.5vw,26px);line-height:1.65;margin:2px 0}
@@ -421,7 +421,7 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
 .devpick-btns button:hover{border-color:var(--gold)}
 .devpick-btns button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
 
-/* 아빠의 보부상 수첩: 아빠 글은 옅은 갈색, 내 글은 먹색 */
+/* 아빠의 수첩: 아빠 글은 옅은 갈색, 내 글은 먹색 */
 .note-region{font-family:var(--display);font-size:1.05em;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--hanji-2)}
 .note-region:first-child{margin-top:2px}
 .note-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
@@ -438,6 +438,17 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
 .note-line.dad .who{border:1px solid #b9a07a;color:#8a6a48}
 .note-line.me{color:var(--meok)}
 .note-line.me .who{background:var(--meok);color:var(--hanji)}
+/* 한 쪽에 두 손: 아빠 줄은 바랜 옛 먹(명조), 아이 줄은 아래에 새 먹(돋움)으로 들여 쓴다 */
+.note-tally{margin:0;padding:2px 14px 6px;font:13px/1.4 var(--ui);color:var(--dim)}
+#noteTabs{flex-wrap:wrap;align-items:center}
+#noteTabs .dad-tab:not([aria-selected="true"]){color:#9a7a58}
+#noteTabs .tab-sep{flex:none;width:1px;height:1.3em;background:#cdb98f;margin:0 6px}
+.note-pics canvas.me{opacity:1}
+.dad-ink .note-line.dad{color:#8a6a48;opacity:.9}
+.my-ink{margin-left:10px;padding:6px 0 0 9px;border-left:2px solid rgba(37,26,20,.35);border-top:1px dotted #cdb98f}
+.my-ink .note-line.me{font-family:var(--ui);color:#1d140e;line-height:1.6}
+.my-ink.blank{height:2.6em;border-left-color:rgba(37,26,20,.12);background:repeating-linear-gradient(transparent 0 1.25em,rgba(205,185,143,.55) 1.25em calc(1.25em + 1px));opacity:.8}
+.entry.me{font-family:var(--ui);color:#1d140e;padding-left:9px;border-left:2px solid rgba(37,26,20,.35)}
 
 /* 마지막 지역 끝 화면: 엄마가 지어 준 새 이름 */
 .newname{display:flex;flex-direction:column;gap:6px;margin-top:4px}
@@ -448,7 +459,7 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
 /* 휴대폰 세로: 시작·끝 화면 뒤의 패드 글씨가 비쳐 제목과 겹치지 않게 */
 @media (pointer:coarse) and (orientation:portrait){.cover{background:rgba(26,19,15,.96)}}
 
-/* 책 아래 저장·처음부터 버튼 줄 */
+/* 수첩 아래 저장·처음부터 버튼 줄 */
 .panel-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 14px;border-top:1px solid var(--hanji-2)}
 .panel-foot .small{flex:1;min-width:10em}
 
@@ -534,7 +545,7 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
 .map-flying #bossbar{display:none!important}
 .toast.map-notice{z-index:26}
 @media (pointer:coarse) and (orientation:portrait){
-  .pad-top{grid-template-columns:repeat(4,minmax(44px,1fr))}
+  .pad-top{grid-template-columns:repeat(3,minmax(44px,1fr))}
   .pad-top .chipbtn{padding:6px 2px}
   .map-panel{inset:1%;height:auto}
   .map-chart{margin-inline:16px;height:126px}
