@@ -113,7 +113,8 @@ function drawKkuCue(){
   }
   if(Math.abs(G.px-n.x)>64||(!stir&&!awake))return;
   ctx.save();ctx.font='10px sans-serif';ctx.textAlign='center';
-  const text=awake?'…어? 불렀어?':stir>.5?'…으음…':'코가 씰룩…';
+  // 말풍선은 잠에서 깨는 소리뿐이다. 고개를 든 때(하암…)에 말을 걸면 된다.
+  const text=awake?'하암…':stir>.5?'…으음…':'쿨…';
   const width=ctx.measureText(text).width+10;
   ctx.fillStyle=awake?'#f5e7bb':'#e9e0cf';ctx.fillRect(x-width/2,GROUND-43,width,14);
   ctx.fillStyle='#5a4030';ctx.fillText(text,x,GROUND-33);ctx.restore();

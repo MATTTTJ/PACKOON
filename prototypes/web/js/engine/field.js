@@ -514,7 +514,7 @@ function tryInteract(){
     if(p.peek!==false)peekAt(p.x,p.y??fieldGround());
     talk([[p.who||'너구리',texts[i]]]);
   }else if(kind==='wanderers'){
-    if(G.f.wanderersDone?.[expansionKey(p.id)])talk([[p.name||'길손',p.greeting||'길에서 또 만나자.']]);
+    if(G.f.wanderersDone?.[expansionKey(p.id)])talk(Array.isArray(p.greeting)?p.greeting:[[p.name||'길손',p.greeting||'길에서 또 만나자.']]);
     else p.talk();
   }
 }

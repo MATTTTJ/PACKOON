@@ -38,7 +38,7 @@ function nalMenu(){
   const F=G.f;
   if(!CLASSIC&&F.nalYDone){
     const c=[];
-    if(!F.yCraftJujube)c.push({t:'다래 덩굴로 대추를 바꾼다',go:craftJujube});
+    if(!F.yCraftJujube)c.push({t:'지게에 매달린 대추 꾸러미를 묻는다',go:craftJujube});
     c.push(...nalAskChoices());
     c.push({t:'산길로 간다',go:null});
     talk([['날쌘',F.shortcut?'설피에 눈이 꽉 붙었네. 털고 가.\n안쪽 길도 이제 알겠지.':'설피 끈 단단히 매. 눈 굴에서는\n네 발자국을 따라 돌아오면 돼.',c]]);return;
@@ -62,9 +62,9 @@ function craftJujube(){
   if(CLASSIC||!G.f.seolpi||G.f.yCraftJujube)return;
   ledger('t_craft_jujube','날쌘','다래 덩굴 1','대추 2');
   if(!has('darae_vine')){
-    talk([['날쌘','대추 말려 뒀어. 덩굴 하나만 바꾸자.\n산막 옆이나 눈 굴 끝 덤불을 베 봐.']]);return;
+    talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n덩굴 하나랑 바꿀까 했지.'],['날쌘','산막 옆이나 눈 굴 끝 덤불을 베 봐.\n덩굴 하나에 대추 둘이야.']]);return;
   }
-  talk([['날쌘','덩굴은 장작 묶는 데 써.\n하나에 말린 대추 둘, 어때?',[
+  talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n덩굴 하나랑 바꿀까 했지.'],['날쌘','마침 덩굴이 있네.\n하나에 대추 둘, 어때?',[
     {t:'바꾼다',go:()=>{
       if(G.f.yCraftJujube||!has('darae_vine'))return;
       takeItem('darae_vine',1);addItem('jujube',2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
@@ -618,7 +618,7 @@ function talkMagpie(){
     ['늙은 까치','이제는 발이 영 말을 안 듣는구나.\n끈 하나를 못 묶어서 한나절을 앉아 있었다.'],
     ['늙은 까치',first?'단풍골에선 네가 눌러 주고 내가 묶었지.\n이번엔 네가 묶어 주련?':'아가, 이 끈 좀 묶어 주련?',[
       {t:'짐끈을 대신 묶어 준다',go:magpieKnot},
-      {t:'나중에 도울게',go:null}
+      {t:'나중에 도울게요',go:null}
     ]]
   ]);
 }
