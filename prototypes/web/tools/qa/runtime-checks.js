@@ -75,11 +75,11 @@ async function runSave({ browser, outDir, rules }) {
     await browser.key('ArrowRight', 'keyDown');
     try { await until(browser, 'G.px >= '+acorn.x, 10000, '저장 전 도토리로 이동'); }
     finally { await browser.key('ArrowRight', 'keyUp'); }
-    await browser.wait(100);await browser.key('ArrowDown');await browser.wait(650);
+    await browser.wait(100);await browser.key('z');await browser.wait(650);
     await browser.click('#btnSaveHud');
     const stored = await browser.eval("JSON.parse(localStorage.getItem('packoon-save-v1'))");
     if (!stored?.G?.started || !(stored.G.inv.acorn >= 1)) throw new Error('중간 수동 저장에 줍기 결과가 없다.');
-    step('2. 도토리 앞으로 걸어가 아래 방향키로 줍고 화면의 저장 버튼을 누른다.');
+    step('2. 도토리 앞으로 걸어가 Z 키로 줍고 화면의 저장 버튼을 누른다.');
     await browser.reload();
     await installHooks(browser, rules);
     await until(browser, "!!document.querySelector('#tsContinue')?.getClientRects().length", 15000, '이어서 하기 버튼');

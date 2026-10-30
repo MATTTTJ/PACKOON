@@ -7,7 +7,7 @@ const {execFileSync}=require('node:child_process');
 const {createHash}=require('node:crypto');
 const {launchBrowser,startServer}=require('./browser');
 const root=path.resolve(__dirname,'../../../..');
-const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','drops-floor','drops-persistence','drops-departure','drops-full'];
+const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','map','drops-floor','drops-persistence','drops-departure','drops-full'];
 const staticNames=names.slice(0,5);
 const args=process.argv.slice(2);
 let quick=false,only=null;
@@ -150,6 +150,10 @@ const watchdog=setTimeout(async()=>{
     if(selected.has('edges'))add(await runEdges({outDir,rules,evidence:hookEvidence}));
     if(selected.has('save'))add(await withBrowser('save',(browser,directory)=>runSave({browser,outDir:directory,rules})));
     if(selected.has('mobile'))add(await withBrowser('mobile',(browser,directory)=>runMobile({browser,outDir:directory,rules})));
+    if(selected.has('map')){
+      const {runMap}=require('./map-checks');
+      add(await withBrowser('map',(browser,directory)=>runMap({browser,outDir:directory})));
+    }
     const {runDropCheck}=require('./drop-checks');
     for(const name of names.filter(n=>n.startsWith('drops-')))if(selected.has(name))
       add(await withBrowser(name,(browser,directory)=>runDropCheck({browser,outDir:directory,name})));

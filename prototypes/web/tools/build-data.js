@@ -27,7 +27,20 @@ const t=name=>{
 };
 
 const items=t('items'),bosses=t('bosses'),parts=t('boss_parts'),heirlooms=t('heirlooms'),notebook=t('notebook');
-const regionIds=new Set(t('regions').map(r=>r.id));
+const regions=t('regions'),regionIds=new Set(regions.map(r=>r.id)),ZONES={};
+/* 지역·구역 이름 목록은 기존 지역 표에서 읽는다. 이름 안의 가운뎃점을 보존하기 위해 |로 나눈다. */
+for(const r of regions){
+  if(!r['구역']?.trim())fail('regions.csv '+r.id+': 구역 목록이 비어 있다');
+  const names=new Set(),zones={};
+  for(const entry of r['구역'].split('|')){
+    const match=entry.trim().match(/^([a-z][a-z0-9_]*):([^:|]+)$/);
+    if(!match||!match[2].trim())fail('regions.csv '+r.id+': 구역은 id:이름을 |로 나눈 모양이어야 한다');
+    const [,id,raw]=match,name=raw.trim();
+    if(Object.hasOwn(zones,id)||names.has(name))fail('regions.csv '+r.id+': 구역 id 또는 이름이 겹친다 '+id);
+    zones[id]=name;names.add(name);
+  }
+  ZONES[r.id]=zones;
+}
 /* 이름 → id (가공법·진정수치 칸은 사람이 읽는 이름으로 적혀 있다) */
 const byName=Object.fromEntries(items.map(r=>[r['이름'],r.id]));
 const idOf=(name,where)=>{const id=byName[name.trim()];if(!id)fail(where+': 아이템 이름 "'+name.trim()+'"을(를) items.csv 에서 찾지 못했다');return id;};
@@ -204,7 +217,7 @@ const TUNING=numericTable('tuning','분류',
     'field_jump_velocity field_gravity field_fall_speed field_pickup_x field_pickup_y',
     'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at',
     'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval toast_frames',
-    'field_interact_y zone_transition_frames vista_pan_frames',
+    'field_interact_y zone_transition_frames vista_pan_frames map_flight_ms map_landing_margin',
     'drop_arc_height drop_flight_frames drop_min_spacing drop_spread drop_bounce_height drop_bounce_frames',
     'pickup_range pickup_range_y pickup_motion_frames pickup_pull_frames',
     'battle_bare_speed battle_bare_cooldown battle_bare_radius',
@@ -229,6 +242,7 @@ for(let i=1;i<noteKeys.length;i++)requireValue(MINIGAMES['rhythm_note_'+noteKeys
 requireValue(MINIGAMES.dad_steps<=3,'minigames.csv: 구현된 몸짓은 세 단계까지다');
 requireValue(TUNING.kkubeogi_awake<=TUNING.kkubeogi_cycle&&TUNING.kkubeogi_cue<=TUNING.kkubeogi_cycle,'tuning.csv: 꾸벅이 판정과 예고가 주기보다 길다');
 requireValue(TUNING.field_swing_hit_at<TUNING.field_swing_frames,'tuning.csv: 휘두르기 판정 시점이 전체 시간보다 짧아야 한다');
+requireValue(TUNING.map_flight_ms>0&&TUNING.map_landing_margin>0,'tuning.csv: 까치 이동 시간과 착지 여백은 0보다 커야 한다');
 requireValue(TUNING.drop_min_spacing>=16&&TUNING.drop_spread>=TUNING.drop_min_spacing,'tuning.csv: 바닥 아이템 간격은 16px 이상이며 퍼짐 폭 안에 있어야 한다');
 requireValue(TUNING.pickup_range>0&&TUNING.pickup_range_y>0,'tuning.csv: 줍기 범위는 0보다 커야 한다');
 requireValue(TUNING.pickup_pull_frames<=TUNING.pickup_motion_frames,'tuning.csv: 빨려 드는 시간은 줍기 동작보다 길 수 없다');
@@ -242,7 +256,7 @@ for(const id of ['root','ssari','kkoe','eoksae','seogi','darae_vine']){
   requireValue(width>0&&width+MINIGAMES.gather_help_width<=MINIGAMES.gather_zone_span&&MINIGAMES.gather_zone_start+MINIGAMES.gather_zone_span<=100,'minigames.csv: '+id+' 채집 판정 범위가 막대를 벗어난다');
 }
 
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS},null,1)+";\n";
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

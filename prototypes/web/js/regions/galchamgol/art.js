@@ -2,6 +2,7 @@
 /* 단풍골 동물들의 도트 그림과 곁에 놓인 소품. (ox, oy)는 발밑, f 는 바라보는 방향 */
 (()=>{
 const Rg=REGIONS.galchamgol;
+Rg.springRevisit=()=>!CLASSIC&&!!G?.f?.spring&&regionCompleted('yeongsan');
 Rg.art={
   squirrel(ox,oy,f){const O='#c3632d',D='#8e3f1c',C='#f1d7b0',K='#2b1d14';const t=Math.floor(G.anim/20)%2;
     M(ox,oy,f,-11,-20+t,6,15,O);M(ox,oy,f,-13,-24+t,8,6,O);M(ox,oy,f,-9,-26+t,5,3,D);M(ox,oy,f,-9,-17+t,2,10,D);
@@ -32,7 +33,16 @@ Rg.props={
 if(!CLASSIC){
   const C={ink:'#382b2b',bark:'#61402d',soil:'#67452f',ochre:'#d9a650',
     ember:'#c85c36',gold:'#f2c65d',cream:'#f7ddb0',water:'#668b87'};
-  const px=(x,y,w,h,c)=>R(Math.round(x),Math.round(y),Math.round(w),Math.round(h),c);
+  const springColors={
+    '#d2b2a5':'#b9cfc2','#e0bc9c':'#c5d8c8','#edc9a0':'#d5dfc4','#f5d9ac':'#e1e5ca','#f3cea0':'#d6dfba','#edb886':'#c2d1a7',
+    '#805f78':'#849e98','#9d6a7b':'#98b1a5','#bb7b7e':'#b4c4ad','#d8927e':'#c9d2b5','#edaa83':'#dce1bf','#f5c598':'#e7e6c9',
+    '#bd8e83':'#91aa90','#aa7964':'#728c71','#877377':'#7c9586','#7c766e':'#6a8673',
+    '#c85c36':'#668b50','#d37b3e':'#7f9b5c','#bc6139':'#66874e','#df9748':'#9ab16b','#966245':'#54754b','#9f7047':'#648552','#815139':'#496743',
+    '#c57a38':'#779855','#ab5735':'#66874e','#b96738':'#779855','#bd7944':'#6f8d54','#d28c4b':'#8fa665',
+    '#67452f':'#6c6243','#ab7842':'#8c9a5f','#7b5132':'#72804d','#4c5140':'#4c5b40','#8d9060':'#8b9d67',
+    '#c65b37':'#668b50','#e4aa47':'#8fa665','#f0cc76':'#b0bc7c','#e99849':'#a6b778','#edb660':'#c2ca92'
+  };
+  const px=(x,y,w,h,c)=>R(Math.round(x),Math.round(y),Math.round(w),Math.round(h),Rg.springRevisit()?(springColors[c]||c):c);
   const visible=(x,w=80)=>x+w>-20&&x-w<W+20;
 
   function sky(dusk=false){
@@ -168,9 +178,11 @@ if(!CLASSIC){
     for(let i=-7;i<8;i+=4)px(x+i,y-9,1,8,'#d2aa68');px(x-10,y-11,20,2,'#765234');
   }
   function leaf(x,y,color=C.gold){
+    if(Rg.springRevisit())color='#8fa665';
     px(x-3,y,7,2,color);px(x-2,y-2,5,5,color);px(x,y-4,2,8,color);px(x+1,y+3,4,1,'#855838');
   }
   function shrub(x,y=GROUND,color='#af6938'){
+    if(Rg.springRevisit())color='#668b50';
     px(x-13,y-9,24,8,color);px(x-9,y-13,16,4,color);px(x-4,y-16,4,4,color);
     px(x-10,y-7,3,2,'#e4b568');px(x+4,y-10,3,2,'#e4b568');
   }

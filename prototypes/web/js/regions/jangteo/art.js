@@ -2,6 +2,7 @@
 /* 큰 장터 동물들의 도트 그림과 소품. (ox, oy)는 발밑, f 는 바라보는 방향 */
 (()=>{
 const Rg=REGIONS.jangteo;
+Rg.springRevisit=()=>!CLASSIC&&!!G?.f?.spring&&regionCompleted('yeongsan');
 const night=()=>G&&G.f&&G.f.night;
 Rg.art={
   /* 부엉 영감: 수리부엉이. 낮에는 눈을 감고 존다 */
@@ -62,14 +63,15 @@ if(CLASSIC)return;
 const Rg=REGIONS.jangteo;
 const n=()=>!!G?.f?.night;
 const P=(x,y,w,h,c)=>R(Math.round(x),Math.round(y),Math.round(w),Math.round(h),c);
-const tone=()=>n()?{sky:'#141c34',mist:'#343d5c',mount:'#252f49',snow:'#c0cedb',wall:'#625358',wood:'#493a3b',tile:'#273346'}:
+const tone=()=>Rg.springRevisit()?(n()?{sky:'#141c34',mist:'#343d5c',mount:'#253d38',snow:'#516b4a',wall:'#625358',wood:'#493a3b',tile:'#273346'}:
+  {sky:'#dce8df',mist:'#bdcdb7',mount:'#99b09a',snow:'#8fa665',wall:'#b79272',wood:'#73503c',tile:'#4b5965'}):n()?{sky:'#141c34',mist:'#343d5c',mount:'#252f49',snow:'#c0cedb',wall:'#625358',wood:'#493a3b',tile:'#273346'}:
   {sky:'#dce8ef',mist:'#bbcdd9',mount:'#99b0c0',snow:'#f4f4ed',wall:'#b79272',wood:'#73503c',tile:'#4b5965'};
 function steppedRidge(offset,base,amp,color,seed){
   for(let x=-2;x<W+2;x+=2){const u=x+offset,h=Math.round(base-Math.sin(u*.008+seed)*amp-Math.sin(u*.021+seed*2)*amp*.35);P(x,h,2,H-h,color);}
 }
 function sky(offset=0){
   const t=tone();P(0,0,W,H,t.sky);
-  const bands=n()?['#17213b','#1b2844','#24334e','#344259']:['#dce8ef','#e2eaed','#e9edec','#f1eee2'];
+  const bands=n()?['#17213b','#1b2844','#24334e','#344259']:Rg.springRevisit()?['#dce8df','#e2eadb','#e9edda','#f1eee2']:['#dce8ef','#e2eaed','#e9edec','#f1eee2'];
   bands.forEach((c,i)=>P(0,35+i*30,W,31,c));
   if(n()){
     for(let i=0;i<61;i++){const x=((Math.round(hash(i*9.3)*1200-offset*.02)%W)+W)%W,y=8+Math.round(hash(i*3.7)*81);P(x,y,1,i%11===0?2:1,i%7?'#9eaec4':'#fff0c0');}
@@ -111,7 +113,7 @@ function tileRoof(x,y,w,depth=15,snow=true){
   const t=tone();P(x+8,y-5,w-16,5,t.tile);P(x+2,y,w-4,depth,t.tile);P(x-4,y+depth-2,w+8,4,t.tile);
   for(let i=0;i<w;i+=7){P(x+i,y+2,2,depth-2,n()?'#38455a':'#687580');P(x+i,y+depth+2,5,1,n()?'#1d2a3d':'#384a55');}
   P(x-8,y+depth-5,8,3,t.tile);P(x+w,y+depth-5,8,3,t.tile);
-  if(snow){P(x+9,y-6,w-18,2,t.snow);P(x+2,y-1,9,2,t.snow);P(x+w-11,y-1,9,2,t.snow);P(x-6,y+depth-6,7,1,t.snow);P(x+w,y+depth-6,7,1,t.snow);}
+  if(snow&&!Rg.springRevisit()){P(x+9,y-6,w-18,2,t.snow);P(x+2,y-1,9,2,t.snow);P(x+w-11,y-1,9,2,t.snow);P(x-6,y+depth-6,7,1,t.snow);P(x+w,y+depth-6,7,1,t.snow);}
 }
 function house(x,y,w=84,h=37,lit=n(),roofColor,variant=0){
   const t=tone();P(x,y,w,h,t.wall);P(x+4,y+3,w-8,3,t.wood);
@@ -175,6 +177,11 @@ function stall(x,y,i){
 }
 function bundle(x,y,i=0){P(x-8,y-9,16,9,i%2?'#a17569':'#81928a');P(x-5,y-12,10,4,i%2?'#bd8b78':'#a3aea0');P(x-1,y-10,2,10,'#d6be8c');P(x-4,y-13,8,2,'#6c6654');}
 function snowGround(id){
+  if(Rg.springRevisit()){
+    P(0,GROUND,W,H-GROUND,n()?'#4b5145':'#7d7d5e');P(0,GROUND,W,3,n()?'#516b4a':'#8fa665');
+    for(let x=-16;x<W+16;x+=16){const wx=x+Math.round(cam/16)*16;if(hash(wx+19)>.45)P(x-cam%16,GROUND-2,2,3,n()?'#516b4a':'#79945d');}
+    return;
+  }
   const t=tone();P(0,GROUND,W,H-GROUND,id==='pine'?(n()?'#51606b':'#a2ada9'):(n()?'#625f65':'#afa89b'));P(0,GROUND,W,3,t.snow);
   for(let x=-16;x<W+16;x+=16){const wx=x+Math.round(cam/16)*16;P(x-cam%16,198+Math.floor(hash(wx+19)*18),4+Math.floor(hash(wx)*8),1,n()?'#9ba9b8':'#d8ddd9');}
   // 반복 발자국으로 본길과 생활 흔적을 잇는다.
@@ -252,7 +259,7 @@ function drawScenery(id){
   // 조사 글의 대상은 실제 생활 물건으로도 알아볼 수 있게 둔다.
   if(id==='entrance'){
     const x=240-cam;P(x-6,GROUND-14,12,8,'#ac8b62');P(x-2,GROUND-18,4,8,'#d1b184');P(x-7,GROUND-15,6,3,'#ccbe95');P(x+1,GROUND-18,6,3,'#ccbe95');
-    const sx=1680-cam;P(sx-10,GROUND-11,20,11,t.snow);P(sx-7,GROUND-19,14,10,t.snow);P(sx-4,GROUND-18,1,1,'#4c4843');P(sx+3,GROUND-18,1,1,'#4c4843');P(sx,GROUND-14,7,2,'#aa7251');
+    if(!Rg.springRevisit()){const sx=1680-cam;P(sx-10,GROUND-11,20,11,t.snow);P(sx-7,GROUND-19,14,10,t.snow);P(sx-4,GROUND-18,1,1,'#4c4843');P(sx+3,GROUND-18,1,1,'#4c4843');P(sx,GROUND-14,7,2,'#aa7251');}
   }else if(id==='street'){
     const x=1150-cam;P(x-7,GROUND-11,15,11,'#9a8267');P(x-5,GROUND-14,11,4,'#e4dbbb');P(x-3,GROUND-16,7,3,'#f3eee1');P(x-5,GROUND-7,11,1,'#c4aa7e');
     const yx=2130-cam;P(yx-16,GROUND-10,32,9,'#7d624b');P(yx-14,GROUND-12,28,2,'#cbb184');for(let j=0;j<4;j++)P(yx-10+j*6,GROUND-16+j%2,4,3,'#dfc898');

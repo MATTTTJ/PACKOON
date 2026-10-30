@@ -427,6 +427,7 @@ Rg.startGolem=()=>{
 
 /* ---------- 끝: 까치 편에 약즙 보내기 ---------- */
 Rg.sendMedicine=()=>{
+  if(regionCompleted(Rg.id))return;
   G.f.yakMade=true;
   diary('d_end','깨어난 맷돌로 서리다래를 갈아 약즙을 만들었다. 이번에는 내 손으로 만든 약이다. 까치가 물고 남쪽으로 날아갔다.');
   talk(CLASSIC?[['너구리','서리다래 약즙, 내가 만들었어!'],['너구리','(휘파람을 불자 장승 위의 까치가 내려왔다.)'],['너구리','까치야, 엄마한테 전해 줘. 남쪽 단풍골 너머 우리 집이야.']]
@@ -435,7 +436,7 @@ Rg.sendMedicine=()=>{
   });
 };
 Rg.finishHomeDelivery=()=>{
-  if(G.f.dolHomeDelivered)return;
+  if(G.f.dolHomeDelivered||regionCompleted(Rg.id))return;
   G.f.dolHomeDelivered=true;
   const before=G.inv.darae_yak||0;
   if(!G.f.dolHomeSent&&typeof sendHomeGift==='function'){sendHomeGift('dolneomeo','darae_yak');G.f.dolHomeSent=true;}

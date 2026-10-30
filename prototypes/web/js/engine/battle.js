@@ -362,7 +362,7 @@ function bStep(){
    완제품부터 확보한 뒤 부족분만 재료로 풀고, 대체재 조합 중 부족 수량이 가장 적은 쪽을 고른다. */
 function progressShortage(inv){
   const goals=TABLES.PROGRESS.filter(g=>REGIONS[g.region].order>=REG.order&&
-    !(g.done==='ended'?(g.region===G.region&&G.ended):G.f[g.done]));
+    !regionCompleted(g.region)&&!(g.done==='ended'?(g.region===G.region&&G.ended):G.f[g.done]));
   const recipes=Object.values(RECIPES).flat();
   function shortage(need){
     const stock={...inv};let missing=0;

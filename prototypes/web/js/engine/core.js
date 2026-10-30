@@ -62,31 +62,48 @@ function baseState(){return{
   px:0,py:GROUND,vx:0,vy:0,face:1,onGround:true,anim:0,
   hp:5,maxhp:5,attackT:0,hurtT:0,cam:0,
   inv:{},tool:'pick',sharp:false,
-  floorItems:{},floorPickups:{},   // 지역·구역별 흩어진 물건과 지난 지역의 기존 줍기 지점
+  floorItems:{},floorPickups:{},regionStates:{},visitedZones:{},   // 지역별 필드와 실제로 밟은 구역
   awake:Object.keys(HEIR).filter(k=>HEIR[k].awakeAtStart),   // 깨어난 가보
   clues:[],diary:[],learned:[],nicknames:[],ledger:{},rel:{},f:{faints:0,arcs:arcsEnabled(null)},   // learned: 수첩·아이의 기록에서 공유하는 발견 키
 };}
-/* 지역에 들어간다. 지역의 newState() 가운데 inv 는 보따리에 더하고, rel 은 처음 만나는 NPC만 넣고,
-   f(진행 표시)는 합친다. 나머지(필드에 놓인 것)는 새 지역 것으로 바꾼다 */
-function enterRegion(g,r){
-  const moving=!!g.region&&g.region!==r.id;
-  if(moving){
-    if(g===G)collectRegionFloorItems();
-    (g.floorPickups||(g.floorPickups={}))[g.region]=structuredClone(g.pickups||[]);
-  }
-  if(moving)fadeMomNote(g);
+/* 보따리·호감·진행 표시는 하나로 이어지고 필드만 지역별로 보관한다.
+   새 지역의 시작 물건과 기본 진행값은 첫 입장에만 적용한다. */
+const regionFieldKeys=r=>[...Object.keys(r.newState()).filter(k=>!['inv','rel','f'].includes(k)),'zone','zoneStates'];
+function regionCompleted(id,g=G){return !!g?.regionStates?.[id]?.completed;}
+function markZoneVisited(g=G,r=REG){
+  if(CLASSIC||!g||!r||!usesZones(r)||!r.zones[g.zone])return;
+  const regions=g.visitedZones||(g.visitedZones={});
+  (regions[r.id]||(regions[r.id]={}))[g.zone]=true;
+}
+function rememberRegion(g=G){
+  const r=REGIONS[g?.region];if(!r)return;
+  const states=g.regionStates||(g.regionStates={}),previous=states[r.id];
+  const fields={};for(const key of regionFieldKeys(r))if(g[key]!==undefined)fields[key]=structuredClone(g[key]);
+  states[r.id]={fields,completed:!!g.ended||!!previous?.completed};
+  (g.floorPickups||(g.floorPickups={}))[r.id]=structuredClone(g.pickups||[]);
+  markZoneVisited(g,r);
+  return states[r.id];
+}
+function enterRegion(g,r,options={}){
+  const previous=REGIONS[g.region],moving=!!previous&&previous.id!==r.id;
+  if(previous)rememberRegion(g);
+  const saved=g.regionStates?.[r.id],first=!saved;
+  if(moving&&first)fadeMomNote(g);
   if(g===G&&moving)Sound.travel();
+  if(previous)for(const key of regionFieldKeys(previous))delete g[key];
   const ns=r.newState();
   for(const k in ns){
-    if(k==='inv'){for(const i in ns.inv)g.inv[i]=(g.inv[i]||0)+ns.inv[i];}
+    if(k==='inv'){if(first)for(const i in ns.inv)g.inv[i]=(g.inv[i]||0)+ns.inv[i];}
     else if(k==='rel'){for(const i in ns.rel)if(!g.rel[i])g.rel[i]=ns.rel[i];}
-    else if(k==='f')Object.assign(g.f,ns.f);
+    else if(k==='f'){for(const i in ns.f)if(g.f[i]===undefined)g.f[i]=ns.f[i];}
     else g[k]=ns[k];
   }
-  if(g.floorPickups?.[r.id])g.pickups=structuredClone(g.floorPickups[r.id]);
-  Object.assign(g,{region:r.id,started:false,ended:false,hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,zone:null,zoneStates:{}});
+  Object.assign(g,saved?.fields||{});
+  if(!saved&&g.floorPickups?.[r.id])g.pickups=structuredClone(g.floorPickups[r.id]);
+  Object.assign(g,{region:r.id,started:!!options.mapTravel,ended:false,hp:options.mapTravel?g.hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,
+    zone:options.zone??saved?.fields?.zone??null,zoneStates:saved?.fields?.zoneStates||{}});
   if(r.order>=REGIONS.dolneomeo?.order)g.f.bagReachedDolneomeo=true;
-  prepareZones(g,r,true);return g;
+  prepareZones(g,r,true);rememberRegion(g);return g;
 }
 /* 구역을 선언하지 않은 지역은 기존 REG 경로를 그대로 쓴다. 지역 자체는 바꾸지 않는다. */
 const usesZones=r=>!CLASSIC&&!!r.zones&&Object.keys(r.zones).length>0;
@@ -117,28 +134,6 @@ function canPickupItem(id){
   if((G.inv[id]||0)>0||!Number.isFinite(G.bagSlots))return true;
   return Object.values(G.inv).filter(n=>n>0).length<Math.max(0,Math.floor(G.bagSlots));
 }
-/* 지난 지역으로 돌아갈 수 없는 현재 흐름에서는 남은 물건을 칸 수와 상관없이 챙긴다.
-   got 표시를 먼저 남겨 연속 입력이나 콜백으로 같은 물건이 다시 지급되지 않게 한다. */
-function collectRegionFloorItems(){
-  let count=0;
-  const claim=(a,zoneId)=>{
-    if(a.got||!ITEMS[a.item])return;
-    a.got=true;count++;addItem(a.item,1);
-    const def=usesZones(REG)?REG.zones[zoneId||firstZone(REG)]:REG;
-    if(typeof def?.onPickup==='function')def.onPickup(a);
-    else if(typeof REG.onPickup==='function')REG.onPickup(a);
-    REG.onFloorPickup?.(a);
-  };
-  for(const [zoneId,rows] of Object.entries(G.floorItems?.[G.region]||{})){
-    for(const a of rows)claim(a,zoneId);
-    rows.length=0;
-  }
-  for(const a of G.pickups||[])claim(a,a.zone);
-  // 이미 지역을 마친 옛 저장은 필드 step을 거치지 않고 다음 지역으로 갈 수 있다.
-  if(G.region==='galchamgol'&&G.drop){claim({item:'meoru',x:G.drop.x,y:G.drop.y},usesZones(REG)?'hill':null);G.drop=null;}
-  if(count)toast('두고 온 것을 보따리에 챙겼다');
-  return count;
-}
 function prepareZones(g,r,fresh=false){
   if(!usesZones(r)){
     if(g.zone&&r.zones&&g.zone!==firstZone(r)){g.px=r.startX;g.py=GROUND;g.cam=0;}
@@ -161,6 +156,7 @@ function prepareZones(g,r,fresh=false){
   if(old&&!fresh){g.vx=0;g.vy=0;}
   g.cam=clamp(g.cam||0,0,Math.max(0,z.w-W));
   placeFloorPickups(g,r);
+  markZoneVisited(g,r);
 }
 /* 옛 공중 자동 줍기 지점도 같은 x의 받침 위에 둔다. 닫힌 길의 반대편으로 옮기지 않는다.
    한 번 정한 자리는 저장하며, 새 버전에서 불러온 옛 저장에만 이 보정을 처음 적용한다. */
@@ -203,6 +199,7 @@ const MOM_NOTE=['밥 잘 먹고','아빠 만나면','손 꼭 잡고 와.','엄�
 function normalizeTravelRecords(g){
   g.f=g.f||{};g.nicknames=Array.isArray(g.nicknames)?g.nicknames:[];g.learned=Array.isArray(g.learned)?g.learned:[];
   g.f.arcs=arcsEnabled(g);
+  if(g.f.mapUnlocked===undefined&&(g.f.wanderersDone?.['galchamgol:old_magpie']||(REGIONS[g.region]?.order||0)>=2))g.f.mapUnlocked=true;
   if(!Number.isFinite(g.f.momNoteFade))g.f.momNoteFade=Math.max(0,(REGIONS[g.region]?.order||1)-1);
   if(g.started&&g.f.momNoteSeen===undefined)g.f.momNoteSeen=true;
   if(g.ended&&REGIONS[g.region]&&!REGIONS[g.region].next){g.f.momNoteFade=0;g.f.momNoteRestored=true;}

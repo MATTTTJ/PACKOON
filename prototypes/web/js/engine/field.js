@@ -2,7 +2,7 @@
 /* 필드: 주인공 이동과 점프, 휘두르기, 줍기, 카메라, 화면 그리는 순서.
    지역마다 다른 것(배경, 장애물, 필드 보스, 날씨)은 REG 의 함수를 부른다. 필요한 함수 목록은 README 참고 */
 
-function paused(){return !G.started||G.ended||!!B||inkOn||!!vistaMode||!!zoneMotion||zoneFade>0||open('dlg')||open('bag')||open('book')||open('notebook')||!!openMinigame();}
+function paused(){return !G.started||G.ended||!!B||inkOn||!!vistaMode||!!zoneMotion||!!mapTravel||open('map')||zoneFade>0||open('dlg')||open('bag')||open('book')||open('notebook')||!!openMinigame();}
 function hitPlayer(x1,x2,y1,y2){return G.px+5>x1&&G.px-5<x2&&G.py>y1&&G.py-18<y2;}
 function hurt(srcX){
   if(G.hurtT>0)return;G.hp--;G.hurtT=60;G.px+=(G.px<srcX?-16:16);G.vy=-2.6;G.onGround=false;refreshHud();
@@ -142,6 +142,8 @@ function drawFloorDrops(){
 }
 
 function step(){
+  if(mapTravel){stepMapTravel();return;}
+  if(open('map'))return;
   if(vistaMode){if(!document.hidden&&!Vfx.reducedMotion)vistaMode.tick=Math.min(vistaMode.tick+1,TABLES.TUNING.vista_pan_frames);return;}
   if(zoneMotion){stepZoneTransition();return;}
   if(zoneFade>0){zoneFade=Vfx.reducedMotion?0:zoneFade-1;return;}
@@ -257,6 +259,7 @@ function drawRaccoon(){
 }
 
 function draw(){
+  if(mapTravel){drawMapTravel();return;}
   if(vistaMode){drawVista();return;}
   const sliding=zoneMotion?.kind==='slide';
   drawFieldScene(!sliding);
@@ -286,7 +289,7 @@ function updateOverlay(){
   const pr=$('prompt');
   const n=paused()?null:nearInteraction();const dg=n?null:nearDig();
   const floor=paused()||pickupPose?null:nearFloorItems()[0];
-  if(floor){pr.hidden=false;pr.textContent='줍기 · ↓';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
+  if(floor){pr.hidden=false;pr.textContent=TOUCH?'줍기 · ↓':'줍기 · Z';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
   else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=TOUCH?'휘두르기로 캐기':'J · 캐기';lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
@@ -308,6 +311,7 @@ const pointNear=p=>Math.abs(p.x-G.px)<(p.distance??TABLES.TUNING.field_talk_dist
 const pathOpen=p=>!p.need||p.need();
 const exitSpec=e=>typeof e==='string'?{to:e}:e;
 function resetFieldModes(){
+  resetMap();
   cancelPickup();
   endVista();zoneMotion=null;zoneFade=0;blockedEdge=null;sparks.length=0;shakeT=0;releaseInputs();suppressedKeys.clear();Vfx.clear();
 }
@@ -323,6 +327,7 @@ function changeZone(to,arrival={}){
   }
   const z=REG.zones[to];
   G.zone=to;G.px=clamp(arrival.x??z.startX??70,16,z.w-16);G.py=arrival.y??z.ground??GROUND;
+  markZoneVisited();
   if(!edge)G.vx=0;
   G.vy=G.attackT=0;G.onGround=G.py===(z.ground??GROUND);
   G.cam=clamp(G.px-W*.42,0,Math.max(0,z.w-W));
@@ -540,4 +545,4 @@ function drawVista(){
 }
 // 시작 입력은 경치를 열고, 그다음 입력부터 닫는다. 닫은 입력이 이동·공격·버튼에 새지 않는다.
 addEventListener('pointerdown',e=>{if(vistaMode){endVista();e.preventDefault();e.stopImmediatePropagation();}},true);
-addEventListener('keydown',e=>{if(vistaMode){e.preventDefault();e.stopImmediatePropagation();if(e.repeat)return;suppressedKeys.add(e.key.toLowerCase());endVista();}},true);
+addEventListener('keydown',e=>{if(vistaMode&&!['m','v'].includes(e.key.toLowerCase())){e.preventDefault();e.stopImmediatePropagation();if(e.repeat)return;suppressedKeys.add(e.key.toLowerCase());endVista();}},true);

@@ -115,12 +115,21 @@ function fillCover(){
 function startGame(){
   G.started=true;$('titleScreen').hidden=true;
   REG.onStart();
+  if(!CLASSIC&&G.region==='dolneomeo'&&!G.f.mapUnlocked){
+    G.f.mapUnlocked=true;
+    toast('돌담 위에 까치 떼가 앉아 있다. 지도(M)를 펴면 가 본 곳으로 데려다줄 것 같다');
+  }
   lastGoal='';refreshHud();
 }
 /* 지역을 끝낼 때 지역 코드가 부른다. REG.next 가 있으면 다음 지역 버튼이 나온다 */
 function endGame(){
+  if(regionCompleted(G.region)){
+    if(!CLASSIC&&typeof openMap==='function')openMap();
+    return;
+  }
   if(!REG.next)noteRestore();
   G.ended=true;
+  rememberRegion(G);
   showEnd();refreshGoal();writeSave(true);
 }
 function showEnd(){

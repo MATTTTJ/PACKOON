@@ -35,7 +35,7 @@ async function runDropCheck({browser:b,outDir,name}){
         await until(b,"floorDrops().every(a=>!a.flight&&!a.bounce)");
         if(mode==='expanded'){
           const file=path.join(outDir,region+'-floor.png');await b.screenshot(file);images.push(file);captures.push({region,stage:'floor',file,state:await b.eval('({records:structuredClone(floorDrops()),pose:pickupPose&&{tick:pickupPose.tick}})')});
-          await b.eval('G.px=floorDrops().find(a=>!a.got).x;G.py=fieldGround();G.onGround=true');await b.key('ArrowDown');await b.wait(70);
+          await b.eval('G.px=floorDrops().find(a=>!a.got).x;G.py=fieldGround();G.onGround=true');await b.key('z');await b.wait(70);
           if(!await b.eval('!!pickupPose'))throw Error(region+': 줍기 자세가 열리지 않아 그림을 확인하지 못했다.');
           const pickup=path.join(outDir,region+'-pickup.png');await b.screenshot(pickup);images.push(pickup);captures.push({region,stage:'pickup',file,state:await b.eval('({records:structuredClone(floorDrops()),pose:pickupPose&&{tick:pickupPose.tick}})')});await b.wait(700);
         }
@@ -66,22 +66,22 @@ async function runDropCheck({browser:b,outDir,name}){
         if(old.errors.length)findings.push(fail(name,`${mode}/${region}: 옛 저장 표본 복원 오류`,old));
         records.push({mode,region,before,afterRevisit,stored:canonical(stored.G),restored,old});
       }else if(name==='drops-departure'){
-        const before=await b.eval(`(()=>{G.bagSlots=0;spawnDrops('root',3,{x:250,y:fieldGround()});if(usesZones(REG)){const here=G.zone;G.zone=Object.keys(REG.zones).find(id=>id!==here);spawnDrops('root',2,{x:120,y:fieldGround()});G.zone=here;}const due={};for(const a of [...Object.values(G.floorItems[G.region]).flat(),...G.pickups])if(!a.got)due[a.item]=(due[a.item]||0)+1;const old={region:G.region,inv:{...G.inv},due,next:REG.next,nextInv:REGIONS[REG.next].newState().inv||{}};endGame();return old;})()`);
+        const before=await b.eval(`(()=>{G.bagSlots=0;spawnDrops('root',3,{x:250,y:fieldGround()});if(usesZones(REG)){const here=G.zone;G.zone=Object.keys(REG.zones).find(id=>id!==here);spawnDrops('root',2,{x:120,y:fieldGround()});G.zone=here;}const old={region:G.region,inv:{...G.inv},floor:structuredClone(G.floorItems[G.region]),pickups:structuredClone(G.pickups),next:REG.next,nextInv:REGIONS[REG.next].newState().inv||{}};endGame();return old;})()`);
         await b.click('#btnNext');
-        const after=await b.eval(`({region:G.region,inv:{...G.inv},old:structuredClone(G.floorItems[${j(region)}]||{}),message:$('toast').textContent})`);
-        for(const [item,count] of Object.entries(before.due))if((after.inv[item]||0)!==(before.inv[item]||0)+count+(before.nextInv[item]||0))findings.push(fail(name,`${mode}/${region}: 다음 지역으로 떠날 때 ${item} 회수 수량 오류`,{before,after}));
-        if(after.region!==before.next||Object.values(after.old).flat().some(a=>!a.got))findings.push(fail(name,`${mode}/${region}: 지난 지역 아이템이 회수되지 않았다.`,{before,after}));
+        const after=await b.eval(`({region:G.region,inv:{...G.inv},old:structuredClone(G.floorItems[${j(region)}]||{}),pickups:structuredClone(G.floorPickups[${j(region)}]||[]),message:$('toast').textContent})`);
+        for(const item of new Set([...Object.keys(before.inv),...Object.keys(before.nextInv),...Object.keys(after.inv)]))if((after.inv[item]||0)!==(before.inv[item]||0)+(before.nextInv[item]||0))findings.push(fail(name,`${mode}/${region}: 다음 지역으로 떠날 때 ${item}이 자동 지급되거나 소지품이 바뀌었다.`,{before,after}));
+        if(after.region!==before.next||j(before.floor)!==j(after.old)||j(before.pickups)!==j(after.pickups))findings.push(fail(name,`${mode}/${region}: 지난 지역 바닥 물건의 위치·개수·줍기 상태가 바뀌었다.`,{before,after}));
         records.push({mode,region,before,after});
       }else if(name==='drops-full'){
         await b.eval(`(()=>{G.inv={rice:2};G.bagSlots=1;G.pickups=[];spawnDrops('root',2,{x:G.px,y:fieldGround()});})()`);
         await until(b,'floorDrops().every(a=>!a.flight&&!a.bounce)');
         await b.eval('G.px=floorDrops()[0].x;G.py=floorDrops()[0].y;G.onGround=true');
         const before=await b.eval('({floor:structuredClone(floorDrops()),inv:{...G.inv}})');
-        await b.key('ArrowDown');await b.wait(650);
+        await b.key('z');await b.wait(650);
         const blocked=await b.eval("({floor:structuredClone(floorDrops()),inv:{...G.inv},message:$('toast').textContent})");
         if(j(before.floor)!==j(blocked.floor)||j(before.inv)!==j(blocked.inv))findings.push(fail(name,`${mode}/${region}: 보따리가 가득 찼는데 바닥 물건이나 소지품이 바뀌었다.`,{before,blocked}));
         if(!/가득/.test(blocked.message))findings.push(fail(name,`${mode}/${region}: 보따리 가득 안내가 없다.`,blocked));
-        await b.eval('G.bagSlots=2');await b.key('ArrowDown');await b.key('ArrowDown');await b.key('ArrowDown');await b.wait(700);
+        await b.eval('G.bagSlots=2');await b.key('z');await b.key('z');await b.key('z');await b.wait(700);
         const freed=await b.eval('({floor:structuredClone(floorDrops()),inv:{...G.inv}})');
         if(!(freed.inv.root>0))findings.push(fail(name,`${mode}/${region}: 칸을 비운 뒤에도 줍지 못했다.`,freed));
         if(freed.inv.root>2)findings.push(fail(name,`${mode}/${region}: 연속 줍기 입력으로 보상이 중복됐다.`,freed));
@@ -93,7 +93,7 @@ async function runDropCheck({browser:b,outDir,name}){
   }catch(error){findings.push(fail(name,error.message,{scene:b.scene}));const file=path.join(outDir,'failure.png');await b.screenshot(file).catch(()=>{});images.push(file);}
   const file=path.join(outDir,'scenarios.json');fs.writeFileSync(file,j({method:'격리 상태 주입. 연속 플레이 증거와 별개.',chrome:b.version.product,records,images,captures,findings}));
   for(const f of findings)f.evidence=[file,...images];
-  const descriptions={'drops-floor':'흩뿌리기 최소 간격·유효 바닥, 네 지역 3장면씩 그림','drops-persistence':'구역 왕복·저장·새로고침 위치·개수','drops-departure':'지역 출발 시 전 구역 잔여 물건 회수','drops-full':'보따리 가득 시 잔류·칸을 비운 뒤 줍기'};
+  const descriptions={'drops-floor':'흩뿌리기 최소 간격·유효 바닥, 네 지역 3장면씩 그림','drops-persistence':'구역 왕복·저장·새로고침 위치·개수','drops-departure':'지역 출발 시 전 구역 잔여 물건 보존·자동 회수 없음','drops-full':'보따리 가득 시 잔류·칸을 비운 뒤 줍기'};
   return {name,status:findings.length?'fail':'pass',summary:descriptions[name]+` (${records.length}개 모드·지역, 문제 ${findings.length}건)`,findings,evidence:[file,...images]};
 }
 module.exports={runDropCheck};

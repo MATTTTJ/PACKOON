@@ -2,6 +2,7 @@
 /* 돌너머 동물들의 도트 그림과 소품. (ox, oy)는 발밑, f 는 바라보는 방향 */
 (()=>{
 const Rg=REGIONS.dolneomeo;
+Rg.springRevisit=()=>!CLASSIC&&!!G?.f?.spring&&regionCompleted('yeongsan');
 /* 꾸벅이는 졸다가 잠깐씩 고개를 든다. 고개를 든 동안에만 말이 통한다 */
 const NOD=TABLES.TUNING.kkubeogi_cycle,AWAKE=TABLES.TUNING.kkubeogi_awake;
 Rg.kkuAwakeNow=()=>!(Rg.arcs()&&G.f.dolneomeo_arc_kku3)&&(G.anim%NOD)<AWAKE;
@@ -48,7 +49,10 @@ Rg.props={
 if(CLASSIC)return;
 const Rg=REGIONS.dolneomeo;
 const P={ink:'#38494e',deep:'#394d57',ridge:'#647b87',far:'#a8b7bf',stone:'#818c8c',light:'#b6c1bf',frost:'#edf4f0',moss:'#667b60',earth:'#525d5b',warm:'#ead1a1'};
-const px=(x,y,w,h,c)=>R(Math.round(x),Math.round(y),Math.round(w),Math.round(h),c);
+const springColors={'#edf4f0':'#8b9e78','#a7b8b4':'#8b9e78','#748580':'#667b60','#525d5b':'#626b50',
+  '#bfcdd3':'#c5d7c3','#cbd8d9':'#d4dfc8','#dce1da':'#e0e5ce','#a4b7bd':'#b4c4ad',
+  '#a3b6be':'#a4b799','#829aa6':'#89a181','#657f89':'#6e896a','#d0ddd6':'#a5b689'};
+const px=(x,y,w,h,c)=>R(Math.round(x),Math.round(y),Math.round(w),Math.round(h),Rg.springRevisit()?(springColors[c]||c):c);
 const mod=(n,d)=>(n%d+d)%d;
 function bands(colors,heights){let y=0;colors.forEach((c,i)=>{px(0,y,W,heights[i],c);y+=heights[i];});}
 function wash(stops){const rgb=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));for(let y=0;y<H;y+=3){let i=0;while(i<stops.length-2&&y>stops[i+1][0])i++;const a=stops[i],b=stops[i+1],t=Math.max(0,Math.min(1,(y-a[0])/(b[0]-a[0]))),ca=rgb(a[1]),cb=rgb(b[1]);px(0,y,W,3,'#'+ca.map((v,j)=>Math.round(v+(cb[j]-v)*t).toString(16).padStart(2,'0')).join(''));}}
@@ -117,7 +121,7 @@ function front(zone){
   // 받침돌의 흐린 흔적만 보인다. 글자나 집안 낙관은 정하지 않는다.
   const host={gate:[1710,160],village:[1160,161],cliff:[2390,116]}[zone];
   if(host){const x=Math.round(host[0]-cam),y=host[1],c='#937e73';px(x-1,y,3,2,c);px(x-3,y-2,1,1,c);px(x-1,y-3,1,1,c);px(x+1,y-3,1,1,c);px(x+3,y-2,1,1,c);}
-  if(Vfx.reducedMotion)return;for(let i=0;i<13;i++){const x=mod(i*37-Math.floor(G.anim*.13),W),y=mod(i*23+Math.floor(G.anim*.09),H);if(i%3!==1)px(x,y,1,1,i%2?'#eff5ed':'#cbdad7');}if(zone==='shrine'&&Math.floor(G.anim/36)%3===0){px(56,74,17,1,'#dce6df');px(77,72,9,1,'#dce6df');}}
+  if(Vfx.reducedMotion||Rg.springRevisit())return;for(let i=0;i<13;i++){const x=mod(i*37-Math.floor(G.anim*.13),W),y=mod(i*23+Math.floor(G.anim*.09),H);if(i%3!==1)px(x,y,1,1,i%2?'#eff5ed':'#cbdad7');}if(zone==='shrine'&&Math.floor(G.anim/36)%3===0){px(56,74,17,1,'#dce6df');px(77,72,9,1,'#dce6df');}}
 
 /* 첫 경치: 햇빛은 구름 사이의 틈에서만 따뜻하다. 돌과 서리는 은빛이다. */
 function cliffSky(){wash([[0,'#57788e'],[50,'#8ba6af'],[84,'#bdc2b6'],[117,'#efd6a5'],[225,'#e7e5d3']]);disc(291,88,26,'#e8ce9d');disc(291,88,23,'#f2daa7');disc(291,88,19,'#ffe8b2');for(let i=0;i<22;i++)px(mod(i*47-cam*.1,430)-15,25+i%4*9,1,1,'#afc5cd');px(254,105,78,1,'#f9e7bc');px(263,108,58,1,'#f8e6ba');px(176,69,73,1,'#c7c6b7');px(192,67,31,1,'#c7c6b7');px(335,74,56,1,'#d0c8b2');}

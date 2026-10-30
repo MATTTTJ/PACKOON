@@ -37,9 +37,12 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){releaseInp
 addEventListener('pointercancel',releaseInputs);
 
 function onPress(k){
+  if(k==='v'){Sound.toggle();return;}
+  if(k==='m'){toggleMap();return;}
+  if(mapTravel)return;
+  if(open('map')){mapKey(k);return;}
   if(vistaMode){endVista();return;}
   if(zoneFade>0||zoneMotion)return;
-  if(k==='m'){Sound.toggle();return;}
   if(!G.started||G.ended)return;
   if(B){
     if(!$('bResult').hidden){if(k==='enter'||k==='e'||k===' ')$('bResOk').click();return;}
@@ -60,13 +63,15 @@ function onPress(k){
   if(k==='n'){toggleNote();return;}
   if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
   if(open('bag')||open('book')||open('notebook'))return;
-  if(k==='arrowdown'){tryPickup();return;}
+  if(k==='z'){tryPickup();return;}
   if(pickupPose)return;
   if(k===' '||k==='w'||k==='arrowup')jumpQ=true;
   if(k==='j'||k==='x')atkQ=true;
   if(k==='e'||k==='enter')tryTalk();
 }
 function padAction(k){
+  if(k==='map'){toggleMap();return;}
+  if(mapTravel||open('map'))return;
   if(vistaMode){endVista();return;}
   if(zoneFade>0||zoneMotion)return;
   if(!G.started||G.ended)return;

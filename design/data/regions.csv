@@ -1,5 +1,5 @@
-﻿id,순서,이름,계절,색,랜드마크,가보,보스,귀한열매,상태,비고
-galchamgol,1,단풍골,늦가을,주황·갈색·노랑,당산나무,jeolgu,kudzu,meoru,확정,웹 프로토타입 있음
-dolneomeo,2,돌너머 마을,초겨울·첫서리,회청·흰 서리·이끼 초록,성황당 돌무더기·장승,maetdol,golem,seoridarae,확정,이름 임시
-jangteo,3,큰 장터,한겨울·설 장날,붉은 등불·눈 흰색,보부상 숙소·떡집 굴뚝,siru,dokkaebi,nunhongsi,확정,보스(헌물 도깨비)와 귀한열매(눈홍시)는 제안
-yeongsan,4,북쪽 영산,늦겨울→첫봄,흰 눈·남색→연분홍,산꼭대기 호수·오래된 신목,yakyeon,gangcheol,legend_fruit,확정,보스(서리무기)는 제안. 아빠의 행방과 숨은 사연이 드러나는 곳
+﻿id,순서,이름,계절,색,랜드마크,가보,보스,귀한열매,상태,비고,구역
+galchamgol,1,단풍골,늦가을,주황·갈색·노랑,당산나무,jeolgu,kudzu,meoru,확정,웹 프로토타입 있음,village:집·마을 어귀|forge:대장간 길|forest:참나무 숲|marsh:늪가 약방|hill:당산나무 언덕
+dolneomeo,2,돌너머 마을,초겨울·첫서리,회청·흰 서리·이끼 초록,성황당 돌무더기·장승,maetdol,golem,seoridarae,확정,이름 임시,gate:장승 고갯길|village:돌너머 마을|field:메밀밭·둥지|cliff:돌산 절벽길|shrine:성황당 돌탑
+jangteo,3,큰 장터,한겨울·설 장날,붉은 등불·눈 흰색,보부상 숙소·떡집 굴뚝,siru,dokkaebi,nunhongsi,확정,보스(헌물 도깨비)와 귀한열매(눈홍시)는 제안,entrance:장터 입구|street:장터 거리|inn:보부상 숙소|pine:뒷산 솔숲|warehouse:창고 뒷길
+yeongsan,4,북쪽 영산,늦겨울→첫봄,흰 눈·남색→연분홍,산꼭대기 호수·오래된 신목,yakyeon,gangcheol,legend_fruit,확정,보스(서리무기)는 제안. 아빠의 행방과 숨은 사연이 드러나는 곳,shelter:산막|snow:깊은 눈길|slope:얼어붙은 비탈|shore:호숫가|island:신목 섬

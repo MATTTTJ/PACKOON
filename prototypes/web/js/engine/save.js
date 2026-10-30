@@ -7,10 +7,10 @@
    - 처음부터 하기 / 새로 시작: 저장이 있으면 한 번 더 눌러야 저장을 지운다 */
 const SAVE_KEY='packoon-save-v1';
 let saveRecoveryBlocked=false;
-const busyForSave=()=>!!B||inkOn||!!vistaMode||!!zoneMotion||zoneFade>0||open('dlg')||!!openMinigame();
+const busyForSave=()=>!!B||inkOn||!!vistaMode||!!zoneMotion||zoneFade>0||(typeof mapTravel!=='undefined'&&!!mapTravel)||open('dlg')||!!openMinigame();
 const saveObject=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
 /* 빠진 칸만 지역 기본값으로 보충한다. 존재하는 진행·수량을 새 게임 값으로 덮지 않는다. */
-function repairSavedState(source){
+function repairSavedState(source,repairRegions=true){
   if(!saveObject(source)||!Object.hasOwn(REGIONS,source.region))throw Error('region');
   const r=REGIONS[source.region],defaults=baseState(),ns=r.newState();
   const flags={...defaults.f,...ns.f};Object.assign(defaults,ns,{region:r.id,f:{},inv:{}});
@@ -56,7 +56,20 @@ function repairSavedState(source){
     }
     for(const [id,z] of Object.entries(r.zones))g.zoneStates[id]=fill(g.zoneStates[id],z.newState?z.newState():{});
   }else g.zone=null;
-  return normalizeTravelRecords(g);
+  if(!saveObject(g.regionStates)||!saveObject(g.visitedZones))throw Error('regions');
+  for(const [id,zones] of Object.entries(g.visitedZones)){
+    if(!Object.hasOwn(REGIONS,id)||!saveObject(zones))throw Error('visitedZones');
+    for(const [zone,value] of Object.entries(zones))if(!TABLES.ZONES[id]?.[zone]||value!==true)throw Error('visitedZones');
+  }
+  if(repairRegions)for(const [id,snapshot] of Object.entries(g.regionStates)){
+    if(!Object.hasOwn(REGIONS,id)||!saveObject(snapshot)||!saveObject(snapshot.fields)||typeof snapshot.completed!=='boolean')throw Error('regionStates');
+    const restored=repairSavedState({...g,...snapshot.fields,region:id,ended:snapshot.completed,regionStates:{},visitedZones:{}},false);
+    const fields={};for(const key of regionFieldKeys(REGIONS[id]))if(restored[key]!==undefined)fields[key]=restored[key];
+    g.regionStates[id]={fields,completed:snapshot.completed};
+  }
+  normalizeTravelRecords(g);
+  if(repairRegions)rememberRegion(g); // 옛 저장은 현재 지역 한 곳만 보관한다.
+  return g;
 }
 function readSave(){
   let raw;try{raw=localStorage.getItem(SAVE_KEY);}catch(_){return null;}
@@ -81,6 +94,7 @@ function writeSave(quiet){
   returnPouch();   // 가공대에 올려 둔 물건은 보따리로 돌려 놓고 저장
   // 저장 주기를 유지하면서 실제로 반환한 재료·소지품·버튼을 화면에도 반영한다.
   if(open('bag')){pouchMsg='';renderBag();}
+  rememberRegion(G);
   try{localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,at:Date.now(),G}));}
   catch(_){if(!quiet)toast('이 브라우저에서는 저장할 수 없다');return false;}
   if(!quiet)toast('저장했다');
