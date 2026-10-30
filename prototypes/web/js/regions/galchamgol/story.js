@@ -62,7 +62,7 @@ function dodamOldStory(){
 function dodamMain(){
   const F=G.f;
   if(!F.dodamTalk){F.dodamTalk=true;
-    talk([['도담','어, 못 보던 너구리네! 잠깐, 그 모자 어디서 봤는데…'],
+    talk([['도담','어, 숲에선 처음 보는 너구리네!\n잠깐, 그 모자 어디서 봤는데…'],
       ['도담','뭐 찾아? 내가 알려 줄까?',[{t:'해머루는 어디 있어?',go:dodamFruit},{t:'우리 아빠 봤어? 너구리 보부상이야',go:()=>dodamDad(dodamFruit)}]]]);
   }else if(!F.dodamDone){
     if(has('powder'))dodamTrade();
