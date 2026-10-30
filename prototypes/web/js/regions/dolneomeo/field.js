@@ -334,7 +334,7 @@ if(!CLASSIC){
   }
   function commonStep(id){
     memoryStep();if(Rg.arcs())G.f.arcs=true;
-    if(!G.f.dolSeenZones)G.f.dolSeenZones={};G.f.dolSeenZones[id]=true;
+    // 방문 구역은 엔진의 G.visitedZones가 기록한다. 매 프레임 진행값을 쓰지 않는다(지도 왕복 검사가 흔들렸다).
     if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>2310)Rg.startGolem();
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
