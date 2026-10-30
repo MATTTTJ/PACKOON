@@ -479,3 +479,31 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
   .title-scene{justify-content:center}
   .title-view{width:min(100%, calc(100dvh * 16 / 9));border-width:2px;border-radius:4px}
 }
+
+/* 그림이 아닌 클릭 요소 자체를 넓힌다. 지역 창의 인라인 크기도 같은 기준을 따른다. */
+@media (pointer:coarse){
+  button,[role="button"],.prompt{min-width:44px!important;min-height:44px!important;flex-shrink:0}
+  .prompt{display:flex;align-items:center;justify-content:center;width:max-content;white-space:normal;word-break:keep-all;max-width:90%;text-align:center}
+  .hud-btns .chipbtn{height:auto;white-space:normal}
+  .panel-head,.panel-foot,.craft-actions{flex-wrap:wrap}
+  .panel-head h2{flex:1;min-width:0}
+  .tabs button{flex-shrink:0}
+  #galHands button{margin:4px}
+  .shell:has(>#galHands:not([hidden])) .hud #btnSound,.shell:has(>#galHands:not([hidden])) .hud #btnVolume{visibility:hidden;pointer-events:none}
+  #gbar,#fbar{min-height:44px}
+  .mom-transcript summary{min-height:44px}
+  body.in-battle .b-top{top:calc(2.5% + 52px)}
+}
+@media (pointer:coarse) and (orientation:portrait){
+  .pad-top{display:grid;grid-template-columns:repeat(3,minmax(44px,1fr));gap:8px}
+  .goal-m{grid-column:1/-1}
+  .pad-top .chipbtn{justify-content:center;padding:6px 10px}
+  .bench{flex-wrap:wrap}
+  .bench .ins{flex-basis:100%;justify-content:center}
+}
+@media (pointer:coarse) and (orientation:landscape){
+  .pbtn.atk{font-size:14px;padding-inline:0;white-space:nowrap}
+  #galHands h2{margin:4px 0;font-size:22px}
+  #galHands p{margin:4px 0}
+  #galHands canvas{height:80px;object-fit:contain}
+}

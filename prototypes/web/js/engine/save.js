@@ -6,13 +6,60 @@
    - 시작 화면: 저장이 있으면 '이어서 하기'
    - 처음부터 하기 / 새로 시작: 저장이 있으면 한 번 더 눌러야 저장을 지운다 */
 const SAVE_KEY='packoon-save-v1';
+let saveRecoveryBlocked=false;
 const busyForSave=()=>!!B||inkOn||!!vistaMode||!!zoneMotion||zoneFade>0||open('dlg')||!!openMinigame();
+const saveObject=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+/* 빠진 칸만 지역 기본값으로 보충한다. 존재하는 진행·수량을 새 게임 값으로 덮지 않는다. */
+function repairSavedState(source){
+  if(!saveObject(source)||!Object.hasOwn(REGIONS,source.region))throw Error('region');
+  const r=REGIONS[source.region],defaults=baseState(),ns=r.newState();
+  const flags={...defaults.f,...ns.f};Object.assign(defaults,ns,{region:r.id,f:{},inv:{}});
+  function fill(value,fallback){
+    if(value===undefined)return structuredClone(fallback);
+    if(Array.isArray(fallback)){
+      if(!Array.isArray(value))throw Error('array');return value;
+    }
+    if(saveObject(fallback)){
+      if(!saveObject(value))throw Error('object');
+      const out={...value};for(const key of Object.keys(fallback))out[key]=fill(value[key],fallback[key]);return out;
+    }
+    if(fallback!==null&&(typeof value!==typeof fallback||typeof value==='number'&&!Number.isFinite(value)))throw Error('value');
+    return value;
+  }
+  const g=fill(source,defaults);
+  // 진행값(f)은 플레이 중 형태가 바뀔 수 있어 검사하지 않는다. 빠진 칸만 기본값으로 채운다 (옛 저장 호환).
+  g.f={...flags,...g.f};
+  for(const [id,n] of Object.entries(g.inv)){if(!Object.hasOwn(ITEMS,id)){delete g.inv[id];continue;}if(!Number.isSafeInteger(n)||n<0)throw Error('inv');} // 없어진 아이템은 버리고 나머지는 살린다
+  for(const row of Object.values(g.rel))if(!saveObject(row)||typeof row.t!=='string'||!Number.isFinite(row.v))throw Error('rel');
+  for(const key of ['awake','learned'])if(g[key].some(id=>typeof id!=='string'))throw Error(key);
+  for(const key of ['diary','clues','nicknames'])if(g[key].some(row=>!saveObject(row)||typeof row.id!=='string'||typeof row.text!=='string'))throw Error(key);
+  for(const key of ['digs','pickups','mobs'])if(g[key]?.some(row=>!saveObject(row)||!Number.isFinite(row.x)))throw Error(key);
+  for(const key of ['digs','pickups'])if(g[key]?.some(row=>!Object.hasOwn(ITEMS,row.item)))throw Error(key);
+  if(g.pickups?.some(row=>!Number.isFinite(row.y)))throw Error('pickups');
+  if(g.drop!==undefined&&g.drop!==null&&(!saveObject(g.drop)||!['x','y','vy'].every(key=>Number.isFinite(g.drop[key]))))throw Error('drop');
+  if(!Number.isSafeInteger(g.hp)||!Number.isSafeInteger(g.maxhp)||g.hp<0||g.maxhp<=0||g.maxhp>100||g.hp>g.maxhp||!Object.hasOwn(TOOLS,g.tool))throw Error('player');
+  for(const row of Object.values(g.ledger))if(!saveObject(row)||typeof row.npc!=='string')throw Error('ledger');
+  if(g.zoneStates===undefined)g.zoneStates={};
+  if(!saveObject(g.zoneStates))throw Error('zoneStates');
+  if(usesZones(r)){
+    if(typeof g.zone!=='string'||!Object.hasOwn(r.zones,g.zone)){
+      g.zone=firstZone(r);g.px=r.zones[g.zone].startX??r.startX;g.py=r.zones[g.zone].ground??GROUND;g.cam=0;
+    }
+    for(const [id,z] of Object.entries(r.zones))g.zoneStates[id]=fill(g.zoneStates[id],z.newState?z.newState():{});
+  }else g.zone=null;
+  return normalizeTravelRecords(g);
+}
 function readSave(){
-  try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
-    if(s&&s.v===1&&s.G&&REGIONS[s.G.region])return s;}catch(_){}
-  return null;
+  let raw;try{raw=localStorage.getItem(SAVE_KEY);}catch(_){return null;}
+  if(raw===null)return null;
+  try{
+    const s=JSON.parse(raw);if(!saveObject(s)||s.v!==1)throw Error('version');
+    return {...s,at:Number.isFinite(s.at)?s.at:Date.now(),G:repairSavedState(s.G)};
+  }catch(_){return {invalid:true,raw,G:{region:regionList()[0].id},at:0};}
 }
 function writeSave(quiet){
+  // 원문을 별도 보관하지 못했다면 자동 저장도 원본을 덮지 않는다.
+  if(saveRecoveryBlocked){if(!quiet)toast('이 브라우저에서는 저장할 수 없다');return false;}
   if(!G||busyForSave()){if(!quiet)toast('대화나 전투가 끝난 뒤에 저장할 수 있다');return false;}
   returnPouch();   // 가공대에 올려 둔 물건은 보따리로 돌려 놓고 저장
   // 저장 주기를 유지하면서 실제로 반환한 재료·소지품·버튼을 화면에도 반영한다.
@@ -22,15 +69,24 @@ function writeSave(quiet){
   if(!quiet)toast('저장했다');
   refreshSaveUI();return true;
 }
-function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(_){}refreshSaveUI();}
+function clearSave(){try{localStorage.removeItem(SAVE_KEY);saveRecoveryBlocked=false;}catch(_){}refreshSaveUI();}
 function loadSave(){
   const s=readSave();if(!s)return false;
   TitleScreen.close();
-  G=normalizeTravelRecords(Object.assign(baseState(),s.G));   // 저장 키·발견 키는 유지하고 빠진 기록 칸만 채운다
+  if(s.invalid){
+    saveRecoveryBlocked=true;
+    try{
+      let key=SAVE_KEY+'-unreadable-'+Date.now();while(localStorage.getItem(key)!==null)key+='-copy';
+      localStorage.setItem(key,s.raw);saveRecoveryBlocked=false;
+    }catch(_){}
+    G=newGame();resetScreens();toast('저장을 읽지 못했어요. 새로 시작할 수 있어요');return false;
+  }
+  G=s.G;
   resetScreens();if(G.ended)showEnd();
   toast('이어서 한다 · '+REGIONS[G.region].name);return true;
 }
 function saveLabel(s){
+  if(s.invalid)return '저장을 읽지 못했어요. 새로 시작할 수 있어요';
   const d=new Date(s.at),now=new Date();
   const t=d.toLocaleTimeString('ko-KR',{hour:'numeric',minute:'2-digit'});
   const day=d.toDateString()===now.toDateString()?'오늘':(d.getMonth()+1)+'월 '+d.getDate()+'일';

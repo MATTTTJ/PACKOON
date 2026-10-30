@@ -74,10 +74,10 @@ addEventListener('resize',()=>{if(B){blayout();renderBattleMasks();}});
 
 /* 필드에서 전투로 넘어가는 먹물 번짐. sx 는 번지기 시작하는 가로 위치(%) */
 function inkTransition(text,sx,cb){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){cb();return;}
   const k=$('ink');$('inkText').textContent=text;
   k.style.setProperty('--ix',clamp(sx,5,95)+'%');k.hidden=false;k.className='ink';void k.offsetWidth;k.className='ink on';inkOn=true;
-  const fast=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  setTimeout(()=>{cb();k.className='ink off';setTimeout(()=>{k.hidden=true;k.className='ink';inkOn=false;},fast?40:460);},fast?250:1050);
+  setTimeout(()=>{cb();k.className='ink off';setTimeout(()=>{k.hidden=true;k.className='ink';inkOn=false;},460);},1050);
 }
 /* onEnd(결과, {hits}) 결과는 'win' | 'calm' | 'lose' | 'flee' */
 function startBattle(kind,onEnd){

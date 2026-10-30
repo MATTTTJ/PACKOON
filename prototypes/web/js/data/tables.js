@@ -2208,7 +2208,8 @@ const TABLES={
   "battle_gaksi_radius": 36,
   "battle_base_damage": 1,
   "battle_sharp_damage": 2,
-  "battle_pickaxe_bonus": 1
+  "battle_pickaxe_bonus": 1,
+  "toast_frames": 300
  },
  "PROGRESS": [
   {
