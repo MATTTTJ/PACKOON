@@ -126,6 +126,13 @@ function drawRaccoon(){
 
 function draw(){
   if(vistaMode){drawVista();return;}
+  const sliding=zoneMotion?.kind==='slide';
+  drawFieldScene(!sliding);
+  updateOverlay();
+  if(zoneFade>0){ctx.save();ctx.globalAlpha=zoneFade/TABLES.TUNING.zone_transition_frames;R(0,0,W,H,'#211d24');ctx.restore();}
+  drawZoneTransition();
+}
+function drawFieldScene(showPlayer=true){
   cam=Math.round(G.cam)+(shakeT&&!Vfx.reducedMotion?(shakeT%2?1:-1):0);
   if(fieldDef().drawBack)fieldCall('drawBack');else{R(0,0,W,H,'#d7cfb4');R(0,fieldGround(),W,H-fieldGround(),'#785b3a');}
   Vfx.draw('back');
@@ -136,12 +143,9 @@ function draw(){
   drawPickups();
   drawNpcs();
   fieldCall('drawActors');
-  drawRaccoon();
+  if(showPlayer)drawRaccoon();
   if(!Vfx.reducedMotion)for(const s of sparks)R(s.x-cam,s.y,1,1,'#fff3b0');
   Vfx.front();
-  updateOverlay();
-  if(zoneFade>0){ctx.save();ctx.globalAlpha=zoneFade/TABLES.TUNING.zone_transition_frames;R(0,0,W,H,'#211d24');ctx.restore();}
-  drawZoneTransition();
 }
 let lastNear=null;
 function nearDig(){if(paused())return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
@@ -173,12 +177,34 @@ function resetFieldModes(){
 }
 function changeZone(to,arrival={}){
   if(!usesZones(REG)||!REG.zones[to]||paused())return false;
+  const edge=arrival.edgeDirection===1||arrival.edgeDirection===-1;
+  let image,start;
+  if(edge&&!Vfx.reducedMotion){
+    // 배경 두 장을 밀고 주인공은 그 위에 한 번만 그린다.
+    drawFieldScene(false);start={x:G.px-cam,y:G.py};
+    image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);
+  }
   const z=REG.zones[to];
   G.zone=to;G.px=clamp(arrival.x??z.startX??70,16,z.w-16);G.py=arrival.y??z.ground??GROUND;
-  G.vx=G.vy=G.attackT=0;G.onGround=G.py===(z.ground??GROUND);
+  if(!edge)G.vx=0;
+  G.vy=G.attackT=0;G.onGround=G.py===(z.ground??GROUND);
   G.cam=clamp(G.px-W*.42,0,Math.max(0,z.w-W));
-  suppressHeldInputs();sparks.length=0;shakeT=0;lastNear=null;blockedEdge=null;Vfx.clear();
-  zoneFade=Vfx.reducedMotion?0:TABLES.TUNING.zone_transition_frames;
+  if(edge){
+    for(const k in keys)if(!['arrowleft','arrowright','a','d'].includes(k)){
+      if(keys[k])suppressedKeys.add(k);keys[k]=false;
+    }
+    touch.up=touch.down=false;jumpQ=atkQ=false;
+    document.querySelectorAll('#pad .on').forEach(b=>{if(!['left','right'].includes(b.dataset.k))b.classList.remove('on');});
+  }else suppressHeldInputs();
+  sparks.length=0;shakeT=0;lastNear=null;blockedEdge=null;Vfx.clear();
+  zoneFade=edge||Vfx.reducedMotion?0:TABLES.TUNING.zone_transition_frames;
+  if(image){
+    const incoming=document.createElement('canvas');incoming.width=W;incoming.height=H;
+    zoneMotion={kind:'slide',opts:{direction:arrival.edgeDirection},image,incoming,start,
+      frames:TABLES.TUNING.zone_transition_frames,tick:0,owner:G,region:G.region,zone:G.zone,end:{x:G.px,y:G.py}};
+    // 지역이 자체 보관하는 이전 화면에도 가장자리 전환 그림이 겹치지 않게 한다.
+    ctx.clearRect(0,0,W,H);
+  }
   Sound.playSfx(arrival.sound||'zone_travel');return true;
 }
 /* 지역 전용 전환을 다음 패스에서 교체할 공통 틀. 좌표는 필드 px, frames는 CSV에서 읽은 60Hz 갱신 횟수다.
@@ -206,6 +232,11 @@ function finishZoneTransition(){
   const m=zoneMotion;if(!m)return;
   zoneMotion=null;
   if(m.owner!==G||m.region!==G.region||m.zone!==G.zone)return;
+  if(m.kind==='slide'){
+    // 전환 도중 손을 뗐거나 방향을 바꾼 입력도 그대로 반영한다.
+    G.vx=((isRight()?1:0)-(isLeft()?1:0))*Math.abs(G.vx);
+    return;
+  }
   G.px=m.end.x;G.py=m.end.y;G.vx=G.vy=G.attackT=0;G.onGround=G.py===fieldGround();
   G.cam=clamp(G.px-W*.42,0,Math.max(0,fieldWidth()-W));
   suppressHeldInputs();
@@ -225,10 +256,22 @@ function stepZoneTransition(){
   if(m.tick===m.frames)finishZoneTransition();
 }
 function drawZoneTransition(){
-  const m=zoneMotion;if(!m||Vfx.reducedMotion)return;
+  const m=zoneMotion;if(!m)return;
+  if(Vfx.reducedMotion){
+    if(m.kind==='slide')drawRaccoon();
+    return;
+  }
   const t=m.tick/m.frames,e=t*t*(3-2*t);
   ctx.save();
-  if(m.kind==='zoom'){
+  if(m.kind==='slide'){
+    m.incoming.getContext('2d').drawImage(cv,0,0);
+    const shift=m.opts.direction*Math.round(W*e);
+    ctx.clearRect(0,0,W,H);
+    ctx.drawImage(m.image,-shift,0);ctx.drawImage(m.incoming,m.opts.direction*W-shift,0);
+    const x=m.start.x+(G.px-cam-m.start.x)*e,y=m.start.y+(G.py-m.start.y)*e;
+    const st=G.onGround&&G.vx?Math.floor((G.anim+m.tick)/6)%2:0;
+    drawRaccoonAt(x,y,G.face,st,0,heldTool());
+  }else if(m.kind==='zoom'){
     const x=m.opts.focusX??W/2,y=m.opts.focusY??H/2,s=1+(m.opts.reverse?-.16:.18)*e;
     ctx.globalAlpha=1-e;ctx.translate(x,y);ctx.scale(s,s);ctx.drawImage(m.image,-x,-y);
   }else if(m.kind==='climb'){
@@ -249,7 +292,8 @@ function zoneEdge(){
     blockedEdge=side;return false;
   }
   const dest=REG.zones[p.to];if(!dest)return false;
-  return changeZone(p.to,{x:p.toX??(side==='right'?16:dest.w-16),y:p.toY});
+  const direction=side==='right'?1:-1;
+  return changeZone(p.to,{x:direction>0?16:dest.w-16,y:p.toY,edgeDirection:direction});
 }
 function nearInteraction(){
   if(paused())return null;

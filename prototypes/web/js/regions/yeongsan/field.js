@@ -215,7 +215,6 @@ if(!CLASSIC){
     ]),
     snow:zone('snow',[],{left:'shelter',right:'slope'},[
       {x:2000,y:108,to:'shore',toX:2020,toY:108,label:'바라보던 능선 속으로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
-      {x:180,to:'shelter',toX:1500,label:'눈 굴을 나와 산막으로',draw:sign},
     ]),
     slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y)}},[
       {x:2320,to:'shore',toX:170,label:'바위턱을 디뎌 호숫가로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
