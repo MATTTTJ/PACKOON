@@ -55,7 +55,15 @@ function readSave(){
   try{
     const s=JSON.parse(raw);if(!saveObject(s)||s.v!==1)throw Error('version');
     return {...s,at:Number.isFinite(s.at)?s.at:Date.now(),G:repairSavedState(s.G)};
-  }catch(_){return {invalid:true,raw,G:{region:regionList()[0].id},at:0};}
+  }catch(_){
+    // 읽지 못한 저장은 지우지 않고 다른 칸에 옮겨 둔 뒤, 저장이 없는 것처럼 새로 시작하게 한다.
+    try{
+      let key=SAVE_KEY+'-unreadable-'+Date.now();while(localStorage.getItem(key)!==null)key+='-copy';
+      localStorage.setItem(key,raw);localStorage.removeItem(SAVE_KEY);
+      setTimeout(()=>toast('저장을 읽지 못해 따로 보관했어요. 새로 시작할 수 있어요'),0);
+    }catch(_){saveRecoveryBlocked=true;}   // 옮기지 못했으면 자동 저장도 원본을 덮지 않는다
+    return null;
+  }
 }
 function writeSave(quiet){
   // 원문을 별도 보관하지 못했다면 자동 저장도 원본을 덮지 않는다.

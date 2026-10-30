@@ -102,6 +102,11 @@ async function runSave({ browser, outDir, rules }) {
     await until(browser, 'G.started && G.region === "galchamgol"', 10000, '손상 저장 뒤 새 게임');
     if (!(await browser.eval('readSave() === null'))) findings.push(failure('save-corrupt-read', '손상 JSON을 유효한 저장으로 읽었다.'));
     corruptCompleted = true;
+    // 옛 코드로 만든 저장 표본이 그대로 읽혀야 한다 (fixtures/old-saves.json).
+    const oldSaves = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'old-saves.json'), 'utf8')).saves;
+    const oldResults = await browser.eval(`(${JSON.stringify(oldSaves)}).map(s=>{localStorage.setItem('packoon-save-v1',s);const r=readSave();const want=JSON.parse(s).G.region;return r&&r.G&&r.G.region===want?'ok':'fail:'+want;})`);
+    oldResults.forEach((r, i) => { if (r !== 'ok') findings.push(failure('save-old-format', `옛 저장 표본 ${i + 1}(${r.slice(5)})을 불러오지 못했다.`)); });
+    await browser.eval("localStorage.removeItem('packoon-save-v1')");
     step('4. localStorage 저장값을 깨진 JSON으로 바꾸고 새로고침한 뒤 새 게임을 시작한다.');
     evidence.push(write(outDir, 'save-state.json', { start: '빈 격리 프로필의 새 게임', origin: browser.url, steps, stored, restored, corruptNewGame: await browser.eval('({region:G.region,started:G.started})') }));
   } catch (error) {
@@ -110,7 +115,7 @@ async function runSave({ browser, outDir, rules }) {
   }
   for (const f of findings) Object.assign(f, { evidence, steps: (f.steps || steps).map(s => s.replace(/^\d+\.\s*/, '')), reproductions: '이번 실행 1회',
     environment: { url: browser.url, viewport: '1280×720', input: 'CDP 실제 키·마우스', start: '빈 격리 저장에서 새 게임' } });
-  return result('save', findings, evidence, `중간 저장 왕복 ${reloadCompleted ? '완료' : '미완료'}, 손상 JSON 뒤 새 게임 ${corruptCompleted ? '완료' : '미완료'}, 문제 ${findings.length}건. 옛 저장 호환은 별도 확인이 필요하다.`);
+  return result('save', findings, evidence, `중간 저장 왕복 ${reloadCompleted ? '완료' : '미완료'}, 손상 JSON 뒤 새 게임 ${corruptCompleted ? '완료' : '미완료'}, 문제 ${findings.length}건. 옛 저장 표본 확인 포함.`);
 }
 
 /* Scrollable panels are intentional. Only clipped/escaping text, not their scroll range, is a failure. */
