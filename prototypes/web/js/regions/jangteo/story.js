@@ -793,7 +793,7 @@ Rg.npcs=[
 
 if(!CLASSIC){
   Rg.npcs=Rg.npcs.map(n=>{
-    const place={morak:['street',1380,110],yeotbang:['street',720,GROUND],nal:['entrance',430,GROUND],maru:['inn',1080,GROUND],bueong:['inn',920,GROUND]}[n.id];
+    const place={morak:['street',1380,110],yeotbang:['street',1660,GROUND],nal:['street',430,GROUND],maru:['inn',1080,GROUND],bueong:['inn',920,GROUND]}[n.id];
     const p=Object.defineProperties({},Object.getOwnPropertyDescriptors(n));
     Object.defineProperty(p,'x',{value:place[1],writable:true,enumerable:true,configurable:true});
     p.zone=place[0];p.y=place[2];
@@ -830,7 +830,7 @@ Rg.goal=()=>{
       const sb=G.inv.solbang||0;
       return sb>=5?'엿방울에게 솔방울 건네기':'뒷산 소나무 숲에서 솔방울 줍기 ('+sb+'/5)';
     }
-    if(!has('pat'))return CLASSIC?'숙소 앞 날쌘에게 팥 구하기':'장터 입구 날쌘에게 팥 구하기';
+    if(!has('pat'))return CLASSIC?'숙소 앞 날쌘에게 팥 구하기':'장터 거리 · 날쌘에게 팥 구하기';
     if((G.inv.ssal_powder||0)<2)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루 갈기';
     return '보따리를 열고 시루에 쌀가루 2와 팥 1 넣어 찌기';
   }

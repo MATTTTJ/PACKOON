@@ -176,7 +176,7 @@ if(!CLASSIC){
     talk:()=>Rg.lanternTalk(),
   };
   Rg.zones={
-    entrance:{...common('entrance'),name:'장터 입구',w:2600,npcs:['nal'],
+    entrance:{...common('entrance'),name:'장터 입구',w:2600,npcs:[],
       platforms:[...stairs(1040),...stairs(1980)],
       pickups:cones('entrance',[[330,192],[355,192],[380,192]]),
       exits:{right:{to:'street',toX:60}},
@@ -184,7 +184,7 @@ if(!CLASSIC){
       wanderers:E.wanderers.entrance,examines:E.examines.entrance,
       stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint}],
     },
-    street:{...common('street'),name:'장터 거리',w:2800,npcs:['morak','yeotbang'],
+    street:{...common('street'),name:'장터 거리',w:2800,npcs:['morak','yeotbang','nal'],
       platforms:[...stairs(430),{x:610,y:96,w:510},{x:1250,y:110,w:300},...stairs(2370),{x:2550,y:96,w:180}],
       pickups:cones('street',[[830,192],[850,192],[875,192]]),
       exits:{left:{to:'entrance',toX:2530},right:{to:'inn',toX:60}},
@@ -227,7 +227,9 @@ if(!CLASSIC){
       platforms:[...stairs(460),...stairs(1230),...stairs(1840),...stairs(2340)],
       pickups:cones('warehouse',[[700,192],[725,192],[750,192]]),
       exits:{left:{to:'inn',toX:2490}},
-      doors:[{x:280,to:'inn',toX:2130,label:'지붕 사이, 숙소 불빛으로 돌아가기',draw:gate}],
+      doors:[{x:280,to:'inn',toX:2130,label:'지붕 사이, 숙소 불빛으로 돌아가기',draw:gate},
+        {x:2290,to:'inn',toX:1530,label:'짐 나르는 귀환 문으로 숙소에',need:()=>G.boss.dead,
+          reason:'도깨비가 물러나면 짐 나르는 귀환 문을 쓸 수 있겠다.',draw:gate,drawBlocked:shutter}],
       examines:E.examines.warehouse,
       drawActors(){
         const x=Rg.STORE_X-cam;R(x-38,GROUND-58,76,58,'#493d3b');R(x-44,GROUND-62,88,5,'#243b48');R(x-44,GROUND-64,88,2,'#dbe8ed');

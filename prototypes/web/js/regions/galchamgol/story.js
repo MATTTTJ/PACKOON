@@ -627,11 +627,11 @@ if(!CLASSIC){
           {t:'물받이 낙엽부터 함께 걷는다',go:()=>hands('물레방아 물받이 비우기','wheel_leaves',[
             '물받이 위 낙엽을 모은다','젖은 낙엽은 옆 물로 뺀다','막힌 물구멍을 드러낸다'],()=>{
               F.galWheelStage=1;diary('galWheelStart','오래 멈춰 있던 물레방아를 고치기로 했다. 엄마는 아프기 전까지 마을 곡식을 혼자 절구에 찧었다. 까치와 물받이를 비웠다.');
-              talk([['늙은 까치','살 하나는 물에 떠내려갔을 게다. 숲 쪽으로.\n굴대는… 무쇠가 새로 깎아 뒀다더라.']]);
+              talk([['늙은 까치','살 하나는 물에 떠내려갔을 게다. 개울 아래로.\n굴대는… 무쇠가 새로 깎아 뒀다더라.']]);
             })},{t:'어디가 고장 났는지 보고 간다',go:null}]]]);return;
     }
     if(stage<3){
-      talk([['너구리',F.galWheelAxle?'굴대는 개울 받침에 왔어.\n떠내려간 살만 찾으면 돼. 숲 쪽으로 갔댔지.':!F.galWheelSpoke?'살은 물살 따라 숲 쪽으로 갔대.\n굴대는 무쇠 아저씨가 깎아 뒀다고 했어.':'살은 찾았어.\n이제 무쇠 아저씨가 깎아 둔 굴대만 있으면 돼.']]);return;
+      talk([['너구리',F.galWheelAxle?'굴대는 개울 받침에 왔어.\n떠내려간 살만 찾으면 돼. 개울 아래로 갔댔지.':!F.galWheelSpoke?'살은 물살 따라 개울 아래로 갔대.\n굴대는 무쇠 아저씨가 깎아 뒀다고 했어.':'살은 찾았어.\n이제 무쇠 아저씨가 깎아 둔 굴대만 있으면 돼.']]);return;
     }
     if(stage===3){
       talk([['너구리','살도 굴대도 다 왔어요.'],['늙은 까치','쐐기는 내가 부리로 물고 있으마.\n넌 살을 홈에 맞춰 끼우렴.',[
@@ -666,7 +666,7 @@ if(!CLASSIC){
       {t:'가지가 내려올 때 두 손으로 받는다',go:()=>hands('가지에 걸린 물레방아 살','wheel_spoke',[
         '낮은 가지를 살짝 당긴다','걸린 살 끝을 받친다','살을 비틀지 않고 빼낸다'],()=>{
           F.galWheelSpoke=true;F.galWheelStage=wheelStage();
-          diary('galWheelSpoke','숲 입구의 낮은 가지에서 물레방아 살을 받았다. 물에 쓸려도 끝의 빗금은 남아 있었다.');
+          diary('galWheelSpoke','대장간 아래 개울가 낮은 가지에서 물레방아 살을 받았다. 물에 쓸려도 끝의 빗금은 남아 있었다.');
           talk([['너구리',F.galWheelAxle?'굴대도 개울 받침에 왔지.\n물레방아로 돌아가자.':'굴대는 형제네 평상이라고 했어.\n대장간 길로 나가며 들르자.']]);
         })},{t:'먼저 가지 모양을 살핀다',go:null}]]]);
   }
@@ -726,7 +726,7 @@ if(!CLASSIC){
         '쿵, 쿵, 쿵. 나무 공이도 한 번 쉬네.\n엄마는 혼자 이 소리를 다 내셨구나.':'빠진 살 사이로 물만 흘러간다. 굴대도 갈라졌다.\n이 방아가 서 있어서 엄마가 절구질을 했었지.')],
     forge:[
       examine('forge_sign',230,'갈림길 팻말 읽기',()=> '왼쪽은 집과 개울, 오른쪽은 참나무 숲.\n숯 냄새를 따라가면 무쇠 아저씨가 있겠다.'),
-      examine('forge_charcoal',1860,'식힌 숯가마 살펴보기',()=> '재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 아저씨 불씨도 여기서 시작했겠지.'),
+      examine('forge_charcoal',1820,'식힌 숯가마 살펴보기',()=> '재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 아저씨 불씨도 여기서 시작했겠지.'),
       examine('forge_share',870,'낮은 평상 살펴보기',()=>G.f.galExpBrothersSorted?
         '큰 도토리부터 양쪽 바구니에 번갈아 놓았다.\n작은 것도 나눠 담으니 높이가 비슷해졌다.':'빈 바구니 두 개가 나란히 놓였다.\n작은 발 둘이 서기 딱 좋은 낮은 평상이다.')],
     forest:[
@@ -757,7 +757,7 @@ if(!CLASSIC){
     draw:(sx,sy)=>{if(id==='wheel')Rg.expArt.marker(sx,sy);}});
   Rg.zones.village.npcs.push(work('wheel',1050,'물레방아 함께 고치기',wheelTalk));
   Rg.zones.forge.npcs.push(work('baskets',810,'평상에서 도토리 나누기 · 굴대 함께 들기',wheelAxle));
-  Rg.zones.forest.npcs.push(work('spoke',450,'낮은 가지의 물레방아 살 받기',wheelSpoke));
+  Rg.zones.forge.npcs.push(work('spoke',430,'낮은 가지의 물레방아 살 받기',wheelSpoke));
   Rg.zones.marsh.npcs.push(work('fly_reeds',520,'갈대의 반딧불에게 등롱 내밀기',()=>inviteFirefly(0)),
     work('fly_stone',1030,'디딤돌 위 불빛에 등롱 내밀기',()=>inviteFirefly(1),158),
     work('fly_shelf',1450,'선반 옆 불빛에 등롱 내밀기',()=>inviteFirefly(2)));
@@ -784,9 +784,10 @@ if(!CLASSIC){
     if(F.dodamDone&&!F.musoeMet)return '대장간 길로 돌아가 무쇠에게 낫 묻기';
     if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠의 시험 통과하기 · 다시 말 걸기';
     if(F.dodamDone&&!F.musoeDone&&!has('coal')&&!F.nalTalk)return '대장간 오른쪽 좌판의 날쌘에게 숯 구하기';
+    if(!F.musoeDone&&F.nalTalk&&!F.nalDone&&!has('coal')&&!has('root'))return '대장간 길 · 날쌘 좌판 옆 반짝이는 흙더미 캐기';
     if(F.musoeDone&&!G.barrier.cut)return '참나무 숲 안쪽 금줄의 덩굴을 낫으로 걷기';
     if(G.barrier.cut&&!G.boss.dead)return '당산나무 속을 올라 엉킨 칡과 만나기';
-    if(G.boss.dead&&!G.drop)return '늪가 약방의 두꺼비 할멈에게 해머루 가져가기';
+    if(G.boss.dead&&!G.drop)return '언덕 끝 약초 귀환길 → 늪가 약방의 두꺼비 할멈';
     return oldGoal();
   };
 }

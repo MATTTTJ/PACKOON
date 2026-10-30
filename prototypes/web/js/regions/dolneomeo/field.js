@@ -185,9 +185,9 @@ if(!CLASSIC){
     ['field',1790,192],['field',1840,192],['field',1890,192],
     ['village',1920,112],['field',2040,112],
   ];
-  const digMap=[['field',510],['field',930],['field',1710],['field',2310]];
+  const digMap=[['field',1330],['field',1420],['field',1600],['field',2310]];
   function placeOld(g){
-    // 확장 전 저장도 got/done을 지킨 채 옮긴다. 새 저장에서는 다시 옮기지 않는다.
+    // 기존 저장의 got/done은 유지하고 위치만 현재 배치에 맞춘다.
     let pi=0,di=0;
     for(const p of g.pickups){
       if(p.zone)continue;
@@ -195,6 +195,8 @@ if(!CLASSIC){
       const at=pickupMap[pi++];if(at)Object.assign(p,{id:'dol_old_pickup_'+(pi-1),zone:at[0],x:at[1],y:at[2]});
     }
     for(const d of g.digs){
+      const i=Number(d.id?.match(/^dol_old_dig_([0-2])$/)?.[1]);
+      if(Number.isInteger(i))Object.assign(d,{zone:digMap[i][0],x:digMap[i][1]});
       if(d.zone)continue;
       if(d.item==='seogi'){Object.assign(d,{id:'dol_seogi',zone:'cliff',x:1920});continue;}
       const at=digMap[di++];if(at)Object.assign(d,{id:'dol_old_dig_'+(di-1),zone:at[0],x:at[1]});
@@ -329,7 +331,7 @@ if(!CLASSIC){
     if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>2310)Rg.startGolem();
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
-    weather:()=>Vfx.setWeather('frost'),ambient:()=>{placeOld(G);Rg.ambient();applyMemory();},
+    weather:()=>Vfx.setWeather('frost'),ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);Rg.ambient();applyMemory();},
     drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);if(id==='gate')A.drawBridgeWork(1870-cam,GROUND);drawStonePlatforms(id);},
     drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
     weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),
@@ -337,12 +339,18 @@ if(!CLASSIC){
   };}
   Rg.startZone='gate';
   Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2800,[])};
+  // 대화가 이어지는 동안은 화자의 자리를 지키고, 끝나면 진행값으로 위치를 정한다.
+  let ppuriScene=null;
+  const ppuriVillage=()=>ppuriScene?.owner===G&&open('dlg')?
+    ppuriScene.zone==='village':!!G?.f.ppuriMet&&!G.f.ppuriPassed;
   // 복원 중에는 같은 돌쇠가 현장에 온다. 두 구역에 동시에 놓지 않는다.
   Object.defineProperty(Rg.zones.gate,'npcs',{get:()=>{
     const n=Rg.npcs?.find(n=>n.id==='dolsoe');
-    return G?.f.dolBridgeCrewHere&&n?['ppuri',{...n,x:1908,zone:'gate',props:null}]:['ppuri'];
+    const list=ppuriVillage()?[]:['ppuri'];
+    return G?.f.dolBridgeCrewHere&&n?[...list,{...n,x:1908,zone:'gate',props:null}]:list;
   }});
-  Object.defineProperty(Rg.zones.village,'npcs',{get:()=>G?.f.dolBridgeCrewHere?['nal']:['dolsoe','nal']});
+  Object.defineProperty(Rg.zones.village,'npcs',{get:()=>[
+    ...(G?.f.dolBridgeCrewHere?['nal']:['dolsoe','nal']),...(ppuriVillage()?['ppuri']:[])]});
   Rg.zones.gate.exits={right:{to:'village',toX:80}};
   Rg.zones.village.exits={left:{to:'gate',toX:2320},right:{to:'field',toX:80}};
   Rg.zones.field.exits={left:{to:'village',toX:2720}};
@@ -387,6 +395,17 @@ if(!CLASSIC){
   Rg.installExpansion=()=>{
     const loc={kkubeogi:['field',1510],dolsoe:['village',1080],nal:['village',1640],ppuri:['gate',610]};
     for(const n of Rg.npcs){const at=loc[n.id];n.zone=at[0];n.x=at[1];}
+    const ppuri=Rg.npcs.find(n=>n.id==='ppuri'),ppuriTalk=ppuri.talk;
+    Object.defineProperties(ppuri,{
+      x:{configurable:true,get:()=>ppuriVillage()?2380:610},
+      zone:{configurable:true,get:()=>ppuriVillage()?'village':'gate'},
+    });
+    ppuri.talk=()=>{
+      ppuriScene={owner:G,zone:G.zone};
+      if(G.zone==='village'&&G.f.ppuriMet&&!G.f.ppuriPassed)
+        talk([['뿔이','장승제 전에 성황당 길을 살펴 두는 중이다.\n메밀가루를 가져오면 여기서 바로 부치마.']],ppuriTalk);
+      else ppuriTalk();
+    };
     const oldBossDie=Rg.bossDie;
     Rg.bossDie=()=>{oldBossDie();placeOld(G);};
     Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.id==='dol_seogi'))G.digs.push({id:'dol_seogi',zone:'cliff',x:1920,item:'seogi',done:false});};
@@ -408,7 +427,9 @@ if(!CLASSIC){
     Rg.goal=()=>{
       if(!G.started||G.ended)return oldGoal();
       if(has('darae_yak'))return '마을 돌담의 늙은 까치에게 약즙 맡기기 · 성황당 입구로 돌아가면 마을';
+      if(!G.f.ppuriMet)return '장승 고갯길 · 뿔이에게 돌산 길 묻기';
       if(!G.f.kkuTalk)return '돌담 마을을 지나 오른쪽 메밀밭의 꾸벅이 찾아가기';
+      if(!G.f.ppuriPassed&&has('memil_powder'))return '돌담 마을 돌계단 앞 · 뿔이에게 메밀가루 건네기';
       if(G.f.ppuriPassed&&!G.boss.dead)return '장승 사이 또는 마을 돌계단 안쪽 → 성황당 끝의 돌 골렘';
       if(G.boss.dead&&!G.f.daraePicked)return '성황당 끝 샛길 → 절벽 위의 서리다래 · 흰 돌턱을 밟자';
       return oldGoal();
