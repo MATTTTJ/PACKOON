@@ -270,6 +270,15 @@ if(!CLASSIC){
       }
     }
     if(zone==='forge'){
+      // 함지박 도착 둑 아래의 개울과 낮은 가지. 걷는 바닥은 그대로 둔다.
+      const sx=430-cam;
+      px(sx-75,GROUND+3,120,13,'#73938b');px(sx-75,GROUND,120,3,'#a79669');
+      for(let i=0;i<5;i++)px(sx-65+i*23,GROUND+7+i%2*3,13,1,'#c6d7b8');
+      if(!G.f.galWheelSpoke){
+        px(sx-17,GROUND-31,4,31,'#725038');px(sx-29,GROUND-27,16,3,'#725038');
+        px(sx-25,GROUND-24,48,5,'#bd945d');px(sx-23,GROUND-23,43,1,'#dfba7d');
+        for(let i=0;i<3;i++){px(sx+11+i*3,GROUND-24,1,2,'#725032');px(sx+12+i*3,GROUND-22,1,2,'#725032');}
+      }
       for(let i=0;i<3;i++){const x=1008-cam+i*9;px(x,GROUND-90-i*8,5,3,'#d3b9a0');px(x+2,GROUND-95-i*8,4,3,'#d3b9a0');}
       for(const u of [1340,1830]){const x=u-cam;px(x-6,GROUND-11,12,11,'#514132');px(x-8,GROUND-12,16,2,'#a18b62');px(x-4,GROUND-14,8,2,'#3f3934');}
       Rg.expArt.marker(230-cam,GROUND);
@@ -302,13 +311,6 @@ if(!CLASSIC){
       px(rx-26,GROUND-4,15,3,'#775237');px(rx+12,GROUND-8,20,4,'#775237');px(rx+27,GROUND-4,11,3,'#775237');
       px(rx-14,GROUND-7,12,1,'#ae7a44');px(rx+15,GROUND-7,12,1,'#ae7a44');
       px(rx-8,GROUND-3,11,3,'#453326');px(rx-5,GROUND-4,6,1,'#a48050');
-      if(!G.f.galWheelSpoke){
-        // Floodwater left a mill spoke across a low fork, within reach from level ground.
-        const sx=450-cam;
-        px(sx-17,GROUND-31,4,31,'#725038');px(sx-29,GROUND-27,16,3,'#725038');
-        px(sx-25,GROUND-24,48,5,'#bd945d');px(sx-23,GROUND-23,43,1,'#dfba7d');
-        for(let i=0;i<3;i++){px(sx+11+i*3,GROUND-24,1,2,'#725032');px(sx+12+i*3,GROUND-22,1,2,'#725032');}
-      }
       // A trail rope hangs from living forks, pointing inward toward the sacred tree.
       const gx=1180-cam;
       for(const dx of [-31,31]){px(gx+dx,147,3,45,'#735239');px(gx+dx-8,146,19,3,'#735239');

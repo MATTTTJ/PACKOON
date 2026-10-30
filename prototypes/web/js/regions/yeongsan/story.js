@@ -397,6 +397,24 @@ Rg.npcs=[
 if(!CLASSIC){
   const zones={nal:'shelter',salgeumi:'slope',dad:'shore',sangun:'island'};
   for(const n of Rg.npcs)n.zone=zones[n.id];
+  const salg=Rg.npcs.find(n=>n.id==='salgeumi'),salgTalk=salg.talk;
+  let salgScene=null;
+  Rg.clearRouteScenes=()=>{if(!open('dlg'))salgScene=null;};
+  const location=()=>{
+    if(salgScene?.owner===G&&open('dlg'))return salgScene.at;
+    if(G.f.spring&&G.zone==='island')return ['island',330];
+    if(G.f.dadDone||G.f.spring)return ['shore',arcs()&&!G.f.yArcsSalg3?1050:G.f.spring?2365:1050];
+    return ['slope',G.salg?.x??1480];
+  };
+  Object.defineProperties(salg,{
+    zone:{configurable:true,get:()=>location()[0]},x:{configurable:true,get:()=>location()[1]},
+  });
+  salg.talk=()=>{
+    salgScene={owner:G,at:location()};
+    if(G.zone==='shore'&&G.f.dadDone&&arcs()&&!G.f.yArcsSalg3)
+      talk([['살금이','아, 아빠 만났구나…\n나, 할 말이 있어서 따라왔어.']],salgTalk);
+    else salgTalk();
+  };
   delete Rg.npcs[0].props; // 확장 산막은 지역 배경이 그린다.
 }
 

@@ -184,7 +184,10 @@ if(!CLASSIC){
     if(id==='slope')p.push({x:835,y:150,w:130},{x:1200,y:150,w:130});
     return p;
   }
-  const content=(id,kind)=>Rg.expContent?.[kind]?.[id]||[];
+  const content=(id,kind)=>{
+    const list=Rg.expContent?.[kind]?.[id]||[];
+    return id==='shore'&&kind==='wanderers'&&Rg.replyCourierHere?.()?list.filter(n=>n.id!=='y_magpie_knot'):list;
+  };
   function zone(id,npcs,exits,doors=[]){return {
     w:2600,startX:70,ground:GROUND,npcs,platforms:platforms(id),exits,doors,
     drawBack:()=>back(id),drawScenery:()=>{
@@ -202,7 +205,7 @@ if(!CLASSIC){
     },
     drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:Rg.onPickup,
     onHit:Rg.onHit,faint:Rg.faint,
-    weather:Rg.weather,weatherFront:front,ambient:()=>Rg.stepDadPose?.(),
+    weather:Rg.weather,weatherFront:front,ambient:()=>{Rg.clearRouteScenes();Rg.placeRouteSupplies();Rg.stepDadPose?.();},
     step:stepCommon,
     get examines(){return content(id,'examines');},
     get wanderers(){return content(id,'wanderers');},
