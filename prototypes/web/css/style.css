@@ -60,16 +60,17 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .vista-return{width:max-content;max-width:100%;margin:0 0 0 auto;padding:3px 10px 4px;background:rgba(26,19,15,.78);text-align:right;font-family:var(--ui);font-size:clamp(10px,1.25vw,12px)}
 
 /* 대화 시트 */
-.dialog{position:absolute;left:2.5%;right:2.5%;bottom:3.5%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(8px,1.6vw,16px);align-items:start;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;padding:clamp(8px,1.6vw,16px);box-shadow:0 6px 0 rgba(0,0,0,.35);cursor:pointer;z-index:5}
+.dialog{position:absolute;left:2.5%;right:2.5%;bottom:3.5%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(8px,1.6vw,16px);align-items:center;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;padding:clamp(8px,1.6vw,16px);box-shadow:0 6px 0 rgba(0,0,0,.35);cursor:pointer;z-index:5}
 .face{width:clamp(48px,8vw,76px);aspect-ratio:1;background:var(--hanji-2);border:2px solid var(--meok);border-radius:4px;display:grid;place-items:end center;overflow:hidden}
 .face canvas{width:100%;height:auto;image-rendering:pixelated;display:block}
-.dbody{min-width:0;display:flex;flex-direction:column;gap:4px}
+.dbody{min-width:0;display:flex;flex-direction:column;gap:4px;position:relative}
 .who{font-family:var(--ui);font-size:clamp(11px,1.4vw,14px);color:var(--dan);letter-spacing:.04em}
 .text{font-family:var(--display);font-size:clamp(13px,1.85vw,18px);line-height:1.6;max-width:62ch;min-height:2.4em}
 .choices{display:flex;flex-direction:column;gap:5px;margin-top:4px}
 .choices button{font-family:var(--display);font-size:clamp(13px,1.7vw,16px);text-align:left;background:#f8eed8;border:1px solid #cdb98f;border-radius:4px;padding:6px 12px;color:var(--meok);cursor:pointer;min-height:36px;touch-action:manipulation}
 .choices button:hover,.choices button:focus-visible{background:var(--hanji-2);border-color:var(--meok)}
-.next{align-self:flex-end;font-size:clamp(10px,1.2vw,12px);color:var(--dim)}
+/* 넘김 안내는 이름 줄 오른쪽에 둔다. 아래에 한 줄을 더 쌓지 않아 초상 위아래 여백이 같아진다 (피드백 11) */
+.next{position:absolute;top:0;right:0;font-size:clamp(10px,1.2vw,12px);color:var(--dim);line-height:1.6}
 
 /* 한지 패널 */
 .panel{position:absolute;inset:5%;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;display:flex;flex-direction:column;overflow:hidden;font-size:clamp(12px,1.5vw,14px);z-index:6;box-shadow:0 10px 30px rgba(0,0,0,.45)}
@@ -560,11 +561,11 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
 .chipbtn.warn{animation:bagWarn .9s ease-out 1;border-color:#a8322a}
 @keyframes bagWarn{0%,100%{transform:none;background:var(--hanji)}15%,45%{transform:translateX(-2px);background:#f3c9b8}30%,60%{transform:translateX(2px);background:#f3c9b8}}
 @media (prefers-reduced-motion:reduce){.chipbtn.warn{animation:none;background:#f3c9b8}}
-/* 살펴보기 작은 그림 (PA-45): 무대 오른쪽 위에 한지 액자로 잠깐 */
-.stage .peek{position:absolute;top:17%;right:3%;width:28%;max-width:240px;padding:4px;background:var(--hanji);border:3px solid var(--meok);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.35);pointer-events:none;z-index:6}
+/* 살펴보기 작은 그림 (PA-45): 무대 정중앙에 한지 액자로 잠깐. 대화창이 무대를 덮으면 덮이지 않은 위쪽의 가운데 (field.js placePeek) */
+.stage .peek{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:28%;max-width:240px;padding:4px;background:var(--hanji);border:3px solid var(--meok);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.35);pointer-events:none;z-index:6}
 .stage .peek canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
 .stage .peek.show{animation:peekIn .18s ease-out}
-@keyframes peekIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes peekIn{from{opacity:0;transform:translate(-50%,-50%) scale(.85)}to{opacity:1;transform:translate(-50%,-50%)}}
 @media (prefers-reduced-motion:reduce){.stage .peek.show{animation:none}}
 /* 잎사귀 변신 (forms.js): HUD 의 지금 모습, 휴대폰 잎사귀 버튼과 변신 고리 */
 .form-now{display:flex;align-items:center;gap:4px;color:var(--hanji);border-left:1px solid #4b3a2e;padding-left:8px;white-space:nowrap}
