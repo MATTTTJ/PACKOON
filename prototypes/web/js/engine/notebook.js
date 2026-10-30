@@ -1,12 +1,13 @@
 'use strict';
 /* 아빠의 수첩: 젊은 아빠가 남긴 그림·메모·도장 위에 아이가 이어 적는 한 권 (N·B 키, 화면의 수첩 버튼).
    동물·물건·도장 쪽에는 아빠의 줄(흐린 옛 먹, 아빠 그림)과 아이의 줄(새 먹)이 한 쪽에 같이 놓인다.
-   일기·단서·별명·손버릇·숨은 가공법·까치 답장·엄마의 쪽지·장부는 아이가 이어 적은 장이다 (그리기는 book.js).
+   불리는 이름·익힌 솜씨·숨은 가공법·장부는 아이가 이어 적은 장이다 (그리기는 book.js).
+   아빠 단서와 엄마의 쪽지는 보따리의 '중요' 탭에 있다 (bag.js). 일기·까치 답장 장은 없앴고 기록(G.diary)은 진행 판정에 그대로 쓴다.
 
    쪽 하나: {id, kind:'animal'|'item'|'stamp', name?, lines:[{who:'dad'|'me', text, when?, section}], dadDrawing?:true}
    - id 는 NPC·전투 상대·아이템 id (npcs.csv · bosses.csv · items.csv, 원본은 design/data/notebook.csv)
    - who:'dad' 이고 when 이 없으면 처음부터 보인다. when 이 있으면 learn(when) 된 뒤에 보인다
-   - section 은 notebook.csv 의 기록갈래: 관찰 줄은 그 쪽에, 손버릇·숨은 가공법 줄은 같은 이름의 장에 놓인다
+   - section 은 notebook.csv 의 기록갈래: 관찰 줄은 그 쪽에, 익힌 솜씨·숨은 가공법 줄은 같은 이름의 장에 놓인다
    - 엔진이 저절로 learn 하는 것: 'met:<npc>' 처음 말 걸기, 'fight:<상대>' 전투 시작, 'got:<아이템>' 처음 얻기,
      'like:<상대>:<아이템>' 전투에서 좋아하는 선물, 'core:<상대>' 핵심 부위가 드러남, 'calm:<상대>' 달래서 끝냄
    - 지역 기믹은 지역 코드가 learn('<키>') 를 부른다 */
@@ -68,9 +69,10 @@ function drawingFor(e,dad){
 }
 
 /* 탭: 앞의 셋은 아빠와 같이 쓰는 쪽, 나머지는 아이가 이어 적은 장. 탭 선택은 저장하지 않는다 */
+// 결정 D-30: 수첩에서 일기·까치 답장을 빼고, 아빠 단서·엄마의 쪽지는 보따리 '중요' 탭으로. 손버릇은 '익힌 솜씨' (design/data/decisions.csv)
 const NOTE_TABS=[['animal','동물',1],['item','물건',1],...(CLASSIC?[]:[['stamp','도장',1]]),
-  ['diary','일기'],['clues','아빠 단서'],['nicknames','불리는 이름'],['habits','손버릇'],['recipes','숨은 가공법'],['replies','까치 답장'],['mom','엄마의 쪽지'],['ledger','물품 장부']];
-const PAGE_SECTION={animal:'관찰',item:'관찰',stamp:'관찰',habits:'손버릇',recipes:'숨은 가공법'};
+  ['nicknames','불리는 이름'],['habits','익힌 솜씨'],['recipes','숨은 가공법'],['ledger','물품 장부']];
+const PAGE_SECTION={animal:'관찰',item:'관찰',stamp:'관찰',habits:'익힌 솜씨',recipes:'숨은 가공법'};
 let noteTab='animal';
 // 너구리의 책이 따로 있던 때의 이름(bookTab)도 같은 탭을 가리킨다. 없어진 관찰 탭은 동물 쪽으로 간다
 Object.defineProperty(window,'bookTab',{configurable:true,get:()=>noteTab,set:v=>{noteTab=v==='observations'?'animal':v;}});
@@ -89,10 +91,10 @@ function toggleBook(){toggleNote();}
 function renderBook(){renderNotebook();}
 $('btnNote').onclick=()=>{if(G.started&&!open('dlg')&&!openMinigame())toggleNote();};
 $('noteClose').onclick=closePanels;
-/* 첫 지역에 처음 들어설 때 한 번: 엄마의 쪽지 장을 펼친다 */
+/* 첫 지역에 처음 들어설 때 한 번: 보따리의 '중요' 탭에서 엄마의 쪽지를 펼친다 */
 function showMomNote(){
   if(G.f.momNoteSeen)return false;
-  G.f.momNoteSeen=true;noteTab='mom';closePanels();renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;Sound.paper();return true;
+  G.f.momNoteSeen=true;openBag('중요');Sound.paper();return true;
 }
 
 /* 보이는 것만 센다: 아빠가 적어 둔 쪽 수와 아이가 이어 적은 줄 수 */
@@ -100,14 +102,15 @@ function noteTally(){
   const pages=Object.values(NOTES);
   const dad=pages.filter(e=>(!CLASSIC||e.kind!=='stamp')&&pageShown(e)).length;
   const mine=pages.reduce((n,e)=>n+e.lines.filter(l=>l.who!=='dad'&&lineShown(l)).length+(gotItem(e)?1:0),0)
-    +G.diary.length+G.clues.length+(G.nicknames||[]).length+Object.keys(G.ledger||{}).length;
+    +(G.nicknames||[]).length+Object.keys(G.ledger||{}).length;
   return {dad,mine};
 }
 /* 쪽 하나: 아빠 그림·줄 아래에 아이의 그림·줄 */
 function notePage(e,section){
   const dad=section==='관찰'?dadLinesOf(e):[],mine=myTexts(e,section);
   const card=el('div','note-card'),pics=el('div','note-pics');
-  if(section==='관찰'&&(e.dadDrawing||(e.kind!=='item'&&npcFind(e.id)&&dad.length))){const d=drawingFor(e,true);if(d){d.classList.add('dad');pics.appendChild(d);}}
+  // 물건은 얻고 나면 내 그림(색)만 둔다. 아빠의 흐린 그림이 같이 있으면 같은 물건이 두 개로 보인다.
+  if(section==='관찰'&&!(e.kind==='item'&&mine.length)&&(e.dadDrawing||(e.kind!=='item'&&npcFind(e.id)&&dad.length))){const d=drawingFor(e,true);if(d){d.classList.add('dad');pics.appendChild(d);}}
   // 전투 상대의 수묵 그림은 한 장이면 된다
   if(mine.length&&!(pics.children.length&&ENEMIES[e.id]&&!npcFind(e.id))){const d=drawingFor(e,false);if(d){d.classList.add('me');pics.appendChild(d);}}
   if(pics.children.length)card.appendChild(pics);
@@ -126,7 +129,7 @@ function renderPages(body,section,kind){
     body.appendChild(el('div','note-region',r.name+(kind==='stamp'?' · '+stampCount(r.id)+'개':'')));
     const grid=el('div','note-grid');pages.forEach(e=>grid.appendChild(notePage(e,section)));body.appendChild(grid);
   }
-  if(!shown)body.appendChild(el('p','empty-note',section==='손버릇'?'가보로 만들어 보며 손에 남는 것을 적는다.':section==='숨은 가공법'?'재료를 직접 넣어 찾은 맛을 여기에 적는다.':'여행하며 보고 들은 것을 여기에 적는다.'));
+  if(!shown)body.appendChild(el('p','empty-note',section==='익힌 솜씨'?'가보로 만들어 보며 손에 익은 것을 적는다.':section==='숨은 가공법'?'재료를 직접 넣어 찾은 맛을 여기에 적는다.':'여행하며 보고 들은 것을 여기에 적는다.'));
 }
 function renderNotebook(){
   if(!NOTE_TABS.some(t=>t[0]===noteTab))noteTab='animal';

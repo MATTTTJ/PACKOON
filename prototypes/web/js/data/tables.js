@@ -1753,7 +1753,7 @@ const TABLES={
     {
      "who": "me",
      "text": "엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.",
-     "section": "손버릇",
+     "section": "익힌 솜씨",
      "when": "habit:jeolgu"
     }
    ],
@@ -1767,7 +1767,7 @@ const TABLES={
     {
      "who": "me",
      "text": "증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.",
-     "section": "손버릇",
+     "section": "익힌 솜씨",
      "when": "habit:maetdol"
     }
    ],
@@ -1781,7 +1781,7 @@ const TABLES={
     {
      "who": "me",
      "text": "잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.",
-     "section": "손버릇",
+     "section": "익힌 솜씨",
      "when": "habit:siru"
     }
    ],
@@ -1795,7 +1795,7 @@ const TABLES={
     {
      "who": "me",
      "text": "아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.",
-     "section": "손버릇",
+     "section": "익힌 솜씨",
      "when": "habit:yakyeon"
     }
    ],
@@ -2149,24 +2149,25 @@ const TABLES={
   "gather_help_width": 12,
   "gather_zone_start": 10,
   "gather_zone_span": 80,
-  "gather_speed_gain": 0.3,
+  "gather_ring_period": 48,
+  "gather_just_window": 7,
+  "gather_perfect_power": 2,
   "gather_cooldown": 12,
-  "gather_finish_wait": 300,
   "gather_yield": 1,
   "gather_perfect_yield": 2,
   "gather_root_hits": 3,
   "gather_root_width": 21,
   "gather_root_speed": 1.5,
-  "gather_ssari_hits": 1,
+  "gather_ssari_hits": 2,
   "gather_ssari_width": 24,
   "gather_ssari_speed": 2.2,
-  "gather_kkoe_hits": 1,
+  "gather_kkoe_hits": 2,
   "gather_kkoe_width": 26,
   "gather_kkoe_speed": 2.4,
   "gather_eoksae_hits": 2,
   "gather_eoksae_width": 21,
   "gather_eoksae_speed": 1.8,
-  "gather_seogi_hits": 1,
+  "gather_seogi_hits": 2,
   "gather_seogi_width": 26,
   "gather_seogi_speed": 2.4,
   "gather_darae_vine_hits": 2,

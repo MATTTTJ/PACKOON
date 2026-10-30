@@ -545,6 +545,7 @@ function bDraw(){
   if(!B)return;const c=bctx;c.setTransform(BDPR,0,0,BDPR,0,0);
   if(B.bonk>20)c.translate(Math.sin(B.bonk*2.3)*3,0);
   if(paper)c.drawImage(paper,0,0,LW,LH);
+  if(B.E.drawBack)B.E.drawBack(c);   // 적마다 배경 (예: 무쇠의 대장간). 판정 상자 밖 여백에만 그린다
   c.save();c.translate(LW/2,EY);c.scale(0.84,0.84);c.translate(-LW/2,-EY);
   B.E.draw(c);
   c.restore();

@@ -60,16 +60,17 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .vista-return{width:max-content;max-width:100%;margin:0 0 0 auto;padding:3px 10px 4px;background:rgba(26,19,15,.78);text-align:right;font-family:var(--ui);font-size:clamp(10px,1.25vw,12px)}
 
 /* 대화 시트 */
-.dialog{position:absolute;left:2.5%;right:2.5%;bottom:3.5%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(8px,1.6vw,16px);align-items:start;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;padding:clamp(8px,1.6vw,16px);box-shadow:0 6px 0 rgba(0,0,0,.35);cursor:pointer;z-index:5}
+.dialog{position:absolute;left:2.5%;right:2.5%;bottom:3.5%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(8px,1.6vw,16px);align-items:center;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;padding:clamp(8px,1.6vw,16px);box-shadow:0 6px 0 rgba(0,0,0,.35);cursor:pointer;z-index:5}
 .face{width:clamp(48px,8vw,76px);aspect-ratio:1;background:var(--hanji-2);border:2px solid var(--meok);border-radius:4px;display:grid;place-items:end center;overflow:hidden}
 .face canvas{width:100%;height:auto;image-rendering:pixelated;display:block}
-.dbody{min-width:0;display:flex;flex-direction:column;gap:4px}
+.dbody{min-width:0;display:flex;flex-direction:column;gap:4px;position:relative}
 .who{font-family:var(--ui);font-size:clamp(11px,1.4vw,14px);color:var(--dan);letter-spacing:.04em}
 .text{font-family:var(--display);font-size:clamp(13px,1.85vw,18px);line-height:1.6;max-width:62ch;min-height:2.4em}
 .choices{display:flex;flex-direction:column;gap:5px;margin-top:4px}
 .choices button{font-family:var(--display);font-size:clamp(13px,1.7vw,16px);text-align:left;background:#f8eed8;border:1px solid #cdb98f;border-radius:4px;padding:6px 12px;color:var(--meok);cursor:pointer;min-height:36px;touch-action:manipulation}
 .choices button:hover,.choices button:focus-visible{background:var(--hanji-2);border-color:var(--meok)}
-.next{align-self:flex-end;font-size:clamp(10px,1.2vw,12px);color:var(--dim)}
+/* 넘김 안내는 이름 줄 오른쪽에 둔다. 아래에 한 줄을 더 쌓지 않아 초상 위아래 여백이 같아진다 (피드백 11) */
+.next{position:absolute;top:0;right:0;font-size:clamp(10px,1.2vw,12px);color:var(--dim);line-height:1.6}
 
 /* 한지 패널 */
 .panel{position:absolute;inset:5%;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;display:flex;flex-direction:column;overflow:hidden;font-size:clamp(12px,1.5vw,14px);z-index:6;box-shadow:0 10px 30px rgba(0,0,0,.45)}
@@ -84,10 +85,11 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .bag-tab[aria-pressed="true"]{background:var(--meok);color:var(--hanji);border-color:var(--meok)}
 .bag-key-hint{margin-bottom:8px}
 .bag-empty{margin-top:8px}
-.bag-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+/* 보따리 칸: 예전(한 줄 6칸을 꽉 채움)의 절반쯤 크기. 휴대폰에서도 손가락 칸 48px 이상 */
+.bag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,56px));gap:5px;justify-content:start}
 .slot{position:relative;aspect-ratio:1;background:var(--hanji-2);border:1px solid #c7b48c;border-radius:4px;display:grid;place-items:center;cursor:pointer;padding:0;touch-action:manipulation}
-.slot canvas{width:66%;height:66%;image-rendering:pixelated}
-.slot .n{position:absolute;right:4px;bottom:2px;font-size:.9em;font-variant-numeric:tabular-nums}
+.slot canvas{width:62%;height:62%;image-rendering:pixelated}
+.slot .n{position:absolute;right:1px;bottom:1px;font-size:13px;font-weight:700;line-height:1.15;padding:0 3px;border-radius:3px;color:#24180f;background:rgba(255,249,232,.92);box-shadow:0 0 0 1px #c7b48c;font-variant-numeric:tabular-nums}
 .slot.sel{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
 .slot[disabled]{cursor:default;opacity:.45}
 .slot canvas.rarity-mark{position:absolute;right:2px;top:2px}
@@ -100,6 +102,9 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .rarity-gold{filter:drop-shadow(0 0 2px #e8ac2873);animation:rarity-glow 3.6s ease-in-out infinite}
 @keyframes rarity-glow{0%,100%{filter:drop-shadow(0 0 1px #e8ac2852)}50%{filter:drop-shadow(0 0 3px #e8ac2899) brightness(1.12)}}
 @media (min-width:600px){.slot canvas.rarity-mark,.detail canvas.rarity-mark{width:24px;height:24px}}
+.bag-grid .slot canvas.rarity-mark{width:13px;height:13px;right:1px;top:1px}
+.important .sub:first-child{margin-top:4px}
+.important .mom-note{margin-left:0}
 @media (prefers-reduced-motion:reduce){.rarity-gold{animation:none}}
 .btn{font-family:var(--ui);font-size:clamp(13px,1.5vw,15px);background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:4px;padding:6px 14px;cursor:pointer;min-height:38px;touch-action:manipulation}
 .btn:hover{background:#fff6e0}
@@ -310,7 +315,6 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .strike{width:100%;min-height:52px;font-size:17px}
 .bar.soil{background:linear-gradient(90deg,#3e2615,#6b4423 25%,#8b5a2b 50%,#6b4423 75%,#3e2615)}
 .bar.soil .zone{background:rgba(243,212,138,.55);border-color:#f3d48a}
-.gather .fhint b{color:var(--dan);font-weight:normal}
 
 /* 시작·끝 */
 .cover{position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,19,15,.55),rgba(26,19,15,.94) 55%);display:flex;align-items:center;justify-content:center;padding:5%;overflow:auto;z-index:8;border-radius:6px}
@@ -378,7 +382,7 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
   .choices button{font-size:15px;min-height:44px}
   .panel{inset:auto 0 0 0;height:90%;border-radius:12px 12px 0 0;border-bottom:none}
   .grip{display:block;width:40px;height:4px;border-radius:2px;background:#cdb98f;margin:8px auto 0}
-  .bag-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .bag-grid{grid-template-columns:repeat(auto-fill,minmax(48px,56px))}
   .forge{left:0;right:0;top:auto;bottom:0;border-radius:12px 12px 0 0;padding-bottom:max(18px, env(safe-area-inset-bottom, 0px))}
   .cover{border-radius:0}
   .how-touch{display:block}.how-keys{display:none}
@@ -407,7 +411,7 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
   body.in-battle .pad{z-index:16}
   .how-touch{display:block}.how-keys{display:none}
 }
-@media (max-width:560px) and (pointer:fine){.bag-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.forge{left:4%;right:4%;top:8%}}
+@media (max-width:560px) and (pointer:fine){.forge{left:4%;right:4%;top:8%}}
 @media (prefers-reduced-motion:reduce){.bossbar .fill{transition:none}}
 
 /* 지역 글을 넣는 칸: 안의 문단이 카드의 간격을 그대로 받도록 */
@@ -560,11 +564,11 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
 .chipbtn.warn{animation:bagWarn .9s ease-out 1;border-color:#a8322a}
 @keyframes bagWarn{0%,100%{transform:none;background:var(--hanji)}15%,45%{transform:translateX(-2px);background:#f3c9b8}30%,60%{transform:translateX(2px);background:#f3c9b8}}
 @media (prefers-reduced-motion:reduce){.chipbtn.warn{animation:none;background:#f3c9b8}}
-/* 살펴보기 작은 그림 (PA-45): 무대 오른쪽 위에 한지 액자로 잠깐 */
-.stage .peek{position:absolute;top:17%;right:3%;width:28%;max-width:240px;padding:4px;background:var(--hanji);border:3px solid var(--meok);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.35);pointer-events:none;z-index:6}
+/* 살펴보기 작은 그림 (PA-45): 무대 정중앙에 한지 액자로 잠깐. 대화창이 무대를 덮으면 덮이지 않은 위쪽의 가운데 (field.js placePeek) */
+.stage .peek{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:28%;max-width:240px;padding:4px;background:var(--hanji);border:3px solid var(--meok);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.35);pointer-events:none;z-index:6}
 .stage .peek canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
 .stage .peek.show{animation:peekIn .18s ease-out}
-@keyframes peekIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes peekIn{from{opacity:0;transform:translate(-50%,-50%) scale(.85)}to{opacity:1;transform:translate(-50%,-50%)}}
 @media (prefers-reduced-motion:reduce){.stage .peek.show{animation:none}}
 /* 잎사귀 변신 (forms.js): HUD 의 지금 모습, 휴대폰 잎사귀 버튼과 변신 고리 */
 .form-now{display:flex;align-items:center;gap:4px;color:var(--hanji);border-left:1px solid #4b3a2e;padding-left:8px;white-space:nowrap}

@@ -429,7 +429,7 @@ Rg.startGolem=()=>{
     }else{
       G.px=1790;G.f.faints+=res==='lose'?1:0;
       diary('d_hint','돌 골렘은 머리가 높아서 처음엔 닿지 않는다. 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
-      toast('일기에 공략을 적어 두었다. 준비되면 다시 다가가자');
+      talk([['너구리','(머리가 높아서 처음엔 안 닿아.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>toast('준비되면 다시 다가가자'));
     }
   }));
 };
@@ -467,25 +467,25 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '돌너머 마을 체험판 완료';
-  if(!F.kkuTalk)return '장승 옆 고슴도치 꾸벅이에게 말 걸기';
-  if(!F.kkuAwake)return '꾸벅이가 고개를 들 때 맞춰 말 걸기';
-  if(!F.kkuDone)return has('eoksae',3)?'꾸벅이에게 억새 건네기 (고개를 들 때)':'들판의 마른 억새를 낫으로 베기 ('+(G.inv.eoksae||0)+'/3)';
-  if(!F.ppuriMet)return '돌산 길목의 장승지기 뿔이 찾아가기';
+  if(!F.kkuTalk)return '장승 옆 꾸벅이에게 말을 걸어 보자';
+  if(!F.kkuAwake)return '꾸벅이가 고개를 들 때 말을 걸자';
+  if(!F.kkuDone)return has('eoksae',3)?'고개를 들 때 꾸벅이에게 억새를 건네자':'들판의 마른 억새를 낫으로 베자 ('+(G.inv.eoksae||0)+'/3)';
+  if(!F.ppuriMet)return '돌산 길목의 장승지기 뿔이를 찾아가자';
   if(!F.ppuriPassed){
-    if(has('memil_powder'))return '뿔이에게 메밀가루 건네기';
+    if(has('memil_powder'))return '뿔이에게 메밀가루를 건네자';
     if(!isAwake('maetdol')){
-      if(F.dolsoeTea)return '돌쇠 할배에게 돌 쌓기 다시 배우기';
-      if(has('gyeolmyeongja'))return '석수 마당의 돌쇠 할배에게 결명자 차 드리기';
-      if(!F.nalDDone)return (has('kflower')||has('gyeousari',2))?'날쌘에게 칡꽃을 보여 주고 결명자 구하기':'높은 가지의 겨우살이 2개 따서 날쌘에게 가져가기';
-      return '석수 마당의 돌쇠 할배 찾아가기';
+      if(F.dolsoeTea)return '돌쇠 할배께 돌 쌓기를 다시 배우자';
+      if(has('gyeolmyeongja'))return '석수 마당의 돌쇠 할배께 결명자 차를 드리자';
+      if(!F.nalDDone)return (has('kflower')||has('gyeousari',2))?'날쌘에게 칡꽃을 보여 주고 결명자를 구하자':'높은 가지의 겨우살이 2개를 따서 날쌘에게 가져가자';
+      return '석수 마당의 돌쇠 할배를 찾아가자';
     }
     const m=G.inv.memil||0;
-    if(m<3)return '거둔 메밀밭에서 메밀 줍기 ('+m+'/3)';
-    return '보따리를 열고 맷돌에 메밀 3개 넣어 갈기';
+    if(m<3)return '거둔 메밀밭에서 메밀을 줍자 ('+m+'/3)';
+    return '보따리를 열고 맷돌에 메밀 3개를 넣어 갈자';
   }
-  if(!G.boss.dead)return '돌산 절벽 길의 돌 골렘과 맞서기 (부수거나 달래기)';
-  if(!F.daraePicked)return '절벽 바위턱의 서리다래 따기';
-  return '보따리를 열고 맷돌에 서리다래 넣어 약즙 만들기';
+  if(!G.boss.dead)return '돌산 절벽 길의 돌 골렘과 맞서자 (부수거나 달래거나)';
+  if(!F.daraePicked)return '절벽 바위턱의 서리다래를 따자';
+  return '보따리를 열고 맷돌에 서리다래를 넣어 약즙을 만들자';
 };
 })();
 

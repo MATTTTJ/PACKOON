@@ -124,7 +124,7 @@ for(const r of heirlooms){
 const NOTES=[];const byId={};
 for(const r of notebook){
   const section=r['기록갈래'];
-  if(!['아빠 수첩','관찰','손버릇','숨은 가공법'].includes(section)||(r['쓴이']==='아빠')!==(section==='아빠 수첩'))fail('notebook.csv '+r['쪽id']+': 기록갈래와 쓴이가 맞지 않는다');
+  if(!['아빠 수첩','관찰','익힌 솜씨','숨은 가공법'].includes(section)||(r['쓴이']==='아빠')!==(section==='아빠 수첩'))fail('notebook.csv '+r['쪽id']+': 기록갈래와 쓴이가 맞지 않는다');
   let e=byId[r['쪽id']];
   if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':r['종류']==='도장'?'stamp':'animal',lines:[]};if(e.kind==='stamp'||CRAFT[e.id])e.name=r['대상'];NOTES.push(e);}
   if(r['비고'].includes('아빠 그림 있음'))e.dadDrawing=true;
@@ -204,8 +204,8 @@ const MINIGAMES=numericTable('minigames','미니게임',
     'salg_risk_distance salg_grace salg_relief_frames salg_recovery salg_risk_limit',
     'salg_startle_frames salg_max_retreat salg_retreat salg_warning_frames salg_alert_frames',
     'salg_near_distance salg_near_graze salg_near_random dad_steps gather_help_misses',
-    'gather_help_width gather_zone_start gather_zone_span gather_speed_gain gather_cooldown',
-    'gather_finish_wait gather_yield gather_perfect_yield gather_root_hits gather_root_width',
+    'gather_help_width gather_zone_start gather_zone_span gather_ring_period gather_just_window gather_cooldown',
+    'gather_perfect_power gather_yield gather_perfect_yield gather_root_hits gather_root_width',
     'gather_root_speed gather_ssari_hits gather_ssari_width gather_ssari_speed gather_kkoe_hits',
     'gather_kkoe_width gather_kkoe_speed gather_eoksae_hits gather_eoksae_width gather_eoksae_speed',
     'gather_seogi_hits gather_seogi_width gather_seogi_speed gather_darae_vine_hits gather_darae_vine_width',

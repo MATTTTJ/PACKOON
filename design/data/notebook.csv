@@ -103,10 +103,10 @@ legend_fruit,yeongsan,전설의 열매,물건,아빠,got:legend_fruit,처음 얻
 dad_stamps_galchamgol,galchamgol,젊은 아빠의 그날,도장,아빠,stamp:galchamgol:anvil,대장간 모루 밑 도장을 찾았을 때,부를 준다는 열매를 찾으러 낫날부터 벼렸다.,제안,PA-43 개발자 결정 · 젊은 날의 여행,아빠 수첩
 dad_stamps_galchamgol,galchamgol,젊은 아빠의 그날,도장,아빠,stamp:galchamgol:knot,참나무 숲 높은 가지의 도장을 찾았을 때,높이 오르면 남보다 먼저 열매를 찾을 줄 알았다.,제안,PA-43 개발자 결정 · 젊은 날의 여행,아빠 수첩
 dad_stamps_galchamgol,galchamgol,젊은 아빠의 그날,도장,아빠,stamp:galchamgol:roots,당산나무 뿌리의 도장을 찾았을 때,해를 머금은 머루. 맛은 좋다. 내가 찾는 부는 여기 없다.,제안,PA-43 개발자 결정 · 젊은 날의 여행,아빠 수첩
-jeolgu,galchamgol,엄마의 절구,물건,나,habit:jeolgu,가보로 처음 가공했을 때,엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.,확정,PA-43 크래프팅,손버릇
-maetdol,dolneomeo,증조할아버지의 맷돌,물건,나,habit:maetdol,가보로 처음 가공했을 때,증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.,확정,PA-43 크래프팅,손버릇
-siru,jangteo,잔칫날의 시루,물건,나,habit:siru,가보로 처음 가공했을 때,잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.,확정,PA-43 크래프팅,손버릇
-yakyeon,yeongsan,아빠의 약연,물건,나,habit:yakyeon,가보로 처음 가공했을 때,아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.,확정,PA-43 크래프팅,손버릇
+jeolgu,galchamgol,엄마의 절구,물건,나,habit:jeolgu,가보로 처음 가공했을 때,엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.,확정,PA-43 크래프팅,익힌 솜씨
+maetdol,dolneomeo,증조할아버지의 맷돌,물건,나,habit:maetdol,가보로 처음 가공했을 때,증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.,확정,PA-43 크래프팅,익힌 솜씨
+siru,jangteo,잔칫날의 시루,물건,나,habit:siru,가보로 처음 가공했을 때,잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.,확정,PA-43 크래프팅,익힌 솜씨
+yakyeon,yeongsan,아빠의 약연,물건,나,habit:yakyeon,가보로 처음 가공했을 때,아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.,확정,PA-43 크래프팅,익힌 솜씨
 sesame_salt,galchamgol,깨소금,물건,나,recipe:sesame_salt,숨은 가공법을 직접 찾아 만들었을 때,깨와 소금을 함께 찧으니 깨소금이 됐다. 엄마가 밥상에 놓던 냄새다.,확정,PA-43 크래프팅,숨은 가공법
 mung_batter,jangteo,녹두 빈대떡 반죽,물건,나,recipe:mung_batter,숨은 가공법을 직접 찾아 만들었을 때,녹두에 참기름을 더해 갈았다. 장터에서 먹던 빈대떡 반죽이 됐다.,확정,PA-43 크래프팅,숨은 가공법
 rainbow_tteok,yeongsan,무지개떡,물건,나,recipe:rainbow_tteok,숨은 가공법을 직접 찾아 만들었을 때,단풍골 가루에 장터 팥과 영산 열매를 포갰다. 세 계절이 한 떡이 됐다.,확정,PA-43 크래프팅,숨은 가공법

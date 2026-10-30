@@ -365,7 +365,7 @@ Rg.startGangcheol=()=>{
     }else{
       G.px=1960;G.f.faints+=res==='lose'?1:0;
       diary('y_hint','강철이는 입으로 서리를 뿜고, 몸통으로 조여 오고, 꼬리로 고드름을 뿌린다. 머리는 몸통을 풀어야 드러난다. 따뜻한 것을 그리워한다는 말이 있다.');
-      toast('일기에 공략을 적어 두었다. 준비되면 다시 호수로');
+      talk([['너구리','(머리는 몸통을 풀어야 드러나.\n따뜻한 걸 그리워한다는 말이 있었지.)']],()=>toast('준비되면 다시 호수로'));
     }
   }));
 };
@@ -474,22 +474,22 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '너구리 보부상 · 끝';
-  if(!F.nalYTalk)return '산막의 불빛 쪽 날쌘에게 가 보기';
+  if(!F.nalYTalk)return '산막 불빛 쪽의 날쌘에게 가 보자';
   if(!F.seolpi){
-    if(vineOK()&&bindOK())return '날쌘에게 설피 재료 건네기';
-    if(!vineOK())return '눈 덮인 덤불에서 다래 덩굴을 낫으로 베기 ('+(G.inv.darae_vine||0)+'/2)';
-    return '산막 처마 밑 짚단에서 짚 한 줌 줍기';
+    if(vineOK()&&bindOK())return '날쌘에게 설피 재료를 건네자';
+    if(!vineOK())return '눈 덮인 덤불에서 다래 덩굴을 낫으로 베자 ('+(G.inv.darae_vine||0)+'/2)';
+    return '산막 처마 밑 짚단에서 짚 한 줌을 빼 오자';
   }
-  if(!F.salgMet)return '마가목 비탈 너머 고라니 살금이에게 살금살금 다가가기';
-  if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매 건네기 (귀를 세울 때는 멈추기)':'비탈의 마가목 열매 따기 ('+m+'/3)';}
-  if(!F.dadMet)return '얼어붙은 비탈을 지나 호숫가로';
-  if(!F.dadDone)return '아빠의 몸짓 읽기 (아빠에게 다시 말 걸기)';
-  if(!F.sangunMet)return CLASSIC?'호숫가의 산군 할아버지 찾아가기':'호숫가 선착장에서 얼음길을 건너 신목 섬의 산군 할아버지 만나기';
-  if(!G.boss.dead)return '언 호수의 강철이와 맞서기 (부수거나 달래기)';
-  if(!F.fruitGot)return '신목의 전설의 열매 따기';
-  if(!F.nameGiven)return '산군 할아버지에게 셈하러 가기';
-  if(F.yakDone)return '봄길·약연 가공 더 둘러보기 · 준비되면 아빠나 산군에게 말 걸어 귀향';
-  return '아빠와 손을 포개 약연 굴리기';
+  if(!F.salgMet)return '마가목 비탈 너머 살금이에게 살금살금 다가가자';
+  if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매를 건네자 (귀를 세우면 멈추고)':'비탈의 마가목 열매를 따자 ('+m+'/3)';}
+  if(!F.dadMet)return '얼어붙은 비탈을 지나 호숫가로 가자';
+  if(!F.dadDone)return '아빠의 몸짓을 읽어 보자 (아빠에게 다시 말을 걸면 된다)';
+  if(!F.sangunMet)return CLASSIC?'호숫가의 산군 할아버지를 찾아가자':'선착장에서 얼음길을 건너 신목 섬의 산군 할아버지를 만나자';
+  if(!G.boss.dead)return '언 호수의 강철이와 맞서자 (부수거나 달래거나)';
+  if(!F.fruitGot)return '신목에서 전설의 열매를 따자';
+  if(!F.nameGiven)return '산군 할아버지께 셈하러 가자';
+  if(F.yakDone)return '봄길과 약연 가공을 더 둘러보자 · 다 되면 아빠나 산군 할아버지께 말씀드리고 집으로';
+  return '아빠와 손을 포개 약연을 굴리자';
 };
 })();
 

@@ -769,7 +769,7 @@ Rg.startDokkaebi=()=>{
     }else{
       G.px=Rg.STORE_X-70;G.f.faints+=res==='lose'?1:0;
       diary('j_hint','헌물 도깨비는 빗자루로 쓸고, 키로 콩을 뿌리고, 멍석을 말아 온다. 헌물을 하나 부수면 도깨비불이 드러난다. 도깨비는 메밀을 좋아한다는 말이 있다.');
-      toast('일기에 공략을 적어 두었다. 준비되면 다시 창고 문 앞으로');
+      talk([['너구리','(헌물을 하나 부수면 도깨비불이 드러나.\n메밀을 좋아한다는 말도 있었지.)']],()=>toast('준비되면 다시 창고 문 앞으로'));
     }
   });encounter=B;});
 };
@@ -852,27 +852,27 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '큰 장터 체험판 완료';
-  const toNight=s=>night()?s:'밤이 되면 '+s+' (숙소 마루에서 쉬기)';
-  if(!F.bueongNight)return night()?'처마 밑의 부엉 영감에게 말 걸기 (밤에는 깨어 있다)':knows('bueong:night')?'숙소 마루에서 쉬며 해가 지기를 기다리기':'보부상 숙소의 부엉 영감 찾아가기';
+  const toNight=s=>night()?s:'밤이 되면 '+s+' (숙소 마루에서 쉬자)';
+  if(!F.bueongNight)return night()?'처마 밑의 부엉 영감님께 말을 걸어 보자 (밤에는 깨어 계신다)':knows('bueong:night')?'숙소 마루에서 쉬며 해가 지기를 기다리자':'보부상 숙소의 부엉 영감님을 찾아가자';
   if(!F.bueongDone){
-    if(has('patsirutteok'))return toNight('부엉 영감에게 팥시루떡 올리기');
+    if(has('patsirutteok'))return toNight('부엉 영감님께 팥시루떡을 올리자');
     if(!isAwake('siru')){
-      if(!F.morakMet)return '김이 오르는 떡집의 모락 찾아가기';
-      if(F.morakPowder)return '모락에게 김 올리기 다시 배우기';
+      if(!F.morakMet)return '김이 오르는 떡집의 모락을 찾아가자';
+      if(F.morakPowder)return '모락에게 김 올리기를 다시 배우자';
       const sp=G.inv.ssal_powder||0,s=G.inv.ssal||0;
-      if(sp>=3)return '모락에게 쌀가루 3 건네기';
-      if(sp+s>=3)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루 갈기 ('+sp+'/3)';
-      if(!F.yeotMet)return '엿 수레의 엿방울에게 쌀 구하기';
+      if(sp>=3)return '모락에게 쌀가루 3개를 건네자';
+      if(sp+s>=3)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자 ('+sp+'/3)';
+      if(!F.yeotMet)return '엿 수레의 엿방울에게 쌀을 구하자';
       const sb=G.inv.solbang||0;
-      return sb>=5?'엿방울에게 솔방울 건네기':'뒷산 소나무 숲에서 솔방울 줍기 ('+sb+'/5)';
+      return sb>=5?'엿방울에게 솔방울을 건네자':'뒷산 소나무 숲에서 솔방울을 줍자 ('+sb+'/5)';
     }
-    if(!has('pat'))return CLASSIC?'숙소 앞 날쌘에게 팥 구하기':'장터 거리 · 날쌘에게 팥 구하기';
-    if((G.inv.ssal_powder||0)<2)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루 갈기';
-    return '보따리를 열고 시루에 쌀가루 2와 팥 1 넣어 찌기';
+    if(!has('pat'))return CLASSIC?'숙소 앞 날쌘에게 팥을 구하자':'장터 거리 · 날쌘에게 팥을 구하자';
+    if((G.inv.ssal_powder||0)<2)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
+    return '보따리를 열고 시루에 쌀가루 2개와 팥 1개를 넣어 찌자';
   }
-  if(!G.boss.dead)return toNight('숙소 창고 문 앞을 지키기');
-  if(!CLASSIC&&has('hongsi_tteok'))return '숙소 처마의 까치에게 홍시 약떡 보내기';
-  if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루 갈기';
-  return '보따리를 열고 시루에 눈홍시와 쌀가루 넣어 홍시 약떡 찌기';
+  if(!G.boss.dead)return toNight('숙소 창고 문 앞을 지키자');
+  if(!CLASSIC&&has('hongsi_tteok'))return '숙소 처마의 까치 할머니께 홍시 약떡을 맡기자';
+  if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
+  return '보따리를 열고 시루에 눈홍시와 쌀가루를 넣어 홍시 약떡을 찌자';
 };
 })();

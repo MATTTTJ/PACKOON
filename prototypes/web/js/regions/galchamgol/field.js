@@ -122,7 +122,7 @@ Rg.onHit=(x1,x2,dmg,f)=>{
 Rg.faint=()=>{
   if(G.px>1930){G.px=1905;
     diary('hint','엉킨 칡에게 밀려났다. 덩굴 채찍은 뛰어서 피하고, 땅에 그림자가 비치면 자리를 옮길 것.');
-    toast('엉킨 칡에게 밀려났다… 일기에 공략을 적어 두었다');
+    talk([['너구리','(밀려났다… 덩굴 채찍은 뛰어서 피하고,\n땅에 그림자가 비치면 자리를 옮기자.)']]);
   }else{G.px=Math.max(60,G.barrier.x-30);toast('칡덩굴에 밀려 물러났다');}
 };
 Rg.bossDie=()=>{
@@ -165,13 +165,17 @@ if(!CLASSIC){
   const path=(x,to,toX,label,extra={})=>({x,to,toX,label,draw:sign,...extra});
   const hasSickle=()=>G.tool==='sickle';
   const cutPath=()=>G.barrier.cut;
+  // 칡 덩굴로 막힌 길: 아이가 아는 만큼만 말한다 (도담에게 대장간 이야기를 들었는지, 낫을 받았는지).
+  const vineSay=()=>G.tool==='sickle'?'덩굴이 숲 안쪽 금줄에서부터 뻗어 왔네.\n거기 덩굴부터 낫으로 걷자.'
+    :G.f.dodamDone?'곡괭이로는 안 끊기겠어.\n무쇠 삼촌한테 낫을 얻어야겠어.':'질긴 칡덩굴이 꽁꽁 감았네.\n날 선 연장이 있어야겠어.';
+  const bankSay=()=>G.f.dodamDone?'마른 덩굴이 둑길을 덮었네.\n무쇠 삼촌 낫이면 걷을 수 있겠어.':'마른 덩굴이 둑길을 덮었네.\n날 선 연장이 있어야겠어.';
   Rg.zones={
     village:{...basic('village',2600,[{x:490,y:160,w:80},{x:565,y:126,w:80},
       {x:1370,y:160,w:85},{x:1450,y:126,w:70},{x:1890,y:158,w:95},{x:1980,y:124,w:80}]),
       exits:{right:{to:'forge',toX:70}},
       doors:[path(1150,'forge',380,'함지박에 올라 개울 따라가기',{travel:'stream',draw:A.streamDoor}),
         path(1710,'hill',180,'물 건너 당산나무 쪽으로',{travel:'depth',need:cutPath,
-          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',draw:A.treeDoor,drawBlocked:blocked,
+          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',blockedLabel:'칡 덩굴',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:blocked,
           formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 넘기'})],
       // 다람쥐의 잊은 몫 (PA-47, 다람쥐 모습에만 보인다)
       digs:[{id:'gal_cache_village',x:880,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
@@ -184,7 +188,7 @@ if(!CLASSIC){
       npcs:['musoe','nal'],exits:{left:{to:'village',toX:2500},right:{to:'forest',toX:70}},
       doors:[path(380,'village',1150,'개울 둑길로 돌아가기'),
         path(1860,'marsh',2040,'약재 나르는 둑길로 약방에',{need:hasSickle,
-          reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',drawBlocked:blocked})],
+          reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',blockedLabel:'마른 덩굴',blockedSay:bankSay,drawBlocked:blocked})],
       stamps:[{id:'anvil',x:1070,note:'stamp:galchamgol:anvil',label:'모루 밑 눌린 자국 살피기'}],
     },
     forest:{...basic('forest',2800,[{x:410,y:160,w:100},{x:500,y:126,w:80},
@@ -196,7 +200,7 @@ if(!CLASSIC){
         {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false},
         {id:'gal_branch_acorn_1',x:770,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:790,y:96,item:'acorn',got:false}],
       doors:[path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
-          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠에게 낫을 받아 J로 걷자.',draw:A.treeDoor,drawBlocked:blocked,
+          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠에게 낫을 받아 J로 걷자.',blockedLabel:'칡 덩굴',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:blocked,
           formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 나무 속으로'})],
       // 다람쥐만 오르는 높은 참나무 가지와 잊은 몫 (PA-47 선택 자리)
       climbs:[{x:752,top:96}],
@@ -209,7 +213,7 @@ if(!CLASSIC){
       {x:980,y:158,w:100},{x:1070,y:124,w:75},{x:1850,y:160,w:85},{x:1935,y:126,w:75}]),
       npcs:['toad'],exits:{left:{to:'forest',toX:2700}},
       doors:[path(2040,'forge',1860,'약재 나르는 둑길로 대장간에',{need:hasSickle,
-        reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',drawBlocked:blocked})],
+        reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',blockedLabel:'마른 덩굴',blockedSay:bankSay,drawBlocked:blocked})],
       // 선반 뒤 작은 채집 무리. 전부 선택 재료이며, 필수 교환 몫은 앞 구역에 있다.
       pickups:[],
     },
