@@ -129,9 +129,11 @@ function saveLabel(s){
 /* 저장 여부에 따라 시작 화면과 수첩의 버튼 글을 맞춘다 */
 function refreshSaveUI(){
   const s=readSave();
-  $('btnContinue').hidden=!s;$('saveMeta').hidden=!s;
+  // 같은 여행에서 다음 지역으로 넘어온 첫 화면이면 출발 버튼 하나로 충분하다. 저장은 지금보다 앞선 지점이다.
+  const same=!!s&&!s.invalid&&s.G?.runId===G.runId;
+  $('btnContinue').hidden=!s||same;$('saveMeta').hidden=!s||same;
   if(s)$('saveMeta').textContent='저장된 진행: '+saveLabel(s);
-  const other=s&&s.G.runId!==G.runId;   // 화면의 게임이 저장된 게임과 다르면 새로 시작하는 셈
+  const other=!!s&&!same;   // 화면의 게임이 저장된 게임과 다르면 새로 시작하는 셈
   $('btnStart').className=other?'btn':'btn primary';
   $('saveInfo').textContent=s?'마지막 저장: '+saveLabel(s):'아직 저장하지 않았다';
   disarm($('btnStart'));disarm($('btnNewGame'));disarm($('btnRestart'));
