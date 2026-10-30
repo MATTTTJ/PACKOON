@@ -149,6 +149,9 @@ let last=0,acc=0;
 function loop(t){
   if(!last)last=t;acc+=Math.min(100,t-last);last=t;
   while(acc>=1000/60){step();bStep();acc-=1000/60;}
+  // 대화·선택지·전투·손일의 콜백이 바꾼 진행을 다음 화면에 함께 반영한다.
+  // 전투 중에는 모바일 목표 칸의 전투 안내를 유지한다.
+  if(!B&&!inkOn)refreshGoal();
   GameMusic.update();
   if(B&&!$('battle').hidden)bDraw();else draw();requestAnimationFrame(loop);
 }
