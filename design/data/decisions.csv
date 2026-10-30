@@ -24,6 +24,9 @@ D-22,이야기,"엿방울: 아빠가 엿을 맡기며 ""그 애가 오거든 한
 D-23,이야기,"부엉 영감: 아빠 짐 보관 값을 안 받는 건 ""네 아비 셈은 장부에 넉넉히 남아 있다""여서다. 장부 밖의 셈(엄마의 거래)은 모른다",채택,개발자(Claude),있음,design/proposals/characters.md 부엉 영감,jangteo bueongGive·bueongLedger·bueongPromise
 D-24,변신,"잎사귀를 풀피리처럼 입에 대고 불어 변신하고 되돌아온다 (대장 확정: 잎사귀, 머리에 얹지 않음)",채택,개발자(Claude F),있음,design/proposals/leaf-transform.md,engine/forms.js
 D-25,변신,"변신 세부: 동물별 필드 능력과 수치, 열리는 때, 낯선 손님 대사와 기믹 (leaf-transform.md의 표시 없는 세부)",채택,개발자(Claude F),있음,design/proposals/leaf-transform.md,"engine/forms.js, regions/*/strangers.js, tuning.csv"
+D-26,이야기,"부모 이름은 쓰지 않는다. 아이도 인물들도 ""아빠""·""엄마""(어른은 ""네 아비""·""네 어미"")로만 부른다. 이름이 가장 귀한 말이라는 영산의 셈과 맞춘다",채택,개발자(Claude),없음,design/proposals/characters.md,부모 이름을 정하면 산군·엄마 대사의 이름 주제와 함께 본다 (PA-8)
+D-27,이야기,"주인공 성격: 겁이 나면 허세로 버티고(허세 혼잣말), 남의 사정을 먼저 묻는 아이(모락의 ""아주머니 저녁은요?""). 어른에게 존댓말(D-21). 어른스러운 교훈은 말하지 않는다",채택,개발자(Claude),없음,design/proposals/characters.md,너구리 대사 (PA-8)
+D-28,지역,"2~4지역(돌너머·큰 장터·영산) 시나리오 문서의 ""제안"" 진행 흐름을 그대로 채택해 플레이하며 고친다",채택,개발자(Claude)·사용자 지시,없음,design/narrative/*-scenario.md,그 지역 시나리오와 코드 (PA-5)
 D-90,이야기,"강철이의 새 이름 ""서리무기""",대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,"대장 답으로 ""강철이"" 유지"
 D-91,시스템,레어도 이름 순우리말(흔한 것·쓸 만한 것·귀한 것·보배·전설),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 하품·중품·상품·최상품·천하일품
 D-92,시스템,기록 나누기(아빠의 수첩과 아이의 책),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 아빠의 수첩 한 권
