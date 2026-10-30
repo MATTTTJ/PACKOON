@@ -246,7 +246,7 @@ const mark=(x,y)=>{
 };
 const fixture=(id,name,x,talkFn)=>({id,name,x,prompt:name,talk:talkFn,draw:mark,peek:true});
 function survey(i){
-  if(i===3&&!G.f.dadDone){talk([['너구리','호숫가에 앉은 너구리가 이쪽을 보고 있어. 얼음길에 오르기 전에 가 보자.']]);return;}
+  if(i===3&&!G.f.dadDone){talk([['너구리','호숫가에 앉은 너구리가 이쪽을 보고 있어.\n얼음길에 오르기 전에 가 보자.']]);return;}
   if(G.f['yIce'+i]){talk([['너구리','여긴 두드려 봤어. 표시한 가지를 따라가면 돼.']]);return;}
   const lines={
     1:[['너구리','(가늘고 긴 가지를 주웠다. 발은 마른 돌 위에 둔다.)'],['너구리','흰 얼음과 갈대 곁이 다르게 울린다. 색만 보고 밟으면 안 되겠네.']],
@@ -265,7 +265,7 @@ function prepareBoat(part){
   if(part==='launch'&&(!G.f.yBoatOar||!G.f.yBoatRope)){
     talk([['낚시하는 수달','둑에 둔 노부터 챙기자. 조금 앞에 있어.'],['살금이','노 옆 고리도… 보고 와 줘. 내가 배를 잡고 있을게.']]);return;
   }
-  talk([['낚시하는 수달',part==='oar'?'겨울엔 얼음 구멍만 봤지. 이제 같이 호수에 나가자. 노는 여기 올려 뒀어.':part==='rope'?(G.f.yParcelKnot?'얼음이 잡아 주던 배를 이제 이 끈이 잡아 줘야지. 까치한테 배운 고리 기억해?':'얼음이 잡아 주던 배를 이제 이 끈이 잡아 줘야지. 나중에 풀기 쉬운 고리를 만들자.'):'우린 겨울마다 배를 둑에 올려 둬. 이번엔 네가 뒤를 받쳐 줄래?'],
+  talk([['낚시하는 수달',part==='oar'?'겨울엔 얼음 구멍만 봤지.\n이제 같이 호수에 나가자. 노는 여기 올려 뒀어.':part==='rope'?(G.f.yParcelKnot?'얼음이 잡아 주던 배를 이제 이 끈이 잡아 줘야지.\n까치한테 배운 고리 기억해?':'얼음이 잡아 주던 배를 이제 이 끈이 잡아 줘야지.\n나중에 풀기 쉬운 고리를 만들자.'):'우린 겨울마다 배를 둑에 올려 둬. 이번엔 네가 뒤를 받쳐 줄래?'],
     ['살금이','나, 나도 도울게. 물가 돌이라면 내가 잘 아니까.']],()=>Rg.playActivity(part,()=>{
       G.f[key]=true;diary('y_boat_'+part,descriptions[part].title+'를 수달, 살금이와 함께 했다. 겨울에 살핀 얼음길이 봄 물길로 바뀌었다.');
       talk([['너구리',part==='launch'?'배가 떴다! 겨울에 못 본 호수도 보러 가자.':'됐다. 다음 자리도 같이 보자.']]);
@@ -354,7 +354,7 @@ function install(){
   }));
   shore.npcs.push(fixture('y_home_parcel','까치에게 집으로 보낼 것 묻기',570,()=>{
     if(!G.f.spring){talk([['늙은 까치','호수 일이 끝나면 다시 들르렴.\n남쪽으로 갈 때 네 짐도 실어 주마.']]);return;}
-    if(!Rg.offerHomeGift?.())talk([['늙은 까치','집에 갈 때 빨간 열매도 챙겨 가거라. 엄마 손에 네가 쥐여 드려도 좋지.']]);
+    if(!Rg.offerHomeGift?.())talk([['늙은 까치','집에 갈 때 빨간 열매도 챙겨 가거라.\n엄마 손에 네가 쥐여 드려도 좋지.']]);
   }));
   for(const id of ['shelter','snow','shore']){
     const z=Rg.zones[id],npcs=z.npcs.slice(),oldStep=z.step;
