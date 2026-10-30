@@ -438,7 +438,7 @@ if(!CLASSIC){
       if(regionCompleted(Rg.id))return;
       G.f.yakMade=true;
       diary('d_end','깨어난 맷돌로 서리다래를 갈았다. 마을 돌담의 늙은 까치에게 내가 만든 약즙을 맡겼다.');
-      talk([['너구리','까치야, 엄마 약이야.\n남쪽 단풍골 너머 우리 집으로 부탁해.'],['늙은 까치','남쪽 집으로. 단단히 묶었구나.\n다녀오마.']],()=>Rg.finishHomeDelivery());
+      talk([['너구리','까치 할머니, 엄마 약이에요.\n단풍골 우리 집으로 부탁해요.'],['늙은 까치','남쪽 집으로. 단단히 묶었구나.\n다녀오마.']],()=>Rg.finishHomeDelivery());
     };
     const oldGoal=Rg.goal;
     Rg.goal=()=>{

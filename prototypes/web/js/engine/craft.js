@@ -146,7 +146,7 @@ function tasteOf(who,item){return TABLES.TASTES[who]?.[item]||null;}
 function isHomeCraft(item){return ITEMS[item]?.region===G.region&&Object.values(RECIPES).some(list=>list.some(r=>r.optional&&r.out===item));}
 function sendCraftHome(item){
   if(!isHomeCraft(item)||!sendHomeGift(G.region,item))return false;
-  closePanels();talk([['너구리',ITEMS[item].n+' 하나야. 엄마한테 내가 만들었다고 전해 줘.']]);return true;
+  closePanels();talk([['너구리',ITEMS[item].n+' 하나예요. 엄마한테 제가 만들었다고 전해 주세요.']]);return true;
 }
 function giftTaste(who,item){
   const taste=tasteOf(who,item);if(!taste||!G||!has(item))return null;
