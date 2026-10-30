@@ -430,7 +430,7 @@ if(!CLASSIC){
       G.px=2275;
       inkTransition('전투',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
         if(res==='win'||res==='calm'){
-          if(res==='calm'){G.f.golemCalm=true;diary('d_calm','아빠가 올리다 만 소원 돌을 성황당 꼭대기에 대신 올려 주었다. 돌 골렘이 조용히 내려앉았다.');}
+          if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
           Rg.bossDie();
         }else{G.px=2240;G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
           talk([['너구리','(머리가 높아서 처음엔 안 닿아.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>toast('성황당 앞에서 숨을 골랐다. 준비되면 다시 다가가자.'));}
@@ -440,7 +440,7 @@ if(!CLASSIC){
       if(regionCompleted(Rg.id))return;
       G.f.yakMade=true;
       diary('d_end','깨어난 맷돌로 서리다래를 갈았다. 마을 돌담의 늙은 까치에게 내가 만든 약즙을 맡겼다.');
-      talk([['너구리','까치 할머니, 엄마 약이에요.\n단풍골 우리 집으로 부탁해요.'],['늙은 까치','남쪽 집으로. 단단히 묶었구나.\n다녀오마.']],()=>Rg.finishHomeDelivery());
+      talk([['너구리','(약즙 통을 까치 발에 단단히 묶었다.)'],['너구리','엄마한테… 제가 만들었다고 전해 주세요.'],['늙은 까치','오냐. 그 말까지 단단히 묶어 가마.']],()=>Rg.finishHomeDelivery());
     };
     const oldGoal=Rg.goal;
     Rg.goal=()=>{

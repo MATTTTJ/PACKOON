@@ -89,8 +89,8 @@ Rg.faint=()=>{G.px=Math.max(60,G.px-80);toast('눈길에 미끄러져 물러났�
 Rg.bossDie=calm=>{
   G.boss.dead=true;addItem('nunhongsi',1);
   if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
-  diary('j_boss','창고를 털던 범인은 낡은 빗자루·키·멍석에 깃든 헌물 도깨비였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':''));
-  toast('눈홍시를 되찾았다! 시루로 홍시 약떡을 찌자');refreshGoal();
+  diary('j_boss','창고를 털던 범인은 낡은 빗자루·키·멍석에 깃든 헌물 도깨비였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.'));
+  toast('눈홍시를 얻었다! 시루로 홍시 약떡을 찌자');refreshGoal();
 };
 Rg.STORE_X=STORE_X;
 
@@ -138,8 +138,8 @@ if(!CLASSIC){
       if(has('hongsi_tteok')&&!G.f.hongsiMade&&id==='inn'&&Math.abs(G.px-1530)<45)Rg.sendMedicine();
       if(id==='warehouse'&&G.f.guard&&night()&&!G.boss.dead&&Math.abs(G.px-Rg.STORE_X)<24)Rg.startDokkaebi();
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
-        G.f.jxHubChanged=true;diary('jx_hub','시루를 깨워 돌아오니 떡집 앞 멈췄던 줄이 줄었다. 모락의 김이 골목 끝까지 번졌다.');
-        toast('떡집 앞 줄이 줄었다. 밤에는 접힌 좌판 사이로 숙소에 갈 수 있다.');
+        G.f.jxHubChanged=true;diary('jx_hub','모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.');
+        toast('떡집 앞 줄이 짧아졌다. 밤에는 접힌 좌판 사이로 숙소에 갈 수 있다.');
       }
     },
   });
@@ -195,7 +195,7 @@ if(!CLASSIC){
         {x:2180,to:'pine',toX:70,label:'굴뚝 뒤 소나무 숲으로',draw:peg},
         {x:2040,to:'inn',toX:1510,label:'접힌 좌판 사이, 숙소 지름길',need:night,reason:'낮에는 좌판이 골목을 막는다. 밤이면 접힌다.',draw:peg,drawBlocked:shutter,
           formPass:'squirrel',formLabel:'다람쥐로 좌판 밑 지나기'},
-        {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'입구의 아이가 연을 풀면 처마길을 알려 준다.',draw:peg}],
+        {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'입구 아이의 연을 풀어 주면 처마길을 알려 줄 거야.',draw:peg}],
       get wanderers(){return [...E.wanderers.street,yutBoard,...nightLanterns('street')];},examines:E.examines.street,
     },
     inn:{...common('inn'),name:TABLES.ZONES.jangteo.inn,w:2600,npcs:['bueong','maru'],

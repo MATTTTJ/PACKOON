@@ -29,7 +29,7 @@ Rg.strangers={
     line:'어이, 처음 보는 손님이네.\n여기 물건은 값이 좀 나가.',
     price:2,trades:[{give:{acorn:2},get:{salt:1}},{give:{root:1},get:{sesame:1}}],swapPool:['salt','sesame','vine'],
     talk(){
-      if(once('gal_nal_price'))diary('gal_nal_price','낯선 손님으로 가니 날쌘이 값을 두 배로 불렀다. 나한테는 값을 부풀린 적이 없었는데.');
+      if(once('gal_nal_price'))diary('gal_nal_price','낯선 손님으로 가니 날쌘이 값이 좀 나간다며 세게 불렀다. 처음 보는 손님한테는 저렇구나.');
       return false;
     }},
 };

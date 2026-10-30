@@ -1,6 +1,6 @@
 ﻿쪽id,지역,대상,종류,쓴이,알게되는키,알게되는때,내용,상태,비고,기록갈래
-dodam,galchamgol,도담,동물,나,met:dodam,처음 말을 걸 때,"단풍골 숲의 다람쥐. 아빠 모자를 알아봤다. 말이 많아서, 물으면 아는 걸 다 말해 준다.",제안,,관찰
-nal,galchamgol,날쌘,동물,아빠,,처음부터,족제비 떠돌이 보부상. 깍쟁이다. 얕보는 소리를 들으면 오기로 덤을 얹는다.,제안,,아빠 수첩
+dodam,galchamgol,도담,동물,나,met:dodam,처음 말을 걸 때,"단풍골 숲의 다람쥐. 아빠 모자를 알아봤다. 말이 많아서, 묻지 않은 것까지 말해 준다.",제안,,관찰
+nal,galchamgol,날쌘,동물,아빠,,처음부터,족제비 떠돌이 보부상. 다들 깍쟁이라 하지만 셈은 바르다. 제 물건을 깎아내리면 오기로 덤을 얹는다.,제안,,아빠 수첩
 nal,galchamgol,날쌘,동물,나,nal:bluff-paid,허세를 부린 뒤 덤을 받았을 때,정말이었다. 촌구석이라고 허세를 부렸더니 숯을 하나 더 줬다.,제안,,관찰
 nal,galchamgol,날쌘,동물,나,nal:yakyeon,아빠의 약연을 내밀었을 때,아빠의 약연은 받지 않는다. 남의 집 가업 물건은 안 받는 게 보부상 법도라고.,제안,,관찰
 nal,galchamgol,날쌘,동물,나,nal:dolneomeo,돌너머에서 날쌘과 거래했을 때,돌너머에서는 단풍골 칡꽃을 귀하게 쳤다. 같은 물건도 마을마다 값이 다르다.,제안,,관찰
@@ -25,7 +25,7 @@ ssari,galchamgol,싸리버섯,물건,나,got:ssari,처음 얻을 때,(items.csv 
 ssari,galchamgol,싸리버섯,물건,아빠,,처음부터,밑동을 단번에 꺾을 것. 갓이 부서지면 값이 떨어진다.,제안,,아빠 수첩
 kkoe,galchamgol,꾀꼬리버섯,물건,나,got:kkoe,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 meoru,galchamgol,해머루,물건,나,got:meoru,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
-meoru,galchamgol,해머루,물건,아빠,,처음부터,당산나무 꼭대기의 머루. 해를 머금은 듯 알이 따뜻하다.,제안,,아빠 수첩
+meoru,galchamgol,해머루,물건,아빠,,처음부터,해를 머금은 듯 알이 따뜻한 머루. 달여 먹이면 앓던 몸도 기운을 차린다.,제안,,아빠 수첩
 meoru,galchamgol,해머루,물건,아빠,got:meoru,처음 얻을 때,(그림 옆에 나중에 덧쓴 글씨) 여기도 아니다.,제안,,아빠 수첩
 kflower,galchamgol,칡꽃,물건,나,got:kflower,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:sleep,졸 때 말을 걸었을 때,늘 존다. 졸 때 말을 걸면 잠꼬대만 한다.,제안,,관찰
@@ -35,10 +35,10 @@ kkubeogi,dolneomeo,꾸벅이,동물,나,dolneomeo:arcs-kkubeogi,시험판에서 
 dolsoe,dolneomeo,돌쇠 할배,동물,아빠,,처음부터,"돌너머 석수 두더지. ""돌이 마음을 알아야 돈다."" 할배한테 배운 말.",제안,,아빠 수첩
 dolsoe,dolneomeo,돌쇠 할배,동물,나,met:dolsoe,처음 말을 걸 때,눈이 침침해져서 이제 돌을 손끝으로만 읽는다.,제안,,관찰
 dolsoe,dolneomeo,돌쇠 할배,동물,나,dolsoe:tea,결명자 차를 드렸을 때,결명자 차를 드리면 눈이 밝아진다며 마음을 연다.,제안,,관찰
-dolsoe,dolneomeo,돌쇠 할배,동물,나,dolsoe:stack,돌 쌓기를 마쳤을 때,"돌탑은 흔들릴 때 말고, 꼭대기가 가운데 설 때 얹는다.",제안,,관찰
+dolsoe,dolneomeo,돌쇠 할배,동물,나,dolsoe:stack,돌 쌓기를 마쳤을 때,"돌탑은 돌 마음부터 읽고, 하나씩 천천히 얹는다.",제안,,관찰
 ppuri,dolneomeo,뿔이,동물,아빠,,처음부터,돌산 장승지기 산양. 원칙대로다. 장승제를 안 올리면 누구도 못 지나간다.,제안,,아빠 수첩
 ppuri,dolneomeo,뿔이,동물,나,met:ppuri,처음 말을 걸 때,장승제에는 메밀전을 부친다. 메밀가루가 있어야 한다.,제안,,관찰
-ppuri,dolneomeo,뿔이,동물,나,ppuri:seogi,골렘을 달랜 뒤 다시 말을 걸었을 때,의리를 보이면 아무한테나 안 알려 주는 자리를 알려 준다.,제안,,관찰
+ppuri,dolneomeo,뿔이,동물,나,ppuri:seogi,장승제를 올리고 길이 열릴 때,산이 노하면 석이를 올리는 법이라고 했다. 석이 붙은 바위를 알려 줬다.,제안,,관찰
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,아빠,,처음부터,돌산 어귀 성황당. 지날 때 돌 하나 얹고 소원을 빈다.,제안,,아빠 수첩
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,나,fight:golem,처음 맞설 때,돌무더기가 깨어나 일어섰다. 머리가 높아 처음엔 손이 닿지 않는다.,제안,,관찰
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,나,core:golem,핵심 부위가 드러날 때,다리나 팔을 하나 무너뜨리면 휘청이며 머리가 내려온다.,제안,,관찰
@@ -77,7 +77,7 @@ pat,jangteo,팥,물건,나,got:pat,처음 얻을 때,(items.csv 의 설명),제�
 pat,jangteo,팥,물건,아빠,,처음부터,설 고사떡에는 붉은 팥. 잡귀를 쫓는다.,제안,,아빠 수첩
 dokkaebibul,jangteo,도깨비불씨,물건,나,got:dokkaebibul,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 nunhongsi,jangteo,눈홍시,물건,나,got:nunhongsi,처음 얻을 때,(items.csv 의 설명),제안,,관찰
-nal,yeongsan,날쌘,동물,나,nal:yeongsan,설피를 엮어 받았을 때,아빠와 같은 보부상단이었다고 털어놓았다. 아빠는 날쌘을 끝까지 얕보지 않았다고.,제안,,관찰
+nal,yeongsan,날쌘,동물,나,nal:yeongsan,날쌘이 아빠와의 일을 털어놓았을 때,아빠와 같은 보부상단이었다고 털어놓았다. 아빠는 날쌘을 끝까지 얕보지 않았다고.,제안,,관찰
 nal,yeongsan,날쌘,동물,나,nal:tosi,신표를 가지고 설피를 받았을 때,신표를 보더니 말없이 털토시를 얹어 줬다.,제안,,관찰
 salgeumi,yeongsan,살금이,동물,나,met:salgeumi,처음 말을 걸 때,겁 많은 고라니. 겨울 끝이라 굶주렸다.,제안,,관찰
 salgeumi,yeongsan,살금이,동물,나,salgeumi:alert,귀를 세울 때 움직여 놀라게 했을 때,귀를 쫑긋 세울 때 움직이면 놀라 달아난다. 그땐 멈춰야 한다.,제안,,관찰
@@ -112,7 +112,7 @@ mung_batter,jangteo,녹두 빈대떡 반죽,물건,나,recipe:mung_batter,숨은
 rainbow_tteok,yeongsan,무지개떡,물건,나,recipe:rainbow_tteok,숨은 가공법을 직접 찾아 만들었을 때,단풍골 가루에 장터 팥과 영산 열매를 포갰다. 세 계절이 한 떡이 됐다.,확정,PA-43 크래프팅,숨은 가공법
 ssanghwa,yeongsan,쌍화 약재,물건,나,recipe:ssanghwa,숨은 가공법을 직접 찾아 만들었을 때,"칡뿌리와 겨우살이, 대추를 함께 갈았다. 아빠의 약연에서 새 향이 났다.",확정,PA-43 크래프팅,숨은 가공법
 dolneomeo_jangseung,dolneomeo,장승 뒤 도장,도장,아빠,stamp:dolneomeo:jangseung,장승 뒤 발바닥 도장을 찾았을 때,장승 뒤에서 짚신을 고쳤다. 부를 준다는 열매가 북쪽에 있다니 고개 하나쯤은 더 넘을 수 있다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날,아빠 수첩
-dolneomeo_mill_base,dolneomeo,맷돌 받침돌 도장,도장,아빠,stamp:dolneomeo:mill_base,맷돌 받침돌의 발바닥 도장을 찾았을 때,돌쇠 어른께 돌을 배웠다. 부자가 되면 돌가루쯤은 털고 살 줄 알았는데 손끝에서 돌 냄새가 안 빠진다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날,아빠 수첩
+dolneomeo_mill_base,dolneomeo,맷돌 받침돌 도장,도장,아빠,stamp:dolneomeo:mill_base,맷돌 받침돌의 발바닥 도장을 찾았을 때,돌쇠 어른께 돌을 배웠다. 부자가 되면 돌가루 묻힐 일도 없겠지. 그래도 손에 밴 돌 냄새가 싫지는 않다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날,아빠 수첩
 dolneomeo_cliff_crack,dolneomeo,절벽 바위 틈 도장,도장,아빠,stamp:dolneomeo:cliff_crack,절벽 바위 틈의 발바닥 도장을 찾았을 때,구름 아래 마을이 좁쌀만 하다. 부자가 되어 돌아올 길을 잊을까 바위 틈에 발바닥을 찍어 둔다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날,아빠 수첩
 salt,galchamgol,소금,물건,나,got:salt,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 sesame,galchamgol,깨,물건,나,got:sesame,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
@@ -125,8 +125,8 @@ memil_jelly,dolneomeo,메밀묵,물건,나,got:memil_jelly,처음 얻을 때,(it
 yakgwa,jangteo,약과,물건,나,got:yakgwa,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 magamok_tea,yeongsan,마가목차,물건,나,got:magamok_tea,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 dad_stamp_jangteo_flag,jangteo,젊은 아빠의 그날 · 장터 깃대,도장,아빠,stamp:jangteo:flag,장터 깃대 밑 도장을 찾았을 때,부를 준다는 열매를 찾으러 북쪽으로 간다. 장터 깃발에 길을 물으니 바람만 대답했다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩
-dad_stamp_jangteo_pillar,jangteo,젊은 아빠의 그날 · 숙소 기둥,도장,아빠,stamp:jangteo:pillar,숙소 기둥의 도장을 찾았을 때,부자가 되어 돌아오겠다며 묵은 숙소다. 새벽 길을 서두르다 기둥에 젖은 발을 짚었다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩
-dad_stamp_jangteo_rock,jangteo,젊은 아빠의 그날 · 솔숲 바위,도장,아빠,stamp:jangteo:rock,솔숲 큰 바위의 도장을 찾았을 때,보배가 열린다는 산은 아직 멀다. 바위에서 장터를 내려다보니 등불 하나도 빈손으로 꺼지지는 않았다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩
+dad_stamp_jangteo_pillar,jangteo,젊은 아빠의 그날 · 숙소 기둥,도장,아빠,stamp:jangteo:pillar,숙소 기둥의 도장을 찾았을 때,부자가 되어 돌아가겠다고 다짐하며 묵었다. 새벽길을 서두르다 젖은 발로 기둥을 짚었다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩
+dad_stamp_jangteo_rock,jangteo,젊은 아빠의 그날 · 솔숲 바위,도장,아빠,stamp:jangteo:rock,솔숲 큰 바위의 도장을 찾았을 때,보배가 열린다는 산은 아직 멀다. 바위에서 내려다보니 장터 등불은 밤늦도록 꺼지지 않았다. 나도 저렇게 벌 테다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩
 y_stamp_hut,yeongsan,젊은 아빠의 그날 · 산막,도장,아빠,stamp:yeongsan:hut_post,산막 문설주의 도장을 찾았을 때,부를 준다는 열매가 산 위에 있다기에 산막에서 짐을 고쳐 맸다. 빈 보따리를 무겁게 채워 돌아올 줄 알았다.,제안,PA-43 [개발자 결정],아빠 수첩
-y_stamp_snow,yeongsan,젊은 아빠의 그날 · 눈길,도장,아빠,stamp:yeongsan:snow_sign,눈길 이정표의 도장을 찾았을 때,이정표 위 눈을 털고 발바닥 무늬를 남겼다. 부자가 되어 내려올 길도 이쪽일 것이라 생각했다.,제안,PA-43 [개발자 결정],아빠 수첩
+y_stamp_snow,yeongsan,젊은 아빠의 그날 · 눈길,도장,아빠,stamp:yeongsan:snow_sign,눈길 이정표의 도장을 찾았을 때,이정표 위 눈을 털고 발바닥 무늬를 남겼다. 부자가 되어 내려올 때도 이 길로 오겠거니 했다.,제안,PA-43 [개발자 결정],아빠 수첩
 y_stamp_shore,yeongsan,젊은 아빠의 그날 · 호숫가,도장,아빠,stamp:yeongsan:shore_rock,호숫가 바위의 도장을 찾았을 때,부를 주는 열매가 아니었다. 되찾을 것이 없던 나는 빈손으로 돌아갔다. 그래도 신목이 있는 자리는 수첩에 적어 두었다.,제안,PA-43 [개발자 결정],아빠 수첩

@@ -145,7 +145,7 @@ if(!CLASSIC){
   const snowGate=()=>!!G.f.seolpi;
   const ledgeGate=()=>!!G.f.shortcut;
   const snowReason='눈이 허리까지 찬다. 산막의 날쌘에게 설피를 엮어 달라고 하자.';
-  const iceReason='발 디딜 틈이 안 보인다. 비탈의 살금이에게 길을 물어보자.';
+  const iceReason='발 디딜 틈이 안 보인다. 이 산 짐승들은 어디로 다닐까?';
   const sign=(x,y)=>a().door(x,y);
   const stepCommon=()=>{
     Rg.arcsEnabled();
@@ -215,7 +215,7 @@ if(!CLASSIC){
     // 깊은 눈길은 몸의 문제라 산양이 지난다. 얼어붙은 비탈은 수리부엉이가 날개를 펴고 내려간다 (PA-47).
     shelter:zone('shelter',['nal'],{right:{to:'snow',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'}},[
       {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,draw:sign,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'},
-      {x:1860,to:'shore',toX:680,label:'능선 안쪽 호숫가로',need:ledgeGate,reason:'멀리 본 능선이다. 살금이에게 안쪽 길을 물어보자.',draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
+      {x:1860,to:'shore',toX:680,label:'능선 안쪽 호숫가로',need:ledgeGate,reason:'멀리 보이는 능선이다. 저 안쪽으로 가는 길은 아직 모르겠다.',draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
     ]),
     snow:zone('snow',[],{left:'shelter',right:'slope'},[
       {x:2000,y:108,to:'shore',toX:2020,toY:108,label:'바라보던 능선 속으로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y),
@@ -246,7 +246,7 @@ if(!CLASSIC){
   // 겨울에는 오른쪽 얼음길로 걸어 나간다. 봄에는 같은 길이 물에 잠겨 배로만 건넌다.
   Rg.zones.shore.exits.right={to:'island',toX:160,
     need:()=>!G.f.spring&&!!G.f.dadDone,
-    reason:'아빠를 먼저 만나자. 봄에 얼음이 풀리면 선착장의 배로 건넌다.'};
+    reason:'아빠를 먼저 만나자.'};
   Rg.zones.shore.maxX=()=>G.f.spring?2340:2584;
   Rg.zones.island.exits.left={to:'shore',toX:2584,need:()=>!G.f.spring,
     reason:'얼음길이 물에 잠겼다. 오른쪽 선착장에서 배를 타자.'};
@@ -263,7 +263,7 @@ if(!CLASSIC){
     if(G.f.vistasSeen)delete G.f.vistasSeen['yeongsan:spring_tree'];
     oldSpring();
     const fruit=G.pickups[G.pickups.length-1];fruit.id='island_legend_fruit';fruit.zone='island';
-    diary('y_boat','얼음이 녹자 묶어 두었던 작은 배가 떴다. 섬 서쪽 선착장에서 아빠가 있는 호숫가로 돌아갈 수 있다.');
+    diary('y_boat','얼음이 녹자 걸어서 건너온 얼음길이 물에 잠겼다. 호숫가로 돌아가려면 이제 배가 있어야 한다.');
   };
   Rg.zones.snow.vistas=[{id:'snow_ridge',x:1600,y:108,from:0,to:640,sound:'wind',draw:sign,
     thought:'와, 저기서 여기까지 왔네.\n엄마도 저 불빛 너머에 있겠지.',diary:'눈길 능선에서 지나온 고을의 불빛을 보았다. 산 안쪽으로 이어지는 바위턱도 보인다.',
