@@ -9,7 +9,8 @@ const openMinigame=()=>MINIGAMES.find(m=>open(m.id))||null;
 
 const keys={};const touch={left:false,right:false,up:false,down:false};
 const suppressedKeys=new Set();
-let jumpQ=false,atkQ=false;
+let jumpQ=false,atkQ=false,dropQ=false;
+const isDown=()=>keys['arrowdown']||keys['s']||touch.down;
 const isLeft=()=>keys['arrowleft']||keys['a']||touch.left;
 const isRight=()=>keys['arrowright']||keys['d']||touch.right;
 addEventListener('keydown',e=>{
@@ -27,7 +28,7 @@ function suppressHeldInputs(){for(const k in keys)if(keys[k])suppressedKeys.add(
 function releaseInputs(){
   for(const k in keys)keys[k]=false;
   for(const k in touch)touch[k]=false;
-  jumpQ=atkQ=false;
+  jumpQ=atkQ=dropQ=false;
   document.querySelectorAll('#pad .on').forEach(b=>b.classList.remove('on'));
   if(typeof endDrag==='function')endDrag();
 }
@@ -63,12 +64,14 @@ function onPress(k){
   if(k==='n'){toggleNote();return;}
   if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
   if(open('bag')||open('book')||open('notebook'))return;
-  if(k==='z'){tryPickup();return;}
   if(pickupPose)return;
-  if(k===' '||k==='w'||k==='arrowup')jumpQ=true;
-  if(k==='j'||k==='x')atkQ=true;
+  // C(또는 Space·↑·W)는 점프, 아래를 누른 채면 발판 아래로 내려간다.
+  if(k==='c'||k===' '||k==='w'||k==='arrowup')jumpOrDrop();
+  // X(J) 하나로 발밑 물건은 줍고, 없으면 휘두른다.
+  if(k==='j'||k==='x')actionPress();
   if(k==='e'||k==='enter')tryTalk();
 }
+function jumpOrDrop(){if(isDown()&&!(keys['arrowup']||keys['w']))dropQ=true;else jumpQ=true;}
 function padAction(k){
   if(k==='map'){toggleMap();return;}
   if(mapTravel||open('map'))return;
@@ -84,9 +87,9 @@ function padAction(k){
   if(mg){if(k==='atk'||k==='jump')mg.hit();return;}
   if(open('dlg')){if(k!=='down')advance();return;}
   if(open('bag')||open('book')||open('notebook'))return;
-  if(k==='down'){tryPickup();return;}
+  if(k==='down')return;
   if(pickupPose)return;
-  if(k==='jump')jumpQ=true;else if(k==='atk')atkQ=true;else if(k==='talk')tryTalk();
+  if(k==='jump')jumpOrDrop();else if(k==='atk')actionPress();else if(k==='talk')tryTalk();
 }
 document.querySelectorAll('#pad [data-k]').forEach(b=>{
   const k=b.dataset.k;
@@ -97,4 +100,4 @@ document.querySelectorAll('#pad [data-k]').forEach(b=>{
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);
   b.addEventListener('contextmenu',e=>e.preventDefault());
 });
-$('prompt').addEventListener('click',()=>{if(paused())return;if(nearFloorItems().length)tryPickup();else if(nearInteraction())tryInteract();else atkQ=true;});
+$('prompt').addEventListener('click',()=>{if(paused())return;if(nearFloorItems().length)actionPress();else if(nearInteraction())tryInteract();else atkQ=true;});

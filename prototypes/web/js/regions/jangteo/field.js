@@ -102,7 +102,7 @@ if(!CLASSIC){
   const originalState=Rg.newState;
   Rg.newState=()=>{const s=originalState();s.pickups=[];s.boss.x=Rg.STORE_X;return s;};
   const peg=(x,y)=>{R(x-1,y-17,2,17,'#6b4934');R(x-9,y-19,18,7,'#ead4a6');R(x-6,y-17,11,1,'#784b36');};
-  const glint=(x,y)=>{R(x-4,y-3,8,3,'#a85344');R(x-4,y-7,2,2,'#a85344');R(x,y-8,2,2,'#a85344');};
+  const glint=(x,y)=>pawStamp(x,y,'#a85344');
   const shutter=(x,y)=>{R(x-17,y-35,34,35,'#705346');for(let i=0;i<5;i++)R(x-15+i*6,y-33,2,30,'#987459');R(x-18,y-22,36,3,'#b64e41');};
   const gate=(x,y)=>{R(x-20,y-48,4,48,'#604635');R(x+16,y-48,4,48,'#604635');R(x-24,y-49,48,6,'#31434d');R(x-22,y-51,44,2,'#e6eaf0');if(!night()||!has('sinpyo')){R(x-16,y-23,32,3,'#ac4c43');R(x-12,y-27,24,1,'#dba56c');}};
   const needWarehouse=()=>night()&&has('sinpyo');

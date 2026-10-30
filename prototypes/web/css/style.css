@@ -545,3 +545,13 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
   .hud-btns #btnMap{display:block;min-height:44px}
   .map-panel{inset:2% 6%}
 }
+/* 보따리가 가득할 때 보따리 버튼을 잠깐 붉게 흔든다 (PA-45) */
+.chipbtn.warn{animation:bagWarn .9s ease-out 1;border-color:#a8322a}
+@keyframes bagWarn{0%,100%{transform:none;background:var(--hanji)}15%,45%{transform:translateX(-2px);background:#f3c9b8}30%,60%{transform:translateX(2px);background:#f3c9b8}}
+@media (prefers-reduced-motion:reduce){.chipbtn.warn{animation:none;background:#f3c9b8}}
+/* 살펴보기 작은 그림 (PA-45): 무대 오른쪽 위에 한지 액자로 잠깐 */
+.stage .peek{position:absolute;top:17%;right:3%;width:28%;max-width:240px;padding:4px;background:var(--hanji);border:3px solid var(--meok);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.35);pointer-events:none;z-index:6}
+.stage .peek canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+.stage .peek.show{animation:peekIn .18s ease-out}
+@keyframes peekIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.stage .peek.show{animation:none}}

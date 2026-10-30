@@ -215,7 +215,7 @@ if(!CLASSIC){
           reason:'엉킨 칡이 내리막까지 움켜쥐고 있다. 나무를 풀어 주고 내려가자.',drawBlocked:blocked})],
       pickups:[{id:'gal_extra_acorn_4',x:780,y:160,item:'acorn',got:false},
         {id:'gal_cut_vine',x:340,y:GROUND,item:'vine',got:false}],
-      stamps:[{id:'roots',x:2140,note:'stamp:galchamgol:roots',label:'당산나무 뿌리의 발자국 살피기'}],
+      stamps:[{id:'roots',x:2140,note:'stamp:galchamgol:roots',label:'당산나무 뿌리의 손바닥 자국 살피기'}],
       vistas:[{id:'home',x:2380,y:126,from:0,to:160,draw:A.marker,sound:'wind',
         thought:'우리 집 지붕이다.\n엄마, 나 여기까지 왔어.',
         diary:'당산나무 언덕에서 집을 돌아봤다. 골짜기의 단풍 사이로 우리 집 초가지붕이 보였다.',layers:A.vistaHill}],
