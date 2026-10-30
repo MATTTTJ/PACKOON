@@ -5,6 +5,7 @@
 const Rg=REGIONS.dolneomeo;
 const once=(key)=>{const d=G.f.strangerOnce||(G.f.strangerOnce={});if(d[key])return false;d[key]=true;return true;};
 const say=(lines,next)=>{talk(lines,next);return true;};
+// 결정 D-25: 낯선 손님 (design/data/decisions.csv)
 Rg.strangers={
   dolsoe:{
     line:'발소리가 낯설구나.\n어디서 온 손님이냐.',

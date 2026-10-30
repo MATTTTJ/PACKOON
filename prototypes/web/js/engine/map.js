@@ -8,6 +8,7 @@ function mapNotice(message){
   toast(message);$('toast').hidden=false;$('toast').classList.add('map-notice');clearTimeout(mapNoticeTimer);
   mapNoticeTimer=setTimeout(()=>{if($('toast').textContent===message)$('toast').hidden=true;$('toast').classList.remove('map-notice');},TABLES.TUNING.toast_frames*1000/60);
 }
+// 결정 D-18: M 지도와 까치 떼 이동 (design/data/decisions.csv)
 function openMap(){
   if(CLASSIC)return false;
   if(mapTravel||mapBlocked()){mapNotice('지금은 까치 떼를 부를 수 없다');return false;}

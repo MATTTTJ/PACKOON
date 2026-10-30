@@ -41,6 +41,7 @@ function validDropSurface(a){
   const p=dropSurfaceAt(a.x,a.y,a.x,a.zone??G.zone);
   return !!p&&p.x===a.x&&p.y===a.y;
 }
+// 결정 D-19: 바닥에 뿌리고 줍기, 지역을 떠나도 남음 (design/data/decisions.csv)
 function spawnDrops(item,count,source={}){
   if(!ITEMS[item]||!Number.isSafeInteger(count)||count<=0)return [];
   const zone=source.zone??G.zone,rows=floorDrops(G.region,zone);
@@ -522,6 +523,7 @@ function isHomeReplyPoint(p,kind){
   if(/magpie|kkachi|까치/.test((p.id||'')+' '+(p.name||'')))return true;
   return kind==='npc'&&/^(maru|shelter)$/.test(p.id||'');
 }
+// 결정 D-10: 길손 (design/data/decisions.csv)
 function finishWanderer(id){
   if(CLASSIC)return false;
   const done=G.f.wanderersDone||(G.f.wanderersDone={}),key=expansionKey(id);

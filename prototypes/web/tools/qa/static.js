@@ -195,9 +195,32 @@ function checkDialogue(source, file, rules, knownSpeakers = []) {
   return {findings, rows: rows.length, dynamicRows, incompleteRows: rows.filter(row => !row.complete).length};
 }
 
+// 대장 확인 없이 쓰는 결정(design/data/decisions.csv)과 코드의 "결정 D-xx" 표시가 서로 맞는지 본다.
+function checkDecisions(root, files) {
+  const file = 'design/data/decisions.csv', findings = [];
+  if (!fs.existsSync(path.join(root, file))) return {rows: 0, tags: 0, findings: [finding('decisions', file, 1, '결정 목록이 없다.')]};
+  const rows = parseCsv(fs.readFileSync(path.join(root, file), 'utf8').replace(/^\uFEFF/, '')), head = rows.shift().cells;
+  const col = name => head.indexOf(name), byId = new Map();
+  for (const row of rows) byId.set(row.cells[col('id')], {line: row.line, state: row.cells[col('상태')], code: row.cells[col('코드 표시')]});
+  const tagged = new Map();
+  for (const source of files) {
+    const text = fs.readFileSync(path.join(root, source), 'utf8').split(/\r?\n/);
+    text.forEach((line, i) => { for (const m of line.matchAll(/결정 (D-\d+)/g)) {
+      if (!byId.has(m[1])) findings.push(finding('decisions', slash(source), i + 1, '목록에 없는 결정 번호 ' + m[1] + '를 표시했다.'));
+      else if (byId.get(m[1]).state === '대체됨') findings.push(finding('decisions', slash(source), i + 1, '대체된 결정 ' + m[1] + '을 아직 표시하고 있다.'));
+      tagged.set(m[1], (tagged.get(m[1]) || 0) + 1);
+    }});
+  }
+  for (const [id, d] of byId) {
+    if (!['확정', '채택', '대체됨'].includes(d.state)) findings.push(finding('decisions', file, d.line, id + '의 상태는 확정·채택·대체됨 중 하나여야 한다.'));
+    if (d.code === '있음' && !tagged.has(id)) findings.push(finding('decisions', file, d.line, id + '는 코드 표시 있음인데 코드에 "결정 ' + id + '" 표시가 없다.'));
+  }
+  return {rows: byId.size, tags: [...tagged.values()].reduce((a, b) => a + b, 0), findings};
+}
+
 async function runStatic({root, rules, only} = {}) {
   const results = [], wants = name => !only || only.has(name);
-  const files = wants('syntax') || wants('dialogue') ? sourceFiles(root) : [];
+  const files = wants('syntax') || wants('dialogue') || wants('data') ? sourceFiles(root) : [];
   if (wants('syntax')) {
     const findings = [];
     for (const file of files) {
@@ -212,8 +235,11 @@ async function runStatic({root, rules, only} = {}) {
   }
   if (wants('data')) {
     const check = spawnSync(process.execPath, [path.join(root, 'prototypes/web/tools/build-data.js'), '--check'], {cwd: root, encoding: 'utf8', timeout: 30000});
-    results.push(result('data', 'CSV와 tables.js 일치', check.status === 0 ? [] : [finding('data', 'prototypes/web/js/data/tables.js', 1,
-      'CSV와 생성물이 다르거나 변환 검사가 실패했다: ' + (check.stderr || check.stdout || String(check.error)).trim())], {output: (check.stdout + check.stderr).trim()}));
+    const findings = check.status === 0 ? [] : [finding('data', 'prototypes/web/js/data/tables.js', 1,
+      'CSV와 생성물이 다르거나 변환 검사가 실패했다: ' + (check.stderr || check.stdout || String(check.error)).trim())];
+    const decisions = checkDecisions(root, files.length ? files : sourceFiles(root));
+    findings.push(...decisions.findings);
+    results.push(result('data', 'CSV와 tables.js 일치 · 결정 ' + decisions.rows + '개, 코드 표시 ' + decisions.tags + '곳', findings, {output: (check.stdout + check.stderr).trim()}));
   }
   if (wants('versions')) {
     const file = 'prototypes/web/index.html', source = fs.readFileSync(path.join(root, file), 'utf8'), findings = [];
