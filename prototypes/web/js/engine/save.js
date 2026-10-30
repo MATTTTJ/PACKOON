@@ -92,15 +92,15 @@ function readSave(){
 }
 function writeSave(quiet){
   // 원문을 별도 보관하지 못했다면 자동 저장도 원본을 덮지 않는다.
-  if(saveRecoveryBlocked){if(!quiet)toast('이 브라우저에서는 저장할 수 없다');return false;}
-  if(!G||busyForSave()){if(!quiet)toast('대화나 전투가 끝난 뒤에 저장할 수 있다');return false;}
+  if(saveRecoveryBlocked){if(!quiet)toast('이 브라우저에서는 저장할 수 없어요');return false;}
+  if(!G||busyForSave()){if(!quiet)toast('대화나 전투가 끝난 뒤에 저장할 수 있어요');return false;}
   returnPouch();   // 가공대에 올려 둔 물건은 보따리로 돌려 놓고 저장
   // 저장 주기를 유지하면서 실제로 반환한 재료·소지품·버튼을 화면에도 반영한다.
   if(open('bag')){pouchMsg='';renderBag();}
   rememberRegion(G);
   try{localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,at:Date.now(),G}));}
-  catch(_){if(!quiet)toast('이 브라우저에서는 저장할 수 없다');return false;}
-  if(!quiet)toast('저장했다');
+  catch(_){if(!quiet)toast('이 브라우저에서는 저장할 수 없어요');return false;}
+  if(!quiet)toast('저장했어요');
   refreshSaveUI();return true;
 }
 function clearSave(){try{localStorage.removeItem(SAVE_KEY);saveRecoveryBlocked=false;}catch(_){}refreshSaveUI();}
@@ -117,7 +117,7 @@ function loadSave(){
   }
   G=s.G;
   resetScreens();if(G.ended)showEnd();
-  toast('이어서 한다 · '+REGIONS[G.region].name);return true;
+  toast('이어서 해요 · '+REGIONS[G.region].name);return true;
 }
 function saveLabel(s){
   if(s.invalid)return '저장을 읽지 못했어요. 새로 시작할 수 있어요';
@@ -135,7 +135,7 @@ function refreshSaveUI(){
   if(s)$('saveMeta').textContent='저장된 진행: '+saveLabel(s);
   const other=!!s&&!same;   // 화면의 게임이 저장된 게임과 다르면 새로 시작하는 셈
   $('btnStart').className=other?'btn':'btn primary';
-  $('saveInfo').textContent=s?'마지막 저장: '+saveLabel(s):'아직 저장하지 않았다';
+  $('saveInfo').textContent=s?'마지막 저장: '+saveLabel(s):'아직 저장하지 않았어요';
   disarm($('btnStart'));disarm($('btnNewGame'));disarm($('btnRestart'));
 }
 /* 저장을 지우는 버튼은 두 번 눌러야 한다. 처음 누르면 글이 바뀌고, 한 번 더 누르면 실행 */
@@ -146,10 +146,10 @@ $('btnSave').onclick=()=>writeSave(false);
 $('btnSaveHud').onclick=()=>{if(G.started)writeSave(false);};
 /* 처음부터 하기 (수첩 아래, 끝 화면): 저장이 있으면 한 번 더 눌러야 지우고 단풍골 처음으로 */
 function confirmNewGame(b){
-  if(readSave()&&!b.dataset.armed){arm(b,'정말요? 한 번 더 누르면 저장이 지워진다');return;}
+  if(readSave()&&!b.dataset.armed){arm(b,'정말요? 한 번 더 누르면 저장이 지워져요');return;}
   disarm(b);clearSave();G=newGame();resetScreens();
   try{const u=new URL(location.href);u.searchParams.delete('region');history.replaceState(null,'',u);}catch(_){}
-  toast('처음부터 시작한다');
+  toast('처음부터 시작해요');
   TitleScreen.open();
 }
 $('btnNewGame').onclick=()=>confirmNewGame($('btnNewGame'));
@@ -159,7 +159,7 @@ $('btnRestart').onclick=()=>confirmNewGame($('btnRestart'));
 function startOrConfirm(){
   const b=$('btnStart'),s=readSave();
   if(s&&s.G.runId!==G.runId){
-    if(!b.dataset.armed){arm(b,'정말요? 새로 시작하면 저장이 지워진다');return;}
+    if(!b.dataset.armed){arm(b,'정말요? 새로 시작하면 저장이 지워져요');return;}
     clearSave();
   }
   disarm(b);startGame();
