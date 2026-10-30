@@ -405,7 +405,7 @@ A.willowSeeds=()=>{
 };
 A.blockedSnow=(x,y)=>{for(let i=0;i<5;i++){px(x-24+i*10,y-23-i%2*8,12,23+i%2*8,'#d8e7ef');px(x-23+i*10,y-25-i%2*8,10,3,'#f3f7f6');}};
 A.blockedIce=(x,y)=>{px(x-24,y-44,48,44,'#8badc5');px(x-22,y-46,44,4,'#dfeef3');for(let i=0;i<4;i++)px(x-14+i*9,y-37+i*6,2,12,'#c4dce6');};
-A.stamp=(x,y)=>{px(x-3,y-4,6,4,'#b98075');px(x-5,y-7,2,2,'#b98075');px(x-1,y-8,2,2,'#b98075');px(x+3,y-7,2,2,'#b98075');};
+A.stamp=(x,y)=>pawStamp(x,y,'#b98075');
 A.door=(x,y)=>{sign(x,y);px(x-8,y-32,12,1,'#eee7d4');px(x+2,y-34,3,5,'#eee7d4');};
 Rg.expArt=A;
 })();

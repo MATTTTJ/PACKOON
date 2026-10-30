@@ -43,7 +43,7 @@ function defineEnemies(map){Object.assign(ENEMIES,map);}
 const REGIONS={};
 function defineRegion(id,obj){REGIONS[id]=Object.assign(REGIONS[id]||{id},obj);return REGIONS[id];}
 
-const RAR=['흔한 것','쓸 만한 것','귀한 것','보배','전설'];
+const RAR=['하품','중품','상품','최상품','천하일품'];
 const RCOL=['#9c8f78','#5f8a3a','#3f84b5','#8e4fc2','#d29a12'];
 
 /* ---------- 상태 ---------- */

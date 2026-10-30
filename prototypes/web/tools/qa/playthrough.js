@@ -168,7 +168,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   async function gather(item,minimum=1) {
     while(await read(`(G.inv[${json(item)}]||0)<${minimum}`)) {
       const loose=await read(`(()=>{for(const [zone,items] of Object.entries(G.floorItems?.[G.region]||{})){const a=items.find(a=>a.item===${json(item)}&&!a.got);if(a)return {x:a.x,y:a.y,zone:zone==='classic'?null:zone};}return null;})()`);
-      if(loose){if(loose.zone)await zone(loose.zone);await jumpTo(loose.x,loose.y);await wait(900);await key('z');await wait(650);continue;}
+      if(loose){if(loose.zone)await zone(loose.zone);await jumpTo(loose.x,loose.y);await wait(900);await key('x');await wait(650);continue;}
       const d=await read(`G.digs.find(d=>d.item===${json(item)}&&!d.done)&&(({x,zone})=>({x,zone}))(G.digs.find(d=>d.item===${json(item)}&&!d.done))`);
       if(!d)throw new Error('남은 채집점 없음: '+item);
       if(d.zone)await zone(d.zone);
@@ -179,9 +179,9 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     while(await read(`(G.inv[${json(item)}]||0)<${minimum}`)) {
       const p=await read(`(()=>{const reachable=new Set([G.zone]),q=[G.zone];while(q.length&&REG.zones){const z=REG.zones[q.shift()];for(const p of [...Object.values(z.exits||{}),...(z.doors||[])]){const to=typeof p==='string'?p:p.to;if((typeof p==='string'||!p.need||p.need())&&!reachable.has(to)){reachable.add(to);q.push(to);}}}const p=G.pickups.filter(p=>p.item===${json(item)}&&!p.got&&(!p.zone||reachable.has(p.zone))).sort((a,z)=>(z.y-a.y)||((a.zone===G.zone?0:1)-(z.zone===G.zone?0:1)))[0];return p&&{x:p.x,y:p.y,zone:p.zone,id:p.id};})()`);
       if(!p)throw new Error('남은 줍기 없음: '+item);
-      if(p.zone)await zone(p.zone);await jumpTo(p.x,p.y);await wait(100);await key('z');await wait(650);
+      if(p.zone)await zone(p.zone);await jumpTo(p.x,p.y);await wait(100);await key('x');await wait(650);
       const got=await read(`G.pickups.find(p=>p.x===${p.x}&&p.item===${json(item)})?.got`);
-      if(!got){await key('w');await wait(250);await moveX(p.x+6);await wait(450);await key('z');await wait(650);}
+      if(!got){await key('w');await wait(250);await moveX(p.x+6);await wait(450);await key('x');await wait(650);}
       if(!await read(`G.pickups.find(p=>p.x===${p.x}&&p.item===${json(item)})?.got`))throw new Error(`줍기 실패: ${item} x=${p.x},y=${p.y}`);
     }
   }

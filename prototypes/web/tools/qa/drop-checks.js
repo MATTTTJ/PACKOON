@@ -35,7 +35,7 @@ async function runDropCheck({browser:b,outDir,name}){
         await until(b,"floorDrops().every(a=>!a.flight&&!a.bounce)");
         if(mode==='expanded'){
           const file=path.join(outDir,region+'-floor.png');await b.screenshot(file);images.push(file);captures.push({region,stage:'floor',file,state:await b.eval('({records:structuredClone(floorDrops()),pose:pickupPose&&{tick:pickupPose.tick}})')});
-          await b.eval('G.px=floorDrops().find(a=>!a.got).x;G.py=fieldGround();G.onGround=true');await b.key('z');await b.wait(70);
+          await b.eval('G.px=floorDrops().find(a=>!a.got).x;G.py=fieldGround();G.onGround=true');await b.key('x');await b.wait(70);
           if(!await b.eval('!!pickupPose'))throw Error(region+': 줍기 자세가 열리지 않아 그림을 확인하지 못했다.');
           const pickup=path.join(outDir,region+'-pickup.png');await b.screenshot(pickup);images.push(pickup);captures.push({region,stage:'pickup',file,state:await b.eval('({records:structuredClone(floorDrops()),pose:pickupPose&&{tick:pickupPose.tick}})')});await b.wait(700);
         }
@@ -77,11 +77,11 @@ async function runDropCheck({browser:b,outDir,name}){
         await until(b,'floorDrops().every(a=>!a.flight&&!a.bounce)');
         await b.eval('G.px=floorDrops()[0].x;G.py=floorDrops()[0].y;G.onGround=true');
         const before=await b.eval('({floor:structuredClone(floorDrops()),inv:{...G.inv}})');
-        await b.key('z');await b.wait(650);
+        await b.key('x');await b.wait(650);
         const blocked=await b.eval("({floor:structuredClone(floorDrops()),inv:{...G.inv},message:$('toast').textContent})");
         if(j(before.floor)!==j(blocked.floor)||j(before.inv)!==j(blocked.inv))findings.push(fail(name,`${mode}/${region}: 보따리가 가득 찼는데 바닥 물건이나 소지품이 바뀌었다.`,{before,blocked}));
         if(!/가득/.test(blocked.message))findings.push(fail(name,`${mode}/${region}: 보따리 가득 안내가 없다.`,blocked));
-        await b.eval('G.bagSlots=2');await b.key('z');await b.key('z');await b.key('z');await b.wait(700);
+        await b.eval('G.bagSlots=2');await b.key('x');await b.key('x');await b.key('x');await b.wait(700);
         const freed=await b.eval('({floor:structuredClone(floorDrops()),inv:{...G.inv}})');
         if(!(freed.inv.root>0))findings.push(fail(name,`${mode}/${region}: 칸을 비운 뒤에도 줍지 못했다.`,freed));
         if(freed.inv.root>2)findings.push(fail(name,`${mode}/${region}: 연속 줍기 입력으로 보상이 중복됐다.`,freed));

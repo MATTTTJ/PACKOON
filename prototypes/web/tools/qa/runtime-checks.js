@@ -75,7 +75,7 @@ async function runSave({ browser, outDir, rules }) {
     await browser.key('ArrowRight', 'keyDown');
     try { await until(browser, 'G.px >= '+acorn.x, 10000, '저장 전 도토리로 이동'); }
     finally { await browser.key('ArrowRight', 'keyUp'); }
-    await browser.wait(100);await browser.key('z');await browser.wait(650);
+    await browser.wait(100);await browser.key('x');await browser.wait(650);
     await browser.click('#btnSaveHud');
     const stored = await browser.eval("JSON.parse(localStorage.getItem('packoon-save-v1'))");
     if (!stored?.G?.started || !(stored.G.inv.acorn >= 1)) throw new Error('중간 수동 저장에 줍기 결과가 없다.');
@@ -180,9 +180,9 @@ async function runMobile({ browser, outDir, rules }) {
     const acorn=await browser.eval("fieldItems('pickups').find(a=>a.item==='acorn'&&!a.got&&a.y===fieldGround())");
     if(!acorn)throw Error('휴대폰 줍기 시험용 도토리가 없다.');
     await holdTouch(browser, '#pad [data-k="right"]', 'G.px >= '+acorn.x);
-    await tap(browser, '#pad [data-k="down"]');
-    await until(browser, '(G.inv.acorn||0)>=1', 5000, '휴대폰 아래 버튼으로 도토리 줍기');
-    steps.push('아래 터치 버튼으로 바닥 도토리를 직접 줍는다.');
+    await tap(browser, '#pad [data-k="atk"]');
+    await until(browser, '(G.inv.acorn||0)>=1', 5000, '휴대폰 휘두르기 버튼으로 도토리 줍기');
+    steps.push('휘두르기 터치 버튼으로 바닥 도토리를 직접 줍는다.');
     await tap(browser, '#pad [data-k="bag"]');
     await until(browser, "!document.querySelector('#bag').hidden", 5000, '휴대폰 보따리');
     await measure('bag', ['#bag']); await tap(browser, '#bagClose');
