@@ -11,6 +11,7 @@
 - `design/narrative/yeongsan-scenario.md` — 마지막 지역 북쪽 영산과 엔딩 (제안).
 - `design/data/README.md` — 지역·NPC·교환·아이템·가보·보스 표(CSV). 목록형 기획은 이 표가 원본이다.
 - `prototypes/web/README.md` — 기획 검증용 웹 프로토타입 설명. 빌드 없이 `index.html`을 브라우저로 연다. 공통 엔진(`js/engine/`)과 지역별 파일(`js/regions/<지역 id>/`)로 나뉘어 있고, 지역을 더하는 법도 여기 있다.
+- `design/checklists/review.md` — 검수 점검표. 대사·인과·화자 위치·맵 이동·조작감을 고치거나 Codex 작업을 합치기 전에 이 표로 검수한다.
 
 ## 작업 규칙
 

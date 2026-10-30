@@ -290,7 +290,7 @@ Rg.lanternTalk=()=>{
 };
 Rg.lanternAction=id=>{
   if(!night())return;
-  if(!G.f.jxLanternStarted){Rg.lanternTalk();return;}
+  if(!G.f.jxLanternStarted){if(G.zone==='inn')Rg.lanternTalk();else talk([['너구리','빈 등걸이다.\n숙소 처마 밑 까치가 등불 꾸러미를 갖고 있었지.']]);return;}
   if(G.f.jxLanterns?.[id]){talk([['너구리',id==='pine'?'등 너머로 작은 코가 보여.\n솔숲 안에 누가 있나 봐.':'등이 잘 타네. 다음 등걸이도 보여.']]);return;}
   Rg.handWork('lantern',()=>{
     const lights=G.f.jxLanterns||(G.f.jxLanterns={});lights[id]=true;
@@ -751,20 +751,20 @@ function handMedicineToMagpie(){
 }
 Rg.sendMedicine=()=>{
   if(Rg.arcs()&&G.f.jangteoArcsMorak2&&!G.f.jangteoArcsMorak3){
-    talk([['너구리','엄마 드릴 홍시 약떡, 다 됐다!',[{t:'모락의 떡도 함께 보낸다',go:()=>{
+    talk([['너구리','엄마 드릴 홍시 약떡, 다 됐다!',[{t:'모락 아주머니의 설 떡도 함께 보낸다',go:()=>{
       // 별도 소지품·추가 재료 없이 모락이 자기 떡을 보탠다. 약떡은 기존처럼 하나만 소비한다.
       G.f.hongsiMade=true;G.f.jangteoArcsMorak3=true;
       diary('j_end','눈홍시와 쌀가루로 홍시 약떡을 쪘다. 엄마가 동네에 떡을 돌리던 시루로, 이번엔 엄마를 위한 떡을 쪘다.');
-      talk([['모락','내 떡도 하나 얹어 보내자!\n네 엄마도 설 떡 드셔야지.'],
+      talk([['너구리','(모락 아주머니가 싸 준 설 떡도 같이 얹었다.\n“네 엄마도 설 떡 드셔야지.” 하셨지.)'],
         ['너구리','(까치가 떡을 문다.)\n엄마 시루로 쪘다고 전해 줘.']
       ],()=>{
         handMedicineToMagpie();
         // 날아간 직후 답장이 오지 않도록 시간 경과를 밝힌 짧은 후일담으로 마무리한다.
-        talk([['너구리','(한참 뒤, 까치가 떡집으로 돌아왔다.)'],
+        talk([['너구리','(한참 뒤, 까치가 숙소 처마로 돌아왔다.)'],
           ['너구리','(엄마처럼 날개를 볼에 대고 끄덕인다.)'],
-          ['모락','허허, 맛있게 드셨네!\n우리 새끼 떡도 보내야지!']
+          ['너구리','맛있게 드셨구나.\n모락 아주머니한테도 알려 드려야지.']
         ],()=>{
-          diary('jangteoArcsMorak3','모락의 떡도 약떡과 함께 보냈다. 돌아온 까치가 엄마의 몸짓을 흉내 내자 모락도 웃었다.');endGame();
+          diary('jangteoArcsMorak3','모락 아주머니의 설 떡도 약떡과 함께 보냈다. 돌아온 까치가 엄마의 몸짓을 흉내 냈다. 맛있게 드셨다는 뜻이다.');endGame();
         });
       });
     }},{t:'약떡만 보낸다',go:sendMedicine}]]]);return;
