@@ -41,7 +41,26 @@ const Vfx=(()=>{
     const count=Math.min(Math.floor(n),MAX-pending.length);
     for(let i=0;i<count;i++)pending.push(id);
   }
-  function gather(x,y){burst(x,y);}
+  /* 바닥 물건을 줍거나 캘 때 흩날리는 것 (피드백 8). 흙·돌·광물은 먼지, 풀·나무·열매·덩굴은 잎.
+     물건 종류 규칙은 이 표 한 곳에만 둔다. 표에 없는 물건은 잎으로 친다. */
+  const SCATTER_DUST=new Set(['root','ssari','kkoe','coal','seogi','mud','stonedust','mossy_eye','story_stone','kong','gyeolmyeongja']);
+  const LEAF_COLORS={galchamgol:['#cd6939','#df983d','#b98a44'],dolneomeo:['#c2a35c','#a88b4a','#d6c08a'],
+    jangteo:['#5f7a45','#7e8f52','#a3884e'],yeongsan:['#e8eef2','#cfdbe3','#ffffff']};
+  const DUST_COLORS={galchamgol:'#a98256',dolneomeo:'#b8ad98',jangteo:'#a8927a',yeongsan:'#dfe6ea'};
+  function scatterKind(id){return SCATTER_DUST.has(id)?'dust':'leaf';}
+  function scatter(x,y,id,strong=false){
+    if(!G||!G.started||G.ended||motion.matches)return;
+    sync();
+    const reg=G.region,kind=id==null?'dust':scatterKind(id);
+    if(kind==='dust'){
+      const c=DUST_COLORS[reg]||'#bba582',n=strong?14:8;
+      for(let i=0;i<n;i++)emit('clod',x+(Math.random()-.5)*10,y-1,(Math.random()-.5)*1.4,-.6-Math.random()*1,24+Math.random()*12|0,c,'effect');
+    }else{
+      const cs=LEAF_COLORS[reg]||LEAF_COLORS.galchamgol,n=strong?9:6;
+      for(let i=0;i<n;i++)emit('leafbit',x+(Math.random()-.5)*8,y-3,(Math.random()-.5)*1.6,-.9-Math.random()*.9,40+Math.random()*20|0,cs[i%cs.length],'effect');
+    }
+  }
+  function gather(x,y,id){burst(x,y);scatter(x,y,id,true);}
   function dust(){
     if(motion.matches)return;
     for(let i=0;i<4;i++)emit('dust',G.px+(Math.random()-.5)*8,G.py-1,(Math.random()-.5)*.8-G.vx*.12,-.3-Math.random()*.45,20,'#bba582','effect');
@@ -98,6 +117,8 @@ const Vfx=(()=>{
       if(!p.rest){
         p.x+=p.vx;p.y+=p.vy;
         if(p.kind==='dust')p.vy+=.025;
+        else if(p.kind==='clod')p.vy+=.06;
+        else if(p.kind==='leafbit'){p.vy=Math.min(p.vy+.04,.45);p.vx*=.97;p.x+=Math.sin(p.phase+p.age*.18)*.35;}
         else if(p.kind==='item')p.vy*=.96;
         else if(p.layer!=='effect')p.x+=Math.sin(p.phase+p.age*.035)*.3;
         if((p.kind==='maple'||p.kind==='oak')&&p.y>=GROUND-1){p.y=GROUND-1;p.rest=true;p.life=Math.min(p.life,65);}
@@ -121,6 +142,10 @@ const Vfx=(()=>{
         R(x,y,3,1,p.color);R(x+1,y-1,1,3,p.color);if(!p.rest)R(x-1,y-1,1,1,p.color);
       }else if(p.kind==='oak'){
         R(x,y,Math.sin(p.phase+p.age*.04)>0?4:2,1,p.color);R(x+1,y-1,2,1,p.color);
+      }else if(p.kind==='clod'){
+        R(x,y,2,2,p.color);
+      }else if(p.kind==='leafbit'){
+        if(Math.sin(p.phase+p.age*.2)>0){R(x,y,2,1,p.color);R(x+1,y-1,1,1,p.color);}else R(x,y,1,2,p.color);
       }else if(p.kind==='smoke'||p.kind==='mist'){
         ctx.globalAlpha*=.45;R(x,y,4,1,p.color);R(x+1,y-1,2,1,p.color);
       }else{
@@ -132,5 +157,5 @@ const Vfx=(()=>{
   }
   /* 기존 drawFront에 섞인 이정표·색조는 지역의 weatherFront로 보존한다. */
   function front(){if(fieldDef().weather)fieldCall('weatherFront');else fieldCall('drawFront');draw('front');draw('effect');}
-  return {MAX,get count(){return particles.length;},get queued(){return pending.length;},get reducedMotion(){return motion.matches;},setWeather,update,draw,front,item,gather,burst,feet,slash,clear};
+  return {MAX,get count(){return particles.length;},get queued(){return pending.length;},get reducedMotion(){return motion.matches;},setWeather,update,draw,front,item,gather,scatter,scatterKind,burst,feet,slash,clear};
 })();
