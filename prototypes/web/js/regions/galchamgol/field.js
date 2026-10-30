@@ -200,7 +200,7 @@ if(!CLASSIC){
         {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false},
         {id:'gal_branch_acorn_1',x:770,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:790,y:96,item:'acorn',got:false}],
       doors:[path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
-          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠에게 낫을 받아 J로 걷자.',blockedLabel:'칡 덩굴',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:blocked,
+          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡 덩굴',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:blocked,
           formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 나무 속으로'})],
       // 다람쥐만 오르는 높은 참나무 가지와 잊은 몫 (PA-47 선택 자리)
       climbs:[{x:752,top:96}],

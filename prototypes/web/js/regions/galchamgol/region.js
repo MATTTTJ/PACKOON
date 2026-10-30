@@ -10,10 +10,10 @@ const Rg=defineRegion('galchamgol',{
   clueTotal:6,
   gatherDiary:['gather','흙을 살살 달래 가며 뿌리를 캤다. 서두르면 뿌리가 다친다고 엄마가 그랬다.'],
   cover:{
-    tag:'단풍골 체험판',sub:'엄마의 약을 찾아 떠난 첫 마을',ready:'단풍골로 떠날 준비',
-    title:{kicker:'프롤로그',head:'단풍골로 가는 길',start:'단풍골로 떠나기',body:[
+    tag:'단풍골 체험판',sub:'엄마의 약을 찾아 길을 나서는 우리 마을',ready:'길 떠날 준비',
+    title:{kicker:'프롤로그',head:'단풍골, 우리 집',start:'길을 나서기',body:[
       '엄마가 내 이름을 잊어 가고 있다. 처음엔 둔갑을 못 하게 되더니, 요즘은 말이 자꾸 끊긴다.',
-      '아빠는 소문 속 만병통치약을 찾아 떠났고, 석 달째 소식이 없다. 마지막 편지에는 이렇게 적혀 있었다. "단풍골을 지나 북쪽으로 간다."',
+      '아빠는 소문 속 만병통치약을 찾아 떠났고, 석 달째 소식이 없다. 떠나며 남긴 말은 하나였다. "북쪽으로 간다."',
       '나는 부엌의 살림 도구를 보따리에 싸고, 아빠의 보부상 모자를 썼다.']},
     end:{kicker:'단풍골 체험판 완료',head:'북쪽 길이 열렸다',body:[
       '두꺼비 할멈이 해머루로 달인 약을 까치 편에 집으로 보냈다. 엄마의 병을 고치지는 못해도, 조금은 늦출 수 있을 것이다.',
@@ -34,7 +34,7 @@ const Rg=defineRegion('galchamgol',{
   weather:()=>Vfx.setWeather('maple'),
   weatherFront(){if(G.boss.dead){const x=2348-cam;if(x<W+20){R(x,GROUND-26,2,26,'#6b4423');R(x-8,GROUND-26,18,8,'#c9a27a');R(x+6,GROUND-24,2,4,'#6b4423');}}},
   onStart(){
-    diary('start','단풍골에 도착했다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 아빠의 마지막 편지에 적힌 곳이 여기다.');
+    diary('start','오늘 길을 나선다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 아빠가 간 북쪽 길은 단풍골 끝에서 시작된다.');
     toast('도토리를 줍고, 마을 동물들에게 말을 걸어 보자');
   },
   next:'dolneomeo',
@@ -71,8 +71,8 @@ defineIcons({
 /* 흙더미 채집 */
 defineGather({
   root:{title:'칡뿌리 캐기',hits:TABLES.MINIGAMES.gather_root_hits,hint:'흙이 무른 칡뿌리 자리다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
-  ssari:{title:'싸리버섯 따기',hits:TABLES.MINIGAMES.gather_ssari_hits,hint:'밑동을 단번에 꺾어야 갓이 안 상한다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
-  kkoe:{title:'꾀꼬리버섯 따기',hits:TABLES.MINIGAMES.gather_kkoe_hits,hint:'노란 갓이 다치지 않게 밑동을 꺾자. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
+  ssari:{title:'싸리버섯 따기',hits:TABLES.MINIGAMES.gather_ssari_hits,hint:'밑동을 단번에 꺾어야 갓이 안 상한다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 단번에 꺾인다.'},
+  kkoe:{title:'꾀꼬리버섯 따기',hits:TABLES.MINIGAMES.gather_kkoe_hits,hint:'노란 갓이 다치지 않게 밑동을 꺾자. 고리가 가운데 원에 닿을 때 휘두르면 딱! 단번에 꺾인다.'},
 });
 
 /* 엄마의 절구는 처음부터 깨어 있다. 가공법은 heirlooms.csv */

@@ -157,7 +157,7 @@ async function runMobile({ browser, outDir, rules }) {
     const image = path.join(outDir, `mobile-${name}.png`);
     const sceneSteps = ['390×844 터치 에뮬레이션과 빈 격리 저장에서 첫 화면을 연다.',
       ...(['prologue', 'bag', 'dialog'].includes(name) ? ['새로 시작을 누른다.'] : []),
-      ...(['bag', 'dialog'].includes(name) ? ['단풍골로 떠나기를 누르고 엄마 쪽지를 닫는다.'] : []),
+      ...(['bag', 'dialog'].includes(name) ? ['길을 나서기를 누르고 엄마 쪽지를 닫는다.'] : []),
       ...(name === 'bag' ? ['보따리 버튼을 누른다.'] : []),
       ...(name === 'dialog' ? ['오른쪽 터치 버튼을 유지해 마을 x803까지 걷고 말걸기를 누른다.'] : [])];
     const context = { evidence: image, steps: sceneSteps, reproductions: '이번 실행 1회', environment: { url: browser.url, viewport: '390×844, DPR 1', input: 'CDP 실제 터치', start: '빈 격리 저장, 확장판 새 게임' } };

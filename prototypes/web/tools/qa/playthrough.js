@@ -226,7 +226,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await click('#btnStart');await settle();
     if(await read('G.f.arcs')!==(mode==='expanded'))throw new Error('사연 켬/끔 시작값이 모드와 다르다');
     await stage('단풍골 · 가루와 채집',async()=>{await gather('root',1);await pickup('acorn',6);await gather('ssari',1);if(await read('(G.inv.ssari||0)<2'))await gather('kkoe',1);await craft('jeolgu','powder',2);await npc('dodam');});
-    await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);await npc('nal',/숯이랑 바꾸자/);await npc('musoe');await battle(['rice']);await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
+    await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);await npc('nal',/숯이랑 바꾸자|숯을 구한다/);await npc('musoe');await battle(['rice']);await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
     await stage('단풍골 · 당산나무와 약',async()=>{
       if(mode==='expanded')await zone('forest');await moveX((await read('G.barrier.x'))-28);
       for(let i=0;i<5&&!await read('G.barrier.cut');i++){await key('j');await wait(400);}
