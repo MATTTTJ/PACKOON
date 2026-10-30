@@ -99,8 +99,7 @@ function nalMenu(){
   c.push({t:'아빠 짐의 약연을 내민다',go:nalYakyeon});
   if(!G.f.nalDone&&G.rel.nal.v===0)c.push({t:'허세 부리기: "흥, 촌구석 숯이 다 그렇지"',go:nalBluff});
   if(!CLASSIC){
-    c.push({t:G.f.craftTrade_salt?'바꿔 간 소금 이야기':'칡 줄기로 소금과 깨 바꾸기',go:nalCraftSalt});
-    c.push({t:'다음 장사터의 참기름을 묻는다',go:nalCraftOilHint});
+    c.push({t:G.f.craftTrade_salt?'바꿔 간 소금 이야기':G.f.nalBasketSeen?'바구니 테 감을 칡 줄기 이야기':'지게 바구니 테가 풀린 걸 알려 준다',go:nalCraftSalt});
   }
   c.push({t:'그만두기',go:null});
   talk([['날쌘',G.f.nalDone?'또 뭐야? 볼일 끝났으면 길 좀 비켜.':'그래서, 뭘 내놓을 건데?',c]]);
@@ -115,7 +114,7 @@ function nalTrade(){
       '날쌘에게 허세를 부렸더니 숯을 하나 더 얹어 주었다. 꼬마가 숯 보는 눈은 아직이라며 코웃음을 쳤다.');
     return;
   }
-  talk(extra?[['날쌘','봐, 이게 제대로 된 숯이야. 하나 더 얹어 줄 테니 써 봐.'],['날쌘','써 보고도 촌구석 소리가 나오나 보자고.']]:[['날쌘','자, 숯 하나. 딱 맞게 바꾼 거야.'],['날쌘','무쇠 영감한테 줄 거야? 그 영감, 여간 까다로운 게 아닌데.']]);
+  talk(extra?[['날쌘','봐, 이게 제대로 된 숯이야. 하나 더 얹어 줄 테니 써 봐.'],['날쌘','써 보고도 촌구석 소리가 나오나 보자고.']]:[['날쌘','자, 숯 하나. 딱 맞게 바꾼 거야.'],['날쌘','무쇠 아저씨한테 줄 거야? 그 양반, 여간 까다로운 게 아닌데.']]);
 }
 function nalYakyeon(){
   learn('nal:yakyeon');
@@ -127,25 +126,24 @@ function nalBluff(){
   talk([['너구리','흥, 촌구석 숯이 다 그렇지.'],['날쌘','뭐? 촌구석?'],['날쌘','꼬마 보부상이 말은 잘하네.\n바꿔 가 봐. 내 숯이 어떤지 보여 줄 테니까.']],nalMenu);
 }
 
-/* 선택 재료 수량은 trades.csv의 t_craft_salt 그대로다. 필수 교환과 별개로 한 번만 바꾼다. */
+/* 선택 재료 수량은 trades.csv의 t_craft_salt 그대로다. 필수 교환과 별개로 한 번만 바꾼다.
+   아이가 본 것(풀린 바구니 테)에서 시작한다. 날쌘이 줄기를 원하는 까닭과 소금·깨를 내놓는 까닭을 말한다. */
 function nalCraftSalt(){
   if(G.f.craftTrade_salt){talk([['날쌘','소금 종지랑 깨는 벌써 줬잖아.\n묵을 쑤든, 깨랑 찧든 네 솜씨껏 써.']]);return;}
   ledger('t_craft_salt','날쌘','칡 줄기 1','소금 2 + 깨 1');
+  const first=!G.f.nalBasketSeen;G.f.nalBasketSeen=true;
+  const lead=first?[['날쌘','봤어? 숯 바구니 테가 풀려서\n걸을 때마다 숯가루가 새.']]:[];
   if(!has('vine')){
-    talk([['날쌘','바구니 엮을 칡 줄기 하나면\n소금 두 종지에 깨 한 봉지. 남은 건 그것뿐이야.'],
-      ['날쌘','억지로 뜯을 건 없어. 당산나무 칡이 풀리면\n줄기쯤은 발에 채일 테니까.']]);return;
+    talk([...lead,['날쌘','칡 줄기 하나면 다시 감을 텐데.\n숯 말고 지게에 남은 건 소금이랑 깨뿐이야.'],
+      ['날쌘','줄기 구해 오면 소금 두 종지에 깨 한 봉지.\n당산나무 칡이 풀리면 발에 채일 거야.']]);return;
   }
-  talk([['날쌘','질긴 줄기네. 이걸로 바구니 테를 엮으면 되겠어.\n소금 두 종지랑 깨 한 봉지, 바꿀래?',[
+  talk([...lead,['날쌘','마침 질긴 칡 줄기네. 그걸로 테를 감으면 되겠어.'],
+    ['날쌘','숯 말고 남은 건 소금이랑 깨뿐이야.\n소금 두 종지에 깨 한 봉지, 바꿀래?',[
     {t:'칡 줄기 1개를 건넨다',go:()=>{
       if(G.f.craftTrade_salt||!has('vine'))return;
       takeItem('vine',1);addItem('salt',2);addItem('sesame',1);G.f.craftTrade_salt=true;ledgerDone('t_craft_salt');
-      talk([['날쌘','가루에 소금 넣고 묵 쑤는 건 알지?\n깨도 볶아 놨으니, 소금이랑 같이 찧어 봐.']]);
+      talk([['날쌘','이제 숯가루 안 새겠네.'],['날쌘','가루에 소금 넣고 묵 쑤는 건 알지?\n깨도 볶아 놨으니, 소금이랑 같이 찧어 봐.']]);
     }},{t:'줄기는 더 살펴보고 올게',go:null}]]]);
-}
-function nalCraftOilHint(){
-  // t_craft_oil의 원래 지역과 재료를 유지한다. 단풍골에서 억새를 요구하지 않는다.
-  talk([['날쌘','참기름? 그건 북쪽 가서 풀 물건이야.\n이런 촌구석에 꺼내기엔 아깝지.'],
-    ['날쌘','다음 마을에서 만나면 그때 흥정하자.\n꼬마 보부상이 거기까지 오기나 한다면.']]);
 }
 
 /* ---------- 무쇠 (삼촌, 아빠의 동생인 너구리 대장장이) ----------
@@ -385,12 +383,16 @@ function talkToad(){
       ['두꺼비 할멈','전설의 열매라… 남들은 부자가 된다지만,\n나는 잃어버린 걸 돌려준다고 들었단다.'],
       ['두꺼비 할멈','네 아빠도 그 열매를 묻더니 북쪽으로 갔단다.'],
       ['두꺼비 할멈','…보따리에 약연 자루가 비죽 나왔구나.\n그건 아직 네가 쓸 때가 아니란다.']]);
-  }else talk([['두꺼비 할멈','해머루를 가져오렴. 당산나무 꼭대기란다.']]);
+  }else{
+    const c=Rg.expLanternChoice?.();
+    talk([['두꺼비 할멈','해머루를 가져오렴. 당산나무 꼭대기란다.',...(c?[[c,{t:'다녀올게요',go:null}]]:[])]]);
+  }
 }
 function toadFarewell(){
   const F=G.f,c=[{t:'북쪽으로 떠난다',go:endGame}];
   if(Rg.arcsEnabled()&&!F.galArcToad2&&G.rel.toad.v>=1)c.push({t:'엄마를 아는지 묻는다',go:toadWinter});
   if(Rg.arcsEnabled()&&F.galArcToad2&&!F.galArcToad3)c.push({t:'떠나기 전에 인사를 드린다',go:toadWrap});
+  {const lc=Rg.expLanternChoice?.();if(lc)c.push(lc);}
   if(!knows('home:'+Rg.id))for(const item of ['acorn_jelly','sesame_salt'])if(has(item))
     c.push({t:ITEMS[item].n+'을 까치 편에 보낸다',go:()=>galSendHome(item)});
   c.push({t:'마을을 좀 더 둘러본다',go:null});
@@ -591,22 +593,22 @@ if(!CLASSIC){
   function brothersTalk(){
     const sorted=G.f.galExpBrothersSorted;
     if(G.f.galExpBrothersAsked&&sorted){
-      talk([['다람쥐 형제','형: 큰 것부터 번갈아 놓으니 양쪽이 비슷하네.\n동생: 내 몫이 적다고만 생각했는데!'],
+      talk([['다람쥐 형','큰 것부터 번갈아 놓으니 양쪽이 비슷하네.'],['다람쥐 동생','내 몫이 적다고만 생각했는데!'],
         ['너구리','한 바구니에 담고,\n겨울에 같이 먹으면?'],
-        ['다람쥐 형제','형: 그럼 내가 숨긴 자리를 적어 둘게.\n동생: 난 덮어 둔 낙엽 모양을 그려 둘래!'],
-        ['다람쥐 형제','형: 높은 가지에 붉은 옹이가 있어. 그 아래 굵은 가지를 디뎌 봐.\n동생: 거기 우리 말고 누가 남긴 자국이 있더라!']
+        ['다람쥐 형','그럼 내가 숨긴 자리를 적어 둘게.'],['다람쥐 동생','난 덮어 둔 낙엽 모양을 그려 둘래!'],
+        ['다람쥐 형','높은 가지에 붉은 옹이가 있어.\n그 아래 굵은 가지를 디뎌 봐.'],['다람쥐 동생','거기 우리 말고 누가 남긴 자국이 있더라!']
       ],()=>{
         diary('galExpBrothers','다람쥐 형제와 도토리를 큰 것부터 번갈아 나눴다. 겨울에는 같은 바구니에서 먹기로 했다. 형제가 숲 높은 가지의 붉은 옹이를 알려 주었다.');
         finishWanderer('squirrel_brothers');
       });return;
     }
     if(G.f.galExpBrothersAsked){
-      talk([['다람쥐 형제','동생: 우린 아직 큰 도토리를 서로 세고 있어.\n형: 오른쪽 낮은 평상에서 같이 나눠 주기로 했잖아!']],shareBaskets);return;
+      talk([['다람쥐 동생','우린 아직 큰 도토리를 서로 세고 있어.'],['다람쥐 형','오른쪽 낮은 평상에서 같이 나눠 주기로 했잖아!']],shareBaskets);return;
     }
-    talk([['다람쥐 형제','형: 내가 일곱 번을 오갔으니 큰 도토리는 내 몫이지.\n동생: 내가 낙엽을 걷어 찾았잖아!'],
+    talk([['다람쥐 형','내가 일곱 번을 오갔으니 큰 도토리는 내 몫이지.'],['다람쥐 동생','내가 낙엽을 걷어 찾았잖아!'],
       ['너구리','겨울 먹을 거야?\n작은 것만 한쪽에 몰렸네.'],
-      ['다람쥐 형제','형: 큰 건 몇 알 안 되는데, 둘 다 욕심이 나서.\n동생: 도담처럼 묻어 놓고 잊을까 봐 더 그래.'],
-      ['다람쥐 형제','오른쪽 낮은 평상으로 바구니를 옮겨 둘게.\n어떻게 나누면 좋을지 같이 봐 줄래?',[
+      ['다람쥐 형','큰 건 몇 알 안 되는데, 둘 다 욕심이 나서.'],['다람쥐 동생','도담처럼 묻어 놓고 잊을까 봐 더 그래.'],
+      ['다람쥐 형','오른쪽 낮은 평상으로 바구니를 옮겨 둘게.\n어떻게 나누면 좋을지 같이 봐 줄래?',[
         {t:'같이 고르게 나눠 보자',go:()=>{G.f.galExpBrothersAsked=true;toast('오른쪽 낮은 평상에서 바구니를 나누자 · E');}},
         {t:'다음에 같이 보자',go:null}]]]);
   }
@@ -645,8 +647,8 @@ if(!CLASSIC){
   // 만난 뒤로 까치는 물레방아 곁에 앉아 있다. 방아를 같이 고치고, 다 고친 뒤에도 그 소리를 듣는다.
   const wheelMagpie={id:magpie.id,name:magpie.name,x:1120,draw:magpie.draw,talk:magpie.talk};
   Object.defineProperty(wheelMagpie,'greeting',{get:()=>magpie.greeting});
-  const brothers={id:'squirrel_brothers',name:'다람쥐 형제',x:620,draw:picture('brothers'),talk:brothersTalk,
-    greeting:'형: 큰 것부터 번갈아!\n동생: 겨울에는 한 바구니에서!'};
+  const brothers={id:'squirrel_brothers',name:'다람쥐 형제',speakers:['다람쥐 형','다람쥐 동생'],x:620,draw:picture('brothers'),talk:brothersTalk,
+    greeting:[['다람쥐 형','큰 것부터 번갈아!'],['다람쥐 동생','겨울에는 한 바구니에서!']]};
   const chick={id:'lost_chick',name:'꺼병이',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
     greeting:'이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!'};
   function wheelStage(){
@@ -684,11 +686,11 @@ if(!CLASSIC){
         {t:'받쳐 주는 손에 맞춰 조립한다',go:()=>hands('함께 물레방아 맞추기','wheel_fit',[
           '굴대의 홈을 위로 돌린다','빠진 살을 홈에 끼운다','까치가 물고 있던 쐐기를 받아 박는다'],()=>{
             F.galWheelStage=4;diary('galWheelFit','까치가 쐐기를 물고 있는 동안 숲에서 찾은 살을 끼웠다. 물레방아가 다시 한 몸이 됐다.');
-            talk([['너구리','이제 물만 돌리면 돼.'],['늙은 까치','물길 위에 칡이 엉켰구나.\n날 선 것이 있어야 걷히겠다.']]);
+            talk([['너구리','이제 물만 돌리면 돼요.'],['늙은 까치','물길 위에 칡이 엉켰구나.\n날 선 것이 있어야 걷히겠다.']]);
           })},{t:'조금 쉬고 맞춘다',go:null}]]]);return;
     }
     if(G.tool!=='sickle'){
-      talk([['너구리','물길 위를 마른 칡이 막았네.'],['늙은 까치','무쇠가 네 아비 낫을 맡아 두고 있다더라.\n그게 오면 이 칡도 걷히겠지.']]);return;
+      talk([['너구리','물길 위를 마른 칡이 막았어요.'],['늙은 까치','무쇠가 네 아비 낫을 맡아 두고 있다더라.\n그게 오면 이 칡도 걷히겠지.']]);return;
     }
     talk([['너구리','낫으로 덩굴부터 걷을게요.'],['늙은 까치','수문은 조금씩 열렴.\n내가 물을 볼 테니 넌 손잡이를 잡아.',[
       {t:'덩굴을 걷고 수문을 함께 연다',go:()=>hands('물레방아에 물 돌리기','wheel_water',[
@@ -720,19 +722,24 @@ if(!CLASSIC){
     const F=G.f;
     if(!F.galExpBrothersSorted){shareBaskets();return;}
     if(!done('squirrel_brothers')){brothersTalk();return;}
-    if(F.galWheelAxle){talk([['다람쥐 형제','형: 굴대는 물레방아 받침에 올려 뒀어.\n동생: 셋이 드니 하나도 안 무거웠지?']]);return;}
-    if(!F.galWheelStage){talk([['다람쥐 형제','형: 이 통나무는 물레방아 굴대야.\n동생: 누가 고치러 온대? 개울에 물어보자.']]);return;}
-    talk([['다람쥐 형제','형: 무쇠 아저씨가 깎아 둔 굴대야.\n동생: 우린 둘이 들어도 한쪽이 자꾸 처져.'],
+    if(F.galWheelAxle){talk([['다람쥐 형','굴대는 물레방아 받침에 올려 뒀어.'],['다람쥐 동생','셋이 드니 하나도 안 무거웠지?']]);return;}
+    if(!F.galWheelStage){talk([['다람쥐 형','이 통나무는 물레방아 굴대야.'],['다람쥐 동생','근데 고칠 사람이 없어.\n무쇠 아저씨는 다리가 아프대.']]);return;}
+    talk([['다람쥐 형','무쇠 아저씨가 깎아 둔 굴대야.'],['다람쥐 동생','우린 둘이 들어도 한쪽이 자꾸 처져.'],
       ['너구리','내가 가운데를 들게.\n아까 도토리처럼 양쪽을 맞추자.',[
         {t:'형제와 굴대 무게를 나눠 든다',go:()=>hands('셋이 굴대 들기','wheel_axle',[
           '형이 드는 쪽을 함께 받친다','동생 쪽도 같은 높이로 든다','개울 받침까지 함께 옮긴다'],()=>{
             F.galWheelAxle=true;F.galWheelStage=wheelStage();
             diary('galWheelAxle','형제와 굴대를 나눠 들고 개울 받침까지 옮겼다. 셋이 드니 한쪽으로 처지지 않았다.');
-            talk([['다람쥐 형제',F.galWheelSpoke?'형: 굴대는 개울 받침에 왔어.\n동생: 살도 찾았으니 이제 끼우자!':'형: 굴대는 개울 받침에 올려 뒀어.\n동생: 살만 오면 끼우기만 하면 돼!']]);
+            talk(F.galWheelSpoke?[['다람쥐 형','굴대는 개울 받침에 왔어.'],['다람쥐 동생','살도 찾았으니 이제 끼우자!']]
+              :[['다람쥐 형','굴대는 개울 받침에 올려 뒀어.'],['다람쥐 동생','살만 오면 끼우기만 하면 돼!']]);
           })},{t:'손 놓을 자리를 먼저 본다',go:null}]]]);
   }
+  // 반딧불 부탁은 할멈 대화에서만 연다 (할멈이 곁에 없을 때 할멈 대사가 나오지 않게).
   function lanternTalk(){
     const F=G.f;
+    if(F.galLanternAsked&&!F.galLanternLit&&(F.galLanternCount||0)<3){
+      talk([['두꺼비 할멈','낮은 갈대, 돌 위, 약재 선반 옆이란다.\n등롱 입구만 열어 두면 제 발로 들어오지.']]);return;
+    }
     if(F.galLanternLit){talk([['너구리','불빛이 처마 아래로 모였네.'],['두꺼비 할멈','문을 열어 뒀으니 아침이면 갈대로 돌아가겠지.\n또 올 때는 빈 등롱만 살펴 주렴.']]);return;}
     if(F.galLanternCount>=3){
       talk([['너구리','세 마리 다 왔어요.'],['두꺼비 할멈','뚜껑은 닫지 마렴.\n들어앉을 자리만 내어 주면 된단다.',[
@@ -744,21 +751,32 @@ if(!CLASSIC){
           })},{t:'먼저 불빛을 보고 있는다',go:null}]]]);return;
     }
     talk([['두꺼비 할멈','약재를 추려야 하는데 처마가 어둡구나.\n늪의 반딧불에게 잠깐 빛을 빌려 볼까.'],
-      ['너구리','잡아 와요?'],['두꺼비 할멈','아니, 빈 등롱을 내밀렴. 앉으면 같이 오는 거지.\n낮은 갈대, 돌 위, 처마 아래에 한 마리씩 있단다.',[
-        {t:'빈 등롱을 들고 갈대로 간다',go:()=>{F.galLanternAsked=true;toast('왼쪽 갈대, 가운데 디딤돌 위, 약재 선반 옆 불빛 · E');}},
+      ['너구리','잡아 와요?'],['두꺼비 할멈','아니, 빈 등롱을 내밀렴. 앉으면 같이 오는 거지.\n낮은 갈대, 돌 위, 약재 선반 옆에 한 마리씩 있단다.',[
+        {t:'빈 등롱을 받아 갈대로 간다',go:()=>{F.galLanternAsked=true;toast('왼쪽 갈대, 가운데 디딤돌 위, 약재 선반 옆 불빛 · E');}},
         {t:'약 이야기부터 할게요',go:talkToad}]]]);
+  }
+  Rg.expLanternChoice=()=>{
+    const F=G.f;if(CLASSIC||F.galLanternLit)return null;
+    return {t:(F.galLanternCount||0)>=3?'반딧불이 다 왔다고 말씀드린다':F.galLanternAsked?'반딧불 자리를 다시 묻는다':'어두운 처마 이야기를 한다',go:lanternTalk};
+  };
+  // 반딧불 표식과 불빛 자리는 아이 혼자 보는 곳이다. 할멈 대사를 부르지 않는다.
+  function fireflyLook(){
+    const F=G.f;
+    if((F.galLanternCount||0)>=3){talk([['너구리','세 마리 다 등롱에 있어.\n할멈께 가져가서 처마에 걸자.']]);return;}
+    if(F.galLanternAsked){talk([['너구리','등롱 걸 자리는 여기 처마 밑이야.\n갈대, 디딤돌, 선반 옆 불빛부터 데려오자.']]);return;}
+    talk([['너구리','처마 밑에 작은 불빛이 들락거린다.\n할멈 약방이 어두워서 그런가.']]);
   }
   function inviteFirefly(i){
     const F=G.f;
-    if(!F.galLanternAsked){lanternTalk();return;}
+    if(!F.galLanternAsked){talk([['너구리','작은 불빛이 깜박인다.\n빈손으로 다가가면 날아가 버리겠지.']]);return;}
     if(F['galLanternFly'+i]){talk([['너구리','여기 앉던 반딧불은 등롱에 있어.\n다른 데도 둘러보자.']]);return;}
     hands('반딧불에게 자리 내어 주기','lamp_'+i,['불빛 아래로 등롱을 받친다','가만히 손을 펴 앉을 곳을 보인다'],()=>{
       F['galLanternFly'+i]=true;F.galLanternCount=[0,1,2].filter(n=>F['galLanternFly'+n]).length;
-      talk([['너구리',F.galLanternCount===3?'다 왔네.\n처마에 등롱을 걸자.':'앉았다. 꽉 쥐지는 않을게.\n다음 불빛도 찾아보자.']]);
+      talk([['너구리',F.galLanternCount===3?'다 왔네.\n할멈께 가져가서 처마에 걸자.':'앉았다. 꽉 쥐지는 않을게.\n다음 불빛도 찾아보자.']]);
     });
   }
-  const fireflies={id:'reed_fireflies',name:'반딧불',x:1760,draw:(x,y)=>Rg.expArt.marker(x,y),talk:lanternTalk,
-    greeting:'등롱 입구로 작은 빛이 드나든다.\n잡아 두지 않아도 환하네.'};
+  const fireflies={id:'reed_fireflies',name:'반딧불',x:1760,draw:(x,y)=>Rg.expArt.marker(x,y),talk:fireflyLook,
+    greeting:[['너구리','등롱 입구로 작은 빛이 드나든다.\n잡아 두지 않아도 환하네.']]};
   Rg.expWanderers={village:[magpie],forge:[brothers],forest:[chick],marsh:[fireflies],hill:[]};
   function examine(id,x,label,read,y){
     return {id,x,label,...(y===undefined?{}:{y}),get text(){return read();}};
@@ -804,9 +822,12 @@ if(!CLASSIC){
   Rg.zones.village.npcs.push(work('wheel',1050,'물레방아 함께 고치기',wheelTalk));
   Rg.zones.forge.npcs.push(work('baskets',810,'평상에서 도토리 나누기 · 굴대 함께 들기',wheelAxle));
   Rg.zones.forge.npcs.push(work('spoke',430,'낮은 가지의 물레방아 살 받기',wheelSpoke));
-  Rg.zones.marsh.npcs.push(work('fly_reeds',520,'갈대의 반딧불에게 등롱 내밀기',()=>inviteFirefly(0)),
-    work('fly_stone',1030,'디딤돌 위 불빛에 등롱 내밀기',()=>inviteFirefly(1),158),
-    work('fly_shelf',1450,'선반 옆 불빛에 등롱 내밀기',()=>inviteFirefly(2)));
+  const flySpot=(id,x,where,i,y)=>{const w=work(id,x,'',()=>inviteFirefly(i),y);
+    const label=()=>where+(G.f.galLanternAsked?' 불빛에 등롱 내밀기':' 불빛 보기');
+    Object.defineProperty(w,'name',{get:label});Object.defineProperty(w,'prompt',{get:label});return w;};
+  Rg.zones.marsh.npcs.push(flySpot('fly_reeds',520,'갈대의',0),
+    flySpot('fly_stone',1030,'디딤돌 위',1,158),
+    flySpot('fly_shelf',1450,'선반 옆',2));
   Rg.expStep=()=>{
     if(G.zone!=='forest'||!G.f.galExpChickWith||done('lost_chick'))return;
     if(G.f.galExpChickArrived){G.f.galExpChickX=2090;return;}

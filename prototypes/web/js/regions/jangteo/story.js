@@ -127,7 +127,7 @@ defineMinigame({id:'jangteoHands',hit:handHit,step(){
 
 /* 장날 네 말 윷. 판·업기·잡기는 지역 규칙이며 타이밍 바늘은 채집 수치를 재사용한다.
    던진 뒤 옮기고, 윷·모 또는 잡기면 다시 던진다. 빽도는 쓰지 않는다. */
-const yutP=makePanel('jangteoYut','설날 윷놀이 · 콩 네 말','윷 들기');
+const yutP=makePanel('jangteoYut','설날 윷놀이 · 콩 말과 돌 말','윷 들기');
 const ycv=$('jangteoYutCv');ycv.height=240;
 Object.assign(yutP.style,{position:'fixed',left:'50%',right:'auto',top:'50%',bottom:'auto',transform:'translate(-50%,-50%)',width:'min(92vw,760px)',maxHeight:'92dvh',overflowY:'auto',boxSizing:'border-box',zIndex:'22'});
 const ychoices=el('div');ychoices.id='jangteoYutChoices';yutP.appendChild(ychoices);
@@ -164,7 +164,7 @@ const youngStories=[
   '우리가 길을 잘못 들까 봐 해 질 녘 깃대에 헝겊도 묶고 갔지.'
 ];
 function yStory(){
-  const s=yg(),i=Math.min(youngStories.length-1,Math.floor((s.throws-1)/5));
+  const s=yg(),i=Math.min(youngStories.length-1,Math.floor((s.throws-1)/(s.me.length===1?3:5)));
   if(i>=0&&!s.heard.includes(i)){s.heard.push(i);s.story=youngStories[i];}
   else s.story=G.f.night?'노인들: 등불이 켜지니 콩 그림자도 길어졌네. 낮에 놓친 길도 보이지.':'노인들: 말부터 골라 보거라. 모퉁이에 서면 안길로 꺾을 수 있단다.';
 }
@@ -218,23 +218,32 @@ function yRender(){
   const main=$('jangteoYutBtn');main.hidden=!['ready','aim','elder','review'].includes(s.phase);
   main.textContent=s.phase==='ready'?'윷 들기 · Space / J':s.phase==='aim'?'지금 던지기 · Space / J':s.phase==='elder'?'노인들 차례 보기 · Space / J':'다음 차례 · Space / J';
   if(s.phase==='ready'||s.phase==='aim')yButton('손에 맡겨 던지기 (타이밍 없이)',()=>yThrow(yRandom()));
-  if(s.phase==='choose')s.me.forEach((p,i)=>{if(p.node!=='H')yButton('콩 '+(i+1)+'번 옮기기',()=>yChoose(i));});
+  // 판 그림의 콩 번호와 같은 번호로 고른다. 출발에 남은 콩은 하나만, 업힌 콩은 한 버튼으로 보인다.
+  if(s.phase==='choose'){const seen=new Set();s.me.forEach((p,i)=>{
+    if(p.node==='H'||seen.has(p.node))return;seen.add(p.node);const n=s.me.filter(q=>q.node===p.node).length;
+    yButton((i+1)+'번 콩 · '+(p.node==='S'?'출발에서 새로':yNodeName(p.node))+(p.node!=='S'&&n>1?' (업은 콩 '+n+')':''),()=>yChoose(i));});}
   if(s.phase==='route')routeChoices(s.me[s.selected]).forEach(route=>{
     const end=yMove(s.me[s.selected],s.roll,route);
     yButton((route==='outer'?'바깥길':route==='b'?'왼쪽 안길':'오른쪽 안길')+' → '+yNodeName(end.node),()=>yApply('me',s.selected,route));
   });
   if(s.phase==='over'){
-    yButton('한 판 더 (물건 덤은 첫 판만)',()=>yNew());
+    for(const n of [1,2,4])yButton('한 판 더 · 말 '+YN[n]+(n===1?' (짧게)':''),()=>yNew(n));
     yButton('판을 마치고 일어나기',()=>{yutP.hidden=true;refreshHud();});
   }
   yleave.hidden=s.phase==='over';
   yDraw();
 }
-function yNodeName(node){return node==='H'?'들기':node==='S'?'출발':node==='C'?'가운데':node[0]==='A'?'바깥 '+node.slice(1)+'칸':'안길 '+node;}
+function yNodeName(node){return node==='H'?'들기':node==='S'?'출발':node==='C'?'가운데':node[0]==='A'?'바깥 '+node.slice(1)+'칸':
+  (node[0]==='B'?'왼쪽':'오른쪽')+' 안길 '+({1:1,2:2,4:3,5:4}[node[1]])+'칸';}
 function yRandom(){const up=Array.from({length:4},()=>Math.random()<.5?1:0).reduce((a,b)=>a+b,0);return up||5;}
 function yThrow(roll){
   const s=yg();if(!['ready','aim'].includes(s.phase))return;
-  s.roll=roll;s.throws++;s.phase='choose';s.message=ylabels[roll]+'! '+roll+'칸. 옮길 콩 말을 골라 보자.';yStory();yRender();
+  s.roll=roll;s.throws++;s.phase='choose';
+  // 고를 콩이 하나뿐이면 묻지 않고 바로 옮긴다 (갈림길은 그대로 묻는다).
+  const spots=new Set(s.me.filter(p=>p.node!=='H').map(p=>p.node));
+  s.message=ylabels[roll]+'! '+roll+'칸 갈 수 있다.'+(spots.size>1?' 몇 번 콩을 옮길까?':'');yStory();
+  if(spots.size===1){yChoose(s.me.findIndex(p=>p.node!=='H'));return;}
+  yRender();
 }
 function yChoose(i){
   const s=yg();if(s.phase!=='choose'||s.me[i].node==='H')return;s.selected=i;
@@ -247,7 +256,7 @@ function yApply(team,i,route){
   const end=yMove(p,s.roll,route);moving.forEach(q=>Object.assign(q,end));
   const caught=end.node!=='H'?s[other].filter(q=>q.node===end.node):[];
   caught.forEach(q=>Object.assign(q,pawn()));
-  s.message=(team==='me'?'콩':'돌')+' '+(i+1)+'번 · '+ylabels[s.roll]+'('+s.roll+'칸) → '+yNodeName(end.node)+'.'+(moving.length>1?' 업은 말도 함께!':'')+(caught.length?' 상대 말을 잡았다. 한 번 더!':s.roll>=4?' 한 번 더 던진다.':'');
+  s.message=(team==='me'?(i+1)+'번 콩':'노인들 '+(i+1)+'번 돌')+' · '+ylabels[s.roll]+'('+s.roll+'칸) → '+yNodeName(end.node)+'.'+(moving.length>1?' 업은 말도 함께!':'')+(caught.length?' 상대 말을 잡았다. 한 번 더!':s.roll>=4?' 한 번 더 던진다.':'');
   const winner=s[team].every(q=>q.node==='H');
   if(winner){yFinish(team);return;}
   s.turn=(caught.length||s.roll>=4)?team:other;s.phase='review';yRender();
@@ -262,7 +271,9 @@ function yElder(){
   }});yApply('elders',best.i,best.route);
 }
 function yFinish(team){
-  const s=yg();s.phase='over';s.turn=team;s.message=team==='me'?'콩 네 말이 다 들었다. 내가 이겼다!':'돌 네 말이 먼저 들었다. 이번 판은 노인들이 이겼다.';
+  const s=yg(),n=s.me.length;s.phase='over';s.turn=team;
+  s.message=team==='me'?(n===1?'콩이 먼저 들었다. 내가 이겼다!':'콩 말 '+YN[n]+'이 다 들었다. 내가 이겼다!')
+    :(n===1?'돌이 먼저 들었다.':'돌 말 '+YN[n]+'이 먼저 들었다.')+' 이번 판은 노인들이 이겼다.';
   s.story='노인들: 이겨도 져도 같이 앉은 벗이지. 다음엔 밤 불빛 아래서 놀아 보게.';
   if(!G.f.jxYutReward){G.f.jxYutReward=true;addItem('ssal',1);ledger('t_jangteo_yut','윷놀이 노인들','한 판 함께 놀기','쌀 1');ledgerDone('t_jangteo_yut');s.message+=' 승패와 관계없이 쌀 한 되를 받았다.';}
   G.f.jxYutPlays=(G.f.jxYutPlays||0)+1;
@@ -271,7 +282,9 @@ function yFinish(team){
   if(typeof grantNickname==='function')grantNickname('jangteo_yut','한판 벗','윷놀이 노인들');
   diary('jx_yut','노인들과 콩 말과 돌 말을 직접 옮기며 윷놀이를 했다. 젊은 아빠도 이 윷판에서 북쪽 장날을 물었단다. 깃대 밑 돌에 아빠의 옛 도장이 있다.');yRender();
 }
-function yNew(){G.f.jxYutGame={me:[pawn(),pawn(),pawn(),pawn()],elders:[pawn(),pawn(),pawn(),pawn()],phase:'ready',turn:'me',roll:0,throws:0,heard:[],story:G.f.night?'노인들: 낮엔 바빴지? 등불 밑에선 말 그림자도 보게.':'노인들: 자네 아빠 젊을 때도 여기서 한 판 놀았지.',message:'네 말씩 쓰는 장날 윷놀이. 윷·모·잡기는 옮긴 뒤 한 번 더. 빽도는 없어.'};yRender();}
+const YN={1:'하나',2:'둘',4:'넷'};
+// 결정 D-29: 첫 판(쌀 덤)은 말 하나로 짧게, 끝난 뒤 말 수를 고른다 (design/data/decisions.csv)
+function yNew(n=G.f.jxYutReward?4:1){G.f.jxYutGame={me:Array.from({length:n},pawn),elders:Array.from({length:n},pawn),phase:'ready',turn:'me',roll:0,throws:0,heard:[],story:G.f.night?'노인들: 낮엔 바빴지? 등불 밑에선 말 그림자도 보게.':'노인들: 자네 아빠 젊을 때도 여기서 한 판 놀았지.',message:(n===1?'말 하나로 먼저 드는 쪽이 이기는 짧은 판.':'말 '+YN[n]+'씩 쓰는 장날 윷놀이.')+' 윷·모·잡기는 옮긴 뒤 한 번 더. 빽도는 없어.'};yRender();}
 Rg.playYut=()=>{if(CLASSIC)return;yutP.hidden=false;if(!yg())yNew();else yRender();};
 function yHit(){
   if(yutP.hidden)return;const s=yg();
@@ -301,14 +314,14 @@ Rg.lanternTalk=()=>{
 };
 Rg.lanternAction=id=>{
   if(!night())return;
-  if(!G.f.jxLanternStarted){if(G.zone==='inn')Rg.lanternTalk();else talk([['너구리','빈 등걸이다.\n숙소 처마 밑 까치가 등불 꾸러미를 갖고 있었지.']]);return;}
+  if(!G.f.jxLanternStarted){if(G.zone==='inn')Rg.lanternTalk();else talk([['너구리','빈 등걸이다.\n숙소 처마 밑 까치 할머니가 등불 꾸러미를 갖고 계셨지.']]);return;}
   if(G.f.jxLanterns?.[id]){talk([['너구리',id==='pine'?'등 너머로 작은 코가 보여.\n솔숲 안에 누가 있나 봐.':'등이 잘 타네. 다음 등걸이도 보여.']]);return;}
   Rg.handWork('lantern',()=>{
     const lights=G.f.jxLanterns||(G.f.jxLanterns={});lights[id]=true;
     const done=Rg.lanternPoints.every(p=>lights[p.id]);
     const lines={porch:'처마 아래 짐꾼들 발이 보인다.\n눈 묻은 신을 벗고 들어오네.',gate:'창고문 가는 길이 환해졌다.\n돌아올 땐 이 등을 보고 오면 되겠다.',alley:'접힌 좌판 뒤에도 발자국이 있었네.\n저쪽이 숙소 지름길이구나.',pine:'눈 위에 작은 코 자국!\n솔숲 안에서 킁킁 소리가 나.'};
     if(done){G.f.jxLanternDone=true;diary('jx_lanterns','까치와 숙소·골목·솔숲 입구에 등을 달았다. 불빛을 따라 길손들이 돌아왔다. 솔숲 안에서 킁킁 소리가 났다.');}
-    talk([['너구리',lines[id]],...(done?[['너구리','불이 다 이어졌다.\n까치한테 알려 줘야지.']]:[])]);
+    talk([['너구리',lines[id]],...(done?[['너구리','불이 다 이어졌다.\n까치 할머니께 알려 드려야지.']]:[])]);
   });
 };
 
@@ -642,7 +655,7 @@ function nalMenu(){
     if(!F.nalJBluff)c.push({t:'허세 부리기: "흥, 팥 한 되가 뭐 그리 귀해!"',go:nalBluff});
   }
   if(!CLASSIC){
-    if(!F.jxCraftMarket)c.push({t:'솔방울로 떡 재료 바꾸기',go:marketCraftTrade});
+    if(!F.jxCraftMarket)c.push({t:'떡 재료를 더 구할 데를 묻는다',go:marketCraftTrade});
     if(F.nalJDone)c.push({t:'고사떡에 쓸 팥 다시 구하기',go:()=>{
       const id=has('memil_powder')?'memil_powder':'ssal_powder';
       if(!has(id)){talk([['날쌘','쌀가루 하나, 아니면 메밀가루 하나.\n엿방울한테 쌀을 받아 맷돌에 갈아 와.']]);return;}
@@ -656,16 +669,19 @@ function nalMenu(){
     F.nalJDone?'팥 아껴 쓰고 고사떡 잘 쪄.\n부엉 영감은 팥 빛깔까지 따지니까.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니겠지? 뭘 내놓을 건데?':'쌀가루 한 됫박엔 팥 한 되. 메밀가루면\n두 되 쳐줄게. 뭘 낼 건데?';
   talk([['날쌘',line,c]]);
 }
-/* 수량은 trades.csv t_craft_market 그대로. 엿방울의 필수 몫을 먼저 남긴다. */
+/* 수량은 trades.csv t_craft_market 그대로. 엿방울의 필수 몫을 먼저 남긴다.
+   날쌘은 숙소를 피해 밖에서 밤을 나서 솔방울(불쏘시개)이 필요하다. 까닭은 말하지 않는다 (nalLedger 복선). */
 function marketCraftTrade(){
   const enough=has('solbang',G.f.yeotDone?3:8);
-  talk([['날쌘',enough?'솔방울 셋이면 꿀, 참기름, 녹두, 팥.\n하나씩 묶어 줄게. 남은 건 그것뿐이야.':'엿방울한테 줄 다섯은 남겨 둬.\n솔숲에서 셋을 더 주워 오면 떡 재료랑 바꾸자.',
+  talk([['날쌘','꿀, 참기름, 녹두, 팥. 한 줌씩 남았어.\n떡 찌기엔 모자라지 않을걸.'],['너구리','뭐랑 바꿔 줘요?'],
+    ['날쌘','솔방울 셋. 밤에 불 피울 데가 있어서.'],
+    ['날쌘',enough?'넷 다 묶어 줄게. 바꿀래?':G.f.yeotDone?'솔숲에서 셋만 주워 와.':'엿방울한테 줄 다섯은 남겨 두고,\n솔숲에서 셋 더 주워 와.',
     enough?[{t:'솔방울 3개와 바꾼다',go:()=>{
       if(G.f.jxCraftMarket||!has('solbang',G.f.yeotDone?3:8))return;
       takeItem('solbang',3);for(const id of ['honey','sesame_oil','mung','pat'])addItem(id,1);
       G.f.jxCraftMarket=true;ledger('t_craft_market','날쌘','솔방울 3','떡 재료 묶음');ledgerDone('t_craft_market');
       talk([['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n엄마한테 보낼 건 네가 골라.']]);
-    }},{t:'다음에',go:null}]:[{t:'알겠어',go:null}]]]);
+    }},{t:'다음에',go:null}]:[{t:'알겠어요',go:null}]]]);
 }
 function nalTrade(id){
   const F=G.f;takeItem(id,1);F.nalJDone=true;ledgerDone('nal_jangteo');

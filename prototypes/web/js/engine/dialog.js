@@ -30,7 +30,8 @@ function tryTalk(){tryInteract();}
 function portrait(name){
   const c=document.createElement('canvas');c.width=30;c.height=24;
   const save=ctx;ctx=c.getContext('2d');
-  const n=[...fieldNpcs(),...zoneObjects('wanderers')].find(n=>n.name===name);
+  // speakers: 한 그림에 둘이 있는 인물(다람쥐 형제)은 한 사람씩 말한다. 초상은 같은 그림을 쓴다.
+  const n=[...fieldNpcs(),...zoneObjects('wanderers')].find(n=>n.name===name||n.speakers?.includes(name));
   if(n)n.draw(15,30,1);else drawPlayerAt(16,31,1,0,0,heldTool());   // 변신한 채면 그 모습 (forms.js)
   ctx=save;return c;
 }

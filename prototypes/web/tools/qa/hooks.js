@@ -40,7 +40,7 @@ function installInPage(rules) {
   function observe(line) {
     if (!line || typeof line[0] !== 'string') return;
     const speaker = line[0], text = String(line[1]);
-    const visible = [...fieldNpcs(), ...zoneObjects('wanderers')].filter(n => typeof n.draw === 'function').map(n => n.name).filter(Boolean);
+    const visible = [...fieldNpcs(), ...zoneObjects('wanderers')].filter(n => typeof n.draw === 'function').flatMap(n => [n.name, ...(n.speakers || [])]).filter(Boolean);
     const row = { region: G.region, zone: G.zone, x: G.px, y: G.py, speaker, text, visible,
       talk: currentTalk.number, stack: currentTalk.stack, ...origin(currentTalk.stack) };
     data.lines.push(row);
