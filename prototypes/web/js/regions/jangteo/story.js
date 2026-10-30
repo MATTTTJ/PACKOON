@@ -54,10 +54,10 @@ function bueongLedger(){
 }
 function nalLedger(){
   arcScene('jangteoArcsNal3','날쌘은 부엉 영감이 있는 숙소를 피했다. 장부 이야기는 꺼내지 말라고 했다.',[
-    ['너구리',G.f.nalDTalk?'돌너머에선 안 숨었잖아요.':'왜 숙소에서 떨어져 있어요?'],
-    ['날쌘','누가 숨어? 여기서도 장사 잘돼.'],
-    ['너구리','장부에 있던데요.'],
-    ['날쌘','…장부 얘기 하지 마라. 팥이나 봐.']
+    ['너구리','아저씨, 왜 숙소 쪽엔 안 와요?'],
+    ['날쌘','누가 피해? 여기서도 장사 잘돼.'],
+    ['너구리','부엉 영감님 장부에\n아저씨 이름이 있던데요.'],
+    ['날쌘','…장부 얘기 하지 마. 팥이나 봐.']
   ]);
 }
 function bueongPromise(){
@@ -614,7 +614,7 @@ function yeotTrade(){
 /* ---------- 날쌘 (다시 만남): 설 대목 팥 ---------- */
 function talkNal(){
   if(!G.f.nalJTalk){G.f.nalJTalk=true;ledger('nal_jangteo','날쌘','쌀가루 1 (또는 메밀가루 1)','팥');
-    talk([['날쌘',Rg.arcs()?'또 왔냐. 설 고사떡엔 팥이지. 이 대목엔 귀하거든?':'또 왔냐, 꼬마 보부상. 설 고사떡엔 팥이 꼭 들어가니, 이 대목엔 귀한 몸이지.']],nalMenu);}
+    talk([['날쌘',Rg.arcs()?'또 만났네. 설 고사떡엔 팥이지.\n이 대목엔 귀하거든?':'또 만났네, 꼬마 보부상. 설 고사떡엔\n팥이 꼭 들어가니, 이 대목엔 귀한 몸이지.']],nalMenu);}
   else nalMenu();
 }
 function nalMenu(){
@@ -629,20 +629,20 @@ function nalMenu(){
     if(F.nalJDone)c.push({t:'고사떡에 쓸 팥 다시 구하기',go:()=>{
       const id=has('memil_powder')?'memil_powder':'ssal_powder';
       if(!has(id)){talk([['날쌘','쌀가루 하나, 아니면 메밀가루 하나.\n엿방울한테 쌀을 받아 맷돌에 갈아 와.']]);return;}
-      talk([['날쌘','떡을 다른 데 썼냐? 다시 바꾸면 되지.\n지난번이랑 같은 셈이다.',[
+      talk([['날쌘','떡을 다른 데 썼어? 다시 바꾸면 되지.\n지난번이랑 같은 셈이야.',[
         {t:ITEMS[id].n+' 1로 팥 바꾸기',go:()=>nalTrade(id)},{t:'다음에',go:null}]]]);
     }});
   }
   if(Rg.arcs()&&night()&&F.jangteoArcsBueong2&&!F.jangteoArcsNal3)c.push({t:'숙소를 피하는 까닭을 묻는다',go:nalLedger});
   c.push({t:'그만두기',go:null});
   const line=Rg.arcs()?(F.nalJDone?'팥 아껴 써. 부엉 영감은 빛깔까지 따지거든.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니네? 뭘 바꿀 건데?':'쌀가루 하나면 팥 하나. 메밀가루면 둘. 뭘 낼 건데?'):
-    F.nalJDone?'팥 아껴 쓰고 고사떡 잘 쪄라. 부엉 영감은 팥 빛깔까지 따지니까.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니겠지? 뭘 내놓을 테냐?':'쌀가루 한 됫박엔 팥 한 되. 메밀가루면 두 되 쳐주지. 뭘 낼 테냐?';
+    F.nalJDone?'팥 아껴 쓰고 고사떡 잘 쪄.\n부엉 영감은 팥 빛깔까지 따지니까.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니겠지? 뭘 내놓을 건데?':'쌀가루 한 됫박엔 팥 한 되. 메밀가루면\n두 되 쳐줄게. 뭘 낼 건데?';
   talk([['날쌘',line,c]]);
 }
 /* 수량은 trades.csv t_craft_market 그대로. 엿방울의 필수 몫을 먼저 남긴다. */
 function marketCraftTrade(){
   const enough=has('solbang',G.f.yeotDone?3:8);
-  talk([['날쌘',enough?'솔방울 셋이면 꿀, 참기름, 녹두, 팥.\n하나씩 묶어 주지. 한 번만이다.':'엿방울한테 줄 다섯은 남겨 둬.\n솔숲에서 셋을 더 주워 오면 떡 재료랑 바꾸자.',
+  talk([['날쌘',enough?'솔방울 셋이면 꿀, 참기름, 녹두, 팥.\n하나씩 묶어 줄게. 남은 건 그것뿐이야.':'엿방울한테 줄 다섯은 남겨 둬.\n솔숲에서 셋을 더 주워 오면 떡 재료랑 바꾸자.',
     enough?[{t:'솔방울 3개와 바꾼다',go:()=>{
       if(G.f.jxCraftMarket||!has('solbang',G.f.yeotDone?3:8))return;
       takeItem('solbang',3);for(const id of ['honey','sesame_oil','mung','pat'])addItem(id,1);
@@ -654,10 +654,10 @@ function nalTrade(id){
   const F=G.f;takeItem(id,1);F.nalJDone=true;ledgerDone('nal_jangteo');
   const n=(id==='memil_powder'?2:1)+(F.nalJBluff?1:0);addItem('pat',n);
   if(id==='memil_powder')learn('nal:jangteo-memil');
-  talk(id==='memil_powder'?[['날쌘','돌너머 메밀가루로군. 장터에선 귀하니 팥 '+n+'되 쳐주지. 잘 받은 줄 알아라.']]:[['날쌘','자, 팥 '+n+'되. 거래 끝이다.']]);
+  talk(id==='memil_powder'?[['날쌘','돌너머 메밀가루네. 장터에선 귀하니까\n팥 '+n+'되 쳐줄게. 잘 받은 줄 알아.']]:[['날쌘','자, 팥 '+n+'되. 거래 끝.']]);
 }
 function nalBluff(){G.f.nalJBluff=true;rel('nal',1);
-  talk([['너구리','흥, 팥 한 되가 뭐 그리 귀해!'],['날쌘','하! 대목 장사를 모르는 꼬마가 큰소리는.'],['날쌘','내 팥이 시시하단 말이냐? 좋아, 거래하면 한 되 더 얹어 주지.']],nalMenu);}
+  talk([['너구리','흥, 팥 한 되가 뭐 그리 귀해!'],['날쌘','하! 대목 장사도 모르는 꼬마가 큰소리는.'],['날쌘','내 팥이 시시하다고?\n좋아, 거래하면 한 되 더 얹어 줄게.']],nalMenu);}
 
 /* ---------- 숙소 마루: 쉬면 낮과 밤이 바뀐다 ---------- */
 function restMaru(){

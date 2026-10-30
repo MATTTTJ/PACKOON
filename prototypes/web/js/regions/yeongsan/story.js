@@ -23,23 +23,29 @@ const bindOK=()=>has('jip')||has('eoksae',2);
 function talkNal(){
   const F=G.f;
   if(!F.nalYTalk){F.nalYTalk=true;ledger('nal_yeongsan','날쌘','다래 덩굴 2 + 짚 1','설피');
-    talk([['날쌘','…꼬마 보부상, 여기까지 왔냐.'],['날쌘','눈이 허리까지 찬다. 그 발로는 어림없어. 설피를 엮어 주지.'],
-      ['날쌘','다래 덩굴 둘에 짚 하나. 덩굴 대신 싸리 살 하나, 짚 대신 마른 억새 둘도 받아.']],nalMenu);return;}
+    talk([['날쌘','…여기까지 왔네.'],['날쌘','눈이 허리까지 찬다. 그 발로는 어림없어.\n설피를 엮어 주지.'],
+      ['날쌘','다래 덩굴 둘에 짚 하나. 덩굴 대신 싸리 살 하나,\n짚 대신 마른 억새 둘도 받아.']],nalMenu);return;}
   nalMenu();
+}
+/* 설피를 받은 뒤 물을 수 있는 것. 고백(④)을 아직 안 들었으면 고백, 들었으면 아빠가 위에 있는 걸 아는 까닭. */
+function nalAskChoices(){
+  const F=G.f,c=[];if(!arcs())return c;
+  if(!F.yArcsNal4)c.push({t:'아빠를 어떻게 알아요?',go:()=>nalConfess(false)});
+  else if(!F.yNalAutumn)c.push({t:'아빠가 위에 있는 걸 어떻게 알아요?',go:nalAutumn});
+  return c;
 }
 function nalMenu(){
   const F=G.f;
   if(!CLASSIC&&F.nalYDone){
     const c=[];
     if(!F.yCraftJujube)c.push({t:'다래 덩굴로 대추를 바꾼다',go:craftJujube});
-    if(arcs()&&!F.yArcsNal4)c.push({t:'아빠를 어떻게 알아?',go:nalArc});
+    c.push(...nalAskChoices());
     c.push({t:'산길로 간다',go:null});
-    talk([['날쌘',F.shortcut?'눈신에 눈이 꽉 붙었네. 털고 가. 안쪽 길도 이제 알겠지.':'설피 끈 단단히 매. 눈 굴에서는 네 발자국을 따라 돌아오면 돼.',c]]);return;
+    talk([['날쌘',F.shortcut?'설피에 눈이 꽉 붙었네. 털고 가.\n안쪽 길도 이제 알겠지.':'설피 끈 단단히 매. 눈 굴에서는\n네 발자국을 따라 돌아오면 돼.',c]]);return;
   }
   if(F.nalYDone){
     if(arcs()){
-      const c=[];
-      if(!F.yArcsNal4)c.push({t:'아빠를 어떻게 알아?',go:nalArc});
+      const c=nalAskChoices();
       c.push({t:'산길로 간다',go:null});
       talk([['날쌘','설피 끈 단단히 매. 눈에 푹 빠지지 말고.',c]]);return;
     }
@@ -58,48 +64,73 @@ function craftJujube(){
   if(!has('darae_vine')){
     talk([['날쌘','대추 말려 뒀어. 덩굴 하나만 바꾸자.\n산막 옆이나 눈 굴 끝 덤불을 베 봐.']]);return;
   }
-  talk([['날쌘','남은 덩굴로 배를 묶어 둘 참이야.\n덩굴 하나에 말린 대추 둘, 어때?',[
+  talk([['날쌘','덩굴은 장작 묶는 데 써.\n하나에 말린 대추 둘, 어때?',[
     {t:'바꾼다',go:()=>{
       if(G.f.yCraftJujube||!has('darae_vine'))return;
       takeItem('darae_vine',1);addItem('jujube',2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
-      talk([['날쌘','잘 말렸지? 약연을 쓸 수 있게 되면\n마가목이랑 같이 갈아 봐.']]);
+      talk([['날쌘','잘 말렸지? 마가목이랑 같이\n약연에 갈아 봐.']]);
     }},{t:'지금은 놔둘게',go:null}]]]);
 }
 function nalTrade(){
   const F=G.f;
+  const vine=has('darae_vine',2)?'다래 둘':'싸리 살 하나',bind=has('jip')?'짚 하나':'억새 둘';
   if(has('darae_vine',2))takeItem('darae_vine',2);else takeItem('broom_sal',1);
   if(has('jip'))takeItem('jip',1);else takeItem('eoksae',2);
   F.nalYDone=true;F.seolpi=true;addItem('seolpi',1);ledgerDone('nal_yeongsan');
-  nickname('yeongsan_snow_walker','눈길 보부상','날쌘');
   if(arcs()){
     diary('y_nal','날쌘에게 재료를 건네고 설피를 받았다. 이번에는 덤 없이 제값으로 바꿨다.');
-    talk([['날쌘','(날쌘이 덩굴로 테를 짜고 짚을 엮는다.)'],
-      ['날쌘','직접 챙긴 재료로 눈길까지 여네. 눈길 보부상이야.'],
-      ['날쌘','자, 설피. 네 아빠는 저 위 호숫가에 있어.',[
-        {t:'아빠를 어떻게 알아?',go:nalArc},{t:'산길로 간다',go:null}]]]);return;
+    const done=()=>nalHandover(vine,bind);
+    // 장부를 본 아이만 먼저 장부 얘기를 꺼낼 수 있다. 장터에서 하다 만 얘기면 그걸 잇는다.
+    if(F.jangteoArcsBueong2&&!F.yArcsNal4){
+      talk([['날쌘','(날쌘이 재료를 무릎에 대고 둥글게 휜다.)',[
+        {t:F.jangteoArcsNal3?'장터에서 하다 만 장부 얘기를 꺼낸다':'장부 얘기를 꺼낸다',go:()=>nalConfess(true,done)},
+        {t:'말없이 기다린다',go:done}]]]);return;
+    }
+    talk([['날쌘','(날쌘이 재료를 무릎에 대고 둥글게 휜다.)']],done);return;
   }
+  nickname('yeongsan_snow_walker','눈길 보부상','날쌘');
   learn('nal:yeongsan');
   diary('y_nal','날쌘이 설피를 엮으며 아빠와 같은 보부상단이었다고 했다. 다들 날쌘을 얕봤지만, 아빠는 끝까지 그러지 않았단다.');
   const lines=[['날쌘','(날쌘이 말없이 덩굴로 테를 짜고 짚을 엮는다.)'],['날쌘','…나도 네 아빠랑 같은 보부상단에 있었다.'],
-    ['날쌘','다들 깍쟁이라고 날 얕봤지. 네 아빠는… 끝까지 그러지 않더군.']];
+    ['날쌘','다들 나보고 깍쟁이라고 얕봤지.\n네 아빠는… 끝까지 그러지 않더군.']];
   if(has('sinpyo')){addItem('fur_tosi',1);learn('nal:tosi');lines.push(['날쌘','(보따리 끈에 매단 신표를 보더니, 날쌘이 말없이 털토시를 얹어 준다.)']);}
   lines.push(['날쌘','직접 구한 재료로 눈길까지 여네. 눈길 보부상이야.'],['날쌘','가 봐라. 네 아빠, 저 위에 있다.']);
   talk(lines);
 }
-/* ④는 듣지 않아도 설피를 받는다. 앞 지역 표시는 읽기만 한다. */
-function nalArc(){
-  const F=G.f;if(!arcs()||!F.nalYDone||F.yArcsNal4)return;
-  const memory=F.nalJTalk?'장터에서도 봤지? 우연히 마주친 게 아냐.':
-    F.nalDTalk?'돌너머에서도 봤지? 우연히 마주친 게 아냐.':
-    F.nalTalk?'단풍골부터 널 앞질러 와서 지켜봤어.':'지난가을, 네 아빠가 북쪽으로 가는 걸 봤어.';
-  talk([['날쌘','나도 네 아빠랑 같은 보부상단에 있었어.'],
-    ['날쌘','내가 잃은 상단 물건값을 네 아빠가 대신 갚아 줬지.'],
-    ['날쌘','네 아빠는… 날 끝까지 얕보지 않았어.'],
-    ['날쌘',memory],['너구리','그래서 여기까지 왔어?'],
-    ['날쌘','빚 갚으러. 그래도 오늘 거래는 제값이야. 너도 보부상이잖아.']],()=>{
-      F.yArcsNal4=true;learn('nal:yeongsan');
-      diary('y_arcs_nal4','날쌘은 아빠가 대신 갚아 준 물건값을 기억하고 있었다. 내 앞에 나타난 것도 우연이 아니었다. 오늘은 나를 같은 보부상으로 대했다.');
-    });
+/* 설피를 건네며: 처음으로 덤 없이 제값. 별명은 날쌘이 그 이름을 부를 때 붙는다. */
+function nalHandover(vine,bind){
+  talk([['날쌘','(날쌘이 끈을 꼬아 설피에 매고, 이로 끊는다.)'],
+    ['날쌘',vine+', '+bind+'. 설피 한 켤레.\n덤은 없어.'],
+    ['너구리','이제 꼬마 보부상이라고 안 해요?'],
+    ['날쌘','꼬마는 무슨. 이제 눈길 보부상이지.\n보부상끼린 제값이야.'],
+    ['날쌘','신어. 네 아빠는 위에 있어.'],
+    ['너구리','아빠 만나면 말할게요.\n날쌘 아저씨가 설피 엮어 줬다고.'],
+    ['날쌘','…말하지 마. 가.']],()=>nickname('yeongsan_snow_walker','눈길 보부상','날쌘'));
+}
+/* ④ 날쌘의 고백. 듣지 않아도 설피는 받는다. 앞 지역 표시는 읽기만 한다.
+   fromLedger: 아이가 부엉 영감의 장부를 보고 먼저 꺼낸 경우. 아니면 "아빠를 어떻게 알아요?"에 답한다. */
+function nalConfess(fromLedger,next){
+  const F=G.f;if(!arcs()||F.yArcsNal4){if(next)next();return;}
+  const lines=[];
+  if(fromLedger){
+    if(F.jangteoArcsNal3)lines.push(['너구리','장터에서 하다 만 얘기요.\n부엉 영감님 장부에 있던 거.'],['날쌘','…끝까지 물고 늘어지네.']);
+    else lines.push(['너구리','부엉 영감님 장부에서 봤어요.\n아빠가 아저씨 대신 갚았다면서요.'],['날쌘','…영감이 그걸 보여 줬냐.']);
+  }
+  lines.push(['날쌘','같은 상단이었어. 내가 상단 물건 잃었을 때\n네 아빠가 물어 줬어.'],
+    ['날쌘','다들 나보고 깍쟁이라고 했어.\n네 아빠만 안 그랬고. 끝까지.']);
+  const met=[F.nalDTalk&&'돌너머에서도',F.nalJTalk&&'장터에서도'].filter(Boolean);
+  lines.push(['너구리','그럼 '+(met.length?met.join(', '):'여기서 기다린 것도')+'…'],
+    ['날쌘','단풍골에서 처음 봤을 때 그 모자,\n내가 갚을 게 많은 보부상 거거든.']);
+  // 묻고 나서 들은 경우엔 설피를 이미 받았으니, 아빠가 위에 있는 걸 아는 까닭까지 잇는다.
+  if(!fromLedger)lines.push(['날쌘','가을에 이 길로 올라가는 걸 봤어.\n내려오는 건 못 봤고.']);
+  talk(lines,()=>{
+    F.yArcsNal4=true;if(!fromLedger)F.yNalAutumn=true;learn('nal:yeongsan');
+    diary('y_arcs_nal4','날쌘은 아빠와 같은 상단이었다. 아빠가 날쌘이 잃은 물건값을 대신 물어 줬고, 다들 깍쟁이라 할 때도 아빠만은 그러지 않았다. 단풍골에서 아빠 모자를 보고 나를 앞질러 다녔단다.');
+    if(next)next();
+  });
+}
+function nalAutumn(){
+  talk([['날쌘','가을에 이 길로 올라가는 걸 봤어.\n내려오는 건 못 봤고.']],()=>{G.f.yNalAutumn=true;});
 }
 
 /* ---------- 살금이 (고라니 산지기): 귀를 세울 때는 멈춘다 (field.js) ---------- */
