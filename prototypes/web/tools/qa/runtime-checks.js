@@ -146,6 +146,8 @@ function measureScene(selectors) {
   return { viewport: [innerWidth, innerHeight], coarse: matchMedia('(pointer:coarse)').matches, roots: roots.filter(isVisible).length, buttons, overflow };
 }
 
+// 잴 장면 목록. 손일 미니게임은 PA-46에서 빠져 휴대폰 장면에서도 뺐다. 하나라도 못 재면 실패로 본다.
+const MOBILE_SCENES = ['title', 'prologue', 'bag', 'dialog'];
 async function runMobile({ browser, outDir, rules }) {
   const findings = [], scenes = [], evidence = [], steps = [];
   async function measure(name, selectors) {
@@ -154,11 +156,10 @@ async function runMobile({ browser, outDir, rules }) {
     if (!data.roots || !data.buttons.length) findings.push(failure('mobile-coverage', `${name}: 표시된 검사 상자나 버튼이 없어 이 장면을 측정하지 못했다.`, {scene:name,actual:data}));
     const image = path.join(outDir, `mobile-${name}.png`);
     const sceneSteps = ['390×844 터치 에뮬레이션과 빈 격리 저장에서 첫 화면을 연다.',
-      ...(['prologue', 'bag', 'dialog', 'minigame'].includes(name) ? ['새로 시작을 누른다.'] : []),
-      ...(['bag', 'dialog', 'minigame'].includes(name) ? ['단풍골로 떠나기를 누르고 엄마 쪽지를 닫는다.'] : []),
+      ...(['prologue', 'bag', 'dialog'].includes(name) ? ['새로 시작을 누른다.'] : []),
+      ...(['bag', 'dialog'].includes(name) ? ['단풍골로 떠나기를 누르고 엄마 쪽지를 닫는다.'] : []),
       ...(name === 'bag' ? ['보따리 버튼을 누른다.'] : []),
-      ...(['dialog', 'minigame'].includes(name) ? ['오른쪽 터치 버튼을 유지해 마을 x803까지 걷고 말걸기를 누른다.'] : []),
-      ...(name === 'minigame' ? ['까치 대화 네 줄을 진행하고 두 손으로 보자기를 눌러 드린다를 고른다.'] : [])];
+      ...(name === 'dialog' ? ['오른쪽 터치 버튼을 유지해 마을 x803까지 걷고 말걸기를 누른다.'] : [])];
     const context = { evidence: image, steps: sceneSteps, reproductions: '이번 실행 1회', environment: { url: browser.url, viewport: '390×844, DPR 1', input: 'CDP 실제 터치', start: '빈 격리 저장, 확장판 새 게임' } };
     if (!data.coarse || data.viewport[0] !== 390 || data.viewport[1] !== 844) findings.push(failure('mobile-emulation', `${name}: 390×844 터치 화면 조건이 맞지 않는다.`, { actual: data }));
     // 비활성 빈칸은 측정 기록에 남기되 아직 누를 수 있는 터치 표적으로 세지 않는다.
@@ -207,10 +208,12 @@ async function runMobile({ browser, outDir, rules }) {
   } finally {
     await browser.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }).catch(() => {});
   }
+  const missing = MOBILE_SCENES.filter(n => !scenes.some(s => s.name === n));
+  if (missing.length) findings.push(failure('mobile-coverage', '휴대폰 장면을 다 재지 못했다: ' + missing.join(', '), { expected: MOBILE_SCENES, actual: scenes.map(s => s.name) }));
   evidence.push(write(outDir, 'mobile-measurements.json', { input: 'CDP 실제 touchStart/touchEnd, 진행값·위치 주입 없음', steps, scenes, findings }));
   for (const f of findings) if (!f.environment) Object.assign(f, { evidence, steps: (f.steps || steps).map(s => s.replace(/^\d+\.\s*/, '')), reproductions: '이번 실행 1회',
     environment: { url: browser.url, viewport: '390×844, DPR 1', input: 'CDP 실제 터치', start: '빈 격리 저장, 확장판 새 게임' } });
-  return result('mobile', findings, evidence, `390×844 터치 화면 ${scenes.length}/5장면 측정, 작은 버튼 ${findings.filter(f => f.rule === 'touch-target').length}건, 글 넘침 ${findings.filter(f => f.rule === 'mobile-overflow').length}건. 실기기 조작감은 미확인이다.`);
+  return result('mobile', findings, evidence, `390×844 터치 화면 ${scenes.length}/${MOBILE_SCENES.length}장면 측정, 작은 버튼 ${findings.filter(f => f.rule === 'touch-target').length}건, 글 넘침 ${findings.filter(f => f.rule === 'mobile-overflow').length}건. 실기기 조작감은 미확인이다.`);
 }
 
 module.exports = { runEdges, runSave, runMobile, measureScene };
