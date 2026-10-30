@@ -150,24 +150,30 @@ Rg.onPickup=a=>{
 };
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:1770,item:'seogi',done:false});};
 
+/* 확장판의 변신 자리 (PA-47). 늘 구역을 단 채 저장되고 classic 변환이 건드리지 않는다. */
+const formSpotIds=['dol_goat_seogi','dol_cache_field','dol_cache_village'];
 // 같은 출처에서 표시 모드만 바꿔 이어 할 때도 남은 필수 재료를 숨기지 않는다.
 if(CLASSIC){
   const originalAmbient=Rg.ambient;
   Rg.ambient=()=>{
     // 옛 classic 저장에 이미 열린 자리도 골렘보다 앞쪽으로 옮긴다.
     if(G?.region===Rg.id)for(const d of G.digs)if(d.item==='seogi')d.x=1770;
-    if(G?.region===Rg.id&&[...G.pickups,...G.digs].some(p=>p.zone)){
+    // 변신 자리(PA-47)는 구역을 단 채 classic 저장에도 남는다. classic 은 구역 있는 자리를 그리지도 줍지도 않는다.
+    // 순번 id(dol_old_*)로 바뀌지 않게 확장판 저장 판정과 구역 지우기에서 뺀다.
+    const formSpot=p=>formSpotIds.includes(p.id);
+    if(G?.region===Rg.id&&[...G.pickups,...G.digs].some(p=>p.zone&&!formSpot(p))){
       const originalPickups=[[900,192],[945,192],[990,192],[1240,192],[1290,192],[1335,192],[670,118],[1412,118]];
       const extraIds=['dol_memil_extra1','dol_memil_extra2','dol_memil_extra3','dol_mistletoe_extra','dol_memory_seogi'];
       G.f.dolExtraPointState=G.f.dolExtraPointState||{};
       G.pickups=G.pickups.filter(p=>{if(!extraIds.includes(p.id))return true;G.f.dolExtraPointState[p.id]={got:p.got};return false;});
       for(const p of G.pickups){
+        if(formSpot(p))continue;
         const index=Number(p.id?.match(/^dol_old_pickup_(\d+)$/)?.[1]);
         if(Number.isInteger(index)&&originalPickups[index]){[p.x,p.y]=originalPickups[index];}
         if(p.item==='seoridarae'){p.x=2236;p.y=150;}
         delete p.zone;
       }
-      for(const d of G.digs){const index=Number(d.id?.match(/^dol_old_dig_(\d+)$/)?.[1]);if(Number.isInteger(index))d.x=[470,560,760,1030][index]??d.x;if(d.item==='seogi')d.x=1770;delete d.zone;}
+      for(const d of G.digs){if(formSpot(d))continue;const index=Number(d.id?.match(/^dol_old_dig_(\d+)$/)?.[1]);if(Number.isInteger(index))d.x=[470,560,760,1030][index]??d.x;if(d.item==='seogi')d.x=1770;delete d.zone;}
       G.boss.x=1990;G.zone=null;G.px=G.boss.dead?2150:G.f.ppuriPassed?1790:60;G.py=GROUND;G.vy=0;G.cam=clamp(G.px-168,0,2000);delete G.f.dolMemory;
     }
     originalAmbient();
