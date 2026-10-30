@@ -23,12 +23,13 @@ function arcScene(flag,text,lines,after){
 }
 // 결정 D-13: 큰 장터의 밤 얼굴 (design/data/decisions.csv)
 function morakNight(){
-  arcScene('jangteoArcsMorak2','모락은 멀리 떠난 새끼에게 보낼 설 떡을 따로 싸 두었다. 정작 자기 저녁은 아직이었다.',[
+  arcScene('jangteoArcsMorak2','모락은 멀리 떠난 새끼에게 보낼 설 떡을 따로 싸 두었다. 정작 자기 저녁은 아직이었다. 엄마 몫의 설 떡도 하나 싸 주었다.',[
     ['모락','먹고 해, 먹고! 어, 이 보자기는 따로야.'],
     ['너구리','누구 거예요?'],
     ['모락','멀리 간 우리 새끼 줄 설 떡이야!'],
     ['너구리','아주머니는요? 아주머니 저녁은요?'],
-    ['모락','내 저녁? 어이쿠, 그걸 잊었네!']
+    ['모락','내 저녁? 어이쿠, 그걸 잊었네!'],
+    ['모락','참, 네 엄마 몫도 하나 쌌어!\n네 엄마도 설 떡 드셔야지!']
   ]);
 }
 function yeotNight(){
@@ -160,12 +161,12 @@ const youngStories=[
   '젊은 아빠는 북쪽 장날부터 물었어. 장사도 길부터 알아야 한다면서.',
   '말 하나 잡히고 입이 댓 발 나왔지. 그래도 남의 콩은 주워 줬어.',
   '그땐 부를 준다는 열매 소문이 돌았지. 아빠도 그 소문을 쫓았고.',
-  '판 끝나니 장보따리 끈을 고쳐 주더군. 손은 어릴 때부터 야물었어.',
+  '판 끝나니 장보따리 끈을 고쳐 주더군. 손은 그때도 야물었어.',
   '우리가 길을 잘못 들까 봐 해 질 녘 깃대에 헝겊도 묶고 갔지.'
 ];
 function yStory(){
   const s=yg(),i=Math.min(youngStories.length-1,Math.floor((s.throws-1)/(s.me.length===1?3:5)));
-  if(i>=0&&!s.heard.includes(i)){s.heard.push(i);s.story=youngStories[i];}
+  if(i>=0&&!s.heard.includes(i)){s.heard.push(i);s.story='노인들: '+youngStories[i];}
   else s.story=G.f.night?'노인들: 등불이 켜지니 콩 그림자도 길어졌네. 낮에 놓친 길도 보이지.':'노인들: 말부터 골라 보거라. 모퉁이에 서면 안길로 꺾을 수 있단다.';
 }
 function yPoint(node){
@@ -431,10 +432,11 @@ function talkMorak(){
   if(!F.morakMet){F.morakMet=true;ledger('morak','모락','쌀가루 3','시루를 깨움');
     talk([['모락',Rg.arcs()?'어서 와, 꼬마야! 설 대목에 맷돌이 쩍 갈라졌지 뭐야!':'어서 와, 꼬마야!\n아이고, 설 대목에 우리 맷돌이 쩍 갈라져서 정신이 없네.'],
       ['모락',Rg.arcs()?'쌀가루 세 됫박이면 김 다루는 법을 알려 줄게!':'쌀가루가 모자라 떡을 못 찌네.\n세 됫박만 갈아다 주면 김 올리는 법을 가르쳐 줄게!'],
-      ['모락',Rg.arcs()?'쌀은 엿방울한테! 받아서 맷돌에 갈면 돼.':'쌀은 엿방울한테 가 봐! 엿 고고 남은 게 있을 거야.\n그걸 맷돌에 갈면 되지!']],()=>{if(has('ssal_powder',3))morakGive();});
+      ['모락',Rg.arcs()?'쌀은 엿방울한테 있어! 갈 맷돌이 문제지만.':'쌀은 엿방울한테 가 봐! 엿 고고 남은 게 있을 거야.\n갈 맷돌이 문제지만.'],
+      ['너구리','(내 보따리에 증조할아버지 맷돌이 있어!)']],()=>{if(has('ssal_powder',3))morakGive();});
     return;
   }
-  if(!F.morakPowder){if(has('ssal_powder',3))morakGive();else talk([['모락','쌀가루 세 됫박만 부탁해, 꼬마야!\n엿방울한테 쌀을 구해서 맷돌에 갈아 오면 돼!']]);return;}
+  if(!F.morakPowder){if(has('ssal_powder',3))morakGive();else talk([['모락','쌀가루 세 됫박만 부탁해, 꼬마야!\n쌀은 엿방울한테 있을 거야!']]);return;}
   if(!F.steamDone){talk([['모락','자, 다시 해 보자! 부채질은 조금씩, 김은 고르게!',[{t:'다시 아궁이 앞에 앉는다',go:openSteam},{t:'조금 이따가요',go:null}]]]);return;}
   if(Rg.arcs()&&night()&&!F.jangteoArcsMorak2){
     talk([['모락','먹고 해, 먹고! 가게 닫기 전에 한 입 먹을래?',[{t:'따로 싼 떡을 본다',go:morakNight},{t:'다음에 올게요',go:null}]]]);return;
@@ -810,7 +812,7 @@ Rg.sendMedicine=()=>{
 function sendMedicine(){
   G.f.hongsiMade=true;
   diary('j_end','눈홍시와 쌀가루로 홍시 약떡을 쪘다. 엄마가 동네에 떡을 돌리던 시루로, 이번엔 엄마를 위한 떡을 쪘다.');
-  talk([['너구리','엄마 드릴 홍시 약떡, 다 됐다!'],['너구리','(숙소 처마의 까치가 내려와 떡 보자기를 물었다.)'],['너구리','엄마한테 전해 줘. 엄마 시루로 쪘다고.']],()=>{
+  talk([['너구리','엄마 드릴 홍시 약떡, 다 됐다!'],['너구리','(숙소 처마의 까치가 내려와 떡 보자기를 물었다.)'],['너구리','엄마한테 전해 주세요. 엄마 시루로 쪘다고요.']],()=>{
     handMedicineToMagpie();
     talk([['너구리','(한참 뒤, 까치가 빈 떡보자기를 가져왔다.)'],
       ['너구리','(엄마가 빨아 갠 보자기에 말린 감 꼭지 하나가 들어 있다.)'],
