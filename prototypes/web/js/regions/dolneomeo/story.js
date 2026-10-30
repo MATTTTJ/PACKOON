@@ -43,7 +43,8 @@ function talkDolsoeArc(){
   const F=G.f;
   if(!Rg.arcs()||!F.dolsoeTea)return talkDolsoe();
   const c=[];
-  if(!F.dolneomeo_arc_dolsoe1)c.push({t:'꼭대기 돌은 누가 올렸어요?',go:()=>arcScene('dolneomeo_arc_dolsoe1',[
+  const atYard=!F.dolBridgeCrewHere||G.zone!=='gate'; // 다리 현장에서는 마당 돌탑 이야기를 꺼내지 않는다.
+  if(atYard&&!F.dolneomeo_arc_dolsoe1)c.push({t:'꼭대기 돌은 누가 올렸어요?',go:()=>arcScene('dolneomeo_arc_dolsoe1',[
     ['돌쇠 할배','(할배가 꼭대기 돌을 손끝으로 감싼다.)'],
     ['돌쇠 할배','먼저 간 할멈이 올린 돌이란다.'],
     ['돌쇠 할배','손끝마저 무뎌질까 봐, 날마다 만져 본다.'],
@@ -56,7 +57,7 @@ function talkDolsoeArc(){
     ['돌쇠 할배','돌을 몇 번이고 놓쳐서, 내가 맡아 뒀단다.'],
     ['돌쇠 할배','손이 네 아비를 닮았구나. 고맙다.']
   ],'아빠가 떨리는 손으로 못 올린 돌을 대신 올렸다. 돌쇠 할배가 내 손을 짚고 고맙다고 했다.')});
-  else if(F.dolneomeo_arc_dolsoe2&&!F.dolneomeo_arc_dolsoe3)c.push({t:'엄마 몫도 올려도 돼요?',go:()=>arcScene('dolneomeo_arc_dolsoe3',[
+  else if(atYard&&F.dolneomeo_arc_dolsoe2&&!F.dolneomeo_arc_dolsoe3)c.push({t:'엄마 몫도 올려도 돼요?',go:()=>arcScene('dolneomeo_arc_dolsoe3',[
     ['너구리','엄마 몫도 올려도 돼요?'],
     ['돌쇠 할배','이리 오너라. 밑을 받쳐 주마.'],
     ['너구리','(마당의 작은 돌을 골라, 할배 돌탑에 얹었다.)'],
@@ -85,7 +86,7 @@ function talkPpuriArc(){
     ['뿔이','난 길만 살폈지. 기다리는 이는 못 봤다.']
   ],'뿔이는 지난가을 아빠를 사흘 동안 눈 속에서 기다리게 했다. 아빠는 기침을 하면서도 한 번도 화를 내지 않았다고 한다.')});
   else if(F.ppuriPassed&&!F.dolneomeo_arc_ppuri3)c.push({t:'아빠는 어느 길로 갔어요?',go:()=>arcScene('dolneomeo_arc_ppuri3',[
-    ['뿔이',CLASSIC?'금줄 너머 납작한 바위가 보이나.':'마을 끝, 높은 돌계단이 보이나.'],
+    ['뿔이',CLASSIC?'금줄 너머 납작한 바위가 보이나.':'돌담 마을 끝에 높은 돌계단이 있다.'],
     ['뿔이',CLASSIC?'그 옆으로 곧장 가면 성황당이다.':'돌계단 안쪽 길은 성황당으로 곧장 간다.'],
     ['뿔이','네 아빠가 지나간 지름길이다.'],
     ['너구리','알려 줘서 고마워요.'],

@@ -356,6 +356,20 @@ function install(){
       if(s){prompted[s.id]=true;traceStamp(s);}
     };
   }
+  // 봄이 오면 아빠는 섬으로 건너와 산군 곁에 선다. 이름·약·귀향 장면이 모두 섬에서 열리기 때문이다.
+  {
+    const isl=Rg.zones.island,sh=Rg.zones.shore;
+    const islList=isl.npcs,shGet=Object.getOwnPropertyDescriptor(sh,'npcs').get;
+    Object.defineProperty(isl,'npcs',{configurable:true,get:()=>G?.f?.spring?[...islList,'dad']:islList});
+    Object.defineProperty(sh,'npcs',{configurable:true,get:()=>{const l=shGet();return G?.f?.spring?l.filter(n=>n!=='dad'):l;}});
+    // 수달과 살금이는 배와 함께 오간다. 섬 선착장에서도 보인다.
+    const oldIsl=isl.drawActors;
+    isl.drawActors=()=>{
+      oldIsl?.();
+      if(!G.f.spring)return;
+      Rg.expArt.drawOtter(260-cam,GROUND,-1);Rg.art.deer(330-cam,GROUND,-1);
+    };
+  }
 }
 addEventListener('DOMContentLoaded',install,{once:true});
 })();

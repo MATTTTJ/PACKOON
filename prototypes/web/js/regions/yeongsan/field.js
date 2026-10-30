@@ -227,7 +227,7 @@ if(!CLASSIC){
         need:()=>!!G.f.dadDone,reason:'아빠가 기다리고 있다. 먼저 호숫가에서 말을 걸어 보자.',draw:sign},
     ]),
     island:zone('island',['sangun'],{},[
-      {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 아빠 곁으로':'얼음길로 호숫가에 돌아가기';},draw:sign},
+      {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 호숫가로':'얼음길로 호숫가에 돌아가기';},draw:sign},
     ]),
   };
   Rg.zones.snow.step=()=>{
