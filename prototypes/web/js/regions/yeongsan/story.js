@@ -506,8 +506,8 @@ const done=(id,flag,key,text)=>()=>{
 const act=(id,next)=>{if(typeof Rg.playActivity==='function')Rg.playActivity(id,next);else next();};
 function bearSong(){
   talk([
-    ['너구리','잘 자. 바람은 굴 밖에 두고.\n잘 자. 눈은 내가 밟고 갈게.'],
-    ['아기 곰','엄마는 같은 데를 두 번씩 불러 주곤 해.\n그다음엔 말도 발소리도 점점 작아지거든.',[
+    ['너구리','자장자장, 바람은 굴 밖에 두고.\n자장자장, 눈 녹으면 깨어나자.'],
+    ['아기 곰','엄마는 같은 데를 두 번 불러 줘.\n두 번째는 더 작게.',[
       {t:'작은 목소리로 한 번 더 부른다',go:()=>bearSleep(false)},
       {t:'발끝으로 살짝 박자를 맞춘다',go:()=>bearSleep(true)}
     ]]
@@ -515,11 +515,9 @@ function bearSong(){
 }
 function bearSleep(beat){
   act('bear',()=>talk([
-    ['아기 곰',beat?
-      '그 소린 눈 위보다 네 보따리에 톡톡 해 줘.\n그럼 굴 안까지 안 울려. 응. 지금이 좋아.':
-      '두 번째는 바람 소리보다 조금 작아졌네.\n귀를 기울여 듣다 보니 눈이 저절로 감겨.'],
-    ['아기 곰','눈이 녹기 전에 또 깨면 자꾸 밖을 보게 돼.\n굴 안에선 바람이 나를 부르는 것 같거든.'],
-    ['아기 곰','입구 가지에 털을 걸어 둘게. 자는 곰 표지야.\n다시 지나갈 땐 나 대신 그 털만 보고 가 줘.']
+    ['아기 곰',beat?'응, 그거… 엄마도 그렇게 토닥였어.':'바람보다 작아졌다…\n눈이 자꾸 감겨.'],
+    ['아기 곰','이번엔… 진짜 봄에 깰래.'],
+    ['아기 곰','굴 앞 가지에 털 걸어 둘게.\n그거 보이면… 살살 지나가 줘.']
   ],done('y_bear_lullaby','yBearQuiet','y_bear_lullaby','이른 봄인 줄 알고 깬 아기 곰에게 자장가를 불러 주었다. 소리와 박자를 낮추니 곰이 잠들었다. 굴 앞 나뭇가지에 걸린 털이 조용히 지나가라는 표지가 됐다.')));
 }
 function talkBear(){
@@ -672,7 +670,7 @@ const stamp=(id,x,y)=>({id,x,y,note:'stamp:yeongsan:'+id,draw:(sx,sy)=>Rg.expArt
 Rg.expContent={
   wanderers:{
     shelter:[{id:'y_bear_lullaby',name:'아기 곰',x:650,draw:draw('drawBear'),talk:talkBear,
-      get greeting(){return G.f.spring?'봄이네… 이번엔 정말 깨어도 돼?\n너 말고 물이 먼저 노래해 줬어.':'음냐… 눈은 네가 밟고…\n나는 조금만 더 잘게.';}}],
+      get greeting(){return G.f.spring?'봄이네… 이번엔 진짜 봄이지?\n얼음 녹는 소리에 깼어.':'음냐… 자장자장…\n눈 녹으면… 깨어나자…';}}],
     snow:[{id:'y_crow_direction',name:'길 잃은 까마귀',x:750,draw:draw('drawCrow'),talk:talkCrow,
       greeting:'집 방향을 알았으니 바람만 좀 잦아들면 돼.\n네가 그린 골짜기는 눈이 덮여도 기억할게.'}],
     slope:[{id:'y_otter_wait',name:'낚시하는 수달',x:1250,draw:draw('drawOtter'),talk:talkOtter,
