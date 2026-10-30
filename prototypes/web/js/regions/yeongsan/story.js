@@ -160,12 +160,14 @@ function salgTrade(){
     F.salgDone=true;F.shortcut=true;rel('salgeumi',1);ledgerDone('salgeumi');learn('salgeumi:shortcut');
     nickname('yeongsan_soft_step','사뿐발','살금이');
     if(arcs()){
-      clue('y1','살금이','"가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라."');
-      diary('y_salg','살금이에게 먹을 것을 주고 비탈의 지름길을 들었다. 가을부터 호숫가에 말 못 하는 너구리가 있다고 한다.');
+      clue('y1','살금이','"가을부터 호숫가에 너구리 하나가 있어. 입은 달싹이는데, 소리가 안 나더라."');
+      diary('y_salg','살금이에게 먹을 것을 주고 비탈의 지름길을 들었다. 가을부터 호숫가에 너구리가 있는데, 입은 달싹여도 소리가 안 난다고 한다. 호수는 강철이가 붙들고 있다.');
       talk([['살금이','발소리를 죽이고 와 줬네. 사, 사뿐발이라고 불러도 돼?'],
         ['살금이','고, 고마워. 왼쪽 바위턱을 디디면 호숫가로 올라가.'],
-        ['살금이','가을부터 호숫가에 너구리 하나가 있어. 말은 못 하더라.'],
-        ['살금이','이, 이무기가 호수를 휘감아서 봄이 안 와…',salgArcChoices()]]);
+        ['살금이','가을부터 호숫가에 너구리 하나가 있어.\n입은 달싹이는데, 소리가 안 나더라.'],
+        ['살금이','이, 이무기가 호수를 휘감아서 봄이 안 와…'],
+        ['살금이','가, 강철이래. 우리 할머니가 그랬어.\n강철이가 지나간 데는 풀 한 포기 안 난대.'],
+        ['살금이','첫눈 올 무렵 호수에 내려앉더니…\n얼음을 붙들고 안 놓아줘.',salgArcChoices()]]);
       toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();return;
     }
     clue('y1','살금이','"가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라."');
@@ -187,7 +189,7 @@ function salgArcMenu(){
 }
 function salgFoodArc(){
   const F=G.f;if(!arcs()||!F.salgDone||F.yArcsSalg2)return;
-  talk([['살금이','그 너구리한테 내 걸 줘서…'],
+  talk([['살금이','원래도 모자란데… 그 너구리한테 내 걸 줘서.'],
     ['살금이','가을부터 마가목을 갖다 뒀어. 가, 가까이는 못 가고.'],
     ['살금이','놓고 도망쳤다가 보면… 먹었더라. 겨울 내내.']],()=>{
       F.yArcsSalg2=true;
@@ -443,7 +445,7 @@ if(!CLASSIC){
   salg.talk=()=>{
     salgScene={owner:G,at:location()};
     if(G.zone==='shore'&&G.f.dadDone&&arcs()&&!G.f.yArcsSalg3)
-      talk([['살금이','아, 아빠 만났구나…\n나, 할 말이 있어서 따라왔어.']],salgTalk);
+      talk([['살금이','아, 아빠 만났구나…\n궁금해서 따라와 봤어.']],salgTalk);
     else salgTalk();
   };
   delete Rg.npcs[0].props; // 확장 산막은 지역 배경이 그린다.
