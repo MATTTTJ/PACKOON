@@ -25,6 +25,49 @@ function drawKudzu(c){
     if(coreHidden()){brush(c,[[cx-70,cy-20],[cx,cy+10+sway],[cx+70,cy-26]],9,INK,0.85);brush(c,[[cx-60,cy+30],[cx+10,cy-6-sway],[cx+66,cy+24]],8,INK,0.8);}
   }
 }
+/* 무쇠의 시험 배경: 대장간. 왼쪽 화덕의 불빛과 불티, 오른쪽 모루. 판정 상자(BOX)와 그 위 글귀 줄은 비워 둔다. */
+function drawForgeBack(c){
+  const t=B.time,still=Vfx.reducedMotion,top=BOX.y-44;   // 글귀 줄 위까지만
+  const hx=LW*0.13,hy=Math.min(top,EY+150);              // 화덕 아궁이
+  const flick=still?1:1+Math.sin(t*0.21)*0.06+Math.sin(t*0.53)*0.04;
+  // 화덕 불빛: 종이 전체를 따뜻하게 물들이고 아궁이 쪽이 가장 붉다
+  c.save();
+  let g=c.createRadialGradient(hx,hy,8,hx,hy,LW*0.55*flick);
+  g.addColorStop(0,'rgba(226,108,40,.55)');g.addColorStop(0.35,'rgba(214,116,56,.22)');g.addColorStop(1,'rgba(214,120,60,0)');
+  c.fillStyle=g;c.fillRect(0,0,LW,LH);
+  g=c.createLinearGradient(0,LH,0,LH*0.55);g.addColorStop(0,'rgba(120,52,24,.16)');g.addColorStop(1,'rgba(120,52,24,0)');
+  c.fillStyle=g;c.fillRect(0,0,LW,LH);
+  c.restore();
+  // 화덕: 돌을 쌓은 둥근 아궁이와 굴뚝
+  blob(c,hx,hy+6,62,12,INK,0.12);
+  brush(c,[[hx-58,hy+4],[hx-56,hy-46],[hx-30,hy-70],[hx+30,hy-70],[hx+56,hy-46],[hx+58,hy+4]],7,INK,0.85);
+  // 굴뚝: 위로 갈수록 좁아지는 흙벽, 끝에서 연기가 번진다
+  c.save();c.fillStyle='rgba(60,46,36,.55)';c.beginPath();c.moveTo(hx-26,hy-66);c.lineTo(hx-16,8);c.lineTo(hx+16,8);c.lineTo(hx+26,hy-66);c.closePath();c.fill();c.restore();
+  brush(c,[[hx-26,hy-66],[hx-16,8]],5,INK,0.75);brush(c,[[hx+26,hy-66],[hx+16,8]],5,INK,0.75);
+  for(let i=0;i<3;i++){const s=still?0:(t*0.4+i*30)%90;blob(c,hx+Math.sin((t+i*40)*0.03)*10,8-s*0.2+i*4,16+s*0.2,8+s*0.1,INK,0.08);}
+  for(let i=0;i<5;i++)brush(c,[[hx-54+i*4,hy-12-i*12],[hx-40+i*3,hy-14-i*12]],2,INK,0.35);
+  // 아궁이 속 불: 붉은 먹 번짐 세 겹이 흔들린다
+  c.save();c.beginPath();c.ellipse(hx,hy-14,34,26,0,Math.PI,0);c.lineTo(hx+34,hy);c.lineTo(hx-34,hy);c.closePath();c.fillStyle='rgba(29,24,20,.82)';c.fill();c.clip();
+  for(let i=0;i<3;i++){const s=still?0:Math.sin(t*0.17+i*2.1)*4;blob(c,hx-14+i*14+s*0.5,hy-6-i%2*6,13-i*2,20+s,RED,0.75-i*0.15);}
+  blob(c,hx,hy-4,12,9,'#f2b04a',0.85);
+  c.restore();
+  // 불티: 아궁이에서 굴뚝 쪽으로 오르다 사라진다
+  for(let i=0;i<26;i++){
+    const life=70+hash(i*3.7)*60,age=still?life*hash(i*1.9):(t*(0.8+hash(i*5.3)*0.6)+i*37)%life,k=age/life;
+    const x=hx+(hash(i*2.3)-0.5)*70+k*(hash(i*4.1)*90)+Math.sin(age*0.09+i)*10,y=hy-24-k*150;
+    if(y<8)continue;
+    c.save();c.globalAlpha=(1-k)*0.9;c.fillStyle=i%3?RED:'#f2b04a';const sz=2+(i%3);c.fillRect(x,y,sz,sz);c.restore();
+  }
+  // 모루: 오른쪽 작업대 위 쇳덩이. 무쇠의 망치가 내려칠 자리
+  const ax=LW*0.87,ay=Math.min(top,EY+150);
+  blob(c,ax,ay+6,50,9,INK,0.14);
+  brush(c,[[ax-16,ay],[ax-12,ay-26],[ax+12,ay-26],[ax+16,ay]],8,INK,0.85);
+  c.save();c.fillStyle='#2b2520';c.beginPath();c.moveTo(ax-44,ay-44);c.lineTo(ax+30,ay-44);c.lineTo(ax+46,ay-36);c.lineTo(ax+22,ay-28);c.lineTo(ax-26,ay-28);c.lineTo(ax-40,ay-36);c.closePath();c.fill();c.restore();
+  brush(c,[[ax-36,ay-42],[ax+24,ay-42]],2,'#f4ead4',0.35);
+  // 벽에 걸린 집게와 망치 그림자
+  brush(c,[[ax-6,ay-120],[ax-14,ay-76]],3,INK,0.45);brush(c,[[ax+6,ay-120],[ax+14,ay-76]],3,INK,0.45);
+  brush(c,[[ax+38,ay-126],[ax+38,ay-84]],3,INK,0.4);c.save();c.globalAlpha=0.4;c.fillStyle=INK;c.fillRect(ax+28,ay-132,20,10);c.restore();
+}
 function drawMusoe(c){
   const cx=LW/2,cy=EY;const ham=part('hammer'),bel=part('bellows'),core=part('core');
   const bob=Math.sin(B.time*0.05)*2;
@@ -84,6 +127,6 @@ defineEnemies({
     lose:'무쇠의 기세에 밀려 대장간 밖으로 굴러 나왔다.',
     /* 맞은 횟수에 따라 덤: 0대면 숯, 1~2대면 주먹밥 (bosses.csv 비고) */
     onWin(B){if(B.hits===0){B.loot.push('coal');B.bonus='한 대도 안 맞았다! 무쇠가 숯 한 덩이를 던져 준다.';}else if(B.hits<=2){B.loot.push('rice');B.bonus='무쇠가 주먹밥을 하나 내준다. "잘 버텼다."';}else B.bonus='간신히 버텼다. 무쇠가 피식 웃는다.';},
-    draw:drawMusoe},
+    drawBack:drawForgeBack,draw:drawMusoe},
 });
 })();

@@ -70,9 +70,9 @@ defineIcons({
 
 /* 흙더미 채집 */
 defineGather({
-  root:{title:'칡뿌리 캐기',hits:TABLES.MINIGAMES.gather_root_hits,zw:TABLES.MINIGAMES.gather_root_width,speed:TABLES.MINIGAMES.gather_root_speed,hint:'밝은 곳이 흙이 무른 자리다. 세 번 파서 뿌리를 드러내자. 엉뚱한 데를 파면 뿌리가 다친다.',ok:['슥, 흙이 걷힌다.','뿌리 윗부분이 보인다!'],miss:'뿌리를 살짝 찍었다…'},
-  ssari:{title:'싸리버섯 따기',hits:TABLES.MINIGAMES.gather_ssari_hits,zw:TABLES.MINIGAMES.gather_ssari_width,speed:TABLES.MINIGAMES.gather_ssari_speed,hint:'버섯 밑동을 단번에 꺾어야 상하지 않는다.',ok:[],miss:'갓이 조금 부서졌다…'},
-  kkoe:{title:'꾀꼬리버섯 따기',hits:TABLES.MINIGAMES.gather_kkoe_hits,zw:TABLES.MINIGAMES.gather_kkoe_width,speed:TABLES.MINIGAMES.gather_kkoe_speed,hint:'노란 갓이 다치지 않게, 밑동을 단번에.',ok:[],miss:'갓 끝이 찢어졌다…'},
+  root:{title:'칡뿌리 캐기',hits:TABLES.MINIGAMES.gather_root_hits,hint:'흙이 무른 칡뿌리 자리다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
+  ssari:{title:'싸리버섯 따기',hits:TABLES.MINIGAMES.gather_ssari_hits,hint:'밑동을 단번에 꺾어야 갓이 안 상한다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
+  kkoe:{title:'꾀꼬리버섯 따기',hits:TABLES.MINIGAMES.gather_kkoe_hits,hint:'노란 갓이 다치지 않게 밑동을 꺾자. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
 });
 
 /* 엄마의 절구는 처음부터 깨어 있다. 가공법은 heirlooms.csv */

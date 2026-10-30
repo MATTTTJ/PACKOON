@@ -310,7 +310,6 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .strike{width:100%;min-height:52px;font-size:17px}
 .bar.soil{background:linear-gradient(90deg,#3e2615,#6b4423 25%,#8b5a2b 50%,#6b4423 75%,#3e2615)}
 .bar.soil .zone{background:rgba(243,212,138,.55);border-color:#f3d48a}
-.gather .fhint b{color:var(--dan);font-weight:normal}
 
 /* 시작·끝 */
 .cover{position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,19,15,.55),rgba(26,19,15,.94) 55%);display:flex;align-items:center;justify-content:center;padding:5%;overflow:auto;z-index:8;border-radius:6px}

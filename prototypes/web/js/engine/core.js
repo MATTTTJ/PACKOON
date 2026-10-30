@@ -33,7 +33,7 @@ function defineTools(map){Object.assign(TOOLS,map);}
 /* 16×16 아이콘 그림. ICON_ART[id]=P=>{P(x,y,w,h,색);...} */
 const ICON_ART={};
 function defineIcons(map){Object.assign(ICON_ART,map);}
-/* 채집 미니게임 설정 (아이템 id별) */
+/* 채집 설정 (아이템 id별): 필드에서 고리 타이밍으로 캔다 (gather.js) */
 const GATHER={};
 function defineGather(map){Object.assign(GATHER,map);}
 /* 전투 상대: id는 design/data/bosses.csv 의 id와 같다 */
