@@ -184,7 +184,7 @@ function addItem(id,n){
   if(n>0)Sound.item();
   G.inv[id]=(G.inv[id]||0)+n;
   Vfx.item(id,n);
-  if(learn('got:'+id,true)&&NOTES[id])toast('아이의 기록에 그렸다 · '+ITEMS[id].n);
+  if(learn('got:'+id,true)&&NOTES[id])toast('수첩에 그렸다 · '+ITEMS[id].n);
   else toast('+ '+ITEMS[id].n+(n>1?' ×'+n:''));
   refreshHud();
 }

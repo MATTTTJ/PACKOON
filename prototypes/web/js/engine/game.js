@@ -151,7 +151,7 @@ function resetScreens(){
 $('btnStart').onclick=startOrConfirm;   // 처음부터(btnRestart)는 save.js
 /* 다음 지역으로: 보따리·연장·수첩·호감은 그대로 가지고 간다 */
 $('btnNext').onclick=()=>{if(!REGIONS[REG.next])return;enterRegion(G,REGIONS[REG.next]);resetScreens();writeSave(true);};
-$('btnBookEnd').onclick=()=>{Sound.panel(true);noteTab='clues';renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;$('endScreen').hidden=true;
+$('btnBookEnd').onclick=()=>{Sound.panel(true);noteTab='animal';renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;$('endScreen').hidden=true;
   $('noteClose').addEventListener('click',()=>{if(G.ended)$('endScreen').hidden=false;},{once:true});};
 
 let last=0,acc=0;

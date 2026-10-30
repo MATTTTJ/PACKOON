@@ -1753,7 +1753,7 @@ const TABLES={
     {
      "who": "me",
      "text": "엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.",
-     "section": "손버릇",
+     "section": "익힌 솜씨",
      "when": "habit:jeolgu"
     }
    ],
@@ -1767,7 +1767,7 @@ const TABLES={
     {
      "who": "me",
      "text": "증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.",
-     "section": "손버릇",
+     "section": "익힌 솜씨",
      "when": "habit:maetdol"
     }
    ],
@@ -1781,7 +1781,7 @@ const TABLES={
     {
      "who": "me",
      "text": "잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.",
-     "section": "손버릇",
+     "section": "익힌 솜씨",
      "when": "habit:siru"
     }
    ],
@@ -1795,7 +1795,7 @@ const TABLES={
     {
      "who": "me",
      "text": "아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.",
-     "section": "손버릇",
+     "section": "익힌 솜씨",
      "when": "habit:yakyeon"
     }
    ],
