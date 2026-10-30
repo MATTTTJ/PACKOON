@@ -62,6 +62,7 @@ function baseState(){return{
   px:0,py:GROUND,vx:0,vy:0,face:1,onGround:true,anim:0,
   hp:5,maxhp:5,attackT:0,hurtT:0,cam:0,
   inv:{},tool:'pick',sharp:false,
+  forms:[],form:'',   // 잎사귀 변신: 열린 변신 id 와 지금 모습 (''=너구리, forms.js)
   floorItems:{},floorPickups:{},regionStates:{},visitedZones:{},   // 지역별 필드와 실제로 밟은 구역
   awake:Object.keys(HEIR).filter(k=>HEIR[k].awakeAtStart),   // 깨어난 가보
   clues:[],diary:[],learned:[],nicknames:[],ledger:{},rel:{},f:{faints:0,arcs:arcsEnabled(null)},   // learned: 수첩·아이의 기록에서 공유하는 발견 키
@@ -100,7 +101,7 @@ function enterRegion(g,r,options={}){
   }
   Object.assign(g,saved?.fields||{});
   if(!saved&&g.floorPickups?.[r.id])g.pickups=structuredClone(g.floorPickups[r.id]);
-  Object.assign(g,{region:r.id,started:!!options.mapTravel,ended:false,hp:options.mapTravel?g.hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,
+  Object.assign(g,{form:'',region:r.id,started:!!options.mapTravel,ended:false,hp:options.mapTravel?g.hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,
     zone:options.zone??saved?.fields?.zone??null,zoneStates:saved?.fields?.zoneStates||{}});
   if(r.order>=REGIONS.dolneomeo?.order)g.f.bagReachedDolneomeo=true;
   prepareZones(g,r,true);rememberRegion(g);return g;
@@ -227,9 +228,10 @@ function grantBattleGear(field,id,allowed,name){
   if(!G||!allowed.includes(id))return false;
   const owned=G.f[field]||(G.f[field]=[]);if(owned.includes(id))return false;
   owned.push(id);toast(jo(name,'을','를')+' 얻었다');
-  if(typeof renderBattleMasks==='function'&&typeof B!=='undefined'&&B)renderBattleMasks();return true;
+  if(typeof renderBattleForms==='function'&&typeof B!=='undefined'&&B)renderBattleForms();return true;
 }
-function grantMask(id){return grantBattleGear('battleMasks',id,['choraengi','gaksi'],id==='choraengi'?'초랭이탈':'각시탈');}
+/* 초랭이탈·각시탈은 잎사귀 변신으로 바뀌었다 (PA-47). 옛 이야기 호출이 남아 있어도 아무 일도 하지 않는다. */
+function grantMask(){return false;}
 function grantTool(id){return grantBattleGear('battleTools',id,['pickaxe'],'곡괭이');}
 
 /* 지역별 한 번, 현재 지역의 그림 또는 가공품 하나를 보낸다. 그림은 소지품이 없을 때 null을 쓴다.

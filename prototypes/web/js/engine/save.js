@@ -12,6 +12,8 @@ const saveObject=value=>value!==null&&typeof value==='object'&&!Array.isArray(va
 /* 빠진 칸만 지역 기본값으로 보충한다. 존재하는 진행·수량을 새 게임 값으로 덮지 않는다. */
 function repairSavedState(source,repairRegions=true){
   if(!saveObject(source)||!Object.hasOwn(REGIONS,source.region))throw Error('region');
+  // 변신 칸이 없거나 모양이 틀린 옛 저장은 너구리, 열린 변신 없음으로 읽는다 (forms.js)
+  source={...source};if(!Array.isArray(source.forms))delete source.forms;if(typeof source.form!=='string')delete source.form;
   const r=REGIONS[source.region],defaults=baseState(),ns=r.newState();
   const flags={...defaults.f,...ns.f};Object.assign(defaults,ns,{region:r.id,f:{},inv:{}});
   function fill(value,fallback){
@@ -32,6 +34,7 @@ function repairSavedState(source,repairRegions=true){
   for(const [id,n] of Object.entries(g.inv)){if(!Object.hasOwn(ITEMS,id)){delete g.inv[id];continue;}if(!Number.isSafeInteger(n)||n<0)throw Error('inv');} // 없어진 아이템은 버리고 나머지는 살린다
   for(const row of Object.values(g.rel))if(!saveObject(row)||typeof row.t!=='string'||!Number.isFinite(row.v))throw Error('rel');
   for(const key of ['awake','learned'])if(g[key].some(id=>typeof id!=='string'))throw Error(key);
+  g.forms=FORM_IDS.filter(id=>g.forms.includes(id));if(!g.forms.includes(g.form))g.form='';
   for(const key of ['diary','clues','nicknames'])if(g[key].some(row=>!saveObject(row)||typeof row.id!=='string'||typeof row.text!=='string'))throw Error(key);
   for(const key of ['digs','pickups','mobs'])if(g[key]?.some(row=>!saveObject(row)||!Number.isFinite(row.x)))throw Error(key);
   for(const key of ['digs','pickups'])if(g[key]?.some(row=>!Object.hasOwn(ITEMS,row.item)))throw Error(key);

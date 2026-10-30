@@ -97,7 +97,8 @@ Rg.maxX=()=>G.barrier.cut?2330:G.barrier.x-9;
 Rg.step=()=>{
   for(const m of G.mobs){if(m.dead)continue;if(m.flash>0)m.flash--;m.x+=m.dir*0.45;if(m.x<m.min||m.x>m.max)m.dir*=-1;if(hitPlayer(m.x-8,m.x+8,GROUND-12,GROUND))hurt(m.x);}
   if(G.barrier.shake>0)G.barrier.shake--;
-  if(!G.boss.dead&&G.barrier.cut&&G.px>KUDZU_AT)Rg.startKudzu();
+  // 다람쥐로 칡덩굴 위 가지를 타고 언덕에 먼저 들어와도 엉킨 칡은 같은 자리에서 깨어난다 (PA-47)
+  if(!G.boss.dead&&(G.barrier.cut||G.zone==='hill')&&G.px>KUDZU_AT)Rg.startKudzu();
   // 옛 저장에 남은 해머루도 같은 바닥 아이템으로 한 번만 옮긴다.
   if(G.drop){const d=G.drop;G.drop=null;spawnDrops('meoru',1,{x:d.x,y:d.y});}
 };
@@ -170,7 +171,10 @@ if(!CLASSIC){
       exits:{right:{to:'forge',toX:70}},
       doors:[path(1150,'forge',380,'함지박에 올라 개울 따라가기',{travel:'stream',draw:A.streamDoor}),
         path(1710,'hill',180,'물 건너 당산나무 쪽으로',{travel:'depth',need:cutPath,
-          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',draw:A.treeDoor,drawBlocked:blocked})],
+          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',draw:A.treeDoor,drawBlocked:blocked,
+          formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 넘기'})],
+      // 다람쥐의 잊은 몫 (PA-47, 다람쥐 모습에만 보인다)
+      digs:[{id:'gal_cache_village',x:880,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
       vistas:[{id:'stream',x:930,from:0,to:140,draw:A.streamDoor,sound:'water',
         thought:'낙엽이 앞서 가네.\n저 큰 나무까지 가는 걸까?',
         diary:'물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.',layers:A.vistaStream}],
@@ -184,13 +188,19 @@ if(!CLASSIC){
       stamps:[{id:'anvil',x:1070,note:'stamp:galchamgol:anvil',label:'모루 밑 눌린 자국 살피기'}],
     },
     forest:{...basic('forest',2800,[{x:410,y:160,w:100},{x:500,y:126,w:80},
-      {x:1540,y:158,w:100},{x:1710,y:152,w:85},{x:2070,y:158,w:90},{x:2160,y:124,w:75},{x:2230,y:112,w:90}]),
+      {x:1540,y:158,w:100},{x:1710,y:152,w:85},{x:2070,y:158,w:90},{x:2160,y:124,w:75},{x:2230,y:112,w:90},
+      {x:744,y:96,w:64}]),
       npcs:['dodam'],exits:{left:{to:'forge',toX:2480},right:{to:'marsh',toX:70}},
       pickups:[{id:'gal_extra_acorn_1',x:410,y:GROUND,item:'acorn',got:false},
         {id:'gal_extra_acorn_2',x:460,y:GROUND,item:'acorn',got:false},
-        {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false}],
+        {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false},
+        {id:'gal_branch_acorn_1',x:770,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:790,y:96,item:'acorn',got:false}],
       doors:[path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
-          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠에게 낫을 받아 J로 걷자.',draw:A.treeDoor,drawBlocked:blocked})],
+          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠에게 낫을 받아 J로 걷자.',draw:A.treeDoor,drawBlocked:blocked,
+          formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 나무 속으로'})],
+      // 다람쥐만 오르는 높은 참나무 가지와 잊은 몫 (PA-47 선택 자리)
+      climbs:[{x:752,top:96}],
+      digs:[{id:'gal_cache_forest',x:1900,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
       stamps:[{id:'knot',x:2250,y:112,note:'stamp:galchamgol:knot',label:'높은 가지 옹이 살피기'}],
       drawActors:()=>{drawBarrier();},onHit:oldHit,
       step:()=>{commonStep();if(G.barrier.shake>0)G.barrier.shake--;},
