@@ -13,6 +13,7 @@ function gatherPhase(){
 /* 휘두르기를 누른 순간에 판정한다 (손이 닿는 프레임보다 먼저라 누른 박자가 그대로 맞는다) */
 function gatherPress(){const d=nearDig();gatherCue.just=!!(d&&!d.cache&&gatherCue.d===d&&gatherPhase().just);}
 /* 휘두르기가 흙더미에 닿았을 때 (doHit) */
+// 결정 D-31: 채집은 따로 창 없이 필드에서 고리 타이밍. 딱이면 두 몫, 아무 때나 쳐도 한 몫 (design/data/decisions.csv)
 function gatherHit(d){
   const cfg=GATHER[d.item],MG=TABLES.MINIGAMES;if(!cfg||d.done)return;
   const just=gatherCue.just;gatherCue.just=false;
@@ -21,6 +22,7 @@ function gatherHit(d){
   d.prog=(d.prog||0)+(just?MG.gather_perfect_power:1);if(!just)d.flaw=true;
   Sound.gather(true);
   const y=(d.y??fieldGround())-10;
+  Vfx.scatter(d.x,y+6,d.item,just);   // 캐는 물건에 따라 흙먼지 또는 잎
   gatherCue.pops.push({x:d.x,y,t:28,text:just?'딱!':''});
   for(let i=0;i<(just?9:4);i++)gatherCue.dirt.push({x:d.x,y:y+6,vx:(Math.random()-.5)*(just?2.6:1.6),vy:-Math.random()*(just?2.4:1.5),t:22,c:just?'#fff3b0':'#8b5a2b'});
   if(just)shakeT=Math.max(shakeT,4);
@@ -29,7 +31,7 @@ function gatherHit(d){
 }
 function finishGather(d){
   const id=d.item,MG=TABLES.MINIGAMES;d.done=true;d.busy=false;
-  const perfect=!d.flaw;Vfx.gather(d.x,(d.y??fieldGround())-4);
+  const perfect=!d.flaw;Vfx.gather(d.x,(d.y??fieldGround())-4,id);
   spawnDrops(id,perfect?MG.gather_perfect_yield:MG.gather_yield,{x:d.x,y:d.y??fieldGround(),zone:d.zone});
   if(perfect)setTimeout(()=>toast('딱딱 맞춰 캐냈다! '+ITEMS[id].n+' ×'+MG.gather_perfect_yield),700);
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);
