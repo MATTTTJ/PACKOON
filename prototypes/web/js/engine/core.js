@@ -209,10 +209,10 @@ function fadeMomNote(g){
   if(!g.f.momNoteRestored)g.f.momNoteFade=clamp((g.f.momNoteFade||0)+1,0,Math.max(0,regionList().length-1));
   return g.f.momNoteFade||0;
 }
-function noteFade(){const stage=fadeMomNote(G);if(open('book'))renderBook();return stage;}
+function noteFade(){const stage=fadeMomNote(G);if(open('notebook'))renderNotebook();return stage;}
 function noteRestore(){
   G.f.momNoteFade=0;G.f.momNoteRestored=true;
-  if(open('book'))renderBook();return true;
+  if(open('notebook'))renderNotebook();return true;
 }
 function grantNickname(id,text,by){
   if(!G||typeof id!=='string'||!id||typeof text!=='string'||!text.trim())return false;
@@ -220,7 +220,7 @@ function grantNickname(id,text,by){
   if(list.some(n=>n.id===id))return false;
   list.push({id,text:text.trim(),by:by||'',region:G.region});
   learn('nickname:'+id,true);toast('새로 불린 이름 · '+text.trim());
-  if(open('book'))renderBook();return true;
+  if(open('notebook'))renderNotebook();return true;
 }
 function nickname(id){return (G?.nicknames||[]).find(n=>n.id===id)?.text||'';}
 function grantBattleGear(field,id,allowed,name){
@@ -249,7 +249,7 @@ function sendHomeGift(regionId,itemId){
   if(itemId!=null)takeItem(itemId,1);
   learn(key,true);diary(key,(itemId?ITEMS[itemId].n+' 하나':'이곳에서 그린 그림')+'를 까치 편에 집으로 보냈다.');
   Sound.paper();toast('까치가 집으로 날아갔다.');
-  if(open('book'))renderBook();return true;
+  if(open('notebook'))renderNotebook();return true;
 }
 /* 다음 지역의 첫 쉼터 또는 까치 길손에서 부른다. 답장을 보이면 true, 없으면 false. */
 function deliverHomeReply(){

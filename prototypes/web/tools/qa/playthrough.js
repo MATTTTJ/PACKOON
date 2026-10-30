@@ -33,7 +33,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   async function settle(prefer) {
     for(let i=0;i<200;i++) {
       const s=await check();
-      if(await read("!$('book').hidden")){await click('#bookClose');await wait(40);continue;}
+      if(await read("!$('notebook').hidden")){await click('#noteClose');await wait(40);continue;}
       if(s.dlg) {
         if(s.choices.length) {
           let n=-1;
