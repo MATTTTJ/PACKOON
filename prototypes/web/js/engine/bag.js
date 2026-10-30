@@ -21,6 +21,7 @@ function awaken(t){if(!isAwake(t))G.awake.push(t);}
 const pouch={tool:'jeolgu',items:[]};
 let selItem=null,pouchMsg='',lastOut=null,brewing=false;
 /* '중요'는 물건이 아니라 아빠 단서와 엄마의 쪽지를 모아 둔 탭이다 (수첩에서 옮겨 옴) */
+// 결정 D-30: 수첩에서 일기·까치 답장을 빼고, 아빠 단서·엄마의 쪽지는 보따리 '중요' 탭으로. 손버릇은 '익힌 솜씨' (design/data/decisions.csv)
 const BAG_KINDS=['전체','재료','먹을거리','도구','귀한 것','중요'];
 let bagKind='전체';
 function selectBagKind(kind){

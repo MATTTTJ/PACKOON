@@ -69,6 +69,7 @@ function drawingFor(e,dad){
 }
 
 /* 탭: 앞의 셋은 아빠와 같이 쓰는 쪽, 나머지는 아이가 이어 적은 장. 탭 선택은 저장하지 않는다 */
+// 결정 D-30: 수첩에서 일기·까치 답장을 빼고, 아빠 단서·엄마의 쪽지는 보따리 '중요' 탭으로. 손버릇은 '익힌 솜씨' (design/data/decisions.csv)
 const NOTE_TABS=[['animal','동물',1],['item','물건',1],...(CLASSIC?[]:[['stamp','도장',1]]),
   ['nicknames','불리는 이름'],['habits','익힌 솜씨'],['recipes','숨은 가공법'],['ledger','물품 장부']];
 const PAGE_SECTION={animal:'관찰',item:'관찰',stamp:'관찰',habits:'익힌 솜씨',recipes:'숨은 가공법'};
