@@ -46,7 +46,9 @@ function drawMusoe(c){
   // 머리 (고집)
   {const o=shk(core),col=partCol(core);const hx=cx+o,hy=cy-38+bob;
     blob(c,hx,hy,46,38,'#f4ead4');brush(c,[[hx-44,hy+6],[hx-40,hy-26],[hx,hy-40],[hx+40,hy-26],[hx+44,hy+6],[hx+20,hy+34],[hx-20,hy+34],[hx-44,hy+6]],4,col);
-    brush(c,[[hx-22,hy-36],[hx-20,hy-6],[hx-26,hy+18]],12,col,core.broken?0.4:1);brush(c,[[hx+22,hy-36],[hx+20,hy-6],[hx+26,hy+18]],12,col,core.broken?0.4:1);
+    // 너구리 삼촌: 눈가를 가로지르는 검은 탈무늬와 작은 귀.
+    brush(c,[[hx-40,hy-2],[hx-22,hy-9],[hx-6,hy-2],[hx+6,hy-2],[hx+22,hy-9],[hx+40,hy-2]],13,col,core.broken?0.4:1);
+    brush(c,[[hx-36,hy-26],[hx-30,hy-48],[hx-18,hy-36]],5,col);brush(c,[[hx+36,hy-26],[hx+30,hy-48],[hx+18,hy-36]],5,col);
     blob(c,hx,hy+16,7,5,INK);
     if(core.broken||(B.st==='end'&&B.result!=='lose')){brush(c,[[hx-28,hy-2],[hx-16,hy+2]],3,'#f4ead4');brush(c,[[hx+16,hy+2],[hx+28,hy-2]],3,'#f4ead4');brush(c,[[hx-12,hy+26],[hx,hy+29],[hx+12,hy+26]],3,INK);}
     else{const [ex,ey]=lookAt(hx,hy);blob(c,hx-21+ex,hy-2+ey,3.5,3.5,'#f4ead4');blob(c,hx+21+ex,hy-2+ey,3.5,3.5,'#f4ead4');
@@ -71,13 +73,13 @@ defineEnemies({
   /* 무쇠는 피하기만 하는 시험이라 핵심 부위를 쓰지 않는다 (표의 '호통' 핵심 표시를 끔. 켜면 그림에 가려짐 표시가 생긴다) */
   musoe:{name:'무쇠',calmLabel:'마음',npc:true,dodge:6,
     forgeTrial:{sequence:['hammer','bellows','core'],repeatText:'"아까 배운 대로!"'},
-    intro:'[시험판] "아저씨, 왜 이래요!" 먹선이 생기면 작업 자리에서 손을 빼자.',
+    intro:'[시험판] "삼촌, 왜 이래요!" 먹선이 생기면 작업 자리에서 손을 빼자.',
     bonkText:'"어른 앞에서 연장 들이대지 마라!" 딱! 꿀밤이 날아왔다.',
     parts:tableParts('musoe',{hammer:{atk:'forgeHammer',tell:'모루 위 세로 먹줄! 내려치기 전에 그 칸을 비워라.'},bellows:{atk:'forgeWind',tell:'가는 붓선이 바람길을 그린다. 오른쪽 낮은 판 아래 쉼터로!'},core:{atk:'forgeShout',tell:'입 앞 먹선이 부푼다. 부채꼴 양옆으로 손을 빼라.',core:false}}),
     likes:TABLES.CALM.musoe,likeText:'"…마침 출출하던 참이다." 무쇠의 어깨가 조금 내려간다.',
     coreHidden:'',
     coreShown:'무쇠의 고집이 흔들린다. 이제 고집을 노릴 수 있다!',
-    calmWin:'무쇠가 망치를 내려놓는다. "…됐다. 네 아비를 꼭 닮았군."',
+    calmWin:'무쇠 삼촌이 망치를 내려놓는다. "…됐다. 형을 꼭 닮았군."',
     win:'끝까지 버텨 냈다! 무쇠가 망치를 내려놓는다.',
     lose:'무쇠의 기세에 밀려 대장간 밖으로 굴러 나왔다.',
     /* 맞은 횟수에 따라 덤: 0대면 숯, 1~2대면 주먹밥 (bosses.csv 비고) */

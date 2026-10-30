@@ -479,7 +479,7 @@ function tryInteract(){
   const p=nearInteraction();if(!p)return;
   const kind=interactionKind(p);
   if(isHomeReplyPoint(p,kind)&&deliverHomeReply())return;
-  if(kind==='npc'){learn('met:'+p.id);p.talk();}
+  if(kind==='npc'){learn('met:'+p.id);if(p.peek)peekAt(p.x,p.y??fieldGround());p.talk();}
   else if(kind==='doors'){
     if(!pathOpen(p)){toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
     changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});

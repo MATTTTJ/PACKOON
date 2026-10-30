@@ -226,12 +226,12 @@ function dolsoeTea(){
       ['돌쇠 할배','(할배가 자개 발자국을 손끝으로 더듬는다.)'],
       ['돌쇠 할배','네 집안 맷돌이구나. 4대째 내려온 게지.'],
       ['돌쇠 할배','“돌이 마음을 알아야 돈다.” 아빠한테 들었니?'],
-      ['돌쇠 할배','탑 꼭대기가 가운데 올 때, 돌 세 개를 얹거라.']
+      ['돌쇠 할배','돌 마음부터 읽고, 저 탑에 돌 세 개를 얹거라.']
     ]:[['돌쇠 할배','눈이 좀 밝아지는구나. 고맙다.'],['돌쇠 할배','보따리를 이리 줘 보거라.'],
       ['돌쇠 할배','(할배가 맷돌 윗돌의 자개 발자국을 손끝으로 천천히 더듬는다.)'],
       ['돌쇠 할배','이 자개 발자국… 그 녀석 집안 맷돌이구나. 4대째 내려온 게지.'],
       ['돌쇠 할배','"돌이 마음을 알아야 돈다." 네 아빠도 그 말을 하더냐. 내가 가르쳐 주었지.'],
-      ['돌쇠 할배','돌 마음부터 읽어 보거라. 저 돌탑 꼭대기가 가운데 올 때, 돌을 하나씩 세 개 얹으면 된다.']];
+      ['돌쇠 할배','돌 마음부터 읽어 보거라.\n저 돌탑에 돌을 하나씩 세 개 얹으면 된다.']];
     if(Rg.arcs())lines.push(['돌쇠 할배','배워 보겠느냐.',[
       {t:'돌 쌓기를 배운다',go:openStack},
       {t:'꼭대기 돌 이야기를 듣는다',go:talkDolsoeArc},
@@ -363,6 +363,8 @@ function finishStack(){
   talk(lines);
 }
 function grantDolsoeMask(lines){
+  // 전투 탈은 유씨 집안 잎사귀 변신으로 바뀌었다 (PA-47). 돌쇠 할배는 더 이상 각시탈을 주지 않는다.
+  return;
   if(G.rel.dolsoe.v<2||G.f.dolGaksiGiven)return;
   if(typeof grantMask!=='function'){G.f.dolGaksiPending=true;return;}
   grantMask('gaksi');G.f.dolGaksiGiven=true;delete G.f.dolGaksiPending;

@@ -1,5 +1,5 @@
 'use strict';
-/* 북쪽 영산 필드: 남색 밤하늘의 늦겨울 → 서리무기를 넘기면 첫봄.
+/* 북쪽 영산 필드: 남색 밤하늘의 늦겨울 → 강철이를 넘기면 첫봄.
    깊은 눈길(설피가 있어야 지난다), 마가목 비탈, 살금이, 얼어붙은 비탈(살금이의 지름길), 호숫가, 언 호수와 신목 */
 (()=>{
 const Rg=REGIONS.yeongsan;
@@ -8,7 +8,7 @@ const SNOW_X=790;      // 깊은 눈길
 const SLOPE_X=1600;    // 얼어붙은 비탈
 const LAKE_X=1960;     // 호수
 const TREE_X=2236;     // 호수 가운데 섬의 신목
-const BOSS_AT=2030;    // 이보다 오른쪽으로 가면 서리무기
+const BOSS_AT=2030;    // 이보다 오른쪽으로 가면 강철이
 const spring=()=>G.f.spring;
 
 /* ---------- 배경 ---------- */
@@ -65,7 +65,7 @@ function drawLake(){const x=LAKE_X-cam;if(x>W+10)return;
   }
   else{R(tx-30,GROUND-112,24,1,'#ffffff');R(tx+6,GROUND-120,30,1,'#ffffff');}
 }
-/* 서리무기: 신목이 있는 섬을 휘감고 겨울을 놓지 않는다 (필드에서는 잠든 듯 똬리) */
+/* 강철이: 신목이 있는 섬을 휘감고 겨울을 놓지 않는다 (필드에서는 잠든 듯 똬리) */
 function drawCoil(){if(G.boss.dead)return;const x=G.boss.x-cam;if(x<-120||x>W+120)return;const b=Math.floor(G.anim/20)%2;
   for(let i=0;i<7;i++){const a=i/7*Math.PI*2;R(x+Math.cos(a)*70+40,GROUND-18-Math.sin(a)*10-b,22,10,'#7a8ca8');R(x+Math.cos(a)*70+42,GROUND-18-Math.sin(a)*10-b,18,2,'#b8c8dc');}
   R(x-38,GROUND-34-b,22,14,'#6a7c98');R(x-34,GROUND-30-b,4,3,'#e8f2fa');R(x-26,GROUND-30-b,4,3,'#e8f2fa');R(x-40,GROUND-26-b,8,1,'#e8f2fa');R(x-44,GROUND-24-b,6,1,'#e8f2fa');
@@ -133,7 +133,7 @@ Rg.onPickup=a=>{if(a.item==='legend_fruit'&&!G.f.fruitGot){G.f.fruitGot=true;Rg.
 Rg.bringSpring=()=>{
   G.boss.dead=true;G.f.spring=true;
   G.pickups.push({x:TREE_X,y:150,item:'legend_fruit',got:false});
-  diary('y_spring','서리무기가 떠나자 호수의 얼음이 풀렸다. 느티나무에 새잎이 돋고 산자락에 진달래가 폈다. 신목 가지에 무언가 열렸다.');
+  diary('y_spring','강철이가 떠나자 호수의 얼음이 풀렸다. 느티나무에 새잎이 돋고 산자락에 진달래가 폈다. 신목 가지에 무언가 열렸다.');
   toast('봄이 왔다! 신목에 열매가 열렸다');refreshGoal();
 };
 Rg.SLOPE_X=SLOPE_X;Rg.TREE_X=TREE_X;

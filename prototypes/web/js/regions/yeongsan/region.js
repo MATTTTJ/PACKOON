@@ -244,7 +244,7 @@ const mark=(x,y)=>{
   R(x-2,y-27,4,27,'#8c735d');R(x-9,y-28,18,3,'#d9c18c');
   for(let i=0;i<3;i++)R(x-15+i*13,y-1,8,2,'#bdcfd6');
 };
-const fixture=(id,name,x,talkFn)=>({id,name,x,prompt:name,talk:talkFn,draw:mark});
+const fixture=(id,name,x,talkFn)=>({id,name,x,prompt:name,talk:talkFn,draw:mark,peek:true});
 function survey(i){
   if(i===3&&!G.f.dadDone){talk([['너구리','호숫가에 앉은 너구리가 이쪽을 보고 있어. 얼음길에 오르기 전에 가 보자.']]);return;}
   if(G.f['yIce'+i]){talk([['너구리','여긴 두드려 봤어. 표시한 가지를 따라가면 돼.']]);return;}
