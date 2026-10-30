@@ -22,7 +22,7 @@ function talkDodam(){
   const F=G.f,c=[{t:F.dodamDone?'해머루 가는 길 묻기':'해머루 이야기하기',go:dodamMain}];
   if(!F.galArcDodam1)c.push({t:'도토리 걱정을 들어 본다',go:dodamCacheAsk});
   else if(!F.galArcDodam2&&(F.galArcDodamFound||G.pickups[F.galArcDodamCache]?.got))c.push({t:'찾은 자리를 내 여행 기록에 그린다',go:dodamCacheDraw});
-  else if(F.galArcDodam2&&F.dodamDone&&!F.galArcDodam3)c.push({t:'도담이 부르는 소리를 듣는다',go:dodamOldStory});
+  else if(F.galArcDodam2&&F.dodamDone&&!F.galArcDodam3)c.push({t:'도담 이야기를 더 듣는다',go:dodamOldStory});
   if(c.length===1){dodamMain();return;}
   c.push({t:'다음에 이야기하자',go:null});
   talk([['도담','어, 그러니까! 무슨 일이야?',c]]);
@@ -143,8 +143,8 @@ function nalCraftSalt(){
 }
 function nalCraftOilHint(){
   // t_craft_oil의 원래 지역과 재료를 유지한다. 단풍골에서 억새를 요구하지 않는다.
-  talk([['날쌘','참기름은 돌너머에서 풀 거야.\n여기서는 소금이랑 깨만 바꾼다.'],
-    ['날쌘','그쪽 마른 억새 하나면 기름 한 병.\n둥지 지을 녀석 몫은 먼저 남겨 둬.']]);
+  talk([['날쌘','참기름? 그건 북쪽 가서 풀 물건이야.\n이런 촌구석에 꺼내기엔 아깝지.'],
+    ['날쌘','북쪽 장에서 만나면 그때 흥정하자.\n꼬마 보부상이 거기까지 오기나 한다면.']]);
 }
 
 /* ---------- 무쇠 (오소리 대장장이) ---------- */

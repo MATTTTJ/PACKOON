@@ -457,7 +457,7 @@ function talkBear(){
   talk([
     ['아기 곰','굴 안에 햇빛이 들어와서 봄인 줄 알았어.\n마른 풀을 밀치고 나왔는데 발이 푹 빠졌지.'],
     ['아기 곰','엄마는 아직 자. 옆에 도로 누워 봤는데\n눈만 말똥말똥해. 굴 밖 바람이 자꾸 들려.'],
-    ['아기 곰','엄마 깨우면 또 너무 일찍 일어났다고 할 거야.\n작은 목소리로 내가 다시 잘 노래를 해 줄래?',[
+    ['아기 곰','엄마 깨우면 또 너무 일찍 일어났다고 할 거야.\n나 다시 잠들게 작은 목소리로 노래 불러 줄래?',[
       {t:'작은 목소리로 자장가를 부른다',go:bearSong},
       {t:'지금은 조용히 지나간다',go:null}
     ]]
@@ -609,7 +609,7 @@ Rg.expContent={
     slope:[{id:'y_otter_wait',name:'낚시하는 수달',x:1250,draw:draw('drawOtter'),talk:talkOtter,
       get greeting(){return G.f.spring?'구멍이 호수만큼 커졌네.\n이젠 배 위에서 기다려야겠다.':'오늘은 작은 꼬리 하나를 봤으니 됐어.\n다음 큰 물결까지 조금 더 앉아 있을래.';}}],
     shore:[{id:'y_magpie_knot',name:'늙은 까치',x:500,draw:draw('drawMagpie'),talk:talkMagpie,
-      greeting:'이쪽 끝을 당기면 풀리지. 기억했니?\n돌아갈 땐 네 손도 조금은 덜 시리겠구나.'}]
+      greeting:'아가, 고맙다.\n이 끈은 남쪽까지 안 풀리겠구나.'}]
   },
   examines,
   stamps:{shelter:[stamp('hut_post',1040,108)],snow:[stamp('snow_sign',1780,108)],shore:[stamp('shore_rock',2130,192)]}
