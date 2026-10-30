@@ -36,8 +36,8 @@ function dodamCacheStart(){
   const index=G.pickups.findIndex(a=>a.item==='acorn'&&a.y===GROUND&&!a.got&&(CLASSIC||a.zone==='forest'));
   // 이미 전부 주웠다면 그 자리를 그려 줄 수 있다. 도토리를 다시 내거나 새로 모을 필요는 없다.
   arcScene('galArcDodam1',index<0?
-    [['도담','어, 땅에 있던 건 다 주웠어?'],['도담','해머루는 당산나무 꼭대기야!']]:
-    [['도담','흙 묻은 도토리가 내 거야!'],['도담','해머루는 당산나무 꼭대기야!']],
+    [['도담','어, 땅에 있던 건 다 주웠어?'],['도담','그중에 흙 묻은 게 내 거였을 거야!\n어디서 주웠어?']]:
+    [['도담','흙 묻은 도토리가 내 거야!'],['도담','찾으면 꼭 알려 줘! 그 밑에 더 묻었거든!']],
     '도담이 겨울 먹을 도토리를 묻은 자리를 잊었다. 숲에서 도토리를 찾을 때 함께 살펴보기로 했다.',
     ()=>{G.f.galArcDodamCache=index;G.f.galArcDodamFound=index<0;});
 }
@@ -47,8 +47,8 @@ Rg.onPickup=a=>{
 };
 function dodamCacheDraw(){
   if(!(G.f.galArcDodamFound||G.pickups[G.f.galArcDodamCache]?.got))return;
-  arcScene('galArcDodam2',[['너구리','여기였어. 내 기록에 그려 둘게.'],
-    ['도담','어, 그러니까… 여기에 동그라미!'],['도담','적어 두면 안 잊는구나!'],['도담','잊으면 다시 찾으면 되지!']],
+  arcScene('galArcDodam2',[['너구리','여기 묻혀 있었어. 내 기록에 그려 둘게.'],
+    ['도담','어, 그러니까… 여기에 동그라미!\n남은 건 나중에 내가 파 갈게!'],['도담','적어 두면 안 잊는구나!'],['도담','그래도 잊으면 다시 찾으면 되지!']],
     '도담과 도토리를 찾은 자리를 내 여행 기록에 그렸다. 도담은 적어 두면 안 잊겠다며 웃었다.');
 }
 function dodamOldStory(){
@@ -62,11 +62,11 @@ function dodamOldStory(){
 function dodamMain(){
   const F=G.f;
   if(!F.dodamTalk){F.dodamTalk=true;
-    talk([['도담','어, 못 보던 너구리네! 잠깐, 그 모자 어디서 봤는데…'],
+    talk([['도담','어, 이게 얼마 만의 너구리야!\n잠깐, 그 모자 어디서 봤는데…'],
       ['도담','뭐 찾아? 내가 알려 줄까?',[{t:'해머루는 어디 있어?',go:dodamFruit},{t:'우리 아빠 봤어? 너구리 보부상이야',go:()=>dodamDad(dodamFruit)}]]]);
   }else if(!F.dodamDone){
     if(has('powder'))dodamTrade();
-    else talk([['도담','도토리 가루 하나면 해머루가 어딨는지 알려 줄게! 도토리 세 알을 절구에 넣고 빻으면 돼!']]);
+    else talk([['도담','도토리 가루 하나면 해머루가 어딨는지 알려 줄게!\n도토리 세 알을 절구에 넣고 빻으면 돼!']]);
   }else talk([['도담',CLASSIC?'당산나무는 마을 맨 끝이야! 참, 칡덩굴 조심해!':'숲 안쪽의 금줄을 따라가!\n낫으로 덩굴을 걷으면 당산나무 속으로 갈 수 있어!']]);
 }
 function dodamDad(next){
@@ -76,7 +76,7 @@ function dodamDad(next){
 }
 function dodamFruit(){
   ledger('dodam','도담','도토리 가루 1','해머루가 있는 곳');
-  talk([['도담','해머루? 그럼, 내가 알지!'],['도담','대신 도토리 가루 하나 줘! 숲에서 도토리 세 알 주워서 보따리 속 절구로 빻으면 돼!']],()=>{if(has('powder'))dodamTrade();});
+  talk([['도담','해머루? 그럼, 내가 알지!'],['도담','대신 도토리 가루 하나 줘!\n숲에서 도토리 세 알 주워서 절구에 빻으면 돼!']],()=>{if(has('powder'))dodamTrade();});
 }
 function dodamTrade(){
   talk([['도담','와, 도토리 가루! 나랑 바꿀 거지?',[{t:'도토리 가루 1개를 건넨다',go:()=>{
@@ -377,17 +377,18 @@ function talkToad(){
     ledger('toad','두꺼비 할멈','해머루 1','엄마의 병을 늦추는 약');
     clue('t1','두꺼비 할멈','아빠도 할멈에게 전설의 열매를 묻고 북쪽으로 갔다.');
     diary('toad','두꺼비 할멈은 엄마의 병을 고칠 수는 없지만 늦출 수는 있다고 했다. 해머루가 필요하다.');
-    talk([['두꺼비 할멈','어서 오렴, 꼬마 보부상. 네 엄마 소식은 바람결에 들었단다. 말을 잃어 간다지.'],
+    talk([['두꺼비 할멈','어서 오렴, 꼬마 보부상. 네 엄마 소식은\n늙은 까치한테 들었단다. 말을 잃어 간다지.'],
       ['두꺼비 할멈','그건… 병이라기보다는…'],['두꺼비 할멈','…아니다. 내가 늙어서 헛말이 나오는구나.'],
       ['두꺼비 할멈','내 손으로 고치진 못해도 병을 늦출 수는 있단다. 당산나무 꼭대기 해머루를 가져오렴.'],
-      ['두꺼비 할멈','전설의 열매라… 남들은 부자가 된다지만, 나는 잃어버린 걸 돌려준다고 들었단다.'],
+      ['너구리','전설의 열매를 찾으면 엄마가 나아요?'],
+      ['두꺼비 할멈','전설의 열매라… 남들은 부자가 된다지만,\n나는 잃어버린 걸 돌려준다고 들었단다.'],
       ['두꺼비 할멈','네 아빠도 그 열매를 묻더니 북쪽으로 갔단다.'],
-      ['두꺼비 할멈','…그 보따리 속 약연. 그건 아직 네가 쓸 때가 아니구나.']]);
+      ['두꺼비 할멈','…보따리에 약연 자루가 비죽 나왔구나.\n그건 아직 네가 쓸 때가 아니란다.']]);
   }else talk([['두꺼비 할멈','해머루를 가져오렴. 당산나무 꼭대기란다.']]);
 }
 function toadFarewell(){
   const F=G.f,c=[{t:'북쪽으로 떠난다',go:endGame}];
-  if(Rg.arcsEnabled()&&!F.galArcToad2&&G.rel.toad.v>=1)c.push({t:'엄마도 이 길을 갔는지 묻는다',go:toadWinter});
+  if(Rg.arcsEnabled()&&!F.galArcToad2&&G.rel.toad.v>=1)c.push({t:'엄마를 아는지 묻는다',go:toadWinter});
   if(Rg.arcsEnabled()&&F.galArcToad2&&!F.galArcToad3)c.push({t:'떠나기 전에 인사를 드린다',go:toadWrap});
   if(!knows('home:'+Rg.id))for(const item of ['acorn_jelly','sesame_salt'])if(has(item))
     c.push({t:ITEMS[item].n+'을 까치 편에 보낸다',go:()=>galSendHome(item)});
@@ -415,15 +416,15 @@ function galSendHome(item){
 }
 function toadWinter(){
   if(!G.f.galArcToad1||G.rel.toad.v<1)return;
-  arcScene('galArcToad2',[['너구리','엄마도 이 길을 갔어요?'],['두꺼비 할멈','너를 안고 지나갔지.'],
+  arcScene('galArcToad2',[['너구리','할머니는 우리 엄마를 알아요?'],['두꺼비 할멈','알다마다. 너를 안고 이 길을 지나갔지.'],
     ['두꺼비 할멈','눈 내리던 겨울이었단다.'],['두꺼비 할멈','불가에서 너를 꼭 안고 있었어.'],
-    ['너구리','엄마가요?'],['두꺼비 할멈','늙으면 말이 느려지지… 기억은 나.']],
-    '두꺼비 할멈은 내가 아기였던 겨울, 엄마가 나를 안고 이 길을 지났다고 했다.',null,toadFarewell);
+    ['너구리','엄마가요? 어디 가는 길이었어요?'],['두꺼비 할멈','…늙으면 말이 느려지지.']],
+    '두꺼비 할멈은 내가 아기였던 겨울, 엄마가 나를 안고 이 길을 지났다고 했다. 어디 가는 길이었는지 묻자 말을 돌렸다.',null,toadFarewell);
 }
 function toadWrap(){
   if(!G.f.galArcToad2)return;
   arcScene('galArcToad3',[['두꺼비 할멈','이 끈도 가져가렴.'],['두꺼비 할멈','그 겨울, 네 포대기에 매던 거야.'],
-    ['너구리','엄마가 두고 갔어요?'],['두꺼비 할멈','그래. 내내 간직했단다.'],['너구리','엄마한테 가져갈게요.']],
+    ['너구리','엄마가 두고 갔어요?'],['두꺼비 할멈','그래. 내내 간직했단다.\n떠나는 길이니, 네가 지니는 게 맞겠다.'],['너구리','엄마한테 가져갈게요.']],
     '두꺼비 할멈에게 그 겨울 엄마가 두고 간 포대기 끈을 받았다. 엄마에게 가져가려고 조심히 챙겼다.',
     ()=>learn('galchamgol:arc-toad-wrap'),toadFarewell);
 }
