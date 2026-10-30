@@ -1,5 +1,5 @@
 'use strict';
-/* 단풍골 진행: NPC 대화와 교환, 무쇠의 대장간 미니게임, 전투 시작과 결과, 지금 할 일.
+/* 단풍골 진행: NPC 대화와 교환, 무쇠 삼촌의 시험과 첫 변신, 전투 시작과 결과, 지금 할 일.
    흐름은 design/narrative/galchamgol-scenario.md, 교환은 design/data/trades.csv */
 (()=>{
 const Rg=REGIONS.galchamgol;
@@ -147,64 +147,96 @@ function nalCraftOilHint(){
     ['날쌘','다음 마을에서 만나면 그때 흥정하자.\n꼬마 보부상이 거기까지 오기나 한다면.']]);
 }
 
-/* ---------- 무쇠 (오소리 대장장이) ---------- */
+/* ---------- 무쇠 (삼촌, 아빠의 동생인 너구리 대장장이) ----------
+   아빠와 젊은 날 같은 길에 나섰다가 다리를 다쳐 대장장이가 됐다. 몸이 성치 않아 형을 찾아 나서지 못한다.
+   형이 지난가을 낫과 아이의 잎사귀를 맡기며 "조심성부터 보고 주라"고 했다. 시험 뒤 집안 변신술을 가르친다. */
 function talkMusoe(){
+  // 집안 사람이라 변신해도 알아본다 (leaf-transform.md 6-4).
+  if(G.form){talk([['무쇠','잎 소리 다 들린다.\n삼촌 앞에선 제 모습으로 와라.']]);return;}
   if(!Rg.arcsEnabled()){musoeMain();return;}
   const F=G.f,c=[{t:F.musoeDone?'낫 이야기하기':'낫과 시험 이야기하기',go:musoeMain}];
-  if(!F.musoeTested&&!F.musoeDone&&!F.galArcMusoe1)c.push({t:'아빠의 낫을 보여 달라고 한다',go:musoePromise});
   if((F.musoeTested||F.musoeDone)&&!F.galArcMusoe2)c.push({t:'아빠가 묵던 밤 이야기를 묻는다',go:musoeNight});
   if(F.galArcMusoe2&&!F.galArcMusoe3&&(has('coal',2)||(F.musoeDone&&G.sharp)))c.push({t:'넉넉히 챙긴 숯 이야기를 한다',go:musoeOldHandle});
   if(c.length===1){musoeMain();return;}
   c.push({t:'다음에 올게요',go:null});
   talk([['무쇠','무슨 일이냐.',c]]);
 }
-function musoePromise(){
-  if(G.f.musoeTested||G.f.musoeDone)return;
-  arcScene('galArcMusoe1',[['너구리','아빠 낫, 볼 수 있어요?'],['무쇠','아직 안 된다.'],
-    ['무쇠','네 아비가 맡기며 당부했다.'],['무쇠','조심성부터 봐 달라더군.'],['무쇠','덤비지는 마라. 피하기만 해라.']],
-    '무쇠 아저씨는 아빠가 조심성부터 봐 달라며 낫을 맡겼다고 했다. 낫은 시험을 통과한 뒤에 내준다고 한다.');
-}
 function musoeNight(){
   if(!G.f.musoeTested&&!G.f.musoeDone)return;
-  arcScene('galArcMusoe2',[['너구리','아빠가 여기서 잤어요?'],['무쇠','지난가을. 사흘 묵었다.'],
+  arcScene('galArcMusoe2',[['너구리','아빠가 떠나기 전에 여기서 잤어요?'],['무쇠','지난가을. 사흘 묵었다.'],
     ['무쇠','밤마다 뭘 들여다봤다.'],['무쇠','그 얘긴 말 말라더군.'],['무쇠','내가 벌써 반은 어겼군.']],
-    '지난가을 아빠는 대장간에서 사흘 묵으며 밤마다 무언가 들여다봤다. 무쇠 아저씨는 말하지 않기로 한 약속을 반만 깼다.',
-    ()=>clue('m2','무쇠','지난가을 아빠는 대장간에서 사흘 묵으며 밤마다 무언가 들여다봤다. 그 이야기는 하지 말라고 무쇠에게 부탁했다.'));
+    '지난가을 아빠는 떠나기 전 삼촌 대장간에서 사흘 묵으며 밤마다 무언가 들여다봤다. 삼촌은 말하지 않기로 한 약속을 반만 깼다.',
+    ()=>clue('m2','무쇠 삼촌','지난가을 아빠는 대장간에서 사흘 묵으며 밤마다 무언가 들여다봤다. 그 이야기는 하지 말라고 삼촌에게 부탁했다.'));
 }
 function musoeOldHandle(){
   if(!G.f.galArcMusoe2||!(has('coal',2)||(G.f.musoeDone&&G.sharp)))return;
-  arcScene('galArcMusoe3',[['무쇠','숯을 넉넉히 챙겼군.'],['무쇠','이 자루 봐라. 네 아비 젊을 적 거다.'],
-    ['너구리','그때도 낫을 벼려 주셨어요?'],['무쇠','그래. 그때도 앞만 보더니.'],['너구리','이번엔 살필게요.']],
-    '무쇠 아저씨가 아빠의 젊은 시절 낫 자루를 꺼내 보여 주었다. 지난가을 맡긴 낫보다 훨씬 오래된 물건이다.');
+  arcScene('galArcMusoe3',[['무쇠','숯을 넉넉히 챙겼군.'],['무쇠','이 자루 봐라. 형이 젊을 때 쓰던 거다.'],
+    ['너구리','그때도 삼촌이 벼려 줬어요?'],['무쇠','그 길엔 나도 같이 갔다.'],['무쇠','돌아올 땐 이 다리로 왔지.'],
+    ['너구리','…그래서 삼촌은 아빠 찾으러 못 가는구나.'],['무쇠','형은 앞만 봤다.\n너는 살펴라.']],
+    '삼촌이 아빠의 젊은 시절 낫 자루를 보여 주었다. 삼촌은 그 길에 아빠와 같이 갔다가 다리를 다쳤다고 한다.');
 }
 function musoeMain(){
   const F=G.f;
   if(!F.musoeMet){F.musoeMet=true;
-    talk([['무쇠','뭘 보냐. 대장간은 놀이터가 아니다.'],['무쇠','…잠깐. 그 모자.'],['무쇠','너, 그 떠돌이 너구리 아들이냐.',[{t:'우리 아빠 알아요?',go:musoe2}]]]);
+    talk([['무쇠','왔냐. 보따리는 왜 멨냐.'],['너구리','아빠 찾으러 가요.\n엄마 약도 구하고요.'],
+      ['무쇠','안 된다. 넌 아직 어리다.'],['무쇠','형도 석 달째 소식이 없다.\n너까지 보낼 순 없다.',[{t:'아빠 낫 주세요, 삼촌. 저도 보부상이에요',go:musoe2}]]]);
   }else if(!F.musoeTested&&!F.musoeDone){
-    talk([['무쇠','숨 골랐냐. 낫 쥘 자격이 있으면 다시 버텨 봐라.',[{t:'다시 해 볼게요',go:battleMusoe},{t:'조금 이따가요',go:null}]]]);
+    talk([['무쇠','숨 골랐냐.\n보부상 소리 하려면 다시 버텨 봐라.',[{t:'다시 해 볼게요',go:battleMusoe},{t:'조금 이따가요',go:null}]]]);
+  }else if(!F.leafGiven){
+    musoeLeaf();
   }else if(!F.musoeDone){
-    if(has('coal'))talk([['무쇠','숯 가져왔군. 불 올린다.'],['무쇠','주황빛 남았을 때 쳐라. 식으면 다시 달궈라.']],openForge);
-    else talk([['무쇠','숯부터 가져와라. 숯 없인 낫 못 벼린다.'],['무쇠',CLASSIC?'물레방아 쪽 날쌘이 녀석한테 가 봐라. 숯을 쟁여 놨을 거다.':'오른쪽 좌판에 날쌘이 있다.\n숯을 쟁여 놨을 거다.']]);
-  }else talk([['무쇠','낫은 손에 익었냐. 네 아비는 그걸로 덩굴을 잘도 쳐냈다.']]);
+    if(has('coal'))talk([['무쇠','숯 가져왔군. 불 올린다.'],['무쇠','(삼촌이 쇠를 달궈 세 번 내리친다.\n다리는 절어도 망치는 흔들리지 않는다.)']],openForge);
+    else talk([['무쇠','숯부터 가져와라.\n숯 없인 낫 못 벼린다.'],['무쇠',CLASSIC?'물레방아 쪽 날쌘이 녀석한테 가 봐라. 숯을 쟁여 놨을 거다.':'오른쪽 좌판에 날쌘이 있다.\n숯을 쟁여 놨을 거다.']]);
+  }else talk([['무쇠','낫은 손에 익었냐.\n형은 그걸로 덩굴을 잘도 쳐냈다.']]);
 }
 function musoe2(){
-  clue('m1','무쇠','아빠는 무쇠에게 낫을 맡기고, 찾으러 오지 않았다.');
-  diary('musoe','대장장이 무쇠 아저씨가 아빠의 모자를 알아봤다. 아빠가 맡겨 둔 낫이 있다고 한다. 그런데 갑자기 덤벼들었다.');
-  talk(Rg.arcsEnabled()?
-    [['무쇠','안다. 낫을 맡기고 갔다.'],['무쇠','조심성부터 보라더군. 네 아비가.'],['무쇠','덤비지는 마라. 피하기만 해 봐라.']]:
-    [['무쇠','안다. 낫을 맡기고 갔지. 금방 찾으러 온다더니 소식이 없다.'],['무쇠','주인 아니면 안 내준다. …아들이라고?'],['무쇠','말로야 누가 못 하냐. 그 낫 쥘 자격이 있는지 버텨 봐라!']],battleMusoe);
+  clue('m1','무쇠 삼촌','아빠는 지난가을 삼촌에게 낫을 맡기고 떠났다. 내가 따라나설 줄 알았다고 한다.');
+  diary('musoe','무쇠 삼촌이 길을 막았다. 아빠가 낫을 맡기며 내 조심성부터 보고 주라고 했단다. 나도 어른 보부상이라는 걸 보여 줘야 한다.');
+  talk([['무쇠','…형이 낫을 맡기고 갔다.\n네가 따라나설 줄 알았던 게지.'],['무쇠','조심성부터 보고 주라더군.'],
+    ['무쇠','이 정도도 겁내면 보부상 못 한다.\n덤비지 말고 버텨 봐라.'],['너구리','(나도 어른 보부상이라는 걸 보여 줘야 해.)']],battleMusoe);
 }
 function battleMusoe(){
   const n=Rg.npcs.find(n=>n.id==='musoe');
   inkTransition('전투',(n.x-G.cam)/W*100,()=>startBattle('musoe',(res,info)=>{
-    if(res==='lose'||res==='flee'){talk([['무쇠','아직 멀었다. 숨 고르고 다시 와라.']]);return;}
+    if(res==='lose'||res==='flee'){talk([['무쇠','아직 멀었다.\n숨 고르고 다시 와라.']]);return;}
     const perfect=res==='win'&&info.hits===0;
-    G.f.musoeTested=true;rel('musoe',(res==='calm'||perfect)?2:1);ledger('musoe','무쇠','숯 1','아빠가 맡긴 낫');
+    G.f.musoeTested=true;rel('musoe',(res==='calm'||perfect)?2:1);ledger('musoe','무쇠 삼촌','숯 1','아빠가 맡긴 낫');
     if(typeof grantTool==='function')grantTool('pickaxe');
-    diary('test',res==='calm'?'무쇠 아저씨에게 먹을 것을 건네 마음을 풀었다. 아빠도 이렇게 했을까.':'무쇠 아저씨가 꿀밤으로 연장부터 빼앗고 덤볐다. 끝까지 피해서 시험을 통과했다.');
-    talk([['무쇠',res==='calm'?'…됐다. 배부터 채웠으니 고집은 그만 부리마.':perfect?'허, 한 대도 안 맞았군. 그 녀석 아들 맞다.':'끝까지 버티는 건 네 아비를 닮았군.'],['무쇠','연장은 도로 가져가라. 이 곡괭이도 덤이다.\n돌 만날 때 써라.'],['무쇠','의리는 지켜야지. 낫은 내주마.'],['무쇠','다만 녹이 슬었다. 벼릴 숯이 마침 떨어졌으니 가져와라.']],()=>{if(has('coal'))talkMusoe();});
+    diary('test',res==='calm'?'무쇠 삼촌에게 먹을 것을 건네 마음을 풀었다. 아빠도 이렇게 했을까.':'무쇠 삼촌이 꿀밤으로 연장부터 빼앗고 덤볐다. 끝까지 피해서 버텼다.');
+    talk([['무쇠',res==='calm'?'…배부터 채웠으니 고집은 그만 부리마.':perfect?'허, 한 대도 안 맞았군.\n형 아들 맞다.':'끝까지 버티는 건 형을 닮았군.'],
+      ['무쇠','연장은 도로 가져가라. 이 곡괭이도 덤이다.\n돌 만날 때 써라.']],musoeLeaf);
   }));
+}
+/* 시험 뒤: 아빠가 맡긴 잎사귀와 첫 변신. 길 떠나는 날 집안 어른이 잎을 주는 것이 유씨 집안 풍습이다. */
+function musoeLeaf(){
+  const F=G.f;
+  if(F.leafGiven){musoeAfterLeaf();return;}
+  const thinkOf=F.dodamDone||knows('met:dodam')?'도담을 떠올리며 잎을 분다':'마을 다람쥐들을 떠올리며 잎을 분다';
+  talk([['무쇠','하나 더 있다.'],['무쇠','(삼촌이 품에서 접어 둔 잎 하나를 꺼낸다.)'],['너구리','나뭇잎이요?'],
+    ['무쇠','당산나무 잎이다.\n형이 낫이랑 같이 맡겼다.'],['무쇠','제 발로 길 나서는 날 주라더군.\n우리 집안 풍습이다.'],
+    ['무쇠','잘 봐라.'],
+    ['무쇠','(삼촌이 자기 잎을 입술에 대고 짧게 분다.\n모루 옆에 오소리 한 마리가 선다.)'],
+    ['너구리','삼촌이… 오소리가 됐어!'],
+    ['무쇠','잎은 네가 아는 만큼만 바뀐다.\n모르는 건 흉내도 안 된다.'],
+    ['무쇠','오늘 본 것 중에 제일 잘 아는 걸 떠올려라.\n이것도 할 수 있겠냐?',[{t:thinkOf,go:musoeFirstForm}]]]);
+}
+function musoeFirstForm(){
+  const F=G.f;F.leafGiven=true;
+  if(typeof unlockForm==='function')unlockForm('squirrel');
+  if(typeof setForm==='function')setForm('squirrel');
+  diary('form_squirrel','삼촌에게 아빠가 맡긴 잎사귀를 받았다. 다람쥐를 떠올리며 잎을 부니 내가 다람쥐가 됐다. 다람쥐는 잊어도 다시 찾는다. 그래서 겁 없이 오른다.');
+  talk([['너구리','(삐익, 풀피리 소리가 났다. 몸이 작아지고 꼬리가 커졌다.)'],['너구리','나… 다람쥐야!'],
+    ['무쇠','됐다. 잎을 한 번 더 불면 돌아온다.'],['너구리','(잎을 다시 부니 너구리로 돌아왔다.)']],()=>{
+      if(typeof setForm==='function')setForm('');
+      toast('잎사귀 변신을 배웠다! 1 다람쥐 · 0 너구리 (휴대폰은 잎사귀 버튼)');
+      musoeAfterLeaf();
+    });
+}
+function musoeAfterLeaf(){
+  talk([['너구리','엄마 경대 위에도 마른 잎이 있었어요.\n버리지 말라고 하셨는데.'],
+    ['무쇠','네 어미 잎이다.\n둔갑을 못 하게 된 뒤로 말라 갔을 게다.'],
+    ['너구리','엄마 약을 구하면 그 잎도 살아나요?'],['무쇠','모른다.\n그러니 가 봐라.'],
+    ['무쇠','다만 녹슨 낫은 벼려야 한다.\n숯이 떨어졌으니 구해 와라.']],()=>{if(has('coal'))talkMusoe();});
 }
 
 /* 대장간: 식기 전 세 번 벼린다. 놓쳐도 횟수·숯은 그대로, 같은 버튼으로 다시 달군다. */
@@ -235,8 +267,11 @@ function prepareForge(){
   $('fhint').setAttribute('aria-live','polite');
 }
 function openForge(){
+  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+  // 낫 벼리기는 무쇠가 직접 한다. 의리 덤은 그대로 준다.
+  Object.assign(forge,{heat:MG.forge_heat,hits:MG.forge_hits,miss:0,edge:MG.forge_bonus_edges,phase:'hot',wait:0,impact:0,particles:[],warned:false,owner:G});
+  Sound.stone?.('tap');finishForge();return;
   prepareForge();
-  Object.assign(forge,{heat:MG.forge_heat,hits:0,miss:0,edge:0,phase:'hot',wait:0,impact:0,particles:[],warned:false,owner:G});
   $('forgeTitle').textContent='대장간 · 아빠의 낫 벼리기';$('forge').hidden=false;
   forgeSay('start');drawForge();
 }
@@ -310,12 +345,12 @@ function finishForge(){
   G.tool='sickle';G.sharp=sharp;G.f.musoeDone=true;learn('musoe:forge');ledgerDone('musoe');rel('musoe',MG.forge_relation);
   if(forge.edge>=MG.forge_bonus_edges)rel('musoe',MG.forge_bonus_relation);
   diary('sickle','아빠의 낫을 받았다. 손잡이에 아빠 손때가 묻어 있다.');
-  if(!Rg.arcsEnabled())clue('m2','무쇠','아빠는 대장간에서 사흘을 묵으며 밤마다 낡은 장부만 들여다봤다.');
+  if(!Rg.arcsEnabled())clue('m2','무쇠 삼촌','아빠는 떠나기 전 삼촌 대장간에서 사흘을 묵으며 밤마다 낡은 장부만 들여다봤다.');
   toast('아빠의 낫을 얻었다!'+(sharp?' 날이 더 날카롭다':''));
   refreshHud();
   talk(Rg.arcsEnabled()?
     [['무쇠','됐다. 네 아비 낫이다.'],['무쇠',sharp?'숯이 넉넉해서 날을 더 세웠다.':'덩굴은 그걸로 끊어라.'],['무쇠','당산나무 앞 칡은 조심해라.']]:
-    [['무쇠','됐다. 네 아비 낫이다.'+(sharp?' 숯이 넉넉해서 날을 더 세웠다.':'')],['무쇠','그 녀석, 여기서 사흘 묵었다. 밤마다 낡은 장부만 보더군. 뭘 찾는지는 끝내 말 안 했다.'],['무쇠','덩굴은 그걸로 끊어라. 당산나무 앞 칡은 성질 고약하다. 조심해라.']]);
+    [['무쇠','됐다. 네 아비 낫이다.'+(sharp?'\n숯이 넉넉해서 날을 더 세웠다.':'')],['무쇠','형은 떠나기 전 여기서 사흘 묵었다.\n밤마다 낡은 장부만 보더군.'],['무쇠','덩굴은 그걸로 끊어라.\n당산나무 앞 칡은 성질 고약하다.']]);
 }
 
 /* ---------- 두꺼비 할멈 (약재상) ---------- */
@@ -413,7 +448,7 @@ Rg.startKudzu=()=>{
 Rg.npcs=[
   {id:'dodam',name:'도담',x:300,talk:talkDodam,draw:Rg.art.squirrel},
   {id:'nal',name:'날쌘',x:820,talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
-  {id:'musoe',name:'무쇠',x:1110,talk:talkMusoe,draw:Rg.art.badger,props:Rg.props.forge},
+  {id:'musoe',name:'무쇠',x:1110,talk:talkMusoe,draw:Rg.art.uncle,props:Rg.props.forge},
   {id:'toad',name:'두꺼비 할멈',x:1430,talk:talkToad,draw:Rg.art.toad,props:Rg.props.toad},
 ];
 
@@ -427,10 +462,10 @@ Rg.goal=()=>{
   const ac=G.inv.acorn||0;
   const powderStep=()=>has('powder')?null:(ac<3?'도토리 줍기 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개 넣어 빻기');
   if(!F.dodamDone)return powderStep()||'도담에게 도토리 가루 건네기';
-  if(!F.musoeMet)return '물레방아 너머 대장간의 무쇠 찾아가기';
-  if(!F.musoeTested&&!F.musoeDone)return '무쇠의 시험 통과하기 (다시 말 걸기)';
+  if(!F.musoeMet)return '물레방아 너머 대장간의 무쇠 삼촌 찾아가기';
+  if(!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내기 (다시 말 걸기)';
   if(!F.musoeDone){
-    if(has('coal'))return '무쇠에게 숯 가져가기';
+    if(has('coal'))return '무쇠 삼촌에게 숯 가져가기';
     if(!F.nalTalk)return '물레방아 옆 족제비 날쌘에게 숯 구하기';
     const p=powderStep();if(p)return p;
     if(!has('root'))return '반짝이는 흙더미를 휘둘러 칡뿌리 캐기';
@@ -460,6 +495,8 @@ if(!CLASSIC){
   let hand=null;
   function hands(title,kind,steps,commit,sort=false){
     if(hand||G.ended)return;
+    // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+    Sound.gather(true);if(G.f.galHandsProgress)delete G.f.galHandsProgress[kind];commit();refreshHud();return;
     const saved=G.f.galHandsProgress?.[kind]||0;
     hand={owner:G,kind,steps,commit,sort,hits:Math.min(saved,steps.length-1),pos:0,dir:1,miss:0,cool:0};
     hp.dataset.kind=kind;ht.textContent=title;
@@ -637,7 +674,7 @@ if(!CLASSIC){
             })},{t:'어디가 고장 났는지 보고 간다',go:null}]]]);return;
     }
     if(stage<3){
-      talk([['너구리',F.galWheelAxle?'굴대는 개울 받침에 왔어.\n떠내려간 살만 찾으면 돼. 개울 아래로 갔댔지.':!F.galWheelSpoke?'살은 물살 따라 개울 아래로 갔대.\n굴대는 무쇠 아저씨가 깎아 뒀다고 했어.':'살은 찾았어.\n이제 무쇠 아저씨가 깎아 둔 굴대만 있으면 돼.']]);return;
+      talk([['너구리',F.galWheelAxle?'굴대는 개울 받침에 왔어.\n떠내려간 살만 찾으면 돼. 개울 아래로 갔댔지.':!F.galWheelSpoke?'살은 물살 따라 개울 아래로 갔대.\n굴대는 무쇠 삼촌이 깎아 뒀다고 했어.':'살은 찾았어.\n이제 무쇠 삼촌이 깎아 둔 굴대만 있으면 돼.']]);return;
     }
     if(stage===3){
       talk([['너구리','살도 굴대도 다 왔어요.'],['늙은 까치','쐐기는 내가 부리로 물고 있으마.\n넌 살을 홈에 맞춰 끼우렴.',[
@@ -731,8 +768,8 @@ if(!CLASSIC){
       examine('village_wheel',990,'물레방아 물길 살펴보기',()=>G.f.galWheelDone?
         '쿵, 쿵, 쿵. 나무 공이도 한 번 쉬네.\n엄마는 혼자 이 소리를 다 내셨구나.':'빠진 살 사이로 물만 흘러간다. 굴대도 갈라졌다.\n이 방아가 서 있어서 엄마가 절구질을 했었지.')],
     forge:[
-      examine('forge_sign',230,'갈림길 팻말 읽기',()=> '왼쪽은 집과 개울, 오른쪽은 참나무 숲.\n숯 냄새를 따라가면 무쇠 아저씨가 있겠다.'),
-      examine('forge_charcoal',1820,'식힌 숯가마 살펴보기',()=> '재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 아저씨 불씨도 여기서 시작했겠지.'),
+      examine('forge_sign',230,'갈림길 팻말 읽기',()=> '왼쪽은 집과 개울, 오른쪽은 참나무 숲.\n숯 냄새를 따라가면 무쇠 삼촌이 있겠다.'),
+      examine('forge_charcoal',1820,'식힌 숯가마 살펴보기',()=> '재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 삼촌 불씨도 여기서 시작했겠지.'),
       examine('forge_share',870,'낮은 평상 살펴보기',()=>G.f.galExpBrothersSorted?
         '큰 도토리부터 양쪽 바구니에 번갈아 놓았다.\n작은 것도 나눠 담으니 높이가 비슷해졌다.':'빈 바구니 두 개가 나란히 놓였다.\n작은 발 둘이 서기 딱 좋은 낮은 평상이다.')],
     forest:[
@@ -759,7 +796,7 @@ if(!CLASSIC){
     Rg.zones[zone].examines=Rg.expExamines[zone];
   }
   // 주연 NPC 목록은 그대로다. 이 객체들은 E로 만지는 작업 자리이며 인물·만남 수에 더하지 않는다.
-  const work=(id,x,label,talk,y=GROUND)=>({id:'gal_work_'+id,name:label,x,y,prompt:label,talk,
+  const work=(id,x,label,talk,y=GROUND)=>({id:'gal_work_'+id,name:label,x,y,prompt:label,talk,peek:true,
     draw:(sx,sy)=>{if(id==='wheel')Rg.expArt.marker(sx,sy);}});
   Rg.zones.village.npcs.push(work('wheel',1050,'물레방아 함께 고치기',wheelTalk));
   Rg.zones.forge.npcs.push(work('baskets',810,'평상에서 도토리 나누기 · 굴대 함께 들기',wheelAxle));
@@ -787,8 +824,8 @@ if(!CLASSIC){
     if(!G.started||G.ended)return oldGoal();
     if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '약을 보냈다 · 할멈께 인사하고 북쪽으로 떠나기';
     if(!F.dodamTalk)return '참나무 숲의 도담 찾아가기 · 대장간 길 오른쪽';
-    if(F.dodamDone&&!F.musoeMet)return '대장간 길로 돌아가 무쇠에게 낫 묻기';
-    if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠의 시험 통과하기 · 다시 말 걸기';
+    if(F.dodamDone&&!F.musoeMet)return '대장간 길로 돌아가 무쇠 삼촌에게 낫 묻기';
+    if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내기 · 다시 말 걸기';
     if(F.dodamDone&&!F.musoeDone&&!has('coal')&&!F.nalTalk)return '대장간 오른쪽 좌판의 날쌘에게 숯 구하기';
     if(!F.musoeDone&&F.nalTalk&&!F.nalDone&&!has('coal')&&!has('root'))return '대장간 길 · 날쌘 좌판 옆 반짝이는 흙더미 캐기';
     if(F.musoeDone&&!G.barrier.cut)return '참나무 숲 안쪽 금줄의 덩굴을 낫으로 걷기';

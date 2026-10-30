@@ -1,11 +1,9 @@
 'use strict';
-/* 패널(보따리·책) 열고 닫기, 보따리 + 가보 가공대 */
-function closePanels(){if(['bag','book','notebook'].some(id=>!$(id).hidden))Sound.panel(false);if(typeof finishCraftHands==='function')finishCraftHands(false);if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('book').hidden=true;$('notebook').hidden=true;}
+/* 패널(보따리·수첩) 열고 닫기, 보따리 + 가보 가공대 */
+function closePanels(){if(['bag','notebook'].some(id=>!$(id).hidden))Sound.panel(false);if(typeof finishCraftHands==='function')finishCraftHands(false);if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('notebook').hidden=true;}
 function toggleBag(){const o=$('bag').hidden;closePanels();if(o){Sound.panel(true);bagKind='전체';selItem=null;lastOut=null;pouchMsg='';renderBag();$('bag').hidden=false;$('bagBody').scrollTop=0;}}
-function toggleBook(){const o=$('book').hidden;closePanels();if(o){Sound.panel(true);renderBook();$('book').hidden=false;}}
 $('btnBag').onclick=()=>{if(G.started&&!G.ended&&!open('dlg')&&!openMinigame())toggleBag();};
-$('btnBook').onclick=()=>{if(G.started&&!open('dlg')&&!openMinigame())toggleBook();};
-$('bagClose').onclick=closePanels;$('bookClose').onclick=closePanels;
+$('bagClose').onclick=closePanels;
 
 /* 가보: 순서대로 가공대 탭에 나온다. 내용은 data/common.js */
 const HEIR={};

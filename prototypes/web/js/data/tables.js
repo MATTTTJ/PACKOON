@@ -294,21 +294,21 @@ const TABLES={
    "r": 2,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "서리무기가 떠나며 남긴 수염. 녹지 않는 서리가 맺혀 있다."
+   "d": "강철이가 떠나며 남긴 수염. 녹지 않는 서리가 맺혀 있다."
   },
   "ice_scale": {
    "n": "얼음 비늘",
    "r": 1,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "서리무기의 몸통에서 떨어진 비늘. 햇빛에 비추면 무지개가 든다."
+   "d": "강철이의 몸통에서 떨어진 비늘. 햇빛에 비추면 무지개가 든다."
   },
   "icicle": {
    "n": "고드름 조각",
    "r": 1,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "서리무기의 꼬리에서 부러진 고드름."
+   "d": "강철이의 꼬리에서 부러진 고드름."
   },
   "broken_orb": {
    "n": "깨진 여의주",
@@ -986,12 +986,12 @@ const TABLES={
   "gangcheol": {
    "magamok_tea": {
     "kind": "아주 좋아함",
-    "line": "찻김의 온기에 서리무기의 긴 몸이 풀린다.",
+    "line": "찻김의 온기에 강철이의 긴 몸이 풀린다.",
     "effect": "calm:60"
    },
    "ssanghwa": {
     "kind": "좋아함",
-    "line": "약재 향을 맡은 서리무기가 긴 숨을 내쉰다.",
+    "line": "약재 향을 맡은 강철이가 긴 숨을 내쉰다.",
     "effect": "calm:60"
    }
   }
@@ -1065,12 +1065,12 @@ const TABLES={
    "lines": [
     {
      "who": "dad",
-     "text": "단풍골 대장장이 오소리. 무뚝뚝해도 의리는 있다. 숯이 없으면 불을 안 지핀다.",
+     "text": "동생 무쇠. 이 길에서 다리를 다쳤다. 단풍골에 남아 망치를 잡겠단다. 내가 앞만 본 탓이다.",
      "section": "아빠 수첩"
     },
     {
      "who": "me",
-     "text": "말보다 시험이 먼저다. 덤비면 꿀밤으로 연장부터 뺏으니, 피하기만 해야 한다.",
+     "text": "삼촌은 말보다 시험이 먼저다. 덤비면 꿀밤으로 연장부터 뺏으니, 피하기만 해야 한다.",
      "section": "관찰",
      "when": "fight:musoe"
     },
@@ -1088,7 +1088,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "쇠는 가장 빨갛게 달았을 때 쳐야 한다. 박자를 놓치면 쇠가 운다.",
+     "text": "삼촌은 다리를 절어도 망치는 흔들리지 않는다. 쇠가 가장 빨갈 때 세 번 친다.",
      "section": "관찰",
      "when": "musoe:forge"
     }
@@ -2180,6 +2180,7 @@ const TABLES={
   "field_move_speed": 1.7,
   "field_swing_speed": 0.7,
   "field_jump_velocity": -5.4,
+  "field_drop_frames": 14,
   "field_gravity": 0.32,
   "field_fall_speed": 6,
   "field_pickup_x": 10,
@@ -2202,16 +2203,27 @@ const TABLES={
   "battle_bare_speed": 2.7,
   "battle_bare_cooldown": 16,
   "battle_bare_radius": 26,
-  "battle_choraengi_speed": 3.3,
-  "battle_choraengi_cooldown": 10,
-  "battle_choraengi_radius": 20,
-  "battle_gaksi_speed": 2.2,
-  "battle_gaksi_cooldown": 24,
-  "battle_gaksi_radius": 36,
+  "battle_iframes": 60,
+  "battle_squirrel_speed": 3.3,
+  "battle_squirrel_cooldown": 10,
+  "battle_squirrel_radius": 20,
+  "battle_goat_speed": 2.2,
+  "battle_goat_cooldown": 18,
+  "battle_goat_radius": 26,
+  "battle_goat_damage_taken": 0.5,
+  "battle_owl_speed": 2.5,
+  "battle_owl_cooldown": 24,
+  "battle_owl_radius": 36,
+  "battle_owl_tell_lead": 30,
+  "battle_deer_speed": 3.2,
+  "battle_deer_cooldown": 16,
+  "battle_deer_radius": 24,
+  "battle_deer_iframes": 96,
   "battle_base_damage": 1,
   "battle_sharp_damage": 2,
   "battle_pickaxe_bonus": 1,
   "toast_frames": 300,
+  "peek_ms": 2600,
   "drop_arc_height": 24,
   "drop_flight_frames": 28,
   "drop_min_spacing": 18,
@@ -2221,7 +2233,16 @@ const TABLES={
   "pickup_range": 28,
   "pickup_range_y": 20,
   "pickup_motion_frames": 15,
-  "pickup_pull_frames": 8
+  "pickup_pull_frames": 8,
+  "form_squirrel_speed": 1.2,
+  "form_climb_speed": 1.6,
+  "form_climb_reach": 10,
+  "form_goat_jump": 1.4,
+  "form_owl_glide_fall": 0.9,
+  "form_deer_speed": 1.45,
+  "form_deer_listen_range": 360,
+  "form_fx_frames": 24,
+  "stranger_trade_limit": 2
  },
  "PROGRESS": [
   {

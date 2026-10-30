@@ -12,6 +12,14 @@ Rg.art={
     M(ox,oy,f,-6,-14,13,12,Gy);M(ox,oy,f,-2,-12,8,10,Ap);M(ox,oy,f,-4,-22,11,8,Wt);M(ox,oy,f,-3,-21,3,5,B);M(ox,oy,f,3,-21,3,5,B);
     M(ox,oy,f,4,-19,1,1,'#ffffff');M(ox,oy,f,7,-16,2,1,B);M(ox,oy,f,-5,-2,4,2,B);M(ox,oy,f,2,-2,4,2,B);
     const up=Math.floor(G.anim/30)%2;M(ox,oy,f,8,-15-up,2,8,'#6b4423');M(ox,oy,f,7,-18-up,5,3,'#4a4a4a');},
+  // 무쇠 삼촌: 아빠와 같은 너구리 털빛, 가죽 앞치마, 붕대 감은 다리, 망치.
+  uncle(ox,oy,f){const Gy='#8c8070',K='#2a211b',Wt='#efe6d6',Ap='#7a4b2a',T='#6f6357';
+    M(ox,oy,f,-12,-11,5,4,Gy);M(ox,oy,f,-12,-10,5,1,K);M(ox,oy,f,-12,-8,5,1,K);
+    M(ox,oy,f,-6,-14,13,12,Gy);M(ox,oy,f,-2,-12,8,10,Ap);M(ox,oy,f,-4,-22,11,8,Gy);
+    M(ox,oy,f,-4,-24,2,2,K);M(ox,oy,f,5,-24,2,2,K);M(ox,oy,f,-4,-20,11,3,K);
+    M(ox,oy,f,-2,-19,1,1,Wt);M(ox,oy,f,4,-19,1,1,Wt);M(ox,oy,f,0,-17,6,3,Wt);M(ox,oy,f,6,-17,2,1,K);
+    M(ox,oy,f,-5,-2,4,2,K);M(ox,oy,f,2,-2,4,2,T);M(ox,oy,f,2,-5,4,3,'#d8cfbd');
+    const up=Math.floor(G.anim/30)%2;M(ox,oy,f,8,-15-up,2,8,'#6b4423');M(ox,oy,f,7,-18-up,5,3,'#4a4a4a');},
   toad(ox,oy,f){const Gr='#7d7a3c',Dg='#5a5728',Bl='#d9cfa6',K='#2b1d14',Sc='#e8e0cf';
     M(ox,oy,f,-9,-12,18,12,Gr);M(ox,oy,f,-5,-9,10,8,Bl);M(ox,oy,f,-7,-10,1,1,Dg);M(ox,oy,f,6,-8,1,1,Dg);M(ox,oy,f,-8,-5,1,1,Dg);
     M(ox,oy,f,-7,-18,14,7,Gr);M(ox,oy,f,-6,-20,4,3,Gr);M(ox,oy,f,3,-20,4,3,Gr);M(ox,oy,f,-5,-19,2,1,K);M(ox,oy,f,4,-19,2,1,K);M(ox,oy,f,-4,-13,9,1,Dg);
@@ -511,7 +519,7 @@ if(!CLASSIC){
       M(x,y,f,3,-10,1,1,'#342b21');M(x,y,f,5,-8,3,1,'#aa6e3d');M(x,y,f,-3,-2,1,2,'#7c5536');M(x,y,f,2,-2,1,2,'#7c5536');
     },
     stamp(x,y){
-      px(x-3,y-5,6,4,'#a25b41');px(x-5,y-8,2,2,'#a25b41');px(x-1,y-10,2,3,'#a25b41');px(x+3,y-9,2,3,'#a25b41');
+      pawStamp(x,y-1,'#a25b41');
     },
     marker(x,y){
       px(x-1,y-29,3,29,'#6b4b32');px(x-15,y-30,31,9,'#d2af72');px(x-12,y-28,22,1,'#e8cb91');

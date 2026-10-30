@@ -150,24 +150,30 @@ Rg.onPickup=a=>{
 };
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:1770,item:'seogi',done:false});};
 
+/* 확장판의 변신 자리 (PA-47). 늘 구역을 단 채 저장되고 classic 변환이 건드리지 않는다. */
+const formSpotIds=['dol_goat_seogi','dol_cache_field','dol_cache_village'];
 // 같은 출처에서 표시 모드만 바꿔 이어 할 때도 남은 필수 재료를 숨기지 않는다.
 if(CLASSIC){
   const originalAmbient=Rg.ambient;
   Rg.ambient=()=>{
     // 옛 classic 저장에 이미 열린 자리도 골렘보다 앞쪽으로 옮긴다.
     if(G?.region===Rg.id)for(const d of G.digs)if(d.item==='seogi')d.x=1770;
-    if(G?.region===Rg.id&&[...G.pickups,...G.digs].some(p=>p.zone)){
+    // 변신 자리(PA-47)는 구역을 단 채 classic 저장에도 남는다. classic 은 구역 있는 자리를 그리지도 줍지도 않는다.
+    // 순번 id(dol_old_*)로 바뀌지 않게 확장판 저장 판정과 구역 지우기에서 뺀다.
+    const formSpot=p=>formSpotIds.includes(p.id);
+    if(G?.region===Rg.id&&[...G.pickups,...G.digs].some(p=>p.zone&&!formSpot(p))){
       const originalPickups=[[900,192],[945,192],[990,192],[1240,192],[1290,192],[1335,192],[670,118],[1412,118]];
       const extraIds=['dol_memil_extra1','dol_memil_extra2','dol_memil_extra3','dol_mistletoe_extra','dol_memory_seogi'];
       G.f.dolExtraPointState=G.f.dolExtraPointState||{};
       G.pickups=G.pickups.filter(p=>{if(!extraIds.includes(p.id))return true;G.f.dolExtraPointState[p.id]={got:p.got};return false;});
       for(const p of G.pickups){
+        if(formSpot(p))continue;
         const index=Number(p.id?.match(/^dol_old_pickup_(\d+)$/)?.[1]);
         if(Number.isInteger(index)&&originalPickups[index]){[p.x,p.y]=originalPickups[index];}
         if(p.item==='seoridarae'){p.x=2236;p.y=150;}
         delete p.zone;
       }
-      for(const d of G.digs){const index=Number(d.id?.match(/^dol_old_dig_(\d+)$/)?.[1]);if(Number.isInteger(index))d.x=[470,560,760,1030][index]??d.x;if(d.item==='seogi')d.x=1770;delete d.zone;}
+      for(const d of G.digs){if(formSpot(d))continue;const index=Number(d.id?.match(/^dol_old_dig_(\d+)$/)?.[1]);if(Number.isInteger(index))d.x=[470,560,760,1030][index]??d.x;if(d.item==='seogi')d.x=1770;delete d.zone;}
       G.boss.x=1990;G.zone=null;G.px=G.boss.dead?2150:G.f.ppuriPassed?1790:60;G.py=GROUND;G.vy=0;G.cam=clamp(G.px-168,0,2000);delete G.f.dolMemory;
     }
     originalAmbient();
@@ -211,7 +217,8 @@ if(!CLASSIC){
   const bases={
     gate:[platform(320,164,86),platform(374,136,76),platform(1320,164,94),platform(1390,136,88),platform(1608,174,60),platform(1680,156,80),platform(2020,112,90),platform(2160,154,90)],
     village:[platform(520,164,94),platform(588,136,80),platform(1120,156,82),platform(1790,164,80),platform(1850,138,84),platform(1910,112,92),platform(2340,164,86),platform(2410,136,90)],
-    field:[platform(260,164,100),platform(330,136,85),platform(1180,164,92),platform(1240,136,88),platform(1900,164,86),platform(1960,138,90),platform(2020,112,88)],
+    // 2190 턱은 디딤 없이 바닥에서 80px 위다. 산양 뛰기로만 오른다 (PA-47 선택 자리).
+    field:[platform(260,164,100),platform(330,136,85),platform(1180,164,92),platform(1240,136,88),platform(1900,164,86),platform(1960,138,90),platform(2020,112,88),platform(2190,112,76)],
     cliff:[platform(320,164,92),platform(390,136,85),platform(790,164,110),platform(860,136,90),platform(1640,164,96),platform(1710,136,92),platform(2220,166,90),platform(2280,138,90),platform(2350,112,130),platform(2500,138,96),platform(2560,112,294)],
     shrine:[platform(280,164,84),platform(340,136,96),platform(1520,112,110),platform(1630,140,80),platform(1950,164,90),platform(2010,136,98),platform(2590,164,80),platform(2650,136,90)],
   };
@@ -368,12 +375,15 @@ if(!CLASSIC){
       get label(){return p.name+(Rg.bridgeSurveyReady(p.job)?' 다시 보기 · E':' 살피기 · E');},
       draw:(x,y)=>{if(surveyVisible())A.drawBridgeSurvey(x,y,Rg.bridgeSurveyReady(p.job));},
     })),
-    {id:'dol_bridge_shortcut',depth:true,x:2040,y:112,to:'cliff',toX:1770,toY:192,label:'놓은 돌다리로 절벽길에 · E',need:bridgeOpen,reason:'다리를 다 놓고 뿔이의 길 허락을 받으면 절벽길로 이어진다.',draw:marker},
+    // 무너진 옛 다리는 몸의 문제라 다람쥐가 남은 들보로 건넌다. 뿔이의 허락(장승제)은 약속이라 변신으로도 남는다 (PA-47).
+    {id:'dol_bridge_shortcut',depth:true,x:2040,y:112,to:'cliff',toX:1770,toY:192,label:'놓은 돌다리로 절벽길에 · E',need:bridgeOpen,reason:'다리를 다 놓고 뿔이의 길 허락을 받으면 절벽길로 이어진다.',draw:marker,
+      formPass:'squirrel',formNeed:permit,formLabel:'다람쥐로 남은 들보 타고 건너기'},
   ];
   Rg.zones.village.doors=[{id:'dol_depth_shrine',depth:true,x:2440,to:'shrine',toX:100,label:'돌계단 안쪽, 성황당으로 · ↑ / E',need:permit,reason:gateReason,draw:marker,drawBlocked:blocked}];
   Rg.zones.cliff.doors=[
     {id:'dol_depth_back',depth:true,reverse:true,x:100,to:'gate',toX:1650,label:'장승 고갯길로 돌아가기 · E',draw:marker},
-    {id:'dol_bridge_return',depth:true,reverse:true,x:1770,to:'gate',toX:2040,toY:112,label:'함께 놓은 돌다리로 돌아가기 · E',need:bridgeOpen,reason:'고갯길에서 옛 다리를 다시 놓으면 이 길로 돌아갈 수 있다.',draw:marker},
+    {id:'dol_bridge_return',depth:true,reverse:true,x:1770,to:'gate',toX:2040,toY:112,label:'함께 놓은 돌다리로 돌아가기 · E',need:bridgeOpen,reason:'고갯길에서 옛 다리를 다시 놓으면 이 길로 돌아갈 수 있다.',draw:marker,
+      formPass:'squirrel',formNeed:permit,formLabel:'다람쥐로 남은 들보 타고 돌아가기'},
     {id:'dol_darae_path',depth:true,x:2160,to:'cliff',toX:2240,label:'골렘이 비켜 준 다래길',need:calm,reason:'성황당 돌무더기가 절벽 위 길을 흔든다. 성황당에서 먼저 잠재우자.',draw:marker,drawBlocked:blocked},
   ];
   // 다래길은 발판만으로 우회하지 못하게 한다. 아래길에서 성황당 출구까지는 항상 안전하다.
@@ -387,6 +397,12 @@ if(!CLASSIC){
   // 필수 물건은 선택 발견에 기대지 않는다. 기존 여섯 알·두 가지에 정확히 +3/+1.
   Rg.zones.field.pickups=[{id:'dol_memil_extra1',x:790,y:192,item:'memil',got:false},{id:'dol_memil_extra2',x:1940,y:192,item:'memil',got:false},{id:'dol_memil_extra3',x:1990,y:192,item:'memil',got:false}];
   Rg.zones.gate.pickups=[{id:'dol_mistletoe_extra',x:2060,y:112,item:'gyeousari',got:false}];
+  // 무너진 다리의 남은 들보. 다람쥐가 타고 다리 끝돌(y=112)에 오른다 (PA-47)
+  Rg.zones.gate.climbs=[{x:2028,top:112,draw:(x,y,top)=>{R(x-2,top,4,y-top,'#6d665c');R(x-2,top,1,y-top,'#a7a093');for(let k=top+9;k<y-4;k+=14)R(x-3,k,6,2,'#4f4a43');}}];
+  // 산양 턱의 석이버섯, 다람쥐의 잊은 몫 (PA-47 선택 자리)
+  Rg.zones.field.pickups.push({id:'dol_goat_seogi',x:2228,y:112,item:'seogi',got:false});
+  Rg.zones.field.digs=[{id:'dol_cache_field',x:880,item:'memil',n:2,form:'squirrel',cache:true,done:false}];
+  Rg.zones.village.digs=[{id:'dol_cache_village',x:1420,item:'acorn',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.shrine.pickups=[{id:'dol_memory_seogi',x:1580,y:112,item:'seogi',got:false}];
   Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'해 떴다!\n엄마도 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:marker,layers:A.cliffLayers}];
   Rg.zones.shrine.vistas=[{id:'wishing_stones',x:1850,from:40,to:390,sound:'wind',thought:'작은 돌도 받치고 있네.\n엄마 돌도 놓을래.',diary:'성황당 돌탑 아래에서 바람을 들었다. 작은 돌들이 서로를 받치고 있었다.',draw:marker,layers:A.shrineLayers}];

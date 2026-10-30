@@ -215,15 +215,19 @@ const TUNING=numericTable('tuning','분류',
   [
     'kkubeogi_cycle kkubeogi_awake kkubeogi_cue field_move_speed field_swing_speed',
     'field_jump_velocity field_gravity field_fall_speed field_pickup_x field_pickup_y',
-    'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at',
-    'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval toast_frames',
+    'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at field_drop_frames',
+    'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval toast_frames peek_ms',
     'field_interact_y zone_transition_frames vista_pan_frames map_flight_ms map_landing_margin',
     'drop_arc_height drop_flight_frames drop_min_spacing drop_spread drop_bounce_height drop_bounce_frames',
     'pickup_range pickup_range_y pickup_motion_frames pickup_pull_frames',
     'battle_bare_speed battle_bare_cooldown battle_bare_radius',
-    'battle_choraengi_speed battle_choraengi_cooldown battle_choraengi_radius',
-    'battle_gaksi_speed battle_gaksi_cooldown battle_gaksi_radius',
-    'battle_base_damage battle_sharp_damage battle_pickaxe_bonus'
+    'battle_iframes battle_squirrel_speed battle_squirrel_cooldown battle_squirrel_radius',
+    'battle_goat_speed battle_goat_cooldown battle_goat_radius battle_goat_damage_taken',
+    'battle_owl_speed battle_owl_cooldown battle_owl_radius battle_owl_tell_lead',
+    'battle_deer_speed battle_deer_cooldown battle_deer_radius battle_deer_iframes',
+    'battle_base_damage battle_sharp_damage battle_pickaxe_bonus',
+    'form_squirrel_speed form_climb_speed form_climb_reach form_goat_jump form_owl_glide_fall',
+    'form_deer_speed form_deer_listen_range form_fx_frames stranger_trade_limit'
   ].join(' '));
 /* 나눗셈·주기·배열 길이와 서로 맞물리는 판정은 실행 전에 확인한다. */
 const requireValue=(ok,message)=>{if(!ok)fail(message);};
@@ -246,10 +250,12 @@ requireValue(TUNING.map_flight_ms>0&&TUNING.map_landing_margin>0,'tuning.csv: �
 requireValue(TUNING.drop_min_spacing>=16&&TUNING.drop_spread>=TUNING.drop_min_spacing,'tuning.csv: 바닥 아이템 간격은 16px 이상이며 퍼짐 폭 안에 있어야 한다');
 requireValue(TUNING.pickup_range>0&&TUNING.pickup_range_y>0,'tuning.csv: 줍기 범위는 0보다 커야 한다');
 requireValue(TUNING.pickup_pull_frames<=TUNING.pickup_motion_frames,'tuning.csv: 빨려 드는 시간은 줍기 동작보다 길 수 없다');
-for(const mask of ['bare','choraengi','gaksi']){
-  requireValue(TUNING['battle_'+mask+'_speed']>0&&TUNING['battle_'+mask+'_radius']>3,'tuning.csv: 전투 탈 속도·되치기 반경을 확인한다');
+for(const form of ['bare','squirrel','goat','owl','deer']){
+  requireValue(TUNING['battle_'+form+'_speed']>0&&TUNING['battle_'+form+'_cooldown']>0&&TUNING['battle_'+form+'_radius']>3,'tuning.csv: 전투 변신 속도·대기·되치기 반경을 확인한다');
 }
-requireValue(TUNING.battle_choraengi_speed>TUNING.battle_bare_speed&&TUNING.battle_gaksi_speed<TUNING.battle_bare_speed&&TUNING.battle_choraengi_cooldown<TUNING.battle_bare_cooldown&&TUNING.battle_gaksi_cooldown>TUNING.battle_bare_cooldown&&TUNING.battle_choraengi_radius<TUNING.battle_bare_radius&&TUNING.battle_gaksi_radius>TUNING.battle_bare_radius,'tuning.csv: 초랭이는 빠르고 좁게 각시는 느리고 넓게 유지한다');
+requireValue(TUNING.battle_squirrel_speed>TUNING.battle_bare_speed&&TUNING.battle_squirrel_cooldown<TUNING.battle_bare_cooldown&&TUNING.battle_squirrel_radius<TUNING.battle_bare_radius&&TUNING.battle_owl_radius>TUNING.battle_bare_radius&&TUNING.battle_owl_cooldown>TUNING.battle_bare_cooldown,'tuning.csv: 다람쥐는 빠르고 좁게, 수리부엉이는 넓고 느리게 유지한다');
+requireValue(TUNING.battle_goat_damage_taken>0&&TUNING.battle_goat_damage_taken<1&&TUNING.battle_owl_tell_lead>=0&&TUNING.battle_deer_iframes>=TUNING.battle_iframes,'tuning.csv: 산양 피해 배수는 0~1 사이, 고라니 무적 시간은 기본 이상이어야 한다');
+requireValue(TUNING.form_squirrel_speed>0&&TUNING.form_deer_speed>0&&TUNING.form_goat_jump>=1&&TUNING.form_owl_glide_fall>0&&TUNING.form_owl_glide_fall<TUNING.field_fall_speed&&TUNING.form_climb_speed>0&&TUNING.form_climb_reach>0&&TUNING.form_deer_listen_range>0&&Number.isInteger(TUNING.stranger_trade_limit)&&TUNING.stranger_trade_limit>0,'tuning.csv: 필드 변신 배수·활공·오르기·손님 교환 수를 확인한다');
 requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_pickaxe_bonus>0,'tuning.csv: 전투 기본 피해·날 세운 피해·곡괭이 덤을 확인한다');
 for(const id of ['root','ssari','kkoe','eoksae','seogi','darae_vine']){
   const width=MINIGAMES['gather_'+id+'_width'];

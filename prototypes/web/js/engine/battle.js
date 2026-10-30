@@ -14,42 +14,49 @@
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
 let B=null,inkOn=false,LW=800,LH=450,BOX={x:250,y:262,w:300,h:160},EY=118;const BDPR=2;
 let paper=null;
-/* 탈은 손놀림만 바꾼다. 옛 저장의 획득 목록이 없으면 맨손으로 시작한다. */
-const BATTLE_MASK_NAMES={'':'맨손',choraengi:'초랭이탈',gaksi:'각시탈'};
-const ownsBattleMask=id=>!id||(G&&Array.isArray(G.f.battleMasks)&&G.f.battleMasks.includes(id));
-function battleMask(){const id=G&&G.f.battleMask;return B&&!B.E.dodge&&!B.noTool&&ownsBattleMask(id)&&BATTLE_MASK_NAMES[id]?id:'';}
+/* 변신은 손 모양과 손놀림만 바꾼다. 피해량은 그대로이며 NPC 피하기 시험(dodge)에서는 늘 너구리 손이다.
+   수치는 tuning.csv 의 battle_bare_*(너구리)·battle_<변신>_* 줄. 버튼은 열린 변신만 보인다 (자리는 옛 탈 버튼 자리). */
+const BATTLE_FORM_TRAITS={'':'익숙한 손',squirrel:'빠름 · 좁음',goat:'느림 · 덜 아픔',owl:'예고 일찍 · 넓음',deer:'빠름 · 무적 김'};
+const BATTLE_FORM_HINTS={'':'너구리 손 · 익숙한 손놀림',squirrel:'다람쥐 손 · 빠른 손과 걸음, 좁은 되치기',goat:'산양 발굽 · 느리지만 두 번 맞아야 한 칸',
+  owl:'수리부엉이 깃 · 공격 예고가 일찍 보이고 넓게 닿는다',deer:'고라니 다리 · 빠른 걸음, 맞은 뒤 오래 버틴다'};
+function battleForm(){const id=G&&G.form;return B&&!B.E.dodge&&!B.noTool&&id&&hasForm(id)?id:'';}
 function battleHandProfile(){
-  const id=battleMask(),prefix='battle_'+(id||'bare')+'_',t=TABLES.TUNING;
+  const id=battleForm(),prefix='battle_'+(id||'bare')+'_',t=TABLES.TUNING;
   return {speed:t[prefix+'speed'],cooldown:t[prefix+'cooldown'],radius:t[prefix+'radius']};
 }
-function setBattleMask(id){
-  if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.E.dodge||B.noTool||!Object.hasOwn(BATTLE_MASK_NAMES,id)||!ownsBattleMask(id))return false;
-  G.f.battleMask=id;renderBattleMasks();return true;
+function battleFormKey(key){
+  if(!B||!['0','1','2','3','4'].includes(key))return false;
+  if(!G.forms?.length)return true;
+  let id=formIdForKey(key);
+  if(id&&!hasForm(id))return true;
+  if(id&&id===G.form)id='';
+  setForm(id);return true;
 }
-function battleMaskKey(key){
-  if(!B||!['0','1','2'].includes(key))return false;
-  setBattleMask(key==='1'?'choraengi':key==='2'?'gaksi':'');return true;
-}
-function renderBattleMasks(){
+function renderBattleForms(){
   if(!B)return;
   let wrap=$('bMasks');
   if(!wrap){
     wrap=el('div','b-masks');wrap.id='bMasks';
-    const buttons=el('div','b-mask-buttons');buttons.setAttribute('aria-label','전투 탈');
-    Object.entries(BATTLE_MASK_NAMES).forEach(([id,name],i)=>{const button=el('button','bbtn',i+' · '+name);button.type='button';button.dataset.mask=id;
-      button.appendChild(el('small','b-mask-trait',id==='choraengi'?'빠름 · 좁음':id==='gaksi'?'느림 · 넓음':'기본 손놀림'));
-      button.onclick=()=>setBattleMask(id);buttons.appendChild(button);});
+    const buttons=el('div','b-mask-buttons');buttons.id='bFormButtons';buttons.setAttribute('aria-label','전투 변신');
     wrap.appendChild(buttons);const hint=el('p','small');hint.id='bMaskHint';wrap.appendChild(hint);
     $('bHit').parentElement.parentElement.appendChild(wrap);
   }
   // 세로 화면에서는 공격 상자 아래 여백에 놓아 적 그림과 예고 글을 가리지 않는다.
   const parent=TOUCH&&matchMedia('(orientation:portrait)').matches?$('battle'):$('bHit').parentElement.parentElement;
   if(wrap.parentElement!==parent)parent.appendChild(wrap);
-  wrap.querySelectorAll('button').forEach(button=>{
-    const id=button.dataset.mask;button.disabled=!!(B.E.dodge||B.noTool||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace')||!ownsBattleMask(id);
-    button.setAttribute('aria-pressed',id===battleMask());
+  const ids=['',...(G.forms||[])],buttons=$('bFormButtons');
+  if(buttons.dataset.ids!==ids.join(',')){
+    buttons.dataset.ids=ids.join(',');buttons.innerHTML='';
+    for(const id of ids){const key=id?FORM_IDS.indexOf(id)+1:0,button=el('button','bbtn',key+' · '+formName(id));button.type='button';button.dataset.form=id;
+      button.appendChild(el('small','b-mask-trait',BATTLE_FORM_TRAITS[id]));
+      button.onclick=()=>{if(id&&id===G.form)setForm('');else setForm(id);};buttons.appendChild(button);}
+  }
+  wrap.hidden=!G.forms?.length;
+  buttons.querySelectorAll('button').forEach(button=>{
+    button.disabled=!formChangeAllowed();
+    button.setAttribute('aria-pressed',String(button.dataset.form===battleForm()));
   });
-  $('bMaskHint').textContent=B.E.dodge?'이번 시험은 연장 없이 피하기.':battleMask()==='choraengi'?'초랭이탈 · 빠른 손과 걸음, 좁은 되치기':battleMask()==='gaksi'?'각시탈 · 넓게 닿는 손, 느린 걸음':'맨손 · 익숙한 손놀림';
+  $('bMaskHint').textContent=B.E.dodge?'이번 시험은 연장 없이 피하기.':BATTLE_FORM_HINTS[battleForm()];
   if(Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe')&&!B.E.dodge)$('bMaskHint').textContent+=' · 돌·얼음은 곡괭이 자동 사용';
 }
 function battlePickaxe(p){return !!(p&&!B.E.npc&&!B.noTool&&Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe')&&['stone','ice'].includes(p.material));}
@@ -70,7 +77,7 @@ function blayout(){
   if(B){if(hand){B.px=BOX.x+hand.u*BOX.w;B.py=BOX.y+hand.v*BOX.h;}
     B.px=clamp(B.px,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py,BOX.y+8,BOX.y+BOX.h-8);}
 }
-addEventListener('resize',()=>{if(B){blayout();renderBattleMasks();}});
+addEventListener('resize',()=>{if(B){blayout();renderBattleForms();}});
 
 /* 필드에서 전투로 넘어가는 먹물 번짐. sx 는 번지기 시작하는 가로 위치(%) */
 function inkTransition(text,sx,cb){
@@ -83,7 +90,7 @@ function inkTransition(text,sx,cb){
 function startBattle(kind,onEnd){
   const E=ENEMIES[kind];learn('fight:'+kind);
   closePanels();$('dlg').hidden=true;
-  B={kind,E,parts:E.parts.map(p=>Object.assign({},p,{max:p.hp,broken:false,shake:0})),calm:0,
+  B={hoof:0,kind,E,parts:E.parts.map(p=>Object.assign({},p,{max:p.hp,broken:false,shake:0})),calm:0,
     px:0,py:0,inv:0,st:'intro',t:90,cur:null,last:null,mark:null,bullets:[],fx:[],cool:0,swing:0,atkT:0,atkDur:0,
     loot:[],msg:E.intro,onEnd,paused:false,time:0,result:null,firstHit:true,hits:0,hitThis:false,survived:0,noTool:false,toolFly:null,bonk:0,bonus:'',autoToolT:0};
   document.body.classList.add('in-battle');$('battle').hidden=false;
@@ -123,7 +130,7 @@ function renderBHud(){
   }
   $('bHearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('');
   $('bCalm').style.width=B.calm+'%';
-  renderBattleMasks();
+  renderBattleForms();
 }
 function bLiving(){return B.parts.filter(p=>!p.broken);}
 /* 핵심 부위는 다른 부위를 하나도 못 꺾었을 때 가려져 있다. 상대에 coreNeeds:'<부위 id>' 가 있으면 그 부위를 꺾어야 드러난다 */
@@ -178,7 +185,12 @@ function openCalmAction(){
   B.calmStone={u,v:0.8,t:150};
   B.msg+=' / '+(B.E.calmAction.prompt||'기울어진 돌 위에서')+' '+HITKEY+': '+(B.E.calmAction.kind==='knot'?'매듭 풀기.':'바로 놓기.');
 }
+/* 수리부엉이 깃: 부위 공격 예고(tell)를 battle_owl_tell_lead 만큼 먼저 보여 준다 */
 function chooseAttack(){
+  chooseAttackBase();
+  if(battleForm()==='owl'&&B.st==='tell')B.t+=TABLES.TUNING.battle_owl_tell_lead;
+}
+function chooseAttackBase(){
   Sound.playSfx('battle_warn');
   if(B.E.cover){B.round++;B.calmStone=null;}
   if(B.E.forgeTrial){
@@ -240,8 +252,14 @@ function openMark(){
 }
 function bAttackDef(p){const mode=B.E.possession||B.E.warmPath;return ATTACKS[(mode&&mode.attacks&&mode.attacks[p.id])||p.atk];}
 function attackTick(p){bAttackDef(p).tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
+/* 하트는 정수다. 산양 발굽은 맞을 때마다 battle_goat_damage_taken 만큼 쌓고 1이 찰 때만 한 칸 준다 (0.5면 두 번에 한 칸).
+   고라니는 맞은 뒤 무적 시간이 battle_deer_iframes 로 길다. */
 function bHitMe(){
-  if(B.inv>0||B.st==='end')return;G.hp--;B.inv=60;B.hits++;B.hitThis=true;refreshHud();bSplash(B.px,B.py,'#b4432a');
+  if(B.inv>0||B.st==='end')return;
+  const form=battleForm(),t=TABLES.TUNING;let loss=1;
+  if(form==='goat'){B.hoof+=t.battle_goat_damage_taken;loss=Math.floor(B.hoof+1e-9);B.hoof-=loss;}
+  G.hp-=loss;B.inv=form==='deer'?t.battle_deer_iframes:t.battle_iframes;B.hits++;B.hitThis=true;refreshHud();
+  bSplash(B.px,B.py,loss?'#b4432a':'#6f6357');if(!loss)B.msg='굳은 발굽이 버텼다!';
   if(G.hp<=0)bEnd('lose');
 }
 function bSplash(x,y,col){for(let i=0;i<9;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*2.4;B.fx.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:2+Math.random()*4,t:28,col:col||'#1d1814'});}}
@@ -265,7 +283,7 @@ function bStrike(){
     if(Math.hypot(s.x-B.px,s.y-B.py)<26){
       B.warm.thaw={...B.warm.ice,t:90};
       B.warm.ice=null;B.mark=null;B.calm=Math.min(100,B.calm+B.E.calmAction.amount);
-      B.msg='얇은 얼음을 걷자 따뜻한 물이 흐른다. 서리무기가 숨을 고른다.';
+      B.msg='얇은 얼음을 걷자 따뜻한 물이 흐른다. 강철이가 숨을 고른다.';
       B.st='idle';B.t=36;renderBHud();if(B.calm>=100)bEnd('calm');return;
     }
   }
@@ -400,7 +418,7 @@ function progressShortage(inv){
 function openGift(){
   if(!B||B.handShow>0||B.st==='end'||B.st==='giftPlace'||!$('bResult').hidden)return;
   if(B.E.forgeTrial&&!B.handShown){
-    B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';renderBattleMasks();return;
+    B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';renderBattleForms();return;
   }
   if(B.E.vinePath)bDrag=null;
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
@@ -412,9 +430,9 @@ function openGift(){
     if(taste&&knows('like:'+B.kind+':'+id))b.appendChild(el('span','small',taste.kind));
     b.onclick=()=>giveGift(id);g.appendChild(b);});
   $('bGiftMenu').hidden=false;
-  renderBattleMasks();
+  renderBattleForms();
 }
-function closeGift(){$('bGiftMenu').hidden=true;if(B){B.paused=false;renderBattleMasks();}}
+function closeGift(){$('bGiftMenu').hidden=true;if(B){B.paused=false;renderBattleForms();}}
 function giveGift(id){
   if(!B||!B.paused||B.st==='end'||!has(id))return;
   const taste=tasteOf(B.kind,id);
@@ -470,6 +488,7 @@ $('bResOk').onclick=()=>{
   touch.up=touch.down=false;vinePointers.clear();B=null;
   loot.forEach(id=>addItem(id,1));
   if(r==='lose'||r==='flee'){G.hp=G.maxhp;G.hurtT=60;}
+  if(r==='lose')revertForm();   // 지면 너구리로 돌아온다
   $('goalM').querySelector('b').textContent='지금 할 일';lastGoal='';
   refreshHud();if(cb)cb(r,info);
 };
@@ -493,7 +512,7 @@ function drawTool(c,kind){
 }
 function drawPaw(c,x,y){
   if(!B.handShow&&B.inv>0&&Math.floor(B.inv/5)%2)return;
-  const mask=battleMask(),wide=mask==='gaksi'?1.25:mask==='choraengi'?0.82:1;
+  const form=battleForm();
   const near=B.mark&&Math.hypot(B.mark.x-B.px,B.mark.y-B.py)<battleHandProfile().radius;
   const tool=B.E.dodge&&!B.noTool?heldTool():B.autoToolT>0||(near&&battlePickaxe(B.mark.part))?'pickaxe':null;
   c.save();c.translate(x,y);c.scale(1.6,1.6);
@@ -501,21 +520,17 @@ function drawPaw(c,x,y){
     const a=B.swing>0?(-1.5+(1-B.swing/12)*2.5):-0.35;
     c.save();c.translate(5,-3);c.rotate(a);drawTool(c,tool);c.restore();
   }
+  if(form&&!B.handShow)drawFormPaw(c,form);
+  else{
   // 손목
   blob(c,7,11,6.5,6,'#3a322b');
-  if(mask){
-    brush(c,[[2,14],[8,16],[13,11]],mask==='gaksi'?4:2,INK);
-    brush(c,[[3,13],[8,15],[12,11]],1.5,RED);
-    if(mask==='gaksi')blob(c,7,14,1.8,1.8,'#efe3c8');
-  }
-  c.save();c.scale(wide,mask==='choraengi'?1.12:1);
   // 손바닥 (오동통한 너구리 손)
   blob(c,0,2,9.5,8.5,'#4a4038');
   for(let i=0;i<4;i++)blob(c,-7.2+i*4.8,-6.2+(i===0||i===3?1.4:0),3.3,3.8,'#4a4038');
   blob(c,0.5,3.5,4.6,3.6,'#b9a38f');
   for(let i=0;i<4;i++)blob(c,-7.2+i*4.8,-6.4+(i===0||i===3?1.4:0),1.7,1.9,'#b9a38f');
   c.strokeStyle=INK;c.lineWidth=1.3;c.beginPath();c.ellipse(0,2,9.5,8.5,0,0,Math.PI*2);c.stroke();
-  c.restore();
+  }
   if(B.swing>0&&!B.handShow){c.strokeStyle=INK;c.lineWidth=2;c.globalAlpha=B.swing/12;c.beginPath();c.arc(4,-6,20+(12-B.swing),-1.9,0.4);c.stroke();}
   c.restore();
 }

@@ -2,7 +2,7 @@
 /* 필드: 주인공 이동과 점프, 휘두르기, 줍기, 카메라, 화면 그리는 순서.
    지역마다 다른 것(배경, 장애물, 필드 보스, 날씨)은 REG 의 함수를 부른다. 필요한 함수 목록은 README 참고 */
 
-function paused(){return !G.started||G.ended||!!B||inkOn||!!vistaMode||!!zoneMotion||!!mapTravel||open('map')||zoneFade>0||open('dlg')||open('bag')||open('book')||open('notebook')||!!openMinigame();}
+function paused(){return !G.started||G.ended||!!B||inkOn||!!vistaMode||!!zoneMotion||!!mapTravel||open('map')||zoneFade>0||open('dlg')||open('bag')||open('notebook')||!!openMinigame();}
 function hitPlayer(x1,x2,y1,y2){return G.px+5>x1&&G.px-5<x2&&G.py>y1&&G.py-18<y2;}
 function hurt(srcX){
   if(G.hurtT>0)return;G.hp--;G.hurtT=60;G.px+=(G.px<srcX?-16:16);G.vy=-2.6;G.onGround=false;refreshHud();
@@ -18,7 +18,7 @@ let shakeT=0;
 function doHit(){
   Vfx.slash();
   const f=G.face,x1=f>0?G.px+TABLES.TUNING.field_hit_front:G.px-TABLES.TUNING.field_hit_back,x2=x1+TABLES.TUNING.field_hit_width;const dmg=G.sharp?2:1;
-  for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&d.x>x1-TABLES.TUNING.field_dig_padding&&d.x<x2+TABLES.TUNING.field_dig_padding&&G.onGround){openGather(d);return;}}
+  for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&d.x>x1-TABLES.TUNING.field_dig_padding&&d.x<x2+TABLES.TUNING.field_dig_padding&&G.onGround){if(d.cache)openCache(d);else openGather(d);return;}}
   fieldCall('onHit',x1,x2,dmg,f);
 }
 const sparks=[];
@@ -67,7 +67,7 @@ function spawnDrops(item,count,source={}){
   refreshGoal();return born;
 }
 function nearFloorItems(){
-  return [...fieldItems('pickups'),...floorDrops()].filter(a=>!a.got&&!(a.flight>0)&&!(a.bounce>0)&&
+  return [...fieldItems('pickups').filter(formVisible),...floorDrops()].filter(a=>!a.got&&!(a.flight>0)&&!(a.bounce>0)&&
     Math.abs(a.x-G.px)<=TABLES.TUNING.pickup_range&&Math.abs(a.y-G.py)<=TABLES.TUNING.pickup_range_y);
 }
 function floorPickupGoal(original){
@@ -85,9 +85,24 @@ function cancelPickup(){pickupPose=null;}
 function tryPickup(){
   if(paused()||pickupPose||!G.onGround||G.attackT>0)return false;
   const nearby=nearFloorItems();if(!nearby.length)return false;
-  if(!nearby.some(a=>canPickupItem(a.item))){toast('보따리가 가득하다');return false;}
+  if(!nearby.some(a=>canPickupItem(a.item))){bagFullWarning();return false;}
   pickupPose={owner:G,region:G.region,zone:G.zone,tick:0,items:null};
-  G.vx=0;jumpQ=atkQ=false;return true;
+  G.vx=0;jumpQ=atkQ=dropQ=false;return true;
+}
+/* X(J) 한 키: 발밑 물건이 있으면 줍고, 없으면 휘두른다. 보따리가 가득하면 휘두르기만 하고 알린다. */
+function actionPress(){
+  const nearby=!pickupPose&&G.onGround&&G.attackT<=0?nearFloorItems():[];
+  if(nearby.length){
+    if(nearby.some(a=>canPickupItem(a.item))){tryPickup();return;}
+    bagFullWarning();
+  }
+  atkQ=true;
+}
+let bagFullAt=-1e9;
+function bagFullWarning(){
+  const now=performance.now();if(now-bagFullAt<1500)return;bagFullAt=now;
+  toast('보따리가 가득 찼다. 더는 담을 수 없다.');
+  for(const b of document.querySelectorAll('#btnBag,#pad [data-k="bag"]')){b.classList.remove('warn');void b.offsetWidth;b.classList.add('warn');setTimeout(()=>b.classList.remove('warn'),1200);}
 }
 function finishFloorPickup(a){
   if(a.got||!canPickupItem(a.item))return false;
@@ -154,21 +169,32 @@ function step(){
   if(paused())return;
   if(document.hidden)return;
   stepFloorItems();
-  if(pickupPose){G.vx=0;jumpQ=atkQ=false;stepPickup();return;}
+  if(pickupPose){G.vx=0;jumpQ=atkQ=dropQ=false;stepPickup();return;}
   if(REG.order===regionList()[0].order&&!G.f.momNoteSeen){showMomNote();return;}
   if(usesZones(REG)&&['inn','shelter'].includes(G.zone)&&deliverHomeReply())return;
+  REG.formCheck?.();   // 지역이 이야기 진행에 맞춰 변신을 여는 자리 (forms.js)
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
-  G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed);if(ax)G.face=ax>0?1:-1;
-  if(jumpQ&&G.onGround){Sound.jump();G.vy=TABLES.TUNING.field_jump_velocity;G.onGround=false;}jumpQ=false;
+  G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed*formMoveMul());if(ax)G.face=ax>0?1:-1;
+  const climbing=stepClimb(ax);
+  if(!climbing){
+  if(jumpQ&&G.onGround){Sound.jump();G.vy=TABLES.TUNING.field_jump_velocity*formJumpMul();G.onGround=false;}jumpQ=false;
+  // ↓+점프: 땅이 아닌 발판 위에서만 아래로 빠진다. 지나는 동안 그 높이의 발판만 무시한다.
+  if(dropQ&&G.onGround&&G.py<fieldGround()-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;}dropQ=false;
+  if(G.dropT>0)G.dropT--;
   G.vy=Math.min(TABLES.TUNING.field_fall_speed,G.vy+TABLES.TUNING.field_gravity);
-  const wasGrounded=G.onGround,prevX=G.px;
-  const prevY=G.py;G.px+=G.vx;G.py+=G.vy;
+  formFallCap();
+  }else formGlide=false;
+  const wasGrounded=G.onGround||climbing,prevX=G.px;
+  const prevY=G.py;
+  if(!climbing){G.px+=G.vx;G.py+=G.vy;}
   if(zoneEdge())return;
   G.px=clamp(G.px,16,fieldDef().maxX?fieldCall('maxX'):fieldWidth()-16);
+  if(!climbing){
   G.onGround=false;
   if(G.py>=fieldGround()){G.py=fieldGround();G.vy=0;G.onGround=true;}
-  else if(G.vy>=0){for(const p of fieldPlatforms()){if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
+  else if(G.vy>=0){for(const p of [...fieldPlatforms(),...formLedges()]){if(G.dropT>0&&Math.abs(p.y-G.dropY)<1)continue;if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
+  }
   Vfx.feet();
   if(!wasGrounded&&G.onGround)Sound.land();
   if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
@@ -189,9 +215,10 @@ function R(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w
 function M(ox,oy,f,lx,ly,w,h,c){R(f>0?ox+lx:ox-lx-w,oy+ly,w,h,c);}
 
 function drawLogs(){for(const p of fieldPlatforms()){const x=p.x-cam;if(x>W||x+p.w<0)continue;R(x,p.y,p.w,5,'#7a4b2a');R(x,p.y,p.w,1,'#a8743b');R(x,p.y+5,p.w,1,'#4a2e1a');R(x,p.y,3,5,'#c9a06a');R(x+p.w-3,p.y,3,5,'#c9a06a');}}
-function drawPickups(){for(const a of fieldItems('pickups')){if(a.got)continue;const p=dropDrawPoint(a),x=p.x-cam;if(x<-8||x>W+8)continue;const bob=Vfx.reducedMotion?0:Math.sin((G.anim+a.x)*0.08)>0.7?-1:0;
+function drawPickups(){for(const a of fieldItems('pickups')){if(a.got||!formVisible(a))continue;const p=dropDrawPoint(a),x=p.x-cam;if(x<-8||x>W+8)continue;const bob=Vfx.reducedMotion?0:Math.sin((G.anim+a.x)*0.08)>0.7?-1:0;
   ctx.save();ctx.translate(0,p.y-a.y);fieldCall('drawPickup',a,x,bob);ctx.restore();}}
-function drawDigs(){const ground=fieldGround();for(const d of fieldItems('digs')){const x=d.x-cam;if(x<-12||x>W+12)continue;
+function drawDigs(){const ground=fieldGround();for(const d of fieldItems('digs')){const x=d.x-cam;if(x<-12||x>W+12||!formVisible(d))continue;
+  if(d.cache){drawCache(d,x);continue;}   // 다람쥐의 잊은 몫 (forms.js)
   if(fieldCall('drawDig',d,x))continue;   // 지역이 직접 그리면 true
   if(d.done){R(x-6,ground-1,12,2,'#3e2615');continue;}
   R(x-7,ground-4,14,4,'#7a4b2a');R(x-5,ground-6,10,2,'#8b5a2b');
@@ -242,6 +269,8 @@ function drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame=0){
   M(ox,oy,f,-4,-12,9,8,Gy);M(ox,oy,f,0,-11,4,6,'#cfc3b2');
   M(ox,oy,f,-3,-20,10,8,Gy);M(ox,oy,f,-2,-17,9,2,K);M(ox,oy,f,4,-17,1,1,'#ffffff');M(ox,oy,f,-2,-15,8,2,Wt);M(ox,oy,f,7,-16,1,2,K);
   M(ox,oy,f,-7,-21,16,2,'#c39b55');M(ox,oy,f,-3,-25,8,4,'#dcbb7a');M(ox,oy,f,-3,-22,8,1,'#6e4f22');M(ox,oy,f,4,-27,2,2,'#fbf7ee');
+  // 삼촌이 따 준 잎사귀는 보따리 끈에 매단다 (머리에 얹지 않는다)
+  if(G?.forms?.length){M(ox,oy,f,-4,-12,1,5,'#6e4f22');drawStrapLeaf(ox,oy,f,-3,-9);}
   const hx=ox+f*5,hy=oy-10;const a=attackT>0?-0.9+(1-attackT/18)*3.2:0.35;
   const dx=f*Math.sin(a),dy=-Math.cos(a);
   for(let i=0;i<10;i++)R(hx+dx*i,hy+dy*i,1,1,'#7a4b2a');
@@ -255,7 +284,7 @@ function drawRaccoon(){
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
   R(G.px-cam-7,fieldGround(),14,1,'rgba(40,24,14,.35)');
   const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
-  drawRaccoonAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);
+  drawPlayerAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);
 }
 
 function draw(){
@@ -279,20 +308,23 @@ function drawFieldScene(showPlayer=true){
   drawFloorDrops();
   drawNpcs();
   fieldCall('drawActors');
-  if(showPlayer)drawRaccoon();
+  if(showPlayer){drawRaccoon();drawFormFx();}
   if(!Vfx.reducedMotion)for(const s of sparks)R(s.x-cam,s.y,1,1,'#fff3b0');
   Vfx.front();
+  if(showPlayer)drawListenMarks();
 }
 let lastNear=null;
-function nearDig(){if(paused())return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
+function nearDig(){if(paused())return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
 function updateOverlay(){
   const pr=$('prompt');
   const n=paused()?null:nearInteraction();const dg=n?null:nearDig();
   const floor=paused()||pickupPose?null:nearFloorItems()[0];
-  if(floor){pr.hidden=false;pr.textContent=TOUCH?'줍기 · ↓':'줍기 · Z';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
+  if(floor){pr.hidden=false;const room=nearFloorItems().some(a=>canPickupItem(a.item));pr.textContent=!room?'보따리 가득':TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
-  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=TOUCH?'휘두르기로 캐기':'J · 캐기';lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
+  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
+  else if(!paused()&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
+  if(!formRing.hidden&&!formChangeAllowed())formRing.hidden=true;
   $('padTalk').classList.toggle('ready',!!n);
   /* 필드 보스 체력 막대: REG.fieldBoss() 가 {name, hp, max} 를 주면 보인다 */
   const fb=fieldCall('fieldBoss');$('bossbar').hidden=!fb;
@@ -308,7 +340,10 @@ function zoneObjects(kind){
   return [...(z?.[kind]||[]),...(REG[kind]||[]).filter(a=>!usesZones(REG)||(a.zone||firstZone(REG))===G.zone)];
 }
 const pointNear=p=>Math.abs(p.x-G.px)<(p.distance??TABLES.TUNING.field_talk_distance)&&Math.abs((p.y??fieldGround())-G.py)<TABLES.TUNING.field_interact_y;
-const pathOpen=p=>!p.need||p.need();
+/* 원래 조건(need) 또는 몸으로 넘는 변신(formPass). formNeed 는 변신으로도 남는 약속 조건이다 (forms.js) */
+const needMet=p=>!p.need||p.need();
+const formPasses=p=>!!(p.formPass&&G?.form===p.formPass&&(!p.formNeed||p.formNeed()));
+const pathOpen=p=>needMet(p)||formPasses(p);
 const exitSpec=e=>typeof e==='string'?{to:e}:e;
 function resetFieldModes(){
   resetMap();
@@ -326,6 +361,7 @@ function changeZone(to,arrival={}){
     image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);
   }
   const z=REG.zones[to];
+  revertForm();   // 구역을 옮기면 너구리로 돌아온다
   G.zone=to;G.px=clamp(arrival.x??z.startX??70,16,z.w-16);G.py=arrival.y??z.ground??GROUND;
   markZoneVisited();
   if(!edge)G.vx=0;
@@ -335,10 +371,10 @@ function changeZone(to,arrival={}){
     for(const k in keys)if(!['arrowleft','arrowright','a','d'].includes(k)){
       if(keys[k])suppressedKeys.add(k);keys[k]=false;
     }
-    touch.up=touch.down=false;jumpQ=atkQ=false;
+    touch.up=touch.down=false;jumpQ=atkQ=dropQ=false;
     document.querySelectorAll('#pad .on').forEach(b=>{if(!['left','right'].includes(b.dataset.k))b.classList.remove('on');});
   }else suppressHeldInputs();
-  sparks.length=0;shakeT=0;lastNear=null;blockedEdge=null;Vfx.clear();
+  hidePeek();sparks.length=0;shakeT=0;lastNear=null;blockedEdge=null;Vfx.clear();
   zoneFade=edge||Vfx.reducedMotion?0:TABLES.TUNING.zone_transition_frames;
   if(image){
     const incoming=document.createElement('canvas');incoming.width=W;incoming.height=H;
@@ -412,7 +448,7 @@ function drawZoneTransition(){
     ctx.drawImage(m.image,-shift,0);ctx.drawImage(m.incoming,m.opts.direction*W-shift,0);
     const x=m.start.x+(G.px-cam-m.start.x)*e,y=m.start.y+(G.py-m.start.y)*e;
     const st=G.onGround&&G.vx?Math.floor((G.anim+m.tick)/6)%2:0;
-    drawRaccoonAt(x,y,G.face,st,0,heldTool());
+    drawPlayerAt(x,y,G.face,st,0,heldTool());
   }else if(m.kind==='zoom'){
     const x=m.opts.focusX??W/2,y=m.opts.focusY??H/2,s=1+(m.opts.reverse?-.16:.18)*e;
     ctx.globalAlpha=1-e;ctx.translate(x,y);ctx.scale(s,s);ctx.drawImage(m.image,-x,-y);
@@ -433,6 +469,7 @@ function zoneEdge(){
     if(blockedEdge!==side)toast(p.reason||'아직 지나갈 수 없는 길이다');
     blockedEdge=side;return false;
   }
+  if(!needMet(p))toast(p.formLabel||formTo(p.formPass)+' 지나간다');
   const dest=REG.zones[p.to];if(!dest)return false;
   const direction=side==='right'?1:-1;
   return changeZone(p.to,{x:direction>0?16:dest.w-16,y:p.toY,edgeDirection:direction});
@@ -451,7 +488,7 @@ function interactionKind(p){
 }
 function interactionLabel(p){
   const k=interactionKind(p);
-  if(k==='doors')return pathOpen(p)?(p.label||'들어가기'):(p.reason||'아직 닫힌 길');
+  if(k==='doors')return needMet(p)?(p.label||'들어가기'):formPasses(p)?(p.formLabel||formTo(p.formPass)+' 지나가기'):(p.reason||'아직 닫힌 길');
   if(k==='vistas')return '바라보기';
   if(k==='stamps')return p.label||'희미한 자국 살펴보기';
   if(k==='examines')return p.label||'조사하기';
@@ -461,7 +498,9 @@ function tryInteract(){
   const p=nearInteraction();if(!p)return;
   const kind=interactionKind(p);
   if(isHomeReplyPoint(p,kind)&&deliverHomeReply())return;
-  if(kind==='npc'){learn('met:'+p.id);p.talk();}
+  // 변신한 채로는 등록된 인물만 아이를 몰라보고 손님으로 대한다 (forms.js). 그 밖은 기존 대화
+  if((kind==='npc'||kind==='wanderers')&&strangerApplies(p)){strangerTalk(p);return;}
+  if(kind==='npc'){learn('met:'+p.id);if(p.peek)peekAt(p.x,p.y??fieldGround());p.talk();}
   else if(kind==='doors'){
     if(!pathOpen(p)){toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
     changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});
@@ -471,6 +510,7 @@ function tryInteract(){
     const texts=Array.isArray(p.text)?p.text:[p.text];
     const visits=G.f.examineVisits||(G.f.examineVisits={}),key=expansionKey(p.id),i=Math.min(visits[key]||0,texts.length-1);
     visits[key]=Math.min(i+1,texts.length-1);
+    if(p.peek!==false)peekAt(p.x,p.y??fieldGround());
     talk([[p.who||'너구리',texts[i]]]);
   }else if(kind==='wanderers'){
     if(G.f.wanderersDone?.[expansionKey(p.id)])talk([[p.name||'길손',p.greeting||'길에서 또 만나자.']]);
@@ -491,26 +531,52 @@ function finishWanderer(id){
 const wandererCount=(region)=>Object.keys(G.f.wanderersDone||{}).filter(k=>!region||k.startsWith(region+':')).length;
 const stampFound=id=>!!G.f.stampsFound?.[expansionKey(id)];
 const stampCount=(region)=>Object.keys(G.f.stampsFound||{}).filter(k=>!region||k.startsWith(region+':')).length;
+/* 아빠의 도장 = 너구리 손바닥 자국. 손바닥과 길게 벌어진 다섯 손가락 (네 지역 공용). */
+function pawStamp(x,y,c){
+  x=Math.round(x);y=Math.round(y);
+  R(x-3,y-4,7,3,c);R(x-2,y-1,5,1,c);
+  R(x-5,y-7,1,2,c);R(x-3,y-9,1,3,c);R(x-1,y-10,1,4,c);R(x+1,y-10,1,4,c);R(x+3,y-9,1,3,c);
+}
 function findStamp(s){
   if(CLASSIC||stampFound(s.id))return false;
   // 문구는 notebook.csv의 알게되는키로 연결한다. 위치와 발견 방식만 지역이 정한다.
   const found=G.f.stampsFound||(G.f.stampsFound={});found[expansionKey(s.id)]=true;
   G.f.stampCount=stampCount();G.f.stampsByRegion=G.f.stampsByRegion||{};G.f.stampsByRegion[REG.id]=stampCount(REG.id);
   learn(s.note,true);Vfx.burst(s.x,s.y??fieldGround());Sound.playSfx('stamp_found');
-  toast('아빠의 도장이다. 수첩에 그날 이야기가 보인다.');return true;
+  peekAt(s.x,s.y??fieldGround(),{w:40,h:28,below:6});
+  toast('아빠의 손바닥 도장이다. 수첩에 그날 이야기가 보인다.');return true;
 }
 function drawZoneObjects(){
   for(const p of zoneObjects('wanderers'))if(p.draw)p.draw(p.x-cam,p.y??fieldGround(),G.px<p.x?-1:1);
   for(const k of ['doors','examines','vistas','stamps'])for(const p of zoneObjects(k)){
     if(k==='stamps'&&!stampFound(p.id))continue;
     if(p.draw)p.draw(p.x-cam,p.y??fieldGround());
-    if(k==='doors'&&!pathOpen(p)&&p.drawBlocked)p.drawBlocked(p.x-cam,p.y??fieldGround());
+    if(k==='doors'&&!needMet(p)&&p.drawBlocked)p.drawBlocked(p.x-cam,p.y??fieldGround());
   }
   const z=zoneDef();if(z)for(const side of ['left','right']){
     const p=exitSpec(z.exits?.[side]);
-    if(p&&!pathOpen(p)&&p.drawBlocked)p.drawBlocked((side==='left'?16:z.w-16)-cam,fieldGround());
+    if(p&&!needMet(p)&&p.drawBlocked)p.drawBlocked((side==='left'?16:z.w-16)-cam,fieldGround());
   }
+  drawClimbs();
 }
+/* 살펴보기 작은 그림: 살펴본 물건 둘레를 주인공 없이 다시 그려 크게 키운 뒤 잠깐 띄운다.
+   조사(examines)·도장은 저절로, 지역 대사에서는 peekAt(x,y)로 부른다. {peek:false}면 띄우지 않는다. */
+const peekBox=el('div','peek');peekBox.hidden=true;peekBox.setAttribute('aria-hidden','true');
+const peekCv=document.createElement('canvas');peekCv.width=64*3;peekCv.height=44*3;peekBox.appendChild(peekCv);
+$('stage').appendChild(peekBox);
+let peekTimer=0;
+function peekAt(x,y=fieldGround(),opts={}){
+  if(CLASSIC||!Number.isFinite(x))return;
+  const full=document.createElement('canvas');full.width=W;full.height=H;
+  const saved=ctx,oldCam=cam;ctx=full.getContext('2d');ctx.imageSmoothingEnabled=false;
+  try{drawFieldScene(false);}finally{ctx=saved;cam=oldCam;}
+  const cw=opts.w||64,ch=opts.h||44,sx=Math.round(clamp(x-G.cam-cw/2,0,W-cw)),sy=Math.round(clamp(y-ch+(opts.below??10),0,H-ch));
+  const pc=peekCv.getContext('2d');pc.imageSmoothingEnabled=false;pc.clearRect(0,0,peekCv.width,peekCv.height);
+  pc.drawImage(full,sx,sy,cw,ch,0,0,peekCv.width,peekCv.height);
+  peekBox.hidden=false;peekBox.classList.remove('show');void peekBox.offsetWidth;peekBox.classList.add('show');
+  clearTimeout(peekTimer);peekTimer=setTimeout(hidePeek,opts.ms||TABLES.TUNING.peek_ms);
+}
+function hidePeek(){clearTimeout(peekTimer);peekBox.hidden=true;peekBox.classList.remove('show');}
 const vistaCaption=el('div',null);
 vistaCaption.setAttribute('role','status');vistaCaption.hidden=true;
 vistaCaption.className='vista-caption';

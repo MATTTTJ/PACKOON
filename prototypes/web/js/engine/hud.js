@@ -13,7 +13,7 @@ function refreshHud(){
   $('hearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('');
   const t=heldTool();
   if(t+G.sharp!==lastTool){lastTool=t+G.sharp;const e=$('toolLabel');e.innerHTML='';e.appendChild(icon(t));e.appendChild(document.createTextNode(TOOLS[t].n+(G.sharp?' +':'')));}
-  if(G)refreshGoal();
+  if(G){refreshGoal();refreshFormUi();}
   if(typeof B!=='undefined'&&B)renderBHud();
 }
 

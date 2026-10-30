@@ -102,7 +102,7 @@ if(!CLASSIC){
   const originalState=Rg.newState;
   Rg.newState=()=>{const s=originalState();s.pickups=[];s.boss.x=Rg.STORE_X;return s;};
   const peg=(x,y)=>{R(x-1,y-17,2,17,'#6b4934');R(x-9,y-19,18,7,'#ead4a6');R(x-6,y-17,11,1,'#784b36');};
-  const glint=(x,y)=>{R(x-4,y-3,8,3,'#a85344');R(x-4,y-7,2,2,'#a85344');R(x,y-8,2,2,'#a85344');};
+  const glint=(x,y)=>pawStamp(x,y,'#a85344');
   const shutter=(x,y)=>{R(x-17,y-35,34,35,'#705346');for(let i=0;i<5;i++)R(x-15+i*6,y-33,2,30,'#987459');R(x-18,y-22,36,3,'#b64e41');};
   const gate=(x,y)=>{R(x-20,y-48,4,48,'#604635');R(x+16,y-48,4,48,'#604635');R(x-24,y-49,48,6,'#31434d');R(x-22,y-51,44,2,'#e6eaf0');if(!night()||!has('sinpyo')){R(x-16,y-23,32,3,'#ac4c43');R(x-12,y-27,24,1,'#dba56c');}};
   const needWarehouse=()=>night()&&has('sinpyo');
@@ -193,17 +193,20 @@ if(!CLASSIC){
         {x:1515,y:110,to:'street',toX:1625,label:'떡집 밖으로',draw:peg},
         {x:1010,y:96,to:'entrance',toX:1310,toY:96,label:'연이 걸렸던 처마로 돌아가기',need:()=>!!G.f.jxKiteDone,reason:'입구에서 연을 풀어 준 뒤 걸어 보자.',draw:peg},
         {x:2180,to:'pine',toX:70,label:'굴뚝 뒤 소나무 숲으로',draw:peg},
-        {x:2040,to:'inn',toX:1510,label:'접힌 좌판 사이, 숙소 지름길',need:night,reason:'낮에는 좌판이 골목을 막는다. 밤이면 접힌다.',draw:peg,drawBlocked:shutter},
+        {x:2040,to:'inn',toX:1510,label:'접힌 좌판 사이, 숙소 지름길',need:night,reason:'낮에는 좌판이 골목을 막는다. 밤이면 접힌다.',draw:peg,drawBlocked:shutter,
+          formPass:'squirrel',formLabel:'다람쥐로 좌판 밑 지나기'},
         {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'입구의 아이가 연을 풀면 처마길을 알려 준다.',draw:peg}],
       get wanderers(){return [...E.wanderers.street,yutBoard,...nightLanterns('street')];},examines:E.examines.street,
     },
     inn:{...common('inn'),name:TABLES.ZONES.jangteo.inn,w:2600,npcs:['bueong','maru'],
       platforms:[...stairs(1160),{x:1340,y:96,w:100},...stairs(1590,128),{x:1770,y:128,w:200},...stairs(2220)],
       pickups:cones('inn',[[420,192],[445,192],[470,192]]),
+      digs:[{id:'j_cache_inn',x:560,item:'solbang',n:2,form:'squirrel',cache:true,done:false}],
       exits:{left:{to:'street',toX:2720},right:{to:'warehouse',toX:60,need:needWarehouse,reason:warehouseReason,drawBlocked:gate}},
       doors:[{x:700,to:'inn',toX:850,label:'숙소 문 열기',draw:peg},
         {x:1120,to:'inn',toX:660,label:'숙소 마당으로',draw:peg},
-        {x:1510,to:'street',toX:2040,label:'밤 골목으로 돌아가기',need:night,reason:'낮에는 장터 좌판이 길을 막는다. 왼쪽 큰길로 돌아가자.',draw:peg,drawBlocked:shutter},
+        {x:1510,to:'street',toX:2040,label:'밤 골목으로 돌아가기',need:night,reason:'낮에는 장터 좌판이 길을 막는다. 왼쪽 큰길로 돌아가자.',draw:peg,drawBlocked:shutter,
+          formPass:'squirrel',formLabel:'다람쥐로 좌판 밑 지나기'},
         {x:2130,to:'warehouse',toX:280,label:'마루에서 보았던 푸른 창고문 안으로',need:needWarehouse,reason:warehouseReason,draw:gate}],
       get wanderers(){return [...E.wanderers.inn,lanternBundle,...nightLanterns('inn')];},examines:E.examines.inn,
       stamps:[{id:'pillar',x:1280,y:128,note:'stamp:jangteo:pillar',draw:glint}],
@@ -212,8 +215,11 @@ if(!CLASSIC){
         diary:'숙소 마루에서 고드름 너머 장터 지붕을 보았다. 처마 사이로 창고의 푸른 문이 보인다.',layers:Rg.expArt.innVista}],
     },
     pine:{...common('pine'),name:TABLES.ZONES.jangteo.pine,w:2800,npcs:[],
-      platforms:[...stairs(420),...stairs(1100),...stairs(2180),{x:2390,y:96,w:340}],
-      pickups:cones('pine',[[250,192],[280,192],[310,192],[600,96],[630,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
+      // 840 헛간 지붕은 720 처마에서 수리부엉이가 날개를 펴야 닿는다 (PA-47 선택 자리)
+      platforms:[...stairs(420),...stairs(1100),...stairs(2180),{x:2390,y:96,w:340},{x:842,y:124,w:56}],
+      digs:[{id:'j_cache_pine',x:1700,item:'kong',n:2,form:'squirrel',cache:true,done:false}],
+      pickups:[...cones('pine',[[250,192],[280,192],[310,192],[600,96],[630,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
+        {id:'j_owl_roof_cone_1',x:858,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:880,y:124,item:'solbang',got:false}],
       doors:[{x:70,to:'street',toX:2180,label:'떡집 굴뚝을 향해 내려가기',draw:peg},
         {x:2480,y:96,to:'street',toX:2650,toY:96,label:'등불 아래 장터 지붕으로',need:()=>!!G.f.jxKiteDone,reason:'처마길은 입구 아이에게 연을 돌려준 뒤 알려 달라고 하자.',draw:peg}],
       exits:{left:{to:'street',toX:2180}},

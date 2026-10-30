@@ -127,7 +127,7 @@ defineBullets({
     }},
 });
 
-/* 서리무기 선택 기능. 예고부터 끝까지 같은 온기 길을 비워 둔다. */
+/* 강철이 선택 기능. 예고부터 끝까지 같은 온기 길을 비워 둔다. */
 function winterAttack(kind){return {dur:220,tick(t){
   if(t===0&&B.E.warmPath)B.bullets.push({k:'gangcheolWinter',kind,t:0,life:220});
 }};}

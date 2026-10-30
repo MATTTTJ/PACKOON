@@ -34,7 +34,7 @@ const Rg=defineRegion('yeongsan',{
     diary('y_start','영산에 왔다. 눈이 허리까지 쌓였다. 산막에 불빛이 보인다.');
     toast('산막의 불빛 쪽으로 가 보자');
   },
-  // 마지막 가족 장면 위에는 점수를 띄우지 않는다 (단서 수는 너구리의 책에서 본다).
+  // 마지막 가족 장면 위에는 점수를 띄우지 않는다 (단서 수는 아빠의 수첩에서 본다).
   endStats:()=>[],
 });
 
@@ -203,6 +203,8 @@ function close(){panel.hidden=true;act=null;releaseInputs();}
 Rg.playActivity=(id,callback)=>{
   if(!descriptions[id]){callback?.();return;}
   if(act)return;
+  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+  {Sound.gather(true);const log=G.f.yActivities||(G.f.yActivities={});log[id]=(log[id]||0)+1;callback?.();return;}
   releaseInputs();G.vx=G.vy=0;
   act={id,index:0,pos:0,dir:1,cool:MG.gather_cooldown,band:40,callback};
   $('yActTitle').textContent=descriptions[id].title;panel.hidden=false;paint();
@@ -242,7 +244,7 @@ const mark=(x,y)=>{
   R(x-2,y-27,4,27,'#8c735d');R(x-9,y-28,18,3,'#d9c18c');
   for(let i=0;i<3;i++)R(x-15+i*13,y-1,8,2,'#bdcfd6');
 };
-const fixture=(id,name,x,talkFn)=>({id,name,x,prompt:name,talk:talkFn,draw:mark});
+const fixture=(id,name,x,talkFn)=>({id,name,x,prompt:name,talk:talkFn,draw:mark,peek:true});
 function survey(i){
   if(i===3&&!G.f.dadDone){talk([['너구리','호숫가에 앉은 너구리가 이쪽을 보고 있어. 얼음길에 오르기 전에 가 보자.']]);return;}
   if(G.f['yIce'+i]){talk([['너구리','여긴 두드려 봤어. 표시한 가지를 따라가면 돼.']]);return;}

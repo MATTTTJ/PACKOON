@@ -4,12 +4,13 @@
 /* {id:창 요소 id, step:매 프레임, hit:누르기} */
 const MINIGAMES=[];
 function defineMinigame(m){MINIGAMES.push(m);}
-const open=id=>!$(id).hidden;
+const open=id=>!!$(id)&&!$(id).hidden; // 없어진 패널 id(옛 'book')는 닫힌 것으로 본다
 const openMinigame=()=>MINIGAMES.find(m=>open(m.id))||null;
 
-const keys={};const touch={left:false,right:false,up:false,down:false};
+const keys={};const touch={left:false,right:false,up:false,down:false,jump:false};   // jump: 누르고 있는 동안 (수리부엉이 활공)
 const suppressedKeys=new Set();
-let jumpQ=false,atkQ=false;
+let jumpQ=false,atkQ=false,dropQ=false;
+const isDown=()=>keys['arrowdown']||keys['s']||touch.down;
 const isLeft=()=>keys['arrowleft']||keys['a']||touch.left;
 const isRight=()=>keys['arrowright']||keys['d']||touch.right;
 addEventListener('keydown',e=>{
@@ -27,7 +28,7 @@ function suppressHeldInputs(){for(const k in keys)if(keys[k])suppressedKeys.add(
 function releaseInputs(){
   for(const k in keys)keys[k]=false;
   for(const k in touch)touch[k]=false;
-  jumpQ=atkQ=false;
+  jumpQ=atkQ=dropQ=false;
   document.querySelectorAll('#pad .on').forEach(b=>b.classList.remove('on'));
   if(typeof endDrag==='function')endDrag();
 }
@@ -47,7 +48,7 @@ function onPress(k){
   if(B){
     if(!$('bResult').hidden){if(k==='enter'||k==='e'||k===' ')$('bResOk').click();return;}
     if(B.paused){if(k==='escape'||k==='k'||k==='c')closeGift();return;}
-    if(battleMaskKey(k))return;
+    if(battleFormKey(k))return;
     if(k==='j'||k==='x'||k===' '||k==='enter')bStrike();else if(k==='k'||k==='c')openGift();return;
   }
   if(inkOn)return;
@@ -59,16 +60,19 @@ function onPress(k){
   }
   if(k==='escape'){closePanels();return;}
   if(k==='i'){toggleBag();return;}
-  if(k==='b'){toggleBook();return;}
-  if(k==='n'){toggleNote();return;}
+  if(k==='n'||k==='b'){toggleNote();return;} // B 는 옛 너구리의 책 키. 이제 같은 아빠의 수첩을 연다
   if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
-  if(open('bag')||open('book')||open('notebook'))return;
-  if(k==='z'){tryPickup();return;}
+  if(open('bag')||open('notebook'))return;
   if(pickupPose)return;
-  if(k===' '||k==='w'||k==='arrowup')jumpQ=true;
-  if(k==='j'||k==='x')atkQ=true;
+  // 0 너구리 · 1 다람쥐 · 2 산양 · 3 수리부엉이 · 4 고라니 (forms.js)
+  if(formKey(k))return;
+  // C(또는 Space·↑·W)는 점프, 아래를 누른 채면 발판 아래로 내려간다.
+  if(k==='c'||k===' '||k==='w'||k==='arrowup')jumpOrDrop();
+  // X(J) 하나로 발밑 물건은 줍고, 없으면 휘두른다.
+  if(k==='j'||k==='x')actionPress();
   if(k==='e'||k==='enter')tryTalk();
 }
+function jumpOrDrop(){if(isDown()&&!(keys['arrowup']||keys['w']))dropQ=true;else jumpQ=true;}
 function padAction(k){
   if(k==='map'){toggleMap();return;}
   if(mapTravel||open('map'))return;
@@ -79,22 +83,21 @@ function padAction(k){
   if(inkOn)return;
   const mg=openMinigame();
   if(k==='bag'){if(!open('dlg')&&!mg)toggleBag();return;}
-  if(k==='book'){if(!open('dlg')&&!mg)toggleBook();return;}
-  if(k==='note'){if(!open('dlg')&&!mg)toggleNote();return;}
+  if(k==='note'||k==='book'){if(!open('dlg')&&!mg)toggleNote();return;}
   if(mg){if(k==='atk'||k==='jump')mg.hit();return;}
   if(open('dlg')){if(k!=='down')advance();return;}
-  if(open('bag')||open('book')||open('notebook'))return;
-  if(k==='down'){tryPickup();return;}
+  if(open('bag')||open('notebook'))return;
+  if(k==='down')return;
   if(pickupPose)return;
-  if(k==='jump')jumpQ=true;else if(k==='atk')atkQ=true;else if(k==='talk')tryTalk();
+  if(k==='jump')jumpOrDrop();else if(k==='atk')actionPress();else if(k==='talk')tryTalk();
 }
 document.querySelectorAll('#pad [data-k]').forEach(b=>{
   const k=b.dataset.k;
   b.addEventListener('pointerdown',e=>{e.preventDefault();b.classList.add('on');
     try{b.setPointerCapture(e.pointerId);}catch(_){}
-    if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up')touch.up=true;else if(k==='down'){touch.down=true;padAction(k);}else padAction(k);});
-  const up=()=>{b.classList.remove('on');if(k==='left')touch.left=false;if(k==='right')touch.right=false;if(k==='up')touch.up=false;if(k==='down')touch.down=false;};
+    if(k==='jump')touch.jump=true;if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up')touch.up=true;else if(k==='down'){touch.down=true;padAction(k);}else padAction(k);});
+  const up=()=>{b.classList.remove('on');if(k==='jump')touch.jump=false;if(k==='left')touch.left=false;if(k==='right')touch.right=false;if(k==='up')touch.up=false;if(k==='down')touch.down=false;};
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);
   b.addEventListener('contextmenu',e=>e.preventDefault());
 });
-$('prompt').addEventListener('click',()=>{if(paused())return;if(nearFloorItems().length)tryPickup();else if(nearInteraction())tryInteract();else atkQ=true;});
+$('prompt').addEventListener('click',()=>{if(paused())return;if(nearFloorItems().length)actionPress();else if(nearInteraction())tryInteract();else atkQ=true;});

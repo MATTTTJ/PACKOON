@@ -229,7 +229,7 @@ function drawReturnedObject(c){
   }
 }
 
-/* 서리무기의 먹 예고. 위험 범위는 공격이 끝날 때까지 옅게 남긴다. */
+/* 강철이의 먹 예고. 위험 범위는 공격이 끝날 때까지 옅게 남긴다. */
 function drawWinterThreat(c,kind,t){
   for(let y=BOX.y+6;y<BOX.y+BOX.h;y+=12)for(let x=BOX.x+6;x<BOX.x+BOX.w;x+=12){
     if(warmSafe(x,y,10))continue;

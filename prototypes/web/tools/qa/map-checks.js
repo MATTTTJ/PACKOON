@@ -49,11 +49,8 @@ async function runMap({browser:b,outDir}){
     await b.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
     await b.eval('G.px=820;G.cam=650;G.py=fieldGround();G.onGround=true');await b.key('e');await until(b,"!$('dlg').hidden");
     for(let i=0;i<8&&!await b.eval("$('dlgChoices').children.length>0");i++)await b.key('e');
-    await b.click('#dlgChoices button:first-child');await until(b,"!$('galHands').hidden");
-    for(let hit=1;hit<=3;hit++){
-      await b.click('#galHandsHit');
-      await until(b,hit===3?"$('galHands').hidden":`+$('galHands').dataset.hits===${hit}`);await b.wait(600);
-    }
+    // 보자기 손일은 미니게임 없이 바로 마친다 (PA-46). 고르면 곧바로 까치 대화가 이어진다.
+    await b.click('#dlgChoices button:first-child');await until(b,"!$('dlg').hidden");
     const unlockLines=[];
     for(let i=0;i<12&&await b.eval("!$('dlg').hidden");i++){
       unlockLines.push(await b.eval("({who:$('dlgWho').textContent,text:$('dlgText').textContent,unlocked:!!G.f.mapUnlocked})"));await b.key('e');
@@ -141,6 +138,7 @@ async function runMap({browser:b,outDir}){
         G.ended=true;rememberRegion(G);
       }
       Object.assign(G.f,{mapUnlocked:true,momNoteSeen:true,momNoteRestored:true,momNoteFade:0,dodamDone:true,musoeDone:true,nalDone:true,toadMet:true,kkuDone:true,ppuriPassed:true,stackDone:true,yakMade:true,bueongDone:true,steamDone:true,yeotDone:true,hongsiMade:true,fruitGot:true,nameGiven:true,yakDone:true,spring:true,yStampPrompted:{}});
+      G.forms=['squirrel','goat','owl','deer'];G.f.leafGiven=true; // 진행값과 맞는 변신 (PA-47). 없으면 도착 때 변신이 열리는 장면이 뜬다.
       G.started=true;resetScreens();G.ended=true;showEnd();rememberRegion(G);
       const stable={inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:structuredClone(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)};
       return {zones,stable,floor:structuredClone(G.floorItems),local:Object.fromEntries(Object.entries(G.regionStates).map(([id,s])=>[id,structuredClone(s)]))};

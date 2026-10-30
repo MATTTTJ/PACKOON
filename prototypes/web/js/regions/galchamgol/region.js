@@ -28,7 +28,7 @@ const Rg=defineRegion('galchamgol',{
     boss:{x:2180,dead:false},
     drop:null,
     f:{dodamTalk:false,dodamDone:false,musoeMet:false,musoeDone:false,nalTalk:false,nalDone:false,toadMet:false,faints:0,musoeTested:false},
-    /* 호감 축: 책의 물품 장부에 이 순서로 나온다 */
+    /* 호감 축: 수첩의 물품 장부에 이 순서로 나온다 */
     rel:{dodam:{t:'호감',v:0},musoe:{t:'의리',v:0},nal:{t:'경멸',v:0},toad:{t:'호감',v:0}},
   }),
   weather:()=>Vfx.setWeather('maple'),
