@@ -2209,7 +2209,17 @@ const TABLES={
   "battle_base_damage": 1,
   "battle_sharp_damage": 2,
   "battle_pickaxe_bonus": 1,
-  "toast_frames": 300
+  "toast_frames": 300,
+  "drop_arc_height": 24,
+  "drop_flight_frames": 28,
+  "drop_min_spacing": 18,
+  "drop_spread": 48,
+  "drop_bounce_height": 3,
+  "drop_bounce_frames": 10,
+  "pickup_range": 28,
+  "pickup_range_y": 20,
+  "pickup_motion_frames": 15,
+  "pickup_pull_frames": 8
  },
  "PROGRESS": [
   {

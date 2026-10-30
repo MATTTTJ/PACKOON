@@ -205,6 +205,8 @@ const TUNING=numericTable('tuning','분류',
     'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at',
     'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval toast_frames',
     'field_interact_y zone_transition_frames vista_pan_frames',
+    'drop_arc_height drop_flight_frames drop_min_spacing drop_spread drop_bounce_height drop_bounce_frames',
+    'pickup_range pickup_range_y pickup_motion_frames pickup_pull_frames',
     'battle_bare_speed battle_bare_cooldown battle_bare_radius',
     'battle_choraengi_speed battle_choraengi_cooldown battle_choraengi_radius',
     'battle_gaksi_speed battle_gaksi_cooldown battle_gaksi_radius',
@@ -227,6 +229,9 @@ for(let i=1;i<noteKeys.length;i++)requireValue(MINIGAMES['rhythm_note_'+noteKeys
 requireValue(MINIGAMES.dad_steps<=3,'minigames.csv: 구현된 몸짓은 세 단계까지다');
 requireValue(TUNING.kkubeogi_awake<=TUNING.kkubeogi_cycle&&TUNING.kkubeogi_cue<=TUNING.kkubeogi_cycle,'tuning.csv: 꾸벅이 판정과 예고가 주기보다 길다');
 requireValue(TUNING.field_swing_hit_at<TUNING.field_swing_frames,'tuning.csv: 휘두르기 판정 시점이 전체 시간보다 짧아야 한다');
+requireValue(TUNING.drop_min_spacing>=16&&TUNING.drop_spread>=TUNING.drop_min_spacing,'tuning.csv: 바닥 아이템 간격은 16px 이상이며 퍼짐 폭 안에 있어야 한다');
+requireValue(TUNING.pickup_range>0&&TUNING.pickup_range_y>0,'tuning.csv: 줍기 범위는 0보다 커야 한다');
+requireValue(TUNING.pickup_pull_frames<=TUNING.pickup_motion_frames,'tuning.csv: 빨려 드는 시간은 줍기 동작보다 길 수 없다');
 for(const mask of ['bare','choraengi','gaksi']){
   requireValue(TUNING['battle_'+mask+'_speed']>0&&TUNING['battle_'+mask+'_radius']>3,'tuning.csv: 전투 탈 속도·되치기 반경을 확인한다');
 }

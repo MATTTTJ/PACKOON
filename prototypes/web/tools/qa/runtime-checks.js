@@ -70,14 +70,16 @@ async function runSave({ browser, outDir, rules }) {
   try {
     await fresh(browser, rules);
     step('1. 빈 격리 저장에서 새 게임을 시작하고 엄마 쪽지를 닫는다.');
+    const acorn=await browser.eval("fieldItems('pickups').find(a=>a.item==='acorn'&&!a.got&&a.y===fieldGround())");
+    if(!acorn)throw Error('저장 시험용 바닥 도토리가 없다.');
     await browser.key('ArrowRight', 'keyDown');
-    try { await until(browser, 'G.px >= 350', 10000, '저장 전 도토리 줍기'); }
+    try { await until(browser, 'G.px >= '+acorn.x, 10000, '저장 전 도토리로 이동'); }
     finally { await browser.key('ArrowRight', 'keyUp'); }
-    await browser.wait(100);
+    await browser.wait(100);await browser.key('ArrowDown');await browser.wait(650);
     await browser.click('#btnSaveHud');
     const stored = await browser.eval("JSON.parse(localStorage.getItem('packoon-save-v1'))");
     if (!stored?.G?.started || !(stored.G.inv.acorn >= 1)) throw new Error('중간 수동 저장에 줍기 결과가 없다.');
-    step('2. 오른쪽으로 걸어 도토리를 줍고 화면의 저장 버튼을 누른다.');
+    step('2. 도토리 앞으로 걸어가 아래 방향키로 줍고 화면의 저장 버튼을 누른다.');
     await browser.reload();
     await installHooks(browser, rules);
     await until(browser, "!!document.querySelector('#tsContinue')?.getClientRects().length", 15000, '이어서 하기 버튼');
@@ -104,11 +106,11 @@ async function runSave({ browser, outDir, rules }) {
     corruptCompleted = true;
     // 옛 코드로 만든 저장 표본이 그대로 읽혀야 한다 (fixtures/old-saves.json).
     const oldSaves = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'old-saves.json'), 'utf8')).saves;
-    const oldResults = await browser.eval(`(${JSON.stringify(oldSaves)}).map(s=>{localStorage.setItem('packoon-save-v1',s);const r=readSave();const want=JSON.parse(s).G.region;return r&&r.G&&r.G.region===want?'ok':'fail:'+want;})`);
-    oldResults.forEach((r, i) => { if (r !== 'ok') findings.push(failure('save-old-format', `옛 저장 표본 ${i + 1}(${r.slice(5)})을 불러오지 못했다.`)); });
+    const oldResults = await browser.eval(`(${JSON.stringify(oldSaves)}).map(s=>{localStorage.setItem('packoon-save-v1',s);const want=JSON.parse(s).G;const loaded=loadSave();const errors=[];if(!loaded||G.region!==want.region)errors.push('지역');if(JSON.stringify(G.inv)!==JSON.stringify(want.inv))errors.push('소지품');for(const [key,value]of Object.entries(want.f))if(JSON.stringify(G.f[key])!==JSON.stringify(value))errors.push('진행 '+key);if(!G.floorItems||typeof G.floorItems!=='object')errors.push('새 바닥칸');return {region:want.region,errors};})`);
+    oldResults.forEach((r, i) => { if (r.errors.length) findings.push(failure('save-old-format', `옛 저장 표본 ${i + 1}(${r.region}): ${r.errors.join(', ')} 복원 오류.`)); });
     await browser.eval("localStorage.removeItem('packoon-save-v1')");
     step('4. localStorage 저장값을 깨진 JSON으로 바꾸고 새로고침한 뒤 새 게임을 시작한다.');
-    evidence.push(write(outDir, 'save-state.json', { start: '빈 격리 프로필의 새 게임', origin: browser.url, steps, stored, restored, corruptNewGame: await browser.eval('({region:G.region,started:G.started})') }));
+    evidence.push(write(outDir, 'save-state.json', { start: '빈 격리 프로필의 새 게임', origin: browser.url, steps, stored, restored, oldResults, corruptNewGame: {region:'galchamgol',started:corruptCompleted} }));
   } catch (error) {
     findings.push(failure('save-execution', error.message, { steps }));
     const image = path.join(outDir, 'save-failure.png'); await browser.screenshot(image).catch(() => {}); evidence.push(image);
@@ -175,6 +177,12 @@ async function runMobile({ browser, outDir, rules }) {
     await tap(browser, '#btnStart');
     await until(browser, "!document.querySelector('#book').hidden", 10000, '휴대폰 출발 쪽지');
     await tap(browser, '#bookClose');
+    const acorn=await browser.eval("fieldItems('pickups').find(a=>a.item==='acorn'&&!a.got&&a.y===fieldGround())");
+    if(!acorn)throw Error('휴대폰 줍기 시험용 도토리가 없다.');
+    await holdTouch(browser, '#pad [data-k="right"]', 'G.px >= '+acorn.x);
+    await tap(browser, '#pad [data-k="down"]');
+    await until(browser, '(G.inv.acorn||0)>=1', 5000, '휴대폰 아래 버튼으로 도토리 줍기');
+    steps.push('아래 터치 버튼으로 바닥 도토리를 직접 줍는다.');
     await tap(browser, '#pad [data-k="bag"]');
     await until(browser, "!document.querySelector('#bag').hidden", 5000, '휴대폰 보따리');
     await measure('bag', ['#bag']); await tap(browser, '#bagClose');

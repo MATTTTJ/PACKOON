@@ -340,9 +340,10 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .goal-m b{display:block;font-family:var(--ui);font-weight:normal;font-size:11px;color:var(--gold);letter-spacing:.06em}
 .pad-top .chipbtn{display:flex;align-items:center;font-size:14px;padding:0 12px;min-height:44px}
 .pad-main{flex:1;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:150px}
-.dpad{display:grid;grid-template-columns:auto auto;grid-template-areas:"left right";gap:12px}
+.dpad{display:grid;grid-template-columns:auto auto;grid-template-areas:"left right" "down down";gap:12px}
 .dpad [data-k="left"]{grid-area:left}.dpad [data-k="right"]{grid-area:right}.dpad [data-k="up"]{grid-area:up}.dpad [data-k="down"]{grid-area:down}
 .pbtn.v{display:none}
+.dpad .pbtn[data-k="down"]{display:grid;justify-self:center}
 body.in-battle .dpad{grid-template-columns:repeat(3,auto);grid-template-areas:". up ." "left down right";gap:6px}
 body.in-battle .dpad .pbtn{width:54px;height:54px}
 body.in-battle .pbtn.v{display:grid}

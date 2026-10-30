@@ -24,6 +24,123 @@ function doHit(){
 const sparks=[];
 function spark(x,y){for(let i=0;i<8;i++)sparks.push({x,y,vx:(Math.random()-.5)*2.4,vy:-Math.random()*2.6,t:26});}
 
+/* 바닥 좌표는 발이 닿는 높이(px)다. 포물선 그림 좌표와 분리해 저장한다.
+   현재 필드는 전 구역에 연속된 바닥이 있고 물·절벽 그림은 그 앞뒤의 풍경이다.
+   실제 발판과 maxX 통행 경계만 사용하므로 풍경의 물 위나 닫힌 길 너머로 던지지 않는다. */
+function dropSurfaceAt(x,sourceY,sourceX,zoneId=G.zone){
+  const z=usesZones(REG)?REG.zones[zoneId]:REG;
+  if(!z)return null;
+  const width=z.w??REG.world,ground=z.ground??GROUND;
+  const max=typeof z.maxX==='function'?z.maxX():width-16;
+  x=Math.round(clamp(x,16,Math.min(width-16,max)));
+  const surfaces=(z.platforms||[]).filter(p=>x>=p.x+8&&x<=p.x+p.w-8&&p.y>=sourceY-.01);
+  const y=surfaces.reduce((v,p)=>Math.min(v,p.y),ground);
+  return {x,y};
+}
+function validDropSurface(a){
+  const p=dropSurfaceAt(a.x,a.y,a.x,a.zone??G.zone);
+  return !!p&&p.x===a.x&&p.y===a.y;
+}
+function spawnDrops(item,count,source={}){
+  if(!ITEMS[item]||!Number.isSafeInteger(count)||count<=0)return [];
+  const zone=source.zone??G.zone,rows=floorDrops(G.region,zone);
+  const sx=Number.isFinite(source.x)?source.x:G.px,sy=Number.isFinite(source.y)?source.y:fieldGround();
+  const spacing=TABLES.TUNING.drop_min_spacing,spread=TABLES.TUNING.drop_spread;
+  const occupied=[...rows.filter(a=>!a.got),...G.pickups.filter(a=>!a.got&&(usesZones(REG)?(a.zone||firstZone(REG))===zone:!a.zone))];
+  const born=[];
+  for(let i=0;i<count;i++){
+    const side=i%2?-1:1,distance=spacing+Math.random()*Math.max(0,spread-spacing);
+    let target=null;
+    // 먼저 좌우로 번갈아 흩뿌리고, 자리가 차면 가까운 바닥부터 찾는다.
+    for(let j=0;j<Math.ceil(fieldWidth()/spacing)*2+2;j++){
+      const offset=j===0?side*distance:(j%2?1:-1)*Math.ceil(j/2)*spacing;
+      const p=dropSurfaceAt(sx+offset,sy,sx,zone);
+      if(p&&occupied.every(a=>Math.hypot(a.x-p.x,a.y-p.y)>=spacing)){target=p;break;}
+    }
+    if(!target)target=dropSurfaceAt(sx,sy,sx,zone); // 비정상적으로 가득한 시험 맵에서도 수량은 버리지 않는다.
+    if(!target)continue;
+    const a={id:'floor:'+G.region+':'+(zone||'classic')+':'+(G.floorSerial=(G.floorSerial||0)+1),item,...target,
+      zone:zone||null,sourceX:sx,sourceY:sy-8,flight:Vfx.reducedMotion?0:TABLES.TUNING.drop_flight_frames,
+      bounce:Vfx.reducedMotion?0:TABLES.TUNING.drop_bounce_frames,got:false};
+    rows.push(a);occupied.push(a);born.push(a);
+  }
+  refreshGoal();return born;
+}
+function nearFloorItems(){
+  return [...fieldItems('pickups'),...floorDrops()].filter(a=>!a.got&&!(a.flight>0)&&!(a.bounce>0)&&
+    Math.abs(a.x-G.px)<=TABLES.TUNING.pickup_range&&Math.abs(a.y-G.py)<=TABLES.TUNING.pickup_range_y);
+}
+function floorPickupGoal(original){
+  if(!G.started||G.ended)return original;
+  const rows=[...G.pickups,...Object.values(G.floorItems?.[G.region]||{}).flat()].filter(a=>!a.got);
+  const a=rows.find(a=>((/줍기|따기|따서|베기|캐기/.test(original)&&original.includes(ITEMS[a.item]?.n))||
+    (a.item==='root'&&!has('root')&&/흙더미 캐기/.test(original))||
+    (a.item==='meoru'&&G.region==='galchamgol'&&G.boss.dead&&!has('meoru')&&!G.diary.some(d=>d.id==='end')))&&
+    !/건네기|넣어|빻기|갈기|찌기/.test(original));
+  return a?'바닥의 '+ITEMS[a.item].n+' 줍기':original;
+}
+let pickupPose=null;
+const pickupIcons=new Map();
+function cancelPickup(){pickupPose=null;}
+function tryPickup(){
+  if(paused()||pickupPose||!G.onGround||G.attackT>0)return false;
+  const nearby=nearFloorItems();if(!nearby.length)return false;
+  if(!nearby.some(a=>canPickupItem(a.item))){toast('보따리가 가득하다');return false;}
+  pickupPose={owner:G,region:G.region,zone:G.zone,tick:0,items:null};
+  G.vx=0;jumpQ=atkQ=false;return true;
+}
+function finishFloorPickup(a){
+  if(a.got||!canPickupItem(a.item))return false;
+  a.got=true;addItem(a.item,1);Vfx.burst(G.px,G.py-6);spark(G.px,G.py-6);
+  fieldCall('onPickup',a);REG.onFloorPickup?.(a);return true;
+}
+function stepFloorItems(){
+  for(const a of floorDrops())if(!a.got){
+    if(Vfx.reducedMotion){a.flight=a.bounce=0;}
+    else if(a.flight>0)a.flight--;else if(a.bounce>0)a.bounce--;
+  }
+}
+function stepPickup(){
+  const p=pickupPose;
+  if(p.owner!==G||p.region!==G.region||p.zone!==G.zone){cancelPickup();return;}
+  p.tick++;
+  if(p.tick===TABLES.TUNING.pickup_motion_frames){
+    const stacks=new Set(Object.keys(G.inv).filter(id=>G.inv[id]>0));p.items=[];
+    for(const a of nearFloorItems()){
+      if(stacks.has(a.item)||!Number.isFinite(G.bagSlots)||stacks.size<G.bagSlots){p.items.push(a);stacks.add(a.item);}
+      else p.full=true;
+    }
+  }
+  if(p.tick>=TABLES.TUNING.pickup_motion_frames+TABLES.TUNING.pickup_pull_frames){
+    let full=!!p.full;
+    for(const a of p.items||[])if(!a.got&&!finishFloorPickup(a))full=true;
+    cancelPickup();if(full)toast('보따리가 가득하다');
+  }
+}
+function dropDrawPoint(a){
+  const p=pickupPose;
+  if(!Vfx.reducedMotion&&p?.items?.includes(a)){
+    const t=clamp((p.tick-TABLES.TUNING.pickup_motion_frames)/TABLES.TUNING.pickup_pull_frames,0,1);
+    return {x:a.x+(G.px-a.x)*t,y:a.y+(G.py-6-a.y)*t};
+  }
+  if(!Vfx.reducedMotion&&a.flight>0){
+    // t=경과/총 프레임(0..1), y=직선 보간-4ht(1-t). h=24px일 때 t=.5에서 24px 높다.
+    const t=1-a.flight/TABLES.TUNING.drop_flight_frames;
+    return {x:a.sourceX+(a.x-a.sourceX)*t,y:a.sourceY+(a.y-a.sourceY)*t-4*TABLES.TUNING.drop_arc_height*t*(1-t)};
+  }
+  const t=1-(a.bounce||0)/TABLES.TUNING.drop_bounce_frames;
+  return {x:a.x,y:a.y-(!Vfx.reducedMotion&&a.bounce>0?Math.sin(Math.PI*t)*TABLES.TUNING.drop_bounce_height:0)};
+}
+function drawFloorDrops(){
+  for(const a of floorDrops()){
+    if(a.got)continue;const p=dropDrawPoint(a),x=p.x-cam;
+    if(x<-16||x>W+16)continue;
+    if(!pickupIcons.has(a.item))pickupIcons.set(a.item,icon(a.item));
+    R(a.x-cam-5,a.y,10,1,'rgba(40,24,14,.25)');
+    ctx.drawImage(pickupIcons.get(a.item),Math.round(x-8),Math.round(p.y-16));
+  }
+}
+
 function step(){
   if(vistaMode){if(!document.hidden&&!Vfx.reducedMotion)vistaMode.tick=Math.min(vistaMode.tick+1,TABLES.TUNING.vista_pan_frames);return;}
   if(zoneMotion){stepZoneTransition();return;}
@@ -33,6 +150,9 @@ function step(){
   const mg=openMinigame();if(mg){mg.step();return;}
   fieldCall('ambient');   // 현재 구역의 날씨·진행만 갱신한다
   if(paused())return;
+  if(document.hidden)return;
+  stepFloorItems();
+  if(pickupPose){G.vx=0;jumpQ=atkQ=false;stepPickup();return;}
   if(REG.order===regionList()[0].order&&!G.f.momNoteSeen){showMomNote();return;}
   if(usesZones(REG)&&['inn','shelter'].includes(G.zone)&&deliverHomeReply())return;
   G.anim++;
@@ -53,7 +173,6 @@ function step(){
   if(atkQ&&G.attackT<=0){Sound.swing();G.attackT=TABLES.TUNING.field_swing_frames;}atkQ=false;
   if(G.attackT>0){G.attackT--;if(G.attackT===TABLES.TUNING.field_swing_hit_at)doHit();}
   if(G.hurtT>0)G.hurtT--;
-  for(const a of fieldItems('pickups')){if(!a.got&&Math.abs(a.x-G.px)<TABLES.TUNING.field_pickup_x&&Math.abs(a.y-G.py)<TABLES.TUNING.field_pickup_y){a.got=true;addItem(a.item,1);fieldCall('onPickup',a);}}
   fieldCall('step');
   for(const s of zoneObjects('stamps'))if(s.auto&&pointNear(s))findStamp(s);
   for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.vy+=0.15;if(--s.t<=0)sparks.splice(i,1);}
@@ -68,8 +187,8 @@ function R(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w
 function M(ox,oy,f,lx,ly,w,h,c){R(f>0?ox+lx:ox-lx-w,oy+ly,w,h,c);}
 
 function drawLogs(){for(const p of fieldPlatforms()){const x=p.x-cam;if(x>W||x+p.w<0)continue;R(x,p.y,p.w,5,'#7a4b2a');R(x,p.y,p.w,1,'#a8743b');R(x,p.y+5,p.w,1,'#4a2e1a');R(x,p.y,3,5,'#c9a06a');R(x+p.w-3,p.y,3,5,'#c9a06a');}}
-function drawPickups(){for(const a of fieldItems('pickups')){if(a.got)continue;const x=a.x-cam;if(x<-8||x>W+8)continue;const bob=Math.sin((G.anim+a.x)*0.08)>0.7?-1:0;
-  fieldCall('drawPickup',a,x,bob);}}
+function drawPickups(){for(const a of fieldItems('pickups')){if(a.got)continue;const p=dropDrawPoint(a),x=p.x-cam;if(x<-8||x>W+8)continue;const bob=Vfx.reducedMotion?0:Math.sin((G.anim+a.x)*0.08)>0.7?-1:0;
+  ctx.save();ctx.translate(0,p.y-a.y);fieldCall('drawPickup',a,x,bob);ctx.restore();}}
 function drawDigs(){const ground=fieldGround();for(const d of fieldItems('digs')){const x=d.x-cam;if(x<-12||x>W+12)continue;
   if(fieldCall('drawDig',d,x))continue;   // 지역이 직접 그리면 true
   if(d.done){R(x-6,ground-1,12,2,'#3e2615');continue;}
@@ -101,8 +220,20 @@ function drawBackpack(ox,oy,f){
     if(dad){M(ox,oy,f,-11,-13,3,2,'#d6c6a3');M(ox,oy,f,-10,-12,1,3,'#403126');}
   }
 }
-function drawRaccoonAt(ox,oy,f,st,attackT,tool){
+function drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame=0){
   const Gy='#8c8070',K='#2a211b',Wt='#efe6d6',Bl='#d9a441',T='#6f6357';
+  if(pickFrame){
+    const bend=pickFrame===2?5:3;
+    M(ox,oy,f,-12,-7,7,4,T);M(ox,oy,f,-10,-7,1,4,K);M(ox,oy,f,-7,-7,1,4,K);
+    drawBackpack(ox-f*2,oy+bend,f);
+    M(ox,oy,f,-4,-4,4,4,K);M(ox,oy,f,2,-4,4,4,K);
+    M(ox,oy,f,-4,-12+bend,10,6,Gy);M(ox,oy,f,3,-15+bend,9,7,Gy);
+    M(ox,oy,f,4,-13+bend,9,2,K);M(ox,oy,f,10,-13+bend,1,1,'#ffffff');
+    M(ox,oy,f,5,-11+bend,8,2,Wt);M(ox,oy,f,12,-12+bend,1,2,K);
+    M(ox,oy,f,0,-17+bend,15,2,'#c39b55');M(ox,oy,f,4,-21+bend,8,4,'#dcbb7a');
+    M(ox,oy,f,4,-18+bend,8,1,'#6e4f22');M(ox,oy,f,10,-23+bend,2,2,'#fbf7ee');
+    M(ox,oy,f,6,-6,3,4,Gy);M(ox,oy,f,8,-3,4,2,K);return;
+  }
   M(ox,oy,f,-13,-9,7,4,T);M(ox,oy,f,-12,-9,1,4,K);M(ox,oy,f,-9,-9,1,4,K);
   drawBackpack(ox,oy,f);
   M(ox,oy,f,-3+st,-4,3,4,K);M(ox,oy,f,2-st,-4,3,4,K);
@@ -121,7 +252,8 @@ function drawRaccoon(){
   if(!Vfx.reducedMotion&&G.hurtT>0&&Math.floor(G.hurtT/4)%2)return;
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
   R(G.px-cam-7,fieldGround(),14,1,'rgba(40,24,14,.35)');
-  drawRaccoonAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool());
+  const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
+  drawRaccoonAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);
 }
 
 function draw(){
@@ -141,6 +273,7 @@ function drawFieldScene(showPlayer=true){
   drawZoneObjects();
   drawDigs();
   drawPickups();
+  drawFloorDrops();
   drawNpcs();
   fieldCall('drawActors');
   if(showPlayer)drawRaccoon();
@@ -152,7 +285,9 @@ function nearDig(){if(paused())return null;for(const d of fieldItems('digs')){if
 function updateOverlay(){
   const pr=$('prompt');
   const n=paused()?null:nearInteraction();const dg=n?null:nearDig();
-  if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
+  const floor=paused()||pickupPose?null:nearFloorItems()[0];
+  if(floor){pr.hidden=false;pr.textContent='줍기 · ↓';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
+  else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
   else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=TOUCH?'휘두르기로 캐기':'J · 캐기';lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
   $('padTalk').classList.toggle('ready',!!n);
@@ -173,10 +308,12 @@ const pointNear=p=>Math.abs(p.x-G.px)<(p.distance??TABLES.TUNING.field_talk_dist
 const pathOpen=p=>!p.need||p.need();
 const exitSpec=e=>typeof e==='string'?{to:e}:e;
 function resetFieldModes(){
+  cancelPickup();
   endVista();zoneMotion=null;zoneFade=0;blockedEdge=null;sparks.length=0;shakeT=0;releaseInputs();suppressedKeys.clear();Vfx.clear();
 }
 function changeZone(to,arrival={}){
   if(!usesZones(REG)||!REG.zones[to]||paused())return false;
+  cancelPickup();
   const edge=arrival.edgeDirection===1||arrival.edgeDirection===-1;
   let image,start;
   if(edge&&!Vfx.reducedMotion){

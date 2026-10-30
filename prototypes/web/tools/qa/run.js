@@ -7,7 +7,7 @@ const {execFileSync}=require('node:child_process');
 const {createHash}=require('node:crypto');
 const {launchBrowser,startServer}=require('./browser');
 const root=path.resolve(__dirname,'../../../..');
-const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile'];
+const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','drops-floor','drops-persistence','drops-departure','drops-full'];
 const staticNames=names.slice(0,5);
 const args=process.argv.slice(2);
 let quick=false,only=null;
@@ -54,7 +54,7 @@ function saveReports() {
   const report={metadata:{...metadata,durationSeconds:+((Date.now()-started)/1000).toFixed(2),outDir:relative(outDir)},
     status:failures.length?'fail':'pass',results,
     limitations:['실제 휴대폰·소리·조작감·서사 개연성은 사람이 확인해야 한다.',
-      '옛 버전 실저장 호환은 검증하지 않는다. 이번 저장 검사는 현재 버전 왕복과 손상 JSON이다.',
+      '옛 코드로 만든 저장 표본 4개와 현재 버전 저장 왕복·손상 JSON을 검사한다. 별도 사용자 기기의 옛 저장은 미확인이다.',
       '화자 검사는 실행한 대화 줄의 현재 구역 배치만 증명한다. 선택 분기 전체를 통과했다고 보지 않는다.']};
   const md=[`# 자동 검수 결과: ${failures.length?'실패':'통과'}`,'',
     `- 대상: \`${metadata.commit}\` (${metadata.branch})`,
@@ -150,6 +150,9 @@ const watchdog=setTimeout(async()=>{
     if(selected.has('edges'))add(await runEdges({outDir,rules,evidence:hookEvidence}));
     if(selected.has('save'))add(await withBrowser('save',(browser,directory)=>runSave({browser,outDir:directory,rules})));
     if(selected.has('mobile'))add(await withBrowser('mobile',(browser,directory)=>runMobile({browser,outDir:directory,rules})));
+    const {runDropCheck}=require('./drop-checks');
+    for(const name of names.filter(n=>n.startsWith('drops-')))if(selected.has(name))
+      add(await withBrowser(name,(browser,directory)=>runDropCheck({browser,outDir:directory,name})));
   }
 })().catch(error=>add(failure('runner',error))).finally(async()=>{
   clearTimeout(watchdog);if(server)await server.close();saveReports();

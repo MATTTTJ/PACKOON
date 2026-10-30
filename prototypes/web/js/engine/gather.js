@@ -33,9 +33,9 @@ function gStrike(){
   drawGather();
 }
 function finishGather(){
-  const d=gat.d,id=d.item;$('gather').hidden=true;d.done=true;d.busy=false;
+  const d=gat.d;if(!d||d.done||!gat.cfg)return;const id=d.item;$('gather').hidden=true;d.done=true;d.busy=false;
   const perfect=gat.miss===0;Vfx.gather(d.x,GROUND-4);
-  addItem(id,perfect?TABLES.MINIGAMES.gather_perfect_yield:TABLES.MINIGAMES.gather_yield);
+  spawnDrops(id,perfect?TABLES.MINIGAMES.gather_perfect_yield:TABLES.MINIGAMES.gather_yield,{x:d.x,y:d.y??fieldGround(),zone:d.zone});
   if(perfect)setTimeout(()=>toast('흠집 하나 없이 캐냈다! '+ITEMS[id].n+' ×'+TABLES.MINIGAMES.gather_perfect_yield),700);
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);
   gat.cfg=null;

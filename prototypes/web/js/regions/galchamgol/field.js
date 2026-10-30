@@ -98,12 +98,15 @@ Rg.step=()=>{
   for(const m of G.mobs){if(m.dead)continue;if(m.flash>0)m.flash--;m.x+=m.dir*0.45;if(m.x<m.min||m.x>m.max)m.dir*=-1;if(hitPlayer(m.x-8,m.x+8,GROUND-12,GROUND))hurt(m.x);}
   if(G.barrier.shake>0)G.barrier.shake--;
   if(!G.boss.dead&&G.barrier.cut&&G.px>KUDZU_AT)Rg.startKudzu();
-  if(G.drop){const d=G.drop;d.vy=Math.min(4,d.vy+0.15);d.y=Math.min(GROUND-3,d.y+d.vy);
-    if(Math.abs(d.x-G.px)<12&&G.py>d.y-6){G.drop=null;addItem('meoru',1);
+  // 옛 저장에 남은 해머루도 같은 바닥 아이템으로 한 번만 옮긴다.
+  if(G.drop){const d=G.drop;G.drop=null;spawnDrops('meoru',1,{x:d.x,y:d.y});}
+};
+Rg.onFloorPickup=a=>{
+  if(a.item==='meoru'){
       clue('h1','아빠의 수첩','젊은 아빠가 수첩의 해머루 그림 옆에 적은 글씨: "여기도 아니다."');
       diary('meoru','해머루를 붓으로 그리려고 아빠의 수첩을 펼쳤다. 젊은 아빠가 그림 옆에 적어 둔 글씨를 다시 읽었다. "여기도 아니다." 아빠도 이 열매를 보고 더 북쪽으로 갔구나.');
       ledger('toad','두꺼비 할멈','해머루 1','엄마의 병을 늦추는 약');
-      setTimeout(()=>toast('수첩의 아빠 그림 옆에 글씨가 있다… 두꺼비 할멈에게 가져가자'),1600);refreshGoal();}}
+      setTimeout(()=>toast('수첩의 아빠 그림 옆에 글씨가 있다… 두꺼비 할멈에게 가져가자'),1600);refreshGoal();}
 };
 /* 휘두르기: 칡덩굴은 낫으로만 끊긴다 */
 Rg.onHit=(x1,x2,dmg,f)=>{
@@ -123,7 +126,7 @@ Rg.faint=()=>{
 };
 Rg.bossDie=()=>{
   const b=G.boss;b.dead=true;
-  G.drop={x:TREE_X+4,y:GROUND-158,vy:0};
+  spawnDrops('meoru',1,{x:TREE_X+4,y:GROUND-158});
   diary('boss','엉킨 칡이 풀렸다. 당산나무가 크게 숨을 쉬는 것 같았다.');
   toast('엉킨 칡이 풀렸다! 해머루가 떨어진다');refreshGoal();
 };
