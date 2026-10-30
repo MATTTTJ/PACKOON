@@ -8,7 +8,7 @@ const say=(lines,next)=>{talk(lines,next);return true;};
 // 결정 D-25: 낯선 손님 (design/data/decisions.csv)
 Rg.strangers={
   yeotbang:{
-    line:'어머, 처음 보는 손님!\n엿장수 마음대로 값 매겨 줄까?',
+    line:'어라, 처음 보는 손님이네?\n값은 엿장수 마음대로지~',
     trades:[{give:{solbang:2},get:{honey:1}}],swapPool:['solbang','kong','mung']},
   morak:{
     line:'어서 와, 손님! 설 대목이라 정신없네!\n떡 하나 바꿔 갈래?',
@@ -19,7 +19,7 @@ Rg.strangers={
     talk(form){
       if(!G.f.night)return say([['너구리','(부엉 영감이 처마 밑에서 졸고 있다.)']]);
       if(form==='owl'&&once('jx_bueong_kin'))return say([
-        ['부엉 영감','밤새 손님이로군. 앉으시오.'],
+        ['부엉 영감','같은 밤새로군. 앉으시오.'],
         ['부엉 영감','지난가을 너구리 보부상 하나가\n짐을 맡기고 갔소.'],
         ['부엉 영감','"아들이 오거든" 한마디만 남기고.\n장부에는 그 말 적을 칸이 없더군.']],
         ()=>diary('jx_bueong_kin','부엉이 모습으로 밤에 찾아가니 부엉 영감이 푸념처럼 털어놓았다. 아빠가 짐을 맡기며 "아들이 오거든"이라고 했단다.'));
@@ -38,7 +38,7 @@ Rg.formCheck=()=>{
   if(!G.f.bueongDone||typeof unlockForm!=='function'||(typeof hasForm==='function'&&hasForm('owl')))return;
   if(open('dlg')||B)return;
   unlockForm('owl');
-  diary('form_owl','밤새 장부를 적는 부엉 영감을 보며 알았다. 밤에 깨어 있는 건 남이 못 보는 걸 적기 위해서다. 잎을 부니 수리부엉이가 됐다.');
-  talk([['너구리','(밤새 장부를 적는 부엉 영감을 보니 알 것 같다.\n남이 못 보는 걸 적으려고 깨어 있는 거야.)'],['너구리','(잎을 대고 수리부엉이를 떠올리면… 될 것 같아.)']]);
+  diary('form_owl','다들 잠든 밤에 장부를 넘기는 부엉 영감을 보며 알았다. 밤에 깨어 있는 건 남이 못 보는 걸 적기 위해서다. 잎을 부니 수리부엉이가 됐다.');
+  talk([['너구리','(다들 잠든 밤에 장부를 넘기는 부엉 영감님.\n남이 못 보는 걸 적으려고 깨어 계신 거야.)'],['너구리','(잎을 대고 수리부엉이를 떠올리면… 될 것 같아.)']]);
 };
 })();

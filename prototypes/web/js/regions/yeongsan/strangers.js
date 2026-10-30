@@ -24,7 +24,7 @@ Rg.strangers={
     line:'이 높은 데까지 손님이라니.\n산 위 물건은 값이 비싸.',
     price:2,trades:[{give:{darae_vine:2},get:{jip:1}}],swapPool:['jip','darae_vine','jujube'],
     talk(){
-      if(once('ys_nal_price'))diary('ys_nal_price','영산에서도 날쌘은 손님에게 두 배를 불렀다. 네 지역 내내 나한테만은 값을 부풀리지 않았다.');
+      if(once('ys_nal_price'))diary('ys_nal_price','영산에서도 날쌘은 손님에게 두 배를 불렀다. 단풍골부터 여기까지, 나한테만은 값을 부풀리지 않았다.');
       return false;
     }},
 };
