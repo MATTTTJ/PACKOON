@@ -268,7 +268,7 @@ function talkSangun(){
 }
 /* 되돌림 약을 만든 뒤에도 봄길과 선택 가공을 둘러볼 수 있다. 귀향은 직접 고른다. */
 function returnPrep(){
-  if(!G.f.yakDone||G.ended)return;
+  if(!G.f.yakDone||G.ended||regionCompleted(Rg.id))return;
   talk([['아빠','(약을 보자기에 싸고, 약연 바퀴에 남은 가루를 턴다. 내 손이 닿도록 약연을 돌려 놓는다.)'],
     ['너구리','엄마 약은 챙겼어.\n같이 마실 것도 갈아 갈까?',[
       {t:'아빠와 집으로 돌아간다',go:()=>Rg.goHome()},

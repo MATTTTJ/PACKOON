@@ -750,6 +750,7 @@ function handMedicineToMagpie(){
   diary('jx_home_reply',Rg.homeReply);
 }
 Rg.sendMedicine=()=>{
+  if(regionCompleted(Rg.id))return;
   if(Rg.arcs()&&G.f.jangteoArcsMorak2&&!G.f.jangteoArcsMorak3){
     talk([['너구리','엄마 드릴 홍시 약떡, 다 됐다!',[{t:'모락 아주머니의 설 떡도 함께 보낸다',go:()=>{
       // 별도 소지품·추가 재료 없이 모락이 자기 떡을 보탠다. 약떡은 기존처럼 하나만 소비한다.

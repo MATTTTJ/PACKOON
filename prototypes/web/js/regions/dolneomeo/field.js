@@ -195,7 +195,7 @@ if(!CLASSIC){
       const at=pickupMap[pi++];if(at)Object.assign(p,{id:'dol_old_pickup_'+(pi-1),zone:at[0],x:at[1],y:at[2]});
     }
     for(const d of g.digs){
-      const i=Number(d.id?.match(/^dol_old_dig_([0-2])$/)?.[1]);
+      const i=Number(d.id?.match(/^dol_old_dig_([0-3])$/)?.[1]);
       if(Number.isInteger(i))Object.assign(d,{zone:digMap[i][0],x:digMap[i][1]});
       if(d.zone)continue;
       if(d.item==='seogi'){Object.assign(d,{id:'dol_seogi',zone:'cliff',x:1920});continue;}
@@ -331,7 +331,7 @@ if(!CLASSIC){
     if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>2310)Rg.startGolem();
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
-    weather:()=>Vfx.setWeather('frost'),ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);Rg.ambient();applyMemory();},
+    weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);Rg.ambient();applyMemory();},
     drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);if(id==='gate')A.drawBridgeWork(1870-cam,GROUND);drawStonePlatforms(id);},
     drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
     weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),
@@ -419,6 +419,7 @@ if(!CLASSIC){
       }));
     };
     Rg.sendMedicine=()=>{
+      if(regionCompleted(Rg.id))return;
       G.f.yakMade=true;
       diary('d_end','깨어난 맷돌로 서리다래를 갈았다. 마을 돌담의 늙은 까치에게 내가 만든 약즙을 맡겼다.');
       talk([['너구리','까치야, 엄마 약이야.\n남쪽 단풍골 너머 우리 집으로 부탁해.'],['늙은 까치','남쪽 집으로. 단단히 묶었구나.\n다녀오마.']],()=>Rg.finishHomeDelivery());

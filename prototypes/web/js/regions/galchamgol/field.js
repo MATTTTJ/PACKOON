@@ -158,7 +158,7 @@ if(!CLASSIC){
   };
   const basic=(id,w,platforms)=>({w,startX:70,ground:GROUND,platforms,npcs:[],
     drawBack:()=>A.back(id),drawScenery:()=>A.scenery(id),
-    drawFront:()=>A.front(id),weather:()=>Vfx.setWeather('maple'),ambient:placeRoot,
+    drawFront:()=>A.front(id),weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'maple'),ambient:placeRoot,
     drawPickup:Rg.drawPickup,onPickup:a=>Rg.onPickup?.(a),step:commonStep});
   const sign=A.marker,blocked=A.blocked;
   const path=(x,to,toX,label,extra={})=>({x,to,toX,label,draw:sign,...extra});

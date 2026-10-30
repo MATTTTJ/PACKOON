@@ -2197,6 +2197,8 @@ const TABLES={
   "field_interact_y": 24,
   "zone_transition_frames": 18,
   "vista_pan_frames": 480,
+  "map_flight_ms": 2000,
+  "map_landing_margin": 40,
   "battle_bare_speed": 2.7,
   "battle_bare_cooldown": 16,
   "battle_bare_radius": 26,
@@ -2408,5 +2410,35 @@ const TABLES={
     }
    ]
   }
- ]
+ ],
+ "ZONES": {
+  "galchamgol": {
+   "village": "집·마을 어귀",
+   "forge": "대장간 길",
+   "forest": "참나무 숲",
+   "marsh": "늪가 약방",
+   "hill": "당산나무 언덕"
+  },
+  "dolneomeo": {
+   "gate": "장승 고갯길",
+   "village": "돌너머 마을",
+   "field": "메밀밭·둥지",
+   "cliff": "돌산 절벽길",
+   "shrine": "성황당 돌탑"
+  },
+  "jangteo": {
+   "entrance": "장터 입구",
+   "street": "장터 거리",
+   "inn": "보부상 숙소",
+   "pine": "뒷산 솔숲",
+   "warehouse": "창고 뒷길"
+  },
+  "yeongsan": {
+   "shelter": "산막",
+   "snow": "깊은 눈길",
+   "slope": "얼어붙은 비탈",
+   "shore": "호숫가",
+   "island": "신목 섬"
+  }
+ }
 };

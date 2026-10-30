@@ -5,6 +5,18 @@
   "notes": "새로 합성한 소리. 각 효과는 어택·몸통·꼬리를 별도 층으로 겹친다. seed를 고정해 웹과 WAV의 노이즈를 맞춘다.",
   "effects": [
     {
+      "id": "magpie_wings", "name": "까치 떼 날갯짓", "category": "특수 이동", "status": "제안",
+      "duration": 0.72, "gain": 0.64,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.12,"gain":0.38,"pan":-0.28,"patch":{"kind":"noise","gain":0.65,"attack":0.022,"decay":0.035,"sustain":0.08,"release":0.05,"tail":0.045,"noise":1,"noiseCutoff":1400,"partials":[],"fixedDuration":0.12},"seed":4801},
+        {"instrument":"wind","note":"C4","start":0.035,"duration":0.13,"gain":0.16,"pan":0.24,"patch":{"kind":"noise","gain":0.65,"attack":0.015,"decay":0.04,"sustain":0.05,"release":0.045,"tail":0.045,"noise":1,"noiseCutoff":2600,"partials":[],"fixedDuration":0.13},"seed":4802},
+        {"instrument":"wind","note":"C4","start":0.2,"duration":0.13,"gain":0.34,"pan":0.26,"patch":{"kind":"noise","gain":0.65,"attack":0.022,"decay":0.04,"sustain":0.08,"release":0.05,"tail":0.045,"noise":1,"noiseCutoff":1250,"partials":[],"fixedDuration":0.13},"seed":4803},
+        {"instrument":"wind","note":"C4","start":0.24,"duration":0.12,"gain":0.15,"pan":-0.22,"patch":{"kind":"noise","gain":0.65,"attack":0.015,"decay":0.04,"sustain":0.05,"release":0.045,"tail":0.045,"noise":1,"noiseCutoff":2400,"partials":[],"fixedDuration":0.12},"seed":4804},
+        {"instrument":"wind","note":"C4","start":0.4,"duration":0.14,"gain":0.3,"pan":-0.12,"patch":{"kind":"noise","gain":0.65,"attack":0.022,"decay":0.04,"sustain":0.08,"release":0.05,"tail":0.045,"noise":1,"noiseCutoff":1100,"partials":[],"fixedDuration":0.14},"seed":4805},
+        {"instrument":"wind","note":"C4","start":0.44,"duration":0.13,"gain":0.14,"pan":0.2,"patch":{"kind":"noise","gain":0.65,"attack":0.015,"decay":0.04,"sustain":0.05,"release":0.045,"tail":0.045,"noise":1,"noiseCutoff":2200,"partials":[],"fixedDuration":0.13},"seed":4806}
+      ]
+    },
+    {
       "id": "footstep_leaf", "name": "낙엽 밟기", "category": "걸음", "status": "제안",
       "duration": 0.38, "gain": 0.72,
       "layers": [
