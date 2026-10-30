@@ -235,8 +235,11 @@ function prepareForge(){
   $('fhint').setAttribute('aria-live','polite');
 }
 function openForge(){
+  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+  // 낫 벼리기는 무쇠가 직접 한다. 의리 덤은 그대로 준다.
+  Object.assign(forge,{heat:MG.forge_heat,hits:MG.forge_hits,miss:0,edge:MG.forge_bonus_edges,phase:'hot',wait:0,impact:0,particles:[],warned:false,owner:G});
+  Sound.stone?.('tap');finishForge();return;
   prepareForge();
-  Object.assign(forge,{heat:MG.forge_heat,hits:0,miss:0,edge:0,phase:'hot',wait:0,impact:0,particles:[],warned:false,owner:G});
   $('forgeTitle').textContent='대장간 · 아빠의 낫 벼리기';$('forge').hidden=false;
   forgeSay('start');drawForge();
 }
@@ -459,6 +462,8 @@ if(!CLASSIC){
   let hand=null;
   function hands(title,kind,steps,commit,sort=false){
     if(hand||G.ended)return;
+    // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+    Sound.gather(true);if(G.f.galHandsProgress)delete G.f.galHandsProgress[kind];commit();refreshHud();return;
     const saved=G.f.galHandsProgress?.[kind]||0;
     hand={owner:G,kind,steps,commit,sort,hits:Math.min(saved,steps.length-1),pos:0,dir:1,miss:0,cool:0};
     hp.dataset.kind=kind;ht.textContent=title;

@@ -263,6 +263,9 @@ function stackSay(kind,extra=''){
   $('shint').textContent=stoneTask?(stoneTask.steps[Math.min(st.hits,MG.stack_hits-1)]+(kind==='edge'?' · 살짝 고쳐 놓았다.':'')):'돌쇠 할배: “'+pick(stackAdvice[kind])+'”'+extra;
 }
 function openStack(task=null){
+  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+  if(task){Sound.stone('tap');task.done();return;}
+  Object.assign(st,{hits:MG.stack_hits,miss:0,done:true});Sound.stone('tap');finishStack();return;
   stoneTask=task;
   panel.querySelector('h2').textContent=task?.title||'돌 쌓기 · 돌의 마음 읽기';
   panel.querySelector('p.fhint').textContent=task?.hint||'붉은 꼭대기가 금빛 가운데에 오면 얹자. 세 개면 된다.';

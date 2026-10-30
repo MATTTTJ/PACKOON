@@ -203,6 +203,8 @@ function close(){panel.hidden=true;act=null;releaseInputs();}
 Rg.playActivity=(id,callback)=>{
   if(!descriptions[id]){callback?.();return;}
   if(act)return;
+  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+  {Sound.gather(true);const log=G.f.yActivities||(G.f.yActivities={});log[id]=(log[id]||0)+1;callback?.();return;}
   releaseInputs();G.vx=G.vy=0;
   act={id,index:0,pos:0,dir:1,cool:MG.gather_cooldown,band:40,callback};
   $('yActTitle').textContent=descriptions[id].title;panel.hidden=false;paint();

@@ -95,6 +95,8 @@ function drawHands(){
   $('jangteoHandsPips').textContent=(hand.part+1)+' / '+handJobs[hand.kind][1].length+' · 금빛 칸에서 살짝';
 }
 Rg.handWork=(kind,after)=>{
+  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+  Sound.gather(true);if(after)after();return;
   Object.assign(hand,{pos:0,dir:1,part:0,cool:0,kind,after});
   handP.querySelector('h2').textContent=handJobs[kind][0];handP.hidden=false;
   $('jangteoHandsHint').textContent='Space · J 또는 손 맞추기 버튼. 늦어도 같이 마칠 수 있어.';drawHands();
@@ -326,6 +328,8 @@ function steamSay(kind){
   $('steamHint').textContent='모락: “'+sm.lastLine+'”';
 }
 function openSteam(){
+  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
+  steamP.hidden=false;finishSteam();return;
   Object.assign(sm,{fire:MG.steam_fire_start,steam:0,prog:0,cool:0,t:0,danger:0,close:false,state:'playing',wind:0,windDone:false,voice:'',voiceCool:0});
   $('steamBtn').innerHTML='부채질 <kbd>Space · J</kbd>';
   $('steamPips').textContent='금빛 칸에 모두 '+(MG.steam_target_frames/60)+'초 · 칸 밖에서도 쌓인 시간은 그대로';
