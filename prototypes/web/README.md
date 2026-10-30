@@ -119,7 +119,8 @@ node prototypes/web/tools/qa/run.js --only save,mobile
 | 휘두르기·줍기 (채집·전투 치기) | X / J. 바닥 물건 위에서는 줍고, 없으면 휘두른다. 보따리가 가득하면 휘두르고 알린다 | 휘두르기 / 치기 |
 | 말 걸기 | E | 말걸기 |
 | 전투 중 선물 | K | 선물 |
-| 전투 탈 바꾸기 | 0 맨손 / 1 초랭이탈 / 2 각시탈 | 전투 화면의 탈 버튼 |
+| 잎사귀 변신 (필드·전투) | 0 너구리 / 1 다람쥐 / 2 산양 / 3 수리부엉이 / 4 고라니. 같은 키를 다시 누르면 너구리 | 필드: 잎사귀 버튼 → 변신 고리, 전투: 변신 버튼 |
+| 다람쥐 오르기 · 수리부엉이 활공 | 줄기 앞에서 ↑ 누르고 있기 · 떨어지는 동안 C 누르고 있기 | ▲ 누르고 있기 · 점프 누르고 있기 |
 | 보따리 / 아빠의 수첩 | I / N (B도 같은 수첩) | 화면 버튼 |
 | 길 지도 (확장판) | M, 방향키·Enter, Esc·M 닫기 | 지도 → 구역 → 까치 떼 부르기 |
 | 소리 켜기·끄기 | V | 기존 HUD 소리 버튼 |
@@ -144,6 +145,7 @@ js/engine/              모든 지역이 같이 쓰는 것
   field.js              주인공 이동·점프·휘두르기, 줍기, 카메라, 필드 그리는 순서
   map.js                방문한 구역 지도, 까치 이동 연출과 입력 정리
   hud.js                체력, 손에 든 연장, 지금 할 일
+  forms.js              잎사귀 변신: 상태·키·필드 능력·변신 그림·낯선 손님·잎사귀 버튼
   bag.js                보따리와 가보 가공대
   book.js               수첩 뒤쪽에 아이가 이어 적은 장 그리기 (일기·단서·별명·답장·엄마 쪽지·장부)
   notebook.js           아빠의 수첩 패널 (아빠의 쪽 + 아이의 줄, 탭, 쪽 수·줄 수, learn)
@@ -167,6 +169,7 @@ id는 `design/data/*.csv`와 같다. 지역 id는 `regions.csv`, 아이템은 `i
    - `field.js`: 배경, 장애물, 날씨, 휘두르기·쓰러짐 처리
    - `enemies.js`: `defineEnemies`로 전투 상대와 수묵 그림
    - `story.js`: NPC 대화와 교환, 지금 할 일, 지역 전용 미니게임
+   - `strangers.js`: 변신한 채 말을 걸 때의 낯선 손님 등록소 `Rg.strangers` (story.js 다음에 읽는다)
 2. `index.html`의 지역 `<script>` 목록 아래에 새 파일을 같은 모양으로 덧붙인다 (`game.js`보다 위).
 3. 앞 지역의 `defineRegion`에 `next: '<새 지역 id>'`를 적는다.
 
@@ -229,10 +232,28 @@ if(!CLASSIC){
 - `sendHomeGift(regionId,itemId)`: 현재 지역 가공품 1개를 보내고 `true`를 돌려준다. CSV의 지역과 가공법 결과를 확인하며 원재료·다른 지역 가공품은 보내지 않는다. `itemId=null`이면 그림을 보내며 물건은 소비하지 않는다. 중복 발송·수량 부족·진행에 필요한 수량 부족 등은 `false`다. 기존 `home:<지역id>` 학습 키를 유지한다. 보내지 않아도 진행 가능하다.
 - `Rg.homeReply`: 보낸 지역이 답장 글을 제공한다. 문자열, 문자열 배열, `talk` 행 배열 또는 발송 기록을 받아 그 값을 돌려주는 함수를 쓴다. 다음 지역의 `inn`·`shelter` 구역은 도착하거나 대화가 끝난 뒤 첫 자유 필드 갱신에서 `deliverHomeReply()`를 호출한다. 그 밖에는 까치(`magpie`·`kkachi`·이름/id의 `까치`), `rest`·`homeReply` 표시가 있는 접점, `maru`·`shelter` NPC에게 E로 말 걸 때 확인한다. 답장은 한 번 보여 주며 수첩에 남긴다. 문을 누른 순간에는 열지 않고 입장한 뒤 확인한다. 답장 글이 아직 없으면 보류한다.
   다음 지역이 없는 영산의 발송 기록은 보관하지만 자동 답장 장면은 열리지 않는다. 귀향 때 답장을 보여 줄 시점은 지역 작업과 확인해야 한다.
-- `grantMask('choraengi'|'gaksi')`, `grantTool('pickaxe')`: 첫 획득은 `true`, 중복·잘못된 id는 `false`다. 획득과 장착은 별개다. 탈은 보스 전투에서 0·1·2 키 또는 화면 버튼으로 바꾼다. 곡괭이는 돌·얼음 부위 타격에 자동으로 쓰이며 없어도 모두 깰 수 있다. 속도·범위·피해 조절값은 `tuning.csv`가 원본이다.
+- `grantTool('pickaxe')`: 첫 획득은 `true`, 중복·잘못된 id는 `false`다. 초랭이탈·각시탈은 잎사귀 변신으로 바뀌어 `grantMask()`는 아무 일도 하지 않고 `false`를 돌려준다 (옛 호출 호환). 곡괭이는 돌·얼음 부위 타격에 자동으로 쓰이며 없어도 모두 깰 수 있다. 속도·범위·피해 조절값은 `tuning.csv`가 원본이다.
 - `noteFade()`: 엄마 쪽지를 한 단계 흐리게 하고 단계를 돌려준다. 지역 이동 때 엔진이 자동 호출하므로 지역 코드에서 중복 호출하지 않는다. 마지막 엔딩에서 `noteRestore()`가 글을 또렷하게 한다. 글이 흐려져도 보상·진행 불이익은 없다.
 
 새 상태는 `G.nicknames`와 기존 `G.f` 안에 저장한다. 값이 없는 옛 저장은 빈 별명·미발송 상태로 읽는다. 쪽지는 현재 지역에 맞는 흐림 단계로 복원한다. 가방 겉모습은 돌너머 도착, 부엉 영감 신표, 영산 아빠 장면의 기존 진행 표시로 판단하며 칸 수는 늘리지 않는다.
+
+### 잎사귀 변신 API (PA-47)
+
+설계는 [잎사귀 변신 설계안](../../design/proposals/leaf-transform.md). 엔진은 `js/engine/forms.js`, 전투 손은 `battle.js`다.
+
+- 상태: `G.forms`(열린 변신, 늘 squirrel·goat·owl·deer 순서), `G.form`(지금 모습, `''`=너구리). 칸이 없는 옛 저장은 너구리, 열린 변신 없음으로 읽고 모르는 id는 버린다.
+- `unlockForm(id)`: 처음이면 `true`와 "새 변신: 다람쥐" 알림. `setForm(id)`: 바뀌면 `true`. 풀피리 소리(`Sound.leaf`)와 먹물 번짐을 낸다. 대화·미니게임·지도·경치·가방·책·줍기·전환 중에는 `false`. `hasForm(id)`, `formName(id)`.
+- 구역·지역을 옮기거나 전투에서 지면 너구리로 돌아온다. NPC 피하기 시험(`dodge`)은 늘 너구리 손이다.
+- 지역은 `REG.formCheck()`를 두면 필드가 한 번 돌 때마다 불린다. 이야기 표시가 참이 되면 `unlockForm`을 부르는 자리로 쓴다.
+- 필드 능력 (수치는 `tuning.csv`의 `form_*`): 다람쥐는 조금 빠르고 `climbs`를 오른다. 산양은 `form_goat_jump`배 높이 뛴다(바닥에서 y=112 턱). 수리부엉이는 떨어지는 동안 점프 키를 누르면 `form_owl_glide_fall`로 천천히 내려온다(↓+C로 발판에서 내려간 뒤에도). 고라니는 빠르고 `listen:true` 대상 쪽에 소리 표시를 띄운다.
+- 구역 오브젝트:
+  - `climbs:[{x, top, bottom?, ledge?, draw?(x,y,top)}]`: 다람쥐가 ↑를 누르는 동안 오르내린다. 꼭대기에는 발판을 두거나 `ledge:true`(다람쥐에게만 작은 디딤). 옆으로만 걸으면 놓고, C로 뛰어내린다.
+  - 문·가장자리 출구의 `formPass:'squirrel'|'goat'|'owl'|'deer'`, `formLabel`, `formNeed()`: `pathOpen(p)`는 `need()`가 참이거나 지금 모습이 `formPass`이고 `formNeed()`(없으면 참)가 참일 때 열린다. 막힘 그림(`drawBlocked`)은 원래 조건으로만 그린다. **몸으로 막힌 길에만** 쓴다. 장승제·신표·창고·산군·보스 같은 약속 조건은 `formNeed`로 남긴다.
+  - `digs`·`pickups`의 `form:'<id>'`: 그 모습일 때만 보이고 캐거나 줍는다. `cache:true` 흙더미는 채집 놀이 없이 `n`개(기본 2)가 바닥에 나온다(다람쥐의 잊은 몫).
+  - `listen:true`: pickups·digs·examines·stamps·wanderers에 둔다.
+- 낯선 손님: 변신한 채 NPC(또는 길손)에게 말을 걸 때 `Rg.strangers[id]`가 있으면 `strangerTalk(npc)`, 없으면 기존 `talk()`다(무쇠·아빠·산군처럼 알아보는 인물과 사물 접점은 등록하지 않는다). 등록 모양:
+  `{line, kin, kinLine, fear:[...], fearLine, timid, timidGift:{item,n,line}, trades:[{give:{},get:{}}], swapPool:[...], price, talk?(form,npc)}`.
+  `talk`가 있으면 그 함수가 대화를 맡는다. 겁내는 모습이면 교환이 없다. 고라니는 `timid` 인물에게서 지역마다 한 번 `timidGift`를 받는다. 손님 교환·산양 같은 품(`ITEMS[id].r`) 맞바꾸기·수리부엉이 외상은 NPC마다 지역당 `stranger_trade_limit`번(`G.f.strangerTrades`)이며 `price`만큼 `give`를 곱한다. 외상은 `G.f.strangerDebt`에 남아 책의 물품 장부에 보이고, 그 지역에 빚이 있으면 새 외상이 없다. `Rg.strangerCreditAtNight`가 참인 지역(큰 장터)은 밤에만 외상을 준다. 호감·이야기 표시는 바꾸지 않고, 진행에 필요한 몫은 건네지 않는다.
 
 ### 공통 구역 전환 API
 

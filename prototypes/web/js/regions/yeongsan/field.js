@@ -212,15 +212,17 @@ if(!CLASSIC){
     get stamps(){return content(id,'stamps');},
   };}
   Rg.zones={
-    shelter:zone('shelter',['nal'],{right:{to:'snow',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y)}},[
-      {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,draw:sign,drawBlocked:(x,y)=>a().blockedSnow(x,y)},
+    // 깊은 눈길은 몸의 문제라 산양이 지난다. 얼어붙은 비탈은 수리부엉이가 날개를 펴고 내려간다 (PA-47).
+    shelter:zone('shelter',['nal'],{right:{to:'snow',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'}},[
+      {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,draw:sign,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'},
       {x:1860,to:'shore',toX:680,label:'능선 안쪽 호숫가로',need:ledgeGate,reason:'멀리 본 능선이다. 살금이에게 안쪽 길을 물어보자.',draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
     ]),
     snow:zone('snow',[],{left:'shelter',right:'slope'},[
-      {x:2000,y:108,to:'shore',toX:2020,toY:108,label:'바라보던 능선 속으로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
+      {x:2000,y:108,to:'shore',toX:2020,toY:108,label:'바라보던 능선 속으로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y),
+        formPass:'owl',formLabel:'수리부엉이로 능선에서 날아 내려가기'},
     ]),
-    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y)}},[
-      {x:2320,to:'shore',toX:170,label:'바위턱을 디뎌 호숫가로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
+    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y),formPass:'owl',formLabel:'수리부엉이로 날개 펴고 비탈 내려가기'}},[
+      {x:2320,to:'shore',toX:170,label:'바위턱을 디뎌 호숫가로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y),formPass:'owl',formLabel:'수리부엉이로 날개 펴고 비탈 내려가기'},
     ]),
     shore:zone('shore',['dad'],{left:'slope'},[
       {x:680,to:'shelter',toX:1860,label:'능선 안쪽으로 산막에 돌아가기',need:ledgeGate,reason:iceReason,draw:sign},
@@ -237,6 +239,10 @@ if(!CLASSIC){
     if(G.f.seolpi)G.f.ySnowTrail=Math.max(G.f.ySnowTrail||180,Math.round(G.px));
   };
   Rg.zones.slope.step=()=>{stepCommon();stepSalg();};
+  // PA-47 선택 자리: 고라니만 듣는 눈 속 짚단, 다람쥐의 잊은 몫
+  Rg.zones.slope.pickups=[{id:'y_deer_jip',x:1640,y:GROUND,item:'jip',form:'deer',listen:true,got:false}];
+  Rg.zones.shelter.digs=[{id:'y_cache_shelter',x:720,item:'acorn',n:2,form:'squirrel',cache:true,done:false}];
+  Rg.zones.snow.digs=[{id:'y_cache_snow',x:1260,item:'solbang',n:2,form:'squirrel',cache:true,done:false}];
   // 겨울에는 오른쪽 얼음길로 걸어 나간다. 봄에는 같은 길이 물에 잠겨 배로만 건넌다.
   Rg.zones.shore.exits.right={to:'island',toX:160,
     need:()=>!G.f.spring&&!!G.f.dadDone,

@@ -196,9 +196,9 @@ async function runMobile({ browser, outDir, rules }) {
       await tap(browser, '#dlg');
     }
     await tap(browser, '#dlgChoices button:first-child');
-    await until(browser, "!document.querySelector('#galHands').hidden", 5000, '까치 손일 미니게임');
-    await measure('minigame', ['#galHands']);
-    steps.push('3. 오른쪽 터치 버튼을 누른 채 늙은 까치에게 걸어가 말걸기를 누르고, 대화 뒤 보자기 손일을 고른다.');
+    // 손일은 미니게임 없이 바로 마치고 대화가 이어진다 (PA-46).
+    await until(browser, "!document.querySelector('#dlg').hidden", 5000, '보자기 손일 뒤 까치 대화');
+    steps.push('3. 오른쪽 터치 버튼을 누른 채 늙은 까치에게 걸어가 말걸기를 누르고, 대화 뒤 보자기 손일을 고른다 (바로 마침).');
     const hooks = await collectHookFindings(browser);
     for (const f of hooks.speakers) findings.push(f);
   } catch (error) {

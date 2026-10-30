@@ -566,3 +566,13 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
 .stage .peek.show{animation:peekIn .18s ease-out}
 @keyframes peekIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.stage .peek.show{animation:none}}
+/* 잎사귀 변신 (forms.js): HUD 의 지금 모습, 휴대폰 잎사귀 버튼과 변신 고리 */
+.form-now{display:flex;align-items:center;gap:4px;color:var(--hanji);border-left:1px solid #4b3a2e;padding-left:8px;white-space:nowrap}
+.form-leaf{display:inline-block;width:.55em;height:.85em;background:#7fb04a;border-radius:0 80% 0 80%;transform:rotate(25deg)}
+.acts{position:relative;grid-template-areas:"leaf talk" "jump atk"}
+.acts .leaf{grid-area:leaf}
+.pbtn.leaf{width:auto;min-width:52px;height:44px;border-radius:22px;padding:0 12px;font-size:14px;background:#3d5a2a;border-color:#2c4020}
+.form-ring{position:absolute;right:0;bottom:calc(100% + 8px);display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;width:max-content;max-width:min(320px,90vw);padding:6px;background:rgba(26,19,15,.92);border:2px solid #4a372a;border-radius:10px;z-index:20;pointer-events:auto}
+.form-pick{min-width:56px;min-height:44px;padding:0 10px;font-family:var(--ui);font-size:14px;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:8px;touch-action:manipulation}
+.form-pick[aria-pressed="true"]{background:var(--meok);color:#fffaf0;border-color:#c9a06a}
+body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}

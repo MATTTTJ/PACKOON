@@ -40,6 +40,7 @@ function renderChildRecord(body,tab){
   else if(tab==='ledger'){
     const r=el('div','rels');
     Object.keys(G.rel).forEach(k=>{const s=el('span','rel',npcName(k)+' · '+G.rel[k].t+' '+G.rel[k].v);r.appendChild(s);});body.appendChild(r);
+    strangerDebtRows().forEach(d=>entry(d.who,d.text));   // 수리부엉이로 받은 외상 (forms.js)
     const ids=Object.keys(G.ledger);if(!ids.length){note('아직 적힌 거래가 없다. 누가 무엇을 원하는지 들으면 여기에 적힌다.');return;}
     const wrap=el('div','ledger-wrap'),table=el('table','ledger me'),head=el('thead'),hr=el('tr');
     ['상대','원하는 것','주는 것','상태'].forEach(t=>hr.appendChild(el('th',null,t)));head.appendChild(hr);table.appendChild(head);

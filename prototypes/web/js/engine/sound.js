@@ -161,6 +161,17 @@ const Sound=(()=>{
     const id={grass:'footstep_snow',cue:'ui_focus',scare:'battle_warn',relief:'battle_soothe',dad:'pickup'}[kind];
     if(id)emit('yeongsan',.04,id,.4);
   }
+  /* 잎사귀 풀피리 (변신, forms.js): 짧게 떨며 오르는 소리를 바로 합성한다. 변신마다 높이만 다르다. */
+  function leaf(form){
+    if(!ready())return;
+    const base={'':523,squirrel:784,goat:587,owl:440,deer:659}[form||'']||523,t=ctx.currentTime;
+    const osc=ctx.createOscillator(),vib=ctx.createOscillator(),depth=ctx.createGain(),gain=ctx.createGain();
+    osc.type='triangle';osc.frequency.setValueAtTime(base*.94,t);osc.frequency.linearRampToValueAtTime(base,t+.06);osc.frequency.linearRampToValueAtTime(base*1.06,t+.32);
+    vib.frequency.value=7;depth.gain.value=base*.012;vib.connect(depth);depth.connect(osc.frequency);
+    gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(.16,t+.03);gain.gain.setValueAtTime(.16,t+.22);gain.gain.exponentialRampToValueAtTime(.001,t+.38);
+    osc.connect(gain);gain.connect(master);osc.start(t);vib.start(t);osc.stop(t+.4);vib.stop(t+.4);
+    osc.onended=()=>{osc.disconnect();vib.disconnect();depth.disconnect();gain.disconnect();};played++;
+  }
   addEventListener('visibilitychange',()=>{
     if(hidden()){stopVoices();stopAmbient();}
     else{if(ambientKind)ambience(ambientKind);warmCommon();}
@@ -169,6 +180,6 @@ const Sound=(()=>{
     voices:sources.size,peakVoices,maxVoices,cached:cache.size,cacheBytes,maxCacheBytes,played,dropped,ambient:!!ambientVoice};}
   return {get enabled(){return enabled;},get volume(){return volume;},get bgmVolume(){return bgmVolume;},get sfxVolume(){return sfxVolume;},
     toggle,toggleVolume,setBgmVolume,setSfxVolume,playSfx,getState,
-    steam,footstep,jump,land,swing,gather,item,exchange,paper,panel,tab,craft,travel,forge,stone,yeongsan,
+    steam,footstep,jump,land,swing,gather,item,exchange,paper,panel,tab,craft,travel,forge,stone,yeongsan,leaf,
     ambience,get ambient(){return ambientKind;},get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
 })();

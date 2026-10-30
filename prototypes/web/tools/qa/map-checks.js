@@ -49,11 +49,8 @@ async function runMap({browser:b,outDir}){
     await b.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
     await b.eval('G.px=820;G.cam=650;G.py=fieldGround();G.onGround=true');await b.key('e');await until(b,"!$('dlg').hidden");
     for(let i=0;i<8&&!await b.eval("$('dlgChoices').children.length>0");i++)await b.key('e');
-    await b.click('#dlgChoices button:first-child');await until(b,"!$('galHands').hidden");
-    for(let hit=1;hit<=3;hit++){
-      await b.click('#galHandsHit');
-      await until(b,hit===3?"$('galHands').hidden":`+$('galHands').dataset.hits===${hit}`);await b.wait(600);
-    }
+    // 보자기 손일은 미니게임 없이 바로 마친다 (PA-46). 고르면 곧바로 까치 대화가 이어진다.
+    await b.click('#dlgChoices button:first-child');await until(b,"!$('dlg').hidden");
     const unlockLines=[];
     for(let i=0;i<12&&await b.eval("!$('dlg').hidden");i++){
       unlockLines.push(await b.eval("({who:$('dlgWho').textContent,text:$('dlgText').textContent,unlocked:!!G.f.mapUnlocked})"));await b.key('e');
