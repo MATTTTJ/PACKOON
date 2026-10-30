@@ -146,7 +146,7 @@ Rg.bossDie=()=>{
 Rg.onPickup=a=>{
   if(a.item==='seoridarae'&&!G.f.daraePicked){G.f.daraePicked=true;
     clue('h2','아빠의 수첩',!CLASSIC||Rg.arcs()?'아빠의 젊은 시절 수첩에는 서리다래 그림이 없다. 지난가을 글자를 읽고 그날 밤 떠났다는 이야기는 돌쇠 할배에게 들었다.':'아빠의 수첩에는 서리다래가 없다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
-    diary('d_darae',!CLASSIC||Rg.arcs()?'서리다래를 내 기록에 그렸다. 아빠의 젊은 시절 수첩에는 이 열매가 없다. 지난가을 급히 떠난 일과는 나눠 적어 두자.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
+    diary('d_darae',!CLASSIC||Rg.arcs()?'서리다래를 수첩에 그렸다. 아빠가 젊을 때 적은 쪽에는 이 열매가 없다. 아빠는 여기서 열매를 찾지 않았다.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
     setTimeout(()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'),1600);refreshGoal();}
 };
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:1770,item:'seogi',done:false});};
@@ -432,7 +432,8 @@ if(!CLASSIC){
         if(res==='win'||res==='calm'){
           if(res==='calm'){G.f.golemCalm=true;diary('d_calm','아빠가 올리다 만 소원 돌을 성황당 꼭대기에 대신 올려 주었다. 돌 골렘이 조용히 내려앉았다.');}
           Rg.bossDie();
-        }else{G.px=2240;G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');toast('성황당 앞에서 숨을 골랐다. 준비되면 다시 다가가자.');}
+        }else{G.px=2240;G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
+          talk([['너구리','(머리가 높아서 처음엔 안 닿아.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>toast('성황당 앞에서 숨을 골랐다. 준비되면 다시 다가가자.'));}
       }));
     };
     Rg.sendMedicine=()=>{
