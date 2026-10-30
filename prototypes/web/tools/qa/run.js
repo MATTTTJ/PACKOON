@@ -121,7 +121,9 @@ const watchdog=setTimeout(async()=>{
     const hookEvidence=[];
     for(const mode of ['expanded','classic']) {
       const name='play-'+mode;
-      if(!selected.has(name)&&!selected.has('speakers')&&!(mode==='expanded'&&selected.has('edges')))continue;
+      // 플레이를 직접 고르면 그 모드만 돈다(CI 갈래). 고르지 않았으면 speakers·edges에 필요한 모드를 돌린다.
+      const pickedPlay=selected.has('play-expanded')||selected.has('play-classic');
+      if(!selected.has(name)&&(pickedPlay||(!selected.has('speakers')&&!(mode==='expanded'&&selected.has('edges')))))continue;
       const result=await withBrowser(name,async(browser,directory)=>{
         const {runPlaythrough}=require('./playthrough');
         await browser.navigate(server.url+(mode==='classic'?'?classic=1':''));

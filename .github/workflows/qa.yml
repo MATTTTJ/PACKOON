@@ -1,17 +1,40 @@
 name: 웹 자동 검수
 
+# 문서(.md)만 바뀐 경우는 건너뛴다. CSV는 data 검사(CSV와 tables.js 일치)가 필요해 건너뛰지 않는다.
 on:
   pull_request:
+    paths-ignore: ['**/*.md']
   push:
     branches: [main]
+    paths-ignore: ['**/*.md']
 
 permissions:
   contents: read
 
+# 같은 PR에 새 커밋이 오면 앞서 돌던 검사를 멈춘다.
+concurrency:
+  group: qa-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  qa:
+  # 가장 긴 연속 플레이 두 개를 따로 돌려 전체 시간을 줄인다. 검사 이름은 tools/qa/run.js --help.
+  shard:
+    name: ${{ matrix.title }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: expanded
+            title: 확장판 연속 플레이
+            only: play-expanded,speakers,edges
+          - key: classic
+            title: 옛 구성 연속 플레이
+            only: play-classic,speakers
+          - key: rest
+            title: 정적·저장·휴대폰·지도·바닥 물건
+            only: static,save,mobile,map,drops-floor,drops-persistence,drops-departure,drops-full
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
@@ -23,15 +46,15 @@ jobs:
         with:
           chrome-version: stable
           install-dependencies: true
-      - name: 정적 검사와 두 모드 연속 플레이
+      - name: 검사 (${{ matrix.only }})
         env:
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
-        run: node prototypes/web/tools/qa/run.js
+        run: node prototypes/web/tools/qa/run.js --only ${{ matrix.only }}
       - name: 실패 로그와 화면 보관
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: qa-results
+          name: qa-results-${{ matrix.key }}
           path: |
             qa-out/**/*.json
             qa-out/**/*.md
@@ -41,3 +64,14 @@ jobs:
             !qa-out/**/profile/**
           retention-days: 7
           if-no-files-found: warn
+
+  # 세 갈래가 모두 통과해야 통과. 브랜치 보호 규칙에 걸 때는 이 'qa'를 고른다.
+  qa:
+    needs: shard
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: 세 갈래 결과
+        run: |
+          echo "갈래 결과: ${{ needs.shard.result }}"
+          test "${{ needs.shard.result }}" = "success"
