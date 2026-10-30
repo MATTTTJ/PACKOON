@@ -248,6 +248,7 @@ if(!CLASSIC){
       const start=()=>{
         if(G.region!==Rg.id)return;
         trip={owner:G,p,tick:0,hold:false,back:false,x:112,y:GROUND,vy:0,ground:true,view:0};
+        if(Vfx.reducedMotion&&p.travel==='stream'){stop(true);return;}
         panel.hidden=false;suppressHeldInputs();
         if(p.travel==='stream')Sound.ambience('water');
         pause.hidden=p.travel==='tree';look.hidden=p.travel!=='stream';
@@ -321,6 +322,7 @@ if(!CLASSIC){
       if(!trip)return;const t=trip;
       if(t.owner!==G||G.region!==Rg.id){stop(false);return;}
       if(document.hidden)return;
+      if(Vfx.reducedMotion&&t.p.travel==='stream'){stop(true);return;}
       if(t.p.travel==='tree'){
         const before=t.y;t.x=clamp(t.x+((isRight()?1:0)-(isLeft()?1:0))*TABLES.TUNING.field_move_speed,78,322);
         t.vy=Math.min(TABLES.TUNING.field_fall_speed,t.vy+TABLES.TUNING.field_gravity);t.y+=t.vy;t.ground=false;

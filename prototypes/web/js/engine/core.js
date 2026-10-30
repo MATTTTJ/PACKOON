@@ -219,4 +219,4 @@ function deliverHomeReply(){
 }
 
 let toastT=0;
-function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=!!vistaMode;toastT=150;}
+function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=!!vistaMode;toastT=TABLES.TUNING.toast_frames;}
