@@ -246,6 +246,8 @@ function dadLedger(){
 }
 function talkDad(){
   const F=G.f;
+  // 아빠는 집안 사람이라 변신한 아이를 알아본다 (leaf-transform.md 6-4).
+  if(G.form&&F.dadMet){talk([['아빠','(아빠가 보따리 끈의 잎사귀를 손가락으로 톡 친다. 다 안다는 얼굴이다.)'],['너구리','…아빠는 알아보는구나.']]);return;}
   if(!F.dadMet){F.dadMet=true;
     talk([['너구리','(호숫가의 너구리가 신목을 바라보고 있다. 저 뒷모습은…)'],['너구리','…아빠?'],
       ['아빠','(아빠가 돌아본다. 입을 열지만 아무 소리도 나오지 않는다.)']],()=>gesture(0));return;}
@@ -258,6 +260,8 @@ function talkDad(){
 /* ---------- 산군 할아버지 (호랑이, 영산의 주인) ---------- */
 function talkSangun(){
   const F=G.f;
+  // 영산의 주인은 무엇으로 와도 알아본다. 셈은 본모습으로만 한다.
+  if(G.form){talk([['산군 할아버지','무엇으로 와도 너는 너다.\n셈은 본모습으로 하자.']]);return;}
   if(!F.dadDone){talk([['산군 할아버지','(커다란 호랑이가 눈을 감고 앉아 있다.)'],['산군 할아버지','…어린 보부상이로구나. 먼저 호숫가에서 네 아비를 만나고 오너라.']]);return;}
   if(!F.sangunMet){F.sangunMet=true;rel('sangun',1);learn('sangun:story');ledger('sangun','산군 할아버지','셈이 맞는 값','되돌림');
     if(arcs()){
@@ -393,6 +397,9 @@ Rg.goHome=()=>{
 /* 엄마의 절정 대사는 decisions.md 그대로. 이름은 이 브라우저의 저장에만 남는다. */
 Rg.endExtra=box=>{
   const wrap=el('div','newname');
+  // 엄마의 마른 잎사귀 (leaf-transform.md 8): 둔갑을 되찾는 순간 같은 잎 소리가 난다.
+  wrap.appendChild(el('p',null,'(경대 위 마른 잎이 엄마 입술에 닿자 초록빛이 돈다. 삐익, 내 잎과 같은 소리가 났다.)'));
+  wrap.appendChild(el('p',null,'(방 안에 반딧불이 가득 찬다. 엄마가 예전처럼 둔갑했다.)'));
   wrap.appendChild(el('p',null,'(반딧불에서 돌아온 엄마가 내 얼굴을 쓰다듬는다.)'));
   wrap.appendChild(el('p','newname-call','엄마: "…네 얼굴은 하나도 안 잊었어. 이름만 비었지."'));
   wrap.appendChild(el('p','newname-call','엄마: "봄에 돌아온 아이니까… 엄마가 새로 지어 줄게."'));
