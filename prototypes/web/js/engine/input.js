@@ -60,6 +60,8 @@ function onPress(k){
   if(k==='n'){toggleNote();return;}
   if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
   if(open('bag')||open('book')||open('notebook'))return;
+  if(k==='arrowdown'){tryPickup();return;}
+  if(pickupPose)return;
   if(k===' '||k==='w'||k==='arrowup')jumpQ=true;
   if(k==='j'||k==='x')atkQ=true;
   if(k==='e'||k==='enter')tryTalk();
@@ -75,17 +77,19 @@ function padAction(k){
   if(k==='book'){if(!open('dlg')&&!mg)toggleBook();return;}
   if(k==='note'){if(!open('dlg')&&!mg)toggleNote();return;}
   if(mg){if(k==='atk'||k==='jump')mg.hit();return;}
-  if(open('dlg')){advance();return;}
+  if(open('dlg')){if(k!=='down')advance();return;}
   if(open('bag')||open('book')||open('notebook'))return;
+  if(k==='down'){tryPickup();return;}
+  if(pickupPose)return;
   if(k==='jump')jumpQ=true;else if(k==='atk')atkQ=true;else if(k==='talk')tryTalk();
 }
 document.querySelectorAll('#pad [data-k]').forEach(b=>{
   const k=b.dataset.k;
   b.addEventListener('pointerdown',e=>{e.preventDefault();b.classList.add('on');
     try{b.setPointerCapture(e.pointerId);}catch(_){}
-    if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up')touch.up=true;else if(k==='down')touch.down=true;else padAction(k);});
+    if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up')touch.up=true;else if(k==='down'){touch.down=true;padAction(k);}else padAction(k);});
   const up=()=>{b.classList.remove('on');if(k==='left')touch.left=false;if(k==='right')touch.right=false;if(k==='up')touch.up=false;if(k==='down')touch.down=false;};
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);
   b.addEventListener('contextmenu',e=>e.preventDefault());
 });
-$('prompt').addEventListener('click',()=>{if(paused())return;if(nearInteraction())tryInteract();else atkQ=true;});
+$('prompt').addEventListener('click',()=>{if(paused())return;if(nearFloorItems().length)tryPickup();else if(nearInteraction())tryInteract();else atkQ=true;});

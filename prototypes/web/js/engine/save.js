@@ -36,6 +36,15 @@ function repairSavedState(source){
   for(const key of ['digs','pickups','mobs'])if(g[key]?.some(row=>!saveObject(row)||!Number.isFinite(row.x)))throw Error(key);
   for(const key of ['digs','pickups'])if(g[key]?.some(row=>!Object.hasOwn(ITEMS,row.item)))throw Error(key);
   if(g.pickups?.some(row=>!Number.isFinite(row.y)))throw Error('pickups');
+  if(!saveObject(g.floorItems)||!saveObject(g.floorPickups))throw Error('floorItems');
+  const validFloorRow=row=>saveObject(row)&&Object.hasOwn(ITEMS,row.item)&&Number.isFinite(row.x)&&Number.isFinite(row.y)&&
+    ['sourceX','sourceY','flight','bounce'].every(key=>row[key]===undefined||Number.isFinite(row[key]));
+  for(const zones of Object.values(g.floorItems)){
+    if(!saveObject(zones))throw Error('floorItems');
+    for(const rows of Object.values(zones))if(!Array.isArray(rows)||rows.some(row=>!validFloorRow(row)))throw Error('floorItems');
+  }
+  for(const rows of Object.values(g.floorPickups))if(!Array.isArray(rows)||rows.some(row=>!validFloorRow(row)))throw Error('floorPickups');
+  if(g.bagSlots!==undefined&&(!Number.isSafeInteger(g.bagSlots)||g.bagSlots<0))throw Error('bagSlots');
   if(g.drop!==undefined&&g.drop!==null&&(!saveObject(g.drop)||!['x','y','vy'].every(key=>Number.isFinite(g.drop[key]))))throw Error('drop');
   if(!Number.isSafeInteger(g.hp)||!Number.isSafeInteger(g.maxhp)||g.hp<0||g.maxhp<=0||g.maxhp>100||g.hp>g.maxhp||!Object.hasOwn(TOOLS,g.tool))throw Error('player');
   for(const row of Object.values(g.ledger))if(!saveObject(row)||typeof row.npc!=='string')throw Error('ledger');
