@@ -1,0 +1,43 @@
+name: 웹 자동 검수
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - uses: browser-actions/setup-chrome@v2
+        id: chrome
+        with:
+          chrome-version: stable
+          install-dependencies: true
+      - name: 정적 검사와 두 모드 연속 플레이
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        run: node prototypes/web/tools/qa/run.js
+      - name: 실패 로그와 화면 보관
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-results
+          path: |
+            qa-out/**/*.json
+            qa-out/**/*.md
+            qa-out/**/*.png
+            qa-out/**/*.log
+            qa-out/**/start.html
+            !qa-out/**/profile/**
+          retention-days: 7
+          if-no-files-found: warn
