@@ -249,7 +249,7 @@ function dadLedger(){
 function talkDad(){
   const F=G.f;
   // 아빠는 집안 사람이라 변신한 아이를 알아본다 (leaf-transform.md 6-4).
-  if(G.form&&F.dadMet){talk([['아빠','(아빠가 보따리 끈의 잎사귀를 손가락으로 톡 친다.\n다 안다는 얼굴이다.)'],['너구리','…아빠는 알아보는구나.']]);return;}
+  if(G.form&&F.dadMet){talk([['아빠','(아빠가 보따리 끈의 잎사귀를 손가락으로 톡 친다.\n다 안다는 얼굴이다.)']]);return;}
   if(!F.dadMet){F.dadMet=true;
     talk([['너구리','(호숫가의 너구리가 신목을 바라보고 있다. 저 뒷모습은…)'],['너구리','…아빠?'],
       ['아빠','(아빠가 돌아본다. 입을 열지만 아무 소리도 나오지 않는다.)']],()=>gesture(0));return;}

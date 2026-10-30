@@ -28,7 +28,7 @@ Rg.strangers={
     line:'장터 물가 알지? 손님은 값이 좀 세.',
     price:2,trades:[{give:{solbang:2},get:{kong:1}}],swapPool:['kong','mung','honey'],
     talk(){
-      if(once('jx_nal_price'))diary('jx_nal_price','큰 장터에서도 날쌘은 낯선 손님에게 두 배를 불렀다. 왜 나한테만 제값일까.');
+      if(once('jx_nal_price'))diary('jx_nal_price','큰 장터에서도 날쌘은 낯선 손님에게 두 배를 불렀다. 왜 나한테만 값을 안 부풀릴까.');
       return false;
     }},
 };
