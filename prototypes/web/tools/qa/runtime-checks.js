@@ -46,8 +46,8 @@ async function fresh(browser, rules, mobile = false) {
   await click(browser, '#tsNew');
   await click(browser, '#btnStart');
   await until(browser, 'G.started && !G.ended', 10000, '새 게임');
-  await until(browser, "!document.querySelector('#notebook').hidden", 10000, '출발 쪽지');
-  await click(browser, '#noteClose');
+  await until(browser, "!document.querySelector('#bag').hidden", 10000, '출발 쪽지');
+  await click(browser, '#bagClose');
 }
 
 async function runEdges({ outDir, evidence = [] }) {
@@ -176,8 +176,8 @@ async function runMobile({ browser, outDir, rules }) {
     await measure('title', ['#titleScene']);
     await tap(browser, '#tsNew'); await measure('prologue', ['#titleScreen']);
     await tap(browser, '#btnStart');
-    await until(browser, "!document.querySelector('#notebook').hidden", 10000, '휴대폰 출발 쪽지');
-    await tap(browser, '#noteClose');
+    await until(browser, "!document.querySelector('#bag').hidden", 10000, '휴대폰 출발 쪽지');
+    await tap(browser, '#bagClose');
     const acorn=await browser.eval("fieldItems('pickups').find(a=>a.item==='acorn'&&!a.got&&a.y===fieldGround())");
     if(!acorn)throw Error('휴대폰 줍기 시험용 도토리가 없다.');
     await holdTouch(browser, '#pad [data-k="right"]', 'G.px >= '+acorn.x);

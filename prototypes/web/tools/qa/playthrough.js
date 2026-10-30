@@ -34,6 +34,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     for(let i=0;i<200;i++) {
       const s=await check();
       if(await read("!$('notebook').hidden")){await click('#noteClose');await wait(40);continue;}
+      if(await read("!$('bag').hidden&&bagKind==='중요'")){await click('#bagClose');await wait(40);continue;}
       if(s.dlg) {
         if(s.choices.length) {
           let n=-1;

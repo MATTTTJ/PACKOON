@@ -84,10 +84,11 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .bag-tab[aria-pressed="true"]{background:var(--meok);color:var(--hanji);border-color:var(--meok)}
 .bag-key-hint{margin-bottom:8px}
 .bag-empty{margin-top:8px}
-.bag-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+/* 보따리 칸: 예전(한 줄 6칸을 꽉 채움)의 절반쯤 크기. 휴대폰에서도 손가락 칸 48px 이상 */
+.bag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,56px));gap:5px;justify-content:start}
 .slot{position:relative;aspect-ratio:1;background:var(--hanji-2);border:1px solid #c7b48c;border-radius:4px;display:grid;place-items:center;cursor:pointer;padding:0;touch-action:manipulation}
-.slot canvas{width:66%;height:66%;image-rendering:pixelated}
-.slot .n{position:absolute;right:4px;bottom:2px;font-size:.9em;font-variant-numeric:tabular-nums}
+.slot canvas{width:62%;height:62%;image-rendering:pixelated}
+.slot .n{position:absolute;right:1px;bottom:1px;font-size:13px;font-weight:700;line-height:1.15;padding:0 3px;border-radius:3px;color:#24180f;background:rgba(255,249,232,.92);box-shadow:0 0 0 1px #c7b48c;font-variant-numeric:tabular-nums}
 .slot.sel{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
 .slot[disabled]{cursor:default;opacity:.45}
 .slot canvas.rarity-mark{position:absolute;right:2px;top:2px}
@@ -100,6 +101,9 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .rarity-gold{filter:drop-shadow(0 0 2px #e8ac2873);animation:rarity-glow 3.6s ease-in-out infinite}
 @keyframes rarity-glow{0%,100%{filter:drop-shadow(0 0 1px #e8ac2852)}50%{filter:drop-shadow(0 0 3px #e8ac2899) brightness(1.12)}}
 @media (min-width:600px){.slot canvas.rarity-mark,.detail canvas.rarity-mark{width:24px;height:24px}}
+.bag-grid .slot canvas.rarity-mark{width:13px;height:13px;right:1px;top:1px}
+.important .sub:first-child{margin-top:4px}
+.important .mom-note{margin-left:0}
 @media (prefers-reduced-motion:reduce){.rarity-gold{animation:none}}
 .btn{font-family:var(--ui);font-size:clamp(13px,1.5vw,15px);background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:4px;padding:6px 14px;cursor:pointer;min-height:38px;touch-action:manipulation}
 .btn:hover{background:#fff6e0}
@@ -378,7 +382,7 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
   .choices button{font-size:15px;min-height:44px}
   .panel{inset:auto 0 0 0;height:90%;border-radius:12px 12px 0 0;border-bottom:none}
   .grip{display:block;width:40px;height:4px;border-radius:2px;background:#cdb98f;margin:8px auto 0}
-  .bag-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .bag-grid{grid-template-columns:repeat(auto-fill,minmax(48px,56px))}
   .forge{left:0;right:0;top:auto;bottom:0;border-radius:12px 12px 0 0;padding-bottom:max(18px, env(safe-area-inset-bottom, 0px))}
   .cover{border-radius:0}
   .how-touch{display:block}.how-keys{display:none}
@@ -407,7 +411,7 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
   body.in-battle .pad{z-index:16}
   .how-touch{display:block}.how-keys{display:none}
 }
-@media (max-width:560px) and (pointer:fine){.bag-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.forge{left:4%;right:4%;top:8%}}
+@media (max-width:560px) and (pointer:fine){.forge{left:4%;right:4%;top:8%}}
 @media (prefers-reduced-motion:reduce){.bossbar .fill{transition:none}}
 
 /* 지역 글을 넣는 칸: 안의 문단이 카드의 간격을 그대로 받도록 */

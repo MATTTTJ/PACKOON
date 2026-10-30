@@ -124,7 +124,7 @@ for(const r of heirlooms){
 const NOTES=[];const byId={};
 for(const r of notebook){
   const section=r['기록갈래'];
-  if(!['아빠 수첩','관찰','손버릇','숨은 가공법'].includes(section)||(r['쓴이']==='아빠')!==(section==='아빠 수첩'))fail('notebook.csv '+r['쪽id']+': 기록갈래와 쓴이가 맞지 않는다');
+  if(!['아빠 수첩','관찰','익힌 솜씨','숨은 가공법'].includes(section)||(r['쓴이']==='아빠')!==(section==='아빠 수첩'))fail('notebook.csv '+r['쪽id']+': 기록갈래와 쓴이가 맞지 않는다');
   let e=byId[r['쪽id']];
   if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':r['종류']==='도장'?'stamp':'animal',lines:[]};if(e.kind==='stamp'||CRAFT[e.id])e.name=r['대상'];NOTES.push(e);}
   if(r['비고'].includes('아빠 그림 있음'))e.dadDrawing=true;
