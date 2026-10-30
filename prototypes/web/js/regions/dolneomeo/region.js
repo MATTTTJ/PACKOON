@@ -11,8 +11,8 @@ const Rg=defineRegion('dolneomeo',{
   cover:{
     tag:'돌너머 마을 체험판',sub:'첫서리 내린 돌담 마을',ready:'돌너머 마을로 들어갈 준비',go:'돌너머 마을로',
     title:{kicker:'둘째 마을',head:'돌너머 마을',start:'돌너머 마을로 들어가기',body:[
-      '단풍골을 지나 북쪽으로 사흘을 걸었다. 밤새 첫서리가 내려 돌담마다 하얗게 소금을 뿌린 것 같다.',
-      '해머루 약은 엄마의 병을 조금 늦췄을 뿐이다. 두꺼비 할멈은 돌산 절벽의 서리다래라면 한 번 더 늦출 수 있을 거라고 했다.',
+      '단풍골을 떠나 북쪽으로 사흘을 걸었다. 밤새 첫서리가 내려 돌담마다 하얗게 소금을 뿌린 것 같다.',
+      '해머루 약은 엄마의 병을 조금 늦췄을 뿐이다. 두꺼비 할멈은 돌너머의 서리다래라면 한 번 더 늦출 수 있다고 했다. 어디 열리는지는 마을에 물어보라고 했다.',
       '아빠도 이 길을 지났을 것이다. 보따리 속 맷돌이 오늘따라 무겁다.']},
     get end(){return {kicker:'돌너머 마을 체험판 완료',head:'큰 장터로 가는 길',body:[
       '깨어난 맷돌로 서리다래를 갈아, 내 손으로 엄마의 약을 만들었다. 까치가 약즙 통을 물고 남쪽으로 날아갔다.',
@@ -32,7 +32,7 @@ const Rg=defineRegion('dolneomeo',{
   weather:()=>Vfx.setWeather('frost'),
   onStart(){
     if(Rg.arcs())G.f.arcs=true;
-    diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 우리를 내려다본다. 서리다래는 돌산 절벽에 있다고 했다.');
+    diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 나를 내려다본다. 서리다래가 어디 열리는지 마을에 물어보자.');
     toast('마을 어귀의 동물들에게 말을 걸어 보자');
   },
   next:'jangteo',
@@ -75,8 +75,8 @@ defineIcons({
 
 /* 채집 (낫으로 억새 베기, 절벽의 석이버섯 떼기) */
 defineGather({
-  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
-  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
+  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 단번에 베인다.'},
+  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 고리가 가운데 원에 닿을 때 휘두르면 딱! 단번에 떨어진다.'},
 });
 
 /* 증조할아버지의 맷돌: 돌쇠 할배의 돌 쌓기를 통과하면 깨어난다. 가공법은 heirlooms.csv */

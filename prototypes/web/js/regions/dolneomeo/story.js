@@ -31,11 +31,11 @@ function talkKkuArc(){
     ],'꾸벅이가 지난가을 둥지 곁에서 들은 아빠의 말을 맡겼다. “미안하다… 그 겨울에 내가 없어서…”')}]);return;
   }
   if(!F.dolneomeo_arc_kku3){
-    arcMenu('꾸벅이','그 말… 기억해 줄 거지이…?',talkKku,[{t:'내 기록에 적어 둘게',go:()=>arcScene('dolneomeo_arc_kku3',[
+    arcMenu('꾸벅이','그 말… 기억해 줄 거지이…?',talkKku,[{t:'수첩에 적어 둘게',go:()=>arcScene('dolneomeo_arc_kku3',[
       ['너구리','내가 적어 둘게.'],
       ['너구리','(아빠 수첩 다음 장에 이어 적었다.)'],
       ['꾸벅이','그래애… 이제 자도 되겠다아…']
-    ],'꾸벅이에게 맡은 말을 내 기록에 적었다. 꾸벅이는 안심하고 잠들었다.',()=>learn('dolneomeo:arcs-kkubeogi'))}]);return;
+    ],'꾸벅이에게 맡은 말을 수첩에 적었다. 꾸벅이는 안심하고 잠들었다.',()=>learn('dolneomeo:arcs-kkubeogi'))}]);return;
   }
   talkKku();
 }
@@ -64,7 +64,7 @@ function talkDolsoeArc(){
     ['너구리','엄마, 약 보낼게.'],
     ['돌쇠 할배','돌은 마음을 알아야 선다.']
   ],'돌쇠 할배가 받쳐 준 돌탑에 엄마 몫의 돌을 얹었다. 약을 만들어 보내 드리자.')});
-  if(c.length)return arcMenu('돌쇠 할배','손끝으로 짚어 보겠느냐.',talkDolsoe,c);
+  if(c.length)return arcMenu('돌쇠 할배','무얼 묻고 싶으냐.',talkDolsoe,c);
   talkDolsoe();
 }
 function talkPpuriArc(){
@@ -152,7 +152,7 @@ function kkuTrade(){
 /* ---------- 날쌘 (다시 만남): 돌투성이 마을이라 칡꽃 향이 귀하다 ---------- */
 function talkNal(){
   if(!G.f.nalDTalk){G.f.nalDTalk=true;ledger('nal_dolneomeo','날쌘','칡꽃 1 (또는 겨우살이 2)','결명자');
-    talk([['날쌘','또 왔네, 꼬마 보부상. 돌만 잔뜩인 동네라 장사가 영 시원찮아.'],['날쌘',has('kflower')?'가만, 그 향은 단풍골 칡꽃이지?\n여기선 그게 귀한 줄이나 알아?':'단풍골 칡꽃 같은 건 없어?\n여기선 그게 귀하거든.']],nalMenu);}
+    talk([['날쌘','또 왔네, 꼬마 보부상. 돌만 잔뜩인 동네라 장사가 영 시원찮아.'],['날쌘',has('kflower')?'가만, 그 향은 단풍골 칡꽃이지?\n여기선 그게 귀해. 결명자 두 개는 쳐줄게.':'단풍골 칡꽃 같은 건 없어? 여기선 귀하거든.\n하나면 결명자 두 개는 쳐줄게.']],nalMenu);}
   else nalMenu();
 }
 function nalMenu(){
@@ -182,7 +182,7 @@ function nalMenu(){
   }});
   c.push({t:'그만두기',go:null});
   const say=F.nalDDone?'결명자는 눈 밝히는 약재야. 돌쇠 할배한테 차로 달여 드려 봐. 쓸 만한 거래였지?'
-    :(has('kflower')||has('gyeousari',2))?'어디, 뭘 내놓을 건데?':'빈손으로 흥정하게? 칡꽃이 없으면 높은 가지에 달린 겨우살이 두 개라도 따 와.';
+    :(has('kflower')||has('gyeousari',2))?'어디, 뭘 내놓을 건데?':'빈손으로 흥정하게? 칡꽃이 없으면\n높은 가지 겨우살이 두 개라도 따 와. 그럼 결명자 하나.';
   talk([['날쌘',say,c]]);
 }
 function nalTrade(id){
@@ -190,7 +190,7 @@ function nalTrade(id){
   takeItem(id,id==='kflower'?1:2);F.nalDDone=true;ledgerDone('nal_dolneomeo');
   const n=(id==='kflower'?2:1)+(F.nalDBluff?1:0);
   addItem('gyeolmyeongja',n);learn('nal:dolneomeo');
-  diary('d_nal','단풍골에서 흔하던 '+(id==='kflower'?'칡꽃을':'겨우살이를')+' 날쌘에게 주고 결명자를 받았다. 마을이 바뀌니 물건값도 달라진다.');
+  diary('d_nal',id==='kflower'?'단풍골에서 가져온 칡꽃을 날쌘에게 주고 결명자를 받았다. 돌투성이 마을에선 꽃 향이 귀하다. 마을이 바뀌니 물건값도 달라진다.':'높은 가지의 겨우살이를 날쌘에게 주고 결명자를 받았다.');
   talk(F.nalDBluff?[['날쌘',id==='kflower'?'그 흔한 물건도 여기 오면 귀해지는 거야.\n자, 결명자. 덤도 얹었어.':'칡꽃은 흔하다며? 겨우살이로 왔네.\n자, 결명자. 덤도 얹었어.'],['날쌘','날쌘이 짜다는 소리는 못 듣지.']]
     :[['날쌘','자, 결명자 '+n+'개. 이만하면 잘 바꿨지?'],['날쌘','눈 밝히는 약재니까 쓸 데가 있을걸.']]);
 }
@@ -226,12 +226,12 @@ function dolsoeTea(){
     ledger('dolsoe','돌쇠 할배','결명자 1','맷돌을 깨움');
     diary('d_dolsoe','돌쇠 할배가 보따리 속 맷돌의 자개 발자국을 손끝으로 더듬더니, 우리 집안 맷돌이라는 걸 알아봤다.');
     const lines=Rg.arcs()?[
-      ['돌쇠 할배','고맙다. 맷돌도 이리 줘 보거라.'],
+      ['돌쇠 할배','고맙다. …그 보따리에서 돌 소리가 나는구나.\n맷돌이냐? 이리 줘 보거라.'],
       ['돌쇠 할배','(할배가 자개 발자국을 손끝으로 더듬는다.)'],
       ['돌쇠 할배','네 집안 맷돌이구나. 4대째 내려온 게지.'],
       ['돌쇠 할배','“돌이 마음을 알아야 돈다.” 네 아비한테 들었느냐?'],
       ['돌쇠 할배','돌 마음부터 읽고, 저 탑에 돌 세 개를 얹거라.']
-    ]:[['돌쇠 할배','눈이 좀 밝아지는구나. 고맙다.'],['돌쇠 할배','보따리를 이리 줘 보거라.'],
+    ]:[['돌쇠 할배','눈이 좀 밝아지는구나. 고맙다.'],['돌쇠 할배','보따리에서 돌 부딪는 소리가 나는구나.\n이리 줘 보거라.'],
       ['돌쇠 할배','(할배가 맷돌 윗돌의 자개 발자국을 손끝으로 천천히 더듬는다.)'],
       ['돌쇠 할배','이 자개 발자국… 그 녀석 집안 맷돌이구나. 4대째 내려온 게지.'],
       ['돌쇠 할배','"돌이 마음을 알아야 돈다." 네 아비도 그 말을 하더냐.\n내가 가르쳐 주었지.'],
@@ -500,7 +500,8 @@ const finish=(id,record,flag)=>()=>{
 };
 const nickname=(id,text,by)=>{
   if(typeof grantNickname==='function')grantNickname(id,text,by);
-  diary('nickname:'+id,by+'에게 '+text+'이라고 불렸다.');
+  const last=text.charCodeAt(text.length-1)-0xAC00;
+  diary('nickname:'+id,by+'에게 '+text+(last>=0&&last<11172&&last%28?'이라고':'라고')+' 불렸다.');
 };
 function hands(title,verb,steps,done){
   Rg.stoneTask({title,verb,steps,hint:'금빛 가운데에 맞춰 보자. 빗나가도 함께 받쳐 주니 떨어지지 않아.',done});
@@ -634,21 +635,21 @@ Rg.bridgeTalk=job=>{
   const missing=!F.dolneomeo_pack_help?'받침돌이 모자라.\n고갯길에서 돌 지고 가던 산토끼가 있었는데.':!F.dolneomeo_mole_pebble?'틈에 끼울 쐐기돌이 모자라.\n마을 꼬마 두더지가 돌을 잔뜩 모으던데.':!F.dolneomeo_magpie_rest?'가장자리에 놓을 흰 돌이 모자라.\n마을 돌담에 흰 돌이 빠져 있던데.':null;
   if(missing){talk([['너구리',missing]]);return;}
   if(!Rg.bridgeSurveyReady?.(work.job)){
-    talk([['너구리','옛 '+work.name+'은 어떻게 놓였을까?\n소원 돌에서 옛길을 보고, 흰 자리를 짚어 보자.']]);return;
+    talk([['너구리','옛 '+jo(work.name,'은','는')+' 어떻게 놓였을까?\n소원 돌에서 옛길을 보고, 흰 자리를 짚어 보자.']]);return;
   }
   F.dolBridgeCrewHere=true;
   if(job!==work.job){
     if(!F.dolBridgeBegun){
       talk([['너구리','(할배가 마당 수레를 밀고 왔다.\n길손들이 내려놓은 돌을 한데 모으셨다.)'],['돌쇠 할배','옛 다리를 보았느냐.\n길손들이 모은 돌도 이제 제자리를 찾겠구나.'],['돌쇠 할배','돌마다 소원이 있다. 읽지 않아도 괜찮다.\n우리는 그 위를 걸을 길을 놓자.'],['너구리','제가 놓을게요. 밑에서 받쳐 주세요.'],['돌쇠 할배',work.at+'부터다.\n먼저 받침이 기울지 않게 해야지.']],()=>{F.dolBridgeBegun=true;});
-    }else talk([['너구리','다음은 '+work.name+'이다.\n'+work.at+'로 가 보자.']]);
+    }else talk([['너구리','다음은 '+jo(work.name,'이다','다')+'.\n'+work.at+'로 가 보자.']]);
     return;
   }
   talk([['돌쇠 할배',stage===0?'이 돌들은 짐꾼과 꼬마가 날라 왔단다.\n물이 흐를 틈은 남겨 두거라.':stage===1?'밑이 단단하구나. 이제 넓은 돌을 잇자.\n다리판 밑은 내가 받쳐 주마.':'길은 이었으니 발이 벗어나지 않게 하자.\n흰 돌을 놓으면 서리 내려도 가장자리가 보인다.'],
-    ['너구리',jo(work.name,'를','을')+' 놓을까?',[
-      {t:jo(work.name,'를','을')+' 함께 놓는다',go:()=>Rg.stoneTask({title:work.title,verb:'돌 맞춰 놓기',steps:work.steps,stones:work.wishes,
+    ['너구리',jo(work.name,'을','를')+' 놓을까?',[
+      {t:jo(work.name,'을','를')+' 함께 놓는다',go:()=>Rg.stoneTask({title:work.title,verb:'돌 맞춰 놓기',steps:work.steps,stones:work.wishes,
         hint:'돌쇠 할배가 밑을 받쳐 준다. 가운데를 맞춰 놓자. 떨어져도 다시 받쳐 주신다.',done:()=>{
           F.dolBridgeStage=stage+1;
-          diary('dol_bridge_'+stage,work.name+'을 놓았다. '+work.wishes.join(' / '));
+          diary('dol_bridge_'+stage,jo(work.name,'을','를')+' 놓았다. '+work.wishes.join(' / '));
           if(stage===2)bridgeComplete();
           else talk([['돌쇠 할배',stage===0?'받침이 섰다. 가운데 다리판 자리로 가자.':'이제 걸을 수 있겠다. 오른쪽 끝에 가장자리 돌도 놓자.']]);
         }})},
@@ -684,7 +685,7 @@ function returningHare(e){
   if(returning){bridgeReturn();return;}
   talk([['늙은 까치','네 손으로 만든 약이로구나.\n이건 내가 꼭 날라 주마.',[
     {t:'약즙을 맡긴다 · 큰 장터로 떠날 준비',go:()=>Rg.sendMedicine()},
-    {t:'마을을 조금 더 둘러볼게',go:null}]]]);
+    {t:'마을을 조금 더 둘러볼게요',go:null}]]]);
 }
 addEventListener('keydown',e=>{if(!e.repeat&&['e','enter'].includes(e.key.toLowerCase())&&!e.target?.matches?.('input,textarea,select'))returningHare(e);},true);
 $('padTalk').addEventListener('pointerdown',returningHare,true);$('prompt').addEventListener('click',returningHare,true);
