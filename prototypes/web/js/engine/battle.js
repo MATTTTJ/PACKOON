@@ -86,6 +86,7 @@ function inkTransition(text,sx,cb){
   k.style.setProperty('--ix',clamp(sx,5,95)+'%');k.hidden=false;k.className='ink';void k.offsetWidth;k.className='ink on';inkOn=true;
   setTimeout(()=>{cb();k.className='ink off';setTimeout(()=>{k.hidden=true;k.className='ink';inkOn=false;},460);},1050);
 }
+// 결정 D-11: 행동으로 달래기(calm) (design/data/decisions.csv)
 /* onEnd(결과, {hits}) 결과는 'win' | 'calm' | 'lose' | 'flee' */
 function startBattle(kind,onEnd){
   const E=ENEMIES[kind];learn('fight:'+kind);

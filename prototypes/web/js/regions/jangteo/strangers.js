@@ -5,6 +5,7 @@
 const Rg=REGIONS.jangteo;
 const once=(key)=>{const d=G.f.strangerOnce||(G.f.strangerOnce={});if(d[key])return false;d[key]=true;return true;};
 const say=(lines,next)=>{talk(lines,next);return true;};
+// 결정 D-25: 낯선 손님 (design/data/decisions.csv)
 Rg.strangers={
   yeotbang:{
     line:'어머, 처음 보는 손님!\n엿장수 마음대로 값 매겨 줄까?',

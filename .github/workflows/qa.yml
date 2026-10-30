@@ -50,6 +50,9 @@ jobs:
         env:
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: node prototypes/web/tools/qa/run.js --only ${{ matrix.only }}
+      - name: 인물별 대사 목록
+        if: matrix.key == 'rest'
+        run: node prototypes/web/tools/dialogue-by-character.js qa-out/dialogue-by-character.md
       - name: 실패 로그와 화면 보관
         if: always()
         uses: actions/upload-artifact@v4

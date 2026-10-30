@@ -6,6 +6,7 @@
 const Rg=REGIONS.galchamgol;
 const once=(key)=>{const d=G.f.strangerOnce||(G.f.strangerOnce={});if(d[key])return false;d[key]=true;return true;};
 const say=(lines,next)=>{talk(lines,next);return true;};
+// 결정 D-25: 낯선 손님 (design/data/decisions.csv)
 Rg.strangers={
   dodam:{
     line:'어, 처음 보는 얼굴이네!\n도토리 바꿀래?',

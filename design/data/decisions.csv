@@ -1,0 +1,30 @@
+﻿id,분야,결정,상태,출처,코드 표시,문서,되돌리는 법
+D-01,이야기,"인과 규칙 1~5: 젊은 아빠는 부를 좇아 영산에 왔다가 빈손으로 감 / 엄마는 그 이야기를 듣고 아기를 안고 혼자 감 / 말을 내놓으면 글도 못 씀 / 가장 귀한 말(이름)부터 거둠 / 값은 숨을 받은 아이에게서, 아빠는 지난가을 영산",채택,개발자(Claude),있음,design/proposals/characters.md 1장,산군 설명(yeongsan talkSangun)과 각 인물 대사의 근거를 함께 고친다. characters.md 1장을 먼저 고친다.
+D-02,이야기,"두꺼비 할멈은 ""엄마가 너를 안고 이 길을 지나갔다""까지만 말하고, 어디 가던 길인지는 말을 돌린다",채택,개발자(Claude),있음,design/proposals/characters.md 두꺼비 할멈,galchamgol toadWinter 대사
+D-03,이야기,날쌘 반전: 아빠가 날쌘의 상단 빚을 대신 갚았다. 날쌘은 단풍골에서 아빠 모자를 보고 앞질러 다니며 지켜봤다. 영산에서 털어놓고 처음으로 덤 없이 제값을 받는다,채택,개발자(Claude)·사용자 다듬음,있음,design/proposals/characters.md 날쌘,"단풍골 모자 지문, 장터 장부 장면, 영산 nalConfess·nalHandover"
+D-04,이야기,"엄마의 절정 대사: ""…네 얼굴은 하나도 안 잊었어. 이름만 비었지."" / ""봄에 돌아온 아이니까… 엄마가 새로 지어 줄게."" / 이름 부르기",채택,개발자(Claude),있음,design/proposals/decisions-1030.md,yeongsan Rg.endExtra
+D-05,이야기,"엔딩 구성: 약연 깨어남과 열매 갈기를 한 장면으로, 마지막 교환(이름)은 대가를 들은 뒤 한 번만 고른다",채택,개발자(Claude),있음,design/narrative/yeongsan-scenario.md,yeongsan giveName·makeReturningMedicine
+D-06,기믹,집으로 보내기: 지역 끝에 까치 편으로 만든 것을 보내고 엄마의 몸짓 답장을 받는다,채택,개발자(Claude),있음,design/proposals/decisions-1030.md,engine/core.js sendHomeGift와 지역별 homeReply
+D-07,기믹,불리는 이름: 지역마다 동물들이 붙여 주는 별명 1~2개를 수첩에 모은다,채택,개발자(Claude),있음,design/proposals/decisions-1030.md,engine/core.js grantNickname과 각 지역 nickname 호출
+D-08,기믹,흐려지는 엄마 쪽지: 지역마다 한 단계씩 흐려지고 엔딩에서 또렷해진다,채택,개발자(Claude),있음,design/proposals/decisions-1030.md,"engine/core.js fadeMomNote, engine/book.js"
+D-09,분량,웹 체험판 목표 지역당 25~35분 (정식판 40~60분은 확정),채택,개발자(Claude),없음,design/gdd/neoguri-concept.md,문서 숫자만 고친다
+D-10,시스템,길손: 지역 NPC 4명에 세지 않는 단역 만남,채택,개발자(Claude),있음,design/proposals/expansion-plan.md,engine/field.js finishWanderer와 각 지역 wanderers
+D-11,전투,보스 시험판 다섯과 행동으로 달래기,채택,개발자(Claude),있음,design/data/bosses.csv,"engine/battle.js calm 처리, bosses.csv"
+D-12,시스템,"보따리 겉모습 성장(보따리 → 멜빵 봇짐 → 작은 지게 → 아빠의 지게), 칸은 무제한",채택,개발자(Claude),없음,design/proposals/decisions-1030.md,각 지역 art.js의 보따리 그림
+D-13,지역,큰 장터의 밤: 기존 넷의 밤 얼굴과 밤에만 나오는 길손,채택,개발자(Claude),있음,design/narrative/jangteo-scenario.md,jangteo story.js 밤 사연 함수
+D-14,지역,"도깨비 키 부위는 콩 2개, 석이버섯 자리는 골렘 전에 뿔이가 알려 준다",채택,개발자(Claude),없음,design/data/boss_parts.csv,CSV 값과 dolneomeo tellSeogi
+D-15,음악,"지역을 옮길 때 길 위 간주(가야금 걷는 장단, 다음 지역 음계)",채택,개발자(Claude),있음,design/proposals/decisions-1030.md,engine/music.js travelInterludes
+D-16,지역,지역 확장(PA-43): 구역 구성·경치·길손·조사 자리. 각 지역 시나리오의 [개발자 결정 · PA-43] 표시,채택,개발자(Claude),없음,design/narrative/*-scenario.md,그 지역 region.js·field.js와 시나리오 표시를 함께 고친다
+D-17,이야기,"늙은 까치는 네 지역에 걸친 한 인물: 길 따라 약과 소식을 나르는 늙은 우체부, 할머니 말투, ""아가"", 늙어 가는 몸. 길 안내는 하지 않는다",채택,개발자(Claude)·사용자 지적,있음,design/proposals/characters.md 늙은 까치,각 지역 까치 대사
+D-18,이동,"M 지도와 까치 떼 이동: 단풍골 보자기 장면 뒤 열리고, 가 본 곳만 가며, 지역마다 상태를 보관한다",채택,사용자 요청·개발자 세부,있음,prototypes/web/README.md,engine/map.js
+D-19,채집,채집물은 바닥에 포물선으로 뿌리고 줍기 키로 줍는다. 지역을 떠나도 그 자리에 남는다,채택,사용자 요청·개발자 세부,있음,prototypes/web/README.md,engine/field.js spawnDrops
+D-20,이야기,"강철이 설화는 살금이가 들려준다. 할머니에게 들었고, 첫눈 무렵 호수에 내려앉는 걸 직접 봤다 (대장 확정: NPC가 미리 설화를 들려준다)",채택,개발자(Claude),있음,design/proposals/characters.md 살금이,yeongsan salgTrade
+D-21,대사,"아이는 어른(날쌘·할멈·부엉 영감·뿔이·돌쇠·모락·엿방울)에게 존댓말, 또래와 작은 동물(도담·꾸벅이·살금이)에게 반말. 허세 부리는 혼잣말은 반말",채택,개발자(Claude),없음,design/proposals/characters.md,해당 인물 대사
+D-22,이야기,"엿방울: 아빠가 엿을 맡기며 ""그 애가 오거든 한바탕 웃긴 다음에 주라""고 했다. 그래서 흥이 올라야 엿이 나온다",채택,개발자(Claude),있음,design/proposals/characters.md 엿방울,jangteo finishRhythm
+D-23,이야기,"부엉 영감: 아빠 짐 보관 값을 안 받는 건 ""네 아비 셈은 장부에 넉넉히 남아 있다""여서다. 장부 밖의 셈(엄마의 거래)은 모른다",채택,개발자(Claude),있음,design/proposals/characters.md 부엉 영감,jangteo bueongGive·bueongLedger·bueongPromise
+D-24,변신,"잎사귀를 풀피리처럼 입에 대고 불어 변신하고 되돌아온다 (대장 확정: 잎사귀, 머리에 얹지 않음)",채택,개발자(Claude F),있음,design/proposals/leaf-transform.md,engine/forms.js
+D-25,변신,"변신 세부: 동물별 필드 능력과 수치, 열리는 때, 낯선 손님 대사와 기믹 (leaf-transform.md의 표시 없는 세부)",채택,개발자(Claude F),있음,design/proposals/leaf-transform.md,"engine/forms.js, regions/*/strangers.js, tuning.csv"
+D-90,이야기,"강철이의 새 이름 ""서리무기""",대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,"대장 답으로 ""강철이"" 유지"
+D-91,시스템,레어도 이름 순우리말(흔한 것·쓸 만한 것·귀한 것·보배·전설),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 하품·중품·상품·최상품·천하일품
+D-92,시스템,기록 나누기(아빠의 수첩과 아이의 책),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 아빠의 수첩 한 권
+D-93,전투,전투 탈 시험판(초랭이탈·각시탈),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 잎사귀 변신

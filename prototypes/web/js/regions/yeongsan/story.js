@@ -109,6 +109,7 @@ function nalHandover(vine,bind){
 }
 /* ④ 날쌘의 고백. 듣지 않아도 설피는 받는다. 앞 지역 표시는 읽기만 한다.
    fromLedger: 아이가 부엉 영감의 장부를 보고 먼저 꺼낸 경우. 아니면 "아빠를 어떻게 알아요?"에 답한다. */
+// 결정 D-03: 날쌘의 고백 (design/data/decisions.csv)
 function nalConfess(fromLedger,next){
   const F=G.f;if(!arcs()||F.yArcsNal4){if(next)next();return;}
   const lines=[];
@@ -154,6 +155,7 @@ function talkSalg(){
   talk([['살금이','봄이 오면 좋겠다… 호숫가 풀이 제일 먼저 나거든.']]);
 }
 const salgCan=()=>has('magamok',3)||has('kong',2);
+// 결정 D-20: 강철이 설화는 살금이가 (design/data/decisions.csv)
 function salgTrade(){
   talk([['살금이','그, 그거 나한테 줄래?',[{t:has('magamok',3)?'마가목 열매 3을 건넨다':'콩 2를 건넨다',go:()=>{
     const F=G.f;if(has('magamok',3))takeItem('magamok',3);else takeItem('kong',2);
@@ -260,6 +262,7 @@ function talkDad(){
 }
 
 /* ---------- 산군 할아버지 (호랑이, 영산의 주인) ---------- */
+// 결정 D-01: 인과 규칙 1~5를 산군이 풀어 준다 (design/data/decisions.csv)
 function talkSangun(){
   const F=G.f;
   // 영산의 주인은 무엇으로 와도 알아본다. 셈은 본모습으로만 한다.
@@ -320,6 +323,7 @@ function returnPrep(){
     ]]]);
 }
 Rg.offerReturnPrep=returnPrep;
+// 결정 D-05: 이름을 내놓는 마지막 교환과 약연 장면 (design/data/decisions.csv)
 function giveName(){
   const F=G.f;if(F.nameGiven)return;
   F.nameGiven=true;ledgerDone('sangun');rel('sangun',1);learn('sangun:name');
@@ -403,6 +407,7 @@ Rg.goHome=()=>{
   talk(lines,()=>{G.f.yDadCarrier=true;endGame();});
 };
 /* 엄마의 절정 대사는 decisions.md 그대로. 이름은 이 브라우저의 저장에만 남는다. */
+// 결정 D-04: 엄마의 절정 대사 (design/data/decisions.csv)
 Rg.endExtra=box=>{
   const wrap=el('div','newname');
   // 엄마의 마른 잎사귀 (leaf-transform.md 8): 둔갑을 되찾는 순간 같은 잎 소리가 난다.

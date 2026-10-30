@@ -21,6 +21,7 @@ Rg.onStart=()=>{
 function arcScene(flag,text,lines,after){
   G.f[flag]=true;diary(flag,text);talk(lines,after);
 }
+// 결정 D-13: 큰 장터의 밤 얼굴 (design/data/decisions.csv)
 function morakNight(){
   arcScene('jangteoArcsMorak2','모락은 멀리 떠난 새끼에게 보낼 설 떡을 따로 싸 두었다. 정작 자기 저녁은 아직이었다.',[
     ['모락','먹고 해, 먹고! 어, 이 보자기는 따로야.'],
@@ -65,6 +66,7 @@ function nalLedger(){
   ]);
 }
 /* 날쌘이 장부 얘기를 막은 뒤에만 연다. 영산에서 날쌘이 "갚을 게 많다"고 하는 까닭의 복선. */
+// 결정 D-03: 상단 셈은 끝났지만 날쌘과 아빠 사이 셈은 남았다 (design/data/decisions.csv)
 function bueongPromise(){
   arcScene('jangteoArcsBueong3','날쌘은 그 일 뒤 상단을 떠났다. 부엉 영감은 상단 셈은 끝났어도 날쌘과 아빠 사이 셈은 아직이라며, 그 줄을 지우지 않는다고 했다.',[
     ['너구리','날쌘 아저씨가 장부 얘기는 하지 말래요.'],
@@ -561,6 +563,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 $('rhythmBtn').addEventListener('pointerdown',e=>{e.preventDefault();rhythmHit();});rcv.addEventListener('pointerdown',e=>{e.preventDefault();rhythmHit();});
 defineMinigame({id:'rhythm',step:rhythmStep,hit:rhythmHit});
+// 결정 D-22: 아빠의 부탁 "한바탕 웃긴 다음에 주라" (design/data/decisions.csv)
 function finishRhythm(){
   if(rhP.hidden)return;rhStop();rhP.hidden=true;const F=G.f;const high=rh.hits>=MG.rhythm_bonus_hits;learn('yeotbang:rhythm');
   const lines=[['엿방울',rhSay(high?(rh.hits===MG.rhythm_bonus_hits?'close':'good'):'fail')]];
@@ -707,6 +710,7 @@ function talkBueong(){
   if(!G.boss.dead){talk([['부엉 영감','그믐 밤엔 헌것들이 들썩인다. 밤에 숙소 창고 문 앞을 지켜라.']]);return;}
   talk([['부엉 영감','수고했다. 제 몫을 하는 보부상이로구나. 장부에 적어 두마.']]);
 }
+// 결정 D-23: 짐 보관 값을 안 받는 근거 (design/data/decisions.csv)
 function bueongGive(){
   talk([['부엉 영감','고사떡을 가져왔구나.',[{t:'팥시루떡을 고사상에 올린다',go:()=>{
     const F=G.f;takeItem('patsirutteok',1);F.bueongDone=true;F.guard=true;ledgerDone('bueong');rel('bueong',1);learn('bueong:sinpyo');

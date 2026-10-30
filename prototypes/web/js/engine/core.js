@@ -206,6 +206,7 @@ function normalizeTravelRecords(g){
   if(g.ended&&REGIONS[g.region]&&!REGIONS[g.region].next){g.f.momNoteFade=0;g.f.momNoteRestored=true;}
   return g;
 }
+// 결정 D-08: 흐려지는 엄마 쪽지 (design/data/decisions.csv)
 function fadeMomNote(g){
   if(!g.f.momNoteRestored)g.f.momNoteFade=clamp((g.f.momNoteFade||0)+1,0,Math.max(0,regionList().length-1));
   return g.f.momNoteFade||0;
@@ -215,6 +216,7 @@ function noteRestore(){
   G.f.momNoteFade=0;G.f.momNoteRestored=true;
   if(open('notebook'))renderNotebook();return true;
 }
+// 결정 D-07: 불리는 이름 (design/data/decisions.csv)
 function grantNickname(id,text,by){
   if(!G||typeof id!=='string'||!id||typeof text!=='string'||!text.trim())return false;
   const list=G.nicknames||(G.nicknames=[]);
@@ -236,6 +238,7 @@ function grantTool(id){return grantBattleGear('battleTools',id,['pickaxe'],'곡�
 
 /* 지역별 한 번, 현재 지역의 그림 또는 가공품 하나를 보낸다. 그림은 소지품이 없을 때 null을 쓴다.
    home:<지역> 발견 키는 옛 저장과 지역 사연이 이미 쓰고 있어 그대로 유지한다. */
+// 결정 D-06: 집으로 보내기와 엄마의 몸짓 답장 (design/data/decisions.csv)
 function sendHomeGift(regionId,itemId){
   if(!G||!G.started||G.ended||regionId!==G.region||!REGIONS[regionId]||knows('home:'+regionId))return false;
   if(itemId!=null&&(!ITEMS[itemId]||!has(itemId)||ITEMS[itemId].region!==regionId||!Object.values(RECIPES).some(list=>list.some(r=>r.out===itemId))))return false;

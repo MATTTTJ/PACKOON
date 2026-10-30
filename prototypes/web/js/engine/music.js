@@ -488,6 +488,7 @@
     }
     async function travel(id) {
       if (destroyed || !tracks.has(id)) return false;
+      // 결정 D-15: 지역을 옮길 때 길 위 간주 (design/data/decisions.csv)
       const interlude = score.travelInterludes && score.travelInterludes[id];
       if (!interlude || !tracks.has(interlude)) return play(id);
       if (travelPlan && travelPlan.to === id) return true;

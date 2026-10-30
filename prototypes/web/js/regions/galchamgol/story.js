@@ -87,6 +87,7 @@ function dodamTrade(){
 }
 
 /* ---------- 날쌘 (족제비 떠돌이 보부상) ---------- */
+// 결정 D-03: 첫 만남에서 날쌘이 아빠 모자를 알아본다(영산 고백의 복선) (design/data/decisions.csv)
 function talkNal(){
   if(!G.f.nalTalk){G.f.nalTalk=true;ledger('nal','날쌘','도토리 가루 1 + 칡뿌리 1','숯');
     talk([['날쌘','어이, 꼬마 보부상. 나도 보부상이거든?\n이 동네 숯은 다 내 지게에 있지.'],['날쌘','(날쌘의 눈이 너구리의 모자에 잠깐 머문다.)'],['날쌘','…바꿀 물건 있으면 꺼내 봐. 시시한 건 안 받아.']],nalMenu);}
@@ -414,6 +415,7 @@ function galSendHome(item){
     }
   }
 }
+// 결정 D-02: 할멈은 "너를 안고 이 길을 지나갔다"까지만 (design/data/decisions.csv)
 function toadWinter(){
   if(!G.f.galArcToad1||G.rel.toad.v<1)return;
   arcScene('galArcToad2',[['너구리','할머니는 우리 엄마를 알아요?'],['두꺼비 할멈','알다마다. 너를 안고 이 길을 지나갔지.'],
@@ -635,6 +637,7 @@ if(!CLASSIC){
         {t:'꺼병이 곁에서 물가 쪽으로 걷는다',go:()=>{G.f.galExpChickWith=true;G.f.galExpChickX=1540;toast('오른쪽 갈대까지 함께 걷자. 멀어지면 꺼병이는 기다린다');}},
         {t:'여기서 기다려. 길부터 살필게',go:null}]]]);
   }
+  // 결정 D-17: 늙은 까치는 네 지역에 걸친 한 인물 (design/data/decisions.csv)
   const magpie={id:'old_magpie',name:'늙은 까치',x:820,draw:picture('magpie'),talk:magpieTalk,
     get greeting(){return G.f.galWheelDone?'쿵, 쿵, 쿵. 이 소리는 내가 안 날라도\n네 집까지 가겠구나.':G.tool==='sickle'?'그게 네 아비 낫이구나.\n손잡이가 반질반질하네.':'날개 좀 말리고 가련다.\n저 방아가 멈춘 뒤로 개울이 너무 조용해.';}};
   const hubMagpie={id:magpie.id,name:magpie.name,x:480,draw:magpie.draw,talk:magpie.talk};

@@ -23,6 +23,7 @@ const FORM_NAMES={'':'너구리',squirrel:'다람쥐',goat:'산양',owl:'수리�
 const formName=id=>FORM_NAMES[id||'']??'';
 const hasForm=id=>!id||(!!G&&Array.isArray(G.forms)&&G.forms.includes(id));
 const formTo=id=>jo(formName(id),'으로','로');
+// 결정 D-24: 잎사귀를 불어 변신 (design/data/decisions.csv)
 function unlockForm(id){
   if(!G||!FORM_IDS.includes(id))return false;
   if(!Array.isArray(G.forms))G.forms=[];
@@ -38,6 +39,7 @@ function formChangeAllowed(){
   return !paused()&&!pickupPose&&!inkOn;
 }
 /* opts.force: 조건 검사 없이 (되돌리기용). opts.quiet: 소리·연출·알림 없이 */
+// 결정 D-25: 변신 세부(능력·수치) (design/data/decisions.csv)
 function setForm(id,opts={}){
   id=id||'';
   if(!G||!Object.hasOwn(FORM_NAMES,id)||!hasForm(id))return false;
