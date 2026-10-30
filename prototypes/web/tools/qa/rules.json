@@ -1,0 +1,38 @@
+{
+  "description": "자동 검수 규칙. 허용 항목은 정확한 장면과 이유를 적으며 실제 위반을 숨기는 용도로 쓰지 않는다.",
+  "dialogue": {
+    "inputTerms": ["E로", "J로", "Space", "스페이스", "버튼을", "누르면", "클릭"],
+    "childRegisterPatterns": [
+      {"pattern": "자네", "reason": "아이를 부르는 하게체 호칭"},
+      {"pattern": "(?:하게|보게|받게|주게|가게|오게|앉게|서게|들게|놓게|두게|쉬게|챙기게|가져가게|가져오게|넘기게|기다리게|맞추게|살피게|꺼내게|쓰게|먹게|듣게|알아두게|기억하게|해 보게|해보게|비켜게|가보게)[.!。](?:[’”]|\\s|$)", "reason": "하게체 명령형. 줄게·할게·갈게 같은 해체 약속은 포함하지 않는다."},
+      {"pattern": "[가-힣](?<!구)나[?？]", "reason": "문장 끝 ~나? 하게체 의문형. ~구나? 감탄 확인은 포함하지 않는다. 어른 사이인 행만 정확한 대사로 예외를 둔다."}
+    ],
+    "maxLineCharacters": 40,
+    "maxLines": 2,
+    "forbiddenSymbols": ["나뭇잎 둔갑", "술병", "삿갓", "벚꽃"],
+    "adultDialogueAllowlist": [],
+    "ruleAllowlist": []
+  },
+  "csv": {
+    "description": "id 머리칸은 파일 안에서 유일해야 한다. boss_parts는 보스+부위id가 복합 키다. notebook의 쪽id는 한 쪽에 여러 기록 행이 속하므로 단독 고유 키가 아니다.",
+    "compositeKeys": [
+      {"file": "design/data/boss_parts.csv", "columns": ["보스", "부위id"], "reason": "부위id는 보스별 이름이다. 서로 다른 보스의 core 등은 정상이다."}
+    ]
+  },
+  "speakers": {
+    "global": [{"name": "너구리", "reason": "플레이어의 혼잣말과 독백"}],
+    "stageDirectionPatterns": [{"pattern": "^[（(]", "reason": "화자 칸 자체가 괄호로 시작하는 지문만 제외한다. 인물의 몸짓 대사는 제외하지 않는다."}],
+    "recordPatterns": [
+      {"pattern": "^아빠의 옛 기록$", "reason": "yeongsan/region.js:306~308에서 옛 수첩을 읽는다."},
+      {"pattern": "^까치$", "stackPattern": "deliverHomeReply", "reason": "engine/core.js:214의 문자열 답장을 까치의 전언으로 감싼 장면에만 적용한다."}
+    ],
+    "minigame": [],
+    "drawActors": [
+      {"region": "yeongsan", "zone": "shore", "name": "낚시하는 수달", "condition": "!!G.f.spring", "reason": "yeongsan/region.js:322~325에서 봄 선착장 수달을 직접 그린다."},
+      {"region": "yeongsan", "zone": "shore", "name": "살금이", "condition": "!!G.f.spring", "reason": "yeongsan/region.js:322~325에서 봄 선착장 살금이를 직접 그린다."},
+      {"region": "yeongsan", "zone": "island", "name": "낚시하는 수달", "condition": "!!G.f.spring", "reason": "yeongsan/region.js:367~370에서 봄 섬 선착장 수달을 직접 그린다."},
+      {"region": "yeongsan", "zone": "island", "name": "살금이", "condition": "!!G.f.spring", "reason": "yeongsan/region.js:367~370에서 봄 섬 선착장 살금이를 직접 그린다."}
+    ]
+  },
+  "runtime": {"stallSeconds": 240}
+}

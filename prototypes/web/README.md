@@ -9,6 +9,37 @@
 
 지금 들어 있는 지역: 1 단풍골 → 2 돌너머 마을 → 3 큰 장터 → 4 북쪽 영산(엔딩). 처음부터 엔딩까지 이어서 플레이할 수 있다. 한 지역이 끝나면 끝 화면의 버튼으로 다음 지역에 들어가고, 보따리·연장·책(일기·단서·장부)·아빠의 수첩·호감·깨어난 가보는 그대로 이어진다. 체력은 다시 찬다.
 
+## 자동 검수
+
+레포 맨 위에서 `node prototypes/web/tools/qa/run.js`를 실행한다. Node 24 이상과 Chrome이 필요하며, 패키지 설치나 게임 빌드는 없다. Chrome을 찾지 못하면 `CHROME_PATH`에 실행 파일 경로를 지정한다. PR과 main 푸시에서도 같은 명령을 실행한다. 실패가 하나라도 있으면 종료 코드 1, 경고만 있으면 0이다.
+
+```text
+node prototypes/web/tools/qa/run.js
+node prototypes/web/tools/qa/run.js --quick
+node prototypes/web/tools/qa/run.js --only dialogue
+node prototypes/web/tools/qa/run.js --only play-expanded
+node prototypes/web/tools/qa/run.js --only save,mobile
+```
+
+`--quick`은 브라우저를 열지 않는다. `--only` 이름은 `syntax`, `data`, `versions`, `csv`, `dialogue`, `play-expanded`, `play-classic`, `speakers`, `edges`, `save`, `mobile`이다. `static`과 `runtime`은 각각의 묶음이며 쉼표로 여러 검사를 고를 수 있다. `speakers`는 두 모드를, `edges`는 확장판 연속 플레이를 먼저 실행한다.
+
+| 검사 | 확인하는 것 |
+|---|---|
+| 정적 | 저장소 JS의 `node --check`, `build-data.js --check`, index 자산의 `?v=` 일치, CSV UTF-8 BOM·id 중복 |
+| 대사 | `talk`·이야기 배열의 상수 대사와 상수 분기. 너구리 외 화자의 조작어, 아이에게 하는 하게체, 타누키 표식, 두 줄 초과는 실패. 한 줄 40자 초과는 경고 |
+| 연속 플레이 | 빈 저장에서 기본 확장판(사연 켬)과 `?classic=1`을 각각 실제 키·마우스로 진행. 목표·입력·소지품·지역별 결과와 막힌 지점을 기록 |
+| 화자·이동 | 표시되는 대사마다 현재 구역의 NPC·길손·명시된 직접 그리기 인물을 대조. 가장자리를 넘을 때 유지한 방향키와 도착 뒤 이동을 기록 |
+| 저장 | 실제로 물건을 주운 뒤 수동 저장, 같은 출처에서 새로고침·이어 하기 후 비교. 깨진 JSON으로 시작해 새 게임이 가능한지 확인 |
+| 휴대폰 | 390×844 터치 에뮬레이션으로 첫 화면·출발 화면·대화·보따리·손일 창을 열어 44×44px 버튼과 요소 밖 글 넘침을 측정 |
+
+규칙과 허용 목록은 [`prototypes/web/tools/qa/rules.json`](tools/qa/rules.json)에 있다. 이 JSON의 `dialogue`에서 조작어·하게체 패턴·길이 기준을, `speakers`에서 화자 예외를 고친다. 어른끼리 대사는 `adultDialogueAllowlist`에 정확한 화자·대사·파일과 `reason`을 적는다. 직접 그리는 인물은 지역·구역·표시 조건까지 한정한다. 기록 화자도 필요한 경우 호출 스택으로 범위를 좁힌다. 실제 위반을 통과시키기 위한 넓은 예외는 넣지 않는다.
+
+`qa-out/`은 git에서 제외한다. 매번 새 결과 폴더에 `report.json`, `report.md`, 입력 로그·화면·Chrome 로그와 격리 프로필이 생기며, 최근 요약은 `qa-out/latest.json`·`latest.md`다. 자체 정적 검출 대조군은 `node prototypes/web/tools/qa/self-test.js`로 실행한다. 임시 파일에 위반을 넣어 검출하고 복구·삭제하며 게임 파일은 건드리지 않는다.
+
+브라우저 검사는 루프백 HTTP 서버와 결과 폴더 안의 새 Chrome 프로필을 쓴다. 사용자 브라우저 저장이나 기본 프로필은 쓰지 않는다. 이 HTTP 저장은 `file://` 실행 저장과 별개다. 화자 감시와 미니게임 관찰 코드는 시험 페이지에만 주입하며 진행값·위치·소지품은 직접 바꾸지 않는다. 연속 플레이의 긴 이동에서는 시험용 `requestAnimationFrame` 시계를 최대 6배로 돌리고, 근거리 이동·대화·미니게임은 정상 속도로 돌린다. 실제 플레이 시간이나 조작감 측정으로 쓰지 않는다. 같은 목표 240초 정체 기준은 `rules.json`의 `runtime.stallSeconds`에서 바꾼다. 전체 명령은 19분을 넘으면 실패하며 CI 제한은 20분이다. Chrome 시작 제한을 피하기 위한 `--no-sandbox`는 이 로컬 시험 프로세스에만 적용한다.
+
+끝까지 진행했더라도 선택 대사 전체·초보자의 길 찾기·말투의 자연스러움·인과·소리·조작감까지 통과한 것은 아니다. 동적 대사 본문은 정적 검사로 모두 해석할 수 없고, 화자 검사는 실제로 표시한 줄만 확인한다. 선택한 검사에 필요한 지역·장면을 실행하지 못하면 실패 보고에 남긴다. 실제 옛 저장 호환과 휴대폰 실기기는 별도 검수가 필요하다. 항목별 구분은 [검수 점검표](../../design/checklists/review.md)를 따른다.
+
 ## 인물 사연과 저장 (PA-43)
 
 확장판 새 게임은 [인물 사연](../../design/proposals/characters.md)을 기본으로 켠다. 비교하려면 `?arcs=0`으로 새 게임을 시작한다. `?classic=1`은 사연을 끈 옛 구성이며 `arcs=1`을 함께 붙여도 사연은 꺼진다.
@@ -169,7 +200,7 @@ if(!CLASSIC){
 - 구역의 `w`는 화면 폭 400 이상이다. `ground`는 발이 닿는 바닥 y이며 기본은 192다. 발판·NPC·조사점은 구역 안 좌표다. NPC·길손·조사점의 `y`를 생략하면 바닥이다. `npcs`를 생략하면 NPC의 `zone`으로 거르고, NPC의 `zone`도 없으면 시작 구역에 둔다. `npcs:[]`는 아무 NPC도 두지 않는다.
 - `drawBack`, `drawScenery`, `drawActors`, `drawFront`, `weather`, `weatherFront`, `ambient`, `step`, `onHit`, `onPickup`, `drawPickup`, `drawDig`, `maxX`, `faint`, `fieldBoss`는 현재 구역 것만 부른다. 구역 방식에서는 지역의 같은 이름 함수로 자동 대체하지 않는다. 필요한 공통 그림 함수는 각 구역에서 참조한다. `goal`, `onStart`, 교환·전투 결과 함수는 계속 지역에 둔다. 전투를 여는 조건도 해당 구역의 `step`에 둔다.
 - 구역별 가변 상태는 `newState()`가 돌려주며 `zoneState()`로 읽는다. 이 함수는 순수한 초기값만 만든다. `G.digs`·`G.pickups`는 기존 저장 구조를 유지하고 `zone`으로 거른다. 구역에 선언한 채집·줍기 지점은 한 번만 복제한다. `id`는 구역 왕복과 저장 뒤에도 유지한다. 기존 `newState()`가 만든 지점이나 이후 코드에서 추가하는 지점은 `zone`이 없으면 시작 구역 소속이다. 다른 구역에 추가할 때는 `zone`도 적는다. 적의 상태·그림·갱신은 해당 구역에 함께 둔다.
-- 가장자리 출구는 문자열 또는 `{to,need,reason,drawBlocked,toX,toY}`다. x가 16 미만 또는 `w-16` 초과가 되도록 밖으로 걸으면 전환하고, 기본 도착점은 반대쪽 가장자리다. 문은 E 또는 휴대폰 말걸기 버튼으로 연다. 문 도착점은 `toX`·`toY`, 없으면 대상 구역의 시작점이다. 조건은 통과 직전에 다시 검사한다. `need`는 소비 없는 판정 함수이며 `reason`은 막힌 이유다. `drawBlocked(x,y)`에는 화면 좌표를 준다. 이동·공격 입력은 전환 때 비운다.
+- 가장자리 출구는 문자열 또는 `{to,need,reason,drawBlocked,toX,toY}`다. x가 16 미만 또는 `w-16` 초과가 되도록 밖으로 걸으면 전환하고, 기본 도착점은 반대쪽 가장자리다. 문은 E 또는 휴대폰 말걸기 버튼으로 연다. 문 도착점은 `toX`·`toY`, 없으면 대상 구역의 시작점이다. 조건은 통과 직전에 다시 검사한다. `need`는 소비 없는 판정 함수이며 `reason`은 막힌 이유다. `drawBlocked(x,y)`에는 화면 좌표를 준다. 가장자리 전환은 좌우 이동 입력을 유지하고 나머지 입력을 비운다. 문 전환은 입력을 모두 비운다.
 - 조사·문·경치·길손·도장은 가까운 하나가 선택된다. 가로 차이는 기존 말 걸기 거리(현재 30px) 미만, 세로 차이는 `field_interact_y`(현재 24px) 미만이다. 경계와 같은 값은 제외한다. 조사 `text`는 문자열 또는 문자열 배열이며 한 번 열 때 한 칸씩 진행해 마지막에 머문다. 1~2줄은 문자열 안 줄바꿈으로 적는다.
 - 길손은 `REG.wanderers`에 `{id,zone,x,draw,talk}`로 두어도 된다. 기존 `talk()`·선택지·교환 함수를 그대로 쓴다. **사연이나 교환이 끝난 콜백에서** `finishWanderer(id)`를 부른다. 거절·취소만으로 끝내지 않는다. 다시 말하면 `greeting`을 쓴다. 완료 id는 `G.f.wanderersDone`, 전체 수는 `G.f.wandererCount`에 저장된다. `wandererCount(regionId?)`로 지역별·전체 수를 읽는다. id는 한 지역 안에서 고유해야 한다.
 - 도장은 기본적으로 E로 발견하고, `auto:true`이면 가까이 닿을 때 발견한다. 발견 전에는 `draw`를 호출하지 않아 숨긴다. 주변 단서는 지역 배경에 그린다. `note`는 `notebook.csv`의 `알게되는키`와 연결한다. 같은 형식의 행에 `종류=도장`, `쓴이=아빠`, `대상=쪽 제목`, `내용=그날 이야기`, `상태=제안`을 적고 데이터를 재생성한다. 기존 동물·물건 id를 바꾸지 않고 지역별 새 쪽id를 쓴다. 발견 때 `learn(note)`·반짝임·획득음은 한 번만 실행된다. 수첩의 도장 탭에서 읽는다. `stampCount(regionId?)`, `G.f.stampCount`, `G.f.stampsByRegion`으로 집계하며 `G.f.stampsFound`는 지역+id별 발견 기록이다. 열두 개 수집 뒤 엔딩 장면은 지역 콘텐츠 단계에서 연결한다.
