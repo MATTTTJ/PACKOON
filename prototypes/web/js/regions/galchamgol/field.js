@@ -136,7 +136,11 @@ if(!CLASSIC){
   const oldState=Rg.newState,oldStep=Rg.step,oldHit=Rg.onHit;
   const acorns=[['village',280,GROUND],['village',530,160],['village',1260,GROUND],
     ['forge',330,GROUND],['forge',2050,122],['forest',350,GROUND],['forest',1120,GROUND],['forest',2250,112]];
-  const digs=[['village',600],['forest',1370],['forest',1020],['marsh',900]];
+  const digs=[['village',600],['forest',1370],['forge',1700],['marsh',900]];
+  const placeRoot=()=>{
+    const d=G.digs.find(d=>d.id==='gal_dig_2'||(d.zone==='forest'&&d.x===1020&&d.item==='root'));
+    if(d)Object.assign(d,{id:'gal_dig_2',zone:'forge',x:1700});
+  };
   Rg.newState=()=>{
     const s=oldState();
     s.pickups.forEach((a,i)=>Object.assign(a,{id:'gal_acorn_'+i,zone:acorns[i][0],x:acorns[i][1],y:acorns[i][2]}));
@@ -151,7 +155,7 @@ if(!CLASSIC){
   };
   const basic=(id,w,platforms)=>({w,startX:70,ground:GROUND,platforms,npcs:[],
     drawBack:()=>A.back(id),drawScenery:()=>A.scenery(id),
-    drawFront:()=>A.front(id),weather:()=>Vfx.setWeather('maple'),
+    drawFront:()=>A.front(id),weather:()=>Vfx.setWeather('maple'),ambient:placeRoot,
     drawPickup:Rg.drawPickup,onPickup:a=>Rg.onPickup?.(a),step:commonStep});
   const sign=A.marker,blocked=A.blocked;
   const path=(x,to,toX,label,extra={})=>({x,to,toX,label,draw:sign,...extra});
@@ -171,7 +175,9 @@ if(!CLASSIC){
     forge:{...basic('forge',2600,[{x:320,y:160,w:85},{x:400,y:126,w:80},
       {x:1940,y:156,w:90},{x:2030,y:122,w:85},{x:2260,y:160,w:95}]),
       npcs:['musoe','nal'],exits:{left:{to:'village',toX:2500},right:{to:'forest',toX:70}},
-      doors:[path(380,'village',1150,'개울 둑길로 돌아가기')],
+      doors:[path(380,'village',1150,'개울 둑길로 돌아가기'),
+        path(1860,'marsh',2040,'약재 나르는 둑길로 약방에',{need:hasSickle,
+          reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',drawBlocked:blocked})],
       stamps:[{id:'anvil',x:1070,note:'stamp:galchamgol:anvil',label:'모루 밑 눌린 자국 살피기'}],
     },
     forest:{...basic('forest',2800,[{x:410,y:160,w:100},{x:500,y:126,w:80},
@@ -200,6 +206,8 @@ if(!CLASSIC){
       exits:{left:{to:'forest',toX:2360}},
       doors:[path(180,'hill',700,'당산나무 속으로 오르기',{travel:'tree',draw:A.treeDoor}),
         path(700,'forest',2360,'뿌리 바깥 숲길로 돌아가기'),
+        path(2250,'marsh',1200,'약초 귀환길로 약방에 내려가기',{need:()=>G.boss.dead,
+          reason:'엉킨 칡이 약초 귀환길을 막았다. 나무를 풀어 주면 약방으로 내려갈 수 있겠다.',drawBlocked:blocked}),
         path(2450,'village',1710,'보이던 개울 둑으로 내려가기',{travel:'depthBack',need:()=>G.boss.dead,
           reason:'엉킨 칡이 내리막까지 움켜쥐고 있다. 나무를 풀어 주고 내려가자.',drawBlocked:blocked})],
       pickups:[{id:'gal_extra_acorn_4',x:780,y:160,item:'acorn',got:false},

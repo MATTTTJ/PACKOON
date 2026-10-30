@@ -46,11 +46,18 @@ if(!CLASSIC){
   const oldState=Rg.newState;
   Rg.newState=()=>{
     const s=oldState();
-    s.pickups=[{id:'shelter_straw',zone:'shelter',x:330,y:GROUND,item:'jip',got:false},
+    s.pickups=[{id:'shelter_straw',zone:'shelter',x:340,y:GROUND,item:'jip',got:false},
       ...[['slope',420,GROUND],['slope',900,150],['shore',880,GROUND],['slope',1265,150],['island',2140,108]].map(([zone,x,y],i)=>
         ({id:'slope_rowan_'+i,zone,x,y,item:'magamok',got:false}))];
-    s.digs=s.digs.map((d,i)=>({...d,id:'shelter_vine_'+i,zone:i===2?'snow':'shelter',x:i===2?1360:d.x}));
+    s.digs=s.digs.map((d,i)=>({...d,id:'shelter_vine_'+i,zone:'shelter',x:[300,330,660][i]}));
     return s;
+  };
+  Rg.placeRouteSupplies=()=>{
+    for(const d of G.digs){
+      const i=Number(d.id?.match(/^shelter_vine_([0-2])$/)?.[1]);
+      if(Number.isInteger(i))Object.assign(d,{zone:'shelter',x:[300,330,660][i]});
+    }
+    const straw=G.pickups.find(p=>p.id==='shelter_straw');if(straw)straw.x=340;
   };
 }
 
@@ -312,7 +319,8 @@ function traceStamp(s){
 function install(){
   const shore=Rg.zones.shore,island=Rg.zones.island;
   shore.doors=shore.doors.filter(d=>d.to!=='island');island.doors=island.doors.filter(d=>d.to!=='shore');
-  shore.npcs.push(...[1350,1900,2240].map((x,j)=>({...fixture('y_ice_station_'+j,'얼음길 막대 '+(j+1),x,()=>G.f.spring?prepareBoat(['oar','rope','launch'][j]):survey(j+1)),
+  shore.npcs.push(...[1350,1900,2240].map((winterX,j)=>({...fixture('y_ice_station_'+j,'얼음길 막대 '+(j+1),winterX,()=>G.f.spring?prepareBoat(['oar','rope','launch'][j]):survey(j+1)),
+    get x(){return G.f.spring?[2180,2210,2240][j]:winterX;},
     get prompt(){return G.f.spring?['둑에 둔 노 손보기','배 묶는 고리 손보기','작은 배 물에 띄우기'][j]:'얼음길 막대 '+(j+1)+' 살피기';}})));
   shore.npcs.push(fixture('y_lake_depart','호수 건너기',2320,()=>sail('island')));
   island.npcs.push(fixture('y_lake_return','호숫가로 돌아가기',160,()=>sail('shore')));
@@ -322,10 +330,10 @@ function install(){
   shore.drawActors=()=>{
     oldDraw?.();
     if(!G.f.spring)return;
-    Rg.expArt.drawOtter(2280-cam,GROUND,1);Rg.art.deer(2365-cam,GROUND,-1);
-    const ox=1350-cam;R(ox-24,GROUND-6,43,2,'#a78a65');R(ox-26,GROUND-9,12,7,'#c3ab7a');
+    Rg.expArt.drawOtter(2280-cam,GROUND,1);
+    const ox=2180-cam;R(ox-24,GROUND-6,43,2,'#a78a65');R(ox-26,GROUND-9,12,7,'#c3ab7a');
     R(ox-13,GROUND-14,39,2,'#836b50');R(ox+16,GROUND-17,13,7,'#bea579');
-    const rx=1900-cam;for(let i=0;i<3;i++){R(rx-12+i*3,GROUND-9+i*2,24-i*6,1,'#d6bd88');R(rx-12+i*3,GROUND-7+i,1,4-i,'#b49a6d');}
+    const rx=2210-cam;for(let i=0;i<3;i++){R(rx-12+i*3,GROUND-9+i*2,24-i*6,1,'#d6bd88');R(rx-12+i*3,GROUND-7+i,1,4-i,'#b49a6d');}
     const bx=2240-cam;for(let i=0;i<3;i++){R(bx-20+i*8,GROUND-5-i*2,31,3,'#a18462');R(bx-21+i*8,GROUND-5-i*2,3,3,'#c7b48e');}
   };
   const oldGoal=Rg.goal;
@@ -367,8 +375,21 @@ function install(){
     isl.drawActors=()=>{
       oldIsl?.();
       if(!G.f.spring)return;
-      Rg.expArt.drawOtter(260-cam,GROUND,-1);Rg.art.deer(330-cam,GROUND,-1);
+      Rg.expArt.drawOtter(260-cam,GROUND,-1);
     };
+  }
+  // 살금이는 진행과 배 도착지에 따라 한 구역에만 둔다. 옛 저장도 같은 진행값으로 복원한다.
+  Rg.replyCourierHere=()=>G?.zone==='shelter'&&open('dlg')&&$('dlgWho').textContent==='까치';
+  for(const [id,z] of Object.entries(Rg.zones)){
+    const desc=Object.getOwnPropertyDescriptor(z,'npcs'),list=z.npcs;
+    Object.defineProperty(z,'npcs',{configurable:true,get:()=>{
+      const current=(desc.get?desc.get():list).filter(n=>(typeof n==='string'?n:n.id)!=='salgeumi');
+      if(id==='shelter'&&Rg.replyCourierHere()){
+        const courier=Rg.expContent.wanderers.shore.find(n=>n.id==='y_magpie_knot');
+        current.push({...courier,x:G.px+24,zone:id});
+      }
+      return Rg.npcs.find(n=>n.id==='salgeumi').zone===id?[...current,'salgeumi']:current;
+    }});
   }
 }
 addEventListener('DOMContentLoaded',install,{once:true});
