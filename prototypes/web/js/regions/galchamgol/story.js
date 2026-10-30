@@ -461,24 +461,24 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '단풍골 체험판 완료';
-  if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '두꺼비 할멈에게 인사하고 북쪽으로 떠나기';
-  if(!F.dodamTalk)return '마을 어귀의 다람쥐 도담에게 말 걸기';
+  if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '할멈께 인사드리고 북쪽으로 떠나자';
+  if(!F.dodamTalk)return '마을 어귀의 도담에게 말을 걸어 보자';
   const ac=G.inv.acorn||0;
-  const powderStep=()=>has('powder')?null:(ac<3?'도토리 줍기 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개 넣어 빻기');
-  if(!F.dodamDone)return powderStep()||'도담에게 도토리 가루 건네기';
-  if(!F.musoeMet)return '물레방아 너머 대장간의 무쇠 삼촌 찾아가기';
-  if(!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내기 (다시 말 걸기)';
+  const powderStep=()=>has('powder')?null:(ac<3?'도토리를 줍자 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개를 넣어 빻자');
+  if(!F.dodamDone)return powderStep()||'도담에게 도토리 가루를 건네자';
+  if(!F.musoeMet)return '물레방아 너머 대장간의 무쇠 삼촌을 찾아가자';
+  if(!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내자 (다시 말을 걸면 된다)';
   if(!F.musoeDone){
-    if(has('coal'))return '무쇠 삼촌에게 숯 가져가기';
-    if(!F.nalTalk)return '물레방아 옆 족제비 날쌘에게 숯 구하기';
+    if(has('coal'))return '무쇠 삼촌께 숯을 가져다드리자';
+    if(!F.nalTalk)return '물레방아 옆 날쌘에게 숯을 구하자';
     const p=powderStep();if(p)return p;
-    if(!has('root'))return '반짝이는 흙더미를 휘둘러 칡뿌리 캐기';
-    return '날쌘에게 도토리 가루와 칡뿌리 건네기';
+    if(!has('root'))return '반짝이는 흙더미를 곡괭이로 쳐서 칡뿌리를 캐자';
+    return '날쌘에게 도토리 가루와 칡뿌리를 건네자';
   }
-  if(!G.barrier.cut)return '마을 끝 칡덩굴을 낫으로 끊기';
-  if(!G.boss.dead)return '당산나무의 엉킨 칡과 맞서기 (부수거나 달래기)';
-  if(G.drop)return '떨어진 해머루 줍기';
-  return '두꺼비 할멈에게 해머루 가져가기';
+  if(!G.barrier.cut)return '마을 끝 칡덩굴을 낫으로 끊자';
+  if(!G.boss.dead)return '당산나무의 엉킨 칡과 맞서자 (부수거나 달래거나)';
+  if(G.drop)return '떨어진 해머루를 줍자';
+  return '할멈께 해머루를 가져다드리자';
 };
 
 /* PA-43: 첫 가을의 길손과 조사. classic은 위의 지도와 대사를 그대로 쓴다. */
@@ -583,22 +583,45 @@ if(!CLASSIC){
         ],()=>{
           diary('galExpMagpie','늙은 까치의 약보자기를 두 손으로 눌러 드렸다. 까치는 길 따라 소식을 나른다고 했다. 엄마한테 밥 잘 먹고 있다고 전해 달라고 했다.');
           finishWanderer('old_magpie');
-          talk([
-            ['늙은 까치','참, 아가. 길이 멀어 발이 아프거든 하늘을 보고 불러라.\n우리 집 젊은 것들이 보자기째 날라 줄 게다.'],
-            ['너구리','보자기째요?'],
-            ['늙은 까치','네 귀를 하나씩 물면 너 하나쯤은 거뜬하지.\n…가 본 길로만 다닌단다. 모르는 길은 저 애들도 몰라.']
-          ],()=>{G.f.mapUnlocked=true;toast('지도(M)를 펴면 가 본 곳으로 까치 떼를 부를 수 있다');});
+          // 결정 D-33: 까치 떼 이동을 말할 때 젊은 까치 둘이 곁에 내려앉고, 그 뒤로 늙은 까치 곁에 머문다 (design/data/decisions.csv)
+          talk([['늙은 까치','참, 아가. 길이 멀어 발이 아프거든 하늘을 보고 불러라.']],()=>{
+            G.f.galMagpieYoung=true;
+            talk([
+              ['너구리','(늙은 까치가 짧게 울자, 덩치 큰 까치 둘이\n지붕에서 내려앉았다.)'],
+              ['늙은 까치','우리 집 젊은 것들이다.\n이 애들이 데려다줄 게다.'],
+              ['너구리','저를요? 어떻게요?'],
+              ['늙은 까치','네 귀 한쪽씩 잡고 날면 되지.\n…가 본 길로만 다닌단다. 모르는 길은 저 애들도 몰라.']
+            ],()=>{G.f.mapUnlocked=true;toast('지도(M)를 펴면 가 본 곳으로 까치 떼를 부를 수 있다');});
+          });
         }))},{t:'바람이 잦아들면 도와드릴게요',go:null}]]]);
   }
   function brothersTalk(){
     const sorted=G.f.galExpBrothersSorted;
     if(G.f.galExpBrothersAsked&&sorted){
-      talk([['다람쥐 형','큰 것부터 번갈아 놓으니 양쪽이 비슷하네.'],['다람쥐 동생','내 몫이 적다고만 생각했는데!'],
-        ['너구리','한 바구니에 담고,\n겨울에 같이 먹으면?'],
-        ['다람쥐 형','그럼 내가 숨긴 자리를 적어 둘게.'],['다람쥐 동생','난 덮어 둔 낙엽 모양을 그려 둘래!'],
-        ['다람쥐 형','높은 가지에 붉은 옹이가 있어.\n그 아래 굵은 가지를 디뎌 봐.'],['다람쥐 동생','거기 우리 말고 누가 남긴 자국이 있더라!']
-      ],()=>{
-        diary('galExpBrothers','다람쥐 형제와 도토리를 큰 것부터 번갈아 나눴다. 겨울에는 같은 바구니에서 먹기로 했다. 형제가 숲 높은 가지의 붉은 옹이를 알려 주었다.');
+      // 결정 D-34: 고르게 나누기 / 형 편 / 동생 편. 덤만 다르고 붉은 옹이 길 안내는 같다 (design/data/decisions.csv)
+      const side=G.f.galExpBrothersSide||'even';
+      const pay=(id,n)=>{if(!G.f.galExpBrothersPaid){G.f.galExpBrothersPaid=true;addItem(id,n);}};
+      const lines={
+        even:[['다람쥐 형','큰 것부터 번갈아 놓으니 양쪽이 비슷하네.'],['다람쥐 동생','내 몫이 적다고만 생각했는데!'],
+          ['너구리','한 바구니에 담고,\n겨울에 같이 먹으면?'],
+          ['다람쥐 형','그럼 내가 숨긴 자리를 적어 둘게.'],['다람쥐 동생','난 덮어 둔 낙엽 모양을 그려 둘래!'],
+          ['다람쥐 형','이건 고르게 나눠 준 몫이야. 도토리 한 알.'],
+          ['다람쥐 형','높은 가지에 붉은 옹이가 있어.\n그 아래 굵은 가지를 디뎌 봐.'],['다람쥐 동생','거기 우리 말고 누가 남긴 자국이 있더라!']],
+        hyung:[['다람쥐 형','봐, 내 말이 맞지! 큰 건 내 몫이야.'],['다람쥐 동생','…치.'],
+          ['다람쥐 형','내 편 들어 줬으니 큰 도토리 두 알 줄게.'],
+          ['다람쥐 형','그리고 높은 가지에 붉은 옹이가 있어.\n그 아래 굵은 가지를 디뎌 봐.'],['다람쥐 동생','…거기 누가 남긴 자국도 있어. 형은 모르지?']],
+        dongsaeng:[['다람쥐 동생','거봐! 찾은 건 나라니까.'],['다람쥐 형','…쳇.'],
+          ['다람쥐 동생','내 편 들어 줬으니까 이거 줄게.\n낙엽 밑에서 찾은 싸리버섯이야.'],
+          ['다람쥐 동생','높은 가지에 붉은 옹이가 있어.\n거기 우리 말고 누가 남긴 자국이 있더라!'],['다람쥐 형','…그 아래 굵은 가지를 디디면 돼.']]
+      };
+      const notes={
+        even:'다람쥐 형제와 도토리를 큰 것부터 번갈아 나눴다. 겨울에는 같은 바구니에서 먹기로 했다. 형제가 숲 높은 가지의 붉은 옹이를 알려 주었다.',
+        hyung:'다람쥐 형제 다툼에서 일곱 번 오간 형 편을 들었다. 형이 큰 도토리 두 알을 주었고 동생은 토라졌다. 숲 높은 가지의 붉은 옹이를 들었다.',
+        dongsaeng:'다람쥐 형제 다툼에서 낙엽을 걷어 찾은 동생 편을 들었다. 동생이 싸리버섯을 주었고 형은 토라졌다. 숲 높은 가지의 붉은 옹이를 들었다.'
+      };
+      talk(lines[side],()=>{
+        pay(...({even:['acorn',1],hyung:['acorn',2],dongsaeng:['ssari',1]})[side]);
+        diary('galExpBrothers',notes[side]);
         finishWanderer('squirrel_brothers');
       });return;
     }
@@ -615,9 +638,12 @@ if(!CLASSIC){
   function shareBaskets(){
     if(!G.f.galExpBrothersAsked){brothersTalk();return;}
     if(G.f.galExpBrothersSorted){brothersTalk();return;}
-    hands('형제와 도토리 나누기','brothers',['제일 큰 알은 왼쪽','다음 큰 알은 오른쪽','작은 알도 왼쪽','마지막 알은 오른쪽'],()=>{
-      G.f.galExpBrothersSorted=true;brothersTalk();
-    },true);
+    const pick=side=>{G.f.galExpBrothersSorted=true;G.f.galExpBrothersSide=side;brothersTalk();};
+    talk([['다람쥐 형','바구니 두 개 다 가져왔어.\n어떻게 나눌래?',[
+      {t:'큰 것부터 번갈아 고르게 나눈다',go:()=>hands('형제와 도토리 나누기','brothers',['제일 큰 알은 왼쪽','다음 큰 알은 오른쪽','작은 알도 왼쪽','마지막 알은 오른쪽'],()=>pick('even'),true)},
+      {t:'형 편을 든다: "일곱 번 오갔으니 큰 건 형 몫이야"',go:()=>pick('hyung')},
+      {t:'동생 편을 든다: "낙엽을 걷어 찾았으니 동생 몫이야"',go:()=>pick('dongsaeng')},
+      {t:'조금 더 생각해 볼게',go:null}]]]);
   }
   function chickTalk(){
     if(G.f.galExpChickWith&&G.f.galExpChickX>=2090){
@@ -640,7 +666,8 @@ if(!CLASSIC){
         {t:'여기서 기다려. 길부터 살필게',go:null}]]]);
   }
   // 결정 D-17: 늙은 까치는 네 지역에 걸친 한 인물 (design/data/decisions.csv)
-  const magpie={id:'old_magpie',name:'늙은 까치',x:820,draw:picture('magpie'),talk:magpieTalk,
+  const drawMagpies=(x,y,f)=>{Rg.expArt.magpie(x,y,f);if(G.f.galMagpieYoung){Rg.expArt.youngMagpie(x-32,y,1);Rg.expArt.youngMagpie(x+34,y,-1);}};
+  const magpie={id:'old_magpie',name:'늙은 까치',x:820,draw:drawMagpies,talk:magpieTalk,
     get greeting(){return G.f.galWheelDone?'쿵, 쿵, 쿵. 이 소리는 내가 안 날라도\n네 집까지 가겠구나.':G.tool==='sickle'?'그게 네 아비 낫이구나.\n손잡이가 반질반질하네.':'날개 좀 말리고 가련다.\n저 방아가 멈춘 뒤로 개울이 너무 조용해.';}};
   const hubMagpie={id:magpie.id,name:magpie.name,x:480,draw:magpie.draw,talk:magpie.talk};
   Object.defineProperty(hubMagpie,'greeting',{get:()=>magpie.greeting});
@@ -648,7 +675,10 @@ if(!CLASSIC){
   const wheelMagpie={id:magpie.id,name:magpie.name,x:1120,draw:magpie.draw,talk:magpie.talk};
   Object.defineProperty(wheelMagpie,'greeting',{get:()=>magpie.greeting});
   const brothers={id:'squirrel_brothers',name:'다람쥐 형제',speakers:['다람쥐 형','다람쥐 동생'],x:620,draw:picture('brothers'),talk:brothersTalk,
-    greeting:[['다람쥐 형','큰 것부터 번갈아!'],['다람쥐 동생','겨울에는 한 바구니에서!']]};
+    get greeting(){return ({
+      hyung:[['다람쥐 형','큰 건 역시 내 몫이지!'],['다람쥐 동생','…다음엔 내가 먼저 찾을 거야.']],
+      dongsaeng:[['다람쥐 동생','찾는 건 내가 최고야!'],['다람쥐 형','…다음엔 내가 더 많이 오갈 거야.']]
+    })[G.f.galExpBrothersSide]||[['다람쥐 형','큰 것부터 번갈아!'],['다람쥐 동생','겨울에는 한 바구니에서!']];}};
   const chick={id:'lost_chick',name:'꺼병이',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
     greeting:'이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!'};
   function wheelStage(){
@@ -846,15 +876,15 @@ if(!CLASSIC){
   Rg.goal=()=>{
     const F=G.f;
     if(!G.started||G.ended)return oldGoal();
-    if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '약을 보냈다 · 할멈께 인사하고 북쪽으로 떠나기';
-    if(!F.dodamTalk)return '참나무 숲의 도담 찾아가기 · 대장간 길 오른쪽';
-    if(F.dodamDone&&!F.musoeMet)return '대장간 길로 돌아가 무쇠 삼촌에게 낫 묻기';
-    if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내기 · 다시 말 걸기';
-    if(F.dodamDone&&!F.musoeDone&&!has('coal')&&!F.nalTalk)return '대장간 오른쪽 좌판의 날쌘에게 숯 구하기';
-    if(!F.musoeDone&&F.nalTalk&&!F.nalDone&&!has('coal')&&!has('root'))return '대장간 길 · 날쌘 좌판 옆 반짝이는 흙더미 캐기';
-    if(F.musoeDone&&!G.barrier.cut)return '참나무 숲 안쪽 금줄의 덩굴을 낫으로 걷기';
-    if(G.barrier.cut&&!G.boss.dead)return '당산나무 속을 올라 엉킨 칡과 만나기';
-    if(G.boss.dead&&!G.drop)return '언덕 끝 약초 귀환길 → 늪가 약방의 두꺼비 할멈';
+    if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '약을 보냈다 · 할멈께 인사드리고 북쪽으로 떠나자';
+    if(!F.dodamTalk)return '참나무 숲의 도담을 찾아가자 · 대장간 길 오른쪽';
+    if(F.dodamDone&&!F.musoeMet)return '대장간 길로 돌아가 무쇠 삼촌께 낫을 여쭤보자';
+    if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내자 · 다시 말을 걸면 된다';
+    if(F.dodamDone&&!F.musoeDone&&!has('coal')&&!F.nalTalk)return '대장간 오른쪽 좌판의 날쌘에게 숯을 구하자';
+    if(!F.musoeDone&&F.nalTalk&&!F.nalDone&&!has('coal')&&!has('root'))return '대장간 길 · 날쌘 좌판 옆 반짝이는 흙더미를 캐자';
+    if(F.musoeDone&&!G.barrier.cut)return '참나무 숲 안쪽 금줄의 덩굴을 낫으로 걷자';
+    if(G.barrier.cut&&!G.boss.dead)return '당산나무 속을 올라 엉킨 칡을 만나자';
+    if(G.boss.dead&&!G.drop)return '언덕 끝 약초 귀환길로 내려가 늪가 약방의 할멈께 가자';
     return oldGoal();
   };
 }

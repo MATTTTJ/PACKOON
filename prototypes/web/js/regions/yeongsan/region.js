@@ -340,7 +340,7 @@ function install(){
   };
   const oldGoal=Rg.goal;
   Rg.goal=()=>{
-    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return '호숫가의 얼음길 막대 세 곳 살피기 (바위 → 검은 금 → 선착장)';
+    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return '호숫가 얼음길의 막대 세 곳을 살피자 (바위 → 검은 금 → 선착장)';
     return oldGoal();
   };
   // 완료 길손의 greeting을 가로채지 않고, 봄에만 별도 행동 자리를 곁에 둔다.

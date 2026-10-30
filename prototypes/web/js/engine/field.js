@@ -74,11 +74,14 @@ function nearFloorItems(){
 function floorPickupGoal(original){
   if(!G.started||G.ended)return original;
   const rows=[...G.pickups,...Object.values(G.floorItems?.[G.region]||{}).flat()].filter(a=>!a.got);
-  const a=rows.find(a=>((/줍기|따기|따서|베기|캐기/.test(original)&&original.includes(ITEMS[a.item]?.n))||
-    (a.item==='root'&&!has('root')&&/흙더미 캐기/.test(original))||
+  // 결정 D-35: 할 일 문구는 아이 말투(~하자)다 (design/data/decisions.csv)
+  const a=rows.find(a=>((/줍자|따자|따서|베자|캐자/.test(original)&&original.includes(ITEMS[a.item]?.n))||
+    (a.item==='root'&&!has('root')&&/흙더미를 캐자/.test(original))||
     (a.item==='meoru'&&G.region==='galchamgol'&&G.boss.dead&&!has('meoru')&&!G.diary.some(d=>d.id==='end')))&&
-    !/건네기|넣어|빻기|갈기|찌기/.test(original));
-  return a?'바닥의 '+ITEMS[a.item].n+' 줍기':original;
+    !/건네자|넣어|빻자|갈자|찌자/.test(original));
+  if(!a)return original;
+  const n=ITEMS[a.item].n,last=n.charCodeAt(n.length-1)-0xAC00;
+  return '바닥의 '+n+(last>=0&&last<11172&&last%28?'을':'를')+' 줍자';
 }
 let pickupPose=null;
 const pickupIcons=new Map();
@@ -489,7 +492,8 @@ function interactionKind(p){
 }
 function interactionLabel(p){
   const k=interactionKind(p);
-  if(k==='doors')return needMet(p)?(p.label||'들어가기'):formPasses(p)?(p.formLabel||formTo(p.formPass)+' 지나가기'):(p.reason||'아직 닫힌 길');
+  // 결정 D-32: 막힌 길 위에는 짧은 이름(blockedLabel)만. 까닭은 다가가 말을 걸면 아이 혼잣말(blockedSay)로 한다 (design/data/decisions.csv)
+  if(k==='doors')return needMet(p)?(p.label||'들어가기'):formPasses(p)?(p.formLabel||formTo(p.formPass)+' 지나가기'):(p.blockedLabel||p.reason||'아직 닫힌 길');
   if(k==='vistas')return '바라보기';
   if(k==='stamps')return p.label||'희미한 자국 살펴보기';
   if(k==='examines')return p.label||'조사하기';
@@ -503,7 +507,8 @@ function tryInteract(){
   if((kind==='npc'||kind==='wanderers')&&strangerApplies(p)){strangerTalk(p);return;}
   if(kind==='npc'){learn('met:'+p.id);if(p.peek)peekAt(p.x,p.y??fieldGround());p.talk();}
   else if(kind==='doors'){
-    if(!pathOpen(p)){toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
+    if(!pathOpen(p)){const say=typeof p.blockedSay==='function'?p.blockedSay():p.blockedSay;
+      if(say)talk([['너구리',say]]);else toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
     changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});
   }else if(kind==='vistas')startVista(p);
   else if(kind==='stamps')findStamp(p);
