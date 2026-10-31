@@ -4,7 +4,8 @@
 const GameMusic=(()=>{
   // 결정 D-105: ACE-Step으로 만든 녹음 음원(시험판). 소리 설정의 '녹음 음원'을 켜면 이 곡들은 녹음으로 튼다.
   // 만든 조건(모델·캡션·시드·기준 음원)은 design/data/music/README.md 의 "녹음 음원" 절.
-  const RECORDINGS={danpunggol:'audio/bgm/danpunggol.ogg',boss_kudzu:'audio/bgm/boss_kudzu.ogg'};
+  // 결정 D-107: 다시 쓴 곡 아홉의 녹음판 (지역 넷 + 보스 다섯). 경치·장면 곡은 합성 그대로.
+  const RECORDINGS=Object.fromEntries(['danpunggol','dolneomeo','market_day','market_night','boss_kudzu','boss_golem','boss_dokkaebi','boss_steel','trial_iron'].map(id=>[id,'audio/bgm/'+id+'.ogg']));
   const RECORDED_KEY='packoon-music-recorded';
   const player=PackoonMusic.createPlayer({...PackoonAudioData,sampleRate:22050,recordings:RECORDINGS});
   try{player.setRecorded(localStorage.getItem(RECORDED_KEY)==='1');}catch(_){}
