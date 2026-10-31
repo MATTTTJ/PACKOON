@@ -327,8 +327,8 @@ function drawRaccoon(){
 function draw(){
   if(mapTravel){drawMapTravel();return;}
   if(vistaMode){drawVista();return;}
-  const sliding=zoneMotion?.kind==='slide';
-  drawFieldScene(!sliding);
+  const hideHero=zoneMotion&&['slide','crawl'].includes(zoneMotion.kind);
+  drawFieldScene(!hideHero);
   updateOverlay();
   if(zoneFade>0){ctx.save();ctx.globalAlpha=zoneFade/TABLES.TUNING.zone_transition_frames;R(0,0,W,H,'#211d24');ctx.restore();}
   drawZoneTransition();
@@ -464,6 +464,7 @@ function stepZoneTransition(){
   if(document.hidden)return;
   if(Vfx.reducedMotion){finishZoneTransition();return;}
   m.tick=Math.min(m.tick+1,m.frames);
+  if(m.kind==='crawl')crawlStep(m);
   if(m.kind==='flow'){
     const t=m.tick/m.frames;
     G.px=m.start.x+(m.end.x-m.start.x)*t;G.py=m.start.y+(m.end.y-m.start.y)*t;
@@ -474,7 +475,7 @@ function stepZoneTransition(){
 function drawZoneTransition(){
   const m=zoneMotion;if(!m)return;
   if(Vfx.reducedMotion){
-    if(m.kind==='slide')drawRaccoon();
+    if(m.kind==='slide'||m.kind==='crawl')drawRaccoon();
     return;
   }
   const t=m.tick/m.frames,e=t*t*(3-2*t);
@@ -493,10 +494,82 @@ function drawZoneTransition(){
   }else if(m.kind==='climb'){
     const shift=(m.opts.reverse?-1:1)*Math.round(H*e);
     ctx.drawImage(m.image,0,shift);
-  }
+  }else if(m.kind==='crawl')drawCrawl(m,t);
   // 장면별 그림은 지역 쪽에서 넘긴다. 공통 함수는 진행과 입력 정리만 맡는다.
   ctx.restore();
   if(typeof m.opts.draw==='function'){ctx.save();try{m.opts.draw(t,m.kind);}finally{ctx.restore();}}
+}
+/* 결정 D-44: 내려가는 문(descend)은 그 자리에서 등을 보이며 기어 내려간 뒤 구역을 넘어가고,
+   올라가는 문(ascend)은 도착한 곳에서 아래로부터 기어 올라온다 (design/data/decisions.csv).
+   나무를 타는 짐승처럼 팔다리를 번갈아 디딘다. 시간은 tuning.csv의 field_crawl_frames, 움직임 줄이기에서는 바로 넘어간다. */
+const CRAWL_DEPTH=30;   // 땅 아래로 내려가 보이는 깊이(px). 화면 아래 끝(225)보다 위에서 어두워진다.
+function startCrawl(p){
+  if(Vfx.reducedMotion||paused())return false;
+  const frames=TABLES.TUNING.field_crawl_frames,face=G.face;
+  if(p.descend){
+    G.vx=G.vy=0;suppressHeldInputs();
+    zoneMotion={kind:'crawl',opts:{dir:1,x:p.x,onComplete:()=>changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'})},
+      frames,tick:0,owner:G,region:G.region,zone:G.zone,start:{x:G.px,y:G.py},end:{x:G.px,y:G.py},form:G.form||'',face};
+    return true;
+  }
+  if(!changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'}))return false;
+  zoneFade=0;   // 도착 화면은 모션이 직접 밝힌다
+  zoneMotion={kind:'crawl',opts:{dir:-1,x:G.px},frames,tick:0,owner:G,region:G.region,zone:G.zone,
+    start:{x:G.px,y:G.py},end:{x:G.px,y:G.py},form:'',face};
+  return true;
+}
+function crawlStep(m){
+  // 팔다리를 한 번 바꿔 디딜 때마다 사각 소리를 낸다.
+  const beat=Math.max(1,Math.round(m.frames/8));
+  if(m.tick%beat===0&&m.tick<m.frames)Sound.playSfx(G.region==='jangteo'?'footstep_market':'footstep_leaf',{gain:.45});
+}
+function drawCrawl(m,t){
+  const down=m.opts.dir>0,steps=8;
+  // 내려갈 때: 문 쪽으로 반 발 다가선 뒤 등을 돌리고 디딤을 따라 내려간다. 올라올 때는 거꾸로.
+  const depth=down?t:1-t;
+  const seg=Math.min(steps-1,Math.floor(depth*steps)),frac=depth*steps-seg;
+  const sink=CRAWL_DEPTH*(seg+Math.min(1,frac*1.6))/steps;   // 한 발씩 끊어 내려간다
+  const lead=down?Math.min(1,t/.18):1;
+  const wx=m.start.x+(m.opts.x-m.start.x)*lead,x=Math.round(wx-cam),y=Math.round(m.start.y+sink);
+  // 디딜 뿌리와 흙 턱: 땅 밑으로 이어진 두 줄기와 가로 매듭
+  const gy=fieldGround();
+  R(x-10,gy,2,H-gy,'#5a3a24');R(x+8,gy,2,H-gy,'#5a3a24');R(x-9,gy,1,H-gy,'#8a6040');
+  for(let yy=gy+4;yy<H;yy+=7)R(x-10,yy,20,1,'#7a5234');
+  const phase=Math.floor(depth*steps)%2;
+  if(down&&t<.18)drawPlayerAt(x,y,m.face,Math.floor(t*20)%2,0,heldTool(),0,m.form);   // 다가서는 반 발
+  else if(!m.form)drawRaccoonBackAt(x,y,phase);
+  else if(m.form==='squirrel'){
+    // 다람쥐는 머리부터 내려간다.
+    ctx.save();ctx.translate(x-5,y-6);ctx.rotate(Math.PI/2*(down?1:-1));drawFormAt(0,8,1,phase,'squirrel');ctx.restore();
+  }else drawFormAt(x,y-(phase?1:0),m.face,phase,m.form,0,m.form==='owl');
+  // 내려갈 때는 끝에서 어두워지고, 올라올 때는 어둠에서 밝아진다.
+  const dark=down?clamp((t-.55)/.45,0,1):clamp(1-t/.4,0,1);
+  if(dark>0){ctx.save();ctx.globalAlpha=dark;R(0,0,W,H,'#211d24');ctx.restore();}
+}
+/* 등 뒤에서 본 너구리: 등에 진 보따리, 줄무늬 꼬리. phase마다 위로 뻗은 팔과 아래 디딘 발이 바뀐다. */
+function drawRaccoonBackAt(ox,oy,phase){
+  const Gy='#8c8070',Dk='#6f6357',K='#2a211b';
+  const up=phase?1:-1;   // 위로 뻗은 팔 쪽 (-1 왼쪽, 1 오른쪽). 같은 쪽 발은 아래를 디딘다.
+  // 꼬리: 아래로 늘어뜨린 줄무늬
+  R(ox-1,oy-8,3,9,Gy);for(const yy of [-6,-3,0])R(ox-1,oy+yy,3,1,K);
+  // 뒷다리
+  const legL=up<0?[-6,-6,3,7]:[-6,-10,3,4],legR=up>0?[3,-6,3,7]:[3,-10,3,4];
+  R(ox+legL[0],oy+legL[1],legL[2],legL[3],K);R(ox+legR[0],oy+legR[1],legR[2],legR[3],K);
+  // 몸통과 등줄기
+  R(ox-5,oy-18,10,11,Gy);R(ox-1,oy-17,2,9,Dk);
+  // 보따리 (여행 단계에 따라 겉모습이 바뀐다)
+  const stage=backpackStage();
+  if(stage===0){R(ox-5,oy-19,10,8,'#d9a441');R(ox-4,oy-17,1,1,'#8a3b2a');R(ox+1,oy-15,1,1,'#8a3b2a');R(ox+3,oy-18,1,1,'#8a3b2a');R(ox-2,oy-21,4,2,'#b07d26');}
+  else if(stage===1){R(ox-5,oy-20,10,11,'#99733d');R(ox-4,oy-19,8,3,'#d9bc82');R(ox-4,oy-13,8,1,'#5c412a');}
+  else{const wood=stage===3?'#61462d':'#a37743';R(ox-6,oy-24,2,18,wood);R(ox+4,oy-24,2,18,wood);R(ox-5,oy-20,10,10,stage===3?'#a28661':'#c4a064');R(ox-6,oy-11,12,2,wood);}
+  R(ox-5,oy-21,1,4,'#6e4f22');R(ox+4,oy-21,1,4,'#6e4f22');
+  if(G?.forms?.length)drawStrapLeaf(ox,oy,1,-5,-17);
+  // 팔: 한쪽은 위로 뻗어 잡고, 다른 쪽은 어깨 아래를 짚는다
+  const armUp=[up<0?-9:6,-28,3,9],armDown=[up<0?6:-9,-21,3,5];
+  R(ox+armUp[0],oy+armUp[1],armUp[2],armUp[3],K);R(ox+armDown[0],oy+armDown[1],armDown[2],armDown[3],K);
+  // 뒤통수와 모자
+  R(ox-4,oy-23,8,4,Gy);R(ox-4,oy-21,8,1,Dk);
+  R(ox-7,oy-25,14,2,'#c39b55');R(ox-4,oy-29,8,4,'#dcbb7a');R(ox-4,oy-26,8,1,'#6e4f22');R(ox+2,oy-31,2,2,'#fbf7ee');
 }
 function zoneEdge(){
   const z=zoneDef();if(!z)return false;
@@ -543,6 +616,7 @@ function tryInteract(){
   else if(kind==='doors'){
     if(!pathOpen(p)){const say=typeof p.blockedSay==='function'?p.blockedSay():p.blockedSay;
       if(say)talk([['너구리',say]]);else toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
+    if((p.descend||p.ascend)&&startCrawl(p))return;
     changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});
   }else if(kind==='vistas')startVista(p);
   else if(kind==='stamps')findStamp(p);
