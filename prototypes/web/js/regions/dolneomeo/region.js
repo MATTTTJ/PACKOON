@@ -64,6 +64,8 @@ Rg.homeReply=[['너구리','(까치가 빈 약즙 통을 물고 돌아왔다.\n�
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({
+  eoksae_som:P=>{P(4,5,8,6,'#f6f1e2');P(3,7,10,3,'#fbf8ee');P(5,4,6,1,'#e6dcc4');P(6,11,4,2,'#e6dcc4');P(7,12,1,3,'#a8916a');P(6,6,1,1,'#ffffff');P(9,8,1,1,'#ffffff');},
+  seokcheong:P=>{P(3,9,10,5,'#6a625a');P(2,11,12,3,'#575049');P(5,6,6,5,'#d99a2b');P(6,5,4,1,'#e8b24a');P(6,7,2,2,'#f5cf6a');P(8,10,1,2,'#c4841c');P(10,4,2,2,'#3a3430');},
   eoksae:P=>{P(4,4,1,10,'#e8dcc0');P(7,2,1,12,'#efe6cf');P(10,3,1,11,'#e8dcc0');P(3,2,2,3,'#f6f0de');P(6,1,3,2,'#f6f0de');P(10,1,2,3,'#f6f0de');P(5,13,6,2,'#a8916a');},
   memil:P=>{P(6,4,4,2,'#3a3330');P(5,6,6,3,'#2b2522');P(6,9,4,2,'#3a3330');P(7,11,2,2,'#2b2522');P(7,5,1,2,'#6b625c');P(9,3,3,2,'#7a9a5a');},
   memil_powder:P=>{P(5,6,6,3,'#d8d2c6');P(6,5,4,1,'#ebe6dc');P(3,9,10,4,'#6b5a4a');P(4,13,8,1,'#4a3c30');P(4,9,8,1,'#8a7866');P(7,7,1,1,'#9a948a');},
@@ -80,8 +82,8 @@ defineIcons({
 
 /* 채집 (낫으로 억새 베기, 절벽의 석이버섯 떼기) */
 defineGather({
-  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 단이 더 베인다.'},
-  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-7],hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 장이 더 떨어진다.'},
+  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],rare:'eoksae_som',hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 단이 더 베인다.'},
+  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-7],rare:'seokcheong',hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 장이 더 떨어진다.'},
 });
 
 /* 증조할아버지의 맷돌: 돌쇠 할배의 돌 쌓기를 통과하면 깨어난다. 가공법은 heirlooms.csv */
