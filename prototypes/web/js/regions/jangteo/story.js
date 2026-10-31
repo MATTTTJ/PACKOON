@@ -858,12 +858,18 @@ Rg.goal=()=>{
   if(!G.started)return '';
   if(G.ended)return '큰 장터 체험판 완료';
   const toNight=s=>night()?s:'밤이 되면 '+s+' (숙소 마루에서 쉬자)';
+  // 결정 D-67: 앞선 진행부터 거꾸로 본다
+  if(G.boss.dead){
+    if(!CLASSIC&&has('hongsi_tteok'))return '숙소 처마의 까치 할머니께 홍시 약떡을 맡기자';
+    if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
+    return '보따리를 열고 시루에 눈홍시와 쌀가루를 넣어 홍시 약떡을 찌자';
+  }
+  if(F.bueongDone)return toNight('숙소 창고 문 앞을 지키자');
   if(!F.bueongNight)return night()?'처마 밑의 부엉 영감님께 말을 걸어 보자 (밤에는 깨어 계신다)':knows('bueong:night')?'숙소 마루에서 쉬며 해가 지기를 기다리자':'보부상 숙소의 부엉 영감님을 찾아가자';
   if(!F.bueongDone){
     if(has('patsirutteok'))return toNight('부엉 영감님께 팥시루떡을 올리자');
     if(!isAwake('siru')){
       if(!F.morakMet)return '김이 오르는 떡집의 모락을 찾아가자';
-      if(F.morakPowder)return '모락에게 김 올리기를 다시 배우자';
       const sp=G.inv.ssal_powder||0,s=G.inv.ssal||0;
       if(sp>=3)return '모락에게 쌀가루 3개를 건네자';
       if(sp+s>=3)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자 ('+sp+'/3)';
@@ -875,10 +881,7 @@ Rg.goal=()=>{
     if((G.inv.ssal_powder||0)<2)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
     return '보따리를 열고 시루에 쌀가루 2개와 팥 1개를 넣어 찌자';
   }
-  if(!G.boss.dead)return toNight('숙소 창고 문 앞을 지키자');
-  if(!CLASSIC&&has('hongsi_tteok'))return '숙소 처마의 까치 할머니께 홍시 약떡을 맡기자';
-  if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
-  return '보따리를 열고 시루에 눈홍시와 쌀가루를 넣어 홍시 약떡을 찌자';
+  return toNight('숙소 창고 문 앞을 지키자');
 };
 
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------

@@ -474,7 +474,10 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '단풍골 체험판 완료';
+  // 결정 D-67: 할 일은 가장 앞선 진행부터 거꾸로 본다. 변신으로 앞질러 가도 지금 상태에 맞는 일을 알려 준다.
   if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '할멈께 인사드리고 북쪽으로 떠나자';
+  if(G.boss.dead)return has('meoru')?'할멈께 해머루를 가져다드리자':'떨어진 해머루를 줍자';
+  if(G.barrier.cut||mapVisited(Rg.id,'hill'))return '당산나무의 엉킨 칡과 맞서자 (부수거나 달래거나)';
   if(!F.dodamTalk)return '마을 어귀의 도담에게 말을 걸어 보자';
   const ac=G.inv.acorn||0;
   const powderStep=()=>has('powder')?null:(ac<3?'도토리를 줍자 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개를 넣어 빻자');
@@ -488,10 +491,7 @@ Rg.goal=()=>{
     if(!has('root'))return '반짝이는 흙더미를 곡괭이로 쳐서 칡뿌리를 캐자';
     return '날쌘에게 도토리 가루와 칡뿌리를 건네자';
   }
-  if(!G.barrier.cut)return '마을 끝 칡덩굴을 낫으로 끊자';
-  if(!G.boss.dead)return '당산나무의 엉킨 칡과 맞서자 (부수거나 달래거나)';
-  if(G.drop)return '떨어진 해머루를 줍자';
-  return '할멈께 해머루를 가져다드리자';
+  return '마을 끝 칡덩굴을 낫으로 끊자';
 };
 
 /* PA-43: 첫 가을의 길손과 조사. classic은 위의 지도와 대사를 그대로 쓴다. */
@@ -898,14 +898,16 @@ if(!CLASSIC){
     const F=G.f;
     if(!G.started||G.ended)return oldGoal();
     if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '약을 보냈다 · 할멈께 인사드리고 북쪽으로 떠나자';
+    // 결정 D-67: 앞선 진행부터 본다. 다람쥐로 덩굴을 넘어 칡을 먼저 만나도 안내가 뒤처지지 않는다.
+    if(G.boss.dead)return has('meoru')?'언덕 끝 약초 귀환길로 내려가 늪가 약방의 할멈께 가자':'언덕에 떨어진 해머루를 줍자';
+    if(mapVisited(Rg.id,'hill'))return '당산나무 언덕의 엉킨 칡과 맞서자';
+    if(G.barrier.cut)return '당산나무 속을 올라 엉킨 칡을 만나자';
     if(!F.dodamTalk)return '참나무 숲의 도담을 찾아가자 · 대장간 길 오른쪽';
     if(F.dodamDone&&!F.musoeMet)return '대장간 길로 돌아가 무쇠 삼촌께 낫을 여쭤보자';
     if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내자 · 다시 말을 걸면 된다';
     if(F.dodamDone&&!F.musoeDone&&!has('coal')&&!F.nalTalk)return '대장간 오른쪽 좌판의 날쌘에게 숯을 구하자';
     if(!F.musoeDone&&F.nalTalk&&!F.nalDone&&!has('coal')&&!has('root'))return '대장간 길 · 날쌘 좌판 옆 반짝이는 흙더미를 캐자';
     if(F.musoeDone&&!G.barrier.cut)return '참나무 숲 안쪽 금줄의 덩굴을 낫으로 걷자';
-    if(G.barrier.cut&&!G.boss.dead)return '당산나무 속을 올라 엉킨 칡을 만나자';
-    if(G.boss.dead&&!G.drop)return '언덕 끝 약초 귀환길로 내려가 늪가 약방의 할멈께 가자';
     return oldGoal();
   };
 }

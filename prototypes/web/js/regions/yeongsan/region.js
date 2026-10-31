@@ -32,7 +32,7 @@ const Rg=defineRegion('yeongsan',{
   onStart(){
     Rg.arcsEnabled();
     diary('y_start','영산에 왔다. 눈이 허리까지 쌓였다. 산막에 불빛이 보인다.');
-    toast('산막의 불빛 쪽으로 가 보자');
+    // 결정 D-68: 첫 화면 안내는 '할 일' 한 줄만
   },
   // 마지막 가족 장면 위에는 점수를 띄우지 않는다 (단서 수는 아빠의 수첩에서 본다).
   endStats:()=>[],

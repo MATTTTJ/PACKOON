@@ -447,12 +447,13 @@ if(!CLASSIC){
     const oldGoal=Rg.goal;
     Rg.goal=()=>{
       if(!G.started||G.ended)return oldGoal();
-      if(has('darae_yak'))return '마을 돌담의 까치 할머니께 약즙을 맡기자 · 성황당 입구로 돌아가면 마을';
+      // 결정 D-67: 앞선 진행부터 본다. 할 일 줄에서 낱말이 끊기지 않게 짧게 쓴다.
+      if(has('darae_yak'))return '마을 돌담의 까치 할머니께 약즙을 맡기자';
+      if(G.boss.dead&&!G.f.daraePicked)return '성황당 끝 샛길 · 절벽 위 서리다래를 따자';
+      if(G.f.ppuriPassed&&!G.boss.dead)return '성황당 끝의 돌 골렘을 만나자 · 장승 사이로';
       if(!G.f.ppuriMet)return '장승 고갯길 · 뿔이에게 돌산 길을 묻자';
       if(!G.f.kkuTalk)return '돌담 마을을 지나 오른쪽 메밀밭의 꾸벅이를 찾아가자';
       if(!G.f.ppuriPassed&&has('memil_powder'))return '돌담 마을 돌계단 앞 · 뿔이에게 메밀가루를 건네자';
-      if(G.f.ppuriPassed&&!G.boss.dead)return '장승 사이나 마을 돌계단 안쪽으로 가서 성황당 끝의 돌 골렘을 만나자';
-      if(G.boss.dead&&!G.f.daraePicked)return '성황당 끝 샛길 → 절벽 위의 서리다래 · 흰 돌턱을 밟자';
       return oldGoal();
     };
   };

@@ -34,7 +34,7 @@ const Rg=defineRegion('jangteo',{
   onStart(){
     Rg.arcs();
     diary('j_start','큰 장터에 왔다. 붉은 등불과 떡 찌는 김. 그런데 밤마다 장터 물건이 없어진다고 한다. 보부상이니 숙소부터 들러 보자.');
-    toast('보부상 숙소부터 찾아보자');
+    // 결정 D-68: 첫 화면 안내는 '할 일' 한 줄만
   },
   next:'yeongsan',
   /* 뒤 지역부터 바로 시작할 때 큰 장터를 이렇게 마친 것으로 친다 (확인용 바로가기). 도깨비는 부순 것으로 (도깨비불씨·짚) */
@@ -46,6 +46,7 @@ const Rg=defineRegion('jangteo',{
     ['solbang','ssal','ssal_powder','pat','patsirutteok','dokkaebibul','nunhongsi','sinpyo','dad_memo'].forEach(id=>g.learned.push('got:'+id));
     ['morak','yeotbang','bueong'].forEach(id=>g.learned.push('met:'+id));g.learned.push('fight:dokkaebi','morak:steam','bueong:sinpyo');
     Object.assign(g.f,{bueongDone:true,steamDone:true,yeotDone:true,hongsiMade:true});g.boss.dead=true;g.ended=true;
+    if(!g.forms.includes('owl'))g.forms.push('owl');   // 결정 D-69
   },
   endStats:()=>[
     ['아빠 단서',G.clues.length+'/'+clueTotalSoFar()],
