@@ -114,6 +114,38 @@ const fieldDef=()=>zoneDef()||REG;
 const fieldWidth=()=>zoneDef()?zoneDef().w:REG.world;
 const fieldGround=()=>zoneDef()?.ground??GROUND;
 const fieldPlatforms=()=>fieldDef().platforms||[];
+/* 결정 D-48: 발판 무리는 오르락내리락한다 (사용자 피드백 2026-10-31 "난간이 너무 일정함").
+   두 칸 계단(낮은 단 → 높은 단)을 되풀이하던 자리를, 올라갔다가 다시 내려오는 n칸 무리로 바꾼다.
+   고정 시드라 열 때마다 같은 모양이다(저장·바닥 물건이 흔들리지 않는다). 한 번에 오르는 높이는 rise 안이라
+   점프(약 45px)로 닿는다. 첫 단은 low 근처라 땅에서 오른다. 물건·문이 놓인 발판은 지역 코드가 그대로 둔다. */
+/* 결정 D-50: 갈대·억새·풀의 흔들림 (사용자 피드백 2026-10-31 "갈대 흔들리는 게 이질적, 사인처럼, 속도도 은은하게 바뀌게").
+   바람 세기는 아주 느린 사인 셋의 합이라 세졌다 잦아들기를 되풀이한다. 줄기 흔들림은 사인 둘의 합이고,
+   위상이 느린 사인으로 밀려서 빠르기도 조금씩 바뀐다. 줄기마다 seed(세상 x)가 달라 같이 움직이지 않는다.
+   뿌리는 고정, 위로 갈수록 많이 휜다(높이 비율 frac의 제곱). 움직임 줄이기면 진폭을 1/4로 줄인다. 반환값은 가로 밀림 px. */
+function windSway(seed,frac,amp=3){
+  const t=G?G.anim:0,reduced=typeof Vfx!=='undefined'&&Vfx.reducedMotion;
+  const gust=.55+.25*Math.sin(t*.0023+seed*.011)+.12*Math.sin(t*.0061+1.7)+.08*Math.sin(t*.0137+.4);
+  const phase=t*.05+2.4*Math.sin(t*.0031+seed*.37)+seed*1.9;
+  const v=.78*Math.sin(phase)+.22*Math.sin(phase*1.83+seed);
+  return amp*(reduced?.25:1)*gust*v*frac*frac;
+}
+/* 휘는 줄기 하나: 아래(x,y)에서 위로 h px. 2px 마디마다 windSway만큼 밀어 그린다. 끝의 밀림을 돌려준다. */
+function swayStem(draw,x,y,h,seed,color,amp=3){
+  for(let k=0;k<h;k+=2)draw(x+Math.round(windSway(seed,k/h,amp)),y-k-2,1,2,color);
+  return Math.round(windSway(seed,1,amp));
+}
+function stepRidge(x,seed,n=4,{low=160,high=112,rise=30}={}){
+  let s=(seed*2654435761)>>>0;const rnd=()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296;
+  const top=1+Math.floor(rnd()*(n-1));
+  const out=[];let y=low-Math.round(rnd()*6),px=x;
+  for(let i=0;i<n;i++){
+    const w=Math.round(54+rnd()*40);out.push({x:Math.round(px),y,w});
+    px+=w+Math.round(rnd()*30)-8;
+    const step=Math.round(rise*.5+rnd()*rise*.5);
+    y=i<top?Math.max(high,y-step):Math.min(low+4,y+step);
+  }
+  return out;
+}
 function fieldCall(name,...args){const f=fieldDef()[name];return typeof f==='function'?f(...args):undefined;}
 function fieldItems(name){return G[name].filter(a=>usesZones(REG)?(a.zone||firstZone(REG))===G.zone:!a.zone);}
 function fieldNpcs(){
