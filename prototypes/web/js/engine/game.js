@@ -2,14 +2,18 @@
 /* 시작 화면, 끝 화면, 게임 루프, 부팅. 화면 글은 지역의 cover 에서 읽는다 */
 // 음악은 진행 상태를 읽기만 한다. 타이머·보상·저장용 G.f에는 관여하지 않는다.
 const GameMusic=(()=>{
-  // 결정 D-105: ACE-Step으로 만든 녹음 음원(시험판). 소리 설정의 '녹음 음원'을 켜면 이 곡들은 녹음으로 튼다.
-  // 만든 조건(모델·캡션·시드·기준 음원)은 design/data/music/README.md 의 "녹음 음원" 절.
-  // 결정 D-107: 다시 쓴 곡 아홉의 녹음판 (지역 넷 + 보스 다섯). 경치·장면 곡은 합성 그대로.
-  const RECORDINGS=Object.fromEntries(['danpunggol','dolneomeo','market_day','market_night','boss_kudzu','boss_golem','boss_dokkaebi','boss_steel','trial_iron'].map(id=>[id,'audio/bgm/'+id+'.ogg']));
+  // 결정 D-121: 배경 음악은 ACE-Step이 새로 지은 곡을 기본으로 튼다. 예전 cover 녹음(D-105~107)은 대체됐다.
+  // 만든 조건(모델·캡션·시드·고른 기준)은 design/data/music/README.md 의 "새 곡" 절.
+  // 결정 D-121: 합성 원곡을 따라 만든 녹음(cover, D-105~107)은 쓰지 않는다. 모든 곡을 ACE-Step이 새로 지은 '새 곡'으로 바꿨다.
+  const RECORDINGS={};
+  // 결정 D-121: 새 곡의 파일·판·반복 구간(초) 표. tools/audio/ace/finish-v5.sh가 js/data/new-music.js로 만든다.
+  const NEW_RECORDINGS=window.PACKOON_NEW_LOOPS||{};
   const RECORDED_KEY='packoon-music-recorded';
-  const player=PackoonMusic.createPlayer({...PackoonAudioData,sampleRate:22050,recordings:RECORDINGS});
-  try{player.setRecorded(localStorage.getItem(RECORDED_KEY)==='1');}catch(_){}
-  $('musicRecorded').checked=player.recordedOn;
+  const player=PackoonMusic.createPlayer({...PackoonAudioData,sampleRate:22050,recordings:RECORDINGS,newRecordings:NEW_RECORDINGS});
+  // 저장 값: off(합성) / new(새 곡). 기본은 새 곡이다. 파일을 못 읽는 곳(file://·OGG 못 읽는 브라우저)에서는 곡마다 합성으로 돌아간다.
+  player.setRecorded('new');
+  try{const v=localStorage.getItem(RECORDED_KEY);if(v==='off'||v==='0')player.setRecorded('off');}catch(_){}
+  $('musicRecorded').value=player.recordedMode;
   PackoonMusic.attachSound(Sound,player);
   const ids=new Set(PackoonAudioData.score.tracks.map(t=>t.id));
   const bosses={kudzu:'boss_kudzu',golem:'boss_golem',dokkaebi:'boss_dokkaebi',gangcheol:'boss_steel',musoe:'trial_iron'};
@@ -144,8 +148,10 @@ const GameMusic=(()=>{
   }
   function levelsFor(kind){
     const t=mood.tension,l=mood.longing,calm=kind==='battle'&&B?B.calm/100:0;
-    if(kind==='battle')return {base:1,longing:clamp(.8-.4*t+.6*calm,0,1.6),pulse:clamp(.4+1.2*t,0,1.7)};
-    return {base:1-.2*l,longing:clamp(.55+l-.3*t,0,1.6),pulse:clamp(.75+.9*t-.6*l,0,1.7)};
+    // 결정 D-121: mix는 새 곡 두 판(지역 calm→tense, 보스 base→climax)을 섞는 값이다. 보스는 핵심이 드러나거나 체력이 낮을 때(긴장 .75 이상) 절정판으로 넘어간다.
+    const ease=(a,b)=>{const x=clamp((t-a)/(b-a),0,1);return x*x*(3-2*x);};
+    if(kind==='battle')return {base:1,longing:clamp(.8-.4*t+.6*calm,0,1.6),pulse:clamp(.4+1.2*t,0,1.7),mix:ease(.6,.82)};
+    return {base:1-.2*l,longing:clamp(.55+l-.3*t,0,1.6),pulse:clamp(.75+.9*t-.6*l,0,1.7),mix:ease(.25,.7)};
   }
   function tempoStep(spec,kind){
     const t=mood.tension,s=spec.tempos;
@@ -159,7 +165,7 @@ const GameMusic=(()=>{
     for(const key of ['tension','longing'])mood[key]+=(goal[key]-mood[key])*.03;
     const now=player.getState(),spec=ADAPTIVE[now.id];
     if(!spec||!now.playing||now.loading||now.id!==target.id||!['region','battle'].includes(target.kind))return;
-    if(!now.layered){   // 길 위 간주처럼 층 없이 들어온 곡은 박을 이어 층 재생으로 바꾼다
+    if(!now.layered&&!now.recorded){   // 길 위 간주처럼 층 없이 들어온 곡은 박을 이어 층 재생으로 바꾼다(새 곡은 판 섞기만)
       adaptKind=target.kind;tempoNow=tempoStep(spec,target.kind);tempoAt=performance.now();applied=levelsFor(target.kind);
       player.play(now.id,{layers:spec.layers,tempo:tempoNow,levels:applied,keepBeat:true,crossfade:.3});return;
     }
@@ -180,11 +186,11 @@ const GameMusic=(()=>{
   addEventListener('packoon-sound-change',()=>setTimeout(update,0));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(update,0);});
   // 녹음 음원 켜고 끄기: 지금 곡을 처음부터 새로 틀게 한다(같은 곡이어도 합성↔녹음을 바꾼다).
-  function setRecorded(on){
-    player.setRecorded(on);try{localStorage.setItem(RECORDED_KEY,on?'1':'0');}catch(_){}
+  function setRecorded(mode){
+    player.setRecorded(mode);try{localStorage.setItem(RECORDED_KEY,player.recordedMode);}catch(_){}
     requested=undefined;pending=false;update();
   }
-  return {update,adapt,setScene,reset,getState,setRecorded,get recorded(){return player.recordedOn;},recordings:RECORDINGS,player};
+  return {update,adapt,setScene,reset,getState,setRecorded,get recorded(){return player.recordedOn;},get recordedMode(){return player.recordedMode;},recordings:RECORDINGS,newRecordings:NEW_RECORDINGS,player};
 })();
 function fillCover(){
   const C=REG.cover;
