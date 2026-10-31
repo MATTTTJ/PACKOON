@@ -71,6 +71,42 @@ function drawGangcheol(c){
   }
 }
 
+/* 결정 D-62: 모든 전투 배경은 상대 뒤쪽 화면 전체로 그린다 (design/data/decisions.csv).
+   강철이는 영산 호숫가. 지나는 곳마다 가뭄이 드는 악룡이라 겨울인데도 눈이 말랐다. 마른 겨울 산, 얼어붙은 호수, 금줄 두른 신목(잎 없는 가지),
+   물이 말라 갈라진 호숫가와 마른 갈대. */
+function drawFrozenLake(c){
+  const t=B.time,still=Vfx.reducedMotion,gy=BOX.y-52;
+  let g=c.createLinearGradient(0,0,0,gy);g.addColorStop(0,'rgba(150,168,186,.2)');g.addColorStop(1,'rgba(200,190,170,.06)');
+  c.save();c.fillStyle=g;c.fillRect(0,0,LW,gy);c.restore();
+  // 마른 겨울 산: 눈이 거의 없는 먹빛 능선, 꼭대기에만 얇은 눈
+  for(const [k,a,base,amp] of [[0,.1,gy*0.55,60],[1,.16,gy*0.78,40]]){
+    const pts=[];for(let x=-20;x<=LW+20;x+=24)pts.push([x,base-Math.abs(Math.sin(x*0.006+k*1.9))*amp-hash(x*0.07+k)*14]);
+    c.save();c.globalAlpha=a;c.fillStyle=INK;c.beginPath();c.moveTo(-20,gy);for(const p of pts)c.lineTo(p[0],p[1]);c.lineTo(LW+20,gy);c.closePath();c.fill();c.restore();
+    if(k===0)for(let i=1;i<pts.length-1;i++)if(pts[i][1]<pts[i-1][1]&&pts[i][1]<pts[i+1][1])brush(c,[[pts[i][0]-10,pts[i][1]+6],[pts[i][0],pts[i][1]+1],[pts[i][0]+10,pts[i][1]+6]],2,'#f4f2ec',0.7);
+  }
+  // 얼어붙은 호수: 지평선 앞의 넓은 얼음 띠와 금
+  const ly=gy-18,lh=34;
+  c.save();c.fillStyle='rgba(196,214,226,.42)';c.beginPath();c.ellipse(LW/2,ly,LW*0.48,lh,0,0,Math.PI*2);c.fill();c.restore();
+  c.save();c.strokeStyle=INK;c.globalAlpha=0.3;c.lineWidth=1.6;c.beginPath();c.ellipse(LW/2,ly,LW*0.48,lh,0,0,Math.PI*2);c.stroke();c.restore();
+  for(let i=0;i<7;i++){const x=LW*0.12+hash(i*4.3)*LW*0.76,y=ly-lh*0.5+hash(i*2.9)*lh;brush(c,[[x,y],[x+12,y+4],[x+22,y-2]],1,INK,0.22);}
+  if(!still){const k=(t*0.004)%1;c.save();c.globalAlpha=0.25;c.fillStyle='#ffffff';c.fillRect(LW*(0.1+k*0.8),ly-2,30,2);c.restore();}
+  // 갈라진 호숫가 바닥
+  c.save();c.fillStyle='rgba(176,150,112,.14)';c.fillRect(0,gy,LW,LH-gy);c.restore();
+  brush(c,[[0,gy+2],[LW*0.5,gy-2],[LW,gy+2]],4,INK,0.45);
+  for(let i=0;i<16;i++){const x=hash(i*5.7)*LW,y=gy+8+hash(i*1.7)*(LH-gy-16);brush(c,[[x,y],[x+8,y+3],[x+12,y-3],[x+20,y+1]],1,INK,0.16);}
+  // 신목: 오른쪽 끝, 잎 없이 비틀린 굵은 가지와 금줄
+  const sx=LW*0.96;   // 오른쪽 끝: 왼쪽 부위 글을 가리지 않게
+  brush(c,[[sx-18,gy],[sx-12,gy*0.6],[sx-4,gy*0.3]],16,INK,0.36);brush(c,[[sx+14,gy],[sx+8,gy*0.6],[sx-2,gy*0.3]],10,INK,0.32);
+  for(const [a,b,w] of [[[sx-6,gy*0.35],[sx-80,gy*0.1],6],[[sx-2,gy*0.3],[sx+30,gy*0.05],6],[[sx-40,gy*0.2],[sx-70,-6],3],[[sx-60,gy*0.15],[sx-110,gy*0.2],3],[[sx+16,gy*0.1],[sx+24,-8],2]])
+    brush(c,[a,[(a[0]+b[0])/2+8,(a[1]+b[1])/2-6],b],w,INK,0.3);
+  const ry=gy*0.86;brush(c,[[sx-24,ry],[sx,ry+8],[sx+20,ry]],3,'#6b5540',0.65);
+  for(let i=0;i<4;i++){const x=sx-16+i*11,y=ry+3+Math.sin(i/3*Math.PI)*5;c.save();c.fillStyle='rgba(250,246,236,.8)';c.fillRect(x-3,y,6,11);c.restore();brush(c,[[x-3,y],[x+3,y],[x+3,y+11],[x-3,y+11],[x-3,y]],1,INK,0.3);}
+  // 마른 갈대: 판정 상자 왼쪽 호숫가
+  for(let i=0;i<9;i++){const x=LW*0.2+i*LW*0.011,h=40+hash(i*3.3)*36,sw=still?0:Math.sin(t*0.02+i*0.7)*3;
+    brush(c,[[x,gy+4],[x+sw*0.5,gy-h*0.5],[x+sw,gy-h]],1.6,'#8a7048',0.6);blob(c,x+sw,gy-h-4,2.5,6,'#a88c5c',0.55);}
+  // 마른 바람에 날리는 흙먼지
+  if(!still)for(let i=0;i<8;i++){const x=(hash(i*2.1)*LW+t*(0.6+hash(i)*0.6))%(LW+60)-30,y=gy-10-hash(i*6.1)*60;brush(c,[[x,y],[x+18,y-2]],1,'#a88c5c',0.2);}
+}
 defineEnemies({
   gangcheol:{name:'강철이',calmLabel:'진정',coreNeeds:'body',
     intro:'[시험판] 서리 덮인 호수에 물김이 오른다. 넓은 흰 길을 따라 옆 샘으로 건너가자.',
@@ -88,6 +124,6 @@ defineEnemies({
     calmWin:'강철이가 서리를 거두고, 따뜻한 남쪽 바다를 향해 천천히 날아오른다.',calmGift:'frost_whisker',
     win:'여의주에 금이 가자 강철이가 호수를 놓고 물러난다.',
     lose:'눈보라에 휩쓸려 호숫가로 밀려났다.',
-    draw:drawGangcheol},
+    backdrop:drawFrozenLake,draw:drawGangcheol},
 });
 })();

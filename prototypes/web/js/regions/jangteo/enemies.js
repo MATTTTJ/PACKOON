@@ -77,6 +77,49 @@ function drawDokkaebi(c){
   }
 }
 
+/* 결정 D-62: 모든 전투 배경은 상대 뒤쪽 화면 전체로 그린다 (design/data/decisions.csv).
+   헌물 도깨비는 그믐밤 보부상 숙소 창고. 어둑한 판자벽과 대들보, 걸린 등불 하나, 헌 멍석·키·빗자루 더미와 설 대목 짐.
+   도깨비가 깃든 헌물은 앞에서 따로 그리므로, 뒤쪽 더미는 흐리게 둔다. */
+function drawStoreRoom(c){
+  const t=B.time,still=Vfx.reducedMotion,gy=BOX.y-52,WOOD='rgba(110,82,58,';
+  c.save();c.fillStyle='rgba(38,36,54,.2)';c.fillRect(0,0,LW,LH);c.restore();
+  // 판자벽과 대들보
+  c.save();c.fillStyle=WOOD+'.13)';c.fillRect(0,0,LW,gy);c.restore();
+  for(let x=18;x<LW;x+=38){brush(c,[[x,0],[x+(hash(x)*4-2),gy]],1.3,INK,0.16+hash(x*0.3)*0.08);}
+  brush(c,[[0,30],[LW,24]],10,'#4a3a2c',0.55);brush(c,[[0,30],[LW,24]],2,INK,0.5);
+  for(const x of [LW*0.04,LW*0.96])brush(c,[[x,0],[x,gy]],9,'#4a3a2c',0.45);
+  // 등불: 대들보에 걸린 붉은 종이 등과 따뜻한 빛
+  {const lx=LW*0.8,ly=78,fl=still?1:1+Math.sin(t*0.19)*0.05+Math.sin(t*0.47)*0.04;
+    const g=c.createRadialGradient(lx,ly,4,lx,ly,LW*0.3*fl);g.addColorStop(0,'rgba(236,178,92,.42)');g.addColorStop(0.45,'rgba(220,150,80,.14)');g.addColorStop(1,'rgba(220,150,80,0)');
+    c.save();c.fillStyle=g;c.fillRect(0,0,LW,LH);c.restore();
+    brush(c,[[lx,28],[lx,ly-18]],1.5,INK,0.6);
+    blob(c,lx,ly,14,18,RED,0.75);blob(c,lx,ly,7,11,'#f2b04a',0.75);
+    brush(c,[[lx-12,ly-16],[lx+12,ly-16]],3,INK,0.7);brush(c,[[lx-12,ly+16],[lx+12,ly+16]],3,INK,0.7);
+    brush(c,[[lx,ly+16],[lx,ly+28]],1.5,RED,0.7);}
+  // 바닥
+  c.save();c.fillStyle=WOOD+'.12)';c.fillRect(0,gy,LW,LH-gy);c.restore();
+  brush(c,[[0,gy],[LW,gy+2]],4,INK,0.5);
+  // 왼쪽: 말아 세운 헌 멍석들과 기대 놓은 빗자루
+  for(let i=0;i<3;i++){const x=LW*0.07+i*22,h=70-i*10;
+    c.save();c.fillStyle='rgba(176,148,96,.3)';c.fillRect(x-9,gy-h,18,h);c.restore();
+    brush(c,[[x-9,gy],[x-9,gy-h],[x+9,gy-h],[x+9,gy]],2.4,INK,0.5);blob(c,x,gy-h,9,4,'rgba(176,148,96,1)',0.35);
+    for(let k=1;k<5;k++)brush(c,[[x-8,gy-h*k/5],[x+8,gy-h*k/5+2]],1,INK,0.25);}
+  for(let i=0;i<2;i++){const x=LW*0.19+i*16;brush(c,[[x,gy-96],[x+14,gy-6]],3,'#6b5540',0.55);
+    for(let k=0;k<6;k++)brush(c,[[x+14,gy-14],[x+8+k*3,gy]],1.4,'#8a7048',0.5);}
+  // 기대 놓은 키(곡식 까부르는 바구니)
+  {const kx=LW*0.27,ky=gy-26;c.save();c.fillStyle='rgba(176,148,96,.3)';c.beginPath();c.ellipse(kx,ky,24,26,0.25,0,Math.PI*2);c.fill();c.restore();
+    c.save();c.strokeStyle=INK;c.globalAlpha=0.45;c.lineWidth=2;c.beginPath();c.ellipse(kx,ky,24,26,0.25,0,Math.PI*2);c.stroke();c.restore();
+    for(let k=-2;k<=2;k++)brush(c,[[kx+k*8-4,ky-22],[kx+k*7+4,ky+22]],1,INK,0.22);}
+  // 오른쪽: 설 대목 짐. 보자기로 싼 짐과 쌀가마
+  const sack=(x,y,w,h)=>{c.save();c.fillStyle='rgba(196,176,136,.3)';c.beginPath();c.ellipse(x,y-h/2,w/2,h/2,0,0,Math.PI*2);c.fill();c.restore();
+    c.save();c.strokeStyle=INK;c.globalAlpha=0.45;c.lineWidth=2;c.beginPath();c.ellipse(x,y-h/2,w/2,h/2,0,0,Math.PI*2);c.stroke();c.restore();
+    brush(c,[[x-w*0.4,y-h*0.35],[x+w*0.4,y-h*0.35]],1.4,INK,0.3);brush(c,[[x-w*0.4,y-h*0.65],[x+w*0.4,y-h*0.65]],1.4,INK,0.3);};
+  sack(LW*0.74,gy,54,40);sack(LW*0.83,gy,58,44);sack(LW*0.785,gy-36,48,34);
+  const bundle=(x,y,s,col)=>{c.save();c.fillStyle=col;c.fillRect(x-14*s,y-22*s,28*s,22*s);c.restore();
+    brush(c,[[x-14*s,y],[x-14*s,y-22*s],[x+14*s,y-22*s],[x+14*s,y]],2,INK,0.45);
+    brush(c,[[x-5*s,y-22*s],[x,y-30*s],[x+5*s,y-22*s]],2.4,INK,0.5);};
+  bundle(LW*0.92,gy,1.1,'rgba(180,67,42,.22)');bundle(LW*0.95,gy-26,0.8,'rgba(84,110,120,.2)');bundle(LW*0.66,gy,0.9,'rgba(84,110,120,.2)');
+}
 defineEnemies({
   dokkaebi:{name:'헌물 도깨비',calmLabel:'진정',
     intro:'[시험판] 불이 옮겨 간 헌물이 공격한다. 붓 자국을 읽고 피하자. 멍석부터 부숴 보자.',
@@ -95,6 +138,6 @@ defineEnemies({
     calmWin:'도깨비가 훔친 설 제수를 돌려놓고 눈홍시 하나를 더 얹는다. "고맙다, 고마워! 이 불씨도 네 거다!" 도깨비가 불씨를 건넨다.',calmGift:'nunhongsi',
     win:'도깨비불이 꺼지자 빗자루와 키와 멍석이 털썩 주저앉는다.',
     lose:'도깨비의 장난에 창고 밖으로 내동댕이쳐졌다.',
-    draw:drawDokkaebi},
+    backdrop:drawStoreRoom,draw:drawDokkaebi},
 });
 })();
