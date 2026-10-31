@@ -30,6 +30,7 @@ function notes(list, mode, base, opt = {}) {
 const sum = list => list.reduce((n, n2) => n + n2[1], 0);
 function check(list, beats, label) { if (Math.abs(sum(list) - beats) > 1e-6) throw new Error(label + ': 마디 길이 ' + sum(list) + ' ≠ ' + beats); return list; }
 
+// 결정 D-107: 보스 곡 4/4 몰이 (design/data/decisions.csv)
 /* ---------- 보스 곡: 4/4, 도입 4 + 반복 44마디 ---------- */
 // 반복 구간: A 8 · B 8 · 쉼 4 · 몰아 올림 4 · A′ 8 · C 8 · 이음 4
 const SECTIONS = [['A · 훅', 8], ['B · 주고받기', 8], ['쉼 · 숨 고르기', 4], ['몰아 올림', 4], ['A′ · 한 옥타브 위 훅', 8], ['C · 절정, 열린 끝음', 8], ['이음 · 처음으로', 4]];
@@ -156,6 +157,7 @@ function rebuildBoss(track, spec) {
   }
 }
 
+// 결정 D-106: 지역 곡 선율을 4마디 훅으로 (design/data/decisions.csv)
 /* ---------- 지역 곡: 선율·응답만 새 훅으로 (장단·북·저음은 그대로) ---------- */
 // 12박 기준(중모리 3·3·3·3). 12/8은 길이를 반으로 쓴다.
 const R12 = {
