@@ -13,7 +13,7 @@ const spring=()=>G.f.spring;
 // 결정 D-87: 호숫가 강철이에게 다가갈수록 긴장이 오른다. 봄이 오면(강철이가 떠나면) 0.
 Rg.moodTension=()=>{
   if(!G.started||G.boss.dead||spring()||(!CLASSIC&&G.zone!=='island'))return 0;
-  return clamp(1-(Math.abs(BOSS_AT-G.px)-60)/800,0,1);
+  return clamp(1-(Math.abs((CLASSIC?BOSS_AT:trimX(BOSS_AT,Rg.trimCuts?.island))-G.px)-60)/800,0,1);
 };
 
 /* ---------- 배경 ---------- */
@@ -146,6 +146,12 @@ Rg.SLOPE_X=SLOPE_X;Rg.TREE_X=TREE_X;
 /* ---------- PA-43: 침묵을 지나 봄으로. 구역 API만 쓰는 지역 확장 ---------- */
 if(!CLASSIC){
   Rg.startZone='shelter';
+  // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
+  // 산막: 능선 문(1860) 뒤 빈 발판. 눈길: 들어선 자리와 까마귀 사이, 능선 문 뒤. 신목 섬: 얼음길 1760px → 560px.
+  Rg.trimCuts={shelter:[[1960,480]],snow:[[300,400],[2230,330]],island:[[300,1200]]};
+  const isl=x=>trimX(x,Rg.trimCuts.island);
+  Rg.trimStateHook=s=>{if(s.boss)s.boss.x=isl(s.boss.x);};   // 강철이는 섬에 있다
+  Rg.trimMigrateHook=g=>{if(g.boss)g.boss.x=isl(g.boss.x);};
   const a=()=>Rg.expArt;
   const snowGate=()=>!!G.f.seolpi;
   const ledgeGate=()=>!!G.f.shortcut;
@@ -258,9 +264,9 @@ if(!CLASSIC){
     reason:'얼음길이 물에 잠겼다. 오른쪽 선착장에서 배를 타자.'};
   Rg.zones.island.step=()=>{
     stepCommon();
-    if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT)Rg.startGangcheol();
+    if(!G.boss.dead&&G.f.sangunMet&&G.px>isl(BOSS_AT))Rg.startGangcheol();
   };
-  Rg.zones.island.maxX=()=>G.f.sangunMet?2584:BOSS_AT-30;
+  Rg.zones.island.maxX=()=>G.f.sangunMet?2584:BOSS_AT-30;   // trimRegion이 이 값도 섬 좌표로 옮긴다
   // 겨울에는 얼음길, 봄에는 배로 같은 선착장을 잇는다.
   // 호수는 이동 문 너머에 두므로 해빙 뒤 물 위를 걷지 않는다.
   const oldSpring=Rg.bringSpring;
@@ -268,7 +274,7 @@ if(!CLASSIC){
     // 겨울에 먼저 바라봤어도 해빙 뒤의 혼잣말은 한 번 새로 들려준다.
     if(G.f.vistasSeen)delete G.f.vistasSeen['yeongsan:spring_tree'];
     oldSpring();
-    const fruit=G.pickups[G.pickups.length-1];fruit.id='island_legend_fruit';fruit.zone='island';
+    const fruit=G.pickups[G.pickups.length-1];fruit.id='island_legend_fruit';fruit.zone='island';fruit.x=isl(fruit.x);
     diary('y_boat','얼음이 녹자 걸어서 건너온 얼음길이 물에 잠겼다. 호숫가로 돌아가려면 이제 배가 있어야 한다.');
   };
   Rg.zones.snow.vistas=[{id:'snow_ridge',x:1600,y:108,from:0,to:640,sound:'wind',draw:sign,

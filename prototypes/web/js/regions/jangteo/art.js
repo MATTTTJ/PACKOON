@@ -209,10 +209,10 @@ function drawPlatforms(id){
 function drawScenery(id){
   const t=tone();
   if(id==='entrance'){
-    for(let wx=160,i=0;wx<2800;wx+=175,i++){const x=wx-cam;if(x<-110||x>W+110)continue;if(i%2===0){const h=32+(i%4)*5;house(x,GROUND-h,72+(i%3)*11,h,n(),undefined,i/2);}else{bundle(x,GROUND,wx);flag(x+38,GROUND,39+i%3*8);}}
-    jangseung(125-cam,GROUND,1);jangseung(242-cam,GROUND,-1);flag(720-cam,GROUND,96);
+    for(let wx=160,i=0;wx<2800;wx+=175,i++){const x=tx(wx)-cam;if(x<-110||x>W+110)continue;if(i%2===0){const h=32+(i%4)*5;house(x,GROUND-h,72+(i%3)*11,h,n(),undefined,i/2);}else{bundle(x,GROUND,wx);flag(x+38,GROUND,39+i%3*8);}}
+    jangseung(tx(125)-cam,GROUND,1);jangseung(tx(242)-cam,GROUND,-1);flag(tx(720)-cam,GROUND,96);
     // 연줄이 낮은 상자에서 처마로 이어져 안전한 첫 오르기를 알린다.
-    if(!G.f.jxKiteFreed){const kx=1200-cam;P(kx-5,89,10,12,'#795444');P(kx-8,92,16,6,'#795444');P(kx-1,88,2,14,'#795444');P(kx-6,93,12,4,'#efe1bb');P(kx-4,90,8,10,'#efe1bb');P(kx-1,90,2,10,'#b75745');P(kx-4,94,8,2,'#bc5946');
+    if(!G.f.jxKiteFreed){const kx=tx(1200)-cam;P(kx-5,89,10,12,'#795444');P(kx-8,92,16,6,'#795444');P(kx-1,88,2,14,'#795444');P(kx-6,93,12,4,'#efe1bb');P(kx-4,90,8,10,'#efe1bb');P(kx-1,90,2,10,'#b75745');P(kx-4,94,8,2,'#bc5946');
       for(let j=0;j<16;j++){const xx=kx-j*4,yy=102+j*2;P(xx,yy,1,2,'#a58f76');}P(kx-8,103,2,12,'#c9604b');P(kx-7,114,4,2,'#c9604b');}
   }else if(id==='street'){
     for(let wx=170,i=0;wx<2800;wx+=185,i++){const x=wx-cam;if(x<-110||x>W+110)continue;stall(x,GROUND,i);if(i%2===0){P(x+100,GROUND-31,4,31,t.wood);lantern(x+102,GROUND-32);}}
@@ -250,16 +250,16 @@ function drawScenery(id){
     const x=2410-cam;P(x-20,96,340,96,n()?'#53616f':'#929eaa');P(x-25,102,345,90,n()?'#53616f':'#929eaa');P(x-19,94,339,3,t.snow);P(x-11,109,4,57,n()?'#3a4b5d':'#798d9a');
     for(let j=0;j<5;j++)P(x+21+j*3,118+j*3,2,1,'#817a73');P(x-4,91,9,3,'#9b8770');
   }else if(id==='warehouse'){
-    for(let wx=120,i=0;wx<2800;wx+=190,i++){const x=wx-cam;if(x<-130||x>W+130)continue;const w=95+i%3*9,h=42+i%3*7;house(x,GROUND-h,w,h,false,undefined,i);P(x+12,GROUND-36,w-24,33,n()?'#51464a':'#8c6c51');for(let j=0;j<(w-24)/11;j++)P(x+15+j*11,GROUND-34,1,29,t.wood);bundle(x+138,GROUND,i);}
-    const x=2320-cam;house(x-64,GROUND-60,128,60,false);P(x-22,GROUND-42,44,42,'#2c2c35');P(x-1,GROUND-42,2,42,'#776154');P(x-8,GROUND-24,16,3,'#b19c73');
+    for(let wx=120,i=0;wx<2800;wx+=190,i++){const x=tx(wx)-cam;if(x<-130||x>W+130)continue;const w=95+i%3*9,h=42+i%3*7;house(x,GROUND-h,w,h,false,undefined,i);P(x+12,GROUND-36,w-24,33,n()?'#51464a':'#8c6c51');for(let j=0;j<(w-24)/11;j++)P(x+15+j*11,GROUND-34,1,29,t.wood);bundle(x+138,GROUND,i);}
+    const x=tx(2320)-cam;house(x-64,GROUND-60,128,60,false);P(x-22,GROUND-42,44,42,'#2c2c35');P(x-1,GROUND-42,2,42,'#776154');P(x-8,GROUND-24,16,3,'#b19c73');
     if(n()&&!G.boss.dead){P(x-18,GROUND-29,3,3,'#89cbd3');P(x+13,GROUND-36,4,4,'#acdce0');P(x-16,GROUND-25,1,2,'#d7e7d7');}
     if(G.boss.dead){bundle(x-44,GROUND,1);bundle(x+43,GROUND,0);P(x+48,GROUND-19,1,15,'#bfa172');P(x+45,GROUND-7,7,5,'#ad8b54');}
   }
   drawPlatforms(id);
   // 조사 글의 대상은 실제 생활 물건으로도 알아볼 수 있게 둔다.
   if(id==='entrance'){
-    const x=240-cam;P(x-6,GROUND-14,12,8,'#ac8b62');P(x-2,GROUND-18,4,8,'#d1b184');P(x-7,GROUND-15,6,3,'#ccbe95');P(x+1,GROUND-18,6,3,'#ccbe95');
-    if(!Rg.springRevisit()){const sx=1680-cam;P(sx-10,GROUND-11,20,11,t.snow);P(sx-7,GROUND-19,14,10,t.snow);P(sx-4,GROUND-18,1,1,'#4c4843');P(sx+3,GROUND-18,1,1,'#4c4843');P(sx,GROUND-14,7,2,'#aa7251');}
+    const x=tx(240)-cam;P(x-6,GROUND-14,12,8,'#ac8b62');P(x-2,GROUND-18,4,8,'#d1b184');P(x-7,GROUND-15,6,3,'#ccbe95');P(x+1,GROUND-18,6,3,'#ccbe95');
+    if(!Rg.springRevisit()){const sx=tx(1680)-cam;P(sx-10,GROUND-11,20,11,t.snow);P(sx-7,GROUND-19,14,10,t.snow);P(sx-4,GROUND-18,1,1,'#4c4843');P(sx+3,GROUND-18,1,1,'#4c4843');P(sx,GROUND-14,7,2,'#aa7251');}
   }else if(id==='street'){
     const x=1150-cam;P(x-7,GROUND-11,15,11,'#9a8267');P(x-5,GROUND-14,11,4,'#e4dbbb');P(x-3,GROUND-16,7,3,'#f3eee1');P(x-5,GROUND-7,11,1,'#c4aa7e');
     const yx=2130-cam;P(yx-16,GROUND-10,32,9,'#7d624b');P(yx-14,GROUND-12,28,2,'#cbb184');for(let j=0;j<4;j++)P(yx-10+j*6,GROUND-16+j%2,4,3,'#dfc898');
@@ -269,8 +269,8 @@ function drawScenery(id){
     const x=1870-cam;for(let j=0;j<7;j++){P(x-12+j*4,GROUND-2-j%2,4,1,'#9b8357');P(x-10+j*4,GROUND-3,1,3,'#78684c');}
     const sx=2280-cam;P(sx-3,122,6,5,'#b9aa89');P(sx-5,124,10,2,'#786e58');
   }else if(id==='warehouse'){
-    const x=400-cam;for(let j=0;j<3;j++){P(x-9+j*5,GROUND-8,3,7,'#aa8c59');P(x-10+j*5,GROUND-10,6,2,'#ccb17b');}P(x-10,GROUND-2,17,2,'#7e6846');
-    const mx=2470-cam;P(mx-17,121,34,7,'#ac9667');P(mx-17,120,34,2,'#d4be86');for(let j=0;j<8;j++)P(mx-15+j*4,122,1,5,'#816e4e');P(mx-12,117,24,3,'#c4aa73');
+    const x=tx(400)-cam;for(let j=0;j<3;j++){P(x-9+j*5,GROUND-8,3,7,'#aa8c59');P(x-10+j*5,GROUND-10,6,2,'#ccb17b');}P(x-10,GROUND-2,17,2,'#7e6846');
+    const mx=tx(2470)-cam;P(mx-17,121,34,7,'#ac9667');P(mx-17,120,34,2,'#d4be86');for(let j=0;j<8;j++)P(mx-15+j*4,122,1,5,'#816e4e');P(mx-12,117,24,3,'#c4aa73');
   }
 }
 function drawFront(id){

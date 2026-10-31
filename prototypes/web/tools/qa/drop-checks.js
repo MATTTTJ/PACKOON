@@ -42,6 +42,11 @@ async function runDropCheck({browser:b,outDir,name}){
         // Test every declared zone, platform and both ends, independently of visual animation.
         const checked=await b.eval(`(()=>{const out=[];const start=G.zone;const zones=usesZones(REG)?Object.keys(REG.zones):[null];for(const zone of zones){if(zone!==G.zone){G.zone=zone;G.py=fieldGround();}const sources=[{x:20,y:fieldGround()},{x:fieldWidth()-20,y:fieldGround()},...fieldPlatforms().slice(0,4).map(p=>({x:p.x+p.w/2,y:p.y}))];for(const source of sources)spawnDrops('root',4,source);const rows=floorDrops().filter(a=>!a.got);const max=fieldDef().maxX?fieldCall('maxX'):fieldWidth()-16;const invalid=rows.filter(a=>!Number.isFinite(a.x)||!Number.isFinite(a.y)||a.x<16||a.x>max+0.001||!(Math.abs(a.y-fieldGround())<0.001||fieldPlatforms().some(p=>Math.abs(a.y-p.y)<0.001&&a.x>=p.x&&a.x<=p.x+p.w))||!validDropSurface(a));const overlaps=[];for(let i=0;i<rows.length;i++)for(let k=i+1;k<rows.length;k++)if(Math.hypot(rows[i].x-rows[k].x,rows[i].y-rows[k].y)<TABLES.TUNING.drop_min_spacing-0.001)overlaps.push([rows[i].id,rows[k].id]);out.push({zone,count:rows.length,max,invalid,overlaps,rows:structuredClone(rows)});}G.zone=start;return out;})()`);
         for(const z of checked)if(z.invalid.length||z.overlaps.length)findings.push(fail(name,`${mode}/${region}/${z.zone}: 유효 바닥 또는 최소 간격 위반`,z));
+        // 결정 D-110: 같은 구역 발판끼리 가로로 겹치고(사이 6px 미만) 세로 차이가 48px 미만이면 포개져 보인다.
+        if(mode==='expanded'){
+          const stacked=await b.eval(`(()=>{const out=[];for(const [zone,z] of Object.entries(REG.zones||{})){const ps=(z.platforms||[]).slice().sort((a,b)=>a.x-b.x);for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const a=ps[i],c=ps[j],ov=Math.min(a.x+a.w,c.x+c.w)-Math.max(a.x,c.x),dy=Math.abs(a.y-c.y);if(ov>-PLAT_GAP&&dy<PLAT_STACK)out.push({zone,a:[a.x,a.y,a.w],b:[c.x,c.y,c.w],overlap:ov,dy});}}return out;})()`);
+          if(stacked.length)findings.push(fail(name,`${mode}/${region}: 포개진 발판 ${stacked.length}쌍`,{stacked}));
+        }
         if(before.records.length!==4)findings.push(fail(name,`${mode}/${region}: 보상 4개가 별도 아이템으로 생성되지 않았다.`,before));
         records.push({mode,region,before,checked});
       }else if(name==='drops-persistence'){

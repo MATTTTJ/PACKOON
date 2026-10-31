@@ -246,28 +246,28 @@ A.scenery=zone=>{
     }
   }
   if(zone==='shelter'){
-    hut(260-cam,GROUND);sign(2200-cam,GROUND);
+    hut(260-cam,GROUND);sign(Rg.zones?.shelter?.w?Rg.zones.shelter.w-400-cam:2200-cam,GROUND);   // 오른쪽 끝에서 400 (D-109로 너비가 줄어도 끝에 둔다)
     // 높은 대피소 별채는 오래된 문설주만 남았다. 도장을 찾는 위치와 맞춘다.
-    const post=1040-cam;px(post-19,108-38,5,38,'#7b6a59');px(post+15,108-38,5,38,'#7b6a59');
+    const post=tx(1040)-cam;px(post-19,108-38,5,38,'#7b6a59');px(post+15,108-38,5,38,'#7b6a59');
     px(post-23,108-42,47,5,'#d9e4eb');px(post-18,108-35,4,11,'#b7a68f');
-    px(1630-cam,GROUND-17,80,17,'#667a86');px(1627-cam,GROUND-20,86,4,'#e0eaf0');
-    px(1653-cam,GROUND-12,33,12,'#333e50');px(1657-cam,GROUND-10,25,2,'#a3b6c8');
-    px(2091-cam,GROUND-14,18,14,'#7c7a70');px(2088-cam,GROUND-17,24,4,'#dbe7ed');
-    for(let i=0;i<4;i++)px(2096-cam+i*3,GROUND-24-i*8,8+i*2,2,'#a5b2bf');
+    px(tx(1630)-cam,GROUND-17,80,17,'#667a86');px(tx(1627)-cam,GROUND-20,86,4,'#e0eaf0');
+    px(tx(1653)-cam,GROUND-12,33,12,'#333e50');px(tx(1657)-cam,GROUND-10,25,2,'#a3b6c8');
+    px(tx(2091)-cam,GROUND-14,18,14,'#7c7a70');px(tx(2088)-cam,GROUND-17,24,4,'#dbe7ed');
+    for(let i=0;i<4;i++)px(tx(2096)-cam+i*3,GROUND-24-i*8,8+i*2,2,'#a5b2bf');
   }
   if(zone==='snow'){
-    sign(1780-cam,108);rock(2000-cam,GROUND,99,30);
-    px(1079-cam,GROUND-1,42,1,'#8ca6bd');px(1087-cam,GROUND-3,2,3,'#8ca6bd');px(1102-cam,GROUND-5,2,5,'#8ca6bd');
-    px(1107-cam,GROUND-4,7,1,'#52677e');px(1111-cam,GROUND-6,3,3,'#52677e');
-    if(G.f.yCrowMap)for(let i=0;i<8;i++)px(1080-cam+i*5,GROUND-2-Math.round(Math.sin(i*.7)*3),6,1,'#667e98');
-    sign(2100-cam,GROUND);for(let i=0;i<5;i++)px(2098-cam,GROUND-5-i*5,6,1,'#5a5d64');
+    sign(tx(1780)-cam,108);rock(tx(2000)-cam,GROUND,99,30);
+    px(tx(1079)-cam,GROUND-1,42,1,'#8ca6bd');px(tx(1087)-cam,GROUND-3,2,3,'#8ca6bd');px(tx(1102)-cam,GROUND-5,2,5,'#8ca6bd');
+    px(tx(1107)-cam,GROUND-4,7,1,'#52677e');px(tx(1111)-cam,GROUND-6,3,3,'#52677e');
+    if(G.f.yCrowMap)for(let i=0;i<8;i++)px(tx(1080)-cam+i*5,GROUND-2-Math.round(Math.sin(i*.7)*3),6,1,'#667e98');
+    sign(tx(2100)-cam,GROUND);for(let i=0;i<5;i++)px(tx(2098)-cam,GROUND-5-i*5,6,1,'#5a5d64');
     // 가지가 눈 지붕을 받친다. 설피를 얻으면 파란 다짐길이 안쪽까지 이어진다.
-    px(220-cam,GROUND-28,60,5,'#e6eef2');px(225-cam,GROUND-35,50,7,'#eff5f5');
-    px(220-cam,GROUND-23,7,23,'#c4d5e2');px(274-cam,GROUND-23,7,23,'#c4d5e2');
-    px(226-cam,GROUND-24,49,3,'#7d7365');
-    if(G.f.seolpi){px(227-cam,GROUND-2,47,2,'#8ca8be');for(let i=0;i<5;i++)px(232-cam+i*8,GROUND-3,4,1,'#627f9a');}
+    px(tx(220)-cam,GROUND-28,60,5,'#e6eef2');px(tx(225)-cam,GROUND-35,50,7,'#eff5f5');
+    px(tx(220)-cam,GROUND-23,7,23,'#c4d5e2');px(tx(274)-cam,GROUND-23,7,23,'#c4d5e2');
+    px(tx(226)-cam,GROUND-24,49,3,'#7d7365');
+    if(G.f.seolpi){px(tx(227)-cam,GROUND-2,47,2,'#8ca8be');for(let i=0;i<5;i++)px(tx(232)-cam+i*8,GROUND-3,4,1,'#627f9a');}
     // 어귀에서 보였던 두 봉우리 사이의 길. 붉은 천은 멀리서도 같은 자리다.
-    px(1996-cam,GROUND-64,4,34,'#776354');px(2000-cam,GROUND-63,15,8,'#c38178');
+    px(tx(1996)-cam,GROUND-64,4,34,'#776354');px(tx(2000)-cam,GROUND-63,15,8,'#c38178');
   }
   if(zone==='slope'){
     rowan(250-cam,GROUND);
@@ -290,23 +290,23 @@ A.scenery=zone=>{
     for(let i=0;i<6;i++){px(2058-cam+i*9,GROUND-2,4,2,'#8195a6');px(2061-cam+i*9,GROUND-5,2,2,'#8195a6');}
   }
   if(zone==='island'){
-    const x=2236-cam;px(x-117,GROUND-4,234,9,pink()?'#93a18c':'#dce8ed');
+    const x=tx(2236)-cam;px(x-117,GROUND-4,234,9,pink()?'#93a18c':'#dce8ed');
     px(x-95,GROUND-8,190,4,pink()?'#b6bea2':'#edf3f3');sacredTree(x,GROUND,pink());
     if(pink()){azalea(x-98,GROUND,.85,3);azalea(x+96,GROUND,.65,14);}
-    boat(160-cam,GROUND+20);
-    px(234-cam,GROUND-21,3,21,'#7b6a57');px(265-cam,GROUND-24,3,24,'#7b6a57');
-    for(let i=0;i<7;i++)px(236-cam+i*4,GROUND-20-i%3,5,2,'#d5c397');
-    for(let i=0;i<3;i++){px(241-cam+i*8,GROUND-18,2,7,'#f1ece0');px(241-cam+i*8,GROUND-12,4,2,'#f1ece0');}
+    boat(tx(160)-cam,GROUND+20);
+    px(tx(234)-cam,GROUND-21,3,21,'#7b6a57');px(tx(265)-cam,GROUND-24,3,24,'#7b6a57');
+    for(let i=0;i<7;i++)px(tx(236)-cam+i*4,GROUND-20-i%3,5,2,'#d5c397');
+    for(let i=0;i<3;i++){px(tx(241)-cam+i*8,GROUND-18,2,7,'#f1ece0');px(tx(241)-cam+i*8,GROUND-12,4,2,'#f1ece0');}
     // 같은 뿌리가 신목에서 입구 쪽으로 이어진다. 끊긴 통나무로 보이지 않게 연결한다.
-    for(let wx=1070;wx<2240;wx+=5){const yy=GROUND+3+Math.round(Math.sin(wx*.018)*2);px(wx-cam,yy,6,4,'#73614f');px(wx-cam,yy,5,1,'#b7a287');}
-    for(let i=0;i<7;i++)px(1096-cam-i*4,GROUND-i*2,5,3,'#73614f');
-    if(pink())for(let i=0;i<7;i++)px(1075-cam+i*7,GROUND+9+i%2*2,5,1,'#c0dbe1');
-    else{px(1069-cam,GROUND-1,33,1,'#d7e8eb');px(1080-cam,GROUND+7,35,1,'#c4d9e3');}
+    for(let wx=1070;wx<2240;wx+=5){const yy=GROUND+3+Math.round(Math.sin(wx*.018)*2);px(tx(wx)-cam,yy,6,4,'#73614f');px(tx(wx)-cam,yy,5,1,'#b7a287');}
+    for(let i=0;i<7;i++)px(tx(1096)-cam-i*4,GROUND-i*2,5,3,'#73614f');
+    if(pink())for(let i=0;i<7;i++)px(tx(1075)-cam+i*7,GROUND+9+i%2*2,5,1,'#c0dbe1');
+    else{px(tx(1069)-cam,GROUND-1,33,1,'#d7e8eb');px(tx(1080)-cam,GROUND+7,35,1,'#c4d9e3');}
     // 낮게 뻗은 가지가 조사 자리까지 닿는다. 겨울눈이 같은 자리에서 새잎이 된다.
-    px(2100-cam,GROUND-72,129,4,'#66514b');px(2100-cam,GROUND-82,3,11,'#66514b');
-    px(2109-cam,GROUND-78,3,7,'#66514b');px(2099-cam,GROUND-85,5,4,pink()?'#9dbb76':'#9b7c75');
-    px(2108-cam,GROUND-81,5,4,pink()?'#9dbb76':'#9b7c75');
-    if(pink()){px(2097-cam,GROUND-86,9,3,'#d1dfa1');px(2105-cam,GROUND-83,10,3,'#d1dfa1');}
+    px(tx(2100)-cam,GROUND-72,129,4,'#66514b');px(tx(2100)-cam,GROUND-82,3,11,'#66514b');
+    px(tx(2109)-cam,GROUND-78,3,7,'#66514b');px(tx(2099)-cam,GROUND-85,5,4,pink()?'#9dbb76':'#9b7c75');
+    px(tx(2108)-cam,GROUND-81,5,4,pink()?'#9dbb76':'#9b7c75');
+    if(pink()){px(tx(2097)-cam,GROUND-86,9,3,'#d1dfa1');px(tx(2105)-cam,GROUND-83,10,3,'#d1dfa1');}
   }
 };
 A.ridgeLayers=[

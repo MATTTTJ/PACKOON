@@ -232,18 +232,18 @@ if(!CLASSIC){
       const x=1530-cam*.35;px(x-3,91,6,44,'#6b5340');px(x-23,77,42,19,'#bd7944');px(x-14,68,30,14,'#d28c4b');
       house(70-cam);house(220-cam,GROUND,.8,false,2);well(440-cam);
       house(1098-cam,GROUND,.78,false,1);wheel(1050-cam);
-      for(const x of [330,590,1200,1560,1980,2320])if(visible(x-cam)){
-        fence(x-cam,GROUND,3);if(x!==590)basket(x-cam+53);
-      }
+      for(const u of [330,590,1200,1560,1980,2320]){const x=tx(u);if(visible(x-cam)){   // tx: 줄인 구역 좌표 (D-109)
+        fence(x-cam,GROUND,3);if(u!==590)basket(x-cam+53);
+      }}
     }else if(zone==='forge'){
       house(1010-cam,GROUND,1.65,false,1);px(1030-cam,GROUND-31,30,31,'#352b26');
       px(1048-cam,GROUND-40,10,9,'#dda25f');px(1051-cam,GROUND-37,4,6,'#ffe1a0');
       // Bellows charcoal and split wood belong beside the working forge.
-      for(const u of [450,820,1230,1760,2120,2410]){const x=u-cam;if(!visible(x))continue;
+      for(const u of [450,820,1230,1760,2120,2410]){const x=tx(u)-cam;if(!visible(x))continue;
         px(x,GROUND-7,24,7,'#725034');px(x+4,GROUND-11,20,4,'#9b7447');px(x+9,GROUND-15,12,4,'#bd945b');
         for(let i=0;i<3;i++)px(x+3+i*7,GROUND-6,3,3,'#c39c67');}
-      fence(1500-cam,GROUND,6);px(1535-cam,GROUND-29,73,5,'#a2573b');px(1541-cam,GROUND-33,61,4,'#c2804c');
-      px(1540-cam,GROUND-24,3,24,'#5a3c2a');px(1600-cam,GROUND-24,3,24,'#5a3c2a');
+      fence(tx(1500)-cam,GROUND,6);px(tx(1535)-cam,GROUND-29,73,5,'#a2573b');px(tx(1541)-cam,GROUND-33,61,4,'#c2804c');
+      px(tx(1540)-cam,GROUND-24,3,24,'#5a3c2a');px(tx(1600)-cam,GROUND-24,3,24,'#5a3c2a');
     }else if(zone==='forest'){
       for(const [i,u] of [180,550,1040,1420,1910,2390,2700].entries())
         tree(u-cam,GROUND,1.1+hash(u+15)*.48,i%3?'#c57a38':'#ab5735',false,i%3);
@@ -303,7 +303,7 @@ if(!CLASSIC){
         for(let i=0;i<3;i++){px(sx+11+i*3,GROUND-24,1,2,'#725032');px(sx+12+i*3,GROUND-22,1,2,'#725032');}
       }
       for(let i=0;i<3;i++){const x=1008-cam+i*9;px(x,GROUND-90-i*8,5,3,'#d3b9a0');px(x+2,GROUND-95-i*8,4,3,'#d3b9a0');}
-      for(const u of [1340,1830]){const x=u-cam;px(x-6,GROUND-11,12,11,'#514132');px(x-8,GROUND-12,16,2,'#a18b62');px(x-4,GROUND-14,8,2,'#3f3934');}
+      for(const u of [1340,1830]){const x=tx(u)-cam;px(x-6,GROUND-11,12,11,'#514132');px(x-8,GROUND-12,16,2,'#a18b62');px(x-4,GROUND-14,8,2,'#3f3934');}
       Rg.expArt.marker(230-cam,GROUND);
       // The siblings' low sorting board holds their own winter stores.
       const bx=810-cam;px(bx-28,GROUND-10,57,4,'#ae8550');px(bx-25,GROUND-6,4,6,'#755332');px(bx+21,GROUND-6,4,6,'#755332');
@@ -321,7 +321,7 @@ if(!CLASSIC){
         px(bx-26,GROUND-6,3,6,'#694a30');px(bx+23,GROUND-6,3,6,'#694a30');
         px(bx+13,GROUND-6,2,6,'#6c4f32');
       }
-      const kx=1860-cam;
+      const kx=tx(1860)-cam;
       px(kx-22,GROUND-19,44,19,'#87745a');px(kx-17,GROUND-25,34,6,'#9b8767');px(kx-11,GROUND-29,22,4,'#ad9672');
       px(kx-9,GROUND-11,18,11,'#3c3932');px(kx-5,GROUND-5,10,4,'#8d8b7b');px(kx-17,GROUND-7,6,2,'#c1b79a');
     }

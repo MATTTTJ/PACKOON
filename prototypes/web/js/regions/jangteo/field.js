@@ -104,6 +104,11 @@ Rg.STORE_X=STORE_X;
    지붕길과 밤 골목은 선택 지름길이다. 아래 눈길은 언제나 안전하게 이어진다. */
 if(!CLASSIC){
   Rg.startZone='entrance';Rg.STORE_X=2320;
+  // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
+  // 장터 입구: 연줄 문(1310) 뒤 빈 길 1290px → 410px (물건 없는 발판 무리를 지운다). 숙소 창고: 빈 마당과 빈 발판 무리 두 곳을 지운다.
+  Rg.trimCuts={entrance:[[1400,880]],warehouse:[[800,900],[1800,380]]};
+  Rg.trimHook=tX=>{Rg.STORE_X=tX(Rg.STORE_X,Rg.trimCuts.warehouse);};
+  Rg.trimMigrateHook=g=>{if(g.boss)g.boss.x=Rg.STORE_X;};
   const originalState=Rg.newState;
   Rg.newState=()=>{const s=originalState();s.pickups=[];s.boss.x=Rg.STORE_X;return s;};
   const peg=(x,y)=>{R(x-1,y-17,2,17,'#6b4934');R(x-9,y-19,18,7,'#ead4a6');R(x-6,y-17,11,1,'#784b36');};

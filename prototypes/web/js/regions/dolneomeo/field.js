@@ -205,7 +205,7 @@ if(!CLASSIC){
     let pi=0,di=0;
     for(const p of g.pickups){
       if(p.zone)continue;
-      if(p.item==='seoridarae'){Object.assign(p,{id:'dol_darae',zone:'cliff',x:2780,y:112});continue;}
+      if(p.item==='seoridarae'){Object.assign(p,{id:'dol_darae',zone:'cliff',x:trimX(2780,Rg.trimCuts?.cliff),y:112});continue;}   // 줄인 절벽길 좌표 (D-109)
       const at=pickupMap[pi++];if(at)Object.assign(p,{id:'dol_old_pickup_'+(pi-1),zone:at[0],x:at[1],y:at[2]});
     }
     for(const d of g.digs){
@@ -259,7 +259,7 @@ if(!CLASSIC){
     if(!z)return;
     const active=m?.zone===G.zone&&!!spec;
     if(spec)z.platforms=active||(G.zone==='gate'&&bridgeReady())?[...bases[G.zone],...spec.bridge]:bases[G.zone];
-    if(G.zone==='cliff')z.platforms=G.boss.dead?bases.cliff:bases.cliff.filter(p=>p.x<2200);
+    if(G.zone==='cliff')z.platforms=G.boss.dead?bases.cliff:bases.cliff.filter(p=>p.x<trimX(2200,Rg.trimCuts?.cliff));
     if(m&&!active)delete G.f.dolMemory;
     if(active&&!vistaMode&&Sound.ambient!=='dol-memory'){Sound.ambience('dol-memory');Sound.passage('memory_layer');}
     if(!active&&Sound.ambient==='dol-memory')Sound.ambience(null);
@@ -354,6 +354,17 @@ if(!CLASSIC){
     step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?2240:80;G.py=GROUND;G.vy=0;delete G.f.dolMemory;applyMemory();toast('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
   };}
   Rg.startZone='gate';
+  // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
+  // 돌담 마을: 들어선 자리와 첫 발판 사이. 절벽길: 아무것도 없는 발판 두 무리를 지운다(개구리까지 1340px → 340px).
+  Rg.trimCuts={village:[[110,280]],cliff:[[160,1000]]};
+  // 구역에 들어설 때 applyMemory가 bases로 발판을 다시 깐다. 그래서 bases도 같은 좌표로 자르고 정리해 둔다 (D-109·D-110).
+  Rg.trimHook=tX=>{
+    for(const id of Object.keys(bases)){
+      const c=Rg.trimCuts[id];
+      const list=c?bases[id].filter(p=>!trimInside(p.x+p.w/2,c)).map(p=>({...p,x:tX(p.x,c)})):bases[id];
+      bases[id]=tidyPlatforms(list,platformAnchors(Rg,id,Rg.zones[id]));
+    }
+  };
   Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2800,[])};
   // 대화가 이어지는 동안은 화자의 자리를 지키고, 끝나면 진행값으로 위치를 정한다.
   let ppuriScene=null;

@@ -148,6 +148,10 @@ Rg.bossDie=()=>{
    위치와 그림 외의 조작·시간 수치는 공통 표를 읽는다. */
 if(!CLASSIC){
   Rg.startZone='village';
+  // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
+  // 마을: 칡에 막힌 나무 입구(1710) 뒤 오른쪽 출구까지 890px → 300px (빈 발판 무리를 지운다).
+  // 대장간: 모루 자국(1070)과 날쌘(1560) 사이 빈 둑길 490px → 160px.
+  Rg.trimCuts={village:[[1800,590]],forge:[[1110,330]]};
   const A=Rg.expArt;
   const oldState=Rg.newState,oldStep=Rg.step,oldHit=Rg.onHit;
   const acorns=[['village',280,GROUND],['village',530,160],['village',1260,GROUND],
