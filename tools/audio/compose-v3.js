@@ -1,4 +1,4 @@
-// 결정 D-106·D-107: 지역 곡의 선율을 기억에 남는 4마디 훅으로, 보스 곡 다섯을 150~172의 4박 몰이로 다시 쓴다.
+// (대체됨: D-106·D-107 → D-121) 합성 3판 악보 도구. 지역 곡의 선율을 기억에 남는 4마디 훅으로, 보스 곡 다섯을 150~172의 4박 몰이로 다시 쓴다.
 // 모든 선율은 '이름의 노래' 동기(도·레·미·솔 오름과 레로 열린 끝)에서 나온다. 다른 게임 곡의 선율·리프·화성은 쓰지 않는다.
 // 이 도구는 design/data/music/music.json의 해당 곡을 고쳐 쓴다. 한 번 돌린 뒤의 원본은 music.json이다.
 //   node tools/audio/compose-v3.js   (그 뒤 node tools/audio/render.js --web-data)
@@ -30,7 +30,7 @@ function notes(list, mode, base, opt = {}) {
 const sum = list => list.reduce((n, n2) => n + n2[1], 0);
 function check(list, beats, label) { if (Math.abs(sum(list) - beats) > 1e-6) throw new Error(label + ': 마디 길이 ' + sum(list) + ' ≠ ' + beats); return list; }
 
-// 결정 D-107: 보스 곡 4/4 몰이 (design/data/decisions.csv)
+// (대체됨 D-107) 보스 곡 4/4 몰이 (design/data/decisions.csv)
 /* ---------- 보스 곡: 4/4, 도입 4 + 반복 44마디 ---------- */
 // 반복 구간: A 8 · B 8 · 쉼 4 · 몰아 올림 4 · A′ 8 · C 8 · 이음 4
 const SECTIONS = [['A · 훅', 8], ['B · 주고받기', 8], ['쉼 · 숨 고르기', 4], ['몰아 올림', 4], ['A′ · 한 옥타브 위 훅', 8], ['C · 절정, 열린 끝음', 8], ['이음 · 처음으로', 4]];
@@ -157,7 +157,7 @@ function rebuildBoss(track, spec) {
   }
 }
 
-// 결정 D-106: 지역 곡 선율을 4마디 훅으로 (design/data/decisions.csv)
+// (대체됨 D-106) 지역 곡 선율을 4마디 훅으로 (design/data/decisions.csv)
 /* ---------- 지역 곡: 선율·응답만 새 훅으로 (장단·북·저음은 그대로) ---------- */
 // 12박 기준(중모리 3·3·3·3). 12/8은 길이를 반으로 쓴다.
 const R12 = {
