@@ -188,15 +188,15 @@ function snowGround(id){
   for(let wx=Math.floor(cam/36)*36;wx<cam+W+36;wx+=36){P(wx-cam,195,3,1,n()?'#8693a0':'#b3b7ad');P(wx-cam+8,197,3,1,n()?'#8693a0':'#b3b7ad');}
 }
 function drawBack(id){
-  sky(cam);steppedRidge(Math.round(cam*.08),116,22,tone().mount,1);steppedRidge(Math.round(cam*.19),137,15,n()?'#34445a':'#b2c1c9',4);
-  farAir(cam);
-  distantTown(Math.round(cam*.32),173,1);
+  sky(RC());steppedRidge(Math.round(RC()*.08),116,22,tone().mount,1);steppedRidge(Math.round(RC()*.19),137,15,n()?'#34445a':'#b2c1c9',4);
+  farAir(RC());
+  distantTown(Math.round(RC()*.32),173,1);
   if(id==='pine'){for(let wx=Math.floor(cam/112)*112-112;wx<cam+W+112;wx+=112)pine(wx-cam,GROUND,62+Math.round(hash(wx)*25));}
   snowGround(id);
 }
 function drawPlatforms(id){
   for(const p of fieldPlatforms()){
-    const x=p.x-cam;if(x>W+10||x+p.w<-10)continue;
+    const x=p.x-RC();if(x>W+10||x+p.w<-10)continue;   // 발판은 이미 옮긴 좌표 (D-128)
     if(id==='street'||id==='inn'||id==='entrance'){
       P(x,p.y,p.w,6,tone().wood);P(x,p.y-1,p.w,2,tone().snow);for(let j=5;j<p.w;j+=10)P(x+j,p.y+2,1,4,n()?'#827475':'#c3a079');
       if(p.y<130){P(x-3,p.y-5,p.w+6,4,tone().tile);P(x,p.y-6,p.w,2,tone().snow);}

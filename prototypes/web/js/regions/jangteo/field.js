@@ -14,15 +14,15 @@ Rg.moodTension=()=>{
 };
 
 /* ---------- 배경 ---------- */
-function ridge(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+cam*par;const h=base-Math.sin(wx*freq)*amp-Math.sin(wx*freq*2.7+1)*amp*0.35;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
+function ridge(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+RC()*par;const h=base-Math.sin(wx*freq)*amp-Math.sin(wx*freq*2.7+1)*amp*0.35;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
 function drawSky(){
   const g=ctx.createLinearGradient(0,0,0,H);
   if(night()){g.addColorStop(0,'#141a2e');g.addColorStop(.6,'#262c48');g.addColorStop(1,'#3a3a54');}
   else{g.addColorStop(0,'#dfe4ea');g.addColorStop(.6,'#c4ccd6');g.addColorStop(1,'#aeb6c2');}
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  if(night()){for(let i=0;i<40;i++){const x=Math.round((hash(i*9.1)*W*1.4-cam*0.02)%W+W)%W,y=Math.round(hash(i*3.3)*90);R(x,y,1,1,i%5?'#c8d0e8':'#fff6d8');}
-    R(Math.round(70-cam*0.02),24,2,10,'#e8e0c0');}   // 그믐 전 가는 달
-  else{const sx=Math.round(320-cam*0.03);R(sx,30,14,14,'#f8f6ee');R(sx-2,33,18,8,'#f8f6ee');}
+  if(night()){for(let i=0;i<40;i++){const x=Math.round((hash(i*9.1)*W*1.4-RC()*0.02)%W+W)%W,y=Math.round(hash(i*3.3)*90);R(x,y,1,1,i%5?'#c8d0e8':'#fff6d8');}
+    R(Math.round(70-RC()*0.02),24,2,10,'#e8e0c0');}   // 그믐 전 가는 달
+  else{const sx=Math.round(320-RC()*0.03);R(sx,30,14,14,'#f8f6ee');R(sx-2,33,18,8,'#f8f6ee');}
   ridge(0.12,night()?'#1e2238':'#9aa4b2',120,28,0.007);
   ridge(0.25,night()?'#262a42':'#868f9c',140,20,0.012);
 }
@@ -108,7 +108,9 @@ if(!CLASSIC){
   // 장터 입구: 연줄 문(1310) 뒤 빈 길 1290px → 410px (물건 없는 발판 무리를 지운다). 숙소 창고: 빈 마당과 빈 발판 무리 두 곳을 지운다.
   Rg.trimCutsV1={entrance:[[1400,880]],warehouse:[[800,900],[1800,380]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
   // 결정 D-116: 숙소 창고문(2130) 뒤 오른쪽 출구까지 빈 마당과 빈 처마 계단(2190~2490)을 지운다.
-  Rg.trimCuts={entrance:[[1400,880]],inn:[[2190,300]],warehouse:[[800,900],[1800,380]]};
+  Rg.trimCutsV2={entrance:[[1400,880]],inn:[[2190,300]],warehouse:[[800,900],[1800,380]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 장터 입구 솔방울·깃발·연 아이 사이 두 곳과 눈 장승 뒤 출구 앞, 숙소 들어선 자리와 신발 사이.
+  Rg.trimCuts={entrance:[[465,135],[830,60],[1400,880],[2390,90]],inn:[[180,50],[2190,300]],warehouse:[[800,900],[1800,380]]};
   Rg.trimHook=tX=>{Rg.STORE_X=tX(Rg.STORE_X,Rg.trimCuts.warehouse);};
   Rg.trimMigrateHook=g=>{if(g.boss)g.boss.x=Rg.STORE_X;};
   const originalState=Rg.newState;
@@ -131,7 +133,8 @@ if(!CLASSIC){
   const cones=(zone,coords)=>coords.map(([x,y],i)=>({id:'j_'+zone+'_fuel_'+i,x,y:y??GROUND,item:'solbang',got:false}));
   let viewedZone=null,depthDirection=0,lastFade=0;
   const common=id=>({ground:GROUND,startX:70,
-    drawBack(){
+    // 결정 D-128: 확대 변환은 장면 전체에 한 번 건다(나눠 그리기 밖). 그리기는 drawBack에서.
+    sceneBegin(){
       // 전경과 원경 사이의 문도 기존 구역 API로 이동한다. 지역 그리기에서만 짧게 확대한다.
       if(viewedZone!==id){
         depthDirection=(viewedZone==='street'&&id==='pine')||(viewedZone==='inn'&&id==='warehouse')?1:
@@ -141,8 +144,9 @@ if(!CLASSIC){
       lastFade=zoneFade;
       const depth=zoneFade>0&&depthDirection&&!Vfx.reducedMotion;
       ctx.save();if(depth){const z=1+depthDirection*zoneFade/(H/2);ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);}
-      Rg.expArt.drawBack(id);
     },
+    drawBack(){Rg.expArt.drawBack(id);},
+    sceneEnd(){ctx.restore();},
     drawScenery(){Rg.expArt.drawScenery(id);},
     // 흔들 소나무: 솔숲 앞줄의 작은 소나무. 칠수록 가지가 흔들린다.
     drawDig(d,x){
@@ -155,7 +159,7 @@ if(!CLASSIC){
     },
     drawPickup:Rg.drawPickup,onHit:Rg.onHit,ambient:Rg.ambient,
     weather:()=>{if(Rg.springRevisit())Vfx.setWeather('');else Rg.weather();},
-    weatherFront(){Rg.expArt.drawFront?.(id);ctx.restore();},
+    weatherFront(){Rg.expArt.drawFront?.(id);},
     faint(){G.px=Math.max(60,G.px-80);G.py=GROUND;G.vy=0;toast('눈을 털고 다시 걸었다.');},
     step(){
       const legacy=G.pickups.filter(a=>a.item==='solbang'&&!a.zone);

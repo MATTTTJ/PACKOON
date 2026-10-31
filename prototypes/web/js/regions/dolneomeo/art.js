@@ -69,15 +69,15 @@ function stone(x,y,w,h,seed=0,frost=true){const c=seed%2?P.stone:'#748282';px(x+
 function cairn(x,y,height=22,seed=0,frost=true){const count=Math.max(3,Math.floor(height/5));for(let j=0;j<count;j++){const w=Math.max(3,Math.round((count-j)*3.5)),h=j===count-1?4:5;stone(x-w/2+(j%2),y-j*5,w,h,seed+j,frost);}if(seed%7===0)px(x-1,y-height+3,1,3,'#9d5d48');}
 function gatePost(x,y,tall=false){const h=tall?54:47;px(x-5,y-h,11,h,'#796d58');px(x-6,y-h-4,13,5,'#4b4e46');px(x-5,y-h-4,12,1,P.frost);px(x-3,y-h+8,2,3,'#293736');px(x+2,y-h+8,2,3,'#293736');px(x-2,y-h+16,5,1,'#293736');px(x-3,y-h+15,1,2,'#293736');px(x+3,y-h+15,1,2,'#293736');px(x-1,y-h+24,3,14,'#5e5b4b');px(x-4,y-h,9,2,'#a2765e');}
 function frostGround(){px(0,GROUND,W,H-GROUND,P.earth);px(0,GROUND,W,2,'#a7b8b4');px(0,GROUND+2,W,2,'#748580');const off=Math.floor(cam);for(let x=-(off%7);x<W;x+=7){const v=hash(x+off+9);if(v<.62)px(x,GROUND-1,2,1,v<.28?P.frost:'#d0ddd6');if(v>.75)px(x+2,GROUND+7+Math.floor(v*17),3,1,'#3d4d4c');}}
-function backdrop(zone){bands(['#bfcdd3','#cbd8d9','#dce1da','#a4b7bd'],[54,49,59,63]);const keep=cam;cam=Math.round(keep*.08);ridge('#a3b6be',131,44,113,480);cam=Math.round(keep*.17);ridge('#829aa6',151,49,82,720);cam=Math.round(keep*.31);ridge('#657f89',177,39,53,140);cam=keep;
+function backdrop(zone){bands(['#bfcdd3','#cbd8d9','#dce1da','#a4b7bd'],[54,49,59,63]);const keep=cam,rk=RC();cam=Math.round(rk*.08);ridge('#a3b6be',131,44,113,480);cam=Math.round(rk*.17);ridge('#829aa6',151,49,82,720);cam=Math.round(rk*.31);ridge('#657f89',177,39,53,140);cam=keep;
   // 골짜기 안개는 능선보다 조금 빨리 흐른다. 가까운 발판은 덮지 않는다.
-  for(let i=0;i<4;i++){const x=mod(i*143-cam*.24,572)-120,y=150+(i%2)*9;px(x,y,136,3,'#a9bfbd');px(x+21,y-2,83,2,'#bbcdca');px(x+12,y+3,104,1,'#9fb8b7');}
+  for(let i=0;i<4;i++){const x=mod(i*143-RC()*.24,572)-120,y=150+(i%2)*9;px(x,y,136,3,'#a9bfbd');px(x+21,y-2,83,2,'#bbcdca');px(x+12,y+3,104,1,'#9fb8b7');}
   const wing=Vfx.reducedMotion?0:Math.floor(G.anim/24)%2;
-  for(let i=0;i<5;i++){const x=mod(58+i*18-cam*.055+(Vfx.reducedMotion?0:G.anim*.035),490)-40,y=52+Math.abs(i-2)*4;px(x,y,2,1,'#7a959c');px(x-3,y-1-wing,3,1,'#7a959c');px(x+2,y-1-wing,3,1,'#7a959c');}
+  for(let i=0;i<5;i++){const x=mod(58+i*18-RC()*.055+(Vfx.reducedMotion?0:G.anim*.035),490)-40,y=52+Math.abs(i-2)*4;px(x,y,2,1,'#7a959c');px(x-3,y-1-wing,3,1,'#7a959c');px(x+2,y-1-wing,3,1,'#7a959c');}
   // 절벽 위 경치가 고갯길과 마을에서 먼저 보인다.
-  const distant=Math.round(312-mod(cam*.09,100));px(distant,93,23,5,'#a4b0b1');px(distant+5,88,14,5,'#aab7b6');px(distant+11,83,3,5,'#e7ece4');
-  if(zone==='field'){for(let i=0;i<8;i++){const x=mod(i*64-cam*.46,512)-52;pine(x,188,.55+(i%3)*.13);}}
-  if(zone==='shrine'){for(let i=0;i<11;i++){const x=mod(i*47-cam*.4,517)-45;cairn(x,184,G.f.dolMemory?.zone===zone?8+i%3*3:15+i%4*5,i+4);}}
+  const distant=Math.round(312-mod(RC()*.09,100));px(distant,93,23,5,'#a4b0b1');px(distant+5,88,14,5,'#aab7b6');px(distant+11,83,3,5,'#e7ece4');
+  if(zone==='field'){for(let i=0;i<8;i++){const x=mod(i*64-RC()*.46,512)-52;pine(x,188,.55+(i%3)*.13);}}
+  if(zone==='shrine'){for(let i=0;i<11;i++){const x=mod(i*47-RC()*.4,517)-45;cairn(x,184,G.f.dolMemory?.zone===zone?8+i%3*3:15+i%4*5,i+4);}}
   frostGround();
 }
 function wall(x,y,width){for(let j=0;j<width;j+=17){stone(x+j,y,16,7,j,true);stone(x+j+6,y-7,15,6,j+1,true);}}
@@ -123,18 +123,18 @@ function front(zone){
   if(Vfx.reducedMotion||Rg.springRevisit())return;for(let i=0;i<13;i++){const x=mod(i*37-Math.floor(G.anim*.13),W),y=mod(i*23+Math.floor(G.anim*.09),H);if(i%3!==1)px(x,y,1,1,i%2?'#eff5ed':'#cbdad7');}if(zone==='shrine'&&Math.floor(G.anim/36)%3===0){px(56,74,17,1,'#dce6df');px(77,72,9,1,'#dce6df');}}
 
 /* 첫 경치: 햇빛은 구름 사이의 틈에서만 따뜻하다. 돌과 서리는 은빛이다. */
-function cliffSky(){wash([[0,'#57788e'],[50,'#8ba6af'],[84,'#bdc2b6'],[117,'#efd6a5'],[225,'#e7e5d3']]);disc(291,88,26,'#e8ce9d');disc(291,88,23,'#f2daa7');disc(291,88,19,'#ffe8b2');for(let i=0;i<22;i++)px(mod(i*47-cam*.1,430)-15,25+i%4*9,1,1,'#afc5cd');px(254,105,78,1,'#f9e7bc');px(263,108,58,1,'#f8e6ba');px(176,69,73,1,'#c7c6b7');px(192,67,31,1,'#c7c6b7');px(335,74,56,1,'#d0c8b2');}
+function cliffSky(){wash([[0,'#57788e'],[50,'#8ba6af'],[84,'#bdc2b6'],[117,'#efd6a5'],[225,'#e7e5d3']]);disc(291,88,26,'#e8ce9d');disc(291,88,23,'#f2daa7');disc(291,88,19,'#ffe8b2');for(let i=0;i<22;i++)px(mod(i*47-RC()*.1,430)-15,25+i%4*9,1,1,'#afc5cd');px(254,105,78,1,'#f9e7bc');px(263,108,58,1,'#f8e6ba');px(176,69,73,1,'#c7c6b7');px(192,67,31,1,'#c7c6b7');px(335,74,56,1,'#d0c8b2');}
 function cloudBank(x,y,w,h,c,top){px(x+5,y,w-10,h,c);px(x,y+2,w,h-3,c);px(x+13,y-3,w-26,4,top);px(x+24,y-5,w-48,2,top);px(x+36,y-7,Math.max(12,w-80),2,top);px(x+9,y+h,w-30,1,'#c4d1c9');}
 function crag(x,y,w,h,near=false){const dark=near?'#435b61':'#7d9396',light=near?'#b3c6bc':'#bfcec3';for(let i=0;i<w;i+=3){const edge=Math.min(i,w-i),top=y+Math.max(0,12-edge*.6)+Math.floor(hash(i+9)*4);px(x+i,top,3,h-(top-y),dark);if(edge>8)px(x+i,top,3,2,light);}for(let i=0;i<6;i++){const xx=x+6+i*(w-14)/6,yy=y+17+i%3*12;px(xx,yy,2,h-(yy-y)-3,near?'#384f56':'#718b8e');px(xx+2,yy+11,9+i%3*3,1,near?'#6d8788':'#9ab0a8');}px(x+12,y-1,w-24,2,'#e7eedd');}
 function cliffFar(){ridge('#9eafb0',139,29,91,190);ridge('#b8bdb1',145,20,65,520);for(let i=0;i<8;i++){const x=mod(i*79-cam,590)-90,y=128+i%3*10;cloudBank(x,y,110,4,'#d8dacc','#e8e3cc');}}
 function cliffSea(){for(let i=0;i<9;i++){const x=mod(i*83-cam,650)-110,y=151+i%3*17;cloudBank(x,y,139,7,i%2?'#dbe1d7':'#e8eadf','#eef0e1');px(x+31,y-8,33,1,'#f5f1de');}const x=mod(275-cam,670)-80;crag(x,148,54,78);pine(x+31,148,.56);cairn(x+16,148,11,2);}
-function cliffNear(){const a=12-Math.round(cam*.09);for(let x=-20;x<W+20;x+=4){const y=201+Math.round(Math.sin((x+cam)/42)*4);px(x,y,4,H-y,'#435b61');px(x,y,4,2,'#bacdc2');if(hash(x+cam)>.6)px(x,y-1,2,1,'#f5f6de');}crag(a,153,84,72,true);pine(a+40,151,1.55);cairn(347-mod(cam*.2,40),211,24,4);for(let i=0;i<32;i++){const x=mod(i*31-cam,430)-12,y=195+i%4*5;px(x,y,1,1,i%3?'#e6ecda':'#fff2c6');if(i%5===0){px(x-1,y,3,1,'#fff8da');px(x,y-1,1,3,'#fff8da');}}}
+function cliffNear(){const a=12-Math.round(RC()*.09);for(let x=-20;x<W+20;x+=4){const y=201+Math.round(Math.sin((x+cam)/42)*4);px(x,y,4,H-y,'#435b61');px(x,y,4,2,'#bacdc2');if(hash(x+cam)>.6)px(x,y-1,2,1,'#f5f6de');}crag(a,153,84,72,true);pine(a+40,151,1.55);cairn(347-mod(RC()*.2,40),211,24,4);for(let i=0;i<32;i++){const x=mod(i*31-cam,430)-12,y=195+i%4*5;px(x,y,1,1,i%3?'#e6ecda':'#fff2c6');if(i%5===0){px(x-1,y,3,1,'#fff8da');px(x,y-1,1,3,'#fff8da');}}}
 
 /* 두 번째 경치: 수백 개의 소원 돌. 한 장면 안에서도 크기가 달라 깊이가 보인다. */
-function shrineSky(){wash([[0,'#6b8796'],[66,'#a4b7b9'],[142,'#c7d1c5'],[225,'#d8d9c7']]);disc(317,49,12,'#e7e6c8');const hold=cam;cam=Math.round(hold*.5);ridge('#7f969e',129,41,102,260);cam=hold;}
+function shrineSky(){wash([[0,'#6b8796'],[66,'#a4b7b9'],[142,'#c7d1c5'],[225,'#d8d9c7']]);disc(317,49,12,'#e7e6c8');const hold=cam;cam=Math.round(RC()*.5);ridge('#7f969e',129,41,102,260);cam=hold;}
 function shrineFar(){for(let row=0;row<3;row++)for(let i=0;i<26;i++){const seed=i+row*31,x=mod(i*20+row*9+Math.floor(hash(seed+2)*7)-cam,520)-30,y=124+row*13+Math.floor(hash(seed)*7);const height=7+(i*3+row)%8;for(let j=0;j<height;j+=3){const w=Math.max(2,8-Math.floor(j/3)*2);px(x-w/2,y-j,w,3,row===0?'#94a8a9':'#8da29f');px(x-w/2,y-j,w,1,'#b9c7bd');}}}
-function shrineMid(){for(let row=0;row<3;row++)for(let i=0;i<16;i++){const seed=i+row*17,x=mod(i*37+row*17+Math.floor(hash(seed+7)*13)-cam,592)-42,y=155+row*16+Math.floor(hash(seed)*9);cairn(x,y,12+(i*7+row*3)%19,i+row*16);}const x=mod(192-cam,580);px(x-1,95,2,36,'#c5c6a8');px(x-22,109,43,1,'#c6c4a1');for(let i=0;i<5;i++){const xx=x-19+i*9;px(xx,110,2,12+i%2*4,i%2?'#d5d8c4':'#a47f6b');px(xx+1,119+i%2*4,3,2,'#d5d8c4');}for(let i=0;i<4;i++){const xx=mod(60+i*99-cam*.6,480)-40,yy=137+i*11;px(xx,yy,31,1,'#dce3d5');px(xx+33,yy-1,9,1,'#dce3d5');}}
-function shrineNear(){px(0,205,W,20,'#526763');for(let x=-20;x<W+35;x+=24){const xx=x-mod(cam,24);stone(xx,213,23,10,Math.floor((x+cam)/24));}for(let i=0;i<8;i++){const x=mod(i*59-cam,472)-30;cairn(x,211,20+(i*7)%20,i+80);}const tree=340-mod(cam*.11,35);pine(tree,203,2.9);px(tree-10,191,22,3,'#7f9080');px(tree-18,196,39,3,'#6a8074');const x=52-mod(cam*.1,25);cairn(x,213,37,3);px(x-2,174,4,1,'#f1edcf');for(let i=0;i<11;i++)px(mod(17+i*43-cam,440)-20,81+i%4*14,1,1,'#dbe7df');}
+function shrineMid(){for(let row=0;row<3;row++)for(let i=0;i<16;i++){const seed=i+row*17,x=mod(i*37+row*17+Math.floor(hash(seed+7)*13)-cam,592)-42,y=155+row*16+Math.floor(hash(seed)*9);cairn(x,y,12+(i*7+row*3)%19,i+row*16);}const x=mod(192-cam,580);px(x-1,95,2,36,'#c5c6a8');px(x-22,109,43,1,'#c6c4a1');for(let i=0;i<5;i++){const xx=x-19+i*9;px(xx,110,2,12+i%2*4,i%2?'#d5d8c4':'#a47f6b');px(xx+1,119+i%2*4,3,2,'#d5d8c4');}for(let i=0;i<4;i++){const xx=mod(60+i*99-RC()*.6,480)-40,yy=137+i*11;px(xx,yy,31,1,'#dce3d5');px(xx+33,yy-1,9,1,'#dce3d5');}}
+function shrineNear(){px(0,205,W,20,'#526763');for(let x=-20;x<W+35;x+=24){const xx=x-mod(cam,24);stone(xx,213,23,10,Math.floor((x+cam)/24));}for(let i=0;i<8;i++){const x=mod(i*59-cam,472)-30;cairn(x,211,20+(i*7)%20,i+80);}const tree=340-mod(RC()*.11,35);pine(tree,203,2.9);px(tree-10,191,22,3,'#7f9080');px(tree-18,196,39,3,'#6a8074');const x=52-mod(RC()*.1,25);cairn(x,213,37,3);px(x-2,174,4,1,'#f1edcf');for(let i=0;i<11;i++)px(mod(17+i*43-cam,440)-20,81+i%4*14,1,1,'#dbe7df');}
 function drawBlocked(x,y){px(x-15,y-38,3,38,'#7a7058');px(x+12,y-38,3,38,'#7a7058');px(x-16,y-34,32,3,'#b19b70');px(x-13,y-25,26,2,'#cbb786');for(let i=0;i<5;i++)px(x-11+i*5,y-32,2,5,i%2?'#ece7cd':'#9d5d48');stone(x-11,y,22,8,0);}
 function drawDepthGate(x,y,spread=0){gatePost(x-24-spread,y,true);gatePost(x+24+spread,y,false);px(x-13,y-1,26,2,'#bdcbb9');px(x-9,y-5,18,1,'#a8bba7');px(x-5,y-8,10,1,'#8ca69b');}
 function drawMemoryBridge(x,y,w){for(let i=0;i<w;i+=19){stone(x+i,y,18,6,i,false);if(i%38===0){px(x+i+7,y,4,18,'#8e9690');px(x+i+4,y+16,10,3,'#7e8984');}}px(x-2,y-8,w+4,2,'#a1aaa1');for(let i=0;i<w;i+=38)px(x+i+6,y-17,3,18,'#919c93');}
@@ -185,7 +185,7 @@ function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.ro
 /* 결정 D-83: 밭 둔덕 경치. 메밀밭 너머 먼 산 아래 성황당 돌무더기가 이따금 꿈틀한다. */
 function stirFar(){
   ridge('#8fa3a6',132,30,96,140);ridge('#a7b4ac',146,16,70,400);
-  const x=Math.round(250-cam*.6),still=Vfx.reducedMotion,stir=!still&&Math.sin(G.anim*0.05)>0.82,k=stir?Math.round(Math.sin(G.anim*0.8)*1.5):0;
+  const x=Math.round(250-RC()*.6),still=Vfx.reducedMotion,stir=!still&&Math.sin(G.anim*0.05)>0.82,k=stir?Math.round(Math.sin(G.anim*0.8)*1.5):0;
   // 돌무더기: 서리 없는 회갈색 돌을 둥글게 쌓은 더미. 꿈틀할 때 위쪽 돌이 한 칸씩 어긋나고 먼지가 인다.
   px(x-34,153,68,2,'#6f7a73');
   const rows=[[0,6,10],[7,5,10],[13,4,10],[19,3,9],[24,2,9]];
@@ -193,7 +193,7 @@ function stirFar(){
   if(stir){px(x-40,149,6,1,'#d8d2bd');px(x+36,147,5,1,'#d8d2bd');px(x-6,122,2,1,'#d8d2bd');px(x+8,120,1,1,'#d8d2bd');}
 }
 function stirMid(){px(0,158,W,30,'#9c9a7b');for(let i=0;i<70;i++){const x=mod(i*13-cam,460)-20,y=160+(i%6)*4;px(x,y,2,1,i%3?'#f1efe2':'#d9d3bf');}}
-function stirNear(){for(let x=-20;x<W+20;x+=4){const y=194-Math.round(Math.sin((x+cam)/58)*7);px(x,y,4,H-y,'#7d7a5c');px(x,y,4,2,'#aaa77d');if(hash(x+cam)>.72)px(x,y-2,1,2,'#c9c492');}stone(30-mod(cam*.2,40),214,22,8,3);}
+function stirNear(){for(let x=-20;x<W+20;x+=4){const y=194-Math.round(Math.sin((x+cam)/58)*7);px(x,y,4,H-y,'#7d7a5c');px(x,y,4,2,'#aaa77d');if(hash(x+cam)>.72)px(x,y-2,1,2,'#c9c492');}stone(30-mod(RC()*.2,40),214,22,8,3);}
 Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawMemoryBridge,drawRestoredBridge,drawBridgeWork,drawBridgeWorkMarker,drawBridgeSurvey,drawWanderer,
   cliffLayers:[{speed:.04,draw:cliffSky},{speed:.14,draw:cliffFar},{speed:.4,draw:cliffSea},{speed:.83,draw:cliffNear}],
   shrineLayers:[{speed:.04,draw:shrineSky},{speed:.16,draw:shrineFar},{speed:.43,draw:shrineMid},{speed:.86,draw:shrineNear}],

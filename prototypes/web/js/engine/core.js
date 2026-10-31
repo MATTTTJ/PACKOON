@@ -159,8 +159,14 @@ function trimX(x,cuts){if(!cuts||!Number.isFinite(x))return x;let s=0;for(const 
 /* 자른 좌표 → 설계 좌표. 잘린 구간 시작에 모인 것은 그 시작으로 돌아간다 (옛 저장을 새 자르기로 옮길 때 쓴다). */
 function untrimX(t,cuts){if(!cuts||!Number.isFinite(t))return t;let s=0;for(const [c,d] of [...cuts].sort((a,b)=>a[0]-b[0])){if(t+s>=c)s+=d;else break;}return t+s;}
 /* 결정 D-116: 자르기 판 번호. 1은 PR #91(D-109) 첫 자르기, 2는 남은 빈 구간까지 줄인 판이다.
-   지역이 Rg.trimCutsV1(첫 판의 자르기)을 두면, 첫 판으로 저장한 상태는 그 차이만큼만 옮긴다. */
-const TRIM_VER=2;
+   결정 D-128: 3은 걷기만 하는 길을 콘텐츠 사이 230px 안팎까지 줄인 판이다.
+   지역이 Rg.trimCutsV1·V2(그 판의 자르기)를 두면, 그 판으로 저장한 상태는 그 차이만큼만 옮긴다. */
+const TRIM_VER=3;
+/* 결정 D-128: 자른 구역의 배경은 남은 구간마다 나눠 그린다(engine/field.js segmentedDraw).
+   그리는 동안 TRIM_SEG는 그 구간이 당겨진 만큼이고, cam은 그만큼 옮겨진다. 그래서 설계 좌표로 쓴 그림(u-cam)이 제자리에 온다.
+   이미 옮긴 좌표(발판·도장·물건)나 원경 원근(cam*k)은 RC()(실제 카메라)를 쓴다. */
+var TRIM_SEG=0,TRIM_SEGMENTING=false;
+function RC(){return cam-TRIM_SEG;}
 const trimInside=(x,cuts)=>!!cuts&&cuts.some(([c,d])=>x>c&&x<c+d);
 function trimObj(o,cuts,done){
   if(!o||typeof o!=='object'||done?.has(o))return o;done?.add(o);
@@ -169,7 +175,7 @@ function trimObj(o,cuts,done){
   return o;
 }
 /* 그림 좌표: 자른 구역의 배경·장식 x를 옮긴다. 잘린 구간 안의 장식은 화면 밖으로 보낸다. */
-function tx(u){const c=!CLASSIC&&REG?.trimCuts?.[G?.zone];if(!c)return u;return trimInside(u,c)?-1e4:trimX(u,c);}
+function tx(u){if(TRIM_SEGMENTING)return u;const c=!CLASSIC&&REG?.trimCuts?.[G?.zone];if(!c)return u;return trimInside(u,c)?-1e4:trimX(u,c);}
 /* 결정 D-110: 단상(발판)이 포개져 보이지 않게 한다 (design/data/decisions.csv).
    가로로 겹치고 세로 차이가 48px 미만인 두 발판: 같은 높이면 하나로 합치고, 다른 높이면 6px 사이를 두고 뗀다.
    물건·문·경치가 올라앉은 자리(anchors)는 남기도록 반대쪽을 줄인다. 너비 40px 밑으로는 줄이지 않는다. */
@@ -245,7 +251,7 @@ function trimState(r,s){
 function trimMigrate(r,g){
   if(!r?.trimCuts||CLASSIC||!g||g.trimVer===TRIM_VER)return;
   // 자르기 전 저장은 설계 좌표에서, 첫 판(1) 저장은 첫 판 좌표에서 지금 자르기로 옮긴다.
-  const prev=g.trimVer===1?(r.trimCutsV1||r.trimCuts):null;
+  const prev=g.trimVer===1?(r.trimCutsV1||r.trimCuts):g.trimVer===2?(r.trimCutsV2||r.trimCuts):null;
   const conv=(zone,x)=>trimX(untrimX(x,prev?.[zone]),r.trimCuts[zone]);
   g.trimVer=TRIM_VER;const z0=firstZone(r);
   for(const k of ['pickups','digs'])for(const a of g[k]||[]){const z=a.zone||z0;if(r.trimCuts[z])a.x=conv(z,a.x);}

@@ -905,7 +905,7 @@ if(!CLASSIC){
       const arc=brosArcChoice();if(!arc)return base;
       const last=base[base.length-1];return [...base.slice(0,-1),[last[0],last[1],[arc,{t:'다음에 보자',go:null}]]];
     }};
-  const chick={id:'lost_chick',name:'꺼병이',hint:'삐약… 삐약… 어디선가 엄마를 찾는 병아리 소리가 들린다.',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
+  const chick={id:'lost_chick',name:'꺼병이',hint:'삐약… 삐약… 어디선가 엄마를 찾는 병아리 소리가 들린다.',get x(){const x=G.f.galExpChickX??1540;return CLASSIC?x:trimX(x,Rg.trimCuts?.forest);}   /* 결정 D-128: galExpChickX는 설계 좌표로 두고 자리만 줄인 숲 좌표로 */,draw:picture('chick'),talk:chickTalk,
     greeting:'이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!'};
   function wheelStage(){
     if(G.f.galWheelDone)return 5;
@@ -1095,7 +1095,7 @@ if(!CLASSIC){
   Rg.expStep=()=>{
     if(G.zone!=='forest'||!G.f.galExpChickWith||done('lost_chick'))return;
     if(G.f.galExpChickArrived){G.f.galExpChickX=2090;return;}
-    const x=G.f.galExpChickX??1540,dx=G.px-x;
+    const x=G.f.galExpChickX??1540,dx=(CLASSIC?G.px:untrimX(G.px,Rg.trimCuts?.forest))-x;   // 설계 좌표끼리 잰다 (D-128)
     // 빠르게 앞질러도 꺼병이는 안전한 자리에서 기다린다. 돌아오면 다시 따라온다.
     if(Math.abs(dx)>TABLES.TUNING.field_talk_distance&&Math.abs(dx)<W*.5){
       G.f.galExpChickX=clamp(x+Math.sign(dx)*TABLES.TUNING.field_move_speed,1540,2090);
