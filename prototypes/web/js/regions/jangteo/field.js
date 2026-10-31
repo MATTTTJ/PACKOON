@@ -94,7 +94,7 @@ Rg.faint=()=>{G.px=Math.max(60,G.px-80);toast('눈길에 미끄러져 물러났�
 Rg.bossDie=calm=>{
   G.boss.dead=true;addItem('nunhongsi',1);
   if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
-  diary('j_boss','창고를 털던 범인은 낡은 빗자루·키·멍석에 깃든 헌물 도깨비였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.'));
+  diary('j_boss','창고를 털던 범인은 낡은 빗자루·키·멍석에 깃든 헌물 도깨비였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()&&G.f.jangteoArcsYeot2?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다. 작년 그믐에 빼앗겼다던 그 가위일까.':''));   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
   toast('눈홍시를 얻었다! 시루로 홍시 약떡을 찌자');refreshGoal();
 };
 Rg.STORE_X=STORE_X;

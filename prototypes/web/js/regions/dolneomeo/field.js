@@ -381,7 +381,8 @@ if(!CLASSIC){
   Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2800,[])};
   // 대화가 이어지는 동안은 화자의 자리를 지키고, 끝나면 진행값으로 위치를 정한다.
   let ppuriScene=null;
-  const ppuriVillage=()=>ppuriScene?.owner===G&&open('dlg')?
+  // 결정 D-135: 다리 완성 장면 동안은 뿔이가 고갯길에 있다.
+  const ppuriVillage=()=>G?.f.dolBridgePpuriHere?false:ppuriScene?.owner===G&&open('dlg')?
     ppuriScene.zone==='village':!!G?.f.ppuriMet&&!G.f.ppuriPassed;
   // 복원 중에는 같은 돌쇠가 현장에 온다. 두 구역에 동시에 놓지 않는다.
   Object.defineProperty(Rg.zones.gate,'npcs',{get:()=>{
