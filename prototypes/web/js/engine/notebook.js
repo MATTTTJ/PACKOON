@@ -171,12 +171,14 @@ function notePage(e,section){
   else if(dad.length){const gap=el('div','my-ink blank');gap.setAttribute('aria-hidden','true');card.appendChild(gap);}
   return card;
 }
+// 결정 D-81: 도장 전체 수는 수첩 데이터에서 센다(도장 쪽의 stamp: 키). 지역별로도 센다.
+const stampTotal=region=>new Set(Object.values(NOTES).filter(e=>e.kind==='stamp'&&(!region||e.region===region)).flatMap(e=>e.lines.map(l=>l.when).filter(w=>w&&w.startsWith('stamp:')))).size;
 function renderPages(body,section,kind){
   let shown=false;
   for(const r of regionList()){
     const pages=Object.values(NOTES).filter(e=>e.region===r.id&&(kind?e.kind===kind&&(pageShown(e)||myTexts(e,section).length):myTexts(e,section).length));
     if(!pages.length)continue;shown=true;
-    body.appendChild(el('div','note-region',r.name+(kind==='stamp'?' · '+stampCount(r.id)+'개':'')));
+    body.appendChild(el('div','note-region',r.name+(kind==='stamp'?' · '+stampCount(r.id)+' / '+stampTotal(r.id):'')));
     const grid=el('div','note-grid');pages.forEach(e=>grid.appendChild(notePage(e,section)));body.appendChild(grid);
   }
   if(!shown)body.appendChild(el('p','empty-note',section==='익힌 솜씨'?'가보로 만들어 보며 손에 익은 것을 적는다.':section==='숨은 가공법'?'재료를 직접 넣어 찾은 맛을 여기에 적는다.':'여행하며 보고 들은 것을 여기에 적는다.'));
@@ -186,7 +188,11 @@ function renderNotebook(){
   document.querySelectorAll('#noteTabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===noteTab));
   const {dad,mine}=noteTally();$('noteTally').textContent='아빠가 적은 쪽 '+dad+' · 내가 이어 적은 줄 '+mine;
   const body=$('noteBody');const sc=body.scrollTop;body.innerHTML='';
-  if(noteTab==='stamp')body.appendChild(el('p','small','찾은 아빠 도장 · 전체 '+stampCount()+'개'));
+  if(noteTab==='stamp'){
+    body.appendChild(el('p','small','찾은 아빠 도장 '+stampCount()+' / '+stampTotal()));
+    // 아빠가 젊어서 적어 둔 말. 열두 곳을 다 찾으면 영산 끝에서 아빠와 나란히 서는 장면이 더해진다 (yeongsan/story.js).
+    body.appendChild(el('p','note-line dad','아빠: 내 손바닥 도장은 네 고장에 열두 개. 다 찾는 이가 있다면 내 길을 다 걸은 셈이다.'));
+  }
   if(PAGE_SECTION[noteTab])renderPages(body,PAGE_SECTION[noteTab],['animal','item','stamp'].includes(noteTab)?noteTab:null);
   else renderChildRecord(body,noteTab);
   body.scrollTop=sc;

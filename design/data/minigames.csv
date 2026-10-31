@@ -132,3 +132,4 @@ gather_seogi_speed,석이버섯 떼기,바늘 기본 속도,2.4,%p/프레임,바
 gather_darae_vine_hits,다래 덩굴 베기,목표 성공 수,2,몫,보통 2번 (딱이면 1번),제안
 gather_darae_vine_width,다래 덩굴 베기,성공 판정 폭,21,%,성공 판정 폭,제안
 gather_darae_vine_speed,다래 덩굴 베기,바늘 기본 속도,1.8,%p/프레임,바늘 기본 속도,제안
+gather_solbang_hits,소나무 흔들기,목표 성공 수,2,몫,큰 장터 솔숲. 보통 2번 (딱이면 1번). 결정 D-82,제안

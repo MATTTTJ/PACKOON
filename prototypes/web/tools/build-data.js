@@ -210,7 +210,8 @@ const MINIGAMES=numericTable('minigames','미니게임',
     'gather_root_speed gather_ssari_hits gather_ssari_width gather_ssari_speed gather_kkoe_hits',
     'gather_kkoe_width gather_kkoe_speed gather_eoksae_hits gather_eoksae_width gather_eoksae_speed',
     'gather_seogi_hits gather_seogi_width gather_seogi_speed gather_darae_vine_hits gather_darae_vine_width',
-    'gather_darae_vine_speed'
+    'gather_darae_vine_speed',
+    'gather_solbang_hits'
   ].join(' '));
 const TUNING=numericTable('tuning','분류',
   [

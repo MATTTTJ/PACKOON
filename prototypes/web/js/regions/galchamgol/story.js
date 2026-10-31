@@ -49,7 +49,7 @@ function dodamCacheDraw(){
   if(!(G.f.galArcDodamFound||G.pickups[G.f.galArcDodamCache]?.got))return;
   arcScene('galArcDodam2',[['너구리','여기 묻혀 있었어. 수첩에 그려 둘게.'],
     ['도담','어, 그러니까… 여기에 동그라미!\n남은 건 나중에 내가 파 갈게!'],['도담','적어 두면 안 잊는구나!'],['도담','그래도 잊으면 다시 찾으면 되지!']],
-    '도담과 도토리를 찾은 자리를 수첩에 그렸다. 도담은 적어 두면 안 잊겠다며 웃었다.');
+    '도담과 도토리를 찾은 자리를 수첩에 그렸다. 도담은 적어 두면 안 잊겠다며 웃었다.',()=>learn('rule:squirrel_cache'));
 }
 function dodamOldStory(){
   if(!G.f.galArcDodam2||!G.f.dodamDone)return;

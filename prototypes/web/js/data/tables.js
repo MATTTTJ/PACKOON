@@ -996,6 +996,12 @@ const TABLES={
      "text": "단풍골 숲의 다람쥐. 아빠 모자를 알아봤다. 말이 많아서, 묻지 않은 것까지 말해 준다.",
      "section": "관찰",
      "when": "met:dodam"
+    },
+    {
+     "who": "me",
+     "text": "흙에 발톱으로 긁은 줄이 셋 있으면 다람쥐가 무언가 묻고 잊은 자리다. 너구리 코로는 어디 묻었는지 모르겠다. 다람쥐라면 알겠지.",
+     "section": "관찰",
+     "when": "rule:squirrel_cache"
     }
    ]
   },
@@ -2162,7 +2168,8 @@ const TABLES={
   "gather_seogi_speed": 2.4,
   "gather_darae_vine_hits": 2,
   "gather_darae_vine_width": 21,
-  "gather_darae_vine_speed": 1.8
+  "gather_darae_vine_speed": 1.8,
+  "gather_solbang_hits": 2
  },
  "TUNING": {
   "kkubeogi_cycle": 200,

@@ -63,6 +63,10 @@ D-66,이야기,"살금이를 만나지 않고 산군에게 먼저 닿으면 산�
 D-67,시스템,"지금 할 일(Rg.goal)은 가장 앞선 진행부터 거꾸로 본다. 변신으로 앞질러 가도(덩굴 너머 칡, 호숫가 먼저) 지금 상태에 맞는 일을 알려 준다. 나올 수 없는 문구(돌 쌓기·김 올리기 다시 배우기)는 지우고 긴 문구를 줄인다",채택,개발자(Claude),있음,,regions/*/story.js Rg.goal · dolneomeo/field.js
 D-68,시스템,"첫 화면 안내는 할 일 한 줄만 둔다. 지역 시작 때 같은 말을 알림으로 한 번 더 띄우지 않는다",채택,개발자(Claude),있음,,regions/*/region.js onStart
 D-69,시스템,"?region= 바로가기로 뒤 지역부터 시작해도 앞 지역에서 배우는 변신(다람쥐·산양·수리부엉이)을 갖고 간다. 앞질러 가는 길을 검수할 수 있게 한다",채택,개발자(Claude),있음,,regions/*/region.js finish
+D-80,탐험,"다람쥐가 묻고 잊은 몫(다람쥐 몫)은 다른 모습에서도 발톱 긁은 줄 셋으로 보인다. 캐는 것은 다람쥐만. 도담이 묻은 자리를 수첩에 그렸을 때나 처음 캤을 때 아이가 수첩에 규칙을 적는다 (게임 검토 9번)",채택,개발자(Claude),있음,design/narrative/galchamgol-scenario.md,"engine/forms.js drawCacheHint · engine/field.js drawDigs · notebook.csv rule:squirrel_cache"
+D-81,탐험,"아빠 도장 자리에는 찾기 전에도 흐린 손바닥 흔적이 남는다. 수첩 도장 탭에 찾은 수 / 전체(지역별 / 3, 전체 / 12)를 단다. 아빠가 젊어서 적어 둔 ""열두 개, 다 찾으면 내 길을 다 걸은 셈"" 한 줄로 열두 개를 모을 까닭을 보인다 (게임 검토 9번)",채택,개발자(Claude),있음,,"engine/field.js drawZoneObjects · engine/notebook.js stampTotal"
+D-82,탐험,"돌너머 돌다리: 다리를 다 놓으면 옛 다리 조사 자리를 없애고 지름길 문을 끝돌 조사 자리에서 45px 띄운다(x2090). 큰 장터: 입구·거리·숙소의 솔방울을 하나씩으로 줄이고, 솔숲에 소나무 흔들기 채집 세 곳을 둔다(채집 고리 D-41) (게임 검토 9번)",채택,개발자(Claude),있음,design/narrative/jangteo-scenario.md,"dolneomeo/field.js 돌다리 문 · jangteo/field.js 솔숲 digs·drawDig · jangteo/region.js defineGather solbang · minigames.csv gather_solbang_hits"
+D-83,탐험,"돌너머 메밀밭 둔덕에 경치 하나: 먼 성황당 돌무더기가 이따금 꿈틀한다. 목적지와 골렘을 미리 보여 준다 (게임 검토 5절)",채택,개발자(Claude),있음,design/narrative/dolneomeo-scenario.md,"dolneomeo/field.js zones.field.vistas · dolneomeo/art.js stirLayers"
 D-90,이야기,"강철이의 새 이름 ""서리무기""",대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,"대장 답으로 ""강철이"" 유지"
 D-91,시스템,레어도 이름 순우리말(흔한 것·쓸 만한 것·귀한 것·보배·전설),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 하품·중품·상품·최상품·천하일품
 D-92,시스템,기록 나누기(아빠의 수첩과 아이의 책),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 아빠의 수첩 한 권

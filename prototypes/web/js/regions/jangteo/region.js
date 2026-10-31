@@ -80,7 +80,13 @@ defineIcons({
 
 /* 가공법은 heirlooms.csv. 시루는 떡집 모락의 김 올리기를 배우면 깨어나고, 메밀떡은 모락에게 따로 배운다 (data/common.js) */
 /* 수리부엉이 손님의 외상은 장터의 밤 장부에서만 연다 (PA-47, forms.js) */
-Rg.strangerCreditAtNight=true;})();
+Rg.strangerCreditAtNight=true;
+
+/* 결정 D-82: 솔숲의 작은 소나무를 흔들어 솔방울을 떨군다 (채집 고리 D-41) */
+defineGather({
+  solbang:{title:'소나무 흔들기',verb:'소나무 흔들기',hits:TABLES.MINIGAMES.gather_solbang_hits,spot:[0,-30],hint:'작은 소나무 줄기를 친다. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 솔방울이 하나 더 떨어진다.'},
+});
+})();
 
 /* PA-43 큰 장터 확장. 길손은 상인 명단과 별개이며 필수 물건을 받지 않는다.
    조사 text 접근자는 E로 조사할 때만 실행된다. 새 플래그는 큰 장터 안에서만 쓴다. */
