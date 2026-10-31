@@ -436,6 +436,13 @@ const TABLES={
    "region": "yeongsan",
    "d": "남쪽 칡뿌리와 겨울 산의 겨우살이, 대추를 함께 갈았다. 건네기 좋은 향긋한 약재다."
   },
+  "ongdal_gourd": {
+   "n": "옹달샘 표주박",
+   "r": 3,
+   "kind": "귀한 것",
+   "region": "yeongsan",
+   "d": "봄에 풀린 옹달샘 첫물이 담긴 낡은 표주박. 끈 매듭 끝이 한 번 거꾸로 감겨 있다."
+  },
   "songi": {
    "n": "송이버섯",
    "r": 3,
@@ -1056,6 +1063,18 @@ const TABLES={
     "effect": "calm:40"
    }
   },
+  "ongdal": {
+   "jujube": {
+    "kind": "좋아함",
+    "line": "대추구먼. 솥에 넣으면 물이 달아지지.",
+    "effect": "none"
+   },
+   "magamok_tea": {
+    "kind": "아주 좋아함",
+    "line": "…끓인 걸 받아 보는 건 몇 해 만이여.",
+    "effect": "none"
+   }
+  },
   "dol_badger": {
    "memil_jelly": {
     "kind": "아주 좋아함",
@@ -1158,6 +1177,18 @@ const TABLES={
      "text": "신표를 보더니 말없이 털토시를 얹어 줬다.",
      "section": "관찰",
      "when": "nal:tosi"
+    },
+    {
+     "who": "me",
+     "text": "아빠 몫으로 대추 두 알을 묶어 맡겼다. 자기가 줬다고는 하지 말라고.",
+     "section": "관찰",
+     "when": "nal:jujube_for_dad"
+    },
+    {
+     "who": "me",
+     "text": "갚을 게 없으면 뭘 지고 다니냐고 했다. 먼저 내려가 고갯길을 봐 두겠단다.",
+     "section": "관찰",
+     "when": "nal:no_debt"
     }
    ]
   },
@@ -1754,6 +1785,12 @@ const TABLES={
      "text": "마가목 열매를 좋아한다. 얼어붙은 비탈의 지름길을 안다.",
      "section": "관찰",
      "when": "salgeumi:shortcut"
+    },
+    {
+     "who": "me",
+     "text": "봄이니까 제 발로 샘까지 가겠단다. 반 남긴 걸 갚으러.",
+     "section": "관찰",
+     "when": "ongdal:salg_goes"
     }
    ]
   },
@@ -1773,6 +1810,36 @@ const TABLES={
      "text": "몸짓으로 말한다. 천천히 보면 알아들을 수 있다.",
      "section": "관찰",
      "when": "dad:ledger"
+    },
+    {
+     "who": "me",
+     "text": "가을부터 하루에 하나씩 막대에 칼집을 냈다. 첫눈 온 날만 깊다.",
+     "section": "관찰",
+     "when": "dad:tally"
+    },
+    {
+     "who": "me",
+     "text": "끈 매듭만 보고 누가 보냈는지 알았다. 손바닥을 펴고 고개를 저었다. 갚을 게 없다는 뜻.",
+     "section": "관찰",
+     "when": "dad:no_debt"
+    },
+    {
+     "who": "me",
+     "text": "글 대신 흙에 그림을 그린다. 우리 셋과 지붕. 내 머리에는 모자.",
+     "section": "관찰",
+     "when": "dad:mud"
+    },
+    {
+     "who": "me",
+     "text": "수첩 맨 뒤에 아빠 손도장. 그 옆에 내 손도장. 다음 쪽은 집에서.",
+     "section": "관찰",
+     "when": "dad:palm"
+    },
+    {
+     "who": "me",
+     "text": "엄마가 맨 매듭에서 손을 멈췄다. 물 한 바가지 빚은 셋이서 갚으러 오자고.",
+     "section": "관찰",
+     "when": "dad:gourd"
     }
    ]
   },
@@ -2250,6 +2317,49 @@ const TABLES={
     }
    ],
    "name": "젊은 아빠의 그날 · 호숫가"
+  },
+  {
+   "id": "ongdal",
+   "region": "yeongsan",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "얼어붙은 샘 대신 금 간 솥에 눈을 녹인다. 오는 짐승마다 한 모금씩.",
+     "section": "관찰",
+     "when": "ongdal:pot"
+    },
+    {
+     "who": "me",
+     "text": "할미 물은 반씩 호숫가로 갔다. 할미는 알면서 모른 척했다.",
+     "section": "관찰",
+     "when": "ongdal:half"
+    },
+    {
+     "who": "me",
+     "text": "솔잎 국물 한 그릇. 겨울 산을 혼자 오르는 너구리는 내가 둘째란다.",
+     "section": "관찰",
+     "when": "ongdal:soup"
+    },
+    {
+     "who": "me",
+     "text": "표주박 끈 매듭이 내 보따리 매듭과 똑같다. 엄마가 가르쳐 준 매듭이다.",
+     "section": "관찰",
+     "when": "ongdal:knot"
+    },
+    {
+     "who": "me",
+     "text": "첫 샘물을 담은 표주박을 맡겼다. 아빠 몫 물 한 바가지 빚은 집에서 갚으라고.",
+     "section": "관찰",
+     "when": "ongdal:gourd"
+    },
+    {
+     "who": "me",
+     "text": "샘이 풀렸는데도 솥을 다시 걸어 빚진 국물을 끓였다. 솥 걸어 놓고 기다리겠단다.",
+     "section": "관찰",
+     "when": "ongdal:bye"
+    }
+   ]
   }
  ],
  "MINIGAMES": {
