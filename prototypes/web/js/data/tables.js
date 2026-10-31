@@ -2112,6 +2112,8 @@ const TABLES={
   "field_swing_speed": 0.7,
   "field_jump_velocity": -5.4,
   "field_drop_frames": 14,
+  "field_drop_hang_frames": 14,
+  "field_drop_hang_speed": 0.9,
   "field_crawl_frames": 54,
   "field_gravity": 0.32,
   "field_fall_speed": 6,

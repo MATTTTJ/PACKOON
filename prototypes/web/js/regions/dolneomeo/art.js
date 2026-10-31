@@ -118,9 +118,7 @@ function scenery(zone,fixtures={}){const sx=x=>Math.round(x-cam);const visible=(
   }
 }
 function front(zone){
-  // 받침돌의 흐린 흔적만 보인다. 글자나 집안 낙관은 정하지 않는다.
-  const host={gate:[1710,160],village:[1160,161],cliff:[2390,116]}[zone];
-  if(host)pawStamp(host[0]-cam,host[1]+2,'#937e73');
+  // 아빠 도장 자리(받침과 흐린 손바닥)는 엔진이 도장 자리마다 그린다 (결정 D-115, engine/field.js drawStampBase).
   if(Vfx.reducedMotion||Rg.springRevisit())return;for(let i=0;i<13;i++){const x=mod(i*37-Math.floor(G.anim*.13),W),y=mod(i*23+Math.floor(G.anim*.09),H);if(i%3!==1)px(x,y,1,1,i%2?'#eff5ed':'#cbdad7');}if(zone==='shrine'&&Math.floor(G.anim/36)%3===0){px(56,74,17,1,'#dce6df');px(77,72,9,1,'#dce6df');}}
 
 /* 첫 경치: 햇빛은 구름 사이의 틈에서만 따뜻하다. 돌과 서리는 은빛이다. */

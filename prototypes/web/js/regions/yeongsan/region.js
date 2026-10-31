@@ -218,7 +218,7 @@ function install(){
   }));
   for(const id of ['shelter','snow','shore']){
     const z=Rg.zones[id],npcs=z.npcs.slice(),oldStep=z.step;
-    Object.defineProperty(z,'npcs',{get:()=>npcs.concat((Rg.expContent.stamps[id]||[]).filter(s=>stampFound(s.id)).map(s=>({...fixture('hands_'+s.id,'도장 홈 손끝으로 짚기',s.x,()=>traceStamp(s)),y:s.y})))});
+    Object.defineProperty(z,'npcs',{get:()=>npcs.concat((Rg.expContent.stamps[id]||[]).filter(s=>stampFound(s.id)).map(s=>({...fixture('hands_'+s.id,'도장 홈 손끝으로 짚기',s.x,()=>traceStamp(s)),y:s.y,draw:()=>{}})))});
     z.step=()=>{
       oldStep?.();if(paused())return;
       const prompted=G.f.yStampPrompted||(G.f.yStampPrompted={});
