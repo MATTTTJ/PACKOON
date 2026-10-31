@@ -252,7 +252,9 @@ function drawPickups(){for(const a of fieldItems('pickups')){if(a.got||!formVisi
   floorShadow(x,a.y);
   drawOutlined(x,p.y,(ox,oy)=>fieldCall('drawPickup',{...a,y:oy},ox,bob));
   floorGlint(x,p.y,9,a.x);}}
-function drawDigs(){const ground=fieldGround();for(const d of fieldItems('digs')){const x=d.x-cam;if(x<-12||x>W+12||!formVisible(d))continue;
+function drawDigs(){const ground=fieldGround();for(const d of fieldItems('digs')){const x=d.x-cam;if(x<-12||x>W+12)continue;
+  // 결정 D-80: 다람쥐가 묻고 잊은 몫은 다른 모습에서도 발톱 긁은 자국으로 보인다. 캐는 것은 다람쥐만 (design/data/decisions.csv)
+  if(!formVisible(d)){if(d.cache&&!d.done)drawCacheHint(d,x);continue;}
   if(d.cache){drawCache(d,x);continue;}   // 다람쥐의 잊은 몫 (forms.js)
   const dy=d.y??ground,live=!d.done&&!d.busy;
   if(live)floorMark(x,dy);                // 캘 수 있는 자리도 밑을 밝혀 눈에 띄게 (피드백 16)
@@ -402,11 +404,12 @@ function updateOverlay(){
   const floor=paused()||pickupPose?null:nearFloorItems()[0];
   if(floor){pr.hidden=false;const room=nearFloorItems().some(a=>canPickupItem(a.item));pr.textContent=!room?'보따리 가득':TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
-  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
+  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':GATHER[dg.item]?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
   else if(!paused()&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
   if(!formRing.hidden&&!formChangeAllowed())formRing.hidden=true;
   $('padTalk').classList.toggle('ready',!!n);
+  {const t=n?actionVerb(n):'말걸기';if($('padTalk').textContent!==t)$('padTalk').textContent=t;}
   updateNpcTags(n);updateHints();
   /* 필드 보스 체력 막대: REG.fieldBoss() 가 {name, hp, max} 를 주면 보인다 */
   const fb=fieldCall('fieldBoss');$('bossbar').hidden=!fb;
@@ -650,6 +653,16 @@ function interactionLabel(p){
   if(k==='examines')return p.label||'조사하기';
   return p.prompt||(p.name||'길손')+'에게 말 걸기';
 }
+/* 결정 D-85: 휴대폰 말걸기 버튼 글자는 대상에 맞춘다. 말풍선 안내의 마지막 낱말(들어가기·살피기·쉬기…)을 쓰고, 길면 종류별 기본 말 */
+function actionVerb(p){
+  const k=interactionKind(p);
+  if(k==='npc'||k==='wanderers'){if(!p.prompt)return '말걸기';}
+  if(k==='vistas')return '바라보기';
+  if(k==='doors'&&!pathOpen(p))return '살피기';
+  const last=String(interactionLabel(p)).trim().split(/\s+/).pop()||'';
+  if(last.length&&last.length<=5&&/기$/.test(last))return last;
+  return k==='doors'?'들어가기':k==='npc'||k==='wanderers'?'말걸기':'살피기';
+}
 function tryInteract(){
   const p=nearInteraction();if(!p)return;
   const kind=interactionKind(p);
@@ -709,7 +722,10 @@ function findStamp(s){
 function drawZoneObjects(){
   for(const p of zoneObjects('wanderers'))if(p.draw)p.draw(p.x-cam,p.y??fieldGround(),G.px<p.x?-1:1);
   for(const k of ['doors','examines','vistas','stamps'])for(const p of zoneObjects(k)){
-    if(k==='stamps'&&!stampFound(p.id))continue;
+    // 결정 D-81: 아빠 도장 자리에는 찾기 전에도 흐린 손바닥 흔적이 남아 있다. 찾으면 또렷해진다 (design/data/decisions.csv)
+    if(k==='stamps'){const sx=p.x-cam,sy=(p.y??fieldGround())-1;
+      if(!stampFound(p.id)){pawStamp(sx,sy,'rgba(92,58,36,.34)');if(!Vfx.reducedMotion&&Math.floor((G.anim+p.x)/20)%6===0)R(Math.round(sx)+2,Math.round(sy)-11,1,1,'#fff3c4');continue;}
+      if(!p.draw){pawStamp(sx,sy,'#7a3b24');continue;}}
     if(p.draw)p.draw(p.x-cam,p.y??fieldGround());
     if(k==='doors'&&!needMet(p)&&p.drawBlocked)p.drawBlocked(p.x-cam,p.y??fieldGround());
   }
@@ -759,7 +775,7 @@ function startVista(p){
   const seen=G.f.vistasSeen||(G.f.vistasSeen={}),key=expansionKey(p.id),first=!seen[key];
   seen[key]=true;if(first&&p.diary)diary('vista:'+key,p.diary);
   closePanels();suppressHeldInputs();G.vx=G.vy=G.attackT=0;
-  const hidden=[document.querySelector('.hud'),$('pad'),$('dlg'),$('prompt'),$('toast'),$('bossbar')].map(e=>[e,e.hidden]);
+  const hidden=[document.querySelector('.hud'),$('pad'),$('dlg'),$('prompt'),$('toast'),$('bossbar'),npcTagLayer].map(e=>[e,e.hidden]);   // 인물 이름표도 경치 동안 숨긴다
   hidden.forEach(([e])=>e.hidden=true);
   vistaMode={p,tick:0,hidden};vistaThought.textContent=first&&p.thought?p.thought:'';vistaThought.hidden=!vistaThought.textContent;
   vistaReturn.textContent=TOUCH?'화면을 누르면 돌아간다':'아무 키나 누르면 돌아간다';vistaCaption.hidden=false;

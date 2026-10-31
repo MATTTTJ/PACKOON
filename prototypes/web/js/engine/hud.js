@@ -7,7 +7,19 @@ function refreshGoal(){
   $('goalM').querySelector('span').textContent=g||REG.cover.ready;
 }
 let lastTool='';
+/* 결정 D-85: 키 안내의 잎사귀 변신은 가진 변신만 보인다. 변신을 하나도 못 배웠으면 줄을 숨긴다. */
+function refreshKeyForms(){
+  const span=$('keyForms');if(!span)return;
+  const ids=G&&Array.isArray(G.forms)?FORM_IDS.filter(id=>G.forms.includes(id)):[];
+  const key=ids.join(',');if(span.dataset.key===key)return;span.dataset.key=key;
+  span.hidden=!ids.length;if(!ids.length){span.textContent='';return;}
+  const all=['',...ids],num=id=>id?FORM_IDS.indexOf(id)+1:0;
+  span.innerHTML='';
+  all.forEach((id,i)=>{if(i)span.append('·');const k=el('kbd',null,String(num(id)));span.append(k);});
+  span.append(' 잎사귀 변신 ('+all.map(id=>num(id)+' '+formName(id)).join(' · ')+', 필드·전투)');
+}
 function refreshHud(){
+  refreshKeyForms();
   $('btnMap').hidden=CLASSIC;$('padMap').hidden=CLASSIC;$('btnMapEnd').hidden=CLASSIC;
   $('mapKeyHint').hidden=CLASSIC;$('mapCoverKeys').hidden=CLASSIC;
   $('hearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('');

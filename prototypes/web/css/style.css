@@ -280,7 +280,8 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .b-part.broken .nm{text-decoration:line-through;opacity:.5}
 .b-part .tag{font-size:.82em;color:var(--dan)}
 .b-me{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
-.b-me .hearts{color:var(--dan)}
+.b-me{min-width:0;max-width:52%}
+.b-me .hearts{color:var(--dan);display:flex;flex-wrap:wrap;justify-content:flex-end;line-height:1.1}   /* 결정 D-84: 체력이 많아도 줄을 바꿔 진정 막대를 밀어내지 않는다 */
 .b-me .hearts .off{color:rgba(42,32,25,.25)}
 .b-calm{display:flex;align-items:center;gap:6px}
 .b-calm .track{width:clamp(64px,13vw,140px);height:8px;border:1px solid var(--meok);background:rgba(255,255,255,.45)}
@@ -384,6 +385,13 @@ body.in-battle .hud-btns{max-width:none;flex-wrap:nowrap}
 body.in-battle .hud-btns .chipbtn{display:none}
 body.in-battle .hud-btns #btnSound,body.in-battle .hud-btns #btnVolume{display:block;height:32px;min-height:32px}
 body.in-battle .b-top{top:calc(2.5% + 40px)}
+/* 결정 D-84: 전투 중 필드 체력 칸은 자리도 차지하지 않는다. 체력 줄이 길어도 소리 버튼이 찌그러지지 않고 진정 막대를 덮지 않는다.
+   전투에서 쓰지 못하는 보따리·수첩·지도 버튼은 숨긴다. */
+body.in-battle .hud-left{display:none}
+body.in-battle .hud{justify-content:flex-end}
+body.in-battle .hud-btns .chipbtn{white-space:nowrap;flex:none}
+body.in-battle .pad-top .chipbtn{display:none}
+.bbtn.armed{background:#b4432a;color:#fff6e8;border-color:#5a1d10}
 .acts{display:grid;grid-template-columns:auto auto;grid-template-areas:"talk talk" "jump atk";gap:12px;justify-items:center;align-items:center}
 .acts .talk{grid-area:talk;justify-self:end}
 .acts .jump{grid-area:jump}

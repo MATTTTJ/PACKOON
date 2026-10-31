@@ -709,11 +709,25 @@ function nalMarketGive(){
   G.f.jxCraftMarket=true;ledger('t_craft_market','날쌘','솔방울 3','떡 재료 묶음');ledgerDone('t_craft_market');
   talk([['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
 }
-function nalTrade(id){
-  const F=G.f;takeItem(id,1);F.nalJDone=true;ledgerDone('nal_jangteo');
-  const n=(id==='memil_powder'?2:1)+(F.nalJBluff?1:0);addItem('pat',n);
+// 결정 D-78: 쌀가루에 약과를 얹으면 날쌘이 제 몫으로 먹고 팥 한 되를 더 준다(날쌘은 약과를 좋아한다, tastes.csv).
+function nalTrade(id,yak=false){
+  const F=G.f;if(!has(id))return;
+  takeItem(id,1);F.nalJDone=true;ledgerDone('nal_jangteo');
+  const extra=yak&&has('yakgwa');if(extra)takeItem('yakgwa',1);
+  const n=(id==='memil_powder'?2:1)+(F.nalJBluff?1:0)+(extra?1:0);addItem('pat',n);
   if(id==='memil_powder')learn('nal:jangteo-memil');
-  talk(id==='memil_powder'?[['날쌘','돌너머 메밀가루네. 장터에선 귀하니까\n팥 '+n+'되 쳐줄게. 잘 받은 줄 알아.']]:[['날쌘','자, 팥 '+n+'되. 거래 끝.']]);
+  const lead=extra?[['날쌘','약과? …제법 빚었네.\n이건 팔 거 아니고, 내가 먹을게. 한 되 더 얹지.']]:[];
+  talk(id==='memil_powder'?[...lead,['날쌘','돌너머 메밀가루네. 장터에선 귀하니까\n팥 '+n+'되 쳐줄게. 잘 받은 줄 알아.']]:[...lead,['날쌘','자, 팥 '+n+'되. 거래 끝.']]);
+}
+/* 결정 D-79: 솔방울과 쌀은 진행에 필요한 몫이 모자랄 때만 다시 생긴다(무한 반복 막기). 확정 '쌀 8개'는 그대로다. */
+function riceNeeded(){return progressShortage({...G.inv,ssal:(G.inv.ssal||0)+8})<progressShortage(G.inv);}
+function conesNeeded(){return riceNeeded()||progressShortage({...G.inv,solbang:(G.inv.solbang||0)+5})<progressShortage(G.inv);}
+Rg.riceNeeded=riceNeeded;
+// 결정 D-77: 설 대목에 깨진 떡집 맷돌을 돌가루로 때운다(trades.csv t_morak 비고). 모락은 약과로 갚는다.
+function morakQuernGive(){
+  if(G.f.morakQuern||!has('stonedust'))return;
+  takeItem('stonedust',1);addItem('yakgwa',1);G.f.morakQuern=true;rel('morak',1);
+  talk([['모락','돌가루? 마침 깨진 맷돌 틈을 못 메워서 애먹었는데!'],['모락','(모락이 돌가루를 물에 개어 맷돌 금에 꾹꾹 채운다.)'],['모락','옳지, 이제 덜컹대지 않겠다!\n자, 약과 하나 가져가!']]);
 }
 
 /* ---------- 숙소 마루: 쉬면 낮과 밤이 바뀐다 ---------- */
@@ -723,8 +737,10 @@ function restMaru(){
     G.f.night=toNight;learn('maru:rest');
     if(!CLASSIC){
       // 잠든 사이 바람이 새 솔방울을 떨어뜨린다. 고정 id를 되살려 저장 중복을 만들지 않는다.
-      for(const a of G.pickups)if(a.zone==='pine'&&a.item==='solbang')a.got=false;
-      toast(toNight?'밤이 되었다. 좌판이 접히고 골목이 열렸다.':'아침이 되었다. 솔숲에 새 솔방울이 떨어졌다.');
+      // 결정 D-79: 진행에 필요한 몫(엿방울 몫, 모자란 쌀)이 모자랄 때만 다시 떨어진다.
+      const refill=!toNight&&conesNeeded();
+      if(refill)for(const a of G.pickups)if(a.zone==='pine'&&a.item==='solbang')a.got=false;
+      toast(toNight?'밤이 되었다. 좌판이 접히고 골목이 열렸다.':refill?'아침이 되었다. 솔숲에 새 솔방울이 떨어졌다.':'아침이 되었다.');
     }else toast(toNight?'밤이 되었다':'아침이 되었다');refreshGoal();});
 }
 
@@ -864,12 +880,13 @@ if(!CLASSIC){
     if(n.id==='morak')p.props=null; // 떡집 실내는 확장 배경에서 발판 높이에 맞춰 그린다.
     if(n.id==='yeotbang')p.talk=()=>{
       if(!G.f.yeotDone){n.talk();return;}
-      talk([['엿방울',night()&&!G.boss.dead&&Rg.arcs()?'(수레 밑에서 꼬리 끝만 비죽 보인다.)':'불쏘시개는 늘 필요하지~\n솔방울을 더 주우면 쌀도 더 바꿔 줄게.',[
+      talk([['엿방울',night()&&!G.boss.dead&&Rg.arcs()?'(수레 밑에서 꼬리 끝만 비죽 보인다.)':(Rg.riceNeeded()?'불쏘시개는 늘 필요하지~\n솔방울을 더 주우면 쌀도 더 바꿔 줄게.':'쌀은 넉넉해 보이는데~\n떡 찌다 모자라면 그때 와.'),[
         {t:'가위 장단과 이야기',go:n.talk},
-        {t:'솔방울 5개로 쌀 8개 더 구하기',go:()=>{
+        // 결정 D-79: 쌀이 진행에 모자랄 때만 더 바꿔 준다.
+        ...(Rg.riceNeeded()?[{t:'솔방울 5개로 쌀 8개 더 구하기',go:()=>{
           if(!has('solbang',5)){talk([['엿방울','솔방울 다섯 개면 쌀 여덟 되야~\n솔숲이 비었으면 숙소에서 쉬고 와. 그새 또 떨어지거든.']]);return;}
           Trade.open('yeotbang');
-        }},{t:'다음에',go:null}]]]);
+        }}]:[]),{t:'다음에',go:null}]]]);
     };
     return p;
   });
@@ -916,18 +933,19 @@ Rg.trade={
     ...(G.f.yeotMet&&!G.f.yeotDone?[{id:'t_yeotbang',item:'ssal',n:8,asks:[{solbang:5}],
       locked:()=>G.f.yeotPaid?'솔방울은 벌써 건넸다. 엿 고는 동안 장단을 맞추면 쌀을 준다.':null,
       done:()=>G.f.yeotDone,accept:yeotGive}]:[]),
-    ...(!CLASSIC&&G.f.yeotDone?[{id:'t_yeotbang_more',item:'ssal',n:8,asks:[{solbang:5}],accept:yeotMoreGive}]:[])
+    ...(!CLASSIC&&G.f.yeotDone&&riceNeeded()?[{id:'t_yeotbang_more',item:'ssal',n:8,asks:[{solbang:5}],accept:yeotMoreGive}]:[])
   ],
   nal:()=>[
     ...(G.ledger.nal_jangteo?[
-      {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:()=>nalTrade('ssal_powder')},
+      {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1},{ssal_powder:1,yakgwa:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:i=>nalTrade('ssal_powder',i===1)},
       {id:'t_nal_jangteo_memil',item:'pat',n:2+(G.f.nalJBluff?1:0),asks:[{memil_powder:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:()=>nalTrade('memil_powder')}
     ]:[]),
     ...(!CLASSIC&&G.f.jxCraftMarketHeard?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 녹두 · 팥',asks:[{solbang:3}],
       locked:()=>!G.f.yeotDone&&(G.inv.solbang||0)<8?'엿방울한테 줄 솔방울 다섯은 남겨 둬야 한다.':null,
       done:()=>G.f.jxCraftMarket,accept:nalMarketGive}]:[])
   ],
-  morak:()=>G.f.morakMet?[{id:'t_morak',item:'patsirutteok',label:'시루를 깨우는 김 다루기',asks:[{ssal_powder:3}],done:()=>G.f.morakPowder,accept:morakGiveNow}]:[],
+  morak:()=>G.f.morakMet?[{id:'t_morak',item:'patsirutteok',label:'시루를 깨우는 김 다루기',asks:[{ssal_powder:3}],done:()=>G.f.morakPowder,accept:morakGiveNow},
+    {id:'t_morak_quern',item:'yakgwa',n:1,label:'깨진 떡집 맷돌 때우기 · 약과 1',asks:[{stonedust:1}],done:()=>G.f.morakQuern,accept:morakQuernGive}]:[],
   bueong:()=>G.f.bueongNight?[{id:'t_bueong',item:'sinpyo',label:'보부상 신표 · 아빠가 맡긴 짐',asks:[{patsirutteok:1}],
     locked:()=>night()?null:'부엉 영감님은 밤에만 깨어 계신다.',done:()=>G.f.bueongDone,accept:bueongGiveNow}]:[]
 };
