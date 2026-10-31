@@ -192,7 +192,7 @@ if(!CLASSIC){
         {x:1590,to:'street',toX:1490,toY:110,label:'떡집 아궁이 옆문으로',draw:peg},
         {x:1515,y:110,to:'street',toX:1625,label:'떡집 밖으로',draw:peg},
         {x:1010,y:96,to:'entrance',toX:1310,toY:96,label:'연이 걸렸던 처마로 돌아가기',need:()=>!!G.f.jxKiteDone,reason:'입구에서 연을 풀어 준 뒤 걸어 보자.',draw:peg},
-        {x:2180,to:'pine',toX:70,label:'굴뚝 뒤 소나무 숲으로',draw:peg},
+        {x:2180,to:'pine',toX:70,label:'굴뚝 뒤 소나무 숲으로',ascend:true,draw:peg},
         {x:2040,to:'inn',toX:1510,label:'접힌 좌판 사이, 숙소 지름길',need:night,reason:'낮에는 좌판이 골목을 막는다. 밤이면 접힌다.',draw:peg,drawBlocked:shutter,
           formPass:'squirrel',formLabel:'다람쥐로 좌판 밑 지나기'},
         {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'입구 아이의 연을 풀어 주면 처마길을 알려 줄 거야.',draw:peg}],
@@ -220,7 +220,8 @@ if(!CLASSIC){
       digs:[{id:'j_cache_pine',x:1700,item:'kong',n:2,form:'squirrel',cache:true,done:false}],
       pickups:[...cones('pine',[[250,192],[280,192],[310,192],[600,96],[630,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
         {id:'j_owl_roof_cone_1',x:858,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:880,y:124,item:'solbang',got:false}],
-      doors:[{x:70,to:'street',toX:2180,label:'떡집 굴뚝을 향해 내려가기',draw:peg},
+      // 결정 D-44: 뒷산에서 장터로는 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
+      doors:[{x:70,to:'street',toX:2180,label:'떡집 굴뚝을 향해 내려가기',descend:true,draw:peg},
         {x:2480,y:96,to:'street',toX:2650,toY:96,label:'등불 아래 장터 지붕으로',need:()=>!!G.f.jxKiteDone,reason:'처마길은 입구 아이에게 연을 돌려준 뒤 알려 달라고 하자.',draw:peg}],
       exits:{left:{to:'street',toX:2180}},
       get wanderers(){return night()?[...E.wanderers.pine,...nightLanterns('pine')]:[];},examines:E.examines.pine,
