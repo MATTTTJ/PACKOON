@@ -363,7 +363,7 @@
         if (seconds >= end) seconds = start + (seconds - start) % (end - start);
       }
       const track = current && current.track || tracks.get(current ? current.id : selectedId), loopStart = track && track.loop ? track.loop.start * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0;
-      return { id: current ? current.id : selectedId, tempoFactor: current ? current.factor || 1 : 1, layered: !!(current && current.parts), playing: !!current && !paused, paused, loading, ended, currentTime: seconds, duration: track ? track.measures * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0, phase: track && track.loop ? seconds < loopStart ? 'intro' : 'loop' : 'once', travel: travelPlan ? { to: travelPlan.to, interlude: travelPlan.interlude, phase: travelPlan.phase } : null, enabled, volume, ducking, unlocked };
+      return { id: current ? current.id : selectedId, tempoFactor: current ? current.factor || 1 : 1, layered: !!(current && current.parts), recorded: !!(current && current.recorded), playing: !!current && !paused, paused, loading, ended, currentTime: seconds, duration: track ? track.measures * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0, phase: track && track.loop ? seconds < loopStart ? 'intro' : 'loop' : 'once', travel: travelPlan ? { to: travelPlan.to, interlude: travelPlan.interlude, phase: travelPlan.phase } : null, enabled, volume, ducking, unlocked };
     }
     let selectedId = null;
     function emit() { if (typeof options.onState === 'function') options.onState(state()); }
@@ -500,7 +500,41 @@
         .catch(() => { preloading.delete(id); return null; });
       preloading.set(id, job);
     }
+    // 결정 D-105: 녹음 음원(ACE-Step 시험판). 켜면 녹음 파일이 있는 곡은 합성 대신 그 파일을 쓴다.
+    // 디코드한 소리를 합성 곡과 같은 모양(left·right·반복 프레임)으로 바꿔, 반복·간주·크로스페이드를 그대로 쓴다.
+    // 녹음은 성부를 나눌 수 없어 층은 전체 세기 하나로 줄이고, 템포 단계는 쓰지 않는다(재생 속도를 바꾸면 음높이도 바뀐다).
+    const recordings = options.recordings || {}, recordFailed = new Set();
+    let recordedOn = false;
+    const isRecorded = id => recordedOn && !!recordings[id] && !recordFailed.has(id);
+    function fetchArrayBuffer(url) {
+      // file://에서도 열리도록 XHR을 쓴다(fetch는 file://을 막는다). 실패하면 합성 곡으로 돌아간다.
+      return new Promise((resolve, reject) => {
+        const x = new XMLHttpRequest(); x.open('GET', url); x.responseType = 'arraybuffer';
+        x.onload = () => (x.status === 200 || (x.status === 0 && x.response && x.response.byteLength)) ? resolve(x.response) : reject(new Error('HTTP ' + x.status));
+        x.onerror = () => reject(new Error('녹음 파일을 읽지 못했다')); x.send();
+      });
+    }
+    async function loadRecorded(id, request) {
+      const key = id + '@rec';
+      let pcm = cache.get(key);
+      if (pcm) { cache.delete(key); cache.set(key, pcm); return pcm; }
+      try {
+        const buf = await context.decodeAudioData(await fetchArrayBuffer(recordings[id]));
+        if (request !== serial || destroyed) return null;
+        const c = compileScore(tracks.get(id), bank, buf.sampleRate), n = Math.min(buf.length, c.frames);
+        const left = buf.getChannelData(0).slice(0, n), right = (buf.numberOfChannels > 1 ? buf.getChannelData(1) : buf.getChannelData(0)).slice(0, n);
+        pcm = { left, right, sampleRate: buf.sampleRate, loopStartFrame: Math.min(c.loopStartFrame || 0, n - 1), loopEndFrame: c.loopEndFrame ? Math.min(c.loopEndFrame, n) : 0, scoreFrames: n, recorded: true };
+        cache.set(key, pcm); trimCache(); return pcm;
+      } catch (error) {
+        recordFailed.add(id); clockEvent('recorded-failed', { id, message: String(error && error.message || error) });
+        return undefined;
+      }
+    }
+    // 층 세기를 녹음 전체 세기 하나로: 바탕 절반, 북 층 3할, 그리움 2할
+    const recordedTrim = lv => clamp(0.5 * (lv.base ?? 1) + 0.2 * (lv.longing ?? 1) + 0.3 * (lv.pulse ?? 1), 0.55, 1.25);
+    function setRecorded(on) { recordedOn = !!on; recordFailed.clear(); emit(); }
     async function loadTrack(id, request, variant) {
+      if (!variant && isRecorded(id)) { const rec = await loadRecorded(id, request); if (rec !== undefined) return rec; }
       const key = variant ? variant.key : id;
       const rate = renderRate();
       let pcm = cache.get(key);
@@ -556,9 +590,12 @@
       if (destroyed) throw new Error('연주기가 닫혔습니다.');
       if (!tracks.has(id)) throw new Error('없는 곡: ' + id);
       if (!settings.route) { travelPlan = null; pausedRoute = null; if (current) { current.next = null; current.endFrame = null; } }
-      const factor = settings.tempo || 1, layers = settings.layers || null, lkey = layerKey(layers);
+      const rec = isRecorded(id);
+      const factor = rec ? 1 : settings.tempo || 1, layers = rec ? null : settings.layers || null, lkey = layerKey(layers);
       if (settings.levels) levels = { ...levels, ...settings.levels };
-      if (current && current.id === id && settings.fromSeconds === undefined && !settings.keepBeat && (current.factor || 1) === factor && (current.layerKey || '') === lkey && !paused) {
+      // 녹음 곡이 이미 흐르면 템포 단계 요청은 세기만 바꾸고 다시 틀지 않는다.
+      if (rec && current && current.id === id && current.recorded && settings.fromSeconds === undefined && !paused) { setLayers(settings.levels || {}); return true; }
+      if (current && current.id === id && settings.fromSeconds === undefined && !settings.keepBeat && !!current.recorded === rec && (current.factor || 1) === factor && (current.layerKey || '') === lkey && !paused) {
         // A 재생 중 B를 준비하다 A로 돌아오면 늦게 끝난 B를 버린다.
         if (loading || selectedId !== id) { serial++; selectedId = id; loading = false; emit(); }
         return true;
@@ -598,6 +635,7 @@
       const start = context.currentTime + 0.035;
       const session = { id, pcm, gain, track, factor, layerKey: lkey, layers, sources: new Set(), frame: Math.floor(from * pcm.sampleRate), when: start, started: start, from, stopping: false, enteredLoop: from * pcm.sampleRate > pcm.loopStartFrame };
       if (parts) session.parts = parts.map(part => { const node = context.createGain(); node.gain.value = levels[part.name] === undefined ? 1 : levels[part.name]; node.connect(gain); return { ...part, node }; });
+      else if (pcm.recorded) { const node = context.createGain(); node.gain.value = recordedTrim(levels); node.connect(gain); session.parts = [{ name: 'recorded', pcm, node }]; session.recorded = true; }
       if (settings.route) { travelPlan = settings.route.plan; session.next = settings.route.next; session.endFrame = settings.route.endFrame; }
       active.add(session); current = session; paused = false; pausedAt = from; loading = false;
       gain.gain.setValueAtTime(0, context.currentTime); gain.gain.linearRampToValueAtTime(1, start + crossfade);
@@ -632,6 +670,7 @@
     }
     function setLayers(next, seconds = 0.6) {
       levels = { ...levels, ...next };
+      if (current && current.recorded) { setGain(current.parts[0].node, recordedTrim(levels), seconds); return; }
       if (current && current.parts) current.parts.forEach(part => { if (next[part.name] !== undefined) setGain(part.node, clamp(next[part.name], 0, 2), seconds); });
     }
     function setVolume(value) { volume = finite(value, 'volume', 0, 1); if (master) setGain(master, enabled ? volume * ducking : 0); emit(); }
@@ -693,7 +732,7 @@
       if (ownsContext && context) context.close().catch(() => {});
     }
     function getDiagnostics() { return { clockEvents: clockEvents.slice(), schedulerRunning: !!timer, sources: sourceCount(), peakSources, sessions: active.size, cachedTracks: cache.size, cacheBytes: [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0), sampleRate: renderRate() }; }
-    return { unlock, play, preload, travel, stop, pause, resume, setLayers, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
+    return { unlock, play, preload, travel, stop, pause, resume, setLayers, setRecorded, get recordedOn() { return recordedOn; }, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
   }
   function attachSound(sound, player) {
     if (!sound || !player) throw new Error('Sound와 player가 필요합니다.');

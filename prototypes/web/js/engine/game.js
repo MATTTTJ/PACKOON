@@ -2,7 +2,13 @@
 /* 시작 화면, 끝 화면, 게임 루프, 부팅. 화면 글은 지역의 cover 에서 읽는다 */
 // 음악은 진행 상태를 읽기만 한다. 타이머·보상·저장용 G.f에는 관여하지 않는다.
 const GameMusic=(()=>{
-  const player=PackoonMusic.createPlayer({...PackoonAudioData,sampleRate:22050});
+  // 결정 D-105: ACE-Step으로 만든 녹음 음원(시험판). 소리 설정의 '녹음 음원'을 켜면 이 곡들은 녹음으로 튼다.
+  // 만든 조건(모델·캡션·시드·기준 음원)은 design/data/music/README.md 의 "녹음 음원" 절.
+  const RECORDINGS={danpunggol:'audio/bgm/danpunggol.ogg',boss_kudzu:'audio/bgm/boss_kudzu.ogg'};
+  const RECORDED_KEY='packoon-music-recorded';
+  const player=PackoonMusic.createPlayer({...PackoonAudioData,sampleRate:22050,recordings:RECORDINGS});
+  try{player.setRecorded(localStorage.getItem(RECORDED_KEY)==='1');}catch(_){}
+  $('musicRecorded').checked=player.recordedOn;
   PackoonMusic.attachSound(Sound,player);
   const ids=new Set(PackoonAudioData.score.tracks.map(t=>t.id));
   const bosses={kudzu:'boss_kudzu',golem:'boss_golem',dokkaebi:'boss_dokkaebi',gangcheol:'boss_steel',musoe:'trial_iron'};
@@ -172,7 +178,12 @@ const GameMusic=(()=>{
   addEventListener('keydown',()=>setTimeout(update,0),true);
   addEventListener('packoon-sound-change',()=>setTimeout(update,0));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(update,0);});
-  return {update,adapt,setScene,reset,getState,player};
+  // 녹음 음원 켜고 끄기: 지금 곡을 처음부터 새로 틀게 한다(같은 곡이어도 합성↔녹음을 바꾼다).
+  function setRecorded(on){
+    player.setRecorded(on);try{localStorage.setItem(RECORDED_KEY,on?'1':'0');}catch(_){}
+    requested=undefined;pending=false;update();
+  }
+  return {update,adapt,setScene,reset,getState,setRecorded,get recorded(){return player.recordedOn;},recordings:RECORDINGS,player};
 })();
 function fillCover(){
   const C=REG.cover;

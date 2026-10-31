@@ -635,3 +635,6 @@ body.ending-scene .hud,body.ending-scene #pad,body.ending-scene #toast,body.endi
 .form-pick{min-width:56px;min-height:44px;padding:0 10px;font-family:var(--ui);font-size:14px;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:8px;touch-action:manipulation}
 .form-pick[aria-pressed="true"]{background:var(--meok);color:#fffaf0;border-color:#c9a06a}
 body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
+/* 결정 D-105: 녹음 음원 설정과 AI 사용 표기 */
+.music-recorded{display:flex;align-items:center;gap:6px;margin-top:6px}
+.ai-note{margin:4px 0 0;font-size:.85em}
