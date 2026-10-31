@@ -131,7 +131,7 @@ Object.defineProperty(window,'bookTab',{configurable:true,get:()=>noteTab,set:v=
     tabs.appendChild(b);
   });
 }
-function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){Sound.panel(true);collectFreshDrawings();renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;}}
+function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){Sound.book(true);collectFreshDrawings();renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;}}
 /* 옛 이름: 너구리의 책이 따로 있던 때 부르던 함수도 이 수첩을 연다 */
 function toggleBook(){toggleNote();}
 function renderBook(){renderNotebook();}

@@ -147,9 +147,13 @@ async function runMap({browser:b,outDir}){
       return {zones,stable,floor:structuredClone(G.floorItems),local:Object.fromEntries(Object.entries(G.regionStates).map(([id,s])=>[id,structuredClone(s)]))};
     })()`);
     // 엔딩 이름 입력은 실제 입력으로 끝낸다. 이름을 정하기 전에 지도로 장면을 건너뛰면 안 된다.
-    await b.click('#btnMapEnd');
+    // 결정 D-73: 엔딩은 한 줄씩. 이름 칸까지 넘긴 뒤 M으로 지도를 열어 본다. 버튼 줄은 이름을 부르고 끝날 때까지 숨는다.
+    for(let i=0;i<12&&!await b.eval("!!$('newName')");i++){await b.click('#endExtra .end-next');await b.wait(80);}
+    check(await b.eval("$('endButtons').hidden"),'map-ending-buttons-hidden','엔딩 대사가 끝나기 전에 아래 버튼이 보인다.');
+    await b.key('m');
     check(await b.eval("$('map').hidden&&document.activeElement===$('newName')"),'map-ending-name-gate','엔딩 이름을 정하기 전에 지도 이동이 열렸다.');
     await b.send('Input.insertText',{text:'봄이'});await b.key('Enter');await until(b,"G.f.newName==='봄이'");await b.wait(1100);
+    for(let i=0;i<8&&await b.eval("$('endButtons').hidden");i++){if(await b.eval("!!document.querySelector('#endExtra .end-next')"))await b.click('#endExtra .end-next');await b.wait(120);}
     seeded.stable=await b.eval('({inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:(({hintsSeen,...f})=>structuredClone(f))(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)})');
     await b.click('#btnMapEnd');await until(b,"!$('map').hidden");await picture('map-four-regions');
     const comparisons=[];
