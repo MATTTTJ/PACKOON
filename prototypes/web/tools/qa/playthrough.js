@@ -246,7 +246,8 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       for(let i=0;i<5&&!await read('G.barrier.cut');i++){await key('j');await wait(400);}
       if(mode==='expanded')await zone('hill');await moveX(2020,{attack:true});await battle(['ssari','kkoe']);
       await gather('meoru',1);
-      await npc('toad');
+      // 처음 만남이 먼저다(해머루를 들고 와도). 두 번째에 보따리를 펼쳐 해머루를 건넨다.
+      for(let i=0;i<3&&!await read("G.diary.some(d=>d.id==='end')");i++)await npc('toad');
     });
     await next();
     await stage('돌너머 · 억새와 메밀',async()=>{await gather('eoksae',3);await pickup('memil',6);for(let i=0;i<15&&!await read('G.f.kkuDone');i++){await npc('kkubeogi');await wait(180);}if(!await read('G.f.kkuDone'))throw new Error('꾸벅이가 깨어 있을 때 교환하지 못했다');});
