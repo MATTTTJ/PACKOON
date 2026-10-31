@@ -58,7 +58,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     const ways=await read("[...document.querySelectorAll('.trade-haggle button[data-way]')].filter(b=>!b.disabled).map(b=>b.dataset.way)");
     const way=prefer&&ways.find(w=>prefer.test(w));
     if(way){log('흥정',way);await click('.trade-haggle button[data-way="'+way+'"]');await wait(40);}
-    const plan=await read("(()=>{const S=Trade.state;if(!S)return null;for(const g of S.goods){if(g.kind!=='story'||g.id.startsWith('t_craft_')||g.locked?.())continue;const i=g.asks.findIndex(a=>Object.entries(a).every(([id,n])=>has(id,n)));if(i>=0)return {good:g.id,ask:g.asks[i]};}return null;})()");
+    const plan=await read("(()=>{const S=Trade.state;if(!S)return null;for(const g of S.goods){if(g.kind!=='story'||g.id.startsWith('t_craft_')||g.locked?.()||g.done?.())continue;const i=g.asks.findIndex(a=>Object.entries(a).every(([id,n])=>has(id,n)));if(i>=0)return {good:g.id,ask:g.asks[i]};}return null;})()");
     if(!plan){log('교환 화면','맞출 부탁 없음');await click('#tradeClose');await wait(40);return;}
     log('교환',plan);await click('.trade-good[data-good="'+plan.good+'"]');
     for(const [id,n] of Object.entries(plan.ask))for(let i=0;i<n;i++)await click('.slot[data-item="'+id+'"]');
