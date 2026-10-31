@@ -2198,7 +2198,13 @@ const TABLES={
   "roll_speed": 1.8,
   "roll_squirrel_speed": 2,
   "roll_accel_frames": 10,
-  "roll_step_frames": 9
+  "roll_step_frames": 9,
+  "npc_move_out_ms": 1000,
+  "npc_move_in_ms": 450,
+  "npc_move_walk_px": 36,
+  "npc_move_step_ms": 130,
+  "npc_move_min_px": 12,
+  "npc_move_window_ms": 1500
  },
  "PROGRESS": [
   {
