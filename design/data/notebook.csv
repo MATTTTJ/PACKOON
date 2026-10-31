@@ -149,11 +149,11 @@ honey,jangteo,꿀,물건,나,got:honey,처음 얻을 때,(items.csv 의 설명),
 jujube,yeongsan,대추,물건,나,got:jujube,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 acorn_jelly,galchamgol,도토리묵,물건,나,got:acorn_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 memil_jelly,dolneomeo,메밀묵,물건,나,got:memil_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
-dol_badger,dolneomeo,메밀댁,동물,나,met:dol_badger,처음 말을 걸 때,"메밀밭 오소리 아주머니. 무릎이 아파 돌계단을 못 오른다. 짐을 맡기는 손이 크다.",제안,D-118,관찰
-dol_badger,dolneomeo,메밀댁,동물,나,dolneomeo:flower-bojagi,보자기를 받았을 때,"오래전 겨울에 값으로 받은 꽃수 보자기를 주인에게 돌려 달라고 했다. 귀퉁이 꽃이 엄마 수다.",제안,D-118,관찰
+dol_badger,dolneomeo,메밀댁,동물,나,met:dol_badger,처음 말을 걸 때,"메밀밭 들쥐 아주머니. 메밀 널어 둔 멍석을 지키느라 밭을 못 뜬다. 짐을 맡기는 손이 크다.",제안,D-130,관찰
+dol_badger,dolneomeo,메밀댁,동물,나,dolneomeo:flower-bojagi,보자기를 받았을 때,"오래전 겨울에 값으로 받은 꽃수 보자기를 주인에게 돌려 달라고 했다. 내 보따리 매듭과 똑같이 묶였고, 귀퉁이 꽃이 엄마 수다.",제안,D-130,관찰
 dol_turtle,dolneomeo,남생이 할미,동물,아빠,,처음부터,"성황당 돌 그늘의 남생이. 백 년을 살았다고 한다. 묻는 말엔 다음에 답한다.",제안,D-118,아빠 수첩
 dol_turtle,dolneomeo,남생이 할미,동물,나,met:dol_turtle,처음 말을 걸 때,"소원 천은 높을수록 잘 들린다고 했다. 가장 높은 가지에 아빠가 맨 천이 있다.",제안,D-118,관찰
-dol_turtle,dolneomeo,남생이 할미,동물,나,dolneomeo:turtle-spring,떠나기 전 이야기를 들었을 때,"무언가 지나간 자리엔 샘이 먼저 언다. 물 마른 데를 만나면 샘부터 찾으라고 했다.",제안,D-118,관찰
+dol_turtle,dolneomeo,남생이 할미,동물,나,dolneomeo:turtle-spring,떠나기 전 이야기를 들었을 때,"무언가 지나간 자리엔 샘이 먼저 죽는다. 여름엔 마르고 겨울엔 언다. 물 마른 데를 만나면 샘부터 찾으라고 했다.",제안,D-130,관찰
 yakgwa,jangteo,약과,물건,나,got:yakgwa,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 magamok_tea,yeongsan,마가목차,물건,나,got:magamok_tea,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 dad_stamp_jangteo_flag,jangteo,젊은 아빠의 그날 · 장터 깃대,도장,아빠,stamp:jangteo:flag,장터 깃대 밑 도장을 찾았을 때,부를 준다는 열매를 찾으러 북쪽으로 간다. 장터 깃발에 길을 물으니 바람만 대답했다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩
