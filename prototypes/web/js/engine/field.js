@@ -763,7 +763,7 @@ function startVista(p){
   const seen=G.f.vistasSeen||(G.f.vistasSeen={}),key=expansionKey(p.id),first=!seen[key];
   seen[key]=true;if(first&&p.diary)diary('vista:'+key,p.diary);
   closePanels();suppressHeldInputs();G.vx=G.vy=G.attackT=0;
-  const hidden=[document.querySelector('.hud'),$('pad'),$('dlg'),$('prompt'),$('toast'),$('bossbar')].map(e=>[e,e.hidden]);
+  const hidden=[document.querySelector('.hud'),$('pad'),$('dlg'),$('prompt'),$('toast'),$('bossbar'),npcTagLayer].map(e=>[e,e.hidden]);   // 인물 이름표도 경치 동안 숨긴다
   hidden.forEach(([e])=>e.hidden=true);
   vistaMode={p,tick:0,hidden};vistaThought.textContent=first&&p.thought?p.thought:'';vistaThought.hidden=!vistaThought.textContent;
   vistaReturn.textContent=TOUCH?'화면을 누르면 돌아간다':'아무 키나 누르면 돌아간다';vistaCaption.hidden=false;
