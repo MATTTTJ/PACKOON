@@ -59,10 +59,10 @@ function onPress(k){
     if(k==='e'||k==='enter'||k===' ')advance();return;
   }
   if(k==='escape'){closePanels();return;}
-  if(k==='i'){toggleBag();return;}
+  if(k==='i'){if(!open('trade'))toggleBag();return;}
   if(k==='n'||k==='b'){toggleNote();return;} // B 는 옛 너구리의 책 키. 이제 같은 아빠의 수첩을 연다
   if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
-  if(open('bag')||open('notebook'))return;
+  if(open('bag')||open('notebook')||open('trade'))return;
   if(pickupPose)return;
   // 0 너구리 · 1 다람쥐 · 2 산양 · 3 수리부엉이 · 4 고라니 (forms.js)
   if(formKey(k))return;
@@ -82,11 +82,11 @@ function padAction(k){
   if(B){if(!$('bResult').hidden){if(k==='atk')$('bResOk').click();return;}if(B.paused)return;if(k==='atk')bStrike();else if(k==='jump')openGift();return;}
   if(inkOn)return;
   const mg=openMinigame();
-  if(k==='bag'){if(!open('dlg')&&!mg)toggleBag();return;}
+  if(k==='bag'){if(!open('dlg')&&!mg&&!open('trade'))toggleBag();return;}
   if(k==='note'||k==='book'){if(!open('dlg')&&!mg)toggleNote();return;}
   if(mg){if(k==='atk'||k==='jump')mg.hit();return;}
   if(open('dlg')){if(k!=='down')advance();return;}
-  if(open('bag')||open('notebook'))return;
+  if(open('bag')||open('notebook')||open('trade'))return;
   if(k==='down')return;
   if(pickupPose)return;
   if(k==='jump')jumpOrDrop();else if(k==='atk')actionPress();else if(k==='talk')tryTalk();

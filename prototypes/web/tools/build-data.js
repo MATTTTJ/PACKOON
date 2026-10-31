@@ -262,7 +262,32 @@ for(const id of ['root','ssari','kkoe','eoksae','seogi','darae_vine']){
   requireValue(width>0&&width+MINIGAMES.gather_help_width<=MINIGAMES.gather_zone_span&&MINIGAMES.gather_zone_start+MINIGAMES.gather_zone_span<=100,'minigames.csv: '+id+' 채집 판정 범위가 막대를 벗어난다');
 }
 
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES},null,1)+";\n";
+/* 결정 D-39: 교환 화면의 흔한 물건. 값은 레어도 단계로만 맞추므로 표에는 내놓는 물건·개수·횟수만 적는다. */
+const STOCK=[];
+for(const r of t('stock')){
+  const where='stock.csv '+r.id;
+  if(!regionIds.has(r['지역'])||!npcIds.has(r.NPC))fail(where+': 지역·NPC id를 확인한다');
+  const n=+r['개수'],times=+r['횟수'];
+  if(!(Number.isSafeInteger(n)&&n>0&&Number.isSafeInteger(times)&&times>0))fail(where+': 개수·횟수는 양의 정수여야 한다');
+  const item=idOf(r['물건'],where);
+  if(['귀한 것','도구'].includes(ITEMS[item].kind))fail(where+': 귀한 것·도구는 흔한 물건으로 내놓지 않는다');
+  STOCK.push({id:r.id,region:r['지역'],npc:r.NPC,item,n,times});
+}
+/* 결정 D-40: 흥정 반응. 지역 줄이 있으면 그 지역에서는 그 줄이 '전체' 줄보다 먼저다. */
+const HAGGLE={};
+for(const r of t('haggle')){
+  const where='haggle.csv '+r.id,way=r['방식'],kind=r['반응'],region=r['지역']==='전체'?'all':r['지역'];
+  if(!npcIds.has(r.NPC))fail(where+': NPC id를 확인한다');
+  if(region!=='all'&&!regionIds.has(region))fail(where+': 지역 id를 확인한다');
+  if(!['허세','사정','칭찬'].includes(way))fail(where+': 방식은 허세·사정·칭찬 중 하나다');
+  if(!['좋아함','그저 그럼','싫어함'].includes(kind))fail(where+': 반응은 좋아함·그저 그럼·싫어함 중 하나다');
+  if(!r['아이대사']?.trim()||!r['대답']?.trim()||/\\n/.test(r['아이대사']+r['대답']))fail(where+': 대사는 한 줄로 적는다');
+  const slot=((HAGGLE[r.NPC]=HAGGLE[r.NPC]||{})[way]=HAGGLE[r.NPC][way]||{});
+  if(slot[region])fail(where+': 같은 NPC·방식·지역 줄이 겹친다');
+  slot[region]={kind,kid:r['아이대사'].trim(),line:r['대답'].trim()};
+}
+for(const [npc,ways] of Object.entries(HAGGLE))for(const way of ['허세','사정','칭찬'])if(!ways[way]?.all)fail('haggle.csv '+npc+': '+way+'의 전체 줄이 필요하다');
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

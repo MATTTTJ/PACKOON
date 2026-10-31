@@ -147,6 +147,7 @@ js/engine/              모든 지역이 같이 쓰는 것
   hud.js                체력, 손에 든 연장, 지금 할 일
   forms.js              잎사귀 변신: 상태·키·필드 능력·변신 그림·낯선 손님·잎사귀 버튼
   bag.js                보따리와 가보 가공대
+  trade.js              보따리 펼치기 교환 화면: 부탁(지역 Rg.trade)·흔한 물건(stock.csv)·흥정(haggle.csv)
   book.js               수첩 뒤쪽에 아이가 이어 적은 장 그리기 (일기·단서·별명·답장·엄마 쪽지·장부)
   notebook.js           아빠의 수첩 패널 (아빠의 쪽 + 아이의 줄, 탭, 쪽 수·줄 수, learn)
   battle-ink.js         수묵 붓 도구

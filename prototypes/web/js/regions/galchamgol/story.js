@@ -67,7 +67,8 @@ function dodamMain(){
   }else if(!F.dodamDone){
     if(has('powder'))dodamTrade();
     else talk([['도담','도토리 가루 하나면 해머루가 어딨는지 알려 줄게!\n도토리 세 알을 곱게 빻으면 돼!']]);
-  }else talk([['도담',CLASSIC?'당산나무는 마을 맨 끝이야! 참, 칡덩굴 조심해!':'숲 안쪽의 금줄을 따라가!\n낫으로 덩굴을 걷으면 당산나무 속으로 갈 수 있어!']]);
+  }else talk([['도담',CLASSIC?'당산나무는 마을 맨 끝이야! 참, 칡덩굴 조심해!':'숲 안쪽의 금줄을 따라가!\n낫으로 덩굴을 걷으면 당산나무 속으로 갈 수 있어!',
+    [{t:'보따리를 펼친다',go:()=>Trade.open('dodam')},{t:'고마워',go:null}]]]);
 }
 function dodamDad(next){
   clue('d1','도담','몇 달 전 보부상 너구리가 단풍골에서 도토리 가루를 바꿔 갔다. 북쪽으로 간다고 했다.');
@@ -79,11 +80,15 @@ function dodamFruit(){
   talk([['도담','해머루? 그럼, 내가 알지!'],['도담','대신 도토리 가루 하나 줘!\n도토리 세 알 주워서 곱게 빻으면 돼!']],()=>{if(has('powder'))dodamTrade();});
 }
 function dodamTrade(){
-  talk([['도담','와, 도토리 가루! 나랑 바꿀 거지?',[{t:'도토리 가루 1개를 건넨다',go:()=>{
+  talk([['도담','와, 도토리 가루! 나랑 바꿀 거지?',[{t:'보따리를 펼친다',go:()=>Trade.open('dodam')},{t:'아직은 안 줄래',go:null}]]]);
+}
+function dodamGive(){
+  if(G.f.dodamDone||!has('powder'))return;
+  {
     takeItem('powder',1);G.f.dodamDone=true;ledgerDone('dodam');rel('dodam',1);
     diary('dodam','해머루는 당산나무 꼭대기에 있다. 요즘 칡덩굴이 나무를 꽁꽁 감았다고 한다.');
     talk([['도담',CLASSIC?'고마워! 해머루는 마을 끝 당산나무 꼭대기에 열려!':'고마워! 해머루는 당산나무 꼭대기에 열려!\n숲 안쪽 금줄 친 데에 나무 속으로 들어가는 길이 있어!'],['도담','근데 칡덩굴이 나무를 꽁꽁 감았어.\n아무도 못 올라가! 곡괭이로는 안 끊길걸?'],['도담','아, 대장간 무쇠 아저씨한테 가 봐! 날 선 연장은 거기밖에 없어!']],()=>{if(!G.clues.some(c=>c.id==='d1'))dodamDad();});
-  }},{t:'아직은 안 줄래',go:null}]]]);
+  }
 }
 
 /* ---------- 날쌘 (족제비 떠돌이 보부상) ---------- */
@@ -94,10 +99,8 @@ function talkNal(){
   else nalMenu();
 }
 function nalMenu(){
-  const c=[];
-  if(!G.f.nalDone)c.push({t:G.f.nalPriceHeard?'숯이랑 바꾸자 (도토리 가루 + 칡뿌리)':'숯을 구한다고 말한다',go:nalTrade});
+  const c=[{t:'보따리를 펼친다',go:()=>Trade.open('nal')}];
   c.push({t:'아빠 짐의 약연을 내민다',go:nalYakyeon});
-  if(!G.f.nalDone&&G.rel.nal.v===0)c.push({t:'허세 부리기: "흥, 촌구석 숯이 다 그렇지"',go:nalBluff});
   if(!CLASSIC){
     c.push({t:G.f.craftTrade_salt?'바꿔 간 소금 이야기':G.f.nalBasketSeen?'바구니 테 감을 칡 줄기 이야기':'지게 바구니 테가 풀린 걸 알려 준다',go:nalCraftSalt});
   }
@@ -128,10 +131,6 @@ function nalYakyeon(){
   clue('n1','날쌘','날쌘은 약연을 보더니 "네 아빠 거잖아"라며 받지 않았다. 떠돌이 보부상들도 아빠를 안다.');
   talk([['날쌘','…이거 네 아빠 거잖아. 안 받아.'],['날쌘','남의 집 대물림 물건 받았다간 장사 끝이야.\n도로 넣어 둬.'],['날쌘','네 아빠는… 됐어. 갈 길이나 가.']]);
 }
-function nalBluff(){
-  rel('nal',1);
-  talk([['너구리','흥, 촌구석 숯이 다 그렇지.'],['날쌘','뭐? 촌구석?'],['날쌘','꼬마 보부상이 말은 잘하네.\n바꿔 가 봐. 내 숯이 어떤지 보여 줄 테니까.']],nalMenu);
-}
 
 /* 선택 재료 수량은 trades.csv의 t_craft_salt 그대로다. 필수 교환과 별개로 한 번만 바꾼다.
    아이가 본 것(풀린 바구니 테)에서 시작한다. 날쌘이 줄기를 원하는 까닭과 소금·깨를 내놓는 까닭을 말한다. */
@@ -146,11 +145,12 @@ function nalCraftSalt(){
   }
   talk([...lead,['날쌘','마침 질긴 칡 줄기네. 그걸로 테를 감으면 되겠어.'],
     ['날쌘','숯 말고 남은 건 소금이랑 깨뿐이야.\n소금 두 종지에 깨 한 봉지, 바꿀래?',[
-    {t:'칡 줄기 1개를 건넨다',go:()=>{
-      if(G.f.craftTrade_salt||!has('vine'))return;
-      takeItem('vine',1);addItem('salt',2);addItem('sesame',1);G.f.craftTrade_salt=true;ledgerDone('t_craft_salt');
-      talk([['날쌘','이제 숯가루 안 새겠네.'],['날쌘','가루에 소금 넣고 묵 쑤는 건 알지?\n깨도 볶아 놨으니, 소금이랑 같이 찧어 봐.']]);
-    }},{t:'줄기는 더 살펴보고 올게요',go:null}]]]);
+    {t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'줄기는 더 살펴보고 올게요',go:null}]]]);
+}
+function nalSaltGive(){
+  if(G.f.craftTrade_salt||!has('vine'))return;
+  takeItem('vine',1);addItem('salt',2);addItem('sesame',1);G.f.craftTrade_salt=true;ledgerDone('t_craft_salt');
+  talk([['날쌘','이제 숯가루 안 새겠네.'],['날쌘','가루에 소금 넣고 묵 쑤는 건 알지?\n깨도 볶아 놨으니, 소금이랑 같이 찧어 봐.']]);
 }
 
 /* ---------- 무쇠 (삼촌, 아빠의 동생인 너구리 대장장이) ----------
@@ -360,24 +360,28 @@ function finishForge(){
 }
 
 /* ---------- 두꺼비 할멈 (약재상) ---------- */
+function toadGive(){
+  if(!has('meoru')||G.diary.some(d=>d.id==='end'))return;
+  talk(Rg.arcsEnabled()?
+    [['두꺼비 할멈','이걸로 네 엄마 약을 달여서\n까치 편에 집으로 보내 주마.'],
+      ['두꺼비 할멈','다만 병을 늦출 뿐이란다.'],['두꺼비 할멈','고치려면 전설의 열매가 있어야 한단다.'],
+      ['두꺼비 할멈','북쪽 돌너머의 서리다래라면 한 번 더 늦출 게다.\n어디 열리는지는 그 마을에 물어보렴.']]:
+    [['두꺼비 할멈','이걸로 약을 달이면 네 엄마 병을 조금 늦출 수 있을 게다.\n까치 편에 보내마.'],['두꺼비 할멈','다만 늦출 뿐이란다. 고치려면 전설의 열매가 있어야 한단다.'],['두꺼비 할멈','북쪽 돌너머의 서리다래라면 한 번 더 늦출 게다.\n어디 열리는지는 그 마을에 물어보렴.'],['두꺼비 할멈','덩굴이 걷혔으니 북쪽 길도 열렸겠구나. 네 아빠도 그 길로 갔단다.']],()=>{
+    takeItem('meoru',1);ledgerDone('toad');rel('toad',1);
+    diary('end','할멈이 엄마에게 약을 보내 주었다. 북쪽 길이 열렸다. 아빠, 기다려요.');
+    if(Rg.arcsEnabled()){
+      G.f.galArcToad1=true;
+      diary('galArcToad1','두꺼비 할멈이 해머루로 엄마의 병을 늦추는 약을 지어 까치 편에 보냈다.');
+      toadFarewell();return;
+    }
+    toadFarewell();
+  });
+}
 function talkToad(){
   if(G.diary.some(d=>d.id==='end')){toadFarewell();return;}
   if(Rg.arcsEnabled()&&G.f.galArcToad1){toadFarewell();return;}
-  if(has('meoru')){
-    talk(Rg.arcsEnabled()?
-      [['두꺼비 할멈','해머루구나. …잘 익었구나.'],['두꺼비 할멈','이걸로 네 엄마 약을 달여서\n까치 편에 집으로 보내 주마.'],
-        ['두꺼비 할멈','다만 병을 늦출 뿐이란다.'],['두꺼비 할멈','고치려면 전설의 열매가 있어야 한단다.'],
-        ['두꺼비 할멈','북쪽 돌너머의 서리다래라면 한 번 더 늦출 게다.\n어디 열리는지는 그 마을에 물어보렴.']]:
-      [['두꺼비 할멈','해머루구나. …잘 익었구나.'],['두꺼비 할멈','이걸로 약을 달이면 네 엄마 병을 조금 늦출 수 있을 게다.\n까치 편에 보내마.'],['두꺼비 할멈','다만 늦출 뿐이란다. 고치려면 전설의 열매가 있어야 한단다.'],['두꺼비 할멈','북쪽 돌너머의 서리다래라면 한 번 더 늦출 게다.\n어디 열리는지는 그 마을에 물어보렴.'],['두꺼비 할멈','덩굴이 걷혔으니 북쪽 길도 열렸겠구나. 네 아빠도 그 길로 갔단다.']],()=>{
-      takeItem('meoru',1);ledgerDone('toad');rel('toad',1);
-      diary('end','할멈이 엄마에게 약을 보내 주었다. 북쪽 길이 열렸다. 아빠, 기다려요.');
-      if(Rg.arcsEnabled()){
-        G.f.galArcToad1=true;
-        diary('galArcToad1','두꺼비 할멈이 해머루로 엄마의 병을 늦추는 약을 지어 까치 편에 보냈다.');
-        toadFarewell();return;
-      }
-      toadFarewell();
-    });
+  if(has('meoru')&&G.f.toadMet){
+    talk([['두꺼비 할멈','해머루구나. …잘 익었구나.'],['두꺼비 할멈','어디, 보따리를 펼쳐 보렴.',[{t:'보따리를 펼친다',go:()=>Trade.open('toad')},{t:'조금 이따가요',go:null}]]]);
     return;
   }
   if(!G.f.toadMet){G.f.toadMet=true;rel('toad',1);
@@ -393,7 +397,7 @@ function talkToad(){
       ['두꺼비 할멈','…보따리에 약연 자루가 비죽 나왔구나.\n그건 아직 네가 쓸 때가 아니란다.']]);
   }else{
     const c=Rg.expLanternChoice?.();
-    talk([['두꺼비 할멈','해머루를 가져오렴. 당산나무 꼭대기란다.',...(c?[[c,{t:'다녀올게요',go:null}]]:[])]]);
+    talk([['두꺼비 할멈','해머루를 가져오렴. 당산나무 꼭대기란다.',[...(c?[c]:[]),{t:'보따리를 펼친다',go:()=>Trade.open('toad')},{t:'다녀올게요',go:null}]]]);
   }
 }
 function toadFarewell(){
@@ -403,6 +407,7 @@ function toadFarewell(){
   {const lc=Rg.expLanternChoice?.();if(lc)c.push(lc);}
   if(!knows('home:'+Rg.id))for(const item of ['acorn_jelly','sesame_salt'])if(has(item))
     c.push({t:ITEMS[item].n+'을 까치 편에 보낸다',go:()=>galSendHome(item)});
+  c.push({t:'보따리를 펼친다',go:()=>Trade.open('toad')});
   c.push({t:'마을을 좀 더 둘러본다',go:null});
   talk([['두꺼비 할멈','북쪽으로 갈 채비는 됐니?',c]]);
 }
@@ -898,4 +903,21 @@ if(!CLASSIC){
     return oldGoal();
   };
 }
+/* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
+   결정 D-39: 원하는 것을 들은 뒤(장부에 적힌 뒤)에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
+   결정 D-40: 날쌘에게 허세가 통하면 숯을 하나 더 얹는다(경멸 축: 얕보이면 오기로 더 준다). 숯을 바꾼 뒤라면 흔한 물건에 덤. */
+Rg.trade={
+  dodam:()=>G.ledger.dodam?[{id:'t_dodam',item:'meoru',label:'해머루가 있는 곳',asks:[{powder:1}],done:()=>G.f.dodamDone,accept:dodamGive}]:[],
+  nal:()=>[
+    ...(G.ledger.nal?[{id:'t_nal_galchamgol',item:'coal',n:1,asks:[{powder:1,root:1}],done:()=>G.f.nalDone,accept:()=>{G.f.nalPriceHeard=true;nalTrade();}}]:[]),
+    ...(G.ledger.t_craft_salt?[{id:'t_craft_salt',item:'salt',label:'소금 2 · 깨 1',asks:[{vine:1}],done:()=>G.f.craftTrade_salt,accept:nalSaltGive}]:[])
+  ],
+  toad:()=>G.f.toadMet?[{id:'t_toad',item:'meoru',icon:'magamok_tea',label:'엄마의 병을 늦추는 약',asks:[{meoru:1}],done:()=>G.diary.some(d=>d.id==='end'),accept:toadGive}]:[]
+};
+Rg.onHaggle=(npc,way)=>{
+  if(npc!=='nal'||way!=='허세'||G.f.nalDone)return false;
+  if(G.rel.nal.v===0)rel('nal',1);
+  return true;
+};
+
 })();

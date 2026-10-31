@@ -444,7 +444,11 @@ function talkMorak(){
   talk([['모락','아이고, 꼬마야! 시루로 떡 좀 쪄 봤어?\n떡은 김이 반인 거 알지?']]);
 }
 function morakGive(){
-  talk([['모락','오, 쌀가루! 세 됫박만 나눠 줄래, 꼬마야?',[{t:'쌀가루 3을 건넨다',go:()=>{
+  talk([['모락','오, 쌀가루! 세 됫박만 나눠 줄래, 꼬마야?',[{t:'보따리를 펼친다',go:()=>Trade.open('morak')},{t:'아직은 안 줄래',go:null}]]]);
+}
+function morakGiveNow(){
+  if(G.f.morakPowder||!has('ssal_powder',3))return;
+  {
     const F=G.f;takeItem('ssal_powder',3);F.morakPowder=true;rel('morak',1);
     clue('j1','모락','모락: "네 엄마 떡 솜씨야 이 장터에서도 알아줬지! 그런데 네 아빠는 엄마 얘기만 나오면 딴소리를 하더라."');
     diary('j_morak','떡집 모락은 엄마를 알았다. 엄마는 이 장터에서도 떡 잘하기로 유명했단다. 아빠는 왜 엄마 얘기만 나오면 말을 돌렸을까.');
@@ -452,7 +456,7 @@ function morakGive(){
       ['너구리','엄마 시루예요.'],['모락',Rg.arcs()?'네 엄마 떡 솜씨야 이 장터에서도 알아줬지!':'아하, 너희 엄마 거였구나! 네 엄마 떡 솜씨야 이 장터에서도 알아줬지!'],
       ['모락',Rg.arcs()?'그런데 네 아빠는 엄마 얘기만 나오면\n딴소리를 하더라.':'그런데 네 아빠는 엄마 얘기만 나오면 딴소리를 하더라. 이상하지?'],
       ['모락',Rg.arcs()?'아궁이로 와! 김을 고르게 올려 시루를 깨워 보자!':'시루를 깨우려면 김부터 다룰 줄 알아야지!\n아궁이 앞으로 와. 내가 가르쳐 줄게.']],openSteam);
-  }},{t:'아직은 안 줄래',go:null}]]]);
+  }
 }
 
 /* ---------- 엿방울 (여우 엿장수): 엿가위 장단 ---------- */
@@ -623,6 +627,8 @@ function talkYeot(){
       ['엿방울',Rg.arcs()?'엿 고고 남은 쌀 여덟 되랑 바꾸자~\n덤은 엿장수 마음이지!':'대신 남은 쌀 여덟 되를 줄게. 덤?\n그야 엿장수 마음이지. 흥만 나면 또 모르고!']],()=>{if(has('solbang',5))yeotTrade();});
     return;
   }
+  // 솔방울을 건넨 뒤 장단을 마치지 못했으면(창을 닫고 다시 열었을 때) 장단부터 마저 한다. 쌀은 장단이 끝나면 준다.
+  if(!F.yeotDone&&F.yeotPaid){talk([['엿방울','솔방울은 받았지~ 불 올랐으니 장단 마저 맞춰 볼래?']],()=>openRhythm(true));return;}
   if(!F.yeotDone){if(has('solbang',5))yeotTrade();else talk([['엿방울','너구리 꼬마, 솔방울 다섯 개면 돼. 뒷산 소나무 숲에 가 봐.']]);return;}
   if(Rg.arcs()){
     const c=[];
@@ -637,10 +643,16 @@ function talkYeot(){
   talk([['엿방울','엿 사려, 엿! 어라, 내 흥 돋우던 너구리 꼬마네?']]);
 }
 function yeotTrade(){
-  talk([['엿방울',Rg.arcs()?'솔방울 다섯 개랑 쌀 여덟 되, 바꿀래?':'어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되, 어때?',[{t:'솔방울 5개를 건넨다',go:()=>{
-    takeItem('solbang',5);
-    talk([['엿방울',Rg.arcs()?'불부터 올리고! 가위 장단도 맞춰 볼래?':'좋아, 불부터 올리고! 엿 고는 동안 내 가위 소리에 장단 맞춰 볼래?']],()=>openRhythm(true));
-  }},{t:'아직은 안 줄래',go:null}]]]);
+  talk([['엿방울',Rg.arcs()?'솔방울 다섯 개랑 쌀 여덟 되, 바꿀래?':'어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되, 어때?',[{t:'보따리를 펼친다',go:()=>Trade.open('yeotbang')},{t:'아직은 안 줄래',go:null}]]]);
+}
+function yeotGive(){
+  if(G.f.yeotDone||G.f.yeotPaid||!has('solbang',5))return;
+  takeItem('solbang',5);G.f.yeotPaid=true;
+  talk([['엿방울',Rg.arcs()?'불부터 올리고! 가위 장단도 맞춰 볼래?':'좋아, 불부터 올리고! 엿 고는 동안 내 가위 소리에 장단 맞춰 볼래?']],()=>openRhythm(true));
+}
+function yeotMoreGive(){
+  if(!G.f.yeotDone||!has('solbang',5))return;
+  takeItem('solbang',5);addItem('ssal',8);talk([['엿방울','자, 쌀 여덟 되. 떡도 또 찌면 되지~\n솜씨가 서툴러도 굶길 순 없잖아.']]);
 }
 
 /* ---------- 날쌘 (다시 만남): 설 대목 팥 ---------- */
@@ -650,21 +662,8 @@ function talkNal(){
   else nalMenu();
 }
 function nalMenu(){
-  const F=G.f,c=[];
-  if(!F.nalJDone){
-    if(has('ssal_powder'))c.push({t:'쌀가루를 내민다 (팥 1)',go:()=>nalTrade('ssal_powder')});
-    if(has('memil_powder'))c.push({t:'메밀가루를 내민다 (팥 2)',go:()=>nalTrade('memil_powder')});
-    if(!F.nalJBluff)c.push({t:'허세 부리기: "흥, 팥 한 되가 뭐 그리 귀해!"',go:nalBluff});
-  }
-  if(!CLASSIC){
-    if(!F.jxCraftMarket)c.push({t:'떡 재료를 더 구할 데를 묻는다',go:marketCraftTrade});
-    if(F.nalJDone)c.push({t:'고사떡에 쓸 팥 다시 구하기',go:()=>{
-      const id=has('memil_powder')?'memil_powder':'ssal_powder';
-      if(!has(id)){talk([['날쌘','쌀가루 하나, 아니면 메밀가루 하나.\n엿방울한테 쌀을 받아 맷돌에 갈아 와.']]);return;}
-      talk([['날쌘','떡을 다른 데 썼어? 다시 바꾸면 되지.\n지난번이랑 같은 셈이야.',[
-        {t:ITEMS[id].n+' 1로 팥 바꾸기',go:()=>nalTrade(id)},{t:'다음에',go:null}]]]);
-    }});
-  }
+  const F=G.f,c=[{t:'보따리를 펼친다',go:()=>Trade.open('nal')}];
+  if(!CLASSIC&&!F.jxCraftMarket)c.push({t:'떡 재료를 더 구할 데를 묻는다',go:marketCraftTrade});
   if(Rg.arcs()&&night()&&F.jangteoArcsBueong2&&!F.jangteoArcsNal3)c.push({t:'숙소를 피하는 까닭을 묻는다',go:nalLedger});
   c.push({t:'그만두기',go:null});
   const line=Rg.arcs()?(F.nalJDone?'팥 아껴 써. 부엉 영감은 빛깔까지 따지거든.':(has('ssal_powder')||has('memil_powder'))?'빈손은 아니네? 뭘 바꿀 건데?':'쌀가루 하나면 팥 하나. 메밀가루면 둘. 뭘 낼 건데?'):
@@ -674,16 +673,18 @@ function nalMenu(){
 /* 수량은 trades.csv t_craft_market 그대로. 엿방울의 필수 몫을 먼저 남긴다.
    날쌘은 숙소를 피해 밖에서 밤을 나서 솔방울(불쏘시개)이 필요하다. 까닭은 말하지 않는다 (nalLedger 복선). */
 function marketCraftTrade(){
+  G.f.jxCraftMarketHeard=true;
   const enough=has('solbang',G.f.yeotDone?3:8);
   talk([['날쌘','꿀, 참기름, 녹두, 팥. 한 줌씩 남았어.\n떡 찌기엔 모자라지 않을걸.'],['너구리','뭐랑 바꿔 줘요?'],
     ['날쌘','솔방울 셋. 밤에 불 피울 데가 있어서.'],
     ['날쌘',enough?'넷 다 묶어 줄게. 바꿀래?':G.f.yeotDone?'솔숲에서 셋만 주워 와.':'엿방울한테 줄 다섯은 남겨 두고,\n솔숲에서 셋 더 주워 와.',
-    enough?[{t:'솔방울 3개와 바꾼다',go:()=>{
-      if(G.f.jxCraftMarket||!has('solbang',G.f.yeotDone?3:8))return;
-      takeItem('solbang',3);for(const id of ['honey','sesame_oil','mung','pat'])addItem(id,1);
-      G.f.jxCraftMarket=true;ledger('t_craft_market','날쌘','솔방울 3','떡 재료 묶음');ledgerDone('t_craft_market');
-      talk([['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
-    }},{t:'다음에',go:null}]:[{t:'알겠어요',go:null}]]]);
+    enough?[{t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'다음에',go:null}]:[{t:'알겠어요',go:null}]]]);
+}
+function nalMarketGive(){
+  if(G.f.jxCraftMarket||!has('solbang',G.f.yeotDone?3:8))return;
+  takeItem('solbang',3);for(const id of ['honey','sesame_oil','mung','pat'])addItem(id,1);
+  G.f.jxCraftMarket=true;ledger('t_craft_market','날쌘','솔방울 3','떡 재료 묶음');ledgerDone('t_craft_market');
+  talk([['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
 }
 function nalTrade(id){
   const F=G.f;takeItem(id,1);F.nalJDone=true;ledgerDone('nal_jangteo');
@@ -691,8 +692,6 @@ function nalTrade(id){
   if(id==='memil_powder')learn('nal:jangteo-memil');
   talk(id==='memil_powder'?[['날쌘','돌너머 메밀가루네. 장터에선 귀하니까\n팥 '+n+'되 쳐줄게. 잘 받은 줄 알아.']]:[['날쌘','자, 팥 '+n+'되. 거래 끝.']]);
 }
-function nalBluff(){G.f.nalJBluff=true;rel('nal',1);
-  talk([['너구리','흥, 팥 한 되가 뭐 그리 귀해!'],['날쌘','하! 대목 장사도 모르는 꼬마가 큰소리는.'],['날쌘','내 팥이 시시하다고?\n좋아, 거래하면 한 되 더 얹어 줄게.']],nalMenu);}
 
 /* ---------- 숙소 마루: 쉬면 낮과 밤이 바뀐다 ---------- */
 function restMaru(){
@@ -730,7 +729,11 @@ function talkBueong(){
 }
 // 결정 D-23: 짐 보관 값을 안 받는 근거 (design/data/decisions.csv)
 function bueongGive(){
-  talk([['부엉 영감','고사떡을 가져왔구나.',[{t:'팥시루떡을 고사상에 올린다',go:()=>{
+  talk([['부엉 영감','고사떡을 가져왔구나.',[{t:'보따리를 펼친다',go:()=>Trade.open('bueong')},{t:'조금 이따가요',go:null}]]]);
+}
+function bueongGiveNow(){
+  if(G.f.bueongDone||!has('patsirutteok')||!night())return;
+  {
     const F=G.f;takeItem('patsirutteok',1);F.bueongDone=true;F.guard=true;ledgerDone('bueong');rel('bueong',1);learn('bueong:sinpyo');
     addItem('sinpyo',1);addItem('dad_memo',1);
     clue('j3','아빠의 메모','아빠가 숙소에 맡긴 짐 속 메모: "글자는 \'되돌림\'이었다. 값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산."');
@@ -750,7 +753,7 @@ function bueongGive(){
       ['너구리','(짐 속에 접힌 종이가 있다. 아빠 글씨다.)'],
       ['너구리','"글자는 \'되돌림\'이었다. 값은 이미 치러졌다.\n이번엔 내가 치른다. 북쪽 영산."'],
       ['부엉 영감','오늘은 섣달그믐이다. 밤마다 장터 물건이 사라진다.\n보부상의 의무로 오늘 밤 숙소 창고를 지켜라.']],()=>{toast('숙소 창고를 지키자');refreshGoal();});
-  }},{t:'아직은 안 올릴래',go:null}]]]);
+  }
 }
 
 /* ---------- 헌물 도깨비 전투 ---------- */
@@ -842,7 +845,7 @@ if(!CLASSIC){
         {t:'가위 장단과 이야기',go:n.talk},
         {t:'솔방울 5개로 쌀 8개 더 구하기',go:()=>{
           if(!has('solbang',5)){talk([['엿방울','솔방울 다섯 개면 쌀 여덟 되야~\n솔숲이 비었으면 숙소에서 쉬고 와. 그새 또 떨어지거든.']]);return;}
-          takeItem('solbang',5);addItem('ssal',8);talk([['엿방울','자, 쌀 여덟 되. 떡도 또 찌면 되지~\n솜씨가 서툴러도 굶길 순 없잖아.']]);
+          Trade.open('yeotbang');
         }},{t:'다음에',go:null}]]]);
     };
     return p;
@@ -876,5 +879,35 @@ Rg.goal=()=>{
   if(!CLASSIC&&has('hongsi_tteok'))return '숙소 처마의 까치 할머니께 홍시 약떡을 맡기자';
   if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
   return '보따리를 열고 시루에 눈홍시와 쌀가루를 넣어 홍시 약떡을 찌자';
+};
+
+/* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
+   결정 D-39: 원하는 것을 들은 뒤에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
+   엿방울의 쌀 8되는 솔방울을 받은 뒤 장단이 끝나면 준다(확정. 장단은 덤 엿에만 영향).
+   결정 D-40: 날쌘에게 허세가 통하면 팥을 한 되 더 얹는다(경멸 축). 그 뒤 다시 바꾸는 팥에도 같은 셈이다. */
+Rg.trade={
+  yeotbang:()=>[
+    ...(G.f.yeotMet&&!G.f.yeotDone?[{id:'t_yeotbang',item:'ssal',n:8,asks:[{solbang:5}],
+      locked:()=>G.f.yeotPaid?'솔방울은 벌써 건넸다. 엿 고는 동안 장단을 맞추면 쌀을 준다.':null,
+      done:()=>G.f.yeotDone,accept:yeotGive}]:[]),
+    ...(!CLASSIC&&G.f.yeotDone?[{id:'t_yeotbang_more',item:'ssal',n:8,asks:[{solbang:5}],accept:yeotMoreGive}]:[])
+  ],
+  nal:()=>[
+    ...(G.ledger.nal_jangteo?[
+      {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:()=>nalTrade('ssal_powder')},
+      {id:'t_nal_jangteo_memil',item:'pat',n:2+(G.f.nalJBluff?1:0),asks:[{memil_powder:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:()=>nalTrade('memil_powder')}
+    ]:[]),
+    ...(!CLASSIC&&G.f.jxCraftMarketHeard?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 녹두 · 팥',asks:[{solbang:3}],
+      locked:()=>!G.f.yeotDone&&(G.inv.solbang||0)<8?'엿방울한테 줄 솔방울 다섯은 남겨 둬야 한다.':null,
+      done:()=>G.f.jxCraftMarket,accept:nalMarketGive}]:[])
+  ],
+  morak:()=>G.f.morakMet?[{id:'t_morak',item:'patsirutteok',label:'시루를 깨우는 김 다루기',asks:[{ssal_powder:3}],done:()=>G.f.morakPowder,accept:morakGiveNow}]:[],
+  bueong:()=>G.f.bueongNight?[{id:'t_bueong',item:'sinpyo',label:'보부상 신표 · 아빠가 맡긴 짐',asks:[{patsirutteok:1}],
+    locked:()=>night()?null:'부엉 영감님은 밤에만 깨어 계신다.',done:()=>G.f.bueongDone,accept:bueongGiveNow}]:[]
+};
+Rg.onHaggle=(npc,way)=>{
+  if(npc!=='nal'||way!=='허세'||G.f.nalJBluff)return false;
+  G.f.nalJBluff=true;rel('nal',1);
+  return true;
 };
 })();
