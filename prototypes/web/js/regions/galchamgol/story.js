@@ -465,7 +465,7 @@ Rg.startKudzu=()=>{
 Rg.npcs=[
   {id:'dodam',name:'도담',x:300,talk:talkDodam,draw:Rg.art.squirrel},
   {id:'nal',name:'날쌘',x:820,talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
-  {id:'musoe',name:'무쇠',x:1110,talk:talkMusoe,draw:Rg.art.uncle,props:Rg.props.forge},
+  {id:'musoe',name:'무쇠',known:true,tag:'무쇠 삼촌',x:1110,talk:talkMusoe,draw:Rg.art.uncle,props:Rg.props.forge},
   {id:'toad',name:'두꺼비 할멈',x:1430,talk:talkToad,draw:Rg.art.toad,props:Rg.props.toad},
 ];
 
@@ -692,7 +692,7 @@ if(!CLASSIC){
       hyung:[['다람쥐 형','큰 건 역시 내 몫이지!'],['다람쥐 동생','…다음엔 내가 먼저 찾을 거야.']],
       dongsaeng:[['다람쥐 동생','찾는 건 내가 최고야!'],['다람쥐 형','…다음엔 내가 더 많이 오갈 거야.']]
     })[G.f.galExpBrothersSide]||[['다람쥐 형','큰 것부터 번갈아!'],['다람쥐 동생','겨울에는 한 바구니에서!']];}};
-  const chick={id:'lost_chick',name:'꺼병이',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
+  const chick={id:'lost_chick',name:'꺼병이',hint:'삐약… 삐약… 어디선가 엄마를 찾는 병아리 소리가 들린다.',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
     greeting:'이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!'};
   function wheelStage(){
     if(G.f.galWheelDone)return 5;
@@ -818,7 +818,7 @@ if(!CLASSIC){
       talk([['너구리',F.galLanternCount===3?'다 왔네.\n할멈께 가져가서 처마에 걸자.':'앉았다. 꽉 쥐지는 않을게.\n다음 불빛도 찾아보자.']]);
     });
   }
-  const fireflies={id:'reed_fireflies',name:'반딧불',x:1760,draw:(x,y)=>Rg.expArt.marker(x,y),talk:fireflyLook,
+  const fireflies={id:'reed_fireflies',name:'반딧불',tag:false,hint:'갈대숲 사이로 작은 불빛이 깜박인다.',x:1760,draw:(x,y)=>Rg.expArt.marker(x,y),talk:fireflyLook,
     greeting:[['너구리','등롱 입구로 작은 빛이 드나든다.\n잡아 두지 않아도 환하네.']]};
   Rg.expWanderers={village:[magpie],forge:[brothers],forest:[chick],marsh:[fireflies],hill:[]};
   function examine(id,x,label,read,y){

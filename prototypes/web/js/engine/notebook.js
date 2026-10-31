@@ -110,9 +110,11 @@ function notePage(e,section){
   const dad=section==='관찰'?dadLinesOf(e):[],mine=myTexts(e,section);
   const card=el('div','note-card'),pics=el('div','note-pics');
   // 물건은 얻고 나면 내 그림(색)만 둔다. 아빠의 흐린 그림이 같이 있으면 같은 물건이 두 개로 보인다.
-  if(section==='관찰'&&!(e.kind==='item'&&mine.length)&&(e.dadDrawing||(e.kind!=='item'&&npcFind(e.id)&&dad.length))){const d=drawingFor(e,true);if(d){d.classList.add('dad');pics.appendChild(d);}}
+  // 결정 D-57: 동물은 만나기 전에는 아빠의 흐린 먹 그림, 만난 뒤(말 걸기·전투·얻기)에는 내 색 그림 하나만 둔다.
+  const met=e.kind==='animal'&&seen(e);
+  if(section==='관찰'&&!met&&!(e.kind==='item'&&mine.length)&&(e.dadDrawing||(e.kind!=='item'&&npcFind(e.id)&&dad.length))){const d=drawingFor(e,true);if(d){d.classList.add('dad');pics.appendChild(d);}}
   // 전투 상대의 수묵 그림은 한 장이면 된다
-  if(mine.length&&!(pics.children.length&&ENEMIES[e.id]&&!npcFind(e.id))){const d=drawingFor(e,false);if(d){d.classList.add('me');pics.appendChild(d);}}
+  if((mine.length||met)&&!(pics.children.length&&ENEMIES[e.id]&&!npcFind(e.id))){const d=drawingFor(e,false);if(d){d.classList.add('me');pics.appendChild(d);}}
   if(pics.children.length)card.appendChild(pics);
   card.appendChild(el('b','note-name',noteName(e)));
   const write=(cls,who,texts)=>{const box=el('div','note-lines '+cls);texts.forEach(t=>{const p=el('p','note-line '+(who==='아빠'?'dad':'me'));p.appendChild(el('span','who',who));p.appendChild(document.createTextNode(t));box.appendChild(p);});card.appendChild(box);};

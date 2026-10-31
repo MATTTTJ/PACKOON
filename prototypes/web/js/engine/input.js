@@ -91,12 +91,13 @@ function padAction(k){
   if(pickupPose)return;
   if(k==='jump')jumpOrDrop();else if(k==='atk')actionPress();else if(k==='talk')tryTalk();
 }
+// 결정 D-52: 휴대폰 ▲은 키보드 ↑과 같다(점프·오르기·↑ 상호작용). 전투에서는 움직임만.
 document.querySelectorAll('#pad [data-k]').forEach(b=>{
   const k=b.dataset.k;
   b.addEventListener('pointerdown',e=>{e.preventDefault();b.classList.add('on');
     try{b.setPointerCapture(e.pointerId);}catch(_){}
-    if(k==='jump')touch.jump=true;if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up')touch.up=true;else if(k==='down'){touch.down=true;padAction(k);}else padAction(k);});
-  const up=()=>{b.classList.remove('on');if(k==='jump')touch.jump=false;if(k==='left')touch.left=false;if(k==='right')touch.right=false;if(k==='up')touch.up=false;if(k==='down')touch.down=false;};
+    if(k==='jump')touch.jump=true;if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up'){touch.up=true;if(!B)document.body.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true}));}else if(k==='down'){touch.down=true;padAction(k);}else padAction(k);});
+  const up=()=>{b.classList.remove('on');if(k==='jump')touch.jump=false;if(k==='left')touch.left=false;if(k==='right')touch.right=false;if(k==='up'){if(touch.up&&!B)document.body.dispatchEvent(new KeyboardEvent('keyup',{key:'ArrowUp',bubbles:true}));touch.up=false;}if(k==='down')touch.down=false;};
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);
   b.addEventListener('contextmenu',e=>e.preventDefault());
 });

@@ -687,9 +687,9 @@ const examines={
 const stamp=(id,x,y)=>({id,x,y,note:'stamp:yeongsan:'+id,draw:(sx,sy)=>Rg.expArt.stamp(sx,sy)});
 Rg.expContent={
   wanderers:{
-    shelter:[{id:'y_bear_lullaby',name:'아기 곰',x:650,draw:draw('drawBear'),talk:talkBear,
+    shelter:[{id:'y_bear_lullaby',name:'아기 곰',hint:'눈 덮인 굴 쪽에서 잠 못 든 새끼 곰이 칭얼대는 소리가 들린다.',x:650,draw:draw('drawBear'),talk:talkBear,
       get greeting(){return G.f.spring?'봄이네… 이번엔 진짜 봄이지?\n얼음 녹는 소리에 깼어.':'음냐… 자장자장…\n눈 녹으면… 깨어나자…';}}],
-    snow:[{id:'y_crow_direction',name:'길 잃은 까마귀',x:750,draw:draw('drawCrow'),talk:talkCrow,
+    snow:[{id:'y_crow_direction',name:'길 잃은 까마귀',hint:'까악… 까악… 눈 속에서 길을 헤매는 까마귀 소리가 들린다.',x:750,draw:draw('drawCrow'),talk:talkCrow,
       greeting:'집 방향을 알았으니 바람만 좀 잦아들면 돼.\n네가 그린 골짜기는 눈이 덮여도 기억할게.'}],
     slope:[{id:'y_otter_wait',name:'낚시하는 수달',x:1250,draw:draw('drawOtter'),talk:talkOtter,
       get greeting(){return G.f.spring?'구멍이 호수만큼 커졌네.\n이젠 배 위에서 기다려야겠다.':'오늘은 작은 꼬리 하나를 봤으니 됐어.\n다음 큰 물결까지 조금 더 앉아 있을래.';}}],
