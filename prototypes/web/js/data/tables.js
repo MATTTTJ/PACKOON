@@ -461,20 +461,9 @@ const TABLES={
   ],
   "musoe": [
    {
-    "id": "hammer",
-    "name": "망치질",
+    "id": "fist",
+    "name": "꿀밤",
     "hp": 3
-   },
-   {
-    "id": "bellows",
-    "name": "풀무",
-    "hp": 3
-   },
-   {
-    "id": "core",
-    "name": "호통",
-    "hp": 3,
-    "core": true
    }
   ],
   "golem": [
@@ -2248,7 +2237,20 @@ const TABLES={
   "form_deer_speed": 1.45,
   "form_deer_listen_range": 360,
   "form_fx_frames": 24,
-  "stranger_trade_limit": 2
+  "stranger_trade_limit": 2,
+  "musoe_bonk_tell_first": 66,
+  "musoe_bonk_tell_last": 34,
+  "musoe_bonk_drop": 9,
+  "musoe_bonk_gap": 26,
+  "musoe_bonk_radius": 30,
+  "musoe_fire_cycle": 300,
+  "musoe_fire_warn": 70,
+  "musoe_fire_burn": 80,
+  "musoe_fire_radius": 22,
+  "musoe_fire_heat": 36,
+  "musoe_finale_bonks": 4,
+  "musoe_finale_gap": 16,
+  "musoe_finale_hold": 70
  },
  "PROGRESS": [
   {

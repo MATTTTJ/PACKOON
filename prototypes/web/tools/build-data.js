@@ -228,7 +228,9 @@ const TUNING=numericTable('tuning','분류',
     'battle_deer_speed battle_deer_cooldown battle_deer_radius battle_deer_iframes',
     'battle_base_damage battle_sharp_damage battle_pickaxe_bonus',
     'form_squirrel_speed form_climb_speed form_climb_reach form_goat_jump form_owl_glide_fall',
-    'form_deer_speed form_deer_listen_range form_fx_frames stranger_trade_limit'
+    'form_deer_speed form_deer_listen_range form_fx_frames stranger_trade_limit',
+    'musoe_bonk_tell_first musoe_bonk_tell_last musoe_bonk_drop musoe_bonk_gap musoe_bonk_radius',
+    'musoe_fire_cycle musoe_fire_warn musoe_fire_burn musoe_fire_radius musoe_fire_heat musoe_finale_bonks musoe_finale_gap musoe_finale_hold'
   ].join(' '));
 /* 나눗셈·주기·배열 길이와 서로 맞물리는 판정은 실행 전에 확인한다. */
 const requireValue=(ok,message)=>{if(!ok)fail(message);};
