@@ -119,6 +119,12 @@
       "attack": 0.0015, "decay": 0.2, "release": 0.12, "tail": 0.35, "fixedDuration": 0.75,
       "partials": [[1, 1, 1], [2.76, 0.45, 1.1], [5.4, 0.18, 1.6]],
       "noise": 0.32, "noiseCutoff": 2600, "noiseDecay": 0.018
-    }
+    },
+    "ajaeng": {"name": "아쟁", "kind": "bow", "gain": 0.3, "attack": 0.09, "decay": 6, "sustain": 0.85, "release": 0.22, "tail": 0.3, "partials": [[1,1,1],[2,0.62,1],[3,0.46,1],[4,0.3,1],[5,0.22,1],[6,0.14,1]], "noise": 0.22, "noiseCutoff": 1500, "resonance": 1.1, "vibratoHz": 4, "vibratoCents": 18, "vibratoDelay": 0.3, "glideCents": -60, "glideSeconds": 0.12},
+    "moduk_low": {"name": "모듬북 큰북", "kind": "drum", "gain": 0.55, "baseFrequency": 52, "attack": 0.003, "decay": 0.32, "release": 0.14, "tail": 0.32, "fixedDuration": 0.9, "partials": [[1,1,1],[1.48,0.35,1.3],[2.2,0.15,2]], "noise": 0.2, "noiseCutoff": 900, "noiseDecay": 0.03, "pitchDrop": 0.35},
+    "moduk_mid": {"name": "모듬북 작은북", "kind": "drum", "gain": 0.38, "baseFrequency": 128, "attack": 0.002, "decay": 0.14, "release": 0.08, "tail": 0.16, "fixedDuration": 0.4, "partials": [[1,1,1],[1.62,0.4,1.5],[2.4,0.2,2]], "noise": 0.28, "noiseCutoff": 2200, "noiseDecay": 0.02, "pitchDrop": 0.25},
+    "danso": {"name": "단소", "kind": "wind", "gain": 0.3, "attack": 0.07, "decay": 5, "sustain": 0.8, "release": 0.25, "tail": 0.3, "partials": [[1,1,1],[2,0.12,1],[3,0.05,1]], "noise": 0.28, "noiseCutoff": 2600, "resonance": 0.8, "vibratoHz": 5, "vibratoCents": 12, "vibratoDelay": 0.3, "glideCents": -25, "glideSeconds": 0.1},
+    "saenghwang": {"name": "생황", "kind": "wind", "gain": 0.26, "attack": 0.22, "decay": 6, "sustain": 0.9, "release": 0.4, "tail": 0.5, "partials": [[1,1,1],[1.5,0.5,1],[2,0.55,1],[3,0.28,1],[4,0.16,1]], "noise": 0.05, "noiseCutoff": 1800, "vibratoHz": 3.2, "vibratoCents": 5, "vibratoDelay": 0.5},
+    "gayageum_harmonic": {"name": "가야금 하모닉스", "kind": "pluck", "gain": 0.3, "attack": 0.003, "decay": 1.3, "release": 0.4, "tail": 0.6, "partials": [[2,1,1],[4,0.2,2],[6,0.06,3]], "noise": 0.03, "noiseCutoff": 3000, "noiseDecay": 0.01, "endWobbleCents": 8, "endWobbleHz": 4.5, "vibratoDelay": 0.5}
   }
 }
