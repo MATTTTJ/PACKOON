@@ -23,12 +23,13 @@ addEventListener('keydown',e=>{
   const first=!keys[k];keys[k]=true;
   if(first)onPress(k);
 });
-addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys[k]=false;suppressedKeys.delete(k);});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys[k]=false;suppressedKeys.delete(k);if(k===' '&&typeof rollRelease==='function')rollRelease();});
 function suppressHeldInputs(){for(const k in keys)if(keys[k])suppressedKeys.add(k);releaseInputs();}
 function releaseInputs(){
   for(const k in keys)keys[k]=false;
   for(const k in touch)touch[k]=false;
   jumpQ=atkQ=dropQ=false;
+  if(typeof endRoll==='function'){endRoll();rollHold=null;}
   document.querySelectorAll('#pad .on').forEach(b=>b.classList.remove('on'));
   if(typeof endDrag==='function')endDrag();
 }
@@ -68,8 +69,11 @@ function onPress(k){
   // 0 너구리 · 1 다람쥐 · 2 산양 · 3 수리부엉이 · 4 고라니 (forms.js)
   if(formKey(k))return;
   // C(또는 Space·↑·W)는 점프, 아래를 누른 채면 발판 아래로 내려간다.
-  if(k==='c'||k===' '||k==='w'||k==='arrowup')jumpOrDrop();
+  // 결정 D-94: 움직이는 중의 Space는 짧게면 점프, 꾹 누르면 구르기 (roll.js). C·W·↑는 늘 바로 점프.
+  if(k===' '&&rollPress()){}
+  else if(k==='c'||k===' '||k==='w'||k==='arrowup')jumpOrDrop();
   // X(J) 하나로 발밑 물건은 줍고, 없으면 휘두른다.
+  if(rolling)return;   // 구르는 동안에는 휘두르기·줍기·말걸기를 하지 않는다
   if(k==='j'||k==='x')actionPress();
   if(k==='e'||k==='enter')tryTalk();
 }
@@ -90,6 +94,7 @@ function padAction(k){
   if(open('bag')||open('notebook')||open('trade'))return;
   if(k==='down')return;
   if(pickupPose)return;
+  if(rolling&&k!=='jump')return;
   if(k==='jump')jumpOrDrop();else if(k==='atk')actionPress();else if(k==='talk')tryTalk();
 }
 // 결정 D-52: 휴대폰 ▲은 키보드 ↑과 같다(점프·오르기·↑ 상호작용). 전투에서는 움직임만.
@@ -97,8 +102,8 @@ document.querySelectorAll('#pad [data-k]').forEach(b=>{
   const k=b.dataset.k;
   b.addEventListener('pointerdown',e=>{e.preventDefault();b.classList.add('on');
     try{b.setPointerCapture(e.pointerId);}catch(_){}
-    if(k==='jump')touch.jump=true;if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up'){touch.up=true;if(!B)document.body.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true}));}else if(k==='down'){touch.down=true;padAction(k);}else padAction(k);});
-  const up=()=>{b.classList.remove('on');if(k==='jump')touch.jump=false;if(k==='left')touch.left=false;if(k==='right')touch.right=false;if(k==='up'){if(touch.up&&!B)document.body.dispatchEvent(new KeyboardEvent('keyup',{key:'ArrowUp',bubbles:true}));touch.up=false;}if(k==='down')touch.down=false;};
+    if(k==='jump')touch.jump=true;if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up'){touch.up=true;if(!B)document.body.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true}));}else if(k==='down'){touch.down=true;padAction(k);}else if(!(k==='jump'&&rollPress()))padAction(k);});
+  const up=()=>{b.classList.remove('on');if(k==='jump'){touch.jump=false;rollRelease();}if(k==='left')touch.left=false;if(k==='right')touch.right=false;if(k==='up'){if(touch.up&&!B)document.body.dispatchEvent(new KeyboardEvent('keyup',{key:'ArrowUp',bubbles:true}));touch.up=false;}if(k==='down')touch.down=false;};
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);
   b.addEventListener('contextmenu',e=>e.preventDefault());
 });

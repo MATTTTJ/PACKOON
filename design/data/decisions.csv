@@ -90,3 +90,4 @@ D-90,이야기,"강철이의 새 이름 ""서리무기""",대체됨,개발자(Cl
 D-91,시스템,레어도 이름 순우리말(흔한 것·쓸 만한 것·귀한 것·보배·전설),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 하품·중품·상품·최상품·천하일품
 D-92,시스템,기록 나누기(아빠의 수첩과 아이의 책),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 아빠의 수첩 한 권
 D-93,전투,전투 탈 시험판(초랭이탈·각시탈),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 잎사귀 변신
+D-94,조작,"구르기: 좌우로 움직이며 Space(휴대폰은 점프 버튼)를 꾹 누르면 몸을 말아 공처럼 굴러 걷기의 약 1.8배로 간다. 떼면 일어선다. 짧게 누르면 점프, 멈춰 있을 때는 바로 점프, C·W·↑는 늘 바로 점프. 너구리(꼬리로 감싼 공)·다람쥐(큰 꼬리로 감싼 작은 공, 조금 더 빠름)만 구르고, 산양·수리부엉이·고라니는 몸이 안 말려 못 구른다(처음 한 번 혼잣말). 구르는 동안 말걸기·줍기·휘두르기·채집은 하지 않는다 (사용자 요청 2026-10-31)",채택,사용자 요청,있음,design/proposals/leaf-transform.md §4,"engine/roll.js · engine/forms.js ROLL_FORMS · engine/input.js · engine/field.js step·drawRaccoon · tuning.csv roll_*"

@@ -181,6 +181,7 @@ function step(){
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
   G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed*formMoveMul());if(ax)G.face=ax>0?1:-1;
+  stepRoll(ax);   // 결정 D-94: 구르는 중이면 G.vx를 구르기 빠르기로 (roll.js)
   const climbing=stepClimb(ax);
   if(!climbing){
   if(jumpQ&&G.onGround){Sound.jump();G.vy=TABLES.TUNING.field_jump_velocity*formJumpMul();G.onGround=false;}jumpQ=false;
@@ -203,6 +204,7 @@ function step(){
   Vfx.feet();
   if(!wasGrounded&&G.onGround)Sound.land();
   if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
+  if(atkQ&&rolling)atkQ=false;
   if(atkQ&&G.attackT<=0){Sound.swing();gatherPress();G.attackT=TABLES.TUNING.field_swing_frames;}atkQ=false;
   if(G.attackT>0){G.attackT--;if(G.attackT===TABLES.TUNING.field_swing_hit_at)doHit();}
   if(G.hurtT>0)G.hurtT--;
@@ -323,6 +325,7 @@ function drawRaccoon(){
   if(!Vfx.reducedMotion&&G.hurtT>0&&Math.floor(G.hurtT/4)%2)return;
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
   R(G.px-cam-7,fieldGround(),14,1,'rgba(40,24,14,.35)');
+  if(rolling){drawRollAt(G.px-cam,G.py,G.form||'',rollAngle);return;}
   const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
   drawPlayerAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);
 }
@@ -398,15 +401,16 @@ function updateHints(){
     seen[key]=true;toast(typeof p.hint==='function'?p.hint():p.hint);return;
   }
 }
-function nearDig(){if(paused())return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
+function nearDig(){if(paused()||(typeof rolling!=="undefined"&&rolling))return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
 function updateOverlay(){
   const pr=$('prompt');
-  const n=paused()?null:nearInteraction();const dg=n?null:nearDig();
-  const floor=paused()||pickupPose?null:nearFloorItems()[0];
+  // 구르는 동안에는 말걸기·줍기·채집 안내를 띄우지 않는다 (D-94)
+  const n=paused()||rolling?null:nearInteraction();const dg=n||rolling?null:nearDig();
+  const floor=paused()||pickupPose||rolling?null:nearFloorItems()[0];
   if(floor){pr.hidden=false;const room=nearFloorItems().some(a=>canPickupItem(a.item));pr.textContent=!room?'보따리 가득':TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
   else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':GATHER[dg.item]?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
-  else if(!paused()&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
+  else if(!paused()&&!rolling&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
   if(!formRing.hidden&&!formChangeAllowed())formRing.hidden=true;
   $('padTalk').classList.toggle('ready',!!n);

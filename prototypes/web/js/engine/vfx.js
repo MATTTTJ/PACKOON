@@ -157,5 +157,5 @@ const Vfx=(()=>{
   }
   /* 기존 drawFront에 섞인 이정표·색조는 지역의 weatherFront로 보존한다. */
   function front(){if(fieldDef().weather)fieldCall('weatherFront');else fieldCall('drawFront');draw('front');draw('effect');}
-  return {MAX,get count(){return particles.length;},get queued(){return pending.length;},get reducedMotion(){return motion.matches;},setWeather,update,draw,front,item,gather,scatter,scatterKind,burst,feet,slash,clear};
+  return {MAX,get count(){return particles.length;},get queued(){return pending.length;},get reducedMotion(){return motion.matches;},setWeather,update,draw,front,item,gather,scatter,scatterKind,burst,dust,feet,slash,clear};   // dust: 구르기(D-94)도 쓴다
 })();

@@ -68,6 +68,14 @@ function formKey(k){
 }
 
 /* ---------- 필드 능력 ---------- */
+// 결정 D-94: 변신별 구르기 (roll.js). roll: 되나 / speed: field_move_speed에 곱하는 tuning 줄 / r: 공 반지름(px) / say: 못 구를 때 처음 한 번 하는 혼잣말
+const ROLL_FORMS={
+  '':{roll:true,speed:'roll_speed',r:8},
+  squirrel:{roll:true,speed:'roll_squirrel_speed',r:6},
+  goat:{roll:false,say:'뿔이 걸려서 몸이 안 말려. 산양으론 못 구르겠어.'},
+  owl:{roll:false,say:'날개를 접어도 공처럼은 안 되네.'},
+  deer:{roll:false,say:'다리가 길어서 몸을 둥글게 말 수가 없어.'}
+};
 let formClimb=null,formGlide=false,formFx=null;
 const formMoveMul=()=>G.form==='squirrel'?TABLES.TUNING.form_squirrel_speed:G.form==='deer'?TABLES.TUNING.form_deer_speed:1;
 const formJumpMul=()=>G.form==='goat'?TABLES.TUNING.form_goat_jump:1;
