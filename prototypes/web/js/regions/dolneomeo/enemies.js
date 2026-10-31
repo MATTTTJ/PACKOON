@@ -85,7 +85,7 @@ function drawStoneCliff(c){
 }
 defineEnemies({
   golem:{name:'돌 골렘',calmLabel:'진정',
-    intro:'[시험판] 첫서리 내린 성황당. 돌 아래 여백에 손을 숨기자. 다리부터 노려 보자.',
+    intro:'[시험판] 첫서리 내린 성황당. 돌 아래 여백에 손을 숨기자. 머리는 높으니 다리나 팔이 틈을 보일 때 치자.',   // 결정 D-103: 부위는 고르지 않는다(확정 흐름). 고를 수 있는 것처럼 말하지 않는다
     cover:true,calmAction:{amount:TABLES.CALM.golem.story_stone/4},placeGift:'story_stone',
     headPose(){return {x:LW/2,y:EY+0.84*(-34+(part('leg').broken?28:0)+Math.sin(B.time*0.04)*2)};},
     markPosition(p){if(p.id==='head')return {x:BOX.x+BOX.w/2,y:BOX.y+30+(part('leg').broken?28*0.84:0)};},
