@@ -995,6 +995,18 @@ const TABLES={
     "line": "소금장수한테 소금을 주냐?",
     "effect": "none"
    }
+  },
+  "deungjan": {
+   "rice": {
+    "kind": "좋아함",
+    "line": "쌀 한 톨이 밤새 힘이다!",
+    "effect": "none"
+   },
+   "sesame_oil": {
+    "kind": "아주 좋아함",
+    "line": "고소한 등잔! 이걸로 밤새 비추지.",
+    "effect": "none"
+   }
   }
  },
  "NOTES": [
@@ -1545,6 +1557,31 @@ const TABLES={
      "text": "아빠가 지난가을 쥐여 준 신표를 한 번도 쓰지 않고 품고 있었다. 이제 그 신표로 마루에서 잔다.",
      "section": "관찰",
      "when": "arc:jangteo:jjandol"
+    },
+    {
+     "who": "me",
+     "text": "부엉 영감이 손님 장부에 짠돌 말고 본이름을 적었단다. 무슨 이름인지는 비밀.",
+     "section": "관찰",
+     "when": "arc:jangteo:jjandol-name"
+    }
+   ]
+  },
+  {
+   "id": "deungjan",
+   "region": "jangteo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "생쥐 밤짐꾼. 해 지고 들어오는 길손 짐을 나르고 허리 등잔으로 길을 비춘다.",
+     "section": "관찰",
+     "when": "met:j_deungjan"
+    },
+    {
+     "who": "me",
+     "text": "지난가을 밤 아빠 짐을 날랐단다. 무겁고 약초 냄새가 났고 아빠는 한참 집 쪽 하늘을 봤다고.",
+     "section": "관찰",
+     "when": "arc:jangteo:deungjan"
     }
    ]
   },

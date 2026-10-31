@@ -417,6 +417,103 @@ function jjArc4(){
     ['짠돌','…따뜻하네.']
   ],()=>{G.f.jjInside=true;learn('arc:jangteo:jjandol');finishWanderer('j_jjandol');});
 }
+/* ⑥ 새 인물 등잔발 (생쥐 밤짐꾼, D-119). 해 지고 들어오는 길손 짐을 나르고 허리 등잔으로 길을 비춘다. 낮엔 잔다.
+   연 아이 사연(②)과 얽힌다: 설 첫새벽 어귀에서 우는 동생을 붉은 차일 등 쪽으로 데려온 게 등잔발이다.
+   지난가을 늦은 밤 모자 쓴 너구리(아빠)의 짐을 숙소까지 날랐다. 짠돌에게 신표를 쥐여 준 그 밤이다(⑤).
+   아이는 신표를 받을 때 부엉 영감에게서 아빠 짐을 받았다. 그래서 "약초 냄새"를 제 보따리에서 확인할 수 있다. */
+function lampArc1(){
+  arcScene('jangteoArcsLamp1','숙소 앞에서 제 몸집 세 배 보따리를 진 생쥐 밤짐꾼 등잔발을 도왔다. 해 지고 들어오는 길손들 짐을 나르고, 허리에 찬 작은 등잔으로 길을 비춰 준단다.',[
+    ['등잔발','(제 몸집 세 배는 되는 보따리를 지고 비틀거린다.)'],
+    ['등잔발','어이쿠, 비켜, 비켜!\n아니, 비키지 말고 좀 받쳐 줘!'],
+    ['너구리','(보따리 아래를 받쳐 같이 든다.)\n이거 어디까지요?'],
+    ['등잔발','숙소 마루까지! 막차로 온 손님 짐이야.'],
+    ['너구리','(마루 끝에 보따리를 내려놓았다.)'],
+    ['등잔발','휴, 살았다. 나는 등잔발. 밤짐꾼이야.'],
+    ['등잔발','해 지고 들어오는 길손들 짐을 나르지.\n낮엔 자고.'],
+    ['너구리','왜 밤에만 해요?'],
+    ['등잔발','밤에 오는 손님은 길이 안 보이잖아.\n이걸로 비춰 주는 거야.'],
+    ['등잔발','(허리에 찬 작은 등잔을 툭툭 친다.)'],
+    ['등잔발','설 대목엔 늦게 오는 손님이 많거든.\n다들 집에 가려고 서두르니까.'],
+    ['너구리','(아빠도 어딘가에서 늦게 오는 중일까.)']
+  ]);
+}
+function lampArc2(){
+  const spare=(G.inv.sesame_oil||0)>0&&progressShortage({...G.inv,sesame_oil:G.inv.sesame_oil-1})<=progressShortage(G.inv);
+  arcScene('jangteoArcsLamp2','등잔발이 설 첫새벽에 어귀로 길 잃은 손님을 마중 나간다고 했다. 연 아이 차일 등이 어귀에서도 보였단다.'+(spare?' 등잔에 참기름을 부어 주었다.':''),[
+    ['등잔발','어이, 그 붉은 차일 등! 네가 달았지?'],
+    ['너구리','연 아이 동생이 밤에 오면 찾으라고요.'],
+    ['등잔발','잘했다. 어귀에서도 저 불이 보이더라.'],
+    ['등잔발','설 첫새벽엔 어귀에 나가 있을 거야.\n꼭 길 잃는 꼬마가 하나씩 있거든.'],
+    ['등잔발','(등잔을 흔들어 본다. 찰랑, 바닥 소리가 난다.)'],
+    ['등잔발','…기름이 간당간당하네.'],
+    ...(spare?[
+      ['너구리','참기름도 불이 붙어요?'],
+      ['등잔발','붙지! 냄새가 고소해서 그렇지.'],
+      ['너구리','(참기름 한 병을 등잔에 부어 주었다.)'],
+      ['등잔발','이거면 새벽까지 넉넉해. 고소한 등잔이네!']
+    ]:[
+      ['너구리','기름은 없는데…'],
+      ['등잔발','괜찮아. 아껴 쓰면 새벽까진 가.'],
+      ['등잔발','대신 네 차일 등이 꺼지지 않게만 해 줘.']
+    ]),
+    ['등잔발','둘이 같이 비추면 안 헤매겠지.']
+  ],()=>{if(spare)takeItem('sesame_oil',1);});
+}
+function lampArc3(){
+  arcScene('jangteoArcsLamp3','설날 아침, 등잔발이 새벽 어귀에서 울던 연 아이 동생을 데려왔다고 했다. 지난가을 늦은 밤엔 모자 쓴 너구리의 짐도 날랐단다. 무겁고 약초 냄새가 났다고. 그 너구리는 짐을 내려놓고 한참 집 쪽 하늘을 봤단다.',[
+    ['등잔발','(담벼락 아래 웅크려 자다가 눈을 뜬다.)'],
+    ['등잔발','…으음, 아침이야?\n새벽 손님 하나 데려왔어.'],
+    ['등잔발','어귀에서 울고 있더라. 형 찾는다고.\n연 꼬리랑 붉은 등 얘기만 하고.'],
+    ['너구리','연 아이 동생이에요! 아침에 만났어요.'],
+    ['등잔발','그래? 다행이다. 그럼 잠이나 더 자야지.'],
+    ['등잔발','(눈을 감다가 다시 뜬다. 내 모자를 본다.)'],
+    ['등잔발','…그 모자. 지난가을 밤에도 봤는데.'],
+    ['등잔발','늦게 들어온 너구리 짐을 내가 날랐지.\n무겁더라. 약초 냄새가 나고.'],
+    ['너구리','(영감님이 내준 아빠 짐 보따리.\n지금도 약초 냄새가 난다.)'],
+    ...(G.f.jangteoArcsJj2?[['너구리','(짠돌 아저씨가 신표를 받은 것도 그 밤이다.)']]:[]),
+    ['등잔발','그 너구리, 짐 내려놓고 한참 서 있더라.\n집 쪽 하늘을 보는 것 같았어.'],
+    ['등잔발','…졸려서 헛것을 봤으려나. 잘 가라.']
+  ],()=>{G.f.lampWoke=true;learn('arc:jangteo:deungjan');});
+}
+function lampDraw(x,y,f=1){
+  const P=(dx,dy,w,h,c)=>R(Math.round(f>0?x+dx:x-dx-w),Math.round(y+dy),w,h,c);
+  P(-12,-6,7,2,'#b9a99a');P(-14,-8,3,2,'#b9a99a');                         // 꼬리
+  P(-6,-11,10,8,'#8f8a86');P(-2,-9,5,5,'#c9c3bd');                          // 몸통과 배
+  P(2,-16,7,6,'#8f8a86');P(8,-14,2,2,'#e6a5a5');P(6,-15,1,1,'#1d1712');     // 머리, 코, 눈
+  P(1,-19,3,3,'#e6a5a5');P(5,-19,3,3,'#e6a5a5');                            // 귀
+  P(-4,-3,2,3,'#6a6560');P(2,-3,2,3,'#6a6560');                             // 다리
+  P(-5,-17,8,6,'#a88456');P(-4,-18,6,2,'#c8a36c');                          // 등짐
+  const glow=night();P(7,-9,3,4,'#5c4632');P(8,-10,1,1,glow?'#ffd36b':'#7a6a55');   // 허리 등잔
+  if(glow){P(6,-11,5,1,'rgba(255,211,107,.45)');}
+}
+function lampTalk(){
+  const F=G.f;
+  if(night()){
+    if(!F.jangteoArcsLamp1){lampArc1();return;}
+    if(F.jangteoArcsKite2&&!F.jangteoArcsLamp2){lampArc2();return;}
+    talk([['등잔발',F.jangteoArcsLamp2?'설 첫새벽엔 어귀에 나가 있을 거야.':'짐 나를 손님 없나…\n어이, 너 보따리 무거워 보인다?']]);return;
+  }
+  if(F.jangteoArcsLamp2&&F.jangteoArcsKite3&&F.bueongDone&&!F.jangteoArcsLamp3){lampArc3();return;}
+  talk([['등잔발','(담벼락 아래서 곤히 잔다.)']]);
+}
+
+/* 마루에서 잔 다음 낮. 영감은 손님 장부에 짠돌의 본이름을 적었다(장부는 이름 칸을 비우지 않는다). 아이는 그 이름을 모른다.
+   길 소금 한 줌은 덤이다(진행과 상관없다). */
+function jjArc5(){
+  arcScene('jangteoArcsJj5','마루에서 잔 다음 날, 짠돌 아저씨가 길 소금 한 줌을 쥐여 주었다. 부엉 영감이 손님 장부에 짠돌 말고 본이름을 적었단다. 무슨 이름인지는 비밀이라고 했다.',[
+    ['짠돌','소금 사려! …아, 너구나.'],
+    ['짠돌','(목소리를 낮춘다.) 마루가 따숩더라.\n밤새 한 번도 안 깼다.'],
+    ['너구리','다행이에요.'],
+    ['짠돌','영감이 손님 장부에 날 적더라.\n짠돌 말고, 본이름으로.'],
+    ['너구리','본이름이 뭔데요?'],
+    ['짠돌','…비밀이다. 장터에선 짠돌이 편해.'],
+    ['짠돌','근데 누가 적어 주니까\n내 이름도 쓸 데가 있구나 싶더라.'],
+    ['짠돌','(소금 한 줌을 종이에 싸서 내 손에 쥐여 준다.)'],
+    ['짠돌','길 소금이다. 북쪽 길은 눈 녹은 물이 싱겁거든.'],
+    ['짠돌','값은… 네 아비 셈에 달아 둬라.'],
+    ['너구리','(웃음이 났다. 짠돌 아저씨도 웃었다.)']
+  ],()=>{addItem('salt',1);learn('arc:jangteo:jjandol-name');});
+}
 /* 짠돌의 두 얼굴: 낮엔 거리 좌판, 밤엔 숙소 문간. 사연이 켜진 판에만 나온다. 문간의 짠돌은 방에 든 뒤로는 없다. */
 function jjDraw(x,y,f=1){
   const P=(dx,dy,w,h,c)=>R(Math.round(f>0?x+dx:x-dx-w),Math.round(y+dy),w,h,c);
@@ -438,6 +535,7 @@ function jjandolTalk(){
     talk([['짠돌',F.jangteoArcsJjSalt?'(신표를 싼 천을 만지작거린다.)\n…영감 앞에 설 낯이 없다.':'낮엔 거리에 있다. 소금 팔아야지.']]);return;
   }
   if(F.jangteoArcsJj2&&!F.jangteoArcsJj3){jjArc3();return;}
+  if(F.jjInside&&!F.jangteoArcsJj5){jjArc5();return;}
   talk([['짠돌',F.jjInside?'소금 사려! …어젯밤엔 마루에서 잤다. 등이 따숩더라.':F.jangteoArcsJj3?'떡집 곰한테 소금은 전했냐?':'소금 사려! 값은 안 깎아.\n소금은 원래 귀한 거야!']]);
 }
 {
@@ -447,7 +545,14 @@ function jjandolTalk(){
     const jjNight={id:'j_jjandol',name:'짠돌',x:1320,talk:jjandolTalk,draw:jjDraw,hint:'숙소 문간에서 누가 이를 딱딱 부딪치는 소리가 난다.',greeting:'(문간에 웅크려 길 쪽만 본다.)'};
     const street=W.street,inn=W.inn;
     Object.defineProperty(W,'street',{configurable:true,get(){return Rg.arcs()&&!night()?[...street,jjDay]:street;}});
-    Object.defineProperty(W,'inn',{configurable:true,get(){return Rg.arcs()&&night()&&!G.f.jjInside?[...inn,jjNight]:inn;}});
+    // 등잔발: 밤엔 숙소 앞 길목, 설날 아침엔 담벼락 아래서 잔다(사연이 남았을 때만).
+    const lampNight={id:'j_deungjan',name:'등잔발',x:1800,talk:lampTalk,draw:lampDraw,hint:'어둠 속에서 작은 등잔 불빛이 흔들리며 다가온다.',greeting:'짐 나를 손님 없나~'};
+    const lampDay={id:'j_deungjan',name:'등잔발',x:1760,talk:lampTalk,draw:lampDraw,greeting:'(담벼락 아래서 곤히 잔다.)'};
+    Object.defineProperty(W,'inn',{configurable:true,get(){
+      if(!Rg.arcs())return inn;
+      if(night())return [...inn,...(G.f.jjInside?[]:[jjNight]),lampNight];
+      return G.f.jangteoArcsLamp2&&!G.f.lampWoke?[...inn,lampDay]:inn;
+    }});
   }
 }
 
