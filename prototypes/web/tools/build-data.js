@@ -126,7 +126,7 @@ for(const r of notebook){
   const section=r['기록갈래'];
   if(!['아빠 수첩','관찰','익힌 솜씨','숨은 가공법'].includes(section)||(r['쓴이']==='아빠')!==(section==='아빠 수첩'))fail('notebook.csv '+r['쪽id']+': 기록갈래와 쓴이가 맞지 않는다');
   let e=byId[r['쪽id']];
-  if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':r['종류']==='도장'?'stamp':'animal',lines:[]};if(e.kind==='stamp'||CRAFT[e.id])e.name=r['대상'];NOTES.push(e);}
+  if(!e){e=byId[r['쪽id']]={id:r['쪽id'],region:r['지역'],kind:r['종류']==='물건'?'item':r['종류']==='도장'?'stamp':'animal',lines:[]};if(e.kind==='stamp'||CRAFT[e.id])e.name=r['대상'];else if(e.kind==='animal'&&e.id.includes('_'))e.name=r['대상'];NOTES.push(e);}   // 결정 D-118: 떠돌이 쪽(지역 NPC가 아닌 쪽id)은 표의 대상 이름을 쓴다
   // 결정 D-61: '아빠 그림 있음'은 이제 아빠가 이름을 적어 둔 쪽이라는 뜻만 남는다(그림은 아이가 본 뒤에 그린다)
   if(r['비고'].includes('아빠 그림 있음'))e.dadDrawing=true;
   if(r['내용']==='(items.csv 의 설명)')continue;
