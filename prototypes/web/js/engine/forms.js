@@ -338,7 +338,7 @@ function repayDebt(npc,key){
 }
 /* 산양: 같은 품(ITEMS[id].r)끼리 하나 대 하나 */
 function swapTargets(e,id){return (Array.isArray(e.swapPool)?e.swapPool:[]).filter(p=>p!==id&&ITEMS[p]&&ITEMS[id]&&ITEMS[p].r===ITEMS[id].r);}
-function swapCandidates(e){return Object.keys(G.inv).filter(id=>G.inv[id]>0&&swapTargets(e,id).length);}
+function swapCandidates(e){return Object.keys(G.inv).filter(id=>G.inv[id]>0&&!keepsake(id)&&swapTargets(e,id).length);}
 function swapMenu(npc,e){
   const who=npc.name||'손님',ids=swapCandidates(e).slice(0,6);
   if(!ids.length){toast('맞바꿀 물건이 없다');return;}
@@ -349,7 +349,7 @@ function swapMenu(npc,e){
   }})),{t:'그만두기',go:null}]]]);
 }
 function doSwap(npc,id,target){
-  if(!has(id)||strangerUsed(npc.id)>=TABLES.TUNING.stranger_trade_limit)return;
+  if(!has(id)||keepsake(id)||strangerUsed(npc.id)>=TABLES.TUNING.stranger_trade_limit)return;
   if(!strangerKeepsProgress({[id]:1}))return;
   takeItem(id,1);addItem(target,1);Sound.exchange();strangerCount(npc.id);
 }

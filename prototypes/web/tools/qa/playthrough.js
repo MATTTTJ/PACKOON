@@ -209,7 +209,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     }
   }
   async function battle(gifts) {
-    scene+=' · 전투';let end=Date.now()+25000;
+    scene+=' · 전투';let end=Date.now()+60000;   // 결정 D-64: 선물은 빈틈에만. 선물 버튼을 누르면 다음 빈틈에 창이 열린다
     while(Date.now()<end) {
       const s=await check();
       if(!s.battle){if(s.ink){await wait(100);continue;}await settle();return;}
@@ -220,7 +220,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       const name=await read(`ITEMS[${json(gift)}].n`);
       await textButton('#bGiftGrid button',new RegExp(name));await wait(150);
     }
-    throw new Error('전투 선물/결과 처리가 25초 안에 끝나지 않았다');
+    throw new Error('전투 선물/결과 처리가 60초 안에 끝나지 않았다');
   }
   async function stage(label,action) {scene=label;b.scene=label;log('시작',label);await action();const s=await check();milestones.push({scene,region:s.region,zone:s.zone,goal:s.goal,inv:s.inv,flags:s.flags,awake:s.awake});}
   async function next() {

@@ -36,7 +36,7 @@ const Rg=defineRegion('galchamgol',{
   weatherFront(){if(G.boss.dead){const x=2348-cam;if(x<W+20){R(x,GROUND-26,2,26,'#6b4423');R(x-8,GROUND-26,18,8,'#c9a27a');R(x+6,GROUND-24,2,4,'#6b4423');}}},
   onStart(){
     diary('start','오늘 길을 나선다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 아빠가 간 북쪽 길은 단풍골 끝에서 시작된다.');
-    toast('도토리를 줍고, 마을 동물들에게 말을 걸어 보자');
+    // 결정 D-68: 첫 화면 안내는 '할 일' 한 줄만. 같은 말을 알림으로 한 번 더 띄우지 않는다.
   },
   next:'dolneomeo',
   /* ?region=dolneomeo 처럼 뒤 지역부터 바로 시작할 때, 단풍골을 이렇게 마친 것으로 친다 (확인용 바로가기) */
@@ -46,7 +46,9 @@ const Rg=defineRegion('galchamgol',{
     ['dodam','nal','musoe','toad'].forEach(id=>g.learned.push('met:'+id));g.learned.push('fight:musoe','fight:kudzu');
     ['d1','n1','m1','m2','t1','h1'].forEach(id=>g.clues.push({id,who:'단풍골',text:'단풍골에서 찾은 단서 (바로가기로 시작해서 내용은 비어 있다)'}));
     g.diary.push({id:'skip_galchamgol',text:'(단풍골은 바로가기로 건너뛰었다.)'});
-    Object.assign(g.f,{dodamDone:true,musoeDone:true,nalDone:true,toadMet:true});
+    Object.assign(g.f,{dodamDone:true,musoeDone:true,nalDone:true,toadMet:true,leafGiven:true});
+    // 결정 D-69: 바로가기로 뒤 지역부터 시작해도 앞 지역에서 배운 변신은 갖고 간다(앞질러 가는 길을 검수할 수 있게).
+    if(!g.forms.includes('squirrel'))g.forms.push('squirrel');
     g.boss.dead=true;g.barrier.cut=true;g.ended=true;
   },
   endStats:()=>[

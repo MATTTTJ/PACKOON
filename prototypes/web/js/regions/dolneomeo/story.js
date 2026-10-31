@@ -475,6 +475,9 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '돌너머 마을 체험판 완료';
+  // 결정 D-67: 앞선 진행부터 거꾸로 본다
+  if(G.boss.dead)return !F.daraePicked?'절벽 바위턱의 서리다래를 따자':'보따리를 열고 맷돌에 서리다래를 넣어 약즙을 만들자';
+  if(F.ppuriPassed)return '돌산 절벽 길의 돌 골렘과 맞서자 (부수거나 달래거나)';
   if(!F.kkuTalk)return '장승 옆 꾸벅이에게 말을 걸어 보자';
   if(!F.kkuAwake)return '꾸벅이가 고개를 들 때 말을 걸자';
   if(!F.kkuDone)return has('eoksae',3)?'고개를 들 때 꾸벅이에게 억새를 건네자':'들판의 마른 억새를 낫으로 베자 ('+(G.inv.eoksae||0)+'/3)';
@@ -482,7 +485,6 @@ Rg.goal=()=>{
   if(!F.ppuriPassed){
     if(has('memil_powder'))return '뿔이에게 메밀가루를 건네자';
     if(!isAwake('maetdol')){
-      if(F.dolsoeTea)return '돌쇠 할배께 돌 쌓기를 다시 배우자';
       if(has('gyeolmyeongja'))return '석수 마당의 돌쇠 할배께 결명자 차를 드리자';
       if(!F.nalDDone)return (has('kflower')||has('gyeousari',2))?'날쌘에게 칡꽃을 보여 주고 결명자를 구하자':'높은 가지의 겨우살이 2개를 따서 날쌘에게 가져가자';
       return '석수 마당의 돌쇠 할배를 찾아가자';
@@ -491,9 +493,7 @@ Rg.goal=()=>{
     if(m<3)return '거둔 메밀밭에서 메밀을 줍자 ('+m+'/3)';
     return '보따리를 열고 맷돌에 메밀 3개를 넣어 갈자';
   }
-  if(!G.boss.dead)return '돌산 절벽 길의 돌 골렘과 맞서자 (부수거나 달래거나)';
-  if(!F.daraePicked)return '절벽 바위턱의 서리다래를 따자';
-  return '보따리를 열고 맷돌에 서리다래를 넣어 약즙을 만들자';
+  return '돌산 절벽 길의 돌 골렘과 맞서자 (부수거나 달래거나)';
 };
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤에만 보인다(장부에 적혔거나, 냄새를 맡고 먼저 말을 꺼낸 뒤). 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
