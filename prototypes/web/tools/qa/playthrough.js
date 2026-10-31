@@ -29,12 +29,13 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     if(index<0)throw new Error(`버튼을 찾지 못함: ${selector} / ${p.source}`);
     await click(`${selector}:nth-of-type(${index+1})`);
   }
-  const defaults=[/북쪽으로 떠난다/,/아빠와 집으로 돌아간다/,/제 이름을 드릴게요/,/말이… 안 나와/,/내가… 아기였을 때/,/나 주려고/,/건넨다|달여 드린다|고사상에 올린다|약즙을 맡긴다/,/돌 쌓기를 배운다/,/낫과 시험|낫 이야기/,/하던 이야기 계속/,/해머루 이야기/,/같이 찾아볼게/,/산길로 간다|길을 나선다/,/그만두기|다음에 이야기|다음에 올게|더 둘러|생각해|조금 이따/];
+  const defaults=[/북쪽으로 떠난다/,/아빠와 집으로 돌아간다/,/제 이름을 드릴게요/,/말이… 안 나와/,/내가… 아기였을 때/,/나 주려고/,/건넨다|보따리를 펼친다|달여 드린다|고사상에 올린다|약즙을 맡긴다/,/돌 쌓기를 배운다/,/낫과 시험|낫 이야기/,/하던 이야기 계속/,/해머루 이야기/,/같이 찾아볼게/,/산길로 간다|길을 나선다/,/그만두기|다음에 이야기|다음에 올게|더 둘러|생각해|조금 이따/];
   async function settle(prefer) {
     for(let i=0;i<200;i++) {
       const s=await check();
       if(await read("!$('notebook').hidden")){await click('#noteClose');await wait(40);continue;}
       if(await read("!$('bag').hidden&&bagKind==='중요'")){await click('#bagClose');await wait(40);continue;}
+      if(await read("!$('trade').hidden")){await trade(prefer);continue;}
       if(s.dlg) {
         if(s.choices.length) {
           let n=-1;
@@ -50,6 +51,19 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       return s;
     }
     throw new Error('대화/미니게임이 200회 입력 뒤에도 닫히지 않는다');
+  }
+  // 결정 D-39: 교환 화면. 진행에 필요한 부탁(선택 교환 t_craft_ 제외) 중 지금 보따리로 맞출 수 있는 첫 조합을
+  // 실제 클릭으로 고르고 얹어 제안한다. prefer가 흥정 방식(허세·사정·칭찬)과 맞으면 먼저 흥정한다.
+  async function trade(prefer) {
+    const ways=await read("[...document.querySelectorAll('.trade-haggle button[data-way]')].filter(b=>!b.disabled).map(b=>b.dataset.way)");
+    const way=prefer&&ways.find(w=>prefer.test(w));
+    if(way){log('흥정',way);await click('.trade-haggle button[data-way="'+way+'"]');await wait(40);}
+    const plan=await read("(()=>{const S=Trade.state;if(!S)return null;for(const g of S.goods){if(g.kind!=='story'||g.id.startsWith('t_craft_')||g.locked?.())continue;const i=g.asks.findIndex(a=>Object.entries(a).every(([id,n])=>has(id,n)));if(i>=0)return {good:g.id,ask:g.asks[i]};}return null;})()");
+    if(!plan){log('교환 화면','맞출 부탁 없음');await click('#tradeClose');await wait(40);return;}
+    log('교환',plan);await click('.trade-good[data-good="'+plan.good+'"]');
+    for(const [id,n] of Object.entries(plan.ask))for(let i=0;i<n;i++)await click('.slot[data-item="'+id+'"]');
+    await click('#tradePropose');await wait(60);
+    if(await read("!$('trade').hidden"))throw new Error('교환 화면에서 제안이 받아들여지지 않았다: '+await read("document.querySelector('.trade-log')?.textContent"));
   }
   async function minigame(id) {
     log('미니게임',id);const end=Date.now()+45000;
@@ -226,17 +240,18 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await click('#btnStart');await settle();
     if(await read('G.f.arcs')!==(mode==='expanded'))throw new Error('사연 켬/끔 시작값이 모드와 다르다');
     await stage('단풍골 · 가루와 채집',async()=>{await gather('root',1);await pickup('acorn',6);await gather('ssari',1);if(await read('(G.inv.ssari||0)<2'))await gather('kkoe',1);await craft('jeolgu','powder',2);await npc('dodam');});
-    await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);await npc('nal',/숯이랑 바꾸자|숯을 구한다/);await npc('musoe');await battle(['rice']);await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
+    await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);if(!await read('G.f.nalDone&&(G.inv.coal||0)>=2'))throw new Error('허세 흥정 뒤 숯 두 개(덤)를 받지 못했다');await npc('musoe');await battle(['rice']);await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
     await stage('단풍골 · 당산나무와 약',async()=>{
       if(mode==='expanded')await zone('forest');await moveX((await read('G.barrier.x'))-28);
       for(let i=0;i<5&&!await read('G.barrier.cut');i++){await key('j');await wait(400);}
       if(mode==='expanded')await zone('hill');await moveX(2020,{attack:true});await battle(['ssari','kkoe']);
       await gather('meoru',1);
-      await npc('toad');
+      // 처음 만남이 먼저다(해머루를 들고 와도). 두 번째에 보따리를 펼쳐 해머루를 건넨다.
+      for(let i=0;i<3&&!await read("G.diary.some(d=>d.id==='end')");i++)await npc('toad');
     });
     await next();
     await stage('돌너머 · 억새와 메밀',async()=>{await gather('eoksae',3);await pickup('memil',6);for(let i=0;i<15&&!await read('G.f.kkuDone');i++){await npc('kkubeogi');await wait(180);}if(!await read('G.f.kkuDone'))throw new Error('꾸벅이가 깨어 있을 때 교환하지 못했다');});
-    await stage('돌너머 · 맷돌과 길',async()=>{await npc('nal',/칡꽃을 내민다/);await npc('dolsoe');await craft('maetdol','memil_powder',2);await npc('ppuri');if(!await read('G.f.ppuriPassed'))await npc('ppuri');});
+    await stage('돌너머 · 맷돌과 길',async()=>{await npc('nal');await npc('dolsoe');await craft('maetdol','memil_powder',2);await npc('ppuri');if(!await read('G.f.ppuriPassed'))await npc('ppuri');});
     await stage('돌너머 · 골렘과 약즙',async()=>{
       if(mode==='expanded')await zone('shrine');await moveX(mode==='expanded'?2330:1920);await battle(['story_stone']);
       await pickup('seoridarae');await craft('maetdol','darae_yak');
@@ -247,7 +262,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await stage('큰 장터 · 시루와 고사떡',async()=>{
       for(let i=0;i<3&&!await read('G.f.steamDone');i++)await npc('morak');
       if(!await read('G.f.steamDone'))throw new Error('모락에게 시루를 깨우지 못했다');
-      await npc('nal',/쌀가루를 내민다/);await craft('siru','patsirutteok');await craft('siru','memiltteok');
+      await npc('nal');await craft('siru','patsirutteok');await craft('siru','memiltteok');
       for(let i=0;i<3&&!await read('G.f.night');i++)await npc('maru');
       if(!await read('G.f.night'))throw new Error('숙소에서 쉬어도 밤이 되지 않았다');
       for(let i=0;i<3&&!await read('G.f.guard');i++)await npc('bueong');

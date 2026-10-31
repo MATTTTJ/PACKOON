@@ -121,6 +121,29 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .mom-note p{font-size:clamp(15px,1.9vw,19px);line-height:1.6;margin:1px 0}
 .mom-note .smudge{filter:blur(3.5px);display:inline-block;user-select:none}
 .mom-transcript{border-top:1px dotted #cdb98f;padding-top:10px}
+/* 결정 D-39: 보부상 교환 화면. 왼쪽 상대의 물건(원하는 것을 그림으로), 오른쪽 내 보따리, 아래 내가 내놓을 것 */
+.trade-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+.trade-side h3,.trade-tray h3{font-family:var(--display);font-size:1.05em;margin:2px 0 8px}
+.trade-good{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;margin-bottom:6px;padding:8px 10px;background:var(--hanji-2);border:1px solid #c7b48c;border-radius:4px;color:var(--meok);font:inherit;cursor:pointer;touch-action:manipulation}
+.trade-good[aria-pressed="true"]{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
+.trade-good-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.trade-good-head canvas{width:26px;height:26px;image-rendering:pixelated}
+.trade-good-head canvas.rarity-mark{width:15px;height:15px}
+.trade-asks{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-height:28px}
+.trade-asks .plus{font-weight:700;color:var(--dim)}
+.trade-good:not([aria-pressed="true"]):not(:hover):not(:focus-visible) .trade-ask{opacity:.55}
+.trade-ask{position:relative;display:inline-flex;align-items:center;gap:1px;background:#fff8e6;border:1px solid #d9c8a5;border-radius:4px;padding:2px 4px}
+.trade-ask canvas{width:24px;height:24px;image-rendering:pixelated}
+.trade-ask b{font-size:.85em}
+.trade-like{position:absolute;left:1px;top:1px;font-size:9px;line-height:1.2;padding:0 2px;border-radius:2px;background:#e9c46a;color:#3b2a14}
+.trade-tray{margin-top:12px;border-top:1px dashed #c7b48c;padding-top:10px}
+.trade-offer{display:flex;flex-wrap:wrap;gap:6px;min-height:36px;align-items:center}
+.trade-chip{display:inline-flex;align-items:center;gap:4px;background:#f8eed8;border:1px solid var(--dan);border-radius:4px;padding:2px 8px 2px 2px;font:inherit;color:var(--meok);cursor:pointer;min-height:36px}
+.trade-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}
+.trade-haggle{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.trade-log{margin-top:8px;font-family:var(--display);line-height:1.55;min-height:3.2em}
+.trade-log p{margin:2px 0}
+@media (max-width:600px){.trade-wrap{grid-template-columns:1fr}}
 .mom-transcript summary{cursor:pointer;min-height:32px}
 .mom-transcript p{margin:4px 0}
 .tabs button[aria-selected="true"]{color:var(--meok);border-bottom-color:var(--dan)}

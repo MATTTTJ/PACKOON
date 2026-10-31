@@ -139,14 +139,18 @@ function talkKku(){
   talk([['꾸벅이','돌쇠 할배는 눈이 침침해서 손끝으로 돌을 보셔…\n결명자 차를 좋아하실 거야… 쿨…']]);
 }
 function kkuTrade(){
-  talk([['꾸벅이','오… 억새다… 나 주는 거야…?',[{t:'마른 억새 3단을 건넨다',go:()=>{
+  talk([['꾸벅이','오… 억새다… 나 주는 거야…?',[{t:'보따리를 펼친다',go:()=>Trade.open('kkubeogi')},{t:'아직은 안 줄래',go:null}]]]);
+}
+function kkuGive(){
+  if(G.f.kkuDone||!has('eoksae',3))return;
+  {
     takeItem('eoksae',3);G.f.kkuDone=true;ledgerDone('kkubeogi');rel('kkubeogi',1);learn('kkubeogi:eoksae');
     diary('d_kku','꾸벅이에게 억새를 주고 들었다. 서리다래는 돌산 절벽 바위턱에 있다. 성황당 돌무더기가 밤마다 움직인 뒤로, 장승지기 뿔이가 돌산 길을 닫았다.');
     const lines=[['꾸벅이','와… 폭신하다… 고마워…'],['너구리','서리다래가 어디 열리는지 알아?'],['꾸벅이','서리다래는… 돌산 절벽 바위턱에 열려… 첫서리를 맞아야 달거든…'],
       ['꾸벅이','성황당 돌무더기가 밤마다 움직여서… 장승지기 뿔이가 돌산 길을 막았어…']];
     if(G.rel.kkubeogi.v>=2)lines.push(['꾸벅이','돌쇠 할배는 눈이 침침해서 손끝으로 돌을 보셔…\n결명자 차를 좋아하실 거야… 날쌘 아저씨한테 결명자가 있어…']);
     talk(lines);
-  }},{t:'아직은 안 줄래',go:null}]]]);
+  }
 }
 
 /* ---------- 날쌘 (다시 만남): 돌투성이 마을이라 칡꽃 향이 귀하다 ---------- */
@@ -157,27 +161,18 @@ function talkNal(){
 }
 function nalMenu(){
   const F=G.f,c=[];
-  if(!F.nalDDone){
-    if(has('kflower'))c.push({t:'칡꽃을 내민다 (결명자 2)',go:()=>nalTrade('kflower')});
-    if(has('gyeousari',2))c.push({t:'겨우살이 2개를 내민다 (결명자 1)',go:()=>nalTrade('gyeousari')});
-    if(!F.nalDBluff)c.push({t:'허세 부리기: "칡꽃? 단풍골엔 흔한데."',go:nalBluff});
-  }
+  c.push({t:'보따리를 펼친다',go:()=>Trade.open('nal')});
   if(Rg.arcs()&&G.tool==='sickle'&&!F.dolneomeo_arc_nal2)c.push({t:'아빠의 낫을 보여 준다',go:nalSickle});
   if(!CLASSIC&&!F.dolneomeo_craft_oil)c.push({t:'지게에서 달그락거리는 병을 묻는다',go:()=>{
     // t_craft_oil: 꾸벅이 둥지 몫을 먼저 남긴다. 거절에는 소비가 없다.
     // 아이는 병 소리를 듣고 묻는다. 날쌘이 억새를 원하는 까닭(돌길에 병이 부딪는다)을 말한다.
-    const lead=['날쌘','참기름 병이야. 돌길이라 병끼리 자꾸 부딪어.'];
+    const lead=['날쌘','참기름 병이야. 돌길이라 병끼리 자꾸 부딪어.'];F.nalOilAsked=true;
     if(!has('eoksae',F.kkuDone?1:4)){
       talk(F.kkuTalk&&!F.kkuDone?[lead,['날쌘','억새 한 단이면 감쌀 텐데.\n꾸벅이 둥지에 쓸 세 단은 남겨 두고.'],['날쌘','그거 말고 한 단 더 생기면 한 병 줄게.']]
         :[lead,['날쌘','마른 억새 한 단이면 감쌀 텐데.\n밭에서 베어 오면 한 병 줄게.']]);return;
     }
     talk([lead,['날쌘','그 억새 한 단이면 감쌀 수 있겠다.\n주면 한 병은 네 몫이야.',[
-      {t:'여분 억새 한 단을 건넨다',go:()=>{
-        if(G.f.dolneomeo_craft_oil||!has('eoksae',G.f.kkuDone?1:4))return;
-        takeItem('eoksae',1);addItem('sesame_oil',1);G.f.dolneomeo_craft_oil=true;
-        diary('dolneomeo_craft_oil','날쌘에게 여분 억새를 주고 참기름을 받았다. 병을 억새로 감싸니 돌길에서도 부딪는 소리가 작아졌다.');
-        talk([['날쌘','이걸로 병끼리 안 부딪겠네.\n기름은 네가 쓸 데에 써.']]);
-      }},{t:'지금은 챙겨 둘게요',go:null}
+      {t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'지금은 챙겨 둘게요',go:null}
     ]]]);
   }});
   c.push({t:'그만두기',go:null});
@@ -185,18 +180,21 @@ function nalMenu(){
     :(has('kflower')||has('gyeousari',2))?'어디, 뭘 내놓을 건데?':'빈손으로 흥정하게? 칡꽃이 없으면\n높은 가지 겨우살이 두 개라도 따 와. 그럼 결명자 하나.';
   talk([['날쌘',say,c]]);
 }
+function nalOilGive(){
+  if(G.f.dolneomeo_craft_oil||!has('eoksae',G.f.kkuDone?1:4))return;
+  takeItem('eoksae',1);addItem('sesame_oil',1);G.f.dolneomeo_craft_oil=true;
+  diary('dolneomeo_craft_oil','날쌘에게 여분 억새를 주고 참기름을 받았다. 병을 억새로 감싸니 돌길에서도 부딪는 소리가 작아졌다.');
+  talk([['날쌘','이걸로 병끼리 안 부딪겠네.\n기름은 네가 쓸 데에 써.']]);
+}
 function nalTrade(id){
   const F=G.f;
+  if(F.nalDDone||!has(id,id==='kflower'?1:2))return;
   takeItem(id,id==='kflower'?1:2);F.nalDDone=true;ledgerDone('nal_dolneomeo');
   const n=(id==='kflower'?2:1)+(F.nalDBluff?1:0);
   addItem('gyeolmyeongja',n);learn('nal:dolneomeo');
   diary('d_nal',id==='kflower'?'단풍골에서 가져온 칡꽃을 날쌘에게 주고 결명자를 받았다. 돌투성이 마을에선 꽃 향이 귀하다. 마을이 바뀌니 물건값도 달라진다.':'높은 가지의 겨우살이를 날쌘에게 주고 결명자를 받았다.');
   talk(F.nalDBluff?[['날쌘',id==='kflower'?'그 흔한 물건도 여기 오면 귀해지는 거야.\n자, 결명자. 덤도 얹었어.':'칡꽃은 흔하다며? 겨우살이로 왔네.\n자, 결명자. 덤도 얹었어.'],['날쌘','날쌘이 짜다는 소리는 못 듣지.']]
     :[['날쌘','자, 결명자 '+n+'개. 이만하면 잘 바꿨지?'],['날쌘','눈 밝히는 약재니까 쓸 데가 있을걸.']]);
-}
-function nalBluff(){
-  const again=knows('nal:bluff-paid');G.f.nalDBluff=true;rel('nal',1);
-  talk([['너구리','칡꽃? 단풍골엔 흔한데.'],['날쌘',again?'허, 꼬마 보부상 허세는 여전하네. 날 뭘로 보고?':'허, 꼬마 보부상이 허세는. 날 뭘로 보고?'],['날쌘','좋아. 바꾸면 결명자 하나 더 얹어 줄게.']],nalMenu);
 }
 
 /* ---------- 돌쇠 할배 (두더지 석수) ---------- */
@@ -221,17 +219,23 @@ function talkDolsoe(){
   talk([['돌쇠 할배','맷돌은 잘 돌더냐.\n메밀은 한 줌씩 넣어야 곱게 갈린다.',c]]);
 }
 function dolsoeTea(){
-  talk([['돌쇠 할배','결명자 냄새로구나.',[{t:'결명자 차를 달여 드린다',go:()=>{
+  G.f.dolsoeAsked=true;
+  talk([['돌쇠 할배','결명자 냄새로구나.',[{t:'보따리를 펼친다',go:()=>Trade.open('dolsoe')},{t:'나중에 달여 드릴게요',go:null}]]]);
+}
+function dolsoeGive(){
+  if(G.f.dolsoeTea||!has('gyeolmyeongja'))return;
+  {
     const F=G.f;takeItem('gyeolmyeongja',1);F.dolsoeTea=true;rel('dolsoe',1);learn('dolsoe:tea');
     ledger('dolsoe','돌쇠 할배','결명자 1','맷돌을 깨움');
     diary('d_dolsoe','돌쇠 할배가 보따리 속 맷돌의 자개 발자국을 손끝으로 더듬더니, 우리 집안 맷돌이라는 걸 알아봤다.');
     const lines=Rg.arcs()?[
+      ['너구리','(결명자를 볶아 차로 달여 드렸다.)'],
       ['돌쇠 할배','고맙다. …그 보따리에서 돌 소리가 나는구나.\n맷돌이냐? 이리 줘 보거라.'],
       ['돌쇠 할배','(할배가 자개 발자국을 손끝으로 더듬는다.)'],
       ['돌쇠 할배','네 집안 맷돌이구나. 4대째 내려온 게지.'],
       ['돌쇠 할배','“돌이 마음을 알아야 돈다.” 네 아비한테 들었느냐?'],
       ['돌쇠 할배','돌 마음부터 읽고, 저 탑에 돌 세 개를 얹거라.']
-    ]:[['돌쇠 할배','눈이 좀 밝아지는구나. 고맙다.'],['돌쇠 할배','보따리에서 돌 부딪는 소리가 나는구나.\n이리 줘 보거라.'],
+    ]:[['너구리','(결명자를 볶아 차로 달여 드렸다.)'],['돌쇠 할배','눈이 좀 밝아지는구나. 고맙다.'],['돌쇠 할배','보따리에서 돌 부딪는 소리가 나는구나.\n이리 줘 보거라.'],
       ['돌쇠 할배','(할배가 맷돌 윗돌의 자개 발자국을 손끝으로 천천히 더듬는다.)'],
       ['돌쇠 할배','이 자개 발자국… 그 녀석 집안 맷돌이구나. 4대째 내려온 게지.'],
       ['돌쇠 할배','"돌이 마음을 알아야 돈다." 네 아비도 그 말을 하더냐.\n내가 가르쳐 주었지.'],
@@ -242,7 +246,7 @@ function dolsoeTea(){
       {t:'조금 이따가요',go:null}
     ]]);
     talk(lines,Rg.arcs()?null:openStack);
-  }},{t:'나중에 달여 드릴게요',go:null}]]]);
+  }
 }
 
 /* 돌 쌓기: 흔들리는 돌탑이 가운데 설 때 돌을 얹는다. 세 개면 맷돌이 깨어난다 (임시 규칙) */
@@ -406,12 +410,16 @@ function talkPpuri(){
   talk([['뿔이','원칙을 지켰으니 통과다. 가도 좋다.']]);
 }
 function ppuriTrade(){
-  talk([['뿔이','메밀가루는 가져왔나.',[{t:'메밀가루를 건넨다',go:()=>{
+  talk([['뿔이','메밀가루는 가져왔나.',[{t:'보따리를 펼친다',go:()=>Trade.open('ppuri')},{t:'나중에 드릴게요',go:null}]]]);
+}
+function ppuriGive(){
+  if(G.f.ppuriPassed||!has('memil_powder'))return;
+  {
     const F=G.f;takeItem('memil_powder',1);F.ppuriPassed=true;ledgerDone('ppuri');rel('ppuri',1);tellSeogi();
     diary('d_ppuri','맷돌로 간 메밀가루로 뿔이가 장승제 메밀전을 부쳤다. 금줄이 걷히고 돌산 길이 열렸다.');
     toast('돌산 길이 열렸다');refreshGoal();
     talk([['뿔이','좋다. 원칙대로 장승제를 올린다.'],['뿔이','(뿔이가 메밀전을 부쳐 돌산 쪽에 올리고 절한 뒤, 금줄을 걷었다.)'],['뿔이','산이 노하면 석이를 올리는 법이다.\n절벽 아래 백 년 바위에 붙어 있다.'],['뿔이','돌무더기 앞까지 안 가도 닿는 자리다.'],['뿔이','통과다. 흰 돌턱을 밟고, 발밑을 살펴라.']]);
-  }},{t:'나중에 드릴게요',go:null}]]]);
+  }
 }
 function tellSeogi(){
   if(G.f.seogiTold)return;
@@ -487,6 +495,26 @@ Rg.goal=()=>{
   if(!F.daraePicked)return '절벽 바위턱의 서리다래를 따자';
   return '보따리를 열고 맷돌에 서리다래를 넣어 약즙을 만들자';
 };
+/* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
+   결정 D-39: 원하는 것을 들은 뒤에만 보인다(장부에 적혔거나, 냄새를 맡고 먼저 말을 꺼낸 뒤). 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
+   결정 D-40: 날쌘에게 허세가 통하면 결명자를 하나 더 얹는다(경멸 축). 결명자를 바꾼 뒤라면 흔한 물건에 덤. */
+Rg.trade={
+  kkubeogi:()=>G.ledger.kkubeogi?[{id:'t_kkubeogi',item:'seoridarae',label:'서리다래가 있는 곳',asks:[{eoksae:3}],done:()=>G.f.kkuDone,accept:kkuGive}]:[],
+  nal:()=>[
+    ...(G.ledger.nal_dolneomeo?[{id:'t_nal_dolneomeo',item:'gyeolmyeongja',n:1,asks:[{kflower:1},{gyeousari:2}],done:()=>G.f.nalDDone,
+      accept:i=>nalTrade(i===0?'kflower':'gyeousari')}]:[]),
+    ...(!CLASSIC&&G.f.nalOilAsked?[{id:'t_craft_oil',item:'sesame_oil',n:1,asks:[{eoksae:1}],done:()=>G.f.dolneomeo_craft_oil,
+      locked:()=>!G.f.kkuDone&&!has('eoksae',4)?'마른 억새 한 단. 꾸벅이 둥지에 쓸 세 단은 남겨 두고 한 단이 더 있어야 한다.':null,accept:nalOilGive}]:[])
+  ],
+  dolsoe:()=>G.f.dolsoeAsked?[{id:'t_dolsoe',item:'gyeolmyeongja',icon:'maetdol',label:'맷돌 보는 법',asks:[{gyeolmyeongja:1}],done:()=>G.f.dolsoeTea,accept:dolsoeGive}]:[],
+  ppuri:()=>G.ledger.ppuri?[{id:'t_ppuri',item:'memil_powder',icon:'seogi',label:'돌산 길 열기',asks:[{memil_powder:1}],done:()=>G.f.ppuriPassed,accept:ppuriGive}]:[]
+};
+Rg.onHaggle=(npc,way)=>{
+  if(npc!=='nal'||way!=='허세'||G.f.nalDDone)return false;
+  if(!G.f.nalDBluff){G.f.nalDBluff=true;rel('nal',1);}
+  return true;
+};
+
 })();
 
 /* PA-43 [개발자 결정] 돌에 새긴 소원. 선택 만남은 필수 교환·가보·출구 조건에 쓰지 않는다. */
@@ -761,4 +789,5 @@ for(const [id,content] of Object.entries(Rg.expansionContent())){
   if(Rg.zones?.[id])Object.assign(Rg.zones[id],content);
 }
 Rg.installExpansion?.();
+
 })();
