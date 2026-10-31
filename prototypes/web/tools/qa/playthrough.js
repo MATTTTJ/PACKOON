@@ -84,7 +84,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     }
     throw new Error(`미니게임 ${id}에서 45초 진행하지 못했다`);
   }
-  async function moveX(x,{edge=false,attack=false,sneak=false}={}) {
+  async function moveX(x,{edge=false,attack=false,sneak=false,slow=false}={}) {
     const begin=await settle();let held=null,previous=begin.x,still=Date.now(),rate=6;const end=Date.now()+45000;
     await read('window.__qaClockRate=6');
     try {
@@ -96,7 +96,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
         }
         if(s.dlg||s.mg||s.ink||s.motion||s.fade){if(held){await key(held,'up');held=null;}await settle();continue;}
         const d=x-s.x;if(Math.abs(d)<=5)return;
-        const desiredRate=Math.abs(d)<50||sneak?1:6;
+        const desiredRate=Math.abs(d)<50||sneak||slow?1:6;
         if(desiredRate!==rate){rate=desiredRate;await read('window.__qaClockRate='+rate);}
         const alert=sneak&&await read("G.salg&&(G.salg.phase==='alert'||G.salg.phase==='warn')&&Math.abs(G.salg.x-G.px)<150");
         const want=alert?null:d>0?'ArrowRight':'ArrowLeft';
@@ -196,23 +196,62 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       await click(`#bagBody .tooltab:nth-child(${toolIndex+1})`);
       const idx=await read(`knownRecipes(${json(tool)}).findIndex(r=>r.out===${json(out)})`);
       if(idx<0)throw new Error('배우지 않은 가공법: '+out);
-      await click(`#bagBody .recipe:nth-child(${idx+1})`);await click('#craftBtn');
-      await wait(80);await click('#bagClose');await wait(100);await settle();
+      // 가공 손 연출 동안(brewing)은 버튼이 잠긴다. 느린 환경에서는 앞 가공 연출이 아직 끝나지 않았을 수 있어 풀릴 때까지 기다린다.
+      const unlocked=async()=>{for(let t=0;t<100&&await read('brewing');t++)await wait(100);};
+      await unlocked();
+      await click(`#bagBody .recipe:nth-child(${idx+1})`);
+      for(let t=0;t<50&&await read("!$('craftBtn')||$('craftBtn').disabled");t++)await wait(100);
+      await click('#craftBtn');
+      await wait(80);await unlocked();await click('#bagClose');await wait(100);await settle();
     }
   }
-  async function battle(gifts) {
-    scene+=' · 전투';let end=Date.now()+60000;   // 결정 D-64: 선물은 빈틈에만. 선물 버튼을 누르면 다음 빈틈에 창이 열린다
+  // 전투 결과를 돌려준다. 졌다면 뒤 단계의 엉뚱한 오류(예: 해머루 없음)로 번지지 않게 mustWin이 밝힌다.
+  async function battle(gifts,{sway=false}={}) {
+    scene=scene.replace(/ · 전투$/,'')+' · 전투';let end=Date.now()+60000;   // 결정 D-64: 선물은 빈틈에만. 선물 버튼을 누르면 다음 빈틈에 창이 열린다
+    let result=null,startHp=null,steer=null;
+    const release=async()=>{if(steer){for(const k of steer)if(k)await key(k,'up');steer=null;}};
     while(Date.now()<end) {
       const s=await check();
-      if(!s.battle){if(s.ink){await wait(100);continue;}await settle();return;}
-      if(await read("!$('bResult').hidden")){await click('#bResOk');await wait(80);continue;}
-      if(!s.battle.paused){await click('#bGift');await wait(120);continue;}
+      if(!s.battle){if(s.ink){await wait(100);continue;}await release();await settle();log('전투 결과',{result,startHp});return {result,startHp};}
+      if(startHp===null)startHp=await read('G.hp');
+      if(await read("!$('bResult').hidden")){await release();result=await read('B&&B.result');await click('#bResOk');await wait(80);continue;}
+      if(!s.battle.paused){
+        if(await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)')){
+          if(sway){
+            const h=await read('({x:B.px,l:BOX.x+BOX.w*0.2,r:BOX.x+BOX.w*0.8})');
+            if(!steer||h.x<h.l||h.x>h.r){const k=h.x>(h.l+h.r)/2?'ArrowLeft':'ArrowRight';if(!steer||steer[0]!==k){await release();await key(k,'down');steer=[k,null];}}
+          }else await release();
+          await click('#bGift');await wait(120);continue;
+        }
+        // 선물이 없으면 친다: 빈틈 표식으로 손을 옮겨 J. 표식이 없으면 손을 멈추고 기다린다.
+        const m=await read("B&&B.mark&&B.st==='open'?{dx:B.mark.x-B.px,dy:B.mark.y-B.py,r:battleHandProfile().radius}:null");
+        const want=m?[m.dx<-6?'ArrowLeft':m.dx>6?'ArrowRight':null,m.dy<-6?'ArrowUp':m.dy>6?'ArrowDown':null]:[null,null];
+        const prev=steer||[null,null];
+        for(let i=0;i<2;i++)if(prev[i]!==want[i]){if(prev[i])await key(prev[i],'up');if(want[i])await key(want[i],'down');}
+        steer=want[0]||want[1]?want:null;
+        if(m&&Math.hypot(m.dx,m.dy)<m.r-4)await key('j');
+        await wait(40);continue;
+      }
+      await release();
       const gift=await read(`(${json(gifts)}).find(id=>(G.inv[id]||0)>0)`);
       if(!gift)throw new Error('달래기 선물 부족: '+gifts.join(','));
       const name=await read(`ITEMS[${json(gift)}].n`);
       await textButton('#bGiftGrid button',new RegExp(name));await wait(150);
     }
     throw new Error('전투 선물/결과 처리가 60초 안에 끝나지 않았다');
+  }
+  // 꼭 이기거나 달래야 하는 전투. 지면 게임 규칙대로 체력이 찬 채 한 번 더 다가가 다시 싸운다(최대 세 번).
+  // 선물을 다 썼으면 표식을 쳐서 싸운다(잘 이기지 못한다). 세 번 다 지면 결과와 시작 체력을 밝히고 멈춘다.
+  async function mustWin(gifts,approach,label) {
+    for(let i=0;i<3;i++) {
+      if(i){
+        const giftsLeft=await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)');
+        log('전투에서 짐, 다시 도전',{label,try:i+1,how:giftsLeft?'선물':'치기'});await approach();
+      }
+      const {result,startHp}=await battle(gifts);
+      if(result==='win'||result==='calm')return result;
+      if(i===2)throw new Error(label+': 세 번 싸워도 이기거나 달래지 못했다 (마지막 결과 '+result+', 시작 체력 '+startHp+')');
+    }
   }
   async function stage(label,action) {scene=label;b.scene=label;log('시작',label);await action();const s=await check();milestones.push({scene,region:s.region,zone:s.zone,goal:s.goal,inv:s.inv,flags:s.flags,awake:s.awake});}
   async function next() {
@@ -231,11 +270,13 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await click('#btnStart');await settle();
     if(await read('G.f.arcs')!==(mode==='expanded'))throw new Error('사연 켬/끔 시작값이 모드와 다르다');
     await stage('단풍골 · 가루와 채집',async()=>{await gather('root',1);await pickup('acorn',6);await gather('ssari',1);if(await read('(G.inv.ssari||0)<2'))await gather('kkoe',1);await craft('jeolgu','powder',2);await npc('dodam');});
-    await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);if(!await read('G.f.nalDone&&(G.inv.coal||0)>=2'))throw new Error('허세 흥정 뒤 숯 두 개(덤)를 받지 못했다');await npc('musoe');await battle(['rice']);await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
+    await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);if(!await read('G.f.nalDone&&(G.inv.coal||0)>=2'))throw new Error('허세 흥정 뒤 숯 두 개(덤)를 받지 못했다');await npc('musoe');await battle(['rice'],{sway:true});await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
     await stage('단풍골 · 당산나무와 약',async()=>{
       if(mode==='expanded')await zone('forest');await moveX((await read('G.barrier.x'))-28);
       for(let i=0;i<5&&!await read('G.barrier.cut');i++){await key('j');await wait(400);}
-      if(mode==='expanded')await zone('hill');await moveX(2020,{attack:true});await battle(['ssari','kkoe']);
+      if(mode==='expanded')await zone('hill');
+      const toKudzu=async()=>{await moveX(2020,{attack:true,slow:true});};
+      await toKudzu();await mustWin(['ssari','kkoe'],toKudzu,'엉킨 칡');
       await gather('meoru',1);
       // 처음 만남이 먼저다(해머루를 들고 와도). 두 번째에 보따리를 펼쳐 해머루를 건넨다.
       for(let i=0;i<3&&!await read("G.diary.some(d=>d.id==='end')");i++)await npc('toad');
@@ -244,7 +285,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await stage('돌너머 · 억새와 메밀',async()=>{await gather('eoksae',3);await pickup('memil',6);for(let i=0;i<15&&!await read('G.f.kkuDone');i++){await npc('kkubeogi');await wait(180);}if(!await read('G.f.kkuDone'))throw new Error('꾸벅이가 깨어 있을 때 교환하지 못했다');});
     await stage('돌너머 · 맷돌과 길',async()=>{await npc('nal');await npc('dolsoe');await craft('maetdol','memil_powder',2);await npc('ppuri');if(!await read('G.f.ppuriPassed'))await npc('ppuri');});
     await stage('돌너머 · 골렘과 약즙',async()=>{
-      if(mode==='expanded')await zone('shrine');await moveX(mode==='expanded'?2330:1920);await battle(['story_stone']);
+      if(mode==='expanded')await zone('shrine');const toGolem=async()=>{await moveX(mode==='expanded'?2330:1920);};await toGolem();await mustWin(['story_stone'],toGolem,'돌 골렘');
       await pickup('seoridarae');await craft('maetdol','darae_yak');
       if(mode==='expanded') {await zone('village');const n=await read("zoneObjects('wanderers').find(n=>n.name==='늙은 까치')&&(({x,y})=>({x,y:y??192}))(zoneObjects('wanderers').find(n=>n.name==='늙은 까치'))");if(!n)throw new Error('약즙 배달 까치가 마을에 없다');await jumpTo(n.x,n.y);await key('e');await settle();}
     });
@@ -259,7 +300,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       for(let i=0;i<3&&!await read('G.f.guard');i++)await npc('bueong');
       if(!await read('G.f.guard'))throw new Error('부엉 영감의 창고 지키기 허락을 받지 못했다');
     });
-    await stage('큰 장터 · 도깨비와 약떡',async()=>{if(mode==='expanded')await zone('warehouse');await moveX(await read('REG.STORE_X'));await battle(['memiltteok','dad_yeot']);if(!await read("has('dokkaebibul')"))throw new Error('도깨비 달래기 뒤 불씨가 없다');await craft('siru','hongsi_tteok');
+    await stage('큰 장터 · 도깨비와 약떡',async()=>{if(mode==='expanded')await zone('warehouse');const toStore=async()=>{await moveX(await read('REG.STORE_X'));};await toStore();await mustWin(['memiltteok','dad_yeot'],toStore,'헌물 도깨비');if(!await read("has('dokkaebibul')"))throw new Error('도깨비 달래기 뒤 불씨가 없다');await craft('siru','hongsi_tteok');
       // 결정 D-131: 그믐밤엔 늙은 까치가 밤길을 못 난다. 마루에서 자고 설날 아침에 맡긴다(그 아침에 사연 마지막 막이 열린다).
       if(mode==='expanded'&&!await read('G.ended')){
         await zone('inn');const magpie="REG.zones.inn.wanderers.find(w=>w.id==='j_magpie').x";
@@ -275,7 +316,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await next();
     await stage('영산 · 설피',async()=>{await pickup('jip');await gather('darae_vine',2);for(let i=0;i<3&&!await read('G.f.seolpi');i++)await npc('nal');if(!await read('G.f.seolpi'))throw new Error('설피를 받지 못했다');});
     await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('아빠 몸짓 읽기를 마치지 못했다');if(mode==='expanded')await npc('y_ice_station_2');});
-    await stage('영산 · 봄과 열매',async()=>{await npc('sangun');await moveX(2050);await battle(['dokkaebibul']);await pickup('legend_fruit');await npc('sangun');});
+    await stage('영산 · 봄과 열매',async()=>{await npc('sangun');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['dokkaebibul'],toSteel,'강철이');await pickup('legend_fruit');await npc('sangun');});
     const final=await settle();if(!final.ended||final.region!=='yeongsan'||!final.flags.yakDone)throw new Error('마지막 귀향과 엔딩에 도착하지 못했다');
     // 결정 D-73: 엔딩은 한 줄씩 넘긴다. 이름 칸이 나올 때까지 '다음'을 누르고, 이름을 부른 뒤에도 끝까지 넘긴다.
     for(let i=0;i<20&&!await read("!!$('newName')");i++){await click('#endExtra .end-next');await wait(80);}
