@@ -34,7 +34,7 @@ ssari,galchamgol,싸리버섯,물건,아빠,,처음부터,밑동을 단번에 �
 kkoe,galchamgol,꾀꼬리버섯,물건,나,got:kkoe,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 meoru,galchamgol,해머루,물건,나,got:meoru,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
 meoru,galchamgol,해머루,물건,아빠,,처음부터,해를 머금은 듯 알이 따뜻한 머루. 달여 먹이면 앓던 몸도 기운을 차린다.,제안,,아빠 수첩
-meoru,galchamgol,해머루,물건,아빠,got:meoru,처음 얻을 때,(그림 옆에 나중에 덧쓴 글씨) 여기도 아니다.,제안,,아빠 수첩
+meoru,galchamgol,해머루,물건,아빠,got:meoru,처음 얻을 때,(해머루 글 끝에 나중에 덧쓴 글씨) 여기도 아니다.,제안,,아빠 수첩
 kflower,galchamgol,칡꽃,물건,나,got:kflower,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:sleep,졸 때 말을 걸었을 때,늘 존다. 졸 때 말을 걸면 잠꼬대만 한다.,제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:awake,고개를 들 때 말을 걸어 깨웠을 때,꾸벅꾸벅 졸다가 고개를 드는 잠깐에만 말이 통한다.,제안,,관찰
