@@ -218,6 +218,7 @@ const TUNING=numericTable('tuning','분류',
     'battle_base_damage battle_sharp_damage battle_pickaxe_bonus',
     'form_squirrel_speed form_climb_speed form_climb_reach form_goat_jump form_owl_glide_fall',
     'form_deer_speed form_deer_listen_range form_fx_frames stranger_trade_limit',
+    'roll_hold_ms roll_speed roll_squirrel_speed roll_accel_frames roll_step_frames',
     'musoe_bonk_tell_first musoe_bonk_tell_last musoe_bonk_drop musoe_bonk_gap musoe_bonk_radius',
     'musoe_fire_cycle musoe_fire_warn musoe_fire_burn musoe_fire_radius musoe_fire_heat musoe_finale_bonks musoe_finale_gap musoe_finale_hold'
   ].join(' '));
@@ -316,6 +317,7 @@ const MUSIC_LAYERS={};
     MUSIC_LAYERS[track]={layers,tempos};
   }
 }
+requireValue(TUNING.roll_hold_ms>=80&&TUNING.roll_hold_ms<=400&&TUNING.roll_speed>1&&TUNING.roll_squirrel_speed>1&&TUNING.roll_accel_frames>=1&&TUNING.roll_step_frames>=1,'tuning.csv: 구르기 문턱은 80~400ms, 빠르기는 걷기보다 커야 한다');
 const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC,MUSIC_LAYERS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';

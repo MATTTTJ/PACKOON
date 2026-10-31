@@ -2190,7 +2190,12 @@ const TABLES={
   "musoe_fire_heat": 36,
   "musoe_finale_bonks": 4,
   "musoe_finale_gap": 16,
-  "musoe_finale_hold": 70
+  "musoe_finale_hold": 70,
+  "roll_hold_ms": 170,
+  "roll_speed": 1.8,
+  "roll_squirrel_speed": 2,
+  "roll_accel_frames": 10,
+  "roll_step_frames": 9
  },
  "PROGRESS": [
   {
