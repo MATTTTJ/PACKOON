@@ -424,7 +424,7 @@ function giftLiked(id){const t=tasteOf(B.kind,id);return !!B.E.likes[id]||!!(t&&
 function openGift(){
   if(!B||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.st==='finale'||!$('bResult').hidden)return;
   if(!giftWindow()||B.giftUsed===giftKey()){
-    B.giftQueued=true;B.msg=B.st==='intro'?'아직 건넬 틈이 없다. 첫 공격을 피한 뒤 빈틈에 건네자.':B.giftUsed===giftKey()?'이번 빈틈엔 벌써 건넸다. 다음 빈틈에 건네자.':'지금은 건넬 틈이 없다. 피한 뒤 빈틈에 건네자.';
+    B.giftQueued=true;B.msg=B.st==='intro'?'아직 건넬 틈이 없다. 공격을 피한 뒤 빈틈에 건네자.':B.giftUsed===giftKey()?'이번 빈틈엔 벌써 건넸다. 다음 빈틈에 건네자.':'지금은 건넬 틈이 없다. 피한 뒤 빈틈에 건네자.';
     renderBattleForms();return;
   }
   B.giftQueued=false;
