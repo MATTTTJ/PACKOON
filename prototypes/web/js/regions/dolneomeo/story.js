@@ -412,13 +412,16 @@ function talkPpuri(){
 function ppuriTrade(){
   talk([['뿔이','메밀가루는 가져왔나.',[{t:'보따리를 펼친다',go:()=>Trade.open('ppuri')},{t:'나중에 드릴게요',go:null}]]]);
 }
-function ppuriGive(){
+// 결정 D-78: 메밀묵을 얹으면 장승제 상에 함께 올리고, 산이 준 몫으로 석이 한 장을 덤으로 준다.
+function ppuriGive(i=0){
   if(G.f.ppuriPassed||!has('memil_powder'))return;
   {
-    const F=G.f;takeItem('memil_powder',1);F.ppuriPassed=true;ledgerDone('ppuri');rel('ppuri',1);tellSeogi();
+    const F=G.f,jelly=i===1&&has('memil_jelly');takeItem('memil_powder',1);F.ppuriPassed=true;ledgerDone('ppuri');rel('ppuri',1);tellSeogi();
+    if(jelly){takeItem('memil_jelly',1);addItem('seogi',1);}
     diary('d_ppuri','맷돌로 간 메밀가루로 뿔이가 장승제 메밀전을 부쳤다. 금줄이 걷히고 돌산 길이 열렸다.');
     toast('돌산 길이 열렸다');refreshGoal();
-    talk([['뿔이','좋다. 원칙대로 장승제를 올린다.'],['뿔이','(뿔이가 메밀전을 부쳐 돌산 쪽에 올리고 절한 뒤, 금줄을 걷었다.)'],['뿔이','산이 노하면 석이를 올리는 법이다.\n절벽 아래 백 년 바위에 붙어 있다.'],['뿔이','돌무더기 앞까지 안 가도 닿는 자리다.'],['뿔이','통과다. 흰 돌턱을 밟고, 발밑을 살펴라.']]);
+    talk([['뿔이','좋다. 원칙대로 장승제를 올린다.'],...(jelly?[['뿔이','메밀묵까지 쑤어 왔군. 상에 함께 올리지.']]:[]),['뿔이','(뿔이가 메밀전을 부쳐 돌산 쪽에 올리고 절한 뒤, 금줄을 걷었다.)'],
+      ...(jelly?[['뿔이','정성을 받았으니 몫을 나눈다. 산이 준 석이 한 장이다.'],['너구리','(뿔이가 말린 석이버섯 한 장을 내민다.)']]:[]),['뿔이','산이 노하면 석이를 올리는 법이다.\n절벽 아래 백 년 바위에 붙어 있다.'],['뿔이','돌무더기 앞까지 안 가도 닿는 자리다.'],['뿔이','통과다. 흰 돌턱을 밟고, 발밑을 살펴라.']]);
   }
 }
 function tellSeogi(){
@@ -498,16 +501,36 @@ Rg.goal=()=>{
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤에만 보인다(장부에 적혔거나, 냄새를 맡고 먼저 말을 꺼낸 뒤). 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
    결정 D-40: 날쌘에게 허세가 통하면 결명자를 하나 더 얹는다(경멸 축). 결명자를 바꾼 뒤라면 흔한 물건에 덤. */
+function dolsoeEyeGive(){
+  if(G.f.dolsoeEye||!has('mossy_eye'))return;
+  takeItem('mossy_eye',1);addItem('stonedust',2);G.f.dolsoeEye=true;rel('dolsoe',1);
+  diary('d_dolsoe_eye','골렘에게서 떨어진 이끼 낀 눈돌을 돌쇠 할배께 드렸다. 할배가 손끝으로 자리를 찾아 성황당 돌무더기에 도로 넣었다.');
+  talk([['돌쇠 할배','(할배가 눈돌을 받아 손끝으로 이끼를 쓸어 본다.)'],['돌쇠 할배','…성황당 돌무더기 눈이구나.\n눈이 없으면 돌무더기가 편히 못 잔다.'],
+    ['돌쇠 할배','자리를 맞추느라 좀 깎았다.\n남은 돌가루는 가져가라. 깨진 돌 때우는 데 쓴다.']]);
+}
+function kkuMudGive(){
+  if(G.f.kkuMud||!has('mud'))return;
+  takeItem('mud',1);addItem('memil',2);G.f.kkuMud=true;rel('kkubeogi',1);
+  talk([['꾸벅이','진흙… 이걸로 둥지 틈 바르면… 바람이 안 들겠다…'],['꾸벅이','가을에 주워 둔 메밀… 자는 동안 눅눅해지니까… 너 가져가…'],['꾸벅이','쿨…']]);
+}
 Rg.trade={
-  kkubeogi:()=>G.ledger.kkubeogi?[{id:'t_kkubeogi',item:'seoridarae',label:'서리다래가 있는 곳',asks:[{eoksae:3}],done:()=>G.f.kkuDone,accept:kkuGive}]:[],
+  kkubeogi:()=>[
+    ...(G.ledger.kkubeogi?[{id:'t_kkubeogi',item:'seoridarae',label:'서리다래가 있는 곳',asks:[{eoksae:3}],done:()=>G.f.kkuDone,accept:kkuGive}]:[]),
+    // 결정 D-77: 겨울잠 들기 전, 억새로 엮은 둥지의 바람 틈을 진흙으로 바른다.
+    ...(G.f.kkuDone?[{id:'t_kkubeogi_mud',item:'memil',n:2,label:'둥지 바람 틈 바르기 · 메밀 2',asks:[{mud:1}],done:()=>G.f.kkuMud,accept:kkuMudGive}]:[])
+  ],
   nal:()=>[
     ...(G.ledger.nal_dolneomeo?[{id:'t_nal_dolneomeo',item:'gyeolmyeongja',n:1,asks:[{kflower:1},{gyeousari:2}],done:()=>G.f.nalDDone,
       accept:i=>nalTrade(i===0?'kflower':'gyeousari')}]:[]),
     ...(!CLASSIC&&G.f.nalOilAsked?[{id:'t_craft_oil',item:'sesame_oil',n:1,asks:[{eoksae:1}],done:()=>G.f.dolneomeo_craft_oil,
       locked:()=>!G.f.kkuDone&&!has('eoksae',4)?'마른 억새 한 단. 꾸벅이 둥지에 쓸 세 단은 남겨 두고 한 단이 더 있어야 한다.':null,accept:nalOilGive}]:[])
   ],
-  dolsoe:()=>G.f.dolsoeAsked?[{id:'t_dolsoe',item:'gyeolmyeongja',icon:'maetdol',label:'맷돌 보는 법',asks:[{gyeolmyeongja:1}],done:()=>G.f.dolsoeTea,accept:dolsoeGive}]:[],
-  ppuri:()=>G.ledger.ppuri?[{id:'t_ppuri',item:'memil_powder',icon:'seogi',label:'돌산 길 열기',asks:[{memil_powder:1}],done:()=>G.f.ppuriPassed,accept:ppuriGive}]:[]
+  dolsoe:()=>[
+    ...(G.f.dolsoeAsked?[{id:'t_dolsoe',item:'gyeolmyeongja',icon:'maetdol',label:'맷돌 보는 법',asks:[{gyeolmyeongja:1}],done:()=>G.f.dolsoeTea,accept:dolsoeGive}]:[]),
+    // 결정 D-77: 골렘이 잠든 뒤, 돌쇠 할배는 성황당 돌무더기의 눈돌을 제자리에 넣어 주려 한다.
+    ...(G.f.dolsoeTea&&G.boss.dead?[{id:'t_dolsoe_eye',item:'stonedust',n:2,label:'돌무더기 눈돌 제자리 찾기 · 돌가루 2',asks:[{mossy_eye:1}],done:()=>G.f.dolsoeEye,accept:dolsoeEyeGive}]:[])
+  ],
+  ppuri:()=>G.ledger.ppuri?[{id:'t_ppuri',item:'memil_powder',icon:'seogi',label:'돌산 길 열기',asks:[{memil_powder:1},{memil_powder:1,memil_jelly:1}],done:()=>G.f.ppuriPassed,accept:ppuriGive}]:[]
 };
 Rg.onHaggle=(npc,way)=>{
   if(npc!=='nal'||way!=='허세'||G.f.nalDDone)return false;

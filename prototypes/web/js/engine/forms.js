@@ -340,6 +340,10 @@ function repayDebt(npc,key){
   if(!strangerKeepsProgress(d.give))return;
   for(const [id,n] of Object.entries(d.give))takeItem(id,n);
   delete G.f.strangerDebt[key];Sound.exchange();toast('외상을 갚았다');
+  // 결정 D-79: 갚으면 사연 한 줄. 부엉 영감 장부에서 본 아빠처럼, 아이도 제 이름 옆 줄을 지운다.
+  if(!knows('debt:repaid')){learn('debt:repaid');
+    diary('debt_repaid','수리부엉이 모습으로 진 외상을 갚았다. 장부의 내 줄이 지워졌다. 아빠도 남의 빚을 이렇게 지워 주었을까.');
+    talk([['너구리','(장부에서 내 외상 줄이 지워졌다. 갚고 나니 어깨가 가볍다.)']]);}
   if(open('notebook'))renderBook();
 }
 /* 산양: 같은 품(ITEMS[id].r)끼리 하나 대 하나 */

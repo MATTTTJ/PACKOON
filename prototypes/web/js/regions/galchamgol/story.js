@@ -362,8 +362,14 @@ function finishForge(){
 }
 
 /* ---------- 두꺼비 할멈 (약재상) ---------- */
-function toadGive(){
+// 결정 D-78: 가공품을 얹으면 덤 하나(확정 PA-9 B). 할멈은 묵을 약과 함께 엄마에게 보내고, 길에서 먹을 버섯을 얹어 준다.
+function toadGive(i=0){
   if(!has('meoru')||G.diary.some(d=>d.id==='end'))return;
+  if(i===1&&has('acorn_jelly')){
+    takeItem('acorn_jelly',1);addItem('kkoe',1);
+    talk([['두꺼비 할멈','묵까지 쑤어 왔구나. 약이랑 같이 까치 편에 보내마.\n네 엄마 입이 좀 달겠지.'],['두꺼비 할멈','너도 길에서 끓여 먹으렴.'],
+      ['너구리','(할멈이 말린 꾀꼬리버섯을 하나 얹어 준다.)']],()=>toadGive(0));return;
+  }
   talk(Rg.arcsEnabled()?
     [['두꺼비 할멈','이걸로 네 엄마 약을 달여서\n까치 편에 집으로 보내 주마.'],
       ['두꺼비 할멈','다만 병을 늦출 뿐이란다.'],['두꺼비 할멈','고치려면 전설의 열매가 있어야 한단다.'],
@@ -922,7 +928,7 @@ Rg.trade={
     ...(G.ledger.nal?[{id:'t_nal_galchamgol',item:'coal',n:1,asks:[{powder:1,root:1}],done:()=>G.f.nalDone,accept:()=>{G.f.nalPriceHeard=true;nalTrade();}}]:[]),
     ...(G.ledger.t_craft_salt?[{id:'t_craft_salt',item:'salt',label:'소금 2 · 깨 1',asks:[{vine:1}],done:()=>G.f.craftTrade_salt,accept:nalSaltGive}]:[])
   ],
-  toad:()=>G.f.toadMet?[{id:'t_toad',item:'meoru',icon:'magamok_tea',label:'엄마의 병을 늦추는 약',asks:[{meoru:1}],done:()=>G.diary.some(d=>d.id==='end'),accept:toadGive}]:[]
+  toad:()=>G.f.toadMet?[{id:'t_toad',item:'meoru',icon:'magamok_tea',label:'엄마의 병을 늦추는 약',asks:[{meoru:1},{meoru:1,acorn_jelly:1}],done:()=>G.diary.some(d=>d.id==='end'),accept:toadGive}]:[]
 };
 Rg.onHaggle=(npc,way)=>{
   if(npc!=='nal'||way!=='허세'||G.f.nalDone)return false;
