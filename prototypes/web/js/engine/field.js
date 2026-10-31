@@ -341,12 +341,12 @@ function drawFieldScene(showPlayer=true){
   fieldCall('drawScenery');
   drawZoneObjects();
   drawDigs();
-  drawGatherCue();   // 채집 고리 (gather.js)
   drawPickups();
   drawFloorDrops();
   drawNpcs();
   fieldCall('drawActors');
   if(showPlayer){drawRaccoon();drawFormFx();}
+  drawGatherCue();   // 채집 고리 (gather.js). 주인공 몸에 가리지 않게 주인공 다음에 그린다
   if(!Vfx.reducedMotion)for(const s of sparks)R(s.x-cam,s.y,1,1,'#fff3b0');
   Vfx.front();
   if(showPlayer)drawListenMarks();
