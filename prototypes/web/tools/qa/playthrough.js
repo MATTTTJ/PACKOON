@@ -300,17 +300,29 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       for(let i=0;i<3&&!await read('G.f.guard');i++)await npc('bueong');
       if(!await read('G.f.guard'))throw new Error('부엉 영감의 창고 지키기 허락을 받지 못했다');
     });
-    await stage('큰 장터 · 도깨비와 약떡',async()=>{if(mode==='expanded')await zone('warehouse');const toStore=async()=>{await moveX(await read('REG.STORE_X'));};await toStore();await mustWin(['memiltteok','dad_yeot'],toStore,'헌물 도깨비');if(!await read("has('dokkaebibul')"))throw new Error('도깨비 달래기 뒤 불씨가 없다');await craft('siru','hongsi_tteok');if(mode==='expanded'&&!await read('G.ended')){await zone('inn');await moveX(1530);await settle();}});
+    await stage('큰 장터 · 도깨비와 약떡',async()=>{if(mode==='expanded')await zone('warehouse');const toStore=async()=>{await moveX(await read('REG.STORE_X'));};await toStore();await mustWin(['memiltteok','dad_yeot'],toStore,'헌물 도깨비');if(!await read("has('dokkaebibul')"))throw new Error('도깨비 달래기 뒤 불씨가 없다');await craft('siru','hongsi_tteok');
+      // 결정 D-131: 그믐밤엔 늙은 까치가 밤길을 못 난다. 마루에서 자고 설날 아침에 맡긴다(그 아침에 사연 마지막 막이 열린다).
+      if(mode==='expanded'&&!await read('G.ended')){
+        await zone('inn');const magpie="REG.zones.inn.wanderers.find(w=>w.id==='j_magpie').x";
+        await jumpTo(await read(magpie),192);await settle();
+        if(!await read('G.f.jxMagpieNight')){await key('e');await settle();}
+        if(await read('G.ended'))throw new Error('그믐밤에 약떡을 보내 설날 아침을 건너뛰었다');
+        if(!await read('G.f.jxMagpieNight'))throw new Error('밤에 까치가 쉬어 가자는 말을 하지 않았다');
+        for(let i=0;i<3&&await read('G.f.night');i++)await npc('maru');
+        if(await read('G.f.night')||!await read('G.f.jxSeollal'))throw new Error('마루에서 자도 설날 아침이 오지 않았다');
+        await jumpTo(await read(magpie),192);await settle(/맡긴다/);
+        if(!await read('G.ended')){await key('e');await settle(/맡긴다/);}
+      }});
     await next();
     await stage('영산 · 설피',async()=>{await pickup('jip');await gather('darae_vine',2);for(let i=0;i<3&&!await read('G.f.seolpi');i++)await npc('nal');if(!await read('G.f.seolpi'))throw new Error('설피를 받지 못했다');});
-    await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('아빠 몸짓 읽기를 마치지 못했다');if(mode==='expanded')for(let i=0;i<3;i++)await npc('y_ice_station_'+i);});
+    await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('아빠 몸짓 읽기를 마치지 못했다');if(mode==='expanded')await npc('y_ice_station_2');});
     await stage('영산 · 봄과 열매',async()=>{await npc('sangun');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['dokkaebibul'],toSteel,'강철이');await pickup('legend_fruit');await npc('sangun');});
     const final=await settle();if(!final.ended||final.region!=='yeongsan'||!final.flags.yakDone)throw new Error('마지막 귀향과 엔딩에 도착하지 못했다');
     // 결정 D-73: 엔딩은 한 줄씩 넘긴다. 이름 칸이 나올 때까지 '다음'을 누르고, 이름을 부른 뒤에도 끝까지 넘긴다.
-    for(let i=0;i<12&&!await read("!!$('newName')");i++){await click('#endExtra .end-next');await wait(80);}
+    for(let i=0;i<20&&!await read("!!$('newName')");i++){await click('#endExtra .end-next');await wait(80);}
     if(!await read("$('endButtons').hidden"))throw new Error('엔딩 대사가 끝나기 전에 아래 버튼이 보인다');
     await click('#newName');await b.send('Input.insertText',{text:'새봄'});await textButton('#endExtra button',/부르기/);await wait(1100);
-    for(let i=0;i<8&&await read("$('endButtons').hidden");i++){if(await read("!!document.querySelector('#endExtra .end-next')"))await click('#endExtra .end-next');await wait(120);}
+    for(let i=0;i<16&&await read("$('endButtons').hidden");i++){if(await read("!!document.querySelector('#endExtra .end-next')"))await click('#endExtra .end-next');await wait(120);}
     if(await read("$('endButtons').hidden"))throw new Error('엔딩을 끝까지 넘겨도 아래 버튼이 나오지 않는다');
     if(await read('G.f.newName')!=='새봄')throw new Error('엔딩 이름 입력이 저장되지 않았다');
     await b.screenshot(path.join(outDir,mode+'-ending.png'));

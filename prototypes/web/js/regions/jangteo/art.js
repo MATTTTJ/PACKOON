@@ -188,15 +188,15 @@ function snowGround(id){
   for(let wx=Math.floor(cam/36)*36;wx<cam+W+36;wx+=36){P(wx-cam,195,3,1,n()?'#8693a0':'#b3b7ad');P(wx-cam+8,197,3,1,n()?'#8693a0':'#b3b7ad');}
 }
 function drawBack(id){
-  sky(cam);steppedRidge(Math.round(cam*.08),116,22,tone().mount,1);steppedRidge(Math.round(cam*.19),137,15,n()?'#34445a':'#b2c1c9',4);
-  farAir(cam);
-  distantTown(Math.round(cam*.32),173,1);
+  sky(RC());steppedRidge(Math.round(RC()*.08),116,22,tone().mount,1);steppedRidge(Math.round(RC()*.19),137,15,n()?'#34445a':'#b2c1c9',4);
+  farAir(RC());
+  distantTown(Math.round(RC()*.32),173,1);
   if(id==='pine'){for(let wx=Math.floor(cam/112)*112-112;wx<cam+W+112;wx+=112)pine(wx-cam,GROUND,62+Math.round(hash(wx)*25));}
   snowGround(id);
 }
 function drawPlatforms(id){
   for(const p of fieldPlatforms()){
-    const x=p.x-cam;if(x>W+10||x+p.w<-10)continue;
+    const x=p.x-RC();if(x>W+10||x+p.w<-10)continue;   // 발판은 이미 옮긴 좌표 (D-128)
     if(id==='street'||id==='inn'||id==='entrance'){
       P(x,p.y,p.w,6,tone().wood);P(x,p.y-1,p.w,2,tone().snow);for(let j=5;j<p.w;j+=10)P(x+j,p.y+2,1,4,n()?'#827475':'#c3a079');
       if(p.y<130){P(x-3,p.y-5,p.w+6,4,tone().tile);P(x,p.y-6,p.w,2,tone().snow);}
@@ -340,7 +340,10 @@ function wanderer(kind,x,y,f=1){
   if(kind==='kite'){
     p(-5,-16,11,14,'#a8a197');p(-5,-25,11,11,'#d5c9b6');p(-4,-38,3,15,'#d5c9b6');p(3,-36,3,12,'#d5c9b6');p(-3,-35,1,9,'#c7988e');p(4,-34,1,8,'#c7988e');p(3,-23,1,2,'#322c30');p(5,-19,3,2,'#b87f72');p(-6,-16,13,4,'#b44d48');p(-5,-2,4,2,'#77706a');p(2,-2,4,2,'#77706a');p(7,-14,7,2,'#c9b397');p(13,-15,3,5,'#87694e');
   }else if(kind==='yut'){
-    for(let q=-1;q<=1;q+=2){const ox=x+q*19;M(ox,y,-q,-7,-14,14,13,'#777b75');M(ox,y,-q,-6,-22,13,10,'#b6b1a0');M(ox,y,-q,-7,-25,4,5,'#605b53');M(ox,y,-q,3,-25,4,5,'#605b53');M(ox,y,-q,-5,-21,3,6,'#3b3a37');M(ox,y,-q,2,-21,3,6,'#3b3a37');M(ox,y,-q,-3,-18,1,1,'#eee4cd');M(ox,y,-q,3,-18,1,1,'#eee4cd');M(ox,y,-q,-4,-14,9,3,q===-1?'#a46b54':'#8a7761');}
+    // 결정 D-131: 사연이 켜진 판의 밤엔 흰눈썹 노인이 일찍 들어가고 곰방대 노인만 화롯불 곁에 남는다 (story.js elderArc2).
+    const alone=!!G.f.night&&!!Rg.arcs?.();
+    if(alone){P(x-24,y-5,10,5,'#4b3b31');P(x-23,y-8,8,3,'#c4532f');P(x-21,y-10,4,2,'#f0a54e');}
+    for(let q=-1;q<=1;q+=2){if(alone&&q<0)continue;const ox=x+q*19;M(ox,y,-q,-7,-14,14,13,'#777b75');M(ox,y,-q,-6,-22,13,10,'#b6b1a0');M(ox,y,-q,-7,-25,4,5,'#605b53');M(ox,y,-q,3,-25,4,5,'#605b53');M(ox,y,-q,-5,-21,3,6,'#3b3a37');M(ox,y,-q,2,-21,3,6,'#3b3a37');M(ox,y,-q,-3,-18,1,1,'#eee4cd');M(ox,y,-q,3,-18,1,1,'#eee4cd');M(ox,y,-q,-4,-14,9,3,q===-1?'#a46b54':'#8a7761');}
     P(x-14,y-3,28,3,'#d1b991');P(x-11,y-6,8,2,'#9d6d43');P(x+1,y-6,8,2,'#9d6d43');P(x-8,y-9,8,2,'#bc925e');P(x+2,y-9,8,2,'#bc925e');
   }else if(kind==='boar'){
     p(-10,-13,18,12,'#9b765c');p(-10,-11,13,2,'#d1b17b');p(-9,-7,12,2,'#d1b17b');p(3,-17,11,12,'#b18a6a');p(3,-21,4,6,'#98745b');p(10,-21,3,6,'#98745b');p(12,-11,6,5,'#c99a81');p(16,-10,1,2,'#60483e');p(9,-15,1,2,'#2d3033');p(-7,-2,3,2,'#55463e');p(4,-2,3,2,'#55463e');p(-14,-10,4,2,'#9b765c');

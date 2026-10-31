@@ -404,12 +404,29 @@ function draw(){
   if(zoneFade>0){ctx.save();ctx.globalAlpha=zoneFade/TABLES.TUNING.zone_transition_frames;R(0,0,W,H,'#211d24');ctx.restore();}
   drawZoneTransition();
 }
+/* 결정 D-128: 자른 구역의 배경·장식은 남은 구간마다 나눠 그린다. 구간마다 그 구간이 당겨진 만큼 카메라를 옮기고,
+   화면에서 그 구간이 차지하는 자리만 남긴다. 그림 좌표를 하나하나 고치지 않아도 자른 자리와 맞는다. */
+function segmentedDraw(fn){
+  const cuts=!CLASSIC&&REG?.trimCuts?.[G?.zone];
+  if(!cuts||TRIM_SEGMENTING){fn();return;}
+  const real=cam,segs=[];let s=0,prev=-1e9;
+  for(const [c,d] of [...cuts].sort((a,b)=>a[0]-b[0])){segs.push([prev,c,s]);prev=c+d;s+=d;}
+  segs.push([prev,1e9,s]);
+  for(const [a,b,sh] of segs){
+    const x0=Math.max(0,a-sh-real),x1=Math.min(W,b-sh-real);
+    if(x1<=x0)continue;
+    ctx.save();ctx.beginPath();ctx.rect(Math.floor(x0),0,Math.ceil(x1-x0),H);ctx.clip();
+    cam=real+sh;TRIM_SEG=sh;TRIM_SEGMENTING=true;
+    try{fn();}finally{TRIM_SEGMENTING=false;TRIM_SEG=0;cam=real;ctx.restore();}
+  }
+}
 function drawFieldScene(showPlayer=true){
   cam=Math.round(G.cam)+(shakeT&&!Vfx.reducedMotion?(shakeT%2?1:-1):0);
-  if(fieldDef().drawBack)fieldCall('drawBack');else{R(0,0,W,H,'#d7cfb4');R(0,fieldGround(),W,H-fieldGround(),'#785b3a');}
+  fieldCall('sceneBegin');   // 장면 전체에 거는 변환(장터 구역 넘어가기 확대 등). 나눠 그리기 밖에서 건다
+  segmentedDraw(()=>{if(fieldDef().drawBack)fieldCall('drawBack');else{R(0,0,W,H,'#d7cfb4');R(0,fieldGround(),W,H-fieldGround(),'#785b3a');}});
   Vfx.draw('back');
   drawLogs();
-  fieldCall('drawScenery');
+  segmentedDraw(()=>fieldCall('drawScenery'));
   drawZoneObjects();
   drawDigs();
   drawPickups();

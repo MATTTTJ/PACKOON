@@ -17,18 +17,18 @@ Rg.moodTension=()=>{
 };
 
 /* ---------- 배경 ---------- */
-function ridge(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+cam*par;const h=base-Math.abs(Math.sin(wx*freq))*amp-Math.sin(wx*freq*2.2+1)*amp*0.3;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
+function ridge(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+RC()*par;const h=base-Math.abs(Math.sin(wx*freq))*amp-Math.sin(wx*freq*2.2+1)*amp*0.3;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
 function drawSky(){
   const g=ctx.createLinearGradient(0,0,0,H);
   if(spring()){g.addColorStop(0,'#f6d8e2');g.addColorStop(.6,'#f0c0cc');g.addColorStop(1,'#e8a8b8');}
   else{g.addColorStop(0,'#1a2244');g.addColorStop(.6,'#2c3866');g.addColorStop(1,'#46508a');}
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  if(!spring())for(let i=0;i<46;i++){const x=Math.round((hash(i*5.7)*W*1.3-cam*0.02)%W+W)%W,y=Math.round(hash(i*2.9)*100);R(x,y,1,1,i%6?'#d8e0f8':'#fff6d8');}
-  else{const sx=Math.round(300-cam*0.03);R(sx,28,16,16,'#fff8f0');R(sx-2,32,20,8,'#fff8f0');}
+  if(!spring())for(let i=0;i<46;i++){const x=Math.round((hash(i*5.7)*W*1.3-RC()*0.02)%W+W)%W,y=Math.round(hash(i*2.9)*100);R(x,y,1,1,i%6?'#d8e0f8':'#fff6d8');}
+  else{const sx=Math.round(300-RC()*0.03);R(sx,28,16,16,'#fff8f0');R(sx-2,32,20,8,'#fff8f0');}
   ridge(0.1,spring()?'#d8a0b4':'#3a4472',112,40,0.005);
   ridge(0.22,spring()?'#c88aa0':'#4a5484',134,26,0.010);
   ridge(0.22,'rgba(255,255,255,.5)',112,40,0.005);   // 눈 쌓인 봉우리 빛
-  for(let i=0;i<6;i++)R(i*87-(cam*.07)%87,141+i%3*3,65,2,spring()?'#ddd1d1':'#7e8ba4');
+  for(let i=0;i<6;i++)R(i*87-(RC()*.07)%87,141+i%3*3,65,2,spring()?'#ddd1d1':'#7e8ba4');
 }
 function drawGround(){
   R(0,GROUND,W,H-GROUND,spring()?'#8a7a6a':'#c8d0e0');R(0,GROUND,W,3,spring()?'#9ab870':'#f4f7fa');
@@ -42,7 +42,8 @@ function drawDrift(){const x=SNOW_X-cam;if(x>W+20||x<-200)return;if(spring())ret
   for(let i=0;i<9;i++){const h=G.f.seolpi?10:22+((i*7)%10);R(x+i*18,GROUND-h,22,h,'#eef2f8');R(x+i*18,GROUND-h,22,2,'#ffffff');}
   if(G.f.seolpi)for(let i=0;i<8;i++)R(x+6+i*20,GROUND-11,6,2,'#c8d0e0');}   // 설피 자국
 /* 마가목 */
-function drawRowan(wx){const x=wx-cam;if(x<-40||x>W+40)return;
+function drawRowan(wx){const x=wx-RC();   // 물건 자리(이미 옮긴 좌표)에 그린다 (D-128)
+ if(x<-40||x>W+40)return;
   R(x-2,GROUND-60,5,60,'#5a4030');R(x-16,GROUND-56,16,2,'#5a4030');R(x+2,GROUND-64,16,2,'#5a4030');
   R(x-18,GROUND-58,18,1,spring()?'#9ab870':'#f4f7fa');R(x+2,GROUND-66,18,1,spring()?'#9ab870':'#f4f7fa');}
 /* 얼어붙은 비탈 */
@@ -71,7 +72,8 @@ function drawLake(){const x=LAKE_X-cam;if(x>W+10)return;
   else{R(tx-30,GROUND-112,24,1,'#ffffff');R(tx+6,GROUND-120,30,1,'#ffffff');}
 }
 /* 강철이: 신목이 있는 섬을 휘감고 겨울을 놓지 않는다 (필드에서는 잠든 듯 똬리) */
-function drawCoil(){if(G.boss.dead)return;const x=G.boss.x-cam;if(x<-120||x>W+120)return;const b=Math.floor(G.anim/20)%2;
+function drawCoil(){if(G.boss.dead)return;const x=G.boss.x-RC();   // 강철이 자리는 이미 옮긴 좌표 (D-128)
+ if(x<-120||x>W+120)return;const b=Math.floor(G.anim/20)%2;
   for(let i=0;i<7;i++){const a=i/7*Math.PI*2;R(x+Math.cos(a)*70+40,GROUND-18-Math.sin(a)*10-b,22,10,'#7a8ca8');R(x+Math.cos(a)*70+42,GROUND-18-Math.sin(a)*10-b,18,2,'#b8c8dc');}
   R(x-38,GROUND-34-b,22,14,'#6a7c98');R(x-34,GROUND-30-b,4,3,'#e8f2fa');R(x-26,GROUND-30-b,4,3,'#e8f2fa');R(x-40,GROUND-26-b,8,1,'#e8f2fa');R(x-44,GROUND-24-b,6,1,'#e8f2fa');
 }
@@ -150,7 +152,9 @@ if(!CLASSIC){
   // 산막: 능선 문(1860) 뒤 빈 발판. 눈길: 들어선 자리와 까마귀 사이, 능선 문 뒤. 신목 섬: 얼음길 1760px → 560px.
   Rg.trimCutsV1={shelter:[[1960,480]],snow:[[300,400],[2230,330]],island:[[300,1200]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
   // 결정 D-116: 비탈 앞 빈 눈밭(500~830)과 빈 능선 발판 무리(1720~2030), 섬 선착장과 신목 사이(1560~1820)를 지운다.
-  Rg.trimCuts={shelter:[[1960,480]],snow:[[300,400],[2230,330]],slope:[[500,330],[1720,310]],island:[[300,1200],[1560,260]]};
+  Rg.trimCutsV2={shelter:[[1960,480]],snow:[[300,400],[2230,330]],slope:[[500,330],[1720,310]],island:[[300,1200],[1560,260]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 산막 짚과 곰 자장가 사이, 비탈 호숫가 문 뒤 출구 앞, 호숫가 떠날 자리 뒤 출구 앞.
+  Rg.trimCuts={shelter:[[450,80],[1960,480]],snow:[[300,400],[2230,330]],slope:[[500,330],[1720,310],[2430,50]],shore:[[2430,50]],island:[[300,1200],[1560,260]]};
   const isl=x=>trimX(x,Rg.trimCuts.island);
   const slp=x=>trimX(x,Rg.trimCuts.slope);
   // 강철이는 섬에, 살금이(자리·돌아갈 자리)는 비탈에 있다 (D-116)

@@ -211,7 +211,7 @@ function ground(zone){
   const lake=zone==='shore'||zone==='island';
   if(lake){
     px(0,157,W,GROUND-157,pink()?'#739cae':'#abc5d6');
-    for(let i=0;i<18;i++)px(i*29-(cam*.1)%29,163+i%4*6,17,1,pink()?'#bfd9dc':'#d6e8ed');
+    for(let i=0;i<18;i++)px(i*29-(RC()*.1)%29,163+i%4*6,17,1,pink()?'#bfd9dc':'#d6e8ed');
   }
   // 횡스크롤 바닥은 마른 해안이나 섬의 흙이다. 물길은 그 너머와 둑 아래에 둔다.
   px(0,GROUND,W,H-GROUND,pink()?'#8a9085':'#b8c7d6');
@@ -227,12 +227,12 @@ function ground(zone){
   }
 }
 A.back=zone=>{
-  sky(Math.round(cam*.1));
-  mountains(Math.round(cam*.07),118,36,pink()?'#c9a6bd':'#384b68',34);
-  mountains(Math.round(cam*.17),151,38,pink()?'#ad99b4':'#506783',109);
-  mountains(Math.round(cam*.28),179,22,pink()?'#8797a3':'#748fa5',384);
-  mist(cam,142,pink());birds(cam,49,pink());
-  if(pink())azaleaRidge(Math.round(cam*.28),179,384,22);
+  sky(Math.round(RC()*.1));
+  mountains(Math.round(RC()*.07),118,36,pink()?'#c9a6bd':'#384b68',34);
+  mountains(Math.round(RC()*.17),151,38,pink()?'#ad99b4':'#506783',109);
+  mountains(Math.round(RC()*.28),179,22,pink()?'#8797a3':'#748fa5',384);
+  mist(RC(),142,pink());birds(RC(),49,pink());
+  if(pink())azaleaRidge(Math.round(RC()*.28),179,384,22);
   ground(zone);
 };
 A.scenery=zone=>{

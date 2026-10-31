@@ -11,7 +11,7 @@ const Rg=defineRegion('jangteo',{
   cover:{
     tag:'큰 장터 체험판',sub:'설 대목, 붉은 등불의 장터',ready:'큰 장터로 들어갈 준비',go:'큰 장터로',
     title:{kicker:'셋째 마을',head:'큰 장터',start:'큰 장터로 들어가기',body:[
-      '돌산을 넘고도 고개를 여럿 더 넘었다. 눈 덮인 길 끝에 붉은 등불이 줄지어 걸린 큰 장터가 나왔다. 설을 앞둔 대목이라 장꾼과 길손이 북적인다.',
+      '돌산을 넘고도 고개를 여럿 더 넘었다. 첫눈은 고갯길에서 맞았다. 눈 덮인 길 끝에 붉은 등불이 줄지어 걸린 큰 장터가 나왔다. 설을 앞둔 대목이라 장꾼과 길손이 북적인다.',
       '그런데 장터 사람들 얼굴이 어둡다. 밤마다 물건이 없어지고, 설 제사상에 올릴 눈홍시까지 사라졌다고 한다. 두꺼비 할멈이 엄마 병을 한 번 더 늦출 수 있다고 한 그 눈홍시다.',
       '보부상은 장터에 오면 숙소부터 들른다. 약연의 글자 하나를 읽고 떠난 아빠도 여기 묵었을까.']},
     end:{kicker:'큰 장터 체험판 완료',head:'북쪽 영산으로',body:[
@@ -185,7 +185,7 @@ Rg.expEncounters={
   wanderers:{
     entrance:[{id:'j_kite',name:'연 아이',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
     street:[{id:'j_yut',name:'윷놀이 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':'한 판 더 하려면 언제든 앉거라.\n다음엔 더 큰 방석을 펴 두마.';}}],
-    inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:oldMagpie,draw:draw('magpie'),get greeting(){return G.f.night?(G.f.jxLanternDone?'네가 단 등을 따라 길손들이 찾아왔구나.\n아침 떡 김이 오르면 다들 또 떠나겠지.':'밤이 됐구나. 등불 꾸러미는 처마 옆에 있단다.\n등은 네가 달고, 길은 내가 일러 주마.'):G.f.jxLanternDone?'밤새 길손들이 쉬고 갔단다.\n이제 나도 남쪽으로 날아갈 차례구나.':'해 지면 다시 오려무나.\n골목 등 다는 걸 좀 거들어 다오.';}}],
+    inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:()=>{const l=Rg.magpieTteok?.();if(l)talk(l);else oldMagpie();},draw:draw('magpie'),get greeting(){const l=Rg.magpieTteok?.();if(l)return l;return G.f.night?(G.f.jxLanternDone?'네가 단 등을 따라 길손들이 찾아왔구나.\n아침 떡 김이 오르면 다들 또 떠나겠지.':'밤이 됐구나. 등불 꾸러미는 처마 옆에 있단다.\n등은 네가 달고, 길은 내가 일러 주마.'):G.f.jxLanternDone?'밤새 길손들이 쉬고 갔단다.\n이제 나도 남쪽으로 날아갈 차례구나.':'해 지면 다시 오려무나.\n골목 등 다는 걸 좀 거들어 다오.';}}],
     pine:[{id:'j_boar',name:'새끼 멧돼지',hint:'킁킁, 킁킁. 솔숲 쪽에서 무언가 냄새를 쫓는 소리가 난다.',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
     warehouse:[]
   },
@@ -222,7 +222,7 @@ Rg.expEncounters={
     ],
     warehouse:[
       {id:'j_warehouse_rope',x:400,label:'접어 둔 좌판 끈',text:'끈 끝을 한데 묶어 바구니에 담았다.\n아침엔 이걸 풀어 다시 장을 펼치겠지.'},
-      {id:'j_warehouse_scratches',x:1230,label:'창고 문 앞 빗자루 자국',get text(){return G.boss.dead?'창고 문 옆에 돌아온 물건들이 놓였다.\n아침에 찾아갈 자리가 저마다 비어 있다.':'눈 위에 빗자루 자국이 지그재그로 났다.\n청소를 했다기엔 창고 문 앞만 빙빙 돌았네.';}},
+      {id:'j_warehouse_scratches',x:1230,label:'창고 문 앞 빗자루 자국',get text(){return G.boss.dead?(Rg.arcs()&&!G.f.jangteoArcsYeotReturned?'창고 문 옆에 돌아온 물건들이 놓였다.\n그 사이에 날이 반질한 엿가위 하나. 장터 엿장수 거겠지?':'창고 문 옆에 돌아온 물건들이 놓였다.\n아침에 찾아갈 자리가 저마다 비어 있다.'):'눈 위에 빗자루 자국이 지그재그로 났다.\n청소를 했다기엔 창고 문 앞만 빙빙 돌았네.';}},
       {id:'j_warehouse_mended',x:2470,y:128,label:'기운 멍석',get text(){return G.boss.dead?'바느질한 모서리에 눈 한 톨 안 묻었다.\n누가 멍석을 얌전히 접어 놓고 갔다.':'멍석 한 귀를 다른 색 짚으로 기웠다.\n헌것도 함부로 버리지 않는 장터구나.';}}
     ]
   }
