@@ -21,7 +21,9 @@ function npcFind(id){for(const r of regionList()){const n=(r.npcs||[]).find(n=>n
 const lineShown=l=>l.when?knows(l.when):l.who==='dad';
 const seen=e=>knows('met:'+e.id)||knows('fight:'+e.id)||knows('got:'+e.id);
 /* 아빠가 적어 둔 쪽: 아빠가 이름을 적어 둔 쪽(notebook.csv 비고 '아빠 그림 있음' → dadDrawing)이거나 아빠 줄이 하나라도 보인다 */
-const pageShown=e=>e.dadDrawing||e.lines.some(l=>l.who==='dad'&&lineShown(l));
+// 결정 D-101: 아빠의 쪽은 그 지역에 닿은 뒤에야 펼친다(앞 지역 이야기를 미리 보이지 않게). 첫 지역은 처음부터 펼쳐 있다.
+const noteRegionOpen=id=>!id||!REGIONS[id]||(REGIONS[id].order||1)<=(REGIONS[G?.region]?.order||1)||!!(G?.visitedZones?.[id]&&Object.keys(G.visitedZones[id]).length);
+const pageShown=e=>noteRegionOpen(e.region)&&(e.dadDrawing||e.lines.some(l=>l.who==='dad'&&lineShown(l)));
 const dadLinesOf=e=>e.lines.filter(l=>l.who==='dad'&&lineShown(l));
 const gotItem=e=>e.kind==='item'&&!!ITEMS[e.id]&&knows('got:'+e.id);
 /* 아이가 그 쪽에 적은 줄. 관찰이면 처음 얻은 물건의 생김새(items.csv 설명)도 아이가 적은 줄로 친다 */

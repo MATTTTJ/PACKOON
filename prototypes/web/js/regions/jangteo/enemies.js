@@ -67,7 +67,7 @@ function drawDokkaebi(c){
   // 도깨비불 (가운데 위, 눈이 있는 불)
   {const col=partCol(core),loc=B.E.possession?possessionPoint():null;
     const hx=loc?cx+(loc.x-cx)/0.84:cx+shk(core),hy=loc?cy+(loc.y-cy)/0.84:cy-30-hop;const fl=Math.sin(B.time*0.25)*4;
-    const fire=core.broken?'rgba(29,24,20,.2)':(col===INK?RED:col);
+    const fire=core.broken?'rgba(29,24,20,.2)':(col===INK?FIRE:col);   // 평소엔 주황 불, 노릴 때만 붉은 표시
     blob(c,hx,hy+6,30,26,fire,core.broken?1:0.75);blob(c,hx-6,hy-22+fl,14,22,fire,core.broken?1:0.55);blob(c,hx+10,hy-30-fl,8,16,fire,core.broken?1:0.45);
     if(!core.broken){const [ex,ey]=lookAt(hx,hy);blob(c,hx-11,hy+4,7,8,'#efe3c8');blob(c,hx+11,hy+4,7,8,'#efe3c8');blob(c,hx-11+ex,hy+4+ey,3.2,3.8,INK);blob(c,hx+11+ex,hy+4+ey,3.2,3.8,INK);
       brush(c,[[hx-12,hy+20],[hx-4,hy+24],[hx+4,hy+20],[hx+12,hy+24]],3,INK);

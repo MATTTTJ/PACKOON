@@ -1,6 +1,7 @@
 'use strict';
 /* 수묵 붓 도구: 전투 화면과 보스 그림이 같이 쓴다. 흑백 + 단청 붉은색 하나 */
-const INK='#1d1814',RED='#b4432a';
+// 결정 D-102: 전투 색은 먹 + 단청 붉은색 하나. 불(화덕 불꽃·도깨비불)만 주황 담채로 따로 둬 공격 신호의 붉은색과 헷갈리지 않게 한다.
+const INK='#1d1814',RED='#b4432a',FIRE='#d9822b';
 function brush(c,pts,w,col,alpha){
   c.save();c.globalAlpha=alpha==null?1:alpha;c.strokeStyle=col||INK;c.lineCap='round';c.lineJoin='round';
   for(let pass=0;pass<2;pass++){

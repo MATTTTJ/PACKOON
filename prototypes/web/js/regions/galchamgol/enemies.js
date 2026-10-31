@@ -65,7 +65,7 @@ function tickForgeFire(){
 function flame(c,x,y,h,w,alpha){
   const sway=Vfx.reducedMotion?0:Math.sin(B.time*0.3+x)*w*0.25;
   c.save();c.globalAlpha=alpha;
-  c.fillStyle=RED;c.beginPath();c.moveTo(x-w,y);c.quadraticCurveTo(x-w*0.8,y-h*0.55,x+sway,y-h);c.quadraticCurveTo(x+w*0.8,y-h*0.55,x+w,y);c.closePath();c.fill();
+  c.fillStyle=FIRE;c.beginPath();c.moveTo(x-w,y);c.quadraticCurveTo(x-w*0.8,y-h*0.55,x+sway,y-h);c.quadraticCurveTo(x+w*0.8,y-h*0.55,x+w,y);c.closePath();c.fill();
   c.fillStyle='#f2b04a';c.beginPath();c.moveTo(x-w*0.5,y);c.quadraticCurveTo(x-w*0.4,y-h*0.4,x+sway*0.6,y-h*0.62);c.quadraticCurveTo(x+w*0.4,y-h*0.4,x+w*0.5,y);c.closePath();c.fill();
   c.restore();
 }
@@ -75,7 +75,7 @@ function drawForgeFloor(c){
     const s=emberState(e),p=emberPoint(e);
     // 바닥 재 자국: 불씨 자리는 늘 보인다
     blob(c,p.x,p.y+4,r,r*0.42,'#6b5a4a',0.18);
-    for(let i=0;i<4;i++)blob(c,p.x-9+i*6,p.y+2+(i%2)*3,2.4,2,i%2?RED:INK,0.55);
+    for(let i=0;i<4;i++)blob(c,p.x-9+i*6,p.y+2+(i%2)*3,2.4,2,i%2?FIRE:INK,0.55);
     if(s.k==='warn'){
       const g=c.createRadialGradient(p.x,p.y,2,p.x,p.y,r*(0.6+s.a*0.6));g.addColorStop(0,'rgba(226,108,40,'+(0.15+s.a*0.35)+')');g.addColorStop(1,'rgba(226,108,40,0)');
       c.save();c.fillStyle=g;c.fillRect(p.x-r*1.3,p.y-r*1.3,r*2.6,r*2.6);c.restore();
