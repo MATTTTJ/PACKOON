@@ -12,11 +12,16 @@ const GameMusic=(()=>{
      곡마다 성부를 층으로 묶고(base·longing·pulse), 템포는 같은 악보를 빠르기만 바꾼 단계로 갈아탄다.
      마음 상태는 두 값: 긴장(tension)과 그리움(longing). 0~1, 매 프레임 목표값으로 천천히 다가간다. */
   const ADAPTIVE={
-    danpunggol:{layers:{base:['melody','bass','stream'],longing:['answer'],pulse:['janggu_low','janggu_high']},tempos:[1,1.12]},
-    boss_kudzu:{layers:{base:['melody','bass'],longing:['answer'],pulse:['janggu_low','janggu_high','vine_stroke']},tempos:[0.92,1,1.12,1.22]}
+    // 결정 D-47: 아쟁(low_string)·가야금 뜯기(arp)는 바탕, 모듬북(moduk_*)은 북 층에 넣는다. 층에 없는 성부는 들리지 않는다.
+    danpunggol:{layers:{base:['melody','bass','stream','low_string'],longing:['answer'],pulse:['janggu_low','janggu_high','moduk_low','moduk_mid']},tempos:[1,1.12]},
+    boss_kudzu:{layers:{base:['melody','bass','arp','low_string'],longing:['answer'],pulse:['janggu_low','janggu_high','vine_stroke','moduk_low','moduk_mid']},tempos:[0.92,1,1.12,1.22]}
   };
   const mood={tension:0,longing:0};
   let applied=null,tempoAt=-1e9,tempoNow=1,adaptKind=null;
+  /* 결정 D-46: 경치는 지역 곡과 겹치지 않는다. 경치가 열리면 지역 곡을 0.4초에 내리고,
+     경치 효과음이 끝날 만큼 쉰 뒤 경치 곡을 들인다. 돌아올 때도 경치 곡을 내리고 잠깐 쉰 뒤 지역 곡을 반복 처음부터 들인다. */
+  const SCENERY_GAP_IN=800,SCENERY_GAP_OUT=350,SCENERY_FADE=.4;
+  let gapFor=null,gapUntil=0,gapKind=null;
   const history=[],warnings=new Set();
   function valid(value,fallback){
     const id=typeof value==='function'?value(G,zoneDef()):value;
@@ -71,6 +76,20 @@ const GameMusic=(()=>{
       else if(travelling)travelTo=travelling.to;
       if(travelling)requested=undefined;
     }
+    // 지역 곡이 자리 잡으면 이 지역 경치 곡을 미리 합성해 둔다(첫 경치에서 소리가 비지 않게).
+    if(target.kind==='region'&&scenery[G.region]&&player.getState().playing&&!player.getState().loading)player.preload(scenery[G.region]);
+    if(gapFor&&gapFor!==target.id)gapFor=null;
+    const lastKind=history.length?history[history.length-1].kind:null;
+    if(lastKind&&target.id&&target.id!==requested&&(target.kind==='scenery')!==(lastKind==='scenery')&&['scenery','region'].includes(target.kind)&&['scenery','region'].includes(lastKind)){
+      if(gapFor!==target.id){
+        gapFor=target.id;gapKind=target.kind;gapUntil=performance.now()+(target.kind==='scenery'?SCENERY_GAP_IN:SCENERY_GAP_OUT);
+        requestCount++;player.stop(SCENERY_FADE);requested=null;pending=false;
+        history.push({id:null,kind:'gap',to:target.id,region:G.region,zone:G.zone,audioTime:Sound.context?.currentTime??0});
+        return;
+      }
+    }
+    if(gapFor===target.id&&performance.now()<gapUntil)return;
+    const afterGap=gapFor===target.id;
     if(target.id===requested&&!pending)return;
     if(!target.id){requestCount++;player.stop(.12);requested=null;pending=false;return;}
     if(!Sound.enabled||!Sound.context||Sound.context.state!=='running'||document.hidden||!player.getState().unlocked){
@@ -82,12 +101,17 @@ const GameMusic=(()=>{
     const row={id:target.id,kind:target.kind,region:G.region,zone:G.zone,audioTime:Sound.context.currentTime};
     history.push(row);if(history.length>80)history.shift();
     const settings={crossfade:['battle','scenery'].includes(target.kind)?.35:1.5};
+    if(afterGap){settings.crossfade=.6;gapFor=null;}
     const spec=ADAPTIVE[target.id];
     if(spec&&['region','battle'].includes(target.kind)){
       adaptKind=target.kind;tempoNow=tempoStep(spec,target.kind);tempoAt=performance.now();applied=levelsFor(target.kind);
       Object.assign(settings,{layers:spec.layers,tempo:tempoNow,levels:applied});
     }
-    if(target.kind==='region'){
+    if(afterGap&&target.kind==='region'){
+      // 경치에서 돌아오면 지역 곡을 반복 처음(박 처음)부터 다시 들인다. 템포 단계가 있으면 그 빠르기로 센다.
+      const t=PackoonAudioData.score.tracks.find(t=>t.id===target.id);
+      if(t?.loop)settings.fromSeconds=t.loop.start*t.meter[0]*4/t.meter[1]*60/(t.tempo*(settings.tempo||1));
+    }else if(target.kind==='region'){
       const now=player.getState(),tracks=PackoonAudioData.score.tracks;
       const before=tracks.find(t=>t.id===now.id),after=tracks.find(t=>t.id===target.id);
       if(before&&after?.loop&&now.id!==target.id&&history.length>1&&history[history.length-2].kind==='region'){
