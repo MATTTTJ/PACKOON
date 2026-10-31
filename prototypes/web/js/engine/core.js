@@ -341,7 +341,8 @@ function addItem(id,n){
 }
 function takeItem(id,n){G.inv[id]=(G.inv[id]||0)-n;if(G.inv[id]<=0)delete G.inv[id];refreshHud();}
 function diary(id,text){if(G.diary.some(d=>d.id===id))return;G.diary.push({id,text});}
-function clue(id,who,text){if(G.clues.some(c=>c.id===id))return;G.clues.push({id,who,text});setTimeout(()=>toast('아빠 단서를 찾았다 ('+G.clues.length+'/'+clueTotalSoFar()+')'),900);}
+// 결정 D-140: 단서에 숫자를 붙이지 않는다 (확정 "사연은 은근히, 탐색 퍼즐이 되면 안 된다"). 세는 것은 보따리 '중요' 탭과 끝 화면에서만.
+function clue(id,who,text){if(G.clues.some(c=>c.id===id))return;G.clues.push({id,who,text});setTimeout(()=>toast('아빠 단서를 찾았다'),900);}
 function ledger(id,npc,want,give){if(!G.ledger[id])G.ledger[id]={npc,want,give,done:false};}
 function ledgerDone(id){if(G.ledger[id]&&!G.ledger[id].done){Vfx.burst(G.px,G.py-12);Sound.exchange();G.ledger[id].done=true;}}
 function rel(id,d){G.rel[id].v+=d;}

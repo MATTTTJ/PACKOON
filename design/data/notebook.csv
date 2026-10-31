@@ -84,8 +84,8 @@ bueong,jangteo,부엉 영감,동물,나,arc:jangteo:kidline,창고 지킨 셈을
 bueong,jangteo,부엉 영감,동물,나,arc:jangteo:stamp,떠날 채비를 말씀드렸을 때,수첩 장부 끝장에 상단 도장. 보부상끼리는 이 도장을 알아본다.,제안,D-119,관찰
 nal,jangteo,날쌘,동물,나,nal:jangteo-memil,큰 장터에서 메밀가루로 팥을 샀을 때,큰 장터에선 돌너머 메밀가루를 팥 두 되로 쳐줬다.,제안,,관찰
 jjandol,jangteo,짠돌,동물,나,met:j_jjandol,처음 말을 걸 때,낮엔 소금값을 짜게 부르는 담비. 밤엔 숙소 문간에 앉아 길 쪽만 본다.,제안,D-119 새 인물,관찰
-jjandol,jangteo,짠돌,동물,나,arc:jangteo:jjandol,마루에 올라섰을 때,아빠가 지난가을 쥐여 준 신표를 한 번도 쓰지 않고 품고 있었다. 이제 그 신표로 마루에서 잔다.,제안,D-119 새 인물,관찰
-jjandol,jangteo,짠돌,동물,나,arc:jangteo:jjandol-name,마루에서 잔 다음 날,부엉 영감이 손님 장부에 짠돌 말고 본이름을 적었단다. 무슨 이름인지는 비밀.,제안,D-119 새 인물,관찰
+jjandol,jangteo,짠돌,동물,나,arc:jangteo:jjandol,마루에 올라섰을 때,아빠가 지난가을 쥐여 준 신표를 한 번도 쓰지 않고 품고 있었다. 이제 그 신표로 방에서 잔다.,제안,D-119 새 인물,관찰
+jjandol,jangteo,짠돌,동물,나,arc:jangteo:jjandol-name,방에서 잔 다음 날,부엉 영감이 손님 장부에 짠돌 말고 본이름을 적었단다. 무슨 이름인지는 비밀.,제안,D-119 새 인물,관찰
 deungjan,jangteo,등잔발,동물,나,met:j_deungjan,처음 말을 걸 때,생쥐 밤짐꾼. 해 지고 들어오는 길손 짐을 나르고 허리 등잔으로 길을 비춘다.,제안,D-119 새 인물,관찰
 deungjan,jangteo,등잔발,동물,나,arc:jangteo:deungjan,설날 아침에 깨었을 때,내 보따리 약초 냄새로 알아봤다. 지난가을 밤 아빠 짐을 날랐단다. 무거웠고 아빠는 한참 남쪽 하늘만 봤다고. 우리 집이 있는 쪽이다.,제안,D-119 새 인물,관찰
 dokkaebi,jangteo,헌물 도깨비,동물,아빠,,처음부터,장터 도깨비 이야기: 헌것에 깃들어 장난을 친다. 메밀 한 그릇이면 순해진다더라.,제안,,아빠 수첩
