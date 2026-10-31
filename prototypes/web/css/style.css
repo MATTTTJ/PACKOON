@@ -127,6 +127,11 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .trade-good{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;margin-bottom:6px;padding:8px 10px;background:var(--hanji-2);border:1px solid #c7b48c;border-radius:4px;color:var(--meok);font:inherit;cursor:pointer;touch-action:manipulation}
 .trade-good[aria-pressed="true"]{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
 .trade-good-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+/* 결정 D-123: 거래 불가·다 바꿈 */
+.trade-good.off{opacity:.55;background:#efe6d0}
+.trade-state{background:#e3d6bb;color:#5b4630}
+.trade-state.done{background:#d9d2c2;color:#6c6253}
+.trade-why{color:#7a5b3c}
 .trade-good-head canvas{width:26px;height:26px;image-rendering:pixelated}
 .trade-good-head canvas.rarity-mark{width:15px;height:15px}
 .trade-asks{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-height:28px}
