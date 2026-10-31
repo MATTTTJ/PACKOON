@@ -268,9 +268,60 @@ function drawDigs(){const ground=fieldGround();for(const d of fieldItems('digs')
   if(d.done){R(x-6,ground-1,12,2,'#3e2615');continue;}
   R(x-7,ground-4,14,4,'#7a4b2a');R(x-5,ground-6,10,2,'#8b5a2b');
   if(Math.floor((G.anim+d.x)/14)%3===0){R(x-3,ground-10,1,1,'#fff3b0');R(x+3,ground-12,1,1,'#fff3b0');}else R(x,ground-11,1,1,'#ffe48a');}}
-function drawNpcs(){for(const n of fieldNpcs()){const x=n.x-cam;if(x<-60||x>W+60)continue;const f=G.px<n.x?-1:1;
+/* 결정 D-126: 대화 뒤 자리를 옮기는 인물은 옛 자리에서 새 자리 쪽으로 걸어가며 점점 흐려지고,
+   새 자리가 화면 안이면 거기서 서서히 나타난다. 사라지는 인물도 걸어 나가며 흐려진다.
+   위치를 바꾸는 지역 코드는 그대로 두고, 그리기 쪽이 직전 자리를 기억했다가 연출만 한다(저장·진행과 무관).
+   대화·교환·전투·미니게임이 이어지는 동안과 끝난 직후(npc_move_window_ms) 생긴 자리 바뀜만 연출한다.
+   연출 중인 인물에게는 말을 걸 수 없고, 이름표도 같이 흐려진다. 움직임 줄이기에서는 바로 바뀐다. */
+const npcMove={key:null,last:new Map(),ghosts:[],fadeIn:new Map(),busyWas:false,calmAt:-1e9,clock:0};   // 시간은 실제 밀리초로 센다(화면 갱신 빈도와 무관)
+function npcMoveBusy(){return open('dlg')||open('trade')||!!B||!!inkOn||!!openMinigame();}
+function npcMoveVisible(n){return n&&n.id&&n.draw&&(typeof formVisible!=='function'||formVisible(n));}
+function trackNpcMoves(){
+  if(!G||!G.started||G.ended){npcMove.key=null;return;}
+  const T=TABLES.TUNING,key=G.region+':'+(G.zone??'classic');
+  const nowMs=performance.now(),dt=npcMove.clock?Math.min(50,nowMs-npcMove.clock):0;npcMove.clock=nowMs;
+  const busy=npcMoveBusy();if(npcMove.busyWas&&!busy)npcMove.calmAt=nowMs;npcMove.busyWas=busy;
+  const now=new Map();
+  for(const n of [...fieldNpcs(),...zoneObjects('wanderers')])if(npcMoveVisible(n))now.set(n.id,{x:n.x,y:n.y??fieldGround(),n});
+  if(npcMove.key!==key||zoneMotion||zoneFade>0){npcMove.key=key;npcMove.last=now;npcMove.ghosts=[];npcMove.fadeIn.clear();return;}
+  const recent=busy||nowMs-npcMove.calmAt<T.npc_move_window_ms;
+  if(recent&&!Vfx.reducedMotion){
+    for(const [id,p] of npcMove.last){
+      const c=now.get(id);
+      if(c&&Math.abs(c.x-p.x)<=T.npc_move_min_px)continue;
+      const dir=c?Math.sign(c.x-p.x)||1:(p.x>=G.px?1:-1);
+      npcMove.ghosts=npcMove.ghosts.filter(g=>g.id!==id);
+      npcMove.ghosts.push({id,n:p.n,x:p.x,y:p.y,dir,t:0});
+      // 새 자리가 화면 안이면 옛 모습이 반쯤 흐려졌을 때부터 나타난다. 화면 밖이면 그대로 둔다.
+      if(c){const sx=c.x-cam;if(sx>-40&&sx<W+40)npcMove.fadeIn.set(id,{t:0,delay:T.npc_move_out_ms/2});}
+    }
+    // 대화 끝에 새로 나타난 인물(다른 자리에서 옮겨 온 경우 포함)은 서서히 나타난다
+    for(const [id,c] of now)if(!npcMove.last.has(id)&&!npcMove.fadeIn.has(id)){const sx=c.x-cam;if(sx>-40&&sx<W+40)npcMove.fadeIn.set(id,{t:0,delay:0});}
+  }
+  npcMove.last=now;
+  // 대화가 열려 있는 동안에는 멈춰 있다가, 대화가 닫히면 움직인다
+  if(paused())return;
+  for(const g of npcMove.ghosts)g.t+=dt;
+  npcMove.ghosts=npcMove.ghosts.filter(g=>g.t<T.npc_move_out_ms);
+  for(const [id,f] of npcMove.fadeIn){if(f.delay>0)f.delay-=dt;else if((f.t+=dt)>=T.npc_move_in_ms)npcMove.fadeIn.delete(id);}
+}
+function npcMoveAlpha(id){const f=npcMove.fadeIn.get(id);if(!f)return 1;return f.delay>0?0:clamp(f.t/TABLES.TUNING.npc_move_in_ms,0,1);}
+function npcMoving(p){return !!p&&npcMove.fadeIn.has(p.id);}
+function drawNpcGhosts(){
+  const T=TABLES.TUNING;
+  for(const g of npcMove.ghosts){
+    const k=g.t/T.npc_move_out_ms,x=Math.round(g.x+g.dir*T.npc_move_walk_px*k-cam);if(x<-60||x>W+60)continue;
+    // 걷는 듯 한 칸씩 들썩이며 옮겨 간다
+    const bob=Math.floor(g.t/T.npc_move_step_ms)%2;
+    ctx.save();ctx.globalAlpha=clamp(1-k,0,1);g.n.draw(x,g.y-bob,g.dir);ctx.restore();
+  }
+}
+function drawNpcs(){drawNpcGhosts();for(const n of fieldNpcs()){const x=n.x-cam;if(x<-60||x>W+60)continue;const f=G.px<n.x?-1:1;
+  const a=npcMoveAlpha(n.id);if(a<=0)continue;
+  if(a<1){ctx.save();ctx.globalAlpha=a;}
   if(n.props)n.props(n);
-  n.draw(x,n.y??fieldGround(),f);}}
+  n.draw(x,n.y??fieldGround(),f);
+  if(a<1)ctx.restore();}}
 
 /* 새 표시가 없는 옛 저장도 도착 지역과 기존 진행을 읽어 겉모습만 복원한다. */
 // 결정 D-12: 보따리 겉모습은 지역 진행에 따라 보따리 → 멜빵 봇짐 → 작은 지게 → 아빠의 지게로 바뀐다. 칸은 무제한 (design/data/decisions.csv)
@@ -398,6 +449,16 @@ function updateNpcTags(near){
       const text=npcTagText(n);if(e.textContent!==text)e.textContent=text;
       e.classList.toggle('unknown',text==='?');
       e.style.left=(x/W*100)+'%';e.style.top=(((n.y??fieldGround())-npcTagHeight(n))/H*100)+'%';e.hidden=false;shown.add(key);
+      e.style.opacity=String(npcMoveAlpha(n.id));   // D-126: 자리를 옮기는 동안 이름표도 같이 흐려진다
+    }
+    // 걸어 나가며 흐려지는 옛 모습에도 이름표가 따라가며 흐려진다
+    for(const g of npcMove.ghosts){
+      const n=g.n;if(n.tag===false||n.prompt||!n.name)continue;
+      const k=g.t/TABLES.TUNING.npc_move_out_ms,x=g.x+g.dir*TABLES.TUNING.npc_move_walk_px*k-cam;if(x<-20||x>W+20)continue;
+      const key='ghost:'+g.id;let e=npcTagEls.get(key);
+      if(!e){e=el('span','npc-tag');npcTagEls.set(key,e);npcTagLayer.appendChild(e);}
+      const text=npcTagText(n);if(e.textContent!==text)e.textContent=text;e.classList.toggle('unknown',text==='?');
+      e.style.left=(x/W*100)+'%';e.style.top=((g.y-npcTagHeight(n))/H*100)+'%';e.style.opacity=String(clamp(1-k,0,1));e.hidden=false;shown.add(key);
     }
   }
   for(const [key,e] of npcTagEls)if(!shown.has(key))e.hidden=true;
@@ -417,6 +478,7 @@ function updateHints(){
 }
 function nearDig(){if(paused()||(typeof rolling!=="undefined"&&rolling))return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
 function updateOverlay(){
+  trackNpcMoves();   // D-126: 안내를 고르기 전에 자리 바뀜을 먼저 본다
   const pr=$('prompt');
   // 구르는 동안에는 말걸기·줍기·채집 안내를 띄우지 않는다 (D-94)
   const n=paused()||rolling?null:nearInteraction();const dg=n||rolling?null:nearDig();
@@ -659,7 +721,7 @@ function nearInteraction(){
   if(!usesZones(REG)&&!['wanderers','doors','examines','vistas','stamps'].some(k=>zoneObjects(k).length))return nearNpc();
   const points=[...fieldNpcs(),...zoneObjects('wanderers'),...zoneObjects('doors'),...zoneObjects('examines'),...zoneObjects('vistas'),...zoneObjects('stamps').filter(s=>!stampFound(s.id))];
   let best=null,dist=Infinity;
-  for(const p of points)if(pointNear(p)&&Math.abs(p.x-G.px)<dist){best=p;dist=Math.abs(p.x-G.px);}
+  for(const p of points)if(!npcMoving(p)&&pointNear(p)&&Math.abs(p.x-G.px)<dist){best=p;dist=Math.abs(p.x-G.px);}
   return best;
 }
 function interactionKind(p){
@@ -767,7 +829,8 @@ function findStamp(s){
   toast('아빠의 손바닥 도장이다. 수첩에 그날 이야기가 보인다.');return true;
 }
 function drawZoneObjects(){
-  for(const p of zoneObjects('wanderers'))if(p.draw)p.draw(p.x-cam,p.y??fieldGround(),G.px<p.x?-1:1);
+  for(const p of zoneObjects('wanderers'))if(p.draw){const a=npcMoveAlpha(p.id);if(a<=0)continue;   // D-126
+    if(a<1){ctx.save();ctx.globalAlpha=a;}p.draw(p.x-cam,p.y??fieldGround(),G.px<p.x?-1:1);if(a<1)ctx.restore();}
   for(const k of ['doors','examines','vistas','stamps'])for(const p of zoneObjects(k)){
     // 결정 D-81: 아빠 도장 자리에는 찾기 전에도 흐린 손바닥 흔적이 남아 있다. 찾으면 또렷해진다 (design/data/decisions.csv)
     if(k==='stamps'){const sx=p.x-cam,gy=p.y??fieldGround(),base=stampBase(p),py=gy-(p.face??STAMP_FACE[base]);
