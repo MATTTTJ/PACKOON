@@ -69,7 +69,7 @@ function baseState(){return{
 };}
 /* 보따리·호감·진행 표시는 하나로 이어지고 필드만 지역별로 보관한다.
    새 지역의 시작 물건과 기본 진행값은 첫 입장에만 적용한다. */
-const regionFieldKeys=r=>[...Object.keys(r.newState()).filter(k=>!['inv','rel','f'].includes(k)),'zone','zoneStates'];
+const regionFieldKeys=r=>[...Object.keys(r.newState()).filter(k=>!['inv','rel','f'].includes(k)),'zone','zoneStates','trimVer'];
 function regionCompleted(id,g=G){return !!g?.regionStates?.[id]?.completed;}
 function markZoneVisited(g=G,r=REG){
   if(CLASSIC||!g||!r||!usesZones(r)||!r.zones[g.zone])return;
@@ -92,7 +92,7 @@ function enterRegion(g,r,options={}){
   if(moving&&first)fadeMomNote(g);
   if(g===G&&moving)Sound.travel();
   if(previous)for(const key of regionFieldKeys(previous))delete g[key];
-  const ns=r.newState();
+  trimRegion(r);const ns=trimState(r,r.newState());
   for(const k in ns){
     if(k==='inv'){if(first)for(const i in ns.inv)g.inv[i]=(g.inv[i]||0)+ns.inv[i];}
     else if(k==='rel'){for(const i in ns.rel)if(!g.rel[i])g.rel[i]=ns.rel[i];}
@@ -100,6 +100,7 @@ function enterRegion(g,r,options={}){
     else g[k]=ns[k];
   }
   Object.assign(g,saved?.fields||{});
+  if(saved&&saved.fields.trimVer===undefined)delete g.trimVer;   // 자르기 전에 저장한 지역은 prepareZones에서 한 번 옮긴다 (D-109)
   if(!saved&&g.floorPickups?.[r.id])g.pickups=structuredClone(g.floorPickups[r.id]);
   Object.assign(g,{form:'',region:r.id,started:!!options.mapTravel,ended:false,hp:options.mapTravel?g.hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,
     zone:options.zone??saved?.fields?.zone??null,zoneStates:saved?.fields?.zoneStates||{}});
@@ -140,11 +141,111 @@ function stepRidge(x,seed,n=4,{low=160,high=112,rise=30}={}){
   const out=[];let y=low-Math.round(rnd()*6),px=x;
   for(let i=0;i<n;i++){
     const w=Math.round(54+rnd()*40);out.push({x:Math.round(px),y,w});
-    px+=w+Math.round(rnd()*30)-8;
+    // 결정 D-110: 이웃 발판은 가로로 겹치지 않는다(사이 6px 이상). 겹치면 단상이 포개져 지저분해 보인다.
+    px+=w+Math.max(6,Math.round(rnd()*30)-8);
     const step=Math.round(rise*.5+rnd()*rise*.5);
     y=i<top?Math.max(high,y-step):Math.min(low+4,y+step);
   }
   return out;
+}
+/* 결정 D-109: 빈 걷기 구간 줄이기 (design/data/decisions.csv).
+   지역 field.js가 Rg.trimCuts={구역:[[c,d],…]}를 둔다. 설계 좌표 c부터 d만큼을 지우고 그 뒤는 d만큼 당긴다.
+   좌표가 여러 파일(field·story·strangers)에 흩어져 있어, 숫자를 고치지 않고 게임 상태를 만들 때 한 번에 옮긴다.
+   · 구역 정의: 너비·시작·발판·문·물건·채집·도장·경치·오르기·조사·인물(같은 구역), 다른 구역에서 들어오는 문의 toX
+   · 게터 목록(떠돌이·조사·도장): 처음 꺼낼 때 그 자리에서 한 번 옮긴다(접근자 x는 이미 실제 좌표라 두지 않는다)
+   · 배경·장식 그림: 그 구역 art의 x에 tx()를 씌운다(잘린 구간 안의 장식은 숨긴다)
+   · 상태(물건·채집)는 trimState, 옛 저장은 trimMigrate가 한 번 옮긴다. 옛 구성(classic)에는 쓰지 않는다. */
+function trimX(x,cuts){if(!cuts||!Number.isFinite(x))return x;let s=0;for(const [c,d] of cuts){if(x>=c+d)s+=d;else if(x>c)s+=x-c;}return x-s;}
+const trimInside=(x,cuts)=>!!cuts&&cuts.some(([c,d])=>x>c&&x<c+d);
+function trimObj(o,cuts,done){
+  if(!o||typeof o!=='object'||done?.has(o))return o;done?.add(o);
+  const dx=Object.getOwnPropertyDescriptor(o,'x');
+  if(dx&&'value' in dx&&Number.isFinite(dx.value))o.x=trimX(dx.value,cuts);
+  return o;
+}
+/* 그림 좌표: 자른 구역의 배경·장식 x를 옮긴다. 잘린 구간 안의 장식은 화면 밖으로 보낸다. */
+function tx(u){const c=!CLASSIC&&REG?.trimCuts?.[G?.zone];if(!c)return u;return trimInside(u,c)?-1e4:trimX(u,c);}
+/* 결정 D-110: 단상(발판)이 포개져 보이지 않게 한다 (design/data/decisions.csv).
+   가로로 겹치고 세로 차이가 48px 미만인 두 발판: 같은 높이면 하나로 합치고, 다른 높이면 6px 사이를 두고 뗀다.
+   물건·문·경치가 올라앉은 자리(anchors)는 남기도록 반대쪽을 줄인다. 너비 40px 밑으로는 줄이지 않는다. */
+const PLAT_GAP=6,PLAT_STACK=48;
+function tidyPlatforms(list,anchors=[]){
+  const on=(p,lo,hi)=>anchors.some(a=>Math.abs(a.y-p.y)<=3&&a.x>=lo&&a.x<=hi);
+  const ps=list.map(p=>({...p})).sort((a,b)=>a.x-b.x||a.y-b.y);
+  for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+    const a=ps[i],b=ps[j];if(!a||!b||Math.abs(a.y-b.y)>6)continue;
+    if(Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>-PLAT_GAP){const x=Math.min(a.x,b.x);a.w=Math.max(a.x+a.w,b.x+b.w)-x;a.x=x;a.y=Math.min(a.y,b.y);ps[j]=null;}
+  }
+  const out=ps.filter(Boolean).sort((a,b)=>a.x-b.x);
+  for(let i=0;i<out.length;i++)for(let j=i+1;j<out.length;j++){
+    const a=out[i],b=out[j],dy=Math.abs(a.y-b.y);if(!a.w||!b.w||dy<=6||dy>=PLAT_STACK)continue;
+    if(Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)<=-PLAT_GAP)continue;
+    const [L,R]=a.x<=b.x?[a,b]:[b,a];
+    const cut=L.x+L.w-(R.x-PLAT_GAP);
+    if(cut>0&&L.w-cut>=40&&!on(L,R.x-PLAT_GAP,L.x+L.w)){L.w-=cut;continue;}
+    const cut2=L.x+L.w+PLAT_GAP-R.x;
+    if(cut2>0&&R.w-cut2>=40&&!on(R,R.x,R.x+cut2)){R.x+=cut2;R.w-=cut2;continue;}
+    // 둘 다 줄일 수 없고, 한쪽이 다른 발판 밑에 대부분 숨어 있으면(겹친 길이가 제 너비의 절반 이상) 숨은 쪽을 뺀다.
+    const ov=Math.min(L.x+L.w,R.x+R.w)-Math.max(L.x,R.x),low=L.y>R.y?L:R;
+    if(ov>=low.w*.5&&!on(low,low.x,low.x+low.w))low.w=0;
+  }
+  return out.filter(p=>p.w>0);
+}
+function platformAnchors(r,id,z){
+  const list=[];const take=a=>{if(a&&Number.isFinite(a.x)&&Number.isFinite(a.y)&&a.y<GROUND)list.push({x:a.x,y:a.y});};
+  for(const k of ['pickups','doors','vistas','stamps','climbs','digs','examines']){
+    const d=Object.getOwnPropertyDescriptor(z,k);if(d&&'value' in d&&Array.isArray(d.value))d.value.forEach(take);
+  }
+  if(r.trimAnchorState)for(const a of r.trimAnchorState.pickups||[])if((a.zone||firstZone(r))===id)take(a);
+  return list;
+}
+function trimRegion(r){
+  if(!r?.trimCuts||!r.zones||r.trimDone||CLASSIC)return;r.trimDone=true;
+  const cuts=r.trimCuts,done=new WeakSet();
+  for(const [id,z] of Object.entries(r.zones)){
+    const c=cuts[id];
+    for(const p of [...(z.doors||[]),...Object.values(z.exits||{})]){
+      if(p&&typeof p==='object'&&cuts[p.to]&&Number.isFinite(p.toX))p.toX=trimX(p.toX,cuts[p.to]);
+    }
+    if(!c)continue;
+    z.w=trimX(z.w,c);if(Number.isFinite(z.startX))z.startX=trimX(z.startX,c);
+    if(Array.isArray(z.platforms))z.platforms=z.platforms.filter(p=>!trimInside(p.x+p.w/2,c)).map(p=>({...p,x:trimX(p.x,c)}));
+    for(const k of ['doors','pickups','digs','stamps','vistas','climbs','examines','npcs']){
+      const d=Object.getOwnPropertyDescriptor(z,k);if(!d)continue;
+      if('value' in d&&Array.isArray(d.value))d.value.forEach(o=>trimObj(o,c,done));
+      else if(d.get){const get=d.get;Object.defineProperty(z,k,{configurable:true,enumerable:d.enumerable,get(){const l=get.call(this);(l||[]).forEach(o=>trimObj(o,c,done));return l;}});}
+    }
+    for(const k of ['wanderers']){
+      const d=Object.getOwnPropertyDescriptor(z,k);
+      if(d?.get){const get=d.get;Object.defineProperty(z,k,{configurable:true,enumerable:d.enumerable,get(){const l=get.call(this);(l||[]).forEach(o=>trimObj(o,c,done));return l;}});}
+      else if(d&&Array.isArray(d.value))d.value.forEach(o=>trimObj(o,c,done));
+    }
+    if(typeof z.maxX==='function'){const f=z.maxX;z.maxX=()=>trimX(f(),c);}
+  }
+  // 구역이 게터인 인물(진행에 따라 자리가 바뀜)은 그 게터가 실제 좌표를 돌려주므로 두지 않는다.
+  // 발판 정리(D-110): 자른 뒤 좌표로, 모든 구역에. 시작 상태의 물건 자리도 받침으로 지킨다.
+  try{r.trimAnchorState=trimState(r,r.newState());}catch(_){r.trimAnchorState=null;}
+  for(const [id,z] of Object.entries(r.zones))if(Array.isArray(z.platforms))z.platforms=tidyPlatforms(z.platforms,platformAnchors(r,id,z));
+  delete r.trimAnchorState;
+  for(const n of r.npcs||[]){const d=Object.getOwnPropertyDescriptor(n,'zone');const zid=d&&'value' in d?d.value:null;if(zid&&cuts[zid])trimObj(n,cuts[zid],done);}
+  r.trimHook?.(trimX);
+}
+function trimState(r,s){
+  if(!r?.trimCuts||CLASSIC)return s;
+  trimRegion(r);const z0=firstZone(r);
+  for(const k of ['pickups','digs'])for(const a of s[k]||[]){const c=r.trimCuts[a.zone||z0];if(c)a.x=trimX(a.x,c);}
+  r.trimStateHook?.(s,trimX);s.trimVer=1;return s;
+}
+/* 옛 저장(자르기 전)의 좌표를 한 번만 옮긴다. 잘린 구간 안에 있던 것은 구간 시작으로 모인다. */
+function trimMigrate(r,g){
+  if(!r?.trimCuts||CLASSIC||!g||g.trimVer===1)return;
+  g.trimVer=1;const z0=firstZone(r);
+  for(const k of ['pickups','digs'])for(const a of g[k]||[]){const c=r.trimCuts[a.zone||z0];if(c)a.x=trimX(a.x,c);}
+  for(const [zid,c] of Object.entries(r.trimCuts)){
+    for(const a of g.floorItems?.[r.id]?.[zid]||[])a.x=trimX(a.x,c);
+    if(g.zone===zid&&g.region===r.id){g.px=trimX(g.px,c);g.cam=0;}
+  }
+  r.trimMigrateHook?.(g,trimX);
 }
 function fieldCall(name,...args){const f=fieldDef()[name];return typeof f==='function'?f(...args):undefined;}
 function fieldItems(name){return G[name].filter(a=>usesZones(REG)?(a.zone||firstZone(REG))===G.zone:!a.zone);}
@@ -168,6 +269,7 @@ function canPickupItem(id){
   return Object.values(G.inv).filter(n=>n>0).length<Math.max(0,Math.floor(G.bagSlots));
 }
 function prepareZones(g,r,fresh=false){
+  trimRegion(r);if(usesZones(r)&&r.trimCuts)trimMigrate(r,g);
   if(!usesZones(r)){
     if(g.zone&&r.zones&&g.zone!==firstZone(r)){g.px=r.startX;g.py=GROUND;g.cam=0;}
     g.zone=null;placeFloorPickups(g,r);return;
