@@ -187,32 +187,18 @@ function numericTable(name,label,required){
 }
 const MINIGAMES=numericTable('minigames','미니게임',
   [
-    'forge_heat forge_hits forge_help_misses forge_floor forge_help_floor',
-    'forge_edge_width forge_cooling forge_help_cooling forge_reheat_wait forge_finish_wait',
-    'forge_bonus_edges forge_relation forge_bonus_relation stack_phase stack_hits',
-    'stack_zone stack_help_zone stack_help_misses stack_amplitude stack_amplitude_gain',
-    'stack_speed stack_speed_gain stack_warning stack_edge_ratio stack_edge_lean',
-    'stack_edge_wait stack_hit_wait stack_miss_wait stack_relation stack_perfect_relation',
-    'steam_fire_start steam_band_min steam_band_max steam_max steam_target_frames',
-    'steam_time_limit steam_wind_at steam_wind_frames steam_fire_decay steam_wind_decay',
-    'steam_steam_follow steam_danger_steam steam_low_grace steam_danger_fire steam_danger_limit',
-    'steam_danger_recovery steam_close_at steam_fan_cooldown steam_fan_power steam_finish_wait',
-    'steam_high_steam steam_high_fire steam_low_hint_after steam_low_fire steam_voice_cooldown',
-    'steam_relation rhythm_notes rhythm_good rhythm_perfect rhythm_scroll_speed',
-    'rhythm_bonus_hits rhythm_start_delay rhythm_subbeat rhythm_intro_beats rhythm_parts',
-    'rhythm_normal_gap rhythm_late_gap rhythm_normal_last rhythm_late_hint_delay rhythm_finish_delay',
-    'rhythm_cooldown rhythm_stray_window rhythm_resume_delay rhythm_combo rhythm_relation rhythm_high_relation',
-    'rhythm_note_one rhythm_note_two rhythm_note_three rhythm_note_four rhythm_note_five',
-    'rhythm_note_six rhythm_note_seven rhythm_note_eight salg_graze salg_return_graze',
-    'salg_moving salg_return_speed salg_active_distance salg_arrival_distance salg_grass_interval',
-    'salg_risk_distance salg_grace salg_relief_frames salg_recovery salg_risk_limit',
-    'salg_startle_frames salg_max_retreat salg_retreat salg_warning_frames salg_alert_frames',
-    'salg_near_distance salg_near_graze salg_near_random dad_steps gather_help_misses',
-    'gather_help_width gather_zone_start gather_zone_span gather_ring_period gather_ring_radius gather_just_window gather_cooldown',
-    'gather_perfect_power gather_yield gather_perfect_bonus gather_root_hits gather_root_width',
-    'gather_root_speed gather_ssari_hits gather_kkoe_hits gather_eoksae_hits gather_seogi_hits',
-    'gather_darae_vine_hits gather_darae_vine_width gather_darae_vine_speed yut_needle_speed yut_nak_zone',
-    'gather_solbang_hits'
+    'handwork_forge_relation handwork_stack_relation handwork_steam_relation rhythm_notes',
+    'rhythm_good rhythm_perfect rhythm_scroll_speed rhythm_bonus_hits rhythm_start_delay rhythm_subbeat',
+    'rhythm_intro_beats rhythm_parts rhythm_normal_gap rhythm_late_gap rhythm_normal_last rhythm_late_hint_delay',
+    'rhythm_finish_delay rhythm_cooldown rhythm_stray_window rhythm_resume_delay rhythm_combo rhythm_relation',
+    'rhythm_high_relation rhythm_note_one rhythm_note_two rhythm_note_three rhythm_note_four rhythm_note_five',
+    'rhythm_note_six rhythm_note_seven rhythm_note_eight salg_graze salg_return_graze salg_moving',
+    'salg_return_speed salg_active_distance salg_arrival_distance salg_grass_interval salg_risk_distance salg_grace',
+    'salg_relief_frames salg_recovery salg_risk_limit salg_startle_frames salg_max_retreat salg_retreat',
+    'salg_warning_frames salg_alert_frames salg_near_distance salg_near_graze salg_near_random dad_steps',
+    'gather_ring_period gather_ring_radius gather_just_window gather_perfect_power gather_yield gather_perfect_bonus',
+    'gather_root_hits gather_ssari_hits gather_kkoe_hits gather_eoksae_hits gather_seogi_hits gather_darae_vine_hits',
+    'yut_needle_speed yut_nak_zone gather_solbang_hits'
   ].join(' '));
 const TUNING=numericTable('tuning','분류',
   [
@@ -242,10 +228,6 @@ for(const [table,values] of [['minigames',MINIGAMES],['tuning',TUNING]]){
     if(/_(hits|frames|wait|cooldown|cycle|cue|steps|notes|parts|interval|target_frames|danger_limit|near_random)$/.test(id))requireValue(n>0,table+'.csv '+id+': 0보다 커야 한다');
   }
 }
-requireValue(MINIGAMES.steam_max>0&&MINIGAMES.steam_band_min<MINIGAMES.steam_band_max&&MINIGAMES.steam_band_max<=MINIGAMES.steam_max,'minigames.csv: 김 판정 범위와 상한을 확인한다');
-requireValue(MINIGAMES.steam_wind_at<=MINIGAMES.steam_max,'minigames.csv: 외풍 시작이 진행 상한보다 크다');
-requireValue(MINIGAMES.stack_zone<=1&&MINIGAMES.stack_help_zone<=1&&MINIGAMES.stack_edge_ratio<=1,'minigames.csv: 돌 쌓기 판정 비율은 1 이하여야 한다');
-requireValue(MINIGAMES.forge_help_floor<MINIGAMES.forge_heat&&MINIGAMES.forge_floor<MINIGAMES.forge_heat,'minigames.csv: 쇠 식음 경계가 재가열한 열보다 낮아야 한다');
 requireValue(MINIGAMES.rhythm_notes<=8&&MINIGAMES.rhythm_normal_last<MINIGAMES.rhythm_notes&&MINIGAMES.rhythm_bonus_hits<=MINIGAMES.rhythm_notes,'minigames.csv: 구현된 노트 수와 덤 기준을 확인한다');
 const noteKeys=['one','two','three','four','five','six','seven','eight'];
 for(let i=1;i<noteKeys.length;i++)requireValue(MINIGAMES['rhythm_note_'+noteKeys[i]]>MINIGAMES['rhythm_note_'+noteKeys[i-1]],'minigames.csv: 노트 시각은 순서대로 커져야 한다');
@@ -265,11 +247,6 @@ requireValue(TUNING.form_squirrel_speed>0&&TUNING.form_deer_speed>0&&TUNING.form
 requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_pickaxe_bonus>0,'tuning.csv: 전투 기본 피해·날 세운 피해·곡괭이 덤을 확인한다');
 requireValue(MINIGAMES.yut_nak_zone>0&&MINIGAMES.yut_nak_zone<40&&MINIGAMES.yut_needle_speed>0,'minigames.csv: 윷 낙 구간은 0~40%, 바늘 속도는 0보다 커야 한다');
 requireValue(MINIGAMES.rhythm_stray_window>=MINIGAMES.rhythm_good,'minigames.csv: 헛가위 범위는 맞음 판정 반폭 이상이어야 한다');
-// 폭·속도 줄은 실제로 막대 판정을 쓰는 칡뿌리(낫 일 놀이)와 다래(영산 활동)만 둔다.
-for(const id of ['root','darae_vine']){
-  const width=MINIGAMES['gather_'+id+'_width'];
-  requireValue(width>0&&width+MINIGAMES.gather_help_width<=MINIGAMES.gather_zone_span&&MINIGAMES.gather_zone_start+MINIGAMES.gather_zone_span<=100,'minigames.csv: '+id+' 채집 판정 범위가 막대를 벗어난다');
-}
 
 /* 결정 D-39: 교환 화면의 흔한 물건. 값은 레어도 단계로만 맞추므로 표에는 내놓는 물건·개수·횟수만 적는다. */
 const STOCK=[];
@@ -310,7 +287,36 @@ const SCENE_MUSIC={};
     SCENE_MUSIC[r.id]={music:song==='지역'?'':song,from};
   }
 }
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC},null,1)+";\n";
+/* 결정 D-87: 마음 상태 음악의 층 나눔(music_layers.csv). 곡의 모든 성부가 꼭 한 층에 들어가야 한다.
+   층에 빠진 성부는 층 재생에서 들리지 않으므로, 음악 원본(design/data/music/music.json)의 성부와 정확히 맞춘다. */
+const MUSIC_LAYERS={};
+{
+  const music=JSON.parse(fs.readFileSync(path.join(DATA,'music/music.json'),'utf8'));
+  const voicesOf=new Map(music.tracks.map(t=>[t.id,t.voices.map(v=>v.id)]));
+  for(const r of t('music_layers')){
+    const where='music_layers.csv '+r.id,track=r['곡'];
+    if(!voicesOf.has(track))fail(where+': 음악에 없는 곡 '+track);
+    if(MUSIC_LAYERS[track])fail(where+': 같은 곡 줄이 겹친다 '+track);
+    const tempos=r['템포단계'].trim().split(/\s+/).map(Number);
+    if(!tempos.length||tempos.some(n=>!(n>=0.8&&n<=1.3))||tempos.some((n,i)=>i&&n<tempos[i-1]))fail(where+': 템포단계는 0.8~1.3 사이 수를 오름차순으로 적는다');
+    const layers={base:r['바탕'],longing:r['그리움'],pulse:r['북']};
+    const seen=new Set();
+    for(const [name,cell] of Object.entries(layers)){
+      const ids=cell.split('+').map(s=>s.trim()).filter(Boolean);
+      if(!ids.length)fail(where+': '+name+' 층이 비어 있다');
+      for(const id of ids){
+        if(!voicesOf.get(track).includes(id))fail(where+': 곡에 없는 성부 '+id);
+        if(seen.has(id))fail(where+': 성부가 두 층에 들어 있다 '+id);
+        seen.add(id);
+      }
+      layers[name]=ids;
+    }
+    const missing=voicesOf.get(track).filter(id=>!seen.has(id));
+    if(missing.length)fail(where+': 층에 빠진 성부(들리지 않게 된다) '+missing.join(', '));
+    MUSIC_LAYERS[track]={layers,tempos};
+  }
+}
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC,MUSIC_LAYERS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

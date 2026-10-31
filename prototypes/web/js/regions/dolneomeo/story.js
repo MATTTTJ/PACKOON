@@ -200,7 +200,6 @@ function nalTrade(id){
 /* ---------- 돌쇠 할배 (두더지 석수) ---------- */
 function talkDolsoe(){
   const F=G.f;
-  if(F.stackDone)grantDolsoeMask();
   if(!F.dolsoeMet){F.dolsoeMet=true;
     talk([['돌쇠 할배','누가 왔느냐. 이리 가까이 오너라.'],['돌쇠 할배','(돌을 쓰다듬던 할배가 얼굴을 가까이 댄다.\n눈을 가늘게 뜨고 들여다본다.)']],()=>{if(has('gyeolmyeongja'))dolsoeTea();});
     return;
@@ -249,107 +248,17 @@ function dolsoeGive(){
   }
 }
 
-/* 돌 쌓기: 흔들리는 돌탑이 가운데 설 때 돌을 얹는다. 세 개면 맷돌이 깨어난다 (임시 규칙) */
-const panel=el('div','forge');panel.id='stack';panel.hidden=true;
-panel.innerHTML='<h2>돌 쌓기 · 돌의 마음 읽기</h2><canvas id="stackCv" width="320" height="140" style="display:block;width:min(100%,360px);height:auto;margin:0 auto;image-rendering:pixelated;background:#efe3c8;border:2px solid var(--meok);border-radius:3px;touch-action:none"></canvas><div class="pips" id="spips"></div><div class="fhint" id="shint"></div><button class="btn primary strike" id="sstrike" type="button">돌 얹기 <kbd>Space · J</kbd></button>';
-$('shell').appendChild(panel);
-panel.insertBefore(el('p','fhint','붉은 꼭대기가 금빛 가운데에 오면 얹자. 세 개면 된다.'),$('spips'));
-$('shint').setAttribute('aria-live','polite');
-const st={phase:MG.stack_phase,hits:0,miss:0,cool:0,zone:MG.stack_zone,settle:0,land:0,edge:0,fall:null,warned:false,done:false};
-let stoneTask=null;
-const scv=$('stackCv'),sx=scv.getContext('2d');
-const sway=()=>Math.sin(st.phase);
-const stackAmp=()=>MG.stack_amplitude+st.hits*MG.stack_amplitude_gain;
-const stackAdvice={
-  start:['손끝에 힘 빼고 기다리거라.','돌도 숨을 고른단다. 천천히.','가운데 오면 살며시 놓거라.'],
-  good:['그래. 돌이 네 손을 아는구나.','잘 놓았다. 다음 것도 천천히 하거라.','허허. 제자리를 찾았구나.'],
-  danger:['기울어도 겁먹지 말거라.','가운데로 돌아올 때를 기다리거라.','손은 가만히 두거라. 돌이 온다.'],
-  edge:['허허, 버텼구나. 힘 빼거라.','돌도 놀랐겠구나. 괜찮다.','아슬아슬했어도 잘 섰구나.'],
-  miss:['괜찮다. 이 돌을 다시 얹어 보거라.','돌은 다치지 않았단다. 다시 놓거라.','서두를 것 없다. 다시 해 보거라.']
-};
-function stackSay(kind,extra=''){
-  $('shint').textContent=stoneTask?(stoneTask.steps[Math.min(st.hits,MG.stack_hits-1)]+(kind==='edge'?' · 살짝 고쳐 놓았다.':'')):'돌쇠 할배: “'+pick(stackAdvice[kind])+'”'+extra;
-}
+/* 돌 쌓기·돌 놓기: 할배 손을 따라 돌을 얹는다. 맷돌이 깨어난다. */
+// 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
 function openStack(task=null){
-  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
-  if(task){Sound.stone('tap');task.done();return;}
-  Object.assign(st,{hits:MG.stack_hits,miss:0,done:true});Sound.stone('tap');finishStack();return;
-  stoneTask=task;
-  panel.querySelector('h2').textContent=task?.title||'돌 쌓기 · 돌의 마음 읽기';
-  panel.querySelector('p.fhint').textContent=task?.hint||'붉은 꼭대기가 금빛 가운데에 오면 얹자. 세 개면 된다.';
-  $('sstrike').innerHTML=(task?.verb||'돌 얹기')+' <kbd>Space · J</kbd>';
-  Object.assign(st,{phase:MG.stack_phase,hits:0,miss:0,cool:0,zone:MG.stack_zone,settle:0,land:0,edge:0,fall:null,warned:false,done:false});
-  stackSay('start');panel.hidden=false;drawStack();
+  Sound.stone('tap');
+  if(task){task.done();return;}
+  finishStack();
 }
-// 같은 판정과 창을 짧은 공동 작업에도 쓴다. 작업 돌은 보따리 물건이 아니다.
 Rg.stoneTask=openStack;
-function stackStone(x,y,w,angle,color){
-  const c=sx;c.save();c.translate(Math.round(x),y+10);c.rotate(angle);
-  c.fillStyle=color;c.fillRect(-w/2,-10,w,12);c.fillStyle='rgba(255,255,255,.35)';c.fillRect(-w/2+2,-9,w-4,2);c.restore();
-}
-function drawStack(){
-  const c=sx,Wc=320,Hc=140,cx=Wc/2,base=Hc-16,amp=stackAmp();
-  c.fillStyle='#efe3c8';c.fillRect(0,0,Wc,Hc);
-  c.fillStyle='rgba(220,165,69,.35)';c.fillRect(cx-st.zone*amp,8,st.zone*amp*2,base-8);
-  c.fillStyle='#8a8680';c.fillRect(cx-46,base,92,10);c.fillStyle='#6a6660';c.fillRect(cx-46,base+8,92,2);
-  const recovery=st.settle/42;
-  const blend=st.settle?Math.max(0,1-st.settle/12):1;
-  const lean=st.land*(1-blend)+sway()*blend+Math.sin(st.settle*.45)*recovery*.12;
-  const n=st.hits+2;
-  for(let i=0;i<=n;i++){
-    const k=i/n,x=cx+lean*amp*k*k,y=base-12-i*14,w=40-i*3;
-    const tilt=i===n?st.edge*recovery*(.65+Math.sin(st.settle*.24)*.35):lean*k*.055;
-    stackStone(x,y-(i===n?recovery*6:0),w,tilt,i===n?'#b4432a':['#9a9690','#8a8680','#aeaaa4'][i%3]);
-  }
-  if(st.fall){const f=st.fall,t=f.age;stackStone(f.x+f.dir*t*2,f.y-t*1.6+t*t*.15,30,f.dir*t*.2,'#b4432a');}
-  if(stoneTask&&Rg.drawStoneTask)Rg.drawStoneTask(c,stoneTask,st);
-  // 꼭대기와 같은 비율의 금빛 범위와 바늘로 남은 여유를 보여 준다.
-  c.fillStyle='#c9b997';c.fillRect(80,5,160,3);c.fillStyle='#dca545';c.fillRect(cx-st.zone*80,4,st.zone*160,5);
-  c.fillStyle='#b4432a';c.fillRect(cx+lean*80-2,3,4,7);
-  c.fillStyle='#5a4030';c.font='10px sans-serif';c.textAlign='center';
-  c.fillText(st.settle?(st.edge?'삐걱… 버틴다!':'탁… 자리 잡는 중'):st.fall?'또 얹으면 된다':Math.abs(sway())<=st.zone?'지금, 살며시!':'가운데를 기다려',cx,23);
-  if(stoneTask){c.fillStyle='#5a4030';c.fillText(stoneTask.stones?.[Math.min(st.hits,MG.stack_hits-1)]||'함께 받치고 있으니 천천히 해도 돼.',cx,Hc-2);}
-  $('spips').innerHTML=Array.from({length:MG.stack_hits},(_,i)=>'<span class="pip'+(i<st.hits?' on':'')+'"></span>').join('');
-  $('sstrike').disabled=st.cool>0||st.done;
-}
-function stackStep(){
-  if(panel.hidden||st.done)return;
-  if(st.cool>0)st.cool--;
-  st.phase+=MG.stack_speed+st.hits*MG.stack_speed_gain;
-  if(st.settle>0){
-    st.settle--;
-    if(st.settle===0){
-      if(st.hits>=MG.stack_hits){st.done=true;if(stoneTask){const done=stoneTask.done;stoneTask=null;panel.hidden=true;done();}else finishStack();return;}
-      stackSay(st.edge?'edge':'good');
-    }
-  }
-  if(st.fall&&++st.fall.age>=24)st.fall=null;
-  // 한 단계에서 한 번만 훈수해 성공/실패 대사를 곧바로 덮지 않는다.
-  if(!st.cool&&!st.fall&&!st.warned&&Math.abs(sway())>MG.stack_warning){st.warned=true;stackSay('danger');}
-  drawStack();
-}
-function stackHit(){
-  if(panel.hidden||st.cool>0||st.hits>=MG.stack_hits||st.done)return;
-  const lean=sway(),distance=Math.abs(lean);
-  if(distance<=st.zone||stoneTask){
-    st.land=lean;
-    st.edge=distance>=st.zone*MG.stack_edge_ratio?Math.sign(lean)*MG.stack_edge_lean:0;
-    st.hits++;st.settle=st.edge?MG.stack_edge_wait:MG.stack_hit_wait;st.cool=st.settle;st.warned=false;
-    stackSay(st.edge?'edge':'good');Sound.stone(st.edge?'edge':'tap');
-  }else{
-    const n=st.hits+2;st.fall={x:160+lean*stackAmp(),y:124-12-n*14,dir:Math.sign(lean),age:0};
-    st.miss++;st.cool=MG.stack_miss_wait;st.warned=true;Sound.stone('fall');
-    if(st.miss>=MG.stack_help_misses)st.zone=MG.stack_help_zone;
-    stackSay('miss',st.miss>=MG.stack_help_misses?' 금빛 가운데가 넓어졌다.':'');
-  }
-  drawStack();
-}
-$('sstrike').addEventListener('pointerdown',e=>{e.preventDefault();stackHit();});
-scv.addEventListener('pointerdown',e=>{e.preventDefault();stackHit();});
-defineMinigame({id:'stack',step:stackStep,hit:stackHit});
 function finishStack(){
-  panel.hidden=true;const F=G.f;const perfect=st.miss===0;
-  F.stackDone=true;awaken('maetdol');learn('dolsoe:stack');ledgerDone('dolsoe');rel('dolsoe',perfect?MG.stack_perfect_relation:MG.stack_relation);
+  const F=G.f;
+  F.stackDone=true;awaken('maetdol');learn('dolsoe:stack');ledgerDone('dolsoe');rel('dolsoe',MG.handwork_stack_relation);
   clue('s1','돌쇠 할배','돌쇠 할배가 지난가을 아빠에게 읽어 준 약연의 글자는 “되돌림”이었다. 아빠는 그날 밤 떠났다.');
   diary('d_maetdol','돌탑에 돌 세 개를 얹었다. 그 순간 보따리 속 맷돌에서 우웅, 낮은 소리가 났다. 증조할아버지의 맷돌이 깨어났다.');
   toast('증조할아버지의 맷돌이 깨어났다! 메밀 3 → 메밀가루 1');refreshHud();
@@ -358,7 +267,7 @@ function finishStack(){
     ['돌쇠 할배','(할배가 보따리 속 약연 바퀴를 손끝으로 짚는다.)'],
     ['돌쇠 할배','이 글자… 지난가을 네 아비가 돌에 새겨 와 묻던 거다.'],
     ['돌쇠 할배','“되돌림.” 그렇게 읽어 줬더니 그날 밤 떠났단다.']
-  ]:[['너구리','(할배 손을 따라 돌탑에 돌 세 개를 얹었다.)'],['돌쇠 할배',perfect?'하나도 안 떨어뜨렸구나. 네 아비보다 낫다.':'됐다. 돌이 네 손을 알아보았구나.'],
+  ]:[['너구리','(할배 손을 따라 돌탑에 돌 세 개를 얹었다.)'],['돌쇠 할배','하나도 안 떨어뜨렸구나. 네 아비보다 낫다.'],
     ['너구리','(맷돌이 따뜻하네! 이제 메밀을 갈아 보자.)'],
     ['돌쇠 할배','네 아비도 지난가을 여기 왔었지.\n약연 글자를 돌에 옮겨 새겨 와서 읽어 달라더구나.'],
     ['돌쇠 할배','글자 하나만 읽어 주었단다. “되돌림.”'],
@@ -367,17 +276,7 @@ function finishStack(){
     diary('d_stone','돌쇠 할배가 아빠의 돌을 내주었다. 아빠가 성황당에 올리려다 끝내 못 올린 소원 돌이다.');
     if(Rg.arcs())lines.push(['돌쇠 할배','네 아비가 못 올린 소원 돌이다. 받아 두거라.'],['돌쇠 할배','성황당에 대신 올려 주겠느냐.']);
     else lines.push(['돌쇠 할배','참, 이 돌도 가져가거라.'],['돌쇠 할배','네 아비가 소원을 적은 돌이란다.\n성황당에 올리려다 끝내 못 올리고 두고 갔지.'],['돌쇠 할배','네가 대신 올려 주려무나.']);}
-  grantDolsoeMask(lines);
   talk(lines);
-}
-function grantDolsoeMask(lines){
-  // 전투 탈은 유씨 집안 잎사귀 변신으로 바뀌었다 (PA-47). 돌쇠 할배는 더 이상 각시탈을 주지 않는다.
-  return;
-  if(G.rel.dolsoe.v<2||G.f.dolGaksiGiven)return;
-  if(typeof grantMask!=='function'){G.f.dolGaksiPending=true;return;}
-  grantMask('gaksi');G.f.dolGaksiGiven=true;delete G.f.dolGaksiPending;
-  if(lines)lines.push(['돌쇠 할배','네 손을 믿으마. 이 각시탈도 받아라.\n넓게 짚되, 서두르지 않는 손이란다.']);
-  diary('dol_gaksi','돌쇠 할배가 손을 믿는다며 각시탈을 내주었다.');
 }
 
 /* ---------- 뿔이 (산양 장승지기): 원칙대로 메밀가루를 받아야 길을 연다 ---------- */
@@ -462,7 +361,7 @@ Rg.finishHomeDelivery=()=>{
   if(!G.f.dolHomeSent&&typeof sendHomeGift==='function'){sendHomeGift('dolneomeo','darae_yak');G.f.dolHomeSent=true;}
   // 공통 함수가 물건을 소비하는 버전과 기록만 남기는 버전 모두 한 통만 보낸다.
   if((G.inv.darae_yak||0)===before&&before>0)takeItem('darae_yak',1);
-  diary('dol_home_reply',Rg.homeReply);endGame();
+  diary('dol_home_reply',Rg.homeReplyText);endGame();
 };
 
 /* ---------- NPC (npcs.csv 의 id). x 는 필드 위치 ---------- */

@@ -9,7 +9,6 @@ const night=()=>G.f.night;
 const originalStart=Rg.onStart;
 Rg.onStart=()=>{
   originalStart();
-  if((G.f.jxChoraengiEarned||G.f.yeotHigh)&&typeof grantMask==='function')grantMask('choraengi');
   if(typeof grantNickname==='function'){
     if(G.f.jxKiteDone)grantNickname('jangteo_kite','연 건지는 손','연 아이');
     if(G.f.jxYutReward)grantNickname('jangteo_yut','한판 벗','윷놀이 노인들');
@@ -87,45 +86,8 @@ function makePanel(id,title,btn){
   $('shell').appendChild(p);return p;
 }
 
-/* 짧은 손일은 채집의 바늘·판정 폭을 그대로 쓴다. 빗나가도 일을 마치며 물건은 쓰지 않는다. */
-const handP=makePanel('jangteoHands','장터의 손일','손 맞추기');
-// 새 지역 활동 창만 화면 안에 둔다. 작은 횡화면에 본문·버튼이 잘리지 않게 한다.
-Object.assign(handP.style,{position:'fixed',left:'50%',right:'auto',top:'50%',bottom:'auto',transform:'translate(-50%,-50%)',width:'min(92vw,760px)',maxHeight:'92dvh',overflowY:'auto',boxSizing:'border-box',zIndex:'22'});
-const hand={pos:0,dir:1,part:0,cool:0,kind:null,after:null};
-const handJobs={
-  kite:['아이와 연줄 감기',['꼬리 펴기','줄 감기','매듭 묶기']],
-  snow:['새끼 멧돼지와 잠자리 치우기',['가지 들어 주기','쌓인 눈 털기','마른 풀 펴기']],
-  lantern:['까치와 등불 달기',['심지 바로 세우기','등줄 묶기','불씨 옮기기']]
-};
-function drawHands(){
-  const c=$('jangteoHandsCv').getContext('2d'),start=MG.gather_zone_start+hand.part*MG.gather_root_width;
-  c.fillStyle='#efe3c8';c.fillRect(0,0,320,120);c.fillStyle='#7b6550';c.fillRect(24,57,272,16);
-  c.fillStyle='#b79044';c.fillRect(24+start*2.72,57,MG.gather_root_width*2.72,16);
-  c.fillStyle='#fff9df';c.fillRect(24+hand.pos*2.72,48,3,34);
-  c.fillStyle='#3b3027';c.font='14px sans-serif';c.fillText(handJobs[hand.kind][1][hand.part],24,30);
-  $('jangteoHandsPips').textContent=(hand.part+1)+' / '+handJobs[hand.kind][1].length+' · 금빛 칸에서 살짝';
-}
-Rg.handWork=(kind,after)=>{
-  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
-  Sound.gather(true);if(after)after();return;
-  Object.assign(hand,{pos:0,dir:1,part:0,cool:0,kind,after});
-  handP.querySelector('h2').textContent=handJobs[kind][0];handP.hidden=false;
-  $('jangteoHandsHint').textContent='Space · J 또는 손 맞추기 버튼. 늦어도 같이 마칠 수 있어.';drawHands();
-};
-function handHit(){
-  if(handP.hidden||hand.cool)return;
-  const start=MG.gather_zone_start+hand.part*MG.gather_root_width;
-  const good=hand.pos>=start&&hand.pos<=start+MG.gather_root_width;
-  Sound.gather(good);hand.cool=MG.gather_cooldown;hand.part++;
-  if(hand.part===handJobs[hand.kind][1].length){handP.hidden=true;const after=hand.after;hand.after=null;if(after)after();return;}
-  $('jangteoHandsHint').textContent=good?'손이 딱 맞았다. 다음 것도 같이 하자.':'조금 늦었네. 옆에서 받쳐 줘서 마쳤다. 다음 걸 해 보자.';
-  hand.pos=0;hand.dir=1;drawHands();
-}
-$('jangteoHandsBtn').addEventListener('pointerdown',e=>{e.preventDefault();handHit();});
-defineMinigame({id:'jangteoHands',hit:handHit,step(){
-  if(hand.cool)hand.cool--;if(!Vfx.reducedMotion){hand.pos+=hand.dir*MG.gather_root_speed;if(hand.pos>=100||hand.pos<=0)hand.dir*=-1;}
-  drawHands();
-}});
+// 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
+Rg.handWork=(kind,after)=>{Sound.gather(true);if(after)after();};
 
 /* 장날 네 말 윷. 판·업기·잡기는 지역 규칙이다.
    던진 뒤 옮기고, 윷·모 또는 잡기면 다시 던진다. 빽도는 쓰지 않는다.
@@ -346,94 +308,12 @@ Rg.lanternAction=id=>{
 };
 
 /* ---------- 모락 (반달가슴곰 떡집): 김 올리기 ---------- */
-/* 김 올리기 (제안): 금빛 칸 누적 5초. 위태로워도 3초간 회복할 수 있고 쌓인 시간은 깎이지 않는다.
-   후반 외풍은 한 번만. 실패는 같은 키/버튼으로 재시작하며 물건·호감·진행 보상 규칙은 그대로 둔다. */
-const steamP=makePanel('steam','떡집 아궁이 · 김 올리기','부채질');
-const sm={fire:0,steam:0,prog:0,band:[MG.steam_band_min,MG.steam_band_max],cool:0,t:0,danger:0,close:false,
-  state:'playing',wind:0,windDone:false,voice:'',voiceCool:0,lastLine:''};
-const scv=$('steamCv'),sx=scv.getContext('2d');
-const steamLines={
-  start:['자, 부채질은 조금씩! 김부터 보자!','허허, 바빠도 불은 살살 다뤄야지!','떡은 김이 반이지! 자, 부쳐 봐!'],
-  good:['허허, 김 한번 곱게 오른다!','그래, 그래! 그 김이면 떡도 잘 익지!','좋다! 대목에 든든한 일손 생겼네!'],
-  high:['어이쿠, 뚜껑 뜬다! 부채 내려놓자!','김 넘치겠다! 부채질 잠깐 쉬자!','그만 부쳐도 되겠다! 김 좀 빠지게 두자!'],
-  low:['불씨 잦아든다! 한 번만 부쳐 보자!','어이쿠, 아궁이 식겠다! 조금만 부쳐 봐!','불씨부터 살리자! 조금씩 부치면 돼!'],
-  wind:['외풍이다! 불씨 꺼지나 잘 보자!','찬바람 드네! 불씨 살리게 조금만 부쳐 봐!'],
-  fail:['괜찮아! 불이야 다시 지피면 되지!','허허, 다시 해 보자! 불씨는 내가 챙길게!','쌀가루는 더 안 들어! 마음 놓고 다시 해 보자!'],
-  close:['허허, 꺼질 뻔한 불씨를 살렸네! 제법이야!','어이쿠, 아슬아슬했다! 그래도 김은 잘 올렸네!'],
-  success:['허허, 이 김이면 떡도 속까지 잘 익지!','좋다! 이제 떡집 일손 다 됐네!']
-};
-function steamSay(kind){
-  if(sm.voice===kind&&sm.voiceCool>0)return;
-  if(sm.voiceCool>0&&kind==='good')return;
-  const choices=steamLines[kind].filter(s=>s!==sm.lastLine);
-  sm.lastLine=choices[Math.floor(Math.random()*choices.length)];sm.voice=kind;sm.voiceCool=MG.steam_voice_cooldown;
-  $('steamHint').textContent='모락: “'+sm.lastLine+'”';
-}
-function openSteam(){
-  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
-  steamP.hidden=false;finishSteam();return;
-  Object.assign(sm,{fire:MG.steam_fire_start,steam:0,prog:0,cool:0,t:0,danger:0,close:false,state:'playing',wind:0,windDone:false,voice:'',voiceCool:0});
-  $('steamBtn').innerHTML='부채질 <kbd>Space · J</kbd>';
-  $('steamPips').textContent='금빛 칸에 모두 '+(MG.steam_target_frames/60)+'초 · 칸 밖에서도 쌓인 시간은 그대로';
-  steamP.hidden=false;steamSay('start');drawSteam();
-}
-function drawSteam(){
-  const c=sx,Wc=320,Hc=120;c.fillStyle='#efe3c8';c.fillRect(0,0,Wc,Hc);
-  // 아궁이와 불
-  c.fillStyle='#6e5b4b';c.fillRect(20,60,90,50);c.fillStyle='#2a1a10';c.fillRect(36,78,58,32);
-  const fh=sm.fire*0.3;for(let i=0;i<5;i++){c.fillStyle=['#ff7b2e','#ffb347','#e8551f'][(i+Math.floor(sm.t/5))%3];c.fillRect(40+i*11,110-fh-((i*7)%5),8,fh);}
-  // 시루와 김
-  c.fillStyle='#9b5b3a';c.fillRect(30,40,70,22);c.fillStyle='#e6b54a';c.fillRect(28,38,74,4);
-  const lift=sm.steam>80?Math.abs(Math.sin(sm.t*0.5))*((sm.steam-80)/3):0;
-  c.fillStyle='#6e4630';c.fillRect(27,33-lift,76,5);c.fillRect(59,29-lift,12,4);
-  const n=Math.floor(sm.steam/10);for(let i=0;i<n;i++){const k=(sm.t*(sm.steam>80?1.6:0.8)+i*14)%40;c.fillStyle='rgba(255,255,255,'+(0.8-k/60).toFixed(2)+')';c.fillRect(32+((i*13)%66)+Math.sin((sm.t+i*30)*0.05)*4+(sm.wind? k*0.5:0),30-k,sm.steam>80?12:8,5);}
-  if(sm.wind){c.fillStyle='#839da2';for(let i=0;i<3;i++)c.fillRect((sm.t*3+i*38)%115,50+i*9,18,1);}
-  // 김 막대
-  const bx=140,bw=160,by=30;c.fillStyle='#3a2a20';c.fillRect(bx,by,bw,16);c.fillStyle='rgba(220,165,69,.7)';c.fillRect(bx+bw*sm.band[0]/100,by,bw*(sm.band[1]-sm.band[0])/100,16);
-  c.fillStyle='#f4efe4';c.fillRect(bx+bw*Math.min(100,sm.steam)/100-2,by-4,4,24);
-  c.fillStyle='#2a2019';c.font='12px "Gowun Dodum", sans-serif';c.fillText(sm.wind?'김 · 외풍!':'김 · 금빛 칸에 맞추기',bx,by-8);
-  // 데워진 정도
-  c.fillStyle='#d8c9a6';c.fillRect(bx,60,bw,10);c.fillStyle='#b7852f';c.fillRect(bx,60,bw*sm.prog/MG.steam_max,10);c.fillStyle='#2a2019';c.fillText('고른 김 '+(sm.prog/(MG.steam_max/(MG.steam_target_frames/60))).toFixed(1)+' / '+(MG.steam_target_frames/60)+'초',bx,86);
-  c.fillStyle='#d8c9a6';c.fillRect(bx,94,bw,5);c.fillStyle=sm.danger>MG.steam_close_at?'#b4432a':'#71824e';c.fillRect(bx,94,bw*(1-sm.danger/MG.steam_danger_limit),5);
-  c.fillStyle='#2a2019';c.fillText(sm.state==='failed'?'다시 해 보자!':sm.danger?'불·김 회복 여유':'불씨 '+Math.round(sm.fire)+' · 남은 '+Math.ceil((MG.steam_time_limit-sm.t)/60)+'초',bx,115);
-}
-function steamStep(){
-  if(steamP.hidden||sm.state!=='playing')return;
-  sm.t++;if(sm.voiceCool>0)sm.voiceCool--;
-  if(!sm.windDone&&sm.prog>=MG.steam_wind_at){sm.windDone=true;sm.wind=MG.steam_wind_frames;steamSay('wind');}
-  sm.fire=Math.max(0,sm.fire-MG.steam_fire_decay-(sm.wind?MG.steam_wind_decay:0));sm.steam+=(sm.fire-sm.steam)*MG.steam_steam_follow;
-  if(sm.wind>0)sm.wind--;if(sm.cool>0)sm.cool--;
-  const inBand=sm.steam>=sm.band[0]&&sm.steam<=sm.band[1];
-  const danger=sm.steam>MG.steam_danger_steam||(sm.t>MG.steam_low_grace&&sm.fire<MG.steam_danger_fire);
-  sm.danger=Math.max(0,Math.min(MG.steam_danger_limit,sm.danger+(danger?1:-MG.steam_danger_recovery)));if(sm.danger>MG.steam_close_at)sm.close=true;
-  if(inBand)sm.prog=Math.min(MG.steam_max,sm.prog+MG.steam_max/MG.steam_target_frames);
-  if(sm.prog>=MG.steam_max){
-    sm.state='won';sm.cool=0;steamSay(sm.close?'close':'success');$('steamPips').textContent='금빛 칸 '+(MG.steam_target_frames/60)+'초 완료!';
-    // 프레임으로 마무리를 기다려 재시작 뒤에 이전 판 타이머가 남지 않게 한다.
-  }else if(sm.danger>=MG.steam_danger_limit||sm.t>=MG.steam_time_limit){
-    sm.state='failed';steamSay('fail');$('steamPips').textContent='물건·호감은 그대로 · 부채질 버튼으로 바로 다시 하기';
-    $('steamBtn').innerHTML='다시 불 지피기 <kbd>Space · J</kbd>';
-  }else if(!sm.wind){
-    if(sm.steam>MG.steam_high_steam||sm.fire>MG.steam_high_fire)steamSay('high');
-    else if(sm.t>MG.steam_low_hint_after&&sm.fire<MG.steam_low_fire)steamSay('low');
-    else if(inBand)steamSay('good');
-  }
-  if(sm.t%36===0&&sm.steam>40)Sound.steam(sm.steam>MG.steam_high_steam?'lid':'bubble');
-  drawSteam();
-}
-function steamHit(){
-  if(steamP.hidden)return;
-  if(sm.state==='failed'){openSteam();Sound.steam('fan');return;}
-  if(sm.state!=='playing'||sm.cool>0)return;
-  sm.cool=MG.steam_fan_cooldown;sm.fire=Math.min(MG.steam_max,sm.fire+MG.steam_fan_power);Sound.steam('fan');
-}
-$('steamBtn').addEventListener('pointerdown',e=>{e.preventDefault();steamHit();});scv.addEventListener('pointerdown',e=>{e.preventDefault();steamHit();});
-defineMinigame({id:'steam',step:()=>{
-  if(sm.state==='won'){sm.cool++;if(sm.cool>=MG.steam_finish_wait)finishSteam();return;}steamStep();
-},hit:steamHit});
+/* 김 올리기: 모락 곁에서 아궁이 김을 올린다. 시루가 깨어난다. */
+// 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
+function openSteam(){Sound.steam?.('fan');finishSteam();}
 function finishSteam(){
-  if(steamP.hidden)return;steamP.hidden=true;const F=G.f;
-  F.steamDone=true;awaken('siru');ledgerDone('morak');rel('morak',MG.steam_relation);learn('morak:steam');
+  const F=G.f;if(F.steamDone)return;
+  F.steamDone=true;awaken('siru');ledgerDone('morak');rel('morak',MG.handwork_steam_relation);learn('morak:steam');
   diary('j_siru','모락에게 김 올리는 법을 배웠다. 보따리 속 시루에 처음으로 김이 서렸다. 잔칫날의 시루가 깨어났다.');
   toast('잔칫날의 시루가 깨어났다! 쌀가루 2 + 팥 1 → 팥시루떡');refreshHud();
   const lines=[['모락','옳지, 바로 그거야! 떡은 김이 반이지!'],['너구리','시루가 따뜻해졌어. 이제 떡을 찔 수 있겠다!']];
@@ -612,7 +492,7 @@ function finishRhythm(){
   if(rh.reward){F.yeotDone=true;ledgerDone('yeotbang');addItem('ssal',8);
     lines.push(['엿방울',high?'얼쑤, 장단 좀 아는걸? 흥이 제법 나네!':'흥은 좀 덜 났지만, 쌀 준다는 말은 안 바꾸지!'],['엿방울','자, 엿 고고 남은 쌀 여덟 되! 이건 약속한 네 몫이야.']);}
   rel('yeotbang',high?MG.rhythm_high_relation:MG.rhythm_relation);
-  if(high){F.jxChoraengiEarned=true;if(typeof grantMask==='function')grantMask('choraengi');}
+  if(high)F.jxChoraengiEarned=true;
   if(Rg.arcs()){
     if(!F.jangteoArcsYeot1){
       F.jangteoArcsYeot1=true;diary('jangteoArcsYeot1','엿방울의 장단에 맞췄다. 빌린 가위라 손에 덜 익는다고 했다. 쌀 여덟 되는 그대로 받았다.');
@@ -819,14 +699,18 @@ Rg.startDokkaebi=()=>{
 };
 
 /* ---------- 끝: 홍시 약떡을 까치 편에 보내기 ---------- */
-Rg.homeReply='한참 뒤, 까치가 빈 떡보자기를 물고 돌아왔다. 엄마가 빨아 갠 보자기에는 말린 감 꼭지 하나가 싸여 있었다. 까치는 엄마처럼 날개를 볼에 대고 고개를 끄덕였다.';
+// 결정 D-89: 까치 답장은 아이가 본 것을 지문으로 쓴다.
+Rg.homeReplyText='한참 뒤, 까치가 빈 떡보자기를 물고 돌아왔다. 엄마가 빨아 갠 보자기에는 말린 감 꼭지 하나가 싸여 있었다. 까치는 엄마처럼 날개를 볼에 대고 고개를 끄덕였다.';
+Rg.homeReply=[['너구리','(한참 뒤, 까치가 빈 떡보자기를 물고 돌아왔다.)'],
+  ['너구리','(엄마가 빨아 갠 보자기에 말린 감 꼭지가 싸여 있다.)'],
+  ['너구리','(까치가 엄마처럼 날개를 볼에 대고 고개를 끄덕인다.)']];
 function handMedicineToMagpie(){
   const before=G.inv.hongsi_tteok||0;
   if(typeof sendHomeGift==='function')sendHomeGift('jangteo','hongsi_tteok');
   // 공통 연결이 없거나 선택 가공품을 먼저 보낸 경우에도 필수 약떡은 보낸다.
   if((G.inv.hongsi_tteok||0)===before)takeItem('hongsi_tteok',1);
   learn('home:jangteo',true);
-  diary('jx_home_reply',Rg.homeReply);
+  diary('jx_home_reply',Rg.homeReplyText);
 }
 Rg.sendMedicine=()=>{
   if(regionCompleted(Rg.id))return;

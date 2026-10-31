@@ -531,7 +531,7 @@ Rg.goal=()=>{
   if(!G.started)return '';
   if(G.ended)return '너구리 보부상 · 끝';
   // 결정 D-67: 앞선 진행부터 거꾸로 본다. 산양·부엉이로 호숫가에 먼저 닿아도 지금 할 일이 나온다.
-  if(F.yakDone)return '봄길과 약연 가공을 더 둘러보자 · 다 되면 아빠나 산군 할아버지께 말씀드리고 집으로';
+  if(F.yakDone)return '되돌림 약을 안고 아빠와 집으로 가자 · 아빠나 산군 할아버지께 말씀드리면 떠난다';
   if(F.nameGiven)return '아빠와 손을 포개 약연을 굴리자';
   if(F.fruitGot)return '산군 할아버지께 셈하러 가자';
   if(G.boss.dead)return '신목에서 전설의 열매를 따자';
