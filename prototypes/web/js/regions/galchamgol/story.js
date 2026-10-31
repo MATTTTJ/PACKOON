@@ -104,6 +104,13 @@ function nalMenu(){
   if(!CLASSIC){
     c.push({t:G.f.craftTrade_salt?'바꿔 간 소금 이야기':G.f.nalBasketSeen?'바구니 테 감을 칡 줄기 이야기':'지게 바구니 테가 풀린 걸 알려 준다',go:nalCraftSalt});
   }
+  // 결정 D-117: 단풍골 날쌘 사연(값은 길이 정한다 → 모자 챙 → 먼저 떠남). 영산 고백(D-03)의 복선이다.
+  if(Rg.arcsEnabled()){
+    const F=G.f;
+    if(F.nalDone&&!F.galArcNal2)c.push({t:'숯값은 누가 정하는지 묻는다',go:nalRoute});
+    else if(F.galArcNal2&&F.musoeDone&&!F.galArcNal3)c.push({t:'모자를 왜 자꾸 보는지 묻는다',go:nalHat});
+    else if(F.galArcNal3&&G.diary.some(d=>d.id==='end')&&!F.galArcNal4)c.push({t:'지게를 꾸리는 까닭을 묻는다',go:nalAhead});
+  }
   c.push({t:'그만두기',go:null});
   talk([['날쌘',G.f.nalDone?'또 뭐야? 볼일 끝났으면 길 좀 비켜.':'그래서, 뭘 내놓을 건데?',c]]);
 }
@@ -125,6 +132,48 @@ function nalTrade(){
     return;
   }
   talk(extra?[['날쌘','봐, 이게 제대로 된 숯이야. 하나 더 얹어 줄 테니 써 봐.'],['날쌘','써 보고도 촌구석 소리가 나오나 보자고.']]:[['날쌘','자, 숯 하나. 딱 맞게 바꾼 거야.'],['날쌘','무쇠 아저씨한테 줄 거야? 그 양반, 여간 까다로운 게 아닌데.']]);
+}
+function nalRoute(){
+  arcScene('galArcNal2',[['너구리','숯 하나에 가루랑 뿌리 둘이요?\n숯이 더 비싸요?'],
+    ['날쌘','단풍골엔 참나무가 흔해. 숯도 흔하지.\n가루는 품이 들고.'],
+    ['날쌘','같은 숯도 돌너머 가면 값이 달라.\n돌투성이라 나무가 귀하거든.'],
+    ['너구리','그럼 북쪽에 가져가면 더 쳐줘요?'],
+    ['날쌘','이제 좀 보부상 같은 소리 하네.'],
+    ['날쌘','값은 물건이 정하는 게 아니야.\n길이 정해.'],
+    ['날쌘','…하나 더. 칡꽃은 북쪽에선 못 봐.\n돌너머 사람들은 꽃 냄새를 귀하게 쳐.'],
+    ['너구리','그걸 왜 알려 줘요?'],
+    ['날쌘','공짜 아니야. 적어 둬.\n나중에 받을 거니까.'],
+    ['너구리','(수첩에 “값은 길이 정한다”고 적었다.)'],
+    ['날쌘','…진짜 적네.']],
+    '날쌘에게 숯값 셈을 물었다. 값은 물건이 아니라 길이 정한다고 했다. 북쪽 돌너머에선 칡꽃이 귀하다고 귀띔하고는, 공짜가 아니니 나중에 받겠다고 했다.',
+    ()=>learn('nal:route-price'));
+}
+function nalHat(){
+  const tip=G.boss.dead?['날쌘','칡도 풀었다며.\n…소문 한번 빠르네, 이 동네.']:['날쌘','덩굴 치러 가거든 서두르지 마.\n칡은 급하게 당기면 더 감겨.'];
+  arcScene('galArcNal3',[['너구리','아저씨, 아까부터 제 모자 봐요.'],
+    ['날쌘','누가? 지게 끈 보고 있었어.'],
+    ['너구리','아빠 모자예요. 엄마가 씌워 줬어요.\n길에서 누가 알아볼지도 모른다고.'],
+    ['날쌘','(날쌘이 한동안 아무 말도 하지 않는다.)'],
+    ['날쌘','…챙이 꺾였잖아. 이리 와 봐.'],
+    ['너구리','(날쌘이 모자를 벗겨 챙을 손바닥으로 편다.\n그리고 도로 씌워 준다.)'],
+    ['날쌘','보부상은 모자부터 바로 써.\n비 오면 챙이 얼굴을 막아 줘.'],
+    ['너구리','아빠도 비 오는 날 그 말 했어요.'],
+    ['날쌘','흔한 말이야. 보부상이면 다 해.'],tip],
+    '날쌘이 꺾인 모자 챙을 펴서 도로 씌워 주었다. 엄마가 씌워 준 아빠 모자라고 하자 한동안 말이 없었다. 아빠가 하던 말과 같은 말을 하고는, 흔한 말이라고 했다.',
+    ()=>learn('nal:hat'));
+}
+function nalAhead(){
+  arcScene('galArcNal4',[['날쌘','(날쌘이 좌판을 걷어 지게에 묶고 있다.)'],
+    ['너구리','어디 가요?'],
+    ['날쌘','북쪽. 날 밝으면 먼저 떠.\n첫눈 오기 전에 고개를 넘어야 하거든.'],
+    ['너구리','저도 북쪽 가요. 같이 가요.'],
+    ['날쌘','보부상은 혼자 다녀.\n짐 나눠 지면 셈이 꼬여.'],
+    ['날쌘','돌너머 어귀에 좌판 펴고 있을지도 모르지.\n그건 그때 가 봐야 알고.'],
+    ['너구리','그럼 거기서 봬요.'],
+    ['날쌘','칡꽃 챙겼어? 빈손으로 오면 흥정 안 해.'],
+    ['날쌘','이건… 남은 주먹밥이야. 상하기 전에 먹어.\n버리기 아까워서 주는 거야.']],
+    '날쌘이 좌판을 걷고 있었다. 날 밝으면 먼저 북쪽으로 간다고 했다. 같이 가자니 보부상은 혼자 다닌다면서, 돌너머 어귀에 있을지도 모른다고 했다. 남은 주먹밥이라며 하나를 줬다.',
+    ()=>addItem('rice',1));
 }
 function nalYakyeon(){
   learn('nal:yakyeon');
@@ -163,6 +212,10 @@ function talkMusoe(){
   const F=G.f,c=[{t:F.musoeDone?'낫 이야기하기':'낫과 시험 이야기하기',go:musoeMain}];
   if((F.musoeTested||F.musoeDone)&&!F.galArcMusoe2)c.push({t:'아빠가 낫을 맡기던 날을 묻는다',go:musoeNight});
   if(F.galArcMusoe2&&!F.galArcMusoe3&&F.musoeDone)c.push({t:'낫 자루가 왜 이렇게 닳았는지 묻는다',go:musoeOldHandle});
+  // 결정 D-117: "너는 살펴라"(galArcMusoe3)를 아이가 그대로 지킨다. 삼촌 다리 → 할멈의 칡뿌리 찜질 → 낫을 다시 세움.
+  if(F.galArcMusoe3&&!F.galArcMusoeLeg1)c.push({t:'삼촌 다리를 살핀다',go:musoeLeg});
+  if(F.galArcMusoeLeg1&&F.galPoultice&&!F.galArcMusoeLeg3)c.push({t:'칡뿌리 찜질을 건넨다',go:musoeLegWrap});
+  if(F.galArcMusoeLeg3&&!F.galArcMusoeBye&&G.diary.some(d=>d.id==='end'))c.push({t:'떠난다고 인사한다',go:musoeBye});
   if(c.length===1){musoeMain();return;}
   c.push({t:'다음에 올게요',go:null});
   talk([['무쇠','무슨 일이냐.',c]]);
@@ -182,6 +235,74 @@ function musoeOldHandle(){
     ['너구리','…다리, 지금도 아파요?'],['무쇠','형은 앞만 봤다.\n너는 살펴라.']],
     '아빠 낫 자루가 손 모양대로 닳아 있었다. 젊을 때부터 쓰던 낫이란다. 삼촌은 그 길에 아빠와 같이 갔다가 다리를 다쳤다고 한다.');
 }
+function musoeLeg(){
+  arcScene('galArcMusoeLeg1',[['너구리','(삼촌이 모루에 기대 무릎을 주무르고 있다.)'],
+    ['무쇠','뭘 보냐.'],
+    ['너구리','다리 또 아파요?'],
+    ['무쇠','비 오기 전엔 쑤신다. 그뿐이다.'],
+    ['너구리','살피라고 했잖아요. 삼촌이.'],
+    ['무쇠','…그 말을 거기다 쓰냐.'],
+    ['무쇠','약 같은 건 됐다.\n할멈한테 가서 쓸데없는 소리 마라.'],
+    ['너구리','(…할머니한테 여쭤봐야겠다.)']],
+    '삼촌이 모루에 기대 무릎을 주물렀다. 비 오기 전엔 쑤신다고만 했다. 할멈한테 쓸데없는 소리 말라길래, 할머니께 여쭤보기로 했다.');
+}
+function musoeLegWrap(){
+  if(!G.f.galPoultice)return;
+  const sharp=G.sharp;
+  arcScene('galArcMusoeLeg3',[['너구리','할머니가 칡뿌리 찜질을 싸 주셨어요.'],
+    ['무쇠','…누가 할멈한테 가랬냐.'],
+    ['너구리','가지 말라고만 하셨어요.'],
+    ['무쇠','(삼촌이 한참 보다가, 말없이 받아 무릎에 감는다.)'],
+    ['무쇠','…따뜻하군.'],
+    ['무쇠','형도 그랬다.\n제 발은 터져도 남 다리만 봤다.'],
+    ['무쇠','그 낫 이리 줘 봐라.'],
+    ['무쇠','(삼촌이 숫돌에 낫을 몇 번 문지른다.)'],
+    ...(sharp?[['무쇠','날은 멀쩡하다. 기름이나 먹여 두마.'],['너구리','고맙습니다, 삼촌.'],['무쇠','고맙긴. 손이 심심해서 그런다.']]
+      :[['무쇠','날이 불량이다. 이제 좀 쓸 만하군.'],['너구리','고맙습니다, 삼촌.'],['무쇠','고맙긴. 불량품 고친 거다.']])],
+    '할머니가 싸 준 칡뿌리 찜질을 삼촌께 갖다 드렸다. 삼촌은 말없이 무릎에 감고 따뜻하다고 했다. 아빠도 제 발은 터져도 남 다리만 봤다고. 그러고는 낫 날을 다시 세워 주었다.',
+    ()=>{G.sharp=true;learn('musoe:leg');refreshHud();});
+}
+function musoeBye(){
+  arcScene('galArcMusoeBye',[['무쇠','(삼촌이 대장간 문턱까지 나와 서 있다.)'],
+    ['너구리','삼촌, 다리는요?'],
+    ['무쇠','찜질 덕에 오늘은 덜 쑤신다.'],
+    ['무쇠','…문턱까지는 나올 만하군.'],
+    ['너구리','돌아올 때 할머니 찜질 또 갖다 드릴게요.'],
+    ['무쇠','필요 없다.'],
+    ['무쇠','…칡뿌리는 굵은 걸로 가져와라.'],
+    ['너구리','(삼촌이 처음으로 손을 들어 흔들었다.)']],
+    '떠나는 날 삼촌이 대장간 문턱까지 나와 있었다. 찜질 덕에 덜 쑤신다고. 필요 없다면서 칡뿌리는 굵은 걸로 가져오라고 했다. 처음으로 손을 흔들어 주었다.');
+}
+/* 칡뿌리는 날쌘 교환 몫이 남아 있으면 내놓지 않는다(진행 보호). */
+function rootSpare(){
+  if(!has('root'))return false;
+  return progressShortage({...G.inv,root:G.inv.root-1})<=progressShortage(G.inv);
+}
+function toadPoultice(){
+  const ask=!G.f.galArcMusoeLeg2;
+  const give=()=>{
+    if(G.f.galPoultice||!rootSpare())return;
+    takeItem('root',1);G.f.galPoultice=true;
+    diary('galPoultice','할머니가 칡뿌리를 짓찧어 무명에 싸 주었다. 식기 전에 삼촌께 갖다 드리라고 했다.');
+    talk([['너구리','(할머니가 칡뿌리를 찧어 무명에 싸 준다.\n아직 따뜻하다.)'],
+      ['두꺼비 할멈','식기 전에 갖다 주렴.\n…그 집 형제는 고맙단 말을 못 배웠지.']]);
+  };
+  const tail=rootSpare()?[['두꺼비 할멈','칡뿌리 하나 있느냐? 찧는 건 내가 하마.',[{t:'칡뿌리 하나를 건넨다',go:give},{t:'조금 이따가요',go:null}]]]
+    :[['두꺼비 할멈',has('root')?'그 뿌리는 아직 쓸 데가 있겠구나.\n남는 걸로 하나 가져오렴.':'칡뿌리 하나 가져오렴.\n찧는 건 내가 하마.']];
+  if(!ask){talk(tail);return;}
+  arcScene('galArcMusoeLeg2',[['너구리','할머니, 무쇠 삼촌 다리가 쑤신대요.\n비 오기 전에요.'],
+    ['두꺼비 할멈','그 고집쟁이가 제 입으로 그러더냐?'],
+    ['너구리','아뇨. 할머니한테 말하지 말래요.'],
+    ['두꺼비 할멈','허허, 그럼 많이 아픈 게로구나.'],
+    ['두꺼비 할멈','칡뿌리를 짓찧어 따뜻하게 싸 매면\n붓기가 좀 내린단다.'],
+    ...tail],
+    '삼촌 다리 이야기를 하자 할머니는 웃었다. 말하지 말라고 했으면 많이 아픈 거라고. 칡뿌리를 짓찧어 싸 매면 붓기가 내린다고 했다.');
+}
+function toadLegChoice(){
+  const F=G.f;
+  if(!Rg.arcsEnabled()||!F.galArcMusoeLeg1||F.galPoultice)return null;
+  return {t:F.galArcMusoeLeg2?'삼촌 찜질에 쓸 칡뿌리 이야기':'삼촌 다리에 듣는 약을 묻는다',go:toadPoultice};
+}
 function musoeMain(){
   const F=G.f;
   if(!F.musoeMet){F.musoeMet=true;
@@ -191,7 +312,7 @@ function musoeMain(){
     talk([['무쇠','숨 골랐냐.\n보부상 소리 하려면 다시 버텨 봐라.',[{t:'다시 해 볼게요',go:battleMusoe},{t:'조금 이따가요',go:null}]]]);
   }else if(!F.leafGiven){
     musoeLeaf();
-  }else if(!F.musoeAfterLeaf&&!F.musoeDone){
+  }else if(!F.musoeAfterLeaf&&F.leafSplit&&!F.musoeDone){
     musoeAfterLeaf();
   }else if(!F.musoeDone){
     if(has('coal'))talk([['무쇠','숯 가져왔군. 불 올린다.'],['무쇠','(삼촌이 쇠를 달궈 세 번 내리친다.\n다리는 절어도 망치는 흔들리지 않는다.)']],openForge);
@@ -231,7 +352,7 @@ function musoeLeaf(){
     ['무쇠','오늘 본 것 중에 제일 잘 아는 걸 떠올려라.\n이것도 할 수 있겠냐?',[{t:thinkOf,go:musoeFirstForm}]]]);
 }
 function musoeFirstForm(){
-  const F=G.f;F.leafGiven=true;
+  const F=G.f;F.leafGiven=true;F.leafSplit=true;   // 결정 D-117: 이 뒤로 엄마 잎 이야기는 다시 말을 걸 때 한 번만
   if(typeof unlockForm==='function')unlockForm('squirrel');
   if(typeof setForm==='function')setForm('squirrel');
   diary('form_squirrel','삼촌에게 아빠가 맡긴 잎사귀를 받았다. 다람쥐를 떠올리며 잎을 부니 내가 다람쥐가 됐다. 다람쥐는 잊어도 다시 찾는다. 그래서 겁 없이 오른다.');
@@ -311,7 +432,8 @@ function talkToad(){
       ['두꺼비 할멈','…보따리에 약연 자루가 비죽 나왔구나.\n그건 아직 네가 쓸 때가 아니란다.']]);
   }else{
     const c=Rg.expLanternChoice?.();
-    talk([['두꺼비 할멈','해머루를 가져오렴. 당산나무 꼭대기란다.',[...(c?[c]:[]),{t:'보따리를 펼친다',go:()=>Trade.open('toad')},{t:'다녀올게요',go:null}]]]);
+    const leg=toadLegChoice(),geom=Rg.toadGeomChoice?.();
+    talk([['두꺼비 할멈','해머루를 가져오렴. 당산나무 꼭대기란다.',[...(c?[c]:[]),...(leg?[leg]:[]),...(geom?[geom]:[]),{t:'보따리를 펼친다',go:()=>Trade.open('toad')},{t:'다녀올게요',go:null}]]]);
   }
 }
 function toadFarewell(){
@@ -322,6 +444,7 @@ function toadFarewell(){
   if(!knows('home:'+Rg.id))for(const item of ['acorn_jelly','sesame_salt'])if(has(item))
     c.push({t:ITEMS[item].n+'을 까치 편에 보낸다',go:()=>galSendHome(item)});
   c.push({t:'보따리를 펼친다',go:()=>Trade.open('toad')});
+  {const leg=toadLegChoice();if(leg)c.push(leg);const geom=Rg.toadGeomChoice?.();if(geom)c.push(geom);}
   c.push({t:'마을을 좀 더 둘러본다',go:null});
   talk([['두꺼비 할멈','북쪽으로 갈 채비는 됐니?',c]]);
 }
@@ -487,6 +610,66 @@ if(!CLASSIC){
         {t:'좋아, 같이 봐 줄게',go:()=>{G.f.galExpBrothersAsked=true;toast('오른쪽 낮은 평상에서 바구니를 나누자 · E');}},
         {t:'다음에 같이 보자',go:null}]]]);
   }
+  /* 결정 D-117: 다람쥐 형제 후일담. 누구 편을 들었는지(galExpBrothersSide)가 그 뒤의 관계를 바꾼다.
+     ① 바구니 자리 다툼, 또는 편을 들어 준 일로 토라짐 → ② 칡이 풀린 숲 안쪽에 묻을 자리를 그려 줌 → ③ 떠나는 날 도토리 두 알 */
+  function brosArcChoice(){
+    const F=G.f;if(!Rg.arcsEnabled()||!done('squirrel_brothers'))return null;
+    const side=F.galExpBrothersSide||'even';
+    if(!F.galArcBros1&&F.leafGiven)return {t:side==='even'?'바구니를 어디 묻을지 묻는다':'둘이 왜 따로 앉았는지 묻는다',go:brosQuarrel};
+    if(F.galArcBros1&&!F.galArcBros2&&G.boss.dead)return {t:'숲 안쪽 이야기를 듣는다',go:brosMap};
+    if(F.galArcBros2&&!F.galArcBros3&&G.diary.some(d=>d.id==='end'))return {t:'북쪽으로 간다고 인사한다',go:brosFarewell};
+    return null;
+  }
+  function brosQuarrel(){
+    const side=G.f.galExpBrothersSide||'even';
+    const lines={
+      even:[['다람쥐 형','바구니를 어디 묻을지로 또 다퉜어.'],['다람쥐 동생','형은 큰 바위 밑, 나는 단풍나무 뿌리!'],
+        ['너구리','둘 다 잊어버리면?'],['다람쥐 형','…그럼 둘 다 겨울에 굶지.'],['다람쥐 동생','도담처럼!'],
+        ['너구리','반씩 나눠 묻고, 형 자리는 동생이,\n동생 자리는 형이 외우면?'],
+        ['다람쥐 형','내가 잊어도 동생이 기억하고…'],['다람쥐 동생','내가 잊어도 형이 기억하고!'],
+        ['다람쥐 형','그럼 한 바구니에서 먹는 거랑 똑같네.']],
+      hyung:[['너구리','(동생이 형한테서 등을 돌리고 앉아 있다.)'],['다람쥐 형','쟤 아직도 저래.\n큰 거 몇 알 가지고.'],
+        ['너구리','…그때 내가 형 편만 들어서 그래?'],['다람쥐 동생','낙엽 걷는 것도 힘들거든.\n그건 아무도 안 세.'],
+        ['너구리','미안. 그건 내가 못 봤어.'],['다람쥐 형','…낙엽 밑에서 찾은 건 맞아. 쟤가.'],
+        ['다람쥐 동생','형이 방금 뭐라고 했어?'],['다람쥐 형','아무 말도 안 했어!']],
+      dongsaeng:[['너구리','(형이 동생한테서 등을 돌리고 앉아 있다.)'],['다람쥐 동생','형 아직도 삐졌어.\n찾은 건 나라니까.'],
+        ['너구리','…그때 내가 동생 편만 들어서 그래?'],['다람쥐 형','일곱 번 오간 다리는 아무도 안 세.'],
+        ['너구리','미안. 그건 내가 못 봤어.'],['다람쥐 동생','…형이 많이 오간 건 맞아.'],
+        ['다람쥐 형','방금 뭐라고 했어?'],['다람쥐 동생','아무 말도 안 했어!']]
+    };
+    const notes={
+      even:'다람쥐 형제가 바구니 묻을 자리로 다퉜다. 반씩 묻고 서로 상대의 자리를 외우자고 했다. 한 사람이 잊어도 다른 사람이 기억한다.',
+      hyung:'형 편을 들어 줬던 일로 동생이 아직 토라져 있었다. 낙엽을 걷은 수고는 아무도 세지 않았다고. 미안하다고 하자 형이 처음으로 동생이 찾은 걸 인정했다.',
+      dongsaeng:'동생 편을 들어 줬던 일로 형이 아직 토라져 있었다. 일곱 번 오간 다리는 아무도 세지 않았다고. 미안하다고 하자 동생이 처음으로 형의 수고를 인정했다.'
+    };
+    arcScene('galArcBros1',lines[side],notes[side]);
+  }
+  function brosMap(){
+    const side=G.f.galExpBrothersSide||'even';
+    const split={
+      even:[['다람쥐 동생','형 자리는 내가 외울게.'],['다람쥐 형','네 자리는 내가.']],
+      hyung:[['다람쥐 형','…뿌리 쪽은 네가 찾은 데니까 네 거 해.'],['다람쥐 동생','진짜? …그럼 바위 쪽은 형 거.']],
+      dongsaeng:[['다람쥐 동생','…바위 쪽은 형이 여러 번 날라야 하니까\n형 거 해.'],['다람쥐 형','…그래. 그럼 뿌리 쪽은 네 거.']]
+    }[side];
+    arcScene('galArcBros2',[['다람쥐 형','당산나무 칡이 풀리니까\n숲 안쪽 흙이 부드러워졌어!'],
+      ['다람쥐 동생','거기 묻으면 겨울에도 안 얼겠다.'],
+      ['너구리',G.f.galArcDodam2?'자리 그려 줄까? 도담한테도 그려 줬어.':'자리 그려 줄까? 그려 두면 안 잊어.'],
+      ['다람쥐 형','그려 줘! 나무껍질에!'],
+      ['너구리','(나뭇가지로 넓은 껍질에 두 자리를 그렸다.\n큰 바위 밑 하나, 단풍나무 뿌리 하나.)'],
+      ...split,
+      ['다람쥐 형','이 껍질은 둘이 같이 보는 거야.'],['다람쥐 동생','응. 같이!']],
+      '칡이 풀리자 숲 안쪽 흙이 부드러워졌다. 다람쥐 형제에게 묻을 자리 둘을 나무껍질에 그려 주었다. 둘이 같이 보는 껍질이 되었다.');
+  }
+  function brosFarewell(){
+    arcScene('galArcBros3',[['너구리','나 내일 북쪽으로 가.'],['다람쥐 동생','벌써?'],['다람쥐 형','잠깐만 기다려!'],
+      ['너구리','(형제가 낙엽 더미에 머리를 박고 한참 뒤적인다.)'],
+      ['다람쥐 형','큰 거 하나, 내가 골랐어.'],['다람쥐 동생','작은 거 하나, 내가 골랐어!'],
+      ['다람쥐 형','길에서 배고프면 먹어.'],['다람쥐 동생','누구랑 나눠 먹어도 되고!'],
+      ['너구리','집에 돌아가면 엄마랑 나눠 먹을게.'],
+      ['다람쥐 형','그럼 썩지 않게 꼭 싸 둬.']],
+      '북쪽으로 간다고 하자 다람쥐 형제가 도토리를 하나씩 골라 주었다. 큰 것 하나, 작은 것 하나. 집에 돌아가면 엄마랑 나눠 먹을 것이다.',
+      ()=>addItem('acorn',2));
+  }
   function shareBaskets(){
     if(!G.f.galExpBrothersAsked){brothersTalk();return;}
     if(G.f.galExpBrothersSorted){brothersTalk();return;}
@@ -517,6 +700,162 @@ if(!CLASSIC){
         {t:'꺼병이 곁에서 물가 쪽으로 걷는다',go:()=>{G.f.galExpChickWith=true;G.f.galExpChickX=1540;toast('오른쪽 갈대까지 함께 걷자. 멀어지면 꺼병이는 기다린다');}},
         {t:'여기서 기다려. 길부터 살필게',go:null}]]]);
   }
+  /* 결정 D-117: 새 떠돌이 둘. 아이가 날라 주는 것으로 관계가 생긴다.
+     여울(개울의 어린 수달): 아이가 타고 내려가는 함지박을 밤마다 도로 밀어 올려 둔다. 그 함지박 밑에 우리 집 낙관(流)이 있다.
+     검댕(참나무 숲 숯쟁이 오소리): 연기에 눈이 절었다. 할멈의 눈약 ↔ 검댕의 숯을 아이가 오가며 나르고, 날쌘의 숨은 덤을 듣는다. */
+  function otterTalk(){
+    const F=G.f;
+    if(!F.galArcOtter1){
+      arcScene('galArcOtter1',[['여울','(수달 하나가 빈 함지박을 머리에 이고\n개울을 거슬러 오른다.)'],
+        ['여울','어! 이거 타고 대장간 쪽 내려가려고?'],
+        ['너구리','타도 돼?'],
+        ['여울','타도 돼. 다 타면 도로 올려놔야지.\n밤마다 내가 밀어 올린다고!'],
+        ['너구리','아… 그래서 늘 그 자리에 있었구나.'],
+        ['여울','이거 빨래 아줌마 거야.\n아줌마 오면 써야 하니까.'],
+        ['너구리','빨래 아줌마?'],
+        ['여울','넓적돌에서 방망이 두드리던 아줌마.\n여름부터 안 와.'],
+        ['여울','그래도 내가 지키고 있어.\n넌 타고 놀아도 돼. 대신 올려놓고 가.']],
+        '개울에서 빈 함지박을 이고 오르는 수달 여울을 만났다. 그 함지박을 밤마다 도로 밀어 올려 둔다고 한다. 여름부터 안 오는 빨래 아줌마 것이라, 그분이 오면 써야 한다며.');
+      return;
+    }
+    if(!F.galArcOtter2){
+      if(!F.toadMet){talk([['여울','빨래 아줌마 아직 안 왔어.\n…넌 어디 가는 길이야?']]);return;}
+      arcScene('galArcOtter2',[['너구리','(함지박을 뒤집어 말리는데, 밑바닥에\n낙관 하나가 찍혀 있다. 流.)'],
+        ['너구리','…이거 우리 집 거야.'],
+        ['여울','어? 너 빨래 아줌마네 애야?'],
+        ['너구리','빨래 아줌마… 우리 엄마야.'],
+        ['여울','아줌마 왜 안 와? 나 계속 기다렸는데.'],
+        ['너구리','엄마가 아파. 여름부터.'],
+        ['여울','(여울이 함지박 끈을 만지작거린다.)'],
+        ['여울','…아줌마가 빨래 다 하면\n나한테 물수제비 떠 줬어. 일곱 번.'],
+        ['너구리','엄마가? 그런 거 하는 줄 몰랐어.'],
+        ['여울','엄청 잘해! 나보다 잘해.'],
+        ['너구리','(엄마가 물가에서 웃는 걸 본 지 오래됐다.)']],
+        '함지박 밑바닥에 우리 집 낙관 流가 찍혀 있었다. 여울이 말하는 빨래 아줌마는 엄마였다. 엄마는 빨래를 마치면 여울에게 물수제비를 일곱 번 떠 줬다고 한다. 나는 몰랐다.',
+        ()=>learn('otter:stone'));
+      return;
+    }
+    if(!F.galArcOtter2b&&F.musoeDone){
+      // 선택지를 고르면 대화의 끝 콜백이 지워지므로, 던진 뒤의 대사는 선택지에서 바로 잇는다.
+      const thrown=[['너구리','(돌이 통, 통, 통 하고 가라앉았다.)'],
+        ['여울','세 번? 빨래 아줌마 아들이면서?'],
+        ['너구리','엄마한테 안 배웠어. 몰랐으니까.'],
+        ['여울','그럼 봄에 배워.\n아줌마가 손목을 이렇게 꺾으라 그랬어.'],
+        ['너구리','(여울이 손목을 꺾어 보인다.\n엄마 손목도 저렇게 움직였을까.)']];
+      arcScene('galArcOtter2b',[['여울','(여울이 납작한 돌을 골라 물 위로 던진다.\n통, 통, 통, 통.)'],
+        ['여울','네 번! 너도 해 봐.',[{t:'납작한 돌을 골라 던진다',go:()=>talk(thrown)}]]],
+        '여울과 물수제비를 떴다. 나는 세 번, 여울은 네 번이었다. 엄마는 일곱 번이라고 했다.');
+      return;
+    }
+    if(!F.galArcOtter3&&G.diary.some(d=>d.id==='end')){
+      arcScene('galArcOtter3',[['여울','까치 할머니가 그러는데,\n아줌마한테 약 갔대!'],
+        ['너구리','응. 할머니가 달여 주셨어.'],
+        ['여울','그럼 아줌마 이제 와?'],
+        ['너구리','…아직. 북쪽 가서 더 좋은 약 구해 올 거야.'],
+        ['여울','그럼 함지박은 내가 계속 지킬게.'],
+        ['너구리','봄에 엄마랑 같이 올게. 빨래하러.'],
+        ['여울','약속!\n그때 나랑 물수제비 내기해. 아줌마 빼고.'],
+        ['너구리','왜 엄마는 빼?'],
+        ['여울','아줌마는 일곱 번이잖아. 반칙이야.']],
+        '약이 갔다는 소식을 여울도 까치에게 들었다. 봄에 엄마랑 빨래하러 오겠다고 약속했다. 그때 물수제비 내기를 하자며, 엄마는 일곱 번이라 반칙이니 빼자고 했다.',
+        ()=>finishWanderer('stream_otter'));
+      return;
+    }
+    talk([['여울',F.galArcOtter2?'함지박 잘 지키고 있어!\n타고 내려가도 돼. 올려놓기만 해.':'빨래 아줌마 아직 안 왔어.']]);
+  }
+  function badgerTalk(){
+    const F=G.f;
+    if(!F.galArcGeom1){
+      arcScene('galArcGeom1',[['검댕','콜록, 콜록…'],
+        ['검댕','거기 너. 눈 좀 빌리자.\n저 연기가 무슨 빛이냐. 희냐, 푸르냐.'],
+        ['너구리','…하얘요. 뭉게뭉게.'],
+        ['검댕','아직이군.\n푸르스름해지면 숯이 다 된 거다.'],
+        ['너구리','아저씨는 안 보여요?'],
+        ['검댕','연기에 눈이 절었다.\n평생 숯을 구웠으니.'],
+        ['검댕','요즘은 빛이 다 뿌옇다.\n숯이 타 버릴까 봐 밤에 잠을 못 잔다.'],
+        ['너구리','늪가 할머니한테 눈약 있을 거예요.'],
+        ['검댕','내려갈 틈이 어딨냐.\n가마 불은 사흘 내내 지켜야 한다.'],
+        ['너구리','제가 다녀올게요. 저 보부상이에요.'],
+        ['검댕','…보부상이면 공짜로는 안 하겠군.\n갔다 와 봐라.']],
+        '참나무 숲에서 숯 굽는 오소리 검댕을 만났다. 연기에 눈이 절어 연기 빛을 못 본다. 흰 연기는 아직, 푸른 연기면 다 된 숯이라고. 늪가 할머니께 눈약을 여쭤보기로 했다.');
+      return;
+    }
+    if(F.galArcGeom2&&!F.galArcGeom3){
+      arcScene('galArcGeom3',[['너구리','할머니가 눈약 달여 주신대요.\n그런데 약탕에 땔 숯이 필요하대요.'],
+        ['검댕','허, 내 눈약을 내 숯으로 달인다고?'],
+        ['검댕','(검댕이 가마 옆 자루에서 숯 두 덩이를 꺼낸다.)'],
+        ['검댕','하나는 할멈 몫. 하나는 네 몫이다.\n심부름 값은 받아야지, 보부상이면.'],
+        ['너구리','(할머니 몫은 보자기에 따로 싸 넣었다.)']],
+        '검댕 아저씨가 숯 두 덩이를 꺼내 주었다. 하나는 할머니 약탕에 땔 몫, 하나는 내 심부름 값이라고 했다.',
+        ()=>{F.galGeomToadCoal=true;addItem('coal',1);});
+      return;
+    }
+    if(F.galGeomEyeWash&&!F.galArcGeom5){
+      arcScene('galArcGeom5',[['너구리','할머니 눈약이에요.\n아침저녁으로 씻으래요.'],
+        ['검댕','(검댕이 눈을 씻고 한참 가마 쪽을 본다.)'],
+        ['검댕','…푸르구나. 저 연기, 푸르다.'],
+        ['너구리','다 된 거예요?'],
+        ['검댕','다 됐다. 사흘 만에 처음 제대로 봤다.'],
+        ['검댕','이 숯은 날쌘이 받아 갈 거다.\n장에 내다 팔 테지.'],
+        ['너구리','날쌘 아저씨는 엄청 깍쟁이던데요.'],
+        ['검댕','그놈? 값 깎는 척 실컷 하고는,\n가마 옆에 꼭 덤을 두고 간다.'],
+        ['검댕','쌀 한 줌, 마른 쑥 한 단.\n모른 척하라더라. 체면 깎인다고.'],
+        ['너구리','…저도 모른 척할게요.'],
+        ['검댕','그래라. 보부상은 입이 무거워야 한다.']],
+        '검댕 아저씨가 할머니 눈약으로 눈을 씻고, 가마 연기가 푸른 걸 처음으로 제대로 봤다. 날쌘 아저씨는 값을 깎는 척하고는 가마 옆에 꼭 덤을 두고 간다고 한다. 모른 척하기로 했다.',
+        ()=>{F.galGeomBlue=true;learn('geom:nal');});
+      return;
+    }
+    if(F.galArcGeom5&&!F.galArcGeom6&&G.diary.some(d=>d.id==='end')){
+      arcScene('galArcGeom6',[['검댕','(가마 연기가 가늘고 푸르게 오른다.)'],
+        ['너구리','저 내일 북쪽으로 가요.'],
+        ['검댕','까치가 지나가며 그러더라.\n늪가 할멈 약이 너희 집으로 갔다고.'],
+        ['검댕','숯은 다 됐을 때 꺼내야 한다.\n덜 되면 연기 나고, 너무 되면 재가 된다.'],
+        ['너구리','…다 됐는지는 어떻게 알아요?'],
+        ['검댕','연기 빛을 봐라.\n네 눈은 좋으니 잘 보겠지.'],
+        ['검댕','이거 가져가라. 길에서 불 피울 때 써라.\n연기가 안 매운 숯이다.']],
+        '떠난다고 하자 검댕 아저씨는 숯은 다 됐을 때 꺼내야 한다고 했다. 다 됐는지는 연기 빛을 보면 안다고. 길에서 불 피울 때 쓰라며 숯 한 덩이를 주었다.',
+        ()=>{addItem('coal',1);finishWanderer('charcoal_badger');});
+      return;
+    }
+    talk([['검댕',F.galArcGeom5?'푸르다. 이제 잘 보인다.\n…심부름 값은 했다.':F.galArcGeom3?'할멈 몫 숯은 잘 갖다줬냐.\n콜록… 연기가 아직 희구나.':'콜록… 연기가 아직 희구나.']]);
+  }
+  /* 할멈 쪽 고리: 검댕의 눈 이야기를 듣고 → 숯을 받아 오면 눈약을 달인다. */
+  function toadGeom(){
+    const F=G.f;
+    if(!F.galArcGeom2){
+      arcScene('galArcGeom2',[['너구리','숲에서 숯 굽는 오소리 아저씨요.\n연기에 눈이 절어서 뿌옇대요.'],
+        ['두꺼비 할멈','검댕이로구나.\n그 눈으로 아직도 가마를 지키는구나.'],
+        ['두꺼비 할멈','눈 씻을 물을 달여 주마.\n…헌데 약탕 불 땔 숯이 떨어졌구나.'],
+        ['두꺼비 할멈','늘 날쌘이 갖다주는데,\n요즘은 대장간에 먼저 대는지 영 안 오는구나.'],
+        ['너구리','그럼 숯은 검댕 아저씨한테 받아 올게요.'],
+        ['두꺼비 할멈','허허, 숯쟁이 눈약을\n숯쟁이 숯으로 달이는구나.']],
+        '할머니가 검댕 아저씨 눈 씻을 물을 달여 주겠다고 했다. 다만 약탕에 땔 숯이 떨어졌다. 숯은 검댕 아저씨한테 받아 오기로 했다.');
+      return;
+    }
+    if(F.galGeomToadCoal&&!F.galArcGeom4){
+      arcScene('galArcGeom4',[['너구리','검댕 아저씨가 보낸 숯이에요.'],
+        ['두꺼비 할멈','(할멈이 숯을 넣고 약탕을 올린다.\n쑥 냄새 섞인 김이 오른다.)'],
+        ['두꺼비 할멈','식혀서 아침저녁으로 눈을 씻으라고 하렴.'],
+        ['두꺼비 할멈','검댕이는 고맙단 말 대신 숯을 보낼 게다.\n그 집 숯은 연기가 안 매워.']],
+        '검댕 아저씨 숯으로 할머니가 눈 씻을 물을 달여 주었다. 쑥 냄새가 났다.',
+        ()=>{F.galGeomToadCoal=false;F.galGeomEyeWash=true;});
+    }
+  }
+  function toadGeomChoice(){
+    const F=G.f;
+    if(!Rg.arcsEnabled()||!F.galArcGeom1)return null;
+    if(!F.galArcGeom2)return {t:'숯쟁이 오소리의 눈약을 묻는다',go:toadGeom};
+    if(F.galGeomToadCoal&&!F.galArcGeom4)return {t:'검댕 아저씨의 숯을 건넨다',go:toadGeom};
+    return null;
+  }
+  Rg.toadGeomChoice=toadGeomChoice;
+  const otter={id:'stream_otter',name:'여울',x:1290,when:()=>Rg.arcsEnabled(),draw:picture('otter'),talk:otterTalk,
+    hint:'첨벙, 첨벙… 개울 쪽에서 무언가 함지박을 밀어 올리는 소리가 난다.',
+    greeting:'함지박은 내가 지키고 있어!\n봄에 와. 물수제비 내기야.'};
+  const badger={id:'charcoal_badger',name:'검댕',x:430,tagY:28,when:()=>Rg.arcsEnabled(),draw:picture('badgerKiln'),talk:badgerTalk,
+    hint:'숲 안쪽에서 매캐한 연기 냄새와 기침 소리가 난다.',
+    greeting:'푸른 연기 보이면 다 된 거다.\n…너도 다 되면 돌아와라.'};
   // 결정 D-17: 늙은 까치는 네 지역에 걸친 한 인물 (design/data/decisions.csv)
   const drawMagpies=(x,y,f)=>{Rg.expArt.magpie(x,y,f);if(G.f.galMagpieYoung){Rg.expArt.youngMagpie(x-32,y,1);Rg.expArt.youngMagpie(x+34,y,-1);}};
   const magpie={id:'old_magpie',name:'늙은 까치',x:820,draw:drawMagpies,talk:magpieTalk,
@@ -527,10 +866,14 @@ if(!CLASSIC){
   const wheelMagpie={id:magpie.id,name:magpie.name,x:1120,draw:magpie.draw,talk:magpie.talk};
   Object.defineProperty(wheelMagpie,'greeting',{get:()=>magpie.greeting});
   const brothers={id:'squirrel_brothers',name:'다람쥐 형제',speakers:['다람쥐 형','다람쥐 동생'],x:620,draw:picture('brothers'),talk:brothersTalk,
-    get greeting(){return ({
-      hyung:[['다람쥐 형','큰 건 역시 내 몫이지!'],['다람쥐 동생','…다음엔 내가 먼저 찾을 거야.']],
-      dongsaeng:[['다람쥐 동생','찾는 건 내가 최고야!'],['다람쥐 형','…다음엔 내가 더 많이 오갈 거야.']]
-    })[G.f.galExpBrothersSide]||[['다람쥐 형','큰 것부터 번갈아!'],['다람쥐 동생','겨울에는 한 바구니에서!']];}};
+    get greeting(){
+      const base=({
+        hyung:[['다람쥐 형','큰 건 역시 내 몫이지!'],['다람쥐 동생','…다음엔 내가 먼저 찾을 거야.']],
+        dongsaeng:[['다람쥐 동생','찾는 건 내가 최고야!'],['다람쥐 형','…다음엔 내가 더 많이 오갈 거야.']]
+      })[G.f.galExpBrothersSide]||[['다람쥐 형','큰 것부터 번갈아!'],['다람쥐 동생','겨울에는 한 바구니에서!']];
+      const arc=brosArcChoice();if(!arc)return base;
+      const last=base[base.length-1];return [...base.slice(0,-1),[last[0],last[1],[arc,{t:'다음에 보자',go:null}]]];
+    }};
   const chick={id:'lost_chick',name:'꺼병이',hint:'삐약… 삐약… 어디선가 엄마를 찾는 병아리 소리가 들린다.',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
     greeting:'이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!'};
   function wheelStage(){
@@ -659,7 +1002,7 @@ if(!CLASSIC){
   }
   const fireflies={id:'reed_fireflies',name:'반딧불',tag:false,hint:'갈대숲 사이로 작은 불빛이 깜박인다.',x:1760,draw:(x,y)=>Rg.expArt.marker(x,y),talk:fireflyLook,
     greeting:[['너구리','등롱 입구로 작은 빛이 드나든다.\n잡아 두지 않아도 환하네.']]};
-  Rg.expWanderers={village:[magpie],forge:[brothers],forest:[chick],marsh:[fireflies],hill:[]};
+  Rg.expWanderers={village:[magpie,otter],forge:[brothers],forest:[chick,badger],marsh:[fireflies],hill:[]};
   function examine(id,x,label,read,y){
     return {id,x,label,...(y===undefined?{}:{y}),get text(){return read();}};
   }
@@ -703,7 +1046,7 @@ if(!CLASSIC){
   // 집에서 묶은 보자기를 들고 대장간 거점으로 날아온다. 같은 id라 만남은 한 번만 센다.
   for(const [zone,list] of Object.entries(Rg.expWanderers))if(Rg.zones?.[zone]){
     Object.defineProperty(Rg.zones[zone],'wanderers',{configurable:true,get:()=>
-      zone==='village'?(!done('old_magpie')?list:[wheelMagpie]):list});
+      (zone==='village'&&done('old_magpie')?[wheelMagpie,...list.filter(w=>w!==magpie)]:list).filter(w=>!w.when||w.when())});
     Rg.zones[zone].examines=Rg.expExamines[zone];
   }
   // 주연 NPC 목록은 그대로다. 이 객체들은 E로 만지는 작업 자리이며 인물·만남 수에 더하지 않는다.
