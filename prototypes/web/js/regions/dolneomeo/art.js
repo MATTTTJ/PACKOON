@@ -152,56 +152,6 @@ function drawBridgeWork(x,y){
 function drawBridgeWorkMarker(x,y){stone(x-9,y,18,11,0,false);px(x-6,y-9,12,2,'#d8d4b5');px(x-4,y-6,7,1,'#88765e');px(x-4,y-4,10,1,'#88765e');}
 function drawBridgeSurvey(x,y,seen){const col=seen?'#adbc98':'#f1ddb3';px(x-7,y-6,14,1,col);px(x-8,y-5,1,5,col);px(x+7,y-5,1,5,col);px(x-4,y-12,8,1,col);px(x-3,y-13,6,1,col);if(!seen){px(x,y-18,1,3,col);px(x-2,y-16,5,1,col);}}
 
-/* 판정 막대는 story.js가 그린다. 여기서는 손을 쓰는 대상만 바꾼다. */
-Rg.drawStoneTask=(c,task,st)=>{
-  const title=task?.title||'';
-  if(!/돌집|등짐|잠자리|바람막이|복원|살피기/.test(title))return false;
-  c.save();c.beginPath();c.rect(0,30,320,94);c.clip();
-  const q=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
-  const block=(x,y,w,h,col='#8b9586')=>{q(x,y,w,h,col);q(x+2,y+1,w-4,2,'#ccd1b5');q(x+1,y+h-2,w-2,2,'#687467');};
-  const n=Math.min(st.hits,3),shift=st.settle?st.land*13:Math.sin(st.phase)*24;
-  const hand=(x,y,f=1)=>{q(x,y,18*f,6,'#89775f');q(x+12*f,y-3,8*f,7,'#bca07c');q(x+16*f,y-5,3*f,8,'#d0b28b');};
-  q(0,30,320,94,'#efe3c8');
-  q(0,115,320,9,'#c6bfa2');q(0,115,320,2,'#a8ad8e');
-  if(title.includes('돌집')){
-    q(112,73,96,43,'#a8aa8b');q(129,82,62,34,'#736f55');
-    if(n>0){block(108,107,28,9);block(184,107,28,9);}
-    if(n>1){block(121,82,13,25);block(187,82,13,25);block(121,73,79,9);}
-    if(n>2){block(139,93,8,8,'#b7c5ac');q(141,93,2,2,'#f9e9b6');}
-    block(140+shift,45,39,12,'#9aa793');hand(107+shift,52);hand(213+shift,52,-1);
-    q(64,96,18,20,'#75634f');q(66,91,14,10,'#927c60');q(78,97,7,4,'#d1aa87');q(77,94,2,2,'#323c32');
-  }else if(title.includes('등짐')){
-    q(139,65,45,51,'#8e7d5a');q(136,66,51,4,'#b5a27a');
-    const sy=n>0?94:70;block(143,sy,36,16,'#818a7d');
-    for(let i=0;i<7;i++)q(140+i*6,n>1?52:96,2,n>1?22:18,i%2?'#d7c79b':'#b4ab78');
-    if(n>2){q(155,54,3,62,'#d4c09b');q(137,90,50,3,'#d4c09b');q(157,89,7,7,'#796a4c');}
-    hand(113+shift,100);hand(205+shift,100,-1);q(231,78,12,38,'#c5bea0');q(229,61,4,22,'#ded1af');q(236,59,4,24,'#ded1af');
-  }else if(title.includes('잠자리')){
-    q(42,114,74,4,'#8daeb0');q(51,112,52,2,'#d4dfcd');
-    block(196,68,55,48,'#a4a98c');q(201,74,44,42,'#777e65');
-    if(n>0)block(124,109,15,7);const rx=n>1?164:119+shift;
-    block(rx,101,55,14,'#a39c76');q(rx+5,101,44,2,'#cfb583');
-    if(n>1){q(rx+13,94,1,5,'#e5c795');q(rx+37,93,1,6,'#e5c795');}
-    const fx=n>2?rx+24:68;q(fx-10,n>2?90:106,20,9,'#879b72');q(fx-8,n>2?85:101,5,7,'#a5b18a');q(fx+3,n>2?85:101,5,7,'#a5b18a');
-    hand(87+shift,103);hand(174+shift,103,-1);
-  }else if(title.includes('바람막이')){
-    for(let j=0;j<4;j++){block(161,54+j*15,26,14);block(215,54+j*15,26,14);}
-    q(189,57,23,58,'#bfc7b2');for(let i=0;i<3;i++)q(58,65+i*13,86,1,'#b6c2b2');
-    for(let i=0;i<n;i++)block(187,99-i*15,29,15);
-    block(178+shift,40,39,12,'#a7ad91');hand(144+shift,49);hand(242+shift,49,-1);
-    q(266,97,15,13,'#415955');q(270,91,12,9,'#415955');q(280,97,10,3,'#aca889');q(274,95,2,2,'#e9e8c8');
-  }else{
-    q(54,115,215,8,'#8ba9a4');for(let i=0;i<3;i++)q(76+i*65,119,31,1,'#d4dfca');
-    block(63,89,36,26);block(225,89,36,26);
-    for(let i=0;i<3;i++){
-      const x=97+i*43,y=82-(i===1?8:0);if(i<n)block(x,y,42,13,'#9ca68e');
-      else{q(x,y,42,1,'#c8bfa1');q(x,y,1,13,'#c8bfa1');q(x+41,y,1,13,'#c8bfa1');}
-    }
-    if(n>1){q(74,75,5,14,'#a9b399');q(245,75,5,14,'#a9b399');}
-    block(137+shift,43,43,13,'#a6af95');hand(102+shift,52);hand(219+shift,52,-1);
-  }
-  c.restore();return true;
-};
 function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.round(y),f,a,b,w,h,c);if(kind==='hare'||kind==='rabbit'||kind==='porter'){
   q(-7,-20,13,19,'#c4c1ad');q(-5,-24,9,10,'#ded7bc');q(-5,-37,3,14,'#d7d1b9');q(0,-39,3,15,'#d7d1b9');q(-4,-35,1,9,'#ab9e8e');q(1,-37,1,10,'#ab9e8e');q(3,-22,1,2,'#35423e');q(5,-19,3,2,'#938979');q(-9,-16,3,11,'#908c72');q(-12,-18,4,14,'#8b7c5d');q(-13,-18,6,2,'#bbaa7c');q(-7,-2,5,2,'#767764');q(2,-2,5,2,'#767764');q(7,-20,2,20,'#6b735f');q(-8,-21,15,2,'#776d55');
   const helped=!!G.f.dolneomeo_pack_help,heavy=helped?-10:-24,reeds=helped?-23:-11;
