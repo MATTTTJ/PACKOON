@@ -269,15 +269,15 @@ A.scenery=zone=>{
     // 어귀에서 보였던 두 봉우리 사이의 길. 붉은 천은 멀리서도 같은 자리다.
     px(tx(1996)-cam,GROUND-64,4,34,'#776354');px(tx(2000)-cam,GROUND-63,15,8,'#c38178');
   }
-  if(zone==='slope'){
-    rowan(250-cam,GROUND);
-    const x=1100-cam;px(x-18,GROUND,36,3,'#536c82');px(x-14,GROUND+2,28,4,'#273e56');
+  if(zone==='slope'){   // tx: 줄인 비탈 좌표 (D-116)
+    rowan(tx(250)-cam,GROUND);
+    const x=tx(1100)-cam;px(x-18,GROUND,36,3,'#536c82');px(x-14,GROUND+2,28,4,'#273e56');
     px(x-12,GROUND-3,24,3,'#deebef');px(x+23,GROUND-5,12,5,'#827467');
     // 눈을 닦아 넓힌 긴 물구멍. 판정은 평평한 바닥이며 추락하지 않는다.
-    px(1112-cam,GROUND+2,170,2,'#65859a');px(1232-cam,GROUND-1,62,5,'#d8e8ed');px(1237-cam,GROUND+1,51,4,'#354e66');
-    if(G.f.yOtterWait){px(1155-cam,GROUND+3,8,1,'#b5cdd4');px(1161-cam,GROUND+2,2,3,'#b5cdd4');}
-    rock(2100-cam,GROUND,52,11);px(2075-cam,GROUND-10,54,3,'#d6dedb');
-    for(let i=0;i<4;i++)px(2081-cam+i*11,GROUND-11,3,2,'#66766f');
+    px(tx(1112)-cam,GROUND+2,170,2,'#65859a');px(tx(1232)-cam,GROUND-1,62,5,'#d8e8ed');px(tx(1237)-cam,GROUND+1,51,4,'#354e66');
+    if(G.f.yOtterWait){px(tx(1155)-cam,GROUND+3,8,1,'#b5cdd4');px(tx(1161)-cam,GROUND+2,2,3,'#b5cdd4');}
+    const rx=tx(2100)-cam;rock(rx,GROUND,52,11);px(rx-25,GROUND-10,54,3,'#d6dedb');
+    for(let i=0;i<4;i++)px(rx-19+i*11,GROUND-11,3,2,'#66766f');
   }
   if(zone==='shore'){
     const x=2320-cam;px(x-50,GROUND-2,100,5,'#9d8c73');

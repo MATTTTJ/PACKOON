@@ -740,9 +740,11 @@ function pawStamp(x,y,c,faint=false){
    p.base가 있으면 그것을, 없으면 도장 id로 고른다. 받침 아래 끝이 (x,y)이고, 도장은 받침 앞면(STAMP_FACE만큼 위)에 찍힌다. */
 const STAMP_BASES={anvil:'log',knot:'bark',roots:'root',jangseung:'post',mill_base:'stone',cliff_crack:'rock',
   flag:'post',pillar:'post',rock:'rock',hut_post:'post',snow_sign:'post',shore_rock:'rock'};
-const STAMP_FACE={rock:1,post:3,log:1,root:0,stone:0,bark:2};
+// 결정 D-116: base:'none'이면 받침을 그리지 않고, 그 자리에 이미 그려진 장승·기둥·바위에 찍는다(face로 높이를 준다).
+const STAMP_FACE={rock:1,post:3,log:1,root:0,stone:0,bark:2,none:8};
 const stampBase=p=>p.base||STAMP_BASES[p.id]||'rock';
 function drawStampBase(kind,x,y){
+  if(kind==='none')return;
   x=Math.round(x);y=Math.round(y);
   const snow=G?.region==='yeongsan'||G?.region==='jangteo';
   if(kind==='rock'){R(x-6,y-8,12,8,'#8a8478');R(x-7,y-6,14,6,'#8a8478');R(x-5,y-8,5,1,'#b3ad9f');R(x-7,y-1,14,1,'#5f5a52');R(x+5,y-6,2,5,'#6f6a60');
@@ -768,7 +770,7 @@ function drawZoneObjects(){
   for(const p of zoneObjects('wanderers'))if(p.draw)p.draw(p.x-cam,p.y??fieldGround(),G.px<p.x?-1:1);
   for(const k of ['doors','examines','vistas','stamps'])for(const p of zoneObjects(k)){
     // 결정 D-81: 아빠 도장 자리에는 찾기 전에도 흐린 손바닥 흔적이 남아 있다. 찾으면 또렷해진다 (design/data/decisions.csv)
-    if(k==='stamps'){const sx=p.x-cam,gy=p.y??fieldGround(),base=stampBase(p),py=gy-STAMP_FACE[base];
+    if(k==='stamps'){const sx=p.x-cam,gy=p.y??fieldGround(),base=stampBase(p),py=gy-(p.face??STAMP_FACE[base]);
       // 결정 D-115: 받침을 먼저 그리고, 그 앞면에 작은 손바닥을 찍는다. 찾기 전에는 흐리고 이따금 반짝인다.
       drawStampBase(base,sx,gy);
       if(!stampFound(p.id)){pawStamp(sx,py,'rgba(110,52,30,.55)',true);pawStamp_glint(sx,py,p.x);continue;}

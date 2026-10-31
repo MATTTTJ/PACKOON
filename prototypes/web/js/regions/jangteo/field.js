@@ -106,7 +106,9 @@ if(!CLASSIC){
   Rg.startZone='entrance';Rg.STORE_X=2320;
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
   // 장터 입구: 연줄 문(1310) 뒤 빈 길 1290px → 410px (물건 없는 발판 무리를 지운다). 숙소 창고: 빈 마당과 빈 발판 무리 두 곳을 지운다.
-  Rg.trimCuts={entrance:[[1400,880]],warehouse:[[800,900],[1800,380]]};
+  Rg.trimCutsV1={entrance:[[1400,880]],warehouse:[[800,900],[1800,380]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-116: 숙소 창고문(2130) 뒤 오른쪽 출구까지 빈 마당과 빈 처마 계단(2190~2490)을 지운다.
+  Rg.trimCuts={entrance:[[1400,880]],inn:[[2190,300]],warehouse:[[800,900],[1800,380]]};
   Rg.trimHook=tX=>{Rg.STORE_X=tX(Rg.STORE_X,Rg.trimCuts.warehouse);};
   Rg.trimMigrateHook=g=>{if(g.boss)g.boss.x=Rg.STORE_X;};
   const originalState=Rg.newState;
@@ -209,7 +211,7 @@ if(!CLASSIC){
       exits:{right:{to:'street',toX:60}},
       doors:[{x:1310,y:96,to:'street',toX:1010,toY:96,label:'연줄을 따라 처마 건너기',need:()=>!!G.f.jxKiteDone,reason:'연을 풀어 준 뒤 아이에게 안전한 처마길을 물어보자.',draw:peg,drawBlocked:shutter}],
       wanderers:E.wanderers.entrance,examines:E.examines.entrance,
-      stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint}],
+      stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint,base:'none',face:18}],   // D-116: 깃대에 바로 찍는다(받침 겹침 없음)
     },
     street:{...common('street'),name:TABLES.ZONES.jangteo.street,w:2800,npcs:['morak','yeotbang','nal'],
       platforms:[...stairs(430),{x:610,y:96,w:510},{x:1250,y:110,w:300},...stairs(2370),{x:2550,y:96,w:180}],
@@ -236,7 +238,7 @@ if(!CLASSIC){
           formPass:'squirrel',formLabel:'다람쥐로 좌판 밑 지나기'},
         {x:2130,to:'warehouse',toX:280,label:'마루에서 보았던 푸른 창고문 안으로',need:needWarehouse,reason:warehouseReason,draw:gate}],
       get wanderers(){return [...E.wanderers.inn,lanternBundle,...nightLanterns('inn')];},examines:E.examines.inn,
-      stamps:[{id:'pillar',x:1280,y:128,note:'stamp:jangteo:pillar',draw:glint}],
+      stamps:[{id:'pillar',x:1280,y:128,note:'stamp:jangteo:pillar',draw:glint,base:'none',face:10}],   // D-116: 숙소 기둥에 바로 찍는다
       vistas:[{id:'icicles',x:1850,y:128,from:0,to:420,sound:'wind',draw:peg,
         thought:'고드름 속 지붕이다.\n저 푸른 문도 가 보고 싶어.',
         diary:'숙소 마루에서 고드름 너머 장터 지붕을 보았다. 처마 사이로 창고의 푸른 문이 보인다.',layers:Rg.expArt.innVista}],

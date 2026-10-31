@@ -261,7 +261,7 @@ if(!CLASSIC){
     }else if(zone==='hill'){
       // 결정 D-45: 줄인 언덕에 맞춘 사당·둔덕 자리 (galchamgol/field.js HILL_SHIFT)
       treeHollow(180-cam);smallShrine(810-cam);
-      for(const u of [460,1070,1760]){const x=u-cam;
+      for(const u of [460,1460]){const x=u-cam;   // D-116: 칡이 300 앞당겨져 둔덕도 옮겼다
         px(x-21,GROUND-9,42,9,'#89795c');px(x-15,GROUND-13,31,4,'#aa956e');px(x-13,GROUND-11,14,1,'#cbb182');}
       // Home has become very small; the vista uses this same bent reed roof.
       house(800-cam*.28,163,.32,true);

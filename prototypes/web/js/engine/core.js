@@ -156,6 +156,11 @@ function stepRidge(x,seed,n=4,{low=160,high=112,rise=30}={}){
    · 배경·장식 그림: 그 구역 art의 x에 tx()를 씌운다(잘린 구간 안의 장식은 숨긴다)
    · 상태(물건·채집)는 trimState, 옛 저장은 trimMigrate가 한 번 옮긴다. 옛 구성(classic)에는 쓰지 않는다. */
 function trimX(x,cuts){if(!cuts||!Number.isFinite(x))return x;let s=0;for(const [c,d] of cuts){if(x>=c+d)s+=d;else if(x>c)s+=x-c;}return x-s;}
+/* 자른 좌표 → 설계 좌표. 잘린 구간 시작에 모인 것은 그 시작으로 돌아간다 (옛 저장을 새 자르기로 옮길 때 쓴다). */
+function untrimX(t,cuts){if(!cuts||!Number.isFinite(t))return t;let s=0;for(const [c,d] of [...cuts].sort((a,b)=>a[0]-b[0])){if(t+s>=c)s+=d;else break;}return t+s;}
+/* 결정 D-116: 자르기 판 번호. 1은 PR #91(D-109) 첫 자르기, 2는 남은 빈 구간까지 줄인 판이다.
+   지역이 Rg.trimCutsV1(첫 판의 자르기)을 두면, 첫 판으로 저장한 상태는 그 차이만큼만 옮긴다. */
+const TRIM_VER=2;
 const trimInside=(x,cuts)=>!!cuts&&cuts.some(([c,d])=>x>c&&x<c+d);
 function trimObj(o,cuts,done){
   if(!o||typeof o!=='object'||done?.has(o))return o;done?.add(o);
@@ -234,18 +239,21 @@ function trimState(r,s){
   if(!r?.trimCuts||CLASSIC)return s;
   trimRegion(r);const z0=firstZone(r);
   for(const k of ['pickups','digs'])for(const a of s[k]||[]){const c=r.trimCuts[a.zone||z0];if(c)a.x=trimX(a.x,c);}
-  r.trimStateHook?.(s,trimX);s.trimVer=1;return s;
+  r.trimStateHook?.(s,trimX);s.trimVer=TRIM_VER;return s;
 }
 /* 옛 저장(자르기 전)의 좌표를 한 번만 옮긴다. 잘린 구간 안에 있던 것은 구간 시작으로 모인다. */
 function trimMigrate(r,g){
-  if(!r?.trimCuts||CLASSIC||!g||g.trimVer===1)return;
-  g.trimVer=1;const z0=firstZone(r);
-  for(const k of ['pickups','digs'])for(const a of g[k]||[]){const c=r.trimCuts[a.zone||z0];if(c)a.x=trimX(a.x,c);}
-  for(const [zid,c] of Object.entries(r.trimCuts)){
-    for(const a of g.floorItems?.[r.id]?.[zid]||[])a.x=trimX(a.x,c);
-    if(g.zone===zid&&g.region===r.id){g.px=trimX(g.px,c);g.cam=0;}
+  if(!r?.trimCuts||CLASSIC||!g||g.trimVer===TRIM_VER)return;
+  // 자르기 전 저장은 설계 좌표에서, 첫 판(1) 저장은 첫 판 좌표에서 지금 자르기로 옮긴다.
+  const prev=g.trimVer===1?(r.trimCutsV1||r.trimCuts):null;
+  const conv=(zone,x)=>trimX(untrimX(x,prev?.[zone]),r.trimCuts[zone]);
+  g.trimVer=TRIM_VER;const z0=firstZone(r);
+  for(const k of ['pickups','digs'])for(const a of g[k]||[]){const z=a.zone||z0;if(r.trimCuts[z])a.x=conv(z,a.x);}
+  for(const zid of Object.keys(r.trimCuts)){
+    for(const a of g.floorItems?.[r.id]?.[zid]||[])a.x=conv(zid,a.x);
+    if(g.zone===zid&&g.region===r.id){g.px=conv(zid,g.px);g.cam=0;}
   }
-  r.trimMigrateHook?.(g,trimX);
+  r.trimMigrateHook?.(g,trimX,conv);
 }
 function fieldCall(name,...args){const f=fieldDef()[name];return typeof f==='function'?f(...args):undefined;}
 function fieldItems(name){return G[name].filter(a=>usesZones(REG)?(a.zone||firstZone(REG))===G.zone:!a.zone);}

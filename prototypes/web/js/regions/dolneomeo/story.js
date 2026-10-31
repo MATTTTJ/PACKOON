@@ -681,7 +681,7 @@ Rg.expansionContent=()=>({
       {id:'dol_mole',name:'꼬마 두더지',hint:'달그락, 달그락. 누가 돌멩이를 굴리며 노는 소리가 난다.',x:740,draw:drawGuest('mole'),talk:meetMole,greeting:'우리 돌집에 문이 생겼어!\n반짝돌도 이제 안 굴러가.'},
       {id:'dol_magpie',name:'늙은 까치',x:2080,draw:drawGuest('magpie'),talk:restMagpie,greeting:'돌손, 좀 쉬어 가거라.\n담 뒤는 바람이 덜하단다.'}
     ],
-    stamps:[stamp('mill_base',1160,156)]
+    stamps:[{...stamp('mill_base',1160,156),base:'none',face:-12}]   // D-116: 맷돌 그림 앞면에 바로 찍는다(받침 겹침 없음)
   },
   field:{
     examines:[
@@ -697,7 +697,7 @@ Rg.expansionContent=()=>({
       {...examine('dry_crack',2540,'갈라진 바위 들여다보기','stone','',138),get text(){return G.f.dolneomeo_frog_warm?'개구리가 말한 마른 바위 틈이다.\n붉은 발자국이 구름바다 쪽을 향한다.':'깊은 틈 안쪽은 서리가 하나도 없다.\n누가 비를 피해 쪼그려 앉았던 걸까?';}}
     ],
     wanderers:[{id:'dol_frog',name:'움츠린 개구리',hint:'돌 틈 어딘가에서 가늘게 떠는 개구리 울음이 들린다.',x:1440,draw:drawGuest('frog'),talk:warmFrog,greeting:'배가 따뜻해졌어… 고마워.\n이번엔 마른 틈에서 잘게.'}],
-    stamps:[stamp('cliff_crack',2390,112)]
+    stamps:[stamp('cliff_crack',2390)]   // D-116: 골렘 뒤에야 깔리는 턱(112) 대신 절벽 밑 바위에. 턱이 없을 때 허공에 뜨지 않는다
   },
   shrine:{
     examines:[

@@ -232,8 +232,8 @@ function drawScenery(id){
     const ax=2210-cam;P(ax,GROUND-72,5,72,t.wood);P(ax+120,GROUND-72,5,72,t.wood);P(ax,GROUND-74,125,5,t.wood);
     if(!n()){for(let j=0;j<5;j++){P(ax+6+j*23,GROUND-45,21,45,j%2?'#a76650':'#b69572');P(ax+7+j*23,GROUND-46,19,2,t.snow);}}
     else{P(ax+4,GROUND-4,116,3,'#b6b9b4');lantern(ax+12,GROUND-61);lantern(ax+111,GROUND-61);}
-  }else if(id==='inn'){
-    for(let wx=100,i=0;wx<2800;wx+=165,i++){const x=wx-cam;if(x<-110||x>W+110)continue;if(wx<650||wx>1450){const h=34+i%3*7;house(x,GROUND-h,76+i%4*8,h,n(),undefined,i);bundle(x+113,GROUND,wx);}}
+  }else if(id==='inn'){   // tx: 줄인 숙소 좌표 (D-116)
+    for(let wx=100,i=0;wx<2800;wx+=165,i++){const x=tx(wx)-cam;if(x<-110||x>W+110)continue;if(wx<650||wx>1450){const h=34+i%3*7;house(x,GROUND-h,76+i%4*8,h,n(),undefined,i);bundle(x+113,GROUND,wx);}}
     const x=760-cam;house(x,GROUND-69,460,69);tileRoof(x-9,GROUND-93,478,23);P(x+39,GROUND-77,382,4,t.wood);
     for(let j=0;j<7;j++){P(x+22+j*65,GROUND-67,5,67,t.wood);P(x+22+j*65,GROUND-65,2,63,n()?'#96715c':'#d2ac7c');}
     P(x+93,GROUND-8,278,8,'#82604c');P(x+93,GROUND-10,278,2,'#ba9470');for(let j=0;j<8;j++)P(x+99+j*34,GROUND-7,1,6,'#4e3a35');
