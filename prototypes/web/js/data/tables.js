@@ -435,6 +435,34 @@ const TABLES={
    "kind": "재료",
    "region": "yeongsan",
    "d": "남쪽 칡뿌리와 겨울 산의 겨우살이, 대추를 함께 갈았다. 건네기 좋은 향긋한 약재다."
+  },
+  "songi": {
+   "n": "송이버섯",
+   "r": 3,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "솔잎 밑 흙에서 드물게 올라오는 가을 송이. 향이 진해 약재상도 반긴다."
+  },
+  "eoksae_som": {
+   "n": "억새꽃 솜",
+   "r": 1,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "억새 이삭에서 털어 낸 하얀 솜. 둥지에 깔면 바람이 덜 든다."
+  },
+  "seokcheong": {
+   "n": "석청",
+   "r": 3,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "절벽 바위틈에 벌이 모아 둔 꿀. 석이 따는 자리에서 드물게 만난다."
+  },
+  "jat": {
+   "n": "잣",
+   "r": 1,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "청설모가 솔가지 사이에 숨겨 둔 잣. 떡 고명으로 귀하게 쓴다."
   }
  },
  "BOSS_PARTS": {
@@ -821,6 +849,35 @@ const TABLES={
     "kind": "좋아함",
     "line": "한데 갈았어도 저마다 향이 남았네.",
     "effect": "none"
+   },
+   "songi": {
+    "kind": "좋아함",
+    "line": "가을 송이로구나. 향만 맡아도 기운이 나는구나.",
+    "effect": "none"
+   }
+  },
+  "stream_otter": {
+   "acorn_jelly": {
+    "kind": "좋아함",
+    "line": "말랑말랑! 물에 넣으면 미끄러질 것 같아.",
+    "effect": "none"
+   },
+   "salt": {
+    "kind": "그저 그럼",
+    "line": "짜! 개울물 마셔야겠다.",
+    "effect": "none"
+   }
+  },
+  "charcoal_badger": {
+   "rice": {
+    "kind": "좋아함",
+    "line": "…가마 지키다 보면 끼니를 잊는다. 잘 먹으마.",
+    "effect": "none"
+   },
+   "sesame_salt": {
+    "kind": "그저 그럼",
+    "line": "고소하군. 숯내에 묻혀 맛은 잘 모르겠다.",
+    "effect": "none"
    }
   },
   "dolsoe": {
@@ -832,6 +889,11 @@ const TABLES={
    "sesame_salt": {
     "kind": "좋아함",
     "line": "손끝에도 고소한 냄새가 배겠네.",
+    "effect": "none"
+   },
+   "seokcheong": {
+    "kind": "좋아함",
+    "line": "…석청이구나. 바위틈에서 땄냐. 귀한 걸 손에 쥐었구나.",
     "effect": "none"
    }
   },
@@ -857,6 +919,11 @@ const TABLES={
     "kind": "좋아함",
     "line": "이건… 숨겨 두고… 천천히…",
     "effect": "none"
+   },
+   "eoksae_som": {
+    "kind": "좋아함",
+    "line": "포근해… 이거 깔면… 겨울 내내 안 춥겠다…",
+    "effect": "none"
    }
   },
   "yeotbang": {
@@ -880,6 +947,11 @@ const TABLES={
    "rainbow_tteok": {
     "kind": "좋아함",
     "line": "허허, 떡 한 조각에 온 길이 다 들었네!",
+    "effect": "none"
+   },
+   "jat": {
+    "kind": "좋아함",
+    "line": "잣이네! 떡 고명으로 딱이야. 고마워!",
     "effect": "none"
    }
   },
@@ -1053,6 +1125,18 @@ const TABLES={
     },
     {
      "who": "me",
+     "text": "값은 물건이 아니라 길이 정한다. 어디서 사서 어디로 가져가느냐. 공짜가 아니니 적어 두라고 했다.",
+     "section": "관찰",
+     "when": "nal:route-price"
+    },
+    {
+     "who": "me",
+     "text": "꺾인 모자 챙을 펴서 도로 씌워 줬다. 보부상은 모자부터 바로 쓴다고. 아빠도 비 오는 날 그렇게 말했다.",
+     "section": "관찰",
+     "when": "nal:hat"
+    },
+    {
+     "who": "me",
      "text": "돌너머에서는 단풍골 칡꽃을 귀하게 쳤다. 같은 물건도 마을마다 값이 다르다.",
      "section": "관찰",
      "when": "nal:dolneomeo"
@@ -1110,6 +1194,12 @@ const TABLES={
      "text": "삼촌은 다리를 절어도 망치는 흔들리지 않는다. 쇠가 가장 빨갈 때 세 번 친다.",
      "section": "관찰",
      "when": "musoe:forge"
+    },
+    {
+     "who": "me",
+     "text": "삼촌 다리는 비 오기 전에 쑤신다. 할머니가 싸 준 칡뿌리 찜질을 감아 드렸더니 따뜻하다고 했다.",
+     "section": "관찰",
+     "when": "musoe:leg"
     }
    ]
   },
@@ -1142,6 +1232,46 @@ const TABLES={
      "when": "galchamgol:arc-toad-wrap"
     }
    ]
+  },
+  {
+   "id": "stream_otter",
+   "region": "galchamgol",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "개울의 어린 수달. 밤마다 함지박을 도로 밀어 올려 둔다. 엄마를 \"빨래 아줌마\"라고 부른다.",
+     "section": "관찰",
+     "when": "met:stream_otter"
+    },
+    {
+     "who": "me",
+     "text": "엄마는 빨래를 마치면 물수제비를 일곱 번 떴다고 한다. 나는 몰랐다.",
+     "section": "관찰",
+     "when": "otter:stone"
+    }
+   ],
+   "name": "여울"
+  },
+  {
+   "id": "charcoal_badger",
+   "region": "galchamgol",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "참나무 숲에서 숯 굽는 오소리. 흰 연기는 아직, 푸른 연기면 다 된 숯이다.",
+     "section": "관찰",
+     "when": "met:charcoal_badger"
+    },
+    {
+     "who": "me",
+     "text": "날쌘 아저씨는 값을 깎는 척하고 가마 옆에 몰래 덤을 두고 간다. 모른 척하기로 했다.",
+     "section": "관찰",
+     "when": "geom:nal"
+    }
+   ],
+   "name": "검댕"
   },
   {
    "id": "kudzu",

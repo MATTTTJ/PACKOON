@@ -8,6 +8,10 @@ taste_musoe_acorn_jelly,musoe,acorn_jelly,아주 좋아함,…손 많이 갔겠�
 taste_musoe_sesame_salt,musoe,sesame_salt,좋아함,밥에 얹으면 되겠군. 잘 빻았다.,none,제안
 taste_toad_magamok_tea,toad,magamok_tea,아주 좋아함,"허허, 찻잔에 산 냄새가 담겼구나.",none,제안
 taste_toad_ssanghwa,toad,ssanghwa,좋아함,한데 갈았어도 저마다 향이 남았네.,none,제안
+taste_stream_otter_acorn_jelly,stream_otter,acorn_jelly,좋아함,말랑말랑! 물에 넣으면 미끄러질 것 같아.,none,제안
+taste_stream_otter_salt,stream_otter,salt,그저 그럼,짜! 개울물 마셔야겠다.,none,제안
+taste_charcoal_badger_rice,charcoal_badger,rice,좋아함,…가마 지키다 보면 끼니를 잊는다. 잘 먹으마.,none,제안
+taste_charcoal_badger_sesame_salt,charcoal_badger,sesame_salt,그저 그럼,고소하군. 숯내에 묻혀 맛은 잘 모르겠다.,none,제안
 taste_dolsoe_memil_jelly,dolsoe,memil_jelly,아주 좋아함,매끈하구나. 잘 갈았어.,none,제안
 taste_dolsoe_sesame_salt,dolsoe,sesame_salt,좋아함,손끝에도 고소한 냄새가 배겠네.,none,제안
 taste_ppuri_memil_jelly,ppuri,memil_jelly,아주 좋아함,메밀 향이 곧군. 정성을 받겠다.,none,제안
@@ -39,3 +43,7 @@ taste_dol_badger_memil_jelly,dol_badger,memil_jelly,아주 좋아함,내 메밀�
 taste_dol_badger_gyeolmyeongja,dol_badger,gyeolmyeongja,그저 그럼,눈보다 무릎이 문제다. 돌쇠 할배나 드려라.,none,제안
 taste_dol_turtle_memil,dol_turtle,memil,좋아함,메밀 알은 천천히 씹어도 달구나.,none,제안
 taste_dol_turtle_stonedust,dol_turtle,stonedust,그저 그럼,돌가루는… 내 등딱지에도 잔뜩 붙어 있다.,none,제안
+taste_toad_songi,toad,songi,좋아함,가을 송이로구나. 향만 맡아도 기운이 나는구나.,none,제안
+taste_kkubeogi_eoksae_som,kkubeogi,eoksae_som,좋아함,포근해… 이거 깔면… 겨울 내내 안 춥겠다…,none,제안
+taste_dolsoe_seokcheong,dolsoe,seokcheong,좋아함,…석청이구나. 바위틈에서 땄냐. 귀한 걸 손에 쥐었구나.,none,제안
+taste_morak_jat,morak,jat,좋아함,잣이네! 떡 고명으로 딱이야. 고마워!,none,제안

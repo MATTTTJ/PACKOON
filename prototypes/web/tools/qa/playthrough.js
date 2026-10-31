@@ -71,17 +71,9 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     if(missRhythm){log('장단 의도된 실패','준비 입력 한 번 뒤 모든 박자를 놓친다');await key('j');}
     while(Date.now()<end) {
       const s=await check();if(s.mg!==id){if(missRhythm){const hits=await read("document.querySelectorAll('#rhythmPips .on').length");log('장단 실패 결과',{hits,expectedHits:0,rice:s.inv.ssal||0});if(hits!==0)throw new Error('장단 전부 실패 시험에서 입력이 맞았다: '+hits);}return;}
-      if(id==='forge') {
-        if(await read("!$('fstrike').disabled"))await click('#fstrike');await wait(90);
-      }else if(id==='stack') {
-        if(await read("!$('sstrike').disabled"))await key('j');await wait(85);
-      }else if(id==='steam') {
-        const fire=await read("window.__qaCanvas?.fire??0");
-        if(fire<60||await read("$('steamBtn').textContent.includes('다시')"))await key('j');await wait(90);
-      }else if(id==='rhythm') {
+      // 손일 미니게임(쇠 벼리기·돌 쌓기·김 올리기·함께 하는 일)은 PR #81(D-88)에서 지웠다. 남은 놀이는 장단·이동 연출뿐이다.
+      if(id==='rhythm') {
         if(!missRhythm)await key('j');await wait(75);
-      }else if(id==='yActivity') {
-        await click('#yActSlow');await wait(80);
       }else if(id==='dolDepthTravel') {
         await wait(100);
       }else if(id==='galTravel') {
@@ -235,7 +227,6 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   try {
     // 시계만 가속한다. 게임 상태와 판정 함수를 쓰거나 교체하지 않는다. 미니게임은 원래 속도다.
     await read(`(()=>{if(window.__qaClockInstalled)return;window.__qaClockInstalled=true;window.__qaClockRate=1;let last=null,virtual=null;const raf=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=callback=>raf(now=>{if(last===null){last=now;virtual=now;}else{virtual+=(now-last)*window.__qaClockRate;last=now;}callback(virtual);});})()`);
-    await read(`(()=>{if(window.__qaCanvas)return;window.__qaCanvas={};const p=CanvasRenderingContext2D.prototype,old=p.fillRect;p.fillRect=function(x,y,w,h){if(this.canvas.id==='steamCv'&&w===8&&['#ff7b2e','#ffb347','#e8551f'].includes(this.fillStyle))window.__qaCanvas.fire=h/.3;return old.apply(this,arguments);};})()`);
     if(await read("!$('titleScene').hidden"))await click('#tsNew');
     await click('#btnStart');await settle();
     if(await read('G.f.arcs')!==(mode==='expanded'))throw new Error('사연 켬/끔 시작값이 모드와 다르다');
