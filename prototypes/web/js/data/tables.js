@@ -2159,7 +2159,7 @@ const TABLES={
   "peek_ms": 1400,
   "peek_fade_ms": 180,
   "hint_range": 150,
-  "craft_auto_step_ms": 260,
+  "craft_motion_ms": 1100,
   "drop_arc_height": 24,
   "drop_flight_frames": 28,
   "drop_min_spacing": 18,
