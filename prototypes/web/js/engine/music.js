@@ -345,7 +345,7 @@
     const tickSeconds = 0.025, horizon = 0.3, chunkSeconds = 0.12;
     const sampleRate = finite(options.sampleRate || 22050, 'player.sampleRate', 8000, 48000);
     const clockEvents = [], sfxCache = new Map();
-    let peakSources = 0, ended = false, travelPlan = null, pausedRoute = null;
+    let peakSources = 0, ended = false, travelPlan = null, pausedRoute = null, pausedShape = null;
     const sourceCount = () => [...active].reduce((n, s) => n + s.sources.size, 0);
     function clockEvent(type, details = {}) {
       const item = { type, clock: context ? context.currentTime : 0, ...details };
@@ -358,8 +358,8 @@
         const start = current.pcm.loopStartFrame / current.pcm.sampleRate, end = current.pcm.loopEndFrame / current.pcm.sampleRate;
         if (seconds >= end) seconds = start + (seconds - start) % (end - start);
       }
-      const track = tracks.get(current ? current.id : selectedId), loopStart = track && track.loop ? track.loop.start * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0;
-      return { id: current ? current.id : selectedId, playing: !!current && !paused, paused, loading, ended, currentTime: seconds, duration: track ? track.measures * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0, phase: track && track.loop ? seconds < loopStart ? 'intro' : 'loop' : 'once', travel: travelPlan ? { to: travelPlan.to, interlude: travelPlan.interlude, phase: travelPlan.phase } : null, enabled, volume, ducking, unlocked };
+      const track = current && current.track || tracks.get(current ? current.id : selectedId), loopStart = track && track.loop ? track.loop.start * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0;
+      return { id: current ? current.id : selectedId, tempoFactor: current ? current.factor || 1 : 1, layered: !!(current && current.parts), playing: !!current && !paused, paused, loading, ended, currentTime: seconds, duration: track ? track.measures * track.meter[0] * 4 / track.meter[1] * 60 / track.tempo : 0, phase: track && track.loop ? seconds < loopStart ? 'intro' : 'loop' : 'once', travel: travelPlan ? { to: travelPlan.to, interlude: travelPlan.interlude, phase: travelPlan.phase } : null, enabled, volume, ducking, unlocked };
     }
     let selectedId = null;
     function emit() { if (typeof options.onState === 'function') options.onState(state()); }
@@ -409,7 +409,7 @@
     function queuedSession(part, when) {
       const gain = context.createGain(); gain.gain.value = 0; gain.connect(master);
       gain.gain.setValueAtTime(0, when); gain.gain.linearRampToValueAtTime(1, when + .015);
-      const session = { id: part.id, pcm: part.pcm, gain, sources: new Set(), frame: 0, when, started: when, from: 0, stopping: false, enteredLoop: false, next: part.next || null, endFrame: part.next ? part.pcm.scoreFrames : null };
+      const session = { id: part.id, pcm: part.pcm, track: tracks.get(part.id), factor: 1, gain, sources: new Set(), frame: 0, when, started: when, from: 0, stopping: false, enteredLoop: false, next: part.next || null, endFrame: part.next ? part.pcm.scoreFrames : null };
       active.add(session); current = session; selectedId = part.id;
       paused = false; pausedAt = 0; loading = false; ended = false;
       if (travelPlan) { travelPlan.phase = part.phase; if (part.phase === 'intro') travelPlan = null; }
@@ -426,7 +426,7 @@
         session.started += skippedClock;
       }
       while (session.when < until && !session.stopping && !destroyed) {
-        if (sourceCount() >= 48) break;
+        if (sourceCount() >= 48 * (session.parts ? session.parts.length : 1)) break;
         const endFrame = session.endFrame || pcm.loopEndFrame || pcm.left.length;
         if (session.frame >= endFrame) {
           if (session.next) {
@@ -448,15 +448,20 @@
         const segmentEnd = session.frame < pcm.loopStartFrame ? Math.min(pcm.loopStartFrame, endFrame) : endFrame;
         const length = Math.min(Math.round(chunkSeconds * rate), segmentEnd - session.frame, Math.floor((until - session.when) * rate));
         if (length < 1) break;
-        const buffer = context.createBuffer(2, length, rate);
-        buffer.copyToChannel(pcm.left.subarray(session.frame, session.frame + length), 0);
-        buffer.copyToChannel(pcm.right.subarray(session.frame, session.frame + length), 1);
-        const source = context.createBufferSource(); source.buffer = buffer; source.connect(session.gain);
-        session.sources.add(source);
+        // 결정 D-37: 층 재생. 층마다 같은 길이로 합성한 PCM을 같은 시각에 예약하고 층 볼륨만 따로 둔다.
+        const parts = session.parts || [{ pcm, node: session.gain }];
+        let duration = 0;
+        for (const part of parts) {
+          const buffer = context.createBuffer(2, length, rate);
+          buffer.copyToChannel(part.pcm.left.subarray(session.frame, session.frame + length), 0);
+          buffer.copyToChannel(part.pcm.right.subarray(session.frame, session.frame + length), 1);
+          const source = context.createBufferSource(); source.buffer = buffer; source.connect(part.node);
+          session.sources.add(source);
+          source.onended = () => { session.sources.delete(source); source.disconnect(); if (session.stopping && !session.cleanup && !session.sources.size) { session.gain.disconnect(); active.delete(session); } };
+          source.start(session.when); duration = buffer.duration;
+        }
         peakSources = Math.max(peakSources, sourceCount());
-        source.onended = () => { session.sources.delete(source); source.disconnect(); if (session.stopping && !session.cleanup && !session.sources.size) { session.gain.disconnect(); active.delete(session); } };
-        source.start(session.when);
-        session.lastEnd = session.when + buffer.duration;
+        session.lastEnd = session.when + duration;
         if (session.next && session.frame + length >= endFrame) {
           session.gain.gain.setValueAtTime(1, Math.max(session.when, session.lastEnd - .015));
           session.gain.gain.linearRampToValueAtTime(0, session.lastEnd);
@@ -475,17 +480,23 @@
       }
     }
     function startTimer() { if (!timer) timer = setInterval(schedule, tickSeconds * 1000); }
-    async function loadTrack(id, request) {
-      let pcm = cache.get(id);
+    async function loadTrack(id, request, variant) {
+      const key = variant ? variant.key : id;
+      let pcm = cache.get(key);
       if (!pcm) {
-        pcm = await renderSongAsync(tracks.get(id), bank, { sampleRate, cancelled: () => request !== serial || destroyed });
+        pcm = await renderSongAsync(variant ? variant.track : tracks.get(id), bank, { sampleRate, cancelled: () => request !== serial || destroyed });
         if (!pcm || request !== serial || destroyed) return null;
       }
-      cache.delete(id); cache.set(id, pcm);
+      cache.delete(key); cache.set(key, pcm);
       const bytes = () => [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0);
-      while (cache.size > 2 || cache.size > 1 && bytes() > 48 * 1024 * 1024) cache.delete(cache.keys().next().value);
+      const limit = 160 * 1024 * 1024;
+      while (cache.size > 1 && (bytes() > limit || cache.size > 24)) cache.delete(cache.keys().next().value);
       return pcm;
     }
+    // 결정 D-37: 템포 변형(같은 악보를 빠르기만 바꿔 합성)과 층(성부 묶음)
+    function variantTrack(id, factor) { const base = tracks.get(id); return factor && factor !== 1 ? { ...base, tempo: base.tempo * factor } : base; }
+    function layerKey(layers) { return layers ? Object.keys(layers).map(n => n + ':' + layers[n].join('+')).join('|') : ''; }
+    let levels = {};
     async function travel(id) {
       if (destroyed || !tracks.has(id)) return false;
       // 결정 D-15: 지역을 옮길 때 길 위 간주 (design/data/decisions.csv)
@@ -520,7 +531,9 @@
       if (destroyed) throw new Error('연주기가 닫혔습니다.');
       if (!tracks.has(id)) throw new Error('없는 곡: ' + id);
       if (!settings.route) { travelPlan = null; pausedRoute = null; if (current) { current.next = null; current.endFrame = null; } }
-      if (current && current.id === id && settings.fromSeconds === undefined && !paused) {
+      const factor = settings.tempo || 1, layers = settings.layers || null, lkey = layerKey(layers);
+      if (settings.levels) levels = { ...levels, ...settings.levels };
+      if (current && current.id === id && settings.fromSeconds === undefined && !settings.keepBeat && (current.factor || 1) === factor && (current.layerKey || '') === lkey && !paused) {
         // A 재생 중 B를 준비하다 A로 돌아오면 늦게 끝난 B를 버린다.
         if (loading || selectedId !== id) { serial++; selectedId = id; loading = false; emit(); }
         return true;
@@ -532,17 +545,34 @@
       }
       const request = ++serial;
       selectedId = id; loading = true; ended = false; emit();
-      const pcm = await loadTrack(id, request);
+      const track = variantTrack(id, factor), base = id + '@' + factor;
+      let pcm = null, parts = null;
+      if (layers) {
+        parts = [];
+        for (const name of Object.keys(layers)) {
+          const voices = new Set(layers[name]);
+          const part = await loadTrack(id, request, { key: base + '#' + name, track: { ...track, voices: track.voices.filter(v => voices.has(v.id)) } });
+          if (!part) return false;
+          parts.push({ name, pcm: part });
+        }
+        pcm = parts[0].pcm;
+      } else pcm = await loadTrack(id, request, factor === 1 ? null : { key: base, track });
       if (!pcm) return false;
       if (request !== serial || destroyed) return false;
       const crossfade = clamp(settings.crossfade === undefined ? 1.5 : settings.crossfade, 0.01, 4);
-      const from = clamp(settings.fromSeconds || 0, 0, pcm.left.length / pcm.sampleRate - 0.001);
+      let fromSeconds = settings.fromSeconds || 0;
+      if (settings.keepBeat && current && current.track) {
+        // 합성이 끝난 지금의 박 위치를 새 템포의 시각으로 옮긴다. 박이 이어져 템포만 바뀐 것처럼 들린다.
+        fromSeconds = state().currentTime * current.track.tempo / track.tempo;
+      }
+      const from = clamp(fromSeconds, 0, pcm.left.length / pcm.sampleRate - 0.001);
       const previous = current;
       // 잦은 장면 교체에서도 이전 곡 하나만 페이드하며 나머지는 정리한다.
       active.forEach(session => { if (session !== previous) discardSession(session); });
       const gain = context.createGain(); gain.gain.value = 0; gain.connect(master);
       const start = context.currentTime + 0.035;
-      const session = { id, pcm, gain, sources: new Set(), frame: Math.floor(from * pcm.sampleRate), when: start, started: start, from, stopping: false, enteredLoop: from * pcm.sampleRate > pcm.loopStartFrame };
+      const session = { id, pcm, gain, track, factor, layerKey: lkey, layers, sources: new Set(), frame: Math.floor(from * pcm.sampleRate), when: start, started: start, from, stopping: false, enteredLoop: from * pcm.sampleRate > pcm.loopStartFrame };
+      if (parts) session.parts = parts.map(part => { const node = context.createGain(); node.gain.value = levels[part.name] === undefined ? 1 : levels[part.name]; node.connect(gain); return { ...part, node }; });
       if (settings.route) { travelPlan = settings.route.plan; session.next = settings.route.next; session.endFrame = settings.route.endFrame; }
       active.add(session); current = session; paused = false; pausedAt = from; loading = false;
       gain.gain.setValueAtTime(0, context.currentTime); gain.gain.linearRampToValueAtTime(1, start + crossfade);
@@ -562,6 +592,7 @@
     function pause() {
       if (!current) return;
       pausedRoute = travelPlan ? { plan: { ...travelPlan }, next: current.next, endFrame: current.endFrame } : null;
+      pausedShape = { tempo: current.factor || 1, layers: current.layers || null };
       pausedAt = state().currentTime; serial++; loading = false; paused = true;
       active.forEach(session => cancelSession(session, 0.025)); current = null;
       if (timer) { clearInterval(timer); timer = null; } emit();
@@ -570,9 +601,13 @@
     async function resume() {
       if (!paused || !selectedId) return false;
       const route = pausedRoute;
-      const ok = await play(selectedId, { fromSeconds: pausedAt, crossfade: 0.08, route });
+      const ok = await play(selectedId, { fromSeconds: pausedAt, crossfade: 0.08, route, ...(pausedShape || {}) });
       if (ok && route && route.plan.phase === 'preparing') { const to = route.plan.to; travelPlan = null; return travel(to); }
       return ok;
+    }
+    function setLayers(next, seconds = 0.6) {
+      levels = { ...levels, ...next };
+      if (current && current.parts) current.parts.forEach(part => { if (next[part.name] !== undefined) setGain(part.node, clamp(next[part.name], 0, 2), seconds); });
     }
     function setVolume(value) { volume = finite(value, 'volume', 0, 1); if (master) setGain(master, enabled ? volume * ducking : 0); emit(); }
     function setDucking(value = 1, seconds = .15) { ducking = finite(value, 'ducking', 0, 1); if (master) setGain(master, enabled ? volume * ducking : 0, seconds); emit(); }
@@ -633,7 +668,7 @@
       if (ownsContext && context) context.close().catch(() => {});
     }
     function getDiagnostics() { return { clockEvents: clockEvents.slice(), schedulerRunning: !!timer, sources: sourceCount(), peakSources, sessions: active.size, cachedTracks: cache.size, cacheBytes: [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0), sampleRate }; }
-    return { unlock, play, travel, stop, pause, resume, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
+    return { unlock, play, travel, stop, pause, resume, setLayers, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
   }
   function attachSound(sound, player) {
     if (!sound || !player) throw new Error('Sound와 player가 필요합니다.');

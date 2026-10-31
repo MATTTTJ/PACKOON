@@ -4,6 +4,11 @@
 const Rg=REGIONS.galchamgol;
 const TREE_X=2214;
 const KUDZU_AT=1955;   // 이보다 오른쪽으로 가면 엉킨 칡과 전투
+// 결정 D-37: 엉킨 칡에 다가갈수록 긴장이 오른다 (음악의 북 층과 템포). 칡이 풀리면 0.
+Rg.moodTension=()=>{
+  if(!G.started||G.boss.dead||(!CLASSIC&&G.zone!=='hill'))return 0;
+  return clamp(1-(Math.abs(KUDZU_AT-G.px)-60)/800,0,1);
+};
 
 /* ---------- 배경 ---------- */
 function hills(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+cam*par;const h=base-Math.sin(wx*freq)*amp-Math.sin(wx*freq*2.3+1)*amp*0.4;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
