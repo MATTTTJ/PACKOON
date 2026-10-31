@@ -196,7 +196,8 @@ function ledgerDone(id){if(G.ledger[id]&&!G.ledger[id].done){Vfx.burst(G.px,G.py
 function rel(id,d){G.rel[id].v+=d;}
 
 /* ---------- 여행하며 모으는 기록 ---------- */
-const MOM_NOTE=['밥 잘 먹고','아빠 만나면','손 꼭 잡고 와.','엄마가 기다릴게.'];
+// 결정 D-38: 첫 줄은 "엄마 걱정은 하지 말고" (사용자 요청 2026-10-31). 늙은 까치에게 아이가 하는 대답이 이 줄을 받는다.
+const MOM_NOTE=['엄마 걱정은 하지 말고','아빠 만나면','손 꼭 잡고 와.','엄마가 기다릴게.'];
 function normalizeTravelRecords(g){
   g.f=g.f||{};g.nicknames=Array.isArray(g.nicknames)?g.nicknames:[];g.learned=Array.isArray(g.learned)?g.learned:[];
   g.f.arcs=arcsEnabled(g);

@@ -1,0 +1,10 @@
+﻿id,지역,NPC,물건,개수,횟수,상태,비고
+s_gal_nal_acorn,galchamgol,nal,도토리,2,3,제안,날쌘 지게 바닥에 굴러다니는 도토리. 숯만 파는 게 아니다 (사용자 피드백 2026-10-31)
+s_gal_dodam_acorn,galchamgol,dodam,도토리,1,3,제안,도담이 겨울 먹이로 모아 둔 도토리. 흙 묻은 자기 몫은 내놓지 않는다
+s_gal_toad_kkoe,galchamgol,toad,꾀꼬리버섯,1,1,제안,약재상이라 말린 버섯을 둔다
+s_dol_nal_memil,dolneomeo,nal,메밀,2,3,제안,돌너머 밭에서 사 둔 메밀
+s_dol_dolsoe_dust,dolneomeo,dolsoe,돌가루,1,2,제안,석수의 작업장에 쌓인 돌가루
+s_jang_nal_mung,jangteo,nal,녹두,1,2,제안,설 대목에 떼 온 녹두
+s_jang_yeot_ssal,jangteo,yeotbang,쌀,1,3,제안,엿 고는 쌀. 솔방울 교환과 별개로 조금 나눠 준다
+s_jang_morak_yakgwa,jangteo,morak,약과,1,1,제안,떡집 좌판의 약과
+s_yeong_nal_magamok,yeongsan,nal,마가목 열매,1,2,제안,눈길에서 딴 마가목 열매

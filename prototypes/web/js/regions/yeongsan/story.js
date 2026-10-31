@@ -38,6 +38,7 @@ function nalMenu(){
   const F=G.f;
   if(!CLASSIC&&F.nalYDone){
     const c=[];
+    c.push({t:'보따리를 펼친다',go:()=>Trade.open('nal')});
     if(!F.yCraftJujube)c.push({t:'지게에 매달린 대추 꾸러미를 묻는다',go:craftJujube});
     c.push(...nalAskChoices());
     c.push({t:'산길로 간다',go:null});
@@ -45,13 +46,13 @@ function nalMenu(){
   }
   if(F.nalYDone){
     if(arcs()){
-      const c=nalAskChoices();
+      const c=[{t:'보따리를 펼친다',go:()=>Trade.open('nal')},...nalAskChoices()];
       c.push({t:'산길로 간다',go:null});
       talk([['날쌘','설피 끈 단단히 매. 눈에 푹 빠지지 말고.',c]]);return;
     }
     talk([['날쌘','설피 끈이나 단단히 매. 눈길에서 서두르다간 푹 빠져.']]);return;
   }
-  const c=[];if(vineOK()&&bindOK())c.push({t:'설피 재료를 건넨다',go:nalTrade});c.push({t:'그만두기',go:null});
+  const c=[{t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'그만두기',go:null}];
   if(arcs()){
     talk([['날쌘',vineOK()&&bindOK()?'다 모았네. 이리 줘.':!vineOK()?'산막 옆 덤불을 낫으로 베 봐. 다래 덩굴이 나와.':'짚 하나면 돼. 산막 처마 밑에서 한 줌 빼 와.',c]]);return;
   }
@@ -65,17 +66,19 @@ function craftJujube(){
     talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n덩굴 하나랑 바꿀까 했지.'],['날쌘','산막 옆이나 눈 굴 끝 덤불을 베 봐.\n덩굴 하나에 대추 둘이야.']]);return;
   }
   talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n덩굴 하나랑 바꿀까 했지.'],['날쌘','마침 덩굴이 있네.\n하나에 대추 둘, 어때?',[
-    {t:'바꾼다',go:()=>{
-      if(G.f.yCraftJujube||!has('darae_vine'))return;
-      takeItem('darae_vine',1);addItem('jujube',2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
-      talk([['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
-    }},{t:'지금은 놔둘게요',go:null}]]]);
+    {t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'지금은 놔둘게요',go:null}]]]);
 }
-function nalTrade(){
-  const F=G.f;
-  const vine=has('darae_vine',2)?'덩굴 둘':'싸리 살 하나',bind=has('jip')?'짚 하나':'억새 둘';
-  if(has('darae_vine',2))takeItem('darae_vine',2);else takeItem('broom_sal',1);
-  if(has('jip'))takeItem('jip',1);else takeItem('eoksae',2);
+function jujubeGive(){
+  if(CLASSIC||!G.f.seolpi||G.f.yCraftJujube||!has('darae_vine'))return;
+  takeItem('darae_vine',1);addItem('jujube',2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
+  talk([['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
+}
+const SEOLPI_ASKS=[{darae_vine:2,jip:1},{darae_vine:2,eoksae:2},{broom_sal:1,jip:1},{broom_sal:1,eoksae:2}];
+function nalTrade(i=0){
+  const F=G.f,ask=SEOLPI_ASKS[i];
+  if(F.nalYDone||!ask||Object.entries(ask).some(([id,n])=>!has(id,n)))return;
+  const vine=ask.darae_vine?'덩굴 둘':'싸리 살 하나',bind=ask.jip?'짚 하나':'억새 둘';
+  for(const [id,n] of Object.entries(ask))takeItem(id,n);
   F.nalYDone=true;F.seolpi=true;addItem('seolpi',1);ledgerDone('nal_yeongsan');
   if(arcs()){
     diary('y_nal','날쌘에게 재료를 건네고 설피를 받았다. 이번에는 덤 없이 제값으로 바꿨다.');
@@ -156,9 +159,15 @@ function talkSalg(){
 }
 const salgCan=()=>has('magamok',3)||has('kong',2);
 // 결정 D-20: 강철이 설화는 살금이가 (design/data/decisions.csv)
+const SALG_ASKS=[{magamok:3},{kong:2}];
 function salgTrade(){
-  talk([['살금이','그, 그거 나한테 줄래?',[{t:has('magamok',3)?'마가목 열매 3을 건넨다':'콩 2를 건넨다',go:()=>{
-    const F=G.f;if(has('magamok',3))takeItem('magamok',3);else takeItem('kong',2);
+  talk([['살금이','그, 그거 나한테 줄래?',[{t:'보따리를 펼친다',go:()=>Trade.open('salgeumi')},{t:'아직은 안 줄래',go:null}]]]);
+}
+function salgGive(i=0){
+  const F=G.f,ask=SALG_ASKS[i];
+  if(F.salgDone||!ask||Object.entries(ask).some(([id,n])=>!has(id,n)))return;
+  {
+    for(const [id,n] of Object.entries(ask))takeItem(id,n);
     F.salgDone=true;F.shortcut=true;rel('salgeumi',1);ledgerDone('salgeumi');learn('salgeumi:shortcut');
     nickname('yeongsan_soft_step','사뿐발','살금이');
     if(arcs()){
@@ -177,7 +186,7 @@ function salgTrade(){
     talk([['살금이','고, 고마워… 사, 사뿐발. 조용히 와 줘서.'],['살금이','어, 얼어붙은 비탈 있지?\n왼쪽 바위턱을 디디면 호숫가로 올라갈 수 있어.'],
       ['살금이','가을부터 호숫가에 너구리 하나가 있어.\n신목만 바라보는데… 말은 못 하더라.'],
       ['살금이','지, 지금은 이무기가 호수에 똬리를 틀고 있어.\n그 녀석 때문에 봄이 안 와…']],()=>{toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();});
-  }},{t:'아직은 안 줄래',go:null}]]]);
+  }
 }
 function salgArcChoices(){
   const F=G.f,c=[];
@@ -491,6 +500,17 @@ Rg.goal=()=>{
   if(F.yakDone)return '봄길과 약연 가공을 더 둘러보자 · 다 되면 아빠나 산군 할아버지께 말씀드리고 집으로';
   return '아빠와 손을 포개 약연을 굴리자';
 };
+/* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
+   결정 D-39: 원하는 것을 들은 뒤(장부에 적힌 뒤)에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
+   설피는 대체 조합 넷을 모두 펼친다. 살금이는 살금살금 다가가 말을 나눈 뒤라야 장부에 적힌다.
+   영산 날쌘은 '덤 없이 제값'이 이야기라 지역 덤(onHaggle)을 두지 않는다. */
+Rg.trade={
+  nal:()=>[
+    ...(G.ledger.nal_yeongsan?[{id:'t_nal_yeongsan',item:'seolpi',n:1,asks:SEOLPI_ASKS,done:()=>G.f.nalYDone,accept:nalTrade}]:[]),
+    ...(!CLASSIC&&G.f.seolpi&&G.ledger.t_craft_jujube?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1}],done:()=>G.f.yCraftJujube,accept:jujubeGive}]:[])
+  ],
+  salgeumi:()=>G.ledger.salgeumi?[{id:'t_salgeumi',item:'magamok',icon:'icicle',label:'호숫가 지름길',asks:SALG_ASKS,done:()=>G.f.salgDone,accept:salgGive}]:[]
+};
 })();
 
 /* PA-43 · 영산의 선택 만남. 필수 교환과 독립이며 거절하면 물건도 기록도 바뀌지 않는다. */
@@ -679,4 +699,5 @@ Rg.expContent={
   examines,
   stamps:{shelter:[stamp('hut_post',1040,108)],snow:[stamp('snow_sign',1780,108)],shore:[stamp('shore_rock',2130,192)]}
 };
+
 })();

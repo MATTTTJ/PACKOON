@@ -5,19 +5,21 @@
 function childNoteSection(line){return line.when?.startsWith('habit:')?'익힌 솜씨':line.when?.startsWith('recipe:')?'숨은 가공법':'관찰';}
 function renderMomNote(body){
   const stage=G.f.momNoteRestored?0:(G.f.momNoteFade||0),paper=el('div','mom-note');
-  const recipient=G.f.momNoteRestored&&G.f.newName?G.f.newName:'＿＿＿',lines=[recipient+'에게',...MOM_NOTE];
-  paper.dataset.fade=stage;paper.setAttribute('role','img');paper.setAttribute('aria-label','엄마가 겨우 써 준 쪽지. '+lines.join(' '));
+  // 결정 D-38: 받는 이의 이름은 번져서 읽히지 않는다. 아이의 이름은 엔딩에서야 나온다. 엔딩 뒤에는 새 이름이 또렷하게 보인다.
+  const named=!!(G.f.momNoteRestored&&G.f.newName),recipient=named?G.f.newName:'아무개',lines=[recipient+'에게',...MOM_NOTE];
+  const spoken=[(named?recipient:'(번진 이름)')+'에게',...MOM_NOTE];
+  paper.dataset.fade=stage;paper.setAttribute('role','img');paper.setAttribute('aria-label','엄마가 겨우 써 준 쪽지. '+spoken.join(' '));
   paper.appendChild(el('small',null,G.f.momNoteRestored?'다시 또렷해진 엄마의 글씨':'출발하는 날, 엄마가 건넨 한 장. 보따리 안쪽에 잘 넣어 두었다'));
   let index=0;
-  for(const text of lines){const line=el('p');for(const ch of text){
-    const glyph=el('span',null,ch);glyph.setAttribute('aria-hidden','true');
+  lines.forEach((text,row)=>{const line=el('p');[...text].forEach((ch,col)=>{
+    const glyph=el('span',row===0&&!named&&col<recipient.length?'smudge':null,ch);glyph.setAttribute('aria-hidden','true');
     const wear=(index++*7+3)%11;glyph.style.opacity=stage===0?'1':String(Math.max(.08,1-stage*(.15+wear*.025)));line.appendChild(glyph);
-  }paper.appendChild(line);}
+  });paper.appendChild(line);});
   body.appendChild(paper);
   body.appendChild(el('p','small',stage?'길을 옮길 때마다 글씨가 조금씩 흐려졌다. 엄마가 건넨 마음은 남아 있다.':'접힌 자리에 엄마 손때가 남아 있다.'));
   // 흐려짐은 그림 연출뿐이다. 쪽지 내용을 다시 읽을 수 있다.
   const transcript=el('details','mom-transcript');transcript.appendChild(el('summary',null,'쪽지 글 다시 읽기'));
-  lines.forEach(text=>transcript.appendChild(el('p',null,text)));body.appendChild(transcript);
+  spoken.forEach(text=>transcript.appendChild(el('p',null,text)));body.appendChild(transcript);
 }
 /* 아이가 적은 장 하나 (tab: clues·nicknames·mom·ledger) */
 function renderChildRecord(body,tab){
