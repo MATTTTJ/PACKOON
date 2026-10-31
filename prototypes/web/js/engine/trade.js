@@ -23,42 +23,83 @@ const Trade=(()=>{
   const key=npc=>G.region+':'+npc;
   const stockLeft=row=>row.times-(G.f.stockUsed?.[row.id]||0);
   const stockOf=npc=>(TABLES.STOCK||[]).filter(r=>r.region===G.region&&r.npc===npc);
+  /* 결정 D-123: 상대가 지녔다고 말한 물건은 바꿀 수 없을 때도 보따리에 보인다(인과: 아이가 들은 것만 보인다).
+     상태는 넷이다. 열림 / 거래 불가(잠김: 지역 조건) / 거래 불가(값: 지금 내 보따리로는 못 맞춤) / 다 바꿈. 바꿀 수 있는 것부터 늘어놓는다. */
   function goodsOf(npc){
-    const story=(REG.trade?.[npc]?.()||[]).filter(g=>!g.done?.()).map(g=>({...g,kind:'story'}));
-    const common=stockOf(npc).filter(r=>stockLeft(r)>0).map(r=>({id:r.id,item:r.item,n:r.n,kind:'common',row:r}));
-    return [...story,...common];
+    const story=(REG.trade?.[npc]?.()||[]).map(g=>({...g,kind:'story'}));
+    const common=stockOf(npc).map(r=>({id:r.id,item:r.item,n:r.n,kind:'common',row:r}));
+    const order={open:0,short:1,lock:2,done:3};
+    return [...story,...common].map((g,i)=>({g,i,k:stateOf(g).k})).sort((a,b)=>order[a.k]-order[b.k]||a.i-b.i).map(x=>x.g);
   }
+  function stateOf(g){
+    if(g.kind==='story'?g.done?.():stockLeft(g.row)<=0)return {k:'done',why:'다 바꿨다.'};
+    const lock=g.locked?.();if(lock)return {k:'lock',why:lock};
+    if(g.kind==='story'){
+      if(!g.asks.some(a=>Object.entries(a).every(([id,n])=>has(id,n))))return {k:'short',why:'지금 보따리로는 못 바꾼다. 필요한 것: '+g.asks.map(askText).join(', 또는 ')+'.'};
+    }else{
+      const need=ITEMS[g.item].r,ok=id=>!offerBlock(g,id,{});
+      const units=Object.keys(G.inv).filter(id=>G.inv[id]>0&&ITEMS[id]&&ok(id));
+      const one=units.some(id=>step(npcOf(g),id)>=need);
+      const two=need>0&&units.reduce((s,id)=>s+(step(npcOf(g),id)>=need-1?G.inv[id]:0),0)>=2;
+      if(!one&&!two)return {k:'short',why:'지금 보따리에 값이 맞는 물건이 없다. '+priceText(g)+'면 된다.'};
+    }
+    return {k:'open'};
+  }
+  const npcOf=g=>g.row?.npc||S?.npc;
   const priceText=g=>{const r=ITEMS[g.item].r;return r?rank(r)+' 하나, 또는 '+rank(r-1)+' 둘':rank(0)+' 하나';};
   const askText=a=>Object.entries(a).map(([id,n])=>ITEMS[id].n+' '+n).join(' + ');
+  /* 결정 D-124: 값은 레어도 단계가 먼저, 수량이 나중이다. 단계가 모자라면 몇 개를 얹었든 단계 이야기만 한다. */
   function commonMatch(g,offer){
     const ids=Object.entries(offer).flatMap(([id,n])=>Array(n).fill(id)),need=ITEMS[g.item].r;
     if(!ids.length)return {ok:false,why:'내놓을 물건을 얹어야 한다.'};
     if(ids.includes(g.item))return {ok:false,why:'같은 물건끼리는 바꾸지 않는다.'};
-    if(ids.length===1&&step(S.npc,ids[0])>=need)return {ok:true};
+    const kinds=[...new Set(ids)],tag=id=>ITEMS[id].n+'('+rank(step(S.npc,id))+')';
+    // 조사는 괄호 앞 낱말(물건 이름) 받침에 맞춘다: 도토리(하품)로는 / 꾀꼬리버섯(상품)으로는
+    const josa=(list,a,b)=>{const last=ITEMS[list[list.length-1]].n;return list.map(tag).join('·')+jo(last,a,b).slice(last.length);};
+    const best=Math.max(...kinds.map(id=>step(S.npc,id)));
+    const head=jo(ITEMS[g.item].n,'은','는')+' '+rank(need)+'이다. ';
+    // 1) 단계: 하나로도, 한 단계 아래 둘로도 닿지 않으면 단계만 말한다
+    if(best<need-(need>0?1:0))return {ok:false,why:head+josa(kinds,'으로는','로는')+' 안 된다.'};
+    if(best<need){
+      const low=kinds.filter(id=>step(S.npc,id)<need-1);
+      if(low.length)return {ok:false,why:head+josa(low,'은','는')+' 값이 모자라다. '+jo(rank(need-1),'이라면','라면')+' 둘이어야 한다.'};
+      // 2) 수량: 한 단계 아래 물건은 둘
+      if(ids.length!==2)return {ok:false,why:jo(rank(need-1),'으로는','로는')+' 둘이어야 한다. 지금 '+ids.length+'개다.'};
+      return {ok:true};
+    }
+    // 2) 수량: 같은 단계 이상이면 하나로 충분하다
+    if(ids.length===1)return {ok:true};
     if(ids.length===2&&need>0&&ids.every(id=>step(S.npc,id)>=need-1))return {ok:true};
-    if(ids.length>2)return {ok:false,why:'하나나 둘이면 된다. 너무 많이 얹었다.'};
-    return {ok:false,why:jo(ITEMS[g.item].n,'은','는')+' '+rank(need)+'이다. '+priceText(g)+'면 된다.'};
+    return {ok:false,why:rank(need)+' 하나면 된다. 나머지는 빼자.'};
   }
   function storyMatch(g,offer){
     const keys=Object.keys(offer).filter(id=>offer[id]>0);
     const i=g.asks.findIndex(a=>Object.keys(a).length===keys.length&&keys.every(id=>a[id]===offer[id]));
-    return i>=0?{ok:true,alt:i}:{ok:false,why:'원하는 건 '+g.asks.map(askText).join(', 또는 ')+'이다.'};
+    if(i>=0)return {ok:true,alt:i};
+    // 결정 D-124: 물건이 맞는지 먼저, 그다음 수를 본다
+    const same=g.asks.find(a=>Object.keys(a).length===keys.length&&keys.every(id=>a[id]));
+    if(same)return {ok:false,why:'물건은 맞다. 수를 맞추자: '+askText(same)+'.'};
+    return {ok:false,why:'원하는 건 '+g.asks.map(askText).join(', 또는 ')+'이다.'};
   }
   // 이 물건을 지금 고른 교환에 얹을 수 있는가. 못 얹으면 까닭을 돌려준다.
   function blocked(id){
     const g=S.goods.find(g=>g.id===S.sel);
     if(!g)return '먼저 받을 물건을 고른다.';
+    const st=stateOf(g);if(st.k==='done'||st.k==='lock')return st.why;
+    return offerBlock(g,id,S.offer);
+  }
+  function offerBlock(g,id,offer){
     if(g.kind==='story')return g.asks.some(a=>a[id])?null:'이 부탁과는 상관없는 물건이다.';
     if(id===g.item)return '같은 물건끼리는 바꾸지 않는다.';
     if(keepsake(id))return /^(dad|mom)_/.test(id)?'집안 물건은 내놓지 않는다.':'귀한 것은 흔한 물건과 바꾸지 않는다.';   // 결정 D-63
-    const now={...G.inv,[id]:(G.inv[id]||0)-(S.offer[id]||0)};
+    const now={...G.inv,[id]:(G.inv[id]||0)-(offer[id]||0)};
     if(progressShortage({...now,[id]:now[id]-1})>progressShortage(now))return '아직 쓸 데가 있다.';
     return null;
   }
   function open(npc){
     closePanels();
     S={npc,name:npcName(npc),goods:goodsOf(npc),sel:null,offer:{},tried:{},log:[]};
-    S.sel=(S.goods.find(g=>g.kind==='story'&&!g.locked?.())||S.goods[0])?.id||null;
+    S.sel=(S.goods.find(g=>g.kind==='story'&&stateOf(g).k==='open')||S.goods.find(g=>stateOf(g).k==='open')||S.goods[0])?.id||null;
     Sound.panel(true);render();$('trade').hidden=false;$('tradeBody').scrollTop=0;
     setTimeout(()=>{const f=$('tradeBody').querySelector('.trade-good');if(f&&matchMedia('(pointer:fine)').matches)f.focus();},0);
   }
@@ -75,23 +116,26 @@ const Trade=(()=>{
     const wrap=el('div','trade-wrap');
     // 상대가 내놓은 물건과, 그 값으로 원하는 것
     const theirs=el('section','trade-side');theirs.appendChild(el('h3',null,S.name+'의 물건'));
-    if(!S.goods.length)theirs.appendChild(el('p','small','지금은 바꿀 물건이 없다.'));
+    if(!S.goods.some(g=>['open','short'].includes(stateOf(g).k)))theirs.appendChild(el('p','small','지금은 바꿀 물건이 없다.'));
     for(const g of S.goods){
-      const lock=g.locked?.()||null,b=el('button','trade-good');b.type='button';b.dataset.good=g.id;
+      const st=stateOf(g),lock=st.k==='open'?null:st.why,b=el('button','trade-good'+(st.k==='done'||st.k==='lock'?' off':''));b.type='button';b.dataset.good=g.id;b.dataset.state=st.k;
       b.setAttribute('aria-pressed',String(S.sel===g.id));
       // 결정 D-112: 물건이 아닌 정보(info:true)는 찢긴 수첩 쪽 아이콘으로 그리고, 이름은 "~에 대한 정보"로 적는다.
       const head=el('span','trade-good-head');head.appendChild(icon(g.info?'torn_page':(g.icon||g.item)));
       head.appendChild(el('b',null,(g.label||ITEMS[g.item].n)+(g.n>1?' ×'+g.n:'')));
       if(!g.label)head.appendChild(rarityIcon(ITEMS[g.item].r));
-      head.appendChild(el('span','chip',g.info?'정보':g.kind==='story'?'부탁':'흔한 물건'));b.appendChild(head);
+      head.appendChild(el('span','chip',g.info?'정보':g.kind==='story'?'부탁':'흔한 물건'));
+      if(st.k!=='open')head.appendChild(el('span','chip trade-state '+st.k,st.k==='done'?'다 바꿈':'거래 불가'));
+      b.appendChild(head);
       const asks=el('span','trade-asks');
-      if(lock)asks.appendChild(el('span','small',lock));
+      if(st.k==='done'||st.k==='lock')asks.appendChild(el('span','small',lock));
       else if(g.kind==='story')g.asks.forEach((a,i)=>{
         if(i)asks.appendChild(el('span','small','또는'));
         Object.entries(a).forEach(([id,n],k)=>{if(k)asks.appendChild(el('span','plus','+'));asks.appendChild(picture(id,n));});
       });
       else{asks.appendChild(el('span','small',priceText(g)));asks.appendChild(el('span','small','· 남은 '+stockLeft(g.row)+'번'));}
       b.appendChild(asks);
+      if(st.k==='short')b.appendChild(el('span','small trade-why',st.why));
       b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(g.kind==='story'?'원하는 것: '+g.asks.map(askText).join(', 또는 '):priceText(g))));
       b.onclick=()=>{if(S.sel!==g.id){S.sel=g.id;S.offer={};}render();};
       theirs.appendChild(b);
@@ -126,7 +170,8 @@ const Trade=(()=>{
     }
     tray.appendChild(chips);
     const row=el('div','trade-actions');
-    if(TABLES.HAGGLE?.[S.npc]){
+    // 결정 D-125: 상대에게 지금 바꿀 수 있는 물건(열림·값 부족)이 하나도 없으면 흥정 줄을 숨긴다.
+    if(TABLES.HAGGLE?.[S.npc]&&S.goods.some(g=>['open','short'].includes(stateOf(g).k))){
       const hag=el('div','trade-haggle'),closed=!!G.f.haggleUsed?.[key(S.npc)];
       hag.appendChild(el('span','small',haggleState()));
       if(!closed)for(const way of WAYS){
@@ -158,7 +203,7 @@ const Trade=(()=>{
   }
   function propose(){
     const g=S.goods.find(g=>g.id===S.sel);if(!g)return;
-    const lock=g.locked?.();if(lock){S.log.push({who:'',line:lock});render();return;}
+    const st=stateOf(g);if(st.k==='done'||st.k==='lock'){S.log.push({who:'',line:st.why});render();return;}
     const m=g.kind==='story'?storyMatch(g,S.offer):commonMatch(g,S.offer);
     if(!m.ok){S.log.push({who:'',line:'('+jo(S.name,'이','가')+' 고개를 젓는다.) '+m.why});render();return;}
     if(g.kind==='story'){close();g.accept(m.alt);return;}
@@ -168,7 +213,7 @@ const Trade=(()=>{
     addItem(g.item,n);(G.f.stockUsed=G.f.stockUsed||{})[g.row.id]=(G.f.stockUsed[g.row.id]||0)+1;
     learn('trade:'+g.row.id);Sound.exchange();
     S.log.push({who:'',line:'('+S.name+'에게서 '+ITEMS[g.item].n+' '+n+'개를 받았다.'+(bonus?' 덤이 하나 붙었다.':'')+')'});
-    S.offer={};S.goods=goodsOf(S.npc);if(!S.goods.some(x=>x.id===S.sel))S.sel=S.goods[0]?.id||null;render();
+    S.offer={};S.goods=goodsOf(S.npc);if(stateOf(S.goods.find(x=>x.id===S.sel)||{}).k!=='open')S.sel=(S.goods.find(x=>stateOf(x).k==='open')||S.goods[0])?.id||null;render();
   }
   $('tradeClose').onclick=()=>closePanels();
   /* 흔한 물건이 남은 상대와 이야기할 때는 대화창에 '보따리 펼치기'를 늘 둔다. 부탁을 마친 뒤에도 바꿀 수 있게.

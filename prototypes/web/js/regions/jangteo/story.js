@@ -814,10 +814,12 @@ Rg.goal=()=>{
    결정 D-40: 날쌘에게 허세가 통하면 팥을 한 되 더 얹는다(경멸 축). 그 뒤 다시 바꾸는 팥에도 같은 셈이다. */
 Rg.trade={
   yeotbang:()=>[
-    ...(G.f.yeotMet&&!G.f.yeotDone?[{id:'t_yeotbang',item:'ssal',n:8,asks:[{solbang:5}],
+    ...(G.f.yeotMet?[{id:'t_yeotbang',item:'ssal',n:8,asks:[{solbang:5}],
       locked:()=>G.f.yeotPaid?'솔방울은 벌써 건넸다. 엿 고는 동안 장단을 맞추면 쌀을 준다.':null,
       done:()=>G.f.yeotDone,accept:yeotGive}]:[]),
-    ...(!CLASSIC&&G.f.yeotDone&&riceNeeded()?[{id:'t_yeotbang_more',item:'ssal',n:8,asks:[{solbang:5}],accept:yeotMoreGive}]:[])
+    // 결정 D-123: 엿방울이 "쌀은 넉넉해 보인다"고 말한 뒤에도 그 쌀은 보따리에 보인다. 모자랄 때만 바꾼다.
+    ...(!CLASSIC&&G.f.yeotDone?[{id:'t_yeotbang_more',item:'ssal',n:8,asks:[{solbang:5}],
+      locked:()=>riceNeeded()?null:'쌀은 넉넉해 보인다고 했다. 떡 찌다 모자라면 그때 오자.',accept:yeotMoreGive}]:[])
   ],
   nal:()=>[
     ...(G.ledger.nal_jangteo?[
