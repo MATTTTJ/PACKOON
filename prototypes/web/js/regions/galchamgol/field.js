@@ -71,10 +71,11 @@ Rg.drawPickup=(a,x,bob)=>{
   R(x-2,a.y-7+bob,5,2,'#6b4423');R(x-2,a.y-5+bob,5,4,'#c9894a');R(x,a.y-8+bob,1,1,'#4a2e1a');};
 
 /* ---------- 칡덩굴 장애물, 덩굴 몹, 엉킨 칡 ---------- */
-function drawBarrier(){const Bq=G.barrier;if(Bq.cut)return;const x=Bq.x-cam+(Bq.shake?(Bq.shake%2?1:-1):0);if(x<-30||x>W+30)return;
-  const h=60*(Bq.hp/3)+10;
-  for(let i=0;i<5;i++){R(x-8+i*4,GROUND-h+((i*7)%10),3,h-((i*7)%10),i%2?'#3f6b2a':'#4f8a35');}
-  for(let y=GROUND-h;y<GROUND;y+=8){R(x-10,y,20,2,'#2c4f1f');R(x-7,y+4,4,3,'#7fb069');}
+// 결정 D-51: 숲의 장벽은 나무 입구(아치)를 덮은 덩굴 그물이다. 낫질마다 아래로 걷힌다.
+function drawBarrier(){const Bq=G.barrier;if(Bq.cut)return;const x=Bq.x-cam+(Bq.shake?(Bq.shake%2?1:-1):0);if(x<-40||x>W+40)return;
+  const h=Math.round(40*(Bq.hp/3)+6),top=GROUND-h;
+  for(let i=-12;i<=10;i+=4){const t=Math.max(top,GROUND-44+Math.abs(i)/2);R(x+i,t,3,GROUND-t,i%8?'#4f8a35':'#3f6b2a');}
+  for(let y=top+2;y<GROUND;y+=8){R(x-14,y,28,2,'#2c4f1f');R(x-9+((y>>3)%3)*6,y+3,4,3,'#7fb069');}
 }
 function drawMobs(){for(const m of G.mobs){if(m.dead)continue;const x=m.x-cam;if(x<-20||x>W+20)continue;const bob=Math.floor(G.anim/10)%2;
   const c=m.flash?'#e8f5d0':'#3f6b2a';
@@ -185,16 +186,17 @@ if(!CLASSIC){
   const hasSickle=()=>G.tool==='sickle';
   const cutPath=()=>G.barrier.cut;
   // 칡 덩굴로 막힌 길: 아이가 아는 만큼만 말한다 (도담에게 대장간 이야기를 들었는지, 낫을 받았는지).
-  const vineSay=()=>G.tool==='sickle'?'덩굴이 숲 안쪽 금줄에서부터 뻗어 왔네.\n거기 덩굴부터 낫으로 걷자.'
-    :G.f.dodamDone?'곡괭이로는 안 끊기겠어.\n무쇠 삼촌한테 낫을 얻어야겠어.':'질긴 칡덩굴이 꽁꽁 감았네.\n날 선 연장이 있어야겠어.';
+  // 결정 D-51: 무엇이 무엇을 막았는지 먼저 말한다 (칡이 당산나무를 감고 나무 속 입구를 덮었다).
+  const vineSay=()=>G.tool==='sickle'?'칡이 나무를 감고 입구까지 덮었네.\n금줄 따라 안쪽 덩굴부터 낫으로 걷자.'
+    :G.f.dodamDone?'칡이 나무 입구를 덮었어. 곡괭이로는 안 끊겨.\n무쇠 삼촌한테 낫을 얻어야겠어.':'칡덩굴이 나무를 감고 입구를 막았네.\n날 선 연장이 있어야겠어.';
   const bankSay=()=>G.f.dodamDone?'마른 덩굴이 둑길을 덮었네.\n무쇠 삼촌 낫이면 걷을 수 있겠어.':'마른 덩굴이 둑길을 덮었네.\n날 선 연장이 있어야겠어.';
   Rg.zones={
-    village:{...basic('village',2600,[{x:490,y:160,w:80},{x:565,y:126,w:80},
-      {x:1370,y:160,w:85},{x:1450,y:126,w:70},{x:1890,y:158,w:95},{x:1980,y:124,w:80}]),
+    // 결정 D-48: 발판은 stepRidge()로 오르락내리락 (engine/core.js)
+    village:{...basic('village',2600,[...stepRidge(490,11,4),...stepRidge(1370,12,3),...stepRidge(1890,13,5)]),
       exits:{right:{to:'forge',toX:70}},
       doors:[path(1150,'forge',380,'함지박에 올라 개울 따라가기',{travel:'stream',draw:A.streamDoor}),
         path(1710,'hill',180,'물 건너 당산나무 쪽으로',{travel:'depth',need:cutPath,
-          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',blockedLabel:'칡 덩굴',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:blocked,
+          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y),
           formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 넘기'})],
       // 다람쥐의 잊은 몫 (PA-47, 다람쥐 모습에만 보인다)
       digs:[{id:'gal_cache_village',x:880,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
@@ -202,16 +204,16 @@ if(!CLASSIC){
         thought:'낙엽이 앞서 가네.\n저 큰 나무까지 가는 걸까?',
         diary:'물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.',layers:A.vistaStream}],
     },
-    forge:{...basic('forge',2600,[{x:320,y:160,w:85},{x:400,y:126,w:80},
-      {x:1940,y:156,w:90},{x:2030,y:122,w:85},{x:2260,y:160,w:95}]),
+    forge:{...basic('forge',2600,[...stepRidge(320,21,4),...stepRidge(1940,22,5)]),
       npcs:['musoe','nal'],exits:{left:{to:'village',toX:2500},right:{to:'forest',toX:70}},
       doors:[path(380,'village',1150,'개울 둑길로 돌아가기'),
         path(1860,'marsh',2040,'약재 나르는 둑길로 약방에',{need:hasSickle,
           reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',blockedLabel:'마른 덩굴',blockedSay:bankSay,drawBlocked:blocked})],
       stamps:[{id:'anvil',x:1070,note:'stamp:galchamgol:anvil',label:'모루 밑 눌린 자국 살피기'}],
     },
-    forest:{...basic('forest',2800,[{x:410,y:160,w:100},{x:500,y:126,w:80},
-      {x:1540,y:158,w:100},{x:1710,y:152,w:85},{x:2070,y:158,w:90},{x:2160,y:124,w:75},{x:2230,y:112,w:90},
+    // 숲 첫 무리는 744 높은 가지(다람쥐만 오르는 자리)에 닿지 않게 낮게 오르내린다.
+    forest:{...basic('forest',2800,[{x:410,y:160,w:90},{x:486,y:138,w:70},{x:566,y:152,w:66},
+      {x:1530,y:164,w:70},{x:1606,y:138,w:62},{x:1710,y:152,w:85},{x:2070,y:158,w:90},{x:2160,y:124,w:75},{x:2230,y:112,w:90},{x:2334,y:136,w:66},
       {x:744,y:96,w:64}]),
       npcs:['dodam'],exits:{left:{to:'forge',toX:2480},right:{to:'marsh',toX:70}},
       pickups:[{id:'gal_extra_acorn_1',x:410,y:GROUND,item:'acorn',got:false},
@@ -219,7 +221,7 @@ if(!CLASSIC){
         {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false},
         {id:'gal_branch_acorn_1',x:770,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:790,y:96,item:'acorn',got:false}],
       doors:[path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
-          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡 덩굴',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:blocked,
+          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y,false),
           formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 나무 속으로'})],
       // 다람쥐만 오르는 높은 참나무 가지와 잊은 몫 (PA-47 선택 자리)
       climbs:[{x:752,top:96}],
@@ -228,8 +230,8 @@ if(!CLASSIC){
       drawActors:()=>{drawBarrier();},onHit:oldHit,
       step:()=>{commonStep();if(G.barrier.shake>0)G.barrier.shake--;},
     },
-    marsh:{...basic('marsh',2400,[{x:420,y:160,w:95},{x:510,y:126,w:85},
-      {x:980,y:158,w:100},{x:1070,y:124,w:75},{x:1850,y:160,w:85},{x:1935,y:126,w:75}]),
+    // 1030 디딤돌(반딧불 자리, y158)은 그대로 두고 오르내림을 붙인다.
+    marsh:{...basic('marsh',2400,[...stepRidge(420,41,4),{x:980,y:158,w:100},{x:1086,y:134,w:62},{x:1156,y:152,w:58},...stepRidge(1780,43,4)]),
       npcs:['toad'],exits:{left:{to:'forest',toX:2700}},
       doors:[path(2040,'forge',1860,'약재 나르는 둑길로 대장간에',{need:hasSickle,
         reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',blockedLabel:'마른 덩굴',blockedSay:bankSay,drawBlocked:blocked})],
@@ -237,9 +239,8 @@ if(!CLASSIC){
       pickups:[],
     },
     // 결정 D-45: 2600 → 1900. 뿌리 길·첫 발판은 150, 당산나무 쪽은 HILL_SHIFT(700)만큼 앞당겼다.
-    hill:{...basic('hill',2600-HILL_SHIFT,[{x:550,y:160,w:100},{x:640,y:126,w:90},
-      {x:770,y:158,w:95},{x:860,y:124,w:85},
-      {x:2290-HILL_SHIFT,y:160,w:100},{x:2380-HILL_SHIFT,y:126,w:100}]),
+    hill:{...basic('hill',2600-HILL_SHIFT,[{x:550,y:160,w:100},...stepRidge(660,51,4),
+      {x:2290-HILL_SHIFT,y:160,w:100},{x:2380-HILL_SHIFT,y:126,w:100},{x:2490-HILL_SHIFT,y:150,w:64}]),
       exits:{left:{to:'forest',toX:2360}},
       doors:[path(180,'hill',550,'당산나무 속으로 오르기',{travel:'tree',draw:A.treeDoor}),
         path(550,'forest',2360,'뿌리 바깥 숲길로 돌아가기'),

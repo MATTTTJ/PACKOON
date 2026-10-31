@@ -77,7 +77,8 @@ Rg.drawPickup=(a,x,bob)=>{
 Rg.drawDig=(d,x)=>{
   if(d.item==='eoksae'){
     if(d.done){R(x-7,GROUND-2,14,2,'#a8916a');return true;}
-    for(let i=0;i<6;i++){const h=16+((i*7)%9);const sway=Math.sin((G.anim+d.x+i*20)*0.04)>0.6?1:0;R(x-7+i*3+sway,GROUND-h,1,h,i%2?'#e8dcc0':'#d8cba8');R(x-8+i*3+sway,GROUND-h-2,3,3,'#f6f0de');}
+    // 결정 D-50: 억새는 windSway로 휜다 (engine/core.js)
+    for(let i=0;i<6;i++){const h=16+((i*7)%9),tip=swayStem(R,x-7+i*3,GROUND,h,d.x+i*5,i%2?'#e8dcc0':'#d8cba8',2.6);R(x-8+i*3+tip,GROUND-h-2,3,3,'#f6f0de');}
     if(Math.floor((G.anim+d.x)/14)%3===0)R(x+2,GROUND-22,1,1,'#fff3b0');
     return true;}
   if(d.item==='seogi'){
@@ -216,12 +217,13 @@ if(!CLASSIC){
 
   const platform=(x,y,w)=>({x,y,w});
   const bases={
-    gate:[platform(320,164,86),platform(374,136,76),platform(1320,164,94),platform(1390,136,88),platform(1608,174,60),platform(1680,156,80),platform(2020,112,90),platform(2160,154,90)],
-    village:[platform(520,164,94),platform(588,136,80),platform(1120,156,82),platform(1790,164,80),platform(1850,138,84),platform(1910,112,92),platform(2340,164,86),platform(2410,136,90)],
+    // 결정 D-48: 두 칸 계단만 stepRidge()로 오르락내리락. 다리·물건·변신 자리 발판은 그대로다.
+    gate:[...stepRidge(320,61,3,{low:164}),...stepRidge(1300,62,4,{low:164}),platform(1608,174,60),platform(1680,156,80),platform(2020,112,90),platform(2160,154,90)],
+    village:[...stepRidge(520,63,4,{low:164}),platform(1120,156,82),platform(1790,164,80),platform(1850,138,84),platform(1910,112,92),...stepRidge(2300,64,3,{low:164})],
     // 2190 턱은 디딤 없이 바닥에서 80px 위다. 산양 뛰기로만 오른다 (PA-47 선택 자리).
-    field:[platform(260,164,100),platform(330,136,85),platform(1180,164,92),platform(1240,136,88),platform(1900,164,86),platform(1960,138,90),platform(2020,112,88),platform(2190,112,76)],
-    cliff:[platform(320,164,92),platform(390,136,85),platform(790,164,110),platform(860,136,90),platform(1640,164,96),platform(1710,136,92),platform(2220,166,90),platform(2280,138,90),platform(2350,112,130),platform(2500,138,96),platform(2560,112,294)],
-    shrine:[platform(280,164,84),platform(340,136,96),platform(1520,112,110),platform(1630,140,80),platform(1950,164,90),platform(2010,136,98),platform(2590,164,80),platform(2650,136,90)],
+    field:[...stepRidge(260,65,3,{low:164}),...stepRidge(1180,66,4,{low:164}),platform(1900,164,86),platform(1960,138,90),platform(2020,112,88),platform(2190,112,76)],
+    cliff:[...stepRidge(320,67,3,{low:164}),...stepRidge(790,68,4,{low:164}),...stepRidge(1600,69,3,{low:164}),platform(2220,166,90),platform(2280,138,90),platform(2350,112,130),platform(2500,138,96),platform(2560,112,294)],
+    shrine:[...stepRidge(280,70,3,{low:164}),platform(1520,112,110),platform(1630,140,80),...stepRidge(1950,71,4,{low:164}),...stepRidge(2560,72,3,{low:164})],
   };
   const memories={
     gate:{x:1800,end:2020,y:112,bridge:[platform(1796,166,58),platform(1844,140,70),platform(1910,140,116)],

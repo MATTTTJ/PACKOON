@@ -194,9 +194,11 @@ if(!CLASSIC){
     px(x-13,y-9,24,8,color);px(x-9,y-13,16,4,color);px(x-4,y-16,4,4,color);
     px(x-10,y-7,3,2,'#e4b568');px(x+4,y-10,3,2,'#e4b568');
   }
+  // 결정 D-50: 갈대는 windSway로 휜다 (engine/core.js). 시드는 화면이 아니라 세상 x라 카메라가 움직여도 같은 줄기다.
   function reeds(x,y=GROUND){
-    for(let i=-15;i<16;i+=6){const h=17+Math.floor(hash(x+i)*14);px(x+i,y-h,1,h,'#9f955c');
-      px(x+i-1,y-h-8,3,9,'#bbb180');px(x+i-2,y-h-7,5,3,'#c9bf8e');}
+    const world=Math.round(x+cam);
+    for(let i=-15;i<16;i+=6){const h=17+Math.floor(hash(world+i)*14),tip=swayStem(px,x+i,y,h,world+i,'#9f955c',3.2);
+      px(x+i+tip-1,y-h-8,3,9,'#bbb180');px(x+i+tip-2,y-h-7,5,3,'#c9bf8e');}
   }
   function treeHollow(x,y=GROUND){
     // One hollow trunk, viewed in section. The footholds themselves are engine platforms.
@@ -539,6 +541,29 @@ if(!CLASSIC){
       px(x-18,y-32,37,3,'#3c5931');px(x-15,y-20,32,2,'#3c5931');
     },
     treeDoor(x,y){treeHollow(x,y);},
+    /* 결정 D-51: 칡에 막힌 당산나무 (사용자 피드백 "탑을 가리는 건지 입구를 막는 건지 모르겠다").
+       막힌 동안에는 나무 속 단면 대신 겉껍질을 덮어 "나무"로 읽히게 하고, 줄기 밑 구멍 입구를 또렷이 그린 뒤
+       칡이 줄기를 비스듬히 감아 오르고 입구를 덮은 모습으로 그린다. curtain=false면 입구 덮개는 숲의 장벽(drawBarrier)이 맡는다. */
+    blockedTree(x,y,curtain=true){
+      // 겉껍질: 단면(선반)을 가린다
+      px(x-31,7,62,y-7,'#6b4630');
+      for(let i=0;i<9;i++){const bx=x-28+i*7,top=10+Math.floor(hash(i*31+5)*30);px(bx,top,1,y-top-8,'#55372a');px(bx+2,top+20,1,y-top-40,'#82593a');}
+      // 줄기 밑 구멍 입구 (어두운 아치와 나무 테)
+      px(x-14,y-38,28,38,'#21190f');px(x-11,y-42,22,4,'#21190f');px(x-7,y-45,14,3,'#21190f');
+      px(x-17,y-40,3,40,'#a07246');px(x+14,y-40,3,40,'#a07246');px(x-13,y-44,3,3,'#a07246');px(x+10,y-44,3,3,'#a07246');px(x-9,y-47,18,2,'#a07246');
+      // 줄기를 감아 오르는 칡: 비스듬한 굵은 줄 넷 + 곁줄
+      for(let k=0;k<4;k++){const base=y-56-k*34;
+        for(let i=-36;i<=36;i+=2){const yy=base+Math.round(i*.42);px(x+i,yy,2,3,'#3a5a2b');if(i%6===0)px(x+i,yy+3,2,1,'#2a4420');}}
+      for(let k=0;k<3;k++){const base=y-70-k*34;for(let i=-34;i<=34;i+=3)px(x+i,base-Math.round(i*.3),1,2,'#567a39');}
+      // 칡잎(세 갈래)이 줄을 따라 붙는다
+      const leaf=(lx,ly)=>{px(lx,ly,4,3,'#6f8f3e');px(lx+4,ly+1,3,3,'#7f9f46');px(lx+1,ly-2,3,2,'#8aab4d');px(lx+2,ly+3,1,2,'#3a5a2b');};
+      for(let k=0;k<4;k++)for(const i of [-26,-6,16,32])leaf(x+i,y-60-k*34+Math.round(i*.42));
+      if(!curtain)return;
+      // 입구를 덮은 덩굴 그물: 아치 모양으로 늘어진 줄기와 가로 엮임, 잎
+      for(let i=-12;i<=10;i+=4){const top=y-44+Math.abs(i)/2;px(x+i,top,3,y-top,i%8?'#4f7434':'#3d6129');}
+      for(let j=0;j<5;j++)px(x-14,y-36+j*8,28,2,'#2f4d24');
+      for(const [lx,ly] of [[-12,-30],[2,-38],[-4,-18],[6,-10],[-10,-6]])leaf(x+lx,y+ly);
+    },
     streamDoor(x,y){
       // A wide leaf in the shallows, held by an ordinary bank-side rope.
       px(x-21,y-4,43,5,'#a2783e');px(x-16,y-8,32,5,'#d4a54c');px(x-10,y-11,19,4,'#e6bd61');
