@@ -149,7 +149,7 @@ function nalAutumn(){
 /* ---------- 살금이 (고라니 산지기): 귀를 세울 때는 멈춘다 (field.js) ---------- */
 function talkSalg(){
   const F=G.f;
-  if(!F.salgMet){F.salgMet=true;ledger('salgeumi','살금이','마가목 열매 3 (또는 콩 2)','호숫가 지름길');
+  if(!F.salgMet){F.salgMet=true;ledger('salgeumi','살금이','마가목 열매 3 (또는 콩 2)','호숫가 지름길에 대한 정보');
     if(arcs()){
       talk([['살금이','가, 가까이 왔네. 무서운 애는 아니지?'],
         ['살금이','겨울 끝이라… 먹을 게 없어.'],
@@ -559,7 +559,7 @@ Rg.trade={
     ...(!CLASSIC&&G.f.seolpi&&G.ledger.t_craft_jujube?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],done:()=>G.f.yCraftJujube,accept:jujubeGive}]:[])
   ],
   salgeumi:()=>[
-    ...(G.ledger.salgeumi?[{id:'t_salgeumi',item:'magamok',icon:'icicle',label:'호숫가 지름길',asks:SALG_ASKS,done:()=>G.f.salgDone,accept:salgGive}]:[]),
+    ...(G.ledger.salgeumi?[{id:'t_salgeumi',item:'magamok',info:true,label:'호숫가 지름길에 대한 정보',asks:SALG_ASKS,done:()=>G.f.salgDone,accept:salgGive}]:[]),
     ...(G.f.salgDone&&G.boss.dead?[{id:'t_salgeumi_scale',item:'magamok',n:2,label:'얼음 비늘 물에 돌려보내기 · 마가목 열매 2',asks:[{ice_scale:1}],done:()=>G.f.salgScale,accept:salgScaleGive}]:[])
   ]
 };

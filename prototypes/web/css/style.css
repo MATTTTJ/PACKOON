@@ -122,7 +122,7 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .mom-note .smudge{filter:blur(3.5px);display:inline-block;user-select:none}
 .mom-transcript{border-top:1px dotted #cdb98f;padding-top:10px}
 /* 결정 D-39: 보부상 교환 화면. 왼쪽 상대의 물건(원하는 것을 그림으로), 오른쪽 내 보따리, 아래 내가 내놓을 것 */
-.trade-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+.trade-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px}
 .trade-side h3,.trade-tray h3{font-family:var(--display);font-size:1.05em;margin:2px 0 8px}
 .trade-good{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;margin-bottom:6px;padding:8px 10px;background:var(--hanji-2);border:1px solid #c7b48c;border-radius:4px;color:var(--meok);font:inherit;cursor:pointer;touch-action:manipulation}
 .trade-good[aria-pressed="true"]{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
@@ -218,24 +218,13 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .craft-hands{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid #b59a6e;border-radius:8px;background:#fbf3e2;text-align:center}
 .craft-hands p{margin:0}
 .craft-cue{font-family:var(--display);min-height:1.6em}
-.craft-figure{position:relative;align-self:center;width:72px;height:62px;display:grid;place-items:center}
-.craft-figure canvas{width:48px;height:48px;image-rendering:pixelated}
-.craft-hands[data-tool="maetdol"] .craft-figure canvas{transform:rotate(var(--craft-turn,0deg));transition:transform .16s ease-out}
-.craft-hands[data-tool="yakyeon"] .craft-figure[data-direction="left"] canvas{transform:translateX(-8px)}
-.craft-hands[data-tool="yakyeon"] .craft-figure[data-direction="right"] canvas{transform:translateX(8px)}
-.craft-hands[data-tool="yakyeon"] .craft-figure canvas{transition:transform .16s ease-out}
-.craft-figure.pound canvas{animation:craft-pound .18s ease-out}
-.craft-vapor{position:absolute;top:0;left:22px;display:flex;gap:5px;opacity:0}
-.craft-vapor i{display:block;width:5px;height:15px;border-left:2px solid #b8a88b;border-radius:50%;transform:rotate(15deg)}
-.craft-hands[data-steam="true"] .craft-vapor{opacity:1}
-@keyframes craft-pound{50%{transform:translateY(6px)}}
-@media (prefers-reduced-motion:reduce){.craft-figure canvas{transform:none!important;animation:none!important;transition:none!important}}
+/* 결정 D-113: 도구 그림은 캔버스 하나에 몸통(고정)과 움직이는 부분을 따로 그린다. 그림 전체를 흔들거나 키우지 않는다. */
+.craft-figure{position:relative;align-self:center;width:120px;height:102px;display:grid;place-items:center}
+.craft-figure canvas{width:120px;height:102px;image-rendering:pixelated}
 .craft-track{height:10px;background:#e4d5b3;border:1px solid #b59a6e;border-radius:8px;overflow:hidden}
 .craft-track>div{height:100%;background:#b38b4b}
-.craft-hands[data-steam="true"] .craft-track>div{background:#9b5b3a}
 .craft-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .craft-actions button{min-height:48px;touch-action:manipulation}
-.craft-drag{min-height:90px;display:grid;place-items:center;border:2px dashed #cdb98f;border-radius:45%;padding:12px;touch-action:none;user-select:none;color:var(--dim)}
 .field-taste{display:flex;flex-direction:column;align-items:flex-start;gap:6px;border-top:1px dashed #b59a6e;padding-top:6px;cursor:default}
 .field-taste .btn{min-height:40px;font-size:13px;padding:5px 10px}
 .taste-choices{display:flex;flex-wrap:wrap;gap:6px;max-height:100px;overflow:auto}

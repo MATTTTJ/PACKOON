@@ -186,9 +186,12 @@ function step(){
   if(!climbing){
   if(jumpQ&&G.onGround){Sound.jump();G.vy=TABLES.TUNING.field_jump_velocity*formJumpMul();G.onGround=false;}jumpQ=false;
   // ↓+점프: 땅이 아닌 발판 위에서만 아래로 빠진다. 지나는 동안 그 높이의 발판만 무시한다.
-  if(dropQ&&G.onGround&&G.py<fieldGround()-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;}dropQ=false;
+  if(dropQ&&G.onGround&&G.py<fieldGround()-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;
+    // 결정 D-114: 발판 가장자리를 붙잡고 등을 보이며 잠깐 미끄러져 내려간 뒤 떨어진다. 공처럼 구르던 중이면 공 모양 그대로 빠진다.
+    G.dropBack=!rolling;G.dropHang=rolling?0:TABLES.TUNING.field_drop_hang_frames;}dropQ=false;
   if(G.dropT>0)G.dropT--;
   G.vy=Math.min(TABLES.TUNING.field_fall_speed,G.vy+TABLES.TUNING.field_gravity);
+  if(G.dropHang>0){G.dropHang--;G.vy=Math.min(G.vy,TABLES.TUNING.field_drop_hang_speed);G.vx=0;}
   formFallCap();
   }else formGlide=false;
   const wasGrounded=G.onGround||climbing,prevX=G.px;
@@ -201,6 +204,7 @@ function step(){
   if(G.py>=fieldGround()){G.py=fieldGround();G.vy=0;G.onGround=true;}
   else if(G.vy>=0){for(const p of [...fieldPlatforms(),...formLedges()]){if(G.dropT>0&&Math.abs(p.y-G.dropY)<1)continue;if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
   }
+  if(G.onGround||climbing){G.dropBack=false;G.dropHang=0;}
   Vfx.feet();
   if(!wasGrounded&&G.onGround)Sound.land();
   if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
@@ -326,10 +330,20 @@ function drawRaccoon(){
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
   R(G.px-cam-7,fieldGround(),14,1,'rgba(40,24,14,.35)');
   if(rolling){drawRollAt(G.px-cam,G.py,G.form||'',rollAngle);return;}
+  const back=heroBackPose();
+  if(back){if(!G.form)drawRaccoonBackAt(G.px-cam,G.py,back.phase);else drawFormBackAt(G.px-cam,G.py,back.phase,G.form);return;}
   const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
   drawPlayerAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);
 }
 
+/* 결정 D-114: ↓로 발판 아래로 내려올 때와 무언가를 타고 오를 때는 등을 보인다. 점프로 오를 때는 그대로 앞모습이다.
+   - 다람쥐가 줄기를 타는 동안(formClimb): 오르내린 거리에 맞춰 팔다리를 번갈아 디딘다.
+   - ↓+점프로 발판에서 빠질 때(G.dropBack): 땅에 닿을 때까지. 휘두르는 중이나 수리부엉이가 활공하는 동안에는 앞모습이다. */
+function heroBackPose(){
+  if(formClimb&&G.form==='squirrel')return {phase:Math.floor(G.py/4)%2};
+  if(G.dropBack&&!G.onGround&&!(G.attackT>0)&&!(G.form==='owl'&&formGlide))return {phase:Math.floor(G.anim/5)%2};
+  return null;
+}
 function draw(){
   if(mapTravel){drawMapTravel();return;}
   if(vistaMode){drawVista();return;}
@@ -409,7 +423,10 @@ function updateOverlay(){
   const floor=paused()||pickupPose||rolling?null:nearFloorItems()[0];
   if(floor){pr.hidden=false;const room=nearFloorItems().some(a=>canPickupItem(a.item));pr.textContent=!room?'보따리 가득':TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
-  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':GATHER[dg.item]?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
+  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':GATHER[dg.item]?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';
+    // 결정 D-108: 채집 기준원이 크니 안내 말풍선은 기준원과 진행 점 위에 띄운다
+    const ringTop=!dg.cache&&GATHER[dg.item]?gatherSpot(dg).y-2*TABLES.MINIGAMES.gather_ring_radius-10:GROUND-14;
+    pr.style.top=(Math.min(GROUND-14,ringTop)/H*100)+'%';}
   else if(!paused()&&!rolling&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
   if(!formRing.hidden&&!formChangeAllowed())formRing.hidden=true;
@@ -710,11 +727,34 @@ const wandererCount=(region)=>Object.keys(G.f.wanderersDone||{}).filter(k=>!regi
 const stampFound=id=>!!G.f.stampsFound?.[expansionKey(id)];
 const stampCount=(region)=>Object.keys(G.f.stampsFound||{}).filter(k=>!region||k.startsWith(region+':')).length;
 /* 아빠의 도장 = 너구리 손바닥 자국. 손바닥과 길게 벌어진 다섯 손가락 (네 지역 공용). */
-function pawStamp(x,y,c){
+/* 결정 D-115: 아빠 손바닥 도장은 작다(가로 7·세로 6, 예전의 절반쯤). 손가락 넷 사이를 비워 손바닥으로 읽히게 하고,
+   받침 앞면에 밝게 다듬은 자리(판) 위에 찍어 작아도 눈에 띈다. (x,y)는 손바닥 아래 끝 가운데. faint면 찾기 전의 흐린 자국이다. */
+const PAW=[[-1,-2,3,1],[-2,-4,5,2],[-3,-6,1,2],[-1,-7,1,2],[1,-7,1,2],[3,-6,1,2]];
+function pawStamp(x,y,c,faint=false){
   x=Math.round(x);y=Math.round(y);
-  R(x-3,y-4,7,3,c);R(x-2,y-1,5,1,c);
-  R(x-5,y-7,1,2,c);R(x-3,y-9,1,3,c);R(x-1,y-10,1,4,c);R(x+1,y-10,1,4,c);R(x+3,y-9,1,3,c);
+  const plate=faint?'rgba(255,244,214,.22)':'rgba(255,244,214,.55)';
+  R(x-4,y-8,9,8,plate);R(x-3,y-9,7,1,plate);   // 손을 대고 누른 자리: 둘레보다 밝게 닳았다
+  for(const [px,py,w,h] of PAW)R(x+px,y+py,w,h,c);
 }
+/* 도장이 찍힌 받침. 좌표가 아니라 자리의 종류로 그린다(맵에서 도장 위치가 바뀌어도 받침이 따라간다).
+   p.base가 있으면 그것을, 없으면 도장 id로 고른다. 받침 아래 끝이 (x,y)이고, 도장은 받침 앞면(STAMP_FACE만큼 위)에 찍힌다. */
+const STAMP_BASES={anvil:'log',knot:'bark',roots:'root',jangseung:'post',mill_base:'stone',cliff_crack:'rock',
+  flag:'post',pillar:'post',rock:'rock',hut_post:'post',snow_sign:'post',shore_rock:'rock'};
+const STAMP_FACE={rock:1,post:3,log:1,root:0,stone:0,bark:2};
+const stampBase=p=>p.base||STAMP_BASES[p.id]||'rock';
+function drawStampBase(kind,x,y){
+  x=Math.round(x);y=Math.round(y);
+  const snow=G?.region==='yeongsan'||G?.region==='jangteo';
+  if(kind==='rock'){R(x-6,y-8,12,8,'#8a8478');R(x-7,y-6,14,6,'#8a8478');R(x-5,y-8,5,1,'#b3ad9f');R(x-7,y-1,14,1,'#5f5a52');R(x+5,y-6,2,5,'#6f6a60');
+    if(snow)R(x-5,y-9,9,2,'#eef3f6');}
+  else if(kind==='post'){R(x-3,y-13,7,13,'#7a5534');R(x-1,y-12,1,11,'#5e4027');R(x+2,y-10,1,8,'#93694a');R(x-4,y-14,9,2,'#5e4027');R(x-4,y-1,9,1,'#4a321e');
+    if(snow)R(x-4,y-15,9,1,'#eef3f6');}
+  else if(kind==='log'){R(x-6,y-7,12,7,'#8a6038');R(x-6,y-8,12,1,'#b0834f');R(x-3,y-5,1,4,'#6b4a2a');R(x+2,y-6,1,4,'#6b4a2a');R(x-6,y-1,12,1,'#4f351f');}
+  else if(kind==='root'){R(x-9,y-3,18,3,'#6b4a2e');R(x-6,y-5,12,2,'#6b4a2e');R(x-4,y-6,8,1,'#7d5836');R(x-5,y-5,6,1,'#8f6a44');R(x-9,y-1,18,1,'#4a321e');}
+  else if(kind==='stone'){R(x-7,y-5,14,5,'#9a958a');R(x-6,y-6,12,1,'#b8b3a6');R(x-7,y-1,14,1,'#6f6a60');R(x+4,y-4,2,2,'#7c776c');}
+  else if(kind==='bark'){R(x-5,y-11,10,11,'#6e4a2c');R(x-4,y-11,1,11,'#59391f');R(x+3,y-10,1,9,'#59391f');R(x-1,y-10,2,2,'#4f331d');R(x-5,y-12,10,1,'#8a6440');}
+}
+function pawStamp_glint(x,y,seed){if(!Vfx.reducedMotion&&Math.floor((G.anim+seed)/18)%7===0)R(Math.round(x)+3,Math.round(y)-8,1,1,'#fff3c4');}
 function findStamp(s){
   if(CLASSIC||stampFound(s.id))return false;
   // 문구는 notebook.csv의 알게되는키로 연결한다. 위치와 발견 방식만 지역이 정한다.
@@ -728,9 +768,12 @@ function drawZoneObjects(){
   for(const p of zoneObjects('wanderers'))if(p.draw)p.draw(p.x-cam,p.y??fieldGround(),G.px<p.x?-1:1);
   for(const k of ['doors','examines','vistas','stamps'])for(const p of zoneObjects(k)){
     // 결정 D-81: 아빠 도장 자리에는 찾기 전에도 흐린 손바닥 흔적이 남아 있다. 찾으면 또렷해진다 (design/data/decisions.csv)
-    if(k==='stamps'){const sx=p.x-cam,sy=(p.y??fieldGround())-1;
-      if(!stampFound(p.id)){pawStamp(sx,sy,'rgba(92,58,36,.34)');if(!Vfx.reducedMotion&&Math.floor((G.anim+p.x)/20)%6===0)R(Math.round(sx)+2,Math.round(sy)-11,1,1,'#fff3c4');continue;}
-      if(!p.draw){pawStamp(sx,sy,'#7a3b24');continue;}}
+    if(k==='stamps'){const sx=p.x-cam,gy=p.y??fieldGround(),base=stampBase(p),py=gy-STAMP_FACE[base];
+      // 결정 D-115: 받침을 먼저 그리고, 그 앞면에 작은 손바닥을 찍는다. 찾기 전에는 흐리고 이따금 반짝인다.
+      drawStampBase(base,sx,gy);
+      if(!stampFound(p.id)){pawStamp(sx,py,'rgba(110,52,30,.55)',true);pawStamp_glint(sx,py,p.x);continue;}
+      if(p.draw)p.draw(sx,py);else pawStamp(sx,py,'#8a3424');
+      pawStamp_glint(sx,py,p.x+7);continue;}
     if(p.draw)p.draw(p.x-cam,p.y??fieldGround());
     if(k==='doors'&&!needMet(p)&&p.drawBlocked)p.drawBlocked(p.x-cam,p.y??fieldGround());
   }
