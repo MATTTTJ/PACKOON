@@ -164,7 +164,11 @@ if(!CLASSIC){
         legacy.forEach((a,i)=>{if(a.got&&pine[i])pine[i].got=true;});
         G.pickups=G.pickups.filter(a=>a.zone||a.item!=='solbang');
       }
-      if(has('hongsi_tteok')&&!G.f.hongsiMade&&id==='inn'&&Math.abs(G.px-1530)<45)Rg.sendMedicine();
+      // 결정 D-131: 까치 곁에 오면 한 번씩 먼저 말을 건다. 밤엔 쉬어 가자 하고, 설날 아침엔 맡길지 묻는다. 바로 보내지 않는다.
+      if(id==='inn'&&Math.abs(G.px-tx(1530))<45&&!open('dlg')){
+        const key=night()?'jxMagpieNight':'jxMagpieMorning',l=!G.f[key]&&Rg.magpieTteok?.();
+        if(l){G.f[key]=true;talk(l,refreshGoal);}
+      }
       if(id==='warehouse'&&G.f.guard&&night()&&!G.boss.dead&&Math.abs(G.px-Rg.STORE_X)<24)Rg.startDokkaebi();
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
         G.f.jxHubChanged=true;diary('jx_hub','모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.');
@@ -266,7 +270,7 @@ if(!CLASSIC){
       pickups:cones('warehouse',[[700,192],[725,192],[750,192]]),
       exits:{left:{to:'inn',toX:2490}},
       doors:[{x:280,to:'inn',toX:2130,label:'지붕 사이, 숙소 불빛으로 돌아가기',draw:gate},
-        {x:2290,to:'inn',toX:1530,label:'짐 나르는 귀환 문으로 숙소에',need:()=>G.boss.dead,
+        {x:2290,to:'inn',toX:1440,label:'짐 나르는 귀환 문으로 숙소에',need:()=>G.boss.dead,
           reason:'도깨비가 물러나면 짐 나르는 귀환 문을 쓸 수 있겠다.',draw:gate,drawBlocked:shutter}],
       examines:E.examines.warehouse,
       drawActors(){
