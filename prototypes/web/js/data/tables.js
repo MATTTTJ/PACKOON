@@ -435,6 +435,41 @@ const TABLES={
    "kind": "재료",
    "region": "yeongsan",
    "d": "남쪽 칡뿌리와 겨울 산의 겨우살이, 대추를 함께 갈았다. 건네기 좋은 향긋한 약재다."
+  },
+  "ongdal_gourd": {
+   "n": "옹달샘 표주박",
+   "r": 3,
+   "kind": "귀한 것",
+   "region": "yeongsan",
+   "d": "봄에 풀린 옹달샘 첫물이 담긴 낡은 표주박. 끈 매듭 끝이 한 번 거꾸로 감겨 있다."
+  },
+  "songi": {
+   "n": "송이버섯",
+   "r": 3,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "솔잎 밑 흙에서 드물게 올라오는 가을 송이. 향이 진해 약재상도 반긴다."
+  },
+  "eoksae_som": {
+   "n": "억새꽃 솜",
+   "r": 1,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "억새 이삭에서 털어 낸 하얀 솜. 둥지에 깔면 바람이 덜 든다."
+  },
+  "seokcheong": {
+   "n": "석청",
+   "r": 3,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "절벽 바위틈에 벌이 모아 둔 꿀. 석이 따는 자리에서 드물게 만난다."
+  },
+  "jat": {
+   "n": "잣",
+   "r": 1,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "청설모가 솔가지 사이에 숨겨 둔 잣. 떡 고명으로 귀하게 쓴다."
   }
  },
  "BOSS_PARTS": {
@@ -821,6 +856,35 @@ const TABLES={
     "kind": "좋아함",
     "line": "한데 갈았어도 저마다 향이 남았네.",
     "effect": "none"
+   },
+   "songi": {
+    "kind": "좋아함",
+    "line": "가을 송이로구나. 향만 맡아도 기운이 나는구나.",
+    "effect": "none"
+   }
+  },
+  "stream_otter": {
+   "acorn_jelly": {
+    "kind": "좋아함",
+    "line": "말랑말랑! 물에 넣으면 미끄러질 것 같아.",
+    "effect": "none"
+   },
+   "salt": {
+    "kind": "그저 그럼",
+    "line": "짜! 개울물 마셔야겠다.",
+    "effect": "none"
+   }
+  },
+  "charcoal_badger": {
+   "rice": {
+    "kind": "좋아함",
+    "line": "…가마 지키다 보면 끼니를 잊는다. 잘 먹으마.",
+    "effect": "none"
+   },
+   "sesame_salt": {
+    "kind": "그저 그럼",
+    "line": "고소하군. 숯내에 묻혀 맛은 잘 모르겠다.",
+    "effect": "none"
    }
   },
   "dolsoe": {
@@ -832,6 +896,11 @@ const TABLES={
    "sesame_salt": {
     "kind": "좋아함",
     "line": "손끝에도 고소한 냄새가 배겠네.",
+    "effect": "none"
+   },
+   "seokcheong": {
+    "kind": "좋아함",
+    "line": "…석청이구나. 바위틈에서 땄냐. 귀한 걸 손에 쥐었구나.",
     "effect": "none"
    }
   },
@@ -857,6 +926,11 @@ const TABLES={
     "kind": "좋아함",
     "line": "이건… 숨겨 두고… 천천히…",
     "effect": "none"
+   },
+   "eoksae_som": {
+    "kind": "좋아함",
+    "line": "포근해… 이거 깔면… 겨울 내내 안 춥겠다…",
+    "effect": "none"
    }
   },
   "yeotbang": {
@@ -880,6 +954,11 @@ const TABLES={
    "rainbow_tteok": {
     "kind": "좋아함",
     "line": "허허, 떡 한 조각에 온 길이 다 들었네!",
+    "effect": "none"
+   },
+   "jat": {
+    "kind": "좋아함",
+    "line": "잣이네! 떡 고명으로 딱이야. 고마워!",
     "effect": "none"
    }
   },
@@ -983,6 +1062,66 @@ const TABLES={
     "line": "꿀 바른 약과의 단내에 강철이가 언 숨을 길게 내쉰다.",
     "effect": "calm:40"
    }
+  },
+  "jjandol": {
+   "rice": {
+    "kind": "좋아함",
+    "line": "…짜게 먹는 놈한텐 맨밥이 제일이지.",
+    "effect": "none"
+   },
+   "salt": {
+    "kind": "그저 그럼",
+    "line": "소금장수한테 소금을 주냐?",
+    "effect": "none"
+   }
+  },
+  "deungjan": {
+   "rice": {
+    "kind": "좋아함",
+    "line": "쌀 한 톨이 밤새 힘이다!",
+    "effect": "none"
+   },
+   "sesame_oil": {
+    "kind": "아주 좋아함",
+    "line": "고소한 등잔! 이걸로 밤새 비추지.",
+    "effect": "none"
+   }
+  },
+  "ongdal": {
+   "jujube": {
+    "kind": "좋아함",
+    "line": "대추구먼. 솥에 넣으면 물이 달아지지.",
+    "effect": "none"
+   },
+   "magamok_tea": {
+    "kind": "아주 좋아함",
+    "line": "…끓인 걸 받아 보는 건 몇 해 만이여.",
+    "effect": "none"
+   }
+  },
+  "dol_badger": {
+   "memil_jelly": {
+    "kind": "아주 좋아함",
+    "line": "내 메밀로 쑨 거냐? 묵이 탱글하구나.",
+    "effect": "none"
+   },
+   "gyeolmyeongja": {
+    "kind": "그저 그럼",
+    "line": "눈보다 무릎이 문제다. 돌쇠 할배나 드려라.",
+    "effect": "none"
+   }
+  },
+  "dol_turtle": {
+   "memil": {
+    "kind": "좋아함",
+    "line": "메밀 알은 천천히 씹어도 달구나.",
+    "effect": "none"
+   },
+   "stonedust": {
+    "kind": "그저 그럼",
+    "line": "돌가루는… 내 등딱지에도 잔뜩 붙어 있다.",
+    "effect": "none"
+   }
   }
  },
  "NOTES": [
@@ -1029,6 +1168,18 @@ const TABLES={
     },
     {
      "who": "me",
+     "text": "값은 물건이 아니라 길이 정한다. 어디서 사서 어디로 가져가느냐. 공짜가 아니니 적어 두라고 했다.",
+     "section": "관찰",
+     "when": "nal:route-price"
+    },
+    {
+     "who": "me",
+     "text": "꺾인 모자 챙을 펴서 도로 씌워 줬다. 보부상은 모자부터 바로 쓴다고. 아빠도 비 오는 날 그렇게 말했다.",
+     "section": "관찰",
+     "when": "nal:hat"
+    },
+    {
+     "who": "me",
      "text": "돌너머에서는 단풍골 칡꽃을 귀하게 쳤다. 같은 물건도 마을마다 값이 다르다.",
      "section": "관찰",
      "when": "nal:dolneomeo"
@@ -1050,6 +1201,18 @@ const TABLES={
      "text": "신표를 보더니 말없이 털토시를 얹어 줬다.",
      "section": "관찰",
      "when": "nal:tosi"
+    },
+    {
+     "who": "me",
+     "text": "아빠 몫으로 대추 두 알을 묶어 맡겼다. 자기가 줬다고는 하지 말라고.",
+     "section": "관찰",
+     "when": "nal:jujube_for_dad"
+    },
+    {
+     "who": "me",
+     "text": "갚을 게 없으면 뭘 지고 다니냐고 했다. 먼저 내려가 고갯길을 봐 두겠단다.",
+     "section": "관찰",
+     "when": "nal:no_debt"
     }
    ]
   },
@@ -1086,6 +1249,12 @@ const TABLES={
      "text": "삼촌은 다리를 절어도 망치는 흔들리지 않는다. 쇠가 가장 빨갈 때 세 번 친다.",
      "section": "관찰",
      "when": "musoe:forge"
+    },
+    {
+     "who": "me",
+     "text": "삼촌 다리는 비 오기 전에 쑤신다. 할머니가 싸 준 칡뿌리 찜질을 감아 드렸더니 따뜻하다고 했다.",
+     "section": "관찰",
+     "when": "musoe:leg"
     }
    ]
   },
@@ -1118,6 +1287,46 @@ const TABLES={
      "when": "galchamgol:arc-toad-wrap"
     }
    ]
+  },
+  {
+   "id": "stream_otter",
+   "region": "galchamgol",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "개울의 어린 수달. 밤마다 함지박을 도로 밀어 올려 둔다. 엄마를 \"빨래 아줌마\"라고 부른다.",
+     "section": "관찰",
+     "when": "met:stream_otter"
+    },
+    {
+     "who": "me",
+     "text": "엄마는 빨래를 마치면 물수제비를 일곱 번 떴다고 한다. 나는 몰랐다.",
+     "section": "관찰",
+     "when": "otter:stone"
+    }
+   ],
+   "name": "여울"
+  },
+  {
+   "id": "charcoal_badger",
+   "region": "galchamgol",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "참나무 숲에서 숯 굽는 오소리. 흰 연기는 아직, 푸른 연기면 다 된 숯이다.",
+     "section": "관찰",
+     "when": "met:charcoal_badger"
+    },
+    {
+     "who": "me",
+     "text": "날쌘 아저씨는 값을 깎는 척하고 가마 옆에 몰래 덤을 두고 간다. 모른 척하기로 했다.",
+     "section": "관찰",
+     "when": "geom:nal"
+    }
+   ],
+   "name": "검댕"
   },
   {
    "id": "kudzu",
@@ -1247,6 +1456,12 @@ const TABLES={
      "text": "지난가을 아빠가 둥지 곁에서 “미안하다… 그 겨울에 내가 없어서…”라고 했단다. 꾸벅이가 잊기 전에 나한테 맡겼다.",
      "section": "관찰",
      "when": "dolneomeo:arcs-kkubeogi"
+    },
+    {
+     "who": "me",
+     "text": "글은 못 읽어도 그림은 알아본다. 봄에 깨면 제일 먼저 볼 자리에 꼬마 두더지와 내 얼굴을 그려 두었다.",
+     "section": "관찰",
+     "when": "dolneomeo:kku-drawing"
     }
    ]
   },
@@ -1277,6 +1492,12 @@ const TABLES={
      "text": "돌탑은 돌 마음부터 읽고, 하나씩 천천히 얹는다.",
      "section": "관찰",
      "when": "dolsoe:stack"
+    },
+    {
+     "who": "me",
+     "text": "할배 눈 대신 꼬마 손이 돌을 읽는다. 할배가 처음으로 소리 내어 웃었다.",
+     "section": "관찰",
+     "when": "dolneomeo:mole-reads"
     }
    ]
   },
@@ -1301,6 +1522,12 @@ const TABLES={
      "text": "산이 노하면 석이를 올리는 법이라고 했다. 석이 붙은 바위를 알려 줬다.",
      "section": "관찰",
      "when": "ppuri:seogi"
+    },
+    {
+     "who": "me",
+     "text": "아버지가 세운 장승에게 아침마다 길 소식을 고한다. 장승 뒤에 떨어진 짐꾼의 이름이 있다.",
+     "section": "관찰",
+     "when": "dolneomeo:ppuri-eyes"
     }
    ]
   },
@@ -1430,6 +1657,12 @@ const TABLES={
      "text": "메밀가루 둘이면 메밀떡을 찔 수 있다고 알려 줬다. 도깨비는 메밀을 좋아한다는 말도.",
      "section": "관찰",
      "when": "morak:memiltteok"
+    },
+    {
+     "who": "me",
+     "text": "엿방울 아주머니가 제 가위로 떡집 줄을 불러 주자 김이 맵다며 눈가를 훔쳤다.",
+     "section": "관찰",
+     "when": "arc:jangteo:pair"
     }
    ]
   },
@@ -1454,6 +1687,12 @@ const TABLES={
      "text": "장단이 맞자 흥이 올라, 숨겨 둔 아빠의 엿을 내줬다.",
      "section": "관찰",
      "when": "yeotbang:high"
+    },
+    {
+     "who": "me",
+     "text": "작년 그믐 밤 모락 아주머니가 숨겨 줬다. 고맙단 말을 못 해서 떡을 못 받았다.",
+     "section": "관찰",
+     "when": "arc:jangteo:pair-night"
     }
    ]
   },
@@ -1481,9 +1720,71 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "설 고사에 팥시루떡을 올리자 장부에 내 이름을 적고 신표를 줬다.",
+     "text": "설 고사에 팥시루떡을 올리자 장부에 한 줄 적고 신표를 줬다.",
      "section": "관찰",
      "when": "bueong:sinpyo"
+    },
+    {
+     "who": "me",
+     "text": "값은 철마다 고장마다 다르다. 장부엔 날짜를 적는다. 첫 줄은 \"늦가을, 단풍골.\"",
+     "section": "관찰",
+     "when": "arc:jangteo:dates"
+    },
+    {
+     "who": "me",
+     "text": "상단 장부, 아빠 줄 아래에 \"그 아들\". 이름 칸은 비어 있다.",
+     "section": "관찰",
+     "when": "arc:jangteo:kidline"
+    },
+    {
+     "who": "me",
+     "text": "수첩 장부 끝장에 상단 도장. 보부상끼리는 이 도장을 알아본다.",
+     "section": "관찰",
+     "when": "arc:jangteo:stamp"
+    }
+   ]
+  },
+  {
+   "id": "jjandol",
+   "region": "jangteo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "낮엔 소금값을 짜게 부르는 담비. 밤엔 숙소 문간에 앉아 길 쪽만 본다.",
+     "section": "관찰",
+     "when": "met:j_jjandol"
+    },
+    {
+     "who": "me",
+     "text": "아빠가 지난가을 쥐여 준 신표를 한 번도 쓰지 않고 품고 있었다. 이제 그 신표로 마루에서 잔다.",
+     "section": "관찰",
+     "when": "arc:jangteo:jjandol"
+    },
+    {
+     "who": "me",
+     "text": "부엉 영감이 손님 장부에 짠돌 말고 본이름을 적었단다. 무슨 이름인지는 비밀.",
+     "section": "관찰",
+     "when": "arc:jangteo:jjandol-name"
+    }
+   ]
+  },
+  {
+   "id": "deungjan",
+   "region": "jangteo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "생쥐 밤짐꾼. 해 지고 들어오는 길손 짐을 나르고 허리 등잔으로 길을 비춘다.",
+     "section": "관찰",
+     "when": "met:j_deungjan"
+    },
+    {
+     "who": "me",
+     "text": "지난가을 밤 아빠 짐을 날랐단다. 무겁고 약초 냄새가 났고 아빠는 한참 집 쪽 하늘을 봤다고.",
+     "section": "관찰",
+     "when": "arc:jangteo:deungjan"
     }
    ]
   },
@@ -1582,6 +1883,12 @@ const TABLES={
      "text": "마가목 열매를 좋아한다. 얼어붙은 비탈의 지름길을 안다.",
      "section": "관찰",
      "when": "salgeumi:shortcut"
+    },
+    {
+     "who": "me",
+     "text": "봄이니까 제 발로 샘까지 가겠단다. 반 남긴 걸 갚으러.",
+     "section": "관찰",
+     "when": "ongdal:salg_goes"
     }
    ]
   },
@@ -1601,6 +1908,36 @@ const TABLES={
      "text": "몸짓으로 말한다. 천천히 보면 알아들을 수 있다.",
      "section": "관찰",
      "when": "dad:ledger"
+    },
+    {
+     "who": "me",
+     "text": "가을부터 하루에 하나씩 막대에 칼집을 냈다. 첫눈 온 날만 깊다.",
+     "section": "관찰",
+     "when": "dad:tally"
+    },
+    {
+     "who": "me",
+     "text": "끈 매듭만 보고 누가 보냈는지 알았다. 손바닥을 펴고 고개를 저었다. 갚을 게 없다는 뜻.",
+     "section": "관찰",
+     "when": "dad:no_debt"
+    },
+    {
+     "who": "me",
+     "text": "글 대신 흙에 그림을 그린다. 우리 셋과 지붕. 내 머리에는 모자.",
+     "section": "관찰",
+     "when": "dad:mud"
+    },
+    {
+     "who": "me",
+     "text": "수첩 맨 뒤에 아빠 손도장. 그 옆에 내 손도장. 다음 쪽은 집에서.",
+     "section": "관찰",
+     "when": "dad:palm"
+    },
+    {
+     "who": "me",
+     "text": "엄마가 맨 매듭에서 손을 멈췄다. 물 한 바가지 빚은 셋이서 갚으러 오자고.",
+     "section": "관찰",
+     "when": "dad:gourd"
     }
    ]
   },
@@ -1939,6 +2276,51 @@ const TABLES={
    "lines": []
   },
   {
+   "id": "dol_badger",
+   "region": "dolneomeo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "메밀밭 오소리 아주머니. 무릎이 아파 돌계단을 못 오른다. 짐을 맡기는 손이 크다.",
+     "section": "관찰",
+     "when": "met:dol_badger"
+    },
+    {
+     "who": "me",
+     "text": "오래전 겨울에 값으로 받은 꽃수 보자기를 주인에게 돌려 달라고 했다. 귀퉁이 꽃이 엄마 수다.",
+     "section": "관찰",
+     "when": "dolneomeo:flower-bojagi"
+    }
+   ],
+   "name": "메밀댁"
+  },
+  {
+   "id": "dol_turtle",
+   "region": "dolneomeo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "성황당 돌 그늘의 남생이. 백 년을 살았다고 한다. 묻는 말엔 다음에 답한다.",
+     "section": "아빠 수첩"
+    },
+    {
+     "who": "me",
+     "text": "소원 천은 높을수록 잘 들린다고 했다. 가장 높은 가지에 아빠가 맨 천이 있다.",
+     "section": "관찰",
+     "when": "met:dol_turtle"
+    },
+    {
+     "who": "me",
+     "text": "무언가 지나간 자리엔 샘이 먼저 언다. 물 마른 데를 만나면 샘부터 찾으라고 했다.",
+     "section": "관찰",
+     "when": "dolneomeo:turtle-spring"
+    }
+   ],
+   "name": "남생이 할미"
+  },
+  {
    "id": "yakgwa",
    "region": "jangteo",
    "kind": "item",
@@ -2033,6 +2415,49 @@ const TABLES={
     }
    ],
    "name": "젊은 아빠의 그날 · 호숫가"
+  },
+  {
+   "id": "ongdal",
+   "region": "yeongsan",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "얼어붙은 샘 대신 금 간 솥에 눈을 녹인다. 오는 짐승마다 한 모금씩.",
+     "section": "관찰",
+     "when": "ongdal:pot"
+    },
+    {
+     "who": "me",
+     "text": "할미 물은 반씩 호숫가로 갔다. 할미는 알면서 모른 척했다.",
+     "section": "관찰",
+     "when": "ongdal:half"
+    },
+    {
+     "who": "me",
+     "text": "솔잎 국물 한 그릇. 겨울 산을 혼자 오르는 너구리는 내가 둘째란다.",
+     "section": "관찰",
+     "when": "ongdal:soup"
+    },
+    {
+     "who": "me",
+     "text": "표주박 끈 매듭이 내 보따리 매듭과 똑같다. 엄마가 가르쳐 준 매듭이다.",
+     "section": "관찰",
+     "when": "ongdal:knot"
+    },
+    {
+     "who": "me",
+     "text": "첫 샘물을 담은 표주박을 맡겼다. 아빠 몫 물 한 바가지 빚은 집에서 갚으라고.",
+     "section": "관찰",
+     "when": "ongdal:gourd"
+    },
+    {
+     "who": "me",
+     "text": "샘이 풀렸는데도 솥을 다시 걸어 빚진 국물을 끓였다. 솥 걸어 놓고 기다리겠단다.",
+     "section": "관찰",
+     "when": "ongdal:bye"
+    }
+   ]
   }
  ],
  "MINIGAMES": {
@@ -2198,7 +2623,13 @@ const TABLES={
   "roll_speed": 1.8,
   "roll_squirrel_speed": 2,
   "roll_accel_frames": 10,
-  "roll_step_frames": 9
+  "roll_step_frames": 9,
+  "npc_move_out_ms": 1000,
+  "npc_move_in_ms": 450,
+  "npc_move_walk_px": 36,
+  "npc_move_step_ms": 130,
+  "npc_move_min_px": 12,
+  "npc_move_window_ms": 1500
  },
  "PROGRESS": [
   {

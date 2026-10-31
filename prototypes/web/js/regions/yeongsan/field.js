@@ -236,7 +236,7 @@ if(!CLASSIC){
       {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,draw:sign,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'},
       {x:1860,to:'shore',toX:680,label:'능선 안쪽 호숫가로',need:ledgeGate,reason:'멀리 보이는 능선이다. 저 안쪽으로 가는 길은 아직 모르겠다.',draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
     ]),
-    snow:zone('snow',[],{left:'shelter',right:'slope'},[
+    snow:zone('snow',['ongdal'],{left:'shelter',right:'slope'},[
       {x:2000,y:108,to:'shore',toX:2020,toY:108,label:'바라보던 능선 속으로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y),
         formPass:'owl',formLabel:'수리부엉이로 능선에서 날아 내려가기'},
     ]),
