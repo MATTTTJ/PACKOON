@@ -205,7 +205,7 @@ const TUNING=numericTable('tuning','분류',
     'kkubeogi_cycle kkubeogi_awake kkubeogi_cue field_move_speed field_swing_speed',
     'field_jump_velocity field_gravity field_fall_speed field_pickup_x field_pickup_y',
     'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at field_drop_frames',
-    'field_crawl_frames',
+    'field_crawl_frames field_drop_hang_frames field_drop_hang_speed',
     'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval toast_frames peek_ms peek_fade_ms hint_range craft_motion_ms',
     'field_interact_y zone_transition_frames vista_pan_frames map_flight_ms map_landing_margin',
     'drop_arc_height drop_flight_frames drop_min_spacing drop_spread drop_bounce_height drop_bounce_frames',
@@ -234,6 +234,7 @@ const noteKeys=['one','two','three','four','five','six','seven','eight'];
 for(let i=1;i<noteKeys.length;i++)requireValue(MINIGAMES['rhythm_note_'+noteKeys[i]]>MINIGAMES['rhythm_note_'+noteKeys[i-1]],'minigames.csv: 노트 시각은 순서대로 커져야 한다');
 requireValue(MINIGAMES.dad_steps<=3,'minigames.csv: 구현된 몸짓은 세 단계까지다');
 requireValue(TUNING.kkubeogi_awake<=TUNING.kkubeogi_cycle&&TUNING.kkubeogi_cue<=TUNING.kkubeogi_cycle,'tuning.csv: 꾸벅이 판정과 예고가 주기보다 길다');
+requireValue(TUNING.field_drop_hang_frames<=TUNING.field_drop_frames&&TUNING.field_drop_hang_speed>0,'tuning.csv: 가장자리 붙잡기 시간은 발판 통과 시간보다 길 수 없고, 빠르기는 0보다 커야 한다 (D-114)');
 requireValue(TUNING.field_swing_hit_at<TUNING.field_swing_frames,'tuning.csv: 휘두르기 판정 시점이 전체 시간보다 짧아야 한다');
 requireValue(TUNING.map_flight_ms>0&&TUNING.map_landing_margin>0,'tuning.csv: 까치 이동 시간과 착지 여백은 0보다 커야 한다');
 requireValue(TUNING.drop_min_spacing>=16&&TUNING.drop_spread>=TUNING.drop_min_spacing,'tuning.csv: 바닥 아이템 간격은 16px 이상이며 퍼짐 폭 안에 있어야 한다');

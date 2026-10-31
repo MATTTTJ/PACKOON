@@ -224,6 +224,46 @@ function drawFormAt(ox,oy,f,st,form,attackT=0,glide=false){
     M(ox,oy,f,4,-19,1,8,STRAP);drawStrapLeaf(ox,oy,f,4,-16);drawSwipe(ox,oy-12,f,attackT,10);return;
   }
 }
+/* 결정 D-114: 변신 모습의 뒷모습(등 쪽). ↓로 내려오거나 무언가를 타고 오를 때 쓴다. (ox,oy)는 발 아래 가운데, phase(0·1)마다 팔다리를 번갈아 디딘다. */
+function drawFormBackAt(ox,oy,phase,form){
+  ox=Math.round(ox);oy=Math.round(oy);
+  const K='#2a211b',up=phase?1:-1;
+  const P=(x,y,w,h,c)=>R(ox+x,oy+y,w,h,c);
+  if(form==='squirrel'){
+    const C='#b5652d',D='#7a3f1c',T='#d08a4f',TL='#e6a868';
+    P(-4,up<0?-3:-5,3,up<0?3:2,D);P(1,up>0?-3:-5,3,up>0?3:2,D);        // 뒷발: 한쪽은 디디고 한쪽은 올린다
+    P(-4,-11,8,8,C);P(-3,-16,6,5,C);P(-3,-18,1,2,C);P(2,-18,1,2,C);   // 몸통·뒤통수·귀
+    P(-3,-14,6,3,BUNDLE);P(-2,-13,1,1,'#8a3b2a');                      // 등 보따리
+    P(up<0?-6:4,-18,2,6,D);P(up<0?4:-6,-14,2,4,D);                       // 앞발: 한쪽은 위로 뻗어 잡는다
+    P(-3,-11,6,9,T);P(-2,-13,4,2,T);P(-1,-10,2,7,TL);                    // 등을 덮은 큰 꼬리
+    return;
+  }
+  if(form==='goat'){
+    const C='#ebe5d9',S='#b9b0a0',H='#8a7a5c',D='#3a2f28';
+    for(const [lx,s] of [[-5,up<0],[-2,!(up<0)],[1,up<0],[4,!(up<0)]]){P(lx,s?-9:-7,2,s?7:7,lx===-5||lx===4?S:C);P(lx,-1,2,1,D);}
+    P(-6,-15,12,8,C);P(-6,-8,12,1,S);P(-1,-16,2,3,'#d6cfc2');
+    P(-4,-19,8,4,BUNDLE);P(-3,-18,1,1,'#8a3b2a');
+    P(-3,-23,6,4,C);P(-4,-26,2,3,H);P(2,-26,2,3,H);P(-5,-28,2,2,H);P(3,-28,2,2,H);
+    return;
+  }
+  if(form==='owl'){
+    const C='#8a6a45',D='#4a3524',E='#c9a040';
+    P(-5,-21,10,19,C);P(-5,-19,2,15,D);P(3,-19,2,15,D);P(-2,-6,4,4,D);
+    P(-3,-16,6,4,BUNDLE);P(-2,-15,1,1,'#8a3b2a');
+    P(-5,-25,10,5,C);P(-5,-27,2,2,C);P(3,-27,2,2,C);
+    P(-3,up<0?-2:-3,2,2,E);P(1,up>0?-2:-3,2,2,E);
+    return;
+  }
+  if(form==='deer'){
+    const C='#b88a55',D='#8a6440',Tu='#f4efe2';
+    for(const [lx,s] of [[-5,up<0],[-2,!(up<0)],[1,up<0],[4,!(up<0)]]){P(lx,s?-13:-11,2,11,lx===-5||lx===4?D:C);P(lx,-1,2,1,'#3a2a1f');}
+    P(-6,-18,12,7,C);P(-1,-19,2,3,Tu);
+    P(-3,-22,6,4,BUNDLE);P(-2,-21,1,1,'#8a3b2a');
+    P(-2,-26,4,4,C);P(-4,-29,2,3,C);P(2,-29,2,3,C);
+    return;
+  }
+  drawFormAt(ox,oy,1,phase,form);
+}
 /* 필드·초상·구역 전환에서 함께 쓴다. form 을 주지 않으면 지금 모습 */
 function drawPlayerAt(ox,oy,f,st,attackT,tool,pickFrame=0,form=G?.form||''){
   if(!form){drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame);return;}
