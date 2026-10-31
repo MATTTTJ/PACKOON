@@ -98,7 +98,7 @@ function renderBag(pop){
     const id=items[i];const b=el('button','slot'+(id&&selItem===id?' sel':''));b.type='button';
     if(id){b.appendChild(icon(id));b.appendChild(el('span','n',G.inv[id]));b.appendChild(rarityIcon(ITEMS[id].r));
       b.setAttribute('aria-label',ITEMS[id].n+' '+G.inv[id]+'개 · '+RAR[ITEMS[id].r]);
-      b.onclick=()=>{if(selItem===id)putIn(id);else{selItem=id;renderBag();}};}
+      b.onclick=()=>{if(selItem!==id){selItem=id;renderBag();}};}   // 결정 D-85: 두 번 누르기 없음
     else{b.disabled=true;b.setAttribute('aria-label','빈 칸');}
     grid.appendChild(b);
   }
@@ -110,14 +110,15 @@ function renderBag(pop){
     const name=el('b',null,ITEMS[id].n);const ch=el('span','chip');ch.appendChild(rarityIcon(ITEMS[id].r));ch.appendChild(el('span',null,RAR[ITEMS[id].r]));name.appendChild(ch);info.appendChild(name);
     info.appendChild(el('div',null,ITEMS[id].d));
     const row=el('div','row');
-    const put=el('button','btn primary',HEIR[pouch.tool].short+'에 넣기');put.type='button';put.onclick=()=>putIn(id);row.appendChild(put);
+    // 먹을거리는 '먹기'가 주 버튼이다
     const eat=ITEMS[id].eat;
-    if(eat){const b=el('button','btn','먹기 · 체력 +'+eat);b.type='button';b.disabled=G.hp>=G.maxhp;
+    if(eat){const b=el('button','btn primary','먹기 · 체력 +'+eat);b.type='button';b.disabled=G.hp>=G.maxhp;
       b.onclick=()=>{takeItem(id,1);G.hp=Math.min(G.maxhp,G.hp+eat);refreshHud();if(!has(id))selItem=null;renderBag();};row.appendChild(b);}
+    const put=el('button',eat?'btn':'btn primary',HEIR[pouch.tool].short+'에 넣기');put.type='button';put.onclick=()=>putIn(id);row.appendChild(put);
     if(isHomeCraft(id)){const b=el('button','btn','까치 편에 집으로 보내기');b.type='button';b.disabled=brewing||knows('home:'+G.region);b.onclick=()=>sendCraftHome(id);row.appendChild(b);}
-    info.appendChild(row);info.appendChild(el('span','small','한 번 더 누르면 바로 고른 가보에 넣는다.'));
+    info.appendChild(row);
     d.appendChild(info);
-  }else d.appendChild(el('span','small','소지품을 누르면 설명이 나오고, 한 번 더 누르면 아래에서 고른 가보에 들어간다.'));
+  }else d.appendChild(el('span','small','소지품을 누르면 설명과 쓸 수 있는 일이 나온다.'));
   body.appendChild(d);
 
   const wrap=el('div','pouch-wrap');
