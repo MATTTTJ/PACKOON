@@ -208,7 +208,8 @@ const MINIGAMES=numericTable('minigames','미니게임',
     'gather_help_width gather_zone_start gather_zone_span gather_ring_period gather_ring_radius gather_just_window gather_cooldown',
     'gather_perfect_power gather_yield gather_perfect_bonus gather_root_hits gather_root_width',
     'gather_root_speed gather_ssari_hits gather_kkoe_hits gather_eoksae_hits gather_seogi_hits',
-    'gather_darae_vine_hits gather_darae_vine_width gather_darae_vine_speed yut_needle_speed yut_nak_zone'
+    'gather_darae_vine_hits gather_darae_vine_width gather_darae_vine_speed yut_needle_speed yut_nak_zone',
+    'gather_solbang_hits'
   ].join(' '));
 const TUNING=numericTable('tuning','분류',
   [

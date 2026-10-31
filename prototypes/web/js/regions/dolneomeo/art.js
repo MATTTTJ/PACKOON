@@ -213,8 +213,21 @@ function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.ro
 }else{
   q(-7,-14,14,11,'#344b52');q(-4,-11,9,7,'#e2e4d3');q(2,-20,8,9,'#344b52');q(8,-17,6,2,'#b8b798');q(7,-19,1,1,'#eef1d9');q(-15,-7,10,3,'#344b52');q(-18,-6,4,2,'#71878a');q(-4,-4,1,4,'#75775f');q(3,-4,1,4,'#75775f');q(-7,-12,4,6,'#627b80');
 }}
+/* 결정 D-83: 밭 둔덕 경치. 메밀밭 너머 먼 산 아래 성황당 돌무더기가 이따금 꿈틀한다. */
+function stirFar(){
+  ridge('#8fa3a6',132,30,96,140);ridge('#a7b4ac',146,16,70,400);
+  const x=Math.round(250-cam*.6),still=Vfx.reducedMotion,stir=!still&&Math.sin(G.anim*0.05)>0.82,k=stir?Math.round(Math.sin(G.anim*0.8)*1.5):0;
+  // 돌무더기: 서리 없는 회갈색 돌을 둥글게 쌓은 더미. 꿈틀할 때 위쪽 돌이 한 칸씩 어긋나고 먼지가 인다.
+  px(x-34,153,68,2,'#6f7a73');
+  const rows=[[0,6,10],[7,5,10],[13,4,10],[19,3,9],[24,2,9]];
+  rows.forEach(([dy,n,w],j)=>{const off=j>=2?k:0;for(let i=0;i<n;i++){const sx=x-n*w/2+i*w+off+(j%2?3:0);stone(sx,152-dy,w-1,7,i+j*7,false);}});
+  if(stir){px(x-40,149,6,1,'#d8d2bd');px(x+36,147,5,1,'#d8d2bd');px(x-6,122,2,1,'#d8d2bd');px(x+8,120,1,1,'#d8d2bd');}
+}
+function stirMid(){px(0,158,W,30,'#9c9a7b');for(let i=0;i<70;i++){const x=mod(i*13-cam,460)-20,y=160+(i%6)*4;px(x,y,2,1,i%3?'#f1efe2':'#d9d3bf');}}
+function stirNear(){for(let x=-20;x<W+20;x+=4){const y=194-Math.round(Math.sin((x+cam)/58)*7);px(x,y,4,H-y,'#7d7a5c');px(x,y,4,2,'#aaa77d');if(hash(x+cam)>.72)px(x,y-2,1,2,'#c9c492');}stone(30-mod(cam*.2,40),214,22,8,3);}
 Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawMemoryBridge,drawRestoredBridge,drawBridgeWork,drawBridgeWorkMarker,drawBridgeSurvey,drawWanderer,
   cliffLayers:[{speed:.04,draw:cliffSky},{speed:.14,draw:cliffFar},{speed:.4,draw:cliffSea},{speed:.83,draw:cliffNear}],
   shrineLayers:[{speed:.04,draw:shrineSky},{speed:.16,draw:shrineFar},{speed:.43,draw:shrineMid},{speed:.86,draw:shrineNear}],
+  stirLayers:[{speed:.04,draw:shrineSky},{speed:.14,draw:stirFar},{speed:.45,draw:stirMid},{speed:.86,draw:stirNear}],
 };
 })();

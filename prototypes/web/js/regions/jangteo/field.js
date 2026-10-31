@@ -132,6 +132,15 @@ if(!CLASSIC){
       Rg.expArt.drawBack(id);
     },
     drawScenery(){Rg.expArt.drawScenery(id);},
+    // 흔들 소나무: 솔숲 앞줄의 작은 소나무. 칠수록 가지가 흔들린다.
+    drawDig(d,x){
+      if(d.item!=='solbang')return false;
+      const y=d.y??GROUND,sway=d.done||Vfx.reducedMotion?0:Math.round(Math.sin(G.anim*0.3+d.x)*(d.prog?1.5:.5));x=Math.round(x);
+      R(x-2,y-34,4,34,'#6b4423');R(x-2,y-34,1,34,'#8a5a2b');
+      for(const [dy,w] of [[-44,12],[-38,18],[-31,22]]){R(x-w/2+sway,y+dy,w,5,'#2f5a3a');R(x-w/2+1+sway,y+dy,w-2,1,'#4f7a4f');}
+      if(!d.done)for(const [dx,dy] of [[-6,-28],[4,-34],[7,-26]])R(x+dx+sway,y+dy,2,3,'#8a5a2b');
+      return true;
+    },
     drawPickup:Rg.drawPickup,onHit:Rg.onHit,ambient:Rg.ambient,
     weather:()=>{if(Rg.springRevisit())Vfx.setWeather('');else Rg.weather();},
     weatherFront(){Rg.expArt.drawFront?.(id);ctx.restore();},
@@ -186,7 +195,7 @@ if(!CLASSIC){
   Rg.zones={
     entrance:{...common('entrance'),name:TABLES.ZONES.jangteo.entrance,w:2600,npcs:[],
       platforms:[...stairs(1040),...stairs(1980)],
-      pickups:cones('entrance',[[330,192],[355,192],[380,192]]),
+      pickups:cones('entrance',[[355,192]]),   // 결정 D-82: 솔방울은 뒷산 솔숲에서 모은다
       exits:{right:{to:'street',toX:60}},
       doors:[{x:1310,y:96,to:'street',toX:1010,toY:96,label:'연줄을 따라 처마 건너기',need:()=>!!G.f.jxKiteDone,reason:'연을 풀어 준 뒤 아이에게 안전한 처마길을 물어보자.',draw:peg,drawBlocked:shutter}],
       wanderers:E.wanderers.entrance,examines:E.examines.entrance,
@@ -194,7 +203,7 @@ if(!CLASSIC){
     },
     street:{...common('street'),name:TABLES.ZONES.jangteo.street,w:2800,npcs:['morak','yeotbang','nal'],
       platforms:[...stairs(430),{x:610,y:96,w:510},{x:1250,y:110,w:300},...stairs(2370),{x:2550,y:96,w:180}],
-      pickups:cones('street',[[830,192],[850,192],[875,192]]),
+      pickups:cones('street',[[850,192]]),
       exits:{left:{to:'entrance',toX:2530},right:{to:'inn',toX:60}},
       doors:[{x:1180,to:'street',toX:1310,toY:110,label:'떡집 문 열기',need:()=>!night(),reason:'앞문은 닫혔다. 오른쪽에 불 켜진 옆문이 있다.',draw:peg,drawBlocked:shutter},
         {x:1590,to:'street',toX:1490,toY:110,label:'떡집 아궁이 옆문으로',draw:peg},
@@ -208,7 +217,7 @@ if(!CLASSIC){
     },
     inn:{...common('inn'),name:TABLES.ZONES.jangteo.inn,w:2600,npcs:['bueong','maru'],
       platforms:[...stairs(1160),{x:1340,y:96,w:100},...stairs(1590,128),{x:1770,y:128,w:200},...stairs(2220)],
-      pickups:cones('inn',[[420,192],[445,192],[470,192]]),
+      pickups:cones('inn',[[445,192]]),
       digs:[{id:'j_cache_inn',x:560,item:'solbang',n:2,form:'squirrel',cache:true,done:false}],
       exits:{left:{to:'street',toX:2720},right:{to:'warehouse',toX:60,need:needWarehouse,reason:warehouseReason,drawBlocked:gate}},
       doors:[{x:700,to:'inn',toX:850,label:'숙소 문 열기',draw:peg},
@@ -225,7 +234,9 @@ if(!CLASSIC){
     pine:{...common('pine'),name:TABLES.ZONES.jangteo.pine,w:2800,npcs:[],
       // 840 헛간 지붕은 720 처마에서 수리부엉이가 날개를 펴야 닿는다 (PA-47 선택 자리)
       platforms:[...stairs(420),...stairs(1100,96,[1]),...stairs(2180,96,[0]),{x:2390,y:96,w:340},{x:842,y:124,w:56}],
-      digs:[{id:'j_cache_pine',x:1700,item:'kong',n:2,form:'squirrel',cache:true,done:false}],
+      // 결정 D-82: 솔숲의 소나무 흔들기 세 곳 (채집 고리 D-41)
+      digs:[{id:'j_cache_pine',x:1700,item:'kong',n:2,form:'squirrel',cache:true,done:false},
+        {id:'j_pine_shake_1',x:960,item:'solbang',done:false},{id:'j_pine_shake_2',x:1620,item:'solbang',done:false},{id:'j_pine_shake_3',x:2080,item:'solbang',done:false}],
       pickups:[...cones('pine',[[250,192],[280,192],[310,192],[600,96],[630,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
         {id:'j_owl_roof_cone_1',x:858,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:880,y:124,item:'solbang',got:false}],
       // 결정 D-44: 뒷산에서 장터로는 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
