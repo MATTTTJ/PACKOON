@@ -196,7 +196,7 @@ const MINIGAMES=numericTable('minigames','미니게임',
     'salg_return_speed salg_active_distance salg_arrival_distance salg_grass_interval salg_risk_distance salg_grace',
     'salg_relief_frames salg_recovery salg_risk_limit salg_startle_frames salg_max_retreat salg_retreat',
     'salg_warning_frames salg_alert_frames salg_near_distance salg_near_graze salg_near_random dad_steps',
-    'gather_ring_period gather_ring_radius gather_just_window gather_perfect_power gather_yield gather_perfect_bonus',
+    'gather_ring_period gather_ring_radius gather_perfect_window gather_good_window gather_perfect_power gather_yield gather_perfect_bonus',
     'gather_root_hits gather_ssari_hits gather_kkoe_hits gather_eoksae_hits gather_seogi_hits gather_darae_vine_hits',
     'yut_needle_speed yut_nak_zone gather_solbang_hits'
   ].join(' '));

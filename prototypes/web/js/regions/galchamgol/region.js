@@ -73,9 +73,10 @@ defineIcons({
 
 /* 흙더미 채집 */
 defineGather({
-  root:{title:'칡뿌리 캐기',hits:TABLES.MINIGAMES.gather_root_hits,spot:[0,-9],hint:'흙이 무른 칡뿌리 자리다. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 더 깊이 들어가 하나 더 나온다.'},
-  ssari:{title:'싸리버섯 따기',hits:TABLES.MINIGAMES.gather_ssari_hits,spot:[0,-9],hint:'밑동을 단번에 꺾어야 갓이 안 상한다. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 옆에 난 것까지 꺾인다.'},
-  kkoe:{title:'꾀꼬리버섯 따기',hits:TABLES.MINIGAMES.gather_kkoe_hits,spot:[0,-9],hint:'노란 갓이 다치지 않게 밑동을 꺾자. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 옆에 난 것까지 꺾인다.'},
+  // 결정 D-108: rare = 한 흙더미를 모두 딱으로 캤을 때 하나 더 나오는 한 단계 위 재료 (그 자리에서 날 법한 것만)
+  root:{title:'칡뿌리 캐기',hits:TABLES.MINIGAMES.gather_root_hits,spot:[0,-9],rare:'ssari',hint:'흙이 무른 칡뿌리 자리다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 더 깊이 들어가 하나 더 나온다. 모두 딱이면 깊은 흙의 싸리버섯까지 딸려 나온다.'},
+  ssari:{title:'싸리버섯 따기',hits:TABLES.MINIGAMES.gather_ssari_hits,spot:[0,-9],hint:'밑동을 단번에 꺾어야 갓이 안 상한다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 옆에 난 것까지 꺾인다.'},
+  kkoe:{title:'꾀꼬리버섯 따기',hits:TABLES.MINIGAMES.gather_kkoe_hits,spot:[0,-9],hint:'노란 갓이 다치지 않게 밑동을 꺾자. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 옆에 난 것까지 꺾인다.'},
 });
 
 /* 엄마의 절구는 처음부터 깨어 있다. 가공법은 heirlooms.csv */

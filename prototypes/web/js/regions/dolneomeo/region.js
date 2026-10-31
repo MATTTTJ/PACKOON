@@ -80,8 +80,8 @@ defineIcons({
 
 /* 채집 (낫으로 억새 베기, 절벽의 석이버섯 떼기) */
 defineGather({
-  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 한 단이 더 베인다.'},
-  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-7],hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 한 장이 더 떨어진다.'},
+  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 단이 더 베인다.'},
+  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-7],hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 장이 더 떨어진다.'},
 });
 
 /* 증조할아버지의 맷돌: 돌쇠 할배의 돌 쌓기를 통과하면 깨어난다. 가공법은 heirlooms.csv */
