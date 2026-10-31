@@ -430,7 +430,7 @@ function tellSeogi(){
 /* ---------- 돌 골렘 전투 ---------- */
 Rg.startGolem=()=>{
   G.px=1845;
-  inkTransition('전투',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
+  inkTransition('돌 골렘',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
     if(res==='win'||res==='calm'){
       if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
       Rg.bossDie();

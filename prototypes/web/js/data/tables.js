@@ -2795,5 +2795,39 @@ const TABLES={
     }
    }
   }
+ },
+ "SCENE_MUSIC": {
+  "g_musoe_night": {
+   "music": "father",
+   "from": 0
+  },
+  "j_nal_ledger": {
+   "music": "",
+   "from": 0
+  },
+  "y_nal_confess": {
+   "music": "father",
+   "from": 0
+  },
+  "y_dad_reunion": {
+   "music": "father",
+   "from": 1
+  },
+  "y_dad_ledger": {
+   "music": "father",
+   "from": 0
+  },
+  "y_sangun_story": {
+   "music": "theme",
+   "from": 0
+  },
+  "y_sangun_name": {
+   "music": "theme",
+   "from": 0
+  },
+  "y_give_name": {
+   "music": "theme",
+   "from": 0
+  }
  }
 };

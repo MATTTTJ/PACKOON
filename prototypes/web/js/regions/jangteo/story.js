@@ -59,6 +59,7 @@ function bueongLedger(){
   ]);
 }
 function nalLedger(){
+  sceneNext('j_nal_ledger');
   arcScene('jangteoArcsNal3','날쌘은 부엉 영감이 있는 숙소를 피했다. 장부 이야기는 꺼내지 말라고 했다.',[
     ['너구리','아저씨, 왜 숙소 쪽엔 안 와요?'],
     ['날쌘','누가 피해? 여기서도 장사 잘돼.'],
@@ -762,7 +763,7 @@ Rg.startDokkaebi=()=>{
   // 전투 결과 콜백은 후퇴·패배 때도 부위 전리품 지급이 끝난 뒤 한 번 실행된다.
   let encounter=null;
   G.px=Rg.STORE_X-30;
-  inkTransition('전투',(Rg.STORE_X-G.cam)/W*100,()=>{startBattle('dokkaebi',res=>{
+  inkTransition('헌물 도깨비',(Rg.STORE_X-G.cam)/W*100,()=>{startBattle('dokkaebi',res=>{
     if(encounter?.parts.some(p=>p.id==='ki'&&p.broken))addItem('kong',1);
     if(res==='win'||res==='calm'){
       if(res==='calm'){

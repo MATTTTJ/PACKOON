@@ -753,6 +753,7 @@ vistaCaption.className='vista-caption';
 const vistaThought=el('p','vista-thought'),vistaReturn=el('p','vista-return');
 vistaCaption.append(vistaThought,vistaReturn);
 $('stage').appendChild(vistaCaption);
+Sound.setQuiet(()=>!!vistaMode);   // 결정 D-74: 경치를 바라보는 동안만 효과음을 쉰다
 function startVista(p){
   if(paused())return;
   const seen=G.f.vistasSeen||(G.f.vistasSeen={}),key=expansionKey(p.id),first=!seen[key];

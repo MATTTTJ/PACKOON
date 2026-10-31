@@ -255,7 +255,7 @@ if(!CLASSIC){
     if(spec)z.platforms=active||(G.zone==='gate'&&bridgeReady())?[...bases[G.zone],...spec.bridge]:bases[G.zone];
     if(G.zone==='cliff')z.platforms=G.boss.dead?bases.cliff:bases.cliff.filter(p=>p.x<2200);
     if(m&&!active)delete G.f.dolMemory;
-    if(active&&!vistaMode&&Sound.ambient!=='dol-memory')Sound.ambience('dol-memory');
+    if(active&&!vistaMode&&Sound.ambient!=='dol-memory'){Sound.ambience('dol-memory');Sound.passage('memory_layer');}
     if(!active&&Sound.ambient==='dol-memory')Sound.ambience(null);
   }
   function memoryTalk(zone){
@@ -430,7 +430,7 @@ if(!CLASSIC){
     Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.id==='dol_seogi'))G.digs.push({id:'dol_seogi',zone:'cliff',x:1920,item:'seogi',done:false});};
     Rg.startGolem=()=>{
       G.px=2275;
-      inkTransition('전투',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
+      inkTransition('돌 골렘',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
         if(res==='win'||res==='calm'){
           if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
           Rg.bossDie();

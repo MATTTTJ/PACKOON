@@ -291,7 +291,21 @@ for(const r of t('haggle')){
   slot[region]={kind,kid:r['아이대사'].trim(),line:r['대답'].trim()};
 }
 for(const [npc,ways] of Object.entries(HAGGLE))for(const way of ['허세','사정','칭찬'])if(!ways[way]?.all)fail('haggle.csv '+npc+': '+way+'의 전체 줄이 필요하다');
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE},null,1)+";\n";
+/* 결정 D-72: 장면별 곡. 곡은 design/data/music/music.json의 곡 id이거나 '지역'(이야기 곡을 깔지 않고 지역 곡을 둔다).
+   시작줄부터 그 곡으로 바꾼다(그 전 줄은 지역 곡). */
+const SCENE_MUSIC={};
+{
+  const music=JSON.parse(fs.readFileSync(path.join(DATA,'music','music.json'),'utf8'));
+  const trackIds=new Set((music.tracks||music.score?.tracks||[]).map(t=>t.id));
+  for(const r of t('scene_music')){
+    const where='scene_music.csv '+r.id,song=r['곡'].trim(),from=+r['시작줄'];
+    if(!regionIds.has(r['지역']))fail(where+': 지역 id를 확인한다');
+    if(song!=='지역'&&!trackIds.has(song))fail(where+': 곡 id가 music.json에 없다 '+song);
+    if(!Number.isSafeInteger(from)||from<0)fail(where+': 시작줄은 0 이상의 정수다');
+    SCENE_MUSIC[r.id]={music:song==='지역'?'':song,from};
+  }
+}
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}
