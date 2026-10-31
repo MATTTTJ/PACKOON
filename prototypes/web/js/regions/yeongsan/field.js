@@ -10,6 +10,11 @@ const LAKE_X=1960;     // 호수
 const TREE_X=2236;     // 호수 가운데 섬의 신목
 const BOSS_AT=2030;    // 이보다 오른쪽으로 가면 강철이
 const spring=()=>G.f.spring;
+// 결정 D-87: 호숫가 강철이에게 다가갈수록 긴장이 오른다. 봄이 오면(강철이가 떠나면) 0.
+Rg.moodTension=()=>{
+  if(!G.started||G.boss.dead||spring()||(!CLASSIC&&G.zone!=='island'))return 0;
+  return clamp(1-(Math.abs(BOSS_AT-G.px)-60)/800,0,1);
+};
 
 /* ---------- 배경 ---------- */
 function ridge(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+cam*par;const h=base-Math.abs(Math.sin(wx*freq))*amp-Math.sin(wx*freq*2.2+1)*amp*0.3;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}

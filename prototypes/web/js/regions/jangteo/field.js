@@ -7,6 +7,11 @@ const INN_X0=1010,INN_X1=1270;     // 보부상 숙소
 const STORE_X=1500;                // 숙소 창고 (그믐 밤에 헌물 도깨비가 나타난다)
 const FOREST_X=1640;               // 뒷산 소나무 숲
 const night=()=>G.f.night;
+// 결정 D-87: 그믐밤 창고 지키기를 맡은 뒤, 창고에 다가갈수록 긴장이 오른다. 도깨비를 달래거나 이기면 0.
+Rg.moodTension=()=>{
+  if(!G.started||G.boss.dead||!G.f.guard||!night()||(!CLASSIC&&G.zone!=='warehouse'))return 0;
+  return clamp(1-(Math.abs(Rg.STORE_X-G.px)-40)/700,0,1);
+};
 
 /* ---------- 배경 ---------- */
 function ridge(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+cam*par;const h=base-Math.sin(wx*freq)*amp-Math.sin(wx*freq*2.7+1)*amp*0.35;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}

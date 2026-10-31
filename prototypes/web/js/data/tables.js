@@ -2833,5 +2833,274 @@ const TABLES={
    "music": "theme",
    "from": 0
   }
+ },
+ "MUSIC_LAYERS": {
+  "danpunggol": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "stream",
+     "low_string"
+    ],
+    "longing": [
+     "answer"
+    ],
+    "pulse": [
+     "janggu_low",
+     "janggu_high",
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    1,
+    1.12
+   ]
+  },
+  "dolneomeo": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "air",
+     "low_string"
+    ],
+    "longing": [
+     "answer",
+     "bowed"
+    ],
+    "pulse": [
+     "stone",
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    1,
+    1.1
+   ]
+  },
+  "market_day": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "low_string"
+    ],
+    "longing": [
+     "answer",
+     "bowed"
+    ],
+    "pulse": [
+     "janggu_low",
+     "janggu_high",
+     "janggu_roll",
+     "small_gong",
+     "scissors",
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    1,
+    1.06
+   ]
+  },
+  "market_night": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "air"
+    ],
+    "longing": [
+     "answer"
+    ],
+    "pulse": [
+     "soft_drum"
+    ]
+   },
+   "tempos": [
+    1,
+    1.1
+   ]
+  },
+  "yeongsan": {
+   "layers": {
+    "base": [
+     "melody",
+     "air"
+    ],
+    "longing": [
+     "low_string"
+    ],
+    "pulse": [
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    1,
+    1.1
+   ]
+  },
+  "yeongsan_spring": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "piri_answer",
+     "chime"
+    ],
+    "longing": [
+     "answer",
+     "bowed_answer"
+    ],
+    "pulse": [
+     "janggu_low",
+     "janggu_high",
+     "deong",
+     "gong",
+     "small_gong",
+     "buk"
+    ]
+   },
+   "tempos": [
+    1,
+    1
+   ]
+  },
+  "boss_kudzu": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "arp",
+     "low_string"
+    ],
+    "longing": [
+     "answer"
+    ],
+    "pulse": [
+     "janggu_low",
+     "janggu_high",
+     "vine_stroke",
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    0.92,
+    1,
+    1.12,
+    1.22
+   ]
+  },
+  "boss_golem": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "arp",
+     "low_string"
+    ],
+    "longing": [
+     "answer"
+    ],
+    "pulse": [
+     "rock",
+     "buk",
+     "jing",
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    0.92,
+    1,
+    1.1,
+    1.18
+   ]
+  },
+  "boss_dokkaebi": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "arp",
+     "low_string"
+    ],
+    "longing": [
+     "answer"
+    ],
+    "pulse": [
+     "janggu_low",
+     "janggu_high",
+     "roll",
+     "small_gong",
+     "scissors",
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    0.92,
+    1,
+    1.06,
+    1.12
+   ]
+  },
+  "boss_steel": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "arp",
+     "low_string",
+     "winter_air"
+    ],
+    "longing": [
+     "answer"
+    ],
+    "pulse": [
+     "buk",
+     "cold_gong",
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    0.92,
+    1,
+    1.12,
+    1.22
+   ]
+  },
+  "trial_iron": {
+   "layers": {
+    "base": [
+     "melody",
+     "bass",
+     "arp",
+     "bellows"
+    ],
+    "longing": [
+     "low_string"
+    ],
+    "pulse": [
+     "hammer",
+     "buk",
+     "moduk_low",
+     "moduk_mid"
+    ]
+   },
+   "tempos": [
+    0.92,
+    1,
+    1.1,
+    1.18
+   ]
+  }
  }
 };

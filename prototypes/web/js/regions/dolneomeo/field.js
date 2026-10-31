@@ -4,6 +4,12 @@
 const Rg=REGIONS.dolneomeo;
 const GATE_X=1590;     // 뿔이가 지키는 돌산 길목 (장승과 금줄)
 const GOLEM_AT=1860;   // 이보다 오른쪽으로 가면 돌 골렘과 전투
+// 결정 D-87: 뿔이가 돌산 길을 열어 준 뒤, 성황당 끝 돌 골렘 쪽으로 다가갈수록 긴장이 오른다. 골렘이 잠들면 0.
+Rg.moodTension=()=>{
+  if(!G.started||G.boss.dead||!G.f.ppuriPassed||(!CLASSIC&&G.zone!=='shrine'))return 0;
+  const at=CLASSIC?GOLEM_AT:2310;   // 확장판 성황당 구역의 전투 시작 자리
+  return clamp(1-(Math.abs(at-G.px)-60)/800,0,1);
+};
 const CLIFF_X=2150;    // 절벽이 시작되는 곳
 const DARAE={x:2236,y:150};
 
