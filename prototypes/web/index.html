@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap">
-<link rel="stylesheet" href="css/style.css?v=20261031tr4">
+<link rel="stylesheet" href="css/style.css?v=20261031ar1">
 </head>
 <body>
 
@@ -119,8 +119,8 @@
       <details class="panel-foot"><summary>소리 설정</summary>
         <label>배경음 <input id="volumeBgm" type="range" min="0" max="1" step="0.05" aria-label="배경음 음량"></label>
         <label>효과음 <input id="volumeSfx" type="range" min="0" max="1" step="0.05" aria-label="효과음 음량"></label>
-        <label class="music-recorded"><input id="musicRecorded" type="checkbox"> 녹음 음원으로 듣기 (시험: 단풍골·엉킨 칡)</label>
-        <p class="small ai-note">녹음 음원은 ACE-Step(AI)으로 만들었다. 끄면 원래 합성 음악이 나온다.</p>
+        <label class="music-recorded">배경 음악 <select id="musicRecorded" aria-label="배경 음악"><option value="new">새 곡</option><option value="off">합성</option></select></label>
+        <p class="small ai-note">'새 곡'은 ACE-Step(AI)으로 만든 음악이다. 파일을 읽지 못하는 환경에서는 합성 음악이 나온다.</p>
       </details>
     </div>
 
@@ -172,64 +172,65 @@
 
 <!-- 새 버전을 올릴 때마다 아래 ?v= 값을 모두 같은 새 값으로 바꾼다 (브라우저가 옛 파일을 쓰지 않게). README 참고 -->
 <!-- 빌드 없이 차례대로 읽는다. 순서: 공통 엔진 → 공통 데이터 → 지역 → 시작(game.js) -->
-<script src="js/engine/core.js?v=20261031tr4"></script>
-<script src="js/engine/input.js?v=20261031tr4"></script>
-<script src="js/data/music-data.js?v=20261031tr4"></script>
-<script src="js/engine/sound.js?v=20261031tr4"></script>
-<script src="js/engine/music.js?v=20261031tr4"></script>
-<script src="js/engine/vfx.js?v=20261031tr4"></script>
-<script src="js/engine/dialog.js?v=20261031tr4"></script>
-<script src="js/engine/gather.js?v=20261031tr4"></script>
-<script src="js/engine/icons.js?v=20261031tr4"></script>
-<script src="js/engine/field.js?v=20261031tr4"></script>
-<script src="js/engine/map.js?v=20261031tr4"></script>
-<script src="js/engine/hud.js?v=20261031tr4"></script>
-<script src="js/engine/forms.js?v=20261031tr4"></script>
-<script src="js/engine/roll.js?v=20261031tr4"></script>
-<script src="js/engine/bag.js?v=20261031tr4"></script>
-<script src="js/engine/craft.js?v=20261031tr4"></script>
-<script src="js/engine/trade.js?v=20261031tr4"></script>
-<script src="js/engine/book.js?v=20261031tr4"></script>
-<script src="js/engine/notebook.js?v=20261031tr4"></script>
-<script src="js/engine/battle-ink.js?v=20261031tr4"></script>
-<script src="js/engine/battle.js?v=20261031tr4"></script>
-<script src="js/engine/battle-attacks.js?v=20261031tr4"></script>
+<script src="js/engine/core.js?v=20261031ar1"></script>
+<script src="js/engine/input.js?v=20261031ar1"></script>
+<script src="js/data/music-data.js?v=20261031ar1"></script>
+<script src="js/data/new-music.js?v=20261031ar1"></script>
+<script src="js/engine/sound.js?v=20261031ar1"></script>
+<script src="js/engine/music.js?v=20261031ar1"></script>
+<script src="js/engine/vfx.js?v=20261031ar1"></script>
+<script src="js/engine/dialog.js?v=20261031ar1"></script>
+<script src="js/engine/gather.js?v=20261031ar1"></script>
+<script src="js/engine/icons.js?v=20261031ar1"></script>
+<script src="js/engine/field.js?v=20261031ar1"></script>
+<script src="js/engine/map.js?v=20261031ar1"></script>
+<script src="js/engine/hud.js?v=20261031ar1"></script>
+<script src="js/engine/forms.js?v=20261031ar1"></script>
+<script src="js/engine/roll.js?v=20261031ar1"></script>
+<script src="js/engine/bag.js?v=20261031ar1"></script>
+<script src="js/engine/craft.js?v=20261031ar1"></script>
+<script src="js/engine/trade.js?v=20261031ar1"></script>
+<script src="js/engine/book.js?v=20261031ar1"></script>
+<script src="js/engine/notebook.js?v=20261031ar1"></script>
+<script src="js/engine/battle-ink.js?v=20261031ar1"></script>
+<script src="js/engine/battle.js?v=20261031ar1"></script>
+<script src="js/engine/battle-attacks.js?v=20261031ar1"></script>
 <!-- 표(design/data/*.csv)에서 만든 데이터. 직접 고치지 말고 tools/build-data.js 로 다시 만든다 -->
-<script src="js/data/tables.js?v=20261031tr4"></script>
-<script src="js/data/common.js?v=20261031tr4"></script>
+<script src="js/data/tables.js?v=20261031ar1"></script>
+<script src="js/data/common.js?v=20261031ar1"></script>
 <!-- 지역 1: 단풍골. 지역을 더할 때는 그 지역 폴더의 파일을 이 아래에 같은 모양으로 덧붙인다 -->
-<script src="js/regions/galchamgol/region.js?v=20261031tr4"></script>
-<script src="js/regions/galchamgol/art.js?v=20261031tr4"></script>
-<script src="js/regions/galchamgol/field.js?v=20261031tr4"></script>
-<script src="js/regions/galchamgol/enemies.js?v=20261031tr4"></script>
-<script src="js/regions/galchamgol/story.js?v=20261031tr4"></script>
-<script src="js/regions/galchamgol/strangers.js?v=20261031tr4"></script>
+<script src="js/regions/galchamgol/region.js?v=20261031ar1"></script>
+<script src="js/regions/galchamgol/art.js?v=20261031ar1"></script>
+<script src="js/regions/galchamgol/field.js?v=20261031ar1"></script>
+<script src="js/regions/galchamgol/enemies.js?v=20261031ar1"></script>
+<script src="js/regions/galchamgol/story.js?v=20261031ar1"></script>
+<script src="js/regions/galchamgol/strangers.js?v=20261031ar1"></script>
 <!-- 지역 2: 돌너머 마을 -->
-<script src="js/regions/dolneomeo/region.js?v=20261031tr4"></script>
-<script src="js/regions/dolneomeo/art.js?v=20261031tr4"></script>
-<script src="js/regions/dolneomeo/field.js?v=20261031tr4"></script>
-<script src="js/regions/dolneomeo/enemies.js?v=20261031tr4"></script>
-<script src="js/regions/dolneomeo/story.js?v=20261031tr4"></script>
-<script src="js/regions/dolneomeo/strangers.js?v=20261031tr4"></script>
+<script src="js/regions/dolneomeo/region.js?v=20261031ar1"></script>
+<script src="js/regions/dolneomeo/art.js?v=20261031ar1"></script>
+<script src="js/regions/dolneomeo/field.js?v=20261031ar1"></script>
+<script src="js/regions/dolneomeo/enemies.js?v=20261031ar1"></script>
+<script src="js/regions/dolneomeo/story.js?v=20261031ar1"></script>
+<script src="js/regions/dolneomeo/strangers.js?v=20261031ar1"></script>
 <!-- 지역 3: 큰 장터 -->
-<script src="js/regions/jangteo/region.js?v=20261031tr4"></script>
-<script src="js/regions/jangteo/art.js?v=20261031tr4"></script>
-<script src="js/regions/jangteo/field.js?v=20261031tr4"></script>
-<script src="js/regions/jangteo/enemies.js?v=20261031tr4"></script>
-<script src="js/regions/jangteo/story.js?v=20261031tr4"></script>
-<script src="js/regions/jangteo/strangers.js?v=20261031tr4"></script>
+<script src="js/regions/jangteo/region.js?v=20261031ar1"></script>
+<script src="js/regions/jangteo/art.js?v=20261031ar1"></script>
+<script src="js/regions/jangteo/field.js?v=20261031ar1"></script>
+<script src="js/regions/jangteo/enemies.js?v=20261031ar1"></script>
+<script src="js/regions/jangteo/story.js?v=20261031ar1"></script>
+<script src="js/regions/jangteo/strangers.js?v=20261031ar1"></script>
 <!-- 지역 4: 북쪽 영산 (마지막) -->
-<script src="js/regions/yeongsan/region.js?v=20261031tr4"></script>
-<script src="js/regions/yeongsan/art.js?v=20261031tr4"></script>
-<script src="js/regions/yeongsan/field.js?v=20261031tr4"></script>
-<script src="js/regions/yeongsan/enemies.js?v=20261031tr4"></script>
-<script src="js/regions/yeongsan/story.js?v=20261031tr4"></script>
-<script src="js/regions/yeongsan/strangers.js?v=20261031tr4"></script>
-<script src="js/engine/save.js?v=20261031tr4"></script>
+<script src="js/regions/yeongsan/region.js?v=20261031ar1"></script>
+<script src="js/regions/yeongsan/art.js?v=20261031ar1"></script>
+<script src="js/regions/yeongsan/field.js?v=20261031ar1"></script>
+<script src="js/regions/yeongsan/enemies.js?v=20261031ar1"></script>
+<script src="js/regions/yeongsan/story.js?v=20261031ar1"></script>
+<script src="js/regions/yeongsan/strangers.js?v=20261031ar1"></script>
+<script src="js/engine/save.js?v=20261031ar1"></script>
 <!-- 첫 화면 (packoon-layer-studio 타이틀 장면) -->
-<script src="js/title/scene-data.js?v=20261031tr4"></script>
-<script src="js/title/title-scene.js?v=20261031tr4"></script>
-<script src="js/title/title-screen.js?v=20261031tr4"></script>
-<script src="js/engine/game.js?v=20261031tr4"></script>
+<script src="js/title/scene-data.js?v=20261031ar1"></script>
+<script src="js/title/title-scene.js?v=20261031ar1"></script>
+<script src="js/title/title-screen.js?v=20261031ar1"></script>
+<script src="js/engine/game.js?v=20261031ar1"></script>
 </body>
 </html>
