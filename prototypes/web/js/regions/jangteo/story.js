@@ -312,7 +312,7 @@ function arcGreeting(w,rows){
       const F=G.f;if(!Rg.arcs())return null;let act=null,label='',line='';
       if(!night()&&F.jxYutReward&&!F.jangteoArcsElder1){act=elderArc1;label='한 판 더 구경한다';line='꼬마 왔구나. 앉아서 구경이나 하려무나.';}
       else if(night()&&F.jangteoArcsElder1&&!F.jangteoArcsElder2){act=elderArc2;label='곰방대 할아버지 곁에 앉는다';line='(곰방대 할아버지 혼자 화롯불 앞에 앉아 있다.)';}
-      else if(!night()&&G.boss.dead&&F.jangteoArcsElder2&&!F.jangteoArcsElder3){act=elderArc3;label='설날 첫판에 앉는다';line='설날 아침이다! 약속대로 첫판 하자.';}
+      else if(!night()&&G.boss.dead&&F.jangteoArcsElder2&&!F.jangteoArcsElder3){act=elderArc3;label='설날 첫판에 앉는다';line=G.f.jxSeollalPast?'설은 지났어도 약속은 약속이지. 첫판 하자.':'설날 아침이다! 약속대로 첫판 하자.';}
       // 흰눈썹 노인은 해 지면 일찍 들어간다(elderArc1). 밤 윷판엔 곰방대 노인만 남는다.
       if(!act&&night())return [['곰방대 노인',F.jxYutReward?'저 양반은 들어갔다.\n한 판 하려면 두 몫은 내가 놓으마.':'저 양반은 들어갔다. 두 몫은 내가 놓으마.\n한 판 놀아 주면 쌀 한 되 얹어 주마.',[{t:'윷판 앞에 앉는다',go:()=>Rg.playYut()},{t:'다음에 올게요',go:null}]]];
       if(!act)return null;
@@ -1138,6 +1138,7 @@ function restMaru(){
   const seollal=!toNight&&G.boss.dead&&!G.f.jxSeollal;
   talk([['너구리',toNight?(Rg.arcs()?'(마루에서 기다리니 해가 졌다. 등불이 켜진다.)':'(숙소 마루에서 해가 지기를 기다렸다. 장터에 하나둘 등불이 켜진다.)'):seollal?'(마루에서 한숨 자고 나니 설날 아침이다.\n지붕마다 떡 김이 오른다.)':'(마루에서 한숨 자고 나니 날이 밝았다.)']],()=>{
     G.f.night=toNight;learn('maru:rest');if(seollal)G.f.jxSeollal=true;
+    if(toNight&&G.f.jxSeollal)G.f.jxSeollalPast=true;   // 설날 아침 뒤로 또 밤을 보내면 그다음 아침부터는 설날이 아니다
     const morning=seollal?'설날 아침이다.':'아침이 되었다.';
     if(!CLASSIC){
       // 잠든 사이 바람이 새 솔방울을 떨어뜨린다. 고정 id를 되살려 저장 중복을 만들지 않는다.
@@ -1152,7 +1153,7 @@ function restMaru(){
 function talkBueong(){
   const F=G.f;
   if(!night()&&Rg.arcs()&&G.boss.dead&&F.jangteoArcsKid2&&!F.jangteoArcsKid3&&has('hongsi_tteok')){
-    talk([['부엉 영감','(설날 아침인데 처마 밑에서 눈을 뜨고 있다.)',[{t:'떠날 채비를 말씀드린다',go:bueongKidArc3},{t:'다음에',go:null}]]]);return;
+    talk([['부엉 영감',G.f.jxSeollalPast?'(아침인데 처마 밑에서 눈을 뜨고 있다.)':'(설날 아침인데 처마 밑에서 눈을 뜨고 있다.)',[{t:'떠날 채비를 말씀드린다',go:bueongKidArc3},{t:'다음에',go:null}]]]);return;
   }
   if(!night()){learn('bueong:night');
     talk([['부엉 영감','(처마 밑에서 꾸벅꾸벅 졸고 있다.)'],['너구리','(낮엔 주무시네. 숙소 마루에서 해 질 때까지 쉬자.)']]);return;}
@@ -1236,7 +1237,7 @@ Rg.magpieTteok=()=>{
   if(CLASSIC||!G.boss.dead||!has('hongsi_tteok')||G.f.hongsiMade||regionCompleted(Rg.id))return null;
   if(night())return [['늙은 까치','아가, 늙은 날개로 밤길은 못 난단다.\n마루에서 한숨 자고, 아침 김 오를 때 떠나자꾸나.',
     [{t:'아침 일찍 올게요',go:()=>{G.f.jxMagpieNight=true;refreshGoal();}}]]];
-  return [['늙은 까치','설날 아침이구나. 이제 날 수 있겠다.\n장터에 인사할 데가 있으면 다녀오렴. 기다리마.',
+  return [['늙은 까치',(G.f.jxSeollalPast?'날이 밝았구나.':'설날 아침이구나.')+' 이제 날 수 있겠다.\n장터에 인사할 데가 있으면 다녀오렴. 기다리마.',
     [{t:'홍시 약떡을 맡긴다',go:Rg.sendMedicine},{t:'인사하고 올게요',go:()=>{G.f.jxMagpieMorning=true;}}]]];
 };
 // 결정 D-89: 까치 답장은 아이가 본 것을 지문으로 쓴다.
