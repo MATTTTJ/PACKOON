@@ -110,7 +110,8 @@ function startBattle(kind,onEnd){
   if(E.cover)gm.querySelector('span').textContent='돌 아래 여백에 손을 숨기자. 공격 뒤에는 표식 치기 또는 소원 돌 바로 놓기.';
   if(E.goalText)gm.querySelector('span').textContent=E.goalText;
   if(E.possession)gm.querySelector('span').textContent='불이 옮겨 간 헌물의 공격을 읽자. 공격 뒤에는 되치기 또는 물건 집기 → 윤곽에서 치기로 돌려놓기.';
-  if(E.vinePath)gm.querySelector('span').textContent='예고 중 고리 위에서 치기를 누른 채 이동하고 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.';
+  if(E.vinePath)gm.querySelector('span').textContent=TOUCH?'예고 중 고리 위에서 치기를 눌러 잡고, 옮긴 뒤 다시 눌러 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.'
+    :'예고 중 고리 위에서 치기를 누른 채 이동하고 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.';
   if(E.warmPath)gm.querySelector('span').textContent='물김 길을 따라 옆 샘으로. 공격 뒤에는 붉은 표식 치기 또는 샘의 얼음 걷기.';
 }
 function setPadLabels(on){
@@ -159,7 +160,9 @@ function damageCover(r){
 }
 /* 칡 선택 기능. 비율 좌표로 저장해 화면을 돌려도 고리와 실제 통로가 함께 옮겨진다. */
 function vineBounds(){const p=B.vinePath;return {x:BOX.x+p.u*BOX.w,w:p.width};}
-function vineHeld(){return keys['j']||keys['x']||keys[' ']||keys['enter']||vinePointers.size>0;}
+// 결정 D-86: 휴대폰은 치기를 한 번 눌러 고리를 잡고, 옮긴 뒤 한 번 더 눌러 놓는다 (design/data/decisions.csv)
+let vineLatch=false;
+function vineHeld(){return keys['j']||keys['x']||keys[' ']||keys['enter']||vinePointers.size>0||vineLatch;}
 function grabVine(){
   const p=B.vinePath;if(!p||B.st!=='tell'||p.locked||p.dragging)return;
   const x=BOX.x+p.u*BOX.w,y=BOX.y+p.v*BOX.h;
@@ -170,7 +173,7 @@ function moveVine(){
   const p=B.vinePath;
   if(vineHeld())grabVine();
   if(!p.dragging)return;
-  if(!vineHeld()){p.dragging=false;p.locked=true;B.msg='고리를 놓았다. 비워 둔 통로로 피하자.';return;}
+  if(!vineHeld()){p.dragging=false;p.locked=true;vineLatch=false;B.msg='고리를 놓았다. 비워 둔 통로로 피하자.';return;}
   p.u=clamp((B.px-BOX.x)/BOX.w+p.offset,p.width/2/BOX.w+0.04,1-p.width/2/BOX.w-0.04);
 }
 function openCalmAction(){
@@ -213,7 +216,9 @@ function chooseAttackBase(){
     const help=Math.min(3,Math.floor(B.hits/2)),arm=B.parts.find(q=>q.id==='arm');
     B.vinePath={u:0.5,v:0.65,width:78+(arm.broken?24:0)+help*12,dragging:false,locked:false};
     B.t=110+help*18;
-    if(!B.pathLesson){B.pathLesson=true;B.t+=90;B.msg='고리 위에서 '+jo(HITKEY,'을','를')+' 누른 채 좌우로 이동하고 놓자. 그 자리가 피할 길이 된다.';}
+    vineLatch=false;
+    if(!B.pathLesson){B.pathLesson=true;B.t+=90;B.msg=TOUCH?'고리 위에서 치기 버튼을 한 번 눌러 잡고, 좌우로 옮긴 뒤 한 번 더 눌러 놓자. 그 자리가 피할 길이 된다.'
+      :'고리 위에서 '+jo(HITKEY,'을','를')+' 누른 채 좌우로 이동하고 놓자. 그 자리가 피할 길이 된다.';}
   }
   if(B.E.warmPath){prepareWarmPath();B.t=80;}
 }
@@ -472,16 +477,32 @@ function giveGift(id){
   }
 }
 $('bGift').onclick=openGift;$('bHit').onclick=()=>bStrike();$('bGiftClose').onclick=closeGift;
-$('bFlee').onclick=()=>{if(B&&B.st!=='end'&&B.st!=='finale'&&!B.paused)bEnd('flee');};
+// 결정 D-84: 물러나기는 한 번 더 눌러야 끝난다. 처음 누르면 글이 바뀌고 잠시 뒤 되돌아간다.
+let fleeArmT=null;
+function disarmFlee(){clearTimeout(fleeArmT);fleeArmT=null;const b=$('bFlee');b.classList.remove('armed');b.textContent='물러나기';}
+$('bFlee').onclick=()=>{
+  if(!B||B.st==='end'||B.st==='finale'||B.paused)return;
+  if(!fleeArmT){const b=$('bFlee');b.classList.add('armed');b.textContent='정말 물러날까? 한 번 더';fleeArmT=setTimeout(disarmFlee,2600);return;}
+  disarmFlee();bEnd('flee');
+};
 /* 기존 치기 버튼의 누름/놓기를 읽는다. 다른 보스의 클릭 처리는 그대로 둔다. */
 const vinePointers=new Set();
 [$('bHit'),document.querySelector('#pad [data-k="atk"]')].filter(Boolean).forEach(button=>{
+  let downAt=0;
   button.addEventListener('pointerdown',e=>{
     if(!B||!B.E.vinePath||B.paused||B.st!=='tell')return;
+    // 잡아 둔 고리를 한 번 더 누르면 놓는다
+    if(vineLatch){vineLatch=false;moveVine();return;}
+    downAt=performance.now();
     vinePointers.add(e.pointerId);try{button.setPointerCapture(e.pointerId);}catch(_){}
     grabVine();
   });
-  const release=e=>{vinePointers.delete(e.pointerId);if(B&&!B.paused&&B.E.vinePath)moveVine();};
+  const release=e=>{
+    if(!vinePointers.delete(e.pointerId))return;
+    // 짧게 누른 터치는 손을 떼도 고리를 잡고 있는다
+    if(TOUCH&&B&&B.vinePath?.dragging&&performance.now()-downAt<280){vineLatch=true;B.msg='고리를 잡았다. 옮긴 뒤 치기 버튼을 한 번 더 누르면 놓는다.';return;}
+    if(B&&!B.paused&&B.E.vinePath)moveVine();
+  };
   button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);
 });
 addEventListener('blur',()=>{vinePointers.clear();});

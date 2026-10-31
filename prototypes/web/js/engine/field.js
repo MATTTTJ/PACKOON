@@ -407,6 +407,7 @@ function updateOverlay(){
   else{pr.hidden=true;lastNear=null;}
   if(!formRing.hidden&&!formChangeAllowed())formRing.hidden=true;
   $('padTalk').classList.toggle('ready',!!n);
+  {const t=n?actionVerb(n):'말걸기';if($('padTalk').textContent!==t)$('padTalk').textContent=t;}
   updateNpcTags(n);updateHints();
   /* 필드 보스 체력 막대: REG.fieldBoss() 가 {name, hp, max} 를 주면 보인다 */
   const fb=fieldCall('fieldBoss');$('bossbar').hidden=!fb;
@@ -649,6 +650,16 @@ function interactionLabel(p){
   if(k==='stamps')return p.label||'희미한 자국 살펴보기';
   if(k==='examines')return p.label||'조사하기';
   return p.prompt||(p.name||'길손')+'에게 말 걸기';
+}
+/* 결정 D-85: 휴대폰 말걸기 버튼 글자는 대상에 맞춘다. 말풍선 안내의 마지막 낱말(들어가기·살피기·쉬기…)을 쓰고, 길면 종류별 기본 말 */
+function actionVerb(p){
+  const k=interactionKind(p);
+  if(k==='npc'||k==='wanderers'){if(!p.prompt)return '말걸기';}
+  if(k==='vistas')return '바라보기';
+  if(k==='doors'&&!pathOpen(p))return '살피기';
+  const last=String(interactionLabel(p)).trim().split(/\s+/).pop()||'';
+  if(last.length&&last.length<=5&&/기$/.test(last))return last;
+  return k==='doors'?'들어가기':k==='npc'||k==='wanderers'?'말걸기':'살피기';
 }
 function tryInteract(){
   const p=nearInteraction();if(!p)return;
