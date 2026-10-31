@@ -64,7 +64,7 @@ function craftStep(h,direction,auto){
   }else if(tool==='siru'){
     if(Math.abs(h.time-cfg.steamMs)>cfg.windowMs)h.good=false;Sound.steam('tap');
   }else{
-    if(direction!==(h.count===cfg.steps-1?'left':'right'))h.good=false;Sound.paper();
+    if(direction!==(h.count===cfg.steps-1?'left':'right'))h.good=false;Sound.roller();   // 결정 D-74: 약연은 약연 굴리는 소리
   }
   h.lastDir=direction;h.count++;
   const figure=$('craftFigure');if(figure&&tool==='jeolgu'){figure.classList.remove('pound');void figure.offsetWidth;figure.classList.add('pound');}

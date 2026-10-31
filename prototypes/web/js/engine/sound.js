@@ -122,15 +122,19 @@ const Sound=(()=>{
   const click=(t,v=.08,g)=>playSfx('rhythm_click',{when:t,group:g,gain:v/.08});
   // 효과음만 짧게 제한한다. 장단의 예약 재생은 이 쿨다운을 거치지 않는다.
   const priority={footstep:0,steam:1,paper:2,panel:3,tab:3,jump:4,land:4,swing:4,gather:5,forge:5,stone:5,yeongsan:5,item:6,exchange:7,craft:8,travel:9};
+  /* 결정 D-74: 환경음이 켜져 있어도 효과음은 난다. 효과음을 막는 때는 경치를 바라보는 동안뿐이다(field.js가 알려 준다).
+     예전에는 환경음이 켜지면 모든 효과음이 꺼져 돌너머 기억 다리·개울 물길에서 점프·착지 소리가 사라졌다. */
+  let quiet=()=>false;
+  function setQuiet(fn){quiet=typeof fn==='function'?fn:()=>false;}
   function effect(key,cool,make){
-    if(!ctx||!enabled||ambientKind||hidden())return;
+    if(!ctx||!enabled||quiet()||hidden())return;
     if(ctx.state!=='running'){if(resuming)resumeEffect={key,cool,make};return;}
     const now=ctx.currentTime;
     if(now-lastEffect<.018||now-(last.get(key)??-Infinity)<cool)return;
     if(pending){if(priority[key]>priority[pending.key])pending={key,make};return;}
     pending={key,make};pendingTimer=setTimeout(()=>{
       const next=pending;pending=null;pendingTimer=null;
-      if(!ready()||ambientKind||!next)return;
+      if(!ready()||quiet()||!next)return;
       lastEffect=ctx.currentTime;last.set(next.key,lastEffect);next.make(lastEffect);
     },0);
   }
@@ -148,6 +152,11 @@ const Sound=(()=>{
   const exchange=()=>emit('exchange',.1,'exchange');
   const paper=()=>emit('paper',.07,'dialog_next');
   const panel=opening=>emit('panel',.07,opening?'bag_open':'bag_close');
+  const book=opening=>emit('panel',.07,opening?'book_open':'book_close');
+  const choice=go=>emit('paper',.07,go?'ui_confirm':'ui_cancel',.8);
+  const roller=()=>emit('craft',.1,'medicine_roller');
+  // 물길·깊이·기억 같은 전환 소리 (drift, depth_enter, memory_layer)
+  const passage=id=>emit('travel',.3,id);
   const tab=()=>emit('tab',.07,'ui_focus');
   const craft=()=>emit('craft',.1,'craft_complete');
   const travel=()=>emit('travel',.3,'region_travel');
@@ -180,6 +189,6 @@ const Sound=(()=>{
     voices:sources.size,peakVoices,maxVoices,cached:cache.size,cacheBytes,maxCacheBytes,played,dropped,ambient:!!ambientVoice};}
   return {get enabled(){return enabled;},get volume(){return volume;},get bgmVolume(){return bgmVolume;},get sfxVolume(){return sfxVolume;},
     toggle,toggleVolume,setBgmVolume,setSfxVolume,playSfx,getState,
-    steam,footstep,jump,land,swing,gather,item,exchange,paper,panel,tab,craft,travel,forge,stone,yeongsan,leaf,
+    steam,footstep,jump,land,swing,gather,item,exchange,paper,panel,book,choice,roller,passage,tab,craft,travel,forge,stone,yeongsan,leaf,setQuiet,
     ambience,get ambient(){return ambientKind;},get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
 })();

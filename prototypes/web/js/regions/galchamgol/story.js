@@ -169,6 +169,7 @@ function talkMusoe(){
 }
 function musoeNight(){
   if(!G.f.musoeTested&&!G.f.musoeDone)return;
+  sceneNext('g_musoe_night');
   arcScene('galArcMusoe2',[['너구리','아빠가 낫 맡기던 날,\n그길로 바로 떠났어요?'],['무쇠','석 달 전. 사흘 묵었다.'],
     ['무쇠','밤마다 뭘 들여다봤다.'],['무쇠','그 얘긴 말 말라더군.'],['무쇠','내가 벌써 반은 어겼군.']],
     '석 달 전 아빠는 떠나기 전 삼촌 대장간에서 사흘 묵으며 밤마다 무언가 들여다봤다. 삼촌은 말하지 않기로 한 약속을 반만 깼다.',
@@ -203,7 +204,8 @@ function musoe2(){
 }
 function battleMusoe(){
   const n=Rg.npcs.find(n=>n.id==='musoe');
-  inkTransition('전투',(n.x-G.cam)/W*100,()=>startBattle('musoe',(res,info)=>{
+  // 결정 D-75: 먹 전환 글자는 상대에 맞춘다. 삼촌과는 싸움이 아니라 시험이다.
+  inkTransition('시험',(n.x-G.cam)/W*100,()=>startBattle('musoe',(res,info)=>{
     if(res==='lose'||res==='flee'){talk([['무쇠','아직 멀었다.\n숨 고르고 다시 와라.']]);return;}
     const perfect=res==='win'&&info.hits===0;
     G.f.musoeTested=true;rel('musoe',(res==='calm'||perfect)?2:1);ledger('musoe','무쇠 삼촌','숯 1','아빠가 맡긴 낫');
@@ -449,7 +451,7 @@ function toadWrap(){
 /* ---------- 엉킨 칡 전투 ---------- */
 Rg.startKudzu=()=>{
   G.px=1950-(Rg.hillShift||0);
-  inkTransition('전투',(G.boss.x-G.cam)/W*100,()=>startBattle('kudzu',res=>{
+  inkTransition('엉킨 칡',(G.boss.x-G.cam)/W*100,()=>startBattle('kudzu',res=>{
     if(res==='win'||res==='calm'){
       if(res==='calm')diary('calm','엉킨 칡을 부수지 않고 달랬다. 칡이 놓아준 자리에 보랏빛 꽃이 피어 있었다.');
       Rg.bossDie();

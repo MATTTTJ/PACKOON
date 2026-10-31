@@ -216,7 +216,9 @@ function showEnd(){
   $('endStats').innerHTML=REG.endStats().map(([k,v])=>'<span>'+k+' <b>'+v+'</b></span>').join('');
   const nx=REGIONS[REG.next],b=$('btnNext');
   b.hidden=!nx;if(nx)b.textContent=REGIONS[REG.next].cover.go||nx.name+'로';
-  $('btnRestart').className=nx?'btn':'btn primary';
+  // 결정 D-73: '처음부터'는 맨 끝에 수수하게 둔다. 마지막 지역 끝 화면에서 가장 눈에 띄는 버튼이 되돌리기면 안 된다.
+  $('btnRestart').className='btn';$('endButtons').hidden=false;
+  document.body.classList.toggle('ending-scene',!nx);
   /* 지역이 끝 화면에 더 넣을 것 (예: 마지막 지역의 이름 짓기) */
   const ex=$('endExtra');ex.innerHTML='';if(REG.endExtra)REG.endExtra(ex);
   $('endScreen').hidden=false;
@@ -225,7 +227,7 @@ function showEnd(){
 function resetScreens(){
   GameMusic.reset();
   resetFieldModes();REG=REGIONS[G.region];prepareZones(G,REG);fillCover();closePanels();
-  $('endScreen').hidden=true;$('titleScreen').hidden=G.started;
+  $('endScreen').hidden=true;$('titleScreen').hidden=G.started;document.body.classList.remove('ending-scene');
   lastGoal='';lastTool='';lastNear=null;refreshHud();refreshSaveUI();
 }
 $('btnStart').onclick=startOrConfirm;   // 처음부터(btnRestart)는 save.js

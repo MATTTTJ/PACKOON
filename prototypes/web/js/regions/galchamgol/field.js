@@ -292,7 +292,7 @@ if(!CLASSIC){
         trip={owner:G,p,tick:0,hold:false,back:false,x:112,y:GROUND,vy:0,ground:true,view:0};
         if(Vfx.reducedMotion&&p.travel==='stream'){stop(true);return;}
         panel.hidden=false;suppressHeldInputs();
-        if(p.travel==='stream')Sound.ambience('water');
+        if(p.travel==='stream'){Sound.ambience('water');Sound.passage('drift');}else Sound.passage('depth_enter');
         pause.hidden=p.travel==='tree';look.hidden=p.travel!=='stream';
         leave.textContent=p.travel==='tree'?'밑동으로 · Esc':'출발한 둑으로 · Esc';
         help.textContent=p.travel==='tree'?'← → 이동 · 점프 버튼 / Space로 오르기\n밝은 구멍이 출구다. 떨어져도 바닥은 안전하다.':
