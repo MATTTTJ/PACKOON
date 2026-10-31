@@ -344,6 +344,10 @@
     const active = new Set(), cache = new Map(), sfxSources = new Set();
     const tickSeconds = 0.025, horizon = 0.3, chunkSeconds = 0.12;
     const sampleRate = finite(options.sampleRate || 22050, 'player.sampleRate', 8000, 48000);
+    // 곡은 0.12초 조각으로 이어 붙여 예약한다. 조각의 샘플레이트가 출력(보통 48000Hz)과 다르면
+    // 브라우저가 조각마다 따로 변환해 이음매마다 딸깍 소리가 난다(12초에 76번). 그래서 출력과 같은 빠르기로 합성한다.
+    // options.sampleRate는 컨텍스트가 아직 없을 때만 쓴다.
+    const renderRate = () => context && context.sampleRate ? Math.min(48000, context.sampleRate) : sampleRate;
     const clockEvents = [], sfxCache = new Map();
     let peakSources = 0, ended = false, travelPlan = null, pausedRoute = null, pausedShape = null;
     const sourceCount = () => [...active].reduce((n, s) => n + s.sources.size, 0);
@@ -482,14 +486,16 @@
     function startTimer() { if (!timer) timer = setInterval(schedule, tickSeconds * 1000); }
     async function loadTrack(id, request, variant) {
       const key = variant ? variant.key : id;
+      const rate = renderRate();
       let pcm = cache.get(key);
+      if (pcm && pcm.sampleRate !== rate) { cache.delete(key); pcm = null; }
       if (!pcm) {
-        pcm = await renderSongAsync(variant ? variant.track : tracks.get(id), bank, { sampleRate, cancelled: () => request !== serial || destroyed });
+        pcm = await renderSongAsync(variant ? variant.track : tracks.get(id), bank, { sampleRate: rate, cancelled: () => request !== serial || destroyed });
         if (!pcm || request !== serial || destroyed) return null;
       }
       cache.delete(key); cache.set(key, pcm);
       const bytes = () => [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0);
-      const limit = 160 * 1024 * 1024;
+      const limit = 360 * 1024 * 1024;
       while (cache.size > 1 && (bytes() > limit || cache.size > 24)) cache.delete(cache.keys().next().value);
       return pcm;
     }
@@ -635,7 +641,7 @@
       if (sfxSources.size >= 12 || typeof document !== 'undefined' && document.hidden) return false;
       let buffer = sfxCache.get(effect.id);
       if (!buffer) {
-        const pcm = renderSfx(effect, bank, { sampleRate });
+        const pcm = renderSfx(effect, bank, { sampleRate: renderRate() });
         buffer = context.createBuffer(2, pcm.left.length, pcm.sampleRate);
         buffer.copyToChannel(pcm.left, 0); buffer.copyToChannel(pcm.right, 1);
         sfxCache.set(effect.id, buffer); if (sfxCache.size > 12) sfxCache.delete(sfxCache.keys().next().value);
@@ -667,7 +673,7 @@
       if (master) setTimeout(() => master.disconnect(), 80);
       if (ownsContext && context) context.close().catch(() => {});
     }
-    function getDiagnostics() { return { clockEvents: clockEvents.slice(), schedulerRunning: !!timer, sources: sourceCount(), peakSources, sessions: active.size, cachedTracks: cache.size, cacheBytes: [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0), sampleRate }; }
+    function getDiagnostics() { return { clockEvents: clockEvents.slice(), schedulerRunning: !!timer, sources: sourceCount(), peakSources, sessions: active.size, cachedTracks: cache.size, cacheBytes: [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0), sampleRate: renderRate() }; }
     return { unlock, play, travel, stop, pause, resume, setLayers, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
   }
   function attachSound(sound, player) {
