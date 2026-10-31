@@ -5,7 +5,8 @@ const Rg=REGIONS.dolneomeo;
 Rg.springRevisit=()=>!CLASSIC&&!!G?.f?.spring&&regionCompleted('yeongsan');
 /* 꾸벅이는 졸다가 잠깐씩 고개를 든다. 고개를 든 동안에만 말이 통한다 */
 const NOD=TABLES.TUNING.kkubeogi_cycle,AWAKE=TABLES.TUNING.kkubeogi_awake;
-Rg.kkuAwakeNow=()=>!(Rg.arcs()&&G.f.dolneomeo_arc_kku3)&&(G.anim%NOD)<AWAKE;
+// 결정 D-130: 사연을 켜면 그림을 둥지에 단 뒤(kku7)에야 깊이 잠든다. 그 전엔 꾸벅꾸벅 고개를 든다.
+Rg.kkuAwakeNow=()=>!(Rg.arcs()&&G.f.dolneomeo_arc_kku7)&&(G.anim%NOD)<AWAKE;
 /* 판정은 그대로 두고, 고개 들기 직전 32프레임의 기척만 필드에 알려 준다. */
 Rg.kkuStirNow=()=>Rg.arcs()&&G.f.dolneomeo_arc_kku3?0:Math.max(0,(G.anim%NOD-(NOD-TABLES.TUNING.kkubeogi_cue))/TABLES.TUNING.kkubeogi_cue);
 Rg.art={
@@ -162,6 +163,15 @@ function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.ro
   q(3,-17,1,1,'#f2efe2');q(6,-15,2,2,'#2b2a28');q(-8,-23,13,3,'#c9b27a');q(-9,-22,2,4,'#b39a62');
   q(-6,-11,11,9,'#d8cfae');q(-4,-8,1,1,'#7a6a4f');q(0,-6,1,1,'#7a6a4f');q(2,-9,1,1,'#7a6a4f');
   q(-8,-2,4,2,'#3d3b37');q(3,-2,4,2,'#3d3b37');q(9,-17,1,17,'#7b6243');q(8,-17,3,1,'#5c4732');
+}else if(kind==='mouse'){
+  // 결정 D-130: 메밀밭 일꾼 들쥐. 머릿수건, 메밀 묻은 앞치마, 긴 꼬리. 발치에 메밀 널린 멍석.
+  q(-22,-2,13,2,'#b8a46e');q(-21,-3,11,1,'#cbb985');q(-19,-3,1,1,'#3a3330');q(-15,-3,1,1,'#3a3330');q(-12,-3,1,1,'#3a3330');
+  q(-12,-5,6,1,'#b58f7c');q(-13,-8,1,4,'#b58f7c');q(-12,-9,1,1,'#b58f7c');
+  q(-6,-12,11,11,'#8a7258');q(-3,-17,9,7,'#9a8064');q(5,-14,3,2,'#c79a86');q(8,-14,1,1,'#3a2a24');q(3,-15,1,1,'#1f1a17');
+  q(-4,-21,4,4,'#9a8064');q(-3,-20,2,2,'#d6a593');q(2,-21,4,4,'#9a8064');q(3,-20,2,2,'#d6a593');
+  q(-4,-18,9,2,'#c9b27a');q(-5,-17,2,3,'#b39a62');
+  q(-4,-9,9,7,'#d8cfae');q(-2,-6,1,1,'#7a6a4f');q(1,-4,1,1,'#7a6a4f');q(3,-7,1,1,'#7a6a4f');
+  q(5,-9,2,2,'#c79a86');q(-6,-2,3,2,'#5a4a3a');q(2,-2,3,2,'#5a4a3a');
 }else if(kind==='turtle'){
   // 결정 D-118: 성황당 돌 그늘의 늙은 남생이. 소원 천을 매기 전에는 붉은 천 조각을 물고 있다.
   q(-9,-9,18,7,'#5f6b4a');q(-7,-11,14,3,'#6f7c56');q(-5,-10,3,1,'#4a553a');q(1,-10,3,1,'#4a553a');q(-2,-8,3,1,'#4a553a');

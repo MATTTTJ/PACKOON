@@ -99,7 +99,8 @@ Rg.playActivity=(id,callback)=>{
 /* 3개 관찰 지점은 본길에 놓인다. 샛길의 도장·선물과는 독립이다.
    마지막 선택을 미룬 채 봄 호수로 돌아와도 전 재료와 아빠에게 닿는다. */
 if(CLASSIC)return;
-const ready=()=>[1,2,3].every(i=>!!G.f['yIce'+i]);
+// 결정 D-132: 바위 곁·검은 금 막대(1·2)는 둘러보기. 건너는 데는 아빠가 길을 이어 주는 선착장 앞 막대(3)만 있으면 된다.
+const ready=()=>!!G.f.yIce3;
 const boatReady=()=>!!G.f.yBoatOar&&!!G.f.yBoatRope&&!!G.f.yBoatLaunch;
 const mark=(x,y)=>{
   R(x-2,y-27,4,27,'#8c735d');R(x-9,y-28,18,3,'#d9c18c');
@@ -117,7 +118,7 @@ function survey(i){
   talk(lines[i],()=>Rg.playActivity('ice'+i,()=>{
     G.f['yIce'+i]=true;
     diary('y_ice_'+i,['','바위 곁에서 얼음을 두드렸다. 하얗게 보여도 갈대 곁에서는 물소리가 났다. 발 디딜 곳에 가지를 세웠다.','검은 금을 따라 흐르는 물을 봤다. 마른 둑 쪽을 택하고 돌아설 자리도 표시했다.','신목으로 이어지는 얼음길을 이었다. 두드린 자리와 다음 가지를 보며 건넌다. 봄엔 이 표시가 물길을 알려 주겠다.'][i]);
-    talk([['너구리',i===3?'이제 섬까지 표시가 이어졌어.\n아빠, 다녀올게.':'표시 하나 세웠다. 다음 돌까지는 여기서 보여.']],refreshGoal);
+    talk([['너구리',i===3?'아빠가 섬까지 길을 이어 줬어.\n두드린 자리만 밟고 가자. 아빠, 다녀올게.':'표시 하나 세웠다. 다음 돌까지는 여기서 보여.']],refreshGoal);
   }));
 }
 function prepareBoat(part){
@@ -137,8 +138,7 @@ function sail(to){
   if(!G.f.spring){
     if(!G.f.dadDone){talk([['너구리','아빠가 기다리고 있어. 먼저 아빠에게 가자.']]);return;}
     if(!ready()){
-      const first=[1,2,3].find(i=>!G.f['yIce'+i]);
-      talk([['너구리','아직 안 두드려 본 자리가 있어. '+({1:'바위 곁',2:'검은 금 곁',3:'선착장 앞'})[first]+'의 막대 표시로 가자.']]);return;
+      talk([['너구리','아직 길을 모르겠어. 선착장 앞 막대에서 얼음을 먼저 두드려 보자.']]);return;
     }
     changeZone(to,{x:to==='island'?200:2320});return;
   }
@@ -188,7 +188,7 @@ function install(){
   shore.npcs.push(fixture('y_lake_depart','호수 건너기',2320,()=>sail('island')));
   island.npcs.push(fixture('y_lake_return','호숫가로 돌아가기',160,()=>sail('shore')));
   shore.exits.right.need=()=>!G.f.spring&&!!G.f.dadDone&&ready();
-  shore.exits.right.reason='선착장 앞까지 세 막대 표시를 살피자. 두드린 얼음만 밟고 건넌다.';
+  shore.exits.right.reason='선착장 앞 막대에서 얼음길을 살피자. 두드린 얼음만 밟고 건넌다.';
   const oldDraw=shore.drawActors;
   shore.drawActors=()=>{
     oldDraw?.();
@@ -201,7 +201,7 @@ function install(){
   };
   const oldGoal=Rg.goal;
   Rg.goal=()=>{
-    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return '호숫가 얼음길의 막대 세 곳을 살피자 (바위 → 검은 금 → 선착장)';
+    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return '선착장 앞 막대에서 아빠와 얼음길을 살피자';
     return oldGoal();
   };
   // 완료 길손의 greeting을 가로채지 않고, 봄에만 별도 행동 자리를 곁에 둔다.
