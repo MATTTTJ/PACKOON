@@ -63,6 +63,8 @@ D-66,이야기,"살금이를 만나지 않고 산군에게 먼저 닿으면 산�
 D-67,시스템,"지금 할 일(Rg.goal)은 가장 앞선 진행부터 거꾸로 본다. 변신으로 앞질러 가도(덩굴 너머 칡, 호숫가 먼저) 지금 상태에 맞는 일을 알려 준다. 나올 수 없는 문구(돌 쌓기·김 올리기 다시 배우기)는 지우고 긴 문구를 줄인다",채택,개발자(Claude),있음,,regions/*/story.js Rg.goal · dolneomeo/field.js
 D-68,시스템,"첫 화면 안내는 할 일 한 줄만 둔다. 지역 시작 때 같은 말을 알림으로 한 번 더 띄우지 않는다",채택,개발자(Claude),있음,,regions/*/region.js onStart
 D-69,시스템,"?region= 바로가기로 뒤 지역부터 시작해도 앞 지역에서 배우는 변신(다람쥐·산양·수리부엉이)을 갖고 간다. 앞질러 가는 길을 검수할 수 있게 한다",채택,개발자(Claude),있음,,regions/*/region.js finish
+D-70,미니게임,"윷 결과(도~모)는 네 윷을 던지듯 무작위로 정하고, 타이밍 바늘은 낙(양 끝 붉은 칸에서 던지면 윷이 멍석 밖으로 떨어져 그 차례를 못 옮김)을 피하는 데만 쓴다. 바늘은 가운데에서 출발하고 동작 줄이기에서는 가운데에 멈춰 낙이 나지 않는다. 던지기 전에는 윷 앞뒤를 보여 주지 않는다. 바늘 수치는 윷 전용 줄(yut_needle_speed·yut_nak_zone) (게임 검토 2026-10-31 먼저 할 일 4)",채택,개발자(Claude),있음,design/narrative/jangteo-scenario.md 설날 윷놀이,"jangteo/story.js yHit·yNak·yDraw"
+D-71,미니게임,"엿가위 장단의 헛가위(판정 밖 입력)는 빗나감이다. 가장 가까운 남은 가위가 rhythm_stray_window(0.36초) 안이면 그 가위를 놓친 것으로 센다. 연타로는 덤(아빠가 맡긴 엿)을 받을 수 없다. 쌀 8개는 장단 결과와 상관없이 준다(확정 그대로) (게임 검토 2026-10-31 먼저 할 일 4)",채택,개발자(Claude),있음,design/narrative/jangteo-scenario.md 엿방울,"jangteo/story.js rhythmHit"
 D-90,이야기,"강철이의 새 이름 ""서리무기""",대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,"대장 답으로 ""강철이"" 유지"
 D-91,시스템,레어도 이름 순우리말(흔한 것·쓸 만한 것·귀한 것·보배·전설),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 하품·중품·상품·최상품·천하일품
 D-92,시스템,기록 나누기(아빠의 수첩과 아이의 책),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 아빠의 수첩 한 권
