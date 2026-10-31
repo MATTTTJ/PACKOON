@@ -11,11 +11,9 @@ const GameMusic=(()=>{
   /* 결정 D-37: 주인공의 마음 상태에 따라 음악이 바뀐다 (design/data/decisions.csv).
      곡마다 성부를 층으로 묶고(base·longing·pulse), 템포는 같은 악보를 빠르기만 바꾼 단계로 갈아탄다.
      마음 상태는 두 값: 긴장(tension)과 그리움(longing). 0~1, 매 프레임 목표값으로 천천히 다가간다. */
-  const ADAPTIVE={
-    // 결정 D-47: 아쟁(low_string)·가야금 뜯기(arp)는 바탕, 모듬북(moduk_*)은 북 층에 넣는다. 층에 없는 성부는 들리지 않는다.
-    danpunggol:{layers:{base:['melody','bass','stream','low_string'],longing:['answer'],pulse:['janggu_low','janggu_high','moduk_low','moduk_mid']},tempos:[1,1.12]},
-    boss_kudzu:{layers:{base:['melody','bass','arp','low_string'],longing:['answer'],pulse:['janggu_low','janggu_high','vine_stroke','moduk_low','moduk_mid']},tempos:[0.92,1,1.12,1.22]}
-  };
+  // 결정 D-87: 층 나눔과 템포 단계는 design/data/music_layers.csv가 원본이다. 네 지역 곡과 보스 넷·무쇠 시험에 쓴다.
+  // 결정 D-47: 아쟁(low_string)·가야금 뜯기(arp)는 바탕, 모듬북(moduk_*)은 북 층에 둔다. 빠진 성부는 빌드 검사가 막는다.
+  const ADAPTIVE=TABLES.MUSIC_LAYERS||{};
   const mood={tension:0,longing:0};
   let applied=null,tempoAt=-1e9,tempoNow=1,adaptKind=null;
   /* 결정 D-46: 경치는 지역 곡과 겹치지 않는다. 경치가 열리면 지역 곡을 0.4초에 내리고,
@@ -144,8 +142,8 @@ const GameMusic=(()=>{
   }
   function tempoStep(spec,kind){
     const t=mood.tension,s=spec.tempos;
-    if(kind==='battle')return t<.3?s[0]:t<.6?s[1]:t<.85?s[2]:s[3];
-    return t>.55||(tempoNow>1&&t>.35)?s[1]:s[0];   // 올라갈 때와 내려올 때 문턱을 달리해 들쭉날쭉하지 않게
+    if(kind==='battle')return s[Math.min(s.length-1,t<.3?0:t<.6?1:t<.85?2:3)];
+    return (t>.55||(tempoNow>1&&t>.35))&&s[1]?s[1]:s[0];   // 올라갈 때와 내려올 때 문턱을 달리해 들쭉날쭉하지 않게
   }
   function adapt(){
     if(!G||!REG)return;

@@ -287,7 +287,36 @@ const SCENE_MUSIC={};
     SCENE_MUSIC[r.id]={music:song==='지역'?'':song,from};
   }
 }
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC},null,1)+";\n";
+/* 결정 D-87: 마음 상태 음악의 층 나눔(music_layers.csv). 곡의 모든 성부가 꼭 한 층에 들어가야 한다.
+   층에 빠진 성부는 층 재생에서 들리지 않으므로, 음악 원본(design/data/music/music.json)의 성부와 정확히 맞춘다. */
+const MUSIC_LAYERS={};
+{
+  const music=JSON.parse(fs.readFileSync(path.join(DATA,'music/music.json'),'utf8'));
+  const voicesOf=new Map(music.tracks.map(t=>[t.id,t.voices.map(v=>v.id)]));
+  for(const r of t('music_layers')){
+    const where='music_layers.csv '+r.id,track=r['곡'];
+    if(!voicesOf.has(track))fail(where+': 음악에 없는 곡 '+track);
+    if(MUSIC_LAYERS[track])fail(where+': 같은 곡 줄이 겹친다 '+track);
+    const tempos=r['템포단계'].trim().split(/\s+/).map(Number);
+    if(!tempos.length||tempos.some(n=>!(n>=0.8&&n<=1.3))||tempos.some((n,i)=>i&&n<tempos[i-1]))fail(where+': 템포단계는 0.8~1.3 사이 수를 오름차순으로 적는다');
+    const layers={base:r['바탕'],longing:r['그리움'],pulse:r['북']};
+    const seen=new Set();
+    for(const [name,cell] of Object.entries(layers)){
+      const ids=cell.split('+').map(s=>s.trim()).filter(Boolean);
+      if(!ids.length)fail(where+': '+name+' 층이 비어 있다');
+      for(const id of ids){
+        if(!voicesOf.get(track).includes(id))fail(where+': 곡에 없는 성부 '+id);
+        if(seen.has(id))fail(where+': 성부가 두 층에 들어 있다 '+id);
+        seen.add(id);
+      }
+      layers[name]=ids;
+    }
+    const missing=voicesOf.get(track).filter(id=>!seen.has(id));
+    if(missing.length)fail(where+': 층에 빠진 성부(들리지 않게 된다) '+missing.join(', '));
+    MUSIC_LAYERS[track]={layers,tempos};
+  }
+}
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC,MUSIC_LAYERS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

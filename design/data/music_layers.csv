@@ -1,0 +1,12 @@
+﻿id,곡,템포단계,바탕,그리움,북,상태,비고
+l_danpunggol,danpunggol,1 1.12,melody+bass+stream+low_string,answer,janggu_low+janggu_high+moduk_low+moduk_mid,제안,D-37 시험판. 엉킨 칡에 다가갈수록 북 층과 템포
+l_dolneomeo,dolneomeo,1 1.1,melody+bass+air+low_string,answer+bowed,stone+moduk_low+moduk_mid,제안,돌 두드림은 북 층. 해금 화답은 그리움 층
+l_market_day,market_day,1 1.06,melody+bass+low_string,answer+bowed,janggu_low+janggu_high+janggu_roll+small_gong+scissors+moduk_low+moduk_mid,제안,원래 빠른 곡(132)이라 한 단만 조금 올린다
+l_market_night,market_night,1 1.1,melody+bass+air,answer,soft_drum,제안,그믐밤 창고 지키기에서 긴장이 오른다
+l_yeongsan,yeongsan,1 1.1,melody+air,low_string,moduk_low+moduk_mid,제안,겨울 곡은 성부가 적다. 아쟁 지속음을 그리움 층으로 둔다
+l_yeongsan_spring,yeongsan_spring,1 1,melody+bass+piri_answer+chime,answer+bowed_answer,janggu_low+janggu_high+deong+gong+small_gong+buk,제안,봄에는 긴장 원천이 없다. 그리움 층만 움직인다
+l_boss_kudzu,boss_kudzu,0.92 1 1.12 1.22,melody+bass+arp+low_string,answer,janggu_low+janggu_high+vine_stroke+moduk_low+moduk_mid,제안,D-37 시험판
+l_boss_golem,boss_golem,0.92 1 1.1 1.18,melody+bass+arp+low_string,answer,rock+buk+jing+moduk_low+moduk_mid,제안,
+l_boss_dokkaebi,boss_dokkaebi,0.92 1 1.06 1.12,melody+bass+arp+low_string,answer,janggu_low+janggu_high+roll+small_gong+scissors+moduk_low+moduk_mid,제안,원래 144로 빠르다. 위 단계를 낮게 둔다
+l_boss_steel,boss_steel,0.92 1 1.12 1.22,melody+bass+arp+low_string+winter_air,answer,buk+cold_gong+moduk_low+moduk_mid,제안,
+l_trial_iron,trial_iron,0.92 1 1.1 1.18,melody+bass+arp+bellows,low_string,hammer+buk+moduk_low+moduk_mid,제안,무쇠는 아빠의 동생. 아쟁을 그리움 층으로 두어 진정이 차면 올라온다
