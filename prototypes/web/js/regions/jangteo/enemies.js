@@ -89,7 +89,8 @@ function drawStoreRoom(c){
   brush(c,[[0,30],[LW,24]],10,'#4a3a2c',0.55);brush(c,[[0,30],[LW,24]],2,INK,0.5);
   for(const x of [LW*0.04,LW*0.96])brush(c,[[x,0],[x,gy]],9,'#4a3a2c',0.45);
   // 등불: 대들보에 걸린 붉은 종이 등과 따뜻한 빛
-  {const lx=LW*0.8,ly=78,fl=still?1:1+Math.sin(t*0.19)*0.05+Math.sin(t*0.47)*0.04;
+  {const lx=LW*0.3,ly=64,   // 오른쪽 위 체력·진정 표시와 겹치지 않게 왼쪽 대들보에 건다
+   fl=still?1:1+Math.sin(t*0.19)*0.05+Math.sin(t*0.47)*0.04;
     const g=c.createRadialGradient(lx,ly,4,lx,ly,LW*0.3*fl);g.addColorStop(0,'rgba(236,178,92,.42)');g.addColorStop(0.45,'rgba(220,150,80,.14)');g.addColorStop(1,'rgba(220,150,80,0)');
     c.save();c.fillStyle=g;c.fillRect(0,0,LW,LH);c.restore();
     brush(c,[[lx,28],[lx,ly-18]],1.5,INK,0.6);
@@ -101,10 +102,10 @@ function drawStoreRoom(c){
   brush(c,[[0,gy],[LW,gy+2]],4,INK,0.5);
   // 왼쪽: 말아 세운 헌 멍석들과 기대 놓은 빗자루
   for(let i=0;i<3;i++){const x=LW*0.07+i*22,h=70-i*10;
-    c.save();c.fillStyle='rgba(176,148,96,.3)';c.fillRect(x-9,gy-h,18,h);c.restore();
-    brush(c,[[x-9,gy],[x-9,gy-h],[x+9,gy-h],[x+9,gy]],2.4,INK,0.5);blob(c,x,gy-h,9,4,'rgba(176,148,96,1)',0.35);
+    c.save();c.fillStyle='rgba(176,148,96,.16)';c.fillRect(x-9,gy-h,18,h);c.restore();   // 부위 이름 글 뒤라 옅게
+    brush(c,[[x-9,gy],[x-9,gy-h],[x+9,gy-h],[x+9,gy]],2.4,INK,0.26);blob(c,x,gy-h,9,4,'rgba(176,148,96,1)',0.35);
     for(let k=1;k<5;k++)brush(c,[[x-8,gy-h*k/5],[x+8,gy-h*k/5+2]],1,INK,0.25);}
-  for(let i=0;i<2;i++){const x=LW*0.19+i*16;brush(c,[[x,gy-96],[x+14,gy-6]],3,'#6b5540',0.55);
+  for(let i=0;i<2;i++){const x=LW*0.19+i*16;brush(c,[[x,gy-96],[x+14,gy-6]],3,'#6b5540',0.3);
     for(let k=0;k<6;k++)brush(c,[[x+14,gy-14],[x+8+k*3,gy]],1.4,'#8a7048',0.5);}
   // 기대 놓은 키(곡식 까부르는 바구니)
   {const kx=LW*0.27,ky=gy-26;c.save();c.fillStyle='rgba(176,148,96,.3)';c.beginPath();c.ellipse(kx,ky,24,26,0.25,0,Math.PI*2);c.fill();c.restore();
