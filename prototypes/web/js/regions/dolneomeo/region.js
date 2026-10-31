@@ -33,7 +33,7 @@ const Rg=defineRegion('dolneomeo',{
   onStart(){
     if(Rg.arcs())G.f.arcs=true;
     diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 나를 내려다본다. 서리다래가 어디 열리는지 마을에 물어보자.');
-    toast('마을 어귀의 동물들에게 말을 걸어 보자');
+    // 결정 D-68: 첫 화면 안내는 '할 일' 한 줄만
   },
   next:'jangteo',
   /* 뒤 지역부터 바로 시작할 때 돌너머를 이렇게 마친 것으로 친다 (확인용 바로가기). 메밀 3은 큰 장터에서 메밀가루로 쓸 수 있다 */
@@ -45,6 +45,7 @@ const Rg=defineRegion('dolneomeo',{
     ['eoksae','memil','memil_powder','gyeousari','gyeolmyeongja','seogi','seoridarae','darae_yak','story_stone'].forEach(id=>g.learned.push('got:'+id));
     ['kkubeogi','dolsoe','ppuri'].forEach(id=>g.learned.push('met:'+id));g.learned.push('fight:golem','kkubeogi:awake','dolsoe:tea','dolsoe:stack');
     Object.assign(g.f,{kkuDone:true,ppuriPassed:true,stackDone:true,yakMade:true});g.boss.dead=true;g.ended=true;
+    if(!g.forms.includes('goat'))g.forms.push('goat');   // 결정 D-69
   },
   endStats:()=>[
     ['아빠 단서',G.clues.length+'/'+clueTotalSoFar()],
