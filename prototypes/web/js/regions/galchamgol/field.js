@@ -2,8 +2,13 @@
 /* 단풍골 필드: 늦가을 하늘과 언덕, 초가집과 물레방아, 당산나무, 길을 막는 칡덩굴, 덩굴 몹, 엉킨 칡, 낙엽 */
 (()=>{
 const Rg=REGIONS.galchamgol;
-const TREE_X=2214;
-const KUDZU_AT=1955;   // 이보다 오른쪽으로 가면 엉킨 칡과 전투
+/* 결정 D-45: 확장판 언덕은 도착(180)에서 엉킨 칡까지 걷는 길을 줄였다 (design/data/decisions.csv).
+   가운데 빈 둔덕 구간을 빼고 당산나무·엉킨 칡·내려가는 문을 HILL_SHIFT만큼 앞당긴다. 옛 구성(classic)은 그대로다. */
+const HILL_SHIFT=CLASSIC?0:700;
+Rg.hillShift=HILL_SHIFT;   // story.js의 칡 앞 자리·물러나는 자리와 언덕 조사 자리도 같이 옮긴다
+const TREE_X=2214-HILL_SHIFT;
+const KUDZU_AT=1955-HILL_SHIFT;   // 이보다 오른쪽으로 가면 엉킨 칡과 전투
+const BOSS_X=2180-HILL_SHIFT;
 // 결정 D-37: 엉킨 칡에 다가갈수록 긴장이 오른다 (음악의 북 층과 템포). 칡이 풀리면 0.
 Rg.moodTension=()=>{
   if(!G.started||G.boss.dead||(!CLASSIC&&G.zone!=='hill'))return 0;
@@ -100,6 +105,7 @@ Rg.drawFront=()=>{
 /* ---------- 진행 ---------- */
 Rg.maxX=()=>G.barrier.cut?2330:G.barrier.x-9;
 Rg.step=()=>{
+  if(!G.boss.dead)G.boss.x=BOSS_X;   // 옛 저장의 칡 자리도 지금 언덕에 맞춘다
   for(const m of G.mobs){if(m.dead)continue;if(m.flash>0)m.flash--;m.x+=m.dir*0.45;if(m.x<m.min||m.x>m.max)m.dir*=-1;if(hitPlayer(m.x-8,m.x+8,GROUND-12,GROUND))hurt(m.x);}
   if(G.barrier.shake>0)G.barrier.shake--;
   // 다람쥐로 칡덩굴 위 가지를 타고 언덕에 먼저 들어와도 엉킨 칡은 같은 자리에서 깨어난다 (PA-47)
@@ -154,7 +160,14 @@ if(!CLASSIC){
     const s=oldState();
     s.pickups.forEach((a,i)=>Object.assign(a,{id:'gal_acorn_'+i,zone:acorns[i][0],x:acorns[i][1],y:acorns[i][2]}));
     s.digs.forEach((d,i)=>Object.assign(d,{id:'gal_dig_'+i,zone:digs[i][0],x:digs[i][1]}));
-    s.barrier.x=2420;s.mobs=[];return s;
+    s.barrier.x=2420;s.mobs=[];s.boss.x=BOSS_X;s.f.galHillV2=true;return s;
+  };
+  // 결정 D-45: 줄이기 전 언덕 좌표 → 지금 좌표. 빈 둔덕 구간(900~1450)은 한 점으로 모인다.
+  const hillMoved=x=>x<400?x:x<900?x-150:x<1450?750:x-HILL_SHIFT;
+  const migrateHill=()=>{
+    if(G.f.galHillV2)return;G.f.galHillV2=true;
+    for(const a of floorDrops(G.region,'hill')){const p=dropSurfaceAt(hillMoved(a.x),Math.min(a.y,GROUND),undefined,'hill');if(p){a.x=p.x;a.y=p.y;}}
+    if(G.zone==='hill'){const p=dropSurfaceAt(hillMoved(G.px),Math.min(G.py,GROUND),undefined,'hill');if(p){G.px=p.x;G.py=p.y;G.vy=0;G.onGround=true;G.cam=clamp(G.px-W*.42,0,Math.max(0,Rg.zones.hill.w-W));}}
   };
   const commonStep=()=>{
     Rg.expStep?.();
@@ -164,7 +177,8 @@ if(!CLASSIC){
   };
   const basic=(id,w,platforms)=>({w,startX:70,ground:GROUND,platforms,npcs:[],
     drawBack:()=>A.back(id),drawScenery:()=>A.scenery(id),
-    drawFront:()=>A.front(id),weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'maple'),ambient:placeRoot,
+    drawFront:()=>A.front(id),weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'maple'),ambient:()=>{migrateHill();placeRoot();},   // 위치 자르기보다 먼저 옛 언덕 좌표를 옮긴다
+    
     drawPickup:Rg.drawPickup,onPickup:a=>Rg.onPickup?.(a),step:commonStep});
   const sign=A.marker,blocked=A.blocked;
   const path=(x,to,toX,label,extra={})=>({x,to,toX,label,draw:sign,...extra});
@@ -222,26 +236,28 @@ if(!CLASSIC){
       // 선반 뒤 작은 채집 무리. 전부 선택 재료이며, 필수 교환 몫은 앞 구역에 있다.
       pickups:[],
     },
-    hill:{...basic('hill',2600,[{x:700,y:160,w:100},{x:790,y:126,w:90},
-      {x:1120,y:158,w:110},{x:1220,y:124,w:90},{x:1470,y:158,w:95},{x:1560,y:124,w:85},
-      {x:2290,y:160,w:100},{x:2380,y:126,w:100}]),
+    // 결정 D-45: 2600 → 1900. 뿌리 길·첫 발판은 150, 당산나무 쪽은 HILL_SHIFT(700)만큼 앞당겼다.
+    hill:{...basic('hill',2600-HILL_SHIFT,[{x:550,y:160,w:100},{x:640,y:126,w:90},
+      {x:770,y:158,w:95},{x:860,y:124,w:85},
+      {x:2290-HILL_SHIFT,y:160,w:100},{x:2380-HILL_SHIFT,y:126,w:100}]),
       exits:{left:{to:'forest',toX:2360}},
-      doors:[path(180,'hill',700,'당산나무 속으로 오르기',{travel:'tree',draw:A.treeDoor}),
-        path(700,'forest',2360,'뿌리 바깥 숲길로 돌아가기'),
-        path(2250,'marsh',1200,'약초 귀환길로 약방에 내려가기',{need:()=>G.boss.dead,
+      doors:[path(180,'hill',550,'당산나무 속으로 오르기',{travel:'tree',draw:A.treeDoor}),
+        path(550,'forest',2360,'뿌리 바깥 숲길로 돌아가기'),
+        // 결정 D-44: 내려가는 길은 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
+        path(2250-HILL_SHIFT,'marsh',1200,'약초 귀환길로 약방에 내려가기',{descend:true,need:()=>G.boss.dead,
           reason:'엉킨 칡이 약초 귀환길을 막았다. 나무를 풀어 주면 약방으로 내려갈 수 있겠다.',drawBlocked:blocked}),
-        path(2450,'village',1710,'보이던 개울 둑으로 내려가기',{travel:'depthBack',need:()=>G.boss.dead,
+        path(2450-HILL_SHIFT,'village',1710,'보이던 개울 둑으로 내려가기',{descend:true,need:()=>G.boss.dead,
           reason:'엉킨 칡이 내리막까지 움켜쥐고 있다. 나무를 풀어 주고 내려가자.',drawBlocked:blocked})],
-      pickups:[{id:'gal_extra_acorn_4',x:780,y:160,item:'acorn',got:false},
+      pickups:[{id:'gal_extra_acorn_4',x:630,y:160,item:'acorn',got:false},
         {id:'gal_cut_vine',x:340,y:GROUND,item:'vine',got:false}],
-      stamps:[{id:'roots',x:2140,note:'stamp:galchamgol:roots',label:'당산나무 뿌리의 손바닥 자국 살피기'}],
-      vistas:[{id:'home',x:2380,y:126,from:0,to:160,draw:A.marker,sound:'wind',
+      stamps:[{id:'roots',x:2140-HILL_SHIFT,note:'stamp:galchamgol:roots',label:'당산나무 뿌리의 손바닥 자국 살피기'}],
+      vistas:[{id:'home',x:2380-HILL_SHIFT,y:126,from:0,to:160,draw:A.marker,sound:'wind',
         thought:'우리 집 지붕이다.\n엄마, 나 여기까지 왔어.',
         diary:'당산나무 언덕에서 집을 돌아봤다. 골짜기의 단풍 사이로 우리 집 초가지붕이 보였다.',layers:A.vistaHill}],
       drawScenery:()=>{A.scenery('hill');Rg.drawScenery();},
       drawActors:drawBoss,onHit:oldHit,
       step:()=>{commonStep();oldStep();},
-      faint:()=>{G.px=1900;G.py=GROUND;G.vy=0;G.onGround=true;toast('나무 앞 쉼터로 물러났다. 버섯 향으로 달랠 수도 있다.');},
+      faint:()=>{G.px=1900-HILL_SHIFT;G.py=GROUND;G.vy=0;G.onGround=true;toast('나무 앞 쉼터로 물러났다. 버섯 향으로 달랠 수도 있다.');},
     },
   };
   // 도장은 발견 전에도 풍경 속 흔적이 보인다. 엔진의 발견 후 표시와 별도로 그린다.
@@ -279,7 +295,7 @@ if(!CLASSIC){
           p.travel==='stream'?'E · 멈춤/계속   ← · 뒤돌아보기\n물레방아를 지나 다음 둑으로 간다.':'아까 바라본 나무를 향해 풍경 안쪽으로 들어간다.';
         drawTrip();
       };
-      const key='galTravelTaught_'+(p.travel==='depthBack'?'depth':p.travel);
+      const key='galTravelTaught_'+p.travel;
       if(!G.f[key])talk([['너구리',p.travel==='stream'?'함지박이 둑에 매여 있어.\n물레방아 아래까진 얕네.':p.travel==='tree'?'나무 속이 비었네.\n낮은 가지부터 디뎌 보자.':G.barrier.cut?'개울에서 보던 당산나무다.\n덩굴을 걷으니 안쪽 길이 보여.':'개울에서 보던 당산나무다.\n덩굴 위로 넘어오니 안쪽 길이 보여.'],
         ['너구리',p.travel==='stream'?'물살이 세면 잠깐 멈춰도 되겠지.\n뒤돌아보면 우리 마을이 보일 거야.':p.travel==='tree'?'나이테가 계단 같아.\n떨어져도 밑이 푹신하네.':'이 길로 가면 나무 밑동에 닿겠어.']],()=>{G.f[key]=true;begin(p);});
       else start();
@@ -331,9 +347,9 @@ if(!CLASSIC){
             A.magpie(Math.round(65-(Vfx.reducedMotion?0:a)*130),176);A.chick(Math.round(350-(Vfx.reducedMotion?0:a)*120),178);
             if(Vfx.reducedMotion){ctx.globalAlpha=a;R(0,0,W,H,'#36251e');ctx.globalAlpha=1;}
           }else{
-            A.back(t.p.travel==='depthBack'?'hill':G.zone);
+            A.back(G.zone);
             ctx.save();
-            if(!Vfx.reducedMotion){const z=t.p.travel==='depthBack'?2-a:1+a;ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);}
+            if(!Vfx.reducedMotion){const z=1+a;ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);}
             A.treeDoor(200,192);ctx.restore();
             ctx.globalAlpha=a;R(0,0,W,H,'#36251e');ctx.globalAlpha=1;
           }

@@ -257,8 +257,9 @@ if(!CLASSIC){
       house(1574-cam,GROUND,1.3,true,2);fence(1510-cam,GROUND,3);
       for(const u of [980,1200,1910]){const x=u-cam;px(x-21,GROUND-5,42,5,'#9d7950');px(x-24,GROUND-6,48,1,'#c3a278');}
     }else if(zone==='hill'){
-      treeHollow(180-cam);smallShrine(1510-cam);
-      for(const u of [610,970,1320,1770,2460]){const x=u-cam;
+      // 결정 D-45: 줄인 언덕에 맞춘 사당·둔덕 자리 (galchamgol/field.js HILL_SHIFT)
+      treeHollow(180-cam);smallShrine(810-cam);
+      for(const u of [460,1070,1760]){const x=u-cam;
         px(x-21,GROUND-9,42,9,'#89795c');px(x-15,GROUND-13,31,4,'#aa956e');px(x-13,GROUND-11,14,1,'#cbb182');}
       // Home has become very small; the vista uses this same bent reed roof.
       house(800-cam*.28,163,.32,true);
@@ -375,7 +376,7 @@ if(!CLASSIC){
     }
     if(zone==='hill'){
       // Small old cloth strips mark a public wish tree, not a transformation costume.
-      const x=1510-cam;px(x-32,GROUND-41,64,1,'#bca376');
+      const x=810-cam;px(x-32,GROUND-41,64,1,'#bca376');
       for(let i=0;i<6;i++)px(x-28+i*11,GROUND-40,4,8+i%3*3,['#dac6a1','#c08a72','#d6b66e'][i%3]);
     }
   }
