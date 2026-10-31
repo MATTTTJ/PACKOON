@@ -38,11 +38,14 @@ function refreshSoundButtons(){
   $('btnVolume').setAttribute('aria-pressed',String(Sound.volume==='high'));
   $('btnVolume').title='음량 크게/작게';
   $('volumeBgm').value=Sound.bgmVolume;
+  if(typeof GameMusic!=='undefined')$('musicRecorded').checked=GameMusic.recorded;
   $('volumeSfx').value=Sound.sfxVolume;
 }
 $('btnSound').onclick=()=>Sound.toggle();
 $('btnVolume').onclick=()=>Sound.toggleVolume();
 $('volumeBgm').oninput=e=>Sound.setBgmVolume(Number(e.target.value));
+// 결정 D-105: 녹음 음원 켜고 끄기 (GameMusic은 game.js에서 늦게 만들어지므로 누를 때 찾는다)
+$('musicRecorded').onchange=e=>{if(typeof GameMusic!=='undefined')GameMusic.setRecorded(e.target.checked);};
 $('volumeSfx').oninput=e=>Sound.setSfxVolume(Number(e.target.value));
 addEventListener('packoon-sound-change',refreshSoundButtons);
 refreshSoundButtons();

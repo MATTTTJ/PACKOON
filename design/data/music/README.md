@@ -201,3 +201,37 @@ Trim·Normalize·샘플레이트 강제 변경은 먼저 끈다. 샘플 위치�
 - 곡의 모든 성부는 꼭 한 층에 있어야 한다. 빠진 성부는 층 재생에서 들리지 않는다. `build-data.js`가 이 규칙을 검사한다. 곡에 성부를 더하면 이 표도 같이 고친다.
 - 지역의 긴장 원천은 지역 코드의 `Rg.moodTension()`이 정한다: 단풍골 엉킨 칡, 돌너머 성황당 끝 골렘, 큰 장터 그믐밤 창고, 영산 호숫가 강철이.
 - 장면 곡(`scene_music.csv`, D-72)이 나오는 대화와 경치(D-46)에는 끼어들지 않는다.
+
+## 녹음 음원 (결정 D-105, 시험판)
+
+ACE-Step 1.5로 단풍골(`danpunggol`)과 엉킨 칡 전투(`boss_kudzu`)의 녹음판을 만들었다. 소리 설정의 "녹음 음원으로 듣기"를 켜면 이 두 곡은 합성 대신 `prototypes/web/audio/bgm/<id>.ogg`를 튼다. 기본은 꺼짐이다. 만드는 순서와 도구는 `tools/audio/ace/README.md`에 있다.
+
+**사용 조건**
+- ACE-Step 1.5 코드와 모델은 MIT 라이선스다. 텍스트 임베딩 Qwen3-Embedding-0.6B는 Apache-2.0이다.
+- 모델 카드에 생성곡을 상업적으로 써도 된다고 적혀 있다. 학습 데이터는 라이선스 음원, 로열티 프리·퍼블릭 도메인 음원, MIDI 합성 음원이다.
+- 권고 사항 두 가지를 따른다.
+  - AI 사용을 밝힌다: 소리 설정 아래에 표기했다.
+  - 특정 곡과 닮지 않았는지 확인한다: 우리 합성 원곡(새로 쓴 '이름의 노래' 변주)을 기준 음원으로 넣은 cover라서, 선율은 원곡을 따른다.
+
+**만든 조건** (2026-10-31, RTX 4080, 곡당 약 12~14초)
+
+| 곡 | 기준 음원 | 모델 | 강도 | BPM·조 지정 | 시드(고른 것) | 캡션 |
+|---|---|---|---|---|---|---|
+| danpunggol | 합성 원곡 105초 | acestep-v15-turbo, standard | 0.6 | 96 · C major | 3742649370 (1031과 같이 생성한 둘째) | Korean traditional instrumental, gugak ensemble, late autumn valley, daegeum bamboo flute lead, gayageum zither, haegeum fiddle answer, ajaeng low bowed string, soft janggu drum in jungmori rhythm, warm, nostalgic, gentle, no vocals |
+| boss_kudzu | 합성 원곡 80초 | acestep-v15-turbo, standard | 0.6 | 126 · C minor | 1031 | Korean traditional fusion battle music, gugak court ensemble, fast jajinmori rhythm, piri double-reed lead, haegeum fiddle, moduk-buk taiko-like ensemble drums driving, janggu, fast plucked gayageum arpeggios, ajaeng low bowed string bass, tense, energetic, heroic, no vocals |
+
+**측정**
+- 길이는 원곡과 같다: 105초, 80초. 박 간격 추정도 원곡과 같다.
+- 음 집합도 같다: 단풍골은 C·D·E·G·A, 칡은 C·Eb·F·G·Bb.
+- 원곡과 시간별 음높이 분포의 상관은 0.971(단풍골), 0.967(칡)이다.
+- 반복 이음새의 경계 샘플 튐
+  - 단풍골: 다듬기 전 0.024 → 다듬은 뒤 0.002
+  - 칡: 다듬기 전 0.023 → 다듬은 뒤 0.0017
+- 끝부분이 조용한 것은 원곡 마지막 마디가 쉼표로 끝나기 때문이다. 원곡도 끝 음량과 가운데 음량의 비율이 같다.
+- 파일 크기: OGG q3, 44.1kHz 기준 1.2MB(단풍골), 0.95MB(칡).
+
+**한계**
+- 녹음은 성부를 나눌 수 없다. 그래서 마음 상태 음악(D-37·D-87)의 층(base·longing·pulse)은 전체 세기 하나로만 반영한다. 세기는 바탕 5할, 북 층 3할, 그리움 2할의 가중합이다.
+- 템포 단계는 쓰지 않는다. 재생 속도를 바꾸면 음높이도 같이 바뀌기 때문이다.
+- 녹음을 끄면 층별 합성을 새로 만드는 동안(약 6초) 녹음이 이어서 나오다가 합성으로 넘어간다.
+- 파일을 읽지 못하면 합성 곡으로 돌아간다. 예를 들어 Safari처럼 OGG Vorbis 디코딩을 못 하는 브라우저가 그렇다.
