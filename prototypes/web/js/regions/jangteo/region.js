@@ -61,6 +61,7 @@ Rg.arcs=arcsEnabled;
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({
+  jat:P=>{P(4,5,3,4,'#d9c08a');P(9,5,3,4,'#d9c08a');P(6,9,4,4,'#e6d09c');P(5,6,1,2,'#f3e4bc');P(10,6,1,2,'#f3e4bc');P(7,10,1,2,'#f3e4bc');P(4,4,3,1,'#8a6a3a');P(9,4,3,1,'#8a6a3a');P(6,8,4,1,'#8a6a3a');},
   solbang:P=>{P(6,3,4,2,'#8a5a2b');P(4,5,8,2,'#6b4423');P(5,7,6,2,'#8a5a2b');P(4,9,8,2,'#6b4423');P(6,11,4,2,'#8a5a2b');P(7,13,2,2,'#5a3a20');P(5,5,1,1,'#c9a06a');P(8,7,1,1,'#c9a06a');P(5,9,1,1,'#c9a06a');},
   ssal:P=>{P(4,9,8,4,'#f2efe6');P(5,8,6,1,'#f8f6ef');P(3,11,10,2,'#e6e1d4');P(5,10,1,1,'#d8d2c2');P(9,9,1,1,'#d8d2c2');P(2,13,12,1,'#c9b991');},
   ssal_powder:P=>{P(5,6,6,3,'#f6f4ee');P(6,5,4,1,'#ffffff');P(3,9,10,4,'#7a4b2a');P(4,13,8,1,'#5a361e');P(4,9,8,1,'#9b6a3d');},
@@ -84,7 +85,7 @@ Rg.strangerCreditAtNight=true;
 
 /* 결정 D-82: 솔숲의 작은 소나무를 흔들어 솔방울을 떨군다 (채집 고리 D-41) */
 defineGather({
-  solbang:{title:'소나무 흔들기',verb:'소나무 흔들기',hits:TABLES.MINIGAMES.gather_solbang_hits,spot:[0,-30],hint:'작은 소나무 줄기를 친다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 솔방울이 하나 더 떨어진다.'},
+  solbang:{title:'소나무 흔들기',rare:'jat',verb:'소나무 흔들기',hits:TABLES.MINIGAMES.gather_solbang_hits,spot:[0,-30],hint:'작은 소나무 줄기를 친다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 솔방울이 하나 더 떨어진다.'},
 });
 })();
 

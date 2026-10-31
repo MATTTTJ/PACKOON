@@ -435,6 +435,34 @@ const TABLES={
    "kind": "재료",
    "region": "yeongsan",
    "d": "남쪽 칡뿌리와 겨울 산의 겨우살이, 대추를 함께 갈았다. 건네기 좋은 향긋한 약재다."
+  },
+  "songi": {
+   "n": "송이버섯",
+   "r": 3,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "솔잎 밑 흙에서 드물게 올라오는 가을 송이. 향이 진해 약재상도 반긴다."
+  },
+  "eoksae_som": {
+   "n": "억새꽃 솜",
+   "r": 1,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "억새 이삭에서 털어 낸 하얀 솜. 둥지에 깔면 바람이 덜 든다."
+  },
+  "seokcheong": {
+   "n": "석청",
+   "r": 3,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "절벽 바위틈에 벌이 모아 둔 꿀. 석이 따는 자리에서 드물게 만난다."
+  },
+  "jat": {
+   "n": "잣",
+   "r": 1,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "청설모가 솔가지 사이에 숨겨 둔 잣. 떡 고명으로 귀하게 쓴다."
   }
  },
  "BOSS_PARTS": {
@@ -821,6 +849,11 @@ const TABLES={
     "kind": "좋아함",
     "line": "한데 갈았어도 저마다 향이 남았네.",
     "effect": "none"
+   },
+   "songi": {
+    "kind": "좋아함",
+    "line": "가을 송이로구나. 향만 맡아도 기운이 나는구나.",
+    "effect": "none"
    }
   },
   "dolsoe": {
@@ -832,6 +865,11 @@ const TABLES={
    "sesame_salt": {
     "kind": "좋아함",
     "line": "손끝에도 고소한 냄새가 배겠네.",
+    "effect": "none"
+   },
+   "seokcheong": {
+    "kind": "좋아함",
+    "line": "…석청이구나. 바위틈에서 땄냐. 귀한 걸 손에 쥐었구나.",
     "effect": "none"
    }
   },
@@ -857,6 +895,11 @@ const TABLES={
     "kind": "좋아함",
     "line": "이건… 숨겨 두고… 천천히…",
     "effect": "none"
+   },
+   "eoksae_som": {
+    "kind": "좋아함",
+    "line": "포근해… 이거 깔면… 겨울 내내 안 춥겠다…",
+    "effect": "none"
    }
   },
   "yeotbang": {
@@ -880,6 +923,11 @@ const TABLES={
    "rainbow_tteok": {
     "kind": "좋아함",
     "line": "허허, 떡 한 조각에 온 길이 다 들었네!",
+    "effect": "none"
+   },
+   "jat": {
+    "kind": "좋아함",
+    "line": "잣이네! 떡 고명으로 딱이야. 고마워!",
     "effect": "none"
    }
   },
