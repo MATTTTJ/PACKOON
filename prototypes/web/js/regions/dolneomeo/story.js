@@ -120,7 +120,7 @@ function talkKku(){
   Sound.stone('wake');
   if(!F.kkuAwake){F.kkuAwake=true;rel('kkubeogi',1);learn('kkubeogi:awake');
     if(Rg.arcs()){F.dolneomeo_arc_kku1=true;diary('dolneomeo_arc_kku1','꾸벅이가 고개를 들 때 말을 걸었다. 겨울잠 둥지에 깔 억새가 모자란다고 했다.');}
-    ledger('kkubeogi','꾸벅이','마른 억새 3','서리다래가 있는 곳');
+    ledger('kkubeogi','꾸벅이','마른 억새 3','서리다래 자리에 대한 정보');
     talk(Rg.arcs()?[
       ['꾸벅이','어, 어…? 안 잤어어… 진짜야아…'],
       ['꾸벅이','그 모자… 어디서 봤더라아…'],
@@ -414,7 +414,7 @@ function kkuMudGive(){
 }
 Rg.trade={
   kkubeogi:()=>[
-    ...(G.ledger.kkubeogi?[{id:'t_kkubeogi',item:'seoridarae',label:'서리다래가 있는 곳',asks:[{eoksae:3}],done:()=>G.f.kkuDone,accept:kkuGive}]:[]),
+    ...(G.ledger.kkubeogi?[{id:'t_kkubeogi',item:'seoridarae',info:true,label:'서리다래 자리에 대한 정보',asks:[{eoksae:3}],done:()=>G.f.kkuDone,accept:kkuGive}]:[]),
     // 결정 D-77: 겨울잠 들기 전, 억새로 엮은 둥지의 바람 틈을 진흙으로 바른다.
     ...(G.f.kkuDone?[{id:'t_kkubeogi_mud',item:'memil',n:2,label:'둥지 바람 틈 바르기 · 메밀 2',asks:[{mud:1}],done:()=>G.f.kkuMud,accept:kkuMudGive}]:[])
   ],
@@ -429,7 +429,7 @@ Rg.trade={
     // 결정 D-77: 골렘이 잠든 뒤, 돌쇠 할배는 성황당 돌무더기의 눈돌을 제자리에 넣어 주려 한다.
     ...(G.f.dolsoeTea&&G.boss.dead?[{id:'t_dolsoe_eye',item:'stonedust',n:2,label:'돌무더기 눈돌 제자리 찾기 · 돌가루 2',asks:[{mossy_eye:1}],done:()=>G.f.dolsoeEye,accept:dolsoeEyeGive}]:[])
   ],
-  ppuri:()=>G.ledger.ppuri?[{id:'t_ppuri',item:'memil_powder',icon:'seogi',label:'돌산 길 열기',asks:[{memil_powder:1},{memil_powder:1,memil_jelly:1}],done:()=>G.f.ppuriPassed,accept:ppuriGive}]:[]
+  ppuri:()=>G.ledger.ppuri?[{id:'t_ppuri',item:'memil_powder',icon:'geumjul',label:'돌산 길 열기',asks:[{memil_powder:1},{memil_powder:1,memil_jelly:1}],done:()=>G.f.ppuriPassed,accept:ppuriGive}]:[]
 };
 Rg.onHaggle=(npc,way)=>{
   if(npc!=='nal'||way!=='허세'||G.f.nalDDone)return false;

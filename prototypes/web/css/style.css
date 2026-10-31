@@ -122,7 +122,7 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .mom-note .smudge{filter:blur(3.5px);display:inline-block;user-select:none}
 .mom-transcript{border-top:1px dotted #cdb98f;padding-top:10px}
 /* 결정 D-39: 보부상 교환 화면. 왼쪽 상대의 물건(원하는 것을 그림으로), 오른쪽 내 보따리, 아래 내가 내놓을 것 */
-.trade-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+.trade-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px}
 .trade-side h3,.trade-tray h3{font-family:var(--display);font-size:1.05em;margin:2px 0 8px}
 .trade-good{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;margin-bottom:6px;padding:8px 10px;background:var(--hanji-2);border:1px solid #c7b48c;border-radius:4px;color:var(--meok);font:inherit;cursor:pointer;touch-action:manipulation}
 .trade-good[aria-pressed="true"]{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
