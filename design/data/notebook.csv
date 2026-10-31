@@ -34,7 +34,7 @@ ssari,galchamgol,싸리버섯,물건,아빠,,처음부터,밑동을 단번에 �
 kkoe,galchamgol,꾀꼬리버섯,물건,나,got:kkoe,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 meoru,galchamgol,해머루,물건,나,got:meoru,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
 meoru,galchamgol,해머루,물건,아빠,,처음부터,해를 머금은 듯 알이 따뜻한 머루. 달여 먹이면 앓던 몸도 기운을 차린다.,제안,,아빠 수첩
-meoru,galchamgol,해머루,물건,아빠,got:meoru,처음 얻을 때,(그림 옆에 나중에 덧쓴 글씨) 여기도 아니다.,제안,,아빠 수첩
+meoru,galchamgol,해머루,물건,아빠,got:meoru,처음 얻을 때,(해머루 글 끝에 나중에 덧쓴 글씨) 여기도 아니다.,제안,,아빠 수첩
 kflower,galchamgol,칡꽃,물건,나,got:kflower,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:sleep,졸 때 말을 걸었을 때,늘 존다. 졸 때 말을 걸면 잠꼬대만 한다.,제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:awake,고개를 들 때 말을 걸어 깨웠을 때,꾸벅꾸벅 졸다가 고개를 드는 잠깐에만 말이 통한다.,제안,,관찰
@@ -77,7 +77,7 @@ yeotbang,jangteo,엿방울,동물,나,arc:jangteo:pair-night,작년 그믐 이�
 bueong,jangteo,부엉 영감,동물,아빠,,처음부터,보부상단 접장 수리부엉이. 밤에만 깬다. 장부를 꼼꼼히 적는 어른.,제안,,아빠 수첩
 bueong,jangteo,부엉 영감,동물,나,bueong:night,낮에 말을 걸었을 때 (졸고 있음),낮에는 처마 밑에서 존다. 숙소 마루에서 해가 지기를 기다리면 된다.,제안,,관찰
 bueong,jangteo,부엉 영감,동물,나,bueong:rule,밤에 처음 말을 걸었을 때,보부상단 물건은 보부상에게만 내준다. 규칙이 먼저다.,제안,,관찰
-bueong,jangteo,부엉 영감,동물,나,bueong:sinpyo,팥시루떡을 올리고 신표를 받았을 때,설 고사에 팥시루떡을 올리자 장부에 한 줄 적고 신표를 줬다.,제안,,관찰
+bueong,jangteo,부엉 영감,동물,나,bueong:sinpyo,팥시루떡을 올리고 신표를 받았을 때,설 고사에 팥시루떡을 올리자 장부 한 줄에 표시를 하고 신표를 줬다. 이름은 묻지 않았다.,제안,,관찰
 bueong,jangteo,부엉 영감,동물,나,arc:jangteo:dates,물품 장부를 보여 드렸을 때,"값은 철마다 고장마다 다르다. 장부엔 날짜를 적는다. 첫 줄은 ""늦가을, 단풍골.""",제안,D-119,관찰
 bueong,jangteo,부엉 영감,동물,나,arc:jangteo:kidline,창고 지킨 셈을 적었을 때,"상단 장부, 아빠 줄 아래에 ""그 아들"". 이름 칸은 비어 있다.",제안,D-119,관찰
 bueong,jangteo,부엉 영감,동물,나,arc:jangteo:stamp,떠날 채비를 말씀드렸을 때,수첩 장부 끝장에 상단 도장. 보부상끼리는 이 도장을 알아본다.,제안,D-119,관찰
@@ -86,7 +86,7 @@ jjandol,jangteo,짠돌,동물,나,met:j_jjandol,처음 말을 걸 때,낮엔 소
 jjandol,jangteo,짠돌,동물,나,arc:jangteo:jjandol,마루에 올라섰을 때,아빠가 지난가을 쥐여 준 신표를 한 번도 쓰지 않고 품고 있었다. 이제 그 신표로 마루에서 잔다.,제안,D-119 새 인물,관찰
 jjandol,jangteo,짠돌,동물,나,arc:jangteo:jjandol-name,마루에서 잔 다음 날,부엉 영감이 손님 장부에 짠돌 말고 본이름을 적었단다. 무슨 이름인지는 비밀.,제안,D-119 새 인물,관찰
 deungjan,jangteo,등잔발,동물,나,met:j_deungjan,처음 말을 걸 때,생쥐 밤짐꾼. 해 지고 들어오는 길손 짐을 나르고 허리 등잔으로 길을 비춘다.,제안,D-119 새 인물,관찰
-deungjan,jangteo,등잔발,동물,나,arc:jangteo:deungjan,설날 아침에 깨었을 때,지난가을 밤 아빠 짐을 날랐단다. 무겁고 약초 냄새가 났고 아빠는 한참 집 쪽 하늘을 봤다고.,제안,D-119 새 인물,관찰
+deungjan,jangteo,등잔발,동물,나,arc:jangteo:deungjan,설날 아침에 깨었을 때,내 보따리 약초 냄새로 알아봤다. 지난가을 밤 아빠 짐을 날랐단다. 무거웠고 아빠는 한참 남쪽 하늘만 봤다고. 우리 집이 있는 쪽이다.,제안,D-119 새 인물,관찰
 dokkaebi,jangteo,헌물 도깨비,동물,아빠,,처음부터,장터 도깨비 이야기: 헌것에 깃들어 장난을 친다. 메밀 한 그릇이면 순해진다더라.,제안,,아빠 수첩
 dokkaebi,jangteo,헌물 도깨비,동물,나,fight:dokkaebi,처음 맞설 때,"낡은 빗자루·키·멍석에 깃든 도깨비. 빗자루는 쓸고, 키는 콩을 뿌리고, 멍석은 말려 든다.",제안,,관찰
 dokkaebi,jangteo,헌물 도깨비,동물,나,core:dokkaebi,핵심 부위가 드러날 때,헌물을 하나 부수면 도깨비불이 드러난다.,제안,,관찰
@@ -150,11 +150,11 @@ honey,jangteo,꿀,물건,나,got:honey,처음 얻을 때,(items.csv 의 설명),
 jujube,yeongsan,대추,물건,나,got:jujube,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 acorn_jelly,galchamgol,도토리묵,물건,나,got:acorn_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 memil_jelly,dolneomeo,메밀묵,물건,나,got:memil_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
-dol_badger,dolneomeo,메밀댁,동물,나,met:dol_badger,처음 말을 걸 때,"메밀밭 오소리 아주머니. 무릎이 아파 돌계단을 못 오른다. 짐을 맡기는 손이 크다.",제안,D-118,관찰
-dol_badger,dolneomeo,메밀댁,동물,나,dolneomeo:flower-bojagi,보자기를 받았을 때,"오래전 겨울에 값으로 받은 꽃수 보자기를 주인에게 돌려 달라고 했다. 귀퉁이 꽃이 엄마 수다.",제안,D-118,관찰
+dol_badger,dolneomeo,메밀댁,동물,나,met:dol_badger,처음 말을 걸 때,"메밀밭 들쥐 아주머니. 메밀 널어 둔 멍석을 지키느라 밭을 못 뜬다. 짐을 맡기는 손이 크다.",제안,D-130,관찰
+dol_badger,dolneomeo,메밀댁,동물,나,dolneomeo:flower-bojagi,보자기를 받았을 때,"오래전 겨울에 값으로 받은 꽃수 보자기를 주인에게 돌려 달라고 했다. 내 보따리 매듭과 똑같이 묶였고, 귀퉁이 꽃이 엄마 수다.",제안,D-130,관찰
 dol_turtle,dolneomeo,남생이 할미,동물,아빠,,처음부터,"성황당 돌 그늘의 남생이. 백 년을 살았다고 한다. 묻는 말엔 다음에 답한다.",제안,D-118,아빠 수첩
 dol_turtle,dolneomeo,남생이 할미,동물,나,met:dol_turtle,처음 말을 걸 때,"소원 천은 높을수록 잘 들린다고 했다. 가장 높은 가지에 아빠가 맨 천이 있다.",제안,D-118,관찰
-dol_turtle,dolneomeo,남생이 할미,동물,나,dolneomeo:turtle-spring,떠나기 전 이야기를 들었을 때,"무언가 지나간 자리엔 샘이 먼저 언다. 물 마른 데를 만나면 샘부터 찾으라고 했다.",제안,D-118,관찰
+dol_turtle,dolneomeo,남생이 할미,동물,나,dolneomeo:turtle-spring,떠나기 전 이야기를 들었을 때,"무언가 지나간 자리엔 샘이 먼저 죽는다. 여름엔 마르고 겨울엔 언다. 물 마른 데를 만나면 샘부터 찾으라고 했다.",제안,D-130,관찰
 yakgwa,jangteo,약과,물건,나,got:yakgwa,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 magamok_tea,yeongsan,마가목차,물건,나,got:magamok_tea,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 dad_stamp_jangteo_flag,jangteo,젊은 아빠의 그날 · 장터 깃대,도장,아빠,stamp:jangteo:flag,장터 깃대 밑 도장을 찾았을 때,부를 준다는 열매를 찾으러 북쪽으로 간다. 장터 깃발에 길을 물으니 바람만 대답했다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩
