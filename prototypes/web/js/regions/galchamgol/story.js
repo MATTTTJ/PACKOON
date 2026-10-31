@@ -208,8 +208,8 @@ function battleMusoe(){
     const perfect=res==='win'&&info.hits===0;
     G.f.musoeTested=true;rel('musoe',(res==='calm'||perfect)?2:1);ledger('musoe','무쇠 삼촌','숯 1','아빠가 맡긴 낫');
     if(typeof grantTool==='function')grantTool('pickaxe');
-    diary('test',res==='calm'?'무쇠 삼촌에게 먹을 것을 건네 마음을 풀었다. 아빠도 이렇게 했을까.':'무쇠 삼촌이 꿀밤으로 연장부터 빼앗고 덤볐다. 끝까지 피해서 버텼다.');
-    talk([['무쇠',res==='calm'?'…배부터 채웠으니 고집은 그만 부리마.':perfect?'허, 한 대도 안 맞았군.\n형 아들 맞다.':'끝까지 버티는 건 형을 닮았군.'],
+    diary('test',res==='calm'?'무쇠 삼촌에게 먹을 것을 건네 마음을 풀었다. 아빠도 이렇게 했을까.':'무쇠 삼촌이 꿀밤으로 연장부터 빼앗고 덤볐다. 끝까지 피했더니, 마지막에 꿀밤을 한 대 쥐어박고는 됐다고 했다.');
+    talk([['무쇠',res==='calm'?'…배부터 채웠으니 고집은 그만 부리마.':perfect?'허, 그 한 대 말고는 다 피했군.\n형 아들 맞다.':'끝까지 버티는 건 형을 닮았군.'],
       ['무쇠','연장은 도로 가져가라.\n곡괭이 날도 세워 뒀다. 돌 만날 때 써라.']],musoeLeaf);
   }));
 }

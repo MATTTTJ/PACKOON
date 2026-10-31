@@ -6,7 +6,10 @@
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
          cover?:엄폐물, vinePath?:칡 전용 통로(arm 부위 필요), calmAction?:{amount:행동 진정량, kind?, prompt?, text?}(cover/vinePath/possession/warmPath 공격 뒤), placeGift?:꼭대기에 얹을 선물 id,
-         forgeTrial?:{sequence:부위 id 순서, repeatText:두 번째 바퀴 대사},
+         backdrop?(c):상대 뒤쪽 화면 전체 배경(결정 D-58. 판정 상자와 글귀 줄 위로는 상자·글이 덮는다), goalText?:지금 할 일 글,
+         showHands?:첫 선물 때 빈손을 펴 보이는 장면, pickAttack?():공격을 직접 고른다(B.bullets 를 넣고 B.st='tell'),
+         tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래),
+         finale?:{start(), step()→끝나면 true}(dodge 를 다 버틴 뒤 입력을 막는 마무리 연출. 그 뒤 'win'),
          possession?:{order:빙의 순서, attacks:부위별 시험판 공격, travel:불 이동 시간, wait:도착 뒤 대피 시간}, partPose?(id):그려진 부위 좌표,
          warmPath?:{width,wideWidth,attacks:부위별 공격},
          headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표,
@@ -97,7 +100,7 @@ function startBattle(kind,onEnd){
   document.body.classList.add('in-battle');$('battle').hidden=false;
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
   if(E.cover){B.covers=[];B.round=0;addCover(0.5,0.43);}
-  if(E.forgeTrial){B.forgeNext=null;B.handShown=false;B.handShow=0;}
+  if(E.showHands){B.handShown=false;B.handShow=0;}
   if(E.possession){B.round=0;B.possession={from:'core',to:'core'};}
   if(E.vinePath){B.round=0;B.vinePath=null;B.pathLesson=false;}
   if(E.warmPath)B.warm={current:{u:0.25,v:0.7},next:null,points:[],round:0,ice:null,fire:0};
@@ -105,7 +108,7 @@ function startBattle(kind,onEnd){
   setPadLabels(true);renderBHud();
   const gm=$('goalM');gm.querySelector('b').textContent='전투';gm.querySelector('span').textContent=E.dodge?'연장 없이 피하기만! 화면을 끌거나 십자 버튼으로 피하자.':'붉은 표식 위에서 치기. 화면을 끌거나 십자 버튼으로 피하자.';
   if(E.cover)gm.querySelector('span').textContent='돌 아래 여백에 손을 숨기자. 공격 뒤에는 표식 치기 또는 소원 돌 바로 놓기.';
-  if(E.forgeTrial)gm.querySelector('span').textContent='먹선이 생기면 작업대 밖으로! 풀무는 낮은 바람막이 뒤, 호통은 부채꼴 양옆으로.';
+  if(E.goalText)gm.querySelector('span').textContent=E.goalText;
   if(E.possession)gm.querySelector('span').textContent='불이 옮겨 간 헌물의 공격을 읽자. 공격 뒤에는 되치기 또는 물건 집기 → 윤곽에서 치기로 돌려놓기.';
   if(E.vinePath)gm.querySelector('span').textContent='예고 중 고리 위에서 치기를 누른 채 이동하고 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.';
   if(E.warmPath)gm.querySelector('span').textContent='물김 길을 따라 옆 샘으로. 공격 뒤에는 붉은 표식 치기 또는 샘의 얼음 걷기.';
@@ -194,14 +197,7 @@ function chooseAttack(){
 function chooseAttackBase(){
   Sound.playSfx('battle_warn');
   if(B.E.cover){B.round++;B.calmStone=null;}
-  if(B.E.forgeTrial){
-    const seq=B.E.forgeTrial.sequence,p=B.parts.find(p=>p.id===seq[B.survived%seq.length]);
-    B.cur=p;B.last=p;B.st='tell';B.t=60;B.hitThis=false;
-    B.msg=(B.survived>=seq.length?B.E.forgeTrial.repeatText+' ':'')+p.tell;
-    // 겹쳐 보인 풀무 예고에도 여기서부터 온전한 회피 시간을 준다.
-    const b=B.forgeNext||{k:p.atk,u:B.survived===3?0.74:0.35,tell:120,hold:28};
-    b.t=0;b.preview=false;B.forgeNext=null;B.bullets.push(b);return;
-  }
+  if(B.E.pickAttack){B.E.pickAttack();return;}
   if(B.E.possession){
     const rule=B.E.possession,order=rule.order,start=(order.indexOf(B.possession.to)+1)%order.length;
     const id=Array.from({length:order.length},(_,i)=>order[(start+i)%order.length]).find(id=>{const p=part(id);return !p.broken&&(!p.core||!coreHidden());});
@@ -256,7 +252,7 @@ function attackTick(p){bAttackDef(p).tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
 /* 하트는 정수다. 산양 발굽은 맞을 때마다 battle_goat_damage_taken 만큼 쌓고 1이 찰 때만 한 칸 준다 (0.5면 두 번에 한 칸).
    고라니는 맞은 뒤 무적 시간이 battle_deer_iframes 로 길다. */
 function bHitMe(){
-  if(B.inv>0||B.st==='end')return;
+  if(B.inv>0||B.st==='end'||B.st==='finale')return;
   const form=battleForm(),t=TABLES.TUNING;let loss=1;
   if(form==='goat'){B.hoof+=t.battle_goat_damage_taken;loss=Math.floor(B.hoof+1e-9);B.hoof-=loss;}
   G.hp-=loss;B.inv=form==='deer'?t.battle_deer_iframes:t.battle_iframes;B.hits++;B.hitThis=true;refreshHud();
@@ -265,7 +261,7 @@ function bHitMe(){
 }
 function bSplash(x,y,col){for(let i=0;i<9;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*2.4;B.fx.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:2+Math.random()*4,t:28,col:col||'#1d1814'});}}
 function bStrike(){
-  if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace')return;
+  if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.st==='finale')return;
   if(B.E.vinePath&&B.st==='tell'){grabVine();return;}
   if(B.cool>0)return;
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
@@ -320,7 +316,7 @@ function breakPart(p){
 function bEnd(result){
   if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.calmStone=null;B.bullets=[];
   if(result==='win'||result==='calm')Sound.playSfx(result==='calm'?'battle_soothe':'battle_victory');
-  if(B.E.forgeTrial){B.forgeNext=null;B.handShow=0;}
+  if(B.E.showHands)B.handShow=0;
   if(B.E.possession){B.returnItem=null;B.returnEcho=null;B.attackPlan=null;}
   if(B.E.vinePath)B.vinePath=null;
   if(B.warm)B.warm.ice=null;
@@ -341,7 +337,7 @@ function bStep(){
   if(B.scentKnot&&--B.scentKnot.t<=0)B.scentKnot=null;
   if(B.warm&&B.warm.fire>0)B.warm.fire--;
   if(B.warm&&B.warm.thaw&&--B.warm.thaw.t<=0)B.warm.thaw=null;
-  if(B.st!=='end'&&B.st!=='giftPlace'){
+  if(B.st!=='end'&&B.st!=='giftPlace'&&B.st!=='finale'){
     let dx=0,dy=0;
     if(keys['arrowleft']||keys['a']||touch.left)dx-=1;if(keys['arrowright']||keys['d']||touch.right)dx+=1;
     if(keys['arrowup']||keys['w']||touch.up)dy-=1;if(keys['arrowdown']||keys['s']||touch.down)dy+=1;
@@ -363,7 +359,8 @@ function bStep(){
     case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover||B.E.possession||B.E.vinePath||B.E.warmPath)B.st='settle';else{B.st='open';openMark();}}break;
     case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';if(B.E.vinePath)B.vinePath=null;openMark();openCalmAction();}break;
     case 'giftPlace':if(--B.t<=0){B.giftPlace=null;bEnd('calm');}break;
-    case 'clear':if(!B.bullets.length){B.survived++;B.msg=(B.hitThis?'아야… 그래도 버텼다. ':'잘 피했다! ')+'('+B.survived+'/'+B.E.dodge+')';renderBHud();if(B.survived>=B.E.dodge)bEnd('win');else{B.st='idle';B.t=40;}}break;
+    case 'clear':if(!B.bullets.length){B.survived++;B.msg=(B.hitThis?'아야… 그래도 버텼다. ':'잘 피했다! ')+'('+B.survived+'/'+B.E.dodge+')';renderBHud();if(B.survived>=B.E.dodge){if(B.E.finale){B.st='finale';B.E.finale.start();}else bEnd('win');}else{B.st='idle';B.t=40;}}break;
+    case 'finale':if(B.E.finale.step())bEnd('win');break;
     case 'open':
       if(B.warm&&B.warm.ice&&--B.warm.ice.t<=0)B.warm.ice=null;
       if(B.returnItem&&B.returnItem.active&&--B.returnItem.t<=0){B.returnItem.active=false;B.returnItem.held=false;}
@@ -374,6 +371,7 @@ function bStep(){
   const X1=BOX.x,X2=BOX.x+BOX.w,Y1=BOX.y,Y2=BOX.y+BOX.h;
   for(const b of B.bullets)BULLETS[b.k].step(b,X1,X2,Y1,Y2);
   B.bullets=B.bullets.filter(b=>!b.dead);
+  if(B.E.tickHazards&&B&&!['intro','bonk','end','finale'].includes(B.st))B.E.tickHazards();
 }
 
 /* 선물 (달래기) */
@@ -417,8 +415,8 @@ function progressShortage(inv){
   return choose(0,{});
 }
 function openGift(){
-  if(!B||B.handShow>0||B.st==='end'||B.st==='giftPlace'||!$('bResult').hidden)return;
-  if(B.E.forgeTrial&&!B.handShown){
+  if(!B||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.st==='finale'||!$('bResult').hidden)return;
+  if(B.E.showHands&&!B.handShown){
     B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';renderBattleForms();return;
   }
   if(B.E.vinePath)bDrag=null;
@@ -459,7 +457,7 @@ function giveGift(id){
   }
 }
 $('bGift').onclick=openGift;$('bHit').onclick=()=>bStrike();$('bGiftClose').onclick=closeGift;
-$('bFlee').onclick=()=>{if(B&&B.st!=='end'&&!B.paused)bEnd('flee');};
+$('bFlee').onclick=()=>{if(B&&B.st!=='end'&&B.st!=='finale'&&!B.paused)bEnd('flee');};
 /* 기존 치기 버튼의 누름/놓기를 읽는다. 다른 보스의 클릭 처리는 그대로 둔다. */
 const vinePointers=new Set();
 [$('bHit'),document.querySelector('#pad [data-k="atk"]')].filter(Boolean).forEach(button=>{
@@ -545,12 +543,12 @@ function bDraw(){
   if(!B)return;const c=bctx;c.setTransform(BDPR,0,0,BDPR,0,0);
   if(B.bonk>20)c.translate(Math.sin(B.bonk*2.3)*3,0);
   if(paper)c.drawImage(paper,0,0,LW,LH);
-  if(B.E.drawBack)B.E.drawBack(c);   // 적마다 배경 (예: 무쇠의 대장간). 판정 상자 밖 여백에만 그린다
+  // 결정 D-58: NPC·보스 전투 배경은 상대 뒤쪽 화면 전체로 그린다 (물건 하나를 구석에 두지 않는다)
+  if(B.E.backdrop)B.E.backdrop(c);
   c.save();c.translate(LW/2,EY);c.scale(0.84,0.84);c.translate(-LW/2,-EY);
   B.E.draw(c);
   c.restore();
   if(B.E.cover)drawGolemAim(c);
-  if(B.E.forgeTrial)drawForgeVoice(c);
   if(B.E.possession)drawPossession(c);
   // 글귀
   c.fillStyle=INK;c.textAlign='center';c.textBaseline='alphabetic';c.font='17px "Gowun Batang", "Batang", serif';
@@ -562,7 +560,7 @@ function bDraw(){
   c.save();c.fillStyle='rgba(255,252,242,.55)';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();
   c.save();c.beginPath();c.rect(BOX.x,BOX.y,BOX.w,BOX.h);c.clip();
   if(B.E.cover)drawBattleCover(c);
-  if(B.E.forgeTrial){drawForgeBench(c);if(B.forgeNext)drawForgeWork(c,B.forgeNext);}
+  if(B.E.drawFloor)B.E.drawFloor(c);
   if(B.E.possession)drawPossessedAttack(c);
   if(B.vinePath)drawVinePath(c);
   for(const b of B.bullets)BULLETS[b.k].draw(c,b);
