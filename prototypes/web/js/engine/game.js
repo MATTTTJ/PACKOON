@@ -8,6 +8,15 @@ const GameMusic=(()=>{
   const bosses={kudzu:'boss_kudzu',golem:'boss_golem',dokkaebi:'boss_dokkaebi',gangcheol:'boss_steel',musoe:'trial_iron'};
   const scenery={galchamgol:'scenery_danpunggol',dolneomeo:'scenery_dolneomeo',jangteo:'scenery_market',yeongsan:'scenery_yeongsan'};
   let owner=null,region=null,scene=null,requested=undefined,pending=false,duck=1,requestCount=0,travelTo=null,arrival=false;
+  /* 결정 D-37: 주인공의 마음 상태에 따라 음악이 바뀐다 (design/data/decisions.csv).
+     곡마다 성부를 층으로 묶고(base·longing·pulse), 템포는 같은 악보를 빠르기만 바꾼 단계로 갈아탄다.
+     마음 상태는 두 값: 긴장(tension)과 그리움(longing). 0~1, 매 프레임 목표값으로 천천히 다가간다. */
+  const ADAPTIVE={
+    danpunggol:{layers:{base:['melody','bass','stream'],longing:['answer'],pulse:['janggu_low','janggu_high']},tempos:[1,1.12]},
+    boss_kudzu:{layers:{base:['melody','bass'],longing:['answer'],pulse:['janggu_low','janggu_high','vine_stroke']},tempos:[0.92,1,1.12,1.22]}
+  };
+  const mood={tension:0,longing:0};
+  let applied=null,tempoAt=-1e9,tempoNow=1,adaptKind=null;
   const history=[],warnings=new Set();
   function valid(value,fallback){
     const id=typeof value==='function'?value(G,zoneDef()):value;
@@ -73,6 +82,11 @@ const GameMusic=(()=>{
     const row={id:target.id,kind:target.kind,region:G.region,zone:G.zone,audioTime:Sound.context.currentTime};
     history.push(row);if(history.length>80)history.shift();
     const settings={crossfade:['battle','scenery'].includes(target.kind)?.35:1.5};
+    const spec=ADAPTIVE[target.id];
+    if(spec&&['region','battle'].includes(target.kind)){
+      adaptKind=target.kind;tempoNow=tempoStep(spec,target.kind);tempoAt=performance.now();applied=levelsFor(target.kind);
+      Object.assign(settings,{layers:spec.layers,tempo:tempoNow,levels:applied});
+    }
     if(target.kind==='region'){
       const now=player.getState(),tracks=PackoonAudioData.score.tracks;
       const before=tracks.find(t=>t.id===now.id),after=tracks.find(t=>t.id===target.id);
@@ -86,15 +100,57 @@ const GameMusic=(()=>{
       if(!ok&&ticket===requestCount)pending=true;
     }).catch(error=>{console.error('음악 재생 실패:',error);});
   }
+  function targets(kind){
+    let tension=0,longing=0;
+    if(kind==='battle'&&B&&!B.result){
+      // 전투: 기본 긴장, 핵심이 드러나면 더, 체력이 낮으면 더. 진정 게이지가 차는 만큼 가라앉는다.
+      tension=.5;if(typeof coreHidden==='function'&&!coreHidden())tension=.75;
+      if(G.hp<=Math.ceil(G.maxhp/3))tension+=.2;
+      tension*=1-(B.calm/100)*.85;
+    }else tension=REG.moodTension?.()||0;
+    // 그리움: 엄마·아빠가 나오는 대화, 경치를 바라볼 때
+    if(open('dlg')){const who=$('dlgWho').textContent,text=$('dlgText').textContent;if(who==='아빠'||who==='엄마'||/엄마|아빠/.test(text))longing=.9;}
+    if(vistaMode)longing=Math.max(longing,.5);
+    return {tension:clamp(tension,0,1),longing:clamp(longing,0,1)};
+  }
+  function levelsFor(kind){
+    const t=mood.tension,l=mood.longing,calm=kind==='battle'&&B?B.calm/100:0;
+    if(kind==='battle')return {base:1,longing:clamp(.8-.4*t+.6*calm,0,1.6),pulse:clamp(.4+1.2*t,0,1.7)};
+    return {base:1-.2*l,longing:clamp(.55+l-.3*t,0,1.6),pulse:clamp(.75+.9*t-.6*l,0,1.7)};
+  }
+  function tempoStep(spec,kind){
+    const t=mood.tension,s=spec.tempos;
+    if(kind==='battle')return t<.3?s[0]:t<.6?s[1]:t<.85?s[2]:s[3];
+    return t>.55||(tempoNow>1&&t>.35)?s[1]:s[0];   // 올라갈 때와 내려올 때 문턱을 달리해 들쭉날쭉하지 않게
+  }
+  function adapt(){
+    if(!G||!REG)return;
+    const target=selection(),k=target.kind==='battle'||target.kind==='region'?target.kind:'other';
+    const goal=targets(k);
+    for(const key of ['tension','longing'])mood[key]+=(goal[key]-mood[key])*.03;
+    const now=player.getState(),spec=ADAPTIVE[now.id];
+    if(!spec||!now.playing||now.loading||now.id!==target.id||!['region','battle'].includes(target.kind))return;
+    if(!now.layered){   // 길 위 간주처럼 층 없이 들어온 곡은 박을 이어 층 재생으로 바꾼다
+      adaptKind=target.kind;tempoNow=tempoStep(spec,target.kind);tempoAt=performance.now();applied=levelsFor(target.kind);
+      player.play(now.id,{layers:spec.layers,tempo:tempoNow,levels:applied,keepBeat:true,crossfade:.3});return;
+    }
+    const lv=levelsFor(target.kind);
+    if(!applied||Object.keys(lv).some(n=>Math.abs(lv[n]-applied[n])>.04)){applied=lv;player.setLayers(lv,.6);}
+    const step=tempoStep(spec,target.kind);
+    if(step!==tempoNow&&performance.now()-tempoAt>3000){
+      tempoNow=step;tempoAt=performance.now();
+      player.play(now.id,{layers:spec.layers,tempo:step,levels:lv,keepBeat:true,crossfade:.3});
+    }
+  }
   function setScene(id){update();scene=id||null;update();}
   function reset(){scene=null;dlgMusic=null;requested=undefined;pending=false;travelTo=null;requestCount++;if(owner!==G||region===G.region)player.stop(.08);}
-  function getState(){return {...player.getState(),desired:selection(),duck,history:history.slice(),diagnostics:player.getDiagnostics()};}
+  function getState(){return {...player.getState(),desired:selection(),duck,mood:{...mood},levels:applied,history:history.slice(),diagnostics:player.getDiagnostics()};}
   // Sound의 trusted 입력 처리와 resume Promise가 끝난 뒤 아직 잠긴 곡을 다시 요청한다.
   addEventListener('pointerdown',()=>setTimeout(update,0),true);
   addEventListener('keydown',()=>setTimeout(update,0),true);
   addEventListener('packoon-sound-change',()=>setTimeout(update,0));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(update,0);});
-  return {update,setScene,reset,getState,player};
+  return {update,adapt,setScene,reset,getState,player};
 })();
 function fillCover(){
   const C=REG.cover;
@@ -161,7 +217,7 @@ function loop(t){
   // 대화·선택지·전투·손일의 콜백이 바꾼 진행을 다음 화면에 함께 반영한다.
   // 전투 중에는 모바일 목표 칸의 전투 안내를 유지한다.
   if(!B&&!inkOn)refreshGoal();
-  GameMusic.update();
+  GameMusic.update();GameMusic.adapt();
   if(B&&!$('battle').hidden)bDraw();else draw();requestAnimationFrame(loop);
 }
 /* 주소 뒤 ?region=<id> 로 그 지역부터 시작할 수 있다 (앞 지역은 마친 것으로 친다). 없으면 첫 지역 */
