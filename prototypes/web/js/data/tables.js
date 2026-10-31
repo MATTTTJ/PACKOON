@@ -1063,6 +1063,30 @@ const TABLES={
     "effect": "calm:40"
    }
   },
+  "jjandol": {
+   "rice": {
+    "kind": "좋아함",
+    "line": "…짜게 먹는 놈한텐 맨밥이 제일이지.",
+    "effect": "none"
+   },
+   "salt": {
+    "kind": "그저 그럼",
+    "line": "소금장수한테 소금을 주냐?",
+    "effect": "none"
+   }
+  },
+  "deungjan": {
+   "rice": {
+    "kind": "좋아함",
+    "line": "쌀 한 톨이 밤새 힘이다!",
+    "effect": "none"
+   },
+   "sesame_oil": {
+    "kind": "아주 좋아함",
+    "line": "고소한 등잔! 이걸로 밤새 비추지.",
+    "effect": "none"
+   }
+  },
   "ongdal": {
    "jujube": {
     "kind": "좋아함",
@@ -1633,6 +1657,12 @@ const TABLES={
      "text": "메밀가루 둘이면 메밀떡을 찔 수 있다고 알려 줬다. 도깨비는 메밀을 좋아한다는 말도.",
      "section": "관찰",
      "when": "morak:memiltteok"
+    },
+    {
+     "who": "me",
+     "text": "엿방울 아주머니가 제 가위로 떡집 줄을 불러 주자 김이 맵다며 눈가를 훔쳤다.",
+     "section": "관찰",
+     "when": "arc:jangteo:pair"
     }
    ]
   },
@@ -1657,6 +1687,12 @@ const TABLES={
      "text": "장단이 맞자 흥이 올라, 숨겨 둔 아빠의 엿을 내줬다.",
      "section": "관찰",
      "when": "yeotbang:high"
+    },
+    {
+     "who": "me",
+     "text": "작년 그믐 밤 모락 아주머니가 숨겨 줬다. 고맙단 말을 못 해서 떡을 못 받았다.",
+     "section": "관찰",
+     "when": "arc:jangteo:pair-night"
     }
    ]
   },
@@ -1684,9 +1720,71 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "설 고사에 팥시루떡을 올리자 장부에 내 이름을 적고 신표를 줬다.",
+     "text": "설 고사에 팥시루떡을 올리자 장부에 한 줄 적고 신표를 줬다.",
      "section": "관찰",
      "when": "bueong:sinpyo"
+    },
+    {
+     "who": "me",
+     "text": "값은 철마다 고장마다 다르다. 장부엔 날짜를 적는다. 첫 줄은 \"늦가을, 단풍골.\"",
+     "section": "관찰",
+     "when": "arc:jangteo:dates"
+    },
+    {
+     "who": "me",
+     "text": "상단 장부, 아빠 줄 아래에 \"그 아들\". 이름 칸은 비어 있다.",
+     "section": "관찰",
+     "when": "arc:jangteo:kidline"
+    },
+    {
+     "who": "me",
+     "text": "수첩 장부 끝장에 상단 도장. 보부상끼리는 이 도장을 알아본다.",
+     "section": "관찰",
+     "when": "arc:jangteo:stamp"
+    }
+   ]
+  },
+  {
+   "id": "jjandol",
+   "region": "jangteo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "낮엔 소금값을 짜게 부르는 담비. 밤엔 숙소 문간에 앉아 길 쪽만 본다.",
+     "section": "관찰",
+     "when": "met:j_jjandol"
+    },
+    {
+     "who": "me",
+     "text": "아빠가 지난가을 쥐여 준 신표를 한 번도 쓰지 않고 품고 있었다. 이제 그 신표로 마루에서 잔다.",
+     "section": "관찰",
+     "when": "arc:jangteo:jjandol"
+    },
+    {
+     "who": "me",
+     "text": "부엉 영감이 손님 장부에 짠돌 말고 본이름을 적었단다. 무슨 이름인지는 비밀.",
+     "section": "관찰",
+     "when": "arc:jangteo:jjandol-name"
+    }
+   ]
+  },
+  {
+   "id": "deungjan",
+   "region": "jangteo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "생쥐 밤짐꾼. 해 지고 들어오는 길손 짐을 나르고 허리 등잔으로 길을 비춘다.",
+     "section": "관찰",
+     "when": "met:j_deungjan"
+    },
+    {
+     "who": "me",
+     "text": "지난가을 밤 아빠 짐을 날랐단다. 무겁고 약초 냄새가 났고 아빠는 한참 집 쪽 하늘을 봤다고.",
+     "section": "관찰",
+     "when": "arc:jangteo:deungjan"
     }
    ]
   },
