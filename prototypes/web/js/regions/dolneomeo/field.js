@@ -5,9 +5,11 @@ const Rg=REGIONS.dolneomeo;
 const GATE_X=1590;     // 뿔이가 지키는 돌산 길목 (장승과 금줄)
 const GOLEM_AT=1860;   // 이보다 오른쪽으로 가면 돌 골렘과 전투
 // 결정 D-87: 뿔이가 돌산 길을 열어 준 뒤, 성황당 끝 돌 골렘 쪽으로 다가갈수록 긴장이 오른다. 골렘이 잠들면 0.
+// 결정 D-116: 확장판 구역의 설계 좌표를 줄인 좌표로 (Rg.trimCuts, engine/core.js trimX). 옛 구성은 그대로다.
+const Z=(zone,x)=>CLASSIC?x:trimX(x,Rg.trimCuts?.[zone]);
 Rg.moodTension=()=>{
   if(!G.started||G.boss.dead||!G.f.ppuriPassed||(!CLASSIC&&G.zone!=='shrine'))return 0;
-  const at=CLASSIC?GOLEM_AT:2310;   // 확장판 성황당 구역의 전투 시작 자리
+  const at=CLASSIC?GOLEM_AT:Z('shrine',2310);   // 확장판 성황당 구역의 전투 시작 자리
   return clamp(1-(Math.abs(at-G.px)-60)/800,0,1);
 };
 const CLIFF_X=2150;    // 절벽이 시작되는 곳
@@ -216,7 +218,7 @@ if(!CLASSIC){
       const at=digMap[di++];if(at)Object.assign(d,{id:'dol_old_dig_'+(di-1),zone:at[0],x:at[1]});
     }
     if(g.f?.dolExtraPointState)for(const p of g.pickups){const prior=g.f.dolExtraPointState[p.id];if(prior){p.got=prior.got;delete g.f.dolExtraPointState[p.id];}}
-    g.boss.x=2400;
+    g.boss.x=Z('shrine',2400);
   }
   Rg.newState=()=>{const s=originalNewState();placeOld(s);return s;};
   Rg.onStart=()=>{originalStart();placeOld(G);toast('장승 안쪽은 아직 닫혔다. 오른쪽 돌담길이 마을로 이어진다.');};
@@ -344,25 +346,32 @@ if(!CLASSIC){
   function commonStep(id){
     memoryStep();if(Rg.arcs())G.f.arcs=true;
     // 방문 구역은 엔진의 G.visitedZones가 기록한다. 매 프레임 진행값을 쓰지 않는다(지도 왕복 검사가 흔들렸다).
-    if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>2310)Rg.startGolem();
+    if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>Z('shrine',2310))Rg.startGolem();
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
     weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);Rg.ambient();applyMemory();},
-    drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);if(id==='gate')A.drawBridgeWork(1870-cam,GROUND);drawStonePlatforms(id);},
+    drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);if(id==='gate')A.drawBridgeWork(tx(1870)-cam,GROUND);drawStonePlatforms(id);},
     drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
     weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),
-    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?2240:80;G.py=GROUND;G.vy=0;delete G.f.dolMemory;applyMemory();toast('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
+    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?Z('shrine',2240):80;G.py=GROUND;G.vy=0;delete G.f.dolMemory;applyMemory();toast('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
   };}
   Rg.startZone='gate';
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
   // 돌담 마을: 들어선 자리와 첫 발판 사이. 절벽길: 아무것도 없는 발판 두 무리를 지운다(개구리까지 1340px → 340px).
-  Rg.trimCuts={village:[[110,280]],cliff:[[160,1000]]};
+  Rg.trimCutsV1={village:[[110,280]],cliff:[[160,1000]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-116: 고갯길은 빈 돌계단 무리(1300~1450), 성황당은 들어선 자리와 첫 돌탑 사이(430~790)를 지운다.
+  Rg.trimCuts={gate:[[1300,150]],village:[[110,280]],cliff:[[160,1000]],shrine:[[430,360]]};
   // 구역에 들어설 때 applyMemory가 bases로 발판을 다시 깐다. 그래서 bases도 같은 좌표로 자르고 정리해 둔다 (D-109·D-110).
   Rg.trimHook=tX=>{
     for(const id of Object.keys(bases)){
       const c=Rg.trimCuts[id];
       const list=c?bases[id].filter(p=>!trimInside(p.x+p.w/2,c)).map(p=>({...p,x:tX(p.x,c)})):bases[id];
       bases[id]=tidyPlatforms(list,platformAnchors(Rg,id,Rg.zones[id]));
+    }
+    // 옛 다리 기억(D-116): 자리·끝·다리 발판도 같은 좌표로. 발판은 drawStonePlatforms가 같은 물건인지로 알아보니 목록째 바꾼다.
+    for(const [id,spec] of Object.entries(memories)){
+      const c=Rg.trimCuts[id];if(!c)continue;
+      spec.x=tX(spec.x,c);spec.end=tX(spec.end,c);spec.bridge=spec.bridge.map(p=>({...p,x:tX(p.x,c)}));
     }
   };
   Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2800,[])};
@@ -374,7 +383,7 @@ if(!CLASSIC){
   Object.defineProperty(Rg.zones.gate,'npcs',{get:()=>{
     const n=Rg.npcs?.find(n=>n.id==='dolsoe');
     const list=ppuriVillage()?[]:['ppuri'];
-    return G?.f.dolBridgeCrewHere&&n?[...list,{...n,x:1908,zone:'gate',props:null}]:list;
+    return G?.f.dolBridgeCrewHere&&n?[...list,{...n,x:Z('gate',1908),zone:'gate',props:null}]:list;
   }});
   Object.defineProperty(Rg.zones.village,'npcs',{get:()=>[
     ...(G?.f.dolBridgeCrewHere?['nal']:['dolsoe','nal']),...(ppuriVillage()?['ppuri']:[])]});
@@ -438,7 +447,7 @@ if(!CLASSIC){
     for(const n of Rg.npcs){const at=loc[n.id];n.zone=at[0];n.x=at[1];}
     const ppuri=Rg.npcs.find(n=>n.id==='ppuri'),ppuriTalk=ppuri.talk;
     Object.defineProperties(ppuri,{
-      x:{configurable:true,get:()=>ppuriVillage()?2380:610},
+      x:{configurable:true,get:()=>ppuriVillage()?Z('village',2380):Z('gate',610)},
       zone:{configurable:true,get:()=>ppuriVillage()?'village':'gate'},
     });
     ppuri.talk=()=>{
@@ -451,12 +460,12 @@ if(!CLASSIC){
     Rg.bossDie=()=>{oldBossDie();placeOld(G);};
     Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.id==='dol_seogi'))G.digs.push({id:'dol_seogi',zone:'cliff',x:1920,item:'seogi',done:false});};
     Rg.startGolem=()=>{
-      G.px=2275;
+      G.px=Z('shrine',2275);
       inkTransition('돌 골렘',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
         if(res==='win'||res==='calm'){
           if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
           Rg.bossDie();
-        }else{G.px=2240;G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
+        }else{G.px=Z('shrine',2240);G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
           talk([['너구리','(머리가 높아서 처음엔 안 닿아.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>toast('성황당 앞에서 숨을 골랐다. 준비되면 다시 다가가자.'));}
       }));
     };

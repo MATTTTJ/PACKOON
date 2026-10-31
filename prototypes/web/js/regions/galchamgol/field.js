@@ -4,7 +4,8 @@
 const Rg=REGIONS.galchamgol;
 /* 결정 D-45: 확장판 언덕은 도착(180)에서 엉킨 칡까지 걷는 길을 줄였다 (design/data/decisions.csv).
    가운데 빈 둔덕 구간을 빼고 당산나무·엉킨 칡·내려가는 문을 HILL_SHIFT만큼 앞당긴다. 옛 구성(classic)은 그대로다. */
-const HILL_SHIFT=CLASSIC?0:700;
+// 결정 D-116: 칡까지 남은 빈 길(810~1255)을 300px 더 줄였다. 700 → 1000.
+const HILL_SHIFT=CLASSIC?0:1000;
 Rg.hillShift=HILL_SHIFT;   // story.js의 칡 앞 자리·물러나는 자리와 언덕 조사 자리도 같이 옮긴다
 const TREE_X=2214-HILL_SHIFT;
 const KUDZU_AT=1955-HILL_SHIFT;   // 이보다 오른쪽으로 가면 엉킨 칡과 전투
@@ -151,7 +152,9 @@ if(!CLASSIC){
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
   // 마을: 칡에 막힌 나무 입구(1710) 뒤 오른쪽 출구까지 890px → 300px (빈 발판 무리를 지운다).
   // 대장간: 모루 자국(1070)과 날쌘(1560) 사이 빈 둑길 490px → 160px.
-  Rg.trimCuts={village:[[1800,590]],forge:[[1110,330]]};
+  Rg.trimCutsV1={village:[[1800,590]],forge:[[1110,330]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-116: 마을 도토리(1260)와 칡 입구(1710) 사이 450 → 200, 대장간 장작(2050)과 오른쪽 출구 사이 550 → 200.
+  Rg.trimCuts={village:[[1310,250],[1800,590]],forge:[[1110,330],[2150,350]]};
   const A=Rg.expArt;
   const oldState=Rg.newState,oldStep=Rg.step,oldHit=Rg.onHit;
   const acorns=[['village',280,GROUND],['village',530,160],['village',1260,GROUND],
@@ -165,14 +168,17 @@ if(!CLASSIC){
     const s=oldState();
     s.pickups.forEach((a,i)=>Object.assign(a,{id:'gal_acorn_'+i,zone:acorns[i][0],x:acorns[i][1],y:acorns[i][2]}));
     s.digs.forEach((d,i)=>Object.assign(d,{id:'gal_dig_'+i,zone:digs[i][0],x:digs[i][1]}));
-    s.barrier.x=2420;s.mobs=[];s.boss.x=BOSS_X;s.f.galHillV2=true;return s;
+    s.barrier.x=2420;s.mobs=[];s.boss.x=BOSS_X;s.f.galHillV2=true;s.f.galHillV3=true;return s;
   };
-  // 결정 D-45: 줄이기 전 언덕 좌표 → 지금 좌표. 빈 둔덕 구간(900~1450)은 한 점으로 모인다.
-  const hillMoved=x=>x<400?x:x<900?x-150:x<1450?750:x-HILL_SHIFT;
+  // 결정 D-45·D-116: 줄이기 전 언덕 좌표 → 지금 좌표. 빈 둔덕 구간(900~1750)은 한 점(750)으로 모인다.
+  const hillMoved=x=>x<400?x:x<900?x-150:x<1750?750:x-HILL_SHIFT;
+  // 첫 줄이기(700) 좌표 → 지금 좌표. 810~1110의 빈 길은 810으로 모이고 그 뒤는 300 당긴다.
+  const hillV2Moved=x=>x<810?x:x<1110?810:x-300;
   const migrateHill=()=>{
-    if(G.f.galHillV2)return;G.f.galHillV2=true;
-    for(const a of floorDrops(G.region,'hill')){const p=dropSurfaceAt(hillMoved(a.x),Math.min(a.y,GROUND),undefined,'hill');if(p){a.x=p.x;a.y=p.y;}}
-    if(G.zone==='hill'){const p=dropSurfaceAt(hillMoved(G.px),Math.min(G.py,GROUND),undefined,'hill');if(p){G.px=p.x;G.py=p.y;G.vy=0;G.onGround=true;G.cam=clamp(G.px-W*.42,0,Math.max(0,Rg.zones.hill.w-W));}}
+    if(G.f.galHillV3)return;
+    const move=G.f.galHillV2?hillV2Moved:hillMoved;G.f.galHillV2=G.f.galHillV3=true;if(G.boss)G.boss.x=BOSS_X;   // 엉킨 칡도 새 자리로
+    for(const a of floorDrops(G.region,'hill')){const p=dropSurfaceAt(move(a.x),Math.min(a.y,GROUND),undefined,'hill');if(p){a.x=p.x;a.y=p.y;}}
+    if(G.zone==='hill'){const p=dropSurfaceAt(move(G.px),Math.min(G.py,GROUND),undefined,'hill');if(p){G.px=p.x;G.py=p.y;G.vy=0;G.onGround=true;G.cam=clamp(G.px-W*.42,0,Math.max(0,Rg.zones.hill.w-W));}}
   };
   const commonStep=()=>{
     Rg.expStep?.();

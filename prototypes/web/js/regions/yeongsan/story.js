@@ -391,13 +391,13 @@ function makeReturningMedicine(){
 
 /* ---------- 강철이 전투 ---------- */
 Rg.startGangcheol=()=>{
-  G.px=2000;
+  G.px=CLASSIC?2000:trimX(2000,Rg.trimCuts?.island);   // 줄인 섬 좌표 (D-116)
   inkTransition('강철이',(G.boss.x-G.cam)/W*100,()=>startBattle('gangcheol',res=>{
     if(res==='win'||res==='calm'){
       if(res==='calm')diary('y_calm','강철이를 부수지 않고 달랬다. 강철이는 서리 수염 하나를 남기고 따뜻한 남쪽 바다로 떠났다.');
       Rg.bringSpring();
     }else{
-      G.px=1960;G.f.faints+=res==='lose'?1:0;
+      G.px=CLASSIC?1960:trimX(1960,Rg.trimCuts?.island);G.f.faints+=res==='lose'?1:0;
       diary('y_hint','강철이는 입으로 서리를 뿜고, 몸통으로 조여 오고, 꼬리로 고드름을 뿌린다. 머리는 몸통을 풀어야 드러난다. 따뜻한 것을 그리워한다는 말이 있다.');
       talk([['너구리','(머리는 몸통을 풀어야 드러나.\n따뜻한 걸 그리워한다는 말이 있었지.)']],()=>toast('준비되면 다시 호수로'));
     }
@@ -509,9 +509,9 @@ if(!CLASSIC){
   Rg.clearRouteScenes=()=>{if(!open('dlg'))salgScene=null;};
   const location=()=>{
     if(salgScene?.owner===G&&open('dlg'))return salgScene.at;
-    if(G.f.spring&&G.zone==='island')return ['island',330];
+    if(G.f.spring&&G.zone==='island')return ['island',trimX(330,Rg.trimCuts?.island)];   // 줄인 섬 좌표 (D-116)
     if(G.f.dadDone||G.f.spring)return ['shore',arcs()&&!G.f.yArcsSalg3?1050:G.f.spring?2365:1050];
-    return ['slope',G.salg?.x??1480];
+    return ['slope',G.salg?.x??trimX(1480,Rg.trimCuts?.slope)];
   };
   Object.defineProperties(salg,{
     zone:{configurable:true,get:()=>location()[0]},x:{configurable:true,get:()=>location()[1]},
@@ -749,7 +749,8 @@ Rg.expContent={
       greeting:'아가, 고맙다.\n이 끈은 남쪽까지 안 풀리겠구나.'}]
   },
   examines,
-  stamps:{shelter:[stamp('hut_post',1040,108)],snow:[stamp('snow_sign',1780,108)],shore:[stamp('shore_rock',2130,192)]}
+  // D-116: 이정표 기둥과 호숫가 큰 바위에는 받침을 따로 그리지 않고 그 위에 찍는다
+  stamps:{shelter:[stamp('hut_post',1040,108)],snow:[{...stamp('snow_sign',1780,108),base:'none',face:10}],shore:[{...stamp('shore_rock',2130,192),base:'none',face:12}]}
 };
 
 })();

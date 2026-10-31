@@ -148,10 +148,17 @@ if(!CLASSIC){
   Rg.startZone='shelter';
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
   // 산막: 능선 문(1860) 뒤 빈 발판. 눈길: 들어선 자리와 까마귀 사이, 능선 문 뒤. 신목 섬: 얼음길 1760px → 560px.
-  Rg.trimCuts={shelter:[[1960,480]],snow:[[300,400],[2230,330]],island:[[300,1200]]};
+  Rg.trimCutsV1={shelter:[[1960,480]],snow:[[300,400],[2230,330]],island:[[300,1200]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-116: 비탈 앞 빈 눈밭(500~830)과 빈 능선 발판 무리(1720~2030), 섬 선착장과 신목 사이(1560~1820)를 지운다.
+  Rg.trimCuts={shelter:[[1960,480]],snow:[[300,400],[2230,330]],slope:[[500,330],[1720,310]],island:[[300,1200],[1560,260]]};
   const isl=x=>trimX(x,Rg.trimCuts.island);
-  Rg.trimStateHook=s=>{if(s.boss)s.boss.x=isl(s.boss.x);};   // 강철이는 섬에 있다
-  Rg.trimMigrateHook=g=>{if(g.boss)g.boss.x=isl(g.boss.x);};
+  const slp=x=>trimX(x,Rg.trimCuts.slope);
+  // 강철이는 섬에, 살금이(자리·돌아갈 자리)는 비탈에 있다 (D-116)
+  Rg.trimStateHook=s=>{if(s.boss)s.boss.x=isl(s.boss.x);if(s.salg){s.salg.x=slp(s.salg.x);s.salg.home=slp(s.salg.home);}};
+  Rg.trimMigrateHook=(g,_,conv)=>{
+    if(g.boss)g.boss.x=conv?conv('island',g.boss.x):isl(g.boss.x);
+    if(g.salg&&conv){g.salg.x=conv('slope',g.salg.x);g.salg.home=conv('slope',g.salg.home);}
+  };
   const a=()=>Rg.expArt;
   const snowGate=()=>!!G.f.seolpi;
   const ledgeGate=()=>!!G.f.shortcut;
