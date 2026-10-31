@@ -33,13 +33,16 @@ kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:sleep,졸 때 말을 걸었을 
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:awake,고개를 들 때 말을 걸어 깨웠을 때,꾸벅꾸벅 졸다가 고개를 드는 잠깐에만 말이 통한다.,제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:eoksae,억새를 건넸을 때,겨울잠 둥지에 쓸 마른 억새를 좋아한다.,제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,dolneomeo:arcs-kkubeogi,시험판에서 꾸벅이에게 맡은 말을 적었을 때,지난가을 아빠가 둥지 곁에서 “미안하다… 그 겨울에 내가 없어서…”라고 했단다. 꾸벅이가 잊기 전에 나한테 맡겼다.,제안,[시험판] arcs=1 선택 장면,관찰
+kkubeogi,dolneomeo,꾸벅이,동물,나,dolneomeo:kku-drawing,그림을 둥지 문턱에 달아 주었을 때,"글은 못 읽어도 그림은 알아본다. 봄에 깨면 제일 먼저 볼 자리에 꼬마 두더지와 내 얼굴을 그려 두었다.",제안,D-118,관찰
 dolsoe,dolneomeo,돌쇠 할배,동물,아빠,,처음부터,"돌너머 석수 두더지. ""돌이 마음을 알아야 돈다."" 할배한테 배운 말.",제안,,아빠 수첩
 dolsoe,dolneomeo,돌쇠 할배,동물,나,met:dolsoe,처음 말을 걸 때,눈이 침침해져서 이제 돌을 손끝으로만 읽는다.,제안,,관찰
 dolsoe,dolneomeo,돌쇠 할배,동물,나,dolsoe:tea,결명자 차를 드렸을 때,결명자 차를 드리면 눈이 밝아진다며 마음을 연다.,제안,,관찰
 dolsoe,dolneomeo,돌쇠 할배,동물,나,dolsoe:stack,돌 쌓기를 마쳤을 때,"돌탑은 돌 마음부터 읽고, 하나씩 천천히 얹는다.",제안,,관찰
+dolsoe,dolneomeo,돌쇠 할배,동물,나,dolneomeo:mole-reads,꼬마 두더지가 할머니 돌을 알아맞혔을 때,"할배 눈 대신 꼬마 손이 돌을 읽는다. 할배가 처음으로 소리 내어 웃었다.",제안,D-118,관찰
 ppuri,dolneomeo,뿔이,동물,아빠,,처음부터,돌산 장승지기 산양. 원칙대로다. 장승제를 안 올리면 누구도 못 지나간다.,제안,,아빠 수첩
 ppuri,dolneomeo,뿔이,동물,나,met:ppuri,처음 말을 걸 때,장승제에는 메밀전을 부친다. 메밀가루가 있어야 한다.,제안,,관찰
 ppuri,dolneomeo,뿔이,동물,나,ppuri:seogi,장승제를 올리고 길이 열릴 때,산이 노하면 석이를 올리는 법이라고 했다. 석이 붙은 바위를 알려 줬다.,제안,,관찰
+ppuri,dolneomeo,뿔이,동물,나,dolneomeo:ppuri-eyes,장승 눈을 칠했을 때,"아버지가 세운 장승에게 아침마다 길 소식을 고한다. 장승 뒤에 떨어진 짐꾼의 이름이 있다.",제안,D-118,관찰
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,아빠,,처음부터,돌산 어귀 성황당. 지날 때 돌 하나 얹고 소원을 빈다.,제안,,아빠 수첩
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,나,fight:golem,처음 맞설 때,돌무더기가 깨어나 일어섰다. 머리가 높아 처음엔 손이 닿지 않는다.,제안,,관찰
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,나,core:golem,핵심 부위가 드러날 때,다리나 팔을 하나 무너뜨리면 휘청이며 머리가 내려온다.,제안,,관찰
@@ -123,6 +126,11 @@ honey,jangteo,꿀,물건,나,got:honey,처음 얻을 때,(items.csv 의 설명),
 jujube,yeongsan,대추,물건,나,got:jujube,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 acorn_jelly,galchamgol,도토리묵,물건,나,got:acorn_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 memil_jelly,dolneomeo,메밀묵,물건,나,got:memil_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
+dol_badger,dolneomeo,메밀댁,동물,나,met:dol_badger,처음 말을 걸 때,"메밀밭 오소리 아주머니. 무릎이 아파 돌계단을 못 오른다. 짐을 맡기는 손이 크다.",제안,D-118,관찰
+dol_badger,dolneomeo,메밀댁,동물,나,dolneomeo:flower-bojagi,보자기를 받았을 때,"오래전 겨울에 값으로 받은 꽃수 보자기를 주인에게 돌려 달라고 했다. 귀퉁이 꽃이 엄마 수다.",제안,D-118,관찰
+dol_turtle,dolneomeo,남생이 할미,동물,아빠,,처음부터,"성황당 돌 그늘의 남생이. 백 년을 살았다고 한다. 묻는 말엔 다음에 답한다.",제안,D-118,아빠 수첩
+dol_turtle,dolneomeo,남생이 할미,동물,나,met:dol_turtle,처음 말을 걸 때,"소원 천은 높을수록 잘 들린다고 했다. 가장 높은 가지에 아빠가 맨 천이 있다.",제안,D-118,관찰
+dol_turtle,dolneomeo,남생이 할미,동물,나,dolneomeo:turtle-spring,떠나기 전 이야기를 들었을 때,"무언가 지나간 자리엔 샘이 먼저 언다. 물 마른 데를 만나면 샘부터 찾으라고 했다.",제안,D-118,관찰
 yakgwa,jangteo,약과,물건,나,got:yakgwa,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 magamok_tea,yeongsan,마가목차,물건,나,got:magamok_tea,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 dad_stamp_jangteo_flag,jangteo,젊은 아빠의 그날 · 장터 깃대,도장,아빠,stamp:jangteo:flag,장터 깃대 밑 도장을 찾았을 때,부를 준다는 열매를 찾으러 북쪽으로 간다. 장터 깃발에 길을 물으니 바람만 대답했다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩

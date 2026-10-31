@@ -983,6 +983,30 @@ const TABLES={
     "line": "꿀 바른 약과의 단내에 강철이가 언 숨을 길게 내쉰다.",
     "effect": "calm:40"
    }
+  },
+  "dol_badger": {
+   "memil_jelly": {
+    "kind": "아주 좋아함",
+    "line": "내 메밀로 쑨 거냐? 묵이 탱글하구나.",
+    "effect": "none"
+   },
+   "gyeolmyeongja": {
+    "kind": "그저 그럼",
+    "line": "눈보다 무릎이 문제다. 돌쇠 할배나 드려라.",
+    "effect": "none"
+   }
+  },
+  "dol_turtle": {
+   "memil": {
+    "kind": "좋아함",
+    "line": "메밀 알은 천천히 씹어도 달구나.",
+    "effect": "none"
+   },
+   "stonedust": {
+    "kind": "그저 그럼",
+    "line": "돌가루는… 내 등딱지에도 잔뜩 붙어 있다.",
+    "effect": "none"
+   }
   }
  },
  "NOTES": [
@@ -1247,6 +1271,12 @@ const TABLES={
      "text": "지난가을 아빠가 둥지 곁에서 “미안하다… 그 겨울에 내가 없어서…”라고 했단다. 꾸벅이가 잊기 전에 나한테 맡겼다.",
      "section": "관찰",
      "when": "dolneomeo:arcs-kkubeogi"
+    },
+    {
+     "who": "me",
+     "text": "글은 못 읽어도 그림은 알아본다. 봄에 깨면 제일 먼저 볼 자리에 꼬마 두더지와 내 얼굴을 그려 두었다.",
+     "section": "관찰",
+     "when": "dolneomeo:kku-drawing"
     }
    ]
   },
@@ -1277,6 +1307,12 @@ const TABLES={
      "text": "돌탑은 돌 마음부터 읽고, 하나씩 천천히 얹는다.",
      "section": "관찰",
      "when": "dolsoe:stack"
+    },
+    {
+     "who": "me",
+     "text": "할배 눈 대신 꼬마 손이 돌을 읽는다. 할배가 처음으로 소리 내어 웃었다.",
+     "section": "관찰",
+     "when": "dolneomeo:mole-reads"
     }
    ]
   },
@@ -1301,6 +1337,12 @@ const TABLES={
      "text": "산이 노하면 석이를 올리는 법이라고 했다. 석이 붙은 바위를 알려 줬다.",
      "section": "관찰",
      "when": "ppuri:seogi"
+    },
+    {
+     "who": "me",
+     "text": "아버지가 세운 장승에게 아침마다 길 소식을 고한다. 장승 뒤에 떨어진 짐꾼의 이름이 있다.",
+     "section": "관찰",
+     "when": "dolneomeo:ppuri-eyes"
     }
    ]
   },
@@ -1937,6 +1979,51 @@ const TABLES={
    "region": "dolneomeo",
    "kind": "item",
    "lines": []
+  },
+  {
+   "id": "dol_badger",
+   "region": "dolneomeo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "me",
+     "text": "메밀밭 오소리 아주머니. 무릎이 아파 돌계단을 못 오른다. 짐을 맡기는 손이 크다.",
+     "section": "관찰",
+     "when": "met:dol_badger"
+    },
+    {
+     "who": "me",
+     "text": "오래전 겨울에 값으로 받은 꽃수 보자기를 주인에게 돌려 달라고 했다. 귀퉁이 꽃이 엄마 수다.",
+     "section": "관찰",
+     "when": "dolneomeo:flower-bojagi"
+    }
+   ],
+   "name": "메밀댁"
+  },
+  {
+   "id": "dol_turtle",
+   "region": "dolneomeo",
+   "kind": "animal",
+   "lines": [
+    {
+     "who": "dad",
+     "text": "성황당 돌 그늘의 남생이. 백 년을 살았다고 한다. 묻는 말엔 다음에 답한다.",
+     "section": "아빠 수첩"
+    },
+    {
+     "who": "me",
+     "text": "소원 천은 높을수록 잘 들린다고 했다. 가장 높은 가지에 아빠가 맨 천이 있다.",
+     "section": "관찰",
+     "when": "met:dol_turtle"
+    },
+    {
+     "who": "me",
+     "text": "무언가 지나간 자리엔 샘이 먼저 언다. 물 마른 데를 만나면 샘부터 찾으라고 했다.",
+     "section": "관찰",
+     "when": "dolneomeo:turtle-spring"
+    }
+   ],
+   "name": "남생이 할미"
   },
   {
    "id": "yakgwa",
