@@ -154,9 +154,11 @@ Rg.bossDie=()=>{
 };
 Rg.onPickup=a=>{
   if(a.item==='seoridarae'&&!G.f.daraePicked){G.f.daraePicked=true;
-    clue('h2','아빠의 수첩',!CLASSIC||Rg.arcs()?'아빠의 젊은 시절 수첩에는 서리다래 그림이 없다. 지난가을 글자를 읽고 그날 밤 떠났다는 이야기는 돌쇠 할배에게 들었다.':'아빠의 수첩에는 서리다래가 없다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
-    diary('d_darae',!CLASSIC||Rg.arcs()?'서리다래를 수첩에 그렸다. 아빠가 젊을 때 적은 쪽에는 이 열매가 없다. 아빠는 여기서 열매를 찾지 않았다.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 없다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
-    setTimeout(()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'),1600);refreshGoal();}
+    // 결정 D-130: 젊은 아빠의 수첩(적혀 있지 않다)과 지난가을의 아빠(열매를 찾지 않고 떠났다)를 나눠 적는다.
+    clue('h2','아빠의 수첩',!CLASSIC||Rg.arcs()?'아빠가 젊을 때 적은 수첩의 돌너머 쪽에는 서리다래가 적혀 있지 않다. 지난가을의 아빠도 열매는 찾지 않고, 글자를 읽은 그날 밤 떠났다(돌쇠 할배).':'아빠의 수첩에는 서리다래가 적혀 있지 않다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
+    diary('d_darae',!CLASSIC||Rg.arcs()?'서리다래를 수첩에 그렸다. 아빠가 젊을 때 적은 쪽에는 이 열매가 적혀 있지 않다. 지난가을의 아빠도 열매는 찾지 않고 떠났다.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 적혀 있지 않다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
+    // 결정 D-130: 약을 직접 갈기로 아이가 정한다. 열매째로는 까치 발에 묶어 보낼 수 없다.
+    talk([['너구리','(열매째 까치 발에 묶으면\n가는 길에 다 짓무르겠다.)'],['너구리','(맷돌이 깨어났으니…\n이번엔 내가 갈아서 약즙으로 보내자.)']],()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'));refreshGoal();}
 };
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:1770,item:'seogi',done:false});};
 
@@ -453,7 +455,7 @@ if(!CLASSIC){
     ppuri.talk=()=>{
       ppuriScene={owner:G,zone:G.zone};
       if(G.zone==='village'&&G.f.ppuriMet&&!G.f.ppuriPassed)
-        talk([['뿔이','장승제 전에 성황당 길을 살펴 두는 중이다.\n메밀가루를 가져오면 여기서 바로 부치마.']],ppuriTalk);
+        talk([['뿔이','장승제 전에 성황당 길을 살펴 두는 중이다.\n메밀가루를 가져오면 여기서 바로 장승제를 올린다.']],ppuriTalk);
       else ppuriTalk();
     };
     const oldBossDie=Rg.bossDie;
@@ -473,7 +475,7 @@ if(!CLASSIC){
       if(regionCompleted(Rg.id))return;
       G.f.yakMade=true;
       diary('d_end','깨어난 맷돌로 서리다래를 갈았다. 마을 돌담의 늙은 까치에게 내가 만든 약즙을 맡겼다.');
-      talk([['너구리','(약즙 통을 까치 발에 단단히 묶었다.)'],['너구리','엄마한테… 제가 만들었다고 전해 주세요.'],['늙은 까치','오냐. 그 말까지 단단히 묶어 가마.']],()=>Rg.finishHomeDelivery());
+      talk([['너구리','(약즙 통을 까치 발에 단단히 묶었다.)'],['너구리','엄마한테… 제가 만들었다고 전해 주세요.'],['늙은 까치','오냐. 그 말까지 단단히 묶어 가마.'],...Rg.nextMedicineWord],()=>Rg.finishHomeDelivery());
     };
     const oldGoal=Rg.goal;
     Rg.goal=()=>{
@@ -481,9 +483,10 @@ if(!CLASSIC){
       // 결정 D-67: 앞선 진행부터 본다. 할 일 줄에서 낱말이 끊기지 않게 짧게 쓴다.
       if(has('darae_yak'))return '마을 돌담의 까치 할머니께 약즙을 맡기자';
       if(G.boss.dead&&!G.f.daraePicked)return '성황당 끝 샛길 · 절벽 위 서리다래를 따자';
-      if(G.f.ppuriPassed&&!G.boss.dead)return '성황당 끝의 돌 골렘을 만나자 · 장승 사이로';
-      if(!G.f.ppuriMet)return '장승 고갯길 · 뿔이에게 돌산 길을 묻자';
-      if(!G.f.kkuTalk)return '돌담 마을을 지나 오른쪽 메밀밭의 꾸벅이를 찾아가자';
+      // 결정 D-130: 아이가 아는 이름과 본 것으로만 부른다.
+      if(G.f.ppuriPassed&&!G.boss.dead)return '성황당 끝 움직이는 돌무더기에게 · 장승 사이로';
+      if(!G.f.ppuriMet)return '장승 고갯길 · 장승지기에게 서리다래를 물어보자';
+      if(!G.f.kkuTalk)return '돌담 마을 지나 메밀밭 끝 · 꾸벅이에게 서리다래를 묻자';
       if(!G.f.ppuriPassed&&has('memil_powder'))return '돌담 마을 돌계단 앞 · 뿔이에게 메밀가루를 건네자';
       return oldGoal();
     };
