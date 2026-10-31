@@ -441,7 +441,7 @@ const TABLES={
    "r": 3,
    "kind": "귀한 것",
    "region": "yeongsan",
-   "d": "봄에 풀린 옹달샘 첫물이 담긴 낡은 표주박. 끈 매듭 끝이 한 번 거꾸로 감겨 있다."
+   "d": "봄에 풀린 옹달샘 첫물이 담긴 낡은 표주박. 끈은 엄마가 가르쳐 준 보따리 매듭으로 묶여 있다."
   },
   "songi": {
    "n": "송이버섯",
@@ -1198,7 +1198,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "신표를 보더니 말없이 털토시를 얹어 줬다.",
+     "text": "신표를 보더니 털토시를 얹어 줬다. 덤이 아니라 신표 단 보부상끼리 주는 거란다.",
      "section": "관찰",
      "when": "nal:tosi"
     },
@@ -1886,7 +1886,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "봄이니까 제 발로 샘까지 가겠단다. 반 남긴 걸 갚으러.",
+     "text": "봄이니까 제 발로 샘까지 가겠단다. 그동안 가져간 물을 갚으러.",
      "section": "관찰",
      "when": "ongdal:salg_goes"
     }
@@ -1932,6 +1932,12 @@ const TABLES={
      "text": "수첩 맨 뒤에 아빠 손도장. 그 옆에 내 손도장. 다음 쪽은 집에서.",
      "section": "관찰",
      "when": "dad:palm"
+    },
+    {
+     "who": "me",
+     "text": "한참 들여다보더니 도로 쥐여 주고 내 가슴을 두 번 짚었다. 신표는 다시 내 보따리 끈에.",
+     "section": "관찰",
+     "when": "dad:sinpyo"
     },
     {
      "who": "me",
@@ -2023,8 +2029,7 @@ const TABLES={
      "text": "영산 비탈에 많다. 고라니가 좋아한다.",
      "section": "아빠 수첩"
     }
-   ],
-   "dadDrawing": true
+   ]
   },
   {
    "id": "broken_orb",
@@ -2044,12 +2049,11 @@ const TABLES={
     },
     {
      "who": "dad",
-     "text": "(그림 옆에 나중에 덧쓴 글씨) 여기다.",
+     "text": "(나중에 덧쓴 글씨) 여기다.",
      "section": "아빠 수첩",
      "when": "got:legend_fruit"
     }
-   ],
-   "dadDrawing": true
+   ]
   },
   {
    "id": "dad_stamps_galchamgol",
@@ -2429,7 +2433,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "할미 물은 반씩 호숫가로 갔다. 할미는 알면서 모른 척했다.",
+     "text": "할미 물은 반씩 호숫가로 갔다. 첫눈 뒤 솥이 비는 게 제 탓 같아 살금이는 발을 끊었다.",
      "section": "관찰",
      "when": "ongdal:half"
     },
