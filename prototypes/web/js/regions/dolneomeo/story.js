@@ -464,7 +464,7 @@ Rg.finishHomeDelivery=()=>{
 
 /* ---------- NPC (npcs.csv 의 id). x 는 필드 위치 ---------- */
 Rg.npcs=[
-  {id:'kkubeogi',name:'꾸벅이',x:320,talk:talkKkuArc,draw:Rg.art.hedgehog,props:Rg.props.nest},
+  {id:'kkubeogi',name:'꾸벅이',hint:'쿨… 쿨… 마른 풀 더미 속에서 누가 코를 곤다.',x:320,talk:talkKkuArc,draw:Rg.art.hedgehog,props:Rg.props.nest},
   {id:'nal',name:'날쌘',x:820,talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
   {id:'dolsoe',name:'돌쇠 할배',x:1150,talk:talkDolsoeArc,draw:Rg.art.mole,props:Rg.props.yard},
   {id:'ppuri',name:'뿔이',x:1560,talk:talkPpuriArc,draw:Rg.art.goat},
@@ -744,7 +744,7 @@ Rg.expansionContent=()=>({
       examine('gate_bell',1240,'장승 풍경 들어 보기','bell','바람이 불 때마다 얇은 쇳소리가 난다.\n산 안쪽에서도 이 소리가 들릴까?'),
       {...examine('broken_bridge',2170,'다리 받침 살펴보기','stone',''),get text(){return (G.f.dolBridgeStage||0)>=3?'돌이 다시 이어졌다. 아래로 물도 잘 흐른다.\n새 다리 가장자리는 흰 돌이라 잘 보이네.':'받침돌만 남고 다리판은 아래로 떨어졌다.\n왼쪽 소원 돌은 왜 여기 서 있을까?';}}
     ],
-    wanderers:[{id:'dol_hare',name:'산토끼 짐꾼',get x(){return G?.f.dolBridgeStage>=3?2280:940;},draw:drawGuest('hare'),talk:helpHare,greeting:'낮게 묶으니 발이 편하구나.\n고개 안쪽 길은 꼭 살피고 가라.'}],
+    wanderers:[{id:'dol_hare',name:'산토끼 짐꾼',hint:'길 저편에서 무거운 등짐에 끙끙대는 소리가 들린다.',get x(){return G?.f.dolBridgeStage>=3?2280:940;},draw:drawGuest('hare'),talk:helpHare,greeting:'낮게 묶으니 발이 편하구나.\n고개 안쪽 길은 꼭 살피고 가라.'}],
     stamps:[stamp('jangseung',1710,156)]
   },
   village:{
@@ -756,7 +756,7 @@ Rg.expansionContent=()=>({
       examine('warm_hearth',2290,'공동 화로 살펴보기','bowl','석수들이 일을 마치고 손을 녹이는 화로다.\n재 속 돌은 불이 꺼진 뒤에도 미지근하다.')
     ],
     wanderers:[
-      {id:'dol_mole',name:'꼬마 두더지',x:740,draw:drawGuest('mole'),talk:meetMole,greeting:'우리 돌집에 문이 생겼어!\n반짝돌도 이제 안 굴러가.'},
+      {id:'dol_mole',name:'꼬마 두더지',hint:'달그락, 달그락. 누가 돌멩이를 굴리며 노는 소리가 난다.',x:740,draw:drawGuest('mole'),talk:meetMole,greeting:'우리 돌집에 문이 생겼어!\n반짝돌도 이제 안 굴러가.'},
       {id:'dol_magpie',name:'늙은 까치',x:2080,draw:drawGuest('magpie'),talk:restMagpie,greeting:'돌손, 좀 쉬어 가거라.\n담 뒤는 바람이 덜하단다.'}
     ],
     stamps:[stamp('mill_base',1160,156)]
@@ -774,7 +774,7 @@ Rg.expansionContent=()=>({
       examine('frozen_trickle',1850,'얼어붙은 물줄기 살펴보기','water','물이 흐르던 홈에 가느다란 얼음이 매달렸다.\n한 방울씩 녹으면 아래 바위 틈이 젖겠다.'),
       {...examine('dry_crack',2540,'갈라진 바위 들여다보기','stone','',138),get text(){return G.f.dolneomeo_frog_warm?'개구리가 말한 마른 바위 틈이다.\n붉은 발자국이 구름바다 쪽을 향한다.':'깊은 틈 안쪽은 서리가 하나도 없다.\n누가 비를 피해 쪼그려 앉았던 걸까?';}}
     ],
-    wanderers:[{id:'dol_frog',name:'움츠린 개구리',x:1440,draw:drawGuest('frog'),talk:warmFrog,greeting:'배가 따뜻해졌어… 고마워.\n이번엔 마른 틈에서 잘게.'}],
+    wanderers:[{id:'dol_frog',name:'움츠린 개구리',hint:'돌 틈 어딘가에서 가늘게 떠는 개구리 울음이 들린다.',x:1440,draw:drawGuest('frog'),talk:warmFrog,greeting:'배가 따뜻해졌어… 고마워.\n이번엔 마른 틈에서 잘게.'}],
     stamps:[stamp('cliff_crack',2390,112)]
   },
   shrine:{

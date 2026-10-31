@@ -368,9 +368,11 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .goal-m b{display:block;font-family:var(--ui);font-weight:normal;font-size:11px;color:var(--gold);letter-spacing:.06em}
 .pad-top .chipbtn{display:flex;align-items:center;font-size:14px;padding:0 12px;min-height:44px}
 .pad-main{flex:1;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:150px}
-.dpad{display:grid;grid-template-columns:auto auto;grid-template-areas:"left right" "down down";gap:12px}
+/* 결정 D-52: 필드에서도 ▲(오르기·들어가기·점프)를 보인다. 전투와 같은 십자 배치 */
+.dpad{display:grid;grid-template-columns:repeat(3,auto);grid-template-areas:". up ." "left down right";gap:6px}
+.dpad .pbtn{width:54px;height:54px}
 .dpad [data-k="left"]{grid-area:left}.dpad [data-k="right"]{grid-area:right}.dpad [data-k="up"]{grid-area:up}.dpad [data-k="down"]{grid-area:down}
-.pbtn.v{display:none}
+.pbtn.v{display:grid}
 .dpad .pbtn[data-k="down"]{display:grid;justify-self:center}
 body.in-battle .dpad{grid-template-columns:repeat(3,auto);grid-template-areas:". up ." "left down right";gap:6px}
 body.in-battle .dpad .pbtn{width:54px;height:54px}
@@ -589,10 +591,15 @@ body.in-battle .b-top{top:calc(2.5% + 40px)}
 @keyframes bagWarn{0%,100%{transform:none;background:var(--hanji)}15%,45%{transform:translateX(-2px);background:#f3c9b8}30%,60%{transform:translateX(2px);background:#f3c9b8}}
 @media (prefers-reduced-motion:reduce){.chipbtn.warn{animation:none;background:#f3c9b8}}
 /* 살펴보기 작은 그림 (PA-45): 무대 정중앙에 한지 액자로 잠깐. 대화창이 무대를 덮으면 덮이지 않은 위쪽의 가운데 (field.js placePeek) */
-.stage .peek{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:28%;max-width:240px;padding:4px;background:var(--hanji);border:3px solid var(--meok);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.35);pointer-events:none;z-index:6}
+.stage .peek{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18%;min-width:92px;max-width:170px;padding:4px;background:var(--hanji);border:3px solid var(--meok);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.35);pointer-events:none;z-index:6}
 .stage .peek canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
 .stage .peek.show{animation:peekIn .18s ease-out}
 @keyframes peekIn{from{opacity:0;transform:translate(-50%,-50%) scale(.85)}to{opacity:1;transform:translate(-50%,-50%)}}
+.stage .peek.out{opacity:0;transition:opacity .18s ease-in}
+/* 결정 D-53: 인물 이름표 */
+.npc-tags{position:absolute;inset:0;pointer-events:none;z-index:3}
+.npc-tag{position:absolute;transform:translate(-50%,-100%);font-family:var(--display);font-size:clamp(9px,1.15vw,12px);line-height:1.2;color:#fff6e0;white-space:nowrap;padding:0 4px;border-radius:3px;background:rgba(30,21,15,.55);text-shadow:0 1px 0 #1e150f,1px 0 0 #1e150f,-1px 0 0 #1e150f,0 -1px 0 #1e150f}
+.npc-tag.unknown{color:#e8d6b0;background:rgba(30,21,15,.35)}
 @media (prefers-reduced-motion:reduce){.stage .peek.show{animation:none}}
 /* 잎사귀 변신 (forms.js): HUD 의 지금 모습, 휴대폰 잎사귀 버튼과 변신 고리 */
 .form-now{display:flex;align-items:center;gap:4px;color:var(--hanji);border-left:1px solid #4b3a2e;padding-left:8px;white-space:nowrap}

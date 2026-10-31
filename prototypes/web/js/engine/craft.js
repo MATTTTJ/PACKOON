@@ -21,7 +21,7 @@ function startCraftHands(tool,recipe,discovered){
 }
 function finishCraftHands(redraw=true){
   const h=craftHands;if(!h)return;
-  cancelAnimationFrame(craftFrame);craftHands=null;brewing=false;
+  cancelAnimationFrame(craftFrame);clearTimeout(h.timer);craftHands=null;brewing=false;
   if(G!==h.owner||G.region!==h.region)return;
   Sound.craft();lastOut=h.recipe.out;
   const voices={
@@ -36,12 +36,28 @@ function finishCraftHands(redraw=true){
     (h.discovered?' 찾은 가공법을 수첩에 이어 적었다.':'');
   if(redraw&&open('bag'))renderBag();
 }
+/* 결정 D-54: 손놀림은 한 번만 한다(재료 수와 상관없이). 첫 손놀림 뒤 남은 박자는 집안 손버릇대로 저절로 이어진다.
+   절구는 세 번 찧고 한 번 쉬기, 맷돌은 왼쪽으로, 약연은 끝에 한 번 거꾸로. 첫 손놀림이 버릇과 맞으면 '엄마처럼' 말이 나온다. */
 function craftHandInput(direction){
-  const h=craftHands;if(!h||h.owner!==G||h.region!==G.region||h.paused)return;
-  if(h.restAt!==null){h.good=false;finishCraftHands();return;}
+  const h=craftHands;if(!h||h.owner!==G||h.region!==G.region||h.paused||h.auto)return;
+  if(h.restAt!==null)return;
+  if(craftStep(h,direction,false))return;
+  h.auto=true;
+  const gap=h.tool==='jeolgu'?h.cfg.intervalMs:TABLES.TUNING.craft_auto_step_ms;
+  const next=()=>{
+    if(craftHands!==h||h.count>=h.cfg.steps)return;
+    if(h.paused){h.timer=setTimeout(next,gap);return;}
+    const dir=h.tool==='maetdol'?'left':h.tool==='yakyeon'?(h.count===h.cfg.steps-1?'left':'right'):'tap';
+    if(!craftStep(h,dir,true)&&h.count<h.cfg.steps)h.timer=setTimeout(next,gap);
+  };
+  if(h.count<h.cfg.steps)h.timer=setTimeout(next,gap);
+  updateCraftHands();
+}
+// 한 박자. 저절로 이어지는 박자(auto)는 버릇대로라 맞음·틀림을 다시 보지 않는다. 끝났으면 true.
+function craftStep(h,direction,auto){
   const {tool,cfg}=h;
   if(tool==='jeolgu'){
-    if(h.lastHit!==null&&Math.abs(h.time-h.lastHit-cfg.intervalMs)>cfg.windowMs)h.good=false;
+    if(!auto&&h.lastHit!==null&&Math.abs(h.time-h.lastHit-cfg.intervalMs)>cfg.windowMs)h.good=false;
     h.lastHit=h.time;Sound.forge('hit');
   }else if(tool==='maetdol'){
     if(direction!=='left')h.good=false;h.turn+=direction==='left'?-cfg.turnDegrees:cfg.turnDegrees;Sound.stone('place');
@@ -53,9 +69,9 @@ function craftHandInput(direction){
   h.lastDir=direction;h.count++;
   const figure=$('craftFigure');if(figure&&tool==='jeolgu'){figure.classList.remove('pound');void figure.offsetWidth;figure.classList.add('pound');}
   if(h.count>=cfg.steps){
-    if(tool==='jeolgu')h.restAt=h.time;else{finishCraftHands();return;}
+    if(tool==='jeolgu')h.restAt=h.time;else{finishCraftHands();return true;}
   }
-  updateCraftHands();
+  updateCraftHands();return false;
 }
 function stepCraftHands(now){
   const h=craftHands;if(!h)return;
@@ -72,14 +88,14 @@ function updateCraftHands(){
   if(h.paused)cue='잠깐 손을 쉬는 중. 돌아오면 이어 한다.';
   else if(h.tool==='jeolgu'){
     if(h.restAt!==null){cue='한 번 쉬기. 손잡이를 놓고 기다린다.';ratio=(h.time-h.restAt)/cfg.restMs;}
-    else{cue='세 번 찧기 · '+h.count+'/'+cfg.steps+' · J / X / Space';ratio=h.lastHit===null?1:Math.min(1,(h.time-h.lastHit)/cfg.intervalMs);}
+    else{cue=h.auto?'쿵, 쿵, 쿵… 엄마처럼 세 번 찧는다 · '+h.count+'/'+cfg.steps:'한 번 누르면 세 번 찧고 한 번 쉰다 · J / X / Space';ratio=h.lastHit===null?1:Math.min(1,(h.time-h.lastHit)/cfg.intervalMs);}
   }else if(h.tool==='maetdol'){
-    cue='왼쪽으로 돌리기 · '+h.count+'/'+cfg.steps+' · ← → / A D';ratio=h.count/cfg.steps;
+    cue=h.auto?'드르륵… 맷돌이 돈다 · '+h.count+'/'+cfg.steps:'한 번 돌리면 끝까지 돈다 · ← → / A D';ratio=h.count/cfg.steps;
   }else if(h.tool==='siru'){
     cue=h.time<cfg.steamMs-cfg.windowMs?'김이 오르는 중… 뚜껑을 보고 기다려 보자.':
       h.time<=cfg.steamMs+cfg.windowMs?'김이 올랐다. 지금 뚜껑을 톡!':'김은 충분하다. 언제 눌러도 잘 익는다.';
     ratio=Math.min(1,h.time/cfg.steamMs);
-  }else{cue=(h.count===cfg.steps-1?'마지막에는 거꾸로 ← / A':'앞으로 굴리기 → / D')+' · '+h.count+'/'+cfg.steps;ratio=h.count/cfg.steps;}
+  }else{cue=h.auto?'데굴데굴… 마지막엔 한 번 거꾸로 · '+h.count+'/'+cfg.steps:'한 번 굴리면 끝까지 굴린다 · → / D (거꾸로 ← / A)';ratio=h.count/cfg.steps;}
   const caption=$('craftCue');if(caption&&caption.textContent!==cue)caption.textContent=cue;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const shown=reduced?(h.tool==='siru'?(h.time>=cfg.steamMs?1:0):h.count/cfg.steps):ratio;

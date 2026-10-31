@@ -142,19 +142,20 @@ async function runMap({browser:b,outDir}){
       Object.assign(G.f,{mapUnlocked:true,momNoteSeen:true,momNoteRestored:true,momNoteFade:0,dodamDone:true,musoeDone:true,nalDone:true,toadMet:true,kkuDone:true,ppuriPassed:true,stackDone:true,yakMade:true,bueongDone:true,steamDone:true,yeotDone:true,hongsiMade:true,fruitGot:true,nameGiven:true,yakDone:true,spring:true,yStampPrompted:{}});
       G.forms=['squirrel','goat','owl','deer'];G.f.leafGiven=true; // 진행값과 맞는 변신 (PA-47). 없으면 도착 때 변신이 열리는 장면이 뜬다.
       G.started=true;resetScreens();G.ended=true;showEnd();rememberRegion(G);
-      const stable={inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:structuredClone(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)};
+      // 결정 D-55: 가까이 가면 뜨는 기척(hintsSeen)은 도착 자리에 따라 생기는 연출 기록이라 공유 진행 비교에서 뺀다.
+      const stable={inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:(({hintsSeen,...f})=>structuredClone(f))(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)};
       return {zones,stable,floor:structuredClone(G.floorItems),local:Object.fromEntries(Object.entries(G.regionStates).map(([id,s])=>[id,structuredClone(s)]))};
     })()`);
     // 엔딩 이름 입력은 실제 입력으로 끝낸다. 이름을 정하기 전에 지도로 장면을 건너뛰면 안 된다.
     await b.click('#btnMapEnd');
     check(await b.eval("$('map').hidden&&document.activeElement===$('newName')"),'map-ending-name-gate','엔딩 이름을 정하기 전에 지도 이동이 열렸다.');
     await b.send('Input.insertText',{text:'봄이'});await b.key('Enter');await until(b,"G.f.newName==='봄이'");await b.wait(1100);
-    seeded.stable=await b.eval('({inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:structuredClone(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)})');
+    seeded.stable=await b.eval('({inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:(({hintsSeen,...f})=>structuredClone(f))(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)})');
     await b.click('#btnMapEnd');await until(b,"!$('map').hidden");await picture('map-four-regions');
     const comparisons=[];
     for(const region of [...regions,regions[0]]){
       await travel(region,seeded.zones[region]);
-      const got=await b.eval(`({region:G.region,zone:G.zone,boss:G.boss,barrier:G.barrier,dig:G.digs[0],pickup:G.pickups[0],zoneState:G.zoneStates[G.zone],completed:regionCompleted(G.region),ended:G.ended,endVisible:!$('endScreen').hidden,floor:structuredClone(G.floorItems),stable:{inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:structuredClone(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)}})`);
+      const got=await b.eval(`({region:G.region,zone:G.zone,boss:G.boss,barrier:G.barrier,dig:G.digs[0],pickup:G.pickups[0],zoneState:G.zoneStates[G.zone],completed:regionCompleted(G.region),ended:G.ended,endVisible:!$('endScreen').hidden,floor:structuredClone(G.floorItems),stable:{inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:(({hintsSeen,...f})=>structuredClone(f))(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)}})`);
       check(got.boss.dead&&got.completed&&!got.ended&&!got.endVisible&&got.zoneState.qaMapMarker===region,'map-region-restore',region+': 보스·지역 완료·구역 상태가 복원되지 않거나 종료 장면이 다시 열렸다.',got);
       check(!got.dig||got.dig.done,'map-dig-restore',region+': 끝낸 채집이 다시 열렸다.',got.dig);
       check(!got.pickup||got.pickup.got,'map-pickup-restore',region+': 주운 물건이 되살아났다.',got.pickup);

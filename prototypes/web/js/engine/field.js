@@ -352,6 +352,49 @@ function drawFieldScene(showPlayer=true){
   if(showPlayer)drawListenMarks();
 }
 let lastNear=null;
+/* 결정 D-53: 필드 인물 머리 위에 이름. 아이가 아는 이름만 쓴다: 처음 말을 걸기 전에는 '?', 만난 뒤(met:<id>)에는 이름.
+   집안 어른처럼 처음부터 아는 인물은 known:true, 다른 부름(무쇠 삼촌)은 tag:'…'. 물건·자리(prompt가 있는 것, tag:false)는 쓰지 않는다.
+   말 걸기 안내가 그 인물 위에 떠 있으면 이름은 안내에 맡기고 숨긴다. 대화·경치·전투·패널 중에는 모두 숨긴다. 높이는 tagY(발에서 위로 px). */
+const npcTagLayer=el('div','npc-tags');npcTagLayer.setAttribute('aria-hidden','true');$('stage').appendChild(npcTagLayer);
+const npcTagEls=new Map();
+// 이름표 높이: 그림을 한 번 그려 보아 가장 높은 칠한 점 위에 둔다(인물마다 키가 다르다). tagY가 있으면 그 값.
+const npcTagHeights=new WeakMap();
+function npcTagHeight(n){
+  if(n.tagY)return n.tagY;if(npcTagHeights.has(n))return npcTagHeights.get(n);
+  let h=30;try{const c=document.createElement('canvas');c.width=96;c.height=96;const save=ctx;ctx=c.getContext('2d');try{n.draw(48,90,1);}finally{ctx=save;}
+    const d=c.getContext('2d').getImageData(0,0,96,96).data;for(let y=0;y<96;y++){let hit=false;for(let x=0;x<96;x++)if(d[(y*96+x)*4+3]>40){hit=true;break;}if(hit){h=90-y+4;break;}}}catch(_){}
+  h=clamp(h,14,80);npcTagHeights.set(n,h);return h;
+}
+function npcTagText(n){return n.known||knows('met:'+n.id)?(n.tag||n.name):'?';}
+function updateNpcTags(near){
+  const shown=new Set();
+  if(G&&G.started&&!G.ended&&!paused()&&!B){
+    for(const n of [...fieldNpcs(),...zoneObjects('wanderers')]){
+      if(n.tag===false||n.prompt||!n.name||!n.draw||n===near)continue;
+      const x=n.x-cam;if(x<-20||x>W+20)continue;
+      if(typeof formVisible==='function'&&!formVisible(n))continue;
+      const key=n.id+'@'+n.x;let e=npcTagEls.get(key);
+      if(!e){e=el('span','npc-tag');npcTagEls.set(key,e);npcTagLayer.appendChild(e);}
+      const text=npcTagText(n);if(e.textContent!==text)e.textContent=text;
+      e.classList.toggle('unknown',text==='?');
+      e.style.left=(x/W*100)+'%';e.style.top=(((n.y??fieldGround())-npcTagHeight(n))/H*100)+'%';e.hidden=false;shown.add(key);
+    }
+  }
+  for(const [key,e] of npcTagEls)if(!shown.has(key))e.hidden=true;
+}
+/* 결정 D-55: 가까이 가면 들리는·보이는 기척. 인물·떠돌이에 hint:'…'(아이가 아는 말로)와 hintRange?(px), hintWhen?()을 두면
+   처음 그 거리 안에 들어올 때 한 번 알림으로 띄운다. 이미 만났거나(met), 떠돌이 일을 마쳤거나, 한 번 띄운 뒤에는 나오지 않는다. */
+function updateHints(){
+  if(!G||!G.started||G.ended||paused())return;
+  for(const p of [...fieldNpcs(),...zoneObjects('wanderers')]){
+    if(!p.hint)continue;
+    const key=G.region+':'+p.id,seen=G.f.hintsSeen||(G.f.hintsSeen={});
+    if(seen[key]||knows('met:'+p.id)||G.f.wanderersDone?.[expansionKey(p.id)])continue;
+    if(p.hintWhen&&!p.hintWhen())continue;
+    if(Math.abs(p.x-G.px)>(p.hintRange||TABLES.TUNING.hint_range))continue;
+    seen[key]=true;toast(typeof p.hint==='function'?p.hint():p.hint);return;
+  }
+}
 function nearDig(){if(paused())return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
 function updateOverlay(){
   const pr=$('prompt');
@@ -364,6 +407,7 @@ function updateOverlay(){
   else{pr.hidden=true;lastNear=null;}
   if(!formRing.hidden&&!formChangeAllowed())formRing.hidden=true;
   $('padTalk').classList.toggle('ready',!!n);
+  updateNpcTags(n);updateHints();
   /* 필드 보스 체력 막대: REG.fieldBoss() 가 {name, hp, max} 를 주면 보인다 */
   const fb=fieldCall('fieldBoss');$('bossbar').hidden=!fb;
   if(fb){$('bossName').textContent=fb.name;$('bossfill').style.width=(fb.hp/fb.max*100)+'%';}
@@ -627,6 +671,7 @@ function tryInteract(){
     if(p.peek!==false)peekAt(p.x,p.y??fieldGround());
     talk([[p.who||'너구리',texts[i]]]);
   }else if(kind==='wanderers'){
+    learn('met:'+p.id,true);
     if(G.f.wanderersDone?.[expansionKey(p.id)])talk(Array.isArray(p.greeting)?p.greeting:[[p.name||'길손',p.greeting||'길에서 또 만나자.']]);
     else p.talk();
   }
@@ -689,7 +734,10 @@ function peekAt(x,y=fieldGround(),opts={}){
   const pc=peekCv.getContext('2d');pc.imageSmoothingEnabled=false;pc.clearRect(0,0,peekCv.width,peekCv.height);
   pc.drawImage(full,sx,sy,cw,ch,0,0,peekCv.width,peekCv.height);
   peekBox.hidden=false;placePeek();requestAnimationFrame(placePeek);peekBox.classList.remove('show');void peekBox.offsetWidth;peekBox.classList.add('show');
-  clearTimeout(peekTimer);peekTimer=setTimeout(hidePeek,opts.ms||TABLES.TUNING.peek_ms);
+  // 결정 D-56: 화면 가운데에 작게, 짧게. 끝에서 흐려지며 사라진다.
+  peekBox.classList.remove('out');clearTimeout(peekTimer);
+  const ms=opts.ms||TABLES.TUNING.peek_ms,fade=TABLES.TUNING.peek_fade_ms;
+  peekTimer=setTimeout(()=>{peekBox.classList.add('out');peekTimer=setTimeout(hidePeek,fade);},Math.max(0,ms-fade));
 }
 /* 무대 가운데. 대화창이 무대 아래를 덮고 있으면 덮이지 않은 위쪽 영역의 가운데로 올린다 */
 function placePeek(){
@@ -698,7 +746,7 @@ function placePeek(){
   const bottom=dr&&dr.top<sr.bottom&&dr.bottom>sr.top?Math.max(sr.top,dr.top):sr.bottom;
   peekBox.style.top=Math.round((bottom-sr.top)/2)+'px';
 }
-function hidePeek(){clearTimeout(peekTimer);peekBox.hidden=true;peekBox.classList.remove('show');}
+function hidePeek(){clearTimeout(peekTimer);peekBox.hidden=true;peekBox.classList.remove('show','out');}
 const vistaCaption=el('div',null);
 vistaCaption.setAttribute('role','status');vistaCaption.hidden=true;
 vistaCaption.className='vista-caption';
