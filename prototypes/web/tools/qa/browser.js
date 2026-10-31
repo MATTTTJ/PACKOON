@@ -173,6 +173,9 @@ async function launchBrowser({outDir,url}) {
     const {sessionId}=await browser.send('Target.attachToTarget',{targetId,flatten:true},true);browser.session=sessionId;
     await browser.send('Page.enable');await browser.send('Runtime.enable');await browser.send('Network.enable');
     await browser.send('Emulation.setDeviceMetricsOverride',{width:1280,height:720,deviceScaleFactor:1,mobile:false});
+    // CI처럼 느린 환경을 흉내 낸다: QA_CPU_THROTTLE=4 면 CPU를 4배 느리게 (가끔 실패하는 검사 재현용)
+    const throttle=Number(process.env.QA_CPU_THROTTLE||0);
+    if(throttle>1)await browser.send('Emulation.setCPUThrottlingRate',{rate:throttle});
     browser.version=await browser.send('Browser.getVersion',{},true);
     await browser.navigate(url);return browser;
   }catch(e){await browser.close();throw e;}
