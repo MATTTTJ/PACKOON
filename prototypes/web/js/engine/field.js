@@ -267,6 +267,7 @@ function drawNpcs(){for(const n of fieldNpcs()){const x=n.x-cam;if(x<-60||x>W+60
   n.draw(x,n.y??fieldGround(),f);}}
 
 /* 새 표시가 없는 옛 저장도 도착 지역과 기존 진행을 읽어 겉모습만 복원한다. */
+// 결정 D-12: 보따리 겉모습은 지역 진행에 따라 보따리 → 멜빵 봇짐 → 작은 지게 → 아빠의 지게로 바뀐다. 칸은 무제한 (design/data/decisions.csv)
 function backpackStage(){
   const f=G.f;
   if((REGIONS[G.region]?.order||1)>=2)f.bagReachedDolneomeo=true;

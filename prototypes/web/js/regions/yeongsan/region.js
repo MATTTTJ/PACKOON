@@ -84,156 +84,16 @@ defineGather({
 /* 아빠의 약연: 산군과의 셈이 맞은 뒤 아빠와 손을 포개면 깨어난다. 가공법은 heirlooms.csv */
 })();
 
-/* PA-43 3단계: 채집의 왕복 바늘 판정을 짧은 공동 작업에 쓴다.
-   판정은 소리·손동작만 바꾼다. 매 입력이 진행하며 물건·호감·체력을 걸지 않는다. */
+/* 영산의 함께 하는 일(곰 잠자리, 얼음 표시, 배 띄우기 등) */
 (()=>{
-const Rg=REGIONS.yeongsan, MG=TABLES.MINIGAMES;
-const panel=el('div','forge');panel.id='yActivity';panel.hidden=true;
-panel.innerHTML='<h2 id="yActTitle"></h2><canvas id="yActCv" width="320" height="110" style="display:block;width:100%;image-rendering:pixelated"></canvas><p id="yActLine" class="fhint" aria-live="polite"></p><div id="yActBar" style="position:relative;height:22px;background:#52667a;margin:16px"><span id="yActBand" style="position:absolute;top:0;bottom:0;background:#c3d8ab"></span><span id="yActMark" style="position:absolute;top:-4px;width:3px;height:30px;background:#ffe4aa"></span></div><p id="yActCount" class="fhint"></p><button id="yActHit" class="btn primary strike" type="button"></button><button id="yActSlow" class="btn" type="button">천천히 해 보기</button><button id="yActLeave" class="btn" type="button">잠깐 쉬기</button>';
-$('shell').appendChild(panel);
-Object.assign(panel.style,{top:'8%',bottom:'auto',gap:'8px',maxHeight:'calc(100dvh - 150px)',overflowY:'auto'});
-Object.assign($('yActCv').style,{maxWidth:'320px',margin:'0 auto'});
-// 작은 화면의 공통 소리 버튼 아래에서 제목을 시작한다.
-$('yActTitle').style.paddingTop='28px';
-const ac=$('yActCv').getContext('2d');
-const descriptions={
-  bear:{title:'보따리 자장가',verb:'보따리 톡톡',steps:[
-    '곰 귀가 쫑긋하네. 보따리 위를 가볍게 두드리자.',
-    '굴 밖 바람이 잦아든다. 이번엔 소리를 조금 낮추자.',
-    '눈꺼풀이 내려온다. 마지막 박자는 손끝으로만.']},
-  bearSpring:{title:'곰 굴에 돌아온 물소리',verb:'물소리 따라 톡톡',steps:[
-    '굴 밖에서 물방울이 떨어진다. 곰과 함께 귀를 기울이자.',
-    '돌 틈 물소리는 조금 빠르네. 보따리에 손끝으로 옮겨 보자.',
-    '곰이 웃으며 박자를 받는다. 이번엔 잠들지 않고 같이 듣는다.']},
-  crow:{title:'눈 위에 집으로 가는 길',verb:'능선 짚기',steps:[
-    '눈앞의 낮은 봉우리부터 눈 위에 그어 보자.',
-    '뾰족한 봉우리는 왼쪽. 그 아래 골짜기를 잇자.',
-    '별보다 낮은 점이 집 불빛이야. 거기에 점을 찍자.']},
-  otter:{title:'얼음 아래 작은 꼬리',verb:'낚싯줄 살짝 풀기',steps:[
-    '수달이 줄을 잡고 있다. 손을 눈 위에 내려놓자.',
-    '작은 물결이 구멍으로 온다. 먹이만 조금 낮추자.',
-    '은빛 꼬리가 돌아선다. 줄을 풀어 보내 주자.']},
-  knot:{title:'함께 묶는 짐끈',verb:'끈 당기기',steps:[
-    '까치가 날개로 보자기를 누른다. 긴 끝을 잡자.',
-    '짧은 끝은 안으로. 긴 끝엔 고리를 남기자.',
-    '부리가 들어갈 틈은 남기고, 양쪽을 살짝 당기자.']},
-  hutPrint:{title:'문설주에 남은 손길',verb:'홈 따라 짚기',steps:[
-    '손바닥을 문설주에 대 보자. 기둥 바깥쪽은 바람에 매끈해졌네.',
-    '발가락 홈에는 눈이 남았다. 손끝으로 눈을 밀고 홈이 꺾이는 데를 따라가자.',
-    '맨 아래 발바닥까지 이어졌다. 내 손보다 큰 무늬를 수첩 그림과 맞춰 보자.']},
-  snowPrint:{title:'이정표 위의 발바닥',verb:'눈 털고 짚기',steps:[
-    '이정표 뒤에 쌓인 눈을 옆으로 밀자. 아래쪽 무늬부터 드러난다.',
-    '위쪽 작은 홈은 발가락이네. 눈을 털 때마다 산 아래 불빛이 그 사이로 보인다.',
-    '아빠가 내려다봤을 쪽으로 서 보자. 올라온 길과 내려갈 길이 같은 곳에서 갈라진다.']},
-  shorePrint:{title:'바위의 무늬와 오늘의 발',verb:'발자국 맞춰 보기',steps:[
-    '바위에 손을 대자. 오래된 무늬는 얕고, 옆 눈에 찍힌 발자국은 깊다.',
-    '얕은 홈을 따라 발가락부터 짚어 보자. 새 발자국과 벌어진 모양이 꼭 같네.',
-    '그 옆에 내 발도 나란히 놓자. 같은 무늬 사이에 작은 발 하나가 들어간다.']},
-  ice1:{title:'얼음길 ① 바위 곁',verb:'막대로 두드리기',steps:[
-    '눈을 쓸어 내니 속이 하얗다. 발은 돌 위에 두고 두드리자.',
-    '갈대 곁에서는 물소리가 난다. 그쪽에 체중을 싣지 말자.',
-    '바위에 붙은 쪽은 둔탁한 소리. 여기에 나뭇가지를 세우자.']},
-  ice2:{title:'얼음길 ② 물이 흐르는 금',verb:'막대로 두드리기',steps:[
-    '검은 금 밑에서 물이 움직인다. 눈만 덮인 다리구나.',
-    '금의 끝을 따라가니 둑과 만난다. 둑 쪽부터 두드리자.',
-    '돌아갈 둑이 바로 옆에 있다. 마른 돌을 따라 표시하자.']},
-  ice3:{title:'얼음길 ③ 섬으로 난 길',verb:'막대로 두드리기',steps:[
-    '섬 뿌리와 호숫가 돌이 한 줄이다. 발밑부터 살피자.',
-    '멀리 반짝이는 곳은 얇다. 앞서 세운 가지를 따라가자.',
-    '다음 가지까지 보인다. 두드린 자리만 이어 디디자.']},
-  oar:{title:'봄 배 ① 겨울을 난 노',verb:'노 돌려 보기',steps:[
-    '겨울에 둑에 올려 둔 노다. 수달이 한쪽을 들어 준다.',
-    '살금이가 자루를 받친다. 날에 붙은 얼음을 털자.',
-    '금이 간 데는 없다. 두 노의 날을 물 쪽으로 놓자.']},
-  rope:{title:'봄 배 ② 손이 놓여도 남는 고리',verb:'밧줄 당기기',steps:[
-    '얼어 굳었던 끈이 풀렸다. 수달이 배를 잡는 동안 고리를 만들자.',
-    '살금이가 말뚝 곁을 눌러 준다. 고리를 말뚝에 걸자.',
-    '밀려나도 다시 닿는 길이다. 끈을 당겨 배를 나란히 붙이자.']},
-  launch:{title:'봄 배 ③ 함께 물에 띄우기',verb:'배 밀기',steps:[
-    '배 아래 둥근 가지를 댔다. 수달이 앞, 나는 뒤를 받친다.',
-    '살금이가 옆을 지킨다. 물결이 들 때 가볍게 밀자.',
-    '배가 떴다. 한 발씩 오르고, 남은 고리는 뱃전에 걸자.']},
-  sail:{title:'호수의 봄길',verb:'노 젓기',steps:[
-    '겨울에 걸었던 길이 물결이 됐다. 두 노를 나란히 넣자.',
-    '갈대 사이 물결은 옆으로 흐른다. 수달 손짓 쪽으로 저어 보자.',
-    '섬의 금줄과 호숫가 바위를 번갈아 보자. 어느 쪽도 잃지 않게.',
-    '겨울에 세운 가지 끝이 물 위로 나왔다. 그 바깥으로 천천히.',
-    '살금이가 뱃전에 앉았다. 배가 기울지 않게 노를 함께 들자.',
-    '잔물결이 둑으로 밀어 준다. 남긴 고리를 말뚝에 걸자.']}
-  ,sailOut:{title:'내가 띄운 배로 신목 섬까지',verb:'함께 노 맞추기',steps:[
-    '이번엔 내가 앞을 본다. 살금이가 고리를 풀면 두 노로 둑을 살짝 밀자.',
-    '겨울에 피했던 검은 금이 긴 물결이 됐다. 수달과 양쪽 노를 나란히 넣자.',
-    '갈대 쪽 물은 빠르네. 바위 쪽으로 짧게 저으니 살금이가 귀를 내린다.',
-    '내가 세운 가지가 물 밖에 남았다. 가지 둘 사이로 배를 향하게 노를 바꾸자.',
-    '신목 금줄이 보인다. 수달이 손을 들면 노를 쉬고, 섬 쪽 물결에 맡기자.',
-    '살금이가 마른 돌을 짚는다. 노를 뱃전에 놓고 고리를 건네면 섬에 닿는다.']}
-};
-let act=null;
-function paint(){
-  if(!act)return;
-  const {id,index,pos}=act,cfg=descriptions[id],spring=/oar|rope|launch|sail/.test(id);
-  ac.fillStyle=spring?'#d8dfd3':'#263957';ac.fillRect(0,0,320,110);
-  ac.fillStyle=spring?'#86b2bd':'#adc9db';ac.fillRect(0,73,320,37);
-  if(id.startsWith('ice')){
-    ac.fillStyle='#66798c';ac.fillRect(30,63,56,17);
-    for(let i=0;i<3;i++){ac.fillStyle=i<=index?'#d4c18c':'#819cb0';ac.fillRect(102+i*66,71-i%2*5,34,4);if(i<=index)ac.fillRect(116+i*66,52,3,23);}
-    ac.fillStyle='#f4edd4';ac.fillRect(59+index*66,41,3,30);
-  }else if(id.endsWith('Print')){
-    ac.fillStyle=id==='hutPrint'?'#8c7764':'#8395a1';ac.fillRect(73,12,174,88);
-    ac.fillStyle='#465466';ac.fillRect(130,45,61,34);ac.fillRect(141,77,39,7);
-    for(let i=0;i<3;i++){ac.fillStyle=i<=index?'#e2c18b':'#465466';ac.fillRect(118+i*31,23+Math.abs(1-i)*7,21,18);}
-    ac.fillStyle='#e7d4b6';ac.fillRect(114+index*31,41+Math.abs(1-index)*7,7,19);ac.fillRect(111+index*31,52+Math.abs(1-index)*7,14,9);
-  }else if(id==='sail'||spring){
-    const x=45+index*(id.startsWith('sail')?35:52);ac.fillStyle='#71574a';ac.fillRect(x,68,65,9);ac.fillRect(x+7,77,51,5);
-    ac.fillStyle='#ceb58c';ac.fillRect(x+12,57,3,24);ac.fillRect(x+52,57,3,24);
-    ac.fillStyle='#a58d76';ac.fillRect(x+25,51,14,17);ac.fillStyle='#b7a27d';ac.fillRect(x+9,46,9,22);ac.fillRect(x+11,39,2,10);
-    ac.fillStyle='#e3e5c2';ac.fillRect(289,36,8,38);ac.fillStyle='#85a570';ac.fillRect(268,18,47,22);
-  }else{
-    const old=ctx;ctx=ac;
-    try{const fn={bear:'drawBear',bearSpring:'drawBear',crow:'drawCrow',otter:'drawOtter',knot:'drawMagpie'}[id];if(Rg.expArt?.[fn])Rg.expArt[fn](220,74,-1);}finally{ctx=old;}
-    ac.fillStyle='#e7d7b9';ac.fillRect(50,53,57,25);ac.fillStyle='#ad8964';ac.fillRect(73,51,3,29);
-    for(let i=0;i<=index;i++){ac.fillStyle='#f2cf8f';ac.fillRect(118+i*22,78-i*6,12,3);}
-  }
-  $('yActLine').textContent=cfg.steps[index];
-  $('yActBand').style.left=act.band+'%';$('yActBand').style.width=MG.gather_darae_vine_width+'%';
-  $('yActMark').style.left=pos+'%';$('yActCount').textContent=(index+1)+' / '+cfg.steps.length+' · 맞추지 못해도 괜찮아';
-  $('yActHit').textContent=cfg.verb+(TOUCH?'':' (J · Space)');
-}
-function close(){panel.hidden=true;act=null;releaseInputs();}
+const Rg=REGIONS.yeongsan;
+// 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
+// 다녀간 일은 G.f.yActivities에 센다(사연 조건).
+const ACTIVITIES=new Set(['bear','bearSpring','crow','otter','knot','hutPrint','snowPrint','shorePrint','ice1','ice2','ice3','oar','rope','launch','sail']);
 Rg.playActivity=(id,callback)=>{
-  if(!descriptions[id]){callback?.();return;}
-  if(act)return;
-  // 손일은 미니게임 없이 바로 마친다 (대장 2026-10-30: 미니게임은 채집·전투·놀이에만).
-  {Sound.gather(true);const log=G.f.yActivities||(G.f.yActivities={});log[id]=(log[id]||0)+1;callback?.();return;}
-  releaseInputs();G.vx=G.vy=0;
-  act={id,index:0,pos:0,dir:1,cool:MG.gather_cooldown,band:40,callback};
-  $('yActTitle').textContent=descriptions[id].title;panel.hidden=false;paint();
+  if(ACTIVITIES.has(id)){Sound.gather(true);const log=G.f.yActivities||(G.f.yActivities={});log[id]=(log[id]||0)+1;}
+  callback?.();
 };
-function hit(slow=false){
-  if(!act||(!slow&&act.cool>0))return;
-  const a=act,good=slow||(a.pos>=a.band&&a.pos<=a.band+MG.gather_darae_vine_width);
-  Sound.gather(good);a.cool=MG.gather_cooldown;
-  if(!good&&a.id.startsWith('ice')){
-    G.px=Math.max(16,G.px-12);G.vx=G.vy=0;
-    toast('첨벙. 뒤의 마른 돌로 올라왔다. 표시한 길은 남아 있다.');
-  }
-  a.index++;
-  if(a.index>=descriptions[a.id].steps.length){
-    const callback=a.callback;
-    const log=G.f.yActivities||(G.f.yActivities={});log[a.id]=(log[a.id]||0)+1;
-    close();callback?.();return;
-  }
-  a.band=MG.gather_zone_start+hash(a.index*17+a.id.length)*Math.max(0,MG.gather_zone_span-MG.gather_darae_vine_width);
-  paint();
-}
-$('yActHit').onclick=()=>hit();$('yActSlow').onclick=()=>hit(true);$('yActCv').onclick=()=>hit();
-$('yActLeave').onclick=close;
-panel.addEventListener('keydown',e=>{
-  if(!['Enter',' ','j','J','x','X'].includes(e.key))return;
-  e.preventDefault();e.stopPropagation();if(e.repeat)return;
-  if((e.key==='Enter'||e.key===' ')&&e.target instanceof HTMLButtonElement)e.target.click();else hit();
-});
-defineMinigame({id:'yActivity',step:()=>{if(!act)return;act.pos+=act.dir*MG.gather_darae_vine_speed;if(act.pos>=100||act.pos<=0){act.pos=clamp(act.pos,0,100);act.dir*=-1;}if(act.cool>0)act.cool--;paint();},hit:()=>hit()});
 
 /* 3개 관찰 지점은 본길에 놓인다. 샛길의 도장·선물과는 독립이다.
    마지막 선택을 미룬 채 봄 호수로 돌아와도 전 재료와 아빠에게 닿는다. */

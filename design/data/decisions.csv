@@ -10,7 +10,7 @@ D-08,기믹,흐려지는 엄마 쪽지: 지역마다 한 단계씩 흐려지고 
 D-09,분량,웹 체험판 목표 지역당 25~35분 (정식판 40~60분은 확정),채택,개발자(Claude),없음,design/gdd/neoguri-concept.md,문서 숫자만 고친다
 D-10,시스템,길손: 지역 NPC 4명에 세지 않는 단역 만남,채택,개발자(Claude),있음,design/proposals/expansion-plan.md,engine/field.js finishWanderer와 각 지역 wanderers
 D-11,전투,보스 시험판 다섯과 행동으로 달래기,채택,개발자(Claude),있음,design/data/bosses.csv,"engine/battle.js calm 처리, bosses.csv"
-D-12,시스템,"보따리 겉모습 성장(보따리 → 멜빵 봇짐 → 작은 지게 → 아빠의 지게), 칸은 무제한",채택,개발자(Claude),없음,design/proposals/decisions-1030.md,각 지역 art.js의 보따리 그림
+D-12,시스템,"보따리 겉모습 성장(보따리 → 멜빵 봇짐 → 작은 지게 → 아빠의 지게), 칸은 무제한",채택,개발자(Claude),있음,design/proposals/decisions-1030.md,각 지역 art.js의 보따리 그림
 D-13,지역,큰 장터의 밤: 기존 넷의 밤 얼굴과 밤에만 나오는 길손,채택,개발자(Claude),있음,design/narrative/jangteo-scenario.md,jangteo story.js 밤 사연 함수
 D-14,지역,"도깨비 키 부위는 콩 2개, 석이버섯 자리는 골렘 전에 뿔이가 알려 준다",채택,개발자(Claude),없음,design/data/boss_parts.csv,CSV 값과 dolneomeo tellSeogi
 D-15,음악,"지역을 옮길 때 길 위 간주(가야금 걷는 장단, 다음 지역 음계)",채택,개발자(Claude),있음,design/proposals/decisions-1030.md,engine/music.js travelInterludes
@@ -28,7 +28,7 @@ D-26,이야기,"부모 이름은 쓰지 않는다. 아이도 인물들도 ""아�
 D-27,이야기,"주인공 성격: 겁이 나면 허세로 버티고(허세 혼잣말), 남의 사정을 먼저 묻는 아이(모락의 ""아주머니 저녁은요?""). 어른에게 존댓말(D-21). 어른스러운 교훈은 말하지 않는다",채택,개발자(Claude),없음,design/proposals/characters.md,너구리 대사 (PA-8)
 D-28,지역,"2~4지역(돌너머·큰 장터·영산) 시나리오 문서의 ""제안"" 진행 흐름을 그대로 채택해 플레이하며 고친다",채택,개발자(Claude)·사용자 지시,없음,design/narrative/*-scenario.md,그 지역 시나리오와 코드 (PA-5)
 D-29,미니게임,"윷놀이 첫 판(쌀 덤)은 말 하나로 짧게, 승패와 관계없이 덤. 끝난 뒤 '한 판 더'에서 말 하나·둘·넷을 고른다. 콩은 판 그림의 번호로 고르고, 고를 콩이 하나면 묻지 않고 옮긴다 (사용자 플레이 피드백 2026-10-30)",채택,사용자 플레이 피드백,있음,,jangteo/story.js yNew의 기본 말 수
-D-30,기록,"아빠의 수첩에서 일기·까치 답장 장을 뺀다(기록 데이터는 남김). 아빠 단서와 엄마의 쪽지는 보따리의 ""중요"" 탭으로 옮긴다. 손버릇 장은 ""익힌 솜씨""로 부른다. 진 뒤 공략은 아이 혼잣말로 짚는다. D-92의 ""한 권"" 원칙 중 장 목록을 바꾼다 (사용자 플레이 피드백 2026-10-30)",채택,사용자 플레이 피드백,있음,design/proposals/decisions-1030.md 기록 반영,engine/notebook.js NOTE_TABS · bag.js BAG_KINDS·renderImportant · 각 지역 패배 뒤 혼잣말
+D-30,기록,"아빠의 수첩에서 일기·까치 답장 장을 뺀다(기록 데이터는 남김). 아빠 단서와 엄마의 쪽지는 보따리의 ""중요"" 탭으로 옮긴다. 손버릇 장은 ""익힌 솜씨""로 부른다. 진 뒤 공략은 아이 혼잣말로 짚는다. ""한 권"" 원칙(대장 결정, PA-46. D-92 ""기록 나누기""를 대체한 것) 안에서 장 목록을 바꾼다 (사용자 플레이 피드백 2026-10-30)",채택,사용자 플레이 피드백,있음,design/proposals/decisions-1030.md 기록 반영,engine/notebook.js NOTE_TABS · bag.js BAG_KINDS·renderImportant · 각 지역 패배 뒤 혼잣말
 D-31,미니게임,"채집은 따로 창을 띄우지 않고 필드에서 한다. 흙더미 위 고리가 가운데 원에 닿을 때 휘두르면 딱(두 몫), 아무 때나 쳐도 한 몫. 칡뿌리 3번(딱 2번), 버섯 2번(딱 1번), 억새·다래 2번(딱 1번). 모두 딱이면 2개 (사용자 플레이 피드백 2026-10-30)",채택,사용자 플레이 피드백,있음,,engine/gather.js gatherHit · minigames.csv gather_ring_period·gather_just_window·gather_perfect_power
 D-32,조작,"막힌 길(칡 덩굴 등) 위에는 짧은 이름만 띄우고, 다가가 말을 걸면 아이가 아는 만큼 혼잣말로 까닭을 말한다 (사용자 플레이 피드백 2026-10-30)",채택,사용자 플레이 피드백,있음,,engine/field.js interactionLabel·tryInteract의 blockedLabel·blockedSay, galchamgol/field.js vineSay·bankSay
 D-33,이야기,"늙은 까치가 까치 떼 이동을 말할 때 덩치 큰 젊은 까치 둘이 내려앉고 그 뒤로 곁에 머문다. ""네 귀 한쪽씩 잡고 날면 되지"" (사용자 플레이 피드백 2026-10-30)",채택,사용자 플레이 피드백,있음,,galchamgol/story.js magpieTalk와 drawMagpies, art.js youngMagpie
@@ -84,6 +84,8 @@ D-84,조작,"전투 화면: 필드 체력 칸은 전투 중 자리도 차지하�
 D-85,조작,"휴대폰 말걸기 버튼 글자는 대상에 맞춘다(들어가기·살피기·쉬기·바라보기, 말풍선 안내의 마지막 낱말). 보따리 칸은 한 번 누르면 고르기만 하고 두 번 누르기로 가보에 넣지 않는다. 먹을거리의 주 버튼은 먹기. 키 안내의 잎사귀 변신은 가진 변신만 보인다(게임 검토 4번 절)",채택,게임 검토,있음,,"engine/field.js actionVerb · engine/bag.js · engine/hud.js refreshKeyForms · index.html keyForms"
 D-86,조작,"칡 전투 고리: 휴대폰은 치기 버튼을 한 번 눌러 잡고, 옮긴 뒤 한 번 더 눌러 놓는다. 누른 채 끌기와 키보드 J 누르기도 그대로 된다(게임 검토 6번 칡 고리 한 번 눌러 고정)",채택,게임 검토,있음,,"engine/battle.js vineLatch"
 D-87,소리,"마음 상태 음악(D-37)을 네 지역 곡(돌너머·큰 장터 낮·밤·영산 겨울·봄)과 보스 넷·무쇠 시험으로 넓힌다. 층 나눔과 템포 단계는 design/data/music_layers.csv가 원본이고, 곡의 모든 성부가 꼭 한 층에 들어가는지 빌드가 검사한다. 지역 긴장 원천: 돌너머는 길이 열린 뒤 성황당 끝 골렘 쪽, 큰 장터는 그믐밤 창고 지키기 중 창고 쪽, 영산은 호숫가 강철이 쪽. 보스를 이기거나 달래면 0. 장면 곡(D-72)이 나오는 대화와 경치(D-46)에는 끼어들지 않는다",채택,개발자(Claude),있음,design/data/music/README.md,"engine/game.js ADAPTIVE=TABLES.MUSIC_LAYERS · design/data/music_layers.csv · regions/{dolneomeo,jangteo,yeongsan}/field.js Rg.moodTension"
+D-88,미니게임,"return으로만 막혀 있던 손일 미니게임 코드(단풍골 쇠 벼리기·길손 손일, 돌너머 돌 쌓기, 큰 장터 김 올리기·장터 손일, 영산 함께 하는 일)를 지우고 바로 마치는 함수만 남긴다. minigames.csv의 forge_·stack_·steam_ 줄과 그 손일만 빌려 쓰던 채집 바늘 줄(gather_root_width/speed, gather_darae_vine_width/speed, gather_zone_*, gather_help_*, gather_cooldown)을 지우고, 손일의 호감 셋(handwork_*_relation)만 남긴다 (확정 §6 손일은 미니게임 없이, 검토 2026-10-31 5번)",채택,개발자(Claude),있음,design/gdd/neoguri-concept.md §6 · 시나리오 셋,"galchamgol openForge·hands · dolneomeo openStack · jangteo Rg.handWork·openSteam · yeongsan Rg.playActivity"
+D-89,대사,"무쇠 대사 덩어리를 나눈다: 시험·잎사귀·첫 변신까지 한자리, 엄마 잎 이야기와 낫 벼리기 안내는 다시 말을 걸 때(숯이 있으면 바로 벼림). 까치 답장(단풍골·돌너머·큰 장터)은 까치 대사가 아니라 너구리 지문으로 쓴다(영산과 같게). 내용은 그대로다 (검토 2026-10-31 7절·대본 토론 남은 일)",채택,개발자(Claude),있음,,"galchamgol musoeFirstForm·musoeMain·Rg.goal · 각 지역 Rg.homeReply"
 D-90,이야기,"강철이의 새 이름 ""서리무기""",대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,"대장 답으로 ""강철이"" 유지"
 D-91,시스템,레어도 이름 순우리말(흔한 것·쓸 만한 것·귀한 것·보배·전설),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 하품·중품·상품·최상품·천하일품
 D-92,시스템,기록 나누기(아빠의 수첩과 아이의 책),대체됨,개발자(Claude),없음,design/proposals/decisions-1030.md,대장 답으로 아빠의 수첩 한 권
