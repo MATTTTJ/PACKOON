@@ -249,6 +249,55 @@ function drawMusoe(c){
     brush(c,[[hx-34,hy-18],[hx-12,hy-10]],4,INK);brush(c,[[hx+34,hy-18],[hx+12,hy-10]],4,INK);brush(c,[[hx-10,hy+26],[hx+10,hy+26]],3,INK);}
 }
 
+/* 결정 D-62: 모든 전투 배경은 상대 뒤쪽 화면 전체로 그린다 (design/data/decisions.csv).
+   엉킨 칡은 당산나무 언덕. 칡이 나무 줄기를 감아 오르고 금줄 아래 입구를 덮었다(D-51 필드 그림과 같은 설정). 늦가을 단풍.
+   가운데 상대와 판정 상자가 먼저 읽히게 담채는 옅게, 먹선은 가늘게 둔다. */
+function drawKudzuHill(c){
+  const t=B.time,still=Vfx.reducedMotion,gy=BOX.y-52,VINE='#4f6b3a';
+  let g=c.createLinearGradient(0,0,0,gy);g.addColorStop(0,'rgba(214,150,96,.18)');g.addColorStop(1,'rgba(214,150,96,.03)');
+  c.save();c.fillStyle=g;c.fillRect(0,0,LW,gy);c.restore();
+  // 먼 산 능선 두 겹
+  for(const [k,a,yb] of [[0,.07,gy-74],[1,.11,gy-38]]){
+    c.save();c.globalAlpha=a;c.fillStyle=INK;c.beginPath();c.moveTo(0,gy);
+    for(let x=0;x<=LW+20;x+=20)c.lineTo(x,yb-Math.sin(x*0.007+k*2)*22-hash(x*0.1+k)*10);
+    c.lineTo(LW,gy);c.closePath();c.fill();c.restore();
+  }
+  c.save();c.fillStyle='rgba(150,110,70,.12)';c.fillRect(0,gy,LW,LH-gy);c.restore();
+  brush(c,[[0,gy+4],[LW*0.3,gy-6],[LW*0.6,gy+2],[LW,gy-4]],4,INK,0.45);
+  // 양옆 단풍나무
+  const maple=(x,y,s,k=1)=>{
+    brush(c,[[x,y],[x-3*s,y-40*s],[x+2*s,y-72*s]],6*s,INK,0.5*k);
+    for(let i=0;i<12;i++){const a=hash(x*0.01+i*3.3)*Math.PI*2,rr=34*s*Math.sqrt(hash(i*5.1+x*0.01));
+      blob(c,x+Math.cos(a)*rr,y-78*s+Math.sin(a)*rr*0.7,22*s,16*s,i%3?RED:'#d98a3a',(0.16+hash(i+x*0.01)*0.12)*k);}
+  };
+  // 왼쪽은 부위 글 뒤라 옅게 둔다
+  maple(LW*0.03,gy+6,1.05,0.5);maple(LW*0.2,gy+2,0.75,0.55);maple(LW*0.88,gy+4,1.2);maple(LW*0.97,gy,0.85);
+  // 당산나무: 칡 뒤 가운데의 굵은 줄기와 가지
+  const tx=LW/2,tw=Math.min(118,LW*0.15);
+  c.save();c.fillStyle='rgba(84,66,50,.17)';c.beginPath();c.moveTo(tx-tw*0.62,gy);c.lineTo(tx-tw*0.42,0);c.lineTo(tx+tw*0.42,0);c.lineTo(tx+tw*0.62,gy);c.closePath();c.fill();c.restore();
+  brush(c,[[tx-tw*0.62,gy],[tx-tw*0.5,gy*0.5],[tx-tw*0.42,0]],5,INK,0.4);
+  brush(c,[[tx+tw*0.62,gy],[tx+tw*0.5,gy*0.5],[tx+tw*0.42,0]],5,INK,0.4);
+  for(let i=0;i<5;i++){const x=tx-tw*0.36+i*tw*0.18;brush(c,[[x,gy-12],[x+hash(i)*6-3,gy*0.55],[x+hash(i+9)*8-4,6]],1.4,INK,0.15);}
+  brush(c,[[tx-tw*0.4,44],[tx-tw*1.4,14],[tx-tw*2.3,-8]],7,INK,0.3);brush(c,[[tx-tw*1.2,22],[tx-tw*1.5,-6]],3,INK,0.25);
+  brush(c,[[tx+tw*0.4,34],[tx+tw*1.5,8],[tx+tw*2.4,-10]],7,INK,0.3);brush(c,[[tx+tw*1.3,16],[tx+tw*1.7,-8]],3,INK,0.25);
+  // 금줄: 줄기를 가로지른 새끼줄과 흰 종이 술
+  const ry=gy*0.4;brush(c,[[tx-tw*0.58,ry],[tx,ry+10],[tx+tw*0.58,ry]],3,'#6b5540',0.65);
+  for(let i=0;i<5;i++){const x=tx-tw*0.4+i*tw*0.2,y=ry+3+Math.sin((i/4)*Math.PI)*7;
+    c.save();c.fillStyle='rgba(250,246,236,.8)';c.fillRect(x-3,y,6,12);c.restore();brush(c,[[x-3,y],[x+3,y],[x+3,y+12],[x-3,y+12],[x-3,y]],1,INK,0.3);}
+  // 줄기 밑 입구 아치와 그것을 덮은 칡 그물
+  const aw=tw*0.36,ah=tw*0.56;
+  c.save();c.fillStyle='rgba(29,24,20,.3)';c.beginPath();c.moveTo(tx-aw,gy);c.lineTo(tx-aw,gy-ah*0.6);c.quadraticCurveTo(tx,gy-ah*1.25,tx+aw,gy-ah*0.6);c.lineTo(tx+aw,gy);c.closePath();c.fill();c.restore();
+  for(let i=0;i<6;i++)brush(c,[[tx-aw+i*aw*0.4,gy],[tx-aw*0.7+i*aw*0.3,gy-ah*0.45],[tx-aw+hash(i*3.3)*aw*2,gy-ah*0.95]],2,VINE,0.5);
+  // 줄기를 비스듬히 감아 오르는 칡
+  for(let k=0;k<4;k++){const pts=[];for(let s=0;s<=12;s++){const y=gy-s*gy/12-k*16;pts.push([tx+Math.sin(s*0.85+k*1.7)*tw*0.56,y]);}
+    brush(c,pts,3,VINE,0.32);
+    for(let s=1;s<12;s+=3)blob(c,pts[s][0],pts[s][1],5,3,VINE,0.28);}
+  // 떨어지는 단풍잎
+  for(let i=0;i<10;i++){
+    const sp=0.3+hash(i*2.7)*0.4,y=still?hash(i*4.1)*gy:((t*sp+i*53)%(gy+40))-20,x=hash(i*1.3)*LW+(still?0:Math.sin(t*0.03+i)*14);
+    c.save();c.globalAlpha=0.32;c.fillStyle=i%2?RED:'#d98a3a';c.translate(x,y);c.rotate(still?i:t*0.04+i);c.fillRect(-3,-2,6,4);c.restore();
+  }
+}
 defineEnemies({
   kudzu:{name:'엉킨 칡',calmLabel:'진정',
     intro:'[시험판] 칡덩굴이 당산나무를 놓지 못한다. 고리를 옮겨 피할 길을 풀어 놓자.',
@@ -261,7 +310,7 @@ defineEnemies({
     calmWin:'엉킨 칡이 스르르 풀리며 당산나무를 놓아준다.',calmGift:'kflower',
     win:'칡의 심이 갈라지며 덩굴이 힘없이 흘러내린다.',
     lose:'덩굴에 밀려 숲 어귀로 물러났다.',
-    draw:drawKudzu},
+    backdrop:drawKudzuHill,draw:drawKudzu},
   /* 무쇠는 피하기만 하는 시험이다. 꿀밤으로 연장을 놓치고 여섯 판을 버틴다 (결정 D-59·D-60). */
   musoe:{name:'무쇠',calmLabel:'마음',npc:true,dodge:6,showHands:true,
     intro:'"삼촌, 왜 이래요!" 손 아래 그림자가 짙어지면 그 자리에서 비키자.',
