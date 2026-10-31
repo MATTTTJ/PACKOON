@@ -996,6 +996,12 @@ const TABLES={
      "text": "단풍골 숲의 다람쥐. 아빠 모자를 알아봤다. 말이 많아서, 묻지 않은 것까지 말해 준다.",
      "section": "관찰",
      "when": "met:dodam"
+    },
+    {
+     "who": "me",
+     "text": "흙에 발톱으로 긁은 줄이 셋 있으면 다람쥐가 무언가 묻고 잊은 자리다. 너구리 코로는 어디 묻었는지 모르겠다. 다람쥐라면 알겠지.",
+     "section": "관찰",
+     "when": "rule:squirrel_cache"
     }
    ]
   },
@@ -2101,6 +2107,7 @@ const TABLES={
   "rhythm_late_hint_delay": 0.2,
   "rhythm_finish_delay": 0.65,
   "rhythm_cooldown": 0.12,
+  "rhythm_stray_window": 0.36,
   "rhythm_resume_delay": 0.3,
   "rhythm_combo": 3,
   "rhythm_relation": 1,
@@ -2149,20 +2156,15 @@ const TABLES={
   "gather_root_width": 21,
   "gather_root_speed": 1.5,
   "gather_ssari_hits": 2,
-  "gather_ssari_width": 24,
-  "gather_ssari_speed": 2.2,
   "gather_kkoe_hits": 2,
-  "gather_kkoe_width": 26,
-  "gather_kkoe_speed": 2.4,
   "gather_eoksae_hits": 2,
-  "gather_eoksae_width": 21,
-  "gather_eoksae_speed": 1.8,
   "gather_seogi_hits": 2,
-  "gather_seogi_width": 26,
-  "gather_seogi_speed": 2.4,
   "gather_darae_vine_hits": 2,
   "gather_darae_vine_width": 21,
-  "gather_darae_vine_speed": 1.8
+  "gather_darae_vine_speed": 1.8,
+  "gather_solbang_hits": 2,
+  "yut_needle_speed": 1.5,
+  "yut_nak_zone": 10
  },
  "TUNING": {
   "kkubeogi_cycle": 200,
@@ -2394,6 +2396,15 @@ const TABLES={
    "options": [
     {
      "patsirutteok": 1
+    }
+   ]
+  },
+  {
+   "region": "jangteo",
+   "done": "hongsiMade",
+   "options": [
+    {
+     "sinpyo": 1
     }
    ]
   },
@@ -2794,6 +2805,40 @@ const TABLES={
      "line": "어, 응… 그런 말은 처음 들어. 고마워."
     }
    }
+  }
+ },
+ "SCENE_MUSIC": {
+  "g_musoe_night": {
+   "music": "father",
+   "from": 0
+  },
+  "j_nal_ledger": {
+   "music": "",
+   "from": 0
+  },
+  "y_nal_confess": {
+   "music": "father",
+   "from": 0
+  },
+  "y_dad_reunion": {
+   "music": "father",
+   "from": 1
+  },
+  "y_dad_ledger": {
+   "music": "father",
+   "from": 0
+  },
+  "y_sangun_story": {
+   "music": "theme",
+   "from": 0
+  },
+  "y_sangun_name": {
+   "music": "theme",
+   "from": 0
+  },
+  "y_give_name": {
+   "music": "theme",
+   "from": 0
   }
  }
 };

@@ -1,0 +1,9 @@
+﻿id,지역,장면,곡,시작줄,까닭,상태
+g_musoe_night,galchamgol,무쇠 삼촌이 아빠가 낫을 맡기던 날을 이야기한다,father,0,아빠의 흔적을 듣는 장면. 무쇠의 평소 대화와 구별한다,제안
+j_nal_ledger,jangteo,날쌘이 장부 이야기를 막는다,지역,0,여러 줄 날쌘 대화라 자동 규칙이 익살 곡(nalsaen)을 고르지만 속내를 감추는 장면이다,제안
+y_nal_confess,yeongsan,날쌘의 고백 (아빠가 잃은 물건값을 대신 물어 줬다),father,0,익살 곡 대신 아빠 곡. 날쌘이 아빠에게 진 빚을 털어놓는다,제안
+y_dad_reunion,yeongsan,호숫가에서 아빠를 처음 만난다,father,1,"아이가 ""…아빠?""라고 알아보는 줄부터 아빠 곡. 그 전에는 영산 곡이 흐른다",제안
+y_dad_ledger,yeongsan,아빠가 내민 장부를 읽는다,father,0,엄마와 아빠의 글씨를 읽는 장면,제안
+y_sangun_story,yeongsan,산군이 엄마의 오래된 셈을 들려준다,theme,0,엄마가 이름과 둔갑을 값으로 낸 이야기. 엄마의 노래로 잇는다,제안
+y_sangun_name,yeongsan,산군이 이름을 값으로 묻는다,theme,0,엄마가 흥얼거리던 '이름의 노래'. 봄이 와도 봄 잔치 곡을 깔지 않는다,제안
+y_give_name,yeongsan,이름을 내놓고 약연에 열매를 놓는다,theme,0,이름 셈에서 이어지는 한 장면이라 같은 곡을 잇는다,제안

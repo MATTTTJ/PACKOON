@@ -1,21 +1,27 @@
 'use strict';
 /* 대화: talk([[말하는이, 대사, 선택지?], ...], 끝나면). 선택지는 [{t:글, go:고르면 할 일}] */
-let dlgQ=[],dlgEnd=null,dlgMusic=null;
+let dlgQ=[],dlgEnd=null,dlgMusic=null,dlgPlan=null,dlgNextScene=null;
 // 세 번째 인자는 지역의 전용 이야기 장면용이다. 기존 호출·선택지·종료 순서는 유지한다.
+/* 결정 D-72: 장면별 곡(design/data/scene_music.csv). options.scene 또는 바로 앞의 sceneNext(id)로 장면을 고르면
+   표의 곡을 시작줄부터 깐다. 장면이 없으면 예전 자동 규칙(아빠가 나오면 아빠 곡, 날쌘과 여러 줄이면 날쌘 곡)이다. */
+function sceneNext(id){dlgNextScene=id;setTimeout(()=>{if(dlgNextScene===id)dlgNextScene=null;},0);}   // 바로 이어지는 talk 한 번에만 쓴다
 function talk(lines,onEnd,options={}){
-  dlgMusic=options.music||(lines.some(l=>l[0]==='아빠')?'father':lines.length>1&&lines.some(l=>l[0]==='날쌘')?'nalsaen':null);
+  const scene=TABLES.SCENE_MUSIC?.[options.scene||dlgNextScene];dlgNextScene=null;
+  if(scene){dlgPlan=lines.map((_,i)=>i>=scene.from?(scene.music||null):null);dlgMusic=dlgPlan[0];}
+  else{dlgPlan=null;dlgMusic=options.music||(lines.some(l=>l[0]==='아빠')?'father':lines.length>1&&lines.some(l=>l[0]==='날쌘')?'nalsaen':null);}
   dlgQ=lines.slice();dlgEnd=onEnd||null;showLine();
 }
 function showLine(){
+  if(dlgPlan){const i=dlgPlan.length-dlgQ.length;if(i<dlgPlan.length)dlgMusic=dlgPlan[i];}
   const L=dlgQ.shift();
-  if(!L){$('dlg').hidden=true;dlgMusic=null;const f=dlgEnd;dlgEnd=null;if(f)f();return;}
+  if(!L){$('dlg').hidden=true;dlgMusic=null;dlgPlan=null;const f=dlgEnd;dlgEnd=null;if(f)f();return;}
   $('dlg').hidden=false;$('dlgWho').textContent=L[0];$('dlgText').textContent=L[1];
   const face=$('dlgFace');face.innerHTML='';face.appendChild(portrait(L[0]));
   const ch=$('dlgChoices');ch.innerHTML='';
   if(L[2]){
     $('dlgNext').hidden=true;
     L[2].forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.textContent=c.t;
-      b.onclick=e=>{e.stopPropagation();Sound.paper();$('dlg').hidden=true;dlgQ=[];dlgEnd=null;dlgMusic=null;if(c.go)c.go();};ch.appendChild(b);});
+      b.onclick=e=>{e.stopPropagation();Sound.choice(!!c.go);$('dlg').hidden=true;dlgQ=[];dlgEnd=null;dlgMusic=null;dlgPlan=null;if(c.go)c.go();};ch.appendChild(b);});
     setTimeout(()=>{const f=ch.querySelector('button');if(f&&matchMedia('(pointer:fine)').matches)f.focus();},0);
   }else $('dlgNext').hidden=false;
 }

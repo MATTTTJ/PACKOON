@@ -179,7 +179,7 @@ function birds(camera,y,bloom=false){
 }
 function sky(camera=0,bloom=pink()){
   for(let y=0;y<H;y+=4){
-    const band=Math.floor(y/40),cols=bloom?['#ecd5df','#efd8e2','#f2dce5','#f5dce5','#e6c9d7','#bbbac6']:['#141c34','#1c2845','#293a59','#3a4a67','#4b5f79','#8b9cae'];
+    const band=Math.floor(y/40),cols=bloom?['#ecd5df','#efd8e2','#f2dce5','#f5dce5','#e6c9d7','#bbbac6']:['#17232c','#1c2845','#293a59','#3a4a67','#4b5f79','#8b9cae'];
     px(0,y,W,4,cols[Math.min(band,5)]);
   }
   if(!bloom){

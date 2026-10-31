@@ -110,7 +110,8 @@ function startBattle(kind,onEnd){
   if(E.cover)gm.querySelector('span').textContent='돌 아래 여백에 손을 숨기자. 공격 뒤에는 표식 치기 또는 소원 돌 바로 놓기.';
   if(E.goalText)gm.querySelector('span').textContent=E.goalText;
   if(E.possession)gm.querySelector('span').textContent='불이 옮겨 간 헌물의 공격을 읽자. 공격 뒤에는 되치기 또는 물건 집기 → 윤곽에서 치기로 돌려놓기.';
-  if(E.vinePath)gm.querySelector('span').textContent='예고 중 고리 위에서 치기를 누른 채 이동하고 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.';
+  if(E.vinePath)gm.querySelector('span').textContent=TOUCH?'예고 중 고리 위에서 치기를 눌러 잡고, 옮긴 뒤 다시 눌러 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.'
+    :'예고 중 고리 위에서 치기를 누른 채 이동하고 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.';
   if(E.warmPath)gm.querySelector('span').textContent='물김 길을 따라 옆 샘으로. 공격 뒤에는 붉은 표식 치기 또는 샘의 얼음 걷기.';
 }
 function setPadLabels(on){
@@ -159,7 +160,9 @@ function damageCover(r){
 }
 /* 칡 선택 기능. 비율 좌표로 저장해 화면을 돌려도 고리와 실제 통로가 함께 옮겨진다. */
 function vineBounds(){const p=B.vinePath;return {x:BOX.x+p.u*BOX.w,w:p.width};}
-function vineHeld(){return keys['j']||keys['x']||keys[' ']||keys['enter']||vinePointers.size>0;}
+// 결정 D-86: 휴대폰은 치기를 한 번 눌러 고리를 잡고, 옮긴 뒤 한 번 더 눌러 놓는다 (design/data/decisions.csv)
+let vineLatch=false;
+function vineHeld(){return keys['j']||keys['x']||keys[' ']||keys['enter']||vinePointers.size>0||vineLatch;}
 function grabVine(){
   const p=B.vinePath;if(!p||B.st!=='tell'||p.locked||p.dragging)return;
   const x=BOX.x+p.u*BOX.w,y=BOX.y+p.v*BOX.h;
@@ -170,7 +173,7 @@ function moveVine(){
   const p=B.vinePath;
   if(vineHeld())grabVine();
   if(!p.dragging)return;
-  if(!vineHeld()){p.dragging=false;p.locked=true;B.msg='고리를 놓았다. 비워 둔 통로로 피하자.';return;}
+  if(!vineHeld()){p.dragging=false;p.locked=true;vineLatch=false;B.msg='고리를 놓았다. 비워 둔 통로로 피하자.';return;}
   p.u=clamp((B.px-BOX.x)/BOX.w+p.offset,p.width/2/BOX.w+0.04,1-p.width/2/BOX.w-0.04);
 }
 function openCalmAction(){
@@ -213,7 +216,9 @@ function chooseAttackBase(){
     const help=Math.min(3,Math.floor(B.hits/2)),arm=B.parts.find(q=>q.id==='arm');
     B.vinePath={u:0.5,v:0.65,width:78+(arm.broken?24:0)+help*12,dragging:false,locked:false};
     B.t=110+help*18;
-    if(!B.pathLesson){B.pathLesson=true;B.t+=90;B.msg='고리 위에서 '+jo(HITKEY,'을','를')+' 누른 채 좌우로 이동하고 놓자. 그 자리가 피할 길이 된다.';}
+    vineLatch=false;
+    if(!B.pathLesson){B.pathLesson=true;B.t+=90;B.msg=TOUCH?'고리 위에서 치기 버튼을 한 번 눌러 잡고, 좌우로 옮긴 뒤 한 번 더 눌러 놓자. 그 자리가 피할 길이 된다.'
+      :'고리 위에서 '+jo(HITKEY,'을','를')+' 누른 채 좌우로 이동하고 놓자. 그 자리가 피할 길이 된다.';}
   }
   if(B.E.warmPath){prepareWarmPath();B.t=80;}
 }
@@ -350,14 +355,16 @@ function bStep(){
   if(B.bonk>0)B.bonk--;
   if(B.toolFly){const f=B.toolFly;f.vy+=0.25;f.x+=f.vx;f.y+=f.vy;f.rot+=0.32;}
   for(const f of B.fx){f.x+=f.vx;f.y+=f.vy;f.vx*=0.9;f.vy*=0.9;f.t--;}B.fx=B.fx.filter(f=>f.t>0);
+  // 미뤄 둔 선물: 빈틈이 열리면 선물 창을 연다 (결정 D-64)
+  if(B.giftQueued&&giftWindow()&&B.giftUsed!==giftKey()){openGift();if(B.paused)return;}
   switch(B.st){
     case 'intro':if(B.t===50&&B.E.howto)B.msg='공격을 피하면 붉은 표식이 뜬다. 손을 그 위로 옮겨 '+jo(HITKEY,'을','를')+' 누르자!';
       if(--B.t<=0){if(B.E.dodge&&!B.noTool){B.st='bonk';B.t=120;B.noTool=true;B.bonk=34;B.msg=B.E.bonkText;B.toolFly={x:B.px+10,y:B.py-12,vx:-3.2,vy:-5.5,rot:0};renderBHud();}else{B.st='idle';B.t=20;}}break;
     case 'bonk':if(B.t===60)B.msg='연장을 놓쳤다! 이번엔 피하기만 해야 한다.';if(--B.t<=0){B.st='idle';B.t=20;B.toolFly=null;}break;
     case 'idle':if(--B.t<=0)chooseAttack();break;
     case 'tell':if(--B.t<=0){if(B.E.vinePath){B.vinePath.dragging=false;B.vinePath.locked=true;B.msg=B.cur.tell;}B.st='atk';B.atkT=0;B.atkDur=bAttackDef(B.cur).dur;}break;
-    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover||B.E.possession||B.E.vinePath||B.E.warmPath)B.st='settle';else{B.st='open';openMark();}}break;
-    case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';if(B.E.vinePath)B.vinePath=null;openMark();openCalmAction();}break;
+    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover||B.E.possession||B.E.vinePath||B.E.warmPath)B.st='settle';else{B.st='open';B.opens=(B.opens||0)+1;openMark();}}break;
+    case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';B.opens=(B.opens||0)+1;if(B.E.vinePath)B.vinePath=null;openMark();openCalmAction();}break;
     case 'giftPlace':if(--B.t<=0){B.giftPlace=null;bEnd('calm');}break;
     case 'clear':if(!B.bullets.length){B.survived++;B.msg=(B.hitThis?'아야… 그래도 버텼다. ':'잘 피했다! ')+'('+B.survived+'/'+B.E.dodge+')';renderBHud();if(B.survived>=B.E.dodge){if(B.E.finale){B.st='finale';B.E.finale.start();}else bEnd('win');}else{B.st='idle';B.t=40;}}break;
     case 'finale':if(B.E.finale.step())bEnd('win');break;
@@ -414,15 +421,26 @@ function progressShortage(inv){
   }
   return choose(0,{});
 }
+/* 결정 D-64: 선물은 빈틈에만, 빈틈 하나에 하나. 부위 공략 전투는 빈틈(open), 피하기 시험(무쇠)은 판과 판 사이(idle·clear).
+   빈틈이 아닐 때 누르면 다음 빈틈에 선물 창이 열리도록 미뤄 둔다. 인트로 중에는 받지 않는다. */
+function giftWindow(){return !!B&&(B.E.dodge?['idle','clear'].includes(B.st):B.st==='open');}
+function giftKey(){return B.E.dodge?'r'+B.survived:'o'+(B.opens||0);}
+function giftLiked(id){const t=tasteOf(B.kind,id);return !!B.E.likes[id]||!!(t&&['아주 좋아함','좋아함'].includes(t.kind));}
 function openGift(){
   if(!B||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.st==='finale'||!$('bResult').hidden)return;
+  if(!giftWindow()||B.giftUsed===giftKey()){
+    B.giftQueued=true;B.msg=B.st==='intro'?'아직 건넬 틈이 없다. 공격을 피한 뒤 빈틈에 건네자.':B.giftUsed===giftKey()?'이번 빈틈엔 벌써 건넸다. 다음 빈틈에 건네자.':'지금은 건넬 틈이 없다. 피한 뒤 빈틈에 건네자.';
+    renderBattleForms();return;
+  }
+  B.giftQueued=false;
   if(B.E.showHands&&!B.handShown){
     B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';renderBattleForms();return;
   }
   if(B.E.vinePath)bDrag=null;
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
-  $('bGiftHint').textContent='좋아하는 걸 주면 마음이 누그러진다. 건넨 물건은 돌아오지 않는다.';
-  const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0);
+  $('bGiftHint').textContent='좋아하는 걸 주면 마음이 누그러진다. 빈틈 하나에 하나만 건넬 수 있다.';
+  // 결정 D-63: 집안 물건·귀한 것은 이 상대가 좋아하는 것만 꺼낸다.
+  const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0&&(!keepsake(k)||giftLiked(k)));
   if(!ids.length)g.appendChild(el('span','small','건넬 물건이 없다.'));
   ids.forEach(id=>{const b=el('button','gift');b.type='button';b.appendChild(icon(id));b.appendChild(el('span',null,ITEMS[id].n+' ×'+G.inv[id]));
     const taste=tasteOf(B.kind,id);
@@ -444,10 +462,12 @@ function giveGift(id){
   }
   // 기존 선물의 진정수치가 우선이다. 새 가공품의 효과만 맛 표에서 더한다.
   const effect=taste&&taste.effect.match(/^calm:(\d+)$/);
-  takeItem(id,1);const v=B.E.likes[id]||(effect?+effect[1]:0);
-  if(v||(taste&&['아주 좋아함','좋아함'].includes(taste.kind)))learn('like:'+B.kind+':'+id);
-  B.calm=Math.min(100,B.calm+(v||8));
-  B.msg=taste?taste.line:v?((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText):jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.';
+  const v=B.E.likes[id]||(effect?+effect[1]:0);
+  // 결정 D-64: 좋아하지 않는 물건은 진정 0, 물건은 보따리에 그대로 둔다. 빈틈도 쓰지 않는다.
+  if(!v){$('bGiftHint').textContent=(taste?taste.line:jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.')+' 물건은 보따리에 그대로 두었다.';return;}
+  takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();
+  B.calm=Math.min(100,B.calm+v);
+  B.msg=taste?taste.line:((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText);
   if(v&&B.E.vinePath)B.scentKnot={u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h,t:90};
   if(B.warm&&id==='dokkaebibul')B.warm.fire=180;
   closeGift();renderBHud();
@@ -457,16 +477,32 @@ function giveGift(id){
   }
 }
 $('bGift').onclick=openGift;$('bHit').onclick=()=>bStrike();$('bGiftClose').onclick=closeGift;
-$('bFlee').onclick=()=>{if(B&&B.st!=='end'&&B.st!=='finale'&&!B.paused)bEnd('flee');};
+// 결정 D-84: 물러나기는 한 번 더 눌러야 끝난다. 처음 누르면 글이 바뀌고 잠시 뒤 되돌아간다.
+let fleeArmT=null;
+function disarmFlee(){clearTimeout(fleeArmT);fleeArmT=null;const b=$('bFlee');b.classList.remove('armed');b.textContent='물러나기';}
+$('bFlee').onclick=()=>{
+  if(!B||B.st==='end'||B.st==='finale'||B.paused)return;
+  if(!fleeArmT){const b=$('bFlee');b.classList.add('armed');b.textContent='정말 물러날까? 한 번 더';fleeArmT=setTimeout(disarmFlee,2600);return;}
+  disarmFlee();bEnd('flee');
+};
 /* 기존 치기 버튼의 누름/놓기를 읽는다. 다른 보스의 클릭 처리는 그대로 둔다. */
 const vinePointers=new Set();
 [$('bHit'),document.querySelector('#pad [data-k="atk"]')].filter(Boolean).forEach(button=>{
+  let downAt=0;
   button.addEventListener('pointerdown',e=>{
     if(!B||!B.E.vinePath||B.paused||B.st!=='tell')return;
+    // 잡아 둔 고리를 한 번 더 누르면 놓는다
+    if(vineLatch){vineLatch=false;moveVine();return;}
+    downAt=performance.now();
     vinePointers.add(e.pointerId);try{button.setPointerCapture(e.pointerId);}catch(_){}
     grabVine();
   });
-  const release=e=>{vinePointers.delete(e.pointerId);if(B&&!B.paused&&B.E.vinePath)moveVine();};
+  const release=e=>{
+    if(!vinePointers.delete(e.pointerId))return;
+    // 짧게 누른 터치는 손을 떼도 고리를 잡고 있는다
+    if(TOUCH&&B&&B.vinePath?.dragging&&performance.now()-downAt<280){vineLatch=true;B.msg='고리를 잡았다. 옮긴 뒤 치기 버튼을 한 번 더 누르면 놓는다.';return;}
+    if(B&&!B.paused&&B.E.vinePath)moveVine();
+  };
   button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);
 });
 addEventListener('blur',()=>{vinePointers.clear();});

@@ -255,7 +255,7 @@ if(!CLASSIC){
     if(spec)z.platforms=active||(G.zone==='gate'&&bridgeReady())?[...bases[G.zone],...spec.bridge]:bases[G.zone];
     if(G.zone==='cliff')z.platforms=G.boss.dead?bases.cliff:bases.cliff.filter(p=>p.x<2200);
     if(m&&!active)delete G.f.dolMemory;
-    if(active&&!vistaMode&&Sound.ambient!=='dol-memory')Sound.ambience('dol-memory');
+    if(active&&!vistaMode&&Sound.ambient!=='dol-memory'){Sound.ambience('dol-memory');Sound.passage('memory_layer');}
     if(!active&&Sound.ambient==='dol-memory')Sound.ambience(null);
   }
   function memoryTalk(zone){
@@ -376,16 +376,18 @@ if(!CLASSIC){
     ...[{job:'bank',x:1820,y:166,name:'옛 다리 밑돌'},{job:'arch',x:1885,y:140,name:'옛 다리판'},{job:'rail',x:2045,y:112,name:'옛 다리 끝돌'}].map(p=>({
       id:'dol_bridge_survey_'+p.job,memorySurvey:p.job,x:p.x,y:p.y,to:'gate',toX:p.x,toY:p.y,
       get label(){return p.name+(Rg.bridgeSurveyReady(p.job)?' 다시 보기 · E':' 살피기 · E');},
-      draw:(x,y)=>{if(surveyVisible())A.drawBridgeSurvey(x,y,Rg.bridgeSurveyReady(p.job));},
+      // 결정 D-82: 다리를 다 놓으면 조사 자리는 사라진다(지름길 안내를 가리지 않게)
+      get distance(){return bridgeReady()?-1:undefined;},
+      draw:(x,y)=>{if(surveyVisible()&&!bridgeReady())A.drawBridgeSurvey(x,y,Rg.bridgeSurveyReady(p.job));},
     })),
     // 무너진 옛 다리는 몸의 문제라 다람쥐가 남은 들보로 건넌다. 뿔이의 허락(장승제)은 약속이라 변신으로도 남는다 (PA-47).
-    {id:'dol_bridge_shortcut',depth:true,x:2040,y:112,to:'cliff',toX:1770,toY:192,label:'놓은 돌다리로 절벽길에 · E',need:bridgeOpen,reason:'다리를 다 놓고 뿔이의 길 허락을 받으면 절벽길로 이어진다.',draw:marker,
+    {id:'dol_bridge_shortcut',depth:true,x:2090,y:112,to:'cliff',toX:1770,toY:192,label:'놓은 돌다리로 절벽길에 · E',need:bridgeOpen,reason:'다리를 다 놓고 뿔이의 길 허락을 받으면 절벽길로 이어진다.',draw:marker,
       formPass:'squirrel',formNeed:permit,formLabel:'다람쥐로 남은 들보 타고 건너기'},
   ];
   Rg.zones.village.doors=[{id:'dol_depth_shrine',depth:true,x:2440,to:'shrine',toX:100,label:'돌계단 안쪽, 성황당으로 · ↑ / E',need:permit,reason:gateReason,draw:marker,drawBlocked:blocked}];
   Rg.zones.cliff.doors=[
     {id:'dol_depth_back',depth:true,reverse:true,x:100,to:'gate',toX:1650,label:'장승 고갯길로 돌아가기 · E',draw:marker},
-    {id:'dol_bridge_return',depth:true,reverse:true,x:1770,to:'gate',toX:2040,toY:112,label:'함께 놓은 돌다리로 돌아가기 · E',need:bridgeOpen,reason:'고갯길에서 옛 다리를 다시 놓으면 이 길로 돌아갈 수 있다.',draw:marker,
+    {id:'dol_bridge_return',depth:true,reverse:true,x:1770,to:'gate',toX:2090,toY:112,label:'함께 놓은 돌다리로 돌아가기 · E',need:bridgeOpen,reason:'고갯길에서 옛 다리를 다시 놓으면 이 길로 돌아갈 수 있다.',draw:marker,
       formPass:'squirrel',formNeed:permit,formLabel:'다람쥐로 남은 들보 타고 돌아가기'},
     {id:'dol_darae_path',depth:true,x:2160,to:'cliff',toX:2240,label:'골렘이 비켜 준 다래길',need:calm,reason:'성황당 돌무더기가 절벽 위 길을 흔든다. 성황당에서 먼저 잠재우자.',draw:marker,drawBlocked:blocked},
   ];
@@ -408,6 +410,9 @@ if(!CLASSIC){
   Rg.zones.village.digs=[{id:'dol_cache_village',x:1420,item:'acorn',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.shrine.pickups=[{id:'dol_memory_seogi',x:1580,y:112,item:'seogi',got:false}];
   Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'해 떴다!\n엄마도 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:marker,layers:A.cliffLayers}];
+  // 결정 D-83: 밭 둔덕에서 먼 성황당 돌무더기가 꿈틀하는 것이 보인다. 목적지(성황당)와 골렘을 미리 보여 준다.
+  Rg.zones.field.vistas=[{id:'shrine_stir',x:1500,from:0,to:180,sound:'wind',thought:'저 먼 돌무더기가… 움직였어?\n바람 탓인가.',
+    diary:'메밀밭 둔덕에서 먼 산 쪽 돌무더기가 꿈틀하는 것을 봤다. 돌이 저절로 움직일 리 없는데.',draw:marker,layers:A.stirLayers}];
   Rg.zones.shrine.vistas=[{id:'wishing_stones',x:1850,from:40,to:390,sound:'wind',thought:'작은 돌도 받치고 있네.\n엄마 돌도 놓을래.',diary:'성황당 돌탑 아래에서 바람을 들었다. 작은 돌들이 서로를 받치고 있었다.',draw:marker,layers:A.shrineLayers}];
 
   // story.js가 NPC와 콜백을 모두 등록한 뒤 한 번 호출한다.
@@ -430,7 +435,7 @@ if(!CLASSIC){
     Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.id==='dol_seogi'))G.digs.push({id:'dol_seogi',zone:'cliff',x:1920,item:'seogi',done:false});};
     Rg.startGolem=()=>{
       G.px=2275;
-      inkTransition('전투',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
+      inkTransition('돌 골렘',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
         if(res==='win'||res==='calm'){
           if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
           Rg.bossDie();

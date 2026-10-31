@@ -50,7 +50,7 @@ const Trade=(()=>{
     if(!g)return '먼저 받을 물건을 고른다.';
     if(g.kind==='story')return g.asks.some(a=>a[id])?null:'이 부탁과는 상관없는 물건이다.';
     if(id===g.item)return '같은 물건끼리는 바꾸지 않는다.';
-    if(['귀한 것','도구'].includes(ITEMS[id].kind))return '귀한 것은 흔한 물건과 바꾸지 않는다.';
+    if(keepsake(id))return /^(dad|mom)_/.test(id)?'집안 물건은 내놓지 않는다.':'귀한 것은 흔한 물건과 바꾸지 않는다.';   // 결정 D-63
     const now={...G.inv,[id]:(G.inv[id]||0)-(S.offer[id]||0)};
     if(progressShortage({...now,[id]:now[id]-1})>progressShortage(now))return '아직 쓸 데가 있다.';
     return null;

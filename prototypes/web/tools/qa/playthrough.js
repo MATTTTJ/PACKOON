@@ -209,7 +209,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     }
   }
   async function battle(gifts) {
-    scene+=' · 전투';let end=Date.now()+25000;
+    scene+=' · 전투';let end=Date.now()+60000;   // 결정 D-64: 선물은 빈틈에만. 선물 버튼을 누르면 다음 빈틈에 창이 열린다
     while(Date.now()<end) {
       const s=await check();
       if(!s.battle){if(s.ink){await wait(100);continue;}await settle();return;}
@@ -220,7 +220,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       const name=await read(`ITEMS[${json(gift)}].n`);
       await textButton('#bGiftGrid button',new RegExp(name));await wait(150);
     }
-    throw new Error('전투 선물/결과 처리가 25초 안에 끝나지 않았다');
+    throw new Error('전투 선물/결과 처리가 60초 안에 끝나지 않았다');
   }
   async function stage(label,action) {scene=label;b.scene=label;log('시작',label);await action();const s=await check();milestones.push({scene,region:s.region,zone:s.zone,goal:s.goal,inv:s.inv,flags:s.flags,awake:s.awake});}
   async function next() {
@@ -274,7 +274,12 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('아빠 몸짓 읽기를 마치지 못했다');if(mode==='expanded')for(let i=0;i<3;i++)await npc('y_ice_station_'+i);});
     await stage('영산 · 봄과 열매',async()=>{await npc('sangun');await moveX(2050);await battle(['dokkaebibul']);await pickup('legend_fruit');await npc('sangun');});
     const final=await settle();if(!final.ended||final.region!=='yeongsan'||!final.flags.yakDone)throw new Error('마지막 귀향과 엔딩에 도착하지 못했다');
+    // 결정 D-73: 엔딩은 한 줄씩 넘긴다. 이름 칸이 나올 때까지 '다음'을 누르고, 이름을 부른 뒤에도 끝까지 넘긴다.
+    for(let i=0;i<12&&!await read("!!$('newName')");i++){await click('#endExtra .end-next');await wait(80);}
+    if(!await read("$('endButtons').hidden"))throw new Error('엔딩 대사가 끝나기 전에 아래 버튼이 보인다');
     await click('#newName');await b.send('Input.insertText',{text:'새봄'});await textButton('#endExtra button',/부르기/);await wait(1100);
+    for(let i=0;i<8&&await read("$('endButtons').hidden");i++){if(await read("!!document.querySelector('#endExtra .end-next')"))await click('#endExtra .end-next');await wait(120);}
+    if(await read("$('endButtons').hidden"))throw new Error('엔딩을 끝까지 넘겨도 아래 버튼이 나오지 않는다');
     if(await read('G.f.newName')!=='새봄')throw new Error('엔딩 이름 입력이 저장되지 않았다');
     await b.screenshot(path.join(outDir,mode+'-ending.png'));
   } catch(error) {

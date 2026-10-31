@@ -135,6 +135,7 @@ function nalConfess(fromLedger,next){
     ['날쌘','단풍골에서 그 모자를 봤어.\n내가 갚을 게 많은 보부상 모자더라.']);
   // 묻고 나서 들은 경우엔 설피를 이미 받았으니, 아빠가 위에 있는 걸 아는 까닭까지 잇는다.
   if(!fromLedger)lines.push(['날쌘','가을에 이 길로 올라가는 걸 봤어.\n내려오는 건 못 봤고.']);
+  sceneNext('y_nal_confess');
   talk(lines,()=>{
     F.yArcsNal4=true;if(!fromLedger)F.yNalAutumn=true;learn('nal:yeongsan');
     diary('y_arcs_nal4','날쌘은 아빠와 같은 상단이었다. 아빠가 날쌘이 잃은 물건값을 대신 물어 줬고, 다들 깍쟁이라 할 때도 아빠만은 그러지 않았다. 단풍골에서 아빠 모자를 보고 나를 앞질러 다녔단다.');
@@ -266,6 +267,7 @@ function dadLedger(){
   const F=G.f;F.dadDone=true;addItem('dad_ledger',1);learn('dad:ledger');
   clue('y2','아빠의 장부 한 장','엄마의 글씨: "제 둔갑과 말을 드립니다. 아이의 숨을 주세요." 그 아래 아빠의 글씨: "말 하나 더함."');
   diary('y_ledger','아빠가 내민 장부에 엄마의 글씨가 있었다. "제 둔갑과 말을 드립니다. 아이의 숨을 주세요." 그 아래에는 아빠의 글씨. "말 하나 더함." 엄마가 아픈 건 나를 살린 값이었다.');
+  sceneNext('y_dad_ledger');
   talk([['너구리','(낡은 장부다. 이 글씨는…)'],
     ['너구리','(엄마의 글씨) "제 둔갑과 말을 드립니다. 아이의 숨을 주세요."'],
     ['너구리','(그 아래, 아빠의 글씨) "말 하나 더함."'],
@@ -277,6 +279,7 @@ function talkDad(){
   // 아빠는 집안 사람이라 변신한 아이를 알아본다 (leaf-transform.md 6-4).
   if(G.form&&F.dadMet){talk([['아빠','(아빠가 보따리 끈의 잎사귀를 손가락으로 톡 친다.\n다 안다는 얼굴이다.)']]);return;}
   if(!F.dadMet){F.dadMet=true;
+    sceneNext('y_dad_reunion');   // 결정 D-72: 알아보는 "…아빠?"부터 아빠 곡
     talk([['너구리','(호숫가의 너구리가 신목을 바라보고 있다. 저 뒷모습은…)'],['너구리','…아빠?'],
       ['아빠','(아빠가 돌아본다. 벌떡 일어나 나를 꽉 끌어안는다.\n입이 달싹이는데, 숨소리만 들린다.)']],()=>gesture(0));return;}
   if(!F.dadDone){gesture(0);return;}
@@ -297,6 +300,7 @@ function talkSangun(){
       clue('y3','산군 할아버지','엄마는 아빠가 젊을 때 다녀온 영산 이야기를 듣고 나를 안고 혼자 왔다. 아빠는 지난가을 말을 내놓아 글로도 연락할 수 없게 됐다.');
       diary('y_sangun','젊은 아빠는 부를 준다는 소문을 좇아 영산에 왔지만 되찾을 것이 없어 빈손으로 돌아갔다. 엄마는 그 이야기를 기억해 나를 안고 혼자 왔다. 그때 아빠는 장삿길에 있었다. 지난가을 아빠가 말을 내놓은 뒤에는 글도 쓸 수 없었다. 장부의 두 글씨는 그 전에 썼을 것이다.');
       // 아이가 아빠에게 받은 장부 한 장을 내밀고 묻는다. 산군은 묻는 것에 답한다.
+      sceneNext('y_sangun_story');
       talk([['너구리','엄마가 여기 와서 이걸 썼어요?'],
         ['산군 할아버지','(커다란 호랑이가 눈을 뜬다. 장부 한 장을 오래 들여다본다.)'],
         ['산군 할아버지','네가 그 아기로구나.'],
@@ -313,6 +317,7 @@ function talkSangun(){
     }
     clue('y3','산군 할아버지','엄마는 아기였던 나를 살리려고 영산에 올라와, 둔갑과 말을 값으로 내놓았다. 아빠는 그걸 알고 자기 말을 더 얹었다.');
     diary('y_sangun','산군 할아버지가 엄마의 오래된 거래를 들려주었다. 숨이 다해 가던 아기였던 나를 살리려고, 엄마가 둔갑과 말을 내놓았다. 아빠는 되돌려 달라고 자기 말을 더 얹었다.');
+    sceneNext('y_sangun_story');
     talk([['산군 할아버지','네가 그 아기로구나. 숨이 꺼져 가던…'],
       ['산군 할아버지','오래전 겨울, 네 어미가 너를 품에 안고 이 산에 올랐다.'],
       ['산군 할아버지','어미는 제 둔갑과 말을 값으로 내놓았다. 나는 네 숨을 돌려주었다.'],
@@ -326,6 +331,7 @@ function talkSangun(){
   if(!G.boss.dead){talk([['산군 할아버지','강철이가 호수를 놓지 않는 한 봄은 오지 않는다.']]);return;}
   if(!F.fruitGot){talk([['산군 할아버지','봄이로구나. 신목에 열매가 열렸다. 따 오너라.']]);return;}
   if(!F.nameGiven){
+    sceneNext('y_sangun_name');
     talk([['산군 할아버지','어미의 둔갑과 말, 둘을 돌려주려면 아비의 말 하나론 모자란다.'],
       ['너구리','아빠 이름으로는 안 돼요?'],
       ['산군 할아버지','받을 수 없었다. 남이 값을 보탤 수는 있어도\n셈을 닫는 값은 숨을 받은 쪽이 낸다.'],
@@ -355,6 +361,7 @@ function giveName(){
   const F=G.f;if(F.nameGiven)return;
   F.nameGiven=true;ledgerDone('sangun');rel('sangun',1);learn('sangun:name');
   diary('y_name','산군 할아버지에게 내 이름을 내놓았다. 셈이 맞았다. 무언가가 가슴에서 조용히 빠져나갔다.');
+  sceneNext('y_give_name');
   talk([['산군 할아버지','…그 이름이면 셈이 맞는다.'],
     ['너구리','(가슴에서 무언가 빠져나갔다. 내 이름… 뭐였지?)'],
     ['아빠','(아빠가 다가와 내 이마에 제 이마를 댄다.\n내 보따리에서 약연을 꺼내, 내 손 위에 손을 포갠다.)'],
@@ -369,7 +376,7 @@ function makeReturningMedicine(){
   if(!has(recipe.out,recipe.n)&&Object.entries(recipe.need).some(([id,n])=>!has(id,n))){
     talk([['아빠','(아빠가 신목의 열매를 가리키고 약연 곁을 가만히 두드린다.)']]);return;
   }
-  awaken('yakyeon');learn('yakyeon:awake');
+  awaken('yakyeon');learn('yakyeon:awake');Sound.roller();
   if(!has(recipe.out,recipe.n)){
     for(const [id,n] of Object.entries(recipe.need))takeItem(id,n);
     addItem(recipe.out,recipe.n);
@@ -385,7 +392,7 @@ function makeReturningMedicine(){
 /* ---------- 강철이 전투 ---------- */
 Rg.startGangcheol=()=>{
   G.px=2000;
-  inkTransition('전투',(G.boss.x-G.cam)/W*100,()=>startBattle('gangcheol',res=>{
+  inkTransition('강철이',(G.boss.x-G.cam)/W*100,()=>startBattle('gangcheol',res=>{
     if(res==='win'||res==='calm'){
       if(res==='calm')diary('y_calm','강철이를 부수지 않고 달랬다. 강철이는 서리 수염 하나를 남기고 따뜻한 남쪽 바다로 떠났다.');
       Rg.bringSpring();
@@ -435,34 +442,56 @@ Rg.goHome=()=>{
 };
 /* 엄마의 절정 대사는 decisions.md 그대로. 이름은 이 브라우저의 저장에만 남는다. */
 // 결정 D-04: 엄마의 절정 대사 (design/data/decisions.csv)
+/* 결정 D-73: 엔딩은 한 줄씩 넘긴다(다음 버튼·화면 누르기·Enter·Space·E). 대사와 순서는 D-04 그대로.
+   "삐익" 줄에서 실제 잎 소리를 낸다. 반딧불은 한 번만 말하고, 빛이 엄마로 모이는 것으로 잇는다.
+   이름을 부르고 끝날 때까지 아래 버튼(수첩·지도·처음부터)은 숨긴다. 다시 열면(이미 이름이 있으면) 한꺼번에 보인다. */
 Rg.endExtra=box=>{
-  const wrap=el('div','newname');
-  // 엄마의 마른 잎사귀 (leaf-transform.md 8): 둔갑을 되찾는 순간 같은 잎 소리가 난다.
-  wrap.appendChild(el('p',null,'(경대 위 마른 잎이 엄마 입술에 닿자 초록빛이 돈다. 삐익, 내 잎과 같은 소리가 났다.)'));
-  wrap.appendChild(el('p',null,'(방 안에 반딧불이 가득 찬다. 예전처럼.)'));
-  wrap.appendChild(el('p',null,'(반딧불에서 돌아온 엄마가 내 얼굴을 쓰다듬는다.)'));
-  wrap.appendChild(el('p','newname-call','엄마: "…네 얼굴은 하나도 안 잊었어. 이름만 비었지."'));
-  wrap.appendChild(el('p','newname-call','엄마: "봄에 돌아온 아이니까… 엄마가 새로 지어 줄게."'));
-  const call=(n,pause)=>{
-    const speech=el('div');speech.setAttribute('aria-live','polite');
-    speech.appendChild(el('p','newname-call','엄마: "'+jo(n,'아','야')+'."'));wrap.appendChild(speech);
-    const finish=()=>{
-      speech.appendChild(el('p','newname-call','엄마: "'+jo(n,'아','야')+', 어서 와."'));
-      speech.appendChild(el('p','newname-call','너구리: "네, 엄마."'));
-      speech.appendChild(el('p',null,'(아빠는 말없이 웃으며 두 팔로 우리를 감싼다.)'));
-    };
-    if(pause){const owner=G;setTimeout(()=>{if(owner===G&&speech.isConnected)finish();},1000);}else finish();
+  const wrap=el('div','newname');wrap.setAttribute('aria-live','polite');
+  const buttons=$('endButtons');
+  const beats=[
+    ()=>{wrap.appendChild(el('p',null,'(경대 위 마른 잎이 엄마 입술에 닿자 초록빛이 돈다. 삐익, 내 잎과 같은 소리가 났다.)'));Sound.leaf('');},
+    ()=>wrap.appendChild(el('p',null,'(방 안에 반딧불이 가득 찬다. 예전처럼.)')),
+    ()=>wrap.appendChild(el('p',null,'(빛이 한데 모여 엄마가 되고, 엄마가 내 얼굴을 쓰다듬는다.)')),
+    ()=>wrap.appendChild(el('p','newname-call','엄마: "…네 얼굴은 하나도 안 잊었어. 이름만 비었지."')),
+    ()=>wrap.appendChild(el('p','newname-call','엄마: "봄에 돌아온 아이니까… 엄마가 새로 지어 줄게."'))
+  ];
+  const owner=G;
+  const done=()=>{if(buttons)buttons.hidden=false;};
+  const call=(n,stepwise)=>{
+    const lines=[['newname-call','엄마: "'+jo(n,'아','야')+'."'],['newname-call','엄마: "'+jo(n,'아','야')+', 어서 와."'],
+      ['newname-call','너구리: "네, 엄마."'],[null,'(아빠는 말없이 웃으며 두 팔로 우리를 감싼다.)']];
+    if(!stepwise){lines.forEach(([c,t])=>wrap.appendChild(el('p',c,t)));done();return;}
+    stepper(lines.map(([c,t])=>()=>wrap.appendChild(el('p',c,t))),done);
   };
-  if(G.f.newName){call(G.f.newName,false);box.appendChild(wrap);return;}
+  // 한 줄씩 넘기는 장치. 마지막 줄 뒤에 next를 부른다.
+  function stepper(list,next){
+    let i=0;const more=el('button','btn end-next','다음 ▸');more.type='button';
+    const step=()=>{if(owner!==G||!wrap.isConnected)return;if(i<list.length)list[i++]();if(i>=list.length){more.remove();removeEventListener('keydown',key,true);next();}else wrap.appendChild(more);more.focus({preventScroll:true});};
+    const key=e=>{if($('endScreen').hidden||e.target.matches?.('input'))return;if([' ','enter','e'].includes(e.key.toLowerCase())){e.preventDefault();e.stopPropagation();step();}};
+    more.onclick=step;addEventListener('keydown',key,true);step();
+  }
+  if(G.f.newName){beats.forEach(b=>b===beats[0]?wrap.appendChild(el('p',null,'(경대 위 마른 잎이 엄마 입술에 닿자 초록빛이 돈다. 삐익, 내 잎과 같은 소리가 났다.)')):b());call(G.f.newName,false);box.appendChild(wrap);return;}
+  if(buttons)buttons.hidden=true;
+  box.appendChild(wrap);
+  stepper(beats,askName);
+  function askName(){
   wrap.appendChild(el('label','newname-label','엄마가 지어 준 새 이름'));
   const row=el('div','row');const inp=el('input','newname-input');inp.type='text';inp.maxLength=6;inp.placeholder='이름을 적어 주세요';inp.id='newName';
   const btn=el('button','btn primary','부르기');btn.type='button';
   const go=()=>{const n=(inp.value||'').trim().slice(0,6);if(!n){inp.focus();return;}
-    if(G.f.newName)return;G.f.newName=n;row.remove();wrap.querySelector('label').remove();call(n,true);
+    if(G.f.newName)return;G.f.newName=n;row.remove();wrap.querySelector('label').remove();
+    // 엄마가 이름을 처음 부른 뒤 한 박자 쉬고, 이어지는 말은 한 줄씩 넘긴다.
+    wrap.appendChild(el('p','newname-call','엄마: "'+jo(n,'아','야')+'."'));
+    setTimeout(()=>{if(owner===G&&wrap.isConnected)stepper([
+      ()=>wrap.appendChild(el('p','newname-call','엄마: "'+jo(n,'아','야')+', 어서 와."')),
+      ()=>wrap.appendChild(el('p','newname-call','너구리: "네, 엄마."')),
+      ()=>wrap.appendChild(el('p',null,'(아빠는 말없이 웃으며 두 팔로 우리를 감싼다.)'))],done);},1000);
     if(typeof writeSave==='function')writeSave(true);
   };
   btn.onclick=go;inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')go();});
-  row.appendChild(inp);row.appendChild(btn);wrap.appendChild(row);box.appendChild(wrap);
+  row.appendChild(inp);row.appendChild(btn);wrap.appendChild(row);
+  setTimeout(()=>{if(matchMedia('(pointer:fine)').matches)inp.focus({preventScroll:true});},0);
+  }
 };
 
 /* ---------- NPC (npcs.csv 의 id). 살금이는 달아났다 돌아오므로 x 를 상태에서 읽는다 ---------- */
