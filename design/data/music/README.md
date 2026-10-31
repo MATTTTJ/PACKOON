@@ -170,3 +170,24 @@ Trim·Normalize·샘플레이트 강제 변경은 먼저 끈다. 샘플 위치�
 | Water 02 · unfa | 물 붓기·물결 | [Freesound 원본](https://freesound.org/people/unfa/sounds/161495/), CC0 |
 | Footsteps - quiet.wav · jodybruchon | 조용한 발걸음 보조층 | [Freesound 원본](https://freesound.org/people/jodybruchon/sounds/433884/), CC0 |
 | Impact Sounds · Kenney | 나무·금속 타격 보조층 | [제작자 배포 페이지](https://kenney.nl/assets/impact-sounds), CC0 |
+
+
+## 장면별 곡 (결정 D-72)
+
+대화 곡은 `design/data/scene_music.csv`가 정한다. 한 줄이 장면 하나이고, 칸은 `id,지역,장면,곡,시작줄,까닭,상태`다.
+
+- `곡`은 이 폴더 `music.json`의 곡 id이거나 `지역`이다. `지역`은 이야기 곡을 깔지 않고 지역 곡을 그대로 둔다.
+- `시작줄`부터 그 곡이 나온다. 그 전 줄에는 지역 곡이 흐른다. 예를 들어 아빠 재회는 아이가 "…아빠?"라고 알아보는 1번 줄부터 아빠 곡이다.
+- 웹에서는 지역 코드가 대화 직전에 `sceneNext('<id>')`를 부른다. 표에 없는 대화는 예전 자동 규칙을 따른다. 아빠가 말하면 아빠 곡, 날쌘과 여러 줄을 나누면 날쌘 곡이다.
+- `build-data.js`가 곡 id와 시작줄을 검사하고 `TABLES.SCENE_MUSIC`으로 넘긴다.
+
+## 효과음 연결 (결정 D-74)
+
+- 환경음(바람·물·기억 다리)이 켜져 있어도 효과음은 난다. 효과음을 쉬는 때는 경치를 바라보는 동안뿐이다(`Sound.setQuiet`).
+- 쓰는 곳
+  - `book_open`·`book_close`: 수첩을 여닫을 때
+  - `medicine_roller`: 약연 손놀림과 약연이 깨어날 때
+  - `ui_confirm`·`ui_cancel`: 대화 선택지를 고를 때. 그만두기는 `ui_cancel`이다.
+  - `drift`: 단풍골 함지박 물길
+  - `depth_enter`: 나무 속으로 들어갈 때
+  - `memory_layer`: 돌너머 기억 다리

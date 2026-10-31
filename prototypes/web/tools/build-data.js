@@ -198,7 +198,7 @@ const MINIGAMES=numericTable('minigames','미니게임',
     'steam_relation rhythm_notes rhythm_good rhythm_perfect rhythm_scroll_speed',
     'rhythm_bonus_hits rhythm_start_delay rhythm_subbeat rhythm_intro_beats rhythm_parts',
     'rhythm_normal_gap rhythm_late_gap rhythm_normal_last rhythm_late_hint_delay rhythm_finish_delay',
-    'rhythm_cooldown rhythm_resume_delay rhythm_combo rhythm_relation rhythm_high_relation',
+    'rhythm_cooldown rhythm_stray_window rhythm_resume_delay rhythm_combo rhythm_relation rhythm_high_relation',
     'rhythm_note_one rhythm_note_two rhythm_note_three rhythm_note_four rhythm_note_five',
     'rhythm_note_six rhythm_note_seven rhythm_note_eight salg_graze salg_return_graze',
     'salg_moving salg_return_speed salg_active_distance salg_arrival_distance salg_grass_interval',
@@ -207,10 +207,8 @@ const MINIGAMES=numericTable('minigames','미니게임',
     'salg_near_distance salg_near_graze salg_near_random dad_steps gather_help_misses',
     'gather_help_width gather_zone_start gather_zone_span gather_ring_period gather_ring_radius gather_just_window gather_cooldown',
     'gather_perfect_power gather_yield gather_perfect_bonus gather_root_hits gather_root_width',
-    'gather_root_speed gather_ssari_hits gather_ssari_width gather_ssari_speed gather_kkoe_hits',
-    'gather_kkoe_width gather_kkoe_speed gather_eoksae_hits gather_eoksae_width gather_eoksae_speed',
-    'gather_seogi_hits gather_seogi_width gather_seogi_speed gather_darae_vine_hits gather_darae_vine_width',
-    'gather_darae_vine_speed'
+    'gather_root_speed gather_ssari_hits gather_kkoe_hits gather_eoksae_hits gather_seogi_hits',
+    'gather_darae_vine_hits gather_darae_vine_width gather_darae_vine_speed yut_needle_speed yut_nak_zone'
   ].join(' '));
 const TUNING=numericTable('tuning','분류',
   [
@@ -261,7 +259,10 @@ requireValue(TUNING.battle_squirrel_speed>TUNING.battle_bare_speed&&TUNING.battl
 requireValue(TUNING.battle_goat_damage_taken>0&&TUNING.battle_goat_damage_taken<1&&TUNING.battle_owl_tell_lead>=0&&TUNING.battle_deer_iframes>=TUNING.battle_iframes,'tuning.csv: 산양 피해 배수는 0~1 사이, 고라니 무적 시간은 기본 이상이어야 한다');
 requireValue(TUNING.form_squirrel_speed>0&&TUNING.form_deer_speed>0&&TUNING.form_goat_jump>=1&&TUNING.form_owl_glide_fall>0&&TUNING.form_owl_glide_fall<TUNING.field_fall_speed&&TUNING.form_climb_speed>0&&TUNING.form_climb_reach>0&&TUNING.form_deer_listen_range>0&&Number.isInteger(TUNING.stranger_trade_limit)&&TUNING.stranger_trade_limit>0,'tuning.csv: 필드 변신 배수·활공·오르기·손님 교환 수를 확인한다');
 requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_pickaxe_bonus>0,'tuning.csv: 전투 기본 피해·날 세운 피해·곡괭이 덤을 확인한다');
-for(const id of ['root','ssari','kkoe','eoksae','seogi','darae_vine']){
+requireValue(MINIGAMES.yut_nak_zone>0&&MINIGAMES.yut_nak_zone<40&&MINIGAMES.yut_needle_speed>0,'minigames.csv: 윷 낙 구간은 0~40%, 바늘 속도는 0보다 커야 한다');
+requireValue(MINIGAMES.rhythm_stray_window>=MINIGAMES.rhythm_good,'minigames.csv: 헛가위 범위는 맞음 판정 반폭 이상이어야 한다');
+// 폭·속도 줄은 실제로 막대 판정을 쓰는 칡뿌리(낫 일 놀이)와 다래(영산 활동)만 둔다.
+for(const id of ['root','darae_vine']){
   const width=MINIGAMES['gather_'+id+'_width'];
   requireValue(width>0&&width+MINIGAMES.gather_help_width<=MINIGAMES.gather_zone_span&&MINIGAMES.gather_zone_start+MINIGAMES.gather_zone_span<=100,'minigames.csv: '+id+' 채집 판정 범위가 막대를 벗어난다');
 }
@@ -291,7 +292,21 @@ for(const r of t('haggle')){
   slot[region]={kind,kid:r['아이대사'].trim(),line:r['대답'].trim()};
 }
 for(const [npc,ways] of Object.entries(HAGGLE))for(const way of ['허세','사정','칭찬'])if(!ways[way]?.all)fail('haggle.csv '+npc+': '+way+'의 전체 줄이 필요하다');
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE},null,1)+";\n";
+/* 결정 D-72: 장면별 곡. 곡은 design/data/music/music.json의 곡 id이거나 '지역'(이야기 곡을 깔지 않고 지역 곡을 둔다).
+   시작줄부터 그 곡으로 바꾼다(그 전 줄은 지역 곡). */
+const SCENE_MUSIC={};
+{
+  const music=JSON.parse(fs.readFileSync(path.join(DATA,'music','music.json'),'utf8'));
+  const trackIds=new Set((music.tracks||music.score?.tracks||[]).map(t=>t.id));
+  for(const r of t('scene_music')){
+    const where='scene_music.csv '+r.id,song=r['곡'].trim(),from=+r['시작줄'];
+    if(!regionIds.has(r['지역']))fail(where+': 지역 id를 확인한다');
+    if(song!=='지역'&&!trackIds.has(song))fail(where+': 곡 id가 music.json에 없다 '+song);
+    if(!Number.isSafeInteger(from)||from<0)fail(where+': 시작줄은 0 이상의 정수다');
+    SCENE_MUSIC[r.id]={music:song==='지역'?'':song,from};
+  }
+}
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

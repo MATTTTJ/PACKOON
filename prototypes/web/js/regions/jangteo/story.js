@@ -59,6 +59,7 @@ function bueongLedger(){
   ]);
 }
 function nalLedger(){
+  sceneNext('j_nal_ledger');
   arcScene('jangteoArcsNal3','날쌘은 부엉 영감이 있는 숙소를 피했다. 장부 이야기는 꺼내지 말라고 했다.',[
     ['너구리','아저씨, 왜 숙소 쪽엔 안 와요?'],
     ['날쌘','누가 피해? 여기서도 장사 잘돼.'],
@@ -126,8 +127,11 @@ defineMinigame({id:'jangteoHands',hit:handHit,step(){
   drawHands();
 }});
 
-/* 장날 네 말 윷. 판·업기·잡기는 지역 규칙이며 타이밍 바늘은 채집 수치를 재사용한다.
-   던진 뒤 옮기고, 윷·모 또는 잡기면 다시 던진다. 빽도는 쓰지 않는다. */
+/* 장날 네 말 윷. 판·업기·잡기는 지역 규칙이다.
+   던진 뒤 옮기고, 윷·모 또는 잡기면 다시 던진다. 빽도는 쓰지 않는다.
+   결정 D-70: 도·개·걸·윷·모는 네 윷을 정말 던지듯 무작위로 정한다(타이밍과 상관없다).
+   바늘은 '낙'을 피하는 데만 쓴다: 양 끝 낙 구간(yut_nak_zone)에서 던지면 윷이 멍석 밖으로 떨어져 그 차례는 못 옮긴다.
+   바늘은 가운데에서 출발하고, 동작 줄이기에서는 가운데에 멈춰 있어 낙이 나지 않는다. 결과 분포는 어느 쪽이든 같다. */
 const yutP=makePanel('jangteoYut','설날 윷놀이 · 콩 말과 돌 말','윷 들기');
 const ycv=$('jangteoYutCv');ycv.height=240;
 Object.assign(yutP.style,{position:'fixed',left:'50%',right:'auto',top:'50%',bottom:'auto',transform:'translate(-50%,-50%)',width:'min(92vw,760px)',maxHeight:'92dvh',overflowY:'auto',boxSizing:'border-box',zIndex:'22'});
@@ -197,16 +201,24 @@ function yDraw(){
     }
   }
   c.fillStyle='#3b3027';c.fillText('콩 '+s.me.filter(p=>p.node==='H').length+'/'+s.me.length,3,17);c.fillText('돌 '+s.elders.filter(p=>p.node==='H').length+'/'+s.elders.length,3,33);
-  // 바늘을 멈추기 전에도 네 윷의 앞뒤와 지금 나올 수를 볼 수 있다.
-  const bits=s.phase==='aim'?Math.min(15,Math.floor(yPos*16/100)):s.roll===5?0:(1<<s.roll)-1;
-  let faces=0;
+  // 손에 든 윷은 앞뒤를 알 수 없다. 던진 뒤에만 나온 면을 그린다. 낙이면 한 짝이 판 밖에 누워 있다.
+  const aiming=s.phase==='aim'||s.phase==='ready',bits=aiming||s.nak?0:s.roll===5?0:(1<<s.roll)-1;
   for(let i=0;i<4;i++){
-    const face=(bits>>i)&1;faces+=face;c.fillStyle=face?'#c9a266':'#8a633a';c.fillRect(5+i*12,75,7,52);
+    const off=s.nak&&!aiming&&i===3;
+    if(aiming){c.fillStyle='#a07a4a';c.fillRect(5+i*12,75,7,52);continue;}
+    const face=(bits>>i)&1;c.fillStyle=face?'#c9a266':'#8a633a';
+    if(off){c.save();c.translate(52,150);c.rotate(1.2);c.fillRect(0,0,7,52);c.restore();continue;}
+    c.fillRect(5+i*12,75,7,52);
     if(face){c.fillStyle='#513c27';c.fillRect(7+i*12,85,2,2);c.fillRect(7+i*12,113,2,2);}
   }
-  if(s.phase==='aim'||s.roll){c.fillStyle='#3b3027';c.fillText(ylabels[faces||5],14,146);}
+  c.fillStyle='#3b3027';
+  if(aiming)c.fillText('?',22,146);else if(s.nak)c.fillText('낙',20,146);else if(s.roll)c.fillText(ylabels[s.roll],14,146);
   if(s.phase==='aim'){
-    c.fillStyle='#a98f69';c.fillRect(10,218,260,12);c.fillStyle='#fff9e8';c.fillRect(10+yPos*2.6,214,3,20);
+    // 바늘 막대: 양 끝 붉은 칸이 낙 구간이다.
+    const nak=MG.yut_nak_zone;
+    c.fillStyle='#a98f69';c.fillRect(10,218,260,12);
+    c.fillStyle='#b4432a';c.fillRect(10,218,260*nak/100,12);c.fillRect(270-260*nak/100,218,260*nak/100,12);
+    c.fillStyle='#fff9e8';c.fillRect(10+yPos*2.6,214,3,20);
   }
   yutP.dataset.phase=s.phase;yutP.dataset.turn=s.turn;
 }
@@ -237,9 +249,16 @@ function yRender(){
 function yNodeName(node){return node==='H'?'들기':node==='S'?'출발':node==='C'?'가운데':node[0]==='A'?'바깥 '+node.slice(1)+'칸':
   (node[0]==='B'?'왼쪽':'오른쪽')+' 안길 '+({1:1,2:2,4:3,5:4}[node[1]])+'칸';}
 function yRandom(){const up=Array.from({length:4},()=>Math.random()<.5?1:0).reduce((a,b)=>a+b,0);return up||5;}
+function yNakZone(){return yPos<MG.yut_nak_zone||yPos>100-MG.yut_nak_zone;}
+// 낙: 윷 한 짝이 멍석 밖으로 떨어졌다. 이번 차례는 옮기지 못하고 노인들에게 넘어간다.
+function yNak(){
+  const s=yg();if(s.phase!=='aim')return;
+  s.throws++;s.roll=0;s.nak=true;s.message='윷 한 짝이 멍석 밖으로 굴러떨어졌다. 낙이라 이번엔 못 옮긴다.';
+  s.turn='elders';s.phase='review';yRender();
+}
 function yThrow(roll){
   const s=yg();if(!['ready','aim'].includes(s.phase))return;
-  s.roll=roll;s.throws++;s.phase='choose';
+  s.nak=false;s.roll=roll;s.throws++;s.phase='choose';
   // 고를 콩이 하나뿐이면 묻지 않고 바로 옮긴다 (갈림길은 그대로 묻는다).
   const spots=new Set(s.me.filter(p=>p.node!=='H').map(p=>p.node));
   s.message=ylabels[roll]+'! '+roll+'칸 갈 수 있다.'+(spots.size>1?' 몇 번 콩을 옮길까?':'');yStory();
@@ -263,7 +282,7 @@ function yApply(team,i,route){
   s.turn=(caught.length||s.roll>=4)?team:other;s.phase='review';yRender();
 }
 function yElder(){
-  const s=yg();s.roll=yRandom();s.throws++;yStory();
+  const s=yg();s.nak=false;s.roll=yRandom();s.throws++;yStory();
   let best=null;
   s.elders.forEach((p,i)=>{if(p.node==='H')return;for(const route of routeChoices(p)){
     const end=yMove(p,s.roll,route),capture=s.me.filter(q=>q.node===end.node&&q.node!=='S'&&q.node!=='H').length;
@@ -289,10 +308,10 @@ function yNew(n=G.f.jxYutReward?4:1){G.f.jxYutGame={me:Array.from({length:n},paw
 Rg.playYut=()=>{if(CLASSIC)return;yutP.hidden=false;if(!yg())yNew();else yRender();};
 function yHit(){
   if(yutP.hidden)return;const s=yg();
-  if(s.phase==='ready'){s.phase='aim';yPos=0;yDir=1;s.message='바늘을 보다가 Space · J. 윷은 어느 쪽이 나와도 괜찮아.';yRender();}
+  if(s.phase==='ready'){s.phase='aim';yPos=50;yDir=1;s.nak=false;s.message='바늘이 붉은 끝에 닿기 전에 Space · J. 끝에서 던지면 낙이야.';yRender();}
   else if(s.phase==='aim'){
-    // 네 윷의 앞뒤 조합 16개. 금빛 타격을 놓쳐도 다른 윷 결과로 이어진다.
-    const bits=Math.min(15,Math.floor(yPos*16/100));let n=0;for(let b=0;b<4;b++)n+=(bits>>b)&1;yThrow(n||5);
+    // 결정 D-70: 무엇이 나올지는 던지는 순간과 상관없다. 바늘은 낙만 가른다.
+    if(yNakZone())yNak();else yThrow(yRandom());
   }else if(s.phase==='elder')yElder();
   else if(s.phase==='review'){s.phase=s.turn==='me'?'ready':'elder';yRender();}
 }
@@ -302,7 +321,7 @@ yutP.addEventListener('keydown',e=>{if([' ','Enter'].includes(e.key)&&e.target.m
 addEventListener('keydown',e=>{
   if(yutP.hidden||!['1','2','3','4'].includes(e.key))return;e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)ychoices.children[+e.key-1]?.click();
 },true);
-defineMinigame({id:'jangteoYut',hit:yHit,step(){if(yg()?.phase==='aim'&&!Vfx.reducedMotion){yPos+=yDir*MG.gather_root_speed;if(yPos>=100){yPos=100;yDir=-1;}if(yPos<=0){yPos=0;yDir=1;}yDraw();}}});
+defineMinigame({id:'jangteoYut',hit:yHit,step(){if(yg()?.phase==='aim'&&!Vfx.reducedMotion){yPos+=yDir*MG.yut_needle_speed;if(yPos>=100){yPos=100;yDir=-1;}if(yPos<=0){yPos=0;yDir=1;}yDraw();}}});
 
 /* 밤에만 다는 등. 불빛은 길 안내이며 본길이나 출구의 조건으로 삼지 않는다. */
 Rg.lanternTalk=()=>{
@@ -565,7 +584,11 @@ function rhythmHit(){
     rh.label=perfect?'잘 맞음':'맞음';rh.flashUntil=now+0.45;
     Sound.metal(now,perfect?0.25:0.14,rh.bus,perfect);
     $('rhythmHint').textContent='엿방울: '+rhSay(rh.hits===MG.rhythm_bonus_hits-1?'danger':'good');
-  }else{rhMiss(null,now);Sound.click(now,0.035,rh.bus);}
+  }else{
+    // 결정 D-71: 헛가위는 빗나감이다. 가장 가까운 남은 가위가 rhythm_stray_window 안이면 그 가위를 놓친 것으로 센다.
+    // 그래서 쉬지 않고 두드리면 가위가 오기 전에 헛가위가 먼저 나가 맞힌 수가 줄어든다. 쌀 8개는 그대로다(확정).
+    rhMiss(n&&Math.abs(n.time-now)<=MG.rhythm_stray_window?n:null,now);Sound.click(now,0.035,rh.bus);
+  }
   drawRhythm();
 }
 // 다른 탭을 보는 동안 기회가 사라지지 않게 반주와 노트를 함께 멈춘다.
@@ -762,7 +785,7 @@ Rg.startDokkaebi=()=>{
   // 전투 결과 콜백은 후퇴·패배 때도 부위 전리품 지급이 끝난 뒤 한 번 실행된다.
   let encounter=null;
   G.px=Rg.STORE_X-30;
-  inkTransition('전투',(Rg.STORE_X-G.cam)/W*100,()=>{startBattle('dokkaebi',res=>{
+  inkTransition('헌물 도깨비',(Rg.STORE_X-G.cam)/W*100,()=>{startBattle('dokkaebi',res=>{
     if(encounter?.parts.some(p=>p.id==='ki'&&p.broken))addItem('kong',1);
     if(res==='win'||res==='calm'){
       if(res==='calm'){

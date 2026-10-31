@@ -1,6 +1,6 @@
 'use strict';
 /* 패널(보따리·수첩) 열고 닫기, 보따리 + 가보 가공대 */
-function closePanels(){if(typeof Trade!=='undefined')Trade.close();if(['bag','notebook'].some(id=>!$(id).hidden))Sound.panel(false);if(typeof finishCraftHands==='function')finishCraftHands(false);if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('notebook').hidden=true;}
+function closePanels(){if(typeof Trade!=='undefined')Trade.close();if(!$('notebook').hidden)Sound.book(false);else if(!$('bag').hidden)Sound.panel(false);if(typeof finishCraftHands==='function')finishCraftHands(false);if(!$('bag').hidden&&G)returnPouch();$('bag').hidden=true;$('notebook').hidden=true;}
 function openBag(kind='전체'){closePanels();Sound.panel(true);bagKind=BAG_KINDS.includes(kind)?kind:'전체';selItem=null;lastOut=null;pouchMsg='';renderBag();$('bag').hidden=false;$('bagBody').scrollTop=0;}
 function toggleBag(){if($('bag').hidden)openBag();else closePanels();}
 $('btnBag').onclick=()=>{if(G.started&&!G.ended&&!open('dlg')&&!openMinigame())toggleBag();};
