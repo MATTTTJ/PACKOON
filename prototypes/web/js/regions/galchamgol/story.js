@@ -76,7 +76,7 @@ function dodamDad(next){
   talk([['도담','아, 생각났다! 보부상 아저씨도 그 모자 썼어!'],['도담','몇 달 전에 여기서 도토리 가루를 잔뜩 바꿔 갔거든!\n북쪽으로 간댔어. 엄청 급해 보이던데.']],next);
 }
 function dodamFruit(){
-  ledger('dodam','도담','도토리 가루 1','해머루가 있는 곳');
+  ledger('dodam','도담','도토리 가루 1','해머루 자리에 대한 정보');
   talk([['도담','해머루? 그럼, 내가 알지!'],['도담','대신 도토리 가루 하나 줘!\n도토리 세 알 주워서 곱게 빻으면 돼!']],()=>{if(has('powder'))dodamTrade();});
 }
 function dodamTrade(){
@@ -755,7 +755,7 @@ if(!CLASSIC){
    결정 D-39: 원하는 것을 들은 뒤(장부에 적힌 뒤)에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
    결정 D-40: 날쌘에게 허세가 통하면 숯을 하나 더 얹는다(경멸 축: 얕보이면 오기로 더 준다). 숯을 바꾼 뒤라면 흔한 물건에 덤. */
 Rg.trade={
-  dodam:()=>G.ledger.dodam?[{id:'t_dodam',item:'meoru',label:'해머루가 있는 곳',asks:[{powder:1}],done:()=>G.f.dodamDone,accept:dodamGive}]:[],
+  dodam:()=>G.ledger.dodam?[{id:'t_dodam',item:'meoru',info:true,label:'해머루 자리에 대한 정보',asks:[{powder:1}],done:()=>G.f.dodamDone,accept:dodamGive}]:[],
   nal:()=>[
     ...(G.ledger.nal?[{id:'t_nal_galchamgol',item:'coal',n:1,asks:[{powder:1,root:1}],done:()=>G.f.nalDone,accept:()=>{G.f.nalPriceHeard=true;nalTrade();}}]:[]),
     ...(G.ledger.t_craft_salt?[{id:'t_craft_salt',item:'salt',label:'소금 2 · 깨 1',asks:[{vine:1}],done:()=>G.f.craftTrade_salt,accept:nalSaltGive}]:[])
