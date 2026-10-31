@@ -177,7 +177,8 @@ const Trade=(()=>{
   function quickNpc(){
     if(!G||!REG||B||$('dlg').hidden)return null;
     const n=fieldNpcs().find(n=>n.name===$('dlgWho').textContent);
-    return n&&stockOf(n.id).some(r=>stockLeft(r)>0)?n.id:null;
+    // 결정 D-77: 부탁이 남은 상대(눈돌·진흙·비늘 같은 뒤늦은 부탁)도 대화창에서 바로 펼친다.
+    return n&&(stockOf(n.id).some(r=>stockLeft(r)>0)||(REG.trade?.[n.id]?.()||[]).some(g=>!g.done?.()))?n.id:null;
   }
   function renderQuick(){
     const npc=quickNpc(),dup=[...$('dlgChoices').children].some(b=>b.textContent==='보따리를 펼친다');

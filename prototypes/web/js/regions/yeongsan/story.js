@@ -68,10 +68,18 @@ function craftJujube(){
   talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n덩굴 하나랑 바꿀까 했지.'],['날쌘','마침 덩굴이 있네.\n하나에 대추 둘, 어때?',[
     {t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'지금은 놔둘게요',go:null}]]]);
 }
-function jujubeGive(){
+// 결정 D-78: 약과를 얹으면 대추 하나 더. 영산의 날쌘은 "제값"이라 받은 만큼 더 준다.
+function jujubeGive(i=0){
   if(CLASSIC||!G.f.seolpi||G.f.yCraftJujube||!has('darae_vine'))return;
-  takeItem('darae_vine',1);addItem('jujube',2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
-  talk([['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
+  const yak=i===1&&has('yakgwa');
+  takeItem('darae_vine',1);if(yak)takeItem('yakgwa',1);addItem('jujube',yak?3:2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
+  talk([...(yak?[['날쌘','약과까지 얹어? …그럼 대추도 하나 더.\n받은 만큼은 줘야 제값이지.']]:[]),['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
+}
+// 결정 D-77: 강철이가 떠난 뒤 남은 얼음 비늘은 산에 두면 또 얼어붙는다. 산지기 살금이가 깊은 물에 돌려보낸다.
+function salgScaleGive(){
+  if(G.f.salgScale||!has('ice_scale'))return;
+  takeItem('ice_scale',1);addItem('magamok',2);G.f.salgScale=true;rel('salgeumi',1);
+  talk([['살금이','그, 그거… 강철이 비늘이지?\n산에 두면 녹지 않고 또 얼어붙어.'],['살금이','내가 호수 깊은 물에 돌려보낼게.\n대신 말려 둔 마가목 열매… 가져가.']]);
 }
 const SEOLPI_ASKS=[{darae_vine:2,jip:1},{darae_vine:2,eoksae:2},{broom_sal:1,jip:1},{broom_sal:1,eoksae:2}];
 function nalTrade(i=0){
@@ -519,9 +527,12 @@ Rg.goal=()=>{
 Rg.trade={
   nal:()=>[
     ...(G.ledger.nal_yeongsan?[{id:'t_nal_yeongsan',item:'seolpi',n:1,asks:SEOLPI_ASKS,done:()=>G.f.nalYDone,accept:nalTrade}]:[]),
-    ...(!CLASSIC&&G.f.seolpi&&G.ledger.t_craft_jujube?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1}],done:()=>G.f.yCraftJujube,accept:jujubeGive}]:[])
+    ...(!CLASSIC&&G.f.seolpi&&G.ledger.t_craft_jujube?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],done:()=>G.f.yCraftJujube,accept:jujubeGive}]:[])
   ],
-  salgeumi:()=>G.ledger.salgeumi?[{id:'t_salgeumi',item:'magamok',icon:'icicle',label:'호숫가 지름길',asks:SALG_ASKS,done:()=>G.f.salgDone,accept:salgGive}]:[]
+  salgeumi:()=>[
+    ...(G.ledger.salgeumi?[{id:'t_salgeumi',item:'magamok',icon:'icicle',label:'호숫가 지름길',asks:SALG_ASKS,done:()=>G.f.salgDone,accept:salgGive}]:[]),
+    ...(G.f.salgDone&&G.boss.dead?[{id:'t_salgeumi_scale',item:'magamok',n:2,label:'얼음 비늘 물에 돌려보내기 · 마가목 열매 2',asks:[{ice_scale:1}],done:()=>G.f.salgScale,accept:salgScaleGive}]:[])
+  ]
 };
 })();
 

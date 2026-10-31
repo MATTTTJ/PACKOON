@@ -803,12 +803,12 @@ const TABLES={
    "acorn_jelly": {
     "kind": "아주 좋아함",
     "line": "…손 많이 갔겠네. 잠깐 앉아라.",
-    "effect": "calm:50"
+    "effect": "none"
    },
    "sesame_salt": {
     "kind": "좋아함",
     "line": "밥에 얹으면 되겠군. 잘 빻았다.",
-    "effect": "calm:35"
+    "effect": "none"
    }
   },
   "toad": {
@@ -942,10 +942,10 @@ const TABLES={
     "line": "도토리 향에 덩굴이 느슨해진다.",
     "effect": "calm:50"
    },
-   "magamok_tea": {
+   "powder": {
     "kind": "좋아함",
-    "line": "따뜻한 김을 따라 칡잎이 펼쳐진다.",
-    "effect": "calm:50"
+    "line": "곱게 빻은 도토리 냄새에 덩굴 끝이 고개를 든다.",
+    "effect": "calm:35"
    }
   },
   "golem": {
@@ -966,22 +966,22 @@ const TABLES={
     "line": "메밀도 좋지만 녹두도 좋지! 얼른 부치자!",
     "effect": "calm:60"
    },
-   "rainbow_tteok": {
+   "yakgwa": {
     "kind": "좋아함",
-    "line": "색도 맛도 층층이네! 내 몫도 있지?",
+    "line": "약과다! 꿀 바른 거! 이건 내 몫이지?",
     "effect": "calm:60"
    }
   },
   "gangcheol": {
-   "magamok_tea": {
+   "jujube": {
     "kind": "아주 좋아함",
-    "line": "찻김의 온기에 강철이의 긴 몸이 풀린다.",
+    "line": "달인 대추의 따뜻한 김에 강철이의 긴 몸이 풀린다.",
     "effect": "calm:60"
    },
-   "ssanghwa": {
+   "yakgwa": {
     "kind": "좋아함",
-    "line": "약재 향을 맡은 강철이가 긴 숨을 내쉰다.",
-    "effect": "calm:60"
+    "line": "꿀 바른 약과의 단내에 강철이가 언 숨을 길게 내쉰다.",
+    "effect": "calm:40"
    }
   }
  },
@@ -1652,7 +1652,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "붉은 팥을 꺼린다.",
+     "text": "붉은 팥 냄새에 움찔 물러났다. 좋아서가 아니라 꺼려서다. 팥은 잡귀를 쫓는다더니.",
      "section": "관찰",
      "when": "like:gangcheol:patsirutteok"
     },
