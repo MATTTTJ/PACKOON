@@ -2393,6 +2393,15 @@ const TABLES={
    ]
   },
   {
+   "region": "jangteo",
+   "done": "hongsiMade",
+   "options": [
+    {
+     "sinpyo": 1
+    }
+   ]
+  },
+  {
    "region": "yeongsan",
    "done": "seolpi",
    "options": [

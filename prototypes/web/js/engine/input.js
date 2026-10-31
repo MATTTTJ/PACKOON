@@ -47,9 +47,10 @@ function onPress(k){
   if(!G.started||G.ended)return;
   if(B){
     if(!$('bResult').hidden){if(k==='enter'||k==='e'||k===' ')$('bResOk').click();return;}
-    if(B.paused){if(k==='escape'||k==='k'||k==='c')closeGift();return;}
+    if(B.paused){if(k==='escape'||k==='k')closeGift();return;}
     if(battleFormKey(k))return;
-    if(k==='j'||k==='x'||k===' '||k==='enter')bStrike();else if(k==='k'||k==='c')openGift();return;
+    // 결정 D-65: 전투에서 C(필드의 점프)는 선물을 열지 않는다. 선물은 K와 '선물' 버튼.
+    if(k==='j'||k==='x'||k===' '||k==='enter')bStrike();else if(k==='k')openGift();return;
   }
   if(inkOn)return;
   const mg=openMinigame();
@@ -79,7 +80,7 @@ function padAction(k){
   if(vistaMode){endVista();return;}
   if(zoneFade>0||zoneMotion)return;
   if(!G.started||G.ended)return;
-  if(B){if(!$('bResult').hidden){if(k==='atk')$('bResOk').click();return;}if(B.paused)return;if(k==='atk')bStrike();else if(k==='jump')openGift();return;}
+  if(B){if(!$('bResult').hidden){if(k==='atk')$('bResOk').click();return;}if(B.paused)return;if(k==='atk')bStrike();return;}   // 결정 D-65: 패드 점프도 선물을 열지 않는다(화면의 '선물' 버튼)
   if(inkOn)return;
   const mg=openMinigame();
   if(k==='bag'){if(!open('dlg')&&!mg&&!open('trade'))toggleBag();return;}
