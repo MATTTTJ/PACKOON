@@ -159,6 +159,12 @@ function talkSalg(){
 }
 const salgCan=()=>has('magamok',3)||has('kong',2);
 // 결정 D-20: 강철이 설화는 살금이가 (design/data/decisions.csv)
+// 결정 D-66: 살금이를 만나지 않고 산군에게 먼저 닿으면 산군이 설화를 들려준다. 아이가 강철이를 모른 채 싸우지 않게.
+function gangcheolLore(){
+  if(G.f.salgDone)return [];
+  return [['산군 할아버지','강철이를 모르는 게로구나.'],
+    ['산군 할아버지','지나는 곳마다 가뭄이 들고 풀이 마르는 이무기다.\n첫눈 무렵 이 호수에 내려앉았지.']];
+}
 const SALG_ASKS=[{magamok:3},{kong:2}];
 function salgTrade(){
   talk([['살금이','그, 그거 나한테 줄래?',[{t:'보따리를 펼친다',go:()=>Trade.open('salgeumi')},{t:'아직은 안 줄래',go:null}]]]);
@@ -292,6 +298,7 @@ function talkSangun(){
         ['너구리','아빠는… 왜 그 뒤로 편지가 없었어요?'],
         ['산군 할아버지','지난가을 제 말을 보탰다.\n어미의 것을 돌려 달라며.'],
         ['산군 할아버지','말을 내놓으면 글도 못 쓴다.'],
+        ...gangcheolLore(),
         ['산군 할아버지','강철이가 겨울을 붙들어 열매가 없구나.\n봄이 오거든 다시 오너라.']],()=>refreshGoal());return;
     }
     clue('y3','산군 할아버지','엄마는 아기였던 나를 살리려고 영산에 올라와, 둔갑과 말을 값으로 내놓았다. 아빠는 그걸 알고 자기 말을 더 얹었다.');
@@ -301,6 +308,7 @@ function talkSangun(){
       ['산군 할아버지','어미는 제 둔갑과 말을 값으로 내놓았다. 나는 네 숨을 돌려주었다.'],
       ['산군 할아버지','셈은 맞아야 한다. 이 산의 법이지.\n어미가 약속한 값은 이제 거두고 있다.'],
       ['산군 할아버지','네 아비도 그 일을 알고 찾아왔다.\n어미의 것을 되돌려 달라며 제 말을 더 얹었지.'],
+      ...gangcheolLore(),
       ['산군 할아버지','신목의 열매는 잃은 것을 돌려준다.\n허나 강철이가 호수를 휘감고 겨울을 붙드니, 봄도 열매도 오지 않는구나.'],
       ['산군 할아버지','봄이 오거든 다시 오너라. 그때 셈을 하자꾸나.']],()=>refreshGoal());
     return;
@@ -483,6 +491,15 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '너구리 보부상 · 끝';
+  // 결정 D-67: 앞선 진행부터 거꾸로 본다. 산양·부엉이로 호숫가에 먼저 닿아도 지금 할 일이 나온다.
+  if(F.yakDone)return '봄길과 약연 가공을 더 둘러보자 · 다 되면 아빠나 산군 할아버지께 말씀드리고 집으로';
+  if(F.nameGiven)return '아빠와 손을 포개 약연을 굴리자';
+  if(F.fruitGot)return '산군 할아버지께 셈하러 가자';
+  if(G.boss.dead)return '신목에서 전설의 열매를 따자';
+  if(F.sangunMet)return '언 호수의 강철이와 맞서자 (부수거나 달래거나)';
+  if(F.dadDone)return CLASSIC?'호숫가의 산군 할아버지를 찾아가자':'선착장에서 얼음길을 건너 신목 섬의 산군 할아버지를 만나자';
+  if(F.dadMet)return '아빠의 몸짓을 읽어 보자 (아빠에게 다시 말을 걸면 된다)';
+  if(mapVisited(Rg.id,'shore'))return '호숫가의 너구리에게 다가가 보자';
   if(!F.nalYTalk)return '산막 불빛 쪽으로 가 보자';
   if(!F.seolpi){
     if(vineOK()&&bindOK())return '날쌘에게 설피 재료를 건네자';
@@ -491,14 +508,7 @@ Rg.goal=()=>{
   }
   if(!F.salgMet)return '마가목 비탈 너머 고라니에게 살금살금 다가가자';
   if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매를 건네자 (귀를 세우면 멈추고)':'비탈의 마가목 열매를 따자 ('+m+'/3)';}
-  if(!F.dadMet)return '얼어붙은 비탈을 지나 호숫가로 가자';
-  if(!F.dadDone)return '아빠의 몸짓을 읽어 보자 (아빠에게 다시 말을 걸면 된다)';
-  if(!F.sangunMet)return CLASSIC?'호숫가의 산군 할아버지를 찾아가자':'선착장에서 얼음길을 건너 신목 섬의 산군 할아버지를 만나자';
-  if(!G.boss.dead)return '언 호수의 강철이와 맞서자 (부수거나 달래거나)';
-  if(!F.fruitGot)return '신목에서 전설의 열매를 따자';
-  if(!F.nameGiven)return '산군 할아버지께 셈하러 가자';
-  if(F.yakDone)return '봄길과 약연 가공을 더 둘러보자 · 다 되면 아빠나 산군 할아버지께 말씀드리고 집으로';
-  return '아빠와 손을 포개 약연을 굴리자';
+  return '얼어붙은 비탈을 지나 호숫가로 가자';
 };
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤(장부에 적힌 뒤)에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
