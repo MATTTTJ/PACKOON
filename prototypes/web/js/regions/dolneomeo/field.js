@@ -16,17 +16,17 @@ const CLIFF_X=2150;    // 절벽이 시작되는 곳
 const DARAE={x:2236,y:150};
 
 /* ---------- 배경 ---------- */
-function ridge(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+cam*par;const h=base-Math.abs(Math.sin(wx*freq))*amp-Math.sin(wx*freq*3.1+2)*amp*0.25;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
+function ridge(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+RC()*par;const h=base-Math.abs(Math.sin(wx*freq))*amp-Math.sin(wx*freq*3.1+2)*amp*0.25;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
 function drawSky(){
   const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#cfdbe0');g.addColorStop(.6,'#a9bcc6');g.addColorStop(1,'#8a9ca6');
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  const sx=Math.round(300-cam*0.03);R(sx,30,14,14,'#f4f2e8');R(sx-2,33,18,8,'#f4f2e8');
-  for(let i=0;i<3;i++){const cx=Math.round(((i*170+60)-cam*0.05)%580+580)%580-90;R(cx,22+i*12,40,4,'#e6edf0');R(cx+8,18+i*12,22,4,'#e6edf0');}
+  const sx=Math.round(300-RC()*0.03);R(sx,30,14,14,'#f4f2e8');R(sx-2,33,18,8,'#f4f2e8');
+  for(let i=0;i<3;i++){const cx=Math.round(((i*170+60)-RC()*0.05)%580+580)%580-90;R(cx,22+i*12,40,4,'#e6edf0');R(cx+8,18+i*12,22,4,'#e6edf0');}
   ridge(0.12,'#8d9ca6',118,34,0.006);
   ridge(0.22,'#77878f',138,26,0.011);
   /* 먼 소나무 */
   for(let i=-1;i<10;i++){
-    const wx=Math.floor((cam*0.5)/56)*56+i*56;const x=Math.round(wx-cam*0.5);const r=hash(wx+7);
+    const wx=Math.floor((RC()*0.5)/56)*56+i*56;const x=Math.round(wx-RC()*0.5);const r=hash(wx+7);
     if(r<0.35)continue;const h=26+r*18;
     R(x+11,GROUND-14-h*0.2,3,h*0.4,'#4a3a2e');
     R(x+4,GROUND-24-h*0.6,17,h*0.35,'#3e5a4a');R(x+7,GROUND-30-h*0.7,11,h*0.3,'#46664f');R(x+10,GROUND-34-h*0.75,5,6,'#507458');
@@ -214,7 +214,7 @@ if(!CLASSIC){
       const i=Number(d.id?.match(/^dol_old_dig_([0-3])$/)?.[1]);
       if(Number.isInteger(i))Object.assign(d,{zone:digMap[i][0],x:digMap[i][1]});
       if(d.zone)continue;
-      if(d.item==='seogi'){Object.assign(d,{id:'dol_seogi',zone:'cliff',x:1920});continue;}
+      if(d.item==='seogi'){Object.assign(d,{id:'dol_seogi',zone:'cliff',x:2920});continue;}   // 설계 좌표(뒤에 trimState가 옮긴다). 결정 D-128
       const at=digMap[di++];if(at)Object.assign(d,{id:'dol_old_dig_'+(di-1),zone:at[0],x:at[1]});
     }
     if(g.f?.dolExtraPointState)for(const p of g.pickups){const prior=g.f.dolExtraPointState[p.id];if(prior){p.got=prior.got;delete g.f.dolExtraPointState[p.id];}}
@@ -320,7 +320,7 @@ if(!CLASSIC){
   $('prompt').addEventListener('click',specialInteract,true);
 
   function drawStonePlatforms(id){
-    for(const p of Rg.zones[id].platforms){const x=Math.round(p.x-cam);if(x>W||x+p.w<0)continue;
+    for(const p of Rg.zones[id].platforms){const x=Math.round(p.x-RC());if(x>W||x+p.w<0)continue;   // 이미 옮긴 좌표 (D-128)
       const remembered=G.f.dolMemory?.zone===id&&memories[id]?.bridge.includes(p);
       if(remembered){R(x,p.y,p.w,6,'#8d9690');A.drawMemoryBridge(x,p.y,p.w);continue;}
       if(id==='gate'&&bridgeReady()&&memories.gate.bridge.includes(p)){A.drawRestoredBridge(x,p.y,p.w);continue;}
@@ -333,7 +333,7 @@ if(!CLASSIC){
     if(G.f.dolMemory?.zone===id){
       ctx.save();ctx.globalAlpha=.66;ctx.filter='grayscale(1)';ctx.drawImage(cv,0,0);ctx.filter='none';ctx.globalAlpha=.18;R(0,0,W,H,'#d6cdb7');ctx.restore();
       // 기억은 현재 지형 위에 겹친다. 돌아올 바닥과 발판의 흰 면은 가리지 않는다.
-      for(let i=0;i<7;i++)R((i*71+Math.round(cam*.12))%W,38+i*17,38,1,'rgba(235,229,207,.38)');
+      for(let i=0;i<7;i++)R((i*71+Math.round(RC()*.12))%W,38+i*17,38,1,'rgba(235,229,207,.38)');
     }
     if(depthFx){
       const t=depthFx.tick/TABLES.TUNING.zone_transition_frames;
@@ -360,7 +360,9 @@ if(!CLASSIC){
   // 돌담 마을: 들어선 자리와 첫 발판 사이. 절벽길: 아무것도 없는 발판 두 무리를 지운다(개구리까지 1340px → 340px).
   Rg.trimCutsV1={village:[[110,280]],cliff:[[160,1000]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
   // 결정 D-116: 고갯길은 빈 돌계단 무리(1300~1450), 성황당은 들어선 자리와 첫 돌탑 사이(430~790)를 지운다.
-  Rg.trimCuts={gate:[[1300,150]],village:[[110,280]],cliff:[[160,1000]],shrine:[[430,360]]};
+  Rg.trimCutsV2={gate:[[1300,150]],village:[[110,280]],cliff:[[160,1000]],shrine:[[430,360]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 고갯길 뿌리·산토끼·종 사이 두 곳, 밭 오른쪽 출구 앞, 절벽길 은이끼와 개구리 사이·언 물줄기와 다래길 사이. 성황당 골렘 자리는 자르지 않는다.
+  Rg.trimCuts={gate:[[720,100],[1050,70],[1300,150]],village:[[110,280]],field:[[2420,60]],cliff:[[160,1000],[1270,50],[1960,80]],shrine:[[430,360]]};
   // 구역에 들어설 때 applyMemory가 bases로 발판을 다시 깐다. 그래서 bases도 같은 좌표로 자르고 정리해 둔다 (D-109·D-110).
   Rg.trimHook=tX=>{
     for(const id of Object.keys(bases)){
@@ -458,7 +460,7 @@ if(!CLASSIC){
     };
     const oldBossDie=Rg.bossDie;
     Rg.bossDie=()=>{oldBossDie();placeOld(G);};
-    Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.id==='dol_seogi'))G.digs.push({id:'dol_seogi',zone:'cliff',x:1920,item:'seogi',done:false});};
+    Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.id==='dol_seogi'))G.digs.push({id:'dol_seogi',zone:'cliff',x:Z('cliff',2920),item:'seogi',done:false});   /* 결정 D-128: 둘째 판의 1920 자리(설계 2920)를 지금 자르기로 */};
     Rg.startGolem=()=>{
       G.px=Z('shrine',2275);
       inkTransition('돌 골렘',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{

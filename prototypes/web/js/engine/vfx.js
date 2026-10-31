@@ -156,6 +156,8 @@ const Vfx=(()=>{
     ctx.restore();
   }
   /* 기존 drawFront에 섞인 이정표·색조는 지역의 weatherFront로 보존한다. */
-  function front(){if(fieldDef().weather)fieldCall('weatherFront');else fieldCall('drawFront');draw('front');draw('effect');}
+  // 결정 D-128: 앞 그림도 자른 구간마다 나눠 그린다. 장면 변환을 푸는 sceneEnd는 나눠 그리기 밖에서 부른다.
+  function front(){const f=()=>{if(fieldDef().weather)fieldCall('weatherFront');else fieldCall('drawFront');};
+    if(typeof segmentedDraw==='function')segmentedDraw(f);else f();fieldCall('sceneEnd');draw('front');draw('effect');}
   return {MAX,get count(){return particles.length;},get queued(){return pending.length;},get reducedMotion(){return motion.matches;},setWeather,update,draw,front,item,gather,scatter,scatterKind,burst,dust,feet,slash,clear};   // dust: 구르기(D-94)도 쓴다
 })();

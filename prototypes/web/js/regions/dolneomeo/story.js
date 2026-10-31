@@ -923,7 +923,7 @@ Rg.expansionContent=()=>({
       examine('gate_bell',1240,'장승 풍경 들어 보기','bell','바람이 불 때마다 얇은 쇳소리가 난다.\n산 안쪽에서도 이 소리가 들릴까?'),
       {...examine('broken_bridge',2170,'다리 받침 살펴보기','stone',''),get text(){return (G.f.dolBridgeStage||0)>=3?'돌이 다시 이어졌다. 아래로 물도 잘 흐른다.\n새 다리 가장자리는 흰 돌이라 잘 보이네.':'받침돌만 남고 다리판은 아래로 떨어졌다.\n왼쪽 소원 돌은 왜 여기 서 있을까?';}}
     ],
-    wanderers:[{id:'dol_hare',name:'산토끼 짐꾼',hint:'길 저편에서 무거운 등짐에 끙끙대는 소리가 들린다.',get x(){return G?.f.dolBridgeStage>=3?2280:940;},draw:drawGuest('hare'),talk:helpHare,greeting:'낮게 묶으니 발이 편하구나.\n고개 안쪽 길은 꼭 살피고 가라.'}],
+    wanderers:[{id:'dol_hare',name:'산토끼 짐꾼',hint:'길 저편에서 무거운 등짐에 끙끙대는 소리가 들린다.',get x(){const x=G?.f.dolBridgeStage>=3?2280:940;return CLASSIC?x:trimX(x,Rg.trimCuts?.gate);}   /* 결정 D-128: 접근자 자리도 줄인 고갯길 좌표로 */,draw:drawGuest('hare'),talk:helpHare,greeting:'낮게 묶으니 발이 편하구나.\n고개 안쪽 길은 꼭 살피고 가라.'}],
     stamps:[stamp('jangseung',1710,156)]
   },
   village:{

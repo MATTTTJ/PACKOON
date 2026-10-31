@@ -17,16 +17,16 @@ Rg.moodTension=()=>{
 };
 
 /* ---------- 배경 ---------- */
-function hills(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+cam*par;const h=base-Math.sin(wx*freq)*amp-Math.sin(wx*freq*2.3+1)*amp*0.4;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
+function hills(par,col,base,amp,freq){ctx.fillStyle=col;for(let x=0;x<W;x+=2){const wx=x+RC()*par;const h=base-Math.sin(wx*freq)*amp-Math.sin(wx*freq*2.3+1)*amp*0.4;ctx.fillRect(x,Math.round(h),2,H-Math.round(h));}}
 function drawSky(){
   const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#f7dcab');g.addColorStop(.55,'#eeaa6c');g.addColorStop(1,'#d27a4a');
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  const sx=Math.round(318-cam*0.03);R(sx,34,18,18,'#fff0c8');R(sx-2,38,22,10,'#fff0c8');R(sx+4,30,10,26,'#fff0c8');
-  for(let i=0;i<3;i++){const cx=Math.round(((i*160+40)-cam*0.06)%560+560)%560-80;R(cx,24+i*14,34,4,'#fbe7c4');R(cx+6,20+i*14,20,4,'#fbe7c4');}
+  const sx=Math.round(318-RC()*0.03);R(sx,34,18,18,'#fff0c8');R(sx-2,38,22,10,'#fff0c8');R(sx+4,30,10,26,'#fff0c8');
+  for(let i=0;i<3;i++){const cx=Math.round(((i*160+40)-RC()*0.06)%560+560)%560-80;R(cx,24+i*14,34,4,'#fbe7c4');R(cx+6,20+i*14,20,4,'#fbe7c4');}
   hills(0.15,'#c98a76',128,22,0.010);
   hills(0.3,'#a8654f',146,18,0.016);
   for(let i=-1;i<10;i++){
-    const wx=Math.floor((cam*0.55)/60)*60+i*60;const x=Math.round(wx-cam*0.55);const r=hash(wx);
+    const wx=Math.floor((RC()*0.55)/60)*60+i*60;const x=Math.round(wx-RC()*0.55);const r=hash(wx);
     const h=30+r*16;const col=['#c9652c','#d98a2f','#b7462a'][Math.floor(r*3)];
     R(x+12,GROUND-18-h*0.4,4,h*0.6,'#5b3a26');
     R(x,GROUND-26-h,28,h*0.7,col);R(x+4,GROUND-32-h,20,8,col);
@@ -154,7 +154,9 @@ if(!CLASSIC){
   // 대장간: 모루 자국(1070)과 날쌘(1560) 사이 빈 둑길 490px → 160px.
   Rg.trimCutsV1={village:[[1800,590]],forge:[[1110,330]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
   // 결정 D-116: 마을 도토리(1260)와 칡 입구(1710) 사이 450 → 200, 대장간 장작(2050)과 오른쪽 출구 사이 550 → 200.
-  Rg.trimCuts={village:[[1310,250],[1800,590]],forge:[[1110,330],[2150,350]]};
+  Rg.trimCutsV2={village:[[1310,250],[1800,590]],forge:[[1110,330],[2150,350]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 마을 당산나무 문 뒤 출구 앞, 대장간 날쌘과 숯 자리 사이, 숲 첫 발판 무리와 도토리 사이·나무 속 문 뒤 출구 앞. 꺼병이 걸음(galExpChickX)은 설계 좌표로 두고 그릴 자리만 옮긴다.
+  Rg.trimCuts={village:[[1310,250],[1800,590],[2410,70]],forge:[[1110,330],[1670,30],[2150,350]],forest:[[918,82],[2530,150]]};
   const A=Rg.expArt;
   const oldState=Rg.newState,oldStep=Rg.step,oldHit=Rg.onHit;
   const acorns=[['village',280,GROUND],['village',530,160],['village',1260,GROUND],
@@ -162,7 +164,7 @@ if(!CLASSIC){
   const digs=[['village',600],['forest',1370],['forge',1700],['marsh',900]];
   const placeRoot=()=>{
     const d=G.digs.find(d=>d.id==='gal_dig_2'||(d.zone==='forest'&&d.x===1020&&d.item==='root'));
-    if(d)Object.assign(d,{id:'gal_dig_2',zone:'forge',x:1700});
+    if(d)Object.assign(d,{id:'gal_dig_2',zone:'forge',x:trimX(1700,Rg.trimCuts.forge)});   // 게임 도중 옮기므로 줄인 좌표로 (D-128)
   };
   Rg.newState=()=>{
     const s=oldState();
@@ -277,7 +279,7 @@ if(!CLASSIC){
   // 도장은 발견 전에도 풍경 속 흔적이 보인다. 엔진의 발견 후 표시와 별도로 그린다.
   for(const z of Object.values(Rg.zones)){
     const scenery=z.drawScenery;
-    z.drawScenery=()=>{scenery?.();for(const s of z.stamps||[])A.stamp(s.x-cam,s.y??GROUND);};
+    z.drawScenery=()=>{scenery?.();for(const s of z.stamps||[])A.stamp(s.x-RC(),s.y??GROUND);};   // 도장은 이미 옮긴 좌표 (D-128)
   }
   installTravel();
 

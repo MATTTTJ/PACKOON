@@ -58,18 +58,18 @@ if(!CLASSIC){
       ['#d2b2a5','#e0bc9c','#edc9a0','#f5d9ac','#f3cea0','#edb886'];
     for(let i=0;i<cols.length;i++)px(0,i*32,W,33,cols[i]);
     // A small stepped disk reads as a pixel sun, without vector antialiasing.
-    const x=300-Math.floor(cam*.025),y=dusk?54:31;
+    const x=300-Math.floor(RC()*.025),y=dusk?54:31;
     px(x+5,y,16,3,'#ffe6b0');px(x+2,y+3,22,4,'#ffe6b0');
     px(x,y+7,26,13,'#ffe6b0');px(x+3,y+20,20,3,'#ffe6b0');px(x+6,y+23,14,2,'#ffe6b0');
     for(let i=0;i<5;i++){
-      const cx=((i*113+26-Math.floor(cam*.07))%600+600)%600-80;
+      const cx=((i*113+26-Math.floor(RC()*.07))%600+600)%600-80;
       px(cx,28+i%3*13,35,2,dusk?'#df9a8d':'#f8e2bc');
       px(cx+10,26+i%3*13,31,2,dusk?'#df9a8d':'#f8e2bc');
     }
   }
   function ridge(par,color,base,amp,freq=.012){
     for(let x=0;x<W;x+=2){
-      const u=x+Math.floor(cam*par),h=Math.round(base-Math.sin(u*freq)*amp-Math.sin(u*freq*.47+1.8)*amp*.65);
+      const u=x+Math.floor(RC()*par),h=Math.round(base-Math.sin(u*freq)*amp-Math.sin(u*freq*.47+1.8)*amp*.65);
       px(x,h,2,H-h,color);
     }
   }
@@ -95,9 +95,9 @@ if(!CLASSIC){
     q(-17,-74,3,2,'#edb660');q(7,-66,4,2,'#edb660');q(-22,-47,3,2,'#edb660');
   }
   function woods(par,dark=false){
-    const s=90,start=Math.floor(cam*par/s)*s;
+    const s=90,start=Math.floor(RC()*par/s)*s;
     for(let u=start-s;u<start+W+s*2;u+=s){
-      const a=hash(u+11),x=u-cam*par;
+      const a=hash(u+11),x=u-RC()*par;
       tree(x,177+Math.floor(a*11),.65+a*.25,
         dark?['#966245','#9f7047','#815139'][Math.floor(a*3)]:['#d37b3e','#bc6139','#df9748'][Math.floor(a*3)],dark,Math.floor(hash(u+73)*3));
     }
@@ -171,13 +171,13 @@ if(!CLASSIC){
   function farAir(dusk=false){
     // Low autumn vapour separates the two ridgelines without covering footholds.
     for(let i=0;i<6;i++){
-      const x=((i*113+22-Math.floor(cam*.14))%720+720)%720-110,y=118+i%3*6;
+      const x=((i*113+22-Math.floor(RC()*.14))%720+720)%720-110,y=118+i%3*6;
       px(x,y,74+i%2*21,2,dusk?'#b79287':'#d8b89a');
       px(x+17,y+3,51+i%2*12,1,dusk?'#b79287':'#d8b89a');
     }
     const drift=Vfx.reducedMotion?0:Math.floor(G.anim/22)%620;
     for(let i=0;i<4;i++){
-      const x=((64+i*15-drift-Math.floor(cam*.06))%620+620)%620-50,y=58+i%3*6;
+      const x=((64+i*15-drift-Math.floor(RC()*.06))%620+620)%620-50,y=58+i%3*6;
       px(x,y,3,1,'#a08378');px(x+3,y+1,2,1,'#a08378');px(x+5,y,3,1,'#a08378');
     }
   }
@@ -229,7 +229,7 @@ if(!CLASSIC){
     woods(.45,zone==='forest'||zone==='marsh');
     if(zone==='village'){
       // The hill is first seen across the wheel's water, long before its path opens.
-      const x=1530-cam*.35;px(x-3,91,6,44,'#6b5340');px(x-23,77,42,19,'#bd7944');px(x-14,68,30,14,'#d28c4b');
+      const x=1530-RC()*.35;px(x-3,91,6,44,'#6b5340');px(x-23,77,42,19,'#bd7944');px(x-14,68,30,14,'#d28c4b');
       house(70-cam);house(220-cam,GROUND,.8,false,2);well(440-cam);
       house(1098-cam,GROUND,.78,false,1);wheel(1050-cam);
       for(const u of [330,590,1200,1560,1980,2320]){const x=tx(u);if(visible(x-cam)){   // tx: 줄인 구역 좌표 (D-109)
@@ -253,7 +253,7 @@ if(!CLASSIC){
       const x=2250-cam;px(x-8,96,17,18,'#61402f');px(x-5,100,11,11,'#ab7c4d');px(x-2,103,5,6,'#704730');
     }else if(zone==='marsh'){
       px(0,171,W,21,'#648379');
-      for(let i=0;i<14;i++){const x=((i*43-Math.floor(cam*.7))%620+620)%620-80;
+      for(let i=0;i<14;i++){const x=((i*43-Math.floor(RC()*.7))%620+620)%620-80;
         px(x,176+i%4*4,21+i%3*8,1,'#9fb092');}
       for(const u of [160,470,800,1090,1370,1850,2140,2340])reeds(u-cam);
       house(1574-cam,GROUND,1.3,true,2);fence(1510-cam,GROUND,3);
@@ -264,7 +264,7 @@ if(!CLASSIC){
       for(const u of [460,1460]){const x=u-cam;   // D-116: 칡이 300 앞당겨져 둔덕도 옮겼다
         px(x-21,GROUND-9,42,9,'#89795c');px(x-15,GROUND-13,31,4,'#aa956e');px(x-13,GROUND-11,14,1,'#cbb182');}
       // Home has become very small; the vista uses this same bent reed roof.
-      house(800-cam*.28,163,.32,true);
+      house(800-RC()*.28,163,.32,true);
     }
     ground(zone==='marsh');
     for(let u=Math.floor(cam/170)*170-170;u<cam+W+170;u+=170){
@@ -388,12 +388,12 @@ if(!CLASSIC){
       ['#785f78','#80617b','#8a677e','#956d80','#a17481','#ae7d83','#bb8785','#c69086','#d19b89','#dda78e','#e6b395','#edbe9d','#f2c9a6','#f5d1ac','#f5d1ac','#f5d1ac']:
       ['#cbb2ad','#d2b7ac','#d9bdac','#dfc2ac','#e6c8ad','#edceb0','#f2d3b1','#f6d9b4','#f8deba','#f9e2bf','#f9e3c1','#f9e3c1','#f9e3c1','#f9e3c1','#f9e3c1','#f9e3c1'];
     for(let i=0;i<colors.length;i++)px(0,i*15,W,16,colors[i]);
-    const sx=311-Math.floor(cam*.1),sy=dusk?57:31;
+    const sx=311-Math.floor(RC()*.1),sy=dusk?57:31;
     px(sx+5,sy,16,3,'#ffe8b7');px(sx+2,sy+3,22,4,'#ffe8b7');px(sx,sy+7,26,13,'#ffe8b7');px(sx+3,sy+20,20,3,'#ffe8b7');px(sx+6,sy+23,14,2,'#ffe8b7');
-    for(let i=0;i<5;i++){const x=31+i*79-Math.floor(cam*.25),y=35+i%3*12;
+    for(let i=0;i<5;i++){const x=31+i*79-Math.floor(RC()*.25),y=35+i%3*12;
       px(x,y,24+i%2*19,1,dusk?'#d9a08e':'#f8e7ca');px(x+8,y-2,36+i%2*10,2,dusk?'#d9a08e':'#f8e7ca');}
     // Evening errands continue above the valley: two magpies, seen only as wing strokes.
-    const x=166-Math.floor(cam*.4);
+    const x=166-Math.floor(RC()*.4);
     px(x,70,3,1,'#9c827a');px(x+3,71,2,1,'#9c827a');px(x+5,70,3,1,'#9c827a');
     px(x+17,64,3,1,'#9c827a');px(x+20,65,2,1,'#9c827a');px(x+22,64,3,1,'#9c827a');
   }
@@ -446,10 +446,10 @@ if(!CLASSIC){
     for(let i=0;i<11;i++)leaf(i*57+24-cam+drift,180+i%5*8,['#d98d43','#eab954','#bd6740'][i%3]);
     // Broken strips reflect the mill, warm paper window and the late sun.
     const refl=(x,y,w,c)=>{for(let i=0;i<8;i++)px(x+(i%2?2:-2),y+i*3,w-Math.floor(i*.8),1,c);};
-    refl(50-cam*.42,174,21,'#b9b58c');refl(266-cam*.42,174,16,'#97a98d');
-    for(let i=0;i<12;i++)px(311-cam*.14-Math.floor(i*.6)+(i%2?3:-2),174+i*3,9+i*2,1,i%3?'#c8ccaa':'#e1d8af');
+    refl(50-RC()*.42,174,21,'#b9b58c');refl(266-RC()*.42,174,16,'#97a98d');
+    for(let i=0;i<12;i++)px(311-RC()*.14-Math.floor(i*.6)+(i%2?3:-2),174+i*3,9+i*2,1,i%3?'#c8ccaa':'#e1d8af');
     // A water strider makes tiny concentric ripples beside an eddy of stranded leaves.
-    const rx=181-cam*.35,ry=191;
+    const rx=181-RC()*.35,ry=191;
     px(rx-5,ry,3,1,'#bbceba');px(rx+4,ry,3,1,'#bbceba');px(rx-2,ry-2,4,1,'#bbceba');px(rx-2,ry+2,4,1,'#bbceba');
     px(rx-1,ry,2,1,'#4c6e69');px(rx-2,ry-1,4,1,'#4c6e69');
   }
