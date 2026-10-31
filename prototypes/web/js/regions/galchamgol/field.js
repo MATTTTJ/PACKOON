@@ -119,7 +119,7 @@ Rg.onFloorPickup=a=>{
   if(a.item==='meoru'){
       // 결정 D-61·D-129: 아빠 쪽은 글만 있다. 해머루 글 끝에 나중에 덧쓴 한 줄이 있다.
       clue('h1','아빠의 수첩','수첩의 해머루 글 끝, 나중에 덧쓴 빛바랜 아빠 글씨: "여기도 아니다."');
-      diary('meoru','해머루를 그려 넣으려고 아빠의 수첩을 펼쳤다. 아빠가 적어 둔 해머루 글 끝에, 나중에 덧쓴 빛바랜 글씨가 그제야 눈에 들어왔다. "여기도 아니다." 아빠도 이 열매를 보고 더 북쪽으로 갔구나.');
+      diary('meoru','해머루를 그려 넣으려고 아빠의 수첩을 펼쳤다. 아빠가 적어 둔 해머루 글 끝에, 나중에 덧쓴 글씨가 그제야 눈에 들어왔다. "여기도 아니다." 먹빛이 많이 바랬다. 아빠는 아주 옛날에 벌써 여기 와 봤구나. 그때도 더 북쪽으로 갔구나.');   // 결정 D-134: 오래된 글씨임을 알아본다
       ledger('toad','두꺼비 할멈','해머루 1','엄마의 병을 늦추는 약');
       setTimeout(()=>toast('수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 두꺼비 할멈에게 가져가자'),1600);refreshGoal();}
 };
@@ -217,7 +217,7 @@ if(!CLASSIC){
       // 다람쥐의 잊은 몫 (PA-47, 다람쥐 모습에만 보인다)
       digs:[{id:'gal_cache_village',x:880,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
       vistas:[{id:'stream',x:930,from:0,to:140,draw:A.streamDoor,sound:'water',
-        thought:'낙엽이 앞서 가네.\n저 큰 나무까지 가는 걸까?',
+        thought:'낙엽이 앞서 가네.\n당산나무까지 가는 걸까?',
         diary:'물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.',layers:A.vistaStream}],
     },
     forge:{...basic('forge',2600,[...stepRidge(320,21,4),...stepRidge(1940,22,5)]),
