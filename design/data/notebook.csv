@@ -4,16 +4,23 @@ dodam,galchamgol,도담,동물,나,rule:squirrel_cache,도담이 묻은 자리�
 nal,galchamgol,날쌘,동물,아빠,,처음부터,족제비 떠돌이 보부상. 다들 깍쟁이라 하지만 셈은 바르다. 제 물건을 깎아내리면 오기로 덤을 얹는다.,제안,,아빠 수첩
 nal,galchamgol,날쌘,동물,나,nal:bluff-paid,허세를 부린 뒤 덤을 받았을 때,정말이었다. 촌구석이라고 허세를 부렸더니 숯을 하나 더 줬다.,제안,,관찰
 nal,galchamgol,날쌘,동물,나,nal:yakyeon,아빠의 약연을 내밀었을 때,아빠의 약연은 받지 않는다. 남의 집 가업 물건은 안 받는 게 보부상 법도라고.,제안,,관찰
+nal,galchamgol,날쌘,동물,나,nal:route-price,날쌘에게 숯값 셈을 물었을 때,"값은 물건이 아니라 길이 정한다. 어디서 사서 어디로 가져가느냐. 공짜가 아니니 적어 두라고 했다.",제안,결정 D-117,관찰
+nal,galchamgol,날쌘,동물,나,nal:hat,날쌘이 모자 챙을 펴 주었을 때,"꺾인 모자 챙을 펴서 도로 씌워 줬다. 보부상은 모자부터 바로 쓴다고. 아빠도 비 오는 날 그렇게 말했다.",제안,결정 D-117,관찰
 nal,galchamgol,날쌘,동물,나,nal:dolneomeo,돌너머에서 날쌘과 거래했을 때,돌너머에서는 단풍골 칡꽃을 귀하게 쳤다. 같은 물건도 마을마다 값이 다르다.,제안,,관찰
 musoe,galchamgol,무쇠,동물,아빠,,처음부터,동생 무쇠. 이 길에서 다리를 다쳤다. 단풍골에 남아 망치를 잡겠단다. 내가 앞만 본 탓이다.,제안,,아빠 수첩
 musoe,galchamgol,무쇠,동물,나,fight:musoe,처음 맞설 때,"삼촌은 말보다 시험이 먼저다. 덤비면 꿀밤으로 연장부터 뺏으니, 피하기만 해야 한다.",제안,,관찰
 musoe,galchamgol,무쇠,동물,나,like:musoe:rice,전투에서 주먹밥을(를) 건넸을 때,출출할 때 주먹밥을 건네면 어깨가 내려간다.,제안,,관찰
 musoe,galchamgol,무쇠,동물,나,like:musoe:powder,전투에서 도토리 가루을(를) 건넸을 때,도토리 가루도 반긴다.,제안,,관찰
 musoe,galchamgol,무쇠,동물,나,musoe:forge,삼촌이 낫을 벼렸을 때,삼촌은 다리를 절어도 망치는 흔들리지 않는다. 쇠가 가장 빨갈 때 세 번 친다.,제안,,관찰
+musoe,galchamgol,무쇠,동물,나,musoe:leg,칡뿌리 찜질을 건넸을 때,"삼촌 다리는 비 오기 전에 쑤신다. 할머니가 싸 준 칡뿌리 찜질을 감아 드렸더니 따뜻하다고 했다.",제안,결정 D-117,관찰
 toad,galchamgol,두꺼비 할멈,동물,아빠,,처음부터,"두꺼비 약재상. 약은 잘 짓는데, 아는 걸 다 말하지는 않는다.",제안,,아빠 수첩
 toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,엄마의 병을 고치지는 못해도 늦출 수는 있다고 했다. 무언가 알면서 말을 아낀다.,제안,,관찰
 toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,보따리 속 약연을 보더니 아직 쓸 때가 아니라고 했다.,제안,,관찰
 toad,galchamgol,두꺼비 할멈,동물,나,galchamgol:arc-toad-wrap,[시험판] 약을 보낸 뒤 엄마 이야기를 듣고 인사를 드렸을 때,내가 아기였던 겨울에 엄마가 두고 간 포대기 끈을 받았다. 할멈이 내내 간직하고 있었다.,제안,arcs=1 선택 장면 · 교환 품목이 아닌 받은 물건의 기록,관찰
+stream_otter,galchamgol,여울,동물,나,met:stream_otter,처음 만났을 때,"개울의 어린 수달. 밤마다 함지박을 도로 밀어 올려 둔다. 엄마를 ""빨래 아줌마""라고 부른다.",제안,결정 D-117,관찰
+stream_otter,galchamgol,여울,동물,나,otter:stone,함지박 밑 낙관을 봤을 때,엄마는 빨래를 마치면 물수제비를 일곱 번 떴다고 한다. 나는 몰랐다.,제안,결정 D-117,관찰
+charcoal_badger,galchamgol,검댕,동물,나,met:charcoal_badger,처음 만났을 때,"참나무 숲에서 숯 굽는 오소리. 흰 연기는 아직, 푸른 연기면 다 된 숯이다.",제안,결정 D-117,관찰
+charcoal_badger,galchamgol,검댕,동물,나,geom:nal,눈을 씻고 연기 빛을 봤을 때,날쌘 아저씨는 값을 깎는 척하고 가마 옆에 몰래 덤을 두고 간다. 모른 척하기로 했다.,제안,결정 D-117,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,fight:kudzu,처음 맞설 때,"당산나무를 감은 칡덩굴. 덩굴손은 위에서 휩쓸고, 뿌리는 땅에서 솟는다.",제안,,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,core:kudzu,핵심 부위가 드러날 때,덩굴손이나 뿌리를 하나 꺾어야 심이 드러난다.,제안,,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,like:kudzu:ssari,전투에서 싸리버섯을(를) 건넸을 때,싸리버섯 향을 맡으면 덩굴이 느슨해진다.,제안,,관찰
@@ -33,13 +40,16 @@ kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:sleep,졸 때 말을 걸었을 
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:awake,고개를 들 때 말을 걸어 깨웠을 때,꾸벅꾸벅 졸다가 고개를 드는 잠깐에만 말이 통한다.,제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,kkubeogi:eoksae,억새를 건넸을 때,겨울잠 둥지에 쓸 마른 억새를 좋아한다.,제안,,관찰
 kkubeogi,dolneomeo,꾸벅이,동물,나,dolneomeo:arcs-kkubeogi,시험판에서 꾸벅이에게 맡은 말을 적었을 때,지난가을 아빠가 둥지 곁에서 “미안하다… 그 겨울에 내가 없어서…”라고 했단다. 꾸벅이가 잊기 전에 나한테 맡겼다.,제안,[시험판] arcs=1 선택 장면,관찰
+kkubeogi,dolneomeo,꾸벅이,동물,나,dolneomeo:kku-drawing,그림을 둥지 문턱에 달아 주었을 때,"글은 못 읽어도 그림은 알아본다. 봄에 깨면 제일 먼저 볼 자리에 꼬마 두더지와 내 얼굴을 그려 두었다.",제안,D-118,관찰
 dolsoe,dolneomeo,돌쇠 할배,동물,아빠,,처음부터,"돌너머 석수 두더지. ""돌이 마음을 알아야 돈다."" 할배한테 배운 말.",제안,,아빠 수첩
 dolsoe,dolneomeo,돌쇠 할배,동물,나,met:dolsoe,처음 말을 걸 때,눈이 침침해져서 이제 돌을 손끝으로만 읽는다.,제안,,관찰
 dolsoe,dolneomeo,돌쇠 할배,동물,나,dolsoe:tea,결명자 차를 드렸을 때,결명자 차를 드리면 눈이 밝아진다며 마음을 연다.,제안,,관찰
 dolsoe,dolneomeo,돌쇠 할배,동물,나,dolsoe:stack,돌 쌓기를 마쳤을 때,"돌탑은 돌 마음부터 읽고, 하나씩 천천히 얹는다.",제안,,관찰
+dolsoe,dolneomeo,돌쇠 할배,동물,나,dolneomeo:mole-reads,꼬마 두더지가 할머니 돌을 알아맞혔을 때,"할배 눈 대신 꼬마 손이 돌을 읽는다. 할배가 처음으로 소리 내어 웃었다.",제안,D-118,관찰
 ppuri,dolneomeo,뿔이,동물,아빠,,처음부터,돌산 장승지기 산양. 원칙대로다. 장승제를 안 올리면 누구도 못 지나간다.,제안,,아빠 수첩
 ppuri,dolneomeo,뿔이,동물,나,met:ppuri,처음 말을 걸 때,장승제에는 메밀전을 부친다. 메밀가루가 있어야 한다.,제안,,관찰
 ppuri,dolneomeo,뿔이,동물,나,ppuri:seogi,장승제를 올리고 길이 열릴 때,산이 노하면 석이를 올리는 법이라고 했다. 석이 붙은 바위를 알려 줬다.,제안,,관찰
+ppuri,dolneomeo,뿔이,동물,나,dolneomeo:ppuri-eyes,장승 눈을 칠했을 때,"아버지가 세운 장승에게 아침마다 길 소식을 고한다. 장승 뒤에 떨어진 짐꾼의 이름이 있다.",제안,D-118,관찰
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,아빠,,처음부터,돌산 어귀 성황당. 지날 때 돌 하나 얹고 소원을 빈다.,제안,,아빠 수첩
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,나,fight:golem,처음 맞설 때,돌무더기가 깨어나 일어섰다. 머리가 높아 처음엔 손이 닿지 않는다.,제안,,관찰
 golem,dolneomeo,성황당 돌무더기 (돌 골렘),동물,나,core:golem,핵심 부위가 드러날 때,다리나 팔을 하나 무너뜨리면 휘청이며 머리가 내려온다.,제안,,관찰
@@ -129,6 +139,11 @@ honey,jangteo,꿀,물건,나,got:honey,처음 얻을 때,(items.csv 의 설명),
 jujube,yeongsan,대추,물건,나,got:jujube,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 acorn_jelly,galchamgol,도토리묵,물건,나,got:acorn_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 memil_jelly,dolneomeo,메밀묵,물건,나,got:memil_jelly,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
+dol_badger,dolneomeo,메밀댁,동물,나,met:dol_badger,처음 말을 걸 때,"메밀밭 오소리 아주머니. 무릎이 아파 돌계단을 못 오른다. 짐을 맡기는 손이 크다.",제안,D-118,관찰
+dol_badger,dolneomeo,메밀댁,동물,나,dolneomeo:flower-bojagi,보자기를 받았을 때,"오래전 겨울에 값으로 받은 꽃수 보자기를 주인에게 돌려 달라고 했다. 귀퉁이 꽃이 엄마 수다.",제안,D-118,관찰
+dol_turtle,dolneomeo,남생이 할미,동물,아빠,,처음부터,"성황당 돌 그늘의 남생이. 백 년을 살았다고 한다. 묻는 말엔 다음에 답한다.",제안,D-118,아빠 수첩
+dol_turtle,dolneomeo,남생이 할미,동물,나,met:dol_turtle,처음 말을 걸 때,"소원 천은 높을수록 잘 들린다고 했다. 가장 높은 가지에 아빠가 맨 천이 있다.",제안,D-118,관찰
+dol_turtle,dolneomeo,남생이 할미,동물,나,dolneomeo:turtle-spring,떠나기 전 이야기를 들었을 때,"무언가 지나간 자리엔 샘이 먼저 언다. 물 마른 데를 만나면 샘부터 찾으라고 했다.",제안,D-118,관찰
 yakgwa,jangteo,약과,물건,나,got:yakgwa,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 magamok_tea,yeongsan,마가목차,물건,나,got:magamok_tea,처음 얻을 때,(items.csv 의 설명),확정,PA-43 크래프팅,관찰
 dad_stamp_jangteo_flag,jangteo,젊은 아빠의 그날 · 장터 깃대,도장,아빠,stamp:jangteo:flag,장터 깃대 밑 도장을 찾았을 때,부를 준다는 열매를 찾으러 북쪽으로 간다. 장터 깃발에 길을 물으니 바람만 대답했다.,제안,PA-43 큰 장터 확장 · 개발자 결정,아빠 수첩
