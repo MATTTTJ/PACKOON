@@ -27,6 +27,7 @@ kudzu,galchamgol,엉킨 칡,동물,나,like:kudzu:ssari,전투에서 싸리버�
 kudzu,galchamgol,엉킨 칡,동물,나,like:kudzu:kkoe,전투에서 꾀꼬리버섯을(를) 건넸을 때,꾀꼬리버섯 향도 좋아한다.,제안,,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,calm:kudzu,달래서 끝냈을 때,부수지 않고 달래면 보랏빛 칡꽃을 피워 두고 물러난다.,제안,,관찰
 acorn,galchamgol,도토리,물건,나,got:acorn,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
+acorn_gift,galchamgol,다람쥐 형제의 도토리,물건,나,got:acorn_gift,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 acorn,galchamgol,도토리,물건,아빠,,처음부터,단풍골에선 도토리 가루가 돈 대신 돈다. 세 알이면 한 줌.,제안,,아빠 수첩
 root,galchamgol,칡뿌리,물건,나,got:root,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 ssari,galchamgol,싸리버섯,물건,나,got:ssari,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
