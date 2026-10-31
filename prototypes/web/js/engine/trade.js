@@ -79,10 +79,11 @@ const Trade=(()=>{
     for(const g of S.goods){
       const lock=g.locked?.()||null,b=el('button','trade-good');b.type='button';b.dataset.good=g.id;
       b.setAttribute('aria-pressed',String(S.sel===g.id));
-      const head=el('span','trade-good-head');head.appendChild(icon(g.icon||g.item));
+      // 결정 D-112: 물건이 아닌 정보(info:true)는 찢긴 수첩 쪽 아이콘으로 그리고, 이름은 "~에 대한 정보"로 적는다.
+      const head=el('span','trade-good-head');head.appendChild(icon(g.info?'torn_page':(g.icon||g.item)));
       head.appendChild(el('b',null,(g.label||ITEMS[g.item].n)+(g.n>1?' ×'+g.n:'')));
       if(!g.label)head.appendChild(rarityIcon(ITEMS[g.item].r));
-      head.appendChild(el('span','chip',g.kind==='story'?'부탁':'흔한 물건'));b.appendChild(head);
+      head.appendChild(el('span','chip',g.info?'정보':g.kind==='story'?'부탁':'흔한 물건'));b.appendChild(head);
       const asks=el('span','trade-asks');
       if(lock)asks.appendChild(el('span','small',lock));
       else if(g.kind==='story')g.asks.forEach((a,i)=>{
@@ -111,7 +112,8 @@ const Trade=(()=>{
       grid.appendChild(s);
     }
     mine.appendChild(grid);
-    wrap.appendChild(theirs);wrap.appendChild(mine);body.appendChild(wrap);
+    // 결정 D-111: 내 보따리가 왼쪽(휴대폰에서는 위), 상대 물건이 오른쪽이다.
+    wrap.appendChild(mine);wrap.appendChild(theirs);body.appendChild(wrap);
     // 내가 내놓을 것, 흥정, 제안
     const tray=el('section','trade-tray');tray.appendChild(el('h3',null,'내가 내놓을 것'));
     const chips=el('div','trade-offer');

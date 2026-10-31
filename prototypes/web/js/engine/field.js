@@ -423,7 +423,10 @@ function updateOverlay(){
   const floor=paused()||pickupPose||rolling?null:nearFloorItems()[0];
   if(floor){pr.hidden=false;const room=nearFloorItems().some(a=>canPickupItem(a.item));pr.textContent=!room?'보따리 가득':TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
-  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':GATHER[dg.item]?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';pr.style.top=((GROUND-14)/H*100)+'%';}
+  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':GATHER[dg.item]?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';
+    // 결정 D-108: 채집 기준원이 크니 안내 말풍선은 기준원과 진행 점 위에 띄운다
+    const ringTop=!dg.cache&&GATHER[dg.item]?gatherSpot(dg).y-2*TABLES.MINIGAMES.gather_ring_radius-10:GROUND-14;
+    pr.style.top=(Math.min(GROUND-14,ringTop)/H*100)+'%';}
   else if(!paused()&&!rolling&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
   if(!formRing.hidden&&!formChangeAllowed())formRing.hidden=true;
