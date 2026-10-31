@@ -465,7 +465,7 @@ Rg.startKudzu=()=>{
 Rg.npcs=[
   {id:'dodam',name:'도담',x:300,talk:talkDodam,draw:Rg.art.squirrel},
   {id:'nal',name:'날쌘',x:820,talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
-  {id:'musoe',name:'무쇠',x:1110,talk:talkMusoe,draw:Rg.art.uncle,props:Rg.props.forge},
+  {id:'musoe',name:'무쇠',known:true,tag:'무쇠 삼촌',x:1110,talk:talkMusoe,draw:Rg.art.uncle,props:Rg.props.forge},
   {id:'toad',name:'두꺼비 할멈',x:1430,talk:talkToad,draw:Rg.art.toad,props:Rg.props.toad},
 ];
 
@@ -692,7 +692,7 @@ if(!CLASSIC){
       hyung:[['다람쥐 형','큰 건 역시 내 몫이지!'],['다람쥐 동생','…다음엔 내가 먼저 찾을 거야.']],
       dongsaeng:[['다람쥐 동생','찾는 건 내가 최고야!'],['다람쥐 형','…다음엔 내가 더 많이 오갈 거야.']]
     })[G.f.galExpBrothersSide]||[['다람쥐 형','큰 것부터 번갈아!'],['다람쥐 동생','겨울에는 한 바구니에서!']];}};
-  const chick={id:'lost_chick',name:'꺼병이',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
+  const chick={id:'lost_chick',name:'꺼병이',hint:'삐약… 삐약… 어디선가 엄마를 찾는 병아리 소리가 들린다.',get x(){return G.f.galExpChickX??1540;},draw:picture('chick'),talk:chickTalk,
     greeting:'이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!'};
   function wheelStage(){
     if(G.f.galWheelDone)return 5;
@@ -818,7 +818,7 @@ if(!CLASSIC){
       talk([['너구리',F.galLanternCount===3?'다 왔네.\n할멈께 가져가서 처마에 걸자.':'앉았다. 꽉 쥐지는 않을게.\n다음 불빛도 찾아보자.']]);
     });
   }
-  const fireflies={id:'reed_fireflies',name:'반딧불',x:1760,draw:(x,y)=>Rg.expArt.marker(x,y),talk:fireflyLook,
+  const fireflies={id:'reed_fireflies',name:'반딧불',tag:false,hint:'갈대숲 사이로 작은 불빛이 깜박인다.',x:1760,draw:(x,y)=>Rg.expArt.marker(x,y),talk:fireflyLook,
     greeting:[['너구리','등롱 입구로 작은 빛이 드나든다.\n잡아 두지 않아도 환하네.']]};
   Rg.expWanderers={village:[magpie],forge:[brothers],forest:[chick],marsh:[fireflies],hill:[]};
   function examine(id,x,label,read,y){
@@ -840,6 +840,12 @@ if(!CLASSIC){
         '큰 도토리부터 양쪽 바구니에 번갈아 놓았다.\n작은 것도 나눠 담으니 높이가 비슷해졌다.':'빈 바구니 두 개가 나란히 놓였다.\n작은 발 둘이 서기 딱 좋은 낮은 평상이다.')],
     forest:[
       examine('forest_root',280,'드러난 뿌리 살펴보기',()=> '칡은 나무를 타고, 참나무는 땅을 붙든다.\n뿌리 밑 흙은 곡괭이가 들어갈 만큼 무르네.'),
+      // 결정 D-49: 도담 옆 높은 참나무 가지(다람쥐만 오르는 자리, PA-47). 지나가면 살펴볼 수 있고, 아이는 아는 만큼만 말한다.
+      Object.assign(examine('forest_oak',772,'높은 참나무 가지 올려다보기',()=>G.form==='squirrel'?
+        '줄기 껍질에 발톱이 쏙쏙 걸린다.\n이 모습이면 저 가지까지 타고 오르겠어.':hasForm('squirrel')?
+        '가지가 너무 높아서 이 몸으로는 못 오르겠다.\n다람쥐가 되면 줄기를 타고 오를 수 있겠어.':
+        G.pickups.some(p=>p.id?.startsWith('gal_branch_acorn')&&!p.got)?
+        '가지에 도토리가 달렸는데 너무 높다.\n지금은 올라가기 힘들겠어.':'저 가지는 너무 높다.\n지금은 올라가기 힘들겠어.'),{peek:false}),
       examine('forest_trail',1180,'나뭇가지에 걸린 금줄 보기',()=>G.tool==='sickle'?
         '개울에서 보던 나무의 금줄이 여기까지 이어졌다.\n안쪽 덩굴을 걷고 나무 속으로 올라가자.':'개울에서 보던 큰 나무다. 금줄이 숲 안으로 이어졌다.\n덩굴을 걷을 낫이 있으면 저곳까지 닿겠어.'),
       examine('forest_mother',2020,'갈대 너머 소리 듣기',()=>G.f.galExpChickWith?

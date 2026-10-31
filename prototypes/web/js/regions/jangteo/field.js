@@ -107,7 +107,15 @@ if(!CLASSIC){
   const gate=(x,y)=>{R(x-20,y-48,4,48,'#604635');R(x+16,y-48,4,48,'#604635');R(x-24,y-49,48,6,'#31434d');R(x-22,y-51,44,2,'#e6eaf0');if(!night()||!has('sinpyo')){R(x-16,y-23,32,3,'#ac4c43');R(x-12,y-27,24,1,'#dba56c');}};
   const needWarehouse=()=>night()&&has('sinpyo');
   const warehouseReason='신표를 받은 뒤, 숙소 마루에서 밤을 기다리자.';
-  const stairs=(x,top=96)=>[{x,y:160,w:80},{x:x+90,y:128,w:90},{x:x+180,y:top,w:120}];
+  // 결정 D-48: 좌판·처마 계단의 아래 두 칸은 자리마다 높이·너비가 조금씩 다르다(고정 시드). 맨 위 처마는 그대로다.
+  // keep: 솔방울이 놓인 칸(0 아래, 1 가운데)은 그대로 둔다. 한 칸 차이는 34px 안이라 점프로 오른다.
+  const stairs=(x,top=96,keep=[])=>{
+    let s=(x*2654435761)>>>0;const rnd=()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296;
+    const low=keep.includes(0)?160:156+Math.round(rnd()*8),lx=keep.includes(0)?x:x-6+Math.round(rnd()*12),lw=keep.includes(0)?80:70+Math.round(rnd()*22);
+    const mid=keep.includes(1)?128:clamp(Math.round(low-24-rnd()*12),Math.max(top,low-34),Math.min(top+34,low-14));
+    const mx=keep.includes(1)?x+90:x+80+Math.round(rnd()*18),mw=keep.includes(1)?90:80+Math.round(rnd()*20);
+    return [{x:lx,y:low,w:lw},{x:mx,y:mid,w:mw},{x:x+180,y:top,w:120}];
+  };
   const cones=(zone,coords)=>coords.map(([x,y],i)=>({id:'j_'+zone+'_fuel_'+i,x,y:y??GROUND,item:'solbang',got:false}));
   let viewedZone=null,depthDirection=0,lastFade=0;
   const common=id=>({ground:GROUND,startX:70,
@@ -216,7 +224,7 @@ if(!CLASSIC){
     },
     pine:{...common('pine'),name:TABLES.ZONES.jangteo.pine,w:2800,npcs:[],
       // 840 헛간 지붕은 720 처마에서 수리부엉이가 날개를 펴야 닿는다 (PA-47 선택 자리)
-      platforms:[...stairs(420),...stairs(1100),...stairs(2180),{x:2390,y:96,w:340},{x:842,y:124,w:56}],
+      platforms:[...stairs(420),...stairs(1100,96,[1]),...stairs(2180,96,[0]),{x:2390,y:96,w:340},{x:842,y:124,w:56}],
       digs:[{id:'j_cache_pine',x:1700,item:'kong',n:2,form:'squirrel',cache:true,done:false}],
       pickups:[...cones('pine',[[250,192],[280,192],[310,192],[600,96],[630,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
         {id:'j_owl_roof_cone_1',x:858,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:880,y:124,item:'solbang',got:false}],

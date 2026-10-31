@@ -484,19 +484,38 @@
       }
     }
     function startTimer() { if (!timer) timer = setInterval(schedule, tickSeconds * 1000); }
+    // 결정 D-46: 경치 곡처럼 곧 들을 곡은 미리 합성해 둔다. 미리 합성 중이면 그 결과를 기다린다.
+    const preloading = new Map();
+    function trimCache() {
+      const bytes = () => [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0);
+      const limit = 360 * 1024 * 1024;
+      while (cache.size > 1 && (bytes() > limit || cache.size > 24)) cache.delete(cache.keys().next().value);
+    }
+    function preload(id) {
+      if (!context || destroyed || !tracks.has(id) || preloading.has(id)) return;
+      const rate = renderRate(), have = cache.get(id);
+      if (have && have.sampleRate === rate) return;
+      const job = renderSongAsync(tracks.get(id), bank, { sampleRate: rate, cancelled: () => destroyed })
+        .then(pcm => { preloading.delete(id); if (pcm && !destroyed && !cache.has(id)) { cache.set(id, pcm); trimCache(); } return pcm; })
+        .catch(() => { preloading.delete(id); return null; });
+      preloading.set(id, job);
+    }
     async function loadTrack(id, request, variant) {
       const key = variant ? variant.key : id;
       const rate = renderRate();
       let pcm = cache.get(key);
       if (pcm && pcm.sampleRate !== rate) { cache.delete(key); pcm = null; }
+      if (!pcm && preloading.has(key)) {
+        pcm = await preloading.get(key);
+        if (pcm && pcm.sampleRate !== rate) pcm = null;
+        if (request !== serial || destroyed) return null;
+      }
       if (!pcm) {
         pcm = await renderSongAsync(variant ? variant.track : tracks.get(id), bank, { sampleRate: rate, cancelled: () => request !== serial || destroyed });
         if (!pcm || request !== serial || destroyed) return null;
       }
       cache.delete(key); cache.set(key, pcm);
-      const bytes = () => [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0);
-      const limit = 360 * 1024 * 1024;
-      while (cache.size > 1 && (bytes() > limit || cache.size > 24)) cache.delete(cache.keys().next().value);
+      trimCache();
       return pcm;
     }
     // 결정 D-37: 템포 변형(같은 악보를 빠르기만 바꿔 합성)과 층(성부 묶음)
@@ -674,7 +693,7 @@
       if (ownsContext && context) context.close().catch(() => {});
     }
     function getDiagnostics() { return { clockEvents: clockEvents.slice(), schedulerRunning: !!timer, sources: sourceCount(), peakSources, sessions: active.size, cachedTracks: cache.size, cacheBytes: [...cache.values()].reduce((n, p) => n + p.left.byteLength + p.right.byteLength, 0), sampleRate: renderRate() }; }
-    return { unlock, play, travel, stop, pause, resume, setLayers, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
+    return { unlock, play, preload, travel, stop, pause, resume, setLayers, setVolume, setDucking, setEnabled, playSfx, getState: state, getDiagnostics, destroy, useContext, get context() { return context; } };
   }
   function attachSound(sound, player) {
     if (!sound || !player) throw new Error('Sound와 player가 필요합니다.');
