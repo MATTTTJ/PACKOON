@@ -698,7 +698,7 @@ if(!CLASSIC){
       ['너구리','집에 돌아가면 엄마랑 나눠 먹을게.'],
       ['다람쥐 형','그럼 썩지 않게 꼭 싸 둬.']],
       '북쪽으로 간다고 하자 다람쥐 형제가 도토리를 하나씩 골라 주었다. 큰 것 하나, 작은 것 하나. 집에 돌아가면 엄마랑 나눠 먹을 것이다.',
-      ()=>addItem('acorn',2));
+      ()=>addItem('acorn_gift',2));   // 결정 D-137: 형제의 도토리는 사연 아이템(교환·가공 불가)
   }
   function shareBaskets(){
     if(!G.f.galExpBrothersAsked){brothersTalk();return;}
