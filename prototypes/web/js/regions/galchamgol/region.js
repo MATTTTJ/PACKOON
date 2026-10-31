@@ -71,9 +71,9 @@ defineIcons({
 
 /* 흙더미 채집 */
 defineGather({
-  root:{title:'칡뿌리 캐기',hits:TABLES.MINIGAMES.gather_root_hits,hint:'흙이 무른 칡뿌리 자리다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 한 번에 더 깊이 들어간다.'},
-  ssari:{title:'싸리버섯 따기',hits:TABLES.MINIGAMES.gather_ssari_hits,hint:'밑동을 단번에 꺾어야 갓이 안 상한다. 고리가 가운데 원에 닿을 때 휘두르면 딱! 단번에 꺾인다.'},
-  kkoe:{title:'꾀꼬리버섯 따기',hits:TABLES.MINIGAMES.gather_kkoe_hits,hint:'노란 갓이 다치지 않게 밑동을 꺾자. 고리가 가운데 원에 닿을 때 휘두르면 딱! 단번에 꺾인다.'},
+  root:{title:'칡뿌리 캐기',hits:TABLES.MINIGAMES.gather_root_hits,spot:[0,-9],hint:'흙이 무른 칡뿌리 자리다. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 더 깊이 들어가 하나 더 나온다.'},
+  ssari:{title:'싸리버섯 따기',hits:TABLES.MINIGAMES.gather_ssari_hits,spot:[0,-9],hint:'밑동을 단번에 꺾어야 갓이 안 상한다. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 옆에 난 것까지 꺾인다.'},
+  kkoe:{title:'꾀꼬리버섯 따기',hits:TABLES.MINIGAMES.gather_kkoe_hits,spot:[0,-9],hint:'노란 갓이 다치지 않게 밑동을 꺾자. 커지는 고리가 작은 원에 꼭 맞을 때 휘두르면 딱! 옆에 난 것까지 꺾인다.'},
 });
 
 /* 엄마의 절구는 처음부터 깨어 있다. 가공법은 heirlooms.csv */
