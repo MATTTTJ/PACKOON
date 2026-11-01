@@ -389,10 +389,13 @@ function drawRaccoon(){
 
 /* 결정 D-114: ↓로 발판 아래로 내려올 때와 무언가를 타고 오를 때는 등을 보인다. 점프로 오를 때는 그대로 앞모습이다.
    - 다람쥐가 줄기를 타는 동안(formClimb): 오르내린 거리에 맞춰 팔다리를 번갈아 디딘다.
-   - ↓+점프로 발판에서 빠질 때(G.dropBack): 땅에 닿을 때까지. 휘두르는 중이나 수리부엉이가 활공하는 동안에는 앞모습이다. */
+   - ↓+점프로 발판에서 빠질 때(G.dropBack): 땅에 닿을 때까지.
+   결정 D-144: 오르내릴 때는 지형과 변신에 상관없이 늘 등을 보인다. 수리부엉이가 발판에서 내려와 활공하는 동안도 등이다.
+   땅 밑으로 기어 내려가는 문(drawCrawl)도 다람쥐·산양·수리부엉이·고라니 모두 뒷모습으로 디딘다.
+   빼는 것 둘: 점프는 오르기가 아니라 뛰기라 앞모습이다. 휘두르는 그 순간(G.attackT)만 앞모습으로 휘두름이 보이게 한다. */
 function heroBackPose(){
-  if(formClimb&&G.form==='squirrel')return {phase:Math.floor(G.py/4)%2};
-  if(G.dropBack&&!G.onGround&&!(G.attackT>0)&&!(G.form==='owl'&&formGlide))return {phase:Math.floor(G.anim/5)%2};
+  if(formClimb)return {phase:Math.floor(G.py/4)%2};
+  if(G.dropBack&&!G.onGround&&!(G.attackT>0))return {phase:Math.floor(G.anim/5)%2};
   return null;
 }
 function draw(){
@@ -686,10 +689,7 @@ function drawCrawl(m,t){
   const phase=Math.floor(depth*steps)%2;
   if(down&&t<.18)drawPlayerAt(x,y,m.face,Math.floor(t*20)%2,0,heldTool(),0,m.form);   // 다가서는 반 발
   else if(!m.form)drawRaccoonBackAt(x,y,phase);
-  else if(m.form==='squirrel'){
-    // 다람쥐는 머리부터 내려간다.
-    ctx.save();ctx.translate(x-5,y-6);ctx.rotate(Math.PI/2*(down?1:-1));drawFormAt(0,8,1,phase,'squirrel');ctx.restore();
-  }else drawFormAt(x,y-(phase?1:0),m.face,phase,m.form,0,m.form==='owl');
+  else drawFormBackAt(x,y,phase,m.form);   // 결정 D-144: 변신해도 등을 보이며 디딘다 (옛 D-44: 다람쥐는 머리부터, 다른 변신은 옆모습)
   // 내려갈 때는 끝에서 어두워지고, 올라올 때는 어둠에서 밝아진다.
   const dark=down?clamp((t-.55)/.45,0,1):clamp(1-t/.4,0,1);
   if(dark>0){ctx.save();ctx.globalAlpha=dark;R(0,0,W,H,'#211d24');ctx.restore();}
