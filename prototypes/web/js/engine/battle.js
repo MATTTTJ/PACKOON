@@ -10,7 +10,7 @@
          부위의 mark?:붉은 표식에 쓸 글자(없으면 이름 첫 글자),
          backdrop?(c):상대 뒤쪽 화면 전체 배경(결정 D-58. 판정 상자와 글귀 줄 위로는 상자·글이 덮는다), goalText?:지금 할 일 글,
          showHands?:첫 선물 때 빈손을 펴 보이는 장면, pickAttack?():공격을 직접 고른다(B.bullets 를 넣고 B.st='tell'),
-         tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래),
+         tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래), drawOver?(c):상자 밖까지 날아가는 탄(상자 위에 잘리지 않게, 결정 D-168),
          finale?:{start(), step()→끝나면 true}(dodge 를 다 버틴 뒤 입력을 막는 마무리 연출. 그 뒤 'win'),
          possession?:{order:빙의 순서, attacks:부위별 시험판 공격, travel:불 이동 시간, wait:도착 뒤 대피 시간}, partPose?(id):그려진 부위 좌표,
          warmPath?:{width,wideWidth,attacks:부위별 공격},
@@ -533,7 +533,6 @@ function bDraw(){
   c.save();c.translate(LW/2,EY);c.scale(0.84,0.84);c.translate(-LW/2,-EY);
   B.E.draw(c);
   c.restore();
-  if(B.E.cover)drawGolemAim(c);
   if(B.E.possession)drawPossession(c);
   // 글귀
   c.fillStyle=INK;c.textAlign='center';c.textBaseline='alphabetic';c.font='17px "Gowun Batang", "Batang", serif';
@@ -564,6 +563,7 @@ function bDraw(){
   else if(B.st!=='giftPlace')drawPaw(c,B.px,B.py);
   for(const f of B.fx)blob(c,f.x,f.y,f.r*(f.t/28),f.r*(f.t/28),f.col,Math.min(1,f.t/14));
   c.restore();
+  if(B.E.drawOver)B.E.drawOver(c);
   if(B.giftPlace)drawPlacedGift(c);
   drawBonk(c);
   // 붓 테두리
