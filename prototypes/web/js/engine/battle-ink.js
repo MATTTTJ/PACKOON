@@ -1,6 +1,7 @@
 'use strict';
 /* 수묵 붓 도구: 전투 화면과 보스 그림이 같이 쓴다. 흑백 + 단청 붉은색 하나 */
 // 결정 D-102: 전투 색은 먹 + 단청 붉은색 하나. 불(화덕 불꽃·도깨비불)만 주황 담채로 따로 둬 공격 신호의 붉은색과 헷갈리지 않게 한다.
+// 결정 D-157: 칡꽃과 그 향만 연보라 담채로 둔다(칡꽃은 보랏빛이라야 칡꽃으로 읽힌다). 색은 단풍골 enemies.js 에 있다.
 const INK='#1d1814',RED='#b4432a',FIRE='#d9822b';
 function brush(c,pts,w,col,alpha){
   c.save();c.globalAlpha=alpha==null?1:alpha;c.strokeStyle=col||INK;c.lineCap='round';c.lineJoin='round';
@@ -27,33 +28,11 @@ function drawOpenHands(c){
   for(const x of [B.px-19,B.px+19])brush(c,[[x-4,B.py-lift+3],[x,B.py-lift+6],[x+4,B.py-lift+2]],1,'#e2cdb6');
 }
 
-/* 칡 선택 기능. 고리와 통로의 여백은 공격이 모두 지나갈 때까지 남긴다. */
+/* 칡: 공격 뒤 느슨해진 매듭과, 좋아하는 선물을 받은 덩굴이 손 쪽으로 내미는 매듭 */
 function drawVineLoop(c,x,y,r,alpha){
   const pts=[];for(let i=0;i<=12;i++){const a=-0.3+i*Math.PI*1.8/12;pts.push([x+Math.cos(a)*r,y+Math.sin(a)*r*0.65]);}
   brush(c,pts,3,INK,alpha);
   brush(c,[[x+r,y-3],[x+r+8,y-12]],1.4,INK,alpha);
-}
-function drawVineAim(c,x,y,progress,alpha){
-  blob(c,x,y,5,5,RED,alpha);
-  // 먹점이 손에 가려져도 겨냥을 읽을 수 있도록 바깥 고리를 함께 좁힌다.
-  c.save();c.strokeStyle=RED;c.globalAlpha=alpha;c.lineWidth=1.6;c.beginPath();c.arc(x,y,26-4*progress,0,Math.PI*2);c.stroke();c.restore();
-}
-function drawVinePath(c){
-  const p=B.vinePath,g=vineBounds(),y=BOX.y+p.v*BOX.h,seed=B.cur.atk==='kudzuSeeds';
-  c.save();c.fillStyle='rgba(255,255,255,.85)';c.fillRect(g.x-g.w/2,BOX.y,g.w,BOX.h);c.restore();
-  // 갈필 선은 여백 바깥에만 남긴다. 뿌리 균열도 예고부터 끝까지 같은 자리다.
-  c.save();clipVineDanger(c);
-  for(let x=BOX.x+6;x<BOX.x+BOX.w;x+=20){
-    if(B.cur.atk==='kudzuRoots')brush(c,[[x,BOX.y+BOX.h],[x-5,BOX.y+BOX.h*.6],[x+4,BOX.y+8]],1.2,INK,0.3);
-    else if(!seed)brush(c,[[x,BOX.y+7],[x+5,BOX.y+13]],2,RED,0.65);
-  }c.restore();
-  for(const s of [-1,1])brush(c,[[g.x+s*(g.w/2+2),BOX.y+3],[g.x+s*(g.w/2+4),BOX.y+BOX.h-3]],1,INK,0.22);
-  drawVineLoop(c,g.x,y,28+(p.width-78)/4,p.dragging?1:0.7);
-  c.save();c.font='12px "Gowun Dodum", sans-serif';c.textAlign='center';c.fillStyle=INK;
-  c.fillText(B.st==='tell'?(p.dragging?'놓으면 고정':p.locked?'고정한 통로':(TOUCH?'치기':'J')+' 누른 채 끌기'):(seed?'먹점을 보고 옆으로':'비워 둔 길'),g.x,BOX.y+BOX.h-8);c.restore();
-  if(seed&&B.st==='tell'){
-    brush(c,[[BOX.x+BOX.w/2,BOX.y],[B.px,B.py]],1,INK,0.3);drawVineAim(c,B.px,B.py,0,0.65);
-  }
 }
 function drawCalmKnot(c){
   const p=coverPoint(B.calmStone),near=Math.hypot(p.x-B.px,p.y-B.py)<26;

@@ -70,14 +70,14 @@ const TABLES={
    "r": 1,
    "kind": "재료",
    "region": "galchamgol",
-   "d": "엉킨 칡의 덩굴손에서 얻은 질긴 줄기. 끈이나 바구니를 엮기 좋다."
+   "d": "엉킨 칡의 줄기에서 얻은 질긴 줄기. 끈이나 바구니를 엮기 좋다."
   },
   "kflower": {
    "n": "칡꽃",
    "r": 3,
    "kind": "재료",
    "region": "galchamgol",
-   "d": "엉킨 칡의 심에서 핀 보랏빛 꽃. 달큰한 향이 오래 남는다."
+   "d": "엉킨 칡의 머리에 핀 보랏빛 꽃. 달큰한 향이 오래 남는다."
   },
   "eoksae": {
    "n": "마른 억새",
@@ -483,19 +483,19 @@ const TABLES={
   "kudzu": [
    {
     "id": "arm",
-    "name": "덩굴손",
+    "name": "칡줄기",
     "hp": 3,
     "mat": "vine"
    },
    {
     "id": "root",
-    "name": "뿌리",
+    "name": "칡뿌리",
     "hp": 3,
     "mat": "root"
    },
    {
     "id": "core",
-    "name": "칡의 심",
+    "name": "칡꽃",
     "hp": 4,
     "mat": "kflower",
     "core": true
@@ -1342,13 +1342,13 @@ const TABLES={
    "lines": [
     {
      "who": "me",
-     "text": "당산나무를 감은 칡덩굴. 덩굴손은 위에서 휩쓸고, 뿌리는 땅에서 솟는다.",
+     "text": "당산나무를 뱀처럼 감은 칡덩굴. 줄기는 채찍처럼 후려치고, 덩이뿌리는 위에서 내리찍고, 꽃은 달큰한 향을 뿜는다.",
      "section": "관찰",
      "when": "fight:kudzu"
     },
     {
      "who": "me",
-     "text": "덩굴손이나 뿌리를 하나 꺾어야 심이 드러난다.",
+     "text": "줄기나 뿌리를 하나 꺾어야 잎이 걷히고 칡꽃이 드러난다.",
      "section": "관찰",
      "when": "core:kudzu"
     },
@@ -2599,6 +2599,7 @@ const TABLES={
   "battle_base_damage": 1,
   "battle_sharp_damage": 2,
   "battle_pickaxe_bonus": 1,
+  "kudzu_stem_cut_chance": 0.5,
   "toast_frames": 300,
   "peek_ms": 1400,
   "peek_fade_ms": 180,
