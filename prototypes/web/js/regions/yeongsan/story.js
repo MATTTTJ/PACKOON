@@ -932,24 +932,34 @@ Rg.goal=()=>{
   if(!G.started)return '';
   if(G.ended)return '너구리 보부상 · 끝';
   // 결정 D-67: 앞선 진행부터 거꾸로 본다. 산양·부엉이로 호숫가에 먼저 닿아도 지금 할 일이 나온다.
-  if(F.yakDone)return '되돌림 약을 안고 아빠와 집으로 가자 · 아빠나 산군 할아버지께 말씀드리면 떠난다';
-  if(F.nameGiven)return '아빠와 손을 포개 약연을 굴리자';
-  if(F.fruitGot)return '산군 할아버지께 셈하러 가자';
-  if(G.boss.dead)return '신목에서 전설의 열매를 따자';
-  if(F.sangunMet)return '언 호수의 강철이와 맞서자 (부수거나 달래거나)';
-  if(F.dadDone)return CLASSIC?'호숫가의 산군 할아버지를 찾아가자':'선착장에서 얼음길을 건너 신목 섬의 산군 할아버지를 만나자';
-  if(F.dadMet)return '아빠의 몸짓을 읽어 보자 (아빠에게 다시 말을 걸면 된다)';
-  if(mapVisited(Rg.id,'shore'))return '호숫가의 너구리에게 다가가 보자';
-  if(!F.nalYTalk)return '산막 불빛 쪽으로 가 보자';
+  // 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
+  if(F.yakDone)return '아빠와 집으로 떠나기';
+  if(F.nameGiven)return '아빠와 약연 굴리기';
+  if(F.fruitGot)return '산군 할아버지께 셈하기';
+  if(G.boss.dead)return '전설의 열매 따기';
+  if(F.sangunMet)return '강철이와 맞서기';
+  if(F.dadDone)return '산군 할아버지 만나기';
+  if(F.dadMet)return '아빠의 몸짓 읽기';
+  if(mapVisited(Rg.id,'shore'))return '호숫가 너구리에게 다가가기';
+  if(!F.nalYTalk)return '산막 불빛 따라가기';
   if(!F.seolpi){
-    if(vineOK()&&bindOK())return '날쌘에게 설피 재료를 건네자';
-    if(!vineOK())return '눈 덮인 덤불에서 다래 덩굴을 낫으로 베자 ('+(G.inv.darae_vine||0)+'/2)';
-    return '산막 처마 밑 짚단에서 짚 한 줌을 빼 오자';
+    if(vineOK()&&bindOK())return '날쌘에게 설피 재료 건네기';
+    if(!vineOK())return '다래 덩굴 베기 ('+(G.inv.darae_vine||0)+'/2)';
+    return '짚 한 줌 구하기';
   }
-  if(!F.salgMet)return '마가목 비탈 너머 고라니에게 살금살금 다가가자';
-  if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매를 건네자 (귀를 세우면 멈추고)':'비탈의 마가목 열매를 따자 ('+m+'/3)';}
-  return '얼어붙은 비탈을 지나 호숫가로 가자';
+  if(!F.salgMet)return '고라니에게 살금살금 다가가기';
+  if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매 건네기':'마가목 열매 따기 ('+m+'/3)';}
+  return '얼어붙은 비탈 지나기';
 };
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+defineSideQuests(Rg.id,[
+  {id:'y_ongdal_water',title:'고라니에게 옹달샘 물 날라 주기',start:F=>F.yOngdal1,done:F=>F.yOngdal2,
+    text:F=>F.salgMet?'살금이에게 표주박 물 갖다주기':'고라니에게 표주박 물 갖다주기'},
+  {id:'y_nal_jujube',title:'날쌘 아저씨와 아빠 사이 말 나르기',start:F=>F.yArcsNalDad1,done:F=>F.yArcsNalDad3,
+    text:F=>F.yArcsNalDad2?'날쌘에게 아빠 몸짓 전하기':'아빠께 대추 갖다드리기'},
+  // 옹달 할미가 맡긴 표주박은 매듭 임자(엄마) 손에 쥐여 드릴 때(영산을 마칠 때) 끝난다.
+  {id:'y_ongdal_gourd',title:'표주박 매듭 임자에게 돌려주기',start:F=>F.yOngdal4,done:()=>regionCompleted('yeongsan'),text:()=>'표주박 매듭 임자에게 돌려주기'},
+]);
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤(장부에 적힌 뒤)에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
    설피는 대체 조합 넷을 모두 펼친다. 살금이는 살금살금 다가가 말을 나눈 뒤라야 장부에 적힌다.

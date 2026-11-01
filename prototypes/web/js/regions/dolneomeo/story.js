@@ -542,27 +542,38 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '돌너머 마을 체험판 완료';
-  // 결정 D-67: 앞선 진행부터 거꾸로 본다
-  if(G.boss.dead)return !F.daraePicked?'절벽 바위턱의 서리다래를 따자':'보따리를 열고 맷돌에 서리다래를 넣어 약즙을 만들자';
+  // 결정 D-67: 앞선 진행부터 거꾸로 본다. 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
+  if(G.boss.dead)return !F.daraePicked?'서리다래 따기':'맷돌에 서리다래 갈아 약즙 만들기';
   // 결정 D-130: 할 일 줄은 아이가 본 대로 '움직이는 돌무더기'라 부른다. 이름은 만나기 전엔 모른다.
-  if(F.ppuriPassed)return '돌산 절벽 길의 움직이는 돌무더기와 맞서자 (부수거나 달래거나)';
-  if(!F.kkuTalk)return '장승 옆 고슴도치에게 서리다래를 물어보자';
-  if(!F.kkuAwake)return '꾸벅이가 고개를 들 때 말을 걸자';
-  if(!F.kkuDone)return has('eoksae',3)?'고개를 들 때 꾸벅이에게 억새를 건네자':'들판의 마른 억새를 낫으로 베자 ('+(G.inv.eoksae||0)+'/3)';
-  if(!F.ppuriMet)return '돌산 길목의 장승지기 뿔이를 찾아가자';
+  if(F.ppuriPassed)return '움직이는 돌무더기와 맞서기';
+  if(!F.kkuTalk)return '고슴도치에게 서리다래 물어보기';
+  if(!F.kkuAwake)return '꾸벅이가 고개 들 때 말 걸기';
+  if(!F.kkuDone)return has('eoksae',3)?'꾸벅이에게 억새 건네기':'마른 억새 베기 ('+(G.inv.eoksae||0)+'/3)';
+  if(!F.ppuriMet)return '장승지기 뿔이 찾아가기';
   if(!F.ppuriPassed){
-    if(has('memil_powder'))return '뿔이에게 메밀가루를 건네자';
+    if(has('memil_powder'))return '뿔이에게 메밀가루 건네기';
     if(!isAwake('maetdol')){
-      if(has('gyeolmyeongja'))return '석수 마당의 돌쇠 할배께 결명자 차를 드리자';
-      if(!F.nalDDone)return !F.nalDTalk?'마을 좌판에서 결명자를 구할 데를 찾아보자':(has('kflower')||has('gyeousari',2))?'날쌘에게 칡꽃을 보여 주고 결명자를 구하자':'높은 가지의 겨우살이 2개를 따서 날쌘에게 가져가자';
-      return '석수 마당의 돌쇠 할배를 찾아가자';
+      if(has('gyeolmyeongja'))return '돌쇠 할배께 결명자 차 드리기';
+      if(!F.nalDDone)return !F.nalDTalk?'결명자 구할 데 찾기':(has('kflower')||has('gyeousari',2))?'날쌘에게 결명자 구하기':'겨우살이 2개 따기';
+      return '돌쇠 할배 찾아가기';
     }
     const m=G.inv.memil||0;
-    if(m<3)return '거둔 메밀밭에서 메밀을 줍자 ('+m+'/3)';
-    return '보따리를 열고 맷돌에 메밀 3개를 넣어 갈자';
+    if(m<3)return '메밀 줍기 ('+m+'/3)';
+    return '맷돌에 메밀 3개 갈기';
   }
-  return '돌산 절벽 길의 움직이는 돌무더기와 맞서자 (부수거나 달래거나)';
+  return '움직이는 돌무더기와 맞서기';
 };
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+defineSideQuests(Rg.id,[
+  {id:'dol_memil_sack',title:'메밀댁 햇메밀 자루 나르기',start:F=>F.dolneomeo_badger1,done:F=>F.dolneomeo_badger_sent,text:()=>'돌쇠 할배께 햇메밀 자루 갖다드리기'},
+  {id:'dol_turtle_wish',title:'남생이 할미 소원 듣기',start:F=>F.dolneomeo_turtle1,done:F=>F.dolneomeo_turtle2,text:()=>'남생이 할미 소원 듣기'},
+  {id:'dol_mole',title:'꼬마 두더지 속마음 듣기',start:F=>F.dolneomeo_arc_dolsoe4,done:F=>F.dolneomeo_arc_dolsoe5,text:()=>'꼬마 두더지 속마음 듣기'},
+  {id:'dol_kku_drawing',title:'꾸벅이에게 그림 남겨 주기',start:F=>F.dolneomeo_arc_kku5,done:F=>F.dolneomeo_arc_kku7,
+    text:F=>F.dolneomeo_arc_kku6?'꾸벅이 둥지에 그림 달아 주기':'꾸벅이에게 그림 그려 주기'},
+  {id:'dol_jangseung_eyes',title:'장승 눈 칠하기',start:F=>F.dolneomeo_arc_ppuri5,done:F=>F.dolneomeo_arc_ppuri6,text:()=>'장승 눈 칠하기'},
+  // 메밀댁이 맡긴 꽃수 보자기는 집에 돌아가 엄마 무릎에 올릴 때(영산을 마칠 때) 끝난다.
+  {id:'dol_flower_bojagi',title:'꽃수 보자기 주인에게 돌려주기',start:F=>F.dolneomeo_badger4,done:()=>regionCompleted('yeongsan'),text:()=>'꽃수 보자기 주인에게 돌려주기'},
+]);
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤에만 보인다(장부에 적혔거나, 냄새를 맡고 먼저 말을 꺼낸 뒤). 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
    결정 D-40: 날쌘에게 허세가 통하면 결명자를 하나 더 얹는다(경멸 축). 결명자를 바꾼 뒤라면 흔한 물건에 덤. */

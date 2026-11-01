@@ -1340,32 +1340,44 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '큰 장터 체험판 완료';
-  const toNight=s=>night()?s:'밤이 되면 '+s+' (숙소 마루에서 쉬자)';
+  // 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다. 밤에만 되는 일은 낮에 '밤에'를 앞에 붙인다.
+  const toNight=s=>night()?s:'밤에 '+s;
   // 결정 D-67: 앞선 진행부터 거꾸로 본다
   if(G.boss.dead){
-    if(!CLASSIC&&has('hongsi_tteok'))return night()&&G.f.jxMagpieNight?'숙소 마루에서 쉬고, 아침에 까치 할머니께 약떡을 맡기자':'숙소 처마의 까치 할머니께 홍시 약떡을 맡기자';
-    if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
-    return '보따리를 열고 시루에 눈홍시와 쌀가루를 넣어 홍시 약떡을 찌자';
+    if(!CLASSIC&&has('hongsi_tteok'))return night()&&G.f.jxMagpieNight?'아침에 까치 할머니께 약떡 맡기기':'까치 할머니께 홍시 약떡 맡기기';
+    if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '맷돌에 쌀 갈기';
+    return '시루에 눈홍시와 쌀가루 넣어 약떡 찌기';
   }
-  if(F.bueongDone)return toNight('숙소 창고 문 앞을 지키자');
-  if(!F.bueongNight)return night()?'처마 밑의 부엉 영감님께 말을 걸어 보자 (밤에는 깨어 계신다)':knows('bueong:night')?'숙소 마루에서 쉬며 해가 지기를 기다리자':'보부상 숙소의 부엉 영감님을 찾아가자';
+  if(F.bueongDone)return toNight('창고 문 앞 지키기');
+  if(!F.bueongNight)return night()?'부엉 영감님께 말 걸기':knows('bueong:night')?'마루에서 쉬며 밤 기다리기':'부엉 영감님 찾아가기';
   if(!F.bueongDone){
-    if(has('patsirutteok'))return toNight('부엉 영감님께 팥시루떡을 올리자');
+    if(has('patsirutteok'))return toNight('부엉 영감님께 팥시루떡 올리기');
     if(!isAwake('siru')){
-      if(!F.morakMet)return '김이 오르는 떡집의 모락을 찾아가자';
+      if(!F.morakMet)return '떡집 모락 찾아가기';
       const sp=G.inv.ssal_powder||0,s=G.inv.ssal||0;
-      if(sp>=3)return '모락에게 쌀가루 3개를 건네자';
-      if(sp+s>=3)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자 ('+sp+'/3)';
-      if(!F.yeotMet)return '엿 수레의 엿방울에게 쌀을 구하자';
+      if(sp>=3)return '모락에게 쌀가루 3개 건네기';
+      if(sp+s>=3)return '맷돌에 쌀 갈기 ('+sp+'/3)';
+      if(!F.yeotMet)return '엿방울에게 쌀 구하기';
       const sb=G.inv.solbang||0;
-      return sb>=5?'엿방울에게 솔방울을 건네자':'뒷산 소나무 숲에서 솔방울을 줍자 ('+sb+'/5)';
+      return sb>=5?'엿방울에게 솔방울 건네기':'솔방울 줍기 ('+sb+'/5)';
     }
-    if(!has('pat'))return CLASSIC?'숙소 앞 날쌘에게 팥을 구하자':'장터 거리 · 날쌘에게 팥을 구하자';
-    if((G.inv.ssal_powder||0)<2)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
-    return '보따리를 열고 시루에 쌀가루 2개와 팥 1개를 넣어 찌자';
+    if(!has('pat'))return '날쌘에게 팥 구하기';
+    if((G.inv.ssal_powder||0)<2)return '맷돌에 쌀 갈기';
+    return '시루에 쌀가루 2개와 팥 1개 찌기';
   }
-  return toNight('숙소 창고 문 앞을 지키자');
+  return toNight('창고 문 앞 지키기');
 };
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+defineSideQuests(Rg.id,[
+  {id:'jang_jj_soup',title:'짠돌 아저씨께 떡국 날라 드리기',start:F=>F.jangteoArcsJj1,done:F=>F.jangteoArcsJj2,
+    text:F=>F.jangteoArcsJjSoup?'짠돌 아저씨께 떡국 갖다드리기':'모락에게 떡국 부탁하기'},
+  {id:'jang_jj_salt',title:'모락에게 짠돌 아저씨 소금 전하기',start:F=>F.jangteoArcsJj3,done:F=>F.jangteoArcsJjSalt,text:()=>'모락에게 짠돌 아저씨 소금 전하기'},
+  {id:'jang_scissors',title:'엿방울의 엿가위 찾기',start:F=>F.jangteoArcsYeot2,done:F=>F.jangteoArcsYeotReturned,
+    text:F=>F.jangteoArcsScissorsFound?'엿방울에게 엿가위 돌려주기':'엿방울의 엿가위 찾기'},
+  {id:'jang_pair_tteok',title:'엿방울에게 모락 떡 전하기',start:F=>F.jangteoArcsPair1,done:F=>F.jangteoArcsPair2,text:()=>'엿방울에게 모락 떡 전하기'},
+  {id:'jang_elder_night',title:'곰방대 할아버지 밤 이야기 듣기',start:F=>F.jangteoArcsElder1,done:F=>F.jangteoArcsElder2,
+    text:()=>night()?'곰방대 할아버지께 말 걸기':'밤에 곰방대 할아버지 찾아가기'},
+]);
 
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.

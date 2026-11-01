@@ -483,14 +483,14 @@ if(!CLASSIC){
     const oldGoal=Rg.goal;
     Rg.goal=()=>{
       if(!G.started||G.ended)return oldGoal();
-      // 결정 D-67: 앞선 진행부터 본다. 할 일 줄에서 낱말이 끊기지 않게 짧게 쓴다.
-      if(has('darae_yak'))return '마을 돌담의 까치 할머니께 약즙을 맡기자';
-      if(G.boss.dead&&!G.f.daraePicked)return '성황당 끝 샛길 · 절벽 위 서리다래를 따자';
+      // 결정 D-67: 앞선 진행부터 본다. 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
+      if(has('darae_yak'))return '까치 할머니께 약즙 맡기기';
+      if(G.boss.dead&&!G.f.daraePicked)return '서리다래 따기';
       // 결정 D-130: 아이가 아는 이름과 본 것으로만 부른다.
-      if(G.f.ppuriPassed&&!G.boss.dead)return '성황당 끝 움직이는 돌무더기에게 · 장승 사이로';
-      if(!G.f.ppuriMet)return '장승 고갯길 · 장승지기에게 서리다래를 물어보자';
-      if(!G.f.kkuTalk)return '돌담 마을 지나 메밀밭 끝 · 꾸벅이에게 서리다래를 묻자';
-      if(!G.f.ppuriPassed&&has('memil_powder'))return '돌담 마을 돌계단 앞 · 뿔이에게 메밀가루를 건네자';
+      if(G.f.ppuriPassed&&!G.boss.dead)return '움직이는 돌무더기와 맞서기';
+      if(!G.f.ppuriMet)return '장승지기에게 서리다래 물어보기';
+      if(!G.f.kkuTalk)return '꾸벅이에게 서리다래 묻기';
+      if(!G.f.ppuriPassed&&has('memil_powder'))return '뿔이에게 메밀가루 건네기';
       return oldGoal();
     };
   };
