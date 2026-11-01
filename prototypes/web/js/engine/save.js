@@ -6,6 +6,8 @@
    - 시작 화면: 저장이 있으면 '이어서 하기'
    - 처음부터 하기 / 새로 시작: 저장이 있으면 한 번 더 눌러야 저장을 지운다 */
 const SAVE_KEY='packoon-save-v1';
+// 결정 D-220: 개발자 모드(dev.js) 중에는 개발용 칸에 읽고 쓴다. 원래 저장은 그대로 둔다.
+const saveKey=()=>typeof Dev!=='undefined'&&Dev.on?DEV_SAVE_KEY:SAVE_KEY;
 let saveRecoveryBlocked=false;
 const busyForSave=()=>!!B||inkOn||!!vistaMode||!!zoneMotion||zoneFade>0||(typeof mapTravel!=='undefined'&&!!mapTravel)||open('dlg')||!!openMinigame();
 const saveObject=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -75,7 +77,7 @@ function repairSavedState(source,repairRegions=true){
   return g;
 }
 function readSave(){
-  let raw;try{raw=localStorage.getItem(SAVE_KEY);}catch(_){return null;}
+  let raw;try{raw=localStorage.getItem(saveKey());}catch(_){return null;}
   if(raw===null)return null;
   try{
     const s=JSON.parse(raw);if(!saveObject(s)||s.v!==1)throw Error('version');
@@ -83,8 +85,8 @@ function readSave(){
   }catch(_){
     // 읽지 못한 저장은 지우지 않고 다른 칸에 옮겨 둔 뒤, 저장이 없는 것처럼 새로 시작하게 한다.
     try{
-      let key=SAVE_KEY+'-unreadable-'+Date.now();while(localStorage.getItem(key)!==null)key+='-copy';
-      localStorage.setItem(key,raw);localStorage.removeItem(SAVE_KEY);
+      let key=saveKey()+'-unreadable-'+Date.now();while(localStorage.getItem(key)!==null)key+='-copy';
+      localStorage.setItem(key,raw);localStorage.removeItem(saveKey());
       setTimeout(()=>toast('저장을 읽지 못해 따로 보관했어요. 새로 시작할 수 있어요'),0);
     }catch(_){saveRecoveryBlocked=true;}   // 옮기지 못했으면 자동 저장도 원본을 덮지 않는다
     return null;
@@ -98,12 +100,12 @@ function writeSave(quiet){
   // 저장 주기를 유지하면서 실제로 반환한 재료·소지품·버튼을 화면에도 반영한다.
   if(open('bag')){pouchMsg='';renderBag();}
   rememberRegion(G);
-  try{localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,at:Date.now(),G}));}
+  try{localStorage.setItem(saveKey(),JSON.stringify({v:1,at:Date.now(),G}));}
   catch(_){if(!quiet)toast('이 브라우저에서는 저장할 수 없어요');return false;}
   if(!quiet)toast('저장했어요');
   refreshSaveUI();return true;
 }
-function clearSave(){try{localStorage.removeItem(SAVE_KEY);saveRecoveryBlocked=false;}catch(_){}refreshSaveUI();}
+function clearSave(){try{localStorage.removeItem(saveKey());saveRecoveryBlocked=false;}catch(_){}refreshSaveUI();}
 function loadSave(){
   const s=readSave();if(!s)return false;
   TitleScreen.close();

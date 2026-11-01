@@ -228,7 +228,8 @@ function drawFist(c,b){
 }
 defineAttacks({musoeFist:{get dur(){return (B&&B.fistDur)||100;},tick(){}}});
 defineBullets({musoeFist:{step:stepFist,draw:drawFist}});
-const BONK_LINES=['무쇠가 주먹을 쳐든다. 손 아래 그림자가 짙어지면 비켜라!','"한 번 더."','"이번엔 두 번이다."','"아까보다 빠르다."','"세 번! 눈 떼지 마라."','"마지막이다. 끝까지 봐라."'];
+// 결정 D-216: 판마다 재촉하지 않고, 잘 본 것을 짚어 주며 다음 판을 알린다 (사용자 피드백 37).
+const BONK_LINES=['무쇠가 주먹을 쳐든다. 손 아래 그림자가 짙어지면 비켜라!','"잘 봤다. 한 번 더."','"이번엔 두 번이다. 서두르지 마라."','"조금 빨라진다. 겁먹을 것 없다."','"세 번이다. 눈은 주먹에 둬라."','"마지막이다. 끝까지 봐라."'];
 function pickBonk(){
   const t=T(),r=B.survived,n=Math.min(3,1+Math.floor(r/2));
   const tell=Math.round(t.musoe_bonk_tell_first+(t.musoe_bonk_tell_last-t.musoe_bonk_tell_first)*r/Math.max(1,B.E.dodge-1));

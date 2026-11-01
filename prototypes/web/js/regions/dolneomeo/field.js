@@ -450,7 +450,8 @@ if(!CLASSIC){
     Rg.goal=()=>{
       if(!G.started||G.ended)return oldGoal();
       // 결정 D-67: 앞선 진행부터 본다. 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
-      if(has('darae_yak'))return '까치 할머니께 약즙 맡기기';
+      // 결정 D-218: '까치 할머니'라는 말은 쓰지 않는다. 약 나르는 까치는 늘 '늙은 까치'다.
+      if(has('darae_yak'))return '늙은 까치에게 약즙 맡기기';
       if(G.boss.dead&&!G.f.daraePicked)return '서리다래 따기';
       // 결정 D-130: 아이가 아는 이름과 본 것으로만 부른다.
       if(G.f.ppuriPassed&&!G.boss.dead)return '움직이는 돌무더기와 맞서기';
