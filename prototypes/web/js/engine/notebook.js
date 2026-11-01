@@ -70,11 +70,44 @@ function crayonCanvas(src,seed){
   }
   g.putImageData(od,0,0);return o;
 }
-/* 도장 쪽: 찾은 아빠 도장(너구리 손바닥 자국)을 찾은 만큼 찍어 그린다 */
-function pawCanvas(n){
-  const c=document.createElement('canvas'),cols=Math.min(3,Math.max(1,n));c.width=cols*14+2;c.height=Math.ceil(n/3)*14+2;const g=c.getContext('2d');
-  for(let i=0;i<n;i++){const x=1+(i%3)*14,y=1+Math.floor(i/3)*14;g.fillStyle='#8a3b2a';
-    g.fillRect(x+3,y+6,7,6);g.fillRect(x+4,y+5,5,1);for(const [dx,dy] of [[1,3],[4,1],[7,1],[10,3]])g.fillRect(x+dx,y+dy,2,2);}
+/* 결정 D-171: 아빠 손바닥 도장에는 그 자리에서 묻은 것이 함께 찍힌다 (사용자 피드백 23).
+   무늬와 눌린 세기는 design/data/stamps.csv (TABLES.STAMP_MARKS, 키 '지역:도장id').
+   눌린 세기로 젊은 아빠의 마음이 은근히 비친다: 길 떠난 첫 도장은 진하게, 빈손으로 돌아선 호숫가는 옅게.
+   fill(x,y,w,h,색)으로 그리므로 필드(R)와 수첩 그림(캔버스)이 같은 무늬를 쓴다. (x,y)는 손바닥 아래 끝 가운데, s는 배율.
+   손바닥 모양 PAW는 engine/field.js. */
+function pawMark(key){return TABLES.STAMP_MARKS?.[key]||null;}
+function drawPawMark(fill,x,y,key,s=1,c='#8a3424'){
+  const m=pawMark(key);if(!m)return;
+  const P=(dx,dy,w,h,col)=>fill(x+dx*s,y+dy*s,w*s,h*s,col);
+  const over=col=>{for(const [px,py,w,h] of PAW)P(px,py,w,h,col);};   // 손바닥 자국 위에만 덧칠한다(둘레 종이는 그대로)
+  if(m.press==='strong')over('rgba(70,22,12,.28)');
+  else if(m.press==='faint')over('rgba(246,238,220,.5)');
+  const W='#f4f7f9';
+  switch(m.mark){
+    case 'soot':P(-5,-3,1,1,'#3b3430');P(4,-6,1,1,'#3b3430');P(4,0,1,1,'#3b3430');P(0,-3,1,1,'#2e2622');P(-2,-4,1,1,'#4a403a');break;   // 쇳가루·숯검댕
+    case 'leaf':P(4,-10,2,2,'#c4532c');P(6,-11,1,1,'#d9702f');P(3,-11,1,1,'#d9702f');P(5,-8,1,1,'#7a3a1e');P(-3,-7,1,1,'#5a1e14');P(1,-8,1,1,'#5a1e14');break;   // 손끝에 붙은 단풍잎
+    case 'juice':P(-1,-3,3,2,'#6b3a6e');P(0,-1,1,1,'#7d4a80');P(0,0,1,1,'#8a5a8c');break;   // 머루즙이 손바닥 가운데 번져 한 방울 흘렀다
+    case 'straw':P(-7,-4,2,1,'#d9b45a');P(4,-2,2,1,'#c9a24a');P(-5,0,1,1,'#d9b45a');P(5,-7,1,1,'#e0c070');P(-1,-3,2,1,'#d9b45a');break;   // 짚 부스러기
+    case 'dust':P(-1,-4,1,1,'#ece6d8');P(1,-3,1,1,'#ece6d8');P(0,-2,1,1,'#ddd6c6');P(-2,-3,1,1,'#ddd6c6');P(3,-6,1,1,'#ece6d8');P(-3,-6,1,1,'#ddd6c6');break;   // 흰 돌가루
+    case 'grip':P(-3,-8,1,1,c);P(-1,-9,1,2,c);P(1,-9,1,2,c);P(3,-8,1,1,c);for(const [px,py,w,h] of PAW.slice(0,2))P(px,py,w,h,'rgba(246,238,220,.45)');
+      P(-4,-9,1,1,'#e6eef3');P(4,-9,1,1,'#e6eef3');P(0,-10,1,1,'#e6eef3');break;   // 바위 틈을 붙잡아 손가락만 길게, 끝에 서리
+    case 'wind':P(-5,-6,1,2,'rgba(120,70,40,.4)');P(-4,-4,1,2,'rgba(120,70,40,.4)');P(-4,-2,1,1,'rgba(120,70,40,.35)');P(-6,-3,1,1,'rgba(150,120,80,.5)');P(5,-1,1,1,'#b9a98a');break;   // 한쪽으로 끌린 흙먼지
+    case 'wet':P(-1,0,1,2,'rgba(138,52,36,.5)');P(1,0,1,3,'rgba(138,52,36,.4)');P(-2,-4,1,1,'rgba(255,255,255,.55)');P(2,-6,1,1,'rgba(255,255,255,.45)');break;   // 젖은 손에서 흘러내린 물 자국
+    case 'resin':P(0,-3,1,1,'#d99a3a');P(-2,-4,1,1,'#c98a2e');P(1,-7,1,1,'#d99a3a');P(-7,-1,3,1,'#3f5a3a');P(5,-5,1,2,'#3f5a3a');break;   // 송진 방울과 솔잎
+    case 'frost':P(-6,-6,1,3,'#e6eef3');P(-7,-5,3,1,'#e6eef3');P(5,-4,1,3,'#e6eef3');P(4,-3,3,1,'#e6eef3');P(-3,-9,1,1,'#e6eef3');P(2,0,1,1,'#e6eef3');break;   // 둘레에 핀 서리꽃
+    case 'snow':P(-3,-7,1,1,W);P(-1,-8,1,1,W);P(1,-8,2,1,W);P(3,-6,1,1,W);P(-2,-4,1,1,W);P(2,-3,1,1,'#dfe8ee');P(-1,-1,2,1,W);P(-5,-2,1,1,'#eef3f6');P(5,-8,1,1,'#eef3f6');break;   // 손끝·손바닥 가에 묻은 눈
+    case 'ice':P(-5,-3,1,1,'#cfe3ec');P(4,-5,1,1,'#cfe3ec');P(-4,-7,1,1,'#dbeaf0');P(2,-1,1,1,'#cfe3ec');break;   // 얼음 알갱이 (옅은 자국은 눌림이 맡는다)
+  }
+}
+/* 도장 쪽: 찾은 아빠 도장(너구리 손바닥 자국)을 찾은 만큼, 묻은 것과 함께 찍어 그린다 (D-171).
+   결정 D-172: 손바닥은 필드 도장과 같은 모양(PAW)을 두 배로 그린다 */
+function pawCanvas(keys){
+  // 칸 하나는 무늬(손바닥 둘레 -7~+6, 위 -11~아래 +3, 두 배)까지 들어가는 크기
+  const n=keys.length,CELL=28,c=document.createElement('canvas'),cols=Math.min(3,Math.max(1,n));c.width=cols*CELL;c.height=Math.ceil(n/3)*CELL;const g=c.getContext('2d');
+  const fill=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  keys.forEach((key,i)=>{const x=(i%3)*CELL+14,y=Math.floor(i/3)*CELL+22;
+    for(const [px,py,w,h] of PAW)fill(x+px*2,y+py*2,w*2,h*2,'#8a3b2a');
+    drawPawMark(fill,x,y,key,2,'#8a3b2a');});
   return c;
 }
 function spriteCanvas(n){const c=document.createElement('canvas');c.width=30;c.height=24;const save=ctx;ctx=c.getContext('2d');n.draw(15,30,1);ctx=save;return c;}
@@ -98,7 +131,7 @@ function cropCanvas(c,cls){
 function drawingFor(e){
   const seed=seedOf(e.id);
   if(e.kind==='item')return crayonCanvas(icon(e.id),seed);
-  if(e.kind==='stamp'){const n=e.lines.filter(l=>l.when&&knows(l.when)).length;return n?crayonCanvas(pawCanvas(n),seed):null;}
+  if(e.kind==='stamp'){const keys=e.lines.filter(l=>l.when&&knows(l.when)).map(l=>l.when.replace(/^stamp:/,''));return keys.length?crayonCanvas(pawCanvas(keys),seed):null;}
   const n=npcFind(e.id);
   if(n)return crayonCanvas(spriteCanvas(n),seed);
   if(ENEMIES[e.id])return enemyCanvas(e.id);
