@@ -402,7 +402,7 @@ function drawKudzuHill(c){
    (채찍 간격 48→62·예고 30→40, 뿌리 예고 46→54·간격 36→48, 꽃 간격 40→44·예고 32→40 프레임).
    결정 D-176: 칡줄기·칡뿌리의 빈틈(붉은 표식)은 공격 뒤 남은 덩굴 위에 뜬다. 마지막 채찍의 늘어진 줄기, 마지막에 박힌 덩이뿌리.
    표식이 있는 동안 줄기·뿌리가 그 자리에 남고, 치면 부위가 깎이며 연장이 있으면 확률로 재료를 얻는다
-   (줄기는 낫, 없으면 곡괭이 · kudzu_stem_cut_chance / 뿌리는 곡괭이, 없으면 낫 · kudzu_root_dig_chance). 표식이 닫히면 거둬 간다. */
+   (든 도구로 끊고 캔다. 줄기는 낫·뿌리는 곡괭이가 잘 먹는다, D-224 · kudzu_stem_cut_chance · kudzu_root_dig_chance). 표식이 닫히면 거둬 간다. */
 /* 칡줄기 채찍: 상자 옆에서 위나 아래 띠를 가로로 후려친다. 띠가 먼저 옅게 붉어진다.
    세 번째는 손이 있는 띠를 노리고, 후려친 뒤 줄기가 축 늘어진다. */
 const WHIP={gap:62,tell:40,swing:14,limp:24,fall:16,back:10,half:0.21};
@@ -418,9 +418,8 @@ function whipTipX(b,k){return b.side<0?BOX.x-14+(BOX.w+28)*k:BOX.x+BOX.w+14-(BOX
 function whipPts(b,x0,x1){const pts=[],n=10;for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n;pts.push([x,whipY(b,x)]);}return pts;}
 /* 표식이 붙든 덩굴: 그 표식이 열려 있는 동안 남아 있다 */
 function heldBy(b){return !!(B.kHold&&B.kHold.b===b&&B.mark);}
-function stemTool(){return G.tool==='sickle'?'sickle':Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe')?'pickaxe':null;}
-function rootTool(){return Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe')?'pickaxe':G.tool==='sickle'?'sickle':null;}
-const TOOL_BY={sickle:'낫으로',pickaxe:'곡괭이로'};
+/* 결정 D-224: 줄기·뿌리를 끊고 캐는 도구는 플레이어가 든 전투 도구다(battleTool). 줄기는 낫, 뿌리는 곡괭이가 잘 먹고
+   (boss_parts.csv 잘먹는도구), 안 먹는 도구로 치면 재료 확률이 battle_tool_bad_mult 배로 준다. */
 /* 빈틈 자리: 줄기·뿌리는 남은 덩굴 위, 칡꽃은 꽃가루 잔향을 피한 자리 */
 function kudzuMark(p){
   B.kHold=null;
@@ -437,20 +436,14 @@ function kudzuMark(p){
 /* 표식을 친 뒤: 연장이 있으면 줄기를 끊거나 뿌리를 캐고, 확률로 재료를 얻는다 */
 function kudzuMarkHit(p,m){
   const h=B.kHold;B.kHold=null;if(!h||(p.id!=='arm'&&p.id!=='root'))return;
-  const b=h.b,arm=p.id==='arm',tool=arm?stemTool():rootTool();
-  if(!tool){if(!p.broken)B.msg=arm?'칡줄기를 쳤다! 맨손으로는 질긴 줄기를 못 끊는다.':'칡뿌리를 쳤다! 맨손으로는 박힌 뿌리를 못 캔다.';return;}
-  B.kTool=tool;B.kToolUntil=B.time+14;
+  const b=h.b,arm=p.id==='arm',tool=battleTool();
+  if(!tool){if(!p.broken)B.msg=arm?'칡줄기를 쳤다. 맨손으로는 질긴 줄기를 못 끊는다.':'칡뿌리를 쳤다. 맨손으로는 박힌 뿌리를 못 캔다.';return;}
   if(arm){b.cut=true;b.cutT=b.t;b.cutX=m.x;bSplash(m.x,m.y,'#3a3a2a');}
   else{b.dug=true;bSplash(m.x,m.y+6,'#8a6a4a');}
   if(p.broken)return;   // 부위가 부러지면 재료는 breakPart 가 준다
-  const by=TOOL_BY[tool];
-  if(arm)B.msg=Math.random()<T().kudzu_stem_cut_chance?(B.loot.push('vine'),by+' 칡줄기를 끊었다! 칡 줄기를 챙겼다.'):by+' 끊었지만 줄기가 짓이겨져 못 쓰겠다.';
-  else B.msg=Math.random()<T().kudzu_root_dig_chance?(B.loot.push('root'),by+' 칡뿌리를 캤다! 칡뿌리를 챙겼다.'):by+' 찍었지만 뿌리가 부서져 못 쓰겠다.';
-}
-function kudzuHandTool(){
-  if(B.kTool&&B.time<B.kToolUntil)return B.kTool;
-  const m=B.mark;if(!m||!B.kHold||Math.hypot(m.x-B.px,m.y-B.py)>=battleHandProfile().radius)return null;
-  return m.part.id==='arm'?stemTool():m.part.id==='root'?rootTool():null;
+  const by=jo(toolName(tool),'으로','로')+' ',fit=toolFit(p,tool)==='bad'?' 도구가 잘 안 먹는다.':'';
+  if(arm)B.msg=Math.random()<toolChance(p,T().kudzu_stem_cut_chance,tool)?(B.loot.push('vine'),by+'칡줄기를 끊었다! 칡 줄기를 챙겼다.'):by+'끊었지만 줄기가 짓이겨져 못 쓰겠다.'+fit;
+  else B.msg=Math.random()<toolChance(p,T().kudzu_root_dig_chance,tool)?(B.loot.push('root'),by+'칡뿌리를 캤다! 칡뿌리를 챙겼다.'):by+'찍었지만 뿌리가 부서져 못 쓰겠다.'+fit;
 }
 /* 칡뿌리 찍기: 손 자리에 그림자가 진 뒤 덩이뿌리가 위에서 내리찍는다. 칡뿌리가 공격할 때마다 한 대 → 두 대 → 세 대.
    마지막 뿌리는 땅에 박힌 채 남는다(D-176) */
@@ -571,20 +564,20 @@ defineBullets({
 });
 defineEnemies({
   kudzu:{name:'엉킨 칡',calmLabel:'진정',
-    intro:'칡덩굴이 뱀처럼 당산나무를 감고 고개를 든다. 공격을 피하고 빈틈을 노리자.',
-    howto:true,firstPart:'arm',
+    // 결정 D-227: 전투 글귀는 일어난 일만 짧게. 피하라·치라는 안내는 쓰지 않는다
+    intro:'칡덩굴이 뱀처럼 당산나무를 감고 고개를 든다.',
+    firstPart:'arm',
     // 결정 D-177: 공격 뒤 매듭 풀기(진정 행동)와 선물 받은 덩굴이 내미는 매듭을 없앤다. 달래기는 버섯 선물로만 한다.
-    goalText:'줄기 채찍·뿌리 찍기·꽃가루를 피하자. 공격 뒤 남은 줄기와 뿌리를 치면 재료를 얻는다.',
-    parts:tableParts('kudzu',{arm:{atk:'kudzuWhip',mark:'줄',tell:'칡줄기가 뒤로 감긴다. 붉어지는 띠에서 비키자!'},
-      root:{atk:'kudzuSlam',mark:'뿌',tell:'덩이뿌리가 쳐들린다. 그림자가 짙어지면 비키자!'},
-      core:{atk:'kudzuScent',mark:'꽃',tell:'칡꽃이 피어오른다. 꽃가루가 번진 자리는 피하자!'}}),
+    parts:tableParts('kudzu',{arm:{atk:'kudzuWhip',mark:'줄',tell:'칡줄기가 뒤로 감긴다.'},
+      root:{atk:'kudzuSlam',mark:'뿌',tell:'덩이뿌리가 쳐들린다.'},
+      core:{atk:'kudzuScent',mark:'꽃',tell:'칡꽃이 피어오른다.'}}),
     likes:TABLES.CALM.kudzu,likeText:'버섯 향에 덩굴이 조금 느슨해진다.',
-    coreHidden:'칡꽃이 잎 뒤에 숨어 있다. 줄기나 뿌리를 먼저 꺾자.',
-    coreShown:'잎이 걷혀 칡꽃이 드러났다! 이제 꽃을 노릴 수 있다.',
+    coreHidden:'칡꽃이 잎 뒤에 숨어 있다.',
+    coreShown:'잎이 걷혀 칡꽃이 드러났다!',
     calmWin:'엉킨 칡이 스르르 풀리며 당산나무를 놓아준다.',calmGift:'kflower',
     win:'칡꽃송이가 꺾이자 덩굴이 힘없이 흘러내린다.',
     lose:'덩굴에 밀려 숲 어귀로 물러났다.',
-    handTool:kudzuHandTool,markPosition:kudzuMark,onMarkHit:kudzuMarkHit,
+    markPosition:kudzuMark,onMarkHit:kudzuMarkHit,
     backdrop:drawKudzuHill,draw:drawKudzu},
   /* 무쇠는 피하기만 하는 시험이다. 꿀밤으로 연장을 놓치고 여섯 판을 버틴다 (결정 D-59·D-60). */
   musoe:{name:'무쇠',calmLabel:'마음',npc:true,dodge:6,showHands:true,

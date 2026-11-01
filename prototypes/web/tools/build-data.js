@@ -71,8 +71,10 @@ for(const r of parts){
   const hp=parseInt(r['내구도'],10);if(!(hp>0))fail('boss_parts.csv '+r['보스']+'.'+r['부위id']+': 내구도가 숫자가 아니다');
   if(r['부수면']&&!ITEMS[r['부수면']])fail('boss_parts.csv '+r['보스']+'.'+r['부위id']+': 부수면 "'+r['부수면']+'"이 items.csv 에 없다');
   const p={id:r['부위id'],name:r['부위'],hp};if(r['부수면'])p.mat=r['부수면'];if(r['핵심']==='O')p.core=true;
-  if(!['','돌','얼음'].includes(r['재질']||''))fail('boss_parts.csv '+r['보스']+'.'+r['부위id']+': 재질은 빈칸·돌·얼음이어야 한다');
-  if(r['재질'])p.material=r['재질']==='돌'?'stone':'ice';
+  // 결정 D-224: 부위마다 잘 먹는 도구(낫 sickle · 곡괭이 pick). 빈칸은 도구를 가리지 않는다(무쇠 피하기 시험)
+  const toolOf={'':null,'낫':'sickle','곡괭이':'pick'};
+  if(!Object.hasOwn(toolOf,r['잘먹는도구']||''))fail('boss_parts.csv '+r['보스']+'.'+r['부위id']+': 잘먹는도구는 빈칸·낫·곡괭이여야 한다');
+  if(r['잘먹는도구'])p.tool=toolOf[r['잘먹는도구']];
   (BOSS_PARTS[r['보스']]=BOSS_PARTS[r['보스']]||[]).push(p);
 }
 /* 진정수치: "싸리버섯 50 · 꾀꼬리버섯 50" */
@@ -229,7 +231,7 @@ const TUNING=numericTable('tuning','분류',
     'battle_goat_speed battle_goat_cooldown battle_goat_radius battle_goat_damage_taken',
     'battle_owl_speed battle_owl_cooldown battle_owl_radius battle_owl_tell_lead',
     'battle_deer_speed battle_deer_cooldown battle_deer_radius battle_deer_iframes',
-    'battle_base_damage battle_sharp_damage battle_pickaxe_bonus kudzu_stem_cut_chance kudzu_root_dig_chance',
+    'battle_base_damage battle_sharp_damage battle_tool_good_damage battle_tool_bad_mult battle_hand_scale kudzu_stem_cut_chance kudzu_root_dig_chance',
     'kudzu_scent_damage kudzu_scent_slow kudzu_scent_slow_frames kudzu_scent_linger',
     'golem_stone_chance golem_stone_step golem_stone_cap golem_foot_rest golem_arm_rest golem_core_frames golem_barrage_count',
     'form_squirrel_speed form_climb_speed form_climb_reach form_goat_jump form_owl_glide_fall',
@@ -263,7 +265,7 @@ for(const form of ['bare','squirrel','goat','owl','deer']){
 requireValue(TUNING.battle_squirrel_speed>TUNING.battle_bare_speed&&TUNING.battle_squirrel_cooldown<TUNING.battle_bare_cooldown&&TUNING.battle_squirrel_radius<TUNING.battle_bare_radius&&TUNING.battle_owl_radius>TUNING.battle_bare_radius&&TUNING.battle_owl_cooldown>TUNING.battle_bare_cooldown,'tuning.csv: 다람쥐는 빠르고 좁게, 수리부엉이는 넓고 느리게 유지한다');
 requireValue(TUNING.battle_goat_damage_taken>0&&TUNING.battle_goat_damage_taken<1&&TUNING.battle_owl_tell_lead>=0&&TUNING.battle_deer_iframes>=TUNING.battle_iframes,'tuning.csv: 산양 피해 배수는 0~1 사이, 고라니 무적 시간은 기본 이상이어야 한다');
 requireValue(TUNING.form_squirrel_speed>0&&TUNING.form_deer_speed>0&&TUNING.form_goat_jump>=1&&TUNING.form_owl_glide_fall>0&&TUNING.form_owl_glide_fall<TUNING.field_fall_speed&&TUNING.form_climb_speed>0&&TUNING.form_climb_reach>0&&TUNING.form_deer_listen_range>0&&Number.isInteger(TUNING.stranger_trade_limit)&&TUNING.stranger_trade_limit>0,'tuning.csv: 필드 변신 배수·활공·오르기·손님 교환 수를 확인한다');
-requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_pickaxe_bonus>0,'tuning.csv: 전투 기본 피해·날 세운 피해·곡괭이 덤을 확인한다');
+requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_tool_good_damage>0&&TUNING.battle_tool_bad_mult>0&&TUNING.battle_tool_bad_mult<1&&TUNING.battle_hand_scale>0.5&&TUNING.battle_hand_scale<=2,'tuning.csv: 전투 기본 피해·날 세운 피해·잘 먹는 도구 덤·안 먹는 도구 배수(0~1)·손 그림 크기를 확인한다');
 requireValue(TUNING.kudzu_stem_cut_chance>0&&TUNING.kudzu_stem_cut_chance<=1&&TUNING.kudzu_root_dig_chance>0&&TUNING.kudzu_root_dig_chance<=1,'tuning.csv: 칡줄기 끊기·칡뿌리 캐기 확률은 0보다 크고 1 이하여야 한다');
 requireValue(TUNING.kudzu_scent_damage>0&&TUNING.kudzu_scent_damage<1&&TUNING.kudzu_scent_slow>0&&TUNING.kudzu_scent_slow<1&&TUNING.kudzu_scent_slow_frames>0&&TUNING.kudzu_scent_linger>0,'tuning.csv: 칡꽃 꽃가루 피해는 0~1칸, 느려짐 배수는 0~1, 시간은 0보다 커야 한다');
 requireValue(TUNING.golem_stone_chance>0&&TUNING.golem_stone_chance<=1&&TUNING.golem_stone_step>0&&Number.isInteger(TUNING.golem_stone_cap)&&TUNING.golem_stone_cap>=1&&Number.isInteger(TUNING.golem_barrage_count)&&TUNING.golem_barrage_count>=1,'tuning.csv: 돌 골렘 돌 확률은 0~1, 오름은 0보다 크고, 돌 수·눈폭탄 수는 1 이상 정수여야 한다 (D-184)');

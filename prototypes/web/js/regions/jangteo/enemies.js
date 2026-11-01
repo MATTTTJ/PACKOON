@@ -123,18 +123,19 @@ function drawStoreRoom(c){
 }
 defineEnemies({
   dokkaebi:{name:'헌물 도깨비',calmLabel:'진정',
-    intro:'[시험판] 불이 옮겨 간 헌물이 공격한다. 붓 자국을 읽고 피하자. 멍석부터 부숴 보자.',
+    // 결정 D-227: 전투 글귀는 일어난 일만 짧게. 피하라·치라는 안내는 쓰지 않는다
+    intro:'[시험판] 불이 옮겨 간 헌물이 들썩인다.',
     possession:{order:['ki','meongseok','broom','core'],attacks:{broom:'hauntedSweep',ki:'hauntedBeans',meongseok:'hauntedRoll'},travel:54,wait:114},
     calmAction:{kind:'return',amount:TABLES.CALM.dokkaebi.memiltteok/4},
     partPose(id){const p=dokkaebiPose(id);return {x:LW/2+(p.x-LW/2)*0.84,y:EY+(p.y-EY)*0.84};},
     markPosition(p){const pose=this.partPose(p.id),v={broom:0.38,ki:0.3,meongseok:0.7,core:0.19}[p.id];
       return {x:clamp(pose.x,BOX.x+28,BOX.x+BOX.w-28),y:BOX.y+BOX.h*v};},
-    parts:tableParts('dokkaebi',{broom:{atk:'broomSweep',tell:'불이 빗자루 손잡이를 탄다. 흰 줄에서 기다렸다가 쓸고 간 뒤쪽으로!'},ki:{atk:'beans',tell:'불이 키 테두리를 돈다. 콩이 떨어질 먹점 사이의 넓은 흰 여백으로!'},meongseok:{atk:'roll',tell:'불이 멍석 끝으로 스민다. 붉은 끝선 너머 흰 여백으로 미리 건너가자!'},core:{atk:'wisp',tell:'헌물에서 나온 불이 손을 느리게 따라온다. 넓게 돌아 피하자.'}}),
+    parts:tableParts('dokkaebi',{broom:{atk:'broomSweep',tell:'불이 빗자루 손잡이를 탄다.'},ki:{atk:'beans',tell:'불이 키 테두리를 돈다.'},meongseok:{atk:'roll',tell:'불이 멍석 끝으로 스민다.'},core:{atk:'wisp',tell:'헌물에서 나온 불이 손을 따라온다.'}}),
     likes:TABLES.CALM.dokkaebi,likeText:'도깨비가 좋아한다.',
     likeTexts:{memiltteok:'"메밀떡이다, 메밀떡!" 도깨비가 냄새를 맡고 덩실덩실 춤을 춘다.',
       dad_yeot:'아빠가 맡긴 엿을 건넸다. "엿이다, 엿! 내 거지?" 도깨비가 엿가락을 소중히 끌어안는다. 엿은 돌려받지 못한다.'},
-    coreHidden:'도깨비불이 헌물 뒤에 숨어 있다. 빗자루나 키, 멍석을 먼저 부수자.',
-    coreShown:'도깨비불이 드러났다! 이제 불을 노릴 수 있다.',
+    coreHidden:'도깨비불이 헌물 뒤에 숨어 있다.',
+    coreShown:'도깨비불이 드러났다!',
     // PA-21 불씨 지급은 jangteo/story.js의 전투 종료 처리에서 한 번만 한다.
     calmWin:'도깨비가 훔친 설 제수를 돌려놓고 눈홍시 하나를 더 얹는다. "고맙다, 고마워! 이 불씨도 네 거다!" 도깨비가 불씨를 건넨다.',calmGift:'nunhongsi',
     win:'도깨비불이 꺼지자 빗자루와 키와 멍석이 털썩 주저앉는다.',
