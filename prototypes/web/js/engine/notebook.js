@@ -2,13 +2,14 @@
 /* 아빠의 수첩: 젊은 아빠가 남긴 메모·도장 위에 아이가 이어 적는 한 권 (N·B 키, 화면의 수첩 버튼).
    동물·물건·도장 쪽에는 아빠의 줄(흐린 옛 먹, 글만)과 아이의 줄(새 먹)이 한 쪽에 같이 놓인다.
    결정 D-61: 그림은 아이가 직접 보고 겪은 것만 아이 손으로 그린다(크레용 그림). 보기 전에는 빈 칸이다.
-   불리는 이름·익힌 솜씨·숨은 가공법·장부는 아이가 이어 적은 장이다 (그리기는 book.js).
+   해야 할 일·불리는 이름·숨은 가공법·장부는 아이가 이어 적은 장이다 (그리기는 book.js).
    아빠 단서와 엄마의 쪽지는 보따리의 '중요' 탭에 있다 (bag.js). 일기·까치 답장 장은 없앴고 기록(G.diary)은 진행 판정에 그대로 쓴다.
 
    쪽 하나: {id, kind:'animal'|'item'|'stamp', name?, lines:[{who:'dad'|'me', text, when?, section}], dadDrawing?:true}
    - id 는 NPC·전투 상대·아이템 id (npcs.csv · bosses.csv · items.csv, 원본은 design/data/notebook.csv)
    - who:'dad' 이고 when 이 없으면 처음부터 보인다. when 이 있으면 learn(when) 된 뒤에 보인다
-   - section 은 notebook.csv 의 기록갈래: 관찰 줄은 그 쪽에, 익힌 솜씨·숨은 가공법 줄은 같은 이름의 장에 놓인다
+   - section 은 notebook.csv 의 기록갈래: 관찰 줄은 그 쪽에, 숨은 가공법 줄은 같은 이름의 장에 놓인다.
+     익힌 솜씨(가보 손버릇) 줄은 장을 따로 두지 않고 그 가보의 물건 쪽 관찰에 함께 놓인다 (결정 D-150)
    - 엔진이 저절로 learn 하는 것: 'met:<npc>' 처음 말 걸기, 'fight:<상대>' 전투 시작, 'got:<아이템>' 처음 얻기,
      'like:<상대>:<아이템>' 전투에서 좋아하는 선물, 'core:<상대>' 핵심 부위가 드러남, 'calm:<상대>' 달래서 끝냄
    - 지역 기믹은 지역 코드가 learn('<키>') 를 부른다 */
@@ -28,7 +29,8 @@ const dadLinesOf=e=>e.lines.filter(l=>l.who==='dad'&&lineShown(l));
 const gotItem=e=>e.kind==='item'&&!!ITEMS[e.id]&&knows('got:'+e.id);
 /* 아이가 그 쪽에 적은 줄. 관찰이면 처음 얻은 물건의 생김새(items.csv 설명)도 아이가 적은 줄로 친다 */
 function myTexts(e,section){
-  const t=e.lines.filter(l=>l.who!=='dad'&&lineShown(l)&&(l.section||childNoteSection(l))===section).map(l=>l.text);
+  const inSection=l=>{const s=l.section||childNoteSection(l);return s===section||(section==='관찰'&&s==='익힌 솜씨');};
+  const t=e.lines.filter(l=>l.who!=='dad'&&lineShown(l)&&inSection(l)).map(l=>l.text);
   if(section==='관찰'&&gotItem(e))t.unshift(ITEMS[e.id].d);
   return t;
 }
@@ -104,7 +106,8 @@ function drawingFor(e){
 }
 /* 아이가 직접 보았나: 동물은 만나거나 싸우거나 얻은 뒤, 물건은 처음 얻은 뒤, 도장은 하나라도 찾은 뒤 */
 function witnessed(e){
-  if(e.kind==='item')return gotItem(e);
+  // 결정 D-150: 가보는 처음부터 보따리에 있다. 손버릇 줄이 물건 쪽에 오면 그 가보 그림도 그린다.
+  if(e.kind==='item')return gotItem(e)||(!!HEIR[e.id]&&knows('habit:'+e.id));
   if(e.kind==='stamp')return e.lines.some(l=>l.when&&knows(l.when));
   return seen(e);
 }
@@ -117,10 +120,12 @@ function collectFreshDrawings(){
 }
 
 /* 탭: 앞의 셋은 아빠와 같이 쓰는 쪽, 나머지는 아이가 이어 적은 장. 탭 선택은 저장하지 않는다 */
-// 결정 D-30: 수첩에서 일기·까치 답장을 빼고, 아빠 단서·엄마의 쪽지는 보따리 '중요' 탭으로. 손버릇은 '익힌 솜씨' (design/data/decisions.csv)
+// 결정 D-30: 수첩에서 일기·까치 답장을 빼고, 아빠 단서·엄마의 쪽지는 보따리 '중요' 탭으로 (design/data/decisions.csv)
+// 결정 D-150: 아이가 적는 장 맨 앞에 '해야 할 일'(중요·보통으로 나눈 할 일, 끝낸 일)을 두고, '익힌 솜씨' 장은 없앤다.
+//   손버릇 줄은 그 가보의 물건 쪽에 아이 줄로 남는다(myTexts). 탭 이름이 같은 보따리 '중요' 탭과 헷갈리지 않게 '해야 할 일'로 부른다.
 const NOTE_TABS=[['animal','동물',1],['item','물건',1],...(CLASSIC?[]:[['stamp','도장',1]]),
-  ['nicknames','불리는 이름'],['habits','익힌 솜씨'],['recipes','숨은 가공법'],['ledger','물품 장부']];
-const PAGE_SECTION={animal:'관찰',item:'관찰',stamp:'관찰',habits:'익힌 솜씨',recipes:'숨은 가공법'};
+  ['todo','해야 할 일'],['nicknames','불리는 이름'],['recipes','숨은 가공법'],['ledger','물품 장부']];
+const PAGE_SECTION={animal:'관찰',item:'관찰',stamp:'관찰',recipes:'숨은 가공법'};
 let noteTab='animal';
 // 너구리의 책이 따로 있던 때의 이름(bookTab)도 같은 탭을 가리킨다. 없어진 관찰 탭은 동물 쪽으로 간다
 Object.defineProperty(window,'bookTab',{configurable:true,get:()=>noteTab,set:v=>{noteTab=v==='observations'?'animal':v;}});
@@ -183,7 +188,7 @@ function renderPages(body,section,kind){
     body.appendChild(el('div','note-region',r.name+(kind==='stamp'?' · '+stampCount(r.id)+' / '+stampTotal(r.id):'')));
     const grid=el('div','note-grid');pages.forEach(e=>grid.appendChild(notePage(e,section)));body.appendChild(grid);
   }
-  if(!shown)body.appendChild(el('p','empty-note',section==='익힌 솜씨'?'가보로 만들어 보며 손에 익은 것을 적는다.':section==='숨은 가공법'?'재료를 직접 넣어 찾은 맛을 여기에 적는다.':'여행하며 보고 들은 것을 여기에 적는다.'));
+  if(!shown)body.appendChild(el('p','empty-note',section==='숨은 가공법'?'재료를 직접 넣어 찾은 맛을 여기에 적는다.':'여행하며 보고 들은 것을 여기에 적는다.'));
 }
 function renderNotebook(){
   if(!NOTE_TABS.some(t=>t[0]===noteTab))noteTab='animal';

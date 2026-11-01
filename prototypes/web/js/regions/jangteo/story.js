@@ -1120,9 +1120,11 @@ function marketCraftTrade(){
 }
 function nalMarketGive(){
   if(G.f.jxCraftMarket||!has('solbang',G.f.yeotDone?3:8))return;
+  // 결정 D-147: 묻기 전에 보따리에서 바로 바꾸면, 날쌘이 솔방울을 받는 말을 먼저 한다(까닭은 여전히 흐린다. nalLedger 복선).
+  const first=!G.f.jxCraftMarketHeard;G.f.jxCraftMarketHeard=true;
   takeItem('solbang',3);for(const id of ['honey','sesame_oil','mung','pat'])addItem(id,1);
   G.f.jxCraftMarket=true;ledger('t_craft_market','날쌘','솔방울 3','떡 재료 묶음');ledgerDone('t_craft_market');
-  talk([['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
+  talk([...(first?[['날쌘','솔방울 셋이라. 마침 밤에 불 피울 데가 있어.\n한 줌씩 남은 거 묶어 줄게.']]:[]),['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
 }
 // 결정 D-78: 쌀가루에 약과를 얹으면 날쌘이 제 몫으로 먹고 팥 한 되를 더 준다(날쌘은 약과를 좋아한다, tastes.csv).
 function nalTrade(id,yak=false){
@@ -1339,32 +1341,44 @@ Rg.goal=()=>{
   const F=G.f;
   if(!G.started)return '';
   if(G.ended)return '큰 장터 체험판 완료';
-  const toNight=s=>night()?s:'밤이 되면 '+s+' (숙소 마루에서 쉬자)';
+  // 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다. 밤에만 되는 일은 낮에 '밤에'를 앞에 붙인다.
+  const toNight=s=>night()?s:'밤에 '+s;
   // 결정 D-67: 앞선 진행부터 거꾸로 본다
   if(G.boss.dead){
-    if(!CLASSIC&&has('hongsi_tteok'))return night()&&G.f.jxMagpieNight?'숙소 마루에서 쉬고, 아침에 까치 할머니께 약떡을 맡기자':'숙소 처마의 까치 할머니께 홍시 약떡을 맡기자';
-    if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
-    return '보따리를 열고 시루에 눈홍시와 쌀가루를 넣어 홍시 약떡을 찌자';
+    if(!CLASSIC&&has('hongsi_tteok'))return night()&&G.f.jxMagpieNight?'아침에 까치 할머니께 약떡 맡기기':'까치 할머니께 홍시 약떡 맡기기';
+    if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '맷돌에 쌀 갈기';
+    return '시루에 눈홍시와 쌀가루 넣어 약떡 찌기';
   }
-  if(F.bueongDone)return toNight('숙소 창고 문 앞을 지키자');
-  if(!F.bueongNight)return night()?'처마 밑의 부엉 영감님께 말을 걸어 보자 (밤에는 깨어 계신다)':knows('bueong:night')?'숙소 마루에서 쉬며 해가 지기를 기다리자':'보부상 숙소의 부엉 영감님을 찾아가자';
+  if(F.bueongDone)return toNight('창고 문 앞 지키기');
+  if(!F.bueongNight)return night()?'부엉 영감님께 말 걸기':knows('bueong:night')?'마루에서 쉬며 밤 기다리기':'부엉 영감님 찾아가기';
   if(!F.bueongDone){
-    if(has('patsirutteok'))return toNight('부엉 영감님께 팥시루떡을 올리자');
+    if(has('patsirutteok'))return toNight('부엉 영감님께 팥시루떡 올리기');
     if(!isAwake('siru')){
-      if(!F.morakMet)return '김이 오르는 떡집의 모락을 찾아가자';
+      if(!F.morakMet)return '떡집 모락 찾아가기';
       const sp=G.inv.ssal_powder||0,s=G.inv.ssal||0;
-      if(sp>=3)return '모락에게 쌀가루 3개를 건네자';
-      if(sp+s>=3)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자 ('+sp+'/3)';
-      if(!F.yeotMet)return '엿 수레의 엿방울에게 쌀을 구하자';
+      if(sp>=3)return '모락에게 쌀가루 3개 건네기';
+      if(sp+s>=3)return '맷돌에 쌀 갈기 ('+sp+'/3)';
+      if(!F.yeotMet)return '엿방울에게 쌀 구하기';
       const sb=G.inv.solbang||0;
-      return sb>=5?'엿방울에게 솔방울을 건네자':'뒷산 소나무 숲에서 솔방울을 줍자 ('+sb+'/5)';
+      return sb>=5?'엿방울에게 솔방울 건네기':'솔방울 줍기 ('+sb+'/5)';
     }
-    if(!has('pat'))return CLASSIC?'숙소 앞 날쌘에게 팥을 구하자':'장터 거리 · 날쌘에게 팥을 구하자';
-    if((G.inv.ssal_powder||0)<2)return '보따리를 열고 맷돌에 쌀을 넣어 쌀가루를 갈자';
-    return '보따리를 열고 시루에 쌀가루 2개와 팥 1개를 넣어 찌자';
+    if(!has('pat'))return '날쌘에게 팥 구하기';
+    if((G.inv.ssal_powder||0)<2)return '맷돌에 쌀 갈기';
+    return '시루에 쌀가루 2개와 팥 1개 찌기';
   }
-  return toNight('숙소 창고 문 앞을 지키자');
+  return toNight('창고 문 앞 지키기');
 };
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+defineSideQuests(Rg.id,[
+  {id:'jang_jj_soup',title:'짠돌 아저씨께 떡국 날라 드리기',start:F=>F.jangteoArcsJj1,done:F=>F.jangteoArcsJj2,
+    text:F=>F.jangteoArcsJjSoup?'짠돌 아저씨께 떡국 갖다드리기':'모락에게 떡국 부탁하기'},
+  {id:'jang_jj_salt',title:'모락에게 짠돌 아저씨 소금 전하기',start:F=>F.jangteoArcsJj3,done:F=>F.jangteoArcsJjSalt,text:()=>'모락에게 짠돌 아저씨 소금 전하기'},
+  {id:'jang_scissors',title:'엿방울의 엿가위 찾기',start:F=>F.jangteoArcsYeot2,done:F=>F.jangteoArcsYeotReturned,
+    text:F=>F.jangteoArcsScissorsFound?'엿방울에게 엿가위 돌려주기':'엿방울의 엿가위 찾기'},
+  {id:'jang_pair_tteok',title:'엿방울에게 모락 떡 전하기',start:F=>F.jangteoArcsPair1,done:F=>F.jangteoArcsPair2,text:()=>'엿방울에게 모락 떡 전하기'},
+  {id:'jang_elder_night',title:'곰방대 할아버지 밤 이야기 듣기',start:F=>F.jangteoArcsElder1,done:F=>F.jangteoArcsElder2,
+    text:()=>night()?'곰방대 할아버지께 말 걸기':'밤에 곰방대 할아버지 찾아가기'},
+]);
 
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
@@ -1384,8 +1398,9 @@ Rg.trade={
       {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1},{ssal_powder:1,yakgwa:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:i=>nalTrade('ssal_powder',i===1)},
       {id:'t_nal_jangteo_memil',item:'pat',n:2+(G.f.nalJBluff?1:0),asks:[{memil_powder:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:()=>nalTrade('memil_powder')}
     ]:[]),
-    ...(!CLASSIC&&G.f.jxCraftMarketHeard?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 녹두 · 팥',asks:[{solbang:3}],
-      locked:()=>!G.f.yeotDone&&(G.inv.solbang||0)<8?'엿방울한테 줄 솔방울 다섯은 남겨 둬야 한다.':null,
+    // 결정 D-147: 떡 재료 묶음은 처음부터 날쌘 지게에 있다. 엿방울 몫을 아직 모르면 까닭은 말하지 않고 남겨 두기만 한다.
+    ...(!CLASSIC?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 녹두 · 팥',asks:[{solbang:3}],
+      locked:()=>!G.f.yeotDone&&has('solbang',3)&&(G.inv.solbang||0)<8?(G.f.yeotMet?'엿방울한테 줄 솔방울 다섯은 남겨 둬야 한다.':'솔방울은 아직 쓸 데가 있다.'):null,
       done:()=>G.f.jxCraftMarket,accept:nalMarketGive}]:[])
   ],
   morak:()=>G.f.morakMet?[{id:'t_morak',item:'patsirutteok',label:'시루를 깨우는 김 다루기',asks:[{ssal_powder:3}],done:()=>G.f.morakPowder,accept:morakGiveNow},
