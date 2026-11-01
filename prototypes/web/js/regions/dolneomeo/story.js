@@ -244,6 +244,9 @@ function nalSickle(){
 }
 
 /* ---------- 꾸벅이 (고슴도치): 고개를 들 때 맞춰 말 걸기 ---------- */
+/* 결정 D-197: 꾸벅이가 고개를 들지 않았을 때(조는 동안·깊이 잠든 뒤)는 보따리를 펼치거나 물건을 건넬 수 없다 (사용자 피드백 57).
+   대화 중엔 필드 시간(G.anim)이 멈춰, 말을 건 순간의 모습이 대화 끝까지 간다. */
+Rg.tradeClosed=id=>id==='kkubeogi'&&!Rg.kkuAwakeNow();
 function talkKku(){
   const F=G.f;F.kkuTalk=true;
   if(!Rg.kkuAwakeNow()){
@@ -827,11 +830,27 @@ function stoneChoice(kind){
       done:finish('dol_mole','꼬마와 돌집의 밑돌·문돌·창가 돌을 직접 놓았다. 남은 쐐기돌은 고갯길 돌탑에 괴겠다고 한다.')});
   });
 }
+/* 결정 D-210: 꼬마 두더지 마당의 납작한 돌과 줄무늬 돌을 한 그림에 나란히 띄운다(작은 창 D-152, 사용자 피드백 49).
+   아이가 두 돌을 견주어 말하는 줄부터 고르는 줄까지 떠 있고, 고르면 내린다. 가운데 작은 것은 꼬마의 반짝돌. */
+const moleStonesPic=(w,h)=>{
+  R(0,0,w,h,'#dcd8c8');R(0,29,w,15,'#a39b8a');R(0,29,w,1,'#857d6e');
+  for(const [x,y] of [[3,35],[13,40],[31,37],[47,41],[59,34]])R(x,y,2,1,'#8a8273');
+  // 납작한 돌: 넓고 얇은 판돌. 윗면이 매끈하게 밝다
+  R(4,31,26,2,'#7a7466');R(6,25,22,6,'#8f9695');R(5,26,24,4,'#8f9695');R(7,24,20,1,'#c9d0cc');R(6,25,22,1,'#b2b9b6');R(10,26,9,1,'#a7aeab');
+  R(5,29,24,1,'#747b7a');R(6,30,22,1,'#5f6665');
+  // 줄무늬 돌: 둥근 몸에 흰 띠가 비스듬히 감긴다
+  R(38,31,22,2,'#7a7466');
+  for(let j=0;j<16;j++){const half=Math.round(10*Math.sqrt(Math.max(0,1-((j-8)/8.5)**2)));
+    for(let i=-half;i<half;i++){const band=(j+Math.floor((i+20)/2))%6;R(49+i,15+j,1,1,band<2?'#ebe5d6':j<4?'#8b827b':'#6f6660');}}
+  R(45,16,3,1,'#a39a92');
+  // 가운데 꼬마의 반짝돌
+  R(31,27,5,4,'#59626a');R(32,26,3,1,'#6e7880');R(33,27,1,1,'#fff6c8');R(34,28,1,1,'#e9f0f2');
+};
 function meetMole(){
   talk([
     ['꼬마 두더지','이 돌 봐! 씻으니까 별이 나왔어.\n우리 할배 마당에는 이런 돌이 많아.'],
     ['꼬마 두더지','나는 돌집을 짓는데 문이랑 담이 비었어.\n이 반짝돌은 예쁘지만 자꾸 굴러가.'],
-    ['너구리','저 납작한 건 문이 되겠네.\n줄무늬 돌은 담으로 쓰고.'],
+    Object.assign(['너구리','저 납작한 건 문이 되겠네.\n줄무늬 돌은 담으로 쓰고.'],{pic:moleStonesPic}),
     ['꼬마 두더지','네가 고른 돌이랑 바꿀래.\n여기 마당에 있는 걸 골라도 돼!',[
       {t:'납작한 돌과 바꾼다',go:()=>stoneChoice('flat')},
       {t:'줄무늬 돌과 바꾼다',go:()=>stoneChoice('stripe')},
@@ -879,7 +898,7 @@ function restMagpie(){
 
 /* 결정 D-164: 고갯길 길섶의 소원 돌탑 (옛 돌다리 다시 놓기를 대신한다, 사용자 피드백 24).
    반쯤 쌓인 돌탑을 작은 창으로 보이고, 아이가 아빠한테 들은 말을 떠올린 뒤 돌 셋을 얹고 소원을 빈다.
-   손일은 미니게임 없이 줄마다 돌이 하나씩 얹힌다(확정 D-88: 미니게임은 채집·전투·놀이에만). */
+   결정 D-212: 돌 셋은 아이가 직접 하나씩 내려 얹는다(아래 stackWish, 사용자 피드백 46). */
 const withPic=(line,pic)=>Object.assign(line,{pic});   // 결정 D-152: 대사 줄에 장면 그림
 Rg.wishTower=()=>{
   const A=Rg.expansionArt,F=G.f;
@@ -895,17 +914,98 @@ Rg.wishTower=()=>{
       {t:'돌을 골라 얹는다',go:stackWish},
       {t:'나중에 다시 올게',go:null}]]]);
 };
+/* 결정 D-212: 소원 돌탑 쌓기 (사용자 피드백 46). 아이가 든 돌이 위에서 천천히 내려온다. ← → 로 옮기고 Space·J 로 살며시 내려놓는다.
+   맨 위 돌의 가운데에서 wish_stack_tolerance 안에 닿으면 얹히고, 더 비끼면 기우뚱 흔들리다 굴러떨어진다. 벌은 없고 다시 주워 든다.
+   손이 조금씩 떨린다(wish_stack_sway). 확정 D-88(손일은 미니게임 없이)은 NPC와 함께 하는 손일의 규칙이고,
+   이 돌탑은 아이 혼자 아빠를 떠올리며 하는 일이라 따로 둔다 (대장 확인 필요, decisions.csv D-212). 수치는 minigames.csv wish_stack_*. */
+const MG=TABLES.MINIGAMES,WS_W=64,WS_H=50,WS_SCALE=5,WS_CX=32,WS_GROUND=46;
+// 결정 D-214: 돌마다 짧은 혼잣말. 굴러떨어져도 나무라지 않는다.
+const WS_HINT=['(길섶에서 주운 납작한 돌. 맨 위 한가운데에, 살며시.)','(하나 더. 흔들리지 않게.)','(마지막 작은 돌. 까치발을 들었다.)'];
+const WS_FALL=['(기우뚱하더니 굴러떨어졌다. 다시 주워 오자.)','(또 굴렀다. 천천히, 한가운데에.)'];
+const wsP=el('div','forge');wsP.id='dolWishStack';wsP.hidden=true;
+wsP.innerHTML='<h2>소원 돌탑</h2><canvas id="dolWishStackCv" width="'+WS_W*WS_SCALE+'" height="'+WS_H*WS_SCALE+'" style="display:block;width:min(100%,320px);height:auto;margin:0 auto;image-rendering:pixelated;border:2px solid var(--meok);border-radius:3px;touch-action:none"></canvas>'
+  +'<div class="fhint" id="dolWishStackHint"></div>'
+  +'<div style="display:flex;gap:8px;justify-content:center"><button class="btn" type="button" data-dir="-1" aria-label="왼쪽으로">◀</button>'
+  +'<button class="btn primary strike" id="dolWishStackBtn" type="button">내려놓기 <kbd>Space · J</kbd></button>'
+  +'<button class="btn" type="button" data-dir="1" aria-label="오른쪽으로">▶</button></div>';
+$('shell').appendChild(wsP);
+const wsBuf=document.createElement('canvas');wsBuf.width=WS_W;wsBuf.height=WS_H;
+let ws=null;
+const wsTop=()=>Rg.expansionArt.wishStackTop(WS_GROUND,ws.n);
+// 반쯤 쌓인 탑의 맨 윗돌은 가운데에서 왼쪽으로 1px (art.js TOWER_ROWS). 그 위로는 아이가 얹은 돌의 가운데.
+const wsSupport=()=>ws.n?WS_CX+ws.offs[ws.n-1]:WS_CX-1;
+function wsHint(t){$('dolWishStackHint').textContent=t;}
+function wsSpawn(hint){
+  const side=ws.n%2?1:-1;
+  ws.stone={hx:wsSupport()+side*MG.wish_stack_start_offset,x:0,y:4,rot:0,paws:true,dir:0};ws.stone.x=ws.stone.hx;
+  ws.phase='fall';ws.t=0;ws.fast=false;ws.steady=1;wsHint(hint||WS_HINT[ws.n]);
+}
+function wsPaint(){
+  const g=wsBuf.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,WS_W,WS_H);
+  const saved=ctx;ctx=g;try{Rg.expansionArt.wishStackPaint(WS_W,WS_H,{n:ws.n,offs:ws.offs,cx:WS_CX,ground:WS_GROUND,stone:ws.stone});}finally{ctx=saved;}
+  const c=$('dolWishStackCv').getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,WS_W*WS_SCALE,WS_H*WS_SCALE);c.drawImage(wsBuf,0,0,WS_W*WS_SCALE,WS_H*WS_SCALE);
+}
+function wsLand(){
+  const b=ws.stone,d=b.x-wsSupport();b.paws=false;
+  // 맨 위 돌에 아예 걸치지 않으면 흔들릴 것도 없이 곁으로 떨어진다
+  const [sl,sr]=Rg.expansionArt.wishStackSpan(WS_CX,ws.n,ws.offs),half=Rg.expansionArt.TOWER_ADD[ws.n][0]/2;
+  if(b.x+half<=sl||b.x-half>=sr){b.dir=d<0?-1:1;ws.phase='roll';ws.t=0;Sound.stone('fall');return;}
+  if(Math.abs(d)<=MG.wish_stack_tolerance){
+    ws.offs.push(Math.round(b.x-WS_CX));ws.n++;ws.stone=null;Sound.stone('place');
+    ws.phase=ws.n>=3?'done':'settle';ws.t=0;
+    if(ws.n>=3)wsHint('(돌 셋이 나란히 올라앉았다.)');
+  }else{b.dir=d<0?-1:1;ws.phase='wobble';ws.t=0;Sound.stone('edge');}
+}
+function wsStep(){
+  if(!ws||wsP.hidden)return;
+  const b=ws.stone;ws.t++;
+  if(ws.phase==='fall'){
+    const dir=(isLeft()?-1:0)+(isRight()?1:0)+ws.touchDir;
+    b.hx=clamp(b.hx+dir*MG.wish_stack_move_speed,wsSupport()-14,wsSupport()+14);
+    // 내려놓기 시작하면 손을 다잡아 떨림이 잦아든다. 그래서 돌은 손이 있는 자리(hx)에 앉는다.
+    const lowering=ws.fast||isDown();ws.steady=lowering?Math.max(0,ws.steady-0.06):Math.min(1,ws.steady+0.02);
+    b.x=b.hx+(Vfx.reducedMotion?0:ws.steady*MG.wish_stack_sway*Math.sin(ws.t*Math.PI*2/MG.wish_stack_sway_period));
+    b.y+=lowering?MG.wish_stack_drop_speed:MG.wish_stack_fall_speed;
+    if(b.y>=wsTop()){b.y=wsTop();wsLand();}
+  }else if(ws.phase==='wobble'){
+    // 비낀 쪽으로 점점 크게 기우뚱거린다
+    const k=ws.t/MG.wish_stack_wobble_frames;b.rot=b.dir*(0.06+0.22*k)*(0.5+0.5*Math.sin(ws.t*0.7));
+    if(ws.t>=MG.wish_stack_wobble_frames){ws.phase='roll';ws.t=0;Sound.stone('fall');}
+  }else if(ws.phase==='roll'){
+    const k=ws.t/MG.wish_stack_roll_frames;b.x+=b.dir*0.55;b.y+=0.2+k*1.6;b.rot+=b.dir*0.22;
+    if(ws.t>=MG.wish_stack_roll_frames){ws.miss++;wsSpawn(WS_FALL[Math.min(ws.miss,WS_FALL.length)-1]);}
+  }else if(ws.phase==='settle'){
+    if(ws.t>=MG.wish_stack_settle_frames)wsSpawn();
+  }else if(ws.phase==='done'){
+    if(ws.t>=MG.wish_stack_done_frames){finishWishStack();return;}
+  }
+  wsPaint();
+}
+function wsHit(){if(ws&&ws.phase==='fall')ws.fast=true;}
 function stackWish(){
+  ws={n:0,offs:[],miss:0,touchDir:0,stone:null,phase:'fall',t:0,fast:false};
+  suppressHeldInputs();wsSpawn();wsP.hidden=false;wsPaint();
+}
+function finishWishStack(){
   const A=Rg.expansionArt;
-  talk([withPic(['너구리','(길섶에서 납작한 돌을 주워\n맨 위에 살며시 얹었다.)'],A.wishTowerPic(1,true)),
-    withPic(['너구리','(하나 더. 흔들리지 않게\n밑을 손끝으로 괴었다.)'],A.wishTowerPic(2,true)),
-    withPic(['너구리','(마지막 작은 돌은\n까치발을 하고 얹었다.)'],A.wishTowerPic(3,true)),
-    ['너구리','(두 손을 모았다.)'],
+  G.f.dolWishOffs=ws.offs.slice();wsP.hidden=true;ws=null;
+  talk([withPic(['너구리','(두 손을 모았다.)'],A.wishTowerPic(3)),
     ['너구리','아빠를… 빨리 만나게 해 주세요.']],()=>{
     G.f.dolWishTower=true;
     diary('dol_wish_tower','고갯길 돌탑에 돌 셋을 얹었다. 아빠가 그랬다. 돌탑을 쌓으면 소원이 이뤄진다고. 아빠를 빨리 만나게 해 달라고 빌었다.');
   });
 }
+$('dolWishStackBtn').addEventListener('pointerdown',e=>{e.preventDefault();wsHit();});
+$('dolWishStackBtn').onclick=e=>{if(e.detail===0)wsHit();};
+wsP.querySelectorAll('button[data-dir]').forEach(btn=>{
+  const set=v=>{if(ws)ws.touchDir=v;};
+  btn.addEventListener('pointerdown',e=>{e.preventDefault();set(+btn.dataset.dir);});
+  for(const ev of ['pointerup','pointerleave','pointercancel'])btn.addEventListener(ev,()=>set(0));
+});
+$('dolWishStackCv').addEventListener('pointerdown',e=>{e.preventDefault();wsHit();});
+defineMinigame({id:'dolWishStack',step:wsStep,hit:wsHit});
+// QA 자동 플레이가 든 돌과 받칠 자리를 읽는다 (읽기만 한다)
+Rg.wishStackState=()=>ws&&{phase:ws.phase,n:ws.n,x:ws.stone?.x,hx:ws.stone?.hx,target:ws.n<3?wsSupport():null};
 /* 짐꾼은 등짐을 고쳐 맨 뒤 짐 괴던 돌을 이 돌탑에 보탠다(hareHands). 아이가 돌을 얹은 뒤 만나면 돌탑 옆에서 말한다. */
 function hareTower(){
   talk([['산토끼 짐꾼','맨 위에 서리 안 앉은 돌 셋,\n네가 얹은 거지?'],

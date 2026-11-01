@@ -145,27 +145,60 @@ function drawGateRope(x,y){px(x-21,y-36,42,1,'#d5c59d');for(let i=0;i<5;i++)px(x
 /* 결정 D-164: 고갯길 길섶의 소원 돌탑. 길손들이 하나씩 얹다 허리께에서 멈췄다. stage(0~3)는 아이가 얹은 돌 수.
    아이가 얹은 돌은 아직 서리가 앉지 않았다. 짐꾼이 괸 돌(hare)은 밑동 옆에 하나 더 붙는다. */
 const TOWER_ROWS=[[26,6],[22,6],[19,5],[15,5],[12,4]],TOWER_ADD=[[10,4],[8,3],[5,3]];
-function towerStones(x,y,stage,drop=0,hare=false){
+// 결정 D-213: offs는 아이가 얹은 돌마다 탑 가운데에서 비낀 거리(px). 쌓기에서 얹힌 자리를 필드·장면 그림에 그대로 그린다.
+const TOWER_OFFS=[0,1,0];
+function towerStones(x,y,stage,drop=0,hare=false,offs=TOWER_OFFS){
   let top=y;
   TOWER_ROWS.forEach(([w,h],j)=>{stone(x-w/2+(j%2?1:-1),top,w,h,j+3,true);top-=h;});
   if(hare)stone(x+13,y,7,4,9,false);
-  for(let i=0;i<Math.min(stage,3);i++){const [w,h]=TOWER_ADD[i],lift=i===stage-1?Math.round(drop):0;stone(x-w/2+(i===1?1:0),top-lift,w,h,i,false);top-=h;}
+  for(let i=0;i<Math.min(stage,3);i++){const [w,h]=TOWER_ADD[i],lift=i===stage-1?Math.round(drop):0;stone(Math.round(x-w/2+(offs[i]??0)),top-lift,w,h,i,false);top-=h;}
+  return top;
 }
-function drawWishTower(x,y,stage=0,hare=false){towerStones(Math.round(x),Math.round(y),stage,0,hare);}
+const wishOffs=()=>G.f.dolWishOffs||TOWER_OFFS;
+function drawWishTower(x,y,stage=0,hare=false){towerStones(Math.round(x),Math.round(y),stage,0,hare,wishOffs());}
 /* 대사 장면 그림(64×44, D-152). drop이면 마지막 돌이 위에서 내려와 앉는다 */
+function wishSky(w,h){
+  const g=h-12;
+  px(0,0,w,h,'#cbd8d9');px(0,0,w,12,'#bfcdd3');
+  for(let i=0;i<w;i+=2){const yy=g-12+Math.round(Math.abs(Math.sin(i/9))*5);px(i,yy,2,g-yy,'#a3b6be');}
+  px(0,g,w,12,'#7d8a86');px(0,g,w,1,'#edf4f0');for(let i=3;i<w;i+=7)px(i,g+1+(i%3),2,1,'#d0ddd6');
+  pine(9,g+1,.5);
+}
 function wishTowerPic(stage,drop=false){
   let start=null;
   return {animate:drop,draw(w,h,t){
     if(start===null){start=t;if(drop)Sound.stone('tap');}
-    px(0,0,w,h,'#cbd8d9');px(0,0,w,12,'#bfcdd3');
-    for(let i=0;i<w;i+=2){const yy=20+Math.round(Math.abs(Math.sin(i/9))*5);px(i,yy,2,32-yy,'#a3b6be');}
-    px(0,32,w,12,'#7d8a86');px(0,32,w,1,'#edf4f0');for(let i=3;i<w;i+=7)px(i,33+(i%3),2,1,'#d0ddd6');
-    pine(9,33,.5);
+    wishSky(w,h);
     const k=drop?clamp((t-start)/.35,0,1):1;
-    towerStones(32,39,stage,(1-k*k)*14);
+    towerStones(32,39,stage,(1-k*k)*14,false,wishOffs());
     if(drop&&k<1)px(30,8,4,1,'#edf4f0');
   }};
 }
+/* 결정 D-212: 소원 돌탑 쌓기 장면. s={n:얹은 수, offs, cx, ground, stone:{x,y,rot,paws}}.
+   든 돌은 아이 두 앞발에 들려 내려오고, 맨 위 돌에 떨어질 자리의 옅은 그림자가 진다. */
+const WISH_ARM='#3d332b',WISH_PAD='#7a6656';
+/* 맨 위 돌 윗면의 [왼쪽, 오른쪽] (든 돌이 닿을 자리) */
+function wishStackSpan(cx,n,offs){
+  if(!n){const j=TOWER_ROWS.length-1,[w]=TOWER_ROWS[j],l=cx-w/2+(j%2?1:-1);return [l,l+w];}
+  const [w]=TOWER_ADD[n-1],l=Math.round(cx-w/2+(offs[n-1]??0));return [l,l+w];
+}
+function wishStackPaint(w,h,s){
+  wishSky(w,h);
+  const top=towerStones(s.cx,s.ground,s.n,0,false,s.offs);
+  const b=s.stone;if(!b||s.n>=3)return;
+  const [sw,sh]=TOWER_ADD[s.n],l=Math.round(b.x-sw/2);
+  if(b.paws){const [sl,sr]=wishStackSpan(s.cx,s.n,s.offs),x0=Math.max(l,sl),x1=Math.min(l+sw,sr);if(x1>x0)px(x0,top-1,x1-x0,1,'rgba(40,52,56,.35)');}
+  ctx.save();
+  if(b.rot){ctx.translate(b.x,b.y-sh/2);ctx.rotate(b.rot);ctx.translate(-b.x,-(b.y-sh/2));}
+  stone(l,Math.round(b.y),sw,sh,s.n,false);
+  ctx.restore();
+  // 아이의 두 앞발(화면 위에서 뻗어 내려온 팔)이 돌 양옆을 쥐고 있다
+  if(b.paws){const y=Math.round(b.y)-sh;
+    for(const ax of [l-2,l+sw]){px(ax,0,2,y+1,WISH_ARM);px(ax,y+1,2,2,WISH_ARM);}
+    px(l-1,y+1,1,1,WISH_PAD);px(l+sw,y+1,1,1,WISH_PAD);}
+}
+/* 쌓기 판정용: 지금 맨 위 돌의 윗면 높이 */
+function wishStackTop(ground,n){let top=ground;TOWER_ROWS.forEach(([,h])=>top-=h);for(let i=0;i<n;i++)top-=TOWER_ADD[i][1];return top;}
 /* 결정 D-165: 성황당 돌탑 그늘에 녹지 않은 첫눈 둔덕. 오른쪽으로 갈수록 높다 */
 function drawSnowDrift(x,y){
   for(const [dx,w,h] of [[-4,56,7],[52,72,11],[130,96,15]])
@@ -181,9 +214,18 @@ function drawSnowStep(x,y,w){
 }
 
 function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.round(y),f,a,b,w,h,c);if(kind==='hare'||kind==='rabbit'||kind==='porter'){
-  q(-7,-20,13,19,'#c4c1ad');q(-5,-24,9,10,'#ded7bc');q(-5,-37,3,14,'#d7d1b9');q(0,-39,3,15,'#d7d1b9');q(-4,-35,1,9,'#ab9e8e');q(1,-37,1,10,'#ab9e8e');q(3,-22,1,2,'#35423e');q(5,-19,3,2,'#938979');q(-9,-16,3,11,'#908c72');q(-12,-18,4,14,'#8b7c5d');q(-13,-18,6,2,'#bbaa7c');q(-7,-2,5,2,'#767764');q(2,-2,5,2,'#767764');q(7,-20,2,20,'#6b735f');q(-8,-21,15,2,'#776d55');
   const helped=!!G.f.dolneomeo_pack_help,heavy=helped?-10:-24,reeds=helped?-23:-11;
-  q(-14,heavy,8,7,'#7d8982');q(-13,heavy,6,1,'#bec5af');q(-11,heavy+1,1,5,'#57685f');q(-16,reeds,10,4,'#b4ac85');q(-15,reeds-2,1,7,'#d5cc9e');q(-12,reeds-3,1,8,'#c8bc8f');q(-9,reeds-1,1,6,'#d5cc9e');q(-15,heavy+5,10,1,'#c3b888');
+  // 결정 D-209: 짐을 거꾸로 멘 동안(숫돌이 꼭대기) 등짐이 좌우로 쏠리고, 짐꾼은 그 쪽으로 끌려 휘청이며 한 발을 내딛는다(사용자 피드백 45).
+  // 필드에서만 움직인다(대화 초상은 그대로). 고쳐 맨 뒤에는 똑바로 선다.
+  const wob=!helped&&ctx.canvas===cv&&!Vfx.reducedMotion,sw=wob?Math.sin(G.anim/17):0;
+  const lean=Math.round(sw*1.4),load=Math.round(sw*2.8),stag=wob&&Math.abs(sw)>.82?(sw>0?-2:2):0;
+  const b=(a,y,w,h,c)=>q(a+lean,y,w,h,c),k=(a,y,w,h,c)=>q(a+load,y,w,h,c);
+  b(-7,-20,13,19,'#c4c1ad');b(-5,-24,9,10,'#ded7bc');b(-5,-37,3,14,'#d7d1b9');b(0,-39,3,15,'#d7d1b9');b(-4,-35,1,9,'#ab9e8e');b(1,-37,1,10,'#ab9e8e');b(3,-22,1,2,'#35423e');b(5,-19,3,2,'#938979');b(-9,-16,3,11,'#908c72');b(-12,-18,4,14,'#8b7c5d');b(-13,-18,6,2,'#bbaa7c');
+  q(-7+(stag<0?stag:0),-2-(stag<0?1:0),5,2,'#767764');q(2+(stag>0?stag:0),-2-(stag>0?1:0),5,2,'#767764');q(7,-20,2,20,'#6b735f');b(-8,-21,15,2,'#776d55');
+  const sq=helped?b:k;   // 숫돌: 거꾸로 멘 동안 꼭대기에서 크게 흔들린다
+  sq(-14,heavy,8,7,'#7d8982');sq(-13,heavy,6,1,'#bec5af');sq(-11,heavy+1,1,5,'#57685f');b(-16,reeds,10,4,'#b4ac85');b(-15,reeds-2,1,7,'#d5cc9e');b(-12,reeds-3,1,8,'#c8bc8f');b(-9,reeds-1,1,6,'#d5cc9e');
+  if(helped)b(-15,heavy+5,10,1,'#c3b888');else{const m=Math.round(load/2);q(-14+m,heavy+7,1,reeds-heavy-7,'#c3b888');q(-8+m,heavy+7,1,reeds-heavy-7,'#c3b888');}   // 끈: 위 숫돌에서 밑 억새로 늘어진다
+  if(wob&&G.anim%96<34)b(6,-31-Math.floor((G.anim%96)/12),1,2,'#d4e4ea');   // 진땀
 }else if(kind==='mole'||kind==='child'){
   q(-6,-13,12,12,'#70675b');q(-4,-16,8,7,'#8a7967');q(4,-13,4,3,'#d6ab8d');q(3,-15,1,1,'#2e3834');q(-6,-13,11,3,'#a2926c');q(-7,-3,4,3,'#4e5549');q(2,-3,4,3,'#4e5549');q(4,-6,4,3,'#c5ab86');q(6,-8,4,3,'#a7b6a9');q(7,-8,2,1,'#e5e9d8');
 }else if(kind==='badger'){
@@ -225,7 +267,7 @@ function stirFar(){
 }
 function stirMid(){px(0,158,W,30,'#9c9a7b');for(let i=0;i<70;i++){const x=mod(i*13-cam,460)-20,y=160+(i%6)*4;px(x,y,2,1,i%3?'#f1efe2':'#d9d3bf');}}
 function stirNear(){for(let x=-20;x<W+20;x+=4){const y=194-Math.round(Math.sin((x+cam)/58)*7);px(x,y,4,H-y,'#7d7a5c');px(x,y,4,2,'#aaa77d');if(hash(x+cam)>.72)px(x,y-2,1,2,'#c9c492');}stone(30-mod(RC()*.2,40),214,22,8,3);}
-Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawGateRope,drawWishTower,wishTowerPic,drawSnowDrift,drawSnowStep,drawWanderer,
+Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawGateRope,drawWishTower,wishTowerPic,wishStackPaint,wishStackTop,wishStackSpan,TOWER_ADD,drawSnowDrift,drawSnowStep,drawWanderer,
   cliffLayers:[{speed:.04,draw:cliffSky},{speed:.14,draw:cliffFar},{speed:.4,draw:cliffSea},{speed:.83,draw:cliffNear}],
   shrineLayers:[{speed:.04,draw:shrineSky},{speed:.16,draw:shrineFar},{speed:.43,draw:shrineMid},{speed:.86,draw:shrineNear}],
   stirLayers:[{speed:.04,draw:shrineSky},{speed:.14,draw:stirFar},{speed:.45,draw:stirMid},{speed:.86,draw:stirNear}],
