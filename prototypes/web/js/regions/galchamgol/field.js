@@ -74,6 +74,8 @@ Rg.drawPickup=(a,x,bob)=>{
 /* ---------- 칡덩굴 장애물, 덩굴 몹, 엉킨 칡 ---------- */
 // 결정 D-51: 숲의 장벽은 나무 입구(아치)를 덮은 덩굴 그물이다. 낫질마다 아래로 걷힌다.
 function drawBarrier(){const Bq=G.barrier;if(Bq.cut)return;const x=Bq.x-cam+(Bq.shake?(Bq.shake%2?1:-1):0);if(x<-40||x>W+40)return;
+  // 결정 D-156: 확장판 숲에서는 나무 몸통의 칡에서 늘어진 덩굴(art.js vineCurtain)이 입구를 덮는다. 낫질마다 위에서부터 걷힌다.
+  if(Rg.expArt?.vineCurtain){Rg.expArt.vineCurtain(x,GROUND,Bq.hp/3);return;}
   const h=Math.round(40*(Bq.hp/3)+6),top=GROUND-h;
   for(let i=-12;i<=10;i+=4){const t=Math.max(top,GROUND-44+Math.abs(i)/2);R(x+i,t,3,GROUND-t,i%8?'#4f8a35':'#3f6b2a');}
   for(let y=top+2;y<GROUND;y+=8){R(x-14,y,28,2,'#2c4f1f');R(x-9+((y>>3)%3)*6,y+3,4,3,'#7fb069');}
@@ -172,7 +174,11 @@ if(!CLASSIC){
   // 결정 D-116: 마을 도토리(1260)와 칡 입구(1710) 사이 450 → 200, 대장간 장작(2050)과 오른쪽 출구 사이 550 → 200.
   Rg.trimCutsV2={village:[[1310,250],[1800,590]],forge:[[1110,330],[2150,350]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
   // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 마을 당산나무 문 뒤 출구 앞, 대장간 날쌘과 숯 자리 사이, 숲 첫 발판 무리와 도토리 사이·나무 속 문 뒤 출구 앞. 꺼병이 걸음(galExpChickX)은 설계 좌표로 두고 그릴 자리만 옮긴다.
-  Rg.trimCuts={village:[[1310,250],[1800,590],[2410,70]],forge:[[1110,330],[1670,30],[2150,350]],forest:[[918,82],[2530,150]]};
+  Rg.trimCutsV3={village:[[1310,250],[1800,590],[2410,70]],forge:[[1110,330],[1670,30],[2150,350]],forest:[[918,82],[2530,150]]};   // 셋째 판(D-128) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-155: 숲의 도담(700)에서 꺼병이(1540)까지 걷는 길을 반으로 (758px → 380px). 들르는 자리(참나무 가지 ~808, 도토리 1120,
+  // 금줄 1180, 캐기 1370, 발판 무리 1530)는 그대로 두고 그 사이 빈 길만 지운다. 나무(1040)·그루터기(920)는 첫 구간과 함께 빠지고,
+  // 나무(1420)는 걸리지 않게 둘째·셋째 구간을 그 양옆에 둔다.
+  Rg.trimCuts={village:[[1310,250],[1800,590],[2410,70]],forge:[[1110,330],[1670,30],[2150,350]],forest:[[830,280],[1230,130],[1472,50],[2530,150]]};
   const A=Rg.expArt;
   const oldState=Rg.newState,oldStep=Rg.step,oldHit=Rg.onHit;
   const acorns=[['village',280,GROUND],['village',530,160],['village',1260,GROUND],
@@ -213,6 +219,9 @@ if(!CLASSIC){
   const path=(x,to,toX,label,extra={})=>({x,to,toX,label,draw:sign,...extra});
   const hasSickle=()=>G.tool==='sickle';
   const cutPath=()=>G.barrier.cut;
+  const KILN_X=396;   // 숯가마 아궁이 가운데 (숲 설계 좌표. 첫 자르기 구간보다 앞이라 줄여도 같다)
+  let forestTreeDoor=null;   // 숲의 칡에 막힌 나무 입구. trimRegion이 x를 줄인 좌표로 옮긴다
+  const syncBarrier=()=>{if(forestTreeDoor&&Number.isFinite(forestTreeDoor.x))G.barrier.x=forestTreeDoor.x;};
   // 칡 덩굴로 막힌 길: 아이가 아는 만큼만 말한다 (도담에게 대장간 이야기를 들었는지, 낫을 받았는지).
   // 결정 D-51: 무엇이 무엇을 막았는지 먼저 말한다 (칡이 당산나무를 감고 나무 속 입구를 덮었다).
   // 아빠 낫은 무쇠 삼촌을 만나 들은 뒤(단서 m1)에야 안다. 그 전에는 도담에게 들은 대로 '날 선 연장'까지만 안다.
@@ -251,15 +260,18 @@ if(!CLASSIC){
         {id:'gal_extra_acorn_2',x:460,y:GROUND,item:'acorn',got:false},
         {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false},
         {id:'gal_branch_acorn_1',x:770,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:790,y:96,item:'acorn',got:false}],
-      doors:[path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
+      doors:[forestTreeDoor=path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
           reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y,false),
           formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 나무 속으로'})],
       // 다람쥐만 오르는 높은 참나무 가지와 잊은 몫 (PA-47 선택 자리)
       climbs:[{x:752,top:96}],
       digs:[{id:'gal_cache_forest',x:1900,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
       stamps:[{id:'knot',x:2250,y:112,note:'stamp:galchamgol:knot',label:'높은 가지 옹이 살피기'}],
-      drawActors:()=>{drawBarrier();},onHit:oldHit,
-      step:()=>{commonStep();if(G.barrier.shake>0)G.barrier.shake--;},
+      // 결정 D-154: 숯가마는 검댕(story.js, x 430)의 왼쪽에 서 있는 배경이다. 사연이 켜진 판에서 검댕과 함께 나온다.
+      drawScenery:()=>{A.scenery('forest');if(Rg.arcsEnabled?.())A.kiln(KILN_X-RC(),GROUND);},
+      // 결정 D-156: 덩굴 그물(G.barrier)은 늘 나무 입구 문과 같은 자리다. 길을 줄여 문이 당겨져도 그물이 따라온다(옛 저장 포함).
+      drawActors:()=>{syncBarrier();drawBarrier();},onHit:(...a)=>{syncBarrier();return oldHit(...a);},
+      step:()=>{commonStep();syncBarrier();if(G.barrier.shake>0)G.barrier.shake--;},
     },
     // 1030 디딤돌(반딧불 자리, y158)은 그대로 두고 오르내림을 붙인다.
     marsh:{...basic('marsh',2400,[...stepRidge(420,41,4),{x:980,y:158,w:100},{x:1086,y:134,w:62},{x:1156,y:152,w:58},...stepRidge(1780,43,4)]),

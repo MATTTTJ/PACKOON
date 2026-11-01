@@ -71,7 +71,7 @@ function onPress(k){
   // C(또는 Space·↑·W)는 점프, 아래를 누른 채면 발판 아래로 내려간다.
   // 결정 D-94: 움직이는 중의 Space는 짧게면 점프, 꾹 누르면 구르기 (roll.js). C·W·↑는 늘 바로 점프.
   if(k===' '&&rollPress()){}
-  else if(k==='c'||k===' '||k==='w'||k==='arrowup')jumpOrDrop();
+  else if(k==='c'||k===' '||k==='w'||k==='arrowup'){if(k!==' ')rollCancelHold();jumpOrDrop();}   // 결정 D-143
   // X(J) 하나로 발밑 물건은 줍고, 없으면 휘두른다.
   if(rolling)return;   // 구르는 동안에는 휘두르기·줍기·말걸기를 하지 않는다
   if(k==='j'||k==='x')actionPress();

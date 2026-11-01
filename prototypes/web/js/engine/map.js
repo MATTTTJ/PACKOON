@@ -8,6 +8,55 @@ function mapNotice(message){
   toast(message);$('toast').hidden=false;$('toast').classList.add('map-notice');clearTimeout(mapNoticeTimer);
   mapNoticeTimer=setTimeout(()=>{if($('toast').textContent===message)$('toast').hidden=true;$('toast').classList.remove('map-notice');},TABLES.TUNING.toast_frames*1000/60);
 }
+/* 결정 D-146: 길 지도의 가 본 구역마다 그곳에서 만난 이와 본 채집물을 적는다 (피드백 16). 아이가 제 눈으로 본 것만 남는다.
+   - 만난 이: 말을 나눈 적 있는(learned 'met:') 인물이 화면에 보였던 마지막 구역. 인물이 자리를 옮겨도 아이가 다시 보기 전까지는 본 자리에 둔다.
+   - 채집물: 화면에 보였던 흙더미(채집)와 주울 거리. 다람쥐가 잊은 몫(cache)은 적지 않는다. 다 캐고 다 주운 것은 흐리게.
+   기록은 G.mapSeen = {지역:{npcs:{id:{zone,name}}, items:{구역:{아이템:1}}}}. 없거나 모양이 틀린 옛 저장은 빈 기록에서 시작하고, 이미 캔·주운 것만 채운다. */
+function mapSeenRegion(region){
+  if(!saveObject(G.mapSeen))G.mapSeen={};
+  const s=G.mapSeen[region];
+  if(saveObject(s)&&saveObject(s.npcs)&&saveObject(s.items))return s;
+  return G.mapSeen[region]={npcs:{},items:{}};
+}
+function mapNoteItem(s,zone,item){if(!ITEMS[item])return;(saveObject(s.items[zone])?s.items[zone]:(s.items[zone]={}))[item]=1;}
+/* 필드 한 걸음마다(10프레임에 한 번) 지금 화면에 보이는 것을 적는다 */
+function mapNoteSeen(){
+  if(CLASSIC||!G?.started||!REG||!usesZones(REG)||!G.zone||G.anim%10)return;
+  const s=mapSeenRegion(REG.id),zone=G.zone,shown=x=>x-cam>-12&&x-cam<W+12;
+  for(const n of [...fieldNpcs(),...zoneObjects('wanderers')]){
+    if(!n?.id||!n.draw||!formVisible(n)||!shown(n.x)||!G.learned.includes('met:'+n.id))continue;
+    const name=typeof n.name==='string'&&n.name?n.name:npcName(n.id);
+    if(s.npcs[n.id]?.zone!==zone||s.npcs[n.id]?.name!==name)s.npcs[n.id]={zone,name};
+  }
+  for(const d of fieldItems('digs'))if(!d.cache&&(d.done||formVisible(d)&&shown(d.x)))mapNoteItem(s,zone,d.item);
+  for(const a of fieldItems('pickups'))if(a.got||formVisible(a)&&shown(a.x))mapNoteItem(s,zone,a.item);
+}
+/* 이 지역의 흙더미·주울 거리 (지금 지역은 G, 다른 지역은 보관한 상태) */
+function mapRegionRows(region,key){const rows=region===G.region?G[key]:G.regionStates?.[region]?.fields?.[key];return Array.isArray(rows)?rows:[];}
+/* 옛 저장: 이미 캔 흙더미와 주운 물건은 아이가 본 것이니 기록에 채운다 */
+function mapBackfillSeen(){
+  for(const r of regionList()){if(!usesZones(r))continue;const s=mapSeenRegion(r.id),z0=firstZone(r);
+    for(const d of mapRegionRows(r.id,'digs'))if(!d.cache&&d.done&&mapVisited(r.id,d.zone||z0))mapNoteItem(s,d.zone||z0,d.item);
+    for(const a of mapRegionRows(r.id,'pickups'))if(a.got&&mapVisited(r.id,a.zone||z0))mapNoteItem(s,a.zone||z0,a.item);}
+}
+/* 한 구역에서 본 것: 만난 이 이름들, 채집물(spent=그 구역에 남은 것이 없다) */
+function mapSeenAt(region,zone){
+  const s=G.mapSeen?.[region];if(!saveObject(s)||!mapVisited(region,zone))return {who:[],items:[]};
+  const who=Object.values(saveObject(s.npcs)?s.npcs:{}).filter(v=>v?.zone===zone&&typeof v.name==='string').map(v=>v.name);
+  const z0=firstZone(REGIONS[region]),here=a=>(a.zone||z0)===zone;
+  const digs=mapRegionRows(region,'digs').filter(d=>here(d)&&!d.cache),picks=mapRegionRows(region,'pickups').filter(here);
+  const items=Object.keys(saveObject(s.items?.[zone])?s.items[zone]:{}).filter(id=>ITEMS[id]).map(id=>{
+    const rows=[...digs.filter(d=>d.item===id).map(d=>!d.done),...picks.filter(a=>a.item===id).map(a=>!a.got)];
+    return {id,spent:rows.length>0&&!rows.some(Boolean)};
+  });
+  return {who,items};
+}
+function mapSeenText(seen){
+  const parts=[];
+  if(seen.who.length)parts.push('만난 이 '+seen.who.join('·'));
+  if(seen.items.length)parts.push('채집물 '+seen.items.map(i=>ITEMS[i.id].n+(i.spent?'(다 거둠)':'')).join('·'));
+  return parts.join(' · ');
+}
 // 결정 D-18: M 지도와 까치 떼 이동 (design/data/decisions.csv)
 function openMap(){
   if(CLASSIC)return false;
@@ -18,7 +67,7 @@ function openMap(){
   if(open('map'))return true;
   mapReturnFocus=document.activeElement;mapWasEnd=open('endScreen');
   closePanels();suppressHeldInputs();G.vx=G.vy=G.attackT=0;
-  markZoneVisited();
+  markZoneVisited();mapBackfillSeen();
   $('endScreen').hidden=true;mapSelection={region:G.region,zone:G.zone};
   renderMap();$('map').hidden=false;document.body.classList.add('map-open');Sound.paper();
   const selected=$('mapBody').querySelector('[aria-pressed="true"]');selected?.focus();
@@ -66,20 +115,31 @@ function renderMap(){
   const body=$('mapBody');body.replaceChildren();
   for(const r of regionList().slice().reverse()){
     const graph=mapGraph(r),known=graph.ids.some(id=>mapVisited(r.id,id));
+    const seen=Object.fromEntries(graph.ids.map(id=>[id,mapSeenAt(r.id,id)])),tall=Object.values(seen).some(v=>v.who.length||v.items.length);
+    // 본 것이 있는 지역은 칸을 키워 이름 아래에 만난 이·채집물 줄을 넣는다 (D-146). 먹선은 칸 위 점에 닿게 맞춘다.
+    const CH=tall?170:126,DOT=tall?28:20;
     const section=el('section','map-region'),heading=el('h3',null,known?r.name:'？');
-    const chart=el('div','map-chart'),canvas=document.createElement('canvas');canvas.width=400;canvas.height=126;canvas.setAttribute('aria-hidden','true');
+    const chart=el('div','map-chart'+(tall?' has-seen':'')),canvas=document.createElement('canvas');canvas.width=400;canvas.height=CH;canvas.setAttribute('aria-hidden','true');
     const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;
     // 먹선은 짧은 직사각형으로 이어 픽셀 가장자리를 지킨다.
-    for(const [a,b] of graph.edges){const p=graph.positions[a],q=graph.positions[b],dx=(q.x-p.x)*4,dy=(q.y-p.y)*1.26;
+    for(const [a,b] of graph.edges){const p=graph.positions[a],q=graph.positions[b],dx=(q.x-p.x)*4,dy=(q.y-p.y)*CH/100;
       c.fillStyle=mapVisited(r.id,a)&&mapVisited(r.id,b)?'#75664e':'#c3b699';
-      for(let i=0,n=Math.max(Math.abs(dx),Math.abs(dy));i<=n;i+=3){const t=n?i/n:0;c.fillRect(Math.round(p.x*4+dx*t),Math.round(p.y*1.26-20+dy*t),3,2);}
+      for(let i=0,n=Math.max(Math.abs(dx),Math.abs(dy));i<=n;i+=3){const t=n?i/n:0;c.fillRect(Math.round(p.x*4+dx*t),Math.round(p.y*CH/100-DOT+dy*t),3,2);}
     }
     chart.appendChild(canvas);
     for(const id of graph.ids){
       const known=mapVisited(r.id,id),current=mapCurrent(r.id,id),p=graph.positions[id];
-      const b=el('button','map-place',known?TABLES.ZONES[r.id][id]:'？');b.type='button';b.dataset.region=r.id;b.dataset.zone=id;
+      const b=el('button','map-place');b.type='button';b.dataset.region=r.id;b.dataset.zone=id;
+      b.appendChild(el('span','map-place-name',known?TABLES.ZONES[r.id][id]:'？'));
       b.style.left=p.x+'%';b.style.top=p.y+'%';b.disabled=!known;
       if(!known){b.title='아직 가 보지 않은 곳';b.setAttribute('aria-label','아직 가 보지 않은 곳');}
+      else{const v=seen[id],line=mapSeenText(v);
+        if(v.who.length)b.appendChild(el('span','map-seen-who',v.who.join('·')));
+        if(v.items.length){const row=el('span','map-seen-items');
+          for(const it of v.items.slice(0,3)){const ic=icon(it.id);if(it.spent)ic.classList.add('spent');ic.setAttribute('aria-hidden','true');row.appendChild(ic);}
+          if(v.items.length>3)row.appendChild(el('b',null,'+'+(v.items.length-3)));
+          b.appendChild(row);}
+        if(line){b.title=TABLES.ZONES[r.id][id]+' · '+line;b.setAttribute('aria-label',b.title);}}
       if(current)b.setAttribute('aria-current','location');
       const selected=mapSelection?.region===r.id&&mapSelection?.zone===id;b.setAttribute('aria-pressed',String(selected));b.tabIndex=selected?0:-1;
       b.onclick=()=>selectMapPlace(b);
@@ -97,6 +157,7 @@ function selectMapPlace(button,focus=true){
 }
 function updateMapSelection(){
   const s=mapSelection;$('mapDestination').textContent=s?TABLES.ZONES[s.region]?.[s.zone]||'어딘가':'';
+  const seenLine=s?mapSeenText(mapSeenAt(s.region,s.zone)):'';$('mapSeenDetail').textContent=seenLine;$('mapSeenDetail').hidden=!seenLine;
   $('mapTravel').disabled=!s||!mapVisited(s.region,s.zone)||mapCurrent(s.region,s.zone);
   // 완료 뒤 지도로 돌아다녀도, 아직 밟지 않은 다음 지역으로 나가는 기존 출발은 남긴다.
   const next=REGIONS[REG.next],exit=$('mapNext');exit.hidden=!next||!regionCompleted(REG.id)||!!G.regionStates[next.id];

@@ -73,10 +73,12 @@ function craftJujube(){
 }
 // 결정 D-78: 약과를 얹으면 대추 하나 더. 영산의 날쌘은 "제값"이라 받은 만큼 더 준다.
 function jujubeGive(i=0){
-  if(CLASSIC||!G.f.seolpi||G.f.yCraftJujube||!has('darae_vine'))return;
+  if(CLASSIC||G.f.yCraftJujube||!has('darae_vine',G.f.seolpi?1:3))return;
+  // 결정 D-147: 대추 이야기를 묻기 전에 보따리에서 바로 바꾸면, 날쌘이 덩굴을 원한 까닭부터 말한다.
+  const first=!G.ledger.t_craft_jujube;ledger('t_craft_jujube','날쌘','다래 덩굴 1','대추 2');
   const yak=i===1&&has('yakgwa');
   takeItem('darae_vine',1);if(yak)takeItem('yakgwa',1);addItem('jujube',yak?3:2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
-  talk([...(yak?[['날쌘','약과까지 얹어? …그럼 대추도 하나 더.\n받은 만큼은 줘야 제값이지.']]:[]),['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
+  talk([...(first?[['날쌘','덩굴이네. 산막 장작 묶을 끈이\n모자라던 참이야.']]:[]),...(yak?[['날쌘','약과까지 얹어? …그럼 대추도 하나 더.\n받은 만큼은 줘야 제값이지.']]:[]),['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
 }
 // 결정 D-77: 강철이가 떠난 뒤 남은 얼음 비늘은 산에 두면 또 얼어붙는다. 산지기 살금이가 깊은 물에 돌려보낸다.
 function salgScaleGive(){
@@ -920,7 +922,7 @@ if(!CLASSIC){
   };
   delete Rg.npcs[0].props; // 확장 산막은 지역 배경이 그린다.
   // 결정 D-120: 눈길 옹달샘의 옹달 할미 (확장판에만. 눈길 구역 설계 좌표)
-  Rg.npcs.push({id:'ongdal',name:'옹달 할미',x:1430,zone:'snow',talk:talkOngdal,draw:Rg.art.badger,
+  Rg.npcs.push({id:'ongdal',name:'옹달 할미',x:1430,zone:'snow',talk:talkOngdal,draw:Rg.art.badger,props:Rg.props.ongdalPot,
     hint:'어디선가 솥 끓는 소리가 난다. 눈 녹는 냄새도.',hintRange:180});
 }
 
@@ -930,24 +932,34 @@ Rg.goal=()=>{
   if(!G.started)return '';
   if(G.ended)return '너구리 보부상 · 끝';
   // 결정 D-67: 앞선 진행부터 거꾸로 본다. 산양·부엉이로 호숫가에 먼저 닿아도 지금 할 일이 나온다.
-  if(F.yakDone)return '되돌림 약을 안고 아빠와 집으로 가자 · 아빠나 산군 할아버지께 말씀드리면 떠난다';
-  if(F.nameGiven)return '아빠와 손을 포개 약연을 굴리자';
-  if(F.fruitGot)return '산군 할아버지께 셈하러 가자';
-  if(G.boss.dead)return '신목에서 전설의 열매를 따자';
-  if(F.sangunMet)return '언 호수의 강철이와 맞서자 (부수거나 달래거나)';
-  if(F.dadDone)return CLASSIC?'호숫가의 산군 할아버지를 찾아가자':'선착장에서 얼음길을 건너 신목 섬의 산군 할아버지를 만나자';
-  if(F.dadMet)return '아빠의 몸짓을 읽어 보자 (아빠에게 다시 말을 걸면 된다)';
-  if(mapVisited(Rg.id,'shore'))return '호숫가의 너구리에게 다가가 보자';
-  if(!F.nalYTalk)return '산막 불빛 쪽으로 가 보자';
+  // 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
+  if(F.yakDone)return '아빠와 집으로 떠나기';
+  if(F.nameGiven)return '아빠와 약연 굴리기';
+  if(F.fruitGot)return '산군 할아버지께 셈하기';
+  if(G.boss.dead)return '전설의 열매 따기';
+  if(F.sangunMet)return '강철이와 맞서기';
+  if(F.dadDone)return '산군 할아버지 만나기';
+  if(F.dadMet)return '아빠의 몸짓 읽기';
+  if(mapVisited(Rg.id,'shore'))return '호숫가 너구리에게 다가가기';
+  if(!F.nalYTalk)return '산막 불빛 따라가기';
   if(!F.seolpi){
-    if(vineOK()&&bindOK())return '날쌘에게 설피 재료를 건네자';
-    if(!vineOK())return '눈 덮인 덤불에서 다래 덩굴을 낫으로 베자 ('+(G.inv.darae_vine||0)+'/2)';
-    return '산막 처마 밑 짚단에서 짚 한 줌을 빼 오자';
+    if(vineOK()&&bindOK())return '날쌘에게 설피 재료 건네기';
+    if(!vineOK())return '다래 덩굴 베기 ('+(G.inv.darae_vine||0)+'/2)';
+    return '짚 한 줌 구하기';
   }
-  if(!F.salgMet)return '마가목 비탈 너머 고라니에게 살금살금 다가가자';
-  if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매를 건네자 (귀를 세우면 멈추고)':'비탈의 마가목 열매를 따자 ('+m+'/3)';}
-  return '얼어붙은 비탈을 지나 호숫가로 가자';
+  if(!F.salgMet)return '고라니에게 살금살금 다가가기';
+  if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매 건네기':'마가목 열매 따기 ('+m+'/3)';}
+  return '얼어붙은 비탈 지나기';
 };
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+defineSideQuests(Rg.id,[
+  {id:'y_ongdal_water',title:'고라니에게 옹달샘 물 날라 주기',start:F=>F.yOngdal1,done:F=>F.yOngdal2,
+    text:F=>F.salgMet?'살금이에게 표주박 물 갖다주기':'고라니에게 표주박 물 갖다주기'},
+  {id:'y_nal_jujube',title:'날쌘 아저씨와 아빠 사이 말 나르기',start:F=>F.yArcsNalDad1,done:F=>F.yArcsNalDad3,
+    text:F=>F.yArcsNalDad2?'날쌘에게 아빠 몸짓 전하기':'아빠께 대추 갖다드리기'},
+  // 옹달 할미가 맡긴 표주박은 매듭 임자(엄마) 손에 쥐여 드릴 때(영산을 마칠 때) 끝난다.
+  {id:'y_ongdal_gourd',title:'표주박 매듭 임자에게 돌려주기',start:F=>F.yOngdal4,done:()=>regionCompleted('yeongsan'),text:()=>'표주박 매듭 임자에게 돌려주기'},
+]);
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤(장부에 적힌 뒤)에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
    설피는 대체 조합 넷을 모두 펼친다. 살금이는 살금살금 다가가 말을 나눈 뒤라야 장부에 적힌다.
@@ -955,7 +967,9 @@ Rg.goal=()=>{
 Rg.trade={
   nal:()=>[
     ...(G.ledger.nal_yeongsan?[{id:'t_nal_yeongsan',item:'seolpi',n:1,asks:SEOLPI_ASKS,done:()=>G.f.nalYDone,accept:nalTrade}]:[]),
-    ...(!CLASSIC&&G.f.seolpi&&G.ledger.t_craft_jujube?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],done:()=>G.f.yCraftJujube,accept:jujubeGive}]:[])
+    // 결정 D-147: 대추 꾸러미는 처음부터 날쌘 지게에 매달려 있다. 설피를 받기 전에는 덩굴 둘이 설피 몫이다(첫 만남에 들은 값).
+    ...(!CLASSIC?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],done:()=>G.f.yCraftJujube,
+      locked:()=>!G.f.seolpi&&has('darae_vine')&&!has('darae_vine',3)?'다래 덩굴 둘은 설피 엮을 몫이다. 하나가 더 있어야 한다.':null,accept:jujubeGive}]:[])
   ],
   salgeumi:()=>[
     ...(G.ledger.salgeumi?[{id:'t_salgeumi',item:'magamok',info:true,label:'호숫가 지름길에 대한 정보',asks:SALG_ASKS,done:()=>G.f.salgDone,accept:salgGive}]:[]),

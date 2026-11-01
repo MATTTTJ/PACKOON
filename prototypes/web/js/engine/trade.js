@@ -3,7 +3,9 @@
    결정 D-39: 상대가 내놓은 물건마다 원하는 것이 그림으로 붙어 있다. 내 보따리에서 골라 얹고 제안하면 상대가 받거나 거절한다.
      · 부탁: 이야기에 걸린 교환. 지역 코드가 REG.trade[npc]()로 넣는다.
          {id, item(그림), n, label?(물건이 아닌 것: 정보·허락), asks:[{물건id:개수}, …대체], locked?()→이유, done?(), accept(대체번호)}
-       상대가 무엇을 원하는지 들은 뒤에만 넣는다(인과). 받은 뒤의 대사·물건 주고받기는 지역 코드가 이어 간다.
+       정보·허락·나중에 생긴 부탁은 상대가 무엇을 원하는지 들은 뒤에만 넣는다(인과). 결정 D-147: 상대가 처음부터 지닌 물건
+       (날쌘의 소금·깨, 참기름, 떡 재료, 대추)은 만나자마자 보인다. 사연을 듣기 전에 바꾸면 받는 대사가 그 사연을 먼저 꺼낸다.
+       받은 뒤의 대사·물건 주고받기는 지역 코드가 이어 간다.
      · 흔한 물건: design/data/stock.csv. 값은 레어도 단계로만 맞춘다: 같은 단계 하나, 또는 한 단계 아래 둘(하품은 하품 하나).
        상대가 좋아하는 맛(tastes.csv)은 한 단계 위로 쳐 준다. 귀한 것·도구, 아직 쓸 데가 남은 물건은 흔한 물건과 바꾸지 않는다.
    결정 D-40: 흥정은 성공·실패가 아니라 조건의 차이다(기획서 §5). 허세·사정·칭찬 중 상대 성격에 맞는 말이면
@@ -23,13 +25,15 @@ const Trade=(()=>{
   const key=npc=>G.region+':'+npc;
   const stockLeft=row=>row.times-(G.f.stockUsed?.[row.id]||0);
   const stockOf=npc=>(TABLES.STOCK||[]).filter(r=>r.region===G.region&&r.npc===npc);
-  /* 결정 D-123: 상대가 지녔다고 말한 물건은 바꿀 수 없을 때도 보따리에 보인다(인과: 아이가 들은 것만 보인다).
-     상태는 넷이다. 열림 / 거래 불가(잠김: 지역 조건) / 거래 불가(값: 지금 내 보따리로는 못 맞춤) / 다 바꿈. 바꿀 수 있는 것부터 늘어놓는다. */
+  /* 결정 D-123: 상대가 지닌 물건은 바꿀 수 없을 때도 보따리에 보인다.
+     결정 D-147: 상태는 셋이다. 열림 / 값 부족(지금 내 보따리로는 못 맞춤) / 잠김(지역 조건). '거래 불가' 딱지는 달지 않는다.
+       값이 모자라면 원하는 물건 그림 가운데 모자란 것만 흐리게 하고 가진 수/필요한 수를 붙인다.
+       다 바꿔서 남은 게 없는 물건은 목록에서 뺀다. 바꿀 수 있는 것부터 늘어놓는다. */
   function goodsOf(npc){
     const story=(REG.trade?.[npc]?.()||[]).map(g=>({...g,kind:'story'}));
     const common=stockOf(npc).map(r=>({id:r.id,item:r.item,n:r.n,kind:'common',row:r}));
-    const order={open:0,short:1,lock:2,done:3};
-    return [...story,...common].map((g,i)=>({g,i,k:stateOf(g).k})).sort((a,b)=>order[a.k]-order[b.k]||a.i-b.i).map(x=>x.g);
+    const order={open:0,short:1,lock:2};
+    return [...story,...common].map((g,i)=>({g,i,k:stateOf(g).k})).filter(x=>x.k!=='done').sort((a,b)=>order[a.k]-order[b.k]||a.i-b.i).map(x=>x.g);
   }
   function stateOf(g){
     if(g.kind==='story'?g.done?.():stockLeft(g.row)<=0)return {k:'done',why:'다 바꿨다.'};
@@ -105,6 +109,18 @@ const Trade=(()=>{
   }
   function close(){if(!$('trade').hidden){Sound.panel(false);$('trade').hidden=true;}S=null;}
   function picture(id,n){const s=el('span','trade-ask');s.appendChild(icon(id));if(n>1)s.appendChild(el('b',null,'×'+n));s.title=ITEMS[id].n+(n>1?' '+n:'');return s;}
+  // 결정 D-147: 부탁의 원하는 물건 그림. 모자란 물건은 흐리게, 가진 수/필요한 수를 붙인다.
+  function askPicture(id,n){
+    const have=G.inv[id]||0;if(have>=n)return picture(id,n);
+    const s=el('span','trade-ask missing');s.appendChild(icon(id));s.appendChild(el('b',null,have+'/'+n));
+    s.title=ITEMS[id].n+' '+n+'개 필요, 지금 '+have+'개';return s;
+  }
+  // 결정 D-148: 품 표시 보기. 날쌘이 첫 만남에 말로 알려 준 것(잎·열매)을 화면의 실제 표시로 늘 보여 준다.
+  function legend(){
+    const d=el('div','trade-legend');d.setAttribute('aria-label','품 표시: 하품, 중품, 상품, 최상품, 천하일품');
+    for(let r=0;r<5;r++){const s=el('span','trade-legend-item');s.appendChild(rarityIcon(r));s.appendChild(el('span',null,rank(r)));d.appendChild(s);}
+    return d;
+  }
   function haggleState(){
     const used=G.f.haggleUsed?.[key(S.npc)];
     if(G.f.haggleBonus?.[key(S.npc)])return '덤을 하나 얹어 주기로 했다.';
@@ -118,24 +134,22 @@ const Trade=(()=>{
     const theirs=el('section','trade-side');theirs.appendChild(el('h3',null,S.name+'의 물건'));
     if(!S.goods.some(g=>['open','short'].includes(stateOf(g).k)))theirs.appendChild(el('p','small','지금은 바꿀 물건이 없다.'));
     for(const g of S.goods){
-      const st=stateOf(g),lock=st.k==='open'?null:st.why,b=el('button','trade-good'+(st.k==='done'||st.k==='lock'?' off':''));b.type='button';b.dataset.good=g.id;b.dataset.state=st.k;
+      const st=stateOf(g),lock=st.k==='open'?null:st.why,b=el('button','trade-good'+(st.k==='lock'?' off':''));b.type='button';b.dataset.good=g.id;b.dataset.state=st.k;
       b.setAttribute('aria-pressed',String(S.sel===g.id));
       // 결정 D-112: 물건이 아닌 정보(info:true)는 찢긴 수첩 쪽 아이콘으로 그리고, 이름은 "~에 대한 정보"로 적는다.
       const head=el('span','trade-good-head');head.appendChild(icon(g.info?'torn_page':(g.icon||g.item)));
       head.appendChild(el('b',null,(g.label||ITEMS[g.item].n)+(g.n>1?' ×'+g.n:'')));
       if(!g.label)head.appendChild(rarityIcon(ITEMS[g.item].r));
       head.appendChild(el('span','chip',g.info?'정보':g.kind==='story'?'부탁':'흔한 물건'));
-      if(st.k!=='open')head.appendChild(el('span','chip trade-state '+st.k,st.k==='done'?'다 바꿈':'거래 불가'));
       b.appendChild(head);
       const asks=el('span','trade-asks');
-      if(st.k==='done'||st.k==='lock')asks.appendChild(el('span','small',lock));
+      if(st.k==='lock')asks.appendChild(el('span','small',lock));
       else if(g.kind==='story')g.asks.forEach((a,i)=>{
         if(i)asks.appendChild(el('span','small','또는'));
-        Object.entries(a).forEach(([id,n],k)=>{if(k)asks.appendChild(el('span','plus','+'));asks.appendChild(picture(id,n));});
+        Object.entries(a).forEach(([id,n],k)=>{if(k)asks.appendChild(el('span','plus','+'));asks.appendChild(st.k==='short'?askPicture(id,n):picture(id,n));});
       });
       else{asks.appendChild(el('span','small',priceText(g)));asks.appendChild(el('span','small','· 남은 '+stockLeft(g.row)+'번'));}
       b.appendChild(asks);
-      if(st.k==='short')b.appendChild(el('span','small trade-why',st.why));
       b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(g.kind==='story'?'원하는 것: '+g.asks.map(askText).join(', 또는 '):priceText(g))));
       b.onclick=()=>{if(S.sel!==g.id){S.sel=g.id;S.offer={};}render();};
       theirs.appendChild(b);
@@ -157,7 +171,7 @@ const Trade=(()=>{
     }
     mine.appendChild(grid);
     // 결정 D-111: 내 보따리가 왼쪽(휴대폰에서는 위), 상대 물건이 오른쪽이다.
-    wrap.appendChild(mine);wrap.appendChild(theirs);body.appendChild(wrap);
+    body.appendChild(legend());wrap.appendChild(mine);wrap.appendChild(theirs);body.appendChild(wrap);
     // 내가 내놓을 것, 흥정, 제안
     const tray=el('section','trade-tray');tray.appendChild(el('h3',null,'내가 내놓을 것'));
     const chips=el('div','trade-offer');
@@ -213,7 +227,7 @@ const Trade=(()=>{
     addItem(g.item,n);(G.f.stockUsed=G.f.stockUsed||{})[g.row.id]=(G.f.stockUsed[g.row.id]||0)+1;
     learn('trade:'+g.row.id);Sound.exchange();
     S.log.push({who:'',line:'('+S.name+'에게서 '+ITEMS[g.item].n+' '+n+'개를 받았다.'+(bonus?' 덤이 하나 붙었다.':'')+')'});
-    S.offer={};S.goods=goodsOf(S.npc);if(stateOf(S.goods.find(x=>x.id===S.sel)||{}).k!=='open')S.sel=(S.goods.find(x=>stateOf(x).k==='open')||S.goods[0])?.id||null;render();
+    S.offer={};S.goods=goodsOf(S.npc);const cur=S.goods.find(x=>x.id===S.sel);if(!cur||stateOf(cur).k!=='open')S.sel=(S.goods.find(x=>stateOf(x).k==='open')||S.goods[0])?.id||null;render();
   }
   $('tradeClose').onclick=()=>closePanels();
   /* 흔한 물건이 남은 상대와 이야기할 때는 대화창에 '보따리 펼치기'를 늘 둔다. 부탁을 마친 뒤에도 바꿀 수 있게.
