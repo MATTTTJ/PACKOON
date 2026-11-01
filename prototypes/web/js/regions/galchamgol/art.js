@@ -501,6 +501,8 @@ if(!CLASSIC){
     M(x,y,f,-3,-11,1,2,'#e1c18a');M(x,y,f,1,-8,1,2,'#e1c18a');M(x,y,f,4,-12,1,2,'#e1c18a');
     M(x,y,f,-1,-3,1,3,'#775638');M(x,y,f,6,-3,1,3,'#775638');
   }
+  // 칡잎: 세 갈래 잎과 잎자루 (몸통 감은 칡과 입구 덩굴이 같이 쓴다)
+  function kudzuLeaf(lx,ly){px(lx,ly,4,3,'#6f8f3e');px(lx+4,ly+1,3,3,'#7f9f46');px(lx+1,ly-2,3,2,'#8aab4d');px(lx+2,ly+3,1,2,'#3a5a2b');}
   Rg.expArt={
     back:zoneBack,scenery,front:()=>{},
     vistaStream:[{speed:.06,draw:vistaStreamSky},{speed:.22,draw:vistaStreamVillage},{speed:.52,draw:vistaStreamWater},{speed:0,draw:vistaStreamFrame}],
@@ -535,13 +537,17 @@ if(!CLASSIC){
       q(-4,-2,2,2,'#4a3222');q(2,-2,2,2,'#4a3222');                                       // 발
       if(!G?.f?.galArcOtter3){q(-6,-27,19,3,'#a77b52');q(-4,-29,15,2,'#c99b66');q(-5,-24,17,1,'#7a5536');}   // 머리에 인 함지박
     },
-    badgerKiln(x,y,f=1){
+    /* 결정 D-154: 숯가마는 검댕 그림에서 떼어 숲 배경(field.js forest drawScenery)이 제자리에 그린다.
+       검댕이 아이 쪽으로 고개를 돌려도(f) 가마는 움직이지 않는다. kx는 가마 아궁이 가운데의 화면 x. */
+    kiln(kx,y){
       // 숯가마: 흙 둔덕과 아궁이, 연기. 눈약으로 눈을 씻은 뒤에는 연기가 푸르스름하다.
-      const kx=x-34*f;
       px(kx-22,y-22,44,22,'#8f6446');px(kx-18,y-28,36,6,'#9e7150');px(kx-12,y-32,24,4,'#a97b58');
       px(kx-6,y-12,12,12,'#2b1d16');px(kx-4,y-10,8,10,'#d0582c');px(kx-2,y-7,4,7,'#f2a03a');
       const blue=!!G?.f?.galGeomBlue,t=(G?.anim||0)/24;
       for(let i=0;i<5;i++){const yy=y-36-i*9,xx=kx+Math.sin(t+i*.9)*3+i;px(xx-3+i%2,yy,6+i,5,blue?'#a9c3d6':'#e9e4da');}
+    },
+    // 검댕(숯쟁이 오소리)만 그린다. 이름은 story.js가 부르는 그대로 둔다 (가마는 위 kiln, D-154).
+    badgerKiln(x,y,f=1){
       const q=(a,b,w,h,c)=>M(x,y,f,a,b,w,h,c);
       q(-8,-13,15,11,'#7c776c');q(-6,-11,11,7,'#9a9488');                                // 몸통
       q(2,-20,10,8,'#2a2622');q(5,-20,2,8,'#ece6d8');q(9,-17,3,2,'#ece6d8');             // 검은 머리, 흰 줄무늬
@@ -581,13 +587,31 @@ if(!CLASSIC){
         for(let i=-36;i<=36;i+=2){const yy=base+Math.round(i*.42);px(x+i,yy,2,3,'#3a5a2b');if(i%6===0)px(x+i,yy+3,2,1,'#2a4420');}}
       for(let k=0;k<3;k++){const base=y-70-k*34;for(let i=-34;i<=34;i+=3)px(x+i,base-Math.round(i*.3),1,2,'#567a39');}
       // 칡잎(세 갈래)이 줄을 따라 붙는다
-      const leaf=(lx,ly)=>{px(lx,ly,4,3,'#6f8f3e');px(lx+4,ly+1,3,3,'#7f9f46');px(lx+1,ly-2,3,2,'#8aab4d');px(lx+2,ly+3,1,2,'#3a5a2b');};
-      for(let k=0;k<4;k++)for(const i of [-26,-6,16,32])leaf(x+i,y-60-k*34+Math.round(i*.42));
-      if(!curtain)return;
-      // 입구를 덮은 덩굴 그물: 아치 모양으로 늘어진 줄기와 가로 엮임, 잎
-      for(let i=-12;i<=10;i+=4){const top=y-44+Math.abs(i)/2;px(x+i,top,3,y-top,i%8?'#4f7434':'#3d6129');}
-      for(let j=0;j<5;j++)px(x-14,y-36+j*8,28,2,'#2f4d24');
-      for(const [lx,ly] of [[-12,-30],[2,-38],[-4,-18],[6,-10],[-10,-6]])leaf(x+lx,y+ly);
+      for(let k=0;k<4;k++)for(const i of [-26,-6,16,32])kudzuLeaf(x+i,y-60-k*34+Math.round(i*.42));
+      if(curtain)Rg.expArt.vineCurtain(x,y,1);
+    },
+    /* 결정 D-156: 입구를 막은 칡 덩굴. 몸통을 감은 맨 아래 칡 줄(y-56, 기울기 .42)에서 줄기가 늘어져
+       아치(x±14, 꼭대기 y-45)를 덮고 땅에 뿌리를 박는다. 그래서 덩굴이 나무와 한 몸으로 보인다.
+       k(0~1)는 남은 덩굴. 낫질로 줄면 줄기가 위에서부터 끊겨 아래로 내려앉는다(숲의 drawBarrier). */
+    vineCurtain(x,y,k=1){
+      x=Math.round(x);y=Math.round(y);k=Math.max(0,Math.min(1,k));
+      const ink='#2a4420',dark='#3a5a2b',mid='#4f7434',sway=Vfx.reducedMotion?0:Math.sin((G?.anim||0)/45);
+      const band=i=>y-56+Math.round(i*.42),topAt=i=>Math.round(band(i)+(y-8-band(i))*(1-k));
+      const stems=[-15,-10,-5,0,5,10,14];
+      // 줄기: 칡 줄에 매달려 아치 앞으로 늘어진다. 아래로 갈수록 조금씩 흔들린다
+      stems.forEach((i,j)=>{const top=topAt(i);
+        for(let yy=top;yy<y;yy+=2){const t=(yy-band(i))/(y-band(i)),xx=x+i+Math.round(Math.sin(t*5.5+j*1.9)*1.6+sway*t*1.4);
+          px(xx,yy,j%2?2:3,2,j%3?mid:dark);}
+        px(x+i-2,y-2,5,2,ink);px(x+i+(j%2?2:-3),y-1,3,1,ink);});   // 땅을 움켜쥔 뿌리 끝
+      // 줄기끼리 비스듬히 엮인 덩굴손: 입구가 비치지 않을 만큼 촘촘하다
+      const lowTop=Math.min(...stems.map(topAt));
+      for(let r=0;r<6;r++){const yy=y-42+r*7;if(yy<lowTop+2)continue;
+        for(let i=-14;i<=13;i+=2){const dy=Math.round(Math.sin(i*.45+r*1.3)*2);if(yy+dy>=topAt(i)+1)px(x+i,yy+dy,2,1,ink);}}
+      // 잎: 남은 덩굴 위에만 붙는다
+      for(const [lx,ly] of [[-13,-34],[1,-41],[8,-30],[-6,-24],[5,-15],[-12,-12],[9,-6],[-3,-5]])
+        if(y+ly>=topAt(lx)+2)kudzuLeaf(x+lx,y+ly);
+      // 걷힌 만큼 아래에 끊긴 덩굴이 쌓인다
+      if(k<1)for(let i=-16;i<=14;i+=3)px(x+i,y-3-Math.round((1-k)*3*((i+16)%7)/6),3,3,((i+16)/3)%2?mid:dark);
     },
     streamDoor(x,y){
       // A wide leaf in the shallows, held by an ordinary bank-side rope.

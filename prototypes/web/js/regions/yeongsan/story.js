@@ -922,7 +922,7 @@ if(!CLASSIC){
   };
   delete Rg.npcs[0].props; // 확장 산막은 지역 배경이 그린다.
   // 결정 D-120: 눈길 옹달샘의 옹달 할미 (확장판에만. 눈길 구역 설계 좌표)
-  Rg.npcs.push({id:'ongdal',name:'옹달 할미',x:1430,zone:'snow',talk:talkOngdal,draw:Rg.art.badger,
+  Rg.npcs.push({id:'ongdal',name:'옹달 할미',x:1430,zone:'snow',talk:talkOngdal,draw:Rg.art.badger,props:Rg.props.ongdalPot,
     hint:'어디선가 솥 끓는 소리가 난다. 눈 녹는 냄새도.',hintRange:180});
 }
 
