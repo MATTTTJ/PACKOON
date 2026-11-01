@@ -2477,6 +2477,56 @@ const TABLES={
    ]
   }
  ],
+ "STAMP_MARKS": {
+  "galchamgol:anvil": {
+   "mark": "soot",
+   "press": "strong"
+  },
+  "galchamgol:knot": {
+   "mark": "leaf",
+   "press": "strong"
+  },
+  "galchamgol:roots": {
+   "mark": "juice",
+   "press": "normal"
+  },
+  "dolneomeo:jangseung": {
+   "mark": "straw",
+   "press": "normal"
+  },
+  "dolneomeo:mill_base": {
+   "mark": "dust",
+   "press": "normal"
+  },
+  "dolneomeo:cliff_crack": {
+   "mark": "grip",
+   "press": "normal"
+  },
+  "jangteo:flag": {
+   "mark": "wind",
+   "press": "normal"
+  },
+  "jangteo:pillar": {
+   "mark": "wet",
+   "press": "normal"
+  },
+  "jangteo:rock": {
+   "mark": "resin",
+   "press": "strong"
+  },
+  "yeongsan:hut_post": {
+   "mark": "frost",
+   "press": "normal"
+  },
+  "yeongsan:snow_sign": {
+   "mark": "snow",
+   "press": "normal"
+  },
+  "yeongsan:shore_rock": {
+   "mark": "ice",
+   "press": "faint"
+  }
+ },
  "MINIGAMES": {
   "handwork_forge_relation": 2,
   "handwork_stack_relation": 2,

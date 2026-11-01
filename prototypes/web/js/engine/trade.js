@@ -232,7 +232,7 @@ const Trade=(()=>{
   $('tradeClose').onclick=()=>closePanels();
   /* 흔한 물건이 남은 상대와 이야기할 때는 대화창에 '보따리 펼치기'를 늘 둔다. 부탁을 마친 뒤에도 바꿀 수 있게.
      대화 선택지에 이미 '보따리를 펼친다'가 있으면 두지 않는다. */
-  const quick=el('div','field-taste trade-quick');quick.hidden=true;$('dlg').querySelector('.dbody').appendChild(quick);
+  const quick=el('div','field-taste trade-quick');quick.hidden=true;$('dlgActions').appendChild(quick);   // 결정 D-163: '물건 건네기'와 한 줄
   const quickBtn=el('button','btn','보따리 펼치기');quickBtn.type='button';quick.appendChild(quickBtn);
   quick.addEventListener('click',e=>e.stopPropagation());
   function quickNpc(){

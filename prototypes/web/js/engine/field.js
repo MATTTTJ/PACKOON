@@ -859,6 +859,7 @@ function drawZoneObjects(){
       drawStampBase(base,sx,gy);
       if(!stampFound(p.id)){pawStamp(sx,py,'rgba(110,52,30,.55)',true);pawStamp_glint(sx,py,p.x);continue;}
       if(p.draw)p.draw(sx,py);else pawStamp(sx,py,'#8a3424');
+      drawPawMark(R,Math.round(sx),Math.round(py),REG.id+':'+p.id);   // 결정 D-171: 그 자리에서 묻은 것 (notebook.js)
       pawStamp_glint(sx,py,p.x+7);continue;}
     if(p.draw)p.draw(p.x-cam,p.y??fieldGround());
     if(k==='doors'&&!needMet(p)&&p.drawBlocked)p.drawBlocked(p.x-cam,p.y??fieldGround());
