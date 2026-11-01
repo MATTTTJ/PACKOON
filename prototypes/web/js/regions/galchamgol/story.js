@@ -544,26 +544,38 @@ Rg.goal=()=>{
   if(!G.started)return '';
   if(G.ended)return '단풍골 체험판 완료';
   // 결정 D-67: 할 일은 가장 앞선 진행부터 거꾸로 본다. 변신으로 앞질러 가도 지금 상태에 맞는 일을 알려 준다.
-  if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '할멈께 인사드리고 북쪽으로 떠나자';
-  if(G.boss.dead)return has('meoru')?'할멈께 해머루를 가져다드리자':'떨어진 해머루를 줍자';
-  if(G.barrier.cut||mapVisited(Rg.id,'hill'))return '당산나무의 엉킨 칡과 맞서자 (부수거나 달래거나)';
-  if(!F.dodamTalk)return '당산나무 해머루에 오르는 길을 마을 어귀의 도담에게 묻자';
+  // 결정 D-149: 짧은 명사형으로 핵심만 쓴다. 장소는 붙이지 않는다.
+  if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '할멈께 인사드리고 북쪽으로 떠나기';
+  if(G.boss.dead)return has('meoru')?'할멈께 해머루 가져다드리기':'떨어진 해머루 줍기';
+  if(G.barrier.cut||mapVisited(Rg.id,'hill'))return '엉킨 칡과 맞서기';
+  if(!F.dodamTalk)return '당산나무 해머루 오르는 방법 찾기';
   const ac=G.inv.acorn||0;
-  const powderStep=()=>has('powder')?null:(ac<3?'도토리를 줍자 ('+ac+'/3)':'보따리를 열고 엄마의 절구에 도토리 3개를 넣어 빻자');
-  if(!F.dodamDone)return powderStep()||'도담에게 도토리 가루를 건네자';
-  if(!F.musoeMet)return '물레방아 너머 대장간의 무쇠 삼촌을 찾아가자';
-  if(!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내자 (다시 말을 걸면 된다)';
-  if(F.leafHeld&&!F.leafGiven&&!F.musoeDone)return '다람쥐를 봤으니 무쇠 삼촌께 잎사귀를 받자';
-  if(F.leafGiven&&!F.musoeAfterLeaf&&!F.musoeDone)return '무쇠 삼촌과 하던 이야기를 마저 하자';
+  const powderStep=()=>has('powder')?null:(ac<3?'도토리 줍기 ('+ac+'/3)':'절구에 도토리 3개 빻기');
+  if(!F.dodamDone)return powderStep()||'도담에게 도토리 가루 건네기';
+  if(!F.musoeMet)return '무쇠 삼촌 찾아가기';
+  if(!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내기';
+  if(F.leafHeld&&!F.leafGiven&&!F.musoeDone)return '무쇠 삼촌께 잎사귀 받기';
+  if(F.leafGiven&&!F.musoeAfterLeaf&&!F.musoeDone)return '무쇠 삼촌과 하던 이야기 마저 하기';
   if(!F.musoeDone){
-    if(has('coal',F.musoeCoal?2:1))return '무쇠 삼촌께 숯을 가져다드리자';   // 결정 D-139
-    if(!F.nalTalk)return '물레방아 옆 날쌘에게 숯을 구하자';
+    if(has('coal',F.musoeCoal?2:1))return '무쇠 삼촌께 숯 가져다드리기';   // 결정 D-139
+    if(!F.nalTalk)return '날쌘에게 숯 구하기';
     const p=powderStep();if(p)return p;
-    if(!has('root'))return '반짝이는 흙더미를 곡괭이로 쳐서 칡뿌리를 캐자';
-    return '날쌘에게 도토리 가루와 칡뿌리를 건네자';
+    if(!has('root'))return '반짝이는 흙더미에서 칡뿌리 캐기';
+    return '날쌘에게 도토리 가루와 칡뿌리 건네기';
   }
-  return '마을 끝 칡덩굴을 낫으로 끊자';
+  return '칡덩굴 낫으로 끊기';
 };
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+defineSideQuests(Rg.id,[
+  {id:'gal_dodam_cache',title:'도담이 묻은 도토리 찾기',start:F=>F.galArcDodam1,done:F=>F.galArcDodam2,
+    text:F=>F.galArcDodamFound||(G.region===Rg.id&&G.pickups[F.galArcDodamCache]?.got)?'도담에게 찾은 자리 알려 주기':'도담이 묻은 도토리 찾기'},
+  {id:'gal_geom_eye',title:'검댕 아저씨 눈약 구해 드리기',start:F=>F.galArcGeom1,done:F=>F.galArcGeom5,
+    text:F=>!F.galArcGeom2?'할멈께 검댕 아저씨 눈약 여쭙기':!F.galArcGeom3?'검댕 아저씨께 약탕 숯 받기':!F.galArcGeom4?'할멈께 약탕 숯 갖다드리기':'검댕 아저씨께 눈약 갖다드리기'},
+  {id:'gal_musoe_leg',title:'무쇠 삼촌 다리 찜질 구해 드리기',start:F=>F.galArcMusoeLeg1,done:F=>F.galArcMusoeLeg3,
+    text:F=>!F.galArcMusoeLeg2?'할멈께 삼촌 다리 약 여쭙기':!F.galPoultice?'할멈께 칡뿌리 갖다드리기':'무쇠 삼촌께 찜질 갖다드리기'},
+  {id:'gal_lost_chick',title:'꺼병이 엄마 찾아 주기',start:F=>F.galExpChickWith,done:F=>!!F.wanderersDone?.['galchamgol:lost_chick'],
+    text:F=>F.galExpChickArrived?'꺼병이에게 말 걸기':'꺼병이와 갈대까지 걷기'},
+]);
 
 /* PA-43: 첫 가을의 길손과 조사. classic은 위의 지도와 대사를 그대로 쓴다. */
 if(!CLASSIC){
@@ -1118,19 +1130,20 @@ if(!CLASSIC){
   Rg.goal=()=>{
     const F=G.f;
     if(!G.started||G.ended)return oldGoal();
-    if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '약을 보냈다 · 할멈께 인사드리고 북쪽으로 떠나자';
+    // 결정 D-149: 짧은 명사형으로 핵심만 쓴다. 장소("대장간 길 오른쪽" 같은)는 붙이지 않는다.
+    if(G.diary.some(d=>d.id==='end')||(Rg.arcsEnabled()&&F.galArcToad1))return '할멈께 인사드리고 북쪽으로 떠나기';
     // 결정 D-67: 앞선 진행부터 본다. 다람쥐로 덩굴을 넘어 칡을 먼저 만나도 안내가 뒤처지지 않는다.
-    if(G.boss.dead)return has('meoru')?'언덕 끝 약초 귀환길로 내려가 늪가 약방의 할멈께 가자':'언덕에 떨어진 해머루를 줍자';
-    if(mapVisited(Rg.id,'hill'))return '당산나무 언덕의 엉킨 칡과 맞서자';
-    if(G.barrier.cut)return '당산나무 속을 올라 엉킨 칡을 만나자';
-    if(!F.dodamTalk)return '당산나무 해머루에 어떻게 오르는지 숲의 도담에게 묻자 · 대장간 길 오른쪽';
-    if(F.dodamDone&&!F.musoeMet)return '대장간 길로 돌아가 무쇠 삼촌께 날 선 연장을 여쭤보자';
-    if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내자 · 다시 말을 걸면 된다';
-    if(F.leafHeld&&!F.leafGiven&&!F.musoeDone)return '다람쥐를 봤으니 무쇠 삼촌께 잎사귀를 받자';
-    if(F.leafGiven&&!F.musoeAfterLeaf&&!F.musoeDone)return '무쇠 삼촌과 하던 이야기를 마저 하자';
-    if(F.dodamDone&&!F.musoeDone&&!has('coal',F.musoeCoal?2:1)&&!F.nalTalk)return '대장간 오른쪽 좌판의 날쌘에게 숯을 구하자';
-    if(!F.musoeDone&&F.nalTalk&&!F.nalDone&&!has('coal',F.musoeCoal?2:1)&&!has('root'))return '대장간 길 · 날쌘 좌판 옆 반짝이는 흙더미를 캐자';
-    if(F.musoeDone&&!G.barrier.cut)return '참나무 숲 안쪽 금줄의 덩굴을 낫으로 걷자';
+    if(G.boss.dead)return has('meoru')?'할멈께 해머루 가져다드리기':'떨어진 해머루 줍기';
+    if(mapVisited(Rg.id,'hill'))return '엉킨 칡과 맞서기';
+    if(G.barrier.cut)return '당산나무 속 올라가기';
+    if(!F.dodamTalk)return '당산나무 해머루 오르는 방법 찾기';
+    if(F.dodamDone&&!F.musoeMet)return '무쇠 삼촌께 날 선 연장 여쭙기';
+    if(F.musoeMet&&!F.musoeTested&&!F.musoeDone)return '무쇠 삼촌 앞에서 버텨 내기';
+    if(F.leafHeld&&!F.leafGiven&&!F.musoeDone)return '무쇠 삼촌께 잎사귀 받기';
+    if(F.leafGiven&&!F.musoeAfterLeaf&&!F.musoeDone)return '무쇠 삼촌과 하던 이야기 마저 하기';
+    if(F.dodamDone&&!F.musoeDone&&!has('coal',F.musoeCoal?2:1)&&!F.nalTalk)return '날쌘에게 숯 구하기';
+    if(!F.musoeDone&&F.nalTalk&&!F.nalDone&&!has('coal',F.musoeCoal?2:1)&&!has('root'))return '반짝이는 흙더미에서 칡뿌리 캐기';
+    if(F.musoeDone&&!G.barrier.cut)return '금줄 덩굴 낫으로 걷기';
     return oldGoal();
   };
 }

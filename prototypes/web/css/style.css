@@ -40,6 +40,20 @@ h1 span{color:var(--gold)}
 .tool canvas{width:1.4em;height:1.4em;image-rendering:pixelated}
 .goal{background:rgba(242,230,204,.92);color:var(--meok);padding:3px 9px;border-radius:4px;border-left:3px solid var(--dan);max-width:min(52vw,420px);font-family:var(--display)}
 .goal b{font-family:var(--ui);font-weight:normal;color:var(--dan);font-size:.85em;margin-right:6px}
+.goal-row+.goal-row{margin-top:2px}
+.goal .sub{font-size:.9em;color:#4b3a2e}
+.goal .sub b{color:#8a6d45}
+.goal-more{font-family:var(--ui);font-size:.75em;color:#7a6a52;margin-top:1px}
+.goal-m-sub{display:block;font-size:12px;color:#d9c9a8;margin-top:3px}
+.goal-m-sub[hidden],body.in-battle .goal-m-sub{display:none}
+.todo-head{font-family:var(--ui);font-size:.85em;letter-spacing:.04em;color:var(--dan);margin:12px 0 4px}
+.todo-head.sub{color:#8a6d45}
+.todo-item{font-family:var(--display);line-height:1.5;padding:5px 0 5px 10px;margin:4px 0;border-left:3px solid var(--dan);max-width:65ch}
+.todo-item.sub{border-left-color:#b39a6c}
+.todo-item small{display:block;font-family:var(--ui);font-size:.78em;color:var(--dim)}
+.todo-done{margin-top:14px}
+.todo-done summary{cursor:pointer;font-family:var(--ui);color:var(--dim);min-height:32px;display:flex;align-items:center}
+.todo-done .todo-item{border-left-color:#cdb98f;color:var(--dim)}
 .hud-btns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;pointer-events:auto;max-width:65%}
 .hud #btnSound,.hud #btnVolume{position:relative;z-index:21;visibility:visible}
 .shell:has(>.panel:not([hidden])) .hud #btnSound,.shell:has(>.panel:not([hidden])) .hud #btnVolume{visibility:hidden;pointer-events:none}

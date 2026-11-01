@@ -201,7 +201,7 @@ function install(){
   };
   const oldGoal=Rg.goal;
   Rg.goal=()=>{
-    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return '선착장 앞 막대에서 아빠와 얼음길을 살피자';
+    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return '아빠와 얼음길 살피기';   // 결정 D-149
     return oldGoal();
   };
   // 완료 길손의 greeting을 가로채지 않고, 봄에만 별도 행동 자리를 곁에 둔다.

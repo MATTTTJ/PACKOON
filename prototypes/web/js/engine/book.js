@@ -1,6 +1,6 @@
 ﻿'use strict';
-/* 아이가 적은 기록을 그린다: 수첩의 불리는 이름·물품 장부, 보따리 '중요' 탭의 아빠 단서·엄마의 쪽지.
-   패널과 탭, 동물·물건·도장·익힌 솜씨·숨은 가공법 쪽은 notebook.js 가 맡는다. 여기서는 받은 body 에 아이의 글씨로 그리기만 한다.
+/* 아이가 적은 기록을 그린다: 수첩의 해야 할 일·불리는 이름·물품 장부, 보따리 '중요' 탭의 아빠 단서·엄마의 쪽지.
+   패널과 탭, 동물·물건·도장·숨은 가공법 쪽은 notebook.js 가 맡는다. 여기서는 받은 body 에 아이의 글씨로 그리기만 한다.
    저장 모양(G.diary·G.clues·G.nicknames·G.ledger·G.rel·G.f.momNote*)은 책이 둘이던 때와 같다. */
 function childNoteSection(line){return line.when?.startsWith('habit:')?'익힌 솜씨':line.when?.startsWith('recipe:')?'숨은 가공법':'관찰';}
 function renderMomNote(body){
@@ -24,11 +24,29 @@ function renderMomNote(body){
   const transcript=el('details','mom-transcript');transcript.appendChild(el('summary',null,'쪽지 글 다시 읽기'));
   spoken.forEach(text=>transcript.appendChild(el('p',null,text)));body.appendChild(transcript);
 }
-/* 아이가 적은 장 하나 (tab: clues·nicknames·mom·ledger) */
+/* 결정 D-150: 수첩 '해야 할 일' 장. 중요(지금 지역의 본 줄거리 한 줄)와 보통(맡은 심부름)을 나누고,
+   끝낸 일은 접어 둔 '끝낸 일' 묶음에 남긴다(지나온 지역의 본 줄거리와 마친 심부름). 할 일 글은 HUD와 같다(hud.js). */
+function renderTodo(body){
+  const item=(box,cls,text,sub)=>{const d=el('div','todo-item '+cls);d.appendChild(document.createTextNode(text));if(sub)d.appendChild(el('small',null,sub));box.appendChild(d);};
+  const head=(cls,text)=>body.appendChild(el('div','todo-head '+cls,text));
+  head('main','중요');
+  const g=mainGoalText();item(body,'main',g||REG.cover.ready,REG.name);
+  head('sub','보통');
+  const subs=activeSideQuests();
+  if(!subs.length)body.appendChild(el('p','empty-note','맡은 부탁이 아직 없다. 길에서 만난 이들의 이야기를 들어 보자.'));
+  subs.forEach(q=>item(body,'sub',q.text(G.f),REGIONS[q.region]?.name));
+  const done=[...regionList().filter(r=>r.id!==G.region&&regionCompleted(r.id)).map(r=>({cls:'main',text:r.cover.end.head,sub:r.name+' · 중요'})),
+    ...SIDE_QUESTS.filter(sideDone).map(q=>({cls:'sub',text:q.title,sub:(REGIONS[q.region]?.name||'')+' · 보통'}))];
+  if(!done.length)return;
+  const box=el('details','todo-done');box.appendChild(el('summary',null,'끝낸 일 '+done.length));
+  done.forEach(d=>item(box,d.cls,d.text,d.sub));body.appendChild(box);
+}
+/* 아이가 적은 장 하나 (tab: todo·clues·nicknames·mom·ledger) */
 function renderChildRecord(body,tab){
   const note=t=>body.appendChild(el('p','empty-note',t));
   const entry=(label,text)=>{const e=el('div','entry me');e.appendChild(el('small',null,label));e.appendChild(document.createTextNode(text));body.appendChild(e);};
-  if(tab==='clues'){
+  if(tab==='todo')renderTodo(body);
+  else if(tab==='clues'){
     if(!G.clues.length)note('아빠의 흔적을 아직 찾지 못했다. '+REG.name+' 동물들에게 말을 걸어 보자.');
     G.clues.forEach(c=>entry(c.who,c.text));
   }else if(tab==='nicknames'){

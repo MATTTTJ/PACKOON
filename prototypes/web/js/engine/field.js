@@ -74,14 +74,13 @@ function nearFloorItems(){
 function floorPickupGoal(original){
   if(!G.started||G.ended)return original;
   const rows=[...G.pickups,...Object.values(G.floorItems?.[G.region]||{}).flat()].filter(a=>!a.got);
-  // 결정 D-35: 할 일 문구는 아이 말투(~하자)다 (design/data/decisions.csv)
-  const a=rows.find(a=>((/줍자|따자|따서|베자|캐자/.test(original)&&original.includes(ITEMS[a.item]?.n))||
-    (a.item==='root'&&!has('root')&&/흙더미를 캐자/.test(original))||
+  // 결정 D-149: 할 일 문구는 짧은 명사형(~하기)이다. 바닥에 떨어진 그 물건이 있으면 '바닥의 ○○ 줍기'로 바꿔 알린다.
+  const a=rows.find(a=>((/줍기|따기|베기|캐기/.test(original)&&original.includes(ITEMS[a.item]?.n))||
+    (a.item==='root'&&!has('root')&&/칡뿌리 캐기/.test(original))||
     (a.item==='meoru'&&G.region==='galchamgol'&&G.boss.dead&&!has('meoru')&&!G.diary.some(d=>d.id==='end')))&&
-    !/건네자|넣어|빻자|갈자|찌자/.test(original));
+    !/건네기|넣어|빻기|갈기|갈아|찌기|드리기|맡기기/.test(original));
   if(!a)return original;
-  const n=ITEMS[a.item].n,last=n.charCodeAt(n.length-1)-0xAC00;
-  return '바닥의 '+n+(last>=0&&last<11172&&last%28?'을':'를')+' 줍자';
+  return '바닥의 '+ITEMS[a.item].n+' 줍기';
 }
 let pickupPose=null;
 const pickupIcons=new Map();
