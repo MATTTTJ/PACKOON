@@ -180,8 +180,9 @@ const Vfx=(()=>{
     if(popWait>0)popWait--;
     for(let i=prints.length-1;i>=0;i--)if(--prints[i].life<=0)prints.splice(i,1);
     if(pending.length&&!popWait){
-      if(emit('item',G.px,G.py-36,0,motion.matches?0:-.9,48,'#fff0bc','effect',false,pending[0])){
-        pending.shift();popWait=52;
+      // 결정 D-202: 얻은 물건은 낮게(약 10px) 떠서 0.5초 만에 사라진다 (사용자 피드백 51. 전에는 36px 위에서 20px 더 떠 0.8초)
+      if(emit('item',G.px,G.py-28,0,motion.matches?0:-.55,30,'#fff0bc','effect',false,pending[0])){
+        pending.shift();popWait=34;
       }
     }
     for(let i=particles.length-1;i>=0;i--){

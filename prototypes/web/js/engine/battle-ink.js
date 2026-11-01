@@ -28,25 +28,6 @@ function drawOpenHands(c){
   for(const x of [B.px-19,B.px+19])brush(c,[[x-4,B.py-lift+3],[x,B.py-lift+6],[x+4,B.py-lift+2]],1,'#e2cdb6');
 }
 
-/* 칡: 공격 뒤 느슨해진 매듭과, 좋아하는 선물을 받은 덩굴이 손 쪽으로 내미는 매듭 */
-function drawVineLoop(c,x,y,r,alpha){
-  const pts=[];for(let i=0;i<=12;i++){const a=-0.3+i*Math.PI*1.8/12;pts.push([x+Math.cos(a)*r,y+Math.sin(a)*r*0.65]);}
-  brush(c,pts,3,INK,alpha);
-  brush(c,[[x+r,y-3],[x+r+8,y-12]],1.4,INK,alpha);
-}
-function drawCalmKnot(c){
-  const p=coverPoint(B.calmStone),near=Math.hypot(p.x-B.px,p.y-B.py)<26;
-  drawVineLoop(c,p.x-5,p.y,14,0.85);drawVineLoop(c,p.x+7,p.y+4,12,0.75);
-  brush(c,[[p.x-20,p.y+2],[p.x-26,p.y+14]],2,INK,0.6);
-  c.save();c.strokeStyle=RED;c.lineWidth=1.7;c.beginPath();c.arc(p.x,p.y,23,0,Math.PI*2*(B.calmStone.t/150));c.stroke();
-  c.font='12px "Gowun Dodum", sans-serif';c.fillStyle=near?RED:INK;c.textAlign='center';c.fillText((TOUCH?'치기':HITKEY)+' · 매듭 풀기',clamp(p.x,BOX.x+65,BOX.x+BOX.w-65),p.y-30);c.restore();
-}
-function drawScentKnot(c){
-  const s=B.scentKnot,t=Math.min(1,(90-s.t)/36),p=coverPoint({u:0.5+(s.u-0.5)*t,v:s.v*t});
-  brush(c,[[BOX.x+BOX.w/2,BOX.y],[p.x-24,p.y-22],[p.x,p.y]],2,INK,0.5);
-  drawVineLoop(c,p.x,p.y,16,Math.min(1,s.t/20));
-}
-
 /* 골렘 선택 기능의 수묵 표현. 흰 여백이 엄폐 범위다. */
 function drawBattleCover(c){
   for(const r of B.covers){const p=coverPoint(r);

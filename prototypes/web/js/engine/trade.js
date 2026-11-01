@@ -238,6 +238,7 @@ const Trade=(()=>{
   function quickNpc(){
     if(!G||!REG||B||$('dlg').hidden)return null;
     const n=fieldNpcs().find(n=>n.name===$('dlgWho').textContent);
+    if(n&&tradeClosedNow(n.id))return null;   // 결정 D-197: 조는 꾸벅이·변신한 채로는 펼치지 않는다 (disguise.js)
     // 결정 D-77: 부탁이 남은 상대(눈돌·진흙·비늘 같은 뒤늦은 부탁)도 대화창에서 바로 펼친다.
     return n&&(stockOf(n.id).some(r=>stockLeft(r)>0)||(REG.trade?.[n.id]?.()||[]).some(g=>!g.done?.()))?n.id:null;
   }

@@ -244,6 +244,9 @@ function nalSickle(){
 }
 
 /* ---------- 꾸벅이 (고슴도치): 고개를 들 때 맞춰 말 걸기 ---------- */
+/* 결정 D-197: 꾸벅이가 고개를 들지 않았을 때(조는 동안·깊이 잠든 뒤)는 보따리를 펼치거나 물건을 건넬 수 없다 (사용자 피드백 57).
+   대화 중엔 필드 시간(G.anim)이 멈춰, 말을 건 순간의 모습이 대화 끝까지 간다. */
+Rg.tradeClosed=id=>id==='kkubeogi'&&!Rg.kkuAwakeNow();
 function talkKku(){
   const F=G.f;F.kkuTalk=true;
   if(!Rg.kkuAwakeNow()){
