@@ -1,6 +1,6 @@
 'use strict';
 /* 돌너머 낯선 손님 (leaf-transform.md 6). 형식은 galchamgol/strangers.js 머리말을 따른다.
-   산양 변신은 뿔이가 장승제를 받고 길을 열 때 열린다 (formCheck). */
+   산양 변신은 뿔영감이 장승제를 받고 길을 열 때 열린다 (formCheck). */
 (()=>{
 const Rg=REGIONS.dolneomeo;
 const once=(key)=>{const d=G.f.strangerOnce||(G.f.strangerOnce={});if(d[key])return false;d[key]=true;return true;};
@@ -19,8 +19,8 @@ Rg.strangers={
     trades:[],
     talk(form){
       if(form==='goat'&&once('dol_ppuri_kin'))return say([
-        ['뿔이','고개 넘는 산양이로군.\n산양끼리는 먹을 데를 나눈다.'],
-        ['뿔이','절벽 아래 바위에서 뗀 석이다.\n하나 가져가라.']],()=>{addItem('seogi',1);diary('dol_ppuri_kin','산양 모습으로 뿔이에게 가니 산양끼리 먹을 데를 나눈다며 석이버섯을 줬다.');});
+        [Rg.npcs.find(n=>n.id==='ppuri').name,'고개 넘는 산양이로군.\n산양끼리는 먹을 데를 나눈다.'],
+        [Rg.npcs.find(n=>n.id==='ppuri').name,'절벽 아래 바위에서 뗀 석이다.\n하나 가져가라.']],()=>{addItem('seogi',1);diary('dol_ppuri_kin','산양 모습으로 뿔영감에게 가니 산양끼리 먹을 데를 나눈다며 석이버섯을 줬다.');});
       return false;
     }},
   kkubeogi:{
