@@ -10,11 +10,11 @@
          부위의 mark?:붉은 표식에 쓸 글자(없으면 이름 첫 글자),
          backdrop?(c):상대 뒤쪽 화면 전체 배경(결정 D-58. 판정 상자와 글귀 줄 위로는 상자·글이 덮는다), goalText?:지금 할 일 글,
          showHands?:첫 선물 때 빈손을 펴 보이는 장면, pickAttack?():공격을 직접 고른다(B.bullets 를 넣고 B.st='tell'),
-         tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래), drawOver?(c):상자 밖까지 날아가는 탄(상자 위에 잘리지 않게, 결정 D-168),
+         tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래), drawOver?(c):상자 밖까지 날아가는 탄(상자 위에 잘리지 않게, 결정 D-182),
          finale?:{start(), step()→끝나면 true}(dodge 를 다 버틴 뒤 입력을 막는 마무리 연출. 그 뒤 'win'),
          possession?:{order:빙의 순서, attacks:부위별 시험판 공격, travel:불 이동 시간, wait:도착 뒤 대피 시간}, partPose?(id):그려진 부위 좌표,
          warmPath?:{width,wideWidth,attacks:부위별 공격},
-         headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표,
+         headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표, openMark?(p):공격 뒤 표식을 직접 정했으면 true,
          draw(c):수묵 그림, onWin(B)?:이겼을 때 보상, onCalm(B)?:달랬을 때 보상 (B.loot 에 넣고 B.bonus 에 글)} */
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
 let B=null,inkOn=false,LW=800,LH=450,BOX={x:250,y:262,w:300,h:160},EY=118;const BDPR=2;
@@ -220,6 +220,7 @@ function finishWarmAttack(){
 }
 function openMark(){
   const p=B.cur;
+  if(B.E.openMark&&B.E.openMark(p))return;   // 결정 D-183: 표식 자리와 글을 상대가 직접 정한다
   if(p.core&&coreHidden()){B.mark=null;B.msg=B.E.coreHidden;return;}
   let x,y,n=0;do{x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+26+Math.random()*(BOX.h-52);n++;}while(Math.hypot(x-B.px,y-B.py)<70&&n<12);
   if(B.E.markPosition){const pos=B.E.markPosition(p);if(pos){x=pos.x;y=pos.y;}}
