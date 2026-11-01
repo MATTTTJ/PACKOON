@@ -397,59 +397,96 @@ function drawKudzuHill(c){
   }
 }
 /* ---------- 엉킨 칡의 공격 (결정 D-157) ---------- */
+/* 결정 D-179: 공격은 빠르되 사이사이 숨 돌릴 틈을 둔다. 예고를 늘리고 한 공격 안의 간격을 벌렸다
+   (채찍 간격 48→62·예고 30→40, 뿌리 예고 46→54·간격 36→48, 꽃 간격 40→44·예고 32→40 프레임).
+   결정 D-176: 칡줄기·칡뿌리의 빈틈(붉은 표식)은 공격 뒤 남은 덩굴 위에 뜬다. 마지막 채찍의 늘어진 줄기, 마지막에 박힌 덩이뿌리.
+   표식이 있는 동안 줄기·뿌리가 그 자리에 남고, 치면 부위가 깎이며 연장이 있으면 확률로 재료를 얻는다
+   (줄기는 낫, 없으면 곡괭이 · kudzu_stem_cut_chance / 뿌리는 곡괭이, 없으면 낫 · kudzu_root_dig_chance). 표식이 닫히면 거둬 간다. */
 /* 칡줄기 채찍: 상자 옆에서 위나 아래 띠를 가로로 후려친다. 띠가 먼저 옅게 붉어진다.
-   세 번째는 손이 있는 띠를 노리고, 후려친 뒤 줄기가 축 늘어진다.
-   결정 D-158: 늘어진 줄기 위에서 치면 낫(없으면 곡괭이)으로 끊고, kudzu_stem_cut_chance 확률로 칡 줄기를 얻는다. */
-const WHIP={gap:48,tell:30,swing:12,limp:58,fall:16,back:8,half:0.21};
+   세 번째는 손이 있는 띠를 노리고, 후려친 뒤 줄기가 축 늘어진다. */
+const WHIP={gap:62,tell:40,swing:14,limp:24,fall:16,back:10,half:0.21};
 function whipState(b){
-  const tl=b.delay+WHIP.tell,sw=tl+WHIP.swing,lp=sw+(b.last?WHIP.limp:0),stop=b.cut?Math.min(lp,b.cutT+WHIP.fall):lp;
-  return {wait:b.t<=b.delay,tell:b.t>b.delay&&b.t<=tl,swing:b.t>tl&&b.t<=sw,limp:b.last&&!b.cut&&b.t>sw&&b.t<=lp,
+  const tl=b.delay+WHIP.tell,sw=tl+WHIP.swing,lp=sw+(b.last?WHIP.limp:0),stop=b.cut?b.cutT+WHIP.fall:lp;
+  return {wait:b.t<=b.delay,tell:b.t>b.delay&&b.t<=tl,swing:b.t>tl&&b.t<=sw,limp:b.last&&!b.cut&&b.t>sw&&b.t<=lp,lp,
     k:clamp((b.t-tl)/WHIP.swing,0,1),fallK:b.cut?clamp((b.t-b.cutT)/WHIP.fall,0,1):0,back:b.t>stop?clamp((b.t-stop)/WHIP.back,0,1):0,end:stop+WHIP.back};
 }
 /* 줄기가 지나는 높이. 늘어지면 가운데가 처진다 */
-function whipY(b,x){const u=(x-BOX.x)/BOX.w,s=whipState(b);
-  return BOX.y+b.v*BOX.h+Math.sin(u*Math.PI*2+b.seed)*5+(s.limp||b.cut?Math.sin(clamp(u,0,1)*Math.PI)*9:0);}
+function stemY(b,x,sag){const u=(x-BOX.x)/BOX.w;return BOX.y+b.v*BOX.h+Math.sin(u*Math.PI*2+b.seed)*5+(sag?Math.sin(clamp(u,0,1)*Math.PI)*9:0);}
+function whipY(b,x){const s=whipState(b);return stemY(b,x,s.limp||b.cut);}
 function whipTipX(b,k){return b.side<0?BOX.x-14+(BOX.w+28)*k:BOX.x+BOX.w+14-(BOX.w+28)*k;}
 function whipPts(b,x0,x1){const pts=[],n=10;for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n;pts.push([x,whipY(b,x)]);}return pts;}
-function limpStem(){return B.bullets.find(b=>b.k==='kudzuWhip'&&whipState(b).limp);}
-function nearStem(b){return Math.abs(B.py-whipY(b,B.px))<16;}
+/* 표식이 붙든 덩굴: 그 표식이 열려 있는 동안 남아 있다 */
+function heldBy(b){return !!(B.kHold&&B.kHold.b===b&&B.mark);}
 function stemTool(){return G.tool==='sickle'?'sickle':Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe')?'pickaxe':null;}
-function cutStem(){
-  const b=limpStem();if(!b||!nearStem(b))return false;
-  const tool=stemTool();if(!tool){B.msg='맨손으로는 질긴 줄기를 못 끊는다.';return true;}
-  b.cut=true;b.cutT=b.t;b.cutX=B.px;B.stemCutT=12;bSplash(B.px,whipY(b,B.px),'#3a3a2a');Sound.playSfx('battle_hit');
-  const by=tool==='sickle'?'낫으로':'곡괭이로';
-  if(Math.random()<T().kudzu_stem_cut_chance){B.loot.push('vine');B.msg=by+' 줄기를 끊었다! 칡 줄기를 챙겼다.';}
-  else B.msg=by+' 끊었지만 줄기가 짓이겨져 못 쓰겠다.';
-  return true;
+function rootTool(){return Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe')?'pickaxe':G.tool==='sickle'?'sickle':null;}
+const TOOL_BY={sickle:'낫으로',pickaxe:'곡괭이로'};
+/* 빈틈 자리: 줄기·뿌리는 남은 덩굴 위, 칡꽃은 꽃가루 잔향을 피한 자리 */
+function kudzuMark(p){
+  B.kHold=null;
+  if(p.id==='arm'){const b=B.bullets.find(q=>q.k==='kudzuWhip'&&q.last&&q.v!=null&&!q.cut);
+    if(b){const x=BOX.x+BOX.w*(B.px<BOX.x+BOX.w/2?0.72:0.28);B.kHold={b};return {x,y:stemY(b,x,true)};}}
+  if(p.id==='root'){const b=B.bullets.find(q=>q.k==='kudzuSlam'&&q.last&&q.x!=null);
+    if(b){B.kHold={b};return {x:b.x,y:clamp(b.y-10,BOX.y+18,BOX.y+BOX.h-18)};}}
+  if(p.core){const puffs=B.bullets.filter(q=>q.k==='kudzuScent'&&q.x!=null);let x,y;
+    for(let n=0;n<24;n++){x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+26+Math.random()*(BOX.h-52);
+      if(Math.hypot(x-B.px,y-B.py)>=70&&puffs.every(q=>Math.hypot(x-q.x,y-q.y)>SCENT.radius+20))break;}
+    return {x,y};}
+  return null;
 }
-function stemHandTool(){const b=limpStem();if(b&&nearStem(b))return stemTool();return B.stemCutT>0?stemTool():null;}
-/* 칡뿌리 찍기: 손 자리에 그림자가 진 뒤 덩이뿌리가 위에서 내리찍는다. 칡뿌리가 공격할 때마다 한 대 → 두 대 → 세 대 */
-const SLAM={tell:46,drop:8,gap:36,radius:28,stay:26};
+/* 표식을 친 뒤: 연장이 있으면 줄기를 끊거나 뿌리를 캐고, 확률로 재료를 얻는다 */
+function kudzuMarkHit(p,m){
+  const h=B.kHold;B.kHold=null;if(!h||(p.id!=='arm'&&p.id!=='root'))return;
+  const b=h.b,arm=p.id==='arm',tool=arm?stemTool():rootTool();
+  if(!tool){if(!p.broken)B.msg=arm?'칡줄기를 쳤다! 맨손으로는 질긴 줄기를 못 끊는다.':'칡뿌리를 쳤다! 맨손으로는 박힌 뿌리를 못 캔다.';return;}
+  B.kTool=tool;B.kToolUntil=B.time+14;
+  if(arm){b.cut=true;b.cutT=b.t;b.cutX=m.x;bSplash(m.x,m.y,'#3a3a2a');}
+  else{b.dug=true;bSplash(m.x,m.y+6,'#8a6a4a');}
+  if(p.broken)return;   // 부위가 부러지면 재료는 breakPart 가 준다
+  const by=TOOL_BY[tool];
+  if(arm)B.msg=Math.random()<T().kudzu_stem_cut_chance?(B.loot.push('vine'),by+' 칡줄기를 끊었다! 칡 줄기를 챙겼다.'):by+' 끊었지만 줄기가 짓이겨져 못 쓰겠다.';
+  else B.msg=Math.random()<T().kudzu_root_dig_chance?(B.loot.push('root'),by+' 칡뿌리를 캤다! 칡뿌리를 챙겼다.'):by+' 찍었지만 뿌리가 부서져 못 쓰겠다.';
+}
+function kudzuHandTool(){
+  if(B.kTool&&B.time<B.kToolUntil)return B.kTool;
+  const m=B.mark;if(!m||!B.kHold||Math.hypot(m.x-B.px,m.y-B.py)>=battleHandProfile().radius)return null;
+  return m.part.id==='arm'?stemTool():m.part.id==='root'?rootTool():null;
+}
+/* 칡뿌리 찍기: 손 자리에 그림자가 진 뒤 덩이뿌리가 위에서 내리찍는다. 칡뿌리가 공격할 때마다 한 대 → 두 대 → 세 대.
+   마지막 뿌리는 땅에 박힌 채 남는다(D-176) */
+const SLAM={tell:54,drop:8,gap:48,radius:28,stay:26};
 function slamCount(){return Math.min(3,((B&&B.slamRound)||0)+1);}
 function slamAt(b){const hit=b.delay+SLAM.tell+SLAM.drop;return {hit,shadow:b.t>b.delay&&b.t<=b.delay+SLAM.tell,falling:b.t>b.delay+SLAM.tell&&b.t<=hit,after:b.t>hit};}
-/* 칡꽃 향: 향 자리가 옅게 보인 뒤 달큰한 향이 핀다. 향에 들면 맞고, 가까이 있으면 손이 향 쪽으로 끌려간다.
-   첫 향은 손 자리, 둘째·셋째는 그 양옆에 핀다 */
-const SCENT={gap:40,tell:32,bloom:46,fade:26,radius:30,pull:0.45,reach:86};
-function scentAt(b){const a=b.delay,tl=a+SCENT.tell,bl=tl+SCENT.bloom;return {tell:b.t>a&&b.t<=tl,bloom:b.t>tl&&b.t<=bl,fade:b.t>bl,k:b.t>a&&b.t<=tl?(b.t-a)/SCENT.tell:b.t>bl?(b.t-bl)/SCENT.fade:1,end:bl+SCENT.fade};}
+function slamLiftAt(b){return b.liftAt??slamAt(b).hit+(b.last?14:8);}
+/* 결정 D-178: 칡꽃 꽃가루. 손 자리 바닥에 칡꽃송이가 솟아(예고) 꽃가루를 터뜨리면 동그란 잔향이 바닥에 번진다.
+   예전의 향 줄기·끌어당김은 없앴다. 번질 때도, 남은 잔향에 들어가도 맞는다. 피해는 kudzu_scent_damage(하트 반 칸)로 다른 공격보다 약하고,
+   맞으면 kudzu_scent_slow_frames 동안 손이 kudzu_scent_slow 배로 느려진다. 연달아 깎이지 않게 맞은 뒤 무적(battle_iframes)을 그대로 쓴다.
+   첫 꽃은 손 자리, 둘째·셋째는 그 양옆에 핀다 */
+const SCENT={gap:44,tell:40,burst:20,fade:30,radius:30};
+function scentAt(b){const a=b.delay,tl=a+SCENT.tell,bu=tl+SCENT.burst,li=bu+T().kudzu_scent_linger,end=li+SCENT.fade;
+  return {wait:b.t<=a,tell:b.t>a&&b.t<=tl,burst:b.t>tl&&b.t<=bu,linger:b.t>bu&&b.t<=li,fade:b.t>li,
+    k:b.t<=tl?clamp((b.t-a)/SCENT.tell,0,1):b.t<=bu?(b.t-tl)/SCENT.burst:b.t<=li?(b.t-bu)/T().kudzu_scent_linger:(b.t-li)/SCENT.fade,end};}
+function scentHit(){
+  if(!bHitMe(T().kudzu_scent_damage))return;
+  B.slowT=T().kudzu_scent_slow_frames;B.slowK=T().kudzu_scent_slow;
+  if(!B.scentNoted&&B.st!=='end'){B.scentNoted=true;B.msg='달큰한 꽃가루에 손이 무거워졌다.';}
+}
 defineAttacks({
-  kudzuWhip:{dur:2*WHIP.gap+WHIP.tell+WHIP.swing,tick(t){if(t)return;
+  kudzuWhip:{dur:2*WHIP.gap+WHIP.tell+WHIP.swing,tick(t){if(t)return;B.kHold=null;
     const first=Math.random()<0.5?0.25:0.75,side=Math.random()<0.5?-1:1;
     for(let i=0;i<3;i++)B.bullets.push({k:'kudzuWhip',t:0,delay:i*WHIP.gap,v:i===2?null:i?1-first:first,last:i===2,side:i%2?-side:side,seed:i*1.7});}},
-  kudzuSlam:{get dur(){return (slamCount()-1)*SLAM.gap+SLAM.tell+SLAM.drop+10;},tick(t){if(t)return;
+  kudzuSlam:{get dur(){return (slamCount()-1)*SLAM.gap+SLAM.tell+SLAM.drop+10;},tick(t){if(t)return;B.kHold=null;
     const n=slamCount();B.slamRound=n;
-    for(let i=0;i<n;i++)B.bullets.push({k:'kudzuSlam',t:0,delay:i*SLAM.gap,x:null,y:null});}},
-  kudzuScent:{dur:2*SCENT.gap+SCENT.tell+SCENT.bloom,tick(t){if(t)return;
-    const side=Math.random()<0.5?-1:1;for(let i=0;i<3;i++)B.bullets.push({k:'kudzuScent',t:0,delay:i*SCENT.gap,i,side,x:null,y:null});}},
+    for(let i=0;i<n;i++)B.bullets.push({k:'kudzuSlam',t:0,delay:i*SLAM.gap,x:null,y:null,last:i===n-1});}},
+  kudzuScent:{dur:2*SCENT.gap+SCENT.tell+SCENT.burst,tick(t){if(t)return;B.kHold=null;
+    const side=Math.random()<0.5?-1:1;for(let i=0;i<3;i++)B.bullets.push({k:'kudzuScent',t:0,delay:i*SCENT.gap,i,side,seed:i*2.3+side,x:null,y:null});}},
 });
 defineBullets({
   kudzuWhip:{
-    step(b){b.t++;const s=whipState(b);
+    step(b){const held=b.last&&!b.cut&&heldBy(b);b.t++;const s=whipState(b);
+      if(held&&b.t>s.lp)b.t=s.lp;   // 표식이 열린 동안 늘어진 채로 둔다
       if(b.v==null&&b.t>b.delay)b.v=(B.py-BOX.y)/BOX.h<0.5?0.25:0.75;   // 마지막 채찍은 예고가 시작될 때 손이 있던 띠
       if(s.swing){const x=whipTipX(b,s.k),y=BOX.y+b.v*BOX.h;
         if(Math.abs(B.py-y)<WHIP.half*BOX.h&&(b.side<0?B.px<=x:B.px>=x))bHitMe();}
-      if(b.last&&b.t===b.delay+WHIP.tell+WHIP.swing+1&&B.st!=='end')B.msg='줄기가 축 늘어졌다! 그 위에서 '+jo(HITKEY,'을','를')+' 눌러 끊자.';
-      if(b.cut&&B.stemCutT>0)B.stemCutT--;
       if(b.t>s.end)b.dead=1;},
     draw(c,b){const s=whipState(b);if(s.wait)return;
       const yc=BOX.y+(b.v==null?(B.py-BOX.y)/BOX.h<0.5?0.25:0.75:b.v)*BOX.h,half=WHIP.half*BOX.h,from=b.side<0?BOX.x-14:BOX.x+BOX.w+14;
@@ -465,13 +502,10 @@ defineBullets({
         const pts=whipPts(b,from,x);kStem(c,pts,8,KSTEM,1);
         for(let i=2;i<pts.length-1;i+=3)kLeaf(c,pts[i][0],pts[i][1]-3,0.6,b.side<0?0.5:-0.5,KLEAF,0.85);
         brush(c,[[x,whipY(b,x)],[x-b.side*8,whipY(b,x)-7],[x-b.side*3,whipY(b,x)-11]],3,KSTEM);return;}
-      const back=s.back,near=s.limp&&nearStem(b);
+      const back=s.back;
       if(!b.cut){const tip=b.side<0?from+(BOX.x+BOX.w+14-from)*(1-back):from-(from-BOX.x+14)*(1-back);
         const pts=whipPts(b,from,tip);kStem(c,pts,7,KSTEM,s.limp?0.9:0.7*(1-back));
-        if(s.limp){for(let i=2;i<pts.length-1;i+=3)kLeaf(c,pts[i][0],pts[i][1]+2,0.6,b.side<0?2.6:-2.6,KLEAF,0.7);
-          const lx=clamp(B.px,BOX.x+60,BOX.x+BOX.w-60),ly=whipY(b,lx)+(b.v<0.5?26:-18);
-          c.save();c.font='12px "Gowun Dodum", sans-serif';c.textAlign='center';c.fillStyle=near?RED:INK;
-          c.fillText((TOUCH?'치기':HITKEY)+' · 줄기 끊기',lx,ly);c.restore();}
+        if(s.limp)for(let i=2;i<pts.length-1;i+=3)kLeaf(c,pts[i][0],pts[i][1]+2,0.6,b.side<0?2.6:-2.6,KLEAF,0.7);
         return;}
       // 끊긴 줄기: 뿌리 쪽은 거둬 가고, 끝 쪽은 떨어지며 흐려진다
       const cut=b.cutX,tipSide=b.side<0?BOX.x+BOX.w+14:BOX.x-14;
@@ -480,18 +514,20 @@ defineBullets({
       c.save();c.globalAlpha=1-s.fallK;c.translate(0,s.fallK*24);kStem(c,whipPts(b,cut,tipSide),6,KSTEM,0.8);c.restore();
     }},
   kudzuSlam:{
-    step(b){b.t++;
+    step(b){const held=b.last&&!b.dug&&heldBy(b);b.t++;
       if(b.x==null&&b.t>b.delay){b.x=B.px;b.y=B.py;}
       const f=slamAt(b);
       if(b.t===f.hit){Sound.playSfx('battle_hit');bSplash(b.x,b.y,'#6f6357');if(Math.hypot(B.px-b.x,B.py-b.y)<SLAM.radius)bHitMe();}
-      if(b.t>f.hit+SLAM.stay)b.dead=1;},
+      if(held&&b.t>f.hit)b.liftAt=b.t+1;   // 표식이 열린 동안 땅에 박힌 채로 둔다
+      if(!held&&b.t>Math.max(f.hit+SLAM.stay,slamLiftAt(b)+18))b.dead=1;},
     draw(c,b){if(b.x==null)return;const f=slamAt(b),R=SLAM.radius;
       if(f.shadow||f.falling){const k=f.shadow?(b.t-b.delay)/SLAM.tell:1;
         blob(c,b.x,b.y+6,R*(0.45+0.55*k),R*0.42*(0.45+0.55*k),INK,0.12+0.3*k);
         if(k>0.7&&Math.floor(b.t/4)%2){c.save();c.strokeStyle=RED;c.lineWidth=2;c.globalAlpha=0.8;c.beginPath();c.ellipse(b.x,b.y+6,R,R*0.42,0,0,Math.PI*2);c.stroke();c.restore();}}
       const club=(y,alpha)=>{brush(c,[[b.x+12,BOX.y-40],[b.x+6,(BOX.y-40+y)/2],[b.x,y-38]],12,KROOT,alpha);kTuber(c,b.x,y-18,46,16,-Math.PI/2,KROOT,INK,alpha);};
       if(f.falling){const k=(b.t-b.delay-SLAM.tell)/SLAM.drop;club(BOX.y-12+(b.y-BOX.y+12)*k,1);}
-      if(f.after){const a=b.t-f.hit,lift=clamp((a-8)/16,0,1);
+      if(f.after){const a=b.t-f.hit,lift=clamp((b.t-slamLiftAt(b))/16,0,1);
+        if(b.last&&lift===0)blob(c,b.x,b.y+5,R*0.62,R*0.24,'#6f5a44',0.35);   // 박힌 자리의 흙
         club(b.y-(b.y-BOX.y+20)*lift*lift,1-lift*0.6);
         c.save();c.strokeStyle=INK;c.globalAlpha=Math.max(0,1-a/SLAM.stay);c.lineWidth=1.6;c.beginPath();
         for(let i=0;i<6;i++){const ang=i*Math.PI/3+0.3,r0=R*0.55,r1=R*0.55+8+a*0.5;c.moveTo(b.x+Math.cos(ang)*r0,b.y+6+Math.sin(ang)*r0*0.42);c.lineTo(b.x+Math.cos(ang+0.15)*r1,b.y+6+Math.sin(ang+0.15)*r1*0.42);}
@@ -503,43 +539,51 @@ defineBullets({
       if(b.x==null&&b.t>b.delay){const o=b.i===0?0:(b.i===1?1:-1)*b.side*80,m=SCENT.radius;
         b.x=clamp(B.px+o,BOX.x+m,BOX.x+BOX.w-m);b.y=clamp(B.py+(b.i===2?14:b.i?-10:0),BOX.y+m*0.7,BOX.y+BOX.h-m*0.7);}
       const s=scentAt(b);
-      if(s.bloom){b.y+=0.15;const dx=b.x-B.px,dy=b.y-B.py,d=Math.hypot(dx,dy);
-        if(d<SCENT.radius-4)bHitMe();
-        else if(d<SCENT.reach){B.px=clamp(B.px+dx/d*SCENT.pull,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy/d*SCENT.pull,BOX.y+8,BOX.y+BOX.h-8);
-          if(!B.scentNoted&&B.st!=='end'){B.scentNoted=true;B.msg='달큰한 향에 손이 끌려간다! 버티며 빠져나오자.';}}}
+      if(b.x!=null){const d=Math.hypot(b.x-B.px,b.y-B.py);
+        if(s.burst&&d<SCENT.radius*(1-(1-s.k)*(1-s.k)))scentHit();          // 꽃가루가 번지는 동안
+        else if((s.linger||(s.fade&&s.k<0.5))&&d<SCENT.radius-4)scentHit();}  // 남은 잔향에 들어가도
       if(b.t>s.end)b.dead=1;},
-    draw(c,b){if(b.x==null)return;const s=scentAt(b),R=SCENT.radius,still=Vfx.reducedMotion;
+    draw(c,b){if(b.x==null)return;const s=scentAt(b),R=SCENT.radius,still=Vfx.reducedMotion,x=b.x,y=b.y;
+      const motes=(n,spread,rise,alpha)=>{for(let i=0;i<n;i++){const h1=hash(i*1.7+b.seed),h2=hash(i*3.1+b.seed*2),a=h1*Math.PI*2,r=spread*(0.35+0.65*h2);
+        blob(c,x+Math.cos(a)*r,y+Math.sin(a)*r-rise*(0.4+h2),2+1.6*h1,2+1.6*h1,i%3?KPUR_LT:'#efe3c8',alpha);}};
+      const pool=(r,alpha)=>{const g=c.createRadialGradient(x,y,2,x,y,r);
+        g.addColorStop(0,'rgba(125,80,150,'+(0.5*alpha).toFixed(3)+')');g.addColorStop(0.75,'rgba(183,145,204,'+(0.38*alpha).toFixed(3)+')');g.addColorStop(1,'rgba(183,145,204,0)');
+        c.save();c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.restore();};
+      const bloom=(len,lean,alpha)=>{c.save();c.translate(x,y+8);c.scale(1.4,1.4);kFlower(c,0,0,len,lean,KPUR_LT,alpha);c.restore();};   // 바닥에서 솟은 칡꽃송이
       if(s.tell){const k=s.k;
-        brush(c,[[BOX.x+BOX.w/2,BOX.y],[(BOX.x+BOX.w/2+b.x)/2+(still?0:Math.sin(b.t*0.2)*8),(BOX.y+b.y)/2],[b.x,b.y]],2,KPUR,0.25+0.2*k);
-        c.save();c.strokeStyle=KPUR;c.globalAlpha=0.65;c.lineWidth=1.6;c.setLineDash([3,4]);c.beginPath();c.arc(b.x,b.y,R*(0.6+0.4*k),0,Math.PI*2);c.stroke();c.restore();
-        if(k>0.75&&Math.floor(b.t/4)%2){c.save();c.strokeStyle=RED;c.globalAlpha=0.85;c.lineWidth=2;c.beginPath();c.arc(b.x,b.y,R,0,Math.PI*2);c.stroke();c.restore();}
-        return;}
-      const a=s.fade?1-s.k:1,g=c.createRadialGradient(b.x,b.y,2,b.x,b.y,R*1.25);
-      g.addColorStop(0,'rgba(125,80,150,'+(0.48*a).toFixed(3)+')');g.addColorStop(0.7,'rgba(183,145,204,'+(0.3*a).toFixed(3)+')');g.addColorStop(1,'rgba(183,145,204,0)');
-      c.save();c.fillStyle=g;c.beginPath();c.arc(b.x,b.y,R*1.25,0,Math.PI*2);c.fill();c.restore();
-      if(s.bloom){c.save();c.strokeStyle=KPUR;c.globalAlpha=0.16;c.lineWidth=1;c.setLineDash([2,6]);c.beginPath();c.arc(b.x,b.y,SCENT.reach,0,Math.PI*2);c.stroke();c.restore();}
-      const spin=still?0:b.t*0.05;
-      c.save();c.strokeStyle=KPUR_LT;c.globalAlpha=0.75*a;c.lineWidth=2;c.lineCap='round';
-      for(let i=0;i<3;i++){const r=R*(0.35+i*0.22);c.beginPath();c.arc(b.x,b.y,r,spin+i*2.1,spin+i*2.1+1.6);c.stroke();}c.restore();
-      for(let i=0;i<4;i++){const ang=spin*1.3+i*1.57,r=R*0.8;blob(c,b.x+Math.cos(ang)*r,b.y+Math.sin(ang)*r*0.8,2.6,1.8,KPUR,0.7*a);}
+        c.save();c.strokeStyle=KPUR;c.globalAlpha=0.35+0.2*k;c.lineWidth=1.2;c.setLineDash([3,4]);c.beginPath();c.arc(x,y,R*(0.55+0.45*k),0,Math.PI*2);c.stroke();c.restore();
+        if(k>0.75&&Math.floor(b.t/4)%2){c.save();c.strokeStyle=RED;c.globalAlpha=0.8;c.lineWidth=1.8;c.beginPath();c.arc(x,y,R,0,Math.PI*2);c.stroke();c.restore();}
+        const sway=still?0:Math.sin(b.t*0.25)*2;
+        kLeaf(c,x-10,y+9,0.75,-0.9,KLEAF,0.4+0.5*k);kLeaf(c,x+10,y+9,0.7,0.9,KLEAF,0.4+0.5*k);
+        bloom(10+22*k,sway,0.35+0.65*k);return;}
+      if(s.burst){const k=s.k,e=1-(1-k)*(1-k);
+        pool(R*e,1);
+        bloom(32,still?0:Math.sin(b.t*0.9)*4,1-k*0.7);   // 꽃가루를 터뜨리며 흔들린다
+        motes(24,R*1.05*e,6*k,0.9-0.3*k);return;}
+      const a=s.fade?1-s.k:1,pulse=still?1:1+Math.sin(b.t*0.12+b.seed)*0.04;
+      pool(R*pulse,a);
+      c.save();c.strokeStyle=KPUR;c.globalAlpha=0.3*a;c.lineWidth=1;c.beginPath();c.arc(x,y,R-4,0,Math.PI*2);c.stroke();c.restore();
+      const drift=still?0:b.t*0.02;
+      for(let i=0;i<6;i++){const ang=drift+i*1.05+b.seed,r=R*(0.25+0.5*hash(i+b.seed));
+        blob(c,x+Math.cos(ang)*r,y+Math.sin(ang)*r*0.8-(still?0:Math.sin(b.t*0.05+i)*2),1.6,1.6,i%2?KPUR_LT:'#efe3c8',0.65*a);}
     }},
 });
 defineEnemies({
   kudzu:{name:'엉킨 칡',calmLabel:'진정',
     intro:'칡덩굴이 뱀처럼 당산나무를 감고 고개를 든다. 공격을 피하고 빈틈을 노리자.',
-    howto:true,firstPart:'arm',giftKnot:true,
-    goalText:'줄기 채찍·뿌리 찍기·꽃향기를 피하자. 늘어진 줄기는 끊을 수 있다. 공격 뒤엔 표식 치기나 매듭 풀기.',
-    calmAction:{kind:'knot',amount:TABLES.CALM.kudzu.ssari/2,prompt:'느슨한 매듭 위에서',text:'느슨한 매듭을 풀었다. 칡이 당산나무를 조금 놓아준다.'},
+    howto:true,firstPart:'arm',
+    // 결정 D-177: 공격 뒤 매듭 풀기(진정 행동)와 선물 받은 덩굴이 내미는 매듭을 없앤다. 달래기는 버섯 선물로만 한다.
+    goalText:'줄기 채찍·뿌리 찍기·꽃가루를 피하자. 공격 뒤 남은 줄기와 뿌리를 치면 재료를 얻는다.',
     parts:tableParts('kudzu',{arm:{atk:'kudzuWhip',mark:'줄',tell:'칡줄기가 뒤로 감긴다. 붉어지는 띠에서 비키자!'},
       root:{atk:'kudzuSlam',mark:'뿌',tell:'덩이뿌리가 쳐들린다. 그림자가 짙어지면 비키자!'},
-      core:{atk:'kudzuScent',mark:'꽃',tell:'칡꽃이 향을 머금는다. 향에 끌려 들어가지 말자!'}}),
-    likes:TABLES.CALM.kudzu,likeText:'버섯 향에 덩굴이 느슨해지며 손 쪽으로 매듭을 내민다.',
+      core:{atk:'kudzuScent',mark:'꽃',tell:'칡꽃이 피어오른다. 꽃가루가 번진 자리는 피하자!'}}),
+    likes:TABLES.CALM.kudzu,likeText:'버섯 향에 덩굴이 조금 느슨해진다.',
     coreHidden:'칡꽃이 잎 뒤에 숨어 있다. 줄기나 뿌리를 먼저 꺾자.',
     coreShown:'잎이 걷혀 칡꽃이 드러났다! 이제 꽃을 노릴 수 있다.',
     calmWin:'엉킨 칡이 스르르 풀리며 당산나무를 놓아준다.',calmGift:'kflower',
     win:'칡꽃송이가 꺾이자 덩굴이 힘없이 흘러내린다.',
     lose:'덩굴에 밀려 숲 어귀로 물러났다.',
-    strike:cutStem,handTool:stemHandTool,
+    handTool:kudzuHandTool,markPosition:kudzuMark,onMarkHit:kudzuMarkHit,
     backdrop:drawKudzuHill,draw:drawKudzu},
   /* 무쇠는 피하기만 하는 시험이다. 꿀밤으로 연장을 놓치고 여섯 판을 버틴다 (결정 D-59·D-60). */
   musoe:{name:'무쇠',calmLabel:'마음',npc:true,dodge:6,showHands:true,
