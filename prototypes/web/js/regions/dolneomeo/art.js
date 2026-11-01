@@ -214,9 +214,18 @@ function drawSnowStep(x,y,w){
 }
 
 function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.round(y),f,a,b,w,h,c);if(kind==='hare'||kind==='rabbit'||kind==='porter'){
-  q(-7,-20,13,19,'#c4c1ad');q(-5,-24,9,10,'#ded7bc');q(-5,-37,3,14,'#d7d1b9');q(0,-39,3,15,'#d7d1b9');q(-4,-35,1,9,'#ab9e8e');q(1,-37,1,10,'#ab9e8e');q(3,-22,1,2,'#35423e');q(5,-19,3,2,'#938979');q(-9,-16,3,11,'#908c72');q(-12,-18,4,14,'#8b7c5d');q(-13,-18,6,2,'#bbaa7c');q(-7,-2,5,2,'#767764');q(2,-2,5,2,'#767764');q(7,-20,2,20,'#6b735f');q(-8,-21,15,2,'#776d55');
   const helped=!!G.f.dolneomeo_pack_help,heavy=helped?-10:-24,reeds=helped?-23:-11;
-  q(-14,heavy,8,7,'#7d8982');q(-13,heavy,6,1,'#bec5af');q(-11,heavy+1,1,5,'#57685f');q(-16,reeds,10,4,'#b4ac85');q(-15,reeds-2,1,7,'#d5cc9e');q(-12,reeds-3,1,8,'#c8bc8f');q(-9,reeds-1,1,6,'#d5cc9e');q(-15,heavy+5,10,1,'#c3b888');
+  // 결정 D-209: 짐을 거꾸로 멘 동안(숫돌이 꼭대기) 등짐이 좌우로 쏠리고, 짐꾼은 그 쪽으로 끌려 휘청이며 한 발을 내딛는다(사용자 피드백 45).
+  // 필드에서만 움직인다(대화 초상은 그대로). 고쳐 맨 뒤에는 똑바로 선다.
+  const wob=!helped&&ctx.canvas===cv&&!Vfx.reducedMotion,sw=wob?Math.sin(G.anim/17):0;
+  const lean=Math.round(sw*1.4),load=Math.round(sw*2.8),stag=wob&&Math.abs(sw)>.82?(sw>0?-2:2):0;
+  const b=(a,y,w,h,c)=>q(a+lean,y,w,h,c),k=(a,y,w,h,c)=>q(a+load,y,w,h,c);
+  b(-7,-20,13,19,'#c4c1ad');b(-5,-24,9,10,'#ded7bc');b(-5,-37,3,14,'#d7d1b9');b(0,-39,3,15,'#d7d1b9');b(-4,-35,1,9,'#ab9e8e');b(1,-37,1,10,'#ab9e8e');b(3,-22,1,2,'#35423e');b(5,-19,3,2,'#938979');b(-9,-16,3,11,'#908c72');b(-12,-18,4,14,'#8b7c5d');b(-13,-18,6,2,'#bbaa7c');
+  q(-7+(stag<0?stag:0),-2-(stag<0?1:0),5,2,'#767764');q(2+(stag>0?stag:0),-2-(stag>0?1:0),5,2,'#767764');q(7,-20,2,20,'#6b735f');b(-8,-21,15,2,'#776d55');
+  const sq=helped?b:k;   // 숫돌: 거꾸로 멘 동안 꼭대기에서 크게 흔들린다
+  sq(-14,heavy,8,7,'#7d8982');sq(-13,heavy,6,1,'#bec5af');sq(-11,heavy+1,1,5,'#57685f');b(-16,reeds,10,4,'#b4ac85');b(-15,reeds-2,1,7,'#d5cc9e');b(-12,reeds-3,1,8,'#c8bc8f');b(-9,reeds-1,1,6,'#d5cc9e');
+  if(helped)b(-15,heavy+5,10,1,'#c3b888');else{const m=Math.round(load/2);q(-14+m,heavy+7,1,reeds-heavy-7,'#c3b888');q(-8+m,heavy+7,1,reeds-heavy-7,'#c3b888');}   // 끈: 위 숫돌에서 밑 억새로 늘어진다
+  if(wob&&G.anim%96<34)b(6,-31-Math.floor((G.anim%96)/12),1,2,'#d4e4ea');   // 진땀
 }else if(kind==='mole'||kind==='child'){
   q(-6,-13,12,12,'#70675b');q(-4,-16,8,7,'#8a7967');q(4,-13,4,3,'#d6ab8d');q(3,-15,1,1,'#2e3834');q(-6,-13,11,3,'#a2926c');q(-7,-3,4,3,'#4e5549');q(2,-3,4,3,'#4e5549');q(4,-6,4,3,'#c5ab86');q(6,-8,4,3,'#a7b6a9');q(7,-8,2,1,'#e5e9d8');
 }else if(kind==='badger'){

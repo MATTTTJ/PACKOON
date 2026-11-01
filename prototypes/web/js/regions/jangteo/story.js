@@ -226,7 +226,7 @@ function bueongKidArc3(){
   arcScene('jangteoArcsKid3','설날 아침, 부엉 영감이 자지 않고 기다렸다. 떠날 채비를 말씀드리자 부엉 영감이 상단 셈은 떠나는 날 맞춘다며 수첩 장부 끝에 상단 도장을 찍어 주었다. 아빠도 이 마루에서 받았단다. 이름 칸을 채우면 들르라고 했다.',[
     ['너구리','영감님, 아침인데 안 주무세요?'],
     ['부엉 영감','창고 일은 끝났고, 보부상은 설 쇠면 길을 뜬다.\n셈은 떠나는 날 맞춘다. 상단 법이다.'],
-    ['너구리','약떡을 다 쪘어요. 까치 할머니 편에\n엄마한테 보내고, 북쪽으로 가려고요.'],
+    ['너구리','약떡을 다 쪘어요. 늙은 까치 편에\n엄마한테 보내고, 북쪽으로 가려고요.'],
     ['너구리','(영감님이 장부를 펼쳐 아빠 줄과\n그 아래 빈 이름 칸을 짚는다.)'],
     ['너구리','제가 갚을 게 있어요?'],
     ['부엉 영감','없다. 네 아비 셈은 네 아비 몫으로 남겨 둔다.\n와서 맞출 사람이 따로 있으니.'],   // 결정 D-136: 남은 셈은 아빠 몫(영산 복선)
@@ -815,7 +815,7 @@ Rg.lanternAction=id=>{
     const done=Rg.lanternPoints.every(p=>lights[p.id]);
     const lines={porch:'처마 아래 짐꾼들 발이 보인다.\n눈 묻은 신을 벗고 들어오네.',gate:'창고문 가는 길이 환해졌다.\n돌아올 땐 이 등을 보고 오면 되겠다.',alley:'접힌 좌판 뒤에도 발자국이 있었네.\n저쪽이 숙소 지름길이구나.',pine:'눈 위에 작은 코 자국!\n솔숲 안에서 킁킁 소리가 나.'};
     if(done){G.f.jxLanternDone=true;diary('jx_lanterns','까치와 숙소·골목·솔숲 입구에 등을 달았다. 불빛을 따라 길손들이 돌아왔다. 솔숲 안에서 킁킁 소리가 났다.');}
-    talk([['너구리',lines[id]],...(done?[['너구리','불이 다 이어졌다.\n까치 할머니께 알려 드려야지.']]:[])]);
+    talk([['너구리',lines[id]],...(done?[['너구리','불이 다 이어졌다.\n늙은 까치한테 알려 드려야지.']]:[])]);
   });
 };
 
@@ -1279,7 +1279,7 @@ function handMedicineToMagpie(){
 Rg.sendMedicine=()=>{
   if(regionCompleted(Rg.id))return;
   if(Rg.arcs()&&G.f.jangteoArcsMorak2&&!G.f.jangteoArcsMorak3){
-    talk([['너구리','까치 할머니, 엄마 드릴 홍시 약떡이에요.',[{t:'모락 아주머니의 설 떡도 함께 보낸다',go:()=>{
+    talk([['너구리','엄마 드릴 홍시 약떡이에요.',[{t:'모락 아주머니의 설 떡도 함께 보낸다',go:()=>{
       // 별도 소지품·추가 재료 없이 모락이 자기 떡을 보탠다. 약떡은 기존처럼 하나만 소비한다.
       G.f.hongsiMade=true;G.f.jangteoArcsMorak3=true;
       diary('j_end','눈홍시와 쌀가루로 홍시 약떡을 쪘다. 엄마가 동네에 떡을 돌리던 시루로, 이번엔 엄마를 위한 떡을 쪘다.');
@@ -1301,7 +1301,7 @@ Rg.sendMedicine=()=>{
 function sendMedicine(){
   G.f.hongsiMade=true;
   diary('j_end','눈홍시와 쌀가루로 홍시 약떡을 쪘다. 엄마가 동네에 떡을 돌리던 시루로, 이번엔 엄마를 위한 떡을 쪘다.');
-  talk([['너구리','까치 할머니, 엄마 드릴 홍시 약떡이에요.'],['너구리','(까치 할머니가 처마에서 내려와 떡 보자기를 물었다.)'],['너구리','엄마한테 전해 주세요. 엄마 시루로 쪘다고요.']],()=>{
+  talk([['너구리','엄마 드릴 홍시 약떡이에요.'],['너구리','(늙은 까치가 처마에서 내려와 떡 보자기를 물었다.)'],['너구리','엄마한테 전해 주세요. 엄마 시루로 쪘다고요.']],()=>{
     handMedicineToMagpie();
     talk([...Rg.homeReply,['너구리','…그래도 감 냄새는 맡으셨구나.']],endGame);
   });
@@ -1347,7 +1347,7 @@ Rg.goal=()=>{
   const toNight=s=>night()?s:'밤에 '+s;
   // 결정 D-67: 앞선 진행부터 거꾸로 본다
   if(G.boss.dead){
-    if(!CLASSIC&&has('hongsi_tteok'))return night()&&G.f.jxMagpieNight?'아침에 까치 할머니께 약떡 맡기기':'까치 할머니께 홍시 약떡 맡기기';
+    if(!CLASSIC&&has('hongsi_tteok'))return night()&&G.f.jxMagpieNight?'아침에 늙은 까치에게 약떡 맡기기':'늙은 까치에게 홍시 약떡 맡기기';
     if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '맷돌에 쌀 갈기';
     return '시루에 눈홍시와 쌀가루 넣어 약떡 찌기';
   }

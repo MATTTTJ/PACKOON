@@ -134,12 +134,17 @@ function renderMap(){
       b.style.left=p.x+'%';b.style.top=p.y+'%';b.disabled=!known;
       if(!known){b.title='아직 가 보지 않은 곳';b.setAttribute('aria-label','아직 가 보지 않은 곳');}
       else{const v=seen[id],line=mapSeenText(v);
-        if(v.who.length)b.appendChild(el('span','map-seen-who',v.who.join('·')));
+        // 결정 D-203: 만난 이 이름은 칸에 바로 쓰지 않고 작은 점으로만 둔다. 마우스를 올리거나(터치는 눌러 고르면) 이름 쪽지가 뜬다 (사용자 피드백 53)
+        if(v.who.length){const row=el('span','map-seen-who');row.setAttribute('aria-hidden','true');
+          for(let i=0;i<Math.min(v.who.length,MAP_WHO_DOTS);i++)row.appendChild(el('i','map-who-dot'));
+          if(v.who.length>MAP_WHO_DOTS)row.appendChild(el('b',null,'+'+(v.who.length-MAP_WHO_DOTS)));
+          b.appendChild(row);b.dataset.who=v.who.join(' · ');}
         if(v.items.length){const row=el('span','map-seen-items');
           for(const it of v.items.slice(0,3)){const ic=icon(it.id);if(it.spent)ic.classList.add('spent');ic.setAttribute('aria-hidden','true');row.appendChild(ic);}
           if(v.items.length>3)row.appendChild(el('b',null,'+'+(v.items.length-3)));
           b.appendChild(row);}
-        if(line){b.title=TABLES.ZONES[r.id][id]+' · '+line;b.setAttribute('aria-label',b.title);}}
+        if(line)b.setAttribute('aria-label',TABLES.ZONES[r.id][id]+' · '+line);
+        b.onpointerenter=e=>{if(e.pointerType==='mouse')showMapTip(b);};b.onpointerleave=e=>{if(e.pointerType==='mouse')showMapTip(mapSelectedButton());};}
       if(current)b.setAttribute('aria-current','location');
       const selected=mapSelection?.region===r.id&&mapSelection?.zone===id;b.setAttribute('aria-pressed',String(selected));b.tabIndex=selected?0:-1;
       b.onclick=()=>selectMapPlace(b);
@@ -147,13 +152,31 @@ function renderMap(){
     }
     section.append(heading,chart);body.appendChild(section);
   }
-  updateMapSelection();
+  updateMapSelection();body.onscroll=()=>showMapTip(mapTipButton);
+}
+/* 만난 이 쪽지: 지도 칸 위에 뜨는 작은 이름표. 지도 몸통이 굴러도 잘리지 않게 지도 창에 따로 둔다 */
+const MAP_WHO_DOTS=5;
+function mapSelectedButton(){return $('mapBody')?.querySelector('.map-place[aria-pressed="true"]')||null;}
+let mapTipButton=null;
+function showMapTip(button){
+  if(button&&!button.isConnected)button=mapSelectedButton();   // 지도를 다시 그린 뒤의 옛 칸
+  mapTipButton=button;let tip=$('mapTip');
+  if(!tip){tip=el('div','map-tip');tip.id='mapTip';tip.setAttribute('aria-hidden','true');$('map').appendChild(tip);}
+  const who=button&&!button.disabled&&open('map')?button.dataset.who:'';
+  tip.hidden=!who;if(!who)return;
+  tip.textContent='만난 이 · '+who;tip.style.left='0px';   // 너비를 잴 때 오른쪽 끝에 눌려 접히지 않게
+  const box=$('map').getBoundingClientRect(),r=button.getBoundingClientRect(),above=r.top-box.top>48;
+  const view=$('mapBody').getBoundingClientRect();if(r.bottom<view.top||r.top>view.bottom){tip.hidden=true;return;}   // 굴러서 안 보이는 칸
+  tip.classList.toggle('below',!above);
+  const half=tip.offsetWidth/2,center=clamp(r.left+r.width/2-box.left,half+6,box.width-half-6);   // 지도 창 밖으로 나가지 않게
+  tip.style.left=Math.round(center)+'px';
+  tip.style.top=Math.round((above?r.top:r.bottom)-box.top)+'px';
 }
 function selectMapPlace(button,focus=true){
   if(button.disabled)return;
   mapSelection={region:button.dataset.region,zone:button.dataset.zone};
   for(const b of $('mapBody').querySelectorAll('button')){const selected=b===button;b.setAttribute('aria-pressed',String(selected));b.tabIndex=selected?0:-1;}
-  updateMapSelection();if(focus)button.focus();
+  updateMapSelection();if(focus)button.focus();showMapTip(button);
 }
 function updateMapSelection(){
   const s=mapSelection;$('mapDestination').textContent=s?TABLES.ZONES[s.region]?.[s.zone]||'어딘가':'';

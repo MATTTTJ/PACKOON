@@ -41,6 +41,7 @@ function finishCraftHands(redraw=true){
     (h.discovered?' 찾은 가공법을 수첩에 이어 적었다.':'');
   if(redraw&&open('bag'))renderBag();
 }
+// 결정 D-201: 가공 한 동작을 조금 더 빠르게 (tuning craft_motion_ms 1100→750)
 const craftMotionMs=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?300:TABLES.TUNING.craft_motion_ms;
 // 한 번 누르면 동작 한 번이 시작된다. 동작 중에는 더 누르지 않는다.
 function craftHandInput(direction){
@@ -201,7 +202,7 @@ fieldTaste.addEventListener('keydown',e=>{
 let fieldTasteWho=null;
 function renderFieldTaste(){
   const n=REG?.npcs.find(n=>n.name===$('dlgWho').textContent);
-  const who=G&&open('dlg')&&!B?n?.id:null;
+  const who=G&&open('dlg')&&!B&&!tradeClosedNow(n?.id)?n?.id:null;   // 결정 D-197 (disguise.js)
   if(who!==fieldTasteWho){fieldTaste.innerHTML='';fieldTasteWho=who;}
   const items=who?Object.keys(TABLES.TASTES[who]||{}).filter(id=>has(id)):[];
   fieldTaste.hidden=!who||!items.length;if(fieldTaste.hidden||fieldTaste.children.length)return;
