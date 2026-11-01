@@ -257,8 +257,9 @@ if(!CLASSIC){
       // 결정 D-82: 솔숲의 소나무 흔들기 세 곳 (채집 고리 D-41)
       digs:[{id:'j_cache_pine',x:1700,item:'kong',n:2,form:'squirrel',cache:true,done:false},
         {id:'j_pine_shake_1',x:960,item:'solbang',done:false},{id:'j_pine_shake_2',x:1620,item:'solbang',done:false},{id:'j_pine_shake_3',x:2080,item:'solbang',done:false}],
-      pickups:[...cones('pine',[[250,192],[280,192],[310,192],[600,96],[630,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
-        {id:'j_owl_roof_cone_1',x:858,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:880,y:124,item:'solbang',got:false}],
+      // 결정 D-207: 솔방울이 같은 간격으로 늘어서지 않게 떨어진 자리를 들쭉날쭉하게 (사용자 피드백 58). 높은 칸의 것은 그 칸 안에서만 옮긴다.
+      pickups:[...cones('pine',[[232,192],[291,192],[318,192],[612,96],[659,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
+        {id:'j_owl_roof_cone_1',x:853,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:884,y:124,item:'solbang',got:false}],
       // 결정 D-44: 뒷산에서 장터로는 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
       doors:[{x:70,to:'street',toX:2180,label:'떡집 굴뚝을 향해 내려가기',descend:true,draw:peg},
         {x:2480,y:96,to:'street',toX:2650,toY:96,label:'등불 아래 장터 지붕으로',need:()=>!!G.f.jxKiteDone,reason:'처마길은 입구 아이에게 연을 돌려준 뒤 알려 달라고 하자.',draw:peg}],
@@ -271,7 +272,7 @@ if(!CLASSIC){
     },
     warehouse:{...common('warehouse'),name:TABLES.ZONES.jangteo.warehouse,w:2600,npcs:[],
       platforms:[...stairs(460),...stairs(1230),...stairs(1840),...stairs(2340)],
-      pickups:cones('warehouse',[[700,192],[725,192],[750,192]]),
+      pickups:cones('warehouse',[[676,192],[709,192],[752,192]]),   // D-207
       exits:{left:{to:'inn',toX:2490}},
       doors:[{x:280,to:'inn',toX:2130,label:'지붕 사이, 숙소 불빛으로 돌아가기',draw:gate},
         {x:2290,to:'inn',toX:1440,label:'짐 나르는 귀환 문으로 숙소에',need:()=>G.boss.dead,
