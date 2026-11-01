@@ -1119,9 +1119,11 @@ function marketCraftTrade(){
 }
 function nalMarketGive(){
   if(G.f.jxCraftMarket||!has('solbang',G.f.yeotDone?3:8))return;
+  // 결정 D-147: 묻기 전에 보따리에서 바로 바꾸면, 날쌘이 솔방울을 받는 말을 먼저 한다(까닭은 여전히 흐린다. nalLedger 복선).
+  const first=!G.f.jxCraftMarketHeard;G.f.jxCraftMarketHeard=true;
   takeItem('solbang',3);for(const id of ['honey','sesame_oil','mung','pat'])addItem(id,1);
   G.f.jxCraftMarket=true;ledger('t_craft_market','날쌘','솔방울 3','떡 재료 묶음');ledgerDone('t_craft_market');
-  talk([['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
+  talk([...(first?[['날쌘','솔방울 셋이라. 마침 밤에 불 피울 데가 있어.\n한 줌씩 남은 거 묶어 줄게.']]:[]),['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
 }
 // 결정 D-78: 쌀가루에 약과를 얹으면 날쌘이 제 몫으로 먹고 팥 한 되를 더 준다(날쌘은 약과를 좋아한다, tastes.csv).
 function nalTrade(id,yak=false){
@@ -1395,8 +1397,9 @@ Rg.trade={
       {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1},{ssal_powder:1,yakgwa:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:i=>nalTrade('ssal_powder',i===1)},
       {id:'t_nal_jangteo_memil',item:'pat',n:2+(G.f.nalJBluff?1:0),asks:[{memil_powder:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:()=>nalTrade('memil_powder')}
     ]:[]),
-    ...(!CLASSIC&&G.f.jxCraftMarketHeard?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 녹두 · 팥',asks:[{solbang:3}],
-      locked:()=>!G.f.yeotDone&&(G.inv.solbang||0)<8?'엿방울한테 줄 솔방울 다섯은 남겨 둬야 한다.':null,
+    // 결정 D-147: 떡 재료 묶음은 처음부터 날쌘 지게에 있다. 엿방울 몫을 아직 모르면 까닭은 말하지 않고 남겨 두기만 한다.
+    ...(!CLASSIC?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 녹두 · 팥',asks:[{solbang:3}],
+      locked:()=>!G.f.yeotDone&&has('solbang',3)&&(G.inv.solbang||0)<8?(G.f.yeotMet?'엿방울한테 줄 솔방울 다섯은 남겨 둬야 한다.':'솔방울은 아직 쓸 데가 있다.'):null,
       done:()=>G.f.jxCraftMarket,accept:nalMarketGive}]:[])
   ],
   morak:()=>G.f.morakMet?[{id:'t_morak',item:'patsirutteok',label:'시루를 깨우는 김 다루기',asks:[{ssal_powder:3}],done:()=>G.f.morakPowder,accept:morakGiveNow},
