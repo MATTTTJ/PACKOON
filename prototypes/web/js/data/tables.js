@@ -1368,7 +1368,7 @@ const TABLES={
    "lines": [
     {
      "who": "me",
-     "text": "당산나무를 뱀처럼 감은 칡덩굴. 줄기는 채찍처럼 후려치고, 덩이뿌리는 위에서 내리찍고, 꽃은 달큰한 향을 뿜는다.",
+     "text": "당산나무를 뱀처럼 감은 칡덩굴. 줄기는 채찍처럼 후려치고, 덩이뿌리는 위에서 내리찍고, 꽃은 꽃가루를 터뜨려 바닥에 달큰한 잔향을 남긴다.",
      "section": "관찰",
      "when": "fight:kudzu"
     },
@@ -2678,7 +2678,12 @@ const TABLES={
   "battle_base_damage": 1,
   "battle_sharp_damage": 2,
   "battle_pickaxe_bonus": 1,
-  "kudzu_stem_cut_chance": 0.5,
+  "kudzu_stem_cut_chance": 0.4,
+  "kudzu_root_dig_chance": 0.4,
+  "kudzu_scent_damage": 0.5,
+  "kudzu_scent_slow": 0.55,
+  "kudzu_scent_slow_frames": 80,
+  "kudzu_scent_linger": 150,
   "golem_stone_chance": 0.25,
   "golem_stone_step": 0.2,
   "golem_stone_cap": 2,
