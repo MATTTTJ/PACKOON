@@ -6,7 +6,7 @@
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
          cover?:엄폐물, calmAction?:{amount:행동 진정량, kind?, prompt?, text?}(공격이 모두 지나간 뒤), placeGift?:꼭대기에 얹을 선물 id,
-         firstPart?:첫 공격 부위 id(첫 예고는 조금 길다), strike?():치기를 상대가 먼저 처리했으면 true, handTool?():손에 그릴 연장 id, giftKnot?:좋아하는 선물에 매듭을 내민다,
+         firstPart?:첫 공격 부위 id(첫 예고는 조금 길다), strike?():치기를 상대가 먼저 처리했으면 true, handTool?():손에 그릴 연장 id, onMarkHit?(부위, 표식):붉은 표식을 친 뒤(재료 얻기 등),
          부위의 mark?:붉은 표식에 쓸 글자(없으면 이름 첫 글자),
          backdrop?(c):상대 뒤쪽 화면 전체 배경(결정 D-58. 판정 상자와 글귀 줄 위로는 상자·글이 덮는다), goalText?:지금 할 일 글,
          showHands?:첫 선물 때 빈손을 펴 보이는 장면, pickAttack?():공격을 직접 고른다(B.bullets 를 넣고 B.st='tell'),
@@ -103,7 +103,6 @@ function startBattle(kind,onEnd){
   if(E.cover){B.covers=[];B.round=0;addCover(0.5,0.43);}
   if(E.showHands){B.handShown=false;B.handShow=0;}
   if(E.possession){B.round=0;B.possession={from:'core',to:'core'};}
-  if(E.calmAction&&E.calmAction.kind==='knot')B.round=0;
   if(E.warmPath)B.warm={current:{u:0.25,v:0.7},next:null,points:[],round:0,ice:null,fire:0};
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
@@ -171,7 +170,7 @@ function openCalmAction(){
   }
   const u=B.mark?(B.mark.x>BOX.x+BOX.w/2?0.14:0.86):(B.round%2?0.86:0.14);
   B.calmStone={u,v:0.8,t:150};
-  B.msg+=' / '+(B.E.calmAction.prompt||'기울어진 돌 위에서')+' '+HITKEY+': '+(B.E.calmAction.kind==='knot'?'매듭 풀기.':'바로 놓기.');
+  B.msg+=' / '+(B.E.calmAction.prompt||'기울어진 돌 위에서')+' '+HITKEY+': 바로 놓기.';
 }
 /* 수리부엉이 깃: 부위 공격 예고(tell)를 battle_owl_tell_lead 만큼 먼저 보여 준다 */
 function chooseAttack(){
@@ -190,7 +189,6 @@ function chooseAttackBase(){
     B.returnEcho=null;B.cur=p;B.last=p;B.st='tell';B.t=rule.travel+rule.wait;B.hitThis=false;
     const attack=bAttackDef(p);B.attackPlan=attack.prepare?attack.prepare():null;B.msg=p.tell;return;
   }
-  if(B.E.calmAction&&B.E.calmAction.kind==='knot'){B.round++;B.calmStone=null;}
   const L=bLiving();let o=L.filter(p=>p!==B.last);if(!o.length)o=L;
   const first=!B.last&&B.E.firstPart?L.find(q=>q.id===B.E.firstPart):null;
   const p=first||o[Math.floor(Math.random()*o.length)];B.cur=p;B.last=p;B.st='tell';B.t=first?72:42;B.msg=p.tell;B.hitThis=false;
@@ -230,14 +228,16 @@ function openMark(){
 function bAttackDef(p){const mode=B.E.possession||B.E.warmPath;return ATTACKS[(mode&&mode.attacks&&mode.attacks[p.id])||p.atk];}
 function attackTick(p){bAttackDef(p).tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
 /* 하트는 정수다. 산양 발굽은 맞을 때마다 battle_goat_damage_taken 만큼 쌓고 1이 찰 때만 한 칸 준다 (0.5면 두 번에 한 칸).
-   고라니는 맞은 뒤 무적 시간이 battle_deer_iframes 로 길다. */
-function bHitMe(){
-  if(B.inv>0||B.st==='end'||B.st==='finale')return;
+   고라니는 맞은 뒤 무적 시간이 battle_deer_iframes 로 길다.
+   결정 D-178: power 는 약한 공격의 피해(칡꽃 꽃가루 kudzu_scent_damage). 산양 배수와 곱해 같은 자리에 쌓는다. 맞았으면 true. */
+function bHitMe(power=1){
+  if(B.inv>0||B.st==='end'||B.st==='finale')return false;
   const form=battleForm(),t=TABLES.TUNING;let loss=1;
-  if(form==='goat'){B.hoof+=t.battle_goat_damage_taken;loss=Math.floor(B.hoof+1e-9);B.hoof-=loss;}
+  if(form==='goat'||power!==1){B.hoof+=power*(form==='goat'?t.battle_goat_damage_taken:1);loss=Math.floor(B.hoof+1e-9);B.hoof-=loss;}
   G.hp-=loss;B.inv=form==='deer'?t.battle_deer_iframes:t.battle_iframes;B.hits++;B.hitThis=true;refreshHud();
-  bSplash(B.px,B.py,loss?'#b4432a':'#6f6357');if(!loss)B.msg='굳은 발굽이 버텼다!';
+  bSplash(B.px,B.py,loss?'#b4432a':'#6f6357');if(!loss&&form==='goat')B.msg='굳은 발굽이 버텼다!';
   if(G.hp<=0)bEnd('lose');
+  return true;
 }
 function bSplash(x,y,col){for(let i=0;i<9;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*2.4;B.fx.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:2+Math.random()*4,t:28,col:col||'#1d1814'});}}
 function bStrike(){
@@ -281,6 +281,7 @@ function bStrike(){
     B.autoToolT=pickaxe?12:0;p.hp=Math.max(0,p.hp-dmg);p.shake=16;bSplash(m.x,m.y);B.mark=null;
     if(p.hp>0)Sound.playSfx('battle_hit');
     if(p.hp<=0)breakPart(p);else B.msg=(pickaxe?'곡괭이로 ':'')+jo(p.name,'을','를')+' 쳤다! 내구도가 깎였다.';
+    if(B.E.onMarkHit&&B.st!=='end')B.E.onMarkHit(p,m);
     renderBHud();
   }else{B.msg=m?'조금 더 가까이! 손이 표식 안에 들어가야 맞는다.':'아직 빈틈이 없다. 피하면서 붉은 표식을 기다리자.';}
 }
@@ -313,7 +314,7 @@ function bStep(){
   if(B.autoToolT>0)B.autoToolT--;
   if(B.covers)B.covers.forEach(r=>{if(r.flash>0)r.flash--;});
   if(B.returnEcho&&--B.returnEcho.t<=0)B.returnEcho=null;
-  if(B.scentKnot&&--B.scentKnot.t<=0)B.scentKnot=null;
+  if(B.slowT>0)B.slowT--;
   if(B.warm&&B.warm.fire>0)B.warm.fire--;
   if(B.warm&&B.warm.thaw&&--B.warm.thaw.t<=0)B.warm.thaw=null;
   if(B.st!=='end'&&B.st!=='giftPlace'&&B.st!=='finale'){
@@ -321,7 +322,7 @@ function bStep(){
     if(keys['arrowleft']||keys['a']||touch.left)dx-=1;if(keys['arrowright']||keys['d']||touch.right)dx+=1;
     if(keys['arrowup']||keys['w']||touch.up)dy-=1;if(keys['arrowdown']||keys['s']||touch.down)dy+=1;
     if(dx&&dy){dx*=0.72;dy*=0.72;}
-    const speed=battleHandProfile().speed;
+    const speed=battleHandProfile().speed*(B.slowT>0?B.slowK:1);   // 결정 D-178: 꽃가루에 맞으면 잠깐 느려진다
     B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);
   }
   B.parts.forEach(p=>{if(p.shake>0)p.shake--;});
@@ -440,7 +441,6 @@ function giveGift(id){
   takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();
   B.calm=Math.min(100,B.calm+v);
   B.msg=taste?taste.line:((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText);
-  if(v&&B.E.giftKnot)B.scentKnot={u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h,t:90};
   if(B.warm&&id==='dokkaebibul')B.warm.fire=180;
   closeGift();renderBHud();
   if(B.calm>=100){
@@ -549,8 +549,7 @@ function bDraw(){
   if(B.E.possession)drawPossessedAttack(c);
   for(const b of B.bullets)BULLETS[b.k].draw(c,b);
   if(B.warm)drawWarmPath(c);
-  if(B.calmStone){if(B.E.calmAction.kind==='knot')drawCalmKnot(c);else drawWishStone(c);}
-  if(B.scentKnot)drawScentKnot(c);
+  if(B.calmStone)drawWishStone(c);
   if(B.returnItem||B.returnEcho)drawReturnedObject(c);
   if(B.mark){const m=B.mark,radius=battleHandProfile().radius;c.save();c.translate(m.x,m.y);
     c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.arc(0,0,radius,-Math.PI/2,-Math.PI/2+Math.PI*2*(m.t/m.max));c.stroke();
