@@ -10,7 +10,7 @@
    - climbs:[{x, top, bottom?, ledge?, draw?(x,y,top)}]: 다람쥐가 ↑를 누르는 동안 오르는 줄기·들보. top 높이에 발판을 두거나
      ledge:true 면 줄기 꼭대기가 다람쥐에게만 작은 디딤이 된다.
    - 문·가장자리 출구의 formPass:'squirrel'|'goat'|'owl'|'deer' (+ formLabel, formNeed()): 원래 need() 가 거짓이어도 그 변신이면 지난다.
-     formNeed 는 몸이 아니라 약속으로 남는 조건(예: 뿔이의 허락)을 따로 적을 때 쓴다.
+     formNeed 는 몸이 아니라 약속으로 남는 조건(예: 뿔영감의 허락)을 따로 적을 때 쓴다.
    - digs/pickups 의 form:'<id>': 그 변신일 때만 보이고 캔다·줍는다. cache:true 인 흙더미는 채집 놀이 없이 n 개(기본 2)를 바로 얻는다.
    - listen:true: 고라니일 때 form_deer_listen_range 안에 있으면 화면에 소리 표시를 띄운다 (pickups·digs·examines·stamps·wanderers).
 
