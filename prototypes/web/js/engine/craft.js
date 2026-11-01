@@ -202,7 +202,7 @@ fieldTaste.addEventListener('keydown',e=>{
 let fieldTasteWho=null;
 function renderFieldTaste(){
   const n=REG?.npcs.find(n=>n.name===$('dlgWho').textContent);
-  const who=G&&open('dlg')&&!B?n?.id:null;
+  const who=G&&open('dlg')&&!B&&!tradeClosedNow(n?.id)?n?.id:null;   // 결정 D-197 (disguise.js)
   if(who!==fieldTasteWho){fieldTaste.innerHTML='';fieldTasteWho=who;}
   const items=who?Object.keys(TABLES.TASTES[who]||{}).filter(id=>has(id)):[];
   fieldTaste.hidden=!who||!items.length;if(fieldTaste.hidden||fieldTaste.children.length)return;
