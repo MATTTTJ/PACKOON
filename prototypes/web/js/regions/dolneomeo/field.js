@@ -74,10 +74,31 @@ Rg.drawScenery=()=>{jangseung(96,true);jangseung(122,false);drawTree(670);drawTr
   }
   const sx=2338-cam;if(G.f.yakMade&&sx<W+20){R(sx,GROUND-26,2,26,'#6b4423');R(sx-8,GROUND-26,18,8,'#c9a27a');R(sx+6,GROUND-24,2,4,'#6b4423');}};
 
+/* 결정 D-208: 채집 전 겨우살이는 덩어리(슬라임처럼 보였다)가 아니라 가지에 붙어 자란 풀 덤불이다(사용자 피드백 47).
+   가지 토막에서 누런 초록 줄기가 두 갈래씩 갈라지고, 끝마다 가는 잎이 짝지어 난다. 갈래 사이에 반투명한 흰 열매. 떠오르지 않고 바람에 잎끝만 흔들린다. */
+function drawMistletoe(x,y,a){
+  const S='#7f8a36',L='#a3b04c',LD='#738232',BR='#eeedd2';
+  const sw=Vfx.reducedMotion?0:Math.sin((G.anim+a.x)/38)*0.6;
+  R(x-10,y-2,20,2,'#5a4a3a');R(x-10,y-2,20,1,'#7a6450');R(x+8,y-4,2,2,'#5a4a3a');   // 붙어 자란 가지 토막
+  const cx=x,cy=y-8;R(cx,cy+1,1,5,S);   // 밑동: 가지 껍질을 뚫고 나온 짧은 줄기
+  // 속은 겹친 잔가지로 어둡게 차 있다(테두리 빛이 사이로 새지 않게)
+  for(let j=-4;j<=3;j++){const half=Math.round(5.5*Math.sqrt(1-(j/4.6)**2));R(cx-half,cy+j,half*2+1,1,j<-1?'#6f7d30':'#5d6a28');}
+  // 줄기가 둥글게 사방으로 뻗는다. 끝마다 가는 잎 한 쌍, 중간에도 한 쌍.
+  for(const deg of [-180,-155,-130,-108,-90,-72,-50,-25,0,155,25]){
+    const t=deg*Math.PI/180,len=deg>0&&deg<180?5:7,ex=Math.cos(t),ey=Math.sin(t);
+    for(let i=1;i<=len;i++)R(Math.round(cx+ex*i+(i>3?sw:0)),Math.round(cy+ey*i),1,1,S);
+    for(const [d,c1,c2] of [[len,L,LD],[4,LD,L]]){
+      const tx=Math.round(cx+ex*d+(d>3?sw:0)),ty=Math.round(cy+ey*d);
+      for(const k of [-1,1]){const lx=-ey*k+ex*.7,ly=ex*k+ey*.7;R(Math.round(tx+lx),Math.round(ty+ly),1,1,k<0?c1:c2);R(Math.round(tx+lx*2),Math.round(ty+ly*2),1,1,c1);}
+    }
+  }
+  // 갈래 사이 반투명한 흰 열매
+  for(const [dx,dy] of [[-2,-3],[2,-2],[0,-5],[-4,0],[4,-4]])R(cx+dx,cy+dy,1,1,BR);
+}
 /* 줍는 것 */
 Rg.drawPickup=(a,x,bob)=>{
   if(a.item==='memil'){R(x-1,a.y-6,1,6,'#9a7a52');R(x-2,a.y-8+bob,3,2,'#2b2522');R(x,a.y-9+bob,2,2,'#3a3330');R(x+1,a.y-7,2,1,'#7a9a5a');}
-  else if(a.item==='gyeousari'){R(x-5,a.y-5+bob,10,5,'#6f9a4a');R(x-3,a.y-7+bob,6,2,'#5a8a3a');R(x-2,a.y-4+bob,2,2,'#f3e28a');R(x+2,a.y-3+bob,2,2,'#f3e28a');}
+  else if(a.item==='gyeousari')drawMistletoe(x,a.y,a);
   else if(a.item==='seoridarae'){R(x-4,a.y-8+bob,4,4,'#8ab86a');R(x,a.y-8+bob,4,4,'#7fa860');R(x-2,a.y-4+bob,4,4,'#6f9850');R(x-3,a.y-7+bob,1,1,'#f4fbff');R(x+1,a.y-7+bob,1,1,'#f4fbff');R(x-1,a.y-11,2,3,'#5a4a2a');}
   else if(!CLASSIC&&a.item==='seogi'){R(x-8,a.y-10,16,10,'#8a9791');R(x-6,a.y-11,12,2,'#e0e8dc');R(x-5,a.y-8,10,6,'#414d47');R(x-2,a.y-9,4,7,'#58655b');R(x+4,a.y-12+bob,1,1,'#fff1bf');}
 };
@@ -212,12 +233,13 @@ if(CLASSIC){
 if(!CLASSIC){
   const A=Rg.expansionArt;
   const originalNewState=Rg.newState,originalStart=Rg.onStart;
+  // 결정 D-207: 채집물은 같은 간격으로 늘어서지 않게 사이를 들쭉날쭉하게 둔다(사용자 피드백 58). 메밀댁(760)·꾸벅이 둥지 문턱(1590)과 겹치지 않게.
   const pickupMap=[
-    ['field',640,192],['field',690,192],['field',740,192],
-    ['field',1790,192],['field',1840,192],['field',1890,192],
+    ['field',602,192],['field',661,192],['field',702,192],
+    ['field',1768,192],['field',1821,192],['field',1866,192],
     ['village',1920,112],['field',2040,112],
   ];
-  const digMap=[['field',1330],['field',1420],['field',1600],['field',2310]];
+  const digMap=[['field',1316],['field',1437],['field',1668],['field',2310]];
   function placeOld(g){
     // 기존 저장의 got/done은 유지하고 위치만 현재 배치에 맞춘다.
     let pi=0,di=0;
@@ -347,7 +369,11 @@ if(!CLASSIC){
   // 결정 D-116: 고갯길은 빈 돌계단 무리(1300~1450), 성황당은 들어선 자리와 첫 돌탑 사이(430~790)를 지운다.
   Rg.trimCutsV2={gate:[[1300,150]],village:[[110,280]],cliff:[[160,1000]],shrine:[[430,360]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
   // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 고갯길 뿌리·산토끼·종 사이 두 곳, 밭 오른쪽 출구 앞, 절벽길 은이끼와 개구리 사이·언 물줄기와 다래길 사이. 성황당 골렘 자리는 자르지 않는다.
-  Rg.trimCuts={gate:[[720,100],[1050,70],[1300,150]],village:[[110,280]],field:[[2420,60]],cliff:[[160,1000],[1270,50],[1960,80]],shrine:[[430,360]]};
+  Rg.trimCutsV3={gate:[[720,100],[1050,70],[1300,150]],village:[[110,280]],field:[[2420,60]],cliff:[[160,1000],[1270,50],[1960,80]],shrine:[[430,360]]};   // 셋째 판(D-128). 넷째 판도 돌너머는 같다. 옛 저장을 옮길 때 쓴다
+  Rg.trimCutsV4=Rg.trimCutsV3;
+  // 결정 D-206: 남생이 할미가 있는 성황당 구역을 더 줄인다(사용자 피드백 54). 들어선 자리와 소원 천 사이, 바라보기 앞, 골렘 자리 뒤 절벽 끝 문 앞.
+  // 골렘 자리·눈 계단·석이 바위·작은 돌탑은 그대로다.
+  Rg.trimCuts={...Rg.trimCutsV3,shrine:[[150,110],[430,360],[1730,80],[2440,110]]};
   // 구역에 들어설 때 applyMemory가 bases로 발판을 다시 깐다. 그래서 bases도 같은 좌표로 자르고 정리해 둔다 (D-109·D-110).
   Rg.trimHook=tX=>{
     for(const id of Object.keys(bases)){
@@ -396,7 +422,7 @@ if(!CLASSIC){
     {id:'dol_after_golem',depth:true,x:2630,to:'cliff',toX:2630,toY:112,label:'아까 본 절벽 끝으로 · E',need:calm,reason:'돌무더기가 가라앉으면 절벽 끝으로 이어진다.',draw:marker,drawBlocked:blocked},
   ];
   // 필수 물건은 선택 발견에 기대지 않는다. 기존 여섯 알·두 가지에 정확히 +3/+1.
-  Rg.zones.field.pickups=[{id:'dol_memil_extra1',x:790,y:192,item:'memil',got:false},{id:'dol_memil_extra2',x:1940,y:192,item:'memil',got:false},{id:'dol_memil_extra3',x:1990,y:192,item:'memil',got:false}];
+  Rg.zones.field.pickups=[{id:'dol_memil_extra1',x:818,y:192,item:'memil',got:false},{id:'dol_memil_extra2',x:1943,y:192,item:'memil',got:false},{id:'dol_memil_extra3',x:2003,y:192,item:'memil',got:false}];   // D-207
   Rg.zones.gate.pickups=[{id:'dol_mistletoe_extra',x:2060,y:112,item:'gyeousari',got:false}];
   // 서리 낀 돌기둥. 다람쥐가 타고 높은 바위턱(y=112)에 오른다 (PA-47)
   Rg.zones.gate.climbs=[{x:2028,top:112,draw:(x,y,top)=>{R(x-2,top,4,y-top,'#6d665c');R(x-2,top,1,y-top,'#a7a093');for(let k=top+9;k<y-4;k+=14)R(x-3,k,6,2,'#4f4a43');}}];

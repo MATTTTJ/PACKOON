@@ -43,21 +43,23 @@ Rg.arcsEnabled=arcsEnabled;
 
 /* PA-43: 옛 배치와 저장은 classic 쪽에 남긴다. 공급은 기존 마가목 넷에 하나를 더한다. */
 if(!CLASSIC){
+  // 결정 D-207: 다래 덩굴 셋과 짚단이 30px 간격으로 붙어 있던 것을 들쭉날쭉 떨어뜨린다(사용자 피드백 58). 셋째 덩굴은 다람쥐 숨긴 몫(640)과 붙지 않게.
+  const SHELTER_VINES=[296,348,706],SHELTER_STRAW=404;
   const oldState=Rg.newState;
   Rg.newState=()=>{
     const s=oldState();
-    s.pickups=[{id:'shelter_straw',zone:'shelter',x:340,y:GROUND,item:'jip',got:false},
+    s.pickups=[{id:'shelter_straw',zone:'shelter',x:SHELTER_STRAW,y:GROUND,item:'jip',got:false},
       ...[['slope',420,GROUND],['slope',900,150],['shore',880,GROUND],['slope',1265,150],['island',2140,108]].map(([zone,x,y],i)=>
         ({id:'slope_rowan_'+i,zone,x,y,item:'magamok',got:false}))];
-    s.digs=s.digs.map((d,i)=>({...d,id:'shelter_vine_'+i,zone:'shelter',x:[300,330,660][i]}));
+    s.digs=s.digs.map((d,i)=>({...d,id:'shelter_vine_'+i,zone:'shelter',x:SHELTER_VINES[i]}));
     return s;
   };
   Rg.placeRouteSupplies=()=>{
     for(const d of G.digs){
       const i=Number(d.id?.match(/^shelter_vine_([0-2])$/)?.[1]);
-      if(Number.isInteger(i))Object.assign(d,{zone:'shelter',x:[300,330,660][i]});
+      if(Number.isInteger(i))Object.assign(d,{zone:'shelter',x:SHELTER_VINES[i]});
     }
-    const straw=G.pickups.find(p=>p.id==='shelter_straw');if(straw)straw.x=340;
+    const straw=G.pickups.find(p=>p.id==='shelter_straw');if(straw)straw.x=SHELTER_STRAW;
   };
 }
 
