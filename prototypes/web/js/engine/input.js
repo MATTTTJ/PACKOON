@@ -49,6 +49,7 @@ function onPress(k){
   if(B){
     if(!$('bResult').hidden){if(k==='enter'||k==='e'||k===' ')$('bResOk').click();return;}
     if(B.paused){if(k==='escape'||k==='k')closeGift();return;}
+    if(battleToolKey(k))return;   // 결정 D-224: Q 로 도구 바꾸기
     if(battleFormKey(k))return;
     // 결정 D-65: 전투에서 C(필드의 점프)는 선물을 열지 않는다. 선물은 K와 '선물' 버튼.
     if(k==='j'||k==='x'||k===' '||k==='enter')bStrike();else if(k==='k')openGift();return;

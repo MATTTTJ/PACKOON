@@ -506,20 +506,23 @@ const TABLES={
     "id": "arm",
     "name": "칡줄기",
     "hp": 3,
-    "mat": "vine"
+    "mat": "vine",
+    "tool": "sickle"
    },
    {
     "id": "root",
     "name": "칡뿌리",
     "hp": 3,
-    "mat": "root"
+    "mat": "root",
+    "tool": "pick"
    },
    {
     "id": "core",
     "name": "칡꽃",
     "hp": 4,
     "mat": "kflower",
-    "core": true
+    "core": true,
+    "tool": "sickle"
    }
   ],
   "musoe": [
@@ -535,14 +538,14 @@ const TABLES={
     "name": "다리",
     "hp": 3,
     "mat": "mud",
-    "material": "stone"
+    "tool": "pick"
    },
    {
     "id": "arm",
     "name": "팔",
     "hp": 3,
     "mat": "stonedust",
-    "material": "stone"
+    "tool": "pick"
    },
    {
     "id": "head",
@@ -550,7 +553,7 @@ const TABLES={
     "hp": 4,
     "mat": "mossy_eye",
     "core": true,
-    "material": "stone"
+    "tool": "pick"
    }
   ],
   "dokkaebi": [
@@ -558,26 +561,30 @@ const TABLES={
     "id": "broom",
     "name": "빗자루",
     "hp": 3,
-    "mat": "broom_sal"
+    "mat": "broom_sal",
+    "tool": "pick"
    },
    {
     "id": "ki",
     "name": "키",
     "hp": 3,
-    "mat": "kong"
+    "mat": "kong",
+    "tool": "sickle"
    },
    {
     "id": "meongseok",
     "name": "멍석",
     "hp": 3,
-    "mat": "jip"
+    "mat": "jip",
+    "tool": "sickle"
    },
    {
     "id": "core",
     "name": "도깨비불",
     "hp": 4,
     "mat": "dokkaebibul",
-    "core": true
+    "core": true,
+    "tool": "pick"
    }
   ],
   "gangcheol": [
@@ -585,28 +592,30 @@ const TABLES={
     "id": "mouth",
     "name": "입",
     "hp": 3,
-    "mat": "frost_whisker"
+    "mat": "frost_whisker",
+    "tool": "sickle"
    },
    {
     "id": "body",
     "name": "몸통",
     "hp": 4,
     "mat": "ice_scale",
-    "material": "ice"
+    "tool": "pick"
    },
    {
     "id": "tail",
     "name": "꼬리",
     "hp": 3,
     "mat": "icicle",
-    "material": "ice"
+    "tool": "pick"
    },
    {
     "id": "core",
     "name": "머리",
     "hp": 5,
     "mat": "broken_orb",
-    "core": true
+    "core": true,
+    "tool": "pick"
    }
   ]
  },
@@ -2688,7 +2697,9 @@ const TABLES={
   "battle_deer_iframes": 96,
   "battle_base_damage": 1,
   "battle_sharp_damage": 2,
-  "battle_pickaxe_bonus": 1,
+  "battle_tool_good_damage": 2,
+  "battle_tool_bad_mult": 0.5,
+  "battle_hand_scale": 1.2,
   "golem_stone_chance": 0.2,
   "golem_stone_step": 0.15,
   "golem_stone_cap": 2,

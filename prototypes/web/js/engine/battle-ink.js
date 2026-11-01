@@ -22,6 +22,32 @@ function lookAt(cx,cy){const a=Math.atan2(B.py-cy,B.px-cx);return [Math.cos(a)*3
 /* 보스 그림에서 부위 찾기 */
 const part=id=>B.parts.find(p=>p.id===id);
 
+/* 결정 D-228: 칠 수 있는 곳과 피해야 할 것을 색으로 가른다 (D-102 의 먹·붉은색에 금빛 하나를 더한다).
+   - 금빛: 칠 수 있는 곳(빈틈 표식, 소원 돌 바로 놓기, 돌려놓을 물건, 샘의 얼음). 둘레의 금빛 호는 남은 시간이다.
+   - 붉은색·먹: 무조건 피해야 하는 공격과 그 예고. 공격 예고 동안에는 글귀 앞에 작은 붉은 세모만 뜬다(D-227). */
+const GOLD='#c98a12',GOLD_LT='rgba(244,207,99,';
+function drawStrikeSpot(c,x,y,r,k,near,tool){
+  const t=B?B.time:0,pulse=0.5+0.5*Math.sin(t*0.22);
+  c.save();
+  const g=c.createRadialGradient(x,y,r*0.15,x,y,r*1.4);g.addColorStop(0,GOLD_LT+(near?0.6:0.32+0.1*pulse)+')');g.addColorStop(1,GOLD_LT+'0)');
+  c.fillStyle=g;c.beginPath();c.arc(x,y,r*1.4,0,Math.PI*2);c.fill();
+  c.strokeStyle=GOLD;c.lineCap='round';c.lineWidth=near?3.4:2.4;
+  c.beginPath();c.arc(x,y,r,-Math.PI/2,-Math.PI/2+Math.PI*2*clamp(k,0,1));c.stroke();
+  c.lineWidth=2;
+  for(let i=0;i<4;i++){const a=i*Math.PI/2+Math.PI/4,r1=r+4+pulse*3,r2=r1+5;c.beginPath();c.moveTo(x+Math.cos(a)*r1,y+Math.sin(a)*r1);c.lineTo(x+Math.cos(a)*r2,y+Math.sin(a)*r2);c.stroke();}
+  if(near){c.strokeStyle='#fffaf0';c.lineWidth=1.6;c.beginPath();c.arc(x,y,Math.max(4,r-5),0,Math.PI*2);c.stroke();}
+  // 결정 D-224: 그 부위에 잘 먹는 도구를 작게. 지금 든 도구가 아니면 흐리게
+  if(tool){c.translate(x+r*0.78,y-r*0.5);c.scale(0.55,0.55);c.globalAlpha=tool===battleTool()?1:0.4;drawTool(c,tool);}
+  c.restore();
+}
+function drawDangerSign(c,x,y,s=1,t=0){
+  c.save();c.translate(x,y);c.scale(s,s);c.globalAlpha=0.75+0.25*Math.sin(t*0.5);
+  c.fillStyle=RED;c.strokeStyle=INK;c.lineWidth=1.2;c.lineJoin='round';
+  c.beginPath();c.moveTo(0,-8);c.lineTo(8,6);c.lineTo(-8,6);c.closePath();c.fill();c.stroke();
+  c.fillStyle='#fff6e8';c.fillRect(-1,-3.5,2,5.5);c.fillRect(-1,3,2,1.8);
+  c.restore();
+}
+
 function drawOpenHands(c){
   const lift=Math.sin((1-B.handShow/72)*Math.PI)*12;
   drawPaw(c,B.px-19,B.py-lift);drawPaw(c,B.px+19,B.py-lift);
@@ -44,8 +70,7 @@ function drawWishStone(c){
   const p=coverPoint(B.calmStone),near=Math.hypot(p.x-B.px,p.y-B.py)<26;
   blob(c,p.x,p.y+13,23,7,INK,0.22);
   c.save();c.translate(p.x,p.y);c.rotate(0.4);blob(c,0,0,15,10,'#65625d');brush(c,[[-12,3],[0,-10],[14,0]],2,INK);c.restore();
-  c.save();c.strokeStyle=RED;c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,23,0,Math.PI*2*(B.calmStone.t/150));c.stroke();
-  c.fillStyle=near?RED:INK;c.textAlign='center';c.font='12px "Gowun Dodum", sans-serif';c.fillText((TOUCH?'치기':HITKEY)+' · 바로 놓기',p.x,p.y+32);c.restore();
+  drawStrikeSpot(c,p.x,p.y,23,B.calmStone.t/150,near,null);   // 결정 D-228
 }
 function drawPlacedGift(c){
   const f=B.giftPlace,p=B.E.headPose(),t=1-B.t/60,e=t*t*(3-2*t);
@@ -98,11 +123,10 @@ function drawPossessedAttack(c){
       brush(c,[[x+(p.side<0?-6:6),Y+H/2-5],[x,Y+H/2],[x+(p.side<0?-6:6),Y+H/2+5]],2,INK,0.6);
     }
   }
-  // 다음 되치기 자리를 같은 헌물의 이름과 연결해 미리 읽게 한다.
+  // 다음 되치기 자리를 옅은 금빛 점선으로 미리 보인다 (결정 D-228: 글은 쓰지 않는다)
   if(!B.mark&&B.st!=='open'){
-    const m=B.E.markPosition(B.cur);blob(c,m.x,m.y,20,20,RED,0.06);
-    c.strokeStyle=INK;c.globalAlpha=0.35;c.lineWidth=1;c.setLineDash([3,4]);c.beginPath();c.arc(m.x,m.y,20,0,Math.PI*2);c.stroke();c.setLineDash([]);
-    c.globalAlpha=0.7;c.fillStyle=INK;c.textAlign='center';c.font='11px "Gowun Dodum", sans-serif';c.fillText(B.cur.name+' 되치기',m.x,m.y+32);
+    const m=B.E.markPosition(B.cur);
+    c.strokeStyle=GOLD;c.globalAlpha=0.45;c.lineWidth=1.2;c.setLineDash([3,4]);c.beginPath();c.arc(m.x,m.y,20,0,Math.PI*2);c.stroke();c.setLineDash([]);
   }
   c.restore();
 }
@@ -120,9 +144,7 @@ function drawReturnedObject(c){
     if(r.active){
       brush(c,[[src.x,src.y],[home.x,home.y]],1,INK,0.2);
       const at=r.held?home:src,near=Math.hypot(at.x-B.px,at.y-B.py)<26;
-      c.save();c.strokeStyle=RED;c.lineWidth=2;c.beginPath();c.arc(at.x,at.y,23,-Math.PI/2,-Math.PI/2+Math.PI*2*r.t/240);c.stroke();
-      c.fillStyle=near?RED:INK;c.textAlign='center';c.font='12px "Gowun Dodum", sans-serif';
-      c.fillText((TOUCH?'치기':HITKEY)+(r.held?' · 돌려놓기':' · 집기'),at.x,at.y+(r.held?30:-26));c.restore();
+      drawStrikeSpot(c,at.x,at.y,23,r.t/240,near,null);   // 결정 D-228
     }
   }
   if(B.returnEcho){
@@ -181,9 +203,8 @@ function drawWarmPath(c){
   }
   if(w.ice){const p=coverPoint(w.ice),near=Math.hypot(p.x-B.px,p.y-B.py)<26;
     brush(c,[[p.x-21,p.y+4],[p.x-8,p.y-7],[p.x+20,p.y+3],[p.x+5,p.y+12],[p.x-21,p.y+4]],2,INK,0.7);
-    brush(c,[[p.x-9,p.y],[p.x,p.y+4],[p.x+7,p.y-2]],1.5,RED);
-    c.save();c.strokeStyle=RED;c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,27,-Math.PI/2,-Math.PI/2+Math.PI*2*w.ice.t/180);c.stroke();
-    c.fillStyle=near?RED:INK;c.font='12px "Gowun Dodum", sans-serif';c.textAlign='center';c.fillText((TOUCH?'치기':'J')+' · 얼음 걷기',p.x,p.y+(w.ice.v<0.5?-29:34));c.restore();
+    brush(c,[[p.x-9,p.y],[p.x,p.y+4],[p.x+7,p.y-2]],1.5,INK,0.6);
+    drawStrikeSpot(c,p.x,p.y,27,w.ice.t/180,near,null);   // 결정 D-228
   }
   if(w.thaw){const p=coverPoint(w.thaw),f=w.thaw.t/90;
     for(let i=0;i<3;i++){const spread=18+i*8+(1-f)*15;

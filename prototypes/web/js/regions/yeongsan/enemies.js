@@ -109,18 +109,19 @@ function drawFrozenLake(c){
 }
 defineEnemies({
   gangcheol:{name:'강철이',calmLabel:'진정',coreNeeds:'body',
-    intro:'[시험판] 서리 덮인 호수에 물김이 오른다. 넓은 흰 길을 따라 옆 샘으로 건너가자.',
+    // 결정 D-227: 전투 글귀는 일어난 일만 짧게. 피하라·치라는 안내는 쓰지 않는다
+    intro:'[시험판] 서리 덮인 호수에 물김이 오른다.',
     warmPath:{width:76,wideWidth:100,attacks:{mouth:'gangcheolFrost',body:'gangcheolCoil',tail:'gangcheolIcicles',core:'gangcheolBlizzard'}},
     calmAction:{kind:'ice',amount:TABLES.CALM.gangcheol.patsirutteok/3},
     markPosition(p){const u=p.id==='mouth'?0.26:p.id==='tail'?0.74:0.5;
       const v=B.warm&&B.warm.current.v<0.5?0.76:0.24;
       return {x:BOX.x+BOX.w*u,y:BOX.y+BOX.h*v};},
-    parts:tableParts('gangcheol',{mouth:{atk:'frostBreath',tell:'서리 띠가 내려온다. 아래에만 머물지 말고 물김 길로 옆 샘에 가자.'},body:{atk:'coil',tell:'똬리의 멈출 선을 보자. 흰 틈을 따라 옆 샘으로 건너가자.'},tail:{atk:'icicleTail',tell:'먹점에 고드름이 떨어진다. 끊기지 않은 흰 길을 먼저 고르자.'},core:{atk:'blizzard',tell:'눈보라가 돌아온다. 물김 길과 옆 샘은 끝까지 열려 있다.'}}),
+    parts:tableParts('gangcheol',{mouth:{atk:'frostBreath',tell:'서리 띠가 내려온다.'},body:{atk:'coil',tell:'강철이가 똬리를 조인다.'},tail:{atk:'icicleTail',tell:'꼬리에서 고드름이 흩날린다.'},core:{atk:'blizzard',tell:'눈보라가 돌아온다.'}}),
     likes:TABLES.CALM.gangcheol,likeText:'강철이가 잠시 숨을 멈춘다.',
     likeTexts:{dokkaebibul:'꺼지지 않는 도깨비불씨를 건넸다. 강철이가 그 온기에 눈을 감는다.',
       patsirutteok:'붉은 팥떡을 내밀자 강철이가 움찔 물러난다. 서리가 조금 걷혔다.'},
-    coreHidden:'머리가 똬리 속에 숨어 있다. 몸통을 먼저 부수면 머리가 드러난다.',
-    coreShown:'똬리가 풀려 온기 길이 넓어졌다! 이제 머리를 노릴 수 있다.',
+    coreHidden:'머리가 똬리 속에 숨어 있다.',
+    coreShown:'똬리가 풀려 온기 길이 넓어졌다!',
     calmWin:'강철이가 서리를 거두고, 따뜻한 남쪽 바다를 향해 천천히 날아오른다.',calmGift:'frost_whisker',
     win:'여의주에 금이 가자 강철이가 호수를 놓고 물러난다.',
     lose:'눈보라에 휩쓸려 호숫가로 밀려났다.',

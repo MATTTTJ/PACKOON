@@ -259,8 +259,9 @@ function stoneRoll(id,hitText){
   const s=B.stones||(B.stones={}),r=s[id]||(s[id]={miss:0,got:0}),t=T(),item=STONE_OF[id];
   part(id).shake=10;bSplash(B.px,B.py-6,id==='head'?JADE:id==='arm'?'#bdb8ad':SLAB);Sound.playSfx('battle_hit');
   if(r.got>=t.golem_stone_cap){B.msg=hitText;return false;}
-  if(Math.random()<Math.min(1,t.golem_stone_chance+t.golem_stone_step*r.miss)){r.got++;r.miss=0;B.loot.push(item);B.msg=hitText+' '+ITEMS[item].n+' 한 조각이 떨어졌다!';return true;}
-  r.miss++;B.msg=hitText+' 돌가루만 튄다.';return false;
+  // 결정 D-224: 곡괭이가 아닌 도구로 치면 확률이 battle_tool_bad_mult 배
+  if(Math.random()<toolChance(part(id),Math.min(1,t.golem_stone_chance+t.golem_stone_step*r.miss))){r.got++;r.miss=0;B.loot.push(item);B.msg=hitText+' '+ITEMS[item].n+' 한 조각이 떨어졌다!';return true;}
+  r.miss++;B.msg=hitText+(toolFit(part(id))==='bad'?' 도구가 잘 안 먹는다.':' 돌가루만 튄다.');return false;
 }
 const HIT_TEXT={leg:'박힌 발바닥을 쳤다!',arm:'멈춘 차돌 팔을 쳤다!',head:'옥돌 핵을 쳤다!'};
 const CLOSE_TEXT={leg:'발바닥이 부서져 눈 속에 묻혔다.',arm:'골렘이 팔을 거둬들였다.',head:'골렘이 가슴을 다시 여몄다.'};
@@ -283,8 +284,7 @@ function strikeGolem(){
   const p=m.part;B.mark=null;B.golemHit=true;
   if(p.id==='leg'&&B.restSole)B.restSole.crack=true;
   if(p.core&&coreHidden()){stoneRoll('head',HIT_TEXT.head);B.msg+=' 눈 껍데기가 두꺼워 몸은 버틴다.';renderBHud();return true;}
-  const pickaxe=battlePickaxe(p),t=T(),dmg=(G.sharp?t.battle_sharp_damage:t.battle_base_damage)+(pickaxe?t.battle_pickaxe_bonus:0);
-  B.autoToolT=pickaxe?12:0;p.hp=Math.max(0,p.hp-dmg);
+  p.hp=Math.max(0,p.hp-toolDamage(p));   // 결정 D-224: 돌은 곡괭이가 잘 먹는다
   const got=stoneRoll(p.id,HIT_TEXT[p.id]);
   if(p.hp<=0){breakPart(p);if(got&&B.st!=='end')B.msg+=' '+ITEMS[STONE_OF[p.id]].n+'도 챙겼다.';}
   renderBHud();return true;
@@ -426,8 +426,7 @@ function drawGolemScene(c){
 defineEnemies({
   golem:{name:'돌 골렘',calmLabel:'진정',
     intro:'눈을 뒤집어쓴 성황당 돌무더기가 일어선다!',   // 결정 D-103: 부위는 고르지 않는다(확정 흐름)
-    howto:true,firstPart:'leg',
-    goalText:'남은 발바닥, 멈춘 팔, 드러난 핵을 노리자.',
+    firstPart:'leg',   // 결정 D-227: 안내 글 없이 시작한다
     calmAction:{amount:TABLES.CALM.golem.story_stone/4},placeGift:'story_stone',
     headPose(){return toScreen(LW/2,bodyY()-46);},
     openMark:golemOpenMark,
@@ -436,8 +435,8 @@ defineEnemies({
       head:{atk:'golemSnow',mark:'핵',tell:'골렘이 두 팔로 눈을 퍼 올린다.'}}),
     likes:TABLES.CALM.golem,likeText:'돌무더기가 잠시 숨을 고른다.',
     likeTexts:{story_stone:'아빠가 못 올린 소원 돌을 건넸다. 돌 골렘이 가만히 내려다본다.'},
-    coreHidden:'가슴이 두꺼운 눈 껍데기에 덮여 있다. 다리나 팔을 먼저 무너뜨리자.',
-    coreShown:'눈 껍데기가 깨지고 옥돌 가슴이 드러났다! 이제 몸을 노릴 수 있다.',
+    coreHidden:'가슴이 두꺼운 눈 껍데기에 덮여 있다.',
+    coreShown:'눈 껍데기가 깨지고 옥돌 가슴이 드러났다!',
     calmWin:'돌 골렘이 스르르 내려앉는다. 눈 덮인 성황당 돌무더기로 돌아왔다.',
     win:'가슴의 눈돌이 빠지자 돌 골렘이 와르르 무너진다.',
     lose:'돌 골렘에게 밀려 눈 비탈을 데굴데굴 굴러 내려왔다.',
