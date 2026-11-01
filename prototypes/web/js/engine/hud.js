@@ -1,13 +1,14 @@
 'use strict';
-/* HUD: 체력, 손에 든 연장, 지금 할 일 (REG.goal() 이 중요한 일, 사연 심부름(SIDE_QUESTS)이 보통 일을 준다) */
-/* 결정 D-149: 할 일은 '중요'(이 지역 본 줄거리)와 '보통'(인물 사연에서 맡은 심부름)으로 나눠 함께 보인다.
+/* HUD: 체력, 손에 든 연장, 지금 할 일 (REG.goal() 이 중요한 일, 사연 심부름(SIDE_QUESTS)이 잔일을 준다) */
+/* 결정 D-149: 할 일은 '중요'(이 지역 본 줄거리)와 '잔일'(인물 사연에서 맡은 심부름)으로 나눠 함께 보인다.
+   결정 D-200: 아래 칸 이름은 '보통' 대신 소일거리라는 뜻의 '잔일' (사용자 피드백 36).
    문구는 짧은 명사형(~하기)으로 핵심만 쓰고 장소는 붙이지 않는다(사용자 피드백 2026-11-01). 수첩 '해야 할 일' 탭(D-150)도 같은 목록을 쓴다.
-   보통 일 하나: {id, region, title(끝낸 뒤 이름), start(F), done(F), text(F)}. 시작 표시가 서고 끝 표시가 없는 동안만 진행 중이다. */
+   잔일 하나: {id, region, title(끝낸 뒤 이름), start(F), done(F), text(F)}. 시작 표시가 서고 끝 표시가 없는 동안만 진행 중이다. */
 const SIDE_QUESTS=[];
 function defineSideQuests(region,list){list.forEach(q=>SIDE_QUESTS.push(Object.assign({region},q)));}
 const sideOn=q=>!!(G&&G.started&&q.start(G.f)&&!q.done(G.f));
 const sideDone=q=>!!(G&&q.start(G.f)&&q.done(G.f));
-/* 진행 중인 보통 일. 지금 지역 것을 앞에 둔다 */
+/* 진행 중인 잔일. 지금 지역 것을 앞에 둔다 */
 function activeSideQuests(){
   const list=SIDE_QUESTS.filter(sideOn);
   return [...list.filter(q=>q.region===G.region),...list.filter(q=>q.region!==G.region)];
@@ -21,11 +22,11 @@ function refreshGoal(){
   const e=$('goal');e.hidden=!g;e.innerHTML='';
   const row=(cls,label,text)=>{const r=el('div','goal-row '+cls);r.appendChild(el('b',null,label));r.appendChild(document.createTextNode(text));e.appendChild(r);};
   if(g)row('main','중요',g);
-  subs.slice(0,HUD_SIDE_MAX).forEach(t=>row('sub','보통',t));
-  if(subs.length>HUD_SIDE_MAX)e.appendChild(el('div','goal-more','보통 일 '+(subs.length-HUD_SIDE_MAX)+'개 더 · 수첩 해야 할 일'));
+  subs.slice(0,HUD_SIDE_MAX).forEach(t=>row('sub','잔일',t));
+  if(subs.length>HUD_SIDE_MAX)e.appendChild(el('div','goal-more','잔일 '+(subs.length-HUD_SIDE_MAX)+'개 더 · 수첩 해야 할 일'));
   const m=$('goalM');m.querySelector('b').textContent=g?'중요':'지금 할 일';m.querySelector('span').textContent=g||REG.cover.ready;
   let ms=$('goalMSub');if(!ms){ms=el('small','goal-m-sub');ms.id='goalMSub';m.appendChild(ms);}
-  ms.hidden=!subs.length;ms.textContent=subs.length?'보통 · '+subs[0]+(subs.length>1?' 외 '+(subs.length-1):''):'';
+  ms.hidden=!subs.length;ms.textContent=subs.length?'잔일 · '+subs[0]+(subs.length>1?' 외 '+(subs.length-1):''):'';
 }
 let lastTool='';
 /* 결정 D-85: 키 안내의 잎사귀 변신은 가진 변신만 보인다. 변신을 하나도 못 배웠으면 줄을 숨긴다. */

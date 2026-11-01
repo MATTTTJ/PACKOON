@@ -24,19 +24,19 @@ function renderMomNote(body){
   const transcript=el('details','mom-transcript');transcript.appendChild(el('summary',null,'쪽지 글 다시 읽기'));
   spoken.forEach(text=>transcript.appendChild(el('p',null,text)));body.appendChild(transcript);
 }
-/* 결정 D-150: 수첩 '해야 할 일' 장. 중요(지금 지역의 본 줄거리 한 줄)와 보통(맡은 심부름)을 나누고,
+/* 결정 D-150: 수첩 '해야 할 일' 장. 중요(지금 지역의 본 줄거리 한 줄)와 잔일(맡은 심부름, D-200)을 나누고,
    끝낸 일은 접어 둔 '끝낸 일' 묶음에 남긴다(지나온 지역의 본 줄거리와 마친 심부름). 할 일 글은 HUD와 같다(hud.js). */
 function renderTodo(body){
   const item=(box,cls,text,sub)=>{const d=el('div','todo-item '+cls);d.appendChild(document.createTextNode(text));if(sub)d.appendChild(el('small',null,sub));box.appendChild(d);};
   const head=(cls,text)=>body.appendChild(el('div','todo-head '+cls,text));
   head('main','중요');
   const g=mainGoalText();item(body,'main',g||REG.cover.ready,REG.name);
-  head('sub','보통');
+  head('sub','잔일');
   const subs=activeSideQuests();
   if(!subs.length)body.appendChild(el('p','empty-note','맡은 부탁이 아직 없다. 길에서 만난 이들의 이야기를 들어 보자.'));
   subs.forEach(q=>item(body,'sub',q.text(G.f),REGIONS[q.region]?.name));
   const done=[...regionList().filter(r=>r.id!==G.region&&regionCompleted(r.id)).map(r=>({cls:'main',text:r.cover.end.head,sub:r.name+' · 중요'})),
-    ...SIDE_QUESTS.filter(sideDone).map(q=>({cls:'sub',text:q.title,sub:(REGIONS[q.region]?.name||'')+' · 보통'}))];
+    ...SIDE_QUESTS.filter(sideDone).map(q=>({cls:'sub',text:q.title,sub:(REGIONS[q.region]?.name||'')+' · 잔일'}))];
   if(!done.length)return;
   const box=el('details','todo-done');box.appendChild(el('summary',null,'끝낸 일 '+done.length));
   done.forEach(d=>item(box,d.cls,d.text,d.sub));body.appendChild(box);

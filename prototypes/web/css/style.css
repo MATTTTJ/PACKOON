@@ -614,7 +614,13 @@ body.ending-scene .hud,body.ending-scene #pad,body.ending-scene #toast,body.endi
 .map-place-name{display:block}
 .map-chart.has-seen{height:170px}
 .map-chart.has-seen .map-place{height:72px}
-.map-seen-who{display:block;font-size:10px;line-height:1.25;color:#5d4e39;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 결정 D-203: 만난 이는 점으로만, 이름은 마우스를 올리거나 골랐을 때 쪽지로 */
+.map-seen-who{display:flex;justify-content:center;align-items:center;gap:3px;height:9px;margin-top:2px}
+.map-who-dot{display:block;width:5px;height:5px;background:#7a4a2a;box-shadow:1px 1px 0 #c9b68e}
+.map-seen-who b{font-size:9px;font-weight:700;color:#5d4e39;line-height:1}
+.map-tip{position:absolute;z-index:3;transform:translate(-50%,calc(-100% - 6px));max-width:min(340px,80%);padding:4px 8px;background:var(--meok);color:#f5ead2;font-size:12px;line-height:1.4;border-radius:2px;box-shadow:0 2px 0 #a68d66;pointer-events:none;word-break:keep-all;text-align:center}
+.map-tip.below{transform:translate(-50%,6px)}
+.map-tip[hidden]{display:none}
 .map-seen-items{display:flex;justify-content:center;align-items:center;gap:1px;height:16px;margin-top:1px}
 .map-seen-items canvas{display:block;width:16px;height:16px;image-rendering:pixelated;pointer-events:none}
 .map-seen-items canvas.spent{opacity:.35}
