@@ -2630,18 +2630,7 @@ const TABLES={
   "gather_darae_vine_hits": 2,
   "gather_solbang_hits": 2,
   "yut_needle_speed": 1.5,
-  "yut_nak_zone": 10,
-  "wish_stack_fall_speed": 0.1,
-  "wish_stack_drop_speed": 0.4,
-  "wish_stack_move_speed": 0.3,
-  "wish_stack_start_offset": 7,
-  "wish_stack_sway": 1,
-  "wish_stack_sway_period": 100,
-  "wish_stack_tolerance": 1.5,
-  "wish_stack_wobble_frames": 30,
-  "wish_stack_roll_frames": 36,
-  "wish_stack_settle_frames": 24,
-  "wish_stack_done_frames": 50
+  "yut_nak_zone": 10
  },
  "TUNING": {
   "kkubeogi_cycle": 200,
@@ -2764,7 +2753,14 @@ const TABLES={
   "npc_move_walk_px": 36,
   "npc_move_step_ms": 130,
   "npc_move_min_px": 12,
-  "npc_move_window_ms": 1500
+  "npc_move_window_ms": 1500,
+  "wish_anim_side": 7,
+  "wish_anim_hover": 6,
+  "wish_anim_carry_frames": 50,
+  "wish_anim_pause_frames": 20,
+  "wish_anim_lower_frames": 30,
+  "wish_anim_settle_frames": 24,
+  "wish_anim_done_frames": 50
  },
  "PROGRESS": [
   {

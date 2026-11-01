@@ -213,9 +213,7 @@ const MINIGAMES=numericTable('minigames','미니게임',
     'salg_warning_frames salg_alert_frames salg_near_distance salg_near_graze salg_near_random dad_steps',
     'gather_ring_period gather_ring_pad gather_perfect_window gather_good_window gather_perfect_power gather_yield gather_perfect_bonus',
     'gather_root_hits gather_ssari_hits gather_kkoe_hits gather_eoksae_hits gather_seogi_hits gather_darae_vine_hits',
-    'yut_needle_speed yut_nak_zone gather_solbang_hits',
-    'wish_stack_fall_speed wish_stack_drop_speed wish_stack_move_speed wish_stack_start_offset wish_stack_sway wish_stack_sway_period',
-    'wish_stack_tolerance wish_stack_wobble_frames wish_stack_roll_frames wish_stack_settle_frames wish_stack_done_frames'
+    'yut_needle_speed yut_nak_zone gather_solbang_hits'
   ].join(' '));
 const TUNING=numericTable('tuning','분류',
   [
@@ -239,6 +237,7 @@ const TUNING=numericTable('tuning','분류',
     'form_squirrel_speed form_climb_speed form_climb_reach form_goat_jump form_owl_glide_fall',
     'form_deer_speed form_deer_listen_range form_fx_frames stranger_trade_limit',
     'form_intro_ms form_gait_frames snow_print_frames snow_print_max',
+    'wish_anim_side wish_anim_hover wish_anim_carry_frames wish_anim_pause_frames wish_anim_lower_frames wish_anim_settle_frames wish_anim_done_frames',
     'roll_hold_ms roll_speed roll_squirrel_speed roll_accel_frames roll_step_frames',
     'musoe_bonk_tell_first musoe_bonk_tell_last musoe_bonk_drop musoe_bonk_gap musoe_bonk_radius',
     'musoe_fire_cycle musoe_fire_warn musoe_fire_burn musoe_fire_radius musoe_fire_heat musoe_finale_bonks musoe_finale_gap musoe_finale_hold'
