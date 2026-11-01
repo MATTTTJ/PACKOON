@@ -127,11 +127,15 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .trade-good{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;margin-bottom:6px;padding:8px 10px;background:var(--hanji-2);border:1px solid #c7b48c;border-radius:4px;color:var(--meok);font:inherit;cursor:pointer;touch-action:manipulation}
 .trade-good[aria-pressed="true"]{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
 .trade-good-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-/* 결정 D-123: 거래 불가·다 바꿈 */
+/* 결정 D-147: 잠긴 물건은 흐리게. 값이 모자란 부탁은 모자란 물건 그림만 흐리게 하고 가진 수/필요한 수를 붉게 단다. */
 .trade-good.off{opacity:.55;background:#efe6d0}
-.trade-state{background:#e3d6bb;color:#5b4630}
-.trade-state.done{background:#d9d2c2;color:#6c6253}
-.trade-why{color:#7a5b3c}
+.trade-ask.missing{border-style:dashed;border-color:#b98a6a;background:#f3e8d6}
+.trade-ask.missing canvas{opacity:.45;filter:grayscale(.6)}
+.trade-ask.missing b{color:#a2462c}
+/* 결정 D-148: 품 표시 보기 */
+.trade-legend{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:0 0 10px;font-size:.82em;color:var(--dim)}
+.trade-legend-item{display:inline-flex;align-items:center;gap:3px}
+.trade-legend canvas.rarity-mark{width:15px;height:15px;image-rendering:pixelated}
 .trade-good-head canvas{width:26px;height:26px;image-rendering:pixelated}
 .trade-good-head canvas.rarity-mark{width:15px;height:15px}
 .trade-asks{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-height:28px}

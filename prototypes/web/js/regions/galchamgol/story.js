@@ -100,7 +100,12 @@ function dodamGive(){
 // 결정 D-03: 첫 만남에서 날쌘이 아빠 모자를 알아본다(영산 고백의 복선) (design/data/decisions.csv)
 function talkNal(){
   if(!G.f.nalTalk){G.f.nalTalk=true;ledger('nal','날쌘','도토리 가루 1 + 칡뿌리 1','숯');
-    talk([['날쌘','어이, 꼬마 보부상. 나도 보부상이거든?\n이 동네 숯은 다 내 지게에 있지.'],['너구리','(날쌘의 눈이 내 모자에 잠깐 머문다.)'],['날쌘','…바꿀 물건 있으면 꺼내 봐. 시시한 건 안 받아.'],['날쌘','같은 품이면 하나, 한 품 아래면 둘.\n보부상 셈이다.']],nalMenu);}   // 결정 D-134: 교환 규칙을 날쌘이 한 줄로 (D-39)
+    talk([['날쌘','어이, 꼬마 보부상. 나도 보부상이거든?\n이 동네 숯은 다 내 지게에 있지.'],['너구리','(날쌘의 눈이 내 모자에 잠깐 머문다.)'],['날쌘','…바꿀 물건 있으면 꺼내 봐. 시시한 건 안 받아.'],
+      // 결정 D-148: 물건의 품(레어도)과 그 표시를 날쌘이 첫 만남에 알려 준다. "시시한 건 안 받아"를 아이가 되묻는 데서 나온다.
+      ['너구리','시시한 거요?'],['날쌘','물건마다 품이 있어.\n우리 보부상은 잎이랑 열매로 매기지.'],
+      ['날쌘','잎 하나면 하품, 잎 둘이면 중품.\n열매가 하나 붙으면 상품, 둘이면 최상품.'],
+      ['날쌘','금빛으로 빛나면 천하일품.\n당산나무 해머루쯤은 돼야 그 소리 듣지.'],
+      ['날쌘','같은 품이면 하나, 한 품 아래면 둘.\n보부상 셈이다.']],nalMenu);}   // 결정 D-134: 교환 규칙을 날쌘이 한 줄로 (D-39)
   else nalMenu();
 }
 function nalMenu(){
@@ -203,8 +208,10 @@ function nalCraftSalt(){
 }
 function nalSaltGive(){
   if(G.f.craftTrade_salt||!has('vine'))return;
+  // 결정 D-147: 바구니 이야기를 듣기 전에 보따리에서 바로 바꾸면, 날쌘이 줄기를 원한 까닭부터 말한다.
+  const first=!G.f.nalBasketSeen;G.f.nalBasketSeen=true;ledger('t_craft_salt','날쌘','칡 줄기 1','소금 2 + 깨 1');
   takeItem('vine',1);addItem('salt',2);addItem('sesame',1);G.f.craftTrade_salt=true;ledgerDone('t_craft_salt');
-  talk([['날쌘','이제 숯가루 안 새겠네.'],['날쌘','가루에 소금 넣고 묵 쑤는 건 알지?\n깨도 볶아 놨으니, 소금이랑 같이 찧어 봐.']]);
+  talk([...(first?[['날쌘','칡 줄기네. 지게 바구니 테가 풀려서\n걸을 때마다 숯가루가 새던 참이야.']]:[]),['날쌘','이제 숯가루 안 새겠네.'],['날쌘','가루에 소금 넣고 묵 쑤는 건 알지?\n깨도 볶아 놨으니, 소금이랑 같이 찧어 봐.']]);
 }
 
 /* ---------- 무쇠 (삼촌, 아빠의 동생인 너구리 대장장이) ----------
@@ -1141,7 +1148,8 @@ Rg.trade={
   dodam:()=>G.ledger.dodam?[{id:'t_dodam',item:'meoru',info:true,label:'해머루 자리에 대한 정보',asks:[{powder:1}],done:()=>G.f.dodamDone,accept:dodamGive}]:[],
   nal:()=>[
     ...(G.ledger.nal?[{id:'t_nal_galchamgol',item:'coal',n:1,asks:[{powder:1,root:1}],done:()=>G.f.nalDone,accept:()=>{G.f.nalPriceHeard=true;nalTrade();}}]:[]),
-    ...(G.ledger.t_craft_salt?[{id:'t_craft_salt',item:'salt',label:'소금 2 · 깨 1',asks:[{vine:1}],done:()=>G.f.craftTrade_salt,accept:nalSaltGive}]:[])
+    // 결정 D-147: 소금·깨는 처음부터 날쌘 지게에 있다. 칡 줄기가 없으면 값이 모자랄 뿐이다.
+    ...(!CLASSIC?[{id:'t_craft_salt',item:'salt',label:'소금 2 · 깨 1',asks:[{vine:1}],done:()=>G.f.craftTrade_salt,accept:nalSaltGive}]:[])
   ],
   toad:()=>G.f.toadMet?[{id:'t_toad',item:'meoru',icon:'magamok_tea',label:'엄마의 병을 늦추는 약',asks:[{meoru:1},{meoru:1,acorn_jelly:1}],done:()=>G.diary.some(d=>d.id==='end'),accept:toadGive}]:[]
 };
