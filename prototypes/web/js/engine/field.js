@@ -783,7 +783,7 @@ function tryInteract(){
     const texts=Array.isArray(p.text)?p.text:[p.text];
     const visits=G.f.examineVisits||(G.f.examineVisits={}),key=expansionKey(p.id),i=Math.min(visits[key]||0,texts.length-1);
     visits[key]=Math.min(i+1,texts.length-1);
-    if(p.peek!==false)peekAt(p.x,p.y??fieldGround());
+    if(p.peek!==false)peekAt(p.x,p.y??fieldGround(),{hold:true});   // 결정 D-151: 조사 그림은 대화창이 닫힐 때까지
     talk([[p.who||'너구리',texts[i]]]);
   }else if(kind==='wanderers'){
     learn('met:'+p.id,true);
@@ -867,33 +867,62 @@ function drawZoneObjects(){
   drawClimbs();
 }
 /* 살펴보기 작은 그림: 살펴본 물건 둘레를 주인공 없이 다시 그려 크게 키운 뒤 잠깐 띄운다.
-   조사(examines)·도장은 저절로, 지역 대사에서는 peekAt(x,y)로 부른다. {peek:false}면 띄우지 않는다. */
+   조사(examines)·도장은 저절로, 지역 대사에서는 peekAt(x,y)로 부른다. {peek:false}면 띄우지 않는다.
+   결정 D-151: 화면 정중앙에 띄운다(대화창과 겹칠 때만 그 위로 비켜 선다). {hold:true}면 시간으로 지우지 않고
+   대화창이 닫힐 때 흐려진다. 조사 그림은 hold다. 대사 줄에 장면 그림을 붙이려면 그 줄 배열에 pic(그리기 함수, null이면 닫기)을 단다(dialog.js). */
 const peekBox=el('div','peek');peekBox.hidden=true;peekBox.setAttribute('aria-hidden','true');
 const peekCv=document.createElement('canvas');peekCv.width=64*3;peekCv.height=44*3;peekBox.appendChild(peekCv);
 $('stage').appendChild(peekBox);
-let peekTimer=0;
+let peekTimer=0,peekHeld=false,peekPaint=0;
 function peekAt(x,y=fieldGround(),opts={}){
   if(CLASSIC||!Number.isFinite(x))return;
   const full=document.createElement('canvas');full.width=W;full.height=H;
   const saved=ctx,oldCam=cam;ctx=full.getContext('2d');ctx.imageSmoothingEnabled=false;
   try{drawFieldScene(false);}finally{ctx=saved;cam=oldCam;}
   const cw=opts.w||64,ch=opts.h||44,sx=Math.round(clamp(x-G.cam-cw/2,0,W-cw)),sy=Math.round(clamp(y-ch+(opts.below??10),0,H-ch));
-  const pc=peekCv.getContext('2d');pc.imageSmoothingEnabled=false;pc.clearRect(0,0,peekCv.width,peekCv.height);
+  peekPaint++;peekBox.classList.remove('scene');const pc=peekCv.getContext('2d');pc.imageSmoothingEnabled=false;pc.clearRect(0,0,peekCv.width,peekCv.height);
   pc.drawImage(full,sx,sy,cw,ch,0,0,peekCv.width,peekCv.height);
+  showPeek(opts);
+}
+/* 결정 D-151: 장면 그림. draw(w,h,초)는 64×44 칸에 지금 ctx로 그린다(R·M을 그대로 쓴다). {animate:true}면 떠 있는 동안 다시 그린다. */
+function peekPicture(draw,opts={}){
+  if(CLASSIC||typeof draw!=='function')return;
+  const buf=document.createElement('canvas');buf.width=64;buf.height=44;
+  const id=++peekPaint,pc=peekCv.getContext('2d');
+  const paint=()=>{
+    const g=buf.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,64,44);
+    const saved=ctx;ctx=g;try{draw(64,44,performance.now()/1000);}finally{ctx=saved;}
+    pc.imageSmoothingEnabled=false;pc.clearRect(0,0,peekCv.width,peekCv.height);pc.drawImage(buf,0,0,peekCv.width,peekCv.height);
+  };
+  peekBox.classList.add('scene');paint();
+  if(opts.animate&&!Vfx.reducedMotion){const step=()=>{if(peekPaint!==id||peekBox.hidden)return;paint();requestAnimationFrame(step);};requestAnimationFrame(step);}
+  showPeek({hold:true,...opts});
+}
+function showPeek(opts={}){
   peekBox.hidden=false;placePeek();requestAnimationFrame(placePeek);peekBox.classList.remove('show');void peekBox.offsetWidth;peekBox.classList.add('show');
   // 결정 D-56: 화면 가운데에 작게, 짧게. 끝에서 흐려지며 사라진다.
   peekBox.classList.remove('out');clearTimeout(peekTimer);
+  peekHeld=!!opts.hold;if(peekHeld)return;
   const ms=opts.ms||TABLES.TUNING.peek_ms,fade=TABLES.TUNING.peek_fade_ms;
   peekTimer=setTimeout(()=>{peekBox.classList.add('out');peekTimer=setTimeout(hidePeek,fade);},Math.max(0,ms-fade));
 }
-/* 무대 가운데. 대화창이 무대 아래를 덮고 있으면 덮이지 않은 위쪽 영역의 가운데로 올린다 */
+/* 결정 D-151: 대화창이 닫히면(또는 장면 그림을 끄는 줄이 오면) 붙들어 둔 그림을 흐리며 닫는다. 시간으로 닫히는 그림은 그대로 둔다. */
+function peekRelease(){
+  if(!peekHeld||peekBox.hidden)return;
+  peekHeld=false;peekPaint++;clearTimeout(peekTimer);peekBox.classList.add('out');peekTimer=setTimeout(hidePeek,TABLES.TUNING.peek_fade_ms);
+}
+/* 무대 정중앙. 대화창과 겹칠 때만 대화창 바로 위로 올린다 */
 function placePeek(){
   if(peekBox.hidden)return;
   const sr=$('stage').getBoundingClientRect(),d=$('dlg'),dr=d.hidden?null:d.getBoundingClientRect();
-  const bottom=dr&&dr.top<sr.bottom&&dr.bottom>sr.top?Math.max(sr.top,dr.top):sr.bottom;
-  peekBox.style.top=Math.round((bottom-sr.top)/2)+'px';
+  let top=sr.height/2;
+  if(dr&&dr.top<sr.bottom&&dr.bottom>sr.top){
+    const h=peekBox.offsetHeight,limit=dr.top-sr.top-6-h/2;
+    if(top>limit)top=Math.max(h/2+4,limit);
+  }
+  peekBox.style.top=Math.round(top)+'px';
 }
-function hidePeek(){clearTimeout(peekTimer);peekBox.hidden=true;peekBox.classList.remove('show','out');}
+function hidePeek(){clearTimeout(peekTimer);peekHeld=false;peekBox.hidden=true;peekBox.classList.remove('show','out');}
 const vistaCaption=el('div',null);
 vistaCaption.setAttribute('role','status');vistaCaption.hidden=true;
 vistaCaption.className='vista-caption';
