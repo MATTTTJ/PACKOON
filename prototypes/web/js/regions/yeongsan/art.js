@@ -23,12 +23,8 @@ Rg.art={
     }},
   /* 옹달 할미 (결정 D-120): 늙은 오소리. 흰 줄무늬 얼굴, 자주색 머릿수건. 곁에 금 간 솥과 작은 불, 허리춤에 표주박.
      봄이 오면(강철이가 떠나면) 솥을 엎어 말린다. */
-  badger(ox,oy,f){const Gy='#857d70',Dk='#4a443d',Wt='#eee6d6',K='#17120e',Sc='#7a4a6a',Pot='#3a3532';
-    const t=(G&&G.anim)||0,spring=G&&G.boss&&G.boss.dead;
-    if(spring){M(ox,oy,f,-26,-5,12,5,Pot);M(ox,oy,f,-25,-6,10,1,'#56504a');}
-    else{M(ox,oy,f,-25,-9,11,7,Pot);M(ox,oy,f,-26,-10,13,2,'#56504a');M(ox,oy,f,-21,-8,1,6,'#6a625a');
-      M(ox,oy,f,-24,-2,8,2,t%20<10?'#e07a2c':'#f0a640');M(ox,oy,f,-22,-3,3,1,'#ffd27a');
-      M(ox,oy,f,-21,-14-(t>>3)%3,2,2,'#dcd6cc');M(ox,oy,f,-18,-17+((t>>3)%3),2,2,'#e8e2d8');}
+  badger(ox,oy,f){const Gy='#857d70',Dk='#4a443d',Wt='#eee6d6',K='#17120e',Sc='#7a4a6a';
+    // 결정 D-154: 옆에 걸어 둔 솥은 Rg.props.ongdalPot이 제자리에 그린다(할미가 고개를 돌려도 움직이지 않는다).
     M(ox,oy,f,-9,-11,15,8,Gy);M(ox,oy,f,-9,-5,15,2,Dk);M(ox,oy,f,-10,-10,2,5,Dk);
     M(ox,oy,f,-8,-3,3,3,K);M(ox,oy,f,-3,-3,3,3,K);M(ox,oy,f,1,-3,3,3,K);
     M(ox,oy,f,4,-16,9,8,Wt);M(ox,oy,f,5,-16,2,8,K);M(ox,oy,f,9,-16,2,7,K);M(ox,oy,f,12,-11,2,2,K);M(ox,oy,f,10,-12,1,1,'#ffffff');
@@ -66,6 +62,12 @@ Rg.art={
     M(ox,oy,f,20,-22,4,1,'#f4f4f4');M(ox,oy,f,20,-20,4,1,'#f4f4f4');},
 };
 Rg.props={
+  /* 결정 D-154: 옹달 할미의 솥. 할미 왼쪽 눈밭에 걸려 있다. 봄(강철이 뒤)에는 불을 끄고 엎어 둔다. */
+  ongdalPot(n){const x=Math.round(n.x-cam),y=n.y??fieldGround(),Pot='#3a3532',t=(G&&G.anim)||0;
+    if(G&&G.boss&&G.boss.dead){R(x-26,y-5,12,5,Pot);R(x-25,y-6,10,1,'#56504a');return;}
+    R(x-25,y-9,11,7,Pot);R(x-26,y-10,13,2,'#56504a');R(x-21,y-8,1,6,'#6a625a');
+    R(x-24,y-2,8,2,t%20<10?'#e07a2c':'#f0a640');R(x-22,y-3,3,1,'#ffd27a');
+    R(x-21,y-14-(t>>3)%3,2,2,'#dcd6cc');R(x-18,y-17+((t>>3)%3),2,2,'#e8e2d8');},
   /* 날쌘의 산막 */
   hut(n){const x=n.x-cam;R(x-50,GROUND-30,46,30,'#6b5038');R(x-56,GROUND-40,58,11,'#4a3424');R(x-56,GROUND-42,58,3,'#f4f6f8');
     R(x-36,GROUND-20,14,20,'#2a1a10');R(x-34,GROUND-18,10,6,'#ffb050');R(x-12,GROUND-48,5,12,'#5a4a3a');

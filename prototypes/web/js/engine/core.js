@@ -160,8 +160,9 @@ function trimX(x,cuts){if(!cuts||!Number.isFinite(x))return x;let s=0;for(const 
 function untrimX(t,cuts){if(!cuts||!Number.isFinite(t))return t;let s=0;for(const [c,d] of [...cuts].sort((a,b)=>a[0]-b[0])){if(t+s>=c)s+=d;else break;}return t+s;}
 /* 결정 D-116: 자르기 판 번호. 1은 PR #91(D-109) 첫 자르기, 2는 남은 빈 구간까지 줄인 판이다.
    결정 D-128: 3은 걷기만 하는 길을 콘텐츠 사이 230px 안팎까지 줄인 판이다.
-   지역이 Rg.trimCutsV1·V2(그 판의 자르기)를 두면, 그 판으로 저장한 상태는 그 차이만큼만 옮긴다. */
-const TRIM_VER=3;
+   결정 D-155: 4는 단풍골 숲의 도담~꺼병이 길을 반으로 줄인 판이다.
+   지역이 Rg.trimCutsV1·V2·V3(그 판의 자르기)를 두면, 그 판으로 저장한 상태는 그 차이만큼만 옮긴다. */
+const TRIM_VER=4;
 /* 결정 D-128: 자른 구역의 배경은 남은 구간마다 나눠 그린다(engine/field.js segmentedDraw).
    그리는 동안 TRIM_SEG는 그 구간이 당겨진 만큼이고, cam은 그만큼 옮겨진다. 그래서 설계 좌표로 쓴 그림(u-cam)이 제자리에 온다.
    이미 옮긴 좌표(발판·도장·물건)나 원경 원근(cam*k)은 RC()(실제 카메라)를 쓴다. */
@@ -251,7 +252,7 @@ function trimState(r,s){
 function trimMigrate(r,g){
   if(!r?.trimCuts||CLASSIC||!g||g.trimVer===TRIM_VER)return;
   // 자르기 전 저장은 설계 좌표에서, 첫 판(1) 저장은 첫 판 좌표에서 지금 자르기로 옮긴다.
-  const prev=g.trimVer===1?(r.trimCutsV1||r.trimCuts):g.trimVer===2?(r.trimCutsV2||r.trimCuts):null;
+  const prev=g.trimVer===1?(r.trimCutsV1||r.trimCuts):g.trimVer===2?(r.trimCutsV2||r.trimCuts):g.trimVer===3?(r.trimCutsV3||r.trimCuts):null;
   const conv=(zone,x)=>trimX(untrimX(x,prev?.[zone]),r.trimCuts[zone]);
   g.trimVer=TRIM_VER;const z0=firstZone(r);
   for(const k of ['pickups','digs'])for(const a of g[k]||[]){const z=a.zone||z0;if(r.trimCuts[z])a.x=conv(z,a.x);}
