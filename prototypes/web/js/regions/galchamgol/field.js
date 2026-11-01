@@ -304,11 +304,6 @@ if(!CLASSIC){
       faint:()=>{G.px=1900-HILL_SHIFT;G.py=GROUND;G.vy=0;G.onGround=true;toast('나무 앞 쉼터로 물러났다. 버섯 향으로 달랠 수도 있다.');},
     },
   };
-  // 도장은 발견 전에도 풍경 속 흔적이 보인다. 엔진의 발견 후 표시와 별도로 그린다.
-  for(const z of Object.values(Rg.zones)){
-    const scenery=z.drawScenery;
-    z.drawScenery=()=>{scenery?.();for(const s of z.stamps||[])A.stamp(s.x-RC(),s.y??GROUND);};   // 도장은 이미 옮긴 좌표 (D-128)
-  }
   installTravel();
 
   /* 공통 엔진을 덮어쓰지 않는 지역 연출. 구역 문에서 출발하고 같은 문 API로 도착한다.
