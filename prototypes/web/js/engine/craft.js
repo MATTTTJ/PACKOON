@@ -41,6 +41,7 @@ function finishCraftHands(redraw=true){
     (h.discovered?' 찾은 가공법을 수첩에 이어 적었다.':'');
   if(redraw&&open('bag'))renderBag();
 }
+// 결정 D-201: 가공 한 동작을 조금 더 빠르게 (tuning craft_motion_ms 1100→750)
 const craftMotionMs=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?300:TABLES.TUNING.craft_motion_ms;
 // 한 번 누르면 동작 한 번이 시작된다. 동작 중에는 더 누르지 않는다.
 function craftHandInput(direction){

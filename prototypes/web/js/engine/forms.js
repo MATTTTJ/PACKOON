@@ -51,16 +51,17 @@ function setForm(id,opts={}){
   G.form=id;formClimb=null;
   // 결정 D-173: 플레이어가 한 번 골라 써 봤으면 빛내기를 그친다 (이야기 연출로 바뀐 것{scripted:true}은 세지 않는다)
   if(id&&!opts.scripted&&G.f.formHintIds?.includes(id))G.f.formHintIds=G.f.formHintIds.filter(x=>x!==id);
+  // 결정 D-191: 변신하거나 풀릴 때 글 알림('…로 변했다', '너구리로 돌아왔다')은 띄우지 않는다. 잎 소리와 먹 번짐만 남긴다.
   if(!opts.quiet){
     Sound.leaf?.(id);
     if(!B)formFx={owner:G,x:G.px,y:G.py-12,t:0};
-    toast(id?formTo(id)+' 변했다':'너구리로 돌아왔다');
   }
+  formIntroHide();   // 결정 D-192: 변신하면 새 변신 카드는 바로 닫힌다
   refreshFormUi();if(typeof B!=='undefined'&&B)renderBattleForms();
   return true;
 }
 /* 구역·지역을 옮기거나 전투에서 지면 부른다 */
-function revertForm(){if(G&&G.form)setForm('',{force:true,quiet:true});formClimb=null;}
+function revertForm(){if(G&&G.form)setForm('',{force:true,quiet:true});formClimb=null;formIntroHide();}
 function formIdForKey(k){return k==='0'?'':FORM_IDS[+k-1];}
 /* 숫자 키. 처리했으면 true */
 function formKey(k){
@@ -245,15 +246,17 @@ function drawFormBackAt(ox,oy,phase,form){
   const K='#2a211b',up=phase?1:-1;
   const P=(x,y,w,h,c)=>R(ox+x,oy+y,w,h,c);
   if(form==='squirrel'){
-    // 결정 D-122: 줄기를 탈 때 뒷모습이 작아 안 보였다. 1.5배로 키우고, 어두운 테두리와 등 위로 솟은 큰 꼬리 실루엣을 그린다.
-    const C='#b5652d',D='#7a3f1c',T='#d08a4f',TL='#f0b878',O='#2a1a10',k=1.5;
+    // 결정 D-122: 줄기를 탈 때 뒷모습이 작아 안 보였다. 키우고 어두운 테두리를 두른다.
+    // 결정 D-189: 꼬리가 몸보다 커서 어색했다(사용자 피드백 39). 앞모습(drawFormAt) 몸집에 맞춰 1.2배로 줄이고,
+    //   꼬리는 몸 한쪽 옆으로 붙여 귀 높이까지만 올린다(몸통 폭의 절반쯤, 끝만 살짝 바깥으로 말린다).
+    const C='#b5652d',D='#7a3f1c',T='#d08a4f',TL='#f0b878',O='#2a1a10',k=1.2;
     const Q=(x,y,w,h,c)=>P(Math.round(x*k),Math.round(y*k),Math.max(1,Math.round(w*k)),Math.max(1,Math.round(h*k)),c);
-    Q(-5,-19,10,18,O);Q(-6,-25,8,15,O);                                  // 몸과 꼬리 테두리(먼저 깐다)
+    Q(-5,-19,10,18,O);Q(-8,-19,4,14,O);                                  // 몸과 꼬리 테두리(먼저 깐다)
+    Q(-7,-17,3,11,T);Q(-5,-8,2,4,T);Q(-8,-18,2,2,T);Q(-6,-16,1,7,TL);   // 몸 왼쪽에 붙은 꼬리, 끝은 바깥으로
     Q(-4,up<0?-3:-5,3,up<0?3:2,D);Q(1,up>0?-3:-5,3,up>0?3:2,D);        // 뒷발: 한쪽은 디디고 한쪽은 올린다
     Q(-4,-11,8,8,C);Q(-3,-16,6,5,C);Q(-3,-18,1,2,C);Q(2,-18,1,2,C);   // 몸통·뒤통수·귀
     Q(-3,-14,6,3,BUNDLE);Q(-2,-13,1,1,'#8a3b2a');                      // 등 보따리
-    Q(up<0?-6:4,-18,2,6,D);Q(up<0?4:-6,-14,2,4,D);                       // 앞발: 한쪽은 위로 뻗어 잡는다
-    Q(-4,-12,6,10,T);Q(-5,-21,5,10,T);Q(-4,-24,4,3,TL);Q(-3,-11,2,8,TL);Q(-4,-19,2,6,TL);   // 등에서 머리 위로 솟은 큰 꼬리
+    Q(up<0?-5:3,-18,2,6,D);Q(up<0?3:-5,-14,2,4,D);                       // 앞발: 한쪽은 위로 뻗어 잡는다
     return;
   }
   if(form==='goat'){
@@ -467,7 +470,8 @@ function refreshFormUi(){
 /* ---------- 결정 D-173: 새 변신 알림 카드와 빛내기 ----------
    unlockForm 이 G.f.formIntroQ 에 넣으면, 대화·전투·패널이 모두 닫힌 첫 순간에 화면 위쪽 가운데에 카드를 띄운다.
    카드는 그 변신이 잘하는 것을 짧은 그림으로 한 번 보여 주고(말로 늘어놓지 않는다), 숫자 키와 휴대폰 잎사귀 버튼을 알린다.
-   입력을 막지 않고 form_intro_ms 뒤 흐려진다. 처음 써 볼 때까지(G.f.formHintIds) 그 변신으로만 갈 수 있는 자리에 작은 잎빛이 반짝인다. */
+   입력을 막지 않고 form_intro_ms 뒤 흐려진다.
+   결정 D-192: 카드는 길어야 form_intro_ms(5초)다. 구역·지역을 옮기거나 플레이어가 변신하면 바로 닫는다. 처음 써 볼 때까지(G.f.formHintIds) 그 변신으로만 갈 수 있는 자리에 작은 잎빛이 반짝인다. */
 const FORM_INTRO={
   squirrel:{line:'줄기를 타고 높은 데까지 오른다'},
   goat:{line:'디딜 데를 보고 훌쩍 높이 뛴다'},
@@ -480,6 +484,11 @@ const formIntroHead=el('b','form-intro-head'),formIntroKeys=el('p','form-intro-k
 formIntroBox.append(formIntroHead,formIntroCv,formIntroLine,formIntroKeys);
 $('stage')?.appendChild(formIntroBox);
 let formIntroShow=null,formIntroBuf=null;
+/* 결정 D-192: 떠 있는 카드를 곧바로 닫는다 (변신·구역 이동) */
+function formIntroHide(){
+  if(!formIntroShow)return;
+  formIntroShow=null;formIntroBox.hidden=true;formIntroBox.classList.remove('show','out');
+}
 /* 변신이 잘하는 것을 DEMO_W×DEMO_H 칸에 그린다(바닥 y=56). t: 카드가 뜬 뒤 흐른 초 */
 const DEMO_W=96,DEMO_H=64,DG=56;
 function drawFormDemo(id,t){
@@ -531,11 +540,12 @@ function formIntroTick(){
   // 손가락으로 하는 화면이면 잎사귀 버튼을, 아니면 숫자 키를 알린다
   if(matchMedia('(pointer:coarse)').matches)formIntroKeys.textContent='잎사귀 버튼을 눌러 바꾼다';
   else formIntroKeys.append(el('kbd',null,String(n)),document.createTextNode(' '+formName(id)+' · '),el('kbd',null,'0'),document.createTextNode(' 너구리'));
-  formIntroShow={id,t0:performance.now()};
+  formIntroShow={id,t0:performance.now(),zone:G.zone,reg:REG};
   formIntroBox.hidden=false;formIntroBox.classList.remove('out');void formIntroBox.offsetWidth;formIntroBox.classList.add('show');
   Sound.leaf?.(id);
   const paint=()=>{
     if(!formIntroShow||formIntroShow.id!==id)return;
+    if(formIntroShow.zone!==G.zone||formIntroShow.reg!==REG){formIntroHide();return;}   // 구역·지역을 옮겼다
     const el2=(performance.now()-formIntroShow.t0)/1000,g=formIntroCv.getContext('2d');
     const buf=formIntroBuf||(formIntroBuf=Object.assign(document.createElement('canvas'),{width:DEMO_W,height:DEMO_H}));
     const b=buf.getContext('2d');b.imageSmoothingEnabled=false;b.clearRect(0,0,DEMO_W,DEMO_H);

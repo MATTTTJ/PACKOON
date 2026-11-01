@@ -21,7 +21,7 @@ stream_otter,galchamgol,여울,동물,나,met:stream_otter,처음 만났을 때,
 stream_otter,galchamgol,여울,동물,나,otter:stone,함지박 밑 낙관을 봤을 때,엄마는 빨래를 마치면 물수제비를 일곱 번 떴다고 한다. 나는 몰랐다.,제안,결정 D-117,관찰
 charcoal_badger,galchamgol,검댕,동물,나,met:charcoal_badger,처음 만났을 때,"참나무 숲에서 숯 굽는 오소리. 흰 연기는 아직, 푸른 연기면 다 된 숯이다.",제안,결정 D-117,관찰
 charcoal_badger,galchamgol,검댕,동물,나,geom:nal,눈을 씻고 연기 빛을 봤을 때,날쌘 아저씨는 값을 깎는 척하고 가마 옆에 몰래 덤을 두고 간다. 모른 척하기로 했다.,제안,결정 D-117,관찰
-kudzu,galchamgol,엉킨 칡,동물,나,fight:kudzu,처음 맞설 때,"당산나무를 뱀처럼 감은 칡덩굴. 줄기는 채찍처럼 후려치고, 덩이뿌리는 위에서 내리찍고, 꽃은 달큰한 향을 뿜는다.",제안,,관찰
+kudzu,galchamgol,엉킨 칡,동물,나,fight:kudzu,처음 맞설 때,"당산나무를 뱀처럼 감은 칡덩굴. 줄기는 채찍처럼 후려치고, 덩이뿌리는 위에서 내리찍고, 꽃은 꽃가루를 터뜨려 바닥에 달큰한 잔향을 남긴다.",제안,,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,core:kudzu,핵심 부위가 드러날 때,줄기나 뿌리를 하나 꺾어야 잎이 걷히고 칡꽃이 드러난다.,제안,,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,like:kudzu:ssari,전투에서 싸리버섯을(를) 건넸을 때,싸리버섯 향을 맡으면 덩굴이 느슨해진다.,제안,,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,like:kudzu:kkoe,전투에서 꾀꼬리버섯을(를) 건넸을 때,꾀꼬리버섯 향도 좋아한다.,제안,,관찰
