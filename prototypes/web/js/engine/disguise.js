@@ -1,13 +1,12 @@
 'use strict';
-/* 결정 D-194: 변신한 채 말을 걸면 (사용자 피드백 63, 2026-11-01)
-   NPC 들은 아이를 너구리 모습으로만 안다. 변신한 채 말을 걸면 누구든 먼저 "누구냐"고 묻고,
-   아이가 잎을 불어 너구리로 돌아와 자기라는 걸 보인 뒤에 원래 대화(필드의 말 걸기)로 이어진다.
+/* 결정 D-194·D-232: 변신한 채 말을 걸면 (사용자 피드백 63, 2026-11-01)
+   NPC 들은 아이를 너구리 모습으로만 안다. 확정(기획서 §3 변신)대로 변신한 동안은 아이를 몰라보고 낯선 손님으로 대한다(D-232).
+   손님 교환·기믹이 있는 인물(REG.strangers)은 손님 첫마디와 교환으로, 없는 인물은 누구냐는 말로 받는다.
+   어느 쪽이든 '본모습을 보인다'를 고르면 아이가 잎을 불어 너구리로 돌아와 자기라는 걸 보인 뒤 원래 대화(필드의 말 걸기)로 이어진다.
    - 처음 보는 인물(met: 표시 없음)은 낯선 짐승을 경계하는 말(first)을, 아는 인물은 알 듯 말 듯한 말(ask)을 한다.
    - 같은 지역에서 그 인물에게 두 번째부터는 짧은 물음(again)과 아이의 짧은 대답만 나온다. 묻는 말은 늘 나온다.
-   - 확정(기획서 §3 변신): 변신한 동안 NPC 는 아이를 낯선 손님으로 대한다. 손님 교환·기믹이 있는 인물(REG.strangers)은
-     물음에 '손님인 척한다'를 함께 두어 그 길을 남긴다. 첫 선택지는 늘 '본모습을 보인다'다.
    - 표에 없는 것(물레방아 손일 자리·윷판·등불 꾸러미·쉼터 같은 사물)은 묻지 않고 예전처럼 다룬다.
-   - 집안 사람(무쇠·아빠)과 산군도 묻되, 알아본다는 반응으로 받는다. story.js 의 if(G.form) 갈래는 이제 닿지 않는다(본모습으로 돌아온 뒤 talk).
+   - 집안 사람(무쇠·아빠)과 산군(knows)은 잎사귀 둔갑을 알아보니 묻고 나서 바로 본모습으로 돌아온다. story.js 의 if(G.form) 갈래는 이제 닿지 않는다(본모습으로 돌아온 뒤 talk).
    줄 값은 문자열이거나 (변신 id, 인물)→문자열 함수. {f}는 변신 이름, {f이}는 받침에 따라 '이'를 붙인 변신 이름. */
 const DISGUISE_ME={low:'나야, 나.',high:'저예요.'},DISGUISE_ME_FIRST={low:'놀랐지? 미안.',high:'놀라게 해서 죄송해요.'};
 const DISGUISE_ME_AGAIN={low:'나야.',high:'저예요.'};
@@ -19,7 +18,7 @@ const DISGUISE_NAL={tone:'high',
   back:'하, 너였어? 별 재주를 다 부리네.',backFirst:'너구리였어? 별 재주를 다 부리네.'};
 const DISGUISE_LINES={
   /* 단풍골 */
-  musoe:{tone:'high',me:'네, 삼촌.',
+  musoe:{tone:'high',knows:true,me:'네, 삼촌.',
     first:'누구냐. …잎 소리.\n삼촌 앞에선 제 모습으로 와라.',ask:'누구냐. …잎 소리.\n삼촌 앞에선 제 모습으로 와라.',again:'누구냐… 또 너구나.',
     back:'그래. 잎은 제법 다루는구나.',backFirst:'그래. 잎은 제법 다루는구나.'},
   nal:DISGUISE_NAL,
@@ -113,11 +112,11 @@ const DISGUISE_LINES={
     first:'누, 누구야? 거기 서!',ask:'누, 누구야…?\n발소리가 처음 듣는 건데.',again:'누, 누구야…?',
     back:'너, 너였어? 귀가 다 쭈뼛했잖아.',backFirst:'너구리구나… 휴.'},
   // 아빠는 말을 잃었다. 몸짓으로만 묻고, 집안 사람이라 잎사귀를 알아본다.
-  dad:{tone:'high',me:'아빠, 저예요.',meFirst:'아빠, 저예요.',meAgain:'저예요, 아빠.',
+  dad:{tone:'high',knows:true,me:'아빠, 저예요.',meFirst:'아빠, 저예요.',meAgain:'저예요, 아빠.',
     first:'(아빠가 낯선 짐승을 물끄러미 본다.\n누구냐고 묻는 눈이다.)',ask:'(아빠가 짐짓 고개를 갸웃한다.\n어디서 온 손님이냐는 얼굴이다.)',
     again:'(아빠가 또 짐짓 고개를 갸웃한다.)',
     back:'(아빠가 보따리 끈의 잎사귀를 손가락으로 톡 친다.\n다 안다는 얼굴이다.)',backFirst:null},
-  sangun:{tone:'high',me:'단풍골 너구리예요.',meFirst:'단풍골 너구리예요.',
+  sangun:{tone:'high',knows:true,me:'단풍골 너구리예요.',meFirst:'단풍골 너구리예요.',
     first:'무엇으로 왔느냐. 이름을 대어라.',ask:'무엇으로 왔느냐. 이름을 대어라.',again:'무엇으로 왔느냐.',
     back:'무엇으로 와도 너는 너다.',backFirst:'무엇으로 와도 너는 너다.'},
   y_bear_lullaby:{tone:'low',
@@ -143,7 +142,7 @@ function disguiseText(v,form,p){
   const name=formName(form);
   return v.replace(/\{f이\}/g,jo(name,'이','')).replace(/\{f\}/g,name);
 }
-/* 물음 → (본모습) → 아이의 대답 → 아는 사이면 반응 → next(). 손님 교환이 있으면 물음에 '손님인 척한다'를 둔다. */
+/* 손님 대접(D-232) → '본모습을 보인다'를 고르면 → 아이의 대답 → 아는 사이면 반응 → next(). */
 function disguiseTalk(p,next){
   const e=disguiseEntry(p),form=G.form,who=e.who||p.speakers?.[0]||p.name;
   const seen=G.f.disguiseSeen||(G.f.disguiseSeen={}),key=REG.id+':'+p.id,again=(seen[key]||0)>0;
@@ -158,9 +157,9 @@ function disguiseTalk(p,next){
     if(back)lines.push([who,back]);
     talk(lines,next);
   };
-  if(typeof strangerEntry==='function'&&strangerEntry(p.id))
-    talk([[who,ask,[{t:'본모습을 보인다',go:reveal},{t:'손님인 척한다',go:()=>strangerTalk(p,{noLine:true})}]]]);
-  else talk([[who,ask]],reveal);
+  if(e.knows)talk([[who,ask]],reveal);
+  else if(typeof strangerEntry==='function'&&strangerEntry(p.id))strangerTalk(p,{reveal,askLine:ask});
+  else talk([[who,ask,[{t:'본모습을 보인다',go:reveal},{t:'그만두기',go:null}]]]);
 }
 /* 결정 D-197: 지금 대화 상대와 보따리를 펴거나 물건을 건넬 수 없는 때 (사용자 피드백 57).
    변신한 채로는 상대가 아이를 모른다(손님 교환은 손님 대화의 선택지로만). 지역은 REG.tradeClosed(id) 로 더 막는다(꾸벅이가 조는 동안). */

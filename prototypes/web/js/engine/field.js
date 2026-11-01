@@ -785,7 +785,7 @@ function actionVerb(p){
 function tryInteract(){
   const p=nearInteraction();if(!p)return;
   const kind=interactionKind(p);
-  // 결정 D-194: 변신한 채 인물에게 말을 걸면 먼저 누구냐고 묻고, 너구리로 돌아와 보인 뒤 이어 간다 (disguise.js)
+  // 결정 D-194·D-232: 변신한 채 인물에게 말을 걸면 낯선 손님으로 받고, '본모습을 보인다'를 고르면 너구리로 돌아와 이어 간다 (disguise.js)
   if((kind==='npc'||kind==='wanderers')&&disguiseApplies(p)){disguiseTalk(p,()=>interactWith(p,kind));return;}
   interactWith(p,kind);
 }
