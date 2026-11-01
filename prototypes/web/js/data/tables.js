@@ -2531,7 +2531,7 @@ const TABLES={
   "salg_near_random": 31,
   "dad_steps": 3,
   "gather_ring_period": 54,
-  "gather_ring_radius": 20,
+  "gather_ring_pad": 3,
   "gather_perfect_window": 3,
   "gather_good_window": 9,
   "gather_perfect_power": 2,
