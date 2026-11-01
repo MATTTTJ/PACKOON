@@ -252,6 +252,13 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .field-taste .btn{min-height:40px;font-size:13px;padding:5px 10px}
 .taste-choices{display:flex;flex-wrap:wrap;gap:6px;max-height:100px;overflow:auto}
 .taste-response{font-family:var(--display);margin:0;line-height:1.5}
+/* 결정 D-163: '물건 건네기'와 '보따리 펼치기'를 한 줄에 나란히. 두 묶음을 풀어(display:contents) 버튼끼리 한 줄에 서고,
+   건넬 물건 목록과 대답은 그 아래 줄 전체를 쓴다. 보이는 묶음이 없으면 줄째 숨긴다. */
+.dlg-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-top:1px dashed #b59a6e;padding-top:6px;cursor:default}
+.dlg-actions:not(:has(> .field-taste:not([hidden]))){display:none}
+.dlg-actions>.field-taste:not([hidden]){display:contents}
+.dlg-actions .taste-choices,.dlg-actions .taste-response{order:1;flex-basis:100%}
+.dlg-actions .taste-response:empty,.dlg-actions .taste-choices[hidden]{display:none}
 .craft{width:100%;min-height:46px;font-size:16px}
 .weapon{display:flex;gap:10px;align-items:center;margin-top:16px;border-top:1px dashed #c7b48c;padding-top:10px}
 .weapon canvas{width:36px;height:36px;image-rendering:pixelated;flex:none}
