@@ -127,7 +127,7 @@ Rg.step=()=>{
   if(!G.boss.dead)G.boss.x=BOSS_X;   // 옛 저장의 칡 자리도 지금 언덕에 맞춘다
   for(const m of G.mobs){if(m.dead)continue;if(m.flash>0)m.flash--;m.x+=m.dir*0.45;if(m.x<m.min||m.x>m.max)m.dir*=-1;if(hitPlayer(m.x-8,m.x+8,GROUND-12,GROUND))hurt(m.x);}
   if(G.barrier.shake>0)G.barrier.shake--;
-  // 다람쥐로 칡덩굴 위 가지를 타고 언덕에 먼저 들어와도 엉킨 칡은 같은 자리에서 깨어난다 (PA-47)
+  // 칡덩굴을 끊었거나 언덕에 와 있으면(옛 저장 포함) 엉킨 칡은 같은 자리에서 깨어난다 (PA-47, D-190)
   if(!G.boss.dead&&(G.barrier.cut||G.zone==='hill')&&G.px>KUDZU_AT)Rg.startKudzu();
   // 옛 저장에 남은 해머루도 같은 바닥 아이템으로 한 번만 옮긴다.
   if(G.drop){const d=G.drop;G.drop=null;spawnDrops('meoru',1,{x:d.x,y:d.y});}
@@ -236,8 +236,7 @@ if(!CLASSIC){
       exits:{right:{to:'forge',toX:70}},
       doors:[path(1150,'forge',380,'함지박에 올라 개울 따라가기',{travel:'stream',draw:A.streamDoor}),
         path(1710,'hill',180,'물 건너 당산나무 쪽으로',{travel:'depth',need:cutPath,
-          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y),
-          formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 넘기'})],
+          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y)})],   // 결정 D-190: 칡덩굴은 낫으로 걷어야만 지난다 (변신으로도 못 넘는다)
       // 다람쥐의 잊은 몫 (PA-47, 다람쥐 모습에만 보인다)
       digs:[{id:'gal_cache_village',x:880,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
       vistas:[{id:'stream',x:930,from:0,to:140,draw:A.streamDoor,sound:'water',
@@ -261,8 +260,7 @@ if(!CLASSIC){
         {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false},
         {id:'gal_branch_acorn_1',x:770,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:790,y:96,item:'acorn',got:false}],
       doors:[forestTreeDoor=path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
-          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y,false),
-          formPass:'squirrel',formLabel:'다람쥐로 덩굴 위 가지 타고 나무 속으로'})],
+          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y,false)})],   // 결정 D-190
       // 다람쥐만 오르는 높은 참나무 가지와 잊은 몫 (PA-47 선택 자리)
       climbs:[{x:752,top:96}],
       digs:[{id:'gal_cache_forest',x:1900,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],

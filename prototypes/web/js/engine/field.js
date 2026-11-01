@@ -189,7 +189,7 @@ function step(){
   // ↓+점프: 땅이 아닌 발판 위에서만 아래로 빠진다. 지나는 동안 그 높이의 발판만 무시한다.
   if(dropQ&&G.onGround&&G.py<fieldGround()-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;
     // 결정 D-114: 발판 가장자리를 붙잡고 등을 보이며 잠깐 미끄러져 내려간 뒤 떨어진다. 공처럼 구르던 중이면 공 모양 그대로 빠진다.
-    G.dropBack=!rolling;G.dropHang=rolling?0:TABLES.TUNING.field_drop_hang_frames;}dropQ=false;
+    G.dropBack=!rolling;G.dropHang=rolling?0:dropHangFrames(G.dropY);}dropQ=false;
   if(G.dropT>0)G.dropT--;
   G.vy=Math.min(TABLES.TUNING.field_fall_speed,G.vy+TABLES.TUNING.field_gravity);
   if(G.dropHang>0){G.dropHang--;G.vy=Math.min(G.vy,TABLES.TUNING.field_drop_hang_speed);G.vx=0;}
@@ -218,6 +218,20 @@ function step(){
   for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.vy+=0.15;if(--s.t<=0)sparks.splice(i,1);}
   if(shakeT>0)shakeT--;
   const target=G.px-W*0.42;G.cam+=(target-G.cam)*0.12;G.cam=clamp(G.cam,0,Math.max(0,fieldWidth()-W));
+}
+
+/* 결정 D-188: 발판 가장자리를 붙잡고 미끄러지는 시간은 내려갈 높이에 맞춘다(사용자 피드백 38).
+   낮은 받침대는 거의 바로 내려서고, 높은 발판일수록 길게 붙잡는다. 미끄러지는 거리는 내려갈 높이의
+   field_drop_hang_ratio 만큼이고, 시간은 field_drop_hang_min_frames ~ field_drop_hang_frames 사이다. */
+function dropLandingY(x,y){
+  let land=fieldGround();
+  for(const p of [...fieldPlatforms(),...formLedges()])if(p.y>y+1&&p.y<land&&x>p.x-3&&x<p.x+p.w+3)land=p.y;
+  return land;
+}
+function dropHangFrames(y){
+  const t=TABLES.TUNING,h=Math.max(0,dropLandingY(G.px,y)-y);
+  const f=Math.round(h*t.field_drop_hang_ratio/t.field_drop_hang_speed);
+  return clamp(f,t.field_drop_hang_min_frames,t.field_drop_hang_frames);
 }
 
 /* ---------- 그리기 ---------- */
