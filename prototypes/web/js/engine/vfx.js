@@ -8,7 +8,78 @@ const Vfx=(()=>{
   let wasGround=true,wasMoving=false,wasFace=1;
   const colors=['#cd6939','#df983d','#b98a44'];
   function remove(i){const p=particles[i];particles[i]=particles[particles.length-1];particles.pop();pool.push(p);}
-  function clear(){while(particles.length)remove(particles.length-1);pending.length=0;popWait=0;}
+  function clear(){while(particles.length)remove(particles.length-1);pending.length=0;popWait=0;prints.length=0;stepIdx=-1;}
+  /* 결정 D-174: 눈(영산)·서리(돌너머) 바닥의 발걸음. 지역·구역 데이터의 surface()가 'snow'·'frost'를 준다.
+     - 걸을 때: 변신마다 다른 박자로 디딜 때마다 눈을 뒤로 차 올리고(snowkick), 땅바닥이면 그 모양의 발자국을 남긴다.
+       발자국 모양: 너구리 볼록살과 발가락 / 다람쥐 작은 두 점 / 산양 갈라진 발굽 / 고라니 좁은 발굽 / 수리부엉이 세 발가락.
+     - 구를 때(roll.js): 공 아래에서 눈보라가 흩뿌려지고(snowspray) 고랑 자국이 이어지며, 구르는 박자마다 눈덩이가 튄다(clump).
+       눈 아닌 바닥에서 구르면 흙먼지와 흙덩이, 단풍골·장터는 잎 부스러기도 튄다. 걷기는 예전처럼 출발·멈춤 먼지만.
+     발자국은 따로 모아 두고(최대 snow_print_max) snow_print_frames 동안 서서히 사라진다. 서리는 옅고 짧다. */
+  const prints=[];
+  const STEP_FRAMES={'':6,squirrel:5,goat:8,owl:8,deer:6};
+  let stepIdx=-1;
+  function surface(){const s=fieldCall('surface');return s==='snow'||s==='frost'?s:'';}
+  function addPrint(x,y,shape,life){
+    const max=TABLES.TUNING.snow_print_max;
+    while(prints.length>=max)prints.shift();
+    prints.push({x,y,shape,life,max:life});
+  }
+  function steps(){
+    if(!G||!G.started||G.ended||B)return;
+    sync();
+    const moving=G.onGround&&Math.abs(G.vx)>.2&&!(typeof rolling!=='undefined'&&rolling);
+    if(!moving){stepIdx=-1;return;}
+    const s=surface();if(!s)return;
+    const form=G.form||'',idx=Math.floor(G.anim/(STEP_FRAMES[form]||6));
+    if(idx===stepIdx)return;stepIdx=idx;
+    const snow=s==='snow',long=form==='goat'||form==='deer',x=G.px-G.face*(idx%2?(long?6:3):(long?-4:-1));
+    if(G.py>=fieldGround()-.5)addPrint(x,G.py,form,snow?TABLES.TUNING.snow_print_frames:Math.round(TABLES.TUNING.snow_print_frames/3));
+    if(motion.matches)return;
+    const n=snow?(form==='squirrel'?2:long?4:3):1;
+    for(let i=0;i<n;i++)emit('snowkick',x+(Math.random()-.5)*4,G.py-1,-G.face*(.3+Math.random()*.7)+(Math.random()-.5)*.3,-.45-Math.random()*(snow?.9:.4),snow?28:16,snow?'#f6fafc':'#dde4e8','effect');
+  }
+  /* 구르는 동안 매 프레임 (roll.js stepRoll) */
+  function rollTrail(){
+    if(!G||!G.onGround||B)return;
+    sync();
+    const s=surface();if(!s)return;
+    const snow=s==='snow',r=G.form==='squirrel'?6:8;
+    if(G.anim%2===0&&G.py>=fieldGround()-.5)addPrint(G.px,G.py,'roll',snow?TABLES.TUNING.snow_print_frames:Math.round(TABLES.TUNING.snow_print_frames/3));
+    if(motion.matches||Math.abs(G.vx)<.4)return;
+    const n=snow?(r>6?2:1):(G.anim%3?0:1);
+    for(let i=0;i<n;i++)emit('snowspray',G.px-Math.sign(G.vx)*r*.7+(Math.random()-.5)*3,G.py-1,-G.vx*(.25+Math.random()*.25)+(Math.random()-.5)*.3,-.35-Math.random()*(snow?1.1:.5),snow?22:14,snow?'#f8fbfd':'#e4eaee','effect');
+  }
+  /* 구르는 박자마다 (roll.js) */
+  function rollStep(){
+    if(!G||motion.matches)return;
+    sync();
+    const s=surface(),reg=G.region,r=G.form==='squirrel'?6:8,bx=G.px-Math.sign(G.vx||G.face)*r*.5;
+    if(s){
+      for(let i=0;i<(s==='snow'?3:1);i++)emit('clump',bx+(Math.random()-.5)*6,G.py-2,-G.vx*.3+(Math.random()-.5)*.8,-.8-Math.random()*.7,30,s==='snow'?'#ffffff':'#e8eef1','effect');
+      return;
+    }
+    dust();
+    const c=DUST_COLORS[reg]||'#bba582';
+    for(let i=0;i<2;i++)emit('clod',bx+(Math.random()-.5)*6,G.py-1,-G.vx*.25+(Math.random()-.5)*.7,-.7-Math.random()*.6,22,c,'effect');
+    if(reg==='galchamgol'||reg==='jangteo'){const cs=LEAF_COLORS[reg];emit('leafbit',bx,G.py-3,-G.vx*.2+(Math.random()-.5),-1-Math.random()*.6,40,cs[Math.floor(Math.random()*cs.length)],'effect');}
+  }
+  /* 땅에 남은 발자국. 장면(배경) 뒤, 인물 앞에 그린다 */
+  function ground(){
+    if(!prints.length)return;
+    ctx.save();
+    for(const p of prints){
+      const x=Math.round(p.x-cam),y=Math.round(p.y);if(x<-6||x>W+6)continue;
+      ctx.globalAlpha=Math.min(1,p.life/60)*(p.max>=TABLES.TUNING.snow_print_frames?.6:.35);
+      const c='#8b9eac',P=(a,b,w,h)=>R(x+a,y+b,w,h,c);
+      if(p.shape==='squirrel'){P(-1,-1,1,1);P(1,-1,1,1);}
+      else if(p.shape==='goat'){P(-1,-1,1,1);P(1,-1,1,1);P(-1,0,1,1);P(1,0,1,1);}
+      else if(p.shape==='deer'){P(-1,-1,1,2);P(1,-1,1,2);}
+      else if(p.shape==='owl'){P(0,-1,1,1);P(-1,-2,1,1);P(1,-2,1,1);P(0,-3,1,1);}
+      else if(p.shape==='roll'){P(-2,-1,5,1);}
+      else{P(-1,-1,3,1);P(-1,-2,1,1);P(1,-2,1,1);}
+    }
+    ctx.restore();
+  }
   function sync(){
     if(state===G&&region===REG&&zone===G.zone)return;
     clear();state=G;region=REG;zone=G.zone;weather='';tick=0;
@@ -107,6 +178,7 @@ const Vfx=(()=>{
     if(G.started&&!G.ended)seedWeather();
     tick++;
     if(popWait>0)popWait--;
+    for(let i=prints.length-1;i>=0;i--)if(--prints[i].life<=0)prints.splice(i,1);
     if(pending.length&&!popWait){
       if(emit('item',G.px,G.py-36,0,motion.matches?0:-.9,48,'#fff0bc','effect',false,pending[0])){
         pending.shift();popWait=52;
@@ -118,6 +190,9 @@ const Vfx=(()=>{
         p.x+=p.vx;p.y+=p.vy;
         if(p.kind==='dust')p.vy+=.025;
         else if(p.kind==='clod')p.vy+=.06;
+        else if(p.kind==='snowkick'||p.kind==='snowspray'||p.kind==='clump'){   // 결정 D-174: 눈은 떨어져 바닥에 닿으면 사라진다
+          p.vy+=p.kind==='clump'?.08:.05;p.vx*=.96;if(p.y>=fieldGround()&&p.vy>0)p.life=0;
+        }
         else if(p.kind==='leafbit'){p.vy=Math.min(p.vy+.04,.45);p.vx*=.97;p.x+=Math.sin(p.phase+p.age*.18)*.35;}
         else if(p.kind==='item')p.vy*=.96;
         else if(p.layer!=='effect')p.x+=Math.sin(p.phase+p.age*.035)*.3;
@@ -144,6 +219,12 @@ const Vfx=(()=>{
         R(x,y,Math.sin(p.phase+p.age*.04)>0?4:2,1,p.color);R(x+1,y-1,2,1,p.color);
       }else if(p.kind==='clod'){
         R(x,y,2,2,p.color);
+      }else if(p.kind==='snowkick'){
+        R(x,y,p.age<6?2:1,1,p.color);
+      }else if(p.kind==='snowspray'){
+        R(x,y,1,1,p.color);if(p.age<4)R(x+1,y,1,1,p.color);
+      }else if(p.kind==='clump'){
+        R(x,y,2,2,p.color);R(x,y+2,2,1,'#c9d6de');
       }else if(p.kind==='leafbit'){
         if(Math.sin(p.phase+p.age*.2)>0){R(x,y,2,1,p.color);R(x+1,y-1,1,1,p.color);}else R(x,y,1,2,p.color);
       }else if(p.kind==='smoke'||p.kind==='mist'){
@@ -159,5 +240,6 @@ const Vfx=(()=>{
   // 결정 D-128: 앞 그림도 자른 구간마다 나눠 그린다. 장면 변환을 푸는 sceneEnd는 나눠 그리기 밖에서 부른다.
   function front(){const f=()=>{if(fieldDef().weather)fieldCall('weatherFront');else fieldCall('drawFront');};
     if(typeof segmentedDraw==='function')segmentedDraw(f);else f();fieldCall('sceneEnd');draw('front');draw('effect');}
-  return {MAX,get count(){return particles.length;},get queued(){return pending.length;},get reducedMotion(){return motion.matches;},setWeather,update,draw,front,item,gather,scatter,scatterKind,burst,dust,feet,slash,clear};   // dust: 구르기(D-94)도 쓴다
+  return {MAX,get count(){return particles.length;},get queued(){return pending.length;},get reducedMotion(){return motion.matches;},setWeather,update,draw,front,item,gather,scatter,scatterKind,burst,dust,feet,slash,clear,
+    steps,rollTrail,rollStep,ground,surface};   // D-174: 눈·서리 발걸음·구르기·발자국   // dust: 구르기(D-94)도 쓴다
 })();

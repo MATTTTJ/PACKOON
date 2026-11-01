@@ -32,7 +32,7 @@ const Rg=defineRegion('dolneomeo',{
       dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false},
     rel:{kkubeogi:{t:'호감',v:0},dolsoe:{t:'신뢰',v:0},ppuri:{t:'의리',v:0},nal:{t:'경멸',v:0}},
   }),
-  weather:()=>Vfx.setWeather('frost'),
+  weather:()=>Vfx.setWeather('frost'),surface:()=>'frost',   // 결정 D-174: 첫서리 바닥 (발걸음 효과)
   onStart(){
     if(Rg.arcs())G.f.arcs=true;
     diary('d_start','돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 나를 내려다본다. 서리다래가 어디 열리는지 마을에 물어보자.');
