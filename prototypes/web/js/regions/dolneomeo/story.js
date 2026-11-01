@@ -326,9 +326,11 @@ function nalMenu(){
 }
 function nalOilGive(){
   if(G.f.dolneomeo_craft_oil||!has('eoksae',G.f.kkuDone?1:4))return;
+  // 결정 D-147: 병 이야기를 듣기 전에 보따리에서 바로 바꾸면, 날쌘이 억새를 원한 까닭부터 말한다.
+  const first=!G.f.nalOilAsked;G.f.nalOilAsked=true;
   takeItem('eoksae',1);addItem('sesame_oil',1);G.f.dolneomeo_craft_oil=true;
   diary('dolneomeo_craft_oil','날쌘에게 여분 억새를 주고 참기름을 받았다. 병을 억새로 감싸니 돌길에서도 부딪는 소리가 작아졌다.');
-  talk([['날쌘','이걸로 병끼리 안 부딪겠네.\n기름은 네가 쓸 데에 써.']]);
+  talk([...(first?[['날쌘','억새 한 단이네. 돌길이라\n참기름 병끼리 자꾸 부딪던 참이야.']]:[]),['날쌘','이걸로 병끼리 안 부딪겠네.\n기름은 네가 쓸 데에 써.']]);
 }
 function nalTrade(id){
   const F=G.f;
@@ -586,8 +588,9 @@ Rg.trade={
   nal:()=>[
     ...(G.ledger.nal_dolneomeo?[{id:'t_nal_dolneomeo',item:'gyeolmyeongja',n:1,asks:[{kflower:1},{gyeousari:2}],done:()=>G.f.nalDDone,
       accept:i=>nalTrade(i===0?'kflower':'gyeousari')}]:[]),
-    ...(!CLASSIC&&G.f.nalOilAsked?[{id:'t_craft_oil',item:'sesame_oil',n:1,asks:[{eoksae:1}],done:()=>G.f.dolneomeo_craft_oil,
-      locked:()=>!G.f.kkuDone&&!has('eoksae',4)?'마른 억새 한 단. 꾸벅이 둥지에 쓸 세 단은 남겨 두고 한 단이 더 있어야 한다.':null,accept:nalOilGive}]:[])
+    // 결정 D-147: 참기름은 처음부터 날쌘 지게에 있다. 꾸벅이 둥지 몫을 아직 모르면 까닭은 말하지 않고 남겨 두기만 한다.
+    ...(!CLASSIC?[{id:'t_craft_oil',item:'sesame_oil',n:1,asks:[{eoksae:1}],done:()=>G.f.dolneomeo_craft_oil,
+      locked:()=>!G.f.kkuDone&&has('eoksae')&&!has('eoksae',4)?(G.f.kkuTalk?'마른 억새 한 단. 꾸벅이 둥지에 쓸 세 단은 남겨 두고 한 단이 더 있어야 한다.':'억새는 아직 쓸 데가 있다.'):null,accept:nalOilGive}]:[])
   ],
   dolsoe:()=>[
     ...(G.f.dolsoeAsked?[{id:'t_dolsoe',item:'gyeolmyeongja',icon:'maetdol',label:'맷돌 보는 법',asks:[{gyeolmyeongja:1}],done:()=>G.f.dolsoeTea,accept:dolsoeGive}]:[]),
