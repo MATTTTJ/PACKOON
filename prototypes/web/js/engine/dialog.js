@@ -14,16 +14,25 @@ function talk(lines,onEnd,options={}){
 function showLine(){
   if(dlgPlan){const i=dlgPlan.length-dlgQ.length;if(i<dlgPlan.length)dlgMusic=dlgPlan[i];}
   const L=dlgQ.shift();
-  if(!L){$('dlg').hidden=true;dlgMusic=null;dlgPlan=null;const f=dlgEnd;dlgEnd=null;if(f)f();return;}
+  if(!L){$('dlg').hidden=true;dlgPic(null);dlgMusic=null;dlgPlan=null;const f=dlgEnd;dlgEnd=null;if(f)f();return;}
   $('dlg').hidden=false;$('dlgWho').textContent=L[0];$('dlgText').textContent=L[1];
+  if('pic' in L)dlgPic(L.pic);
   const face=$('dlgFace');face.innerHTML='';face.appendChild(portrait(L[0]));
   const ch=$('dlgChoices');ch.innerHTML='';
   if(L[2]){
     $('dlgNext').hidden=true;
     L[2].forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.textContent=c.t;
-      b.onclick=e=>{e.stopPropagation();Sound.choice(!!c.go);$('dlg').hidden=true;dlgQ=[];dlgEnd=null;dlgMusic=null;dlgPlan=null;if(c.go)c.go();};ch.appendChild(b);});
+      b.onclick=e=>{e.stopPropagation();Sound.choice(!!c.go);$('dlg').hidden=true;dlgPic(null);dlgQ=[];dlgEnd=null;dlgMusic=null;dlgPlan=null;if(c.go)c.go();};ch.appendChild(b);});
     setTimeout(()=>{const f=ch.querySelector('button');if(f&&matchMedia('(pointer:fine)').matches)f.focus();},0);
   }else $('dlgNext').hidden=false;
+  if(typeof placePeek==='function'){placePeek();requestAnimationFrame(placePeek);}   // 결정 D-151: 선택지로 대화창이 커지면 그림을 그 위로 비킨다
+}
+/* 결정 D-151: 대사 줄의 장면 그림. 줄 배열에 pic을 달면 그 줄부터 화면 가운데 작은 창에 띄우고,
+   pic:null인 줄이 오거나 대화창이 닫히면 내린다. pic은 그리기 함수이거나 {draw, animate}. */
+function dlgPic(pic){
+  if(typeof peekPicture!=='function')return;
+  if(!pic){peekRelease();return;}
+  if(typeof pic==='function')peekPicture(pic);else peekPicture(pic.draw,pic);
 }
 function advance(){if($('dlgChoices').children.length)return;Sound.paper();showLine();}
 $('dlg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')advance();});
