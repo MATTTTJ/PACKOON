@@ -211,7 +211,9 @@ const MINIGAMES=numericTable('minigames','미니게임',
     'salg_warning_frames salg_alert_frames salg_near_distance salg_near_graze salg_near_random dad_steps',
     'gather_ring_period gather_ring_pad gather_perfect_window gather_good_window gather_perfect_power gather_yield gather_perfect_bonus',
     'gather_root_hits gather_ssari_hits gather_kkoe_hits gather_eoksae_hits gather_seogi_hits gather_darae_vine_hits',
-    'yut_needle_speed yut_nak_zone gather_solbang_hits'
+    'yut_needle_speed yut_nak_zone gather_solbang_hits',
+    'wish_stack_fall_speed wish_stack_drop_speed wish_stack_move_speed wish_stack_start_offset wish_stack_sway wish_stack_sway_period',
+    'wish_stack_tolerance wish_stack_wobble_frames wish_stack_roll_frames wish_stack_settle_frames wish_stack_done_frames'
   ].join(' '));
 const TUNING=numericTable('tuning','분류',
   [

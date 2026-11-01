@@ -74,6 +74,12 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       // 손일 미니게임(쇠 벼리기·돌 쌓기·김 올리기·함께 하는 일)은 PR #81(D-88)에서 지웠다. 남은 놀이는 장단·이동 연출뿐이다.
       if(id==='rhythm') {
         if(!missRhythm)await key('j');await wait(75);
+      }else if(id==='dolWishStack') {
+        // 결정 D-212: 든 돌(손 자리 hx)을 맨 위 돌 가운데에 맞춘 뒤 내려놓는다. 어긋나 굴러도 다시 든다.
+        const w=await read('REG.wishStackState?.()');
+        if(w?.phase==='fall'&&w.target!=null){const d=w.target-w.hx;
+          if(Math.abs(d)>0.6){const k=d>0?'ArrowRight':'ArrowLeft';await key(k,'down');await wait(Math.min(150,Math.abs(d)*50));await key(k,'up');}else await key('j');}
+        await wait(40);
       }else if(id==='dolDepthTravel') {
         await wait(100);
       }else if(id==='galTravel') {
@@ -285,6 +291,8 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await stage('돌너머 · 억새와 메밀',async()=>{await gather('eoksae',3);await pickup('memil',6);for(let i=0;i<15&&!await read('G.f.kkuDone');i++){await npc('kkubeogi');await wait(180);}if(!await read('G.f.kkuDone'))throw new Error('꾸벅이가 깨어 있을 때 교환하지 못했다');});
     await stage('돌너머 · 맷돌과 길',async()=>{await npc('nal');await npc('dolsoe');await craft('maetdol','memil_powder',2);await npc('ppuri');if(!await read('G.f.ppuriPassed'))await npc('ppuri');});
     await stage('돌너머 · 골렘과 약즙',async()=>{
+      // 결정 D-212: 고갯길 소원 돌탑에 돌 셋을 직접 얹는다 (사연 판에만 있는 길섶 돌탑)
+      if(mode==='expanded'){await zone('gate');await moveX(await read("zoneObjects('doors').find(d=>d.wishTower).x"));await key('e');await settle(/돌을 골라/);if(!await read('G.f.dolWishTower&&G.f.dolWishOffs?.length===3'))throw new Error('소원 돌탑에 돌 셋을 얹지 못했다');}
       if(mode==='expanded')await zone('shrine');const toGolem=async()=>{await moveX(mode==='expanded'?2330:1920);};await toGolem();await mustWin(['story_stone'],toGolem,'돌 골렘');
       await pickup('seoridarae');await craft('maetdol','darae_yak');
       if(mode==='expanded') {await zone('village');const n=await read("zoneObjects('wanderers').find(n=>n.name==='늙은 까치')&&(({x,y})=>({x,y:y??192}))(zoneObjects('wanderers').find(n=>n.name==='늙은 까치'))");if(!n)throw new Error('약즙 배달 까치가 마을에 없다');await jumpTo(n.x,n.y);await key('e');await settle();}

@@ -2621,7 +2621,18 @@ const TABLES={
   "gather_darae_vine_hits": 2,
   "gather_solbang_hits": 2,
   "yut_needle_speed": 1.5,
-  "yut_nak_zone": 10
+  "yut_nak_zone": 10,
+  "wish_stack_fall_speed": 0.1,
+  "wish_stack_drop_speed": 0.4,
+  "wish_stack_move_speed": 0.3,
+  "wish_stack_start_offset": 7,
+  "wish_stack_sway": 1,
+  "wish_stack_sway_period": 100,
+  "wish_stack_tolerance": 1.5,
+  "wish_stack_wobble_frames": 30,
+  "wish_stack_roll_frames": 36,
+  "wish_stack_settle_frames": 24,
+  "wish_stack_done_frames": 50
  },
  "TUNING": {
   "kkubeogi_cycle": 200,
