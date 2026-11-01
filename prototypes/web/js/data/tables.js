@@ -2574,6 +2574,7 @@ const TABLES={
   "save_interval": 30000,
   "field_interact_y": 24,
   "zone_transition_frames": 18,
+  "depth_gate_open_frames": 20,
   "vista_pan_frames": 480,
   "map_flight_ms": 2000,
   "map_landing_margin": 40,

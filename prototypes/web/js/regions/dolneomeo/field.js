@@ -2,9 +2,9 @@
 /* 돌너머 필드: 첫서리 하늘, 돌산, 돌담, 장승, 억새 들판, 거둔 메밀밭, 겨우살이 나무, 성황당 돌무더기(돌 골렘), 절벽, 서리 */
 (()=>{
 const Rg=REGIONS.dolneomeo;
-const GATE_X=1590;     // 뿔이가 지키는 돌산 길목 (장승과 금줄)
+const GATE_X=1590;     // 뿔영감이 지키는 돌산 길목 (장승과 금줄)
 const GOLEM_AT=1860;   // 이보다 오른쪽으로 가면 돌 골렘과 전투
-// 결정 D-87: 뿔이가 돌산 길을 열어 준 뒤, 성황당 끝 돌 골렘 쪽으로 다가갈수록 긴장이 오른다. 골렘이 잠들면 0.
+// 결정 D-87: 뿔영감이 돌산 길을 열어 준 뒤, 성황당 끝 돌 골렘 쪽으로 다가갈수록 긴장이 오른다. 골렘이 잠들면 0.
 // 결정 D-116: 확장판 구역의 설계 좌표를 줄인 좌표로 (Rg.trimCuts, engine/core.js trimX). 옛 구성은 그대로다.
 const Z=(zone,x)=>CLASSIC?x:trimX(x,Rg.trimCuts?.[zone]);
 Rg.moodTension=()=>{
@@ -235,83 +235,58 @@ if(!CLASSIC){
     cliff:[...stepRidge(320,67,3,{low:164}),...stepRidge(790,68,4,{low:164}),...stepRidge(1600,69,3,{low:164}),platform(2220,166,90),platform(2280,138,90),platform(2350,112,130),platform(2500,138,96),platform(2560,112,294)],
     shrine:[...stepRidge(280,70,3,{low:164}),platform(1520,112,110),platform(1630,140,80),...stepRidge(1950,71,4,{low:164}),...stepRidge(2560,72,3,{low:164})],
   };
-  const memories={
-    gate:{x:1800,end:2020,y:112,bridge:[platform(1796,166,58),platform(1844,140,70),platform(1910,140,116)],
-      say:['돌에 손을 대니, 끊긴 다리가 겹쳐 보인다.\n돌탑이 지금보다 낮았을 때의 길이다.','발밑의 흰 돌부터 밟아 보자.\n떨어져도 아래 돌담길로 돌아오면 된다.']},
-    shrine:{x:1120,end:1550,y:112,bridge:[platform(1120,166,62),platform(1172,140,80),platform(1240,140,140),platform(1370,140,150)],
-      say:['낮은 돌탑 너머로 옛 다리가 이어진다.\n아빠도 젊었을 때 이 길을 걸었을까.','끝의 높은 바위에 석이버섯이 보인다.\n돌다리를 건너 흰 돌턱으로 가 보자.']},
-  };
-  Rg.bridgeMemorySeen=()=>!!(G.f.dolBridgeMemorySeen||G.f.dol_memory_gate);
-  const bridgeReady=()=>G.f.dolBridgeStage>=3;
-  const bridgeOpen=()=>bridgeReady()&&!!G.f.ppuriPassed;
-  Rg.bridgeSurveyReady=job=>job?!!G.f.dolBridgeSurvey?.[job]:['bank','arch','rail'].every(k=>G.f.dolBridgeSurvey?.[k]);
-  const surveyVisible=()=>G.f.dolMemory?.zone==='gate'||!!G.f.dol_memory_gate||bridgeReady();
-  const surveyNotes={
-    bank:'밑돌 사이가 비었네.\n물이 지나갈 자리야. 여긴 막지 말자.',
-    arch:'넓은 돌이 양쪽에 걸렸어.\n발 놓는 면을 위로 맞추면 되겠다.',
-    rail:'끝에는 흰 돌이 있네.\n서리 내려도 발 디딜 곳이 보이겠다.',
-  };
-  function surveyBridge(job){
-    if(!surveyVisible()){talk([['너구리','소원 돌에 손대면 옛 다리가 보여.\n흰 발판을 밟고 올라가 보자.']]);return;}
-    talk([['너구리',surveyNotes[job]]],()=>{
-      (G.f.dolBridgeSurvey||(G.f.dolBridgeSurvey={}))[job]=true;
-      toast('옛 다리의 '+({bank:'받침',arch:'다리판',rail:'끝돌'}[job])+'을 살폈다.');
-    });
-  }
-  function applyMemory(){
-    const m=G.f.dolMemory,z=Rg.zones[G.zone],spec=memories[G.zone];
+  /* 결정 D-165: 옛 다리 기억(D-116의 '소원 돌에 손대기 · 옛 다리')을 걷어 낸다(사용자 피드백 31).
+     대신 성황당 돌탑 그늘에 녹지 않은 첫눈 둔덕을 둔다. 밟아 다지면 높은 바위(석이버섯)로 오르는 눈 계단이 된다.
+     맨땅에서 140 턱은 뛰어 닿지 않으니(점프 약 45px) 눈 계단이 그 길을 연다. 산양은 전처럼 바로 뛴다. */
+  const snowSteps={shrine:{x:1120,steps:[platform(1120,166,62),platform(1172,140,80),platform(1240,140,140),platform(1370,140,150)]}};
+  const snowPacked=()=>!!G.f.dolSnowSteps;
+  // 구역에 들어설 때마다 자른 좌표의 bases로 발판을 다시 깐다 (D-109·D-110). 다진 눈 계단은 그 위에 더한다.
+  function applySteps(){
+    const z=Rg.zones[G.zone],spec=snowSteps[G.zone];
     if(!z)return;
-    const active=m?.zone===G.zone&&!!spec;
-    if(spec)z.platforms=active||(G.zone==='gate'&&bridgeReady())?[...bases[G.zone],...spec.bridge]:bases[G.zone];
+    if(spec||G.zone==='gate')z.platforms=spec&&snowPacked()?[...bases[G.zone],...spec.steps]:bases[G.zone];
     if(G.zone==='cliff')z.platforms=G.boss.dead?bases.cliff:bases.cliff.filter(p=>p.x<trimX(2200,Rg.trimCuts?.cliff));
-    if(m&&!active)delete G.f.dolMemory;
-    if(active&&!vistaMode&&Sound.ambient!=='dol-memory'){Sound.ambience('dol-memory');Sound.passage('memory_layer');}
-    if(!active&&Sound.ambient==='dol-memory')Sound.ambience(null);
   }
-  function memoryTalk(zone){
-    const spec=memories[zone];
-    talk(spec.say.map(s=>['너구리',s]),()=>{
-      if(zone==='gate')G.f.dolBridgeMemorySeen=true;
-      G.f.dolMemory={zone};applyMemory();
-      diary('dol_memory_teach','소원 돌에 손을 대니 옛 돌다리가 보였다. 흰 윗면을 밟으면 건널 수 있겠다. 아래에는 지금의 돌담길이 있어 다시 올라갈 수 있다.');
-      toast('흰 돌다리를 따라 건너자. 시간은 넉넉하다.');
+  function packSnow(){
+    if(snowPacked()){talk([['너구리','(다져 놓은 눈 계단이 그대로다.\n높은 바위까지 오를 수 있겠다.)']]);return;}
+    talk([['너구리','(돌탑 그늘에 첫눈이 녹지 않고\n둔덕으로 쌓여 있다.)'],
+      ['너구리','(발로 꾹꾹 밟아 다지니\n계단처럼 단단해진다.)']],()=>{
+      G.f.dolSnowSteps=true;applySteps();Sound.stone('tap');
+      diary('dol_snow_steps','성황당 돌탑 그늘에 녹지 않은 첫눈을 밟아 다져 계단을 만들었다. 높은 바위까지 오를 수 있다.');
+      toast('눈 계단을 다졌다 · 높은 바위로 올라가 보자');
     });
-  }
-  function memoryStep(){
-    applyMemory();const spec=memories[G.zone];if(!spec||G.f.dolMemory?.zone!==G.zone)return;
-    if(G.px>=spec.end&&G.py<=spec.y+1){
-      G.f['dol_memory_'+G.zone]=true;delete G.f.dolMemory;applyMemory();
-      diary('dol_memory_'+G.zone,G.zone==='gate'?'옛 다리 끝의 서리 낀 바위에 닿자 지금의 길로 돌아왔다. 바위 아래로 새 돌담길이 보인다.':'소원 돌탑이 낮았던 때의 다리를 건넜다. 지금은 높은 바위만 남았다. 돌 틈에 쉬어 간 이들의 둥근 자국이 있다.');
-      toast('옛 다리가 걷히고, 지금의 바위에 발이 닿았다.');
-    }else if(G.px<spec.x-40||G.px>spec.end+150){delete G.f.dolMemory;applyMemory();}
   }
   const marker=(x,y)=>{R(x-1,y-24,2,24,'#675443');R(x-11,y-25,23,7,'#e5ddc8');R(x+6,y-23,3,3,'#516b71');};
-  const memoryMark=(x,y)=>{R(x-8,y-11,16,11,'#7f8987');R(x-5,y-15,10,4,'#b1b9b3');R(x-4,y-16,8,1,'#eef1df');R(x-1,y-10,3,5,'#b78159');};
   const blocked=(x,y)=>A.drawBlocked(x,y);
   const permit=()=>!!G.f.ppuriPassed;
   const calm=()=>!!G.boss.dead;
-  const gateReason='뿔이에게 메밀가루를 건네 장승제를 올려야 한다.';
+  const gateReason='뿔영감에게 메밀가루를 건네 장승제를 올려야 한다.';
   let depthFx=null;
   const travel=el('div');travel.id='dolDepthTravel';travel.hidden=true;travel.style.cssText='pointer-events:none';$('shell').appendChild(travel);
+  const snapshot=()=>{const image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);return image;};
   defineMinigame({id:travel.id,hit:()=>{},step:()=>{
     if(!depthFx){travel.hidden=true;return;}
+    // 결정 D-166: 장승 문은 먼저 장승 둘이 양옆으로 기울며 비켜 선다. 비켜 선 모습을 찍은 뒤 그 사이로 들어간다.
+    if(!depthFx.image){if(++depthFx.open>=TABLES.TUNING.depth_gate_open_frames)depthFx.image=snapshot();return;}
     depthFx.tick++;
     if(depthFx.tick>=TABLES.TUNING.zone_transition_frames){
       const p=depthFx.door;travel.hidden=true;depthFx=null;
       changeZone(p.to,{x:p.toX,y:p.toY});
     }
   }});
+  /* 장승 문이 비켜 선 정도 (0~1). 장승 그림(고갯길 경치·돌계단 문)이 읽는다 */
+  Rg.depthOpen=id=>!depthFx||depthFx.door.id!==id?0:depthFx.image?1:clamp(depthFx.open/TABLES.TUNING.depth_gate_open_frames,0,1);
   function enterDepth(p){
     if(!pathOpen(p)){toast(p.reason);return;}
-    const image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);
-    depthFx={door:p,tick:0,image,pivot:Math.round(p.x-G.cam)};suppressHeldInputs();travel.hidden=false;
+    const gate=!!p.gate&&!Vfx.reducedMotion;
+    depthFx={door:p,tick:0,open:0,image:gate?null:snapshot(),pivot:Math.round(p.x-G.cam)};suppressHeldInputs();travel.hidden=false;
   }
   function specialInteract(e){
     if(REG!==Rg||!usesZones(Rg)||paused())return;
-    const p=nearInteraction();if(!p||(!p.memory&&!p.depth&&!p.bridgeWork&&!p.memorySurvey))return;
+    const p=nearInteraction();if(!p||(!p.wishTower&&!p.snowSteps&&!p.depth))return;
     e.preventDefault();e.stopImmediatePropagation();
     if(e.type==='keydown')suppressedKeys.add(e.key.toLowerCase());
-    if(p.memorySurvey)surveyBridge(p.memorySurvey);else if(p.bridgeWork)Rg.bridgeTalk?.(p.bridgeJob);else if(p.memory)memoryTalk(G.zone);else enterDepth(p);
+    if(p.wishTower)Rg.wishTower?.();else if(p.snowSteps)packSnow();else enterDepth(p);
   }
   addEventListener('keydown',e=>{
     if(e.repeat||!['e','enter','arrowup'].includes(e.key.toLowerCase()))return;
@@ -323,39 +298,33 @@ if(!CLASSIC){
 
   function drawStonePlatforms(id){
     for(const p of Rg.zones[id].platforms){const x=Math.round(p.x-RC());if(x>W||x+p.w<0)continue;   // 이미 옮긴 좌표 (D-128)
-      const remembered=G.f.dolMemory?.zone===id&&memories[id]?.bridge.includes(p);
-      if(remembered){R(x,p.y,p.w,6,'#8d9690');A.drawMemoryBridge(x,p.y,p.w);continue;}
-      if(id==='gate'&&bridgeReady()&&memories.gate.bridge.includes(p)){A.drawRestoredBridge(x,p.y,p.w);continue;}
+      if(snowSteps[id]?.steps.includes(p)){A.drawSnowStep(x,p.y,p.w);continue;}   // 결정 D-165: 다진 눈 계단
       R(x,p.y,p.w,6,'#737e7d');R(x,p.y,p.w,2,'#e2e9e4');R(x+2,p.y+6,p.w-4,3,'#535f60');
       for(let k=13;k<p.w;k+=23)R(x+k,p.y+2,1,5,'#4b595b');
     }
   }
   function front(id){
     A.drawFront(id);
-    if(G.f.dolMemory?.zone===id){
-      ctx.save();ctx.globalAlpha=.66;ctx.filter='grayscale(1)';ctx.drawImage(cv,0,0);ctx.filter='none';ctx.globalAlpha=.18;R(0,0,W,H,'#d6cdb7');ctx.restore();
-      // 기억은 현재 지형 위에 겹친다. 돌아올 바닥과 발판의 흰 면은 가리지 않는다.
-      for(let i=0;i<7;i++)R((i*71+Math.round(RC()*.12))%W,38+i*17,38,1,'rgba(235,229,207,.38)');
-    }
-    if(depthFx){
+    if(depthFx?.image){
       const t=depthFx.tick/TABLES.TUNING.zone_transition_frames;
       ctx.save();ctx.imageSmoothingEnabled=false;
       if(!Vfx.reducedMotion){const s=depthFx.door.reverse?1-.13*t:1+.18*t;ctx.translate(depthFx.pivot,H*.72);ctx.scale(s,s);ctx.drawImage(depthFx.image,-depthFx.pivot,-H*.72);ctx.setTransform(1,0,0,1,0,0);
-        const spread=Math.round(t*48);A.drawDepthGate(depthFx.pivot,GROUND,spread);}
+        const spread=Math.round(t*48);A.drawDepthGate(depthFx.pivot,GROUND,spread,depthFx.door.gate?1:0);}
       ctx.globalAlpha=t;R(0,0,W,H,'#344247');ctx.restore();
     }
   }
   function commonStep(id){
-    memoryStep();if(Rg.arcs())G.f.arcs=true;
+    applySteps();if(Rg.arcs())G.f.arcs=true;
     // 방문 구역은 엔진의 G.visitedZones가 기록한다. 매 프레임 진행값을 쓰지 않는다(지도 왕복 검사가 흔들렸다).
     if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>Z('shrine',2310))Rg.startGolem();
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
-    weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);Rg.ambient();applyMemory();},
-    drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);if(id==='gate')A.drawBridgeWork(tx(1870)-cam,GROUND);drawStonePlatforms(id);},
+    // 옛 저장의 옛 다리 기억(D-116) 표시는 지운다 (결정 D-165)
+    weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);if(G.f.dolMemory)delete G.f.dolMemory;Rg.ambient();applySteps();},
+    drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);drawStonePlatforms(id);},
     drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
     weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),
-    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?Z('shrine',2240):80;G.py=GROUND;G.vy=0;delete G.f.dolMemory;applyMemory();toast('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
+    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?Z('shrine',2240):80;G.py=GROUND;G.vy=0;applySteps();toast('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
   };}
   Rg.startZone='gate';
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
@@ -372,54 +341,36 @@ if(!CLASSIC){
       const list=c?bases[id].filter(p=>!trimInside(p.x+p.w/2,c)).map(p=>({...p,x:tX(p.x,c)})):bases[id];
       bases[id]=tidyPlatforms(list,platformAnchors(Rg,id,Rg.zones[id]));
     }
-    // 옛 다리 기억(D-116): 자리·끝·다리 발판도 같은 좌표로. 발판은 drawStonePlatforms가 같은 물건인지로 알아보니 목록째 바꾼다.
-    for(const [id,spec] of Object.entries(memories)){
+    // 눈 계단(D-165)도 같은 좌표로. 발판은 drawStonePlatforms가 같은 물건인지로 알아보니 목록째 바꾼다.
+    for(const [id,spec] of Object.entries(snowSteps)){
       const c=Rg.trimCuts[id];if(!c)continue;
-      spec.x=tX(spec.x,c);spec.end=tX(spec.end,c);spec.bridge=spec.bridge.map(p=>({...p,x:tX(p.x,c)}));
+      spec.x=tX(spec.x,c);spec.steps=spec.steps.map(p=>({...p,x:tX(p.x,c)}));
     }
   };
   Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2800,[])};
   // 대화가 이어지는 동안은 화자의 자리를 지키고, 끝나면 진행값으로 위치를 정한다.
   let ppuriScene=null;
-  // 결정 D-135: 다리 완성 장면 동안은 뿔이가 고갯길에 있다.
-  const ppuriVillage=()=>G?.f.dolBridgePpuriHere?false:ppuriScene?.owner===G&&open('dlg')?
+  const ppuriVillage=()=>ppuriScene?.owner===G&&open('dlg')?
     ppuriScene.zone==='village':!!G?.f.ppuriMet&&!G.f.ppuriPassed;
-  // 복원 중에는 같은 돌쇠가 현장에 온다. 두 구역에 동시에 놓지 않는다.
-  Object.defineProperty(Rg.zones.gate,'npcs',{get:()=>{
-    const n=Rg.npcs?.find(n=>n.id==='dolsoe');
-    const list=ppuriVillage()?[]:['ppuri'];
-    return G?.f.dolBridgeCrewHere&&n?[...list,{...n,x:Z('gate',1908),zone:'gate',props:null}]:list;
-  }});
-  Object.defineProperty(Rg.zones.village,'npcs',{get:()=>[
-    ...(G?.f.dolBridgeCrewHere?['nal']:['dolsoe','nal']),...(ppuriVillage()?['ppuri']:[])]});
+  Object.defineProperty(Rg.zones.gate,'npcs',{get:()=>ppuriVillage()?[]:['ppuri']});
+  Object.defineProperty(Rg.zones.village,'npcs',{get:()=>['dolsoe','nal',...(ppuriVillage()?['ppuri']:[])]});
   Rg.zones.gate.exits={right:{to:'village',toX:80}};
   Rg.zones.village.exits={left:{to:'gate',toX:2320},right:{to:'field',toX:80}};
   Rg.zones.field.exits={left:{to:'village',toX:2720}};
   Rg.zones.cliff.exits={right:{to:'shrine',toX:80}};
   Rg.zones.shrine.exits={left:{to:'cliff',toX:2920}};
   Rg.zones.gate.doors=[
-    {id:'dol_depth_gate',depth:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:(x,y)=>A.drawDepthGate(x,y),drawBlocked:blocked},
-    {id:'dol_memory_gate',memory:true,x:1800,to:'gate',toX:1800,label:'소원 돌에 손대기 · 옛 다리',draw:memoryMark},
-    {id:'dol_bridge_work',bridgeWork:true,x:1870,to:'gate',toX:1870,get label(){return bridgeReady()?'함께 놓은 돌다리 살펴보기 · E':'옛 돌다리 다시 놓기 · E';},draw:(x,y)=>A.drawBridgeWorkMarker(x,y)},
-    {id:'dol_bridge_bank',bridgeWork:true,bridgeJob:'bank',x:1760,to:'gate',toX:1760,label:'다리 받침돌 놓기 · E',draw:(x,y)=>A.drawBridgeWorkMarker(x,y)},
-    {id:'dol_bridge_arch',bridgeWork:true,bridgeJob:'arch',x:1960,to:'gate',toX:1960,label:'다리 가운데 돌 맞추기 · E',draw:(x,y)=>A.drawBridgeWorkMarker(x,y)},
-    {id:'dol_bridge_rail',bridgeWork:true,bridgeJob:'rail',x:2210,to:'gate',toX:2210,label:'다리 난간돌 세우기 · E',draw:(x,y)=>A.drawBridgeWorkMarker(x,y)},
-    ...[{job:'bank',x:1820,y:166,name:'옛 다리 밑돌'},{job:'arch',x:1885,y:140,name:'옛 다리판'},{job:'rail',x:2045,y:112,name:'옛 다리 끝돌'}].map(p=>({
-      id:'dol_bridge_survey_'+p.job,memorySurvey:p.job,x:p.x,y:p.y,to:'gate',toX:p.x,toY:p.y,
-      get label(){return p.name+(Rg.bridgeSurveyReady(p.job)?' 다시 보기 · E':' 살피기 · E');},
-      // 결정 D-82: 다리를 다 놓으면 조사 자리는 사라진다(지름길 안내를 가리지 않게)
-      get distance(){return bridgeReady()?-1:undefined;},
-      draw:(x,y)=>{if(surveyVisible()&&!bridgeReady())A.drawBridgeSurvey(x,y,Rg.bridgeSurveyReady(p.job));},
-    })),
-    // 무너진 옛 다리는 몸의 문제라 다람쥐가 남은 들보로 건넌다. 뿔이의 허락(장승제)은 약속이라 변신으로도 남는다 (PA-47).
-    {id:'dol_bridge_shortcut',depth:true,x:2090,y:112,to:'cliff',toX:1770,toY:192,label:'놓은 돌다리로 절벽길에 · E',need:bridgeOpen,reason:'다리를 다 놓고 뿔이의 길 허락을 받으면 절벽길로 이어진다.',draw:marker,
-      formPass:'squirrel',formNeed:permit,formLabel:'다람쥐로 남은 들보 타고 건너기'},
+    // 장승 둘은 고갯길 경치(art.js scenery)가 그린다. 들어설 때 비켜 선다 (결정 D-166)
+    {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:blocked},
+    // 결정 D-164: 첫 아빠 도장(장승) 바로 다음, 길섶에 반쯤 쌓인 소원 돌탑. 옛 돌다리 다시 놓기(받침·다리판·가장자리)를 대신한다(사용자 피드백 24).
+    {id:'dol_wish_tower',wishTower:true,x:1800,to:'gate',toX:1800,get label(){return G.f.dolWishTower?'소원 돌탑 바라보기 · E':'반쯤 쌓인 돌탑 살펴보기 · E';},
+      draw:(x,y)=>A.drawWishTower(x,y,G.f.dolWishTower?3:0,!!G.f.dolHareTower)},
   ];
-  Rg.zones.village.doors=[{id:'dol_depth_shrine',depth:true,x:2440,to:'shrine',toX:100,label:'돌계단 안쪽, 성황당으로 · ↑ / E',need:permit,reason:gateReason,draw:marker,drawBlocked:blocked}];
+  // 결정 D-166: 돌계단 안쪽 성황당 입구에도 장승 둘이 늘 서 있다(예전에는 금줄이 걷히면 장승까지 사라졌다). 들어설 때 양옆으로 비켜 선다.
+  Rg.zones.village.doors=[{id:'dol_depth_shrine',depth:true,gate:true,x:2440,to:'shrine',toX:100,label:'돌계단 안쪽, 성황당으로 · ↑ / E',need:permit,reason:gateReason,
+    draw:(x,y)=>A.drawDepthGate(x,y,0,Rg.depthOpen('dol_depth_shrine')),drawBlocked:(x,y)=>A.drawGateRope(x,y)}];
   Rg.zones.cliff.doors=[
     {id:'dol_depth_back',depth:true,reverse:true,x:100,to:'gate',toX:1650,label:'장승 고갯길로 돌아가기 · E',draw:marker},
-    {id:'dol_bridge_return',depth:true,reverse:true,x:1770,to:'gate',toX:2090,toY:112,label:'함께 놓은 돌다리로 돌아가기 · E',need:bridgeOpen,reason:'고갯길에서 옛 다리를 다시 놓으면 이 길로 돌아갈 수 있다.',draw:marker,
-      formPass:'squirrel',formNeed:permit,formLabel:'다람쥐로 남은 들보 타고 돌아가기'},
     {id:'dol_darae_path',depth:true,x:2160,to:'cliff',toX:2240,label:'골렘이 비켜 준 다래길',need:calm,reason:'성황당 돌무더기가 절벽 위 길을 흔든다. 성황당에서 먼저 잠재우자.',draw:marker,drawBlocked:blocked},
   ];
   // 다래길은 발판만으로 우회하지 못하게 한다. 아래길에서 성황당 출구까지는 항상 안전하다.
@@ -427,13 +378,13 @@ if(!CLASSIC){
   Rg.zones.cliff.step=()=>{Rg.zones.cliff.platforms=G.boss.dead?cliffBases:cliffBases.filter(p=>p.x<2200);commonStep('cliff');};
   Rg.zones.shrine.doors=[
     {id:'dol_depth_village',depth:true,reverse:true,x:100,to:'village',toX:2440,label:'돌담 마을로 돌아가기 · E',draw:marker},
-    {id:'dol_memory_shrine',memory:true,x:1120,to:'shrine',toX:1120,label:'낮은 소원 돌에 손대기 · 옛 다리',draw:memoryMark},
+    {id:'dol_snow_steps',snowSteps:true,x:1120,to:'shrine',toX:1120,get label(){return snowPacked()?'다진 눈 계단 · E':'눈 둔덕 밟아 다지기 · E';},draw:(x,y)=>{if(!snowPacked())A.drawSnowDrift(x,y);}},   // 결정 D-165
     {id:'dol_after_golem',depth:true,x:2630,to:'cliff',toX:2630,toY:112,label:'아까 본 절벽 끝으로 · E',need:calm,reason:'돌무더기가 가라앉으면 절벽 끝으로 이어진다.',draw:marker,drawBlocked:blocked},
   ];
   // 필수 물건은 선택 발견에 기대지 않는다. 기존 여섯 알·두 가지에 정확히 +3/+1.
   Rg.zones.field.pickups=[{id:'dol_memil_extra1',x:790,y:192,item:'memil',got:false},{id:'dol_memil_extra2',x:1940,y:192,item:'memil',got:false},{id:'dol_memil_extra3',x:1990,y:192,item:'memil',got:false}];
   Rg.zones.gate.pickups=[{id:'dol_mistletoe_extra',x:2060,y:112,item:'gyeousari',got:false}];
-  // 무너진 다리의 남은 들보. 다람쥐가 타고 다리 끝돌(y=112)에 오른다 (PA-47)
+  // 서리 낀 돌기둥. 다람쥐가 타고 높은 바위턱(y=112)에 오른다 (PA-47)
   Rg.zones.gate.climbs=[{x:2028,top:112,draw:(x,y,top)=>{R(x-2,top,4,y-top,'#6d665c');R(x-2,top,1,y-top,'#a7a093');for(let k=top+9;k<y-4;k+=14)R(x-3,k,6,2,'#4f4a43');}}];
   // 산양 턱의 석이버섯, 다람쥐의 잊은 몫 (PA-47 선택 자리)
   Rg.zones.field.pickups.push({id:'dol_goat_seogi',x:2228,y:112,item:'seogi',got:false});
@@ -442,7 +393,8 @@ if(!CLASSIC){
   Rg.zones.shrine.pickups=[{id:'dol_memory_seogi',x:1580,y:112,item:'seogi',got:false}];
   Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'해 떴다!\n엄마도 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:marker,layers:A.cliffLayers}];
   // 결정 D-83: 밭 둔덕에서 먼 성황당 돌무더기가 꿈틀하는 것이 보인다. 목적지(성황당)와 골렘을 미리 보여 준다.
-  Rg.zones.field.vistas=[{id:'shrine_stir',x:1500,from:0,to:180,sound:'wind',thought:'저 먼 돌무더기가… 움직였어?\n바람 탓인가.',
+  // 결정 D-167: 꾸벅이 둥지(1510)와 붙어 있던 바라보기 자리를 메밀 그루터기 쪽 둔덕으로 옮긴다(사용자 피드백 27).
+  Rg.zones.field.vistas=[{id:'shrine_stir',x:1000,from:0,to:180,sound:'wind',thought:'저 먼 돌무더기가… 움직였어?\n바람 탓인가.',
     diary:'메밀밭 둔덕에서 먼 산 쪽 돌무더기가 꿈틀하는 것을 봤다. 돌이 저절로 움직일 리 없는데.',draw:marker,layers:A.stirLayers}];
   Rg.zones.shrine.vistas=[{id:'wishing_stones',x:1850,from:40,to:390,sound:'wind',thought:'작은 돌도 받치고 있네.\n엄마 돌도 놓을래.',diary:'성황당 돌탑 아래에서 바람을 들었다. 작은 돌들이 서로를 받치고 있었다.',draw:marker,layers:A.shrineLayers}];
 
@@ -458,7 +410,7 @@ if(!CLASSIC){
     ppuri.talk=()=>{
       ppuriScene={owner:G,zone:G.zone};
       if(G.zone==='village'&&G.f.ppuriMet&&!G.f.ppuriPassed)
-        talk([['뿔이','장승제 전에 성황당 길을 살펴 두는 중이다.\n메밀가루를 가져오면 여기서 바로 장승제를 올린다.']],ppuriTalk);
+        talk([[ppuri.name,'장승제 전에 성황당 길을 살펴 두는 중이다.\n메밀가루를 가져오면 여기서 바로 장승제를 올린다.']],ppuriTalk);
       else ppuriTalk();
     };
     const oldBossDie=Rg.bossDie;
@@ -490,7 +442,7 @@ if(!CLASSIC){
       if(G.f.ppuriPassed&&!G.boss.dead)return '움직이는 돌무더기와 맞서기';
       if(!G.f.ppuriMet)return '장승지기에게 서리다래 물어보기';
       if(!G.f.kkuTalk)return '꾸벅이에게 서리다래 묻기';
-      if(!G.f.ppuriPassed&&has('memil_powder'))return '뿔이에게 메밀가루 건네기';
+      if(!G.f.ppuriPassed&&has('memil_powder'))return '뿔영감에게 메밀가루 건네기';
       return oldGoal();
     };
   };
