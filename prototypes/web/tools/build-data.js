@@ -217,6 +217,7 @@ const TUNING=numericTable('tuning','분류',
     'battle_owl_speed battle_owl_cooldown battle_owl_radius battle_owl_tell_lead',
     'battle_deer_speed battle_deer_cooldown battle_deer_radius battle_deer_iframes',
     'battle_base_damage battle_sharp_damage battle_pickaxe_bonus kudzu_stem_cut_chance',
+    'golem_stone_chance golem_stone_step golem_stone_cap golem_foot_rest golem_rest_every golem_rest_frames',
     'form_squirrel_speed form_climb_speed form_climb_reach form_goat_jump form_owl_glide_fall',
     'form_deer_speed form_deer_listen_range form_fx_frames stranger_trade_limit',
     'roll_hold_ms roll_speed roll_squirrel_speed roll_accel_frames roll_step_frames',
@@ -249,6 +250,7 @@ requireValue(TUNING.battle_goat_damage_taken>0&&TUNING.battle_goat_damage_taken<
 requireValue(TUNING.form_squirrel_speed>0&&TUNING.form_deer_speed>0&&TUNING.form_goat_jump>=1&&TUNING.form_owl_glide_fall>0&&TUNING.form_owl_glide_fall<TUNING.field_fall_speed&&TUNING.form_climb_speed>0&&TUNING.form_climb_reach>0&&TUNING.form_deer_listen_range>0&&Number.isInteger(TUNING.stranger_trade_limit)&&TUNING.stranger_trade_limit>0,'tuning.csv: 필드 변신 배수·활공·오르기·손님 교환 수를 확인한다');
 requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_pickaxe_bonus>0,'tuning.csv: 전투 기본 피해·날 세운 피해·곡괭이 덤을 확인한다');
 requireValue(TUNING.kudzu_stem_cut_chance>0&&TUNING.kudzu_stem_cut_chance<=1,'tuning.csv: 칡줄기 끊기 확률은 0보다 크고 1 이하여야 한다');
+requireValue(TUNING.golem_stone_chance>0&&TUNING.golem_stone_chance<=1&&TUNING.golem_stone_step>0&&Number.isInteger(TUNING.golem_stone_cap)&&TUNING.golem_stone_cap>=1&&Number.isInteger(TUNING.golem_rest_every)&&TUNING.golem_rest_every>=1,'tuning.csv: 돌 골렘 돌 확률은 0~1, 오름은 0보다 크고, 돌 수·몸 비는 간격은 1 이상 정수여야 한다 (D-169)');
 requireValue(MINIGAMES.yut_nak_zone>0&&MINIGAMES.yut_nak_zone<40&&MINIGAMES.yut_needle_speed>0,'minigames.csv: 윷 낙 구간은 0~40%, 바늘 속도는 0보다 커야 한다');
 requireValue(MINIGAMES.rhythm_stray_window>=MINIGAMES.rhythm_good,'minigames.csv: 헛가위 범위는 맞음 판정 반폭 이상이어야 한다');
 

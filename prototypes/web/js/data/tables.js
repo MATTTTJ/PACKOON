@@ -163,6 +163,27 @@ const TABLES={
    "region": "dolneomeo",
    "d": "아빠가 성황당에 올리려다 두고 간 돌. 소원이 적혀 있다. 돌 골렘을 달래는 선물이 된다."
   },
+  "gudeuldol": {
+   "n": "구들돌",
+   "r": 1,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "돌 골렘의 다리를 이루던 넓적한 구들돌. 불기운을 오래 품는다. 품이 중품이라 흔한 물건 교환의 값으로 쓴다."
+  },
+  "chadol": {
+   "n": "차돌",
+   "r": 2,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "돌 골렘의 팔에서 떨어진 흰 차돌. 부딪치면 불꽃이 튈 만큼 단단하다. 품이 상품이라 흔한 물건 교환의 값으로 쓴다."
+  },
+  "okdol": {
+   "n": "옥돌",
+   "r": 3,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "돌 골렘의 가슴 속에 있던 푸른 옥돌. 눈 속에서도 은은하게 빛난다. 큰 장터의 소금장수 짠돌이 값을 후하게 쳐 준다."
+  },
   "solbang": {
    "n": "솔방울",
    "r": 0,
@@ -525,7 +546,7 @@ const TABLES={
    },
    {
     "id": "head",
-    "name": "머리",
+    "name": "몸",
     "hp": 4,
     "mat": "mossy_eye",
     "core": true,
@@ -1080,6 +1101,11 @@ const TABLES={
     "kind": "그저 그럼",
     "line": "소금장수한테 소금을 주냐?",
     "effect": "none"
+   },
+   "okdol": {
+    "kind": "좋아함",
+    "line": "…옥돌이잖아. 이거면 소금 한 섬은 쳐 주지.",
+    "effect": "none"
    }
   },
   "deungjan": {
@@ -1556,13 +1582,13 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "돌무더기가 깨어나 일어섰다. 머리가 높아 처음엔 손이 닿지 않는다.",
+     "text": "눈을 뒤집어쓴 돌무더기가 설인처럼 일어섰다. 구들돌 발로 땅을 찧고 차돌 팔로 휩쓸고 눈덩이를 던진다.",
      "section": "관찰",
      "when": "fight:golem"
     },
     {
      "who": "me",
-     "text": "다리나 팔을 하나 무너뜨리면 휘청이며 머리가 내려온다.",
+     "text": "다리나 팔을 하나 무너뜨리면 가슴의 눈 껍데기가 깨지고 푸른 옥돌이 드러난다.",
      "section": "관찰",
      "when": "core:golem"
     },
@@ -2600,6 +2626,12 @@ const TABLES={
   "battle_sharp_damage": 2,
   "battle_pickaxe_bonus": 1,
   "kudzu_stem_cut_chance": 0.5,
+  "golem_stone_chance": 0.25,
+  "golem_stone_step": 0.2,
+  "golem_stone_cap": 2,
+  "golem_foot_rest": 64,
+  "golem_rest_every": 2,
+  "golem_rest_frames": 110,
   "toast_frames": 300,
   "peek_ms": 1400,
   "peek_fade_ms": 180,

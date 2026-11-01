@@ -97,15 +97,29 @@ Rg.drawDig=(d,x)=>{
   return false;
 };
 
-/* 성황당 돌무더기: 골렘이 잠들어 있을 때. 쓰러뜨리거나 달래면 작은 돌무더기로 돌아간다 */
+/* 성황당 돌무더기: 골렘이 잠들어 있을 때. 쓰러뜨리거나 달래면 작은 돌무더기로 돌아간다.
+   결정 D-168: 눈을 뒤집어쓴 설인 같은 돌 골렘이 웅크려 잔다. 구들돌 발, 흰 차돌 팔, 어깨와 머리에 쌓인 눈, 아래로 늘어진 눈 털 */
 function drawCairn(){const b=G.boss;const x=b.x-cam;if(x<-60||x>W+60)return;
   if(b.dead){R(x-14,GROUND-8,28,8,'#8a8680');R(x-10,GROUND-14,20,6,'#9a9690');R(x-6,GROUND-19,12,5,'#8a8680');
+    R(x-12,GROUND-9,10,2,'#f3f5f4');R(x-6,GROUND-20,10,2,'#f3f5f4');
     if(G.f.golemCalm){R(x-3,GROUND-24,7,5,'#9a9690');R(x-1,GROUND-22,1,1,'#b4432a');}return;}
-  const breathe=Math.floor(G.anim/18)%2;
-  R(x-30,GROUND-14,60,14,'#7a766e');R(x-24,GROUND-28-breathe,48,14,'#8a8680');R(x-18,GROUND-40-breathe,36,12,'#7a766e');R(x-10,GROUND-50-breathe,20,10,'#9a9690');
-  for(let i=0;i<6;i++)R(x-28+i*10,GROUND-15-((i*5)%14),8,1,'#eef2f4');
-  R(x-8,GROUND-46-breathe,16,1,'#5a8a3a');
-  R(x-7,GROUND-35-breathe,5,2,'#3a3430');R(x+2,GROUND-35-breathe,5,2,'#3a3430');
+  const br=Math.floor(G.anim/18)%2,SN='#f3f5f4',SH='#c9d2d8';
+  // 구들돌 발 둘
+  R(x-30,GROUND-6,18,6,'#5b5048');R(x-29,GROUND-7,16,1,'#7d7066');R(x+12,GROUND-6,18,6,'#5b5048');R(x+13,GROUND-7,16,1,'#7d7066');
+  for(let i=0;i<3;i++){R(x-30+i*6,GROUND-2,4,2,'#3e352f');R(x+13+i*6,GROUND-2,4,2,'#3e352f');}
+  // 웅크린 몸: 돌무더기에 눈 털을 뒤집어썼다
+  R(x-26,GROUND-34-br,52,28,'#6c6e70');R(x-22,GROUND-40-br,44,8,'#76787a');R(x-16,GROUND-30-br,12,8,'#5f6163');R(x+6,GROUND-26-br,14,10,'#5a5c5e');
+  for(let i=0;i<9;i++){const fx=x-24+i*6,l=5+((i*7)%4);R(fx,GROUND-40-br,3,l,SN);R(fx+2,GROUND-40-br+l-2,1,2,SH);}
+  R(x-28,GROUND-44-br,56,5,SN);R(x-24,GROUND-46-br,48,2,SN);
+  // 흰 차돌 팔: 앞으로 늘어뜨려 주먹을 땅에 짚었다
+  for(const s of [-1,1]){const ax=x+s*24-(s<0?6:0);R(ax,GROUND-34-br,7,22,'#d2cdc3');R(ax+(s<0?0:4),GROUND-26-br,3,10,'#a39d92');R(ax+1,GROUND-30-br,5,1,'#fbfaf6');
+    R(ax-2,GROUND-12,11,9,'#d2cdc3');R(ax-2,GROUND-12,11,1,'#e6e2da');R(ax+(s<0?7:-2),GROUND-9,2,6,'#a39d92');}
+  // 어깨 사이에 파묻힌 머리, 눈 눈썹, 감은 눈
+  R(x-9,GROUND-52-br,18,12,'#66686b');R(x-11,GROUND-55-br,22,4,SN);R(x-7,GROUND-57-br,14,2,SN);
+  R(x-6,GROUND-47-br,4,1,'#2c2723');R(x+2,GROUND-47-br,4,1,'#2c2723');R(x-4,GROUND-43-br,8,1,'#2c2723');
+  // 가슴의 눈 껍데기 틈으로 옥돌이 비친다
+  R(x-3,GROUND-30-br,6,6,SN);R(x-1,GROUND-28-br,2,2,'#5f9a7a');
+  if(br){R(x+12,GROUND-60,2,2,SN);R(x+16,GROUND-64,1,1,SN);}   // 잠든 숨결
 }
 function drawKkuCue(){
   const n=Rg.npcs.find(n=>n.id==='kkubeogi');if(!n)return;
