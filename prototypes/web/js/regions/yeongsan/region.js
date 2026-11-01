@@ -27,7 +27,7 @@ const Rg=defineRegion('yeongsan',{
       dadMet:false,dadDone:false,sangunMet:false,spring:false,fruitGot:false,nameGiven:false,yakDone:false,newName:''},
     rel:{salgeumi:{t:'호감',v:0},sangun:{t:'외경',v:0},nal:{t:'경멸',v:0}},
   }),
-  weather:()=>Vfx.setWeather(G.f.spring?'':'snow'),
+  weather:()=>Vfx.setWeather(G.f.spring?'':'snow'),surface:()=>G.f.spring?'':'snow',   // 결정 D-174: 눈 쌓인 바닥 (발걸음 효과)
   weatherFront(){if(!G.f.spring)R(0,0,W,H,'rgba(20,28,70,.12)');},
   onStart(){
     Rg.arcsEnabled();

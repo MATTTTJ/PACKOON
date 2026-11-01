@@ -660,6 +660,20 @@ body.ending-scene .hud,body.ending-scene #pad,body.ending-scene #toast,body.endi
 .form-pick{min-width:56px;min-height:44px;padding:0 10px;font-family:var(--ui);font-size:14px;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:8px;touch-action:manipulation}
 .form-pick[aria-pressed="true"]{background:var(--meok);color:#fffaf0;border-color:#c9a06a}
 body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
+/* 결정 D-173: 새 변신 알림 카드(입력을 막지 않는다)와 아직 안 써 본 변신이 있을 때의 잎사귀 깜박임 */
+.stage .form-intro{position:absolute;top:16%;left:50%;transform:translateX(-50%);width:min(240px,62%);padding:6px 8px 7px;background:var(--hanji);color:var(--meok);border:3px solid #3d5a2a;border-radius:6px;box-shadow:3px 3px 0 rgba(29,24,20,.45);text-align:center;pointer-events:none;z-index:6;font-family:var(--ui)}
+.stage .form-intro canvas{display:block;width:100%;height:auto;image-rendering:pixelated;border:2px solid var(--meok);border-radius:3px;margin:4px 0}
+.form-intro-head{display:block;font-size:15px;color:#2f4a1f;letter-spacing:.02em}
+.form-intro-head::before{content:'';display:inline-block;width:.55em;height:.85em;margin-right:5px;background:#7fb04a;border-radius:0 80% 0 80%;transform:rotate(25deg)}
+.form-intro-line{margin:0;font-size:12px;line-height:1.35;word-break:keep-all}
+.form-intro-keys{margin:3px 0 0;font-size:11px;color:#5d4e39;word-break:keep-all}
+.form-intro-keys kbd{display:inline-block;min-width:1.3em;padding:0 3px;border:1px solid var(--meok);border-radius:3px;background:#fffaf0;font-size:11px}
+.stage .form-intro.show{animation:formIntroIn .35s ease-out}
+.stage .form-intro.out{opacity:0;transition:opacity .3s ease-in}
+@keyframes formIntroIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%)}}
+.form-now.is-new .form-leaf,.pbtn.leaf.is-new{animation:leafNew 1.4s ease-in-out infinite}
+@keyframes leafNew{50%{filter:brightness(1.6);box-shadow:0 0 6px #b7e07a}}
+@media (prefers-reduced-motion:reduce){.stage .form-intro.show,.form-now.is-new .form-leaf,.pbtn.leaf.is-new{animation:none}}
 /* 결정 D-105: 녹음 음원 설정과 AI 사용 표기 */
 .music-recorded{display:flex;align-items:center;gap:6px;margin-top:6px}
 .ai-note{margin:4px 0 0;font-size:.85em}

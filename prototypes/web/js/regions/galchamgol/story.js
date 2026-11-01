@@ -379,12 +379,12 @@ function musoeLeaf(){
 function musoeFirstForm(){
   const F=G.f;F.leafGiven=true;F.leafSplit=true;   // 결정 D-117: 이 뒤로 엄마 잎 이야기는 다시 말을 걸 때 한 번만
   if(typeof unlockForm==='function')unlockForm('squirrel');
-  if(typeof setForm==='function')setForm('squirrel');
+  if(typeof setForm==='function')setForm('squirrel',{scripted:true});
   diary('form_squirrel','삼촌에게 아빠가 맡긴 잎사귀를 받았다. 다람쥐를 떠올리며 잎을 부니 내가 다람쥐가 됐다. 다람쥐는 잊어도 다시 찾는다. 그래서 겁 없이 오른다.');
   talk([['너구리','(삐익, 풀피리 소리가 났다. 몸이 작아지고 꼬리가 커졌다.)'],['너구리','나… 다람쥐야!'],
     ['무쇠','됐다. 잎을 한 번 더 불면 돌아온다.'],['너구리','(잎을 다시 부니 너구리로 돌아왔다.)']],()=>{
       if(typeof setForm==='function')setForm('');
-      toast('잎사귀 변신을 배웠다! 1 다람쥐 · 0 너구리 (휴대폰은 잎사귀 버튼)');
+      // 결정 D-173: 숫자 키와 다람쥐가 잘하는 것은 새 변신 알림 카드가 알린다 (forms.js)
       // 결정 D-89: 무쇠 대사를 한자리에 몰지 않는다. 엄마 잎 이야기와 낫 벼리기 안내는 다시 말을 걸 때 이어진다.
     });
 }

@@ -34,7 +34,7 @@ function rollRelease(){
 function startRoll(){
   rolling=true;rollVel=G.vx;rollTick=0;
   Sound.playSfx(G.region==='yeongsan'?'footstep_snow':G.region==='jangteo'?'footstep_market':'footstep_leaf',{gain:.7});
-  Vfx.dust();
+  Vfx.rollStep();   // 결정 D-174: 바닥에 맞는 첫 튐 (눈덩이 / 흙먼지)
 }
 function endRoll(){if(!rolling)return;rolling=false;rollVel=0;rollTick=0;}
 /* step()에서 G.vx를 정한 뒤 부른다. 구르는 중이면 G.vx를 구르기 빠르기로 바꾼다. ax: 좌우 입력 -1·0·1 */
@@ -60,9 +60,10 @@ function stepRoll(ax){
   G.vx=rollVel;if(ax)G.face=ax>0?1:-1;
   // 굴러간 거리만큼 공이 돈다. 반지름으로 나누면 미끄러지지 않고 구르는 것처럼 보인다.
   rollAngle+=G.vx/rollSpec().r;rollTick++;
+  Vfx.rollTrail();   // 결정 D-174: 눈·서리 위에서는 공 아래 눈보라와 고랑 자국
   if(G.onGround&&Math.abs(G.vx)>.4&&rollTick%T.roll_step_frames===0){
     Sound.playSfx(G.region==='yeongsan'?'footstep_snow':G.region==='jangteo'?'footstep_market':'footstep_leaf',{gain:.35});
-    if(!Vfx.reducedMotion)Vfx.dust();
+    Vfx.rollStep();   // 눈덩이 튐(눈) / 흙먼지·흙덩이·잎 부스러기(그 밖)
   }
 }
 /* 구르기 공 그리기. (ox,oy)는 발 자리, 공은 그 위에 놓인다 */

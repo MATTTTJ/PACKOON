@@ -351,7 +351,7 @@ if(!CLASSIC){
     if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>Z('shrine',2310))Rg.startGolem();
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
-    weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);Rg.ambient();applyMemory();},
+    weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),surface:()=>Rg.springRevisit()?'':'frost',ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);Rg.ambient();applyMemory();},
     drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);if(id==='gate')A.drawBridgeWork(tx(1870)-cam,GROUND);drawStonePlatforms(id);},
     drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
     weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),

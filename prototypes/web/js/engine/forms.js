@@ -29,6 +29,9 @@ function unlockForm(id){
   if(!Array.isArray(G.forms))G.forms=[];
   if(G.forms.includes(id))return false;
   G.forms.push(id);G.forms.sort((a,b)=>FORM_IDS.indexOf(a)-FORM_IDS.indexOf(b));
+  // 결정 D-173: 새 변신은 알림 카드(대화가 끝난 뒤)로 확실히 알리고, 처음 써 볼 때까지 그 변신으로만 갈 수 있는 자리를 살짝 빛낸다.
+  const hint=G.f.formHintIds||(G.f.formHintIds=[]);if(!hint.includes(id))hint.push(id);
+  (G.f.formIntroQ||(G.f.formIntroQ=[])).push(id);
   toast('새 변신: '+formName(id));refreshFormUi();
   if(typeof B!=='undefined'&&B)renderBattleForms();
   return true;
@@ -46,6 +49,8 @@ function setForm(id,opts={}){
   if(!opts.force&&!formChangeAllowed())return false;
   if((G.form||'')===id)return false;
   G.form=id;formClimb=null;
+  // 결정 D-173: 플레이어가 한 번 골라 써 봤으면 빛내기를 그친다 (이야기 연출로 바뀐 것{scripted:true}은 세지 않는다)
+  if(id&&!opts.scripted&&G.f.formHintIds?.includes(id))G.f.formHintIds=G.f.formHintIds.filter(x=>x!==id);
   if(!opts.quiet){
     Sound.leaf?.(id);
     if(!B)formFx={owner:G,x:G.px,y:G.py-12,t:0};
@@ -77,6 +82,8 @@ const ROLL_FORMS={
   deer:{roll:false,say:'다리가 길어서 몸을 둥글게 말 수가 없어.'}
 };
 let formClimb=null,formGlide=false,formFx=null;
+/* 결정 D-175: 걷는 동안의 네 박자 걸음(-1이면 서 있다). 필드 주인공을 그릴 때만 field.js drawRaccoon 이 정하고, 그린 뒤 -1로 되돌린다 */
+let formGait=-1;
 const formMoveMul=()=>G.form==='squirrel'?TABLES.TUNING.form_squirrel_speed:G.form==='deer'?TABLES.TUNING.form_deer_speed:1;
 const formJumpMul=()=>G.form==='goat'?TABLES.TUNING.form_goat_jump:1;
 const upHeld=()=>!!(keys['arrowup']||keys['w']||touch.up);
@@ -185,15 +192,23 @@ function drawFormAt(ox,oy,f,st,form,attackT=0,glide=false){
   }
   if(form==='goat'){
     const C='#ebe5d9',S='#b9b0a0',H='#8a7a5c',D='#3a2f28';
-    M(ox,oy,f,-6+st,-7,2,7,S);M(ox,oy,f,-3,-7,2,7,C);M(ox,oy,f,3-st,-7,2,7,S);M(ox,oy,f,6,-7,2,7,C);
-    for(const lx of [-6+st,-3,3-st,6])M(ox,oy,f,lx,-1,2,1,D);
-    M(ox,oy,f,-9,-15,2,2,C);
-    M(ox,oy,f,-8,-14,16,7,C);M(ox,oy,f,-7,-8,14,1,S);
-    M(ox,oy,f,-5,-18,7,4,BUNDLE);M(ox,oy,f,-4,-17,1,1,'#8a3b2a');M(ox,oy,f,-1,-16,1,1,'#8a3b2a');
-    M(ox,oy,f,6,-20,4,8,C);M(ox,oy,f,7,-23,6,5,C);M(ox,oy,f,12,-21,2,3,C);M(ox,oy,f,13,-21,1,1,K);
-    M(ox,oy,f,10,-22,1,1,K);M(ox,oy,f,11,-18,2,3,'#d6cfc2');M(ox,oy,f,5,-22,2,1,S);
-    M(ox,oy,f,7,-26,2,3,H);M(ox,oy,f,6,-28,2,2,H);M(ox,oy,f,9,-25,1,2,H);
-    M(ox,oy,f,2,-15,1,7,STRAP);drawStrapLeaf(ox,oy,f,2,-12);drawSwipe(ox,oy-10,f,attackT,10);return;
+    /* 결정 D-175: 산양은 대각선 두 다리씩 번갈아 든다(먼 뒷다리+가까운 앞다리 / 가까운 뒷다리+먼 앞다리).
+       든 다리는 무릎을 굽혀 발굽이 앞으로 나오고, 다리를 드는 박자에 몸이 한 칸 떠오르며, 디디는 박자에 고개가 끄덕인다.
+       걷지 않을 때(formGait<0)는 st 하나로 예전처럼 두 다리만 엇갈린다(초상·기어 내려가기 등). */
+    const g=formGait,lift=g===0?0:g===2?1:-1,bob=lift>=0?-1:0,nod=g===1||g===3?1:0;
+    const legs=g<0?[[-6+st,S,-1],[-3,C,-1],[3-st,S,-1],[6,C,-1]]:[[-6,S,0],[-3,C,1],[3,S,1],[6,C,0]];
+    for(const [lx,col,pair] of legs){
+      if(pair>=0&&pair===lift){M(ox,oy,f,lx,-8,2,4,col);M(ox,oy,f,lx+1,-5,2,2,col);M(ox,oy,f,lx+2,-3,2,1,D);}   // 든 다리: 무릎을 굽혀 앞으로
+      else{M(ox,oy,f,lx,-8,2,8,col);M(ox,oy,f,lx,-1,2,1,D);}
+    }
+    const by=oy+bob,hy=by+nod;
+    M(ox,by,f,-9,-15+(g>=0&&lift<0?1:0),2,2,C);                                            // 꼬리: 디딜 때 살짝 처진다
+    M(ox,by,f,-8,-14,16,7,C);M(ox,by,f,-7,-8,14,1,S);
+    M(ox,by,f,-5,-18,7,4,BUNDLE);M(ox,by,f,-4,-17,1,1,'#8a3b2a');M(ox,by,f,-1,-16,1,1,'#8a3b2a');
+    M(ox,by,f,6,-20,4,8,C);M(ox,hy,f,7,-23,6,5,C);M(ox,hy,f,12,-21,2,3,C);M(ox,hy,f,13,-21,1,1,K);
+    M(ox,hy,f,10,-22,1,1,K);M(ox,hy,f,11,-18,2,3,'#d6cfc2');M(ox,hy,f,5,-22,2,1,S);
+    M(ox,hy,f,7,-26,2,3,H);M(ox,hy,f,6,-28,2,2,H);M(ox,hy,f,9,-25,1,2,H);
+    M(ox,by,f,2,-15,1,7,STRAP);drawStrapLeaf(ox,by,f,2,-12);drawSwipe(ox,by-10,f,attackT,10);return;
   }
   if(form==='owl'){
     const C='#8a6a45',L='#d8c09a',D='#4a3524',E='#f2b43a';
@@ -441,5 +456,117 @@ function refreshFormUi(){
   const label=$('formLabel');
   if(label){label.hidden=!G.forms?.length;label.textContent='';label.append(el('span','form-leaf'),document.createTextNode(formName(G.form)));}
   if(padLeaf)padLeaf.hidden=!G.forms?.length;
+  // 결정 D-173: 아직 한 번도 안 써 본 새 변신이 있으면 잎사귀 표시가 숨 쉬듯 깜박인다
+  const fresh=!!G.f?.formHintIds?.length;label?.classList.toggle('is-new',fresh);padLeaf?.classList.toggle('is-new',fresh);
   if(!formRing.hidden)renderFormRing();
+}
+
+/* ---------- 결정 D-173: 새 변신 알림 카드와 빛내기 ----------
+   unlockForm 이 G.f.formIntroQ 에 넣으면, 대화·전투·패널이 모두 닫힌 첫 순간에 화면 위쪽 가운데에 카드를 띄운다.
+   카드는 그 변신이 잘하는 것을 짧은 그림으로 한 번 보여 주고(말로 늘어놓지 않는다), 숫자 키와 휴대폰 잎사귀 버튼을 알린다.
+   입력을 막지 않고 form_intro_ms 뒤 흐려진다. 처음 써 볼 때까지(G.f.formHintIds) 그 변신으로만 갈 수 있는 자리에 작은 잎빛이 반짝인다. */
+const FORM_INTRO={
+  squirrel:{line:'줄기를 타고 높은 데까지 오른다'},
+  goat:{line:'디딜 데를 보고 훌쩍 높이 뛴다'},
+  owl:{line:'점프를 누른 채 떨어지면 천천히 내려앉는다'},
+  deer:{line:'날쌔게 달리고, 숨은 소리를 먼저 듣는다'}
+};
+const formIntroBox=el('div','form-intro');formIntroBox.hidden=true;formIntroBox.setAttribute('role','status');
+const formIntroCv=document.createElement('canvas');formIntroCv.width=96*3;formIntroCv.height=64*3;
+const formIntroHead=el('b','form-intro-head'),formIntroKeys=el('p','form-intro-keys'),formIntroLine=el('p','form-intro-line');
+formIntroBox.append(formIntroHead,formIntroCv,formIntroLine,formIntroKeys);
+$('stage')?.appendChild(formIntroBox);
+let formIntroShow=null,formIntroBuf=null;
+/* 변신이 잘하는 것을 DEMO_W×DEMO_H 칸에 그린다(바닥 y=56). t: 카드가 뜬 뒤 흐른 초 */
+const DEMO_W=96,DEMO_H=64,DG=56;
+function drawFormDemo(id,t){
+  R(0,0,DEMO_W,DEMO_H,'#e9dcc0');R(0,DG,DEMO_W,DEMO_H-DG,'#9e7a52');R(0,DG,DEMO_W,1,'#7a5536');
+  const walkSt=Math.floor(t*8)%2;
+  if(id==='squirrel'){   // 줄기를 타고 오른다
+    R(52,4,9,DG-4,'#6f4a2c');R(52,4,2,DG-4,'#9a6c42');for(let y=10;y<DG-2;y+=10){R(59,y,2,1,'#4a2e1a');R(55,y+5,2,1,'#4a2e1a');}
+    R(42,4,30,4,'#7f9a4a');R(38,7,8,3,'#6a8a3e');R(66,6,10,3,'#6a8a3e');
+    const c=t%3.4,top=34;
+    if(c<.7)drawFormAt(Math.round(24+c*38),DG,1,walkSt,'squirrel');
+    else if(c<2.6)drawFormBackAt(56,Math.round(DG-(DG-top)*(c-.7)/1.9),Math.floor(t*7)%2,'squirrel');
+    else drawFormBackAt(56,top,0,'squirrel');
+    return;
+  }
+  if(id==='goat'){   // 디딜 데를 보고 바위턱으로 훌쩍
+    const lx=62,ly=32;
+    R(lx,ly,DEMO_W-lx,DG-ly,'#b5ab98');R(lx,ly,DEMO_W-lx,2,'#8f8676');R(lx+5,ly+8,9,1,'#9a907e');R(lx+16,ly+15,10,1,'#9a907e');
+    const c=t%3.6;let x,y;
+    if(c<1.1){x=10+c*30;y=DG;formGait=Math.floor(t*12)%4;}
+    else if(c<1.8){const k=(c-1.1)/.7;x=43+k*31;y=Math.round(DG-(DG-ly)*k-10*Math.sin(Math.PI*k));formGait=-1;}
+    else{x=74;y=ly;formGait=-1;}
+    drawFormAt(Math.round(x),y,1,0,'goat');formGait=-1;
+    return;
+  }
+  if(id==='owl'){   // 떨어지며 날개를 펴고 천천히 내려앉는다
+    R(0,30,22,4,'#8a6a48');R(0,34,5,DG-34,'#7a5c3c');
+    const c=t%3.6;
+    if(c<.6)drawFormAt(9,30,1,walkSt,'owl');
+    else if(c<3){const k=(c-.6)/2.4;drawFormAt(Math.round(18+k*56),Math.round(30+k*(DG-30)),1,0,'owl',0,true);}
+    else drawFormAt(74,DG,1,0,'owl');
+    return;
+  }
+  if(id==='deer'){   // 날쌔게 달리다 덤불 속 소리를 먼저 듣는다
+    R(78,42,16,14,'#6f8a4a');R(75,48,5,8,'#5f7a3e');R(82,39,8,4,'#86a35a');
+    const run=(t*52)%130-16,x=Math.round(Math.min(run,62));
+    drawFormAt(x,DG,1,run<62?Math.floor(t*12)%2:0,'deer');
+    if(run>30){const pulse=Math.floor(t*6)%3,col='rgba(90,60,30,.85)';for(let i=0;i<=pulse;i++)R(74-i*3,44-i,1,4+i*2,col);}
+    return;
+  }
+}
+function formIntroTick(){
+  const q=G?.f?.formIntroQ;
+  if(formIntroShow||!q?.length||B||open('dlg')||paused())return;
+  const id=q.shift();if(!FORM_INTRO[id]||!hasForm(id))return;
+  const n=FORM_IDS.indexOf(id)+1;
+  formIntroHead.textContent='새 변신 · '+formName(id);
+  formIntroLine.textContent=FORM_INTRO[id].line;
+  formIntroKeys.innerHTML='';
+  // 손가락으로 하는 화면이면 잎사귀 버튼을, 아니면 숫자 키를 알린다
+  if(matchMedia('(pointer:coarse)').matches)formIntroKeys.textContent='잎사귀 버튼을 눌러 바꾼다';
+  else formIntroKeys.append(el('kbd',null,String(n)),document.createTextNode(' '+formName(id)+' · '),el('kbd',null,'0'),document.createTextNode(' 너구리'));
+  formIntroShow={id,t0:performance.now()};
+  formIntroBox.hidden=false;formIntroBox.classList.remove('out');void formIntroBox.offsetWidth;formIntroBox.classList.add('show');
+  Sound.leaf?.(id);
+  const paint=()=>{
+    if(!formIntroShow||formIntroShow.id!==id)return;
+    const el2=(performance.now()-formIntroShow.t0)/1000,g=formIntroCv.getContext('2d');
+    const buf=formIntroBuf||(formIntroBuf=Object.assign(document.createElement('canvas'),{width:DEMO_W,height:DEMO_H}));
+    const b=buf.getContext('2d');b.imageSmoothingEnabled=false;b.clearRect(0,0,DEMO_W,DEMO_H);
+    const saved=ctx;ctx=b;try{drawFormDemo(id,Vfx.reducedMotion?1.2:el2);}finally{ctx=saved;formGait=-1;}
+    g.imageSmoothingEnabled=false;g.clearRect(0,0,formIntroCv.width,formIntroCv.height);g.drawImage(buf,0,0,formIntroCv.width,formIntroCv.height);
+    if(el2*1000>=TABLES.TUNING.form_intro_ms){formIntroBox.classList.add('out');setTimeout(()=>{if(formIntroShow?.id===id){formIntroShow=null;formIntroBox.hidden=true;formIntroBox.classList.remove('show','out');}},300);return;}
+    if(!Vfx.reducedMotion||el2<.05)requestAnimationFrame(paint);
+    else setTimeout(paint,250);
+  };
+  paint();
+}
+/* 그 변신으로만 갈 수 있거나 그 변신에게만 보이는 자리 (지금 구역) */
+function formHintSpots(id){
+  const out=[],gy=fieldGround();
+  for(const p of zoneObjects('doors'))if(p.formPass===id&&!needMet(p))out.push({x:p.x,y:(p.y??gy)-24});
+  const z=zoneDef();
+  if(z)for(const side of ['left','right']){const p=exitSpec(z.exits?.[side]);if(p&&p.formPass===id&&!needMet(p))out.push({x:side==='left'?16:z.w-16,y:gy-24});}
+  if(id==='squirrel')for(const c of zoneObjects('climbs'))out.push({x:c.x,y:c.top+6});
+  for(const d of fieldItems('digs'))if(d.form===id&&!d.done)out.push({x:d.x,y:(d.y??gy)-12});
+  for(const a of fieldItems('pickups'))if(a.form===id&&!a.got)out.push({x:a.x,y:(a.y??gy)-12});
+  return out;
+}
+/* 작은 잎빛: 서너 초에 한 번 십자로 반짝인다. 처음 써 보면(setForm) 그친다 */
+function drawFormHints(){
+  const ids=G?.f?.formHintIds;if(!ids?.length||!G.started||G.ended)return;
+  for(const id of ids){
+    if(!hasForm(id)||G.form===id)continue;
+    formHintSpots(id).forEach((p,i)=>{
+      const x=Math.round(p.x-cam),y=Math.round(p.y);if(x<-6||x>W+6)return;
+      const k=Vfx.reducedMotion?.5:Math.max(0,Math.sin(((G.anim+i*23)%200)/200*Math.PI*2));
+      if(k<.05)return;
+      ctx.save();ctx.globalAlpha=.25+.6*k;
+      R(x,y-2,1,5,'#d8f0a0');R(x-2,y,5,1,'#d8f0a0');if(k>.6){R(x-1,y-1,3,3,'#b7e07a');R(x,y,1,1,'#fbffe8');}
+      ctx.restore();
+    });
+  }
 }
