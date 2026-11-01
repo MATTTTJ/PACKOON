@@ -2503,6 +2503,56 @@ const TABLES={
    ]
   }
  ],
+ "STAMP_MARKS": {
+  "galchamgol:anvil": {
+   "mark": "soot",
+   "press": "strong"
+  },
+  "galchamgol:knot": {
+   "mark": "leaf",
+   "press": "strong"
+  },
+  "galchamgol:roots": {
+   "mark": "juice",
+   "press": "normal"
+  },
+  "dolneomeo:jangseung": {
+   "mark": "straw",
+   "press": "normal"
+  },
+  "dolneomeo:mill_base": {
+   "mark": "dust",
+   "press": "normal"
+  },
+  "dolneomeo:cliff_crack": {
+   "mark": "grip",
+   "press": "normal"
+  },
+  "jangteo:flag": {
+   "mark": "wind",
+   "press": "normal"
+  },
+  "jangteo:pillar": {
+   "mark": "wet",
+   "press": "normal"
+  },
+  "jangteo:rock": {
+   "mark": "resin",
+   "press": "strong"
+  },
+  "yeongsan:hut_post": {
+   "mark": "frost",
+   "press": "normal"
+  },
+  "yeongsan:snow_sign": {
+   "mark": "snow",
+   "press": "normal"
+  },
+  "yeongsan:shore_rock": {
+   "mark": "ice",
+   "press": "faint"
+  }
+ },
  "MINIGAMES": {
   "handwork_forge_relation": 2,
   "handwork_stack_relation": 2,
@@ -2655,6 +2705,10 @@ const TABLES={
   "form_deer_speed": 1.45,
   "form_deer_listen_range": 360,
   "form_fx_frames": 24,
+  "form_intro_ms": 6500,
+  "form_gait_frames": 4,
+  "snow_print_frames": 360,
+  "snow_print_max": 48,
   "stranger_trade_limit": 2,
   "musoe_bonk_tell_first": 66,
   "musoe_bonk_tell_last": 34,

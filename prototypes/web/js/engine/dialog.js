@@ -41,12 +41,43 @@ $('dlg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')advance();}
 function nearNpc(){let best=null,bd=TABLES.TUNING.field_talk_distance;for(const n of fieldNpcs()){if(typeof npcMoving==='function'&&npcMoving(n))continue;const d=Math.abs(n.x-G.px);if(d<bd){bd=d;best=n;}}return best;}
 function tryTalk(){tryInteract();}
 
-/* 대화 초상: 캐릭터 그리기 함수를 작은 캔버스에 재사용. 이름이 NPC와 맞지 않으면 주인공 */
+/* 대화 초상: 캐릭터 그리기 함수를 작은 캔버스에 재사용. 주인공 그림은 '너구리'와 지문에만 쓴다.
+   결정 D-162: 예전에는 지금 구역에 서 있는 인물만 찾아서, 다른 구역에서 불러온 대사나 자리를 옮기는 중인 인물
+   (돌너머 뿔이: 마을에서 장승제를 기다릴 때)이 말하면 주인공 얼굴이 나왔다. 이제 지금 구역 → 이 지역 전체 → 다른 지역 순서로
+   그 이름의 인물을 찾는다. 이름이 바뀌었거나 한 그림에 여럿이 있는 화자는 PORTRAIT_ALIAS 로 인물 id 에 잇는다.
+   때를 타서만 나오는 인물(큰 장터 밤의 등잔발)은 지역이 Rg.portraits[이름]=그리기 함수 로 올려 둔다. */
+const PORTRAIT_ALIAS={
+  '뿔이':'ppuri','뿔영감':'ppuri',                        // 이름 바꾸는 중에도 같은 산양 그림
+  '흰눈썹 노인':'j_yut','곰방대 노인':'j_yut',             // 윷판의 두 노인은 한 그림(윷놀이 노인들)
+  '까치':'old_magpie',                                    // 까치 답장(deliverHomeReply)은 늙은 까치 그림
+  '아빠의 옛 기록':'dad',                                 // 아빠가 남긴 글은 아빠 얼굴
+};
+/* 한 지역의 말하는 인물 후보: 고정 인물, 구역별 인물·떠돌이, 확장 만남 */
+function portraitCandidates(r){
+  const list=[...(r.npcs||[]),...(r.wanderers||[])];
+  for(const z of Object.values(r.zones||{})){
+    try{for(const n of z.npcs||[])list.push(typeof n==='string'?(r.npcs||[]).find(a=>a.id===n):n);}catch(_){}
+    try{list.push(...(z.wanderers||[]));}catch(_){}
+  }
+  for(const l of Object.values(r.expEncounters?.wanderers||{}))if(Array.isArray(l))list.push(...l);
+  return list.filter(n=>n&&typeof n.draw==='function');
+}
+function portraitNpc(name){
+  if(!name||name==='너구리'||/^[（(]/.test(name))return null;
+  const id=PORTRAIT_ALIAS[name];
+  const hit=n=>n&&typeof n.draw==='function'&&(n.name===name||n.speakers?.includes(name)||(id&&n.id===id));
+  const here=[...fieldNpcs(),...zoneObjects('wanderers')].find(hit);if(here)return here;
+  const order=[REG,...regionList().filter(r=>r!==REG)];
+  for(const r of order){const n=portraitCandidates(r).find(hit);if(n)return n;}
+  for(const r of order){const d=r.portraits?.[name];if(typeof d==='function')return {id:name,name,draw:d};}
+  return null;
+}
 function portrait(name){
   const c=document.createElement('canvas');c.width=30;c.height=24;
   const save=ctx;ctx=c.getContext('2d');
   // speakers: 한 그림에 둘이 있는 인물(다람쥐 형제)은 한 사람씩 말한다. 초상은 같은 그림을 쓴다.
-  const n=[...fieldNpcs(),...zoneObjects('wanderers')].find(n=>n.name===name||n.speakers?.includes(name));
-  if(n)n.draw(15,30,1);else drawPlayerAt(16,31,1,0,0,heldTool());   // 변신한 채면 그 모습 (forms.js)
-  ctx=save;return c;
+  const n=portraitNpc(name);
+  try{if(n)n.draw(15,30,1);else drawPlayerAt(16,31,1,0,0,heldTool());}   // 변신한 채면 그 모습 (forms.js)
+  finally{ctx=save;}
+  return c;
 }

@@ -130,7 +130,8 @@ function nalTrade(){
     G.f.nalPriceHeard=true;
     // 처음엔 값부터 듣는다. 재료가 다 있으면 건넬지 고른다.
     talk([['날쌘','숯? 도토리 가루 하나에 칡뿌리 하나.\n그럼 숯 하나 줄게.'],...(both?[['날쌘','마침 둘 다 있네. 바꿀래?',[{t:'도토리 가루와 칡뿌리를 건넨다',go:nalTrade},{t:'조금 이따가요',go:null}]]]:
-      [['날쌘',has('root')?'도토리 가루부터 빻아 와.':'칡뿌리는 흙 무른 데를 곡괭이로 파 봐.\n보부상이 그런 것도 몰라?']])]);return;
+      [['날쌘',has('root')?'도토리 가루부터 빻아 와.':'칡뿌리는 흙 무른 데를 곡괭이로 파 봐.\n보부상이 그런 것도 몰라?'],
+        ...(has('root')?[]:[['날쌘','…하긴, 나도 첫 장사 땐 몰랐어.']])])]);return;   // 결정 D-161: 놀린 뒤 같은 보부상으로 한 발 물러선다
   }
   if(!both){talk([['날쌘','값은 벌써 말했잖아.\n도토리 가루 하나에 칡뿌리 하나. 둘 다 가져와.'],['날쌘','가루는 빻아 오고, 칡뿌리는 흙 무른 데를 파 봐.\n보부상이 그런 것도 몰라?']]);return;}
   takeItem('powder',1);takeItem('root',1);G.f.nalDone=true;ledgerDone('nal');
@@ -379,12 +380,12 @@ function musoeLeaf(){
 function musoeFirstForm(){
   const F=G.f;F.leafGiven=true;F.leafSplit=true;   // 결정 D-117: 이 뒤로 엄마 잎 이야기는 다시 말을 걸 때 한 번만
   if(typeof unlockForm==='function')unlockForm('squirrel');
-  if(typeof setForm==='function')setForm('squirrel');
+  if(typeof setForm==='function')setForm('squirrel',{scripted:true});
   diary('form_squirrel','삼촌에게 아빠가 맡긴 잎사귀를 받았다. 다람쥐를 떠올리며 잎을 부니 내가 다람쥐가 됐다. 다람쥐는 잊어도 다시 찾는다. 그래서 겁 없이 오른다.');
   talk([['너구리','(삐익, 풀피리 소리가 났다. 몸이 작아지고 꼬리가 커졌다.)'],['너구리','나… 다람쥐야!'],
     ['무쇠','됐다. 잎을 한 번 더 불면 돌아온다.'],['너구리','(잎을 다시 부니 너구리로 돌아왔다.)']],()=>{
       if(typeof setForm==='function')setForm('');
-      toast('잎사귀 변신을 배웠다! 1 다람쥐 · 0 너구리 (휴대폰은 잎사귀 버튼)');
+      // 결정 D-173: 숫자 키와 다람쥐가 잘하는 것은 새 변신 알림 카드가 알린다 (forms.js)
       // 결정 D-89: 무쇠 대사를 한자리에 몰지 않는다. 엄마 잎 이야기와 낫 벼리기 안내는 다시 말을 걸 때 이어진다.
     });
 }

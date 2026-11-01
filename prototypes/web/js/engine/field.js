@@ -178,6 +178,7 @@ function step(){
   if(REG.order===regionList()[0].order&&!G.f.momNoteSeen){showMomNote();return;}
   if(usesZones(REG)&&['inn','shelter'].includes(G.zone)&&deliverHomeReply())return;
   REG.formCheck?.();   // 지역이 이야기 진행에 맞춰 변신을 여는 자리 (forms.js)
+  formIntroTick();     // 결정 D-173: 새 변신 알림 카드는 대화가 끝난 뒤에 (forms.js)
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
   G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed*formMoveMul());if(ax)G.face=ax>0?1:-1;
@@ -205,7 +206,7 @@ function step(){
   else if(G.vy>=0){for(const p of [...fieldPlatforms(),...formLedges()]){if(G.dropT>0&&Math.abs(p.y-G.dropY)<1)continue;if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
   }
   if(G.onGround||climbing){G.dropBack=false;G.dropHang=0;}
-  Vfx.feet();
+  Vfx.feet();Vfx.steps();   // 결정 D-174: 눈·서리 바닥의 발걸음·발자국 (vfx.js)
   if(!wasGrounded&&G.onGround)Sound.land();
   if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
   if(atkQ&&rolling)atkQ=false;
@@ -384,7 +385,9 @@ function drawRaccoon(){
   const back=heroBackPose();
   if(back){if(!G.form)drawRaccoonBackAt(G.px-cam,G.py,back.phase);else drawFormBackAt(G.px-cam,G.py,back.phase,G.form);return;}
   const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
-  drawPlayerAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);
+  // 결정 D-175: 걷는 동안만 네 박자 걸음(산양). 그린 뒤 되돌려 초상·기어 내려가기 그림에 남지 않게 한다
+  formGait=(G.onGround&&Math.abs(G.vx)>0.2&&!phase)?Math.floor(G.anim/TABLES.TUNING.form_gait_frames)%4:-1;
+  drawPlayerAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);formGait=-1;
 }
 
 /* 결정 D-114: ↓로 발판 아래로 내려올 때와 무언가를 타고 오를 때는 등을 보인다. 점프로 오를 때는 그대로 앞모습이다.
@@ -430,6 +433,7 @@ function drawFieldScene(showPlayer=true){
   Vfx.draw('back');
   drawLogs();
   segmentedDraw(()=>fieldCall('drawScenery'));
+  Vfx.ground();   // 결정 D-174: 눈·서리에 남은 발자국과 구른 자국 (vfx.js)
   drawZoneObjects();
   drawDigs();
   drawPickups();
@@ -440,7 +444,7 @@ function drawFieldScene(showPlayer=true){
   drawGatherCue();   // 채집 고리 (gather.js). 주인공 몸에 가리지 않게 주인공 다음에 그린다
   if(!Vfx.reducedMotion)for(const s of sparks)R(s.x-cam,s.y,1,1,'#fff3b0');
   Vfx.front();
-  if(showPlayer)drawListenMarks();
+  if(showPlayer){drawListenMarks();drawFormHints();}   // 결정 D-173: 새 변신으로만 갈 수 있는 자리의 잎빛 (forms.js)
 }
 let lastNear=null;
 /* 결정 D-53: 필드 인물 머리 위에 이름. 아이가 아는 이름만 쓴다: 처음 말을 걸기 전에는 '?', 만난 뒤(met:<id>)에는 이름.
@@ -855,6 +859,7 @@ function drawZoneObjects(){
       drawStampBase(base,sx,gy);
       if(!stampFound(p.id)){pawStamp(sx,py,'rgba(110,52,30,.55)',true);pawStamp_glint(sx,py,p.x);continue;}
       if(p.draw)p.draw(sx,py);else pawStamp(sx,py,'#8a3424');
+      drawPawMark(R,Math.round(sx),Math.round(py),REG.id+':'+p.id);   // 결정 D-171: 그 자리에서 묻은 것 (notebook.js)
       pawStamp_glint(sx,py,p.x+7);continue;}
     if(p.draw)p.draw(p.x-cam,p.y??fieldGround());
     if(k==='doors'&&!needMet(p)&&p.drawBlocked)p.drawBlocked(p.x-cam,p.y??fieldGround());

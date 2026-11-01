@@ -132,6 +132,8 @@ const watchdog=setTimeout(async()=>{
         await browser.screenshot(path.join(directory,'start.png'));
         const result=await runPlaythrough({browser,mode,outDir:directory,rules,report:message=>console.log(`[${name}] ${message}`)});
         const hook=await collectHookFindings(browser);
+        // 결정 D-162: 확장판 끝에서 코드에 적힌 모든 화자 이름의 초상을 한 번 더 본다(실행하지 않은 갈래까지)
+        if(mode==='expanded')hook.portraitStatic=await require('./hooks').portraitFindings(browser,root,rules);
         hookEvidence.push({mode,...hook});
         fs.writeFileSync(path.join(directory,'hooks.json'),JSON.stringify(hook,null,2));
         if((hook.speakers||[]).length){result.status='fail';result.summary+=`; 화자 위치 위반 ${hook.speakers.length}건`;result.findings.push(...hook.speakers);}
@@ -147,7 +149,12 @@ const watchdog=setTimeout(async()=>{
     if(selected.has('speakers')) {
       const findings=hookEvidence.flatMap(h=>(h.findings||h.speakers||[]).map(f=>({...f,mode:h.mode})));
       const count=hookEvidence.reduce((sum,h)=>sum+(h.lines?.length||h.lineCount||0),0);
-      add({name:'speakers',status:findings.length||!count?'fail':'pass',summary:`실행 대사 ${count}줄, 화자 위치 위반 ${findings.length}건`,findings});
+      // 결정 D-162: 화자마다 초상 그림이 있는지 (실행한 대사 + 코드에 적힌 모든 화자)
+      const seen=new Set(),portraits=hookEvidence.flatMap(h=>[...(h.portraits||[]),...(h.portraitStatic?.findings||[])].map(f=>({...f,mode:h.mode})))
+        .filter(f=>{const k=f.speaker+'|'+(f.text||'');if(seen.has(k))return false;seen.add(k);return true;});
+      const checked=hookEvidence.reduce((n,h)=>n+(h.portraitStatic?.checked||0),0);
+      add({name:'speakers',status:findings.length||portraits.length||!count?'fail':'pass',
+        summary:`실행 대사 ${count}줄, 화자 위치 위반 ${findings.length}건, 초상 없는 화자 ${portraits.length}건${checked?` (코드의 화자 ${checked}명 확인)`:''}`,findings:[...findings,...portraits]});
     }
     if(selected.has('edges'))add(await runEdges({outDir,rules,evidence:hookEvidence}));
     if(selected.has('save'))add(await withBrowser('save',(browser,directory)=>runSave({browser,outDir:directory,rules})));
