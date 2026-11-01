@@ -320,7 +320,7 @@ if(!CLASSIC){
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
     // 옛 저장의 옛 다리 기억(D-116) 표시는 지운다 (결정 D-165)
-    weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);if(G.f.dolMemory)delete G.f.dolMemory;Rg.ambient();applySteps();},
+    weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),surface:()=>Rg.springRevisit()?'':'frost',ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);if(G.f.dolMemory)delete G.f.dolMemory;Rg.ambient();applySteps();},
     drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);drawStonePlatforms(id);},
     drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
     weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),

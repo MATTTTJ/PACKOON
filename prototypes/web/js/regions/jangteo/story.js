@@ -498,6 +498,8 @@ function lampArc3(){
     ['등잔발','…졸려서 헛것을 봤으려나. 잘 가라.']
   ],()=>{G.f.lampWoke=true;learn('arc:jangteo:deungjan');});
 }
+// 결정 D-162: 등잔발은 밤·설날 아침에만 나오니 대화 초상이 언제든 찾게 그림을 올려 둔다
+Rg.portraits={...Rg.portraits,'등잔발':lampDraw};
 function lampDraw(x,y,f=1){
   const P=(dx,dy,w,h,c)=>R(Math.round(f>0?x+dx:x-dx-w),Math.round(y+dy),w,h,c);
   P(-12,-6,7,2,'#b9a99a');P(-14,-8,3,2,'#b9a99a');                         // 꼬리

@@ -228,7 +228,7 @@ if(!CLASSIC){
     },
     drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:Rg.onPickup,
     onHit:Rg.onHit,faint:Rg.faint,
-    weather:Rg.weather,weatherFront:front,ambient:()=>{Rg.clearRouteScenes();Rg.placeRouteSupplies();Rg.stepDadPose?.();},
+    weather:Rg.weather,surface:()=>G.f.spring?'':'snow',weatherFront:front,ambient:()=>{Rg.clearRouteScenes();Rg.placeRouteSupplies();Rg.stepDadPose?.();},
     step:stepCommon,
     get examines(){return content(id,'examines');},
     get wanderers(){return content(id,'wanderers');},

@@ -192,7 +192,7 @@ function giftTaste(who,item){
 }
 /* 지역 대화의 선택지·종료 함수를 건드리지 않고 먹을거리 나누기를 붙인다. */
 const fieldTaste=el('div','field-taste');
-fieldTaste.id='fieldTaste';fieldTaste.hidden=true;$('dlg').querySelector('.dbody').appendChild(fieldTaste);
+fieldTaste.id='fieldTaste';fieldTaste.hidden=true;$('dlgActions').appendChild(fieldTaste);   // 결정 D-163: '보따리 펼치기'와 한 줄
 fieldTaste.addEventListener('click',e=>e.stopPropagation());
 fieldTaste.addEventListener('keydown',e=>{
   if(![' ','enter'].includes(e.key.toLowerCase())||!e.target.matches('button'))return;
