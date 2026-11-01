@@ -4,6 +4,8 @@
    - 짧게 누르면 지금처럼 점프한다. 멈춰 있을 때 누르면 바로 점프한다(기다림 없음).
      움직이는 중에 누르면 roll_hold_ms 동안 기다렸다가, 그 전에 떼면 뗄 때 점프하고 계속 누르고 있으면 구른다.
    - C·W·↑ 점프는 늘 바로 뛴다. 구르는 중에 점프하면 공 모양 그대로 뛰고, 내려와서도 Space가 눌려 있으면 계속 구른다.
+   - 결정 D-143: ↑(W)을 누른 채 Space를 누르면 기다리지 않고 바로 뛴다(대각선 점프). Space를 기다리는 동안 C·W·↑로 뛰면
+     기다림을 거둔다. 그래서 그 점프 뒤에 구르거나, Space를 뗄 때 한 번 더 뛰지 않는다. 기다리는 시간도 늘렸다(roll_hold_ms).
    - 구르는 동안에는 말걸기·줍기·휘두르기·채집을 하지 않는다. 대화·패널·경치·전투·미니게임·구역 전환 중에는 구르지 않는다.
    - 변신마다 되고 안 되고가 다르다(forms.js ROLL_FORMS). 안 되는 모습으로 처음 해 보면 아이 혼잣말을 한 번 띄운다. */
 let rollHold=null,rolling=false,rollVel=0,rollAngle=0,rollTick=0;
@@ -15,12 +17,15 @@ function rollPress(){
   if(!rollAllowedNow()||!G.onGround||isDown())return false;
   if(rolling)return false;                       // 구르는 중의 점프는 원래 점프로 (공 모양 그대로)
   if(!(isLeft()||isRight()))return false;        // 멈춰 있으면 바로 점프
+  if(keys['arrowup']||keys['w']||touch.up)return false;   // 결정 D-143: ↑과 함께 누르면 대각선 점프. 바로 뛴다
   const spec=rollSpec();
   // 못 구르는 모습: 혼잣말을 이미 봤으면 기다리지 않고 바로 점프한다.
   if(!spec.roll&&G.f.rollSaid?.[G.form||''])return false;
   rollHold={t0:performance.now(),form:G.form||''};
   return true;
 }
+/* 결정 D-143: C·W·↑ 점프가 나가면 Space 기다림을 거둔다 (뒤늦게 구르거나, 뗄 때 한 번 더 뛰지 않게) */
+function rollCancelHold(){if(rollHold)rollHold.done=true;}
 /* 점프 뗌. 문턱 전에 떼면 그때 점프한다. 구르던 중이면 일어선다. */
 function rollRelease(){
   if(rollHold){const h=rollHold;rollHold=null;if(!rolling&&!h.done)jumpOrDrop();}
