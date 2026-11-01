@@ -135,6 +135,19 @@ for(const r of notebook){
 for(const e of NOTES)if(e.kind==='item'&&!ITEMS[e.id]&&!CRAFT[e.id])fail('notebook.csv '+e.id+': 물건 쪽인데 items.csv 또는 heirlooms.csv 에 없다');
 for(const [tool,c]of Object.entries(CRAFT))if(!NOTES.some(e=>e.id===tool&&e.lines.some(l=>l.when===c.habitKey)))fail('notebook.csv: 손버릇 기록이 없다 '+tool);
 for(const recipe of Object.values(RECIPES).flat().filter(r=>r.hidden))if(!NOTES.some(e=>e.id===recipe.out&&e.lines.some(l=>l.when===recipe.discover)))fail('notebook.csv: 숨은 가공법 발견 기록이 없다 '+recipe.out);
+/* 결정 D-171: 아빠 손바닥 도장마다 그 자리에서 묻은 것(무늬)과 눌린 세기. 키는 '지역:도장id' (notebook.csv 알게되는키 stamp:지역:도장id) */
+const STAMP_MARKS={},STAMP_MARK_KINDS=['soot','leaf','juice','straw','dust','grip','wind','wet','resin','frost','snow','ice'],STAMP_PRESS={'진하게':'strong','보통':'normal','옅게':'faint'};
+const stampKeys=new Set(NOTES.filter(e=>e.kind==='stamp').flatMap(e=>e.lines.map(l=>l.when).filter(w=>w&&w.startsWith('stamp:'))));
+for(const r of t('stamps')){
+  const key=r['도장키'];
+  if(!stampKeys.has(key))fail('stamps.csv '+r.id+': notebook.csv 에 없는 도장키 '+key);
+  if(!key.startsWith('stamp:'+r['지역']+':'))fail('stamps.csv '+r.id+': 지역과 도장키가 맞지 않는다');
+  if(!STAMP_MARK_KINDS.includes(r['무늬']))fail('stamps.csv '+r.id+': 무늬는 '+STAMP_MARK_KINDS.join('/')+' 중 하나');
+  if(!STAMP_PRESS[r['눌림']])fail('stamps.csv '+r.id+': 눌림은 진하게/보통/옅게');
+  const k=key.slice(6);if(STAMP_MARKS[k])fail('stamps.csv '+r.id+': 도장키가 겹친다');
+  STAMP_MARKS[k]={mark:r['무늬'],press:STAMP_PRESS[r['눌림']]};
+}
+for(const key of stampKeys)if(!STAMP_MARKS[key.slice(6)])fail('stamps.csv: 도장 무늬가 없다 '+key);
 
 /* 좋아하는 맛: 인물·물건 한 쌍에 반응 하나. 효과는 기존 진정수치와 별도로 새 선물에만 쓴다. */
 const TASTES={},npcIds=new Set(t('npcs').map(r=>r.id)),bossIds=new Set(bosses.map(r=>r.id));
@@ -321,7 +334,7 @@ const MUSIC_LAYERS={};
   }
 }
 requireValue(TUNING.roll_hold_ms>=80&&TUNING.roll_hold_ms<=400&&TUNING.roll_speed>1&&TUNING.roll_squirrel_speed>1&&TUNING.roll_accel_frames>=1&&TUNING.roll_step_frames>=1,'tuning.csv: 구르기 문턱은 80~400ms, 빠르기는 걷기보다 커야 한다');
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC,MUSIC_LAYERS},null,1)+";\n";
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,STAMP_MARKS,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC,MUSIC_LAYERS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}
