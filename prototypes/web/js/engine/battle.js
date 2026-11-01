@@ -5,7 +5,9 @@
    상대 {name, calmLabel, intro, howto?, npc?, dodge?(피하기만 하는 시험: 버틸 공격 수), bonkText?(dodge 시작 때 연장을 뺏기는 글),
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
-         cover?:엄폐물, vinePath?:칡 전용 통로(arm 부위 필요), calmAction?:{amount:행동 진정량, kind?, prompt?, text?}(cover/vinePath/possession/warmPath 공격 뒤), placeGift?:꼭대기에 얹을 선물 id,
+         cover?:엄폐물, calmAction?:{amount:행동 진정량, kind?, prompt?, text?}(공격이 모두 지나간 뒤), placeGift?:꼭대기에 얹을 선물 id,
+         firstPart?:첫 공격 부위 id(첫 예고는 조금 길다), strike?():치기를 상대가 먼저 처리했으면 true, handTool?():손에 그릴 연장 id, giftKnot?:좋아하는 선물에 매듭을 내민다,
+         부위의 mark?:붉은 표식에 쓸 글자(없으면 이름 첫 글자),
          backdrop?(c):상대 뒤쪽 화면 전체 배경(결정 D-58. 판정 상자와 글귀 줄 위로는 상자·글이 덮는다), goalText?:지금 할 일 글,
          showHands?:첫 선물 때 빈손을 펴 보이는 장면, pickAttack?():공격을 직접 고른다(B.bullets 를 넣고 B.st='tell'),
          tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래),
@@ -67,8 +69,7 @@ function battlePickaxe(p){return !!(p&&!B.E.npc&&!B.noTool&&Array.isArray(G.f.ba
    공격 종류(atk)와 예고 글(tell)은 지역 코드에서 받아 합친다. 순서는 표 순서 */
 function tableParts(boss,extra){return TABLES.BOSS_PARTS[boss].map(p=>Object.assign({},p,extra[p.id]));}
 function blayout(){
-  const hand=B&&(B.E.possession||B.E.vinePath)?{u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h}:null;
-  if(B&&B.E.vinePath)bDrag=null;
+  const hand=B&&B.E.possession?{u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h}:null;
   const r=$('battle').getBoundingClientRect();const tall=r.height>0&&r.width/r.height<1.25;
   if(tall){LW=600;LH=600;BOX={x:150,y:330,w:300,h:190};EY=168;}else{LW=800;LH=450;BOX={x:250,y:262,w:300,h:160};EY=112;}
   bcv.width=LW*BDPR;bcv.height=LH*BDPR;
@@ -102,7 +103,7 @@ function startBattle(kind,onEnd){
   if(E.cover){B.covers=[];B.round=0;addCover(0.5,0.43);}
   if(E.showHands){B.handShown=false;B.handShow=0;}
   if(E.possession){B.round=0;B.possession={from:'core',to:'core'};}
-  if(E.vinePath){B.round=0;B.vinePath=null;B.pathLesson=false;}
+  if(E.calmAction&&E.calmAction.kind==='knot')B.round=0;
   if(E.warmPath)B.warm={current:{u:0.25,v:0.7},next:null,points:[],round:0,ice:null,fire:0};
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
@@ -110,8 +111,6 @@ function startBattle(kind,onEnd){
   if(E.cover)gm.querySelector('span').textContent='돌 아래 여백에 손을 숨기자. 공격 뒤에는 표식 치기 또는 소원 돌 바로 놓기.';
   if(E.goalText)gm.querySelector('span').textContent=E.goalText;
   if(E.possession)gm.querySelector('span').textContent='불이 옮겨 간 헌물의 공격을 읽자. 공격 뒤에는 되치기 또는 물건 집기 → 윤곽에서 치기로 돌려놓기.';
-  if(E.vinePath)gm.querySelector('span').textContent=TOUCH?'예고 중 고리 위에서 치기를 눌러 잡고, 옮긴 뒤 다시 눌러 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.'
-    :'예고 중 고리 위에서 치기를 누른 채 이동하고 놓자. 공격 뒤에는 표식 치기 또는 매듭 풀기.';
   if(E.warmPath)gm.querySelector('span').textContent='물김 길을 따라 옆 샘으로. 공격 뒤에는 붉은 표식 치기 또는 샘의 얼음 걷기.';
 }
 function setPadLabels(on){
@@ -158,24 +157,6 @@ function damageCover(r){
   if(r.cracked){B.covers=B.covers.filter(q=>q!==r);const p=coverPoint(r);bSplash(p.x,p.y);B.msg='금 간 돌이 부서졌다. 다음 돌의 자리를 보자.';}
   else{r.cracked=true;B.msg='돌이 막았다! 금이 갔지만 이번 공격까지는 버틴다.';}
 }
-/* 칡 선택 기능. 비율 좌표로 저장해 화면을 돌려도 고리와 실제 통로가 함께 옮겨진다. */
-function vineBounds(){const p=B.vinePath;return {x:BOX.x+p.u*BOX.w,w:p.width};}
-// 결정 D-86: 휴대폰은 치기를 한 번 눌러 고리를 잡고, 옮긴 뒤 한 번 더 눌러 놓는다 (design/data/decisions.csv)
-let vineLatch=false;
-function vineHeld(){return keys['j']||keys['x']||keys[' ']||keys['enter']||vinePointers.size>0||vineLatch;}
-function grabVine(){
-  const p=B.vinePath;if(!p||B.st!=='tell'||p.locked||p.dragging)return;
-  const x=BOX.x+p.u*BOX.w,y=BOX.y+p.v*BOX.h;
-  if(Math.hypot(B.px-x,B.py-y)<32+(p.width-78)/4){p.dragging=true;p.offset=p.u-(B.px-BOX.x)/BOX.w;}
-}
-function moveVine(){
-  if(!B.E.vinePath||B.st!=='tell')return;
-  const p=B.vinePath;
-  if(vineHeld())grabVine();
-  if(!p.dragging)return;
-  if(!vineHeld()){p.dragging=false;p.locked=true;vineLatch=false;B.msg='고리를 놓았다. 비워 둔 통로로 피하자.';return;}
-  p.u=clamp((B.px-BOX.x)/BOX.w+p.offset,p.width/2/BOX.w+0.04,1-p.width/2/BOX.w-0.04);
-}
 function openCalmAction(){
   if(!B.E.calmAction)return;
   if(B.E.calmAction.kind==='return'){
@@ -209,17 +190,10 @@ function chooseAttackBase(){
     B.returnEcho=null;B.cur=p;B.last=p;B.st='tell';B.t=rule.travel+rule.wait;B.hitThis=false;
     const attack=bAttackDef(p);B.attackPlan=attack.prepare?attack.prepare():null;B.msg=p.tell;return;
   }
-  if(B.E.vinePath){B.round++;B.calmStone=null;}
+  if(B.E.calmAction&&B.E.calmAction.kind==='knot'){B.round++;B.calmStone=null;}
   const L=bLiving();let o=L.filter(p=>p!==B.last);if(!o.length)o=L;
-  const p=(!B.last&&B.E.vinePath?L.find(q=>q.id==='arm'):null)||o[Math.floor(Math.random()*o.length)];B.cur=p;B.last=p;B.st='tell';B.t=42;B.msg=p.tell;B.hitThis=false;
-  if(B.E.vinePath){
-    const help=Math.min(3,Math.floor(B.hits/2)),arm=B.parts.find(q=>q.id==='arm');
-    B.vinePath={u:0.5,v:0.65,width:78+(arm.broken?24:0)+help*12,dragging:false,locked:false};
-    B.t=110+help*18;
-    vineLatch=false;
-    if(!B.pathLesson){B.pathLesson=true;B.t+=90;B.msg=TOUCH?'고리 위에서 치기 버튼을 한 번 눌러 잡고, 좌우로 옮긴 뒤 한 번 더 눌러 놓자. 그 자리가 피할 길이 된다.'
-      :'고리 위에서 '+jo(HITKEY,'을','를')+' 누른 채 좌우로 이동하고 놓자. 그 자리가 피할 길이 된다.';}
-  }
+  const first=!B.last&&B.E.firstPart?L.find(q=>q.id===B.E.firstPart):null;
+  const p=first||o[Math.floor(Math.random()*o.length)];B.cur=p;B.last=p;B.st='tell';B.t=first?72:42;B.msg=p.tell;B.hitThis=false;
   if(B.E.warmPath){prepareWarmPath();B.t=80;}
 }
 /* 온기 길은 비율 좌표로 보관한다. 판정과 그림이 같은 꺾은선을 쓴다. */
@@ -267,10 +241,10 @@ function bHitMe(){
 function bSplash(x,y,col){for(let i=0;i<9;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*2.4;B.fx.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:2+Math.random()*4,t:28,col:col||'#1d1814'});}}
 function bStrike(){
   if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.st==='finale')return;
-  if(B.E.vinePath&&B.st==='tell'){grabVine();return;}
   if(B.cool>0)return;
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
   B.cool=battleHandProfile().cooldown;B.swing=12;
+  if(B.E.strike&&B.E.strike())return;
   const r=B.returnItem;
   if(r&&r.active&&B.st==='open'){
     const source=coverPoint(r),home=coverPoint({u:r.homeU,v:r.homeV});
@@ -323,7 +297,6 @@ function bEnd(result){
   if(result==='win'||result==='calm')Sound.playSfx(result==='calm'?'battle_soothe':'battle_victory');
   if(B.E.showHands)B.handShow=0;
   if(B.E.possession){B.returnItem=null;B.returnEcho=null;B.attackPlan=null;}
-  if(B.E.vinePath)B.vinePath=null;
   if(B.warm)B.warm.ice=null;
   B.msg=result==='win'?B.E.win:result==='calm'?B.E.calmWin:result==='flee'?'일단 물러나자.':B.E.lose;
   if(result==='calm'){learn('calm:'+B.kind);if(B.E.calmGift)B.loot.push(B.E.calmGift);}
@@ -350,7 +323,6 @@ function bStep(){
     const speed=battleHandProfile().speed;
     B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);
   }
-  if(B.E.vinePath)moveVine();
   B.parts.forEach(p=>{if(p.shake>0)p.shake--;});
   if(B.bonk>0)B.bonk--;
   if(B.toolFly){const f=B.toolFly;f.vy+=0.25;f.x+=f.vx;f.y+=f.vy;f.rot+=0.32;}
@@ -362,9 +334,9 @@ function bStep(){
       if(--B.t<=0){if(B.E.dodge&&!B.noTool){B.st='bonk';B.t=120;B.noTool=true;B.bonk=34;B.msg=B.E.bonkText;B.toolFly={x:B.px+10,y:B.py-12,vx:-3.2,vy:-5.5,rot:0};renderBHud();}else{B.st='idle';B.t=20;}}break;
     case 'bonk':if(B.t===60)B.msg='연장을 놓쳤다! 이번엔 피하기만 해야 한다.';if(--B.t<=0){B.st='idle';B.t=20;B.toolFly=null;}break;
     case 'idle':if(--B.t<=0)chooseAttack();break;
-    case 'tell':if(--B.t<=0){if(B.E.vinePath){B.vinePath.dragging=false;B.vinePath.locked=true;B.msg=B.cur.tell;}B.st='atk';B.atkT=0;B.atkDur=bAttackDef(B.cur).dur;}break;
-    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover||B.E.possession||B.E.vinePath||B.E.warmPath)B.st='settle';else{B.st='open';B.opens=(B.opens||0)+1;openMark();}}break;
-    case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';B.opens=(B.opens||0)+1;if(B.E.vinePath)B.vinePath=null;openMark();openCalmAction();}break;
+    case 'tell':if(--B.t<=0){B.st='atk';B.atkT=0;B.atkDur=bAttackDef(B.cur).dur;}break;
+    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.cover||B.E.possession||B.E.warmPath||B.E.calmAction)B.st='settle';else{B.st='open';B.opens=(B.opens||0)+1;openMark();}}break;
+    case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';B.opens=(B.opens||0)+1;openMark();openCalmAction();}break;
     case 'giftPlace':if(--B.t<=0){B.giftPlace=null;bEnd('calm');}break;
     case 'clear':if(!B.bullets.length){B.survived++;B.msg=(B.hitThis?'아야… 그래도 버텼다. ':'잘 피했다! ')+'('+B.survived+'/'+B.E.dodge+')';renderBHud();if(B.survived>=B.E.dodge){if(B.E.finale){B.st='finale';B.E.finale.start();}else bEnd('win');}else{B.st='idle';B.t=40;}}break;
     case 'finale':if(B.E.finale.step())bEnd('win');break;
@@ -436,7 +408,6 @@ function openGift(){
   if(B.E.showHands&&!B.handShown){
     B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';renderBattleForms();return;
   }
-  if(B.E.vinePath)bDrag=null;
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
   $('bGiftHint').textContent='좋아하는 걸 주면 마음이 누그러진다. 빈틈 하나에 하나만 건넬 수 있다.';
   // 결정 D-63: 집안 물건·귀한 것은 이 상대가 좋아하는 것만 꺼낸다.
@@ -468,7 +439,7 @@ function giveGift(id){
   takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();
   B.calm=Math.min(100,B.calm+v);
   B.msg=taste?taste.line:((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText);
-  if(v&&B.E.vinePath)B.scentKnot={u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h,t:90};
+  if(v&&B.E.giftKnot)B.scentKnot={u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h,t:90};
   if(B.warm&&id==='dokkaebibul')B.warm.fire=180;
   closeGift();renderBHud();
   if(B.calm>=100){
@@ -485,28 +456,6 @@ $('bFlee').onclick=()=>{
   if(!fleeArmT){const b=$('bFlee');b.classList.add('armed');b.textContent='정말 물러날까? 한 번 더';fleeArmT=setTimeout(disarmFlee,2600);return;}
   disarmFlee();bEnd('flee');
 };
-/* 기존 치기 버튼의 누름/놓기를 읽는다. 다른 보스의 클릭 처리는 그대로 둔다. */
-const vinePointers=new Set();
-[$('bHit'),document.querySelector('#pad [data-k="atk"]')].filter(Boolean).forEach(button=>{
-  let downAt=0;
-  button.addEventListener('pointerdown',e=>{
-    if(!B||!B.E.vinePath||B.paused||B.st!=='tell')return;
-    // 잡아 둔 고리를 한 번 더 누르면 놓는다
-    if(vineLatch){vineLatch=false;moveVine();return;}
-    downAt=performance.now();
-    vinePointers.add(e.pointerId);try{button.setPointerCapture(e.pointerId);}catch(_){}
-    grabVine();
-  });
-  const release=e=>{
-    if(!vinePointers.delete(e.pointerId))return;
-    // 짧게 누른 터치는 손을 떼도 고리를 잡고 있는다
-    if(TOUCH&&B&&B.vinePath?.dragging&&performance.now()-downAt<280){vineLatch=true;B.msg='고리를 잡았다. 옮긴 뒤 치기 버튼을 한 번 더 누르면 놓는다.';return;}
-    if(B&&!B.paused&&B.E.vinePath)moveVine();
-  };
-  button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);
-});
-addEventListener('blur',()=>{vinePointers.clear();});
-
 function showResult(){
   const r=B.result,E=B.E;
   $('bResKick').textContent=E.npc?(r==='win'||r==='calm'?'시험 통과':'시험 실패'):(r==='win'?'승리':r==='calm'?'진정':'후퇴');
@@ -520,7 +469,7 @@ function showResult(){
 $('bResOk').onclick=()=>{
   if(!B)return;const r=B.result,loot=B.loot.slice(),cb=B.onEnd,info={hits:B.hits};
   $('bResult').hidden=true;$('bGiftMenu').hidden=true;$('battle').hidden=true;document.body.classList.remove('in-battle');setPadLabels(false);
-  touch.up=touch.down=false;vinePointers.clear();B=null;
+  touch.up=touch.down=false;B=null;
   loot.forEach(id=>addItem(id,1));
   if(r==='lose'||r==='flee'){G.hp=G.maxhp;G.hurtT=60;}
   if(r==='lose')revertForm();   // 지면 너구리로 돌아온다
@@ -533,8 +482,8 @@ let bDrag=null;
 bcv.addEventListener('pointerdown',e=>{if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||bDrag)return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={pointerId:e.pointerId,x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
 bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||e.pointerId!==bDrag.pointerId)return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
   const speed=battleHandProfile().speed/TABLES.TUNING.battle_bare_speed;
-  B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);if(B.E.vinePath)moveVine();});
-function endDrag(e){if(e&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;if(!e)vinePointers.clear();}bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
+  B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);});
+function endDrag(e){if(e&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;}bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
 bcv.addEventListener('lostpointercapture',endDrag);
 
 /* ---------- 전투 화면 그리기 ---------- */
@@ -549,7 +498,7 @@ function drawPaw(c,x,y){
   if(!B.handShow&&B.inv>0&&Math.floor(B.inv/5)%2)return;
   const form=battleForm();
   const near=B.mark&&Math.hypot(B.mark.x-B.px,B.mark.y-B.py)<battleHandProfile().radius;
-  const tool=B.E.dodge&&!B.noTool?heldTool():B.autoToolT>0||(near&&battlePickaxe(B.mark.part))?'pickaxe':null;
+  const tool=B.E.dodge&&!B.noTool?heldTool():(B.E.handTool&&B.E.handTool())||(B.autoToolT>0||(near&&battlePickaxe(B.mark.part))?'pickaxe':null);
   c.save();c.translate(x,y);c.scale(1.6,1.6);
   if(tool&&!B.noTool&&!B.handShow){
     const a=B.swing>0?(-1.5+(1-B.swing/12)*2.5):-0.35;
@@ -598,7 +547,6 @@ function bDraw(){
   if(B.E.cover)drawBattleCover(c);
   if(B.E.drawFloor)B.E.drawFloor(c);
   if(B.E.possession)drawPossessedAttack(c);
-  if(B.vinePath)drawVinePath(c);
   for(const b of B.bullets)BULLETS[b.k].draw(c,b);
   if(B.warm)drawWarmPath(c);
   if(B.calmStone){if(B.E.calmAction.kind==='knot')drawCalmKnot(c);else drawWishStone(c);}
@@ -607,7 +555,7 @@ function bDraw(){
   if(B.mark){const m=B.mark,radius=battleHandProfile().radius;c.save();c.translate(m.x,m.y);
     c.strokeStyle=RED;c.lineWidth=3;c.beginPath();c.arc(0,0,radius,-Math.PI/2,-Math.PI/2+Math.PI*2*(m.t/m.max));c.stroke();
     c.fillStyle='rgba(180,67,42,.16)';c.beginPath();c.arc(0,0,radius-3,0,Math.PI*2);c.fill();
-    c.fillStyle=RED;c.font='bold 15px "Gowun Batang", serif';c.textAlign='center';c.textBaseline='middle';c.fillText(m.part.name[0],0,1);c.restore();
+    c.fillStyle=RED;c.font='bold 15px "Gowun Batang", serif';c.textAlign='center';c.textBaseline='middle';c.fillText(m.part.mark||m.part.name[0],0,1);c.restore();
     const near=Math.hypot(m.x-B.px,m.y-B.py)<radius;const lab=near?(TOUCH?'지금 치기!':'지금 J!'):(TOUCH?'치기':'J');
     c.save();c.font='bold 13px "Gowun Dodum", sans-serif';const tw=c.measureText(lab).width+12;const ly=m.y+(m.y>BOX.y+BOX.h-46?-44:30);
     c.fillStyle=near?RED:'rgba(255,250,238,.95)';c.strokeStyle=near?RED:INK;c.lineWidth=1.5;c.beginPath();c.rect(m.x-tw/2,ly-10,tw,20);c.fill();c.stroke();
