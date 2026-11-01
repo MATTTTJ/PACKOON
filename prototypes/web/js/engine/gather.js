@@ -1,9 +1,9 @@
 'use strict';
-/* 채집: 따로 창을 띄우지 않는다. 흙더미(G.digs) 앞에 서면 채집 지점(뿌리 끝·버섯 밑동·억새 밑동) 위에
-   큰 기준원이 뜨고, 가운데 점 하나에서 원 하나가 밖으로 커진다. 커지는 원이 기준원에 꼭 맞을 때 휘두르면 딱(perfect),
+/* 채집: 따로 창을 띄우지 않는다. 흙더미(G.digs) 앞에 서면 그 채집물을 감싸는
+   기준원이 뜨고, 가운데 점 하나에서 원 하나가 밖으로 커진다. 커지는 원이 기준원에 꼭 맞을 때 휘두르면 딱(perfect),
    조금 어긋나면 좋아(good), 아무 때나 쳐도 한 몫은 판다(벌 없음). 원이 기준원을 지나치면 사라졌다가 다시 점에서 커진다.
-   아이템별 설정은 defineGather 로 지역이 넣는다: {title, hits:보통 타수, hint, spot:[dx,dy] 채집 지점, rare?:모두 딱일 때 덤으로 나오는 상위 재료}
-   수치는 minigames.csv 의 gather_* (원이 커지는 시간·기준원 크기·딱/좋아 판정 창·딱 힘·수량). 처음 캐면 남는 일기는 지역의 gatherDiary:[id, 글] */
+   아이템별 설정은 defineGather 로 지역이 넣는다: {title, hits:보통 타수, hint, spot:[dx,dy] 캐는 자리(흙먼지·글자), box?:[x0,y0,x1,y1] 그림 범위, rare?:모두 딱일 때 덤으로 나오는 상위 재료}
+   수치는 minigames.csv 의 gather_* (원이 커지는 시간·기준원 여유·딱/좋아 판정 창·딱 힘·수량). 처음 캐면 남는 일기는 지역의 gatherDiary:[id, 글] */
 const gatherCue={d:null,start:0,grade:null,pops:[],dirt:[]};
 // 결정 D-108: 원이 기준원에 닿는 프레임(ring_period) 앞뒤로 좋아 창만큼 더 커진 뒤 사라지고 다시 점에서 시작한다.
 function gatherCycle(){const MG=TABLES.MINIGAMES;return MG.gather_ring_period+MG.gather_good_window;}
@@ -48,6 +48,15 @@ function finishGather(d){
 }
 /* 채집 지점: 흙더미 그림에서 실제로 캐는 곳(뿌리 끝·밑동). 지역이 spot:[dx,dy]로 준다 */
 function gatherSpot(d){const s=GATHER[d.item]?.spot||[0,-8];return {x:d.x+s[0],y:(d.y??fieldGround())+s[1]};}
+/* 결정 D-145: 기준원은 채집물 그림을 다 감싸는 크기에 여유(gather_ring_pad)만 더하고, 가운데는 그 그림 한가운데에 둔다 (피드백: 원이 너무 크다).
+   그림 범위는 지역이 defineGather 의 box:[x0,y0,x1,y1](흙더미 x·바닥 y 기준)로 준다. 없으면 엔진이 그리는 기본 흙더미(field.js drawDigs) 범위 */
+const GATHER_DEFAULT_BOX=[-7,-12,7,0];
+function gatherRing(d){
+  const b=GATHER[d.item]?.box||GATHER_DEFAULT_BOX,ground=d.y??fieldGround();
+  return {x:d.x+(b[0]+b[2])/2,y:ground+(b[1]+b[3])/2,r:Math.ceil(Math.hypot((b[2]-b[0])/2,(b[3]-b[1])/2))+TABLES.MINIGAMES.gather_ring_pad};
+}
+/* 기준원과 진행 점 맨 위 (말풍선 안내는 그 위에 띄운다) */
+function gatherRingTop(d){const g=gatherRing(d);return g.y-g.r-10;}
 /* 커지는 원의 색과 선 무늬: 지금 모습(G.form)마다 다르다 (D-41의 변신별 표현을 원 하나로 옮김) */
 const GATHER_RING_STYLE={
   '':{c:'#f2a24a',dash:[]},            // 너구리: 단풍빛 실선
@@ -69,9 +78,9 @@ function drawGatherCue(){
   if(live!==gatherCue.d){gatherCue.d=live;gatherCue.start=G.anim;}
   const c=ctx;
   if(live){
-    // 채집 지점 위의 큰 기준원(가는 실선)과, 가운데 점에서 커지는 원 하나. 커지는 원이 기준원에 꼭 맞을 때가 딱이다.
-    const cfg=GATHER[live.item],sp=gatherSpot(live),x=Math.round(sp.x-cam),{grade}=gatherPhase(),ph=gatherPhase();
-    const r0=TABLES.MINIGAMES.gather_ring_radius,y=Math.round(sp.y-r0+6);   // 기준원 아래쪽이 채집 지점에 닿게 둔다
+    // 채집물을 감싸는 기준원(가는 실선)과, 그 가운데 점에서 커지는 원 하나. 커지는 원이 기준원에 꼭 맞을 때가 딱이다. (D-145)
+    const cfg=GATHER[live.item],ring=gatherRing(live),x=Math.round(ring.x-cam),ph=gatherPhase(),grade=ph.grade;
+    const r0=ring.r,y=Math.round(ring.y);
     const just=grade==='perfect',st=GATHER_RING_STYLE[G.form||'']||GATHER_RING_STYLE[''];
     if(grade){c.save();c.fillStyle=just?'rgba(255,228,138,.32)':'rgba(255,249,232,.14)';c.beginPath();c.arc(x+.5,y+.5,r0,0,Math.PI*2);c.fill();c.restore();}
     ringStroke(c,x,y,r0,just?'#ffe48a':'#fff9e8',1,[]);
