@@ -348,11 +348,13 @@ function strangerKeepsProgress(give){
 const strangerDebts=()=>G.f.strangerDebt||(G.f.strangerDebt={});
 const regionDebt=()=>Object.entries(G.f.strangerDebt||{}).filter(([k])=>k.startsWith(REG.id+':'));
 const creditOpen=()=>REG.strangerCreditAtNight?!!G.f.night:true;
-function strangerTalk(npc){
+/* opts.noLine: 앞에서 이미 누구냐고 물었으면(disguise.js) 손님 첫마디(line)를 다시 하지 않는다 */
+function strangerTalk(npc,opts={}){
   const e=strangerEntry(npc?.id);if(!e){npc?.talk?.();return;}
   const form=G.form,who=npc.name||'손님';
-  if(typeof e.talk==='function'){e.talk(form,npc);return;}
-  const lines=[];if(e.line)lines.push([who,e.line]);
+  // 결정 D-196: 지역의 talk(form)이 거짓을 돌려주면 손님 첫마디와 교환으로 간다 (예전엔 그대로 끝나, 다람쥐로 꾸벅이에게 말을 걸면 아무 일도 없었다)
+  if(typeof e.talk==='function'&&e.talk(form,npc))return;
+  const lines=[];if(e.line&&!opts.noLine)lines.push([who,e.line]);
   if(Array.isArray(e.fear)&&e.fear.includes(form)){
     if(e.fearLine)lines.push([who,e.fearLine]);
     if(lines.length)talk(lines);else toast(jo(who,'이','가')+' 몸을 숨겼다');
@@ -365,9 +367,10 @@ function strangerTalk(npc){
     addItem(gift.item,Number.isSafeInteger(gift.n)&&gift.n>0?gift.n:1);
   }
   const menu=strangerMenu(npc,e);
-  if(!menu.length){if(lines.length)talk(lines);return;}
+  if(!menu.length){if(!lines.length&&e.line)lines.push([who,e.line]);if(lines.length)talk(lines);return;}   // 바꿀 것이 없으면 손님 첫마디가 곧 그 인물의 대답이다
   menu.push({t:'그만두기',go:null});
   if(lines.length){const last=lines[lines.length-1];lines[lines.length-1]=[last[0],last[1],menu];}
+  else if(opts.noLine)lines.push(['너구리','(대답 대신 고개만 꾸벅했다.)',menu]);   // 누구냐는 물음에 손님인 척 입을 다문다 (D-194)
   else lines.push([who,'…',menu]);
   talk(lines);
 }
