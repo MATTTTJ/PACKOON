@@ -127,11 +127,15 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .trade-good{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;margin-bottom:6px;padding:8px 10px;background:var(--hanji-2);border:1px solid #c7b48c;border-radius:4px;color:var(--meok);font:inherit;cursor:pointer;touch-action:manipulation}
 .trade-good[aria-pressed="true"]{outline:2px solid var(--dan);outline-offset:-1px;background:#f8eed8}
 .trade-good-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-/* 결정 D-123: 거래 불가·다 바꿈 */
+/* 결정 D-147: 잠긴 물건은 흐리게. 값이 모자란 부탁은 모자란 물건 그림만 흐리게 하고 가진 수/필요한 수를 붉게 단다. */
 .trade-good.off{opacity:.55;background:#efe6d0}
-.trade-state{background:#e3d6bb;color:#5b4630}
-.trade-state.done{background:#d9d2c2;color:#6c6253}
-.trade-why{color:#7a5b3c}
+.trade-ask.missing{border-style:dashed;border-color:#b98a6a;background:#f3e8d6}
+.trade-ask.missing canvas{opacity:.45;filter:grayscale(.6)}
+.trade-ask.missing b{color:#a2462c}
+/* 결정 D-148: 품 표시 보기 */
+.trade-legend{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin:0 0 10px;font-size:.82em;color:var(--dim)}
+.trade-legend-item{display:inline-flex;align-items:center;gap:3px}
+.trade-legend canvas.rarity-mark{width:15px;height:15px;image-rendering:pixelated}
 .trade-good-head canvas{width:26px;height:26px;image-rendering:pixelated}
 .trade-good-head canvas.rarity-mark{width:15px;height:15px}
 .trade-asks{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-height:28px}
@@ -578,13 +582,23 @@ body.ending-scene .hud,body.ending-scene #pad,body.ending-scene #toast,body.endi
 .map-region{border-bottom:1px dashed #b7a584;padding:6px 0}
 .map-region h3{margin:0 0 0 6px;font:700 15px var(--display);color:#584936}
 .map-chart{position:relative;height:126px;margin:0 14px}
-.map-chart canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none}
+.map-chart>canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none}
 .map-place{position:absolute;transform:translate(-50%,-50%);width:88px;height:56px;min-width:44px;min-height:52px;padding:16px 3px 3px;background:rgba(248,238,216,.94);border:1px solid transparent;border-radius:3px;font:13px var(--display);color:var(--meok);cursor:pointer;touch-action:manipulation;word-break:keep-all;line-height:1.3}
 .map-place::before{content:'';position:absolute;left:calc(50% - 3px);top:5px;width:6px;height:6px;background:var(--meok);box-shadow:1px 1px 0 #75664e}
 .map-place:disabled{opacity:.42;cursor:default;background:transparent}
 .map-place[aria-pressed="true"]{border-color:var(--meok);box-shadow:0 2px 0 #a68d66}
 .map-place[aria-current="location"]::before{width:10px;height:10px;left:calc(50% - 5px);top:3px;background:var(--dan);border:2px solid var(--hanji);outline:1px solid var(--meok);transform:rotate(45deg)}
 .map-place:focus-visible{outline:2px solid var(--meok);outline-offset:2px}
+/* 결정 D-146: 가 본 구역 칸의 만난 이·채집물 줄 */
+.map-place-name{display:block}
+.map-chart.has-seen{height:170px}
+.map-chart.has-seen .map-place{height:72px}
+.map-seen-who{display:block;font-size:10px;line-height:1.25;color:#5d4e39;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-seen-items{display:flex;justify-content:center;align-items:center;gap:1px;height:16px;margin-top:1px}
+.map-seen-items canvas{display:block;width:16px;height:16px;image-rendering:pixelated;pointer-events:none}
+.map-seen-items canvas.spent{opacity:.35}
+.map-seen-items b{font-size:10px;font-weight:700;color:#5d4e39}
+.map-seen-detail{padding:4px 14px 0;font-size:12px;color:#5d4e39;line-height:1.4;word-break:keep-all}
 .map-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;border-top:1px solid #c9b68e;flex-wrap:wrap}
 .map-foot button{min-height:44px;min-width:44px}
 .map-foot button:disabled{opacity:.45;cursor:default}
@@ -597,7 +611,9 @@ body.ending-scene .hud,body.ending-scene #pad,body.ending-scene #toast,body.endi
   .pad-top .chipbtn{padding:6px 2px}
   .map-panel{inset:1%;height:auto}
   .map-chart{margin-inline:16px;height:126px}
+  .map-chart.has-seen{height:196px}
   .map-place{width:64px;font-size:12px;min-height:54px}
+  .map-chart.has-seen .map-place{height:84px}
   .map-hint{font-size:12px}
 }
 @media (pointer:coarse) and (orientation:landscape){

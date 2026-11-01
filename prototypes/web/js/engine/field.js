@@ -172,6 +172,7 @@ function step(){
   const mg=openMinigame();if(mg){mg.step();return;}
   fieldCall('ambient');   // 현재 구역의 날씨·진행만 갱신한다
   if(paused())return;
+  mapNoteSeen();          // D-146: 길 지도에 적을, 지금 화면에 보이는 인물·채집물
   if(document.hidden)return;
   stepFloorItems();
   if(pickupPose){G.vx=0;jumpQ=atkQ=dropQ=false;stepPickup();return;}
@@ -389,10 +390,13 @@ function drawRaccoon(){
 
 /* 결정 D-114: ↓로 발판 아래로 내려올 때와 무언가를 타고 오를 때는 등을 보인다. 점프로 오를 때는 그대로 앞모습이다.
    - 다람쥐가 줄기를 타는 동안(formClimb): 오르내린 거리에 맞춰 팔다리를 번갈아 디딘다.
-   - ↓+점프로 발판에서 빠질 때(G.dropBack): 땅에 닿을 때까지. 휘두르는 중이나 수리부엉이가 활공하는 동안에는 앞모습이다. */
+   - ↓+점프로 발판에서 빠질 때(G.dropBack): 땅에 닿을 때까지.
+   결정 D-144: 오르내릴 때는 지형과 변신에 상관없이 늘 등을 보인다. 수리부엉이가 발판에서 내려와 활공하는 동안도 등이다.
+   땅 밑으로 기어 내려가는 문(drawCrawl)도 다람쥐·산양·수리부엉이·고라니 모두 뒷모습으로 디딘다.
+   빼는 것 둘: 점프는 오르기가 아니라 뛰기라 앞모습이다. 휘두르는 그 순간(G.attackT)만 앞모습으로 휘두름이 보이게 한다. */
 function heroBackPose(){
-  if(formClimb&&G.form==='squirrel')return {phase:Math.floor(G.py/4)%2};
-  if(G.dropBack&&!G.onGround&&!(G.attackT>0)&&!(G.form==='owl'&&formGlide))return {phase:Math.floor(G.anim/5)%2};
+  if(formClimb)return {phase:Math.floor(G.py/4)%2};
+  if(G.dropBack&&!G.onGround&&!(G.attackT>0))return {phase:Math.floor(G.anim/5)%2};
   return null;
 }
 function draw(){
@@ -503,8 +507,8 @@ function updateOverlay(){
   if(floor){pr.hidden=false;const room=nearFloorItems().some(a=>canPickupItem(a.item));pr.textContent=!room?'보따리 가득':TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
   else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':GATHER[dg.item]?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';
-    // 결정 D-108: 채집 기준원이 크니 안내 말풍선은 기준원과 진행 점 위에 띄운다
-    const ringTop=!dg.cache&&GATHER[dg.item]?gatherSpot(dg).y-2*TABLES.MINIGAMES.gather_ring_radius-10:GROUND-14;
+    // 결정 D-108·D-145: 안내 말풍선은 채집 기준원과 진행 점 위에 띄운다
+    const ringTop=!dg.cache&&GATHER[dg.item]?gatherRingTop(dg):GROUND-14;
     pr.style.top=(Math.min(GROUND-14,ringTop)/H*100)+'%';}
   else if(!paused()&&!rolling&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
@@ -686,10 +690,7 @@ function drawCrawl(m,t){
   const phase=Math.floor(depth*steps)%2;
   if(down&&t<.18)drawPlayerAt(x,y,m.face,Math.floor(t*20)%2,0,heldTool(),0,m.form);   // 다가서는 반 발
   else if(!m.form)drawRaccoonBackAt(x,y,phase);
-  else if(m.form==='squirrel'){
-    // 다람쥐는 머리부터 내려간다.
-    ctx.save();ctx.translate(x-5,y-6);ctx.rotate(Math.PI/2*(down?1:-1));drawFormAt(0,8,1,phase,'squirrel');ctx.restore();
-  }else drawFormAt(x,y-(phase?1:0),m.face,phase,m.form,0,m.form==='owl');
+  else drawFormBackAt(x,y,phase,m.form);   // 결정 D-144: 변신해도 등을 보이며 디딘다 (옛 D-44: 다람쥐는 머리부터, 다른 변신은 옆모습)
   // 내려갈 때는 끝에서 어두워지고, 올라올 때는 어둠에서 밝아진다.
   const dark=down?clamp((t-.55)/.45,0,1):clamp(1-t/.4,0,1);
   if(dark>0){ctx.save();ctx.globalAlpha=dark;R(0,0,W,H,'#211d24');ctx.restore();}

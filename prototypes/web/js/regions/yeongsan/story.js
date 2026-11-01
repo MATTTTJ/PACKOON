@@ -73,10 +73,12 @@ function craftJujube(){
 }
 // 결정 D-78: 약과를 얹으면 대추 하나 더. 영산의 날쌘은 "제값"이라 받은 만큼 더 준다.
 function jujubeGive(i=0){
-  if(CLASSIC||!G.f.seolpi||G.f.yCraftJujube||!has('darae_vine'))return;
+  if(CLASSIC||G.f.yCraftJujube||!has('darae_vine',G.f.seolpi?1:3))return;
+  // 결정 D-147: 대추 이야기를 묻기 전에 보따리에서 바로 바꾸면, 날쌘이 덩굴을 원한 까닭부터 말한다.
+  const first=!G.ledger.t_craft_jujube;ledger('t_craft_jujube','날쌘','다래 덩굴 1','대추 2');
   const yak=i===1&&has('yakgwa');
   takeItem('darae_vine',1);if(yak)takeItem('yakgwa',1);addItem('jujube',yak?3:2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
-  talk([...(yak?[['날쌘','약과까지 얹어? …그럼 대추도 하나 더.\n받은 만큼은 줘야 제값이지.']]:[]),['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
+  talk([...(first?[['날쌘','덩굴이네. 산막 장작 묶을 끈이\n모자라던 참이야.']]:[]),...(yak?[['날쌘','약과까지 얹어? …그럼 대추도 하나 더.\n받은 만큼은 줘야 제값이지.']]:[]),['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
 }
 // 결정 D-77: 강철이가 떠난 뒤 남은 얼음 비늘은 산에 두면 또 얼어붙는다. 산지기 살금이가 깊은 물에 돌려보낸다.
 function salgScaleGive(){
@@ -955,7 +957,9 @@ Rg.goal=()=>{
 Rg.trade={
   nal:()=>[
     ...(G.ledger.nal_yeongsan?[{id:'t_nal_yeongsan',item:'seolpi',n:1,asks:SEOLPI_ASKS,done:()=>G.f.nalYDone,accept:nalTrade}]:[]),
-    ...(!CLASSIC&&G.f.seolpi&&G.ledger.t_craft_jujube?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],done:()=>G.f.yCraftJujube,accept:jujubeGive}]:[])
+    // 결정 D-147: 대추 꾸러미는 처음부터 날쌘 지게에 매달려 있다. 설피를 받기 전에는 덩굴 둘이 설피 몫이다(첫 만남에 들은 값).
+    ...(!CLASSIC?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],done:()=>G.f.yCraftJujube,
+      locked:()=>!G.f.seolpi&&has('darae_vine')&&!has('darae_vine',3)?'다래 덩굴 둘은 설피 엮을 몫이다. 하나가 더 있어야 한다.':null,accept:jujubeGive}]:[])
   ],
   salgeumi:()=>[
     ...(G.ledger.salgeumi?[{id:'t_salgeumi',item:'magamok',info:true,label:'호숫가 지름길에 대한 정보',asks:SALG_ASKS,done:()=>G.f.salgDone,accept:salgGive}]:[]),
