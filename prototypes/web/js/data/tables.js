@@ -576,14 +576,14 @@ const TABLES={
    "r": 0,
    "kind": "먹을거리",
    "region": "jangteo",
-   "d": "연 아이네 한과 좌판의 유과. 바삭하고 고물이 잔뜩 묻었다. 먹으면 기운이 조금 난다."
+   "d": "얼레네 한과 좌판의 유과. 바삭하고 고물이 잔뜩 묻었다. 먹으면 기운이 조금 난다."
   },
   "gangjeong": {
    "n": "깨강정",
    "r": 0,
    "kind": "먹을거리",
    "region": "jangteo",
-   "d": "연 아이 할머니가 설에 싸 보낸 깨강정. 깨가 촘촘히 엉겨 있다. 먹으면 기운이 조금 난다."
+   "d": "얼레 할머니가 설에 싸 보낸 깨강정. 깨가 촘촘히 엉겨 있다. 먹으면 기운이 조금 난다."
   },
   "gotgam": {
    "n": "곶감",
@@ -2759,8 +2759,18 @@ const TABLES={
   "gather_darae_vine_hits": 2,
   "gather_solbang_hits": 2,
   "gather_snow_mound_hits": 2,
-  "yut_needle_speed": 1.5,
-  "yut_nak_zone": 10
+  "tuho_arrows": 4,
+  "tuho_ear_points": 3,
+  "tuho_steady_mouth": 0.6,
+  "tuho_steady_ear": 0.05,
+  "tuho_bold_mouth": 0.3,
+  "tuho_bold_ear": 0.12,
+  "tuho_stake": 1,
+  "tuho_steady_pay": 1,
+  "tuho_bold_pay": 2,
+  "tuho_bets_per_day": 3,
+  "tuho_throw_frames": 42,
+  "tuho_pause_frames": 26
  },
  "TUNING": {
   "kkubeogi_cycle": 200,

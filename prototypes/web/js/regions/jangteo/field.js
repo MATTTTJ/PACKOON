@@ -207,13 +207,15 @@ if(!CLASSIC){
     talk:()=>Rg.lanternAction(p.id),
   }));
   const nightLanterns=zone=>night()?lanterns.filter(p=>p.zone===zone):[];
-  const yutBoard={id:'j_yut_board',name:'윷판',prompt:'윷놀이 시작·이어 하기',x:1960,y:GROUND,
+  // 결정 D-325: 윷판 대신 투호 판돈 바구니(항아리는 노인들 그림에 있다). 말을 걸면 노인들의 투호 내기 판이 열린다 (story.js Rg.playTuho)
+  const yutBoard={id:'j_yut_board',name:'판돈 바구니',prompt:'투호 내기 구경하기',x:1960,y:GROUND,
     draw(x,y){
-      R(x-15,y-4,30,4,'#c2a576');R(x-13,y-5,26,1,'#ead4a2');
-      for(let i=0;i<4;i++)R(x-11+i*7,y-3,2,1,'#785c43');
-      R(x-8,y-8,4,3,'#c6b691');R(x+4,y-8,4,3,'#936c46');
+      R(x-7,y-7,14,7,'#a07a4a');R(x-8,y-8,16,2,'#c39b62');for(let i=0;i<4;i++)R(x-6+i*4,y-5,2,4,'#8a6538');   // 짚 바구니
+      R(x-5,y-11,4,4,'#7a5232');R(x,y-12,4,5,'#8a5a32');R(x+3,y-10,3,3,'#7a5232');R(x-4,y-10,2,1,'#b98a52');R(x+1,y-11,2,1,'#b98a52');   // 솔방울
+      R(x+10,y-14,4,14,'#6f5a3c');R(x+10,y-15,4,1,'#4f3f2a');                // 화살통
+      R(x+11,y-21,1,7,'#6b4a2c');R(x+11,y-22,1,2,'#b54a34');R(x+13,y-20,1,6,'#6b4a2c');R(x+13,y-21,1,2,'#416c82');   // 꽂아 둔 화살
     },
-    talk:()=>Rg.playYut(),
+    talk:()=>Rg.playTuho(),
   };
   const lanternBundle={id:'j_lantern_bundle',name:'등불 꾸러미',prompt:'까치와 등불 꾸러미 풀기',x:1610,y:GROUND,
     draw(x,y){
