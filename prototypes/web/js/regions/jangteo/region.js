@@ -115,26 +115,31 @@ function kiteChild(){
     if(!G.f.jxKiteReeled){
       Rg.handWork('kite',()=>{G.f.jxKiteReeled=true;kiteChild();});return;
     }
-    // 결정 D-290: 연을 건져 준 몫. 붉은 차일 뒤 한과 좌판의 유과
+    // 결정 D-321: 연 이벤트는 걸림 → 풀림 → 때움 → 다시 띄움으로 흐르고, 단계마다 연의 모습을 작은 창과 필드에 그린다(art.js kitePics·kiteScene).
+    // 결정 D-293 의 지붕길 배우기는 뺐다(장터 순간이동 지붕문을 없앤다). 연 건져 준 값은 한과 좌판 유과(D-290)다.
     talk([
-      ['연 아이','살았다, 내 방패연!\n줄은 천천히 감을게. 또 처마에 걸리면 큰일이야.'],
-      ['너구리','꼬리를 길게 달았네.\n저 멀리서도 네 연인 줄 알겠어.'],
-      ['연 아이','설에 집으로 오는 동생한테 보이려고!\n저 붉은 차일 뒤로 오면 우리 좌판이거든.'],
-      ['연 아이','우리 좌판 유과야. 연 건져 준 값!\n엄마가 파는 거니까 맛은 내가 장담해.'],
-      gotLine('yugwa',2),
-      ['연 아이','나 연 날리러 지붕에 자주 올라가거든.\n밟아도 되는 기와는 내가 다 알아.'],   // 결정 D-293
-      ['너구리','(연 아이가 금 간 기와와 튼튼한 기와를 하나하나 짚어 준다.\n이제 지붕을 따라 장터 거리까지 건널 수 있겠다.)']
-    ],()=>{addItem('yugwa',2);G.f.jxKiteDone=true;record('kite','설에 돌아오는 동생에게 보이려고 날린 연을 내려 줬다. 연 건져 준 값이라며 한과 좌판 유과를 받았다. 연 날리러 다니는 지붕길도 배웠다.');finishWanderer('j_kite');
-      if(typeof grantNickname==='function')grantNickname('jangteo_kite','연 건지는 손','연 아이');});
+      ['얼레','살았다, 내 방패연!'],
+      ['너구리','모서리가 처마 못에 찢겼어.'],
+      ['얼레','이 정도는 괜찮아.\n조청 바르고 한지 덧대면 돼.'],
+      ['너구리','(얼레가 좌판에서 조청을 찍어 와\n찢긴 모서리에 한지를 덧댄다.)'],
+      Object.assign(['얼레','됐다. 다시 띄운다!'],{pic:Rg.kitePics.rise()}),
+      ['너구리','꼬리를 길게 달았네.\n멀리서도 네 연인 줄 알겠어.'],
+      ['얼레','설에 집으로 오는 동생한테 보이려고!\n저 붉은 차일 뒤로 오면 우리 좌판이거든.'],
+      // 결정 D-322: '연 아이'를 얼레로 부른다. 아이는 연을 다시 띄운 뒤 제 입으로 이름을 알려 준다
+      Object.assign(['얼레','난 얼레야. 연 날릴 땐 늘 얼레를 끼고 다녀서\n다들 그렇게 불러.'],{pic:null}),
+      ['얼레','이건 우리 좌판 유과야. 연 건져 준 값!\n엄마가 파는 거니까 맛은 내가 장담해.'],
+      gotLine('yugwa',2)
+    ],()=>{addItem('yugwa',2);G.f.jxKiteDone=true;record('kite','설에 돌아오는 동생에게 보이려고 날린 연이 처마 못에 걸려 있었다. 꼬리를 풀어 주자 얼레가 찢긴 모서리를 한지로 때워 다시 띄웠다. 연 건져 준 값이라며 한과 좌판 유과를 받았다.');finishWanderer('j_kite');
+      if(typeof grantNickname==='function')grantNickname('jangteo_kite','연 건지는 손','얼레');});
     return;
   }
   if(G.f.jxKiteStarted){
-    talk([['연 아이','상자 위에서 낮은 처마로 올라가 봐.\n꼬리만 살살 빼면 돼!']]);return;
+    talk([['얼레','상자 위에서 낮은 처마로 올라가 봐.\n꼬리만 살살 빼면 돼!']]);return;
   }
   talk([
-    ['연 아이','줄을 당길수록 더 걸려.\n설 전에 동생한테 보여 줘야 하는 연인데…'],
-    ['너구리','처마에 꼬리가 걸렸네.\n아래 상자부터 올라가 볼까?'],
-    ['연 아이','줄은 내가 느슨하게 잡고 있을게.\n올라가서 꼬리만 살짝 빼 줄래?',[
+    Object.assign(['얼레','줄을 당길수록 더 걸려.\n설 전에 동생한테 보여 줘야 하는 연인데…'],{pic:Rg.kitePics.stuck()}),
+    ['너구리','꼬리가 처마 못에 감겼네.\n바람 불 때마다 연이 처마에 부딪혀.'],
+    ['얼레','줄은 내가 느슨하게 잡고 있을게.\n올라가서 꼬리만 살짝 빼 줄래?',[
       {t:'상자를 밟고 올라간다',go:()=>{G.f.jxKiteStarted=true;toast('상자 → 낮은 처마 → 연. 가까이서 E · 연 꼬리 풀기');}},
       {t:'잠깐 둘러보고 올게',go:null}
     ]]
@@ -157,24 +162,26 @@ function babyBoar(){
   if(G.f.jxBoarScent2){
     if(!G.f.jxBoarBed){Rg.handWork('snow',()=>{G.f.jxBoarBed=true;babyBoar();});return;}
     talk([
-      ['새끼 멧돼지','이 냄새야! 솔잎 아래 마른 풀이 있어.\n아까 엄마랑 여기서 쉬었어.'],
+      ['알밤이','이 냄새야! 솔잎 아래 마른 풀이 있어.\n아까 엄마랑 여기서 쉬었어.'],
       ['너구리','눈 묻은 솔가지는 치워 둘게.\n바람은 바위가 막아 주네.'],
-      ['새끼 멧돼지','엄마가 찾으러 올 때까지 여기 있을래.\n큰 바위 뒤에 이상한 발자국도 봤어.'],
+      ['알밤이','엄마가 찾으러 올 때까지 여기 있을래.\n큰 바위 뒤에 이상한 발자국도 봤어.'],
       // 결정 D-290: 잠자리를 찾아 준 몫. 멧돼지 코로 솔잎 밑 청설모가 묻은 잣을 파낸다
-      ['너구리','(새끼 멧돼지가 솔잎 더미에 코를 박고 킁킁 파헤친다.)'],
-      ['새끼 멧돼지','찾았다! 청설모가 묻어 둔 잣이야.\n엄마가 길에서 도움받으면 꼭 나누랬어.'],
+      ['너구리','(알밤이가 솔잎 더미에 코를 박고 킁킁 파헤친다.)'],
+      ['알밤이','찾았다! 청설모가 묻어 둔 잣이야.\n엄마가 길에서 도움받으면 꼭 나누랬어.'],
       gotLine('jat',2),
-      ['새끼 멧돼지','이제 장터 냄새는 안 쫓아갈래.\n달콤한 냄새가 나도 여기서 기다릴 거야.']
-    ],()=>{addItem('jat',2);record('boar','장터 냄새를 따라 나온 새끼 멧돼지와 솔잎 냄새를 따라 잠자리로 돌아왔다. 멧돼지가 솔잎 밑에서 청설모가 묻은 잣을 파내 나눠 주었다. 바람을 막는 큰 바위 뒤에 발자국이 있다.');finishWanderer('j_boar');});
+      ['알밤이','이제 장터 냄새는 안 쫓아갈래.\n달콤한 냄새가 나도 여기서 기다릴 거야.']
+    ],()=>{addItem('jat',2);record('boar','장터 냄새를 따라 나온 새끼 멧돼지 알밤이와 솔잎 냄새를 따라 잠자리로 돌아왔다. 멧돼지가 솔잎 밑에서 청설모가 묻은 잣을 파내 나눠 주었다. 바람을 막는 큰 바위 뒤에 발자국이 있다.');finishWanderer('j_boar');});
     return;
   }
   if(G.f.jxBoarStarted){
-    talk([['새끼 멧돼지',G.f.jxBoarScent1?'부러진 솔가지 냄새는 여기까지야.\n조금 더 가면 마른 솔잎 냄새가 나.':'장터 냄새 말고 숲 냄새를 찾아야 해.\n저기 부러진 솔가지, 같이 맡아 볼래?']]);return;
+    talk([['알밤이',G.f.jxBoarScent1?'부러진 솔가지 냄새는 여기까지야.\n조금 더 가면 마른 솔잎 냄새가 나.':'장터 냄새 말고 숲 냄새를 찾아야 해.\n저기 부러진 솔가지, 같이 맡아 볼래?']]);return;
   }
   talk([
-    ['새끼 멧돼지','달콤한 냄새만 따라왔는데 깜깜해졌어.\n집으로 가는 냄새가 안 나.'],
-    ['너구리','코에 눈이 붙었네.\n털고, 하나씩 맡아 보자.'],
-    ['새끼 멧돼지','마른 풀하고 솔잎 냄새였어.\n뛰지 말고 옆에서 같이 찾아줄래?',[
+    ['알밤이','달콤한 냄새만 따라왔는데 깜깜해졌어.\n집으로 가는 냄새가 안 나.'],
+    ['너구리','코에 눈이 붙었네.\n털고, 하나씩 맡아 보자. 이름이 뭐야?'],
+    // 결정 D-322: '새끼 멧돼지'를 알밤이로 부른다. 밤빛 줄무늬에 동글동글해서 엄마가 붙인 이름이다
+    ['알밤이','알밤이. 엄마가 그렇게 불러.\n집 냄새는 마른 풀하고 솔잎 냄새였어.'],
+    ['알밤이','뛰지 말고 옆에서 같이 찾아줄래?',[
       {t:'솔가지부터 함께 살펴본다',go:()=>{G.f.jxBoarStarted=true;toast('오른쪽의 부러진 솔가지 → 마른 솔잎. E로 냄새 살펴보기');}},
       {t:'잠깐 길부터 살펴볼게',go:null}
     ]]
@@ -203,19 +210,22 @@ function oldMagpie(){
 
 Rg.expEncounters={
   wanderers:{
-    entrance:[{id:'j_kite',name:'연 아이',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
+    entrance:[{id:'j_kite',name:'얼레',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
     street:[{id:'j_yut',name:'윷놀이 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':'한 판 더 하려면 언제든 앉거라.\n다음엔 더 큰 방석을 펴 두마.';}}],
     inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:()=>{const l=Rg.magpieTteok?.();if(l)talk(l);else oldMagpie();},draw:draw('magpie'),get greeting(){const l=Rg.magpieTteok?.();if(l)return l;return G.f.night?(G.f.jxLanternDone?'네가 단 등을 따라 길손들이 찾아왔구나.\n아침 떡 김이 오르면 다들 또 떠나겠지.':'밤이 됐구나. 등불 꾸러미는 처마 옆에 있단다.\n등은 네가 달고, 길은 내가 일러 주마.'):G.f.jxLanternDone?'밤새 길손들이 쉬고 갔단다.\n이제 나도 남쪽으로 날아갈 차례구나.':'해 지면 다시 오려무나.\n골목 등 다는 걸 좀 거들어 다오.';}}],
-    pine:[{id:'j_boar',name:'새끼 멧돼지',hint:'킁킁, 킁킁. 솔숲 쪽에서 무언가 냄새를 쫓는 소리가 난다.',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
+    pine:[{id:'j_boar',name:'알밤이',hint:'킁킁, 킁킁. 솔숲 쪽에서 무언가 냄새를 쫓는 소리가 난다.',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
     warehouse:[]
   },
   examines:{
     entrance:[
       {id:'j_flag_knot',x:240,label:'장터 깃발 매듭',text:['깃발 아래 매듭은 풀기 쉽게 묶었다.\n장이 끝나면 눈 오기 전에 내려야 하니까.','돌받침 안쪽에 붉은 점이 있다.\n눈을 털면 발가락 모양이 보일까?']},
-      {id:'j_kite_tail',x:1180,y:128,label:'연 꼬리 풀기',get text(){
-        if(!G.f.jxKiteStarted)return '방패연 꼬리가 처마 못에 걸렸다.\n아래 아이에게 줄을 느슨하게 잡아 달라고 하자.';
-        G.f.jxKiteFreed=true;return ['줄이 느슨해진 사이 꼬리를 살짝 뺐다.\n연이 아이 쪽으로 사르르 내려간다.',
-          '처마에 걸렸던 꼬리를 반듯하게 폈다.\n아래에서 아이가 줄을 감고 있다.'];
+      // 결정 D-321: 연 꼬리는 그 자리 그림 대신 연 장면 그림을 띄운다 (걸림 → 너구리 손이 풀면 줄에 끌려 내려감)
+      {id:'j_kite_tail',x:1180,y:128,label:'연 꼬리 풀기',peek:false,get text(){
+        if(!G.f.jxKiteStarted){if(typeof peekPicture==='function')peekPicture(Rg.kitePics.stuck().draw,{animate:true});
+          return '방패연 꼬리가 처마 못에 감겼다.\n아래 아이에게 줄을 느슨하게 잡아 달라고 하자.';}
+        if(!G.f.jxKiteFreed&&typeof peekPicture==='function')peekPicture(Rg.kitePics.free().draw,{animate:true});
+        G.f.jxKiteFreed=true;return ['줄이 느슨해진 사이 꼬리를 못에서 살짝 뺐다.\n연이 얼레 쪽으로 흔들흔들 내려간다.',
+          '처마 못에 연 종이 부스러기가 걸려 있다.\n여기에 모서리가 찢겼구나.'];
       }},
       {id:'j_jangseung_snow',x:1680,label:'장승 코의 눈',text:'장승 코에만 눈이 안 쌓였다.\n지나가는 짐꾼들이 코를 톡 짚고 들어오나 봐.'}
     ],
@@ -232,11 +242,11 @@ Rg.expEncounters={
     pine:[
       {id:'j_pine_scent1',x:1730,label:'부러진 솔가지',get text(){
         if(!G.f.jxBoarStarted)return '눈 아래 가지 하나가 부러져 있다.\n진한 송진 냄새. 코끝이 얼얼하다.';
-        G.f.jxBoarScent1=true;return '솔가지에 쌓인 눈을 손바닥으로 털었다.\n새끼 멧돼지가 코를 들고 마른 솔잎 쪽으로 간다.';
+        G.f.jxBoarScent1=true;return '솔가지에 쌓인 눈을 손바닥으로 털었다.\n알밤이가 코를 들고 마른 솔잎 쪽으로 간다.';
       }},
       {id:'j_pine_scent2',x:1870,label:'눈 아래 마른 솔잎',get text(){
         if(!G.f.jxBoarScent1)return '큰 바위 밑에 마른 솔잎이 모였다.\n바람은 여기를 비켜 가는 모양이다.';
-        G.f.jxBoarScent2=true;return '마른 솔잎 아래에서 따뜻한 풀 냄새가 났다.\n새끼 멧돼지가 오른쪽 잠자리를 알아보고 뛰어간다.';
+        G.f.jxBoarScent2=true;return '마른 솔잎 아래에서 따뜻한 풀 냄새가 났다.\n알밤이가 오른쪽 잠자리를 알아보고 뛰어간다.';
       }},
       {id:'j_pine_scale',x:2280,y:128,label:'큰 바위의 솔방울 비늘',text:'솔방울 비늘이 바위 틈에 차곡차곡 끼었다.\n작은 발자국 아래에는 훨씬 오래된 붉은 자국이 있다.'}
     ],
