@@ -105,7 +105,8 @@ Rg.STORE_X=STORE_X;
 if(!CLASSIC){
   Rg.startZone='entrance';Rg.STORE_X=2320;
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
-  // 장터 입구: 연줄 문(1310) 뒤 빈 길 1290px → 410px (물건 없는 발판 무리를 지운다). 숙소 창고: 빈 마당과 빈 발판 무리 두 곳을 지운다.
+  // 결정 D-293: 처마 지붕길은 연줄을 따라 건너는 게 아니라, 연 아이가 알려 준 튼튼한 기와를 밟아 건넌다.
+  // 장터 입구: 지붕길 문(1310) 뒤 빈 길 1290px → 410px (물건 없는 발판 무리를 지운다). 숙소 창고: 빈 마당과 빈 발판 무리 두 곳을 지운다.
   Rg.trimCutsV1={entrance:[[1400,880]],warehouse:[[800,900],[1800,380]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
   // 결정 D-116: 숙소 창고문(2130) 뒤 오른쪽 출구까지 빈 마당과 빈 처마 계단(2190~2490)을 지운다.
   Rg.trimCutsV2={entrance:[[1400,880]],inn:[[2190,300]],warehouse:[[800,900],[1800,380]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
@@ -172,6 +173,8 @@ if(!CLASSIC){
       if(id==='inn'&&Math.abs(G.px-tx(1530))<45&&!open('dlg')){
         const key=night()?'jxMagpieNight':'jxMagpieMorning',l=!G.f[key]&&Rg.magpieTteok?.();
         if(l){G.f[key]=true;talk(l,refreshGoal);}
+        // 결정 D-290: 등을 다 단 뒤 까치 곁에 오면 길손이 맡긴 곶감을 건넨다(한 번)
+        else if(G.f.jxLanternDone&&!G.f.jxLanternPaid&&!open('dlg'))Rg.lanternThanks?.();
       }
       if(id==='warehouse'&&G.f.guard&&night()&&!G.boss.dead&&Math.abs(G.px-Rg.STORE_X)<24)Rg.startDokkaebi();
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
@@ -217,7 +220,7 @@ if(!CLASSIC){
       platforms:[...stairs(1040),...stairs(1980)],
       pickups:cones('entrance',[[355,192]]),   // 결정 D-82: 솔방울은 뒷산 솔숲에서 모은다
       exits:{right:{to:'street',toX:60}},
-      doors:[{x:1310,y:96,to:'street',toX:1010,toY:96,label:'연줄을 따라 처마 건너기',need:()=>!!G.f.jxKiteDone,reason:'연을 풀어 준 뒤 아이에게 안전한 처마길을 물어보자.',draw:peg,drawBlocked:shutter}],
+      doors:[{x:1310,y:96,to:'street',toX:1010,toY:96,label:'기와지붕 따라 건너기',need:()=>!!G.f.jxKiteDone,reason:'어느 기와가 튼튼한지 모른다. 지붕에서 연을 날리는 아이라면 알 텐데.',draw:peg,drawBlocked:shutter}],
       wanderers:E.wanderers.entrance,examines:E.examines.entrance,
       stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint,base:'none',face:18}],   // D-116: 깃대에 바로 찍는다(받침 겹침 없음)
     },
@@ -228,11 +231,11 @@ if(!CLASSIC){
       doors:[{x:1180,to:'street',toX:1310,toY:110,label:'떡집 문 열기',need:()=>!night(),reason:'앞문은 닫혔다. 오른쪽에 불 켜진 옆문이 있다.',draw:peg,drawBlocked:shutter},
         {x:1590,to:'street',toX:1490,toY:110,label:'떡집 아궁이 옆문으로',draw:peg},
         {x:1515,y:110,to:'street',toX:1625,label:'떡집 밖으로',draw:peg},
-        {x:1010,y:96,to:'entrance',toX:1310,toY:96,label:'연이 걸렸던 처마로 돌아가기',need:()=>!!G.f.jxKiteDone,reason:'입구에서 연을 풀어 준 뒤 걸어 보자.',draw:peg},
+        {x:1010,y:96,to:'entrance',toX:1310,toY:96,label:'기와지붕 따라 입구로',need:()=>!!G.f.jxKiteDone,reason:'어느 기와가 튼튼한지 모른다. 입구의 연 아이라면 알 텐데.',draw:peg},
         {x:2180,to:'pine',toX:70,label:'굴뚝 뒤 소나무 숲으로',ascend:true,draw:peg},
         {x:2040,to:'inn',toX:1510,label:'접힌 좌판 사이, 숙소 지름길',need:night,reason:'낮에는 좌판이 골목을 막는다. 밤이면 접힌다.',draw:peg,drawBlocked:shutter,
           formPass:'squirrel',formLabel:'다람쥐로 좌판 밑 지나기'},
-        {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'입구 아이의 연을 풀어 주면 처마길을 알려 줄 거야.',draw:peg}],
+        {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'어느 기와가 튼튼한지 모른다. 입구의 연 아이라면 알 텐데.',draw:peg}],
       get wanderers(){return [...E.wanderers.street,yutBoard,...nightLanterns('street')];},examines:E.examines.street,
     },
     inn:{...common('inn'),name:TABLES.ZONES.jangteo.inn,w:2600,npcs:['bueong','maru'],
@@ -262,7 +265,7 @@ if(!CLASSIC){
         {id:'j_owl_roof_cone_1',x:853,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:884,y:124,item:'solbang',got:false}],
       // 결정 D-44: 뒷산에서 장터로는 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
       doors:[{x:70,to:'street',toX:2180,label:'떡집 굴뚝을 향해 내려가기',descend:true,draw:peg},
-        {x:2480,y:96,to:'street',toX:2650,toY:96,label:'등불 아래 장터 지붕으로',need:()=>!!G.f.jxKiteDone,reason:'처마길은 입구 아이에게 연을 돌려준 뒤 알려 달라고 하자.',draw:peg}],
+        {x:2480,y:96,to:'street',toX:2650,toY:96,label:'등불 아래 장터 지붕으로',need:()=>!!G.f.jxKiteDone,reason:'어느 기와가 튼튼한지 모른다. 입구의 연 아이라면 알 텐데.',draw:peg}],
       exits:{left:{to:'street',toX:2180}},
       get wanderers(){return night()?[...E.wanderers.pine,...nightLanterns('pine')]:[];},examines:E.examines.pine,
       stamps:[{id:'rock',x:2410,y:96,note:'stamp:jangteo:rock',draw:glint}],
@@ -286,6 +289,17 @@ if(!CLASSIC){
       },
     },
   };
+  /* 결정 D-265: 장터 골목에도 주울 것을 조금 둔다 (사용자 피드백 2026-11-02 "빈 곳이 너무 많다").
+     장터에는 풀숲이 없으니 땔감 지게와 아궁이 장작단에서 흘린 솔방울(불쏘시개)만, 처마 위에는 바람에 얹힌 것만 둔다.
+     솔숲은 이미 촘촘해 그대로 둔다. 좌표는 길을 줄인 뒤의 자리. */
+  addZoneGather(Rg,'j_g_',[
+    ['entrance','p',165,'solbang'],['entrance','p',705,'solbang'],['entrance','p',1080,'solbang',{y:96}],
+    ['street','p',190,'solbang'],['street','p',712,'solbang',{y:96}],['street','p',1790,'solbang'],['street','p',2290,'solbang'],['street','p',2600,'solbang',{y:96}],
+    ['inn','p',160,'solbang'],['inn','p',760,'solbang'],['inn','p',1350,'solbang',{y:96}],['inn','p',1905,'solbang',{y:128}],['inn','p',2170,'solbang'],
+    ['warehouse','p',150,'solbang'],['warehouse','p',590,'solbang',{y:124}],['warehouse','p',1270,'solbang',{y:96}],
+    // 몰린 자리 (간격이 고르지 않게)
+    ['entrance','p',735,'solbang'],['inn','p',2210,'solbang'],
+  ]);
   // 길손의 조사에는 배경과 구별되는 작고 일정한 표지를 쓴다. 숨은 도장은 표지를 붙이지 않는다.
   for(const z of Object.values(Rg.zones))for(const p of z.examines)p.draw=p.draw||((x,y)=>{R(x-2,y-6,5,4,'#caa970');R(x,y-10,1,2,'#f6ead0');});
 }

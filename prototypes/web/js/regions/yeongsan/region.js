@@ -19,8 +19,11 @@ const Rg=defineRegion('yeongsan',{
       '그날 밤.']},
   },
   newState:()=>({
-    pickups:[[985,160],[1128,150],[1265,158],[1340,GROUND]].map(([x,y])=>({x,y,item:'magamok',got:false})).concat([{x:330,y:GROUND,item:'jip',got:false}]),   // 산막 처마 밑 짚단
-    digs:[{x:420,item:'darae_vine',done:false},{x:540,item:'darae_vine',done:false},{x:660,item:'darae_vine',done:false}],
+    pickups:[[985,160],[1128,150],[1265,158],[1340,GROUND]].map(([x,y])=>({x,y,item:'magamok',got:false})).concat([{x:330,y:GROUND,item:'jip',got:false}])   // 산막 처마 밑 짚단
+      // 결정 D-265: 옛 구성에만 소나무 밑 솔방울 둘을 더한다(확장판은 구역 선언의 것을 쓴다)
+      .concat(CLASSIC?[190,742].map((x,i)=>({id:'y_cl_'+i,x,y:GROUND,item:'solbang',got:false})):[]),
+    // 결정 D-265: 120px 고른 간격이던 덤불을 들쭉날쭉하게. 확장판은 이 순서대로 산막 자리(SHELTER_VINES)로 옮긴다
+    digs:[{x:404,item:'darae_vine',done:false},{x:551,item:'darae_vine',done:false},{x:612,item:'darae_vine',done:false}],
     boss:{x:2120,dead:false},
     salg:{x:1480,home:1480,startle:0},   // 살금이: 귀를 세울 때 움직이면 달아난다
     f:{nalYTalk:false,nalYDone:false,seolpi:false,salgMet:false,salgDone:false,shortcut:false,

@@ -403,19 +403,33 @@ function drawKudzuHill(c){
    결정 D-176: 칡줄기·칡뿌리의 빈틈(붉은 표식)은 공격 뒤 남은 덩굴 위에 뜬다. 마지막 채찍의 늘어진 줄기, 마지막에 박힌 덩이뿌리.
    표식이 있는 동안 줄기·뿌리가 그 자리에 남고, 치면 부위가 깎이며 연장이 있으면 확률로 재료를 얻는다
    (든 도구로 끊고 캔다. 줄기는 낫·뿌리는 곡괭이가 잘 먹는다, D-224 · kudzu_stem_cut_chance · kudzu_root_dig_chance). 표식이 닫히면 거둬 간다. */
-/* 칡줄기 채찍: 상자 옆에서 위나 아래 띠를 가로로 후려친다. 띠가 먼저 옅게 붉어진다.
-   세 번째는 손이 있는 띠를 노리고, 후려친 뒤 줄기가 축 늘어진다. */
+/* 칡줄기 채찍: 상자 옆에서 위나 아래 띠를 가로로, 또는 상자 위·아래에서 왼쪽·가운데·오른쪽 띠를 세로로 후려친다.
+   띠가 먼저 옅게 붉어진다. 세 번째는 손이 있는 띠를 노리고, 후려친 뒤 줄기가 축 늘어진다.
+   결정 D-246: 채찍 세 번의 방향이 차례마다 바뀐다 — 모두 가로 → 모두 세로 → 섞어서 (사용자 피드백 2026-11-02: 좌우만이 아니라 상하로도).
+   b.o 'h' 는 가로 띠(옆에서 옴, b.v 는 띠의 세로 자리), 'v' 는 세로 띠(위나 아래에서 옴, b.v 는 띠의 가로 자리).
+   아래 함수의 a 는 줄기가 뻗는 쪽 좌표(가로 띠면 x, 세로 띠면 y), 돌려주는 값은 띠를 가로지르는 쪽 좌표다. */
 const WHIP={gap:62,tell:40,swing:14,limp:24,fall:16,back:10,half:0.21};
 function whipState(b){
   const tl=b.delay+WHIP.tell,sw=tl+WHIP.swing,lp=sw+(b.last?WHIP.limp:0),stop=b.cut?b.cutT+WHIP.fall:lp;
   return {wait:b.t<=b.delay,tell:b.t>b.delay&&b.t<=tl,swing:b.t>tl&&b.t<=sw,limp:b.last&&!b.cut&&b.t>sw&&b.t<=lp,lp,
     k:clamp((b.t-tl)/WHIP.swing,0,1),fallK:b.cut?clamp((b.t-b.cutT)/WHIP.fall,0,1):0,back:b.t>stop?clamp((b.t-stop)/WHIP.back,0,1):0,end:stop+WHIP.back};
 }
-/* 줄기가 지나는 높이. 늘어지면 가운데가 처진다 */
-function stemY(b,x,sag){const u=(x-BOX.x)/BOX.w;return BOX.y+b.v*BOX.h+Math.sin(u*Math.PI*2+b.seed)*5+(sag?Math.sin(clamp(u,0,1)*Math.PI)*9:0);}
-function whipY(b,x){const s=whipState(b);return stemY(b,x,s.limp||b.cut);}
-function whipTipX(b,k){return b.side<0?BOX.x-14+(BOX.w+28)*k:BOX.x+BOX.w+14-(BOX.w+28)*k;}
-function whipPts(b,x0,x1){const pts=[],n=10;for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n;pts.push([x,whipY(b,x)]);}return pts;}
+const wv=b=>b.o==='v';
+const whipA0=b=>wv(b)?BOX.y:BOX.x,whipL=b=>wv(b)?BOX.h:BOX.w;
+/* 띠 반폭(px). 세로 띠도 가로 띠와 같은 굵기 */
+const whipHalf=()=>WHIP.half*BOX.h;
+/* 띠 가운데 */
+function whipCross(b,v=b.v){return wv(b)?BOX.x+v*BOX.w:BOX.y+v*BOX.h;}
+/* 손이 있는 띠: 가로면 위·아래 두 띠 중 하나, 세로면 왼쪽·가운데·오른쪽 세 띠 중 가까운 것 */
+function handBand(o){if(o==='v'){const u=(B.px-BOX.x)/BOX.w;return [0.2,0.5,0.8].reduce((a,v)=>Math.abs(v-u)<Math.abs(a-u)?v:a);}return (B.py-BOX.y)/BOX.h<0.5?0.25:0.75;}
+/* 줄기가 지나는 자리. 늘어지면 가운데가 처진다 */
+function stemC(b,a,sag){const u=(a-whipA0(b))/whipL(b);return whipCross(b)+Math.sin(u*Math.PI*2+b.seed)*5+(sag?Math.sin(clamp(u,0,1)*Math.PI)*9:0);}
+function whipC(b,a){const s=whipState(b);return stemC(b,a,s.limp||b.cut);}
+function whipFrom(b){return b.side<0?whipA0(b)-14:whipA0(b)+whipL(b)+14;}
+function whipTip(b,k){return b.side<0?whipA0(b)-14+(whipL(b)+28)*k:whipA0(b)+whipL(b)+14-(whipL(b)+28)*k;}
+/* (뻗는 쪽, 가로지르는 쪽) → 화면 [x, y] */
+function wpt(b,a,cr){return wv(b)?[cr,a]:[a,cr];}
+function whipPts(b,a0,a1){const pts=[],n=10;for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n;pts.push(wpt(b,a,whipC(b,a)));}return pts;}
 /* 표식이 붙든 덩굴: 그 표식이 열려 있는 동안 남아 있다 */
 function heldBy(b){return !!(B.kHold&&B.kHold.b===b&&B.mark);}
 /* 결정 D-224: 줄기·뿌리를 끊고 캐는 도구는 플레이어가 든 전투 도구다(battleTool). 줄기는 낫, 뿌리는 곡괭이가 잘 먹고
@@ -424,7 +438,8 @@ function heldBy(b){return !!(B.kHold&&B.kHold.b===b&&B.mark);}
 function kudzuMark(p){
   B.kHold=null;
   if(p.id==='arm'){const b=B.bullets.find(q=>q.k==='kudzuWhip'&&q.last&&q.v!=null&&!q.cut);
-    if(b){const x=BOX.x+BOX.w*(B.px<BOX.x+BOX.w/2?0.72:0.28);B.kHold={b};return {x,y:stemY(b,x,true)};}}
+    if(b){const hand=wv(b)?(B.py-BOX.y)/BOX.h:(B.px-BOX.x)/BOX.w,a=whipA0(b)+whipL(b)*(hand<0.5?0.72:0.28);B.kHold={b};
+      const [x,y]=wpt(b,a,stemC(b,a,true));return {x,y:clamp(y,BOX.y+18,BOX.y+BOX.h-26)};}}
   if(p.id==='root'){const b=B.bullets.find(q=>q.k==='kudzuSlam'&&q.last&&q.x!=null);
     if(b){B.kHold={b};return {x:b.x,y:clamp(b.y-10,BOX.y+18,BOX.y+BOX.h-18)};}}
   if(p.core){const puffs=B.bullets.filter(q=>q.k==='kudzuScent'&&q.x!=null);let x,y;
@@ -438,7 +453,7 @@ function kudzuMarkHit(p,m){
   const h=B.kHold;B.kHold=null;if(!h||(p.id!=='arm'&&p.id!=='root'))return;
   const b=h.b,arm=p.id==='arm',tool=battleTool();
   if(!tool){if(!p.broken)B.msg=arm?'칡줄기를 쳤다. 맨손으로는 질긴 줄기를 못 끊는다.':'칡뿌리를 쳤다. 맨손으로는 박힌 뿌리를 못 캔다.';return;}
-  if(arm){b.cut=true;b.cutT=b.t;b.cutX=m.x;bSplash(m.x,m.y,'#3a3a2a');}
+  if(arm){b.cut=true;b.cutT=b.t;b.cutA=wv(b)?m.y:m.x;bSplash(m.x,m.y,'#3a3a2a');}
   else{b.dug=true;bSplash(m.x,m.y+6,'#8a6a4a');}
   if(p.broken)return;   // 부위가 부러지면 재료는 breakPart 가 준다
   const by=jo(toolName(tool),'으로','로')+' ',fit=toolFit(p,tool)==='bad'?' 도구가 잘 안 먹는다.':'';
@@ -466,46 +481,53 @@ function scentHit(){
 }
 defineAttacks({
   kudzuWhip:{dur:2*WHIP.gap+WHIP.tell+WHIP.swing,tick(t){if(t)return;B.kHold=null;
-    const first=Math.random()<0.5?0.25:0.75,side=Math.random()<0.5?-1:1;
-    for(let i=0;i<3;i++)B.bullets.push({k:'kudzuWhip',t:0,delay:i*WHIP.gap,v:i===2?null:i?1-first:first,last:i===2,side:i%2?-side:side,seed:i*1.7});}},
+    // 결정 D-246: 모두 가로 → 모두 세로 → 섞어서 를 차례로 돈다. 처음 차례는 무작위
+    B.kWhipN=(B.kWhipN??Math.floor(Math.random()*3))+1;const pat=B.kWhipN%3;
+    const os=pat===0?['h','h','h']:pat===1?['v','v','v']:Math.random()<0.5?['h','v',Math.random()<0.5?'h':'v']:['v','h',Math.random()<0.5?'h':'v'];
+    const side=Math.random()<0.5?-1:1,firstH=Math.random()<0.5?0.25:0.75,firstV=Math.random()<0.5?0.2:0.8;
+    const band=(o,i)=>o==='h'?(i?1-firstH:firstH):(i?(os[0]==='v'?1-firstV:0.5):firstV);
+    for(let i=0;i<3;i++)B.bullets.push({k:'kudzuWhip',o:os[i],t:0,delay:i*WHIP.gap,v:i===2?null:band(os[i],i),last:i===2,side:i%2?-side:side,seed:i*1.7});}},
   kudzuSlam:{get dur(){return (slamCount()-1)*SLAM.gap+SLAM.tell+SLAM.drop+10;},tick(t){if(t)return;B.kHold=null;
-    const n=slamCount();B.slamRound=n;
-    for(let i=0;i<n;i++)B.bullets.push({k:'kudzuSlam',t:0,delay:i*SLAM.gap,x:null,y:null,last:i===n-1});}},
+    const n=slamCount();B.slamRound=n;const lean=Math.random()<0.5?-1:1;
+    // 결정 D-246: 뿌리가 내리찍는 기울기가 한 대마다 왼쪽·오른쪽 위로 번갈아 바뀐다
+    for(let i=0;i<n;i++)B.bullets.push({k:'kudzuSlam',t:0,delay:i*SLAM.gap,x:null,y:null,last:i===n-1,lean:i%2?-lean:lean});}},
   kudzuScent:{dur:2*SCENT.gap+SCENT.tell+SCENT.burst,tick(t){if(t)return;B.kHold=null;
-    const side=Math.random()<0.5?-1:1;for(let i=0;i<3;i++)B.bullets.push({k:'kudzuScent',t:0,delay:i*SCENT.gap,i,side,seed:i*2.3+side,x:null,y:null});}},
+    // 결정 D-246: 둘째·셋째 꽃은 양옆이나 위아래에 번갈아 핀다
+    const side=Math.random()<0.5?-1:1,axis=altDir('kScent')?'v':'h';for(let i=0;i<3;i++)B.bullets.push({k:'kudzuScent',t:0,delay:i*SCENT.gap,i,side,axis,seed:i*2.3+side,x:null,y:null});}},
 });
 defineBullets({
   kudzuWhip:{
     step(b){const held=b.last&&!b.cut&&heldBy(b);b.t++;const s=whipState(b);
       if(held&&b.t>s.lp)b.t=s.lp;   // 표식이 열린 동안 늘어진 채로 둔다
-      if(b.v==null&&b.t>b.delay)b.v=(B.py-BOX.y)/BOX.h<0.5?0.25:0.75;   // 마지막 채찍은 예고가 시작될 때 손이 있던 띠
-      if(s.swing){const x=whipTipX(b,s.k),y=BOX.y+b.v*BOX.h;
-        if(Math.abs(B.py-y)<WHIP.half*BOX.h&&(b.side<0?B.px<=x:B.px>=x))bHitMe();}
+      if(b.v==null&&b.t>b.delay)b.v=handBand(b.o);   // 마지막 채찍은 예고가 시작될 때 손이 있던 띠
+      if(s.swing){const tip=whipTip(b,s.k),cr=whipCross(b),hc=wv(b)?B.px:B.py,ha=wv(b)?B.py:B.px;
+        if(Math.abs(hc-cr)<whipHalf()&&(b.side<0?ha<=tip:ha>=tip))bHitMe();}
       if(b.t>s.end)b.dead=1;},
     draw(c,b){const s=whipState(b);if(s.wait)return;
-      const yc=BOX.y+(b.v==null?(B.py-BOX.y)/BOX.h<0.5?0.25:0.75:b.v)*BOX.h,half=WHIP.half*BOX.h,from=b.side<0?BOX.x-14:BOX.x+BOX.w+14;
+      const v=wv(b),cc=whipCross(b,b.v==null?handBand(b.o):b.v),half=whipHalf(),from=whipFrom(b),P=(a,cr)=>wpt(b,a,cr);
       if(s.tell){const k=(b.t-b.delay)/WHIP.tell,flash=k>0.72&&Math.floor(b.t/4)%2;
-        c.save();c.fillStyle='rgba(180,67,42,'+(0.05+0.13*k).toFixed(3)+')';c.fillRect(BOX.x,yc-half,BOX.w,half*2);
+        c.save();c.fillStyle='rgba(180,67,42,'+(0.05+0.13*k).toFixed(3)+')';
+        if(v)c.fillRect(cc-half,BOX.y,half*2,BOX.h);else c.fillRect(BOX.x,cc-half,BOX.w,half*2);
         c.strokeStyle=RED;c.globalAlpha=flash?0.95:0.45;c.lineWidth=1.6;c.setLineDash([7,5]);
-        c.beginPath();c.moveTo(BOX.x,yc-half);c.lineTo(BOX.x+BOX.w,yc-half);c.moveTo(BOX.x,yc+half);c.lineTo(BOX.x+BOX.w,yc+half);c.stroke();c.restore();
+        const a0=whipA0(b),a1=a0+whipL(b);c.beginPath();
+        for(const e of [-half,half]){const p=P(a0,cc+e),q=P(a1,cc+e);c.moveTo(p[0],p[1]);c.lineTo(q[0],q[1]);}c.stroke();c.restore();
         // 띠 끝에서 줄기 끝이 뒤로 감긴다
-        const ex=b.side<0?BOX.x+6:BOX.x+BOX.w-6,d=-b.side;
-        kStem(c,[[ex-d*12,yc+10],[ex+d*4,yc+2],[ex+d*8,yc-10],[ex,yc-14],[ex-d*4,yc-6]],5,KSTEM,0.4+0.5*k);return;}
-      if(s.swing){const x=whipTipX(b,s.k);
-        for(let j=-2;j<=2;j++)brush(c,[[from,yc+j*half*0.4],[x,yc+j*half*0.3]],2,INK,0.12);   // 후려치는 바람
-        const pts=whipPts(b,from,x);kStem(c,pts,8,KSTEM,1);
-        for(let i=2;i<pts.length-1;i+=3)kLeaf(c,pts[i][0],pts[i][1]-3,0.6,b.side<0?0.5:-0.5,KLEAF,0.85);
-        brush(c,[[x,whipY(b,x)],[x-b.side*8,whipY(b,x)-7],[x-b.side*3,whipY(b,x)-11]],3,KSTEM);return;}
-      const back=s.back;
-      if(!b.cut){const tip=b.side<0?from+(BOX.x+BOX.w+14-from)*(1-back):from-(from-BOX.x+14)*(1-back);
+        const ex=b.side<0?a0+6:a1-6,d=-b.side;
+        kStem(c,[P(ex-d*12,cc+10),P(ex+d*4,cc+2),P(ex+d*8,cc-10),P(ex,cc-14),P(ex-d*4,cc-6)],5,KSTEM,0.4+0.5*k);return;}
+      if(s.swing){const tip=whipTip(b,s.k);
+        for(let j=-2;j<=2;j++)brush(c,[P(from,cc+j*half*0.4),P(tip,cc+j*half*0.3)],2,INK,0.12);   // 후려치는 바람
+        const pts=whipPts(b,from,tip);kStem(c,pts,8,KSTEM,1);
+        for(let i=2;i<pts.length-1;i+=3)kLeaf(c,pts[i][0]-(v?3:0),pts[i][1]-(v?0:3),0.6,(b.side<0?0.5:-0.5)+(v?-Math.PI/2:0),KLEAF,0.85);
+        const tc=whipC(b,tip);brush(c,[P(tip,tc),P(tip-b.side*8,tc-7),P(tip-b.side*3,tc-11)],3,KSTEM);return;}
+      const back=s.back,far=b.side<0?whipA0(b)+whipL(b)+14:whipA0(b)-14;
+      if(!b.cut){const tip=from+(far-from)*(1-back);
         const pts=whipPts(b,from,tip);kStem(c,pts,7,KSTEM,s.limp?0.9:0.7*(1-back));
-        if(s.limp)for(let i=2;i<pts.length-1;i+=3)kLeaf(c,pts[i][0],pts[i][1]+2,0.6,b.side<0?2.6:-2.6,KLEAF,0.7);
+        if(s.limp)for(let i=2;i<pts.length-1;i+=3)kLeaf(c,pts[i][0]+(v?2:0),pts[i][1]+(v?0:2),0.6,(b.side<0?2.6:-2.6)+(v?-Math.PI/2:0),KLEAF,0.7);
         return;}
       // 끊긴 줄기: 뿌리 쪽은 거둬 가고, 끝 쪽은 떨어지며 흐려진다
-      const cut=b.cutX,tipSide=b.side<0?BOX.x+BOX.w+14:BOX.x-14;
-      const keep=b.side<0?from+(cut-from)*(1-back):from-(from-cut)*(1-back);
+      const cut=b.cutA,keep=from+(cut-from)*(1-back);
       kStem(c,whipPts(b,from,keep),7,KSTEM,0.85);
-      c.save();c.globalAlpha=1-s.fallK;c.translate(0,s.fallK*24);kStem(c,whipPts(b,cut,tipSide),6,KSTEM,0.8);c.restore();
+      c.save();c.globalAlpha=1-s.fallK;c.translate(0,s.fallK*24);kStem(c,whipPts(b,cut,far),6,KSTEM,0.8);c.restore();
     }},
   kudzuSlam:{
     step(b){const held=b.last&&!b.dug&&heldBy(b);b.t++;
@@ -518,7 +540,7 @@ defineBullets({
       if(f.shadow||f.falling){const k=f.shadow?(b.t-b.delay)/SLAM.tell:1;
         blob(c,b.x,b.y+6,R*(0.45+0.55*k),R*0.42*(0.45+0.55*k),INK,0.12+0.3*k);
         if(k>0.7&&Math.floor(b.t/4)%2){c.save();c.strokeStyle=RED;c.lineWidth=2;c.globalAlpha=0.8;c.beginPath();c.ellipse(b.x,b.y+6,R,R*0.42,0,0,Math.PI*2);c.stroke();c.restore();}}
-      const club=(y,alpha)=>{brush(c,[[b.x+12,BOX.y-40],[b.x+6,(BOX.y-40+y)/2],[b.x,y-38]],12,KROOT,alpha);kTuber(c,b.x,y-18,46,16,-Math.PI/2,KROOT,INK,alpha);};
+      const L=b.lean||0.3,club=(y,alpha)=>{brush(c,[[b.x+L*40,BOX.y-40],[b.x+L*20,(BOX.y-40+y)/2],[b.x,y-38]],12,KROOT,alpha);kTuber(c,b.x,y-18,46,16,-Math.PI/2+L*0.3,KROOT,INK,alpha);};
       if(f.falling){const k=(b.t-b.delay-SLAM.tell)/SLAM.drop;club(BOX.y-12+(b.y-BOX.y+12)*k,1);}
       if(f.after){const a=b.t-f.hit,lift=clamp((b.t-slamLiftAt(b))/16,0,1);
         if(b.last&&lift===0)blob(c,b.x,b.y+5,R*0.62,R*0.24,'#6f5a44',0.35);   // 박힌 자리의 흙
@@ -530,8 +552,11 @@ defineBullets({
     }},
   kudzuScent:{
     step(b){b.t++;
-      if(b.x==null&&b.t>b.delay){const o=b.i===0?0:(b.i===1?1:-1)*b.side*80,m=SCENT.radius;
-        b.x=clamp(B.px+o,BOX.x+m,BOX.x+BOX.w-m);b.y=clamp(B.py+(b.i===2?14:b.i?-10:0),BOX.y+m*0.7,BOX.y+BOX.h-m*0.7);}
+      if(b.x==null&&b.t>b.delay){const o=b.i===0?0:(b.i===1?1:-1)*b.side,m=SCENT.radius;
+        if(b.axis==='v'){b.x=clamp(B.px+(b.i===2?14:b.i?-10:0),BOX.x+m,BOX.x+BOX.w-m);
+          // 위아래로 피면 상자 안에 들도록, 손이 가장자리에 붙어 있으면 반대쪽으로 더 멀리 민다
+          let y=B.py+o*58;if(y<BOX.y+m*0.7||y>BOX.y+BOX.h-m*0.7)y=B.py-o*58;b.y=clamp(y,BOX.y+m*0.7,BOX.y+BOX.h-m*0.7);}
+        else{b.x=clamp(B.px+o*80,BOX.x+m,BOX.x+BOX.w-m);b.y=clamp(B.py+(b.i===2?14:b.i?-10:0),BOX.y+m*0.7,BOX.y+BOX.h-m*0.7);}}
       const s=scentAt(b);
       if(b.x!=null){const d=Math.hypot(b.x-B.px,b.y-B.py);
         if(s.burst&&d<SCENT.radius*(1-(1-s.k)*(1-s.k)))scentHit();          // 꽃가루가 번지는 동안

@@ -22,11 +22,14 @@ const Rg=defineRegion('dolneomeo',{
       '까치가 두꺼비 할멈의 말을 전했다. 다음 약은 큰 장터의 눈홍시다. 길손이 모이는 장터라면, “되돌림”을 듣고 떠난 아빠를 본 이도 있을지 모른다.']}},
   },
   newState:()=>({
+    // 결정 D-265: 메밀 이삭이 45px 간격으로 셋씩 늘어서지 않게 몰렸다 비었다 한다 (field.js 옛 구성 변환 표도 같은 자리)
     pickups:[
-      ...[900,945,990,1240,1290,1335].map(x=>({x,y:GROUND,item:'memil',got:false})),
+      ...[886,941,1003,1229,1262,1341].map(x=>({x,y:GROUND,item:'memil',got:false})),
       {x:670,y:118,item:'gyeousari',got:false},{x:1412,y:118,item:'gyeousari',got:false},
     ],
-    digs:[{x:470,item:'eoksae',done:false},{x:560,item:'eoksae',done:false},{x:760,item:'eoksae',done:false},{x:1030,item:'eoksae',done:false}],
+    // 옛 구성에만 돌담 밑 눈 둔덕 하나를 더한다 (결정 D-266). 확장판은 구역 선언의 눈 둔덕을 쓴다.
+    digs:[{x:470,item:'eoksae',done:false},{x:560,item:'eoksae',done:false},{x:760,item:'eoksae',done:false},{x:1030,item:'eoksae',done:false},
+      ...(CLASSIC?[{id:'dol_cl_mound_0',x:205,item:'memil',gather:'snow_mound',found:'돌담 밑에 쌓아 두고 잊은 메밀 단이 눈에 덮여 있었다. 이삭이 아직 붙어 있다.',done:false}]:[])],
     boss:{x:1990,dead:false},
     f:{kkuTalk:false,kkuAwake:false,kkuDone:false,ppuriMet:false,ppuriPassed:false,nalDTalk:false,nalDDone:false,nalDBluff:false,
       dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false},
@@ -88,12 +91,19 @@ defineIcons({
   gudeuldol:P=>{P(2,8,12,5,'#5b5048');P(3,7,10,1,'#7d7066');P(2,12,12,1,'#3e352f');P(4,8,4,1,'#f3f5f4');P(10,9,2,1,'#3e352f');},
   chadol:P=>{P(4,5,8,8,'#d2cdc3');P(3,7,10,5,'#d2cdc3');P(5,4,5,1,'#e6e2da');P(4,8,7,1,'#fbfaf6');P(8,10,4,1,'#fbfaf6');P(9,6,3,5,'#a39d92');P(4,12,8,1,'#8c867b');},
   okdol:P=>{P(5,4,6,9,'#5f9a7a');P(4,6,8,5,'#5f9a7a');P(6,5,3,2,'#a6d8ba');P(5,7,1,2,'#a6d8ba');P(9,9,2,3,'#3f7a5c');P(5,13,6,1,'#2f5a44');},
+  // 결정 D-276: 돌너머 보상 물건. 접은 메밀전, 공깃돌 다섯 알, 곱돌 잔
+  memil_jeon:P=>{P(2,7,12,6,'#c9a565');P(3,6,10,1,'#dcbc80');P(2,12,12,1,'#9a7a44');P(4,8,2,1,'#6f9a4a');P(9,9,2,1,'#6f9a4a');P(6,10,2,1,'#8a6a3a');P(11,7,1,1,'#efd9a6');},
+  gongi:P=>{for(const [x,y,c] of [[3,9,'#b8b2a8'],[7,10,'#a39d92'],[11,9,'#c8c2b8'],[5,6,'#a39d92'],[9,6,'#b8b2a8']]){P(x,y,3,3,c);P(x,y,1,1,'#e6e2da');}P(3,13,11,1,'#7d776c');},
+  gopdol_jan:P=>{P(3,6,10,2,'#6e6a64');P(4,8,8,4,'#7d7972');P(5,12,6,2,'#5d5a55');P(4,6,8,1,'#3e3b38');P(5,9,2,2,'#9a958d');P(6,14,4,1,'#4a4743');},
 });
 
 /* 채집 (낫으로 억새 베기, 절벽의 석이버섯 떼기) */
 defineGather({
   eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],box:[-10,-26,12,0],rare:'eoksae_som',hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 단이 더 베인다.'},
   seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-7],box:[-9,-12,9,0],rare:'seokcheong',hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 장이 더 떨어진다.'},
+  // 결정 D-266: 그늘에 녹지 않은 첫눈이 도톰하게 솟은 둔덕. 걷어 내면 눈에 덮였던 것이 나온다(자리마다 다르다. field.js 의 found 글)
+  snow_mound:{title:'눈 둔덕 파기',verb:'눈 둔덕 파헤치기',hits:TABLES.MINIGAMES.gather_snow_mound_hits,spot:[0,-6],box:[-12,-11,12,0],scatter:null,dirt:'#f4f8f9',
+    hint:'눈이 유난히 도톰하게 솟았다. 밑에 무언가 묻혀 있는 모양이다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 움큼 더 나온다.'},
 });
 
 /* 증조할아버지의 맷돌: 돌쇠 할배의 돌 쌓기를 통과하면 깨어난다. 가공법은 heirlooms.csv */

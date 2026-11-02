@@ -66,9 +66,13 @@ Rg.drawScenery=()=>{const x=TREE_X-cam;if(x<-120||x>W+120)return;
     if(Math.floor(G.anim/8)%2)R(dx-5,d.y-12,1,1,'#fff3b0');}
 };
 
-/* 도토리 */
+/* 도토리 · 밤 · 칡 줄기 */
 Rg.drawPickup=(a,x,bob)=>{
   if(Rg.arcCache(a)){R(x-5,a.y-3,11,3,'#7a4b2a');R(x-7,a.y-12,3,1,'#fff3b0');R(x+5,a.y-12,3,1,'#fff3b0');}
+  // 결정 D-265: 벌어진 밤송이 곁에 굴러 나온 알밤
+  if(a.item==='bam'){R(x-7,a.y-3,5,3,'#7d8a3c');R(x-8,a.y-4,1,1,'#a9b552');R(x-5,a.y-5,1,1,'#a9b552');R(x-3,a.y-4,1,1,'#a9b552');R(x-6,a.y-2,2,1,'#c9a86a');
+    R(x-1,a.y-6+bob,5,5,'#7a4321');R(x,a.y-7+bob,3,1,'#8d5129');R(x,a.y-5+bob,1,2,'#b0703f');R(x-1,a.y-2+bob,5,1,'#e2c79a');return;}
+  if(a.item==='vine'){R(x-6,a.y-3,12,2,'#4f8a35');R(x-4,a.y-5,4,2,'#3f6b2a');R(x+2,a.y-6+bob,3,2,'#7fb069');R(x-7,a.y-2,2,1,'#3f6b2a');return;}
   R(x-2,a.y-7+bob,5,2,'#6b4423');R(x-2,a.y-5+bob,5,4,'#c9894a');R(x,a.y-8+bob,1,1,'#4a2e1a');};
 
 /* ---------- 칡덩굴 장애물, 덩굴 몹, 엉킨 칡 ---------- */
@@ -304,6 +308,22 @@ if(!CLASSIC){
     },
   };
   installTravel();
+  /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 단풍 든 참나무·밤나무 아래 도토리와 밤, 무른 흙의 칡뿌리, 늪가 버섯.
+     구역마다 200px 안팎에 하나꼴로, 몇 개는 붙여 두고 사이는 들쭉날쭉하게 비운다. 좌표는 길을 줄인 뒤의 자리.
+     언덕은 엉킨 칡 앞(KUDZU_AT)에 하나, 칡을 푼 뒤 오르는 바위턱에 하나만 둔다. */
+  addZoneGather(Rg,'gal_g_',[
+    ['village','p',168,'bam'],['village','p',372,'acorn'],['village','p',701,'bam',{y:118}],['village','p',1205,'acorn'],
+    ['village','p',1336,'bam',{y:152}],['village','d',1560,'root'],['village','p',1618,'acorn'],
+    ['forge','p',128,'bam'],['forge','p',545,'acorn',{y:113}],['forge','p',700,'bam'],['forge','p',1140,'acorn'],
+    ['forge','p',1390,'bam'],['forge','p',1785,'acorn',{y:112}],['forge','p',1846,'bam'],
+    ['forest','p',158,'bam'],['forest','p',1165,'acorn',{y:138}],['forest','d',1360,'root'],['forest','p',1500,'bam'],
+    ['forest','p',1895,'acorn',{y:136}],['forest','p',2080,'bam'],
+    ['marsh','p',140,'acorn'],['marsh','d',250,'root'],['marsh','p',548,'acorn',{y:138}],['marsh','p',735,'acorn',{y:164}],
+    ['marsh','p',1115,'acorn',{y:134}],['marsh','d',1310,'ssari'],['marsh','d',1690,'root'],['marsh','p',1900,'acorn',{y:136}],['marsh','p',2290,'bam'],
+    ['hill','p',410,'acorn'],['hill','p',868,'bam',{y:116}],['hill','p',1522,'bam',{y:150}],
+    // 몰린 자리 (간격이 고르지 않게)
+    ['marsh','p',172,'acorn'],['marsh','p',2322,'bam'],
+  ]);
 
   /* 공통 엔진을 덮어쓰지 않는 지역 연출. 구역 문에서 출발하고 같은 문 API로 도착한다.
      이동 중 저장은 일반 미니게임과 똑같이 막힌다. 중단하면 출발한 안전한 바닥으로 돌아온다. */

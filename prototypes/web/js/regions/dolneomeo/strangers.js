@@ -20,7 +20,7 @@ Rg.strangers={
     talk(form){
       if(form==='goat'&&once('dol_ppuri_kin'))return say([
         [Rg.npcs.find(n=>n.id==='ppuri').name,'고개 넘는 산양이로군.\n산양끼리는 먹을 데를 나눈다.'],
-        [Rg.npcs.find(n=>n.id==='ppuri').name,'절벽 아래 바위에서 뗀 석이다.\n하나 가져가라.']],()=>{addItem('seogi',1);diary('dol_ppuri_kin','산양 모습으로 뿔영감에게 가니 산양끼리 먹을 데를 나눈다며 석이버섯을 줬다.');});
+        [Rg.npcs.find(n=>n.id==='ppuri').name,'절벽 아래 바위에서 뗀 석이다.\n하나 가져가라.'],receiveItem('seogi',1)],()=>{diary('dol_ppuri_kin','산양 모습으로 뿔영감에게 가니 산양끼리 먹을 데를 나눈다며 석이버섯을 줬다.');});
       return false;
     }},
   kkubeogi:{
@@ -29,9 +29,9 @@ Rg.strangers={
     talk(form){
       if(form==='owl')return say([['너구리','(꾸벅이가 가시를 세우고 동그랗게 몸을 만다.)']]);
       if(form==='deer'&&once('dol_kkubeogi_deer'))return say([
-        ['꾸벅이','고라니구나… 너는 안 찌를게…\n둥지 짓다 남은 거 가져가…'],
+        ['꾸벅이','고라니구나… 너는 안 찌를게…\n둥지 짓다 남은 거 가져가…'],receiveItem('eoksae',1),
         ['꾸벅이','근데 그 족제비 있잖아…\n너구리 꼬마보다 하루 먼저 왔더라…'],
-        ['꾸벅이','쿨…']],()=>{addItem('eoksae',1);diary('dol_kkubeogi_deer','고라니 모습으로 가니 꾸벅이가 경계를 풀었다. 꾸벅이가 날쌘이 나보다 하루 먼저 마을에 왔다고 했다.');});
+        ['꾸벅이','쿨…']],()=>{diary('dol_kkubeogi_deer','고라니 모습으로 가니 꾸벅이가 경계를 풀었다. 꾸벅이가 날쌘이 나보다 하루 먼저 마을에 왔다고 했다.');});
       return false;
     }},
   nal:{
