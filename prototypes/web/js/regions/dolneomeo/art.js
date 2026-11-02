@@ -67,7 +67,39 @@ function pine(x,y,s=1,palette=P){x=Math.round(x);y=Math.round(y);const q=(a,b,w,
 }
 function stone(x,y,w,h,seed=0,frost=true){const c=seed%2?P.stone:'#748282';px(x+2,y-h,w-4,1,P.light);px(x,y-h+2,w,h-2,c);px(x+1,y-h,w-2,3,c);px(x+2,y-h+1,w-4,1,frost?P.frost:P.light);px(x+2,y-2,w-4,2,'#626f70');if(w>10){px(x+w-5,y-h+4,1,3,'#5b696a');px(x+4,y-h+3,2,1,'#a2b0ac');}}
 function cairn(x,y,height=22,seed=0,frost=true){const count=Math.max(3,Math.floor(height/5));for(let j=0;j<count;j++){const w=Math.max(3,Math.round((count-j)*3.5)),h=j===count-1?4:5;stone(x-w/2+(j%2),y-j*5,w,h,seed+j,frost);}if(seed%7===0)px(x-1,y-height+3,1,3,'#9d5d48');}
-function gatePost(x,y,tall=false){const h=tall?54:47;px(x-5,y-h,11,h,'#796d58');px(x-6,y-h-4,13,5,'#4b4e46');px(x-5,y-h-4,12,1,P.frost);px(x-3,y-h+8,2,3,'#293736');px(x+2,y-h+8,2,3,'#293736');px(x-2,y-h+16,5,1,'#293736');px(x-3,y-h+15,1,2,'#293736');px(x+3,y-h+15,1,2,'#293736');px(x-1,y-h+24,3,14,'#5e5b4b');px(x-4,y-h,9,2,'#a2765e');}
+/* 결정 D-263: 장승 둘은 실제 장승처럼 다르게 깎는다 (사용자 피드백 2026-11-02: 두 장승이 너무 같은 그림이다).
+   - 천하대장군(tall, 왼쪽): 키가 크고 검은 사모를 쓴다. 굵게 치켜 올린 눈썹, 부릅뜬 왕방울 눈, 큰 코, 이를 드러낸 입과 송곳니, 턱수염. 붉은 칠이 바랜 짙은 나무.
+   - 지하여장군(오른쪽): 작고 갓 없이 둥근 머리에 가르마 탄 검은 머리. 가는 눈썹, 내리감은 순한 눈, 작은 코와 다문 입, 볼에 연지. 밝은 나무.
+   - 몸통 글씨(세로 다섯 자·넷 자)와 나뭇결·갈라진 틈 자리도 서로 다르다. (x,y)는 발치 가운데. */
+function gatePost(x,y,tall=false){
+  const K='#26201b',Wt='#eee5cc';
+  if(tall){
+    const h=56;
+    px(x-5,y-h,11,h,'#6f5f4b');px(x-5,y-h,1,h,'#5c4e3e');px(x+5,y-h+22,1,h-22,'#857257');            // 몸통과 그늘
+    px(x-3,y-h+24,1,22,'#5e503f');px(x+3,y-h+30,1,18,'#5e503f');px(x+2,y-h+44,2,1,'#4a3f33');           // 나뭇결·갈라진 틈
+    px(x-5,y-h,11,21,'#94583f');px(x-5,y-h+19,11,2,'#7a4a36');                                        // 바랜 붉은 얼굴
+    px(x-4,y-h-7,9,6,'#2b2925');px(x-6,y-h-2,13,2,'#2b2925');px(x-9,y-h-5,3,2,'#2b2925');px(x+7,y-h-5,3,2,'#2b2925');   // 사모와 양 날개
+    px(x-4,y-h-7,9,1,P.frost);px(x-6,y-h-2,13,1,'#4a4740');
+    px(x-5,y-h+3,3,1,K);px(x-3,y-h+4,2,1,K);px(x+3,y-h+3,3,1,K);px(x+2,y-h+4,2,1,K);                     // 치켜 올린 눈썹
+    px(x-4,y-h+6,3,3,Wt);px(x+2,y-h+6,3,3,Wt);px(x-3,y-h+7,1,1,K);px(x+3,y-h+7,1,1,K);                  // 부릅뜬 눈
+    px(x-1,y-h+9,3,4,'#7a4532');px(x-1,y-h+12,1,1,K);px(x+1,y-h+12,1,1,K);                              // 큰 코
+    px(x-4,y-h+14,9,3,K);px(x-3,y-h+14,7,1,Wt);px(x-3,y-h+15,1,2,Wt);px(x+3,y-h+15,1,2,Wt);            // 이와 송곳니
+    px(x-3,y-h+18,1,3,'#3d322a');px(x-1,y-h+18,1,4,'#3d322a');px(x+1,y-h+18,1,4,'#3d322a');px(x+3,y-h+18,1,3,'#3d322a');   // 턱수염
+    for(let i=0;i<5;i++){const yy=y-h+24+i*6;px(x-1,yy,3,1,K);px(x,yy-1+(i%2),1,3,K);if(i%2)px(x-1,yy+2,1,1,K);else px(x+1,yy+2,1,1,K);}   // 天下大將軍
+  }else{
+    const h=46;
+    px(x-5,y-h,10,h,'#958467');px(x+4,y-h,1,h,'#7f7057');px(x-4,y-h-2,8,2,'#958467');px(x-3,y-h-3,6,1,'#958467');   // 둥근 머리 몸통
+    px(x-2,y-h+22,1,18,'#83745b');px(x+2,y-h+18,1,14,'#83745b');                                        // 나뭇결
+    px(x-4,y-h-3,8,4,'#2f2924');px(x-3,y-h-3,6,1,P.frost);px(x,y-h-2,1,3,'#958467');                    // 가르마 탄 검은 머리
+    px(x-4,y-h+4,3,1,'#4a3c30');px(x+1,y-h+4,3,1,'#4a3c30');                                            // 가는 눈썹
+    px(x-4,y-h+6,3,1,K);px(x+1,y-h+6,3,1,K);px(x-3,y-h+7,1,1,'#6e5f4a');px(x+2,y-h+7,1,1,'#6e5f4a');     // 내리감은 눈
+    px(x-1,y-h+8,1,3,'#76664f');                                                                       // 작은 코
+    px(x-4,y-h+9,2,2,'#b4513a');px(x+2,y-h+9,2,2,'#b4513a');                                            // 연지
+    px(x-2,y-h+12,3,1,'#7a3326');                                                                      // 다문 입
+    for(let i=0;i<4;i++){const yy=y-h+19+i*6;px(x-2,yy,3,1,K);px(x-1,yy+1,1,2,K);if(i===1||i===3)px(x-2,yy+2,1,1,K);}   // 地下女將軍
+  }
+  px(x-6,y-2,13,2,'#5d6660');px(x-4,y-3,3,1,P.frost);                                                  // 발치에 괸 돌
+}
 /* 결정 D-166: 장승이 비켜 설 때는 발치를 축으로 바깥쪽으로 기운다 (open 0~1) */
 function leanPost(x,y,tall,angle){if(!angle){gatePost(x,y,tall);return;}ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(angle);gatePost(0,0,tall);ctx.restore();}
 const OPEN_PX=14,OPEN_LEAN=.14;
@@ -93,7 +125,7 @@ function scenery(zone,fixtures={}){const sx=x=>Math.round(tx(x)-cam);const visib
   for(let x=80;x<3100;x+=122){if(!visible(x))continue;const y=GROUND-2;stone(sx(x),y,15+(x%3)*3,7,Math.floor(x/122));if(x%244===80){px(sx(x+23),y-5,1,5,'#b8bea1');px(sx(x+21),y-8,5,2,'#c8cbb5');}}
   if(zone==='gate'){
     const gx=fixtures.gateX??1650;gatePair(sx(gx),GROUND,Rg.depthOpen?.('dol_depth_gate')||0);
-    const pole=sx(gx);if(!G.f.ppuriPassed){px(pole-19,GROUND-35,38,1,'#d5c59d');for(let i=0;i<5;i++)px(pole-16+i*8,GROUND-34,2,5,i%2?'#f0e8ce':'#9d5d48');}
+    const pole=sx(gx);if(!G.f.ppuriPassed)keumjul(pole,GROUND-36,19);   // 결정 D-264: 장승 둘 사이에 금줄만
     for(const x of [180,820,1300,1930,2380])if(visible(x))pine(sx(x),GROUND,.92+hash(x)*.43);
     if(visible(1020))wall(sx(980),GROUND-3,75);
     if(visible(940)){const x=sx(925);stone(x-12,GROUND,24,9,0);px(x-5,GROUND-16,12,6,'#a89c79');px(x-6,GROUND-12,14,1,'#d0c29c');px(x-3,GROUND-16,1,10,'#685f47');}
@@ -138,10 +170,20 @@ function shrineSky(){wash([[0,'#6b8796'],[66,'#a4b7b9'],[142,'#c7d1c5'],[225,'#d
 function shrineFar(){for(let row=0;row<3;row++)for(let i=0;i<26;i++){const seed=i+row*31,x=mod(i*20+row*9+Math.floor(hash(seed+2)*7)-cam,520)-30,y=124+row*13+Math.floor(hash(seed)*7);const height=7+(i*3+row)%8;for(let j=0;j<height;j+=3){const w=Math.max(2,8-Math.floor(j/3)*2);px(x-w/2,y-j,w,3,row===0?'#94a8a9':'#8da29f');px(x-w/2,y-j,w,1,'#b9c7bd');}}}
 function shrineMid(){for(let row=0;row<3;row++)for(let i=0;i<16;i++){const seed=i+row*17,x=mod(i*37+row*17+Math.floor(hash(seed+7)*13)-cam,592)-42,y=155+row*16+Math.floor(hash(seed)*9);cairn(x,y,12+(i*7+row*3)%19,i+row*16);}const x=mod(192-cam,580);px(x-1,95,2,36,'#c5c6a8');px(x-22,109,43,1,'#c6c4a1');for(let i=0;i<5;i++){const xx=x-19+i*9;px(xx,110,2,12+i%2*4,i%2?'#d5d8c4':'#a47f6b');px(xx+1,119+i%2*4,3,2,'#d5d8c4');}for(let i=0;i<4;i++){const xx=mod(60+i*99-RC()*.6,480)-40,yy=137+i*11;px(xx,yy,31,1,'#dce3d5');px(xx+33,yy-1,9,1,'#dce3d5');}}
 function shrineNear(){px(0,205,W,20,'#526763');for(let x=-20;x<W+35;x+=24){const xx=x-mod(cam,24);stone(xx,213,23,10,Math.floor((x+cam)/24));}for(let i=0;i<8;i++){const x=mod(i*59-cam,472)-30;cairn(x,211,20+(i*7)%20,i+80);}const tree=340-mod(RC()*.11,35);pine(tree,203,2.9);px(tree-10,191,22,3,'#7f9080');px(tree-18,196,39,3,'#6a8074');const x=52-mod(RC()*.1,25);cairn(x,213,37,3);px(x-2,174,4,1,'#f1edcf');for(let i=0;i<11;i++)px(mod(17+i*43-cam,440)-20,81+i%4*14,1,1,'#dbe7df');}
-function drawBlocked(x,y){px(x-15,y-38,3,38,'#7a7058');px(x+12,y-38,3,38,'#7a7058');px(x-16,y-34,32,3,'#b19b70');px(x-13,y-25,26,2,'#cbb786');for(let i=0;i<5;i++)px(x-11+i*5,y-32,2,5,i%2?'#ece7cd':'#9d5d48');stone(x-11,y,22,8,0);}
+/* 결정 D-264: 막힌 길은 기둥·가로대 틀 없이 금줄로만 막는다 (검수: 기둥 둘에 가로대 둘, 윗대가 기둥 밖으로 뻗은 옛 틀이 일본 도리이처럼 보였다).
+   금줄은 왼새끼로 꼰 새끼줄이 가운데로 처지고, 사이사이 한지 오리와 솔가지를 끼운다. (x,y)는 줄 가운데 아래 땅, top은 묶은 높이, half는 반 길이. */
+function keumjul(x,top,half){
+  const sag=Math.max(2,Math.round(half/6)),yAt=i=>top+Math.round(sag*(1-(i/half)*(i/half)));
+  for(let i=-half;i<=half;i++){const yy=yAt(i);px(x+i,yy,1,2,(i+half)%3===0?'#9c8452':'#c9b27a');}   // 꼰 새끼줄
+  for(let i=-half+4,k=0;i<=half-4;i+=5,k++){const yy=yAt(i)+2;
+    if(k%2===0){px(x+i,yy,2,2,'#f3eedb');px(x+i+1,yy+2,2,2,'#f3eedb');px(x+i,yy+4,2,1,'#dcd5bd');}   // 한지 오리 (꺾어 접은 흰 종이)
+    else{px(x+i-1,yy,3,2,'#4f6b3a');px(x+i,yy+2,2,1,'#6d8a4c');}}                                          // 솔가지
+}
+/* 결정 D-264: 장승이 없는 막힌 길은 양쪽에 작은 돌무더기를 괴고 그 사이에 낮은 금줄을 맨다 */
+function drawBlocked(x,y){cairn(x-16,y,12,3);cairn(x+16,y,12,4);keumjul(x,y-11,15);}
 function drawDepthGate(x,y,spread=0,open=0){gatePair(x,y,open,24+spread);px(x-13,y-1,26,2,'#bdcbb9');px(x-9,y-5,18,1,'#a8bba7');px(x-5,y-8,10,1,'#8ca69b');}
 /* 결정 D-166: 금줄만. 장승 둘은 문 그림(drawDepthGate)이 늘 그린다 */
-function drawGateRope(x,y){px(x-21,y-36,42,1,'#d5c59d');for(let i=0;i<5;i++)px(x-17+i*8,y-35,2,5,i%2?'#f0e8ce':'#9d5d48');}
+function drawGateRope(x,y){keumjul(x,y-36,20);}   // 결정 D-264
 /* 결정 D-164: 고갯길 길섶의 소원 돌탑. 길손들이 하나씩 얹다 허리께에서 멈췄다. stage(0~3)는 아이가 얹은 돌 수.
    아이가 얹은 돌은 아직 서리가 앉지 않았다. 짐꾼이 괸 돌(hare)은 밑동 옆에 하나 더 붙는다. */
 const TOWER_ROWS=[[26,6],[22,6],[19,5],[15,5],[12,4]],TOWER_ADD=[[10,4],[8,3],[5,3]];

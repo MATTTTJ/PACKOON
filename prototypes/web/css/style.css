@@ -677,14 +677,19 @@ body.ending-scene .hud,body.ending-scene #pad,body.ending-scene #toast,body.endi
 .stage .peek{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18%;min-width:92px;max-width:170px;padding:4px;background:var(--hanji);border:3px solid var(--meok);border-radius:4px;box-shadow:3px 3px 0 rgba(0,0,0,.35);pointer-events:none;z-index:6}
 .stage .peek.scene{width:24%;max-width:230px}   /* 결정 D-152: 대사 속 장면 그림은 조금 크게 */
 .stage .peek canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
-.stage .peek.show{animation:peekIn .18s ease-out}
-@keyframes peekIn{from{opacity:0;transform:translate(-50%,-50%) scale(.85)}to{opacity:1;transform:translate(-50%,-50%)}}
-.stage .peek.out{opacity:0;transition:opacity .18s ease-in}
+/* 결정 D-261: 족자처럼 펼쳐지며 열리고 접히며 닫힌다. 길이는 tuning.csv peek_open_ms·peek_fade_ms (field.js showPeek가 변수로 넣는다) */
+.stage .peek{transform-origin:50% 50%}
+.stage .peek.show{animation:peekUnfold var(--peek-open,460ms) cubic-bezier(.22,.8,.3,1) both}
+.stage .peek.show canvas{animation:peekInk var(--peek-open,460ms) ease-out both}
+@keyframes peekUnfold{0%{opacity:0;transform:translate(-50%,-50%) scale(.05,.55) rotate(-2deg)}22%{opacity:1;transform:translate(-50%,-50%) scale(.05,1.03) rotate(-1.5deg)}70%{transform:translate(-50%,-50%) scale(1.04,1) rotate(.6deg)}86%{transform:translate(-50%,-50%) scale(.99,1) rotate(-.2deg)}100%{opacity:1;transform:translate(-50%,-50%)}}
+@keyframes peekInk{0%,48%{opacity:0;filter:blur(1.5px) sepia(.6)}100%{opacity:1;filter:none}}
+.stage .peek.out{animation:peekFold var(--peek-fold,240ms) ease-in both}
+@keyframes peekFold{0%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-50%) scale(.05,.92) rotate(1.5deg)}}
 /* 결정 D-53: 인물 이름표 */
 .npc-tags{position:absolute;inset:0;pointer-events:none;z-index:3}
 .npc-tag{position:absolute;transform:translate(-50%,-100%);font-family:var(--display);font-size:clamp(9px,1.15vw,12px);line-height:1.2;color:#fff6e0;white-space:nowrap;padding:0 4px;border-radius:3px;background:rgba(30,21,15,.55);text-shadow:0 1px 0 #1e150f,1px 0 0 #1e150f,-1px 0 0 #1e150f,0 -1px 0 #1e150f}
 .npc-tag.unknown{color:#e8d6b0;background:rgba(30,21,15,.35)}
-@media (prefers-reduced-motion:reduce){.stage .peek.show{animation:none}}
+@media (prefers-reduced-motion:reduce){.stage .peek.show,.stage .peek.show canvas,.stage .peek.out{animation:none}.stage .peek.out{opacity:0;transition:opacity .18s ease-in}}
 /* 잎사귀 변신 (forms.js): HUD 의 지금 모습, 휴대폰 잎사귀 버튼과 변신 고리 */
 .form-now{display:flex;align-items:center;gap:4px;color:var(--hanji);border-left:1px solid #4b3a2e;padding-left:8px;white-space:nowrap}
 .form-leaf{display:inline-block;width:.55em;height:.85em;background:#7fb04a;border-radius:0 80% 0 80%;transform:rotate(25deg)}
@@ -729,3 +734,39 @@ body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
 .dev-flags{max-height:240px;overflow:auto;margin:4px 0}
 .dev-flag{display:flex;gap:4px;align-items:center;padding:1px 0}.dev-flag code{flex:1;font-size:11px;overflow-wrap:anywhere}
 .dev-flag input:not([type=checkbox]){width:110px}.dev-panel .dev-x-btn{min-height:20px;padding:0 5px}
+/* 결정 D-260: 휴대폰 단추는 작게, 서로 멀리 (사용자 피드백 2026-11-02: 버튼이 너무 크고 다른 버튼과 가까워 누르기 어렵다).
+   - 누르는 칸은 44px 아래로 줄이지 않는다(자동 검사 mobile). 대신 그림 크기를 그 언저리로 줄이고 단추 사이를 넓힌다.
+   - 십자 단추는 서로 14px 띄우고, 점프·휘두르기는 왼손 십자와 떨어진 오른쪽 아래(엄지 자리)에 비스듬히 둔다.
+   - 터치 화면에서는 키보드 글자(I·N·M·V·J·K)를 숨긴다. 누를 수 없는 키라 단추만 넓힌다. */
+@media (pointer:coarse){
+  .chipbtn kbd,.bbtn kbd{display:none}
+  .pbtn{width:48px;height:48px;font-size:18px;box-shadow:0 3px 0 #0d0907}
+  .pbtn.atk{width:58px;height:58px;font-size:13px;padding:0;white-space:nowrap;letter-spacing:-.02em}
+  .pbtn.jump{width:50px;height:50px;font-size:13px}
+  .pbtn.talk{height:44px;border-radius:22px;padding:0 14px;font-size:13px;white-space:nowrap}
+  .pbtn.leaf{font-size:13px;white-space:nowrap}
+  .dpad,body.in-battle .dpad{gap:12px 14px}
+  .dpad .pbtn,body.in-battle .dpad .pbtn{width:48px;height:48px}
+  .acts{gap:10px 18px;align-items:end}
+  .acts .jump{margin-bottom:20px}
+  .hud-btns{gap:8px}
+  .hud-btns .chipbtn{font-size:13px;padding:2px 10px}
+  .pad-top .chipbtn{font-size:13px}
+}
+@media (pointer:coarse) and (orientation:portrait){
+  .pad-main{align-items:flex-end;padding:0 10px 22px}
+  .pad-top{gap:12px}
+}
+@media (pointer:coarse) and (orientation:landscape){
+  .pbtn{width:46px;height:46px;font-size:16px}
+  .pbtn.atk{width:52px;height:52px;font-size:13px}
+  .pbtn.jump{width:46px;height:46px;font-size:12px}
+  .pbtn.talk{height:44px;font-size:13px}
+  .dpad,body.in-battle .dpad{gap:8px 12px}
+  .dpad .pbtn,body.in-battle .dpad .pbtn{width:46px;height:46px}
+  .acts{gap:6px 14px}
+  .acts .jump{margin-bottom:14px}
+  .pad-main{padding:0 10px}
+  .hud-btns{max-width:62%}
+  .hud-btns .chipbtn{padding:2px 8px}
+}

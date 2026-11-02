@@ -1042,7 +1042,9 @@ function drawThing(kind,x,y){
   }else if(kind==='water'){
     R(x-14,y-2,28,2,'#a1c1ca');R(x-10,y-1,20,1,'#e0edf0');R(x-15,y-4,4,4,'#687b7f');R(x+12,y-5,4,5,'#687b7f');
   }else if(kind==='bell'){
-    R(x,y-23,1,14,'#77776a');R(x-3,y-10,7,6,'#9e9d83');R(x-4,y-5,9,2,'#cfbf8c');R(x,y-2,1,2,'#665b4e');
+    // 결정 D-261: 풍경은 바람에 흔들리고 추는 반대로 늦게 따라간다 (살펴보기 작은 창 안에서도)
+    const a=Vfx.reducedMotion?0:G.anim*.09,s=Math.round(Math.sin(a)*1.6),k=Math.round(Math.sin(a-1.1)*2.2);
+    R(x,y-23,1,13,'#77776a');R(x+Math.round(s/2),y-11,1,2,'#77776a');R(x-3+s,y-10,7,6,'#9e9d83');R(x-4+s,y-5,9,2,'#cfbf8c');R(x+s+k,y-2,1,2,'#665b4e');R(x+s+k,y,1,3,'#b9b08a');
   }else{
     R(x-10,y-6,20,6,'#747f7d');R(x-8,y-8,15,3,'#9da7a1');R(x-6,y-8,6,1,'#e2ece5');R(x+5,y-4,3,3,'#698470');
   }

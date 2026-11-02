@@ -43,11 +43,20 @@ function drawGround(){
 /* 돌담 */
 function drawWall(x0,x1){const a=Math.max(x0-cam,-10),b=Math.min(x1-cam,W+10);if(b<a)return;
   for(let x=a;x<b;x+=12){const wx=Math.floor(x+cam);const r=hash(wx);R(x,GROUND-14,11,7,r<0.5?'#8a8680':'#9a9690');R(x+5,GROUND-21,10,7,r<0.5?'#9a9690':'#8a8680');R(x,GROUND-15,11,1,'#eef2f4');R(x+5,GROUND-22,10,1,'#eef2f4');}}
-/* 장승: 둥근 눈에 웃는 입, 이마에 글씨 자리 */
-function jangseung(wx,tall){const x=wx-cam;if(x<-20||x>W+20)return;const h=tall?44:38;
-  R(x-4,GROUND-h,9,h,'#8a6a4a');R(x-5,GROUND-h-4,11,6,'#5a4030');R(x-3,GROUND-h+8,2,2,'#2b1d14');R(x+2,GROUND-h+8,2,2,'#2b1d14');
-  R(x-2,GROUND-h+14,5,1,'#2b1d14');R(x-3,GROUND-h+13,1,1,'#2b1d14');R(x+3,GROUND-h+13,1,1,'#2b1d14');
-  R(x-1,GROUND-h+20,3,12,'#6b4e36');R(x-4,GROUND-h-1,9,1,'#b4432a');}
+/* 결정 D-263: 장승 둘은 다르게 깎는다. tall은 천하대장군(사모·부릅뜬 눈·드러낸 이·붉은 얼굴), 아니면 지하여장군(검은 머리·순한 눈·연지) */
+function jangseung(wx,tall){const x=wx-cam;if(x<-20||x>W+20)return;const K='#2b1d14',Wt='#efe6cf';
+  if(tall){const h=46,t=GROUND-h;
+    R(x-4,t,9,h,'#7a5f44');R(x-4,t,9,18,'#9a5a40');R(x-2,t+22,1,20,'#674d37');R(x+2,t+26,1,16,'#674d37');
+    R(x-3,t-6,7,5,'#2b2925');R(x-5,t-2,11,2,'#2b2925');R(x-7,t-5,2,2,'#2b2925');R(x+5,t-5,2,2,'#2b2925');
+    R(x-4,t+3,3,1,K);R(x+2,t+3,3,1,K);R(x-3,t+5,3,3,Wt);R(x+1,t+5,3,3,Wt);R(x-2,t+6,1,1,K);R(x+2,t+6,1,1,K);
+    R(x-1,t+8,2,3,'#6e3e2c');R(x-3,t+12,7,3,K);R(x-2,t+12,5,1,Wt);R(x-2,t+13,1,2,Wt);R(x+2,t+13,1,2,Wt);
+    for(let i=0;i<4;i++){const yy=t+22+i*5;R(x-1,yy,3,1,K);R(x,yy-1,1,3,K);}
+  }else{const h=38,t=GROUND-h;
+    R(x-4,t,8,h,'#977f60');R(x-3,t-2,6,2,'#977f60');R(x-3,t-3,6,4,'#2f2924');R(x,t-2,1,3,'#977f60');R(x+1,t+18,1,14,'#84705a');
+    R(x-3,t+4,2,1,K);R(x+1,t+4,2,1,K);R(x-3,t+6,1,1,'#6e5f4a');R(x+2,t+6,1,1,'#6e5f4a');
+    R(x-4,t+8,2,2,'#b4513a');R(x+2,t+8,2,2,'#b4513a');R(x-1,t+11,2,1,'#7a3326');
+    for(let i=0;i<3;i++){const yy=t+17+i*5;R(x-2,yy,3,1,K);R(x-1,yy+1,1,2,K);}
+  }}
 function drawGate(){
   jangseung(GATE_X-14,true);jangseung(GATE_X+14,false);
   if(!G.f.ppuriPassed){const x=GATE_X-cam;if(x>-30&&x<W+30){R(x-12,GROUND-30,24,1,'#e8dcc0');for(let i=0;i<4;i++)R(x-9+i*6,GROUND-29,2,4,i%2?'#f4ecd8':'#b4432a');}}
@@ -413,7 +422,7 @@ if(!CLASSIC){
   Rg.zones.shrine.exits={left:{to:'cliff',toX:2920}};
   Rg.zones.gate.doors=[
     // 장승 둘은 고갯길 경치(art.js scenery)가 그린다. 들어설 때 비켜 선다 (결정 D-166)
-    {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:blocked},
+    {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:()=>{}},   // 결정 D-264: 장승 사이 금줄은 고갯길 경치(art.js)가 그린다. 틀을 따로 세우지 않는다
     // 결정 D-164: 첫 아빠 도장(장승) 바로 다음, 길섶에 반쯤 쌓인 소원 돌탑. 옛 돌다리 다시 놓기(받침·다리판·가장자리)를 대신한다(사용자 피드백 24).
     {id:'dol_wish_tower',wishTower:true,x:1800,to:'gate',toX:1800,get label(){return G.f.dolWishTower?'소원 돌탑 바라보기 · E':'반쯤 쌓인 돌탑 살펴보기 · E';},
       draw:(x,y)=>A.drawWishTower(x,y,G.f.dolWishTower?3:0,!!G.f.dolHareTower)},

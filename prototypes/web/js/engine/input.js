@@ -99,6 +99,7 @@ function padAction(k){
   if(k==='jump')jumpOrDrop();else if(k==='atk')actionPress();else if(k==='talk')tryTalk();
 }
 // 결정 D-52: 휴대폰 ▲은 키보드 ↑과 같다(점프·오르기·↑ 상호작용). 전투에서는 움직임만.
+// 결정 D-260: 단추 크기와 사이 간격은 css/style.css 끝의 D-260 묶음이 정한다 (누르는 칸 44px 이상, 그림은 작게, 사이는 넓게)
 document.querySelectorAll('#pad [data-k]').forEach(b=>{
   const k=b.dataset.k;
   b.addEventListener('pointerdown',e=>{e.preventDefault();b.classList.add('on');
