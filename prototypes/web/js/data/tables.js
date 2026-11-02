@@ -9,6 +9,13 @@ const TABLES={
    "region": "galchamgol",
    "d": "참나무 열매. 떫어서 그냥은 못 먹고 가루로 빻아 쓴다."
   },
+  "bam": {
+   "n": "밤",
+   "r": 0,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "가시 송이째 떨어져 벌어진 알밤. 구우면 속이 노랗고 달다."
+  },
   "acorn_gift": {
    "n": "다람쥐 형제의 도토리",
    "r": 1,
@@ -1421,6 +1428,12 @@ const TABLES={
    "dadDrawing": true
   },
   {
+   "id": "bam",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
    "id": "acorn_gift",
    "region": "galchamgol",
    "kind": "item",
@@ -2629,6 +2642,7 @@ const TABLES={
   "gather_seogi_hits": 2,
   "gather_darae_vine_hits": 2,
   "gather_solbang_hits": 2,
+  "gather_snow_mound_hits": 2,
   "yut_needle_speed": 1.5,
   "yut_nak_zone": 10
  },

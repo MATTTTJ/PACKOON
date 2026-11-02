@@ -238,18 +238,13 @@ function wishStackPaint(w,h,s){
 }
 /* 지금 맨 위 돌의 윗면 높이 (든 돌이 내려앉을 높이) */
 function wishStackTop(ground,n){let top=ground;TOWER_ROWS.forEach(([,h])=>top-=h);for(let i=0;i<n;i++)top-=TOWER_ADD[i][1];return top;}
-/* 결정 D-165: 성황당 돌탑 그늘에 녹지 않은 첫눈 둔덕. 오른쪽으로 갈수록 높다 */
-function drawSnowDrift(x,y){
-  for(const [dx,w,h] of [[-4,56,7],[52,72,11],[130,96,15]])
-    for(let j=0;j<h;j++){const half=Math.round(w/2*Math.sqrt(1-(j/h)**2));px(x+dx+w/2-half,y-j-1,half*2,1,j>=h-2?'#ffffff':j%3?'#e4ecee':'#d3dfe3');}
-}
-/* 다진 눈 계단: 윗면은 밟을 자리, 밑은 땅까지 다져진 눈 둔덕 */
-function drawSnowStep(x,y,w){
-  // 밑은 땅까지 다져진 눈. 아래로 갈수록 그늘이 진다
-  const h=GROUND-y-6;for(let j=0;j<h;j+=3){const k=j/h;px(x+3,y+6+j,w-6,3,k<.35?'#dde6e9':k<.7?'#d2dde1':'#c5d2d7');}
-  px(x+3,y+6,1,h,'#bccbd0');px(x+w-4,y+6,1,h,'#e8eff1');
-  px(x+1,y,w-2,6,'#e4ecee');px(x,y+1,w,4,'#e4ecee');px(x+1,y,w-2,2,'#ffffff');px(x+2,y+5,w-4,1,'#b9c8cc');
-  for(let k=9;k<w;k+=15)px(x+k,y+2,3,1,'#c6d3d6');for(let k=6;k<w-6;k+=11)px(x+k,y+10+(k%3)*7,2,1,'#e9f0f2');
+/* 결정 D-266: 굴러 내려와 박힌 바윗돌. 윗면이 발판(y)이고 밑은 땅에 묻혔다. 눈이 얹혔다 */
+function drawBoulder(x,y,w){
+  const h=GROUND-y;
+  px(x+2,y+2,w-4,h-2,'#6f7b7b');px(x,y+5,w,h-7,'#6f7b7b');px(x+1,y+3,w-2,2,'#7f8b8a');
+  px(x+3,y+5,3,h-9,'#8d9897');px(x+w-5,y+6,2,h-8,'#58646a');px(x+1,y+h-2,w-2,2,'#525d5f');
+  for(let k=7;k<w-6;k+=11)px(x+k,y+9+(k%3)*4,4,1,'#5d696b');
+  px(x+1,y,w-2,3,'#e4ecee');px(x+3,y-1,w-6,1,'#ffffff');px(x+w-7,y+3,4,1,'#dfe8ea');
 }
 
 function drawWanderer(kind,x,y,f=1){const q=(a,b,w,h,c)=>M(Math.round(x),Math.round(y),f,a,b,w,h,c);if(kind==='hare'||kind==='rabbit'||kind==='porter'){
@@ -306,7 +301,7 @@ function stirFar(){
 }
 function stirMid(){px(0,158,W,30,'#9c9a7b');for(let i=0;i<70;i++){const x=mod(i*13-cam,460)-20,y=160+(i%6)*4;px(x,y,2,1,i%3?'#f1efe2':'#d9d3bf');}}
 function stirNear(){for(let x=-20;x<W+20;x+=4){const y=194-Math.round(Math.sin((x+cam)/58)*7);px(x,y,4,H-y,'#7d7a5c');px(x,y,4,2,'#aaa77d');if(hash(x+cam)>.72)px(x,y-2,1,2,'#c9c492');}stone(30-mod(RC()*.2,40),214,22,8,3);}
-Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawGateRope,drawWishTower,wishTowerPic,wishStackPaint,wishStackTop,wishStackSpan,TOWER_ADD,TOWER_OFFS,drawSnowDrift,drawSnowStep,drawWanderer,
+Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawGateRope,drawWishTower,wishTowerPic,wishStackPaint,wishStackTop,wishStackSpan,TOWER_ADD,TOWER_OFFS,drawBoulder,drawWanderer,
   cliffLayers:[{speed:.04,draw:cliffSky},{speed:.14,draw:cliffFar},{speed:.4,draw:cliffSea},{speed:.83,draw:cliffNear}],
   shrineLayers:[{speed:.04,draw:shrineSky},{speed:.16,draw:shrineFar},{speed:.43,draw:shrineMid},{speed:.86,draw:shrineNear}],
   stirLayers:[{speed:.04,draw:shrineSky},{speed:.14,draw:stirFar},{speed:.45,draw:stirMid},{speed:.86,draw:stirNear}],

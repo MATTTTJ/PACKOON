@@ -23,7 +23,10 @@ const Rg=defineRegion('galchamgol',{
   },
   newState:()=>({
     inv:{rice:2},
-    pickups:[[210,GROUND],[362,160],[540,GROUND],[726,150],[880,GROUND],[1020,158],[1200,GROUND],[1343,150]].map(a=>({x:a[0],y:a[1],item:'acorn',got:false})),
+    // 결정 D-265: 도토리가 150px 남짓 고르게 늘어서지 않게 몰렸다 비었다 한다. 확장판은 이 순서대로 구역 자리에 옮긴다(field.js acorns).
+    // 옛 구성에만 밤·도토리 몇 알을 더한다(확장판 새 게임은 구역 선언의 채집물을 쓴다).
+    pickups:[[182,GROUND],[236,GROUND],[368,160],[612,GROUND],[742,150],[1004,158],[1186,GROUND],[1352,150]].map(a=>({x:a[0],y:a[1],item:'acorn',got:false}))
+      .concat(CLASSIC?[[455,'bam'],[906,'bam'],[1488,'acorn'],[1612,'bam']].map(([x,item],i)=>({id:'gal_cl_'+i,x,y:GROUND,item,got:false})):[]),
     digs:[{x:470,item:'root',done:false},{x:950,item:'ssari',done:false},{x:1250,item:'root',done:false},{x:1540,item:'kkoe',done:false}],
     barrier:{x:1660,hp:3,cut:false,shake:0},
     mobs:[{x:1760,dir:-1,hp:2,dead:false,min:1700,max:1840,flash:0},{x:1860,dir:1,hp:2,dead:false,min:1800,max:1920,flash:0}],
@@ -61,6 +64,7 @@ const Rg=defineRegion('galchamgol',{
 
 /* 아이템 이름·레어도·설명은 design/data/items.csv (js/data/tables.js). 여기에는 아이콘만 */
 defineIcons({
+  bam:P=>{P(7,3,2,1,'#4a2a14');P(6,4,4,1,'#6b3a1c');P(5,5,6,1,'#7a4321');P(4,6,8,5,'#7a4321');P(3,7,1,4,'#4a2a14');P(12,7,1,4,'#4a2a14');P(5,6,2,3,'#a8653a');P(4,11,8,2,'#e2c79a');P(5,13,6,1,'#c9ad80');},
   acorn:P=>{P(7,1,2,2,'#4a2e1a');P(5,3,6,2,'#6b4423');P(4,5,8,2,'#8a5a2b');P(5,7,6,5,'#c9894a');P(6,12,4,1,'#a86d35');P(6,8,1,2,'#e2b07a');},
   powder:P=>{P(5,6,6,3,'#e3c99a');P(6,5,4,1,'#efdcb5');P(3,9,10,4,'#7a4b2a');P(4,13,8,1,'#5a361e');P(4,9,8,1,'#9b6a3d');},
   root:P=>{P(9,1,3,2,'#5f8a3a');P(7,2,2,4,'#8a5a2b');P(6,6,3,3,'#9b6a35');P(5,9,2,3,'#8a5a2b');P(8,9,2,4,'#7a4b2a');P(4,12,2,2,'#6b4423');P(9,12,2,2,'#6b4423');P(3,14,1,1,'#6b4423');},

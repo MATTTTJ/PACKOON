@@ -81,6 +81,9 @@ Rg.drawBack=()=>{drawSky();drawGround();};
 Rg.drawScenery=()=>{[1000,1140,1280,1360].forEach(drawRowan);drawDrift();drawSlope();drawLake();drawCoil();};
 Rg.drawPickup=(a,x,bob)=>{
   if(a.item==='magamok'){R(x-1,a.y-9,1,3,'#5a4030');R(x-3,a.y-6+bob,3,3,'#d0302a');R(x+1,a.y-6+bob,3,3,'#e0402a');R(x-1,a.y-3+bob,3,3,'#c02a22');R(x-3,a.y-7,7,1,'#f4f7fa');}
+  // 결정 D-265: 눈 위의 솔방울, 청설모가 떨군 잣송이(잣나무는 높은 산에 자란다)
+  else if(a.item==='solbang'){R(x-2,a.y-7+bob,5,2,'#8a5a2b');R(x-3,a.y-5+bob,7,2,'#6b4423');R(x-2,a.y-3+bob,5,2,'#8a5a2b');R(x-1,a.y-1,3,1,'#5a3a20');R(x-2,a.y-8+bob,4,1,'#f4f7fa');}
+  else if(a.item==='jat'){R(x-3,a.y-9+bob,6,8,'#6b4a2a');for(let k=0;k<3;k++){R(x-2,a.y-8+k*3+bob,2,1,'#a0703f');R(x+1,a.y-7+k*3+bob,2,1,'#a0703f');}R(x-1,a.y-1,2,1,'#4f3820');R(x-3,a.y-10+bob,5,1,'#f4f7fa');R(x+3,a.y-3,2,1,'#c79d5c');}
   else if(a.item==='jip'){R(x-5,a.y-8,10,8,'#d9b860');R(x-5,a.y-8,10,1,'#f4f7fa');R(x-1,a.y-8,2,8,'#a8883a');}
   else if(a.item==='legend_fruit'){const gl=Math.floor(G.anim/8)%2;R(x-4,a.y-9+bob,8,8,'#f0a0b8');R(x-2,a.y-8+bob,3,3,'#fde0ea');R(x-1,a.y-12,2,3,'#6b4423');if(gl){R(x-7,a.y-12,1,1,'#fff6d8');R(x+6,a.y-6,1,1,'#fff6d8');}}
 };
@@ -266,6 +269,19 @@ if(!CLASSIC){
   Rg.zones.slope.pickups=[{id:'y_deer_jip',x:1640,y:GROUND,item:'jip',form:'deer',listen:true,got:false}];
   Rg.zones.shelter.digs=[{id:'y_cache_shelter',x:720,item:'acorn',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.snow.digs=[{id:'y_cache_snow',x:1260,item:'solbang',n:2,form:'squirrel',cache:true,done:false}];
+  /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 눈 덮인 마가목 열매(줍는 자리마다 마가목이 선다), 덤불의 다래 덩굴,
+     소나무 밑 솔방울, 높은 바위턱의 잣송이. 살금이 둘레(비탈 900~1350)는 비워 둔다. 좌표는 길을 줄인 뒤의 자리. */
+  addZoneGather(Rg,'y_g_',[
+    ['shelter','p',480,'solbang'],['shelter','d',1110,'darae_vine'],['shelter','p',1300,'magamok'],['shelter','p',1560,'solbang'],['shelter','d',1960,'darae_vine'],
+    ['snow','p',140,'solbang'],['snow','p',455,'magamok'],['snow','d',610,'darae_vine'],['snow','p',960,'solbang'],['snow','p',1120,'magamok'],
+    ['snow','p',1420,'jat',{y:108}],['snow','d',1800,'darae_vine'],
+    ['slope','d',140,'darae_vine'],['slope','p',330,'solbang'],['slope','p',1490,'solbang',{y:108}],['slope','d',1560,'darae_vine'],['slope','p',1800,'magamok'],
+    ['shore','d',140,'darae_vine'],['shore','p',380,'solbang'],['shore','p',1190,'solbang'],['shore','d',1440,'darae_vine'],['shore','p',1610,'jat',{y:108}],
+    ['island','p',860,'magamok'],
+    // 몰린 자리 (간격이 고르지 않게)
+    ['shore','p',1218,'solbang'],
+    ['snow','p',985,'solbang'],
+  ]);
   // 겨울에는 오른쪽 얼음길로 걸어 나간다. 봄에는 같은 길이 물에 잠겨 배로만 건넌다.
   Rg.zones.shore.exits.right={to:'island',toX:160,
     need:()=>!G.f.spring&&!!G.f.dadDone,

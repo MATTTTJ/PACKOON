@@ -19,8 +19,10 @@ const Rg=defineRegion('jangteo',{
       '"글자는 \'되돌림\'이었다. 값은 이미 치러졌다. 이번엔 내가 치른다." 누가, 무슨 값을 치렀다는 걸까. 아빠는 북쪽 영산에 있다.']},
   },
   newState:()=>({
-    /* 뒷산 소나무 숲의 솔방울. 셋은 통나무 위에 있다 */
-    pickups:[[1700,GROUND],[1781,158],[1880,GROUND],[1960,GROUND],[2043,150],[2140,GROUND],[2230,156],[2300,GROUND]].map(([x,y])=>({x,y,item:'solbang',got:false})),
+    /* 뒷산 소나무 숲의 솔방울. 넷은 통나무 위에 있다. 결정 D-265: 80~100px 고른 간격을 몰렸다 비었다 하게 바꿨다.
+       옛 구성에만 장터 골목에 땔감에서 흘린 솔방울 넷을 더한다(확장판은 구역 선언의 것을 쓴다). */
+    pickups:[[1694,GROUND],[1772,158],[1797,158],[1952,GROUND],[2047,150],[2121,GROUND],[2236,156],[2318,GROUND]].map(([x,y])=>({x,y,item:'solbang',got:false}))
+      .concat(CLASSIC?[215,500,790,1330].map((x,i)=>({id:'j_cl_'+i,x,y:GROUND,item:'solbang',got:false})):[]),
     digs:[],
     boss:{x:1500,dead:false},
     f:{night:false,bueongMet:false,bueongNight:false,bueongDone:false,guard:false,
