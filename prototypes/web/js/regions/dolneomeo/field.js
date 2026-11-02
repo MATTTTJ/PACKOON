@@ -100,10 +100,28 @@ Rg.drawPickup=(a,x,bob)=>{
   if(a.item==='memil'){R(x-1,a.y-6,1,6,'#9a7a52');R(x-2,a.y-8+bob,3,2,'#2b2522');R(x,a.y-9+bob,2,2,'#3a3330');R(x+1,a.y-7,2,1,'#7a9a5a');}
   else if(a.item==='gyeousari')drawMistletoe(x,a.y,a);
   else if(a.item==='seoridarae'){R(x-4,a.y-8+bob,4,4,'#8ab86a');R(x,a.y-8+bob,4,4,'#7fa860');R(x-2,a.y-4+bob,4,4,'#6f9850');R(x-3,a.y-7+bob,1,1,'#f4fbff');R(x+1,a.y-7+bob,1,1,'#f4fbff');R(x-1,a.y-11,2,3,'#5a4a2a');}
+  else if(a.item==='solbang'){R(x-2,a.y-7+bob,5,2,'#8a5a2b');R(x-3,a.y-5+bob,7,2,'#6b4423');R(x-2,a.y-3+bob,5,2,'#8a5a2b');R(x-1,a.y-1,3,1,'#5a3a20');R(x-2,a.y-8+bob,4,1,'#f4f7fa');}   // 결정 D-265
   else if(!CLASSIC&&a.item==='seogi'){R(x-8,a.y-10,16,10,'#8a9791');R(x-6,a.y-11,12,2,'#e0e8dc');R(x-5,a.y-8,10,6,'#414d47');R(x-2,a.y-9,4,7,'#58655b');R(x+4,a.y-12+bob,1,1,'#fff1bf');}
 };
+/* 결정 D-266: 그늘에 녹지 않은 첫눈이 도톰하게 솟은 둔덕(파헤치는 채집 자리). (x,y)는 바닥 가운데. 옛 구성에도 쓰므로 field.js 에 둔다.
+   d.prog 만큼 파이면 위가 깎이고, 다 파면 걷어 낸 눈이 양옆에 쌓이고 가운데 검은 흙이 드러난다.
+   꼭대기의 불룩한 혹이 밑에 무언가 있다는 표시다. 눈 계단(D-165)은 걷어 냈다. */
+function drawSnowMound(x,y,d){
+  const half0=13,need=TABLES.MINIGAMES.gather_snow_mound_hits,cut=d.done?1:Math.min(1,(d.prog||0)/need);
+  if(d.done){
+    for(const s of [-1,1])for(let j=0;j<4;j++){const half=4-j;R(x+s*11-half,y-j-1,half*2+1,1,j===3?'#ffffff':'#dfe8ea');}
+    R(x-7,y-2,14,2,'#4a3a2c');R(x-6,y-3,12,1,'#5c4a38');R(x-3,y-2,2,1,'#6f5a44');R(x+3,y-3,1,1,'#3a2d22');
+    R(x-9,y-1,18,1,'#c5d2d7');return;}
+  const h=Math.round(12-cut*6);
+  for(let j=0;j<h;j++){const half=Math.round(half0*Math.sqrt(1-(j/h)**2));R(x-half,y-j-1,half*2+1,1,j>=h-2?'#ffffff':j%3?'#e4ecee':'#d3dfe3');}
+  R(x-half0,y-1,half0*2+1,1,'#b9c8cc');R(x+half0-5,y-4,3,1,'#c6d3d6');R(x-half0+3,y-3,2,1,'#c6d3d6');
+  if(!cut){R(x-2,y-h-2,5,2,'#f4f8f9');R(x-1,y-h-3,3,1,'#ffffff');R(x+2,y-h-1,1,1,'#c6d3d6');}
+  else{R(x-4,y-h,8,2,'#8f8576');R(x-3,y-h+1,6,1,'#5c4a38');for(const [dx,dy] of [[-8,-h-2],[7,-h-1],[-5,-h-4]])R(x+dx,y+dy,2,2,'#ffffff');}
+}
 /* 억새 무더기와 바위의 석이버섯 */
 Rg.drawDig=(d,x)=>{
+  // 결정 D-266: 눈 둔덕 파기 자리. 나오는 물건(d.item)과 상관없이 둔덕으로 그린다
+  if(d.gather==='snow_mound'){drawSnowMound(Math.round(x),d.y??GROUND,d);return true;}
   if(d.item==='eoksae'){
     if(d.done){R(x-7,GROUND-2,14,2,'#a8916a');return true;}
     // 결정 D-50: 억새는 windSway로 휜다 (engine/core.js)
@@ -201,9 +219,10 @@ if(CLASSIC){
     if(G?.region===Rg.id)for(const d of G.digs)if(d.item==='seogi')d.x=1770;
     // 변신 자리(PA-47)는 구역을 단 채 classic 저장에도 남는다. classic 은 구역 있는 자리를 그리지도 줍지도 않는다.
     // 순번 id(dol_old_*)로 바뀌지 않게 확장판 저장 판정과 구역 지우기에서 뺀다.
-    const formSpot=p=>formSpotIds.includes(p.id);
+    // 결정 D-265·D-266: 확장판에만 있는 길섶 채집물(dol_g_*)도 구역을 단 채 둔다. classic 은 그리지도 줍지도 않는다.
+    const formSpot=p=>formSpotIds.includes(p.id)||/^dol_g_/.test(p.id||'');
     if(G?.region===Rg.id&&[...G.pickups,...G.digs].some(p=>p.zone&&!formSpot(p))){
-      const originalPickups=[[900,192],[945,192],[990,192],[1240,192],[1290,192],[1335,192],[670,118],[1412,118]];
+      const originalPickups=[[886,192],[941,192],[1003,192],[1229,192],[1262,192],[1341,192],[670,118],[1412,118]];   // 결정 D-265: region.js 의 옛 자리와 같게
       const extraIds=['dol_memil_extra1','dol_memil_extra2','dol_memil_extra3','dol_mistletoe_extra','dol_memory_seogi'];
       G.f.dolExtraPointState=G.f.dolExtraPointState||{};
       G.pickups=G.pickups.filter(p=>{if(!extraIds.includes(p.id))return true;G.f.dolExtraPointState[p.id]={got:p.got};return false;});
@@ -236,6 +255,8 @@ if(!CLASSIC){
   const digMap=[['field',1316],['field',1437],['field',1668],['field',2310]];
   function placeOld(g){
     // 기존 저장의 got/done은 유지하고 위치만 현재 배치에 맞춘다.
+    // 옛 구성에만 있는 눈 둔덕(dol_cl_*, 결정 D-266)은 확장판에 자리가 없어 뺀다.
+    if(g.digs?.some(d=>/^dol_cl_/.test(d.id||'')))g.digs=g.digs.filter(d=>!/^dol_cl_/.test(d.id||''));
     let pi=0,di=0;
     for(const p of g.pickups){
       if(p.zone)continue;
@@ -263,28 +284,17 @@ if(!CLASSIC){
     // 2190 턱은 디딤 없이 바닥에서 80px 위다. 산양 뛰기로만 오른다 (PA-47 선택 자리).
     field:[...stepRidge(260,65,3,{low:164}),...stepRidge(1180,66,4,{low:164}),platform(1900,164,86),platform(1960,138,90),platform(2020,112,88),platform(2190,112,76)],
     cliff:[...stepRidge(320,67,3,{low:164}),...stepRidge(790,68,4,{low:164}),...stepRidge(1600,69,3,{low:164}),platform(2220,166,90),platform(2280,138,90),platform(2350,112,130),platform(2500,138,96),platform(2560,112,294)],
-    shrine:[...stepRidge(280,70,3,{low:164}),platform(1520,112,110),platform(1630,140,80),...stepRidge(1950,71,4,{low:164}),...stepRidge(2560,72,3,{low:164})],
+    // 결정 D-266: 높은 바위(석이버섯)로는 굴러 내려와 박힌 바윗돌 둘을 딛고 오른다(26·26·28px, 점프 약 45px). 눈 계단(D-165)은 걷어 냈다.
+    shrine:[...stepRidge(280,70,3,{low:164}),{...platform(1428,166,40),boulder:true},{...platform(1476,140,36),boulder:true},platform(1520,112,110),platform(1630,140,80),...stepRidge(1950,71,4,{low:164}),...stepRidge(2560,72,3,{low:164})],
   };
-  /* 결정 D-165: 옛 다리 기억(D-116의 '소원 돌에 손대기 · 옛 다리')을 걷어 낸다(사용자 피드백 31).
-     대신 성황당 돌탑 그늘에 녹지 않은 첫눈 둔덕을 둔다. 밟아 다지면 높은 바위(석이버섯)로 오르는 눈 계단이 된다.
-     맨땅에서 140 턱은 뛰어 닿지 않으니(점프 약 45px) 눈 계단이 그 길을 연다. 산양은 전처럼 바로 뛴다. */
-  const snowSteps={shrine:{x:1120,steps:[platform(1120,166,62),platform(1172,140,80),platform(1240,140,140),platform(1370,140,150)]}};
-  const snowPacked=()=>!!G.f.dolSnowSteps;
-  // 구역에 들어설 때마다 자른 좌표의 bases로 발판을 다시 깐다 (D-109·D-110). 다진 눈 계단은 그 위에 더한다.
+  /* 결정 D-266: 눈 둔덕을 밟아 다져 계단을 만들던 일(D-165)은 현실성이 없어 뺐다(사용자 피드백 2026-11-02).
+     성황당 솔숲 그늘의 눈 둔덕은 이제 파헤치는 채집 자리다(아래 addZoneGather 의 snow_mound). 옛 저장의 dolSnowSteps 표시는 쓰지 않는다. */
+  // 구역에 들어설 때마다 자른 좌표의 bases로 발판을 다시 깐다 (D-109·D-110).
   function applySteps(){
-    const z=Rg.zones[G.zone],spec=snowSteps[G.zone];
+    const z=Rg.zones[G.zone];
     if(!z)return;
-    if(spec||G.zone==='gate')z.platforms=spec&&snowPacked()?[...bases[G.zone],...spec.steps]:bases[G.zone];
+    if(G.zone==='shrine'||G.zone==='gate')z.platforms=bases[G.zone];
     if(G.zone==='cliff')z.platforms=G.boss.dead?bases.cliff:bases.cliff.filter(p=>p.x<trimX(2200,Rg.trimCuts?.cliff));
-  }
-  function packSnow(){
-    if(snowPacked()){talk([['너구리','(다져 놓은 눈 계단이 그대로다.\n높은 바위까지 오를 수 있겠다.)']]);return;}
-    talk([['너구리','(돌탑 그늘에 첫눈이 녹지 않고\n둔덕으로 쌓여 있다.)'],
-      ['너구리','(발로 꾹꾹 밟아 다지니\n계단처럼 단단해진다.)']],()=>{
-      G.f.dolSnowSteps=true;applySteps();Sound.stone('tap');
-      diary('dol_snow_steps','성황당 돌탑 그늘에 녹지 않은 첫눈을 밟아 다져 계단을 만들었다. 높은 바위까지 오를 수 있다.');
-      toast('눈 계단을 다졌다 · 높은 바위로 올라가 보자');
-    });
   }
   const marker=(x,y)=>{R(x-1,y-24,2,24,'#675443');R(x-11,y-25,23,7,'#e5ddc8');R(x+6,y-23,3,3,'#516b71');};
   const blocked=(x,y)=>A.drawBlocked(x,y);
@@ -313,10 +323,10 @@ if(!CLASSIC){
   }
   function specialInteract(e){
     if(REG!==Rg||!usesZones(Rg)||paused())return;
-    const p=nearInteraction();if(!p||(!p.wishTower&&!p.snowSteps&&!p.depth))return;
+    const p=nearInteraction();if(!p||(!p.wishTower&&!p.depth))return;
     e.preventDefault();e.stopImmediatePropagation();
     if(e.type==='keydown')suppressedKeys.add(e.key.toLowerCase());
-    if(p.wishTower)Rg.wishTower?.();else if(p.snowSteps)packSnow();else enterDepth(p);
+    if(p.wishTower)Rg.wishTower?.();else enterDepth(p);
   }
   addEventListener('keydown',e=>{
     if(e.repeat||!['e','enter','arrowup'].includes(e.key.toLowerCase()))return;
@@ -328,7 +338,7 @@ if(!CLASSIC){
 
   function drawStonePlatforms(id){
     for(const p of Rg.zones[id].platforms){const x=Math.round(p.x-RC());if(x>W||x+p.w<0)continue;   // 이미 옮긴 좌표 (D-128)
-      if(snowSteps[id]?.steps.includes(p)){A.drawSnowStep(x,p.y,p.w);continue;}   // 결정 D-165: 다진 눈 계단
+      if(p.boulder){A.drawBoulder(x,p.y,p.w);continue;}   // 결정 D-266: 디딤 바윗돌
       R(x,p.y,p.w,6,'#737e7d');R(x,p.y,p.w,2,'#e2e9e4');R(x+2,p.y+6,p.w-4,3,'#535f60');
       for(let k=13;k<p.w;k+=23)R(x+k,p.y+2,1,5,'#4b595b');
     }
@@ -366,7 +376,7 @@ if(!CLASSIC){
   Rg.trimCutsV3={gate:[[720,100],[1050,70],[1300,150]],village:[[110,280]],field:[[2420,60]],cliff:[[160,1000],[1270,50],[1960,80]],shrine:[[430,360]]};   // 셋째 판(D-128). 넷째 판도 돌너머는 같다. 옛 저장을 옮길 때 쓴다
   Rg.trimCutsV4=Rg.trimCutsV3;
   // 결정 D-206: 남생이 할미가 있는 성황당 구역을 더 줄인다(사용자 피드백 54). 들어선 자리와 소원 천 사이, 바라보기 앞, 골렘 자리 뒤 절벽 끝 문 앞.
-  // 골렘 자리·눈 계단·석이 바위·작은 돌탑은 그대로다.
+  // 골렘 자리·석이 바위·작은 돌탑은 그대로다.
   Rg.trimCuts={...Rg.trimCutsV3,shrine:[[150,110],[430,360],[1730,80],[2440,110]]};
   // 구역에 들어설 때 applyMemory가 bases로 발판을 다시 깐다. 그래서 bases도 같은 좌표로 자르고 정리해 둔다 (D-109·D-110).
   Rg.trimHook=tX=>{
@@ -374,11 +384,6 @@ if(!CLASSIC){
       const c=Rg.trimCuts[id];
       const list=c?bases[id].filter(p=>!trimInside(p.x+p.w/2,c)).map(p=>({...p,x:tX(p.x,c)})):bases[id];
       bases[id]=tidyPlatforms(list,platformAnchors(Rg,id,Rg.zones[id]));
-    }
-    // 눈 계단(D-165)도 같은 좌표로. 발판은 drawStonePlatforms가 같은 물건인지로 알아보니 목록째 바꾼다.
-    for(const [id,spec] of Object.entries(snowSteps)){
-      const c=Rg.trimCuts[id];if(!c)continue;
-      spec.x=tX(spec.x,c);spec.steps=spec.steps.map(p=>({...p,x:tX(p.x,c)}));
     }
   };
   Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2800,[])};
@@ -412,7 +417,6 @@ if(!CLASSIC){
   Rg.zones.cliff.step=()=>{Rg.zones.cliff.platforms=G.boss.dead?cliffBases:cliffBases.filter(p=>p.x<2200);commonStep('cliff');};
   Rg.zones.shrine.doors=[
     {id:'dol_depth_village',depth:true,reverse:true,x:100,to:'village',toX:2440,label:'돌담 마을로 돌아가기 · E',draw:marker},
-    {id:'dol_snow_steps',snowSteps:true,x:1120,to:'shrine',toX:1120,get label(){return snowPacked()?'다진 눈 계단 · E':'눈 둔덕 밟아 다지기 · E';},draw:(x,y)=>{if(!snowPacked())A.drawSnowDrift(x,y);}},   // 결정 D-165
     {id:'dol_after_golem',depth:true,x:2630,to:'cliff',toX:2630,toY:112,label:'아까 본 절벽 끝으로 · E',need:calm,reason:'돌무더기가 가라앉으면 절벽 끝으로 이어진다.',draw:marker,drawBlocked:blocked},
   ];
   // 필수 물건은 선택 발견에 기대지 않는다. 기존 여섯 알·두 가지에 정확히 +3/+1.
@@ -425,6 +429,27 @@ if(!CLASSIC){
   Rg.zones.field.digs=[{id:'dol_cache_field',x:880,item:'memil',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.village.digs=[{id:'dol_cache_village',x:1420,item:'acorn',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.shrine.pickups=[{id:'dol_memory_seogi',x:1580,y:112,item:'seogi',got:false}];
+  /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 고갯길·절벽길 억새, 높은 바위턱의 겨우살이, 마을 길에 흘린 메밀 이삭.
+     결정 D-266: 그늘에 녹지 않은 첫눈 둔덕을 파면 눈에 덮였던 것이 나온다. 무엇이 왜 거기 있었는지는 자리마다 found 로 알린다.
+     솔방울은 소나무 곁 둔덕에서만, 메밀은 밭머리·돌담 밑에서만, 억새는 바람이 쓸어 모으는 바위 밑에서만 나온다. 좌표는 길을 줄인 뒤의 자리. */
+  const mound=found=>({gather:'snow_mound',found});
+  const PINE='소나무 그늘이라 첫눈이 녹지 않았다. 눈 밑에 가을에 떨어진 솔방울이 묻혀 있었다.';
+  addZoneGather(Rg,'dol_g_',[
+    ['gate','d',150,'eoksae'],['gate','p',545,'gyeousari',{y:115}],['gate','d',765,'solbang',mound(PINE)],
+    ['gate','p',1184,'gyeousari',{y:112}],['gate','d',1585,'solbang',mound(PINE)],['gate','d',2010,'eoksae'],
+    ['village','d',250,'eoksae'],['village','p',610,'memil'],['village','p',672,'memil'],
+    ['village','d',1230,'memil',mound('돌담 밑에 쌓아 두고 잊은 메밀 단이 눈에 덮여 있었다. 이삭이 아직 붙어 있다.')],
+    ['village','d',1940,'eoksae'],['village','p',2300,'memil'],
+    ['field','d',170,'eoksae'],['field','d',455,'memil',mound('밭머리에 남겨 둔 메밀 이삭 단이 첫눈에 덮여 있었다.')],['field','p',1200,'memil'],
+    ['cliff','d',290,'eoksae'],['cliff','d',600,'eoksae',mound('바람에 꺾인 억새가 바위 밑에 쓸려 와 쌓였고, 그 위로 눈이 덮였다.')],
+    ['cliff','p',757,'gyeousari',{y:112}],['cliff','p',1290,'seogi',{y:112}],['cliff','d',1520,'solbang',mound(PINE)],['cliff','d',1700,'eoksae'],
+    ['shrine','d',400,'eoksae'],['shrine','d',690,'solbang',mound(PINE)],
+    ['shrine','d',820,'gyeousari',mound('바람에 꺾여 떨어진 겨우살이 가지가 눈 속에 묻혀 있었다.')],
+    ['shrine','p',1440,'solbang',{y:160}],
+    // 몰린 자리 (간격이 고르지 않게)
+    ['gate','d',196,'eoksae'],
+    ['shrine','p',1180,'solbang',{y:140}],
+  ]);
   Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'해 떴다!\n엄마도 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:marker,layers:A.cliffLayers}];
   // 결정 D-83: 밭 둔덕에서 먼 성황당 돌무더기가 꿈틀하는 것이 보인다. 목적지(성황당)와 골렘을 미리 보여 준다.
   // 결정 D-167: 꾸벅이 둥지(1510)와 붙어 있던 바라보기 자리를 메밀 그루터기 쪽 둔덕으로 옮긴다(사용자 피드백 27).

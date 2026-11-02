@@ -286,6 +286,17 @@ if(!CLASSIC){
       },
     },
   };
+  /* 결정 D-265: 장터 골목에도 주울 것을 조금 둔다 (사용자 피드백 2026-11-02 "빈 곳이 너무 많다").
+     장터에는 풀숲이 없으니 땔감 지게와 아궁이 장작단에서 흘린 솔방울(불쏘시개)만, 처마 위에는 바람에 얹힌 것만 둔다.
+     솔숲은 이미 촘촘해 그대로 둔다. 좌표는 길을 줄인 뒤의 자리. */
+  addZoneGather(Rg,'j_g_',[
+    ['entrance','p',165,'solbang'],['entrance','p',705,'solbang'],['entrance','p',1080,'solbang',{y:96}],
+    ['street','p',190,'solbang'],['street','p',712,'solbang',{y:96}],['street','p',1790,'solbang'],['street','p',2290,'solbang'],['street','p',2600,'solbang',{y:96}],
+    ['inn','p',160,'solbang'],['inn','p',760,'solbang'],['inn','p',1350,'solbang',{y:96}],['inn','p',1905,'solbang',{y:128}],['inn','p',2170,'solbang'],
+    ['warehouse','p',150,'solbang'],['warehouse','p',590,'solbang',{y:124}],['warehouse','p',1270,'solbang',{y:96}],
+    // 몰린 자리 (간격이 고르지 않게)
+    ['entrance','p',735,'solbang'],['inn','p',2210,'solbang'],
+  ]);
   // 길손의 조사에는 배경과 구별되는 작고 일정한 표지를 쓴다. 숨은 도장은 표지를 붙이지 않는다.
   for(const z of Object.values(Rg.zones))for(const p of z.examines)p.draw=p.draw||((x,y)=>{R(x-2,y-6,5,4,'#caa970');R(x,y-10,1,2,'#f6ead0');});
 }
