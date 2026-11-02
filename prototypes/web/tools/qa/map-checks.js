@@ -52,7 +52,7 @@ async function runMap({browser:b,outDir}){
     // 보자기 손일은 미니게임 없이 바로 마친다 (PA-46). 고르면 곧바로 까치 대화가 이어진다.
     await b.click('#dlgChoices button:first-child');await until(b,"!$('dlg').hidden");
     const unlockLines=[];
-    for(let i=0;i<12&&await b.eval("!$('dlg').hidden");i++){
+    for(let i=0;i<20&&await b.eval("!$('dlg').hidden");i++){   // 단풍골 대사 손질(PA-148)로 까치 대화가 12줄을 넘었다
       unlockLines.push(await b.eval("({who:$('dlgWho').textContent,text:$('dlgText').textContent,unlocked:!!G.f.mapUnlocked})"));await b.key('e');
     }
     const supplied=[
