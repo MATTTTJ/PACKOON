@@ -22,11 +22,14 @@ const Rg=defineRegion('dolneomeo',{
       '까치가 두꺼비 할멈의 말을 전했다. 다음 약은 큰 장터의 눈홍시다. 길손이 모이는 장터라면, “되돌림”을 듣고 떠난 아빠를 본 이도 있을지 모른다.']}},
   },
   newState:()=>({
+    // 결정 D-265: 메밀 이삭이 45px 간격으로 셋씩 늘어서지 않게 몰렸다 비었다 한다 (field.js 옛 구성 변환 표도 같은 자리)
     pickups:[
-      ...[900,945,990,1240,1290,1335].map(x=>({x,y:GROUND,item:'memil',got:false})),
+      ...[886,941,1003,1229,1262,1341].map(x=>({x,y:GROUND,item:'memil',got:false})),
       {x:670,y:118,item:'gyeousari',got:false},{x:1412,y:118,item:'gyeousari',got:false},
     ],
-    digs:[{x:470,item:'eoksae',done:false},{x:560,item:'eoksae',done:false},{x:760,item:'eoksae',done:false},{x:1030,item:'eoksae',done:false}],
+    // 옛 구성에만 돌담 밑 눈 둔덕 하나를 더한다 (결정 D-266). 확장판은 구역 선언의 눈 둔덕을 쓴다.
+    digs:[{x:470,item:'eoksae',done:false},{x:560,item:'eoksae',done:false},{x:760,item:'eoksae',done:false},{x:1030,item:'eoksae',done:false},
+      ...(CLASSIC?[{id:'dol_cl_mound_0',x:205,item:'memil',gather:'snow_mound',found:'돌담 밑에 쌓아 두고 잊은 메밀 단이 눈에 덮여 있었다. 이삭이 아직 붙어 있다.',done:false}]:[])],
     boss:{x:1990,dead:false},
     f:{kkuTalk:false,kkuAwake:false,kkuDone:false,ppuriMet:false,ppuriPassed:false,nalDTalk:false,nalDDone:false,nalDBluff:false,
       dolsoeMet:false,dolsoeTea:false,stackDone:false,stoneGiven:false,golemCalm:false,seogiTold:false,daraePicked:false,yakMade:false},
@@ -98,6 +101,9 @@ defineIcons({
 defineGather({
   eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],box:[-10,-26,12,0],rare:'eoksae_som',hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 단이 더 베인다.'},
   seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-7],box:[-9,-12,9,0],rare:'seokcheong',hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 장이 더 떨어진다.'},
+  // 결정 D-266: 그늘에 녹지 않은 첫눈이 도톰하게 솟은 둔덕. 걷어 내면 눈에 덮였던 것이 나온다(자리마다 다르다. field.js 의 found 글)
+  snow_mound:{title:'눈 둔덕 파기',verb:'눈 둔덕 파헤치기',hits:TABLES.MINIGAMES.gather_snow_mound_hits,spot:[0,-6],box:[-12,-11,12,0],scatter:null,dirt:'#f4f8f9',
+    hint:'눈이 유난히 도톰하게 솟았다. 밑에 무언가 묻혀 있는 모양이다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 한 움큼 더 나온다.'},
 });
 
 /* 증조할아버지의 맷돌: 돌쇠 할배의 돌 쌓기를 통과하면 깨어난다. 가공법은 heirlooms.csv */

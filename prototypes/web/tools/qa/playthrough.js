@@ -226,8 +226,8 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
           }else await release();
           await click('#bGift');await wait(120);continue;
         }
-        // 선물이 없으면 친다: 빈틈 표식으로 손을 옮겨 J. 표식이 없으면 손을 멈추고 기다린다.
-        const m=await read("B&&B.mark&&B.st==='open'?{dx:B.mark.x-B.px,dy:B.mark.y-B.py,r:battleHandProfile().radius}:null");
+        // 선물이 없으면 친다: 빈틈 표식으로 도구 날 자리(bAim, 결정 D-240)를 옮겨 J. 표식이 없으면 손을 멈추고 기다린다.
+        const m=await read("B&&B.mark&&B.st==='open'?{dx:B.mark.x-bAim().x,dy:B.mark.y-bAim().y,r:battleHandProfile().radius}:null");
         const want=m?[m.dx<-6?'ArrowLeft':m.dx>6?'ArrowRight':null,m.dy<-6?'ArrowUp':m.dy>6?'ArrowDown':null]:[null,null];
         const prev=steer||[null,null];
         for(let i=0;i<2;i++)if(prev[i]!==want[i]){if(prev[i])await key(prev[i],'up');if(want[i])await key(want[i],'down');}

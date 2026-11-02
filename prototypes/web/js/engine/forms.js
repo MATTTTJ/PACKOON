@@ -85,6 +85,9 @@ const ROLL_FORMS={
 let formClimb=null,formGlide=false,formFx=null;
 /* 결정 D-175: 걷는 동안의 네 박자 걸음(-1이면 서 있다). 필드 주인공을 그릴 때만 field.js drawRaccoon 이 정하고, 그린 뒤 -1로 되돌린다 */
 let formGait=-1;
+/* 결정 D-262: 네발 변신이 공중에 있을 때의 다리 (0 땅, 1 뛰어오름: 네 다리를 접는다, 2 내려옴: 앞다리를 앞아래로 뻗고 뒷다리는 뒤로).
+   formGait 처럼 field.js drawRaccoon·drawCrawl 이 그리기 직전에 정하고 그린 뒤 0으로 되돌린다. 산양·고라니가 쓴다. */
+let formAir=0;
 const formMoveMul=()=>G.form==='squirrel'?TABLES.TUNING.form_squirrel_speed:G.form==='deer'?TABLES.TUNING.form_deer_speed:1;
 const formJumpMul=()=>G.form==='goat'?TABLES.TUNING.form_goat_jump:1;
 const upHeld=()=>!!(keys['arrowup']||keys['w']||touch.up);
@@ -196,9 +199,14 @@ function drawFormAt(ox,oy,f,st,form,attackT=0,glide=false){
     /* 결정 D-175: 산양은 대각선 두 다리씩 번갈아 든다(먼 뒷다리+가까운 앞다리 / 가까운 뒷다리+먼 앞다리).
        든 다리는 무릎을 굽혀 발굽이 앞으로 나오고, 다리를 드는 박자에 몸이 한 칸 떠오르며, 디디는 박자에 고개가 끄덕인다.
        걷지 않을 때(formGait<0)는 st 하나로 예전처럼 두 다리만 엇갈린다(초상·기어 내려가기 등). */
-    const g=formGait,lift=g===0?0:g===2?1:-1,bob=lift>=0?-1:0,nod=g===1||g===3?1:0;
+    const g=formAir?-1:formGait,lift=g===0?0:g===2?1:-1,bob=lift>=0?-1:0,nod=g===1||g===3?1:formAir===2?1:0;
     const legs=g<0?[[-6+st,S,-1],[-3,C,-1],[3-st,S,-1],[6,C,-1]]:[[-6,S,0],[-3,C,1],[3,S,1],[6,C,0]];
-    for(const [lx,col,pair] of legs){
+    if(formAir===1)for(const [lx,col] of legs){M(ox,oy,f,lx,-8,2,4,col);M(ox,oy,f,lx+(lx>0?1:-1),-5,2,2,col);M(ox,oy,f,lx+(lx>0?1:-1),-4,2,1,D);}   // 결정 D-262: 뛰어오를 때 네 다리를 접는다
+    else if(formAir===2)for(const [lx,col] of legs){   // 결정 D-262: 내려올 때 앞다리는 디딜 곳으로 뻗고 뒷다리는 뒤로 민다
+      if(lx>0){M(ox,oy,f,lx,-8,2,4,col);M(ox,oy,f,lx+1,-5,2,4,col);M(ox,oy,f,lx+1,-1,2,1,D);}
+      else{M(ox,oy,f,lx,-8,2,3,col);M(ox,oy,f,lx-1,-6,2,3,col);M(ox,oy,f,lx-2,-4,2,2,col);M(ox,oy,f,lx-2,-3,2,1,D);}
+    }
+    else for(const [lx,col,pair] of legs){
       if(pair>=0&&pair===lift){M(ox,oy,f,lx,-8,2,4,col);M(ox,oy,f,lx+1,-5,2,2,col);M(ox,oy,f,lx+2,-3,2,1,D);}   // 든 다리: 무릎을 굽혀 앞으로
       else{M(ox,oy,f,lx,-8,2,8,col);M(ox,oy,f,lx,-1,2,1,D);}
     }
@@ -229,8 +237,13 @@ function drawFormAt(ox,oy,f,st,form,attackT=0,glide=false){
   }
   if(form==='deer'){
     const C='#b88a55',L='#e3c9a0',D='#8a6440',Tu='#f4efe2';
-    M(ox,oy,f,-5+st,-11,2,11,D);M(ox,oy,f,-2,-11,2,11,C);M(ox,oy,f,4-st,-11,2,11,D);M(ox,oy,f,7,-11,2,11,C);
-    for(const lx of [-5+st,-2,4-st,7])M(ox,oy,f,lx,-1,2,1,'#3a2a1f');
+    if(formAir===1)for(const [lx,col] of [[-5,D],[-2,C],[4,D],[7,C]]){const k=lx>0?1:-1;M(ox,oy,f,lx,-11,2,5,col);M(ox,oy,f,lx+k,-7,2,3,col);M(ox,oy,f,lx+k*2,-5,2,1,'#3a2a1f');}   // 결정 D-262: 뛰어오를 때 다리를 접는다
+    else if(formAir===2)for(const [lx,col] of [[-5,D],[-2,C],[4,D],[7,C]]){   // 결정 D-262: 내려올 때 앞다리를 앞아래로 뻗고 뒷다리는 뒤로 길게
+      if(lx>0){M(ox,oy,f,lx,-11,2,5,col);M(ox,oy,f,lx+1,-6,2,5,col);M(ox,oy,f,lx+1,-1,2,1,'#3a2a1f');}
+      else{M(ox,oy,f,lx,-11,2,4,col);M(ox,oy,f,lx-1,-8,2,3,col);M(ox,oy,f,lx-2,-5,2,3,col);M(ox,oy,f,lx-3,-3,2,1,'#3a2a1f');}
+    }
+    else{M(ox,oy,f,-5+st,-11,2,11,D);M(ox,oy,f,-2,-11,2,11,C);M(ox,oy,f,4-st,-11,2,11,D);M(ox,oy,f,7,-11,2,11,C);
+    for(const lx of [-5+st,-2,4-st,7])M(ox,oy,f,lx,-1,2,1,'#3a2a1f');}
     M(ox,oy,f,-8,-18,2,2,L);
     M(ox,oy,f,-7,-18,16,7,C);M(ox,oy,f,-5,-12,12,1,L);
     M(ox,oy,f,-3,-22,6,4,BUNDLE);M(ox,oy,f,-2,-21,1,1,'#8a3b2a');
@@ -240,7 +253,7 @@ function drawFormAt(ox,oy,f,st,form,attackT=0,glide=false){
     M(ox,oy,f,4,-19,1,8,STRAP);drawStrapLeaf(ox,oy,f,4,-16);drawSwipe(ox,oy-12,f,attackT,10);return;
   }
 }
-/* 결정 D-114: 변신 모습의 뒷모습(등 쪽). ↓로 내려오거나 무언가를 타고 오를 때 쓴다. (ox,oy)는 발 아래 가운데, phase(0·1)마다 팔다리를 번갈아 디딘다. */
+/* 결정 D-114: 변신 모습의 뒷모습(등 쪽). 결정 D-262부터 필드에서는 쓰지 않는다(네발 변신은 등을 보이며 오르내리지 않는다). 그림은 남겨 둔다. (ox,oy)는 발 아래 가운데, phase(0·1)마다 팔다리를 번갈아 디딘다. */
 function drawFormBackAt(ox,oy,phase,form){
   ox=Math.round(ox);oy=Math.round(oy);
   const K='#2a211b',up=phase?1:-1;
@@ -285,10 +298,39 @@ function drawFormBackAt(ox,oy,phase,form){
   }
   drawFormAt(ox,oy,1,phase,form);
 }
+/* 결정 D-262: 다람쥐는 줄기에 배를 붙이고 몸을 세로로 세워 탄다(옛 D-114 뒷모습 대신). 오를 때는 머리가 위이고 꼬리가 아래로 늘어지며,
+   내려올 때는 실제 다람쥐처럼 뒷발을 돌려 잡고 머리부터 내려온다(그림을 위아래로 뒤집는다. 꼬리는 위로).
+   (tx,footY)는 줄기 가운데와 발 높이(G.py), face가 -1이면 줄기 왼쪽에 붙는다. phase(0·1)마다 앞발·뒷발을 번갈아 뻗는다. */
+function drawSquirrelClimbAt(tx,footY,phase,headDown,face=1){
+  const C='#b5652d',L='#e9cfa4',D='#7a3f1c',T='#d08a4f',TL='#f0b878',O='#2a1a10',K='#2a211b';
+  ctx.save();ctx.translate(Math.round(tx),Math.round(footY));
+  if(face<0)ctx.scale(-1,1);
+  if(headDown){ctx.translate(0,-12);ctx.scale(1,-1);ctx.translate(0,12);}
+  const P=(x,y,w,h,c)=>R(x,y,w,h,c);
+  try{
+    P(2,-26,8,21,O);P(6,-8,5,6,O);P(7,-3,6,6,O);                                  // 몸·꼬리 테두리 (줄기 위에서도 보이게)
+    P(7,-7,3,5,T);P(8,-3,4,4,T);P(7,0,4,2,T);P(6,1,3,2,TL);P(10,-2,1,3,TL);        // 아래로 늘어진 꼬리
+    if(phase){P(1,-8,3,3,D);P(1,-5,2,2,D);}else{P(1,-6,3,3,D);P(1,-3,2,2,D);}       // 뒷발: 줄기를 디딘다
+    P(3,-18,6,12,C);P(3,-17,2,10,L);                                               // 몸통과 배
+    P(7,-16,4,6,BUNDLE);P(8,-15,1,1,'#8a3b2a');P(9,-12,1,1,'#8a3b2a');              // 등 보따리
+    P(6,-17,1,1,STRAP);P(5,-15,1,1,STRAP);P(5,-13,2,1,LEAF);
+    if(phase){P(1,-22,3,2,D);P(1,-16,2,2,D);}else{P(1,-20,3,2,D);P(1,-14,2,2,D);}   // 앞발: 하나는 위로 뻗어 잡는다
+    P(3,-23,6,5,C);P(3,-25,3,2,C);P(3,-26,1,1,K);P(5,-22,1,1,K);P(8,-24,2,2,C);P(8,-23,1,1,T);P(3,-20,2,2,L);   // 머리·주둥이·눈·귀
+  }finally{ctx.restore();}
+}
+/* 결정 D-262: 비탈을 디뎌 내려가는 네발 모습. 옆모습을 한 번 그려 세로 줄마다 기울기만큼 내려 붙인다(돌리지 않아 점이 흐려지지 않는다).
+   slope>0이면 오른쪽이 내려간다. (ox,oy)는 발 아래 가운데. */
+const tiltBuf=document.createElement('canvas');tiltBuf.width=48;tiltBuf.height=44;
+function drawTiltedForm(ox,oy,slope,fn){
+  const g=tiltBuf.getContext('2d');g.clearRect(0,0,48,44);
+  const saved=ctx;ctx=g;try{fn(24,40);}finally{ctx=saved;}
+  ox=Math.round(ox);oy=Math.round(oy);
+  for(let x=0;x<48;x++){const dy=Math.round((x-24)*slope);ctx.drawImage(tiltBuf,x,0,1,44,ox-24+x,oy-40+dy,1,44);}
+}
 /* 필드·초상·구역 전환에서 함께 쓴다. form 을 주지 않으면 지금 모습 */
 function drawPlayerAt(ox,oy,f,st,attackT,tool,pickFrame=0,form=G?.form||''){
   if(!form){drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame);return;}
-  drawFormAt(ox,oy+(pickFrame===2?2:pickFrame?1:0),f,st,form,attackT,form==='owl'&&formGlide&&!pickFrame);
+  drawFormAt(ox,oy+(pickFrame===2?2:pickFrame?1:0),f,st,form,attackT,form==='owl'&&(formGlide||formAir===2)&&!pickFrame);   // 결정 D-262: 수리부엉이는 내려올 때 늘 날개를 편다
 }
 /* 먹물이 번지듯 바뀐다 (잎사귀를 불면) */
 function drawFormFx(){
@@ -500,8 +542,8 @@ function drawFormDemo(id,t){
     R(42,4,30,4,'#7f9a4a');R(38,7,8,3,'#6a8a3e');R(66,6,10,3,'#6a8a3e');
     const c=t%3.4,top=34;
     if(c<.7)drawFormAt(Math.round(24+c*38),DG,1,walkSt,'squirrel');
-    else if(c<2.6)drawFormBackAt(56,Math.round(DG-(DG-top)*(c-.7)/1.9),Math.floor(t*7)%2,'squirrel');
-    else drawFormBackAt(56,top,0,'squirrel');
+    else if(c<2.6)drawSquirrelClimbAt(56,Math.round(DG-(DG-top)*(c-.7)/1.9),Math.floor(t*7)%2,false);   // 결정 D-262
+    else drawSquirrelClimbAt(56,top,0,false);
     return;
   }
   if(id==='goat'){   // 디딜 데를 보고 바위턱으로 훌쩍
