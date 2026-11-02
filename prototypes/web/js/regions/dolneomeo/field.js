@@ -43,11 +43,20 @@ function drawGround(){
 /* 돌담 */
 function drawWall(x0,x1){const a=Math.max(x0-cam,-10),b=Math.min(x1-cam,W+10);if(b<a)return;
   for(let x=a;x<b;x+=12){const wx=Math.floor(x+cam);const r=hash(wx);R(x,GROUND-14,11,7,r<0.5?'#8a8680':'#9a9690');R(x+5,GROUND-21,10,7,r<0.5?'#9a9690':'#8a8680');R(x,GROUND-15,11,1,'#eef2f4');R(x+5,GROUND-22,10,1,'#eef2f4');}}
-/* 장승: 둥근 눈에 웃는 입, 이마에 글씨 자리 */
-function jangseung(wx,tall){const x=wx-cam;if(x<-20||x>W+20)return;const h=tall?44:38;
-  R(x-4,GROUND-h,9,h,'#8a6a4a');R(x-5,GROUND-h-4,11,6,'#5a4030');R(x-3,GROUND-h+8,2,2,'#2b1d14');R(x+2,GROUND-h+8,2,2,'#2b1d14');
-  R(x-2,GROUND-h+14,5,1,'#2b1d14');R(x-3,GROUND-h+13,1,1,'#2b1d14');R(x+3,GROUND-h+13,1,1,'#2b1d14');
-  R(x-1,GROUND-h+20,3,12,'#6b4e36');R(x-4,GROUND-h-1,9,1,'#b4432a');}
+/* 결정 D-263: 장승 둘은 다르게 깎는다. tall은 천하대장군(사모·부릅뜬 눈·드러낸 이·붉은 얼굴), 아니면 지하여장군(검은 머리·순한 눈·연지) */
+function jangseung(wx,tall){const x=wx-cam;if(x<-20||x>W+20)return;const K='#2b1d14',Wt='#efe6cf';
+  if(tall){const h=46,t=GROUND-h;
+    R(x-4,t,9,h,'#7a5f44');R(x-4,t,9,18,'#9a5a40');R(x-2,t+22,1,20,'#674d37');R(x+2,t+26,1,16,'#674d37');
+    R(x-3,t-6,7,5,'#2b2925');R(x-5,t-2,11,2,'#2b2925');R(x-7,t-5,2,2,'#2b2925');R(x+5,t-5,2,2,'#2b2925');
+    R(x-4,t+3,3,1,K);R(x+2,t+3,3,1,K);R(x-3,t+5,3,3,Wt);R(x+1,t+5,3,3,Wt);R(x-2,t+6,1,1,K);R(x+2,t+6,1,1,K);
+    R(x-1,t+8,2,3,'#6e3e2c');R(x-3,t+12,7,3,K);R(x-2,t+12,5,1,Wt);R(x-2,t+13,1,2,Wt);R(x+2,t+13,1,2,Wt);
+    for(let i=0;i<4;i++){const yy=t+22+i*5;R(x-1,yy,3,1,K);R(x,yy-1,1,3,K);}
+  }else{const h=38,t=GROUND-h;
+    R(x-4,t,8,h,'#977f60');R(x-3,t-2,6,2,'#977f60');R(x-3,t-3,6,4,'#2f2924');R(x,t-2,1,3,'#977f60');R(x+1,t+18,1,14,'#84705a');
+    R(x-3,t+4,2,1,K);R(x+1,t+4,2,1,K);R(x-3,t+6,1,1,'#6e5f4a');R(x+2,t+6,1,1,'#6e5f4a');
+    R(x-4,t+8,2,2,'#b4513a');R(x+2,t+8,2,2,'#b4513a');R(x-1,t+11,2,1,'#7a3326');
+    for(let i=0;i<3;i++){const yy=t+17+i*5;R(x-2,yy,3,1,K);R(x-1,yy+1,1,2,K);}
+  }}
 function drawGate(){
   jangseung(GATE_X-14,true);jangseung(GATE_X+14,false);
   if(!G.f.ppuriPassed){const x=GATE_X-cam;if(x>-30&&x<W+30){R(x-12,GROUND-30,24,1,'#e8dcc0');for(let i=0;i<4;i++)R(x-9+i*6,GROUND-29,2,4,i%2?'#f4ecd8':'#b4432a');}}
@@ -153,11 +162,23 @@ function drawCairn(){const b=G.boss;const x=b.x-cam;if(x<-60||x>W+60)return;
   // 흰 차돌 팔: 앞으로 늘어뜨려 주먹을 땅에 짚었다
   for(const s of [-1,1]){const ax=x+s*24-(s<0?6:0);R(ax,GROUND-34-br,7,22,'#d2cdc3');R(ax+(s<0?0:4),GROUND-26-br,3,10,'#a39d92');R(ax+1,GROUND-30-br,5,1,'#fbfaf6');
     R(ax-2,GROUND-12,11,9,'#d2cdc3');R(ax-2,GROUND-12,11,1,'#e6e2da');R(ax+(s<0?7:-2),GROUND-9,2,6,'#a39d92');}
-  // 어깨 사이에 파묻힌 머리, 눈 눈썹, 감은 눈
-  R(x-9,GROUND-52-br,18,12,'#66686b');R(x-11,GROUND-55-br,22,4,SN);R(x-7,GROUND-57-br,14,2,SN);
-  R(x-6,GROUND-47-br,4,1,'#2c2723');R(x+2,GROUND-47-br,4,1,'#2c2723');R(x-4,GROUND-43-br,8,1,'#2c2723');
-  // 가슴의 눈 껍데기 틈으로 옥돌이 비친다
-  R(x-3,GROUND-30-br,6,6,SN);R(x-1,GROUND-28-br,2,2,'#5f9a7a');
+  // 결정 D-250: 성황제를 받는 돌무더기. 어깨에 금줄(새끼줄에 흰 한지 오리)을 두르고 오른 어깨에 오색 천을 매었다
+  // 금줄은 눈 털 아래 가슴께로 처지게 두른다(입처럼 읽히지 않게 머리와 떨어뜨린다)
+  for(let i=0;i<25;i++){const dx=-24+i*2,sag=Math.round(Math.sin(i/24*Math.PI)*3);R(x+dx,GROUND-34-br+sag,2,2,i%3?'#b39556':'#7a6232');}
+  for(const k of [-16,-6,6,15])R(x+k,GROUND-32-br+Math.round(Math.sin((k+24)/48*Math.PI)*3),2,4,'#f8f4e6');
+  for(const [i,col] of ['#b8432f','#2f5f9e','#d9a83a','#f2efe6','#3f7d52'].entries())R(x+21+i,GROUND-42-br+(i%2),1,8+i%3,col);
+  // 결정 D-250: 어깨 사이에 파묻힌 깎은 돌 머리. 처진 눈썹돌이 눈을 덮고 입은 곧게 다물었다 (무표정·무뚝뚝). 웃는 얼굴로 읽히지 않게
+  const hy=GROUND-56-br;
+  R(x-11,hy,22,15,'#5d5f63');R(x-12,hy+3,1,9,'#5d5f63');R(x+11,hy+3,1,9,'#5d5f63');R(x-11,hy+14,22,1,'#46484c');
+  R(x-12,hy-2,24,3,SN);R(x-8,hy-4,16,2,SN);
+  R(x-12,hy+4,24,2,'#4a4c50');R(x-12,hy+3,24,1,'#8a8c90');R(x-2,hy+6,4,1,'#4a4c50');   // 가운데로 처진 눈썹돌
+  R(x-9,hy+6,6,2,'#3a3c40');R(x+3,hy+6,6,2,'#3a3c40');                                 // 눈썹돌 밑 그늘
+  R(x-8,hy+7,4,1,'#16120f');R(x+4,hy+7,4,1,'#16120f');                                 // 그늘 속 가는 눈(잠들어 감았다)
+  R(x-1,hy+7,2,4,'#4c4e52');R(x-2,hy+10,4,1,'#3e4044');                                // 넓적한 코
+  R(x-5,hy+12,10,1,'#211c18');                                                          // 곧게 다문 입
+  R(x+6,hy+1,1,3,'#3d3f43');R(x+7,hy+4,1,2,'#3d3f43');R(x-10,hy+10,3,2,'#5f7a48');     // 금과 볼의 이끼
+  // 결정 D-251: 가슴의 눈 껍데기 틈으로 서리 옥 핵이 비친다
+  R(x-3,GROUND-30-br,6,6,SN);R(x-1,GROUND-29-br,3,3,'#8fcfcb');R(x-1,GROUND-29-br,1,1,'#e4fbf6');
   if(br){R(x+12,GROUND-60,2,2,SN);R(x+16,GROUND-64,1,1,SN);}   // 잠든 숨결
 }
 function drawKkuCue(){
@@ -192,21 +213,27 @@ Rg.step=()=>{
 };
 Rg.onHit=()=>{};
 Rg.faint=()=>{G.px=Math.max(60,Math.min(G.px,GOLEM_AT)-80);toast('찬바람에 휘청여 물러났다');};
-/* 골렘이 쓰러지거나 잠들면 절벽 길이 열리고 바위턱에 서리다래가 보인다 */
+/* 결정 D-257: 서리다래는 골렘의 핵 안에서 나온다(사용자 결정 2026-11-02). 이기면 갈라진 핵에서 굴러 나오고,
+   달래면 골렘이 꺼내 내려놓는다. 전투 끝에 보따리에 들어오고, 받아 든 장면이 곧바로 이어진다. 그 뒤 성황당 뒤 절벽 길이 열린다.
+   옛 저장(예전처럼 절벽 바위턱에 서리다래가 놓인 채 끝난 저장)은 그 자리에서 그대로 딴다(onPickup). */
 Rg.bossDie=()=>{
   G.boss.dead=true;
-  G.pickups.push({x:DARAE.x,y:DARAE.y,item:'seoridarae',got:false});
-  diary('d_boss','성황당 돌무더기가 다시 조용해졌다. 절벽 바위턱에 서리 맞은 다래가 보인다.');
-  toast('절벽 길이 열렸다! 바위턱의 서리다래를 따자');refreshGoal();
+  diary('d_boss',G.f.golemCalm?'성황당 돌무더기가 가슴의 핵에서 서리다래를 꺼내 내려놓고 다시 조용해졌다.':'성황당 돌무더기의 핵이 갈라지며 서리다래가 굴러 나왔다. 돌무더기는 무너졌다.');
+  toast('성황당 뒤 절벽 길이 열렸다');refreshGoal();
+  if(has('seoridarae'))daraeGot(G.f.golemCalm?'calm':'win');
 };
-Rg.onPickup=a=>{
-  if(a.item==='seoridarae'&&!G.f.daraePicked){G.f.daraePicked=true;
-    // 결정 D-130: 젊은 아빠의 수첩(적혀 있지 않다)과 지난가을의 아빠(열매를 찾지 않고 떠났다)를 나눠 적는다.
-    clue('h2','아빠의 수첩',!CLASSIC||Rg.arcs()?'아빠가 젊을 때 적은 수첩의 돌너머 쪽에는 서리다래가 적혀 있지 않다. 지난가을의 아빠도 열매는 찾지 않고, 글자를 읽은 그날 밤 떠났다(돌쇠 할배).':'아빠의 수첩에는 서리다래가 적혀 있지 않다. 아빠는 여기서 열매를 찾지 않고 곧장 떠났다.');
-    diary('d_darae',!CLASSIC||Rg.arcs()?'서리다래를 수첩에 그렸다. 아빠가 젊을 때 적은 쪽에는 이 열매가 적혀 있지 않다. 지난가을의 아빠도 열매는 찾지 않고 떠났다.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 적혀 있지 않다. 아빠는 이곳에서 열매를 찾지 않았다. 무언가를 알고 길을 바꾼 걸까.');
-    // 결정 D-130: 약을 직접 갈기로 아이가 정한다. 열매째로는 까치 발에 묶어 보낼 수 없다.
-    talk([['너구리','(열매째 까치 발에 묶으면\n가는 길에 다 짓무르겠다.)'],['너구리','(맷돌이 깨어났으니…\n이번엔 내가 갈아서 약즙으로 보내자.)']],()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'));refreshGoal();}
-};
+Rg.onPickup=a=>{if(a.item==='seoridarae')daraeGot('ledge');};
+function daraeGot(how){
+  if(G.f.daraePicked)return;G.f.daraePicked=true;
+  // 결정 D-130: 젊은 아빠의 수첩(적혀 있지 않다)과 지난가을의 아빠(열매를 받지 못하고 떠났다)를 나눠 적는다.
+  clue('h2','아빠의 수첩',!CLASSIC||Rg.arcs()?'아빠가 젊을 때 적은 수첩의 돌너머 쪽에는 서리다래가 적혀 있지 않다. 지난가을의 아빠는 서리다래를 기다리다, 글자를 읽은 그날 밤 떠났다(돌쇠 할배).':'아빠의 수첩에는 서리다래가 적혀 있지 않다. 아빠는 여기서 열매를 얻지 않고 곧장 떠났다.');
+  diary('d_darae',!CLASSIC||Rg.arcs()?'서리다래를 수첩에 그렸다. 아빠가 젊을 때 적은 쪽에는 이 열매가 적혀 있지 않다. 지난가을의 아빠도 열매를 얻지 못하고 떠났다.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 적혀 있지 않다. 아빠는 이곳에서 열매를 얻지 않았다. 무언가를 알고 길을 바꾼 걸까.');
+  // 결정 D-257: 받아 든 열매. 달랬으면 골렘이 내려놓은 것, 이겼으면 무너진 돌 사이에서 주운 것
+  const first=how==='calm'?['너구리','(돌무더기가 내려놓은 서리다래다.\n서리가 하얗게 앉아 손끝이 시리다.)']
+    :how==='win'?['너구리','(무너진 돌 틈에서 서리다래를 주웠다.\n서리가 하얗게 앉아 손끝이 시리다.)']:null;
+  // 결정 D-130: 약을 직접 갈기로 아이가 정한다. 열매째로는 까치 발에 묶어 보낼 수 없다.
+  talk([...(first?[first]:[]),['너구리','(열매째 까치 발에 묶으면\n가는 길에 다 짓무르겠다.)'],['너구리','(맷돌이 깨어났으니…\n이번엔 내가 갈아서 약즙으로 보내자.)']],()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'));refreshGoal();
+}
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:1770,item:'seogi',done:false});};
 
 /* 확장판의 변신 자리 (PA-47). 늘 구역을 단 채 저장되고 classic 변환이 건드리지 않는다. */
@@ -400,7 +427,7 @@ if(!CLASSIC){
   Rg.zones.shrine.exits={left:{to:'cliff',toX:2920}};
   Rg.zones.gate.doors=[
     // 장승 둘은 고갯길 경치(art.js scenery)가 그린다. 들어설 때 비켜 선다 (결정 D-166)
-    {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:blocked},
+    {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:()=>{}},   // 결정 D-264: 장승 사이 금줄은 고갯길 경치(art.js)가 그린다. 틀을 따로 세우지 않는다
     // 결정 D-164: 첫 아빠 도장(장승) 바로 다음, 길섶에 반쯤 쌓인 소원 돌탑. 옛 돌다리 다시 놓기(받침·다리판·가장자리)를 대신한다(사용자 피드백 24).
     {id:'dol_wish_tower',wishTower:true,x:1800,to:'gate',toX:1800,get label(){return G.f.dolWishTower?'소원 돌탑 바라보기 · E':'반쯤 쌓인 돌탑 살펴보기 · E';},
       draw:(x,y)=>A.drawWishTower(x,y,G.f.dolWishTower?3:0,!!G.f.dolHareTower)},
@@ -482,7 +509,7 @@ if(!CLASSIC){
           if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
           Rg.bossDie();
         }else{G.px=Z('shrine',2240);G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
-          talk([['너구리','(머리가 높아서 처음엔 안 닿아.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>toast('성황당 앞에서 숨을 골랐다. 준비되면 다시 다가가자.'));}
+          talk([['너구리','(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>toast('성황당 앞에서 숨을 골랐다. 준비되면 다시 다가가자.'));}
       }));
     };
     Rg.sendMedicine=()=>{
