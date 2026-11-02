@@ -146,14 +146,19 @@ function kiteChild(){
   ]);
 }
 
+// 결정 D-325: 윷판 대신 투호 항아리. 두 노인이 번갈아 던지고, 아이는 이길 쪽에 솔방울을 건다 (판은 story.js Rg.playTuho)
 function yutElders(){
   talk([
-    ['윷놀이 노인들','한 자리 비었구나. 방석 당겨 앉거라.\n객지 나간 새끼들 오기 전에 손부터 풀어야지.'],
-    ['너구리','콩이랑 돌이 말이에요?'],
-    ['윷놀이 노인들','장에서 남은 콩이랑 마당 돌이지 뭐.\n너는 콩, 우리는 돌. 판을 돌아 먼저 들이면 이긴다.'],
-    ['윷놀이 노인들','윷은 네가 던지고 말도 네가 고르거라.\n이기든 지든 한 판 놀아 주면 쌀 한 되 얹어 주마.',[
-      {t:'윷판 앞에 앉는다',go:()=>Rg.playYut()},
-      {t:'이번엔 구경할게요',go:null}
+    ['너구리','(할아버지 둘이 항아리를 사이에 두고 화살을 번갈아 던진다.)'],
+    ['곰방대 노인','곰방대가 던진다! …에잇, 테만 맞았네.'],
+    ['흰눈썹 노인','기세만 좋지. 투호는 입에 고르게 넣는 거다.'],
+    ['곰방대 노인','고르게 넣다 늙었지, 저 양반은.\n…꼬마, 구경하려면 하나 걸어라. 그래야 재미가 있지.'],
+    ['너구리','판돈은 뭘로 해요?'],
+    ['곰방대 노인','솔방울 하나. 화롯불 땔 거다.\n맞히면 이긴 쪽이 제 주머니에서 값을 치른다.'],
+    ['흰눈썹 노인','내가 이기면 곶감 하나, 저 양반이 이기면 군밤 둘.\n저 양반이 이기는 날이 드무니 그렇다.'],
+    ['곰방대 노인','드물어도 이기면 크게 이기지.',[
+      {t:'투호 내기를 건다',go:()=>Rg.playTuho()},
+      {t:'이번엔 그냥 지나갈게요',go:null}
     ]]
   ]);
 }
@@ -211,7 +216,7 @@ function oldMagpie(){
 Rg.expEncounters={
   wanderers:{
     entrance:[{id:'j_kite',name:'얼레',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
-    street:[{id:'j_yut',name:'윷놀이 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':'한 판 더 하려면 언제든 앉거라.\n다음엔 더 큰 방석을 펴 두마.';}}],
+    street:[{id:'j_yut',name:'투호 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':'또 걸 테냐? 솔방울 하나면 된다.\n화롯불은 늘 배가 고프거든.';}}],
     inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:()=>{const l=Rg.magpieTteok?.();if(l)talk(l);else oldMagpie();},draw:draw('magpie'),get greeting(){const l=Rg.magpieTteok?.();if(l)return l;return G.f.night?(G.f.jxLanternDone?'네가 단 등을 따라 길손들이 찾아왔구나.\n아침 떡 김이 오르면 다들 또 떠나겠지.':'밤이 됐구나. 등불 꾸러미는 처마 옆에 있단다.\n등은 네가 달고, 길은 내가 일러 주마.'):G.f.jxLanternDone?'밤새 길손들이 쉬고 갔단다.\n이제 나도 남쪽으로 날아갈 차례구나.':'해 지면 다시 오려무나.\n골목 등 다는 걸 좀 거들어 다오.';}}],
     pine:[{id:'j_boar',name:'알밤이',hint:'킁킁, 킁킁. 솔숲 쪽에서 무언가 냄새를 쫓는 소리가 난다.',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
     warehouse:[]
@@ -232,7 +237,7 @@ Rg.expEncounters={
     street:[
       {id:'j_stall_gap',x:310,label:'좌판 사이 골목',get text(){return G.f.night?'차일을 걷고 판을 접으니 골목이 나왔다.\n낮에는 물건 밑에 감춰져 있던 길이다.':'좌판 아래로 발자국이 이어지다 끊긴다.\n장을 마치고 판을 접으면 저 안으로 갈 수 있겠다.';}},
       {id:'j_steam_flour',x:1150,label:'쌀가루 묻은 발판',get text(){return G.awake.includes('siru')?'바닥 가루에 내 발자국도 섞였다.\n모락이랑 김을 올린 자리는 아직 따뜻하다.':'하얀 가루 위에 큰 발자국이 어지럽다.\n모락이 아궁이 앞을 몇 번이나 오갔을까.';}},
-      {id:'j_broken_yut',x:2130,label:'반질반질한 윷가락',text:'한쪽 윷가락만 유난히 반질반질하다.\n노인들이 자기 차례마다 소매로 문질렀나 봐.'}
+      {id:'j_broken_yut',x:2130,label:'반질반질한 화살',text:'화살 하나만 깃이 유난히 반질반질하다.\n던지기 전마다 손가락으로 쓸어 넘긴 자국이다.'}
     ],
     inn:[
       {id:'j_inn_shoes',x:350,label:'마루 아래 신발',text:'눈 묻은 신발은 코를 바깥으로 돌려 뒀다.\n내일 갈 길을 향해 벌써 줄을 섰네.'},
