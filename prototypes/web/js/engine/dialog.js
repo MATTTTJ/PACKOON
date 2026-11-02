@@ -1,20 +1,28 @@
 'use strict';
 /* 대화: talk([[말하는이, 대사, 선택지?], ...], 끝나면). 선택지는 [{t:글, go:고르면 할 일}] */
-let dlgQ=[],dlgEnd=null,dlgMusic=null,dlgPlan=null,dlgNextScene=null;
+let dlgQ=[],dlgEnd=null,dlgMusic=null,dlgPlan=null,dlgNextScene=null,dlgLonging=false,dlgGone={at:-1e9,music:null,longing:false};
+/* 결정 D-233: 콜백·setTimeout으로 잠깐 닫혔다 다시 열리는 이어진 대화를 한 대화로 본다.
+   닫힌 뒤 music_dialog_hold_ms 안에 다시 열리면 앞 대화의 곡·그리움을 잇고, 음악(game.js)도 그동안 덕킹과 곡을 그대로 둔다.
+   예전엔 그 틈마다 BGM이 커졌다 작아지고, 아빠 곡이 지역 곡으로 갔다 돌아왔다. */
+const dlgHeld=()=>performance.now()-dlgGone.at<TABLES.TUNING.music_dialog_hold_ms;
+function dlgClosed(){dlgGone={at:performance.now(),music:dlgMusic,longing:dlgLonging};dlgMusic=null;dlgLonging=false;}
 // 세 번째 인자는 지역의 전용 이야기 장면용이다. 기존 호출·선택지·종료 순서는 유지한다.
 /* 결정 D-72: 장면별 곡(design/data/scene_music.csv). options.scene 또는 바로 앞의 sceneNext(id)로 장면을 고르면
    표의 곡을 시작줄부터 깐다. 장면이 없으면 예전 자동 규칙(아빠가 나오면 아빠 곡, 날쌘과 여러 줄이면 날쌘 곡)이다. */
 function sceneNext(id){dlgNextScene=id;setTimeout(()=>{if(dlgNextScene===id)dlgNextScene=null;},0);}   // 바로 이어지는 talk 한 번에만 쓴다
 function talk(lines,onEnd,options={}){
   const scene=TABLES.SCENE_MUSIC?.[options.scene||dlgNextScene];dlgNextScene=null;
+  const held=dlgHeld();
   if(scene){dlgPlan=lines.map((_,i)=>i>=scene.from?(scene.music||null):null);dlgMusic=dlgPlan[0];}
-  else{dlgPlan=null;dlgMusic=options.music||(lines.some(l=>l[0]==='아빠')?'father':lines.length>1&&lines.some(l=>l[0]==='날쌘')?'nalsaen':null);}
+  else{dlgPlan=null;dlgMusic=options.music||(lines.some(l=>l[0]==='아빠')?'father':lines.length>1&&lines.some(l=>l[0]==='날쌘')?'nalsaen':null)||(held?dlgGone.music:null);}
+  // 결정 D-234: 음악의 그리움은 줄마다가 아니라 대화 단위로 정한다 (줄마다 바꾸면 넘길 때마다 층 음량이 출렁였다)
+  dlgLonging=lines.some(l=>l[0]==='아빠'||l[0]==='엄마'||/엄마|아빠/.test(l[1]||''))||(held&&dlgGone.longing);
   dlgQ=lines.slice();dlgEnd=onEnd||null;showLine();
 }
 function showLine(){
   if(dlgPlan){const i=dlgPlan.length-dlgQ.length;if(i<dlgPlan.length)dlgMusic=dlgPlan[i];}
   const L=dlgQ.shift();
-  if(!L){$('dlg').hidden=true;dlgPic(null);dlgMusic=null;dlgPlan=null;const f=dlgEnd;dlgEnd=null;if(f)f();return;}
+  if(!L){$('dlg').hidden=true;dlgPic(null);dlgClosed();dlgPlan=null;const f=dlgEnd;dlgEnd=null;if(f)f();return;}
   $('dlg').hidden=false;$('dlgWho').textContent=L[0];$('dlgText').textContent=L[1];
   if('pic' in L)dlgPic(L.pic);
   const face=$('dlgFace');face.innerHTML='';face.appendChild(portrait(L[0]));
@@ -22,7 +30,7 @@ function showLine(){
   if(L[2]){
     $('dlgNext').hidden=true;
     L[2].forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.textContent=c.t;
-      b.onclick=e=>{e.stopPropagation();Sound.choice(!!c.go);$('dlg').hidden=true;dlgPic(null);dlgQ=[];dlgEnd=null;dlgMusic=null;dlgPlan=null;if(c.go)c.go();};ch.appendChild(b);});
+      b.onclick=e=>{e.stopPropagation();Sound.choice(!!c.go);$('dlg').hidden=true;dlgPic(null);dlgQ=[];dlgEnd=null;dlgClosed();dlgPlan=null;if(c.go)c.go();};ch.appendChild(b);});
     setTimeout(()=>{const f=ch.querySelector('button');if(f&&matchMedia('(pointer:fine)').matches)f.focus();},0);
   }else $('dlgNext').hidden=false;
   if(typeof placePeek==='function'){placePeek();requestAnimationFrame(placePeek);}   // 결정 D-151: 선택지로 대화창이 커지면 그림을 그 위로 비킨다
