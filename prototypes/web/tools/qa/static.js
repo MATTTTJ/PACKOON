@@ -231,7 +231,27 @@ async function runStatic({root, rules, only} = {}) {
         findings.push(finding('syntax', file, match ? Number(match[1]) : 1, 'JS 문법 검사 실패: ' + diagnostic));
       }
     }
-    results.push(result('syntax', 'JS ' + files.length + '개 node --check', findings));
+    // 결정 D-237: index.html 이 싣는 스크립트는 전역 이름을 나눠 쓴다. 맨 앞 칸의 const·let·class 이름이 다른 파일의 이름과 같으면
+    // 브라우저에서 "already been declared" 로 그 파일 전체가 멈춘다 (node --check 로는 못 잡는다).
+    const html = fs.readFileSync(path.join(root, 'prototypes/web/index.html'), 'utf8');
+    const loaded = [...html.matchAll(/<script[^>]*src="([^"?]+)/g)].map(m => 'prototypes/web/' + m[1]).filter(f => fs.existsSync(path.join(root, f)));
+    const seen = new Map();
+    for (const file of loaded) {
+      const lines = fs.readFileSync(path.join(root, file), 'utf8').split(/\r?\n/);
+      let scoped = false;   // 지역 파일처럼 (()=>{ … })(); 로 감싼 곳의 이름은 그 안에만 있다
+      lines.forEach((line, i) => {
+        if (/^\(\s*(\(\)\s*=>|function\b)/.test(line)) scoped = true;
+        if (/^\}\)\(\);?/.test(line)) { scoped = false; return; }
+        if (scoped) return;
+        const m = line.match(/^(?:async\s+)?(function\*?|const|let|class)\s+([A-Za-z_$][\w$]*)/);
+        if (!m) return;
+        const kind = m[1].startsWith('function') ? 'function' : m[1], prev = seen.get(m[2]);
+        if (prev && prev.file !== file && (kind !== 'function' || prev.kind !== 'function'))
+          findings.push(finding('syntax', file, i + 1, '전역 이름 ' + m[2] + '이(가) ' + prev.file + ':' + prev.line + '에도 있다 (브라우저에서 이미 선언됨 오류).'));
+        else if (!prev) seen.set(m[2], {file, line: i + 1, kind});
+      });
+    }
+    results.push(result('syntax', 'JS ' + files.length + '개 node --check · 전역 이름 ' + seen.size + '개 겹침 검사', findings));
   }
   if (wants('data')) {
     const check = spawnSync(process.execPath, [path.join(root, 'prototypes/web/tools/build-data.js'), '--check'], {cwd: root, encoding: 'utf8', timeout: 30000});
