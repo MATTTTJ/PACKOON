@@ -111,8 +111,11 @@ defineEnemies({
   gangcheol:{name:'강철이',calmLabel:'진정',coreNeeds:'body',
     // 결정 D-227: 전투 글귀는 일어난 일만 짧게. 피하라·치라는 안내는 쓰지 않는다
     intro:'[시험판] 서리 덮인 호수에 물김이 오른다.',
-    warmPath:{width:76,wideWidth:100,attacks:{mouth:'gangcheolFrost',body:'gangcheolCoil',tail:'gangcheolIcicles',core:'gangcheolBlizzard'}},
-    calmAction:{kind:'ice',amount:TABLES.CALM.gangcheol.patsirutteok/3},
+    // 결정 D-246: 방향(0·1)마다 예고 글. 없는 부위는 parts 의 tell 을 쓴다
+    warmPath:{width:76,wideWidth:100,attacks:{mouth:'gangcheolFrost',body:'gangcheolCoil',tail:'gangcheolIcicles',core:'gangcheolBlizzard'},
+      tells:{mouth:['서리 띠가 내려온다.','서리 띠가 옆으로 밀려온다.'],body:['강철이가 양옆에서 똬리를 조인다.','강철이가 위아래로 똬리를 조인다.'],
+        tail:['꼬리에서 고드름이 쏟아진다.','꼬리가 옆으로 고드름을 흩뿌린다.']}},
+    // 결정 D-243: 샘의 얼음 걷기(행동 진정)를 뺐다. 온기 길은 피하는 길로만 남고, 달래기는 도깨비불씨·팥시루떡 선물로만 한다
     markPosition(p){const u=p.id==='mouth'?0.26:p.id==='tail'?0.74:0.5;
       const v=B.warm&&B.warm.current.v<0.5?0.76:0.24;
       return {x:BOX.x+BOX.w*u,y:BOX.y+BOX.h*v};},

@@ -23,7 +23,7 @@ function lookAt(cx,cy){const a=Math.atan2(B.py-cy,B.px-cx);return [Math.cos(a)*3
 const part=id=>B.parts.find(p=>p.id===id);
 
 /* 결정 D-228: 칠 수 있는 곳과 피해야 할 것을 색으로 가른다 (D-102 의 먹·붉은색에 금빛 하나를 더한다).
-   - 금빛: 칠 수 있는 곳(빈틈 표식, 소원 돌 바로 놓기, 돌려놓을 물건, 샘의 얼음). 둘레의 금빛 호는 남은 시간이다.
+   - 금빛: 칠 수 있는 곳(빈틈 표식). 둘레의 금빛 호는 남은 시간이다. (행동으로 달래는 자리는 D-243 으로 없앴다)
    - 붉은색·먹: 무조건 피해야 하는 공격과 그 예고. 공격 예고 동안에는 글귀 앞에 작은 붉은 세모만 뜬다(D-227). */
 const GOLD='#c98a12',GOLD_LT='rgba(244,207,99,';
 function drawStrikeSpot(c,x,y,r,k,near,tool){
@@ -37,7 +37,13 @@ function drawStrikeSpot(c,x,y,r,k,near,tool){
   for(let i=0;i<4;i++){const a=i*Math.PI/2+Math.PI/4,r1=r+4+pulse*3,r2=r1+5;c.beginPath();c.moveTo(x+Math.cos(a)*r1,y+Math.sin(a)*r1);c.lineTo(x+Math.cos(a)*r2,y+Math.sin(a)*r2);c.stroke();}
   if(near){c.strokeStyle='#fffaf0';c.lineWidth=1.6;c.beginPath();c.arc(x,y,Math.max(4,r-5),0,Math.PI*2);c.stroke();}
   // 결정 D-224: 그 부위에 잘 먹는 도구를 작게. 지금 든 도구가 아니면 흐리게
-  if(tool){c.translate(x+r*0.78,y-r*0.5);c.scale(0.55,0.55);c.globalAlpha=tool===battleTool()?1:0.4;drawTool(c,tool);}
+  if(tool){const held=tool===battleTool(),swap=!held&&B&&B.toolWant===tool;
+    c.translate(x+r*0.78,y-r*0.5);
+    // 결정 D-242: 잘 먹는 도구가 따로 있고 가졌으면 그 그림이 금빛으로 깜박이고, 키보드면 옆에 Q 키를 그린다(터치 화면은 도구 단추가 깜박인다)
+    if(swap){c.save();c.globalAlpha=0.45+0.4*pulse;c.fillStyle=GOLD_LT+'1)';c.beginPath();c.arc(0,-9,11,0,Math.PI*2);c.fill();c.restore();
+      if(!TOUCH){c.save();c.translate(15,-20);c.fillStyle='#fffaf0';c.strokeStyle=INK;c.lineWidth=1.4;c.beginPath();c.rect(-7,-7,14,14);c.fill();c.stroke();
+        c.fillStyle=INK;c.font='bold 11px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('Q',0,0.5);c.restore();}}
+    c.scale(0.55,0.55);c.globalAlpha=held||swap?1:0.4;drawTool(c,tool);}
   c.restore();
 }
 function drawDangerSign(c,x,y,s=1,t=0){
@@ -50,7 +56,7 @@ function drawDangerSign(c,x,y,s=1,t=0){
 
 function drawOpenHands(c){
   const lift=Math.sin((1-B.handShow/72)*Math.PI)*12;
-  drawPaw(c,B.px-19,B.py-lift);drawPaw(c,B.px+19,B.py-lift);
+  drawPaw(c,B.px-19,B.py-lift,true);drawPaw(c,B.px+19,B.py-lift,true);   // 빈손을 펴 보이는 장면만 손바닥
   for(const x of [B.px-19,B.px+19])brush(c,[[x-4,B.py-lift+3],[x,B.py-lift+6],[x+4,B.py-lift+2]],1,'#e2cdb6');
 }
 
@@ -65,12 +71,6 @@ function drawBattleCover(c){
     if(r.cracked)brush(c,[[p.x-4,p.y-12],[p.x+2,p.y-3],[p.x-5,p.y+3],[p.x+4,p.y+12]],2,r.flash>0?RED:INK);
     if(r.flash>0)blob(c,p.x,p.y,29,19,RED,r.flash/70);
   }
-}
-function drawWishStone(c){
-  const p=coverPoint(B.calmStone),near=Math.hypot(p.x-B.px,p.y-B.py)<26;
-  blob(c,p.x,p.y+13,23,7,INK,0.22);
-  c.save();c.translate(p.x,p.y);c.rotate(0.4);blob(c,0,0,15,10,'#65625d');brush(c,[[-12,3],[0,-10],[14,0]],2,INK);c.restore();
-  drawStrikeSpot(c,p.x,p.y,23,B.calmStone.t/150,near,null);   // 결정 D-228
 }
 function drawPlacedGift(c){
   const f=B.giftPlace,p=B.E.headPose(),t=1-B.t/60,e=t*t*(3-2*t);
@@ -107,14 +107,29 @@ function drawPossessedAttack(c){
   c.save();
   if(p){
     c.fillStyle='rgba(29,24,20,.08)';c.fillRect(X,Y,W,H);c.fillStyle='#f7f4ed';
-    if(p.kind==='sweep'){
+    // 결정 D-246: o:'y' 는 위아래로 오는 공격. 빈 띠와 화살표를 그 방향으로 그린다
+    const arrow=(x,y,dx,dy)=>{brush(c,[[x,y],[x+dx*38,y+dy*38]],2,INK,0.7);
+      brush(c,[[x+dx*27-dy*6,y+dy*27-dx*6],[x+dx*38,y+dy*38],[x+dx*27+dy*6,y+dy*27+dx*6]],2,INK,0.7);};
+    if(p.kind==='sweep'&&p.o==='y'){
+      const x=X+p.gap*W,hw=p.half*W;c.fillRect(x-hw,Y,hw*2,H);
+      brush(c,[[x-hw,Y],[x-hw,Y+H]],1.5,RED,0.6);brush(c,[[x+hw,Y],[x+hw,Y+H]],1.5,RED,0.6);
+      arrow(x,p.side>0?Y+14:Y+H-14,0,p.side>0?1:-1);
+    }else if(p.kind==='sweep'){
       const y=Y+p.gap*H,hh=p.half*H;c.fillRect(X,y-hh,W,hh*2);
       brush(c,[[X,y-hh],[X+W,y-hh]],1.5,RED,0.6);brush(c,[[X,y+hh],[X+W,y+hh]],1.5,RED,0.6);
-      const x=p.side>0?X+30:X+W-30;brush(c,[[x,y],[x+p.side*38,y]],2,INK,0.7);
-      brush(c,[[x+p.side*27,y-6],[x+p.side*38,y],[x+p.side*27,y+6]],2,INK,0.7);
+      arrow(p.side>0?X+30:X+W-30,y,p.side,0);
+    }else if(p.kind==='beans'&&p.o==='y'){
+      c.fillRect(X,Y+(p.gap-p.half)*H,W,2*p.half*H);
+      const from=p.side>0?X+8:X+W-8,to=p.side>0?X+W-8:X+8;
+      for(const v of p.dots){const y=Y+v*H;brush(c,[[X+6,y],[X+W-5,y]],1,INK,0.18);blob(c,from,y,4,5,INK,0.9);blob(c,to,y,3,4,RED,0.7);}
     }else if(p.kind==='beans'){
       c.fillRect(X+(p.gap-p.half)*W,Y,2*p.half*W,H);
       for(const u of p.dots){const x=X+u*W;brush(c,[[x,Y+6],[x,Y+H-5]],1,INK,0.18);blob(c,x,Y+8,5,4,INK,0.9);blob(c,x,Y+H-8,4,3,RED,0.7);}
+    }else if(p.kind==='roll'&&p.o==='y'){
+      const edge=Y+(p.side<0?p.depth:1-p.depth)*H;
+      c.fillRect(X,p.side<0?edge+9:Y,W,(1-p.depth)*H-9);
+      brush(c,[[X,edge],[X+W,edge]],2.5,RED,0.85);
+      arrow(X+W/2,edge+(p.side<0?-30:30),0,p.side<0?1:-1);
     }else if(p.kind==='roll'){
       const edge=X+(p.side<0?p.depth:1-p.depth)*W;
       c.fillRect(p.side<0?edge+9:X,Y,(1-p.depth)*W-9,H);
@@ -130,53 +145,37 @@ function drawPossessedAttack(c){
   }
   c.restore();
 }
-/* 튕겨 나온 물건과 원래 윤곽. 치기로 집고 치기로 놓으므로 터치와 키보드가 같은 동작이다. */
-function marketObject(c,x,y,outline){
-  if(!outline)blob(c,x,y,13,8,'#f7f4ed');
-  brush(c,[[x-13,y-3],[x-9,y+7],[x+9,y+7],[x+13,y-3],[x-13,y-3]],2,INK,outline?0.4:0.9);
-  brush(c,[[x-8,y-4],[x-6,y-11],[x+6,y-11],[x+8,y-4]],2,INK,outline?0.4:0.9);
-}
-function drawReturnedObject(c){
-  const r=B.returnItem;
-  if(r){
-    const home=coverPoint({u:r.homeU,v:r.homeV}),src=coverPoint(r),p=r.held?{x:B.px,y:B.py-16}:src;
-    c.save();c.setLineDash([3,3]);marketObject(c,home.x,home.y,true);c.restore();marketObject(c,p.x,p.y,false);
-    if(r.active){
-      brush(c,[[src.x,src.y],[home.x,home.y]],1,INK,0.2);
-      const at=r.held?home:src,near=Math.hypot(at.x-B.px,at.y-B.py)<26;
-      drawStrikeSpot(c,at.x,at.y,23,r.t/240,near,null);   // 결정 D-228
-    }
-  }
-  if(B.returnEcho){
-    const e=B.returnEcho,home=coverPoint(e),t=1-e.t/60;
-    marketObject(c,home.x,home.y,false);
-    // 도깨비가 옆 물건도 윤곽에 맞춰 돌려놓는다.
-    const dest={x:home.x+(e.u>0.5?-38:38),y:home.y-24};
-    c.save();c.setLineDash([3,3]);marketObject(c,dest.x,dest.y,true);c.restore();
-    const x=LW/2+(dest.x-LW/2)*t,y=BOX.y-18+(dest.y-BOX.y+18)*t;
-    blob(c,x,y-15,5,7,RED,0.7);marketObject(c,x,y,false);
-  }
-}
-
 /* 강철이의 먹 예고. 위험 범위는 공격이 끝날 때까지 옅게 남긴다. */
 function drawWinterThreat(c,kind,t){
+  const dir=B.warm?B.warm.dir:0;   // 결정 D-246: 방향마다 예고와 먹을 그 방향으로 그린다
   for(let y=BOX.y+6;y<BOX.y+BOX.h;y+=12)for(let x=BOX.x+6;x<BOX.x+BOX.w;x+=12){
     if(warmSafe(x,y,10))continue;
     blob(c,x,y,7,7,INK,0.07);
-    if(winterThreat(kind,t,x,y)){
-      if(kind==='tail')brush(c,[[x-3,y-9],[x+3,y-9],[x,y+7]],3,INK,0.9);
+    if(winterThreat(kind,t,x,y,dir)){
+      if(kind==='tail')brush(c,dir?[[x+9,y-3],[x+9,y+3],[x-7,y]]:[[x-3,y-9],[x+3,y-9],[x,y+7]],3,INK,0.9);
       else brush(c,[[x-5,y+2],[x,y-2],[x+5,y+1]],12,INK,0.65);
     }
   }
-  if(kind==='mouth')for(let y=BOX.y+24;y<BOX.y+BOX.h;y+=32){
-    for(let x=BOX.x+8;x<BOX.x+BOX.w;x+=14)if(!warmSafe(x,y,10))brush(c,[[x-4,y],[x+4,y]],2,INK,0.2);
+  if(kind==='mouth'){
+    if(dir)for(let x=BOX.x+24;x<BOX.x+BOX.w;x+=40)for(let y=BOX.y+8;y<BOX.y+BOX.h;y+=14){if(!warmSafe(x,y,10))brush(c,[[x,y-4],[x,y+4]],2,INK,0.2);}
+    else for(let y=BOX.y+24;y<BOX.y+BOX.h;y+=32)for(let x=BOX.x+8;x<BOX.x+BOX.w;x+=14){if(!warmSafe(x,y,10))brush(c,[[x-4,y],[x+4,y]],2,INK,0.2);}
+    // 서리가 들어오는 쪽 가장자리에 붉은 줄
+    if(t===0)brush(c,dir?[[BOX.x+3,BOX.y+4],[BOX.x+3,BOX.y+BOX.h-4]]:[[BOX.x+4,BOX.y+3],[BOX.x+BOX.w-4,BOX.y+3]],3,RED,0.7);
   }
-  if(kind==='body')for(const u of [0.46,0.54])for(let y=BOX.y+8;y<BOX.y+BOX.h;y+=14){
-    const x=BOX.x+BOX.w*u;if(!warmSafe(x,y,10))brush(c,[[x,y-4],[x,y+4]],3,RED,0.6);
+  if(kind==='body'){
+    if(dir)for(const v of [0.4,0.6])for(let x=BOX.x+8;x<BOX.x+BOX.w;x+=14){const y=BOX.y+BOX.h*v;if(!warmSafe(x,y,10))brush(c,[[x-4,y],[x+4,y]],3,RED,0.6);}
+    else for(const u of [0.46,0.54])for(let y=BOX.y+8;y<BOX.y+BOX.h;y+=14){const x=BOX.x+BOX.w*u;if(!warmSafe(x,y,10))brush(c,[[x,y-4],[x,y+4]],3,RED,0.6);}
   }
-  if(kind==='tail')for(let i=0;i<=8;i++)for(let y=BOX.y+12;y<BOX.y+BOX.h;y+=30){
-    const x=BOX.x+BOX.w*i/8;if(!warmSafe(x,y,10))blob(c,x,y,3,4,INK,0.4);
+  if(kind==='tail'){
+    if(dir){for(let i=0;i<=5;i++)for(let x=BOX.x+12;x<BOX.x+BOX.w;x+=30){const y=BOX.y+BOX.h*i/5;if(!warmSafe(x,y,10))blob(c,x,y,4,3,INK,0.4);}
+      if(t===0)brush(c,[[BOX.x+BOX.w-3,BOX.y+4],[BOX.x+BOX.w-3,BOX.y+BOX.h-4]],3,RED,0.7);}
+    else for(let i=0;i<=8;i++)for(let y=BOX.y+12;y<BOX.y+BOX.h;y+=30){const x=BOX.x+BOX.w*i/8;if(!warmSafe(x,y,10))blob(c,x,y,3,4,INK,0.4);}
   }
+  if(kind==='core'&&t===0){   // 도는 쪽을 가리키는 붉은 호
+    const cx=BOX.x+BOX.w/2,cy=BOX.y+BOX.h/2,r=Math.min(BOX.w,BOX.h)*0.42,s=dir?-1:1;
+    c.save();c.strokeStyle=RED;c.globalAlpha=0.7;c.lineWidth=2.5;c.beginPath();c.arc(cx,cy,r,-Math.PI/2-s*0.9,-Math.PI/2+s*0.9,s<0);c.stroke();
+    const a=-Math.PI/2+s*0.9,hx=cx+Math.cos(a)*r,hy=cy+Math.sin(a)*r;
+    c.beginPath();c.moveTo(hx,hy);c.lineTo(hx-s*8*Math.sin(a)-6*Math.cos(a),hy+s*8*Math.cos(a)-6*Math.sin(a));c.stroke();c.restore();}
 }
 function drawWarmPath(c){
   const w=B.warm;
@@ -199,16 +198,6 @@ function drawWarmPath(c){
     }
     if(r===w.next&&B.st!=='open'){
       brush(c,[[p.x-8,p.y+20],[p.x,p.y+26],[p.x+8,p.y+20]],2,RED,0.7);
-    }
-  }
-  if(w.ice){const p=coverPoint(w.ice),near=Math.hypot(p.x-B.px,p.y-B.py)<26;
-    brush(c,[[p.x-21,p.y+4],[p.x-8,p.y-7],[p.x+20,p.y+3],[p.x+5,p.y+12],[p.x-21,p.y+4]],2,INK,0.7);
-    brush(c,[[p.x-9,p.y],[p.x,p.y+4],[p.x+7,p.y-2]],1.5,INK,0.6);
-    drawStrikeSpot(c,p.x,p.y,27,w.ice.t/180,near,null);   // 결정 D-228
-  }
-  if(w.thaw){const p=coverPoint(w.thaw),f=w.thaw.t/90;
-    for(let i=0;i<3;i++){const spread=18+i*8+(1-f)*15;
-      brush(c,[[p.x-spread,p.y+5+i*5],[p.x,p.y+12+i*5],[p.x+spread,p.y+5+i*5]],1.5,INK,f*0.5);
     }
   }
 }
