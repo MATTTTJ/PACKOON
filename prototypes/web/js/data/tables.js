@@ -498,6 +498,13 @@ const TABLES={
    "kind": "재료",
    "region": "jangteo",
    "d": "청설모가 솔가지 사이에 숨겨 둔 잣. 떡 고명으로 귀하게 쓴다."
+  },
+  "bingeo": {
+   "n": "빙어",
+   "r": 0,
+   "kind": "먹을거리",
+   "region": "yeongsan",
+   "d": "얼음 구멍에서 낚은 작고 맑은 물고기. 눈에 묻어 두면 오래 간다."
   }
  },
  "BOSS_PARTS": {
