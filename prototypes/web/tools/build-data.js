@@ -55,6 +55,7 @@ for(const r of items){
   if(!['재료','먹을거리','도구','귀한 것'].includes(r['종류']))fail('items.csv '+r.id+': 종류는 재료·먹을거리·도구·귀한 것 중 하나여야 한다');
   if(r['지역']!=='전체'&&!regionIds.has(r['지역']))fail('items.csv '+r.id+': 지역 id를 확인한다');
   ITEMS[r.id]={n:r['이름'],r:lv-1,kind:r['종류'],region:r['지역'],d:r['설명']};
+  if(r['세는말'])ITEMS[r.id].u=r['세는말'];   // 결정 D-238: "(쌀 여덟 되를 얻었다.)"의 세는 말. 비면 '개'
   for(const entry of (r['진행보호']||'').split('·').map(x=>x.trim()).filter(Boolean)){
     const m=entry.match(/^([a-z_]+):([A-Za-z_]+):([1-9]\d*)(?::([a-z_]+))?$/);
     if(!m||!regionIds.has(m[1])||!Number.isSafeInteger(+m[3]))fail('items.csv '+r.id+': 진행보호 형식·지역·수량을 확인한다');

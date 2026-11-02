@@ -211,9 +211,7 @@ function drawScenery(id){
   if(id==='entrance'){
     for(let wx=160,i=0;wx<2800;wx+=175,i++){const x=tx(wx)-cam;if(x<-110||x>W+110)continue;if(i%2===0){const h=32+(i%4)*5;house(x,GROUND-h,72+(i%3)*11,h,n(),undefined,i/2);}else{bundle(x,GROUND,wx);flag(x+38,GROUND,39+i%3*8);}}
     jangseung(tx(125)-cam,GROUND,1);jangseung(tx(242)-cam,GROUND,-1);flag(tx(720)-cam,GROUND,96);
-    // 연줄이 낮은 상자에서 처마로 이어져 안전한 첫 오르기를 알린다.
-    if(!G.f.jxKiteFreed){const kx=tx(1200)-cam;P(kx-5,89,10,12,'#795444');P(kx-8,92,16,6,'#795444');P(kx-1,88,2,14,'#795444');P(kx-6,93,12,4,'#efe1bb');P(kx-4,90,8,10,'#efe1bb');P(kx-1,90,2,10,'#b75745');P(kx-4,94,8,2,'#bc5946');
-      for(let j=0;j<16;j++){const xx=kx-j*4,yy=102+j*2;P(xx,yy,1,2,'#a58f76');}P(kx-8,103,2,12,'#c9604b');P(kx-7,114,4,2,'#c9604b');}
+    // 결정 D-320: 연과 연줄은 얼레 그림(wanderer 'kite')이 얼레 손에서부터 함께 그린다.
   }else if(id==='street'){
     for(let wx=170,i=0;wx<2800;wx+=185,i++){const x=wx-cam;if(x<-110||x>W+110)continue;stall(x,GROUND,i);if(i%2===0){P(x+100,GROUND-31,4,31,t.wood);lantern(x+102,GROUND-32);}}
     const x=1250-cam;
@@ -345,10 +343,139 @@ function elder(ox,y,f,who){
   if(who==='steady'){M(ox,y,f,-6,-22,4,1,'#f6f1e4');M(ox,y,f,2,-22,4,1,'#f6f1e4');}
   else{M(ox,y,f,4,-16,6,1,'#5b4430');M(ox,y,f,9,-18,2,2,'#a5532f');}
 }
+/* 결정 D-320: 얼레(연 날리는 토끼 아이)의 방패연 (사용자 피드백 2026-11-02: 연 아이 이벤트가 구리다, 연이 바람에 날리듯, 연 상태를 그림으로).
+   연은 늘 얼레 손의 얼레(실패)와 줄로 이어져 있고, 상태마다 모습이 다르다.
+   - 처마 못에 걸림(jxKiteFreed 전): 긴 꼬리가 못에 감겨 연이 거꾸로 매달려 바람에 흔들린다. 줄은 얼레가 느슨하게 잡아 처진다.
+   - 풀려 내려옴(jxKiteFreed, jxKiteDone 전): 찢긴 모서리를 위로 하고 얼레 발치 눈 위에 놓여 있다.
+   - 다시 띄움(jxKiteDone, 낮): 한지로 때운 연이 하늘에서 바람결에 기울고 솟는다. 센 바람엔 줄이 팽팽해지고 잦아들면 처진다. 꼬리가 S 자로 나부낀다.
+   - 밤: 연이 안 보여서 거둬들여 얼레 곁에 세워 둔다. 설날 아침(꼭지가 온 뒤)엔 꼭지의 작은 연이 하나 더 뜬다.
+   바람은 kiteGust(초)가 -1~1로 정하고, 동작 줄이기면 0(바람 없는 한 장)이다. */
+const KITE={paper:'#f4ecd6',paper2:'#e6dcc2',edge:'#7d5d3c',stick:'#a88a62',band:'#b8473c',cap:'#2f5f8f',patch:'#fffaf0',seam:'#cdbb92',tail1:'#c9523f',tail2:'#e0a23a',line:'#5f5246'};
+const kiteNow=()=>performance.now()/1000;
+function kiteGust(t){return Vfx.reducedMotion?0:Math.sin(t*0.9)*0.6+Math.sin(t*2.3+1)*0.4;}
+// 방패연 한 장. (cx,cy) 가운데, ang 기울기(라디안), s 배율. o.torn 찢긴 모서리, o.patched 한지로 때운 모서리, o.hole 방구멍 너머 색
+function kitePaper(cx,cy,ang,s=1,o={}){
+  const w=10*s,h=13*s;
+  ctx.save();ctx.translate(Math.round(cx),Math.round(cy));ctx.rotate(ang);
+  const r=(x,y,ww,hh,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(ww)),Math.max(1,Math.round(hh)));};
+  r(-w/2-1,-h/2-1,w+2,h+2,KITE.edge);r(-w/2,-h/2,w,h,KITE.paper);r(w/2-2*s,-h/2,2*s,h,KITE.paper2);
+  r(-w/2,-h/2,w,Math.max(2,2*s),KITE.band);                                   // 머리 띠
+  r(-1.5*s,-h/2+2.5*s,3*s,2*s,KITE.cap);r(-1*s,-h/2+2*s,2*s,3*s,KITE.cap);     // 꼭지 (둥근 색종이)
+  for(let i=1;i<8;i++){const u=i/8;r(-w/2+u*w,-h/2+u*h,1,1,KITE.stick);r(w/2-u*w-1,-h/2+u*h,1,1,KITE.stick);}   // X 자 대살
+  r(-0.5,-h/2,1,h,KITE.stick);
+  const hr=Math.max(1.5,1.8*s);r(-hr,1*s-hr+0.5,hr*2,hr*2-1,o.hole||'#c7d7df');r(-hr+0.5,1*s-hr,hr*2-1,hr*2,o.hole||'#c7d7df');   // 방구멍
+  if(o.torn){r(-w/2,h/2-3*s,3*s,3*s,KITE.paper2);for(let i=0;i<3*s;i++)r(-w/2+i,h/2-3*s+i+((i%2)?1:0),1,1,KITE.edge);}   // 못에 찢긴 아래 모서리: 접힌 귀와 들쭉날쭉한 금
+  if(o.patched){r(-w/2,h/2-3.5*s,3.5*s,3.5*s,KITE.patch);r(-w/2+3.5*s,h/2-3.5*s,1,3.5*s,KITE.seam);r(-w/2,h/2-3.5*s,3.5*s,1,KITE.seam);}
+  ctx.restore();
+}
+// 연의 아래 끝에서 나온 꼬리. 바람 쪽(wx)으로 흘러가며 물결친다. 동작 줄이기면 곧게 처진다
+function kiteTail(x0,y0,t,len,wx,down=1){
+  const rm=Vfx.reducedMotion;let x=x0,y=y0;
+  for(let i=0;i<len;i++){const ph=t*5-i*0.55;
+    x+=wx*0.8+(rm?0:Math.sin(ph)*0.45*(1+i*0.06));y+=down*(0.9+(rm?0:Math.cos(ph)*0.35));
+    P(x,y,2,2,i%4<2?KITE.tail1:KITE.tail2);if(i%6===5)P(x-1,y,4,1,KITE.tail1);}   // 군데군데 매듭
+}
+// 연줄: 손(x1,y1)에서 연(x2,y2)까지. sag 만큼 가운데가 처진다 (팽팽하면 0에 가깝다)
+function kiteLine(x1,y1,x2,y2,sag){
+  const n=Math.max(4,Math.ceil(Math.hypot(x2-x1,y2-y1)/1.5)),mx=(x1+x2)/2,my=(y1+y2)/2+sag;
+  for(let i=0;i<=n;i++){const u=i/n,a=(1-u)*(1-u),b=2*u*(1-u),c=u*u;P(a*x1+b*mx+c*x2,a*y1+b*my+c*y2,1,1,KITE.line);}
+}
+// 얼레(실 감는 틀)를 쥔 손. 줄은 여기서 나간다
+function kiteReel(hx,hy){P(hx-2,hy-3,5,6,'#87694e');P(hx-1,hy-2,3,4,'#d8c7a3');P(hx-3,hy-1,7,1,'#6c5139');P(hx,hy+3,1,3,'#6c5139');}
+/* 필드의 연 장면. (x,y)는 얼레 발밑 화면 좌표, f 는 얼레가 바라보는 쪽 */
+function kiteScene(x,y,f){
+  const F=G.f,t=kiteNow(),g=kiteGust(t),hx=x+f*13,hy=y-14;kiteReel(hx,hy);
+  if(!F.jxKiteFreed){
+    // 처마 못에 걸림: 꼬리가 못에 감기고 연은 거꾸로 매달려 흔들린다
+    const nx=tx(1223)-cam,ny=98,sw=Vfx.reducedMotion?0.2:Math.sin(t*2.1)*0.35+g*0.25;
+    P(nx-1,ny-2,2,3,'#3a3330');
+    const kx=nx+Math.sin(sw)*13,ky=ny+Math.cos(sw)*13;
+    for(let i=0;i<6;i++){const u=i/6;P(nx+(kx-nx)*u+(Vfx.reducedMotion?0:Math.sin(t*6+i)*0.8),ny+(ky-6-ny)*u,2,2,i%4<2?KITE.tail1:KITE.tail2);}
+    kitePaper(kx,ky,Math.PI+sw*0.8,1.2,{torn:true});
+    kiteLine(hx,hy,kx,ky+3,26);
+    return;
+  }
+  if(!F.jxKiteDone){
+    // 풀려 내려옴: 얼레 발치 눈 위에 놓였다. 찢긴 모서리가 보인다
+    kitePaper(hx+f*9,y-4,f*1.35,1,{torn:true});kiteTail(hx+f*14,y-2,0,6,f*0.9,0);
+    kiteLine(hx,hy,hx+f*8,y-6,3);return;
+  }
+  if(n()){
+    // 밤엔 연이 안 보여서 거둬들였다. 얼레 곁에 세워 둔다
+    kitePaper(x-f*10,y-9,-f*0.12,0.9,{patched:true});return;
+  }
+  // 다시 띄움: 바람결에 기울고 솟고, 센 바람엔 줄이 팽팽해진다
+  const kx=hx+f*(96+g*7),ky=46+(Vfx.reducedMotion?0:Math.sin(t*1.3)*4)-g*4,ang=f*(0.32+g*0.22);
+  kiteLine(hx,hy,kx,ky+2,Math.max(2,16-g*11));
+  kiteTail(kx-f*Math.sin(ang)*8,ky+7,t,34,f*0.9);
+  kitePaper(kx,ky,ang,1.15,{patched:true});
+  if(F.jangteoArcsKite3){
+    // 설날 아침: 꼭지가 와서 작은 연을 하나 더 띄운다. 꼭지는 얼레 뒤에 붙어 선다
+    const cx=x-f*12,sx=cx+f*8,sy=y-10,k2x=sx+f*(52+g*5),k2y=92+(Vfx.reducedMotion?0:Math.sin(t*1.7+1)*3)-g*3;
+    const q=(a,b,w,h,c)=>M(cx,y,f,a,b,w,h,c);
+    q(-3,-10,7,9,'#a8a197');q(-3,-16,7,7,'#d5c9b6');q(-3,-24,2,9,'#d5c9b6');q(2,-23,2,8,'#d5c9b6');q(2,-14,1,1,'#322c30');q(-4,-10,8,2,'#d9a441');q(-3,-1,3,1,'#77706a');q(1,-1,3,1,'#77706a');
+    P(sx,sy,2,2,'#87694e');kiteLine(sx+1,sy,k2x,k2y+2,Math.max(2,10-g*6));kiteTail(k2x,k2y+5,t+0.7,12,f*0.8);kitePaper(k2x,k2y,f*(0.25+g*0.2),0.75,{});
+  }
+}
+/* 대사 작은 창 그림 (결정 D-151 장면 그림, 64×44 칸). Rg.kitePics.stuck()·free()·rise() 는 열 때마다 새로 만든다 */
+function kiteSky(w,h){R(0,0,w,h,'#c9d6de');R(0,0,w,8,'#bccbd5');}
+function kiteEave(w){
+  for(let x=-2;x<w;x+=6){R(x,0,6,6,'#5b6670');R(x,0,6,1,'#7d8992');R(x+5,0,1,6,'#3f4950');}
+  R(0,6,w,2,'#f4f6f8');R(0,8,w,3,'#6d4f3a');R(0,11,w,1,'#4b3628');
+}
+function kiteFlakes(w,h,t,n=10){if(Vfx.reducedMotion)return;for(let i=0;i<n;i++){const sp=18+(i*7)%11,x=((i*23+t*sp*1.6)%(w+8))-4,y=((i*13+t*sp*0.6)%(h+4))-2;R(Math.round(x),Math.round(y),1,1,'#ffffff');}}
+Rg.kitePics={
+  // 처마 못에 꼬리가 감긴 연. 바람이 불 때마다 거꾸로 매달린 연이 휘청이며 모서리가 처마에 부딪힌다
+  stuck(){return {animate:true,draw(w,h,t){
+    kiteSky(w,h);kiteEave(w);const g=kiteGust(t),rm=Vfx.reducedMotion;
+    const nx=36,ny=11,sw=rm?0.3:Math.sin(t*2.1)*0.45+g*0.3;R(nx-1,ny-1,2,3,'#2e2826');
+    const kx=nx+Math.sin(sw)*14,ky=ny+Math.cos(sw)*14;
+    for(let i=0;i<7;i++){const u=i/7;R(Math.round(nx+(kx-nx)*u+(rm?0:Math.sin(t*6+i)*0.8)),Math.round(ny+(ky-7-ny)*u),2,2,i%4<2?KITE.tail1:KITE.tail2);}
+    kitePaper(kx,ky,Math.PI+sw*0.8,1.45,{torn:true});
+    kiteLine(kx,ky+4,-2,h+2,8);kiteFlakes(w,h,t);
+  }};},
+  // 너구리 손이 못에서 꼬리를 풀자 연이 줄에 끌려 얼레 쪽(왼쪽 아래)으로 흔들리며 내려간다
+  free(){let t0=null;return {animate:true,draw(w,h,t){
+    if(t0===null)t0=t;const k=Vfx.reducedMotion?1.2:Math.min(2.6,t-t0);
+    kiteSky(w,h);kiteEave(w);R(35,10,2,3,'#2e2826');
+    const reach=Math.min(1,k/0.5),lift=Math.max(0,Math.min(1,(k-0.5)/0.3)),fall=Math.max(0,(k-0.8)/1.4);
+    // 너구리 팔 (오른쪽 위 처마 너머에서 뻗어 온다). 회색 털 팔, 검은 손, 앞으로 내민 손가락
+    const px=Math.round(56-reach*17),py=Math.round(6+reach*4-lift*3);
+    for(let i=0;i<5;i++)R(px+4+i*3,py-3-i*2,5,4,i%2?'#7d7163':'#8c8070');   // 팔 (어깨 쪽으로 비스듬히)
+    R(px+1,py-2,6,5,'#3b332e');R(px,py-1,1,3,'#3b332e');R(px-2,py,2,1,'#2a2420');R(px-2,py+2,2,1,'#2a2420');R(px+2,py+3,1,1,'#2a2420');   // 손과 손가락
+    R(px+3,py-1,2,1,'#5a5049');
+    let kx=36,ky=25,ang=Math.PI;
+    if(fall>0){const e=Math.min(1,fall);kx=36-e*30+Math.sin(fall*5)*4*(1-e*0.5);ky=25+e*26;ang=Math.PI*(1-e)+Math.sin(fall*5)*0.5;}
+    if(fall<0.05)for(let i=0;i<6;i++)R(36+(i%2),Math.round(11+i*1.6-lift*2),2,2,i%4<2?KITE.tail1:KITE.tail2);
+    else kiteTail(kx,ky-6,t,8,0.6,-1);
+    kitePaper(kx,ky,ang,1.45,{torn:true});kiteLine(kx,ky,-2,h+2,Math.max(2,10-fall*6));kiteFlakes(w,h,t,6);
+  }};},
+  // 얼레가 찢긴 모서리를 한지로 때운 연을 다시 띄운다. 몇 걸음 달리자 줄이 팽팽해지고 연이 바람을 타고 솟는다
+  rise(){let t0=null;return {animate:true,draw(w,h,t){
+    if(t0===null)t0=t;const k=Vfx.reducedMotion?4:t-t0,g=kiteGust(t);
+    kiteSky(w,h);R(0,30,w,3,'#9aa5a8');for(let x=0;x<w;x+=9)R(x,28+(x%4),6,3,'#aeb7b7');R(0,36,w,8,'#e8eeee');R(0,36,w,1,'#ffffff');
+    const run=Math.min(1,k/0.7),ex=Math.round(6+run*8),ey=42;
+    const q=(a,b,ww,hh,c)=>M(ex,ey,1,a,b,ww,hh,c);
+    // 얼레 (토끼 아이). 달리는 동안 발이 엇갈린다
+    const step=run<1&&!Vfx.reducedMotion&&Math.floor(k*10)%2;
+    q(-4,-11,9,10,'#a8a197');q(-4,-18,9,8,'#d5c9b6');q(-3,-27,2,10,'#d5c9b6');q(3,-26,2,9,'#d5c9b6');q(-2,-25,1,6,'#c7988e');q(3,-15,1,1,'#322c30');q(5,-13,2,1,'#b87f72');q(-5,-11,11,3,'#b44d48');
+    q(step?-4:-3,-1,3,1,'#77706a');q(step?3:2,-1,3,1,'#77706a');
+    const hx=ex+9,hy=ey-10;R(hx-2,hy-2,4,5,'#87694e');R(hx-1,hy-1,2,3,'#d8c7a3');
+    const up=Math.max(0,Math.min(1,(k-0.5)/1.3)),e=up*up*(3-2*up);
+    const kx=40+e*5+g*2*e,ky=37-e*21+(Vfx.reducedMotion?0:Math.sin(t*1.3)*1.5*e)-g*1.5*e,ang=(1-e)*1.2+e*(0.3+g*0.2);
+    kiteLine(hx,hy,kx,ky+2,Math.max(1,9*(1-e)+3-g*2));
+    if(e>0.15)kiteTail(kx-Math.sin(ang)*6,ky+6,t,Math.round(6+e*12),0.7*e+0.1,1);
+    kitePaper(kx,ky,ang,1.3,{patched:true});
+  }};}
+};
 function wanderer(kind,x,y,f=1){
   x=Math.round(x);y=Math.round(y);const p=(a,b,w,h,c)=>M(x,y,f,a,b,w,h,c);
   if(kind==='kite'){
-    p(-5,-16,11,14,'#a8a197');p(-5,-25,11,11,'#d5c9b6');p(-4,-38,3,15,'#d5c9b6');p(3,-36,3,12,'#d5c9b6');p(-3,-35,1,9,'#c7988e');p(4,-34,1,8,'#c7988e');p(3,-23,1,2,'#322c30');p(5,-19,3,2,'#b87f72');p(-6,-16,13,4,'#b44d48');p(-5,-2,4,2,'#77706a');p(2,-2,4,2,'#77706a');p(7,-14,7,2,'#c9b397');p(13,-15,3,5,'#87694e');
+    // 얼레: 연 날리는 토끼 아이. 손에 실 감는 얼레를 쥐었다. 대화 초상(작은 칸)에는 연을 그리지 않는다.
+    // 필드에서는 늘 연(바람 부는 오른쪽)을 보고 선다
+    if(ctx.canvas.width===W)f=1;
+    p(-5,-16,11,14,'#a8a197');p(-5,-25,11,11,'#d5c9b6');p(-4,-38,3,15,'#d5c9b6');p(3,-36,3,12,'#d5c9b6');p(-3,-35,1,9,'#c7988e');p(4,-34,1,8,'#c7988e');p(3,-23,1,2,'#322c30');p(5,-19,3,2,'#b87f72');p(-6,-16,13,4,'#b44d48');p(-5,-2,4,2,'#77706a');p(2,-2,4,2,'#77706a');p(6,-14,6,2,'#c9b397');
+    if(ctx.canvas.width===W&&G.zone==='entrance')kiteScene(x,y,f);
   }else if(kind==='yut'){
     // 결정 D-131: 사연이 켜진 판의 밤엔 흰눈썹 노인이 일찍 들어가고 곰방대 노인만 화롯불 곁에 남는다 (story.js elderArc2).
     const alone=!!G.f.night&&!!Rg.arcs?.();
