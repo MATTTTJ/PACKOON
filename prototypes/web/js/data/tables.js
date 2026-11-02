@@ -2713,8 +2713,18 @@ const TABLES={
   "gather_darae_vine_hits": 2,
   "gather_solbang_hits": 2,
   "gather_snow_mound_hits": 2,
-  "yut_needle_speed": 1.5,
-  "yut_nak_zone": 10
+  "tuho_arrows": 4,
+  "tuho_ear_points": 3,
+  "tuho_steady_mouth": 0.6,
+  "tuho_steady_ear": 0.05,
+  "tuho_bold_mouth": 0.3,
+  "tuho_bold_ear": 0.12,
+  "tuho_stake": 1,
+  "tuho_steady_pay": 1,
+  "tuho_bold_pay": 2,
+  "tuho_bets_per_day": 3,
+  "tuho_throw_frames": 42,
+  "tuho_pause_frames": 26
  },
  "TUNING": {
   "kkubeogi_cycle": 200,

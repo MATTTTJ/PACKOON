@@ -11,7 +11,7 @@ Rg.onStart=()=>{
   originalStart();
   if(typeof grantNickname==='function'){
     if(G.f.jxKiteDone)grantNickname('jangteo_kite','연 건지는 손','연 아이');
-    if(G.f.jxYutReward)grantNickname('jangteo_yut','한판 벗','윷놀이 노인들');
+    if(G.f.jxYutReward)grantNickname('jangteo_yut','한판 벗','투호 노인들');
   }
 };
 
@@ -88,15 +88,15 @@ function bueongPromise(){
 
 /* ---------- 결정 D-119: 큰 장터 사연 넷 (사용자 지시 "분량은 NPC 서사로", D-98) ----------
    모두 선택이다(?arcs=0이면 열리지 않는다). 막마다 다른 때(낮·밤·그믐 뒤 설날 아침)에 연다.
-   ① 윷 노인들 "부르는 이름": 첫 판 뒤 낮 → 그 밤 → 설날 아침
+   ① 투호 노인들 "부르는 이름": 첫 판 구경 뒤 낮 → 그 밤 → 설날 아침
    ② 연 아이 "멀리서 보이는 표시": 연을 건진 뒤 밤 → 설날 아침
    ③ 부엉 영감 "장부 아랫줄": 신표 뒤 밤 → 그믐 창고를 지킨 밤 → 약떡을 보낸 뒤 밤
    ④ 모락과 엿방울 "작년 그믐의 빚": 낮(떡 심부름) → 밤(엿방울의 속사정) → 엿가위를 찾은 뒤 낮 */
 
-/* ① 윷놀이 노인들. 흰눈썹 노인은 가을부터 이름을 흘린다. 곰방대 노인은 던질 때마다 제 이름을 외친다.
+/* ① 투호 노인들(D-325). 흰눈썹 노인은 가을부터 이름을 흘린다. 곰방대 노인은 화살을 던질 때마다 제 이름을 외친다.
    아이는 엄마가 제 이름을 놓치는 걸 안다(출발 일기). 그래서 둘째 막에서 제 얘기를 꺼낸다. */
 function elderArc1(){
-  arcScene('jangteoArcsElder1','윷놀이 할아버지 하나가 쉰 해 친구의 이름을 놓쳤다. 곰방대 할아버지는 윷을 던질 때마다 제 이름을 크게 외쳤다. 밤에 다시 오라고 했다.',[
+  arcScene('jangteoArcsElder1','투호 할아버지 하나가 쉰 해 친구의 이름을 놓쳤다. 곰방대 할아버지는 화살을 던질 때마다 제 이름을 크게 외쳤다. 밤에 다시 오라고 했다.',[
     ['흰눈썹 노인','한 판 더 하자. 이번엔 내가 이긴다.'],
     ['곰방대 노인','그 말은 어제도 했다.'],
     ['흰눈썹 노인','어제는 어제고. 자, 던져 봐라…'],
@@ -105,10 +105,10 @@ function elderArc1(){
     ['곰방대 노인','쉰 해를 같이 놀고도 이런다니까.'],
     ['흰눈썹 노인','안다, 알아. 혀가 꼬여서 그래.'],
     ['너구리','(흰눈썹 할아버지 귀가 빨개졌다.)'],
-    ['곰방대 노인','(윷가락을 높이 든다.) 곰방대가 던진다!'],
-    ['곰방대 노인','…걸이다. 곰방대 걸!'],
+    ['곰방대 노인','(화살을 높이 든다.) 곰방대가 던진다!'],
+    ['곰방대 노인','…들었다. 곰방대 하나!'],
     ['너구리','왜 던질 때마다 이름을 외치세요?'],
-    ['곰방대 노인','윷은 기세지, 기세.'],
+    ['곰방대 노인','투호는 기세지, 기세.'],
     ['너구리','(곰방대 할아버지가 곰방대를 물고\n흰눈썹 할아버지 쪽은 보지 않는다.)'],
     ['곰방대 노인','밤에 다시 와 봐라.\n저 양반은 해 지면 일찍 들어가거든.']
   ]);
@@ -132,18 +132,18 @@ function elderArc2(){
   ]);
 }
 function elderArc3(){
-  arcScene('jangteoArcsElder3','설날 아침 윷판에서 흰눈썹 할아버지가 곰방대 할아버지의 이름을 불렀다. 모가 나와서 웃는 거라고 했지만, 곰방대 할아버지는 한참 웃었다. 집에 가거든 나도 자꾸 불러 드리라고 했다.',[
+  arcScene('jangteoArcsElder3','설날 아침 투호판에서 흰눈썹 할아버지가 곰방대 할아버지의 이름을 불렀다. 화살이 귀에 꽂혀서 웃는 거라고 했지만, 곰방대 할아버지는 한참 웃었다. 집에 가거든 나도 자꾸 불러 드리라고 했다.',[
     ['흰눈썹 노인','왔냐, 꼬마. 설날 첫판이다.'],
     ['곰방대 노인','네가 먼저 던져라.'],
-    ['너구리','(윷가락을 던졌다. 개다.)'],
-    ['흰눈썹 노인','이번엔 내 차례지.\n설에 모 한 번 나오면 한 해가 편하다더라.'],
-    ['너구리','(흰눈썹 할아버지의 윷가락이 높이 올라갔다가 떨어진다.)'],
-    ['흰눈썹 노인','모다! 곰방대야, 봤냐!'],
+    ['너구리','(화살을 던졌다. 항아리 테를 맞고 튕겨 나갔다.)'],
+    ['흰눈썹 노인','이번엔 내 차례지.\n설에 귀에 한 번 꽂으면 한 해가 편하다더라.'],
+    ['너구리','(흰눈썹 할아버지의 화살이 높이 떴다가 항아리 귀에 쏙 꽂힌다.)'],
+    ['흰눈썹 노인','귀다! 곰방대야, 봤냐!'],
     ['곰방대 노인','…'],
     ['너구리','(곰방대 할아버지가 곰방대를 입에서 떼고 한참 웃는다.)'],
     ['곰방대 노인','봤다. 봤어.'],
-    ['흰눈썹 노인','뭘 그렇게 웃어. 모가 그렇게 좋으냐?'],
-    ['곰방대 노인','그래. 모가 좋아서 그런다.'],
+    ['흰눈썹 노인','뭘 그렇게 웃어. 귀 한 번이 그렇게 좋으냐?'],
+    ['곰방대 노인','그래. 귀에 꽂혀서 좋아 그런다.'],
     ['너구리','(곰방대 할아버지 눈가가 젖었다.)'],
     ['곰방대 노인','꼬마야. 집에 가거든\n네 이름, 네가 자꾸 들려 드려라.'],   // 결정 D-136: 노인의 논리대로 제 이름을 엄마 귀에 들려 드린다
     ['너구리','네.']
@@ -304,10 +304,10 @@ function pairArc4(){
     ['너구리','(떡집 줄이 엿가위 장단에 맞춰 줄어든다.)']
   ],()=>learn('arc:jangteo:pair'));
 }
-/* 떠돌이(region.js의 윷 노인들·연 아이)에 사연 막을 붙인다. 원래 대화는 그대로 두고, 열릴 막이 있을 때만 앞에 고르게 한다.
-   윷 노인들은 한 그림에 둘이 있어 speakers로 한 사람씩 말한다(PA-54 다람쥐 형제와 같은 방식). */
+/* 떠돌이(region.js의 투호 노인들·연 아이)에 사연 막을 붙인다. 원래 대화는 그대로 두고, 열릴 막이 있을 때만 앞에 고르게 한다.
+   투호 노인들은 한 그림에 둘이 있어 speakers로 한 사람씩 말한다(PA-54 다람쥐 형제와 같은 방식). */
 /* 결정 D-131: 떠돌이는 한 번 마치면(finishWanderer) 엔진이 talk 대신 greeting만 보여 준다(engine/field.js tryInteract).
-   윷 노인·연 아이·짠돌의 다음 막은 모두 그 뒤에 열리므로, 열릴 막이 있으면 greeting이 그 막을 고르는 대사가 된다. */
+   투호 노인·연 아이·짠돌의 다음 막은 모두 그 뒤에 열리므로, 열릴 막이 있으면 greeting이 그 막을 고르는 대사가 된다. */
 function arcGreeting(w,rows){
   const d=Object.getOwnPropertyDescriptor(w,'greeting'),base=d?.get?()=>d.get.call(w):()=>d?.value;
   Object.defineProperty(w,'greeting',{configurable:true,enumerable:true,get(){return rows()||base();}});
@@ -316,17 +316,17 @@ function arcGreeting(w,rows){
   const W=Rg.expEncounters?.wanderers||{};
   const elders=(W.street||[]).find(w=>w.id==='j_yut');
   if(elders){
-    elders.speakers=['윷놀이 노인들','흰눈썹 노인','곰방대 노인'];
+    elders.speakers=['투호 노인들','흰눈썹 노인','곰방대 노인'];
     const base=elders.talk;
     const rows=()=>{
       const F=G.f;if(!Rg.arcs())return null;let act=null,label='',line='';
       if(!night()&&F.jxYutReward&&!F.jangteoArcsElder1){act=elderArc1;label='한 판 더 구경한다';line='꼬마 왔구나. 앉아서 구경이나 하려무나.';}
       else if(night()&&F.jangteoArcsElder1&&!F.jangteoArcsElder2){act=elderArc2;label='곰방대 할아버지 곁에 앉는다';line='(곰방대 할아버지 혼자 화롯불 앞에 앉아 있다.)';}
       else if(!night()&&G.boss.dead&&F.jangteoArcsElder2&&!F.jangteoArcsElder3){act=elderArc3;label='설날 첫판에 앉는다';line=G.f.jxSeollalPast?'설은 지났어도 약속은 약속이지. 첫판 하자.':'설날 아침이다! 약속대로 첫판 하자.';}
-      // 흰눈썹 노인은 해 지면 일찍 들어간다(elderArc1). 밤 윷판엔 곰방대 노인만 남는다.
-      if(!act&&night())return [['곰방대 노인',F.jxYutReward?'저 양반은 들어갔다.\n한 판 하려면 두 몫은 내가 놓으마.':'같이 노는 양반은 해 지면 들어간다. 두 몫은 내가 놓으마.\n너는 콩, 나는 돌. 한 판 놀아 주면 쌀 한 되 얹어 주마.'/* 결정 D-136 */,[{t:'윷판 앞에 앉는다',go:()=>Rg.playYut()},{t:'다음에 올게요',go:null}]]];
+      // 흰눈썹 노인은 해 지면 일찍 들어간다(elderArc1). 밤 투호판엔 곰방대 노인만 남고, 내기는 둘이 있어야 하니 열리지 않는다(D-325).
+      if(!act&&night())return [['곰방대 노인',F.jxYutReward?'저 양반은 들어갔다.\n내기는 둘이 있어야 하지. 날 밝거든 오너라.':'같이 던지는 양반은 해 지면 들어간다.\n내기 구경은 날 밝거든 오너라.']];
       if(!act)return null;
-      return [[act===elderArc2?'너구리':'곰방대 노인',line,[{t:label,go:act},{t:'윷 한 판 놀자고 한다',go:base},{t:'다음에 올게요',go:null}]]];
+      return [[act===elderArc2?'너구리':'곰방대 노인',line,[{t:label,go:act},{t:'투호 내기를 건다',go:()=>Rg.playTuho()},{t:'다음에 올게요',go:null}]]];
     };
     elders.talk=()=>{const l=rows();if(l)talk(l);else base();};
     arcGreeting(elders,rows);
@@ -615,208 +615,191 @@ function makePanel(id,title,btn){
 // 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
 Rg.handWork=(kind,after)=>{Sound.gather(true);if(after)after();};
 
-/* 장날 네 말 윷. 판·업기·잡기는 지역 규칙이다.
-   던진 뒤 옮기고, 윷·모 또는 잡기면 다시 던진다. 빽도는 쓰지 않는다.
-   결정 D-70: 도·개·걸·윷·모는 네 윷을 정말 던지듯 무작위로 정한다(타이밍과 상관없다).
-   바늘은 '낙'을 피하는 데만 쓴다: 양 끝 낙 구간(yut_nak_zone)에서 던지면 윷이 멍석 밖으로 떨어져 그 차례는 못 옮긴다.
-   바늘은 가운데에서 출발하고, 동작 줄이기에서는 가운데에 멈춰 있어 낙이 나지 않는다. 결과 분포는 어느 쪽이든 같다. */
-const yutP=makePanel('jangteoYut','설날 윷놀이 · 콩 말과 돌 말','윷 들기');
-const ycv=$('jangteoYutCv');ycv.height=240;
-Object.assign(yutP.style,{position:'fixed',left:'50%',right:'auto',top:'50%',bottom:'auto',transform:'translate(-50%,-50%)',width:'min(92vw,760px)',maxHeight:'92dvh',overflowY:'auto',boxSizing:'border-box',zIndex:'22'});
-const ychoices=el('div');ychoices.id='jangteoYutChoices';yutP.appendChild(ychoices);
-const yleave=el('button','btn','판을 두고 잠깐 일어나기');yleave.type='button';yutP.appendChild(yleave);
-const ylabels=['','도','개','걸','윷','모'];
-let yPos=0,yDir=1;
-const yg=()=>G.f.jxYutGame;
-const pawn=()=>({node:'S',lane:'outer'});
-const routeChoices=p=>p.node==='A5'?['outer','b']:p.node==='A10'?['outer','d']:p.node==='C'?['b','d']:[p.lane];
-function yMove(p,steps,route){
-  let node=p.node,lane=route||p.lane;
-  for(let i=0;i<steps&&node!=='H';i++){
-    if(node==='S'){node='A1';lane='outer';}
-    else if(node==='A5'&&lane==='b')node='B1';
-    else if(node==='A10'&&lane==='d')node='D1';
-    else if(node==='B1')node='B2';else if(node==='B2')node='C';
-    else if(node==='D1')node='D2';else if(node==='D2')node='C';
-    else if(node==='C')node=lane==='b'?'B4':'D4';
-    else if(node==='B4')node='B5';else if(node==='D4')node='D5';
-    else if(node==='B5'){node='A15';lane='outer';}
-    else if(node==='D5'){node='A20';lane='outer';}
-    else if(node==='A20')node='H';
-    else node='A'+(+node.slice(1)+1);
-  }
-  return {node,lane};
+/* ---------- 결정 D-325: 투호 내기 (윷놀이를 뺐다, 사용자 지시 2026-11-02) ----------
+   두 노인이 장터 한구석에서 항아리에 화살을 번갈아 던진다. 아이는 직접 던지지 않고, 판이 열리기 전에 이길 쪽에 솔방울 하나를 건다.
+   솔방울은 곰방대 노인의 화롯불 땔감이 된다. 맞히면 이긴 노인이 제 주머니에서 값을 치른다(흰눈썹은 설에 쓰려던 곶감, 곰방대는 화롯불에 구운 군밤).
+   결정 D-326: 흰눈썹 노인은 고르게 입에 넣고 귀는 드물다. 곰방대 노인은 자주 빗나가지만 귀(세 점)에 곧잘 꽂는다.
+   대략 6 대 4로 흰눈썹이 이기므로 값은 흰눈썹 곶감 하나, 곰방대 군밤 둘이다. 비기면 한 살씩 더 던지고, 세 번을 더 비기면 판돈을 돌려준다.
+   낮마다 tuho_bets_per_day 판까지 건다(해가 지고 다시 밝으면 다시 센다). 구경만 하는 판은 세지 않는다.
+   사연이 켜진 밤에는 흰눈썹 노인이 일찍 들어가 내기가 없다(D-131). 수치는 minigames.csv의 tuho_* 줄. */
+const tuhoP=makePanel('jangteoTuho','투호 구경 · 누가 이길까','건너뛰기');
+const tcv=$('jangteoTuhoCv');tcv.height=150;tcv.style.width='min(100%,560px)';
+Object.assign(tuhoP.style,{position:'fixed',left:'50%',right:'auto',top:'50%',bottom:'auto',transform:'translate(-50%,-50%)',width:'min(92vw,620px)',maxHeight:'92dvh',overflowY:'auto',boxSizing:'border-box',zIndex:'22'});
+const tchoices=el('div');tchoices.id='jangteoTuhoChoices';tuhoP.appendChild(tchoices);
+const TH={steady:{name:'흰눈썹 노인',short:'흰눈썹',x:46,hand:60,pay:'gotgam',fletch:'#b54a34'},
+  bold:{name:'곰방대 노인',short:'곰방대',x:274,hand:260,pay:'gunbam',fletch:'#416c82'}};
+const POT={x:160,mouth:66,ear:80,earDx:13,floor:132};
+let tg=null;   // 지금 판. 판은 짧아서 저장하지 않는다 (창을 닫으면 그 판은 끝난다)
+const yAlone=()=>!!G.f.night&&Rg.arcs();
+function tBetsLeft(){const d=G.f.jxTuhoDay;return MG.tuho_bets_per_day-(d&&d.night===!!G.f.night?d.n:0);}
+function tPay(who){return MG['tuho_'+who+'_pay'];}
+function tRoll(who){const r=Math.random(),ear=MG['tuho_'+who+'_ear'],mouth=MG['tuho_'+who+'_mouth'];return r<ear?'ear':r<ear+mouth?'mouth':'miss';}
+const tPoints=r=>r==='ear'?MG.tuho_ear_points:r==='mouth'?1:0;
+function tPlan(){
+  const list=[];for(let i=0;i<MG.tuho_arrows;i++)for(const who of ['steady','bold'])list.push({who,res:tRoll(who)});
+  const sum=who=>list.filter(a=>a.who===who).reduce((n,a)=>n+tPoints(a.res),0);
+  for(let k=0;k<3&&sum('steady')===sum('bold');k++)for(const who of ['steady','bold'])list.push({who,res:tRoll(who),extra:true});
+  // 떨어지는 자리: 귀는 던진 쪽 귀, 입은 가운데에서 조금씩, 빗나가면 항아리 둘레 멍석 위
+  return list.map((a,i)=>Object.assign(a,{seed:hash(i*7.3+Math.random()*99),side:a.who==='steady'?-1:1}));
 }
-Rg.yutRules={move:yMove,routes:routeChoices};
+function tTarget(a){
+  if(a.res==='ear')return [POT.x+a.side*POT.earDx,POT.ear];
+  if(a.res==='mouth')return [POT.x+Math.round((a.seed-.5)*4),POT.mouth];
+  return [POT.x+a.side*(18+Math.round(a.seed*18)),POT.floor-2];
+}
+function tNew(){tg={phase:'bet',bet:null,plan:[],i:0,t:0,score:{steady:0,bold:0},message:'',story:''};tRender();}
+function tStart(bet){
+  if(bet){if(!has('solbang',MG.tuho_stake)||tBetsLeft()<=0)return;takeItem('solbang',MG.tuho_stake);
+    const d=G.f.jxTuhoDay;G.f.jxTuhoDay={night:!!G.f.night,n:(d&&d.night===!!G.f.night?d.n:0)+1};}
+  Object.assign(tg,{phase:'play',bet,plan:tPlan(),i:0,t:0,score:{steady:0,bold:0},story:''});
+  tg.message=bet?TH[bet].short+' 할아버지에게 솔방울을 걸었다. 흰눈썹 할아버지부터 던진다.':'걸지 않고 구경한다. 흰눈썹 할아버지부터 던진다.';
+  tRender();
+}
+const T_SAY={
+  steady:{mouth:'쏙, 입에 들었다.',ear:'귀에 꽂혔다! 흰눈썹 할아버지가 수염을 쓸어내린다.',miss:'테를 맞고 멍석에 떨어졌다.'},
+  bold:{mouth:'…들었다! 곰방대 하나!',ear:'귀에 꽂혔다! 곰방대 셋!',miss:'…에잇, 바람이 샜다.'}
+};
+function tLand(a){
+  tg.score[a.who]+=tPoints(a.res);
+  tg.message=(a.extra?'비겨서 한 살 더. ':'')+(a.who==='bold'?'곰방대가 던진다! ':'흰눈썹 할아버지가 숨을 고르고 던진다. ')+T_SAY[a.who][a.res];
+  if(tg.i===MG.tuho_arrows)tStory();   // 판 가운데쯤, 노인들이 옛 방석 이야기를 하나 꺼낸다
+}
+// 결정 D-327: 아빠 이야기(D-136 보부상 청년)는 투호 구경판에서 듣는다. 청년은 늘 기복 큰 쪽에 걸었다. 부를 준다는 열매 소문을 쫓던 그때와 같은 결.
 const youngStories=[
-  // 결정 D-136: 노인들은 아이를 알아보지 못한다. 옛 방석의 '보부상 청년' 이야기만 하고, 끈 끝을 한 번 거꾸로 감는 손버릇을 듣고 아이가 먼저 알아본다.
-  '예전에 보부상 청년 하나가 이 방석에 앉았지. 보따리 끈 끝을 꼭 한 번 거꾸로 감더라. 그 집 버릇인지.',
+  '예전에 보부상 청년 하나가 이 자리에서 구경했지. 보따리 끈 끝을 꼭 한 번 거꾸로 감더라. 그 집 버릇인지.',
   '그 청년, 앉자마자 북쪽 장날부터 물었어. 장사도 길부터 알아야 한다면서.',
-  '말 하나 잡히고 입이 댓 발 나왔지. 그래도 남의 콩은 주워 줬어.',
+  '그 청년은 꼭 곰방대 쪽에 걸더라. 한 번에 크게 먹겠다고. 지고는 입이 댓 발 나왔지. 그래도 떨어진 화살은 주워 줬어.',
   '그땐 부를 준다는 열매 소문이 돌았지. 그 청년도 그 소문을 쫓았고.',
   '판 끝나니 우리 장보따리 끈도 고쳐 주더군. 손이 야물었어.',
   '우리가 길을 잘못 들까 봐 해 질 녘 깃대에 헝겊도 묶고 갔지.'
 ];
-function yStory(){
-  const s=yg(),i=Math.min(youngStories.length-1,Math.floor((s.throws-1)/(s.me.length===1?3:5)));
-  if(i>=0&&!s.heard.includes(i)){s.heard.push(i);s.story=yWho()+': '+youngStories[i];}
-  else s.story=G.f.night?yWho()+': 등불이 켜지니 콩 그림자도 길어졌네. 낮에 놓친 길도 보이지.':'노인들: 말부터 골라 보거라. 모퉁이에 서면 안길로 꺾을 수 있단다.';
+function tStory(){
+  const heard=G.f.jxYutHeard||(G.f.jxYutHeard=[]),i=youngStories.findIndex((_,k)=>!heard.includes(k));
+  const who=yAlone()?'곰방대 노인':'흰눈썹 노인';
+  if(i>=0){heard.push(i);tg.story=who+': '+youngStories[i];}
+  else tg.story=G.f.night?'곰방대 노인: 등불이 켜지니 화살 그림자도 길어졌네.':'흰눈썹 노인: 투호는 마음을 고르는 놀이다. 기세만으론 안 들어가.';
 }
-function yPoint(node){
-  if(node==='S')return [285,205];if(node==='H')return [285,172];
-  const fixed={B1:[235,62],B2:[201,88],C:[166,115],B4:[132,141],B5:[97,168],D1:[97,62],D2:[132,88],D4:[201,141],D5:[235,168]};
-  if(fixed[node])return fixed[node];
-  const i=+node.slice(1);
-  if(i<=5)return [270,205-i*36];if(i<=10)return [270-(i-5)*42,25];
-  if(i<=15)return [60,25+(i-10)*36];return [60+(i-15)*42,205];
-}
-function yDraw(){
-  const s=yg();if(!s)return;const c=ycv.getContext('2d');
-  c.fillStyle='#efe3c8';c.fillRect(0,0,320,240);c.strokeStyle='#9b754c';c.lineWidth=2;
-  c.strokeRect(60,25,210,180);c.beginPath();c.moveTo(60,25);c.lineTo(270,205);c.moveTo(270,25);c.lineTo(60,205);c.stroke();
-  for(const n of [...Array.from({length:20},(_,i)=>'A'+(i+1)),'B1','B2','C','B4','B5','D1','D2','D4','D5']){
-    const [x,y]=yPoint(n);c.fillStyle='#fcf5e5';c.beginPath();c.arc(x,y,n==='C'?8:5,0,Math.PI*2);c.fill();c.stroke();
+function tFinish(){
+  const s=tg.score,winner=s.steady>s.bold?'steady':s.bold>s.steady?'bold':null;tg.phase='over';
+  let msg=winner?TH[winner].name+'이 이겼다 ('+s.steady+' 대 '+s.bold+').':'세 번을 더 던져도 비겼다 ('+s.steady+' 대 '+s.bold+').';
+  if(tg.bet&&!winner){addItem('solbang',MG.tuho_stake);msg+=' 판돈 솔방울을 도로 받았다.';}
+  else if(tg.bet&&tg.bet===winner){const n=tPay(winner);addItem(TH[winner].pay,n);
+    msg+=' '+(winner==='bold'?'곰방대 할아버지가 화롯불에서 군밤을 꺼내 준다.':'흰눈썹 할아버지가 소매에서 곶감을 꺼내 준다.')+'\n'+gotText([[TH[winner].pay,n]]);}
+  else if(tg.bet)msg+=' 솔방울은 화롯불 바구니로 들어갔다.';
+  tg.message=msg;
+  if(tg.bet&&!G.f.jxTuhoBetOnce){G.f.jxTuhoBetOnce=true;ledger('t_jangteo_yut','투호 노인들','투호 한 판에 솔방울 걸기','이긴 노인의 곶감 또는 군밤');ledgerDone('t_jangteo_yut');}
+  if(!G.f.jxYutReward){
+    // 첫 판을 끝까지 함께 본 뒤에 사연 막(elderArc1)이 열린다. 옛 이름의 진행값을 그대로 쓴다(옛 저장과 맞춘다).
+    G.f.jxYutReward=true;finishWanderer('j_yut');
+    if(typeof grantNickname==='function')grantNickname('jangteo_yut','한판 벗','투호 노인들');
+    diary('jx_yut','장터 노인 둘이 항아리에 화살을 던지는 투호를 구경했다. 옛날 이 자리에서 구경하던 보부상 청년이 끈 끝을 한 번 거꾸로 감았단다. 아빠다.');
   }
-  c.font='11px sans-serif';c.fillStyle='#3a3028';c.fillText('도착',278,159);c.fillText('출발',278,232);
-  for(const [team,color] of [['me','#b54a34'],['elders','#416c82']]){
-    const groups={};s[team].forEach((p,i)=>{const key=['S','H'].includes(p.node)?p.node+i:p.node;(groups[key]||(groups[key]=[])).push(i);});
-    for(const ids of Object.values(groups)){
-      const i=ids[0],p=s[team][i],[x,y]=yPoint(p.node);
-      const dx=['S','H'].includes(p.node)?(team==='me'?-10:10)+(i%2?4:-4):0;
-      const dy=['S','H'].includes(p.node)?Math.floor(i/2)*13-6:0;
-      if(ids.length>1){c.fillStyle='#674a34';c.beginPath();c.arc(x+dx,y+dy-4,8,0,Math.PI*2);c.fill();}
-      c.fillStyle=color;c.beginPath();c.arc(x+dx,y+dy,8,0,Math.PI*2);c.fill();c.fillStyle='#fff9e8';c.fillText(String(i+1),x+dx-3,y+dy+4);
-      if(ids.length>1){c.fillStyle='#3b3027';c.fillText('×'+ids.length,x+dx+9,y+dy+4);}
-    }
-  }
-  c.fillStyle='#3b3027';c.fillText('콩 '+s.me.filter(p=>p.node==='H').length+'/'+s.me.length,3,17);c.fillText('돌 '+s.elders.filter(p=>p.node==='H').length+'/'+s.elders.length,3,33);
-  // 손에 든 윷은 앞뒤를 알 수 없다. 던진 뒤에만 나온 면을 그린다. 낙이면 한 짝이 판 밖에 누워 있다.
-  const aiming=s.phase==='aim'||s.phase==='ready',bits=aiming||s.nak?0:s.roll===5?0:(1<<s.roll)-1;
-  for(let i=0;i<4;i++){
-    const off=s.nak&&!aiming&&i===3;
-    if(aiming){c.fillStyle='#a07a4a';c.fillRect(5+i*12,75,7,52);continue;}
-    const face=(bits>>i)&1;c.fillStyle=face?'#c9a266':'#8a633a';
-    if(off){c.save();c.translate(52,150);c.rotate(1.2);c.fillRect(0,0,7,52);c.restore();continue;}
-    c.fillRect(5+i*12,75,7,52);
-    if(face){c.fillStyle='#513c27';c.fillRect(7+i*12,85,2,2);c.fillRect(7+i*12,113,2,2);}
-  }
-  c.fillStyle='#3b3027';
-  if(aiming)c.fillText('?',22,146);else if(s.nak)c.fillText('낙',20,146);else if(s.roll)c.fillText(ylabels[s.roll],14,146);
-  if(s.phase==='aim'){
-    // 바늘 막대: 양 끝 붉은 칸이 낙 구간이다.
-    const nak=MG.yut_nak_zone;
-    c.fillStyle='#a98f69';c.fillRect(10,218,260,12);
-    c.fillStyle='#b4432a';c.fillRect(10,218,260*nak/100,12);c.fillRect(270-260*nak/100,218,260*nak/100,12);
-    c.fillStyle='#fff9e8';c.fillRect(10+yPos*2.6,214,3,20);
-  }
-  yutP.dataset.phase=s.phase;yutP.dataset.turn=s.turn;
-}
-function yButton(text,go){const b=el('button','btn',text);b.type='button';b.style.margin='3px';b.onclick=go;ychoices.appendChild(b);return b;}
-function yRender(){
-  const s=yg();ychoices.replaceChildren();
-  $('jangteoYutHint').textContent=(s.message||'콩은 내 말, 푸른 돌은 '+yWho()+' 말.')+'\n'+(s.story||'Space · J로 들고, 한 번 더 눌러 던져 보자.');
-  $('jangteoYutHint').style.whiteSpace='pre-line';
-  $('jangteoYutPips').textContent='도 1 · 개 2 · 걸 3 · 윷 4 · 모 5 | 업기·잡기 있음';
-  const main=$('jangteoYutBtn');main.hidden=!['ready','aim','elder','review'].includes(s.phase);
-  main.textContent=s.phase==='ready'?'윷 들기 · Space / J':s.phase==='aim'?'지금 던지기 · Space / J':s.phase==='elder'?yWho()+' 차례 보기 · Space / J':'다음 차례 · Space / J';
-  if(s.phase==='ready'||s.phase==='aim')yButton('손에 맡겨 던지기 (타이밍 없이)',()=>yThrow(yRandom()));
-  // 판 그림의 콩 번호와 같은 번호로 고른다. 출발에 남은 콩은 하나만, 업힌 콩은 한 버튼으로 보인다.
-  if(s.phase==='choose'){const seen=new Set();s.me.forEach((p,i)=>{
-    if(p.node==='H'||seen.has(p.node))return;seen.add(p.node);const n=s.me.filter(q=>q.node===p.node).length;
-    yButton((i+1)+'번 콩 · '+(p.node==='S'?'출발에서 새로':yNodeName(p.node))+(p.node!=='S'&&n>1?' (업은 콩 '+n+')':''),()=>yChoose(i));});}
-  if(s.phase==='route')routeChoices(s.me[s.selected]).forEach(route=>{
-    const end=yMove(s.me[s.selected],s.roll,route);
-    yButton((route==='outer'?'바깥길':route==='b'?'왼쪽 안길':'오른쪽 안길')+' → '+yNodeName(end.node),()=>yApply('me',s.selected,route));
-  });
-  if(s.phase==='over'){
-    for(const n of [1,2,4])yButton('한 판 더 · 말 '+YN[n]+(n===1?' (짧게)':''),()=>yNew(n));
-    yButton('판을 마치고 일어나기',()=>{yutP.hidden=true;refreshHud();
-      // 결정 D-136: 아이가 먼저 알아본다. 끈 끝을 한 번 거꾸로 감는 건 집에서 본 아빠 손버릇(notebook habit:yakyeon과 같은 결). 노인들은 아이를 알아보지 못했다.
-      if(!G.f.jxYutDadKnown&&yg().heard.includes(0)){G.f.jxYutDadKnown=true;const who=yAlone()?'곰방대 노인':'윷놀이 노인들';
-        talk([['너구리','끈 끝을 한 번 거꾸로 감는 거…\n아빠가 보따리 묶을 때 꼭 그랬어요.'],[who,'…네 아비냐? 그 청년이?'],['너구리','네. 이 모자도 아빠 거예요.'],[who,'허, 그 청년이 그새 아비가 됐구나.\n다음 판엔 그 청년 얘기 더 해 주마.']]);}
-    });
-  }
-  yleave.hidden=s.phase==='over';
-  yDraw();
-}
-function yNodeName(node){return node==='H'?'들기':node==='S'?'출발':node==='C'?'가운데':node[0]==='A'?'바깥 '+node.slice(1)+'칸':
-  (node[0]==='B'?'왼쪽':'오른쪽')+' 안길 '+({1:1,2:2,4:3,5:4}[node[1]])+'칸';}
-function yRandom(){const up=Array.from({length:4},()=>Math.random()<.5?1:0).reduce((a,b)=>a+b,0);return up||5;}
-function yNakZone(){return yPos<MG.yut_nak_zone||yPos>100-MG.yut_nak_zone;}
-// 낙: 윷 한 짝이 멍석 밖으로 떨어졌다. 이번 차례는 옮기지 못하고 노인들에게 넘어간다.
-function yNak(){
-  const s=yg();if(s.phase!=='aim')return;
-  s.throws++;s.roll=0;s.nak=true;s.message='윷 한 짝이 멍석 밖으로 굴러떨어졌다. 낙이라 이번엔 못 옮긴다.';
-  s.turn='elders';s.phase='review';yRender();
-}
-function yThrow(roll){
-  const s=yg();if(!['ready','aim'].includes(s.phase))return;
-  s.nak=false;s.roll=roll;s.throws++;s.phase='choose';
-  // 고를 콩이 하나뿐이면 묻지 않고 바로 옮긴다 (갈림길은 그대로 묻는다).
-  const spots=new Set(s.me.filter(p=>p.node!=='H').map(p=>p.node));
-  s.message=ylabels[roll]+'! '+roll+'칸 갈 수 있다.'+(spots.size>1?' 몇 번 콩을 옮길까?':'');yStory();
-  if(spots.size===1){yChoose(s.me.findIndex(p=>p.node!=='H'));return;}
-  yRender();
-}
-function yChoose(i){
-  const s=yg();if(s.phase!=='choose'||s.me[i].node==='H')return;s.selected=i;
-  if(routeChoices(s.me[i]).length>1){s.phase='route';s.message='모퉁이에 섰다. 이번에 갈 길을 골라 보자.';yRender();}
-  else yApply('me',i,s.me[i].lane);
-}
-function yApply(team,i,route){
-  const s=yg(),other=team==='me'?'elders':'me',p=s[team][i],from=p.node;
-  const moving=s[team].filter((q,k)=>k===i||(from!=='S'&&from!=='H'&&q.node===from));
-  const end=yMove(p,s.roll,route);moving.forEach(q=>Object.assign(q,end));
-  const caught=end.node!=='H'?s[other].filter(q=>q.node===end.node):[];
-  caught.forEach(q=>Object.assign(q,pawn()));
-  s.message=(team==='me'?(i+1)+'번 콩':yWho()+' '+(i+1)+'번 돌')+' · '+ylabels[s.roll]+'('+s.roll+'칸) → '+yNodeName(end.node)+'.'+(moving.length>1?' 업은 말도 함께!':'')+(caught.length?' 상대 말을 잡았다. 한 번 더!':s.roll>=4?' 한 번 더 던진다.':'');
-  const winner=s[team].every(q=>q.node==='H');
-  if(winner){yFinish(team);return;}
-  s.turn=(caught.length||s.roll>=4)?team:other;s.phase='review';yRender();
-}
-function yElder(){
-  const s=yg();s.nak=false;s.roll=yRandom();s.throws++;yStory();
-  let best=null;
-  s.elders.forEach((p,i)=>{if(p.node==='H')return;for(const route of routeChoices(p)){
-    const end=yMove(p,s.roll,route),capture=s.me.filter(q=>q.node===end.node&&q.node!=='S'&&q.node!=='H').length;
-    const score=(end.node==='H'?100:0)+capture*30+(end.node==='C'?18:0)+(end.node[0]==='A'?+end.node.slice(1):10);
-    if(!best||score>best.score)best={i,route,score};
-  }});yApply('elders',best.i,best.route);
-}
-function yFinish(team){
-  const s=yg(),n=s.me.length;s.phase='over';s.turn=team;
-  s.message=team==='me'?(n===1?'콩이 먼저 들었다. 내가 이겼다!':'콩 말 '+YN[n]+'이 다 들었다. 내가 이겼다!')
-    :(n===1?'돌이 먼저 들었다.':'돌 말 '+YN[n]+'이 먼저 들었다.')+' 이번 판은 '+yWho()+'이 이겼다.';
-  s.story=yWho()+': 이겨도 져도 같이 앉은 벗이지. 다음 판도 기다리마.';
-  if(!G.f.jxYutReward){G.f.jxYutReward=true;addItem('ssal',1);ledger('t_jangteo_yut','윷놀이 노인들','한 판 함께 놀기','쌀 1');ledgerDone('t_jangteo_yut');s.message+=' 승패와 관계없이 쌀 한 되를 받았다.';}
   G.f.jxYutPlays=(G.f.jxYutPlays||0)+1;
-  if(G.f.night)G.f.jxYutNight=true;else G.f.jxYutDay=true;
-  finishWanderer('j_yut');
-  if(typeof grantNickname==='function')grantNickname('jangteo_yut','한판 벗','윷놀이 노인들');
-  diary('jx_yut','노인들과 콩 말과 돌 말을 직접 옮기며 윷놀이를 했다. 옛날 이 방석에 앉았던 보부상 청년이 끈 끝을 한 번 거꾸로 감았단다. 아빠다.');yRender();
+  tRender();
 }
-const YN={1:'하나',2:'둘',4:'넷'};
-// 결정 D-131: 사연이 켜진 판의 밤 윷판엔 곰방대 노인만 있다 (흰눈썹 노인은 해 지면 일찍 들어간다).
-const yAlone=()=>!!G.f.night&&Rg.arcs(),yWho=()=>yAlone()?'곰방대 노인':'노인들';
-// 결정 D-29: 첫 판(쌀 덤)은 말 하나로 짧게, 끝난 뒤 말 수를 고른다 (design/data/decisions.csv)
-function yNew(n=G.f.jxYutReward?4:1){G.f.jxYutGame={me:Array.from({length:n},pawn),elders:Array.from({length:n},pawn),phase:'ready',turn:'me',roll:0,throws:0,heard:[],story:G.f.night?(yAlone()?'곰방대 노인: 저 양반 몫은 내가 놓으마. 등불 밑에서 한 판 하자꾸나.':'노인들: 등불 밑이라 콩 그림자가 길다. 한 판 하자꾸나.'):'노인들: 보따리는 거기 내려놓고. 어디, 한 판 놀아 보자꾸나.'/* 결정 D-136: 첫 인사에서 아이를 알아보지 않는다 */,message:(n===1?'말 하나로 먼저 드는 쪽이 이기는 짧은 판.':'말 '+YN[n]+'씩 쓰는 장날 윷놀이.')+' 윷·모·잡기는 옮긴 뒤 한 번 더. 빽도는 없어.'};yRender();}
-Rg.playYut=()=>{if(CLASSIC)return;yutP.hidden=false;if(!yg())yNew();else yRender();};
-function yHit(){
-  if(yutP.hidden)return;const s=yg();
-  if(s.phase==='ready'){s.phase='aim';yPos=50;yDir=1;s.nak=false;s.message='바늘이 붉은 끝에 닿기 전에 Space · J. 끝에서 던지면 낙이야.';yRender();}
-  else if(s.phase==='aim'){
-    // 결정 D-70: 무엇이 나올지는 던지는 순간과 상관없다. 바늘은 낙만 가른다.
-    if(yNakZone())yNak();else yThrow(yRandom());
-  }else if(s.phase==='elder')yElder();
-  else if(s.phase==='review'){s.phase=s.turn==='me'?'ready':'elder';yRender();}
+function tSkip(){
+  if(tg?.phase!=='play')return;
+  while(tg.i<tg.plan.length){tLand(tg.plan[tg.i]);tg.i++;}
+  tFinish();
 }
-$('jangteoYutBtn').onclick=yHit;
-yleave.onclick=()=>{if(yg()?.phase==='aim')yg().phase='ready';yutP.hidden=true;toast('윷판은 그대로야. 거리의 윷판에서 이어 할 수 있어.');};
-yutP.addEventListener('keydown',e=>{if([' ','Enter'].includes(e.key)&&e.target.matches('button')){e.preventDefault();e.stopPropagation();e.target.click();}});
+function tButton(text,go,disabled){const b=el('button','btn',text);b.type='button';b.style.margin='3px';b.disabled=!!disabled;b.onclick=go;tchoices.appendChild(b);return b;}
+function tClose(){
+  const heard=G.f.jxYutHeard||[];tuhoP.hidden=true;tg=null;refreshHud();
+  // 결정 D-136: 아이가 먼저 알아본다. 끈 끝을 한 번 거꾸로 감는 건 집에서 본 아빠 손버릇. 노인들은 아이를 알아보지 못했다.
+  if(!G.f.jxYutDadKnown&&heard.includes(0)){G.f.jxYutDadKnown=true;const who=yAlone()?'곰방대 노인':'흰눈썹 노인';
+    talk([['너구리','끈 끝을 한 번 거꾸로 감는 거…\n아빠가 보따리 묶을 때 꼭 그랬어요.'],[who,'…네 아비냐? 그 청년이?'],['너구리','네. 이 모자도 아빠 거예요.'],[who,'허, 그 청년이 그새 아비가 됐구나.\n다음 판엔 그 청년 얘기 더 해 주마.']]);}
+}
+function tRender(){
+  const s=tg;tchoices.replaceChildren();
+  const left=tBetsLeft(),stake=MG.tuho_stake,have=has('solbang',stake);
+  if(s.phase==='bet')s.message=left<=0?'오늘 내기는 다 걸었다. 구경은 얼마든지 된다.':
+    !have?'걸 솔방울이 없다. 구경만 할 수는 있다.':'누가 이길까? 오늘 '+left+'판 더 걸 수 있다.';
+  $('jangteoTuhoHint').textContent=s.message+(s.story?'\n'+s.story:'');$('jangteoTuhoHint').style.whiteSpace='pre-line';
+  $('jangteoTuhoPips').textContent='입 1점 · 귀 '+MG.tuho_ear_points+'점 · 한 사람 '+MG.tuho_arrows+'살';
+  const main=$('jangteoTuhoBtn');main.hidden=s.phase!=='play';main.textContent='끝까지 건너뛰기 · Space / J';
+  if(s.phase==='bet'){
+    for(const who of ['steady','bold'])tButton(TH[who].short+' 할아버지에게 솔방울 걸기 (맞히면 '+ITEMS[TH[who].pay].n+' '+tPay(who)+')',()=>tStart(who),!have||left<=0);
+    tButton('걸지 않고 구경만 하기',()=>tStart(null));
+    tButton('일어나기',tClose);
+  }
+  if(s.phase==='over'){
+    tButton('한 판 더 보기',tNew);
+    tButton('일어나기',tClose);
+  }
+  tuhoP.dataset.phase=s.phase;tDraw();
+}
+function tArrow(c,x,y,ang,color,len=16){
+  const dx=Math.cos(ang),dy=Math.sin(ang);c.strokeStyle='#6b4a2c';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(x,y);c.lineTo(x-dx*len,y-dy*len);c.stroke();
+  c.fillStyle='#2f2a26';c.fillRect(Math.round(x-1),Math.round(y-1),2,2);   // 촉
+  c.fillStyle=color;const fx=x-dx*len,fy=y-dy*len;c.fillRect(Math.round(fx-2),Math.round(fy-2),4,4);   // 깃
+}
+function tElder(c,who){
+  const e=TH[who],x=e.x,f=POT.floor,face=who==='steady'?1:-1;
+  c.fillStyle=who==='steady'?'#ddd5c2':'#8d9089';c.fillRect(x-11,f-22,22,22);   // 앉은 두루마기
+  c.fillStyle=who==='steady'?'#c3b9a2':'#6f7370';c.fillRect(x-13,f-4,26,4);
+  c.fillStyle='#b9b0a0';c.fillRect(x-7,f-36,14,14);   // 얼굴
+  c.fillStyle='#3b3a37';c.fillRect(x-8,f-40,16,5);   // 갓 대신 탕건
+  c.fillStyle=who==='steady'?'#f6f1e4':'#5a5650';c.fillRect(x-6,f-31,5,2);c.fillRect(x+1,f-31,5,2);   // 눈썹: 흰눈썹은 희다
+  c.fillStyle='#2b2a28';c.fillRect(x-4,f-29,2,2);c.fillRect(x+2,f-29,2,2);
+  c.fillStyle='#eee9dc';c.fillRect(x-4,f-25,8,5);   // 수염
+  if(who==='bold'){c.fillStyle='#5b4430';c.fillRect(x-14,f-25,10,2);c.fillStyle='#a5532f';c.fillRect(x-16,f-27,3,3);}   // 곰방대
+  // 던지는 차례면 화살 쥔 팔을 항아리 쪽으로 든다
+  const cur=tg.phase==='play'?tg.plan[tg.i]:null,throwing=cur&&cur.who===who&&tg.t<(Vfx.reducedMotion?1:MG.tuho_throw_frames)*0.35;
+  c.fillStyle=who==='steady'?'#ddd5c2':'#8d9089';
+  if(throwing)c.fillRect(face>0?x+8:x-16,f-34,8,4);else c.fillRect(face>0?x+8:x-14,f-16,6,4);
+  c.fillStyle='#3b3027';c.font='11px sans-serif';c.textAlign='center';c.fillText(e.short,x,f+14);
+  if(tg.bet===who){c.fillStyle='#8a5a32';c.fillRect(x+face*14-3,f-50,6,7);c.fillStyle='#b98a52';c.fillRect(x+face*14-2,f-49,4,2);c.fillRect(x+face*14-2,f-46,4,2);}   // 건 솔방울
+}
+function tDraw(){
+  if(!tg)return;const c=tcv.getContext('2d');c.save();c.textAlign='left';
+  c.fillStyle='#efe3c8';c.fillRect(0,0,320,150);
+  c.fillStyle='#d9c08a';c.fillRect(0,POT.floor,320,18);c.fillStyle='#c4a66d';for(let x=2;x<320;x+=8)c.fillRect(x,POT.floor+3,5,1);   // 멍석
+  for(const who of ['steady','bold'])tElder(c,who);
+  // 투호 항아리: 둥근 몸, 긴 목, 목 양옆의 귀
+  const P2=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
+  P2(POT.x-12,POT.floor-26,24,26,'#5d6a6b');P2(POT.x-14,POT.floor-20,28,16,'#5d6a6b');P2(POT.x-10,POT.floor-24,6,14,'#7d8b8a');
+  P2(POT.x-4,POT.mouth,8,POT.floor-26-POT.mouth,'#5d6a6b');P2(POT.x-5,POT.mouth-2,10,3,'#3f4a4b');
+  for(const sd of [-1,1]){P2(POT.x+sd*POT.earDx-2,POT.ear-1,4,9,'#5d6a6b');P2(POT.x+sd*POT.earDx-3,POT.ear-2,6,2,'#3f4a4b');P2(POT.x+sd*7-(sd>0?0:3),POT.ear+4,6,2,'#5d6a6b');}
+  // 이미 던진 화살
+  const dur=Vfx.reducedMotion?1:MG.tuho_throw_frames;
+  tg.plan.forEach((a,k)=>{
+    if(k>tg.i||(k===tg.i&&tg.phase==='play'&&tg.t<dur))return;
+    const [tx,ty]=tTarget(a),col=TH[a.who].fletch;
+    if(a.res==='miss')tArrow(c,tx,ty,a.side>0?0.05:Math.PI-0.05,col,14);
+    else tArrow(c,tx,ty+(a.res==='ear'?2:4),Math.PI/2+(a.seed-.5)*0.35,col,16);
+  });
+  // 날아가는 화살
+  if(tg.phase==='play'&&tg.i<tg.plan.length){
+    const a=tg.plan[tg.i],u=Math.min(1,tg.t/dur),x0=TH[a.who].hand,y0=POT.floor-30,[tx,ty]=tTarget(a),H=48;
+    if(u<1){const x=x0+(tx-x0)*u,y=y0+(ty-y0)*u-H*4*u*(1-u),vx=tx-x0,vy=(ty-y0)-H*4*(1-2*u);tArrow(c,x,y,Math.atan2(vy,vx),TH[a.who].fletch);}
+  }
+  c.fillStyle='#3b3027';c.font='12px sans-serif';c.textAlign='center';
+  c.fillText('흰눈썹 '+tg.score.steady+'  :  '+tg.score.bold+' 곰방대',160,16);
+  const thrown=w=>tg.plan.slice(0,tg.i).filter(a=>a.who===w&&!a.extra).length;
+  for(const who of ['steady','bold'])for(let k=0;k<MG.tuho_arrows;k++){c.fillStyle=k<thrown(who)?'#c9b893':TH[who].fletch;c.fillRect(TH[who].x-11+k*6,8,4,8);}
+  c.restore();
+}
+function tStep(){
+  if(tg?.phase!=='play')return;
+  const dur=Vfx.reducedMotion?1:MG.tuho_throw_frames;
+  tg.t++;
+  if(tg.t===dur){tLand(tg.plan[tg.i]);tRender();}
+  if(tg.t>=dur+MG.tuho_pause_frames){tg.i++;tg.t=0;if(tg.i>=tg.plan.length)tFinish();}
+  tDraw();
+}
+function tHit(){if(tuhoP.hidden||!tg)return;if(tg.phase==='play')tSkip();}
+Rg.playTuho=()=>{
+  if(CLASSIC)return;
+  if(yAlone()){talk([['곰방대 노인','저 양반은 들어갔다.\n내기는 둘이 있어야 하지. 날 밝거든 오너라.']]);return;}
+  tuhoP.hidden=false;tNew();
+};
+$('jangteoTuhoBtn').onclick=tHit;
+tuhoP.addEventListener('keydown',e=>{if([' ','Enter'].includes(e.key)&&e.target.matches('button')){e.preventDefault();e.stopPropagation();e.target.click();}});
 addEventListener('keydown',e=>{
-  if(yutP.hidden||!['1','2','3','4'].includes(e.key))return;e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)ychoices.children[+e.key-1]?.click();
+  if(tuhoP.hidden||!['1','2','3','4'].includes(e.key))return;e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)tchoices.children[+e.key-1]?.click();
 },true);
-defineMinigame({id:'jangteoYut',hit:yHit,step(){if(yg()?.phase==='aim'&&!Vfx.reducedMotion){yPos+=yDir*MG.yut_needle_speed;if(yPos>=100){yPos=100;yDir=-1;}if(yPos<=0){yPos=0;yDir=1;}yDraw();}}});
+defineMinigame({id:'jangteoTuho',hit:tHit,step:tStep});
 
 /* 밤에만 다는 등. 불빛은 길 안내이며 본길이나 출구의 조건으로 삼지 않는다. */
 /* 결정 D-290: 등을 다 단 몫. 불빛을 보고 숙소를 찾은 길손이 까치 편에 곶감을 남기고 갔다(까치는 물건을 나르는 우체부다).
@@ -1294,7 +1277,7 @@ Rg.startDokkaebi=()=>{
 
 /* ---------- 끝: 홍시 약떡을 까치 편에 보내기 ---------- */
 // 결정 D-131: 약떡은 그믐밤에 쪄도 설날 아침에 맡긴다. 늙은 까치는 밤길을 못 난다(region.js 첫 만남 "날개가 예전 같지 않아서").
-// 그래서 아이는 마루에서 하룻밤을 더 자고, 그 아침에 장터 사연의 마지막 막(윷 첫판·연 아이 동생·등잔발·영감 도장 등)이 열린다.
+// 그래서 아이는 마루에서 하룻밤을 더 자고, 그 아침에 장터 사연의 마지막 막(투호 첫판·연 아이 동생·등잔발·영감 도장 등)이 열린다.
 Rg.magpieTteok=()=>{
   if(CLASSIC||!G.boss.dead||!has('hongsi_tteok')||G.f.hongsiMade||regionCompleted(Rg.id))return null;
   if(night())return [['늙은 까치','아가, 늙은 날개로 밤길은 못 난단다.\n마루에서 한숨 자고, 아침 김 오를 때 떠나자꾸나.',

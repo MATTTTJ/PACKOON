@@ -199,13 +199,16 @@ if(!CLASSIC){
     talk:()=>Rg.lanternAction(p.id),
   }));
   const nightLanterns=zone=>night()?lanterns.filter(p=>p.zone===zone):[];
-  const yutBoard={id:'j_yut_board',name:'윷판',prompt:'윷놀이 시작·이어 하기',x:1960,y:GROUND,
+  // 결정 D-325: 윷판 대신 투호 항아리. 말을 걸면 노인들의 투호 내기 판이 열린다 (story.js Rg.playTuho)
+  const yutBoard={id:'j_yut_board',name:'투호 항아리',prompt:'투호 내기 구경하기',x:1960,y:GROUND,
     draw(x,y){
-      R(x-15,y-4,30,4,'#c2a576');R(x-13,y-5,26,1,'#ead4a2');
-      for(let i=0;i<4;i++)R(x-11+i*7,y-3,2,1,'#785c43');
-      R(x-8,y-8,4,3,'#c6b691');R(x+4,y-8,4,3,'#936c46');
+      R(x-14,y-2,28,2,'#c2a576');                                 // 멍석 끝
+      R(x-5,y-11,10,9,'#5d6a6b');R(x-6,y-9,12,5,'#5d6a6b');R(x-4,y-10,2,5,'#7d8b8a');
+      R(x-1,y-18,3,7,'#5d6a6b');R(x-2,y-19,5,1,'#3f4a4b');R(x-4,y-17,2,3,'#5d6a6b');R(x+3,y-17,2,3,'#5d6a6b');   // 목과 귀
+      R(x,y-26,1,8,'#6b4a2c');R(x,y-27,1,2,'#b54a34');R(x+2,y-24,1,6,'#6b4a2c');R(x+2,y-25,1,2,'#416c82');   // 꽂힌 화살
+      R(x+8,y-3,8,1,'#6b4a2c');R(x+15,y-4,2,2,'#416c82');                 // 빗나가 누운 화살
     },
-    talk:()=>Rg.playYut(),
+    talk:()=>Rg.playTuho(),
   };
   const lanternBundle={id:'j_lantern_bundle',name:'등불 꾸러미',prompt:'까치와 등불 꾸러미 풀기',x:1610,y:GROUND,
     draw(x,y){

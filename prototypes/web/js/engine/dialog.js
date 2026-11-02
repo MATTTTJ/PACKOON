@@ -68,7 +68,7 @@ function tryTalk(){tryInteract();}
    때를 타서만 나오는 인물(큰 장터 밤의 등잔발)은 지역이 Rg.portraits[이름]=그리기 함수 로 올려 둔다. */
 const PORTRAIT_ALIAS={
   '뿔이':'ppuri','뿔영감':'ppuri',                        // 이름 바꾸는 중에도 같은 산양 그림
-  '흰눈썹 노인':'j_yut','곰방대 노인':'j_yut',             // 윷판의 두 노인은 한 그림(윷놀이 노인들)
+  '흰눈썹 노인':'j_yut','곰방대 노인':'j_yut',             // 투호판의 두 노인은 한 그림(투호 노인들, 결정 D-325)
   '까치':'old_magpie',                                    // 까치 답장(deliverHomeReply)은 늙은 까치 그림
   '아빠의 옛 기록':'dad',                                 // 아빠가 남긴 글은 아빠 얼굴
 };
