@@ -146,6 +146,39 @@ function kiteChild(){
   ]);
 }
 
+/* 결정 D-318: 장터 길목의 작은 사건 (사용자 피드백 2026-11-02 "쓸모없는 부분을 콘텐츠로 채워라", 보상 규칙 D-271).
+   해 준 일의 무게만큼, 그 장꾼다운 물건으로 갚는다. 받는 줄에는 "(○○을 얻었다.)"가 있다(D-235). */
+function strawSeller(){
+  if(G.f.jxStrawDone){talk([['청설모 할아범','새 끈은 질기구먼.\n오늘 장은 짚신 흘릴 걱정이 없겠어.']]);return;}
+  talk([
+    ['청설모 할아범','아이고, 짚신 꿴 끈이 삭아서 끊어졌구먼.\n장 서기 전에 다 주워야 하는데, 허리가 영 안 굽혀져.'],
+    ['청설모 할아범','눈에 묻히면 젖어서 못 팔지.',[
+      {t:'흩어진 짚신을 주워 드린다',go:()=>talk([
+        ['너구리','(눈에 반쯤 묻힌 짚신을 한 켤레씩 찾아 털고,\n할아범이 내민 새 끈에 꿰었다.)'],
+        ['청설모 할아범','열하나, 열둘… 하나도 안 빠졌구먼.\n남의 장짐 주워 준 걸 그냥 보낼 순 없지.'],
+        ['청설모 할아범','짚신 삼고 남은 짚이다.\n불쏘시개로도 끈으로도 쓴다.'],
+        gotLine('jip',2)
+      ],()=>{addItem('jip',2);G.f.jxStrawDone=true;record('straw','장터 어귀에서 청설모 할아범이 흘린 짚신을 주워 새 끈에 꿰어 드렸다. 짚신 삼고 남은 짚을 받았다.');finishWanderer('j_straw');})},
+      {t:'다음에',go:null}
+    ]]
+  ]);
+}
+function beanSeller(){
+  if(G.f.jxBeanDone){talk([['까투리 아주머니','자루 밑을 두 번 꿰맸어.\n이제 장 끝날 때까지 끄떡없지!']]);return;}
+  talk([
+    ['까투리 아주머니','어머, 어머! 자루 밑이 터졌네!\n콩이 눈밭으로 다 굴러간다!'],
+    ['까투리 아주머니','새들이 먼저 보면 끝장이야!',[
+      {t:'같이 콩을 쓸어 담는다',go:()=>talk([
+        ['너구리','(눈 위에 흩어진 콩을 손바닥으로 쓸어 자루에 담았다.\n아주머니가 터진 데를 짚으로 동여맨다.)'],
+        ['까투리 아주머니','휴, 다 건졌네. 혼자였으면 새들 잔치 났겠어!'],
+        ['까투리 아주머니','콩장수는 콩으로 갚아야지.\n한 되 넉넉히 담았다!'],
+        gotLine('kong')
+      ],()=>{addItem('kong',1);G.f.jxBeanDone=true;record('bean','장터 거리에서 까투리 아주머니의 콩 자루가 터져 같이 쓸어 담았다. 콩 한 되를 받았다.');finishWanderer('j_bean');})},
+      {t:'다음에',go:null}
+    ]]
+  ]);
+}
+
 // 결정 D-325: 윷판 대신 투호 항아리. 두 노인이 번갈아 던지고, 아이는 이길 쪽에 솔방울을 건다 (판은 story.js Rg.playTuho)
 function yutElders(){
   talk([
@@ -215,15 +248,16 @@ function oldMagpie(){
 
 Rg.expEncounters={
   wanderers:{
-    entrance:[{id:'j_kite',name:'얼레',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
-    street:[{id:'j_yut',name:'투호 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':'또 걸 테냐? 솔방울 하나면 된다.\n화롯불은 늘 배가 고프거든.';}}],
+    entrance:[{id:'j_straw',name:'청설모 할아범',x:360,talk:strawSeller,draw:draw('straw'),greeting:'새 끈은 질기구먼.\n오늘 장은 짚신 흘릴 걱정이 없겠어.'},{id:'j_kite',name:'얼레',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
+    street:[{id:'j_bean',name:'까투리 아주머니',x:880,talk:beanSeller,draw:draw('bean'),greeting:'자루 밑을 두 번 꿰맸어.\n이제 장 끝날 때까지 끄떡없지!'},{id:'j_yut',name:'투호 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':'또 걸 테냐? 솔방울 하나면 된다.\n화롯불은 늘 배가 고프거든.';}}],
     inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:()=>{const l=Rg.magpieTteok?.();if(l)talk(l);else oldMagpie();},draw:draw('magpie'),get greeting(){const l=Rg.magpieTteok?.();if(l)return l;return G.f.night?(G.f.jxLanternDone?'네가 단 등을 따라 길손들이 찾아왔구나.\n아침 떡 김이 오르면 다들 또 떠나겠지.':'밤이 됐구나. 등불 꾸러미는 처마 옆에 있단다.\n등은 네가 달고, 길은 내가 일러 주마.'):G.f.jxLanternDone?'밤새 길손들이 쉬고 갔단다.\n이제 나도 남쪽으로 날아갈 차례구나.':'해 지면 다시 오려무나.\n골목 등 다는 걸 좀 거들어 다오.';}}],
     pine:[{id:'j_boar',name:'알밤이',hint:'킁킁, 킁킁. 솔숲 쪽에서 무언가 냄새를 쫓는 소리가 난다.',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
     warehouse:[]
   },
   examines:{
     entrance:[
-      {id:'j_flag_knot',x:240,label:'장터 깃발 매듭',text:['깃발 아래 매듭은 풀기 쉽게 묶었다.\n장이 끝나면 눈 오기 전에 내려야 하니까.','돌받침 안쪽에 붉은 점이 있다.\n눈을 털면 발가락 모양이 보일까?']},
+      // 결정 D-310: 조사 자리를 큰 보부상단 깃발 밑(설계 700)으로 옮겼다. 예전엔 깃발 없는 장승 곁(240)에 있었다.
+      {id:'j_flag_knot',x:700,label:'보부상단 깃발',text:['패랭이에 목화송이. 보부상단의 표다.\n내 모자 꼭지의 송이랑 같다.','이 깃발이 선 장에는 상단 숙소가 있다.\n돌받침 안쪽에는 붉은 점이 있다. 손바닥 모양일까?']},
       // 결정 D-321: 연 꼬리는 그 자리 그림 대신 연 장면 그림을 띄운다 (걸림 → 너구리 손이 풀면 줄에 끌려 내려감)
       {id:'j_kite_tail',x:1180,y:128,label:'연 꼬리 풀기',peek:false,get text(){
         if(!G.f.jxKiteStarted){if(typeof peekPicture==='function')peekPicture(Rg.kitePics.stuck().draw,{animate:true});
@@ -235,14 +269,17 @@ Rg.expEncounters={
       {id:'j_jangseung_snow',x:1680,label:'장승 코의 눈',text:'장승 코에만 눈이 안 쌓였다.\n지나가는 짐꾼들이 코를 톡 짚고 들어오나 봐.'}
     ],
     street:[
-      {id:'j_stall_gap',x:310,label:'좌판 사이 골목',get text(){return G.f.night?'차일을 걷고 판을 접으니 골목이 나왔다.\n낮에는 물건 밑에 감춰져 있던 길이다.':'좌판 아래로 발자국이 이어지다 끊긴다.\n장을 마치고 판을 접으면 저 안으로 갈 수 있겠다.';}},
+      {id:'j_stall_gap',x:310,label:'좌판 사이 골목',get text(){return G.f.night?'차일을 걷고 판을 접으니 골목이 휑하다.\n낮에 북적이던 자리에 발자국만 남았다.':'좌판 아래로 콩알 몇 개가 굴러다닌다.\n어디 자루가 샜나?';}},   // 결정 D-316: 밤 골목 지름길을 뺐다
+      {id:'j_onggi',x:575,label:'옹기전 독',text:'독을 손끝으로 퉁기니 맑게 운다.\n금 간 독은 둔하게 운다고, 장꾼이 하나씩 두드려 보고 판다.'},
       {id:'j_steam_flour',x:1150,label:'쌀가루 묻은 발판',get text(){return G.awake.includes('siru')?'바닥 가루에 내 발자국도 섞였다.\n모락이랑 김을 올린 자리는 아직 따뜻하다.':'하얀 가루 위에 큰 발자국이 어지럽다.\n모락이 아궁이 앞을 몇 번이나 오갔을까.';}},
-      {id:'j_broken_yut',x:2130,label:'반질반질한 화살',text:'화살 하나만 깃이 유난히 반질반질하다.\n던지기 전마다 손가락으로 쓸어 넘긴 자국이다.'}
+      {id:'j_broken_yut',x:2130,label:'반질반질한 화살',text:'화살 하나만 깃이 유난히 반질반질하다.\n던지기 전마다 손가락으로 쓸어 넘긴 자국이다.'},
+      {id:'j_gukbap',x:2470,label:'장국밥 가마솥',get text(){return G.f.night?'불 꺼진 가마솥에 아직 온기가 남았다.\n내일 장에 끓일 뼈가 소금에 절여 있다.':'가마솥에서 장국밥 김이 오른다.\n장꾼들이 선 채로 한 그릇씩 비우고 다시 짐을 진다.';}}
     ],
     inn:[
       {id:'j_inn_shoes',x:350,label:'마루 아래 신발',text:'눈 묻은 신발은 코를 바깥으로 돌려 뒀다.\n내일 갈 길을 향해 벌써 줄을 섰네.'},
       {id:'j_inn_pillar',x:1210,label:'기둥의 키 자국',text:'기둥에 작은 금이 층층이 그어져 있다.\n짐 높이를 잰 걸까, 해마다 온 아이들 키일까?'},
-      {id:'j_inn_icicle',x:1780,label:'처마 끝 고드름',text:'고드름 끝에 지붕이 거꾸로 매달렸다.\n물방울이 떨어지자 지붕도 잠깐 흔들린다.'}
+      {id:'j_inn_icicle',x:1780,label:'처마 끝 고드름',text:'고드름 끝에 지붕이 거꾸로 매달렸다.\n물방울이 떨어지자 지붕도 잠깐 흔들린다.'},
+      {id:'j_inn_stable',x:2110,label:'마구간 나귀',get text(){return G.f.night?'나귀가 선 채로 졸다가 귀만 쫑긋한다.\n여물통에 짚이 반쯤 남았다.':'짐을 부린 나귀가 여물을 씹는다.\n숙소에 묵는 보부상들은 짐을 나귀에 실어 온다.';}}
     ],
     pine:[
       {id:'j_pine_scent1',x:1730,label:'부러진 솔가지',get text(){
@@ -257,6 +294,7 @@ Rg.expEncounters={
     ],
     warehouse:[
       {id:'j_warehouse_rope',x:400,label:'접어 둔 좌판 끈',text:'끈 끝을 한데 묶어 바구니에 담았다.\n아침엔 이걸 풀어 다시 장을 펼치겠지.'},
+      {id:'j_warehouse_fire',x:1780,label:'짐꾼 화톳불 자리',text:'짐꾼들이 짐을 부리며 쬐던 화톳불 자리다.\n재 속에 군밤 껍질이 묻혀 아직 따뜻하다.'},
       {id:'j_warehouse_scratches',x:1230,label:'창고 문 앞 빗자루 자국',get text(){return G.boss.dead?(Rg.arcs()&&!G.f.jangteoArcsYeotReturned?'창고 문 옆에 돌아온 물건들이 놓였다.\n그 사이에 날이 반질한 엿가위 하나. 장터 엿장수 거겠지?':'창고 문 옆에 돌아온 물건들이 놓였다.\n아침에 찾아갈 자리가 저마다 비어 있다.'):'눈 위에 빗자루 자국이 지그재그로 났다.\n청소를 했다기엔 창고 문 앞만 빙빙 돌았네.';}},
       {id:'j_warehouse_mended',x:2470,y:128,label:'기운 멍석',get text(){return G.boss.dead?'바느질한 모서리에 눈 한 톨 안 묻었다.\n누가 멍석을 얌전히 접어 놓고 갔다.':'멍석 한 귀를 다른 색 짚으로 기웠다.\n헌것도 함부로 버리지 않는 장터구나.';}}
     ]

@@ -153,8 +153,43 @@ function pine(x,y,h=86,foreground=false){
     P(left+1,yy+6,ww-2,2,n()?'#173a3e':'#37594f');
   }
 }
+/* 결정 D-310: 장터 어귀의 큰 깃발은 보부상단 깃발이다 (사용자 피드백 2026-11-02 "깃발을 더 의미 있는 그림으로").
+   보부상단이 든 장에는 상단 깃발을 세워, 길 가던 보부상이 숙소(접장)를 찾아오게 한다. 상단의 표는 패랭이에 목화송이.
+   주인공 모자 꼭지의 흰 송이와 같은 표라, 아이가 이 깃발을 보고 숙소부터 찾는 까닭이 선다.
+   세로로 긴 흰 기폭에 쪽빛 테, 바깥 가장자리는 붉은 불꽃 이(화염각). 장대 꼭대기에는 꿩 깃 장목. 바람에 끝이 조금 흔들린다. */
 function flag(x,y,h=64){
-  P(x,y-h,3,h,'#69503f');P(x-3,y-h+4,9,2,'#4d382f');P(x+3,y-h+5,23,19,n()?'#8a4745':'#bd5547');P(x+5,y-h+7,18,2,'#deae73');P(x+10,y-h+11,3,8,'#f3ddac');P(x+6,y-h+14,12,2,'#f3ddac');P(x+20,y-h+22,6,3,tone().sky);P(x-6,y-4,16,4,'#807c78');P(x-7,y-5,18,2,tone().snow);
+  const cloth=n()?'#b9b4a6':'#efe8d6',edge=n()?'#2f3f5c':'#3c5378',fire=n()?'#8a4745':'#c24e3e';
+  const sway=Vfx.reducedMotion?0:Math.round(Math.sin(G.anim*.05)*1.2);
+  P(x-1,y-h-6,5,4,'#3d2e26');P(x,y-h-11,3,6,'#58463a');   // 장목 받침
+  P(x-2,y-h-16,2,7,'#6f5a3c');P(x+3,y-h-17,2,8,'#8a6f45');P(x+1,y-h-19,2,9,'#b08a50');   // 꿩 깃
+  P(x,y-h,3,h,'#69503f');P(x+1,y-h,1,h,'#8a6a52');
+  P(x+3,y-h+3,22,2,'#4d382f');   // 기폭을 거는 가로대
+  const top=y-h+5,bw=19,bh=Math.round(h*.46);
+  P(x+4,top,bw,bh,edge);P(x+6,top+2,bw-4,bh-4,cloth);
+  for(let k=0;k<bh;k+=5)P(x+4+bw+(k%10?0:sway),top+k,3,3,fire);   // 바깥 불꽃 이
+  P(x+4,top+bh,bw,2,fire);for(let k=0;k<bw;k+=5)P(x+4+k+sway,top+bh+2,3,2,fire);
+  // 패랭이와 목화송이 (상단의 표)
+  const cx=x+4+Math.floor(bw/2),cy=top+Math.round(bh*.42);
+  P(cx-6,cy+2,13,2,'#2a211b');P(cx-3,cy-3,7,5,'#2a211b');P(cx-2,cy-2,5,3,n()?'#7d6a4a':'#c39b55');
+  P(cx-8,cy-1,3,3,'#fbf7ee');P(cx+6,cy-1,3,3,'#fbf7ee');P(cx-7,cy,1,1,'#d9d2c0');P(cx+7,cy,1,1,'#d9d2c0');
+  P(cx-1,cy+6,3,Math.max(2,bh-Math.round(bh*.42)-12),edge);   // 아래로 내린 쪽빛 줄
+  P(x-6,y-4,16,4,'#807c78');P(x-7,y-5,18,2,tone().snow);P(x-4,y-8,10,4,'#6f6b66');
+}
+/* 결정 D-311: 장터 어귀 집 사이에 되풀이되던 작은 붉은 깃발 대신, 장날 어귀에 실제로 놓였을 짐을 번갈아 둔다.
+   지게에 얹은 짐, 장작더미, 옹기 독, 짚단. 길을 막지 않게 낮게 그린다. */
+function marketProp(x,y,i){
+  const t=tone(),k=((i%4)+4)%4;
+  if(k===0){   // 받쳐 세운 지게와 짐
+    P(x-1,y-30,2,30,t.wood);P(x+9,y-30,2,30,t.wood);P(x-1,y-12,12,2,t.wood);P(x-1,y-22,12,2,t.wood);P(x+4,y-6,2,6,'#5a4334');
+    P(x-3,y-27,16,12,n()?'#6d6156':'#a98d6a');P(x-2,y-28,14,2,t.snow);P(x+4,y-27,2,12,'#d6be8c');
+  }else if(k===1){   // 장작더미
+    for(let r=0;r<3;r++)for(let c=0;c<4-r;c++){const xx=x-10+c*7+r*3,yy=y-6-r*6;P(xx,yy,6,6,n()?'#5d4a3c':'#8a6448');P(xx+2,yy+2,2,2,n()?'#7d6650':'#c79b6c');}
+    P(x-11,y-19,24,2,t.snow);
+  }else if(k===2){   // 옹기 독 셋
+    for(const [dx,s] of [[-9,1],[2,1.3],[13,.9]]){const w=Math.round(9*s),h=Math.round(11*s);P(x+dx-w/2,y-h,w,h,n()?'#3e3330':'#6b4a34');P(x+dx-w/2+1,y-h+2,2,h-4,n()?'#5e4a40':'#9a6e4c');P(x+dx-w/2+1,y-h-2,w-2,2,'#4a3428');P(x+dx-w/2+1,y-h-3,w-2,1,t.snow);}
+  }else{   // 세워 묶은 짚단
+    for(let j=0;j<3;j++){const xx=x-8+j*8;P(xx,y-18,6,18,n()?'#8a7a52':'#d9b860');P(xx+1,y-18,1,18,n()?'#a8975f':'#ead27a');P(xx-1,y-10,8,2,'#8a6a3a');P(xx,y-20,6,2,t.snow);}
+  }
 }
 function jangseung(x,y,f){
   P(x-5,y-55,10,55,'#987752');P(x-6,y-58,12,6,'#806143');P(x-4,y-52,8,1,'#d0ad79');
@@ -169,11 +204,29 @@ function stall(x,y,i){
     P(x-4,y-35,80,5,'#8b7668');P(x+5,y-29,61,19,'#4c4243');for(let j=0;j<7;j++)P(x+8+j*8,y-28,1,17,'#7c6960');P(x+9,y-11,53,2,'#ad8870');
   }else{
     P(x-6,y-49,84,11,red);P(x-10,y-39,92,5,red);P(x-8,y-49,88,2,t.snow);for(let j=0;j<8;j++)P(x-8+j*12,y-34,7,3,red);
-    P(x+3,y-17,66,6,'#a37450');for(let j=0;j<6;j++){const c=['#b76743','#ded7c2','#b9914c','#9b594d'][i%4];P(x+6+j*10,y-23-(j%2)*2,7,6,c);P(x+7+j*10,y-24-(j%2)*2,5,1,'#e1bc83');}
+    P(x+3,y-17,66,6,'#a37450');
+    // 결정 D-312: 좌판마다 파는 것이 다르다 (포목·어물·옹기·곶감·짚신). 같은 좌판이 줄지어 되풀이되지 않게.
+    const kind=((i%5)+5)%5;
+    if(kind===0){for(let j=0;j<6;j++){const c=['#3c5378','#c24e3e','#e6d9b8','#6f8f6a','#b9914c','#8a5a7a'][(j+i)%6];P(x+6+j*10,y-27,8,10,c);P(x+6+j*10,y-27,8,1,'#f4ead0');P(x+9+j*10,y-27,1,10,'rgba(0,0,0,.18)');}}   // 포목: 세워 둔 피륙 두루마리
+    else if(kind===1){P(x+4,y-33,64,1,'#5a4334');for(let j=0;j<7;j++){P(x+7+j*9,y-32,1,3,'#5a4334');P(x+5+j*9,y-29,5,12,'#b9a27a');P(x+6+j*9,y-27,3,1,'#7a6448');P(x+6+j*9,y-18,3,2,'#8a7458');}}   // 어물: 줄에 꿴 북어
+    else if(kind===2){for(let j=0;j<5;j++){const h=8+(j%2)*4;P(x+6+j*13,y-17-h,10,h,'#6b4a34');P(x+7+j*13,y-15-h,2,h-4,'#9a6e4c');P(x+7+j*13,y-19-h,8,2,'#4a3428');}}   // 옹기
+    else if(kind===3){P(x+4,y-33,64,1,'#5a4334');for(let j=0;j<4;j++)for(let k=0;k<3;k++)P(x+10+j*16,y-31+k*5,5,4,'#b4562a');P(x+20,y-23,22,6,'#8a6448');for(let j=0;j<5;j++)P(x+21+j*4,y-26,4,4,'#e0602a');}   // 곶감 꼬챙이와 감 바구니
+    else{for(let j=0;j<6;j++){P(x+6+j*10,y-21,8,4,'#d9b860');P(x+7+j*10,y-20,6,1,'#a8883a');P(x+6+j*10,y-25,8,3,'#c9a850');}}   // 짚신 켤레
     // 손님은 좌판 뒤 작은 실루엣. 길을 가리는 물체로 그리지 않는다.
     P(x+28,y-34,11,15,'#647b79');P(x+30,y-41,8,7,'#92755e');P(x+29,y-44,3,4,'#92755e');P(x+36,y-44,3,4,'#92755e');
   }
   lantern(x+61,y-39,1);
+}
+/* 결정 D-314: 되풀이 배경(집·곳간·짐)을 줄인 뒤의 실제 좌표로 늘어놓는 자리. 랜드마크·높은 발판(busy)과 겹치면 건너뛰지 않고
+   그 뒤 빈 자리로 밀어 둔다. 그래서 잘라 낸 자리에서 반쪽 집이 생기지 않고, 랜드마크 사이도 비지 않는다. */
+function rowSlots(zw,start,step,widthOf,busy){
+  const out=[];let rx=start;
+  for(let i=0;rx<zw+120&&i<80;i++){
+    const w=widthOf(i);let moved=true,guard=0;
+    while(moved&&guard++<20){moved=false;for(const [a,b] of busy)if(rx<b&&rx+w>a){rx=b+12;moved=true;}}
+    out.push({rx,i,w});rx=Math.max(rx+w+18,start+(i+1)*step);
+  }
+  return out;
 }
 function bundle(x,y,i=0){P(x-8,y-9,16,9,i%2?'#a17569':'#81928a');P(x-5,y-12,10,4,i%2?'#bd8b78':'#a3aea0');P(x-1,y-10,2,10,'#d6be8c');P(x-4,y-13,8,2,'#6c6654');}
 function snowGround(id){
@@ -197,11 +250,27 @@ function drawBack(id){
 function drawPlatforms(id){
   for(const p of fieldPlatforms()){
     const x=p.x-RC();if(x>W+10||x+p.w<-10)continue;   // 발판은 이미 옮긴 좌표 (D-128)
+    /* 결정 D-313: 높은 발판이 공중에 뜬 판자로 보이지 않게, 밑을 땅까지 채운다 (사용자 피드백 "배경 완성 안 된 거").
+       장터·숙소의 높은 처마(y<130)는 그 밑에 이층 곳간 몸채를, 창고 마당의 발판은 쌓은 짐짝을, 솔숲은 바위 더미를 그린다. */
     if(id==='street'||id==='inn'||id==='entrance'){
-      P(x,p.y,p.w,6,tone().wood);P(x,p.y-1,p.w,2,tone().snow);for(let j=5;j<p.w;j+=10)P(x+j,p.y+2,1,4,n()?'#827475':'#c3a079');
-      if(p.y<130){P(x-3,p.y-5,p.w+6,4,tone().tile);P(x,p.y-6,p.w,2,tone().snow);}
-      else{P(x+4,p.y+6,3,GROUND-p.y-6,tone().wood);P(x+p.w-7,p.y+6,3,GROUND-p.y-6,tone().wood);}
+      const t=tone();
+      if(p.y<130){
+        const top=p.y+6;P(x+3,top,p.w-6,GROUND-top,t.wall);P(x+3,top,p.w-6,3,t.wood);
+        P(x+3,top,3,GROUND-top,t.wood);P(x+p.w-6,top,3,GROUND-top,t.wood);P(x+3,GROUND-4,p.w-6,4,t.wood);
+        const mid=Math.round((top+GROUND)/2);P(x+3,mid,p.w-6,3,t.wood);
+        for(let j=14;j<p.w-16;j+=30){P(x+j,top+9,12,Math.min(14,mid-top-12),n()?'#d69750':'#e5d8b8');P(x+j+6,top+9,1,Math.min(14,mid-top-12),t.wood);}
+        P(x+Math.round(p.w/2)-8,GROUND-26,16,22,n()?'#3a2c26':'#5a3e2c');P(x+Math.round(p.w/2),GROUND-26,1,22,t.wood);   // 곳간 문
+      }
+      P(x,p.y,p.w,6,t.wood);P(x,p.y-1,p.w,2,t.snow);for(let j=5;j<p.w;j+=10)P(x+j,p.y+2,1,4,n()?'#827475':'#c3a079');
+      if(p.y<130){P(x-3,p.y-5,p.w+6,4,t.tile);P(x,p.y-6,p.w,2,t.snow);}
+      else{P(x+4,p.y+6,3,GROUND-p.y-6,t.wood);P(x+p.w-7,p.y+6,3,GROUND-p.y-6,t.wood);}
+    }else if(id==='warehouse'){
+      const top=p.y+5;
+      for(let yy=top,r=0;yy<GROUND;yy+=13,r++){const off=r%2?6:0;for(let xx=x+2+off;xx<x+p.w-8;xx+=20){const w=Math.min(18,x+p.w-2-xx),h=Math.min(12,GROUND-yy);P(xx,yy,w,h,r%2?(n()?'#5d4a3c':'#8a6448'):(n()?'#6b5a48':'#a17a52'));P(xx+1,yy+1,w-2,1,n()?'#86705a':'#c79b6c');P(xx+Math.round(w/2),yy,1,h,n()?'#3d3028':'#6b4c36');}}
+      P(x,p.y,p.w,5,n()?'#6b5a48':'#9b7a58');P(x,p.y-2,p.w,3,tone().snow);
     }else{
+      if(id==='pine'){const top=p.y+10;P(x+5,top,p.w-10,GROUND-top,n()?'#46525c':'#8a9490');P(x+2,Math.round((top+GROUND)/2),p.w-4,GROUND-Math.round((top+GROUND)/2),n()?'#3e4a54':'#7f8a86');
+        for(let yy=top+8;yy<GROUND-6;yy+=14)P(x+8+((yy*7)%Math.max(8,p.w-20)),yy,6,1,n()?'#2f3a44':'#6c7672');P(x+6,top,2,GROUND-top,n()?'#5d6973':'#a3aca7');}
       P(x,p.y,p.w,7,n()?'#5d6670':'#9a9c96');P(x+3,p.y+7,p.w-6,5,n()?'#424d57':'#7f847f');P(x,p.y-2,p.w,3,tone().snow);P(x+4,p.y+2,Math.max(3,p.w-11),1,n()?'#75838b':'#b5b9ad');
     }
   }
@@ -209,29 +278,53 @@ function drawPlatforms(id){
 function drawScenery(id){
   const t=tone();
   if(id==='entrance'){
-    for(let wx=160,i=0;wx<2800;wx+=175,i++){const x=tx(wx)-cam;if(x<-110||x>W+110)continue;if(i%2===0){const h=32+(i%4)*5;house(x,GROUND-h,72+(i%3)*11,h,n(),undefined,i/2);}else{bundle(x,GROUND,wx);flag(x+38,GROUND,39+i%3*8);}}
+    // 결정 D-314: 되풀이 집은 줄인 뒤의 실제 좌표로 늘어놓는다. 설계 좌표로 그리면 잘라 낸 자리(trimCuts)에서 집이 반쪽으로 잘려 보였다.
+    const zw=zoneDef().w,busy=[[95,275],[550,630],[1170,1240],...fieldPlatforms().map(p=>[p.x-14,p.x+p.w+14])];
+    for(const {rx,i,w} of rowSlots(zw,150,150,i=>i%2?58:72+(i%3)*11,busy)){const x=rx-RC();if(x<-110||x>W+110)continue;
+      if(i%2===0){const h=32+(i%4)*5;house(x,GROUND-h,w,h,n(),undefined,i/2);}else{bundle(x+6,GROUND,rx);marketProp(x+38,GROUND,i>>1);}}
     jangseung(tx(125)-cam,GROUND,1);jangseung(tx(242)-cam,GROUND,-1);flag(tx(720)-cam,GROUND,96);
     // 결정 D-320: 연과 연줄은 얼레 그림(wanderer 'kite')이 얼레 손에서부터 함께 그린다.
   }else if(id==='street'){
-    for(let wx=170,i=0;wx<2800;wx+=185,i++){const x=wx-cam;if(x<-110||x>W+110)continue;stall(x,GROUND,i);if(i%2===0){P(x+100,GROUND-31,4,31,t.wood);lantern(x+102,GROUND-32);}}
-    const x=1250-cam;
-    // 떡집 안은 높은 마루의 단면으로 보인다. 아궁이와 맷돌 자리까지 한눈에 잇는다.
-    P(x,39,280,71,n()?'#9a775c':'#c8aa7d');P(x+8,48,264,56,n()?'#b8996e':'#e2c79b');P(x+8,48,264,3,'#8d6850');
-    tileRoof(x-6,23,292,16);P(x+1,43,5,67,t.wood);P(x+274,43,5,67,t.wood);P(x,107,280,5,'#865c40');P(x+2,106,276,2,'#d4ae75');
-    for(let j=0;j<6;j++)P(x+18+j*43,51,1,53,'#c2a075');
-    P(x+201,79,45,31,'#8c6651');P(x+205,84,37,21,'#4b3a34');P(x+213,95,19,7,'#b35a3e');P(x+217,91,11,9,'#ecaa58');P(x+209,78,32,4,'#b79b78');
-    for(let j=0;j<3;j++){P(x+213,68-j*7,26,5,'#a97a51');P(x+211,66-j*7,30,2,'#d2aa70');P(x+215,71-j*7,22,1,'#72513a');}
-    P(x+28,94,29,16,'#817b71');P(x+23,91,39,5,'#a39e8d');P(x+26,89,33,3,'#b9b4a0');P(x+41,83,3,7,'#6b5848');
-    P(x+35,57,22,26,n()?'#e9c77f':'#efe2bb');P(x+45,57,2,26,'#927552');P(x+35,68,22,2,'#927552');P(x+156,59,28,19,'#d8c49c');P(x+159,62,22,2,'#a47b55');P(x+159,68,15,2,'#a47b55');
-    P(x+238,4,10,22,n()?'#625253':'#907565');P(x+236,1,14,4,'#655451');smoke(x+241,-3,2);
-    // 낮에 열던 앞 좌판은 접힌다. 옆문과 불빛은 남아 필수 교환을 막지 않는다.
-    P(1165-cam,GROUND-43,30,43,'#544338');P(1168-cam,GROUND-40,24,40,n()?'#bb8659':'#e0b47e');P(1178-cam,GROUND-39,1,39,'#805e46');P(1186-cam,GROUND-23,2,3,'#ead0a1');lantern(1159-cam,GROUND-45);
-    for(let j=0;j<4;j++){P(x+12+j*65,128,46,64,n()?'#675a54':'#967958');if(n())for(let k=0;k<4;k++)P(x+14+j*65+k*11,130,1,59,'#8d7663');}P(x-3,125,286,5,t.wood);P(x-5,122,290,3,t.snow);
-    const ax=2210-cam;P(ax,GROUND-72,5,72,t.wood);P(ax+120,GROUND-72,5,72,t.wood);P(ax,GROUND-74,125,5,t.wood);
-    if(!n()){for(let j=0;j<5;j++){P(ax+6+j*23,GROUND-45,21,45,j%2?'#a76650':'#b69572');P(ax+7+j*23,GROUND-46,19,2,t.snow);}}
-    else{P(ax+4,GROUND-4,116,3,'#b6b9b4');lantern(ax+12,GROUND-61);lantern(ax+111,GROUND-61);}
+    // 결정 D-315: 떡집 자리(1220~1560)와 뒷산 돌계단 자리(2140~2300)에는 좌판을 세우지 않는다 (예전엔 떡집 밑·골목 문 뒤에 좌판이 겹쳤다).
+    for(let wx=170,i=0;wx<2800;wx+=185,i++){const x=wx-cam;if(x<-110||x>W+110)continue;if((wx+80>1220&&wx<1560)||(wx+80>2140&&wx<2300))continue;stall(x,GROUND,i);if(i%2===0){P(x+100,GROUND-31,4,31,t.wood);lantern(x+102,GROUND-32);}}
+    /* 결정 D-315: 떡집은 땅 위의 가겟집이다. 앞을 터 둔 가게라 안(아궁이·시루·떡 시렁·맷돌)이 길에서 보이고, 모락은 그 안 땅에 선다.
+       예전엔 떡집 안을 기둥 위 높은 마루의 단면으로 그려, 문을 열면 공중의 가게로 순간이동했다. 굴뚝은 오른쪽 지붕 위로 솟아 장터 어디서나 김이 보인다. */
+    const x=1250-cam,g=GROUND;
+    P(x,g-80,280,80,n()?'#7d624c':'#b8946a');P(x+8,g-72,264,68,n()?'#b8996e':'#e2c79b');P(x+8,g-72,264,3,'#8d6850');
+    tileRoof(x-6,g-96,292,16);P(x+1,g-82,5,82,t.wood);P(x+274,g-82,5,82,t.wood);P(x+92,g-78,3,78,t.wood);P(x+184,g-78,3,78,t.wood);
+    P(x,g-4,280,4,'#865c40');P(x+2,g-5,276,1,'#d4ae75');
+    P(x+105,g-92,70,11,'#5a361e');P(x+108,g-90,64,7,'#d8c39e');for(let j=0;j<4;j++)P(x+116+j*14,g-89,5,5,'#5a361e');   // 떡집 현판
+    P(x+238,g-128,10,36,n()?'#625253':'#907565');P(x+236,g-131,14,4,'#655451');smoke(x+241,g-135,2);   // 굴뚝
+    // 아궁이, 가마솥, 그 위의 시루
+    P(x+200,g-30,46,30,'#8c6651');P(x+204,g-26,38,4,'#b79b78');P(x+213,g-15,19,11,'#4b3a34');P(x+217,g-12,11,8,'#ecaa58');P(x+219,g-10,6,4,'#ffe0a0');
+    P(x+206,g-38,34,9,'#4a4440');P(x+204,g-39,38,2,'#6b6460');P(x+210,g-54,26,16,'#a0623e');P(x+211,g-53,2,14,'#c27a4e');for(let j=0;j<4;j++)P(x+214+j*6,g-48,2,2,'#6b3a22');
+    if(!n()||G.f.steamDone)for(let j=0;j<5;j++){const k=(G.anim*0.5+j*14)%60;P(x+216+Math.round(Math.sin((G.anim+j*30)*0.05)*3),g-58-k,5-k/20,3,'rgba(255,255,255,'+(0.7-k/90).toFixed(2)+')');}
+    // 떡 시렁
+    for(let j=0;j<3;j++){P(x+112,g-62+j*14,70,3,'#a97a51');P(x+112,g-63+j*14,70,1,'#d2aa70');for(let k=0;k<5;k++)P(x+116+k*13,g-68+j*14,9,5,['#f3eee1','#e8c97a','#9b594d','#6f8f6a','#f3eee1'][(k+j)%5]);}
+    // 맷돌과 창호
+    P(x+28,g-18,29,14,'#817b71');P(x+23,g-21,39,5,'#a39e8d');P(x+26,g-23,33,3,'#b9b4a0');P(x+41,g-29,3,7,'#6b5848');
+    P(x+35,g-66,22,22,n()?'#e9c77f':'#efe2bb');P(x+45,g-66,2,22,'#927552');P(x+35,g-56,22,2,'#927552');
+    // 밤에는 앞을 반쯤 판자로 막고, 오른쪽 아궁이 쪽만 불빛이 새어 나온다 (길은 열려 있다)
+    if(n()){for(let j=0;j<9;j++)P(x+8+j*10,g-72,9,68,j%2?'#5a4638':'#66503f');P(x+8,g-40,90,2,'#3a2c26');P(x+190,g-70,80,60,'rgba(255,190,110,.12)');}
+    lantern(x+12,g-76);lantern(x+266,g-76);
+    // 떡집 앞 낮은 떡 좌판 (밤엔 보자기로 덮는다)
+    const fx=1165-cam;P(fx,g-20,34,4,t.wood);P(fx+2,g-16,3,16,t.wood);P(fx+29,g-16,3,16,t.wood);
+    if(n())P(fx,g-26,34,6,'#6f8c68');else for(let k=0;k<4;k++)P(fx+2+k*8,g-25,6,5,['#f3eee1','#e8c97a','#9b594d','#f3eee1'][k]);
+    /* 결정 D-319: 거리 끝 뒷산으로 오르는 돌계단. 가게 줄이 끊긴 자리에 언덕이 있고, 돌계단이 솔숲으로 올라간다.
+       '굴뚝 뒤'라 부르던 엉뚱한 이름 대신 길에서 그대로 보이는 고샅 돌계단이다. */
+    const sx=2150-cam;
+    if(sx>-180&&sx<W+40){
+      for(let k=0;k<70;k++){const hy=Math.round(Math.min(64,k*1.1));P(sx+k*2,g-hy,2,hy,n()?'#3e4a4e':'#8e9a94');P(sx+k*2,g-hy-1,2,2,t.snow);}
+      P(sx+140,g-64,30,64,n()?'#3e4a4e':'#8e9a94');P(sx+140,g-65,30,2,t.snow);
+      for(let k=0;k<9;k++){const xx=sx+18+k*14,yy=g-6-k*6.5;P(xx,yy,13,4,n()?'#77736c':'#c2bcae');P(xx,yy+4,13,2,n()?'#4e4b47':'#8d877b');P(xx+1,yy-1,11,1,t.snow);}
+      pine(sx+120,g-60,58);pine(sx+160,g-62,66);pine(sx+70,g-40,44);
+      P(sx+6,g-30,3,30,t.wood);P(sx+1,g-32,13,6,'#ead4a6');P(sx+3,g-30,9,1,'#784b36');   // 이정 말뚝
+    }
   }else if(id==='inn'){   // tx: 줄인 숙소 좌표 (D-116)
-    for(let wx=100,i=0;wx<2800;wx+=165,i++){const x=tx(wx)-cam;if(x<-110||x>W+110)continue;if(wx<650||wx>1450){const h=34+i%3*7;house(x,GROUND-h,76+i%4*8,h,n(),undefined,i);bundle(x+113,GROUND,wx);}}
+    {// 결정 D-314: 되풀이 집은 줄인 뒤의 실제 좌표로 (잘라 낸 자리에서 집이 반쪽으로 잘리지 않게). 숙소 몸채·누마루·높은 발판 자리는 비운다.
+      const zw=zoneDef().w,busy=[[580,1420],[1690,1940],[1990,2130],...fieldPlatforms().map(p=>[p.x-14,p.x+p.w+14])];
+      for(const {rx,i,w} of rowSlots(zw,100,165,i=>96+i%4*8,busy)){const x=rx-RC();if(x<-110||x>W+110)continue;
+        const h=34+i%3*7;house(x,GROUND-h,w-20,h,n(),undefined,i);bundle(x+w-6,GROUND,rx);}}
     const x=760-cam;house(x,GROUND-69,460,69);tileRoof(x-9,GROUND-93,478,23);P(x+39,GROUND-77,382,4,t.wood);
     for(let j=0;j<7;j++){P(x+22+j*65,GROUND-67,5,67,t.wood);P(x+22+j*65,GROUND-65,2,63,n()?'#96715c':'#d2ac7c');}
     P(x+93,GROUND-8,278,8,'#82604c');P(x+93,GROUND-10,278,2,'#ba9470');for(let j=0;j<8;j++)P(x+99+j*34,GROUND-7,1,6,'#4e3a35');
@@ -248,7 +341,9 @@ function drawScenery(id){
     const x=2410-cam;P(x-20,96,340,96,n()?'#53616f':'#929eaa');P(x-25,102,345,90,n()?'#53616f':'#929eaa');P(x-19,94,339,3,t.snow);P(x-11,109,4,57,n()?'#3a4b5d':'#798d9a');
     for(let j=0;j<5;j++)P(x+21+j*3,118+j*3,2,1,'#817a73');P(x-4,91,9,3,'#9b8770');
   }else if(id==='warehouse'){
-    for(let wx=120,i=0;wx<2800;wx+=190,i++){const x=tx(wx)-cam;if(x<-130||x>W+130)continue;const w=95+i%3*9,h=42+i%3*7;house(x,GROUND-h,w,h,false,undefined,i);P(x+12,GROUND-36,w-24,33,n()?'#51464a':'#8c6c51');for(let j=0;j<(w-24)/11;j++)P(x+15+j*11,GROUND-34,1,29,t.wood);bundle(x+138,GROUND,i);}
+    // 결정 D-314: 되풀이 곳간도 줄인 뒤의 실제 좌표로. 창고 큰 문과 짐짝 발판 자리는 비운다.
+    const zw=zoneDef().w,sxr=trimX(2320,REG.trimCuts?.warehouse),busy=[[sxr-90,sxr+90],...fieldPlatforms().map(p=>[p.x-14,p.x+p.w+14])];
+    for(const {rx,i,w:ww} of rowSlots(zw,120,190,i=>95+i%3*9+30,busy)){const x=rx-RC();if(x<-130||x>W+130)continue;const w=ww-30,h=42+i%3*7;house(x,GROUND-h,w,h,false,undefined,i);P(x+12,GROUND-36,w-24,33,n()?'#51464a':'#8c6c51');for(let j=0;j<(w-24)/11;j++)P(x+15+j*11,GROUND-34,1,29,t.wood);bundle(x+w+16,GROUND,i);}
     const x=tx(2320)-cam;house(x-64,GROUND-60,128,60,false);P(x-22,GROUND-42,44,42,'#2c2c35');P(x-1,GROUND-42,2,42,'#776154');P(x-8,GROUND-24,16,3,'#b19c73');
     if(n()&&!G.boss.dead){P(x-18,GROUND-29,3,3,'#89cbd3');P(x+13,GROUND-36,4,4,'#acdce0');P(x-16,GROUND-25,1,2,'#d7e7d7');}
     if(G.boss.dead){bundle(x-44,GROUND,1);bundle(x+43,GROUND,0);P(x+48,GROUND-19,1,15,'#bfa172');P(x+45,GROUND-7,7,5,'#ad8b54');}
@@ -257,16 +352,39 @@ function drawScenery(id){
   // 조사 글의 대상은 실제 생활 물건으로도 알아볼 수 있게 둔다.
   if(id==='entrance'){
     const x=tx(240)-cam;P(x-6,GROUND-14,12,8,'#ac8b62');P(x-2,GROUND-18,4,8,'#d1b184');P(x-7,GROUND-15,6,3,'#ccbe95');P(x+1,GROUND-18,6,3,'#ccbe95');
-    if(!Rg.springRevisit()){const sx=tx(1680)-cam;P(sx-10,GROUND-11,20,11,t.snow);P(sx-7,GROUND-19,14,10,t.snow);P(sx-4,GROUND-18,1,1,'#4c4843');P(sx+3,GROUND-18,1,1,'#4c4843');P(sx,GROUND-14,7,2,'#aa7251');}
+    // 결정 D-314: 눈 장승은 잘라 낸 구간 안(설계 1680)에 있어 그림만 사라지고 조사 자리만 남았었다. 조사 자리(줄인 뒤 좌표)에 그린다.
+    if(!Rg.springRevisit()){const sx=trimX(1680,REG.trimCuts?.entrance)-RC();P(sx-10,GROUND-11,20,11,t.snow);P(sx-7,GROUND-19,14,10,t.snow);P(sx-4,GROUND-18,1,1,'#4c4843');P(sx+3,GROUND-18,1,1,'#4c4843');P(sx,GROUND-14,7,2,'#aa7251');}
   }else if(id==='street'){
     const x=1150-cam;P(x-7,GROUND-11,15,11,'#9a8267');P(x-5,GROUND-14,11,4,'#e4dbbb');P(x-3,GROUND-16,7,3,'#f3eee1');P(x-5,GROUND-7,11,1,'#c4aa7e');
+    // 결정 D-318: 장국밥 가마솥 (조사 '장국밥 가마솥')
+    const gx=2470-cam;P(gx-16,GROUND-14,32,14,'#6b5848');P(gx-13,GROUND-11,26,8,'#4b3a34');if(!n())P(gx-8,GROUND-8,16,5,'#e08a3a');
+    P(gx-14,GROUND-24,28,10,'#3e3834');P(gx-16,GROUND-25,32,2,'#5e5652');P(gx-6,GROUND-28,12,3,'#3e3834');
+    if(!n())for(let j=0;j<4;j++){const k=(G.anim*0.5+j*15)%50;P(gx-4+Math.round(Math.sin((G.anim+j*25)*0.05)*3),GROUND-32-k,5,3,'rgba(255,255,255,'+(0.6-k/90).toFixed(2)+')');}
+    P(gx+20,GROUND-12,14,3,t.wood);P(gx+22,GROUND-9,2,9,t.wood);P(gx+30,GROUND-9,2,9,t.wood);for(let j=0;j<3;j++)P(gx+21+j*4,GROUND-15,3,3,'#efe6cf');   // 국밥 그릇
     const yx=2130-cam;P(yx-16,GROUND-10,32,9,'#7d624b');P(yx-14,GROUND-12,28,2,'#cbb184');for(let j=0;j<4;j++)P(yx-10+j*6,GROUND-16+j%2,4,3,'#dfc898');
   }else if(id==='inn'){
+    // 결정 D-318: 숙소 오른쪽 창고 쪽문 곁 마구간과 나귀 (조사 '마구간 나귀'). 설계 2060~2160, 잘라 낸 구간(2190~) 앞이다.
+    {const sx=2110-cam;P(sx-50,GROUND-44,100,4,t.wood);tileRoof(sx-54,GROUND-58,108,12);P(sx-50,GROUND-40,3,40,t.wood);P(sx+47,GROUND-40,3,40,t.wood);
+      P(sx-46,GROUND-38,92,34,n()?'#4a3e38':'#8f735a');P(sx-46,GROUND-8,92,8,n()?'#6b5a40':'#c9a850');
+      const nx=sx-8,sl=!Vfx.reducedMotion&&!n()?Math.round(Math.sin(G.anim*.06)):0;   // 나귀: 여물을 씹으며 고개를 까딱인다
+      P(nx-12,GROUND-22,24,11,'#7d746c');P(nx-12,GROUND-11,3,11,'#5e5650');P(nx+9,GROUND-11,3,11,'#5e5650');P(nx-6,GROUND-11,3,11,'#5e5650');P(nx+3,GROUND-11,3,11,'#5e5650');
+      P(nx+10,GROUND-30+sl,7,10,'#7d746c');P(nx+15,GROUND-24+sl,5,5,'#b9b0a6');P(nx+11,GROUND-37+sl,2,8,'#5e5650');P(nx+14,GROUND-36+sl,2,7,'#5e5650');P(nx+15,GROUND-28+sl,1,1,'#1a1410');
+      P(nx-14,GROUND-21,3,8,'#5e5650');P(nx-10,GROUND-25,14,3,'#a8432f');P(nx-9,GROUND-27,6,2,'#c9a06a');   // 꼬리와 길마
+      P(sx+20,GROUND-14,22,10,'#6b4c36');P(sx+21,GROUND-16,20,3,n()?'#8a7a52':'#d9b860');}   // 여물통
     const x=350-cam;P(x-9,GROUND-5,8,4,'#77796b');P(x+2,GROUND-5,8,4,'#77796b');P(x-8,GROUND-7,5,3,'#bdb8a1');P(x+3,GROUND-7,5,3,'#bdb8a1');
   }else if(id==='pine'){
+    // 결정 D-319: 솔숲 왼쪽 끝은 장터에서 올라온 돌계단의 꼭대기다. 계단이 왼쪽 아래 장터 지붕 쪽으로 내려간다.
+    {const sx=-cam,dark=n()?'#2f3a44':'#6c7672',stone=n()?'#77736c':'#c2bcae',riser=n()?'#4e4b47':'#8d877b';
+      // 언덕 마루 바로 앞(왼쪽 끝)에서 돌계단이 아래로 내려간다. 걷는 자리는 덮지 않는다.
+      for(let k=0;k<5;k++){const xx=sx+50-k*11,yy=GROUND+3+k*5;P(xx-11,yy,12,H-yy,riser);P(xx-11,yy,12,2,stone);P(xx-10,yy-1,10,1,t.snow);}
+      P(sx+52,GROUND+2,3,H-GROUND-2,dark);P(sx+52,GROUND+1,3,1,t.snow);
+      pine(sx+96,GROUND,58);}
     const x=1870-cam;for(let j=0;j<7;j++){P(x-12+j*4,GROUND-2-j%2,4,1,'#9b8357');P(x-10+j*4,GROUND-3,1,3,'#78684c');}
     const sx=2280-cam;P(sx-3,122,6,5,'#b9aa89');P(sx-5,124,10,2,'#786e58');
   }else if(id==='warehouse'){
+    // 결정 D-318: 짐꾼 화톳불 자리 (조사 '짐꾼 화톳불 자리'). 설계 1780은 줄인 뒤 880, 짐짝 더미와 창고 큰 문 사이 빈 마당
+    {const fx=1780-cam;for(let j=0;j<5;j++)P(fx-12+j*5,GROUND-4,5,4,'#6b6460');P(fx-9,GROUND-6,18,3,'#3a3430');P(fx-6,GROUND-8,4,2,n()?'#ff9a3a':'#c9604b');P(fx+1,GROUND-7,3,2,n()?'#ffcf70':'#8a4a2a');
+      if(n())P(fx-14,GROUND-20,28,18,'rgba(255,160,70,.10)');P(fx+14,GROUND-12,10,10,'#8a6448');P(fx+15,GROUND-13,8,2,'#a17a52');}   // 짐꾼이 걸터앉던 짐짝
     const x=tx(400)-cam;for(let j=0;j<3;j++){P(x-9+j*5,GROUND-8,3,7,'#aa8c59');P(x-10+j*5,GROUND-10,6,2,'#ccb17b');}P(x-10,GROUND-2,17,2,'#7e6846');
     const mx=tx(2470)-cam;P(mx-17,121,34,7,'#ac9667');P(mx-17,120,34,2,'#d4be86');for(let j=0;j<8;j++)P(mx-15+j*4,122,1,5,'#816e4e');P(mx-12,117,24,3,'#c4aa73');
   }
@@ -484,6 +602,21 @@ function wanderer(kind,x,y,f=1){
     // 결정 D-325: 둘 사이에 투호 항아리와 꽂힌 화살 (예전엔 윷판)
     P(x-14,y-2,28,2,'#d1b991');P(x-4,y-10,8,8,'#5d6a6b');P(x-5,y-8,10,4,'#5d6a6b');P(x-3,y-9,2,4,'#7d8b8a');P(x-1,y-15,3,5,'#5d6a6b');P(x-2,y-16,5,1,'#3f4a4b');P(x-3,y-14,1,2,'#5d6a6b');P(x+3,y-14,1,2,'#5d6a6b');
     P(x,y-22,1,7,'#6b4a2c');P(x,y-23,1,2,'#b54a34');P(x+2,y-20,1,5,'#6b4a2c');P(x+2,y-21,1,2,'#416c82');
+  }else if(kind==='straw'){
+    // 결정 D-318: 청설모 짚신장수 할아범. 귀 끝 털, 굽은 등, 등에 짚신 꾸러미. 끝내기 전엔 발치에 짚신이 흩어져 있다.
+    p(-6,-15,12,13,'#6f5a4c');p(-4,-11,6,8,'#c9b8a0');p(-3,-24,10,10,'#7a6454');p(-3,-27,2,4,'#4e3e34');p(4,-27,2,4,'#4e3e34');p(-4,-29,1,3,'#4e3e34');p(5,-29,1,3,'#4e3e34');
+    p(5,-21,4,3,'#c9b8a0');p(8,-20,1,1,'#2a211b');p(2,-22,1,1,'#2a211b');p(-1,-25,8,1,'#e8e0d0');
+    p(-14,-14,6,12,'#7a6454');p(-15,-18,5,6,'#8a7262');p(-13,-20,3,3,'#9a8272');   // 꼬리
+    p(-10,-27,9,13,'#d9b860');p(-9,-26,7,1,'#a8883a');p(-9,-21,7,1,'#a8883a');p(-9,-16,7,1,'#a8883a');   // 짚신 꾸러미
+    p(-4,-2,3,2,'#4e3e34');p(2,-2,3,2,'#4e3e34');p(7,-14,1,14,'#8a6a3a');
+    if(!G.f.jxStrawDone)for(const [dx,dy] of [[14,-2],[20,-1],[-22,-2],[26,-2]])p(dx,dy,6,2,'#d9b860');
+  }else if(kind==='bean'){
+    // 결정 D-318: 까투리(암꿩) 콩장수 아주머니. 얼룩 깃, 머릿수건, 곁에 콩 자루. 끝내기 전엔 자루 밑이 터져 콩이 흩어져 있다.
+    p(-7,-15,14,12,'#a8875e');for(let i=0;i<4;i++)p(-5+i*3,-13+(i%2)*3,2,2,'#6b5034');p(-3,-24,9,10,'#b8986e');p(-3,-25,9,3,'#c9604b');p(-4,-23,2,4,'#c9604b');
+    p(5,-20,4,2,'#d9b860');p(3,-21,1,1,'#2a211b');p(-14,-12,8,3,'#8a6a48');p(-17,-11,5,2,'#6b5034');   // 부리·꼬리깃
+    p(-3,-2,2,3,'#c9a06a');p(3,-2,2,3,'#c9a06a');
+    p(10,-12,12,12,'#b9a27a');p(11,-14,10,3,'#d6be8c');p(15,-15,2,2,'#8a6a3a');
+    if(!G.f.jxBeanDone){p(11,-1,10,1,'#8a6a3a');for(const [dx,dy] of [[24,-1],[28,-2],[33,-1],[19,-1],[37,-1]])p(dx,dy,2,2,'#d9c07a');}
   }else if(kind==='boar'){
     p(-10,-13,18,12,'#9b765c');p(-10,-11,13,2,'#d1b17b');p(-9,-7,12,2,'#d1b17b');p(3,-17,11,12,'#b18a6a');p(3,-21,4,6,'#98745b');p(10,-21,3,6,'#98745b');p(12,-11,6,5,'#c99a81');p(16,-10,1,2,'#60483e');p(9,-15,1,2,'#2d3033');p(-7,-2,3,2,'#55463e');p(4,-2,3,2,'#55463e');p(-14,-10,4,2,'#9b765c');
   }else{

@@ -70,7 +70,11 @@ Rg.drawScenery=()=>{
   drawInn();drawStore();drawForest();drawLogsSnow();
   const sx=2338-cam;if(G.f.hongsiMade&&sx<W+20){R(sx,GROUND-26,2,26,'#6b4423');R(sx-8,GROUND-26,18,8,'#c9a27a');R(sx+6,GROUND-24,2,4,'#6b4423');}
 };
-Rg.drawPickup=(a,x,bob)=>{R(x-2,a.y-7+bob,5,2,'#8a5a2b');R(x-3,a.y-5+bob,7,2,'#6b4423');R(x-2,a.y-3+bob,5,2,'#8a5a2b');R(x-1,a.y-1,3,1,'#5a3a20');};
+Rg.drawPickup=(a,x,bob)=>{
+  // 결정 D-318: 짐짝에서 샌 콩과 마구간에서 흘린 짚도 줍는다. 솔방울이 아닌 것은 그 모양으로.
+  if(a.item==='kong'){for(const [dx,dy] of [[-3,-3],[0,-4],[2,-2],[-1,-1]])R(x+dx,a.y+dy+bob,2,2,'#d9c07a');R(x-1,a.y-4+bob,1,1,'#f1e0a6');return;}
+  if(a.item==='jip'){R(x-5,a.y-3+bob,10,2,'#d9b860');R(x-4,a.y-5+bob,8,2,'#c9a850');R(x-1,a.y-6+bob,2,6,'#a8883a');return;}
+  R(x-2,a.y-7+bob,5,2,'#8a5a2b');R(x-3,a.y-5+bob,7,2,'#6b4423');R(x-2,a.y-3+bob,5,2,'#8a5a2b');R(x-1,a.y-1,3,1,'#5a3a20');};
 
 /* 눈 */
 const snow=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H,s:0.25+Math.random()*0.45,p:Math.random()*6}));
@@ -101,16 +105,18 @@ Rg.STORE_X=STORE_X;
 
 /* PA-43 [개발자 결정]. 옛 장터는 위에 그대로 두고, 확장에서는 구역 안 좌표만 쓴다.
    필수: 입구 → 거리 → 숙소(밤) → 거리/솔숲 → 시루/고사떡 → 숙소 → 창고.
-   지붕길과 밤 골목은 선택 지름길이다. 아래 눈길은 언제나 안전하게 이어진다. */
+   결정 D-316: 구역 사이는 실제로 이어진 길로만 오간다 (사용자 피드백 2026-11-02 "순간이동 기믹 빼라").
+   예전의 지붕길 문(입구 지붕↔거리 지붕↔솔숲 능선), 밤 골목 지름길(거리 한가운데↔숙소 한가운데), 창고의 '귀환 문'은 뺐다.
+   결정 D-317: 건물은 들어간 곳으로 나온다. 떡집은 앞이 트인 땅 위 가게라 문 없이 걸어 들어가고, 숙소 마당도 걸어서 드나든다.
+   숙소와 창고 마당은 숙소 오른쪽 끝 창고 쪽문(가장자리) 하나로만 잇는다. */
 if(!CLASSIC){
   Rg.startZone='entrance';Rg.STORE_X=2320;
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
-  // 결정 D-293: 처마 지붕길은 연줄을 따라 건너는 게 아니라, 연 아이가 알려 준 튼튼한 기와를 밟아 건넌다.
   // 장터 입구: 지붕길 문(1310) 뒤 빈 길 1290px → 410px (물건 없는 발판 무리를 지운다). 숙소 창고: 빈 마당과 빈 발판 무리 두 곳을 지운다.
   Rg.trimCutsV1={entrance:[[1400,880]],warehouse:[[800,900],[1800,380]]};   // 첫 판(D-109) — 옛 저장을 옮길 때 쓴다
   // 결정 D-116: 숙소 창고문(2130) 뒤 오른쪽 출구까지 빈 마당과 빈 처마 계단(2190~2490)을 지운다.
   Rg.trimCutsV2={entrance:[[1400,880]],inn:[[2190,300]],warehouse:[[800,900],[1800,380]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
-  // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 장터 입구 솔방울·깃발·연 아이 사이 두 곳과 눈 장승 뒤 출구 앞, 숙소 들어선 자리와 신발 사이.
+  // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 장터 입구 솔방울·깃발·연 날리는 아이(얼레) 사이 두 곳과 눈 장승 뒤 출구 앞, 숙소 들어선 자리와 신발 사이.
   Rg.trimCuts={entrance:[[465,135],[830,60],[1400,880],[2390,90]],inn:[[180,50],[2190,300]],warehouse:[[800,900],[1800,380]]};
   Rg.trimHook=tX=>{Rg.STORE_X=tX(Rg.STORE_X,Rg.trimCuts.warehouse);};
   Rg.trimMigrateHook=g=>{if(g.boss)g.boss.x=Rg.STORE_X;};
@@ -118,6 +124,8 @@ if(!CLASSIC){
   Rg.newState=()=>{const s=originalState();s.pickups=[];s.boss.x=Rg.STORE_X;return s;};
   const peg=(x,y)=>{R(x-1,y-17,2,17,'#6b4934');R(x-9,y-19,18,7,'#ead4a6');R(x-6,y-17,11,1,'#784b36');};
   const glint=(x,y)=>pawStamp(x,y,'#a85344');
+  // 결정 D-319: 뒷산 돌계단 들머리의 작은 말뚝 (계단 그림은 art.js 거리·솔숲 배경)
+  const stairPost=(x,y)=>{R(x-1,y-15,3,15,'#6b4934');R(x-6,y-18,13,5,'#ead4a6');R(x-4,y-16,9,1,'#784b36');R(x+3,y-17,3,3,'#784b36');};
   const shutter=(x,y)=>{R(x-17,y-35,34,35,'#705346');for(let i=0;i<5;i++)R(x-15+i*6,y-33,2,30,'#987459');R(x-18,y-22,36,3,'#b64e41');};
   const gate=(x,y)=>{R(x-20,y-48,4,48,'#604635');R(x+16,y-48,4,48,'#604635');R(x-24,y-49,48,6,'#31434d');R(x-22,y-51,44,2,'#e6eaf0');if(!night()||!has('sinpyo')){R(x-16,y-23,32,3,'#ac4c43');R(x-12,y-27,24,1,'#dba56c');}};
   const needWarehouse=()=>night()&&has('sinpyo');
@@ -179,7 +187,7 @@ if(!CLASSIC){
       if(id==='warehouse'&&G.f.guard&&night()&&!G.boss.dead&&Math.abs(G.px-Rg.STORE_X)<24)Rg.startDokkaebi();
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
         G.f.jxHubChanged=true;diary('jx_hub','모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.');
-        toast('떡집 앞 줄이 짧아졌다. 밤에는 접힌 좌판 사이로 숙소에 갈 수 있다.');
+        toast('떡집 앞 줄이 짧아졌다.');
       }
     },
   });
@@ -222,22 +230,17 @@ if(!CLASSIC){
       platforms:[...stairs(1040),...stairs(1980)],
       pickups:cones('entrance',[[355,192]]),   // 결정 D-82: 솔방울은 뒷산 솔숲에서 모은다
       exits:{right:{to:'street',toX:60}},
-      doors:[{x:1310,y:96,to:'street',toX:1010,toY:96,label:'기와지붕 따라 건너기',need:()=>!!G.f.jxKiteDone,reason:'어느 기와가 튼튼한지 모른다. 지붕에서 연을 날리는 아이라면 알 텐데.',draw:peg,drawBlocked:shutter}],
+      doors:[],   // 결정 D-316: 지붕길 문(→거리 지붕)은 뺐다
       wanderers:E.wanderers.entrance,examines:E.examines.entrance,
       stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint,base:'none',face:18}],   // D-116: 깃대에 바로 찍는다(받침 겹침 없음)
     },
     street:{...common('street'),name:TABLES.ZONES.jangteo.street,w:2800,npcs:['morak','yeotbang','nal'],
-      platforms:[...stairs(430),{x:610,y:96,w:510},{x:1250,y:110,w:300},...stairs(2370),{x:2550,y:96,w:180}],
+      // 결정 D-315·D-316: 공중에 뜬 긴 지붕(610·2550)과 떡집 높은 마루(1250, y110)는 뺐다. 처마 계단 둘만 남는다.
+      platforms:[...stairs(430),...stairs(2370)],
       pickups:cones('street',[[850,192]]),
       exits:{left:{to:'entrance',toX:2530},right:{to:'inn',toX:60}},
-      doors:[{x:1180,to:'street',toX:1310,toY:110,label:'떡집 문 열기',need:()=>!night(),reason:'앞문은 닫혔다. 오른쪽에 불 켜진 옆문이 있다.',draw:peg,drawBlocked:shutter},
-        {x:1590,to:'street',toX:1490,toY:110,label:'떡집 아궁이 옆문으로',draw:peg},
-        {x:1515,y:110,to:'street',toX:1625,label:'떡집 밖으로',draw:peg},
-        {x:1010,y:96,to:'entrance',toX:1310,toY:96,label:'기와지붕 따라 입구로',need:()=>!!G.f.jxKiteDone,reason:'어느 기와가 튼튼한지 모른다. 입구의 연 아이라면 알 텐데.',draw:peg},
-        {x:2180,to:'pine',toX:70,label:'굴뚝 뒤 소나무 숲으로',ascend:true,draw:peg},
-        {x:2040,to:'inn',toX:1510,label:'접힌 좌판 사이, 숙소 지름길',need:night,reason:'낮에는 좌판이 골목을 막는다. 밤이면 접힌다.',draw:peg,drawBlocked:shutter,
-          formPass:'squirrel',formLabel:'다람쥐로 좌판 밑 지나기'},
-        {x:2650,y:96,to:'pine',toX:2480,toY:96,label:'처마 너머 보이던 솔숲 능선으로',need:()=>!!G.f.jxKiteDone,reason:'어느 기와가 튼튼한지 모른다. 입구의 연 아이라면 알 텐데.',draw:peg}],
+      // 결정 D-316·D-319: 문은 뒷산 돌계단 하나. 솔숲에서 내려오면 같은 돌계단 아래로 나온다.
+      doors:[{x:2180,to:'pine',toX:70,label:'뒷산 돌계단 오르기',ascend:true,draw:stairPost}],
       get wanderers(){return [...E.wanderers.street,yutBoard,...nightLanterns('street')];},examines:E.examines.street,
     },
     inn:{...common('inn'),name:TABLES.ZONES.jangteo.inn,w:2600,npcs:['bueong','maru'],
@@ -245,11 +248,7 @@ if(!CLASSIC){
       pickups:cones('inn',[[445,192]]),
       digs:[{id:'j_cache_inn',x:560,item:'solbang',n:2,form:'squirrel',cache:true,done:false}],
       exits:{left:{to:'street',toX:2720},right:{to:'warehouse',toX:60,need:needWarehouse,reason:warehouseReason,drawBlocked:gate}},
-      doors:[{x:700,to:'inn',toX:850,label:'숙소 문 열기',draw:peg},
-        {x:1120,to:'inn',toX:660,label:'숙소 마당으로',draw:peg},
-        {x:1510,to:'street',toX:2040,label:'밤 골목으로 돌아가기',need:night,reason:'낮에는 장터 좌판이 길을 막는다. 왼쪽 큰길로 돌아가자.',draw:peg,drawBlocked:shutter,
-          formPass:'squirrel',formLabel:'다람쥐로 좌판 밑 지나기'},
-        {x:2130,to:'warehouse',toX:280,label:'마루에서 보았던 푸른 창고문 안으로',need:needWarehouse,reason:warehouseReason,draw:gate}],
+      doors:[],   // 결정 D-316·D-317: 숙소 문·마당 문(같은 구역 안 건너뛰기), 밤 골목 지름길, 창고문(창고 마당 엉뚱한 자리로)은 뺐다. 창고는 오른쪽 끝 쪽문으로
       get wanderers(){return [...E.wanderers.inn,lanternBundle,...nightLanterns('inn')];},examines:E.examines.inn,
       stamps:[{id:'pillar',x:1280,y:128,note:'stamp:jangteo:pillar',draw:glint,base:'none',face:10}],   // D-116: 숙소 기둥에 바로 찍는다
       vistas:[{id:'icicles',x:1850,y:128,from:0,to:420,sound:'wind',draw:peg,
@@ -266,8 +265,8 @@ if(!CLASSIC){
       pickups:[...cones('pine',[[232,192],[291,192],[318,192],[612,96],[659,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
         {id:'j_owl_roof_cone_1',x:853,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:884,y:124,item:'solbang',got:false}],
       // 결정 D-44: 뒷산에서 장터로는 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
-      doors:[{x:70,to:'street',toX:2180,label:'떡집 굴뚝을 향해 내려가기',descend:true,draw:peg},
-        {x:2480,y:96,to:'street',toX:2650,toY:96,label:'등불 아래 장터 지붕으로',need:()=>!!G.f.jxKiteDone,reason:'어느 기와가 튼튼한지 모른다. 입구의 연 아이라면 알 텐데.',draw:peg}],
+      // 결정 D-319: 올라온 돌계단으로 내려가 거리의 그 돌계단 아래(2180)로 나온다. 지붕길 문(→거리 지붕)은 뺐다(D-316).
+      doors:[{x:70,to:'street',toX:2180,label:'돌계단 따라 장터로 내려가기',descend:true,draw:stairPost}],
       exits:{left:{to:'street',toX:2180}},
       get wanderers(){return night()?[...E.wanderers.pine,...nightLanterns('pine')]:[];},examines:E.examines.pine,
       stamps:[{id:'rock',x:2410,y:96,note:'stamp:jangteo:rock',draw:glint}],
@@ -279,9 +278,7 @@ if(!CLASSIC){
       platforms:[...stairs(460),...stairs(1230),...stairs(1840),...stairs(2340)],
       pickups:cones('warehouse',[[676,192],[709,192],[752,192]]),   // D-207
       exits:{left:{to:'inn',toX:2490}},
-      doors:[{x:280,to:'inn',toX:2130,label:'지붕 사이, 숙소 불빛으로 돌아가기',draw:gate},
-        {x:2290,to:'inn',toX:1440,label:'짐 나르는 귀환 문으로 숙소에',need:()=>G.boss.dead,
-          reason:'도깨비가 물러나면 짐 나르는 귀환 문을 쓸 수 있겠다.',draw:gate,drawBlocked:shutter}],
+      doors:[],   // 결정 D-316·D-317: 숙소로는 들어온 쪽문(왼쪽 가장자리)으로만 돌아간다
       examines:E.examines.warehouse,
       drawActors(){
         const x=Rg.STORE_X-cam;R(x-38,GROUND-58,76,58,'#493d3b');R(x-44,GROUND-62,88,5,'#243b48');R(x-44,GROUND-64,88,2,'#dbe8ed');
@@ -301,6 +298,12 @@ if(!CLASSIC){
     ['warehouse','p',150,'solbang'],['warehouse','p',590,'solbang',{y:124}],['warehouse','p',1270,'solbang',{y:96}],
     // 몰린 자리 (간격이 고르지 않게)
     ['entrance','p',735,'solbang'],['inn','p',2210,'solbang'],
+  ]);
+  /* 결정 D-318: 쓸모없이 걷기만 하던 자리에 장터다운 주울 것을 조금 더 (사용자 피드백 2026-11-02 "콘텐츠와 수집품으로 채워라").
+     마구간 여물통 곁에 흘린 짚, 창고 마당 짐짝 틈으로 샌 콩. 장꾼이 팔 물건은 줍지 않는다. 좌표는 길을 줄인 뒤의 자리. */
+  addZoneGather(Rg,'j_g2_',[
+    ['inn','p',2042,'jip'],['inn','p',2071,'jip'],
+    ['warehouse','p',470,'kong'],['warehouse','p',488,'kong'],['warehouse','p',1150,'kong'],
   ]);
   // 길손의 조사에는 배경과 구별되는 작고 일정한 표지를 쓴다. 숨은 도장은 표지를 붙이지 않는다.
   for(const z of Object.values(Rg.zones))for(const p of z.examines)p.draw=p.draw||((x,y)=>{R(x-2,y-6,5,4,'#caa970');R(x,y-10,1,2,'#f6ead0');});
