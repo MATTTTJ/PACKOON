@@ -9,6 +9,13 @@ const TABLES={
    "region": "galchamgol",
    "d": "참나무 열매. 떫어서 그냥은 못 먹고 가루로 빻아 쓴다."
   },
+  "bam": {
+   "n": "밤",
+   "r": 0,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "가시 송이째 떨어져 벌어진 알밤. 구우면 속이 노랗고 달다."
+  },
   "acorn_gift": {
    "n": "다람쥐 형제의 도토리",
    "r": 1,
@@ -126,7 +133,7 @@ const TABLES={
    "r": 3,
    "kind": "귀한 것",
    "region": "dolneomeo",
-   "d": "첫서리를 맞아야 단맛이 드는 다래. 엄마의 병을 늦추는 약 재료."
+   "d": "첫서리 밤에 성황당 돌무더기가 가슴의 핵 안에 품어 맺은 다래. 엄마의 병을 늦추는 약 재료."
   },
   "darae_yak": {
    "n": "서리다래 약즙",
@@ -1470,6 +1477,12 @@ const TABLES={
    "dadDrawing": true
   },
   {
+   "id": "bam",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
    "id": "acorn_gift",
    "region": "galchamgol",
    "kind": "item",
@@ -1646,7 +1659,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "다리나 팔을 하나 무너뜨리면 가슴의 눈 껍데기가 깨지고 푸른 옥돌이 드러난다.",
+     "text": "다리나 팔을 하나 무너뜨리면 가슴의 눈 껍데기가 깨지고 서리빛 핵이 드러난다. 속에 다래 그림자가 비친다.",
      "section": "관찰",
      "when": "core:golem"
     },
@@ -1664,7 +1677,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "달래면 다시 성황당으로 내려앉는다.",
+     "text": "달래면 핵에서 서리다래를 꺼내 내려놓고 성황당으로 내려앉는다.",
      "section": "관찰",
      "when": "calm:golem"
     }
@@ -2678,6 +2691,7 @@ const TABLES={
   "gather_seogi_hits": 2,
   "gather_darae_vine_hits": 2,
   "gather_solbang_hits": 2,
+  "gather_snow_mound_hits": 2,
   "yut_needle_speed": 1.5,
   "yut_nak_zone": 10
  },
@@ -2745,6 +2759,8 @@ const TABLES={
   "golem_arm_rest": 110,
   "golem_core_frames": 150,
   "golem_barrage_count": 12,
+  "golem_snowball_damage": 0.334,
+  "golem_stomp_clumps": 5,
   "kudzu_stem_cut_chance": 0.4,
   "kudzu_root_dig_chance": 0.4,
   "kudzu_scent_damage": 0.5,
@@ -2753,7 +2769,8 @@ const TABLES={
   "kudzu_scent_linger": 150,
   "toast_frames": 300,
   "peek_ms": 1400,
-  "peek_fade_ms": 180,
+  "peek_fade_ms": 240,
+  "peek_open_ms": 460,
   "hint_range": 150,
   "craft_motion_ms": 750,
   "drop_arc_height": 24,
@@ -2811,7 +2828,10 @@ const TABLES={
   "wish_anim_settle_frames": 24,
   "wish_anim_done_frames": 50,
   "music_duck": 0.72,
-  "music_dialog_hold_ms": 600
+  "music_dialog_hold_ms": 600,
+  "battle_aim_left": 1,
+  "battle_aim_up": 19,
+  "battle_hitstop": 4
  },
  "PROGRESS": [
   {
