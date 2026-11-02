@@ -1359,11 +1359,11 @@ Rg.npcs=[
 
 if(!CLASSIC){
   Rg.npcs=Rg.npcs.map(n=>{
-    const place={morak:['street',1380,110],yeotbang:['street',1660,GROUND],nal:['street',430,GROUND],maru:['inn',1080,GROUND],bueong:['inn',920,GROUND]}[n.id];
+    const place={morak:['street',1380,GROUND],yeotbang:['street',1660,GROUND],nal:['street',430,GROUND],maru:['inn',1080,GROUND],bueong:['inn',920,GROUND]}[n.id];
     const p=Object.defineProperties({},Object.getOwnPropertyDescriptors(n));
     Object.defineProperty(p,'x',{value:place[1],writable:true,enumerable:true,configurable:true});
     p.zone=place[0];p.y=place[2];
-    if(n.id==='morak')p.props=null; // 떡집 실내는 확장 배경에서 발판 높이에 맞춰 그린다.
+    if(n.id==='morak')p.props=null; // 결정 D-315: 떡집은 확장 배경(art.js)이 땅 위 가게로 그리고, 모락은 그 안 땅에 선다.
     if(n.id==='yeotbang')p.talk=()=>{
       if(!G.f.yeotDone){n.talk();return;}
       const hide=night()&&!G.boss.dead&&Rg.arcs();
