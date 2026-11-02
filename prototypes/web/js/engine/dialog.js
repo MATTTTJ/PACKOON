@@ -42,6 +42,18 @@ function dlgPic(pic){
   if(!pic){peekRelease();return;}
   if(typeof pic==='function')peekPicture(pic);else peekPicture(pic.draw,pic);
 }
+/* 결정 D-235: NPC에게서 물건을 받으면 그 대화에 받은 것을 알리는 한 줄을 넣는다 (사용자 피드백 2026-11-02:
+   "대화 끝에 뭔가를 얻으면 가방으로 들어온다. ~~을 얻었다로 표현"). 주인공 독백 꼴 '(메밀 두 개를 얻었다.)'.
+   gotLine('memil',2) 는 줄만 만든다. gotItem('memil',2) 는 보따리에 넣고 같은 줄을 돌려준다.
+   여러 가지는 gotLine([['memil',2],['seogi',1]]) → '(메밀 두 개와 석이를 얻었다.)'. */
+const KO_COUNT=['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
+function gotText(list){
+  const words=list.map(([id,n=1])=>{const name=ITEMS[id]?ITEMS[id].n:id;return n>1?name+' '+(KO_COUNT[n]||n)+' 개':name;});
+  const joined=words.reduce((a,w,i)=>i?jo(a,'과','와')+' '+w:w,'');
+  return '('+jo(joined,'을','를')+' 얻었다.)';
+}
+function gotLine(id,n=1){return ['너구리',gotText(Array.isArray(id)?id:[[id,n]])];}
+function gotItem(id,n=1){const list=Array.isArray(id)?id:[[id,n]];for(const [i,k=1] of list)addItem(i,k);return gotLine(list);}
 function advance(){if($('dlgChoices').children.length)return;Sound.paper();showLine();}
 $('dlg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')advance();});
 
