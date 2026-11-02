@@ -304,6 +304,22 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .b-fit canvas,.b-tool canvas{width:16px;height:16px;image-rendering:pixelated}
 .b-tool{display:inline-flex;align-items:center;gap:4px}
 .b-tool:disabled{opacity:1;cursor:default}
+/* 결정 D-242: 도구 바꾸기를 한눈에. 그림을 키우고, 든 것은 먹색, 바꾸면 좋은 도구는 금빛으로 깜박인다. 앞의 Q 는 바꾸는 키 */
+.b-tool-buttons{align-items:center}
+.b-tool canvas{width:22px;height:22px}
+.b-tool[aria-pressed="false"]{opacity:.62;border-style:dashed}
+.b-tool.want{opacity:1;border-style:solid;border-color:#c98a12;box-shadow:0 0 0 2px rgba(244,207,99,.7);animation:bToolWant .7s ease-in-out infinite alternate}
+@keyframes bToolWant{from{background:rgba(255,250,238,.75)}to{background:rgba(244,207,99,.85)}}
+.b-tool-key{font-family:var(--ui);font-size:11px;font-weight:700;border:1.5px solid var(--meok);border-bottom-width:3px;border-radius:4px;background:#fffaf0;padding:0 5px;line-height:18px}
+@media (prefers-reduced-motion:reduce){.b-tool.want{animation:none;background:rgba(244,207,99,.85)}}
+/* 결정 D-244: 방금 맞은 부위 줄이 한 번 번쩍인다. 결정 D-245·D-224: 반 칸만 남은 내구도·하트 */
+.b-part.hit{animation:bPartHit .5s ease-out}
+.b-part.hit.good{animation:bPartHitGood .6s ease-out}
+@keyframes bPartHit{0%{background:rgba(29,24,20,.25);transform:scale(1.08)}100%{background:transparent;transform:none}}
+@keyframes bPartHitGood{0%{background:rgba(244,207,99,.9);transform:scale(1.12)}100%{background:transparent;transform:none}}
+.b-part{transform-origin:left center;border-radius:3px}
+.b-part .pp i.half{background:linear-gradient(90deg,var(--meok) var(--f),transparent var(--f));box-shadow:inset 0 0 0 1px rgba(42,32,25,.45)}
+.b-me .hearts .part{background:linear-gradient(90deg,var(--dan) var(--f),rgba(42,32,25,.25) var(--f));-webkit-background-clip:text;background-clip:text;color:transparent}
 .b-me{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
 .b-me{min-width:0;max-width:52%}
 .b-me .hearts{color:var(--dan);display:flex;flex-wrap:wrap;justify-content:flex-end;line-height:1.1}   /* 결정 D-84: 체력이 많아도 줄을 바꿔 진정 막대를 밀어내지 않는다 */
