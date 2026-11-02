@@ -84,6 +84,8 @@ function portraitCandidates(r){
 }
 function portraitNpc(name){
   if(!name||name==='너구리'||/^[（(]/.test(name))return null;
+  // 결정 D-328: 지금 지역이 그 이름으로 직접 올린 초상(Rg.portraits)이 먼저다. 한 그림에 여럿이 있는 떠돌이(투호 노인들)도 말하는 사람 얼굴이 나온다.
+  const own=REG?.portraits?.[name];if(typeof own==='function')return {id:name,name,draw:own};
   const id=PORTRAIT_ALIAS[name];
   const hit=n=>n&&typeof n.draw==='function'&&(n.name===name||n.speakers?.includes(name)||(id&&n.id===id));
   const here=[...fieldNpcs(),...zoneObjects('wanderers')].find(hit);if(here)return here;

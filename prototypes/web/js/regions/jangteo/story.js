@@ -519,7 +519,9 @@ function lampArc3(){
   ],()=>{G.f.lampWoke=true;learn('arc:jangteo:deungjan');});
 }
 // 결정 D-162: 등잔발은 밤·설날 아침에만 나오니 대화 초상이 언제든 찾게 그림을 올려 둔다
-Rg.portraits={...Rg.portraits,'등잔발':lampDraw};
+Rg.portraits={...Rg.portraits,'등잔발':lampDraw,
+  // 결정 D-328: 투호 노인 둘은 한 그림이라, 말하는 사람의 얼굴만 따로 그려 초상으로 쓴다 (예전엔 가운데 항아리가 잘려 나왔다)
+  '흰눈썹 노인':(x,y,f=1)=>Rg.expArt.elder(x,y,f,'steady'),'곰방대 노인':(x,y,f=1)=>Rg.expArt.elder(x,y,f,'bold')};
 function lampDraw(x,y,f=1){
   const P=(dx,dy,w,h,c)=>R(Math.round(f>0?x+dx:x-dx-w),Math.round(y+dy),w,h,c);
   P(-12,-6,7,2,'#b9a99a');P(-14,-8,3,2,'#b9a99a');                         // 꼬리
@@ -736,20 +738,18 @@ function tArrow(c,x,y,ang,color,len=16){
 }
 function tElder(c,who){
   const e=TH[who],x=e.x,f=POT.floor,face=who==='steady'?1:-1;
-  c.fillStyle=who==='steady'?'#ddd5c2':'#8d9089';c.fillRect(x-11,f-22,22,22);   // 앉은 두루마기
-  c.fillStyle=who==='steady'?'#c3b9a2':'#6f7370';c.fillRect(x-13,f-4,26,4);
-  c.fillStyle='#b9b0a0';c.fillRect(x-7,f-36,14,14);   // 얼굴
-  c.fillStyle='#3b3a37';c.fillRect(x-8,f-40,16,5);   // 갓 대신 탕건
-  c.fillStyle=who==='steady'?'#f6f1e4':'#5a5650';c.fillRect(x-6,f-31,5,2);c.fillRect(x+1,f-31,5,2);   // 눈썹: 흰눈썹은 희다
-  c.fillStyle='#2b2a28';c.fillRect(x-4,f-29,2,2);c.fillRect(x+2,f-29,2,2);
-  c.fillStyle='#eee9dc';c.fillRect(x-4,f-25,8,5);   // 수염
-  if(who==='bold'){c.fillStyle='#5b4430';c.fillRect(x-14,f-25,10,2);c.fillStyle='#a5532f';c.fillRect(x-16,f-27,3,3);}   // 곰방대
+  // 거리 그림(art.js expArt.elder)과 같은 노인을 두 배로 그린다: 귀, 눈가 검은 털, 흰 눈썹 또는 곰방대
+  const Q=(dx,dy,w,h,col)=>{c.fillStyle=col;c.fillRect(face>0?x+dx*2:x-(dx+w)*2,f+dy*2,w*2,h*2);};
+  Q(-7,-14,14,14,who==='steady'?'#8b8f88':'#777b75');Q(-6,-22,13,10,'#b6b1a0');Q(-7,-25,4,5,'#605b53');Q(3,-25,4,5,'#605b53');
+  Q(-5,-21,3,6,'#3b3a37');Q(2,-21,3,6,'#3b3a37');Q(-3,-18,1,1,'#eee4cd');Q(3,-18,1,1,'#eee4cd');
+  Q(-4,-14,9,3,who==='steady'?'#a46b54':'#8a7761');
+  if(who==='steady'){Q(-6,-22,4,1,'#f6f1e4');Q(2,-22,4,1,'#f6f1e4');}   // 흰 눈썹
+  else{Q(4,-16,6,1,'#5b4430');Q(9,-18,2,2,'#a5532f');}                  // 입에 문 곰방대
   // 던지는 차례면 화살 쥔 팔을 항아리 쪽으로 든다
   const cur=tg.phase==='play'?tg.plan[tg.i]:null,throwing=cur&&cur.who===who&&tg.t<(Vfx.reducedMotion?1:MG.tuho_throw_frames)*0.35;
-  c.fillStyle=who==='steady'?'#ddd5c2':'#8d9089';
-  if(throwing)c.fillRect(face>0?x+8:x-16,f-34,8,4);else c.fillRect(face>0?x+8:x-14,f-16,6,4);
+  if(throwing)Q(6,-20,5,3,'#777b75');else Q(6,-9,4,3,'#777b75');
   c.fillStyle='#3b3027';c.font='11px sans-serif';c.textAlign='center';c.fillText(e.short,x,f+14);
-  if(tg.bet===who){c.fillStyle='#8a5a32';c.fillRect(x+face*14-3,f-50,6,7);c.fillStyle='#b98a52';c.fillRect(x+face*14-2,f-49,4,2);c.fillRect(x+face*14-2,f-46,4,2);}   // 건 솔방울
+  if(tg.bet===who){c.fillStyle='#8a5a32';c.fillRect(x-3,f-64,6,7);c.fillStyle='#b98a52';c.fillRect(x-2,f-63,4,2);c.fillRect(x-2,f-60,4,2);}   // 건 솔방울
 }
 function tDraw(){
   if(!tg)return;const c=tcv.getContext('2d');c.save();c.textAlign='left';
@@ -774,8 +774,11 @@ function tDraw(){
     const a=tg.plan[tg.i],u=Math.min(1,tg.t/dur),x0=TH[a.who].hand,y0=POT.floor-30,[tx,ty]=tTarget(a),H=48;
     if(u<1){const x=x0+(tx-x0)*u,y=y0+(ty-y0)*u-H*4*u*(1-u),vx=tx-x0,vy=(ty-y0)-H*4*(1-2*u);tArrow(c,x,y,Math.atan2(vy,vx),TH[a.who].fletch);}
   }
-  c.fillStyle='#3b3027';c.font='12px sans-serif';c.textAlign='center';
-  c.fillText('흰눈썹 '+tg.score.steady+'  :  '+tg.score.bold+' 곰방대',160,16);
+  // 점수 줄: 이름과 숫자를 따로 놓아 붙어 보이지 않게 (흰눈썹 ··· 3 : 1 ··· 곰방대)
+  c.fillStyle='#3b3027';c.font='12px sans-serif';c.textAlign='right';c.fillText('흰눈썹',128,17);
+  c.textAlign='left';c.fillText('곰방대',192,17);
+  c.font='bold 14px sans-serif';c.textAlign='center';
+  c.fillText(String(tg.score.steady),145,17);c.fillText(':',160,16);c.fillText(String(tg.score.bold),175,17);
   const thrown=w=>tg.plan.slice(0,tg.i).filter(a=>a.who===w&&!a.extra).length;
   for(const who of ['steady','bold'])for(let k=0;k<MG.tuho_arrows;k++){c.fillStyle=k<thrown(who)?'#c9b893':TH[who].fletch;c.fillRect(TH[who].x-11+k*6,8,4,8);}
   c.restore();

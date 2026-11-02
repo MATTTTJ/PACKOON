@@ -335,6 +335,16 @@ const innVista=[
     for(let x=0;x<W;x+=31)P(x-c%31,215,1,10,n()?'#292c34':'#614835');lantern(366-c%23,37,2);
   }}
 ];
+/* 투호 노인 한 사람 (결정 D-325). f는 바라보는 쪽. 흰눈썹은 눈 위에 흰 눈썹, 곰방대는 입에 문 곰방대로 가른다.
+   거리의 두 노인 그림과 대화 초상(story.js Rg.portraits)이 같은 그림을 쓴다. */
+function elder(ox,y,f,who){
+  ox=Math.round(ox);y=Math.round(y);
+  M(ox,y,f,-7,-14,14,13,'#777b75');M(ox,y,f,-6,-22,13,10,'#b6b1a0');M(ox,y,f,-7,-25,4,5,'#605b53');M(ox,y,f,3,-25,4,5,'#605b53');
+  M(ox,y,f,-5,-21,3,6,'#3b3a37');M(ox,y,f,2,-21,3,6,'#3b3a37');M(ox,y,f,-3,-18,1,1,'#eee4cd');M(ox,y,f,3,-18,1,1,'#eee4cd');
+  M(ox,y,f,-4,-14,9,3,who==='steady'?'#a46b54':'#8a7761');
+  if(who==='steady'){M(ox,y,f,-6,-22,4,1,'#f6f1e4');M(ox,y,f,2,-22,4,1,'#f6f1e4');}
+  else{M(ox,y,f,4,-16,6,1,'#5b4430');M(ox,y,f,9,-18,2,2,'#a5532f');}
+}
 function wanderer(kind,x,y,f=1){
   x=Math.round(x);y=Math.round(y);const p=(a,b,w,h,c)=>M(x,y,f,a,b,w,h,c);
   if(kind==='kite'){
@@ -343,7 +353,7 @@ function wanderer(kind,x,y,f=1){
     // 결정 D-131: 사연이 켜진 판의 밤엔 흰눈썹 노인이 일찍 들어가고 곰방대 노인만 화롯불 곁에 남는다 (story.js elderArc2).
     const alone=!!G.f.night&&!!Rg.arcs?.();
     if(alone){P(x-24,y-5,10,5,'#4b3b31');P(x-23,y-8,8,3,'#c4532f');P(x-21,y-10,4,2,'#f0a54e');}
-    for(let q=-1;q<=1;q+=2){if(alone&&q<0)continue;const ox=x+q*19;M(ox,y,-q,-7,-14,14,13,'#777b75');M(ox,y,-q,-6,-22,13,10,'#b6b1a0');M(ox,y,-q,-7,-25,4,5,'#605b53');M(ox,y,-q,3,-25,4,5,'#605b53');M(ox,y,-q,-5,-21,3,6,'#3b3a37');M(ox,y,-q,2,-21,3,6,'#3b3a37');M(ox,y,-q,-3,-18,1,1,'#eee4cd');M(ox,y,-q,3,-18,1,1,'#eee4cd');M(ox,y,-q,-4,-14,9,3,q===-1?'#a46b54':'#8a7761');}
+    for(let q=-1;q<=1;q+=2){if(alone&&q<0)continue;elder(x+q*19,y,-q,q<0?'steady':'bold');}   // 왼쪽 흰눈썹, 오른쪽 곰방대
     // 결정 D-325: 둘 사이에 투호 항아리와 꽂힌 화살 (예전엔 윷판)
     P(x-14,y-2,28,2,'#d1b991');P(x-4,y-10,8,8,'#5d6a6b');P(x-5,y-8,10,4,'#5d6a6b');P(x-3,y-9,2,4,'#7d8b8a');P(x-1,y-15,3,5,'#5d6a6b');P(x-2,y-16,5,1,'#3f4a4b');P(x-3,y-14,1,2,'#5d6a6b');P(x+3,y-14,1,2,'#5d6a6b');
     P(x,y-22,1,7,'#6b4a2c');P(x,y-23,1,2,'#b54a34');P(x+2,y-20,1,5,'#6b4a2c');P(x+2,y-21,1,2,'#416c82');
@@ -353,5 +363,5 @@ function wanderer(kind,x,y,f=1){
     p(-7,-17,12,14,'#293b44');p(-5,-13,7,10,'#e9e3d1');p(-3,-24,10,9,'#2b3c42');p(5,-21,6,2,'#97794b');p(3,-22,1,1,'#f9e9bb');p(-11,-12,5,18,'#263b49');p(-8,-10,3,12,'#557384');p(-5,-2,2,3,'#5c4c3b');p(2,-2,2,3,'#5c4c3b');p(-5,-16,10,2,'#ad7051');p(6,-12,8,6,'#998267');p(8,-13,4,2,'#d2bd8c');
   }
 }
-Rg.expArt={drawBack,drawScenery,drawFront,pineVista,innVista,wanderer,lantern,drawWorkLantern,flag,pine,tileRoof};
+Rg.expArt={drawBack,drawScenery,drawFront,pineVista,innVista,wanderer,elder,lantern,drawWorkLantern,flag,pine,tileRoof};
 })();
