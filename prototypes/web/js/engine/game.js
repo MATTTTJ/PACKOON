@@ -49,7 +49,8 @@ const GameMusic=(()=>{
     // 장단의 예약 반주만 들린다. 이야기 훅이 있어도 장단 위에 BGM을 겹치지 않는다.
     const mg=openMinigame();
     if(mg?.id==='rhythm')return {id:null,kind:'rhythm'};
-    const story=scene||(open('dlg')?dlgMusic:null);
+    // 결정 D-233: 이어지는 대화 사이의 짧은 틈에는 앞 대화의 곡을 그대로 둔다
+    const story=scene||(open('dlg')?dlgMusic:dlgHeld()?dlgGone.music:null);
     if(story)return {id:valid(story,regionTrack()),kind:'story'};
     if(vistaMode)return {id:valid(vistaMode.p.music,scenery[G.region]||'scenery_danpunggol'),kind:'scenery'};
     if(mg)return {id:valid(mg.music,'minigame'),kind:'minigame'};
@@ -67,7 +68,8 @@ const GameMusic=(()=>{
     }
     const target=selection();
     // 대화·손맛·환경음을 살리되 BGM과 효과음의 사용자 음량은 각각 유지한다.
-    const factor=open('dlg')||vistaMode||brewing||!!craftHands?0.72:1;
+    // 결정 D-233: 대화가 닫힌 뒤 music_dialog_hold_ms 동안은 덕킹을 풀지 않는다(이어지는 대화 사이에서 커졌다 작아지지 않게)
+    const factor=open('dlg')||dlgHeld()||vistaMode||brewing||!!craftHands?TABLES.TUNING.music_duck:1;
     if(factor!==duck){duck=factor;player.setDucking(duck,.18);}
     const travelling=player.getState().travel;
     // 도착 대화·패널·경치는 길 위 간주를 지우지 않는다. 전투와 장단은 먼저 들려주고 끝난 뒤 한 번 잇는다.
@@ -142,7 +144,8 @@ const GameMusic=(()=>{
       tension*=1-(B.calm/100)*.85;
     }else tension=REG.moodTension?.()||0;
     // 그리움: 엄마·아빠가 나오는 대화, 경치를 바라볼 때
-    if(open('dlg')){const who=$('dlgWho').textContent,text=$('dlgText').textContent;if(who==='아빠'||who==='엄마'||/엄마|아빠/.test(text))longing=.9;}
+    // 결정 D-234: 대화 단위로 정한 그리움(dialog.js)을 쓴다. 이어지는 대화 사이의 틈에도 잇는다
+    if(open('dlg')?dlgLonging:dlgHeld()&&dlgGone.longing)longing=.9;
     if(vistaMode)longing=Math.max(longing,.5);
     return {tension:clamp(tension,0,1),longing:clamp(longing,0,1)};
   }
@@ -178,7 +181,7 @@ const GameMusic=(()=>{
     }
   }
   function setScene(id){update();scene=id||null;update();}
-  function reset(){scene=null;dlgMusic=null;requested=undefined;pending=false;travelTo=null;requestCount++;if(owner!==G||region===G.region)player.stop(.08);}
+  function reset(){scene=null;dlgMusic=null;dlgGone.at=-1e9;requested=undefined;pending=false;travelTo=null;requestCount++;if(owner!==G||region===G.region)player.stop(.08);}
   function getState(){return {...player.getState(),desired:selection(),duck,mood:{...mood},levels:applied,history:history.slice(),diagnostics:player.getDiagnostics()};}
   // Sound의 trusted 입력 처리와 resume Promise가 끝난 뒤 아직 잠긴 곡을 다시 요청한다.
   addEventListener('pointerdown',()=>setTimeout(update,0),true);

@@ -238,6 +238,7 @@ const TUNING=numericTable('tuning','분류',
     'form_deer_speed form_deer_listen_range form_fx_frames stranger_trade_limit',
     'form_intro_ms form_gait_frames snow_print_frames snow_print_max',
     'wish_anim_side wish_anim_hover wish_anim_carry_frames wish_anim_pause_frames wish_anim_lower_frames wish_anim_settle_frames wish_anim_done_frames',
+    'music_duck music_dialog_hold_ms',
     'roll_hold_ms roll_speed roll_squirrel_speed roll_accel_frames roll_step_frames',
     'musoe_bonk_tell_first musoe_bonk_tell_last musoe_bonk_drop musoe_bonk_gap musoe_bonk_radius',
     'musoe_fire_cycle musoe_fire_warn musoe_fire_burn musoe_fire_radius musoe_fire_heat musoe_finale_bonks musoe_finale_gap musoe_finale_hold'
