@@ -404,7 +404,7 @@ if(!CLASSIC){
   Rg.zones.shrine.exits={left:{to:'cliff',toX:2920}};
   Rg.zones.gate.doors=[
     // 장승 둘은 고갯길 경치(art.js scenery)가 그린다. 들어설 때 비켜 선다 (결정 D-166)
-    {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:blocked},
+    {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:()=>{}},   // 결정 D-264: 장승 사이 금줄은 고갯길 경치(art.js)가 그린다. 틀을 따로 세우지 않는다
     // 결정 D-164: 첫 아빠 도장(장승) 바로 다음, 길섶에 반쯤 쌓인 소원 돌탑. 옛 돌다리 다시 놓기(받침·다리판·가장자리)를 대신한다(사용자 피드백 24).
     {id:'dol_wish_tower',wishTower:true,x:1800,to:'gate',toX:1800,get label(){return G.f.dolWishTower?'소원 돌탑 바라보기 · E':'반쯤 쌓인 돌탑 살펴보기 · E';},
       draw:(x,y)=>A.drawWishTower(x,y,G.f.dolWishTower?3:0,!!G.f.dolHareTower)},
