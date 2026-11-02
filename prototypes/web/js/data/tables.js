@@ -126,7 +126,7 @@ const TABLES={
    "r": 3,
    "kind": "귀한 것",
    "region": "dolneomeo",
-   "d": "첫서리를 맞아야 단맛이 드는 다래. 엄마의 병을 늦추는 약 재료."
+   "d": "첫서리 밤에 성황당 돌무더기가 가슴의 핵 안에 품어 맺은 다래. 엄마의 병을 늦추는 약 재료."
   },
   "darae_yak": {
    "n": "서리다래 약즙",
@@ -1597,7 +1597,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "다리나 팔을 하나 무너뜨리면 가슴의 눈 껍데기가 깨지고 푸른 옥돌이 드러난다.",
+     "text": "다리나 팔을 하나 무너뜨리면 가슴의 눈 껍데기가 깨지고 서리빛 핵이 드러난다. 속에 다래 그림자가 비친다.",
      "section": "관찰",
      "when": "core:golem"
     },
@@ -1615,7 +1615,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "달래면 다시 성황당으로 내려앉는다.",
+     "text": "달래면 핵에서 서리다래를 꺼내 내려놓고 성황당으로 내려앉는다.",
      "section": "관찰",
      "when": "calm:golem"
     }
@@ -2696,6 +2696,8 @@ const TABLES={
   "golem_arm_rest": 110,
   "golem_core_frames": 150,
   "golem_barrage_count": 12,
+  "golem_snowball_damage": 0.334,
+  "golem_stomp_clumps": 5,
   "kudzu_stem_cut_chance": 0.4,
   "kudzu_root_dig_chance": 0.4,
   "kudzu_scent_damage": 0.5,
