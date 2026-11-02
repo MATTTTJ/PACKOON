@@ -189,7 +189,8 @@ function step(){
   // ↓+점프: 땅이 아닌 발판 위에서만 아래로 빠진다. 지나는 동안 그 높이의 발판만 무시한다.
   if(dropQ&&G.onGround&&G.py<fieldGround()-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;
     // 결정 D-114: 발판 가장자리를 붙잡고 등을 보이며 잠깐 미끄러져 내려간 뒤 떨어진다. 공처럼 구르던 중이면 공 모양 그대로 빠진다.
-    G.dropBack=!rolling;G.dropHang=rolling?0:dropHangFrames(G.dropY);}dropQ=false;
+    // 결정 D-262: 매달려 미끄러지는 것은 너구리뿐이다. 네발 변신은 턱을 붙잡지 않고 앞을 본 채 뛰어내리고, 수리부엉이는 날개를 편다.
+    const clings=!rolling&&!G.form;G.dropBack=clings;G.dropHang=clings?dropHangFrames(G.dropY):0;}dropQ=false;
   if(G.dropT>0)G.dropT--;
   G.vy=Math.min(TABLES.TUNING.field_fall_speed,G.vy+TABLES.TUNING.field_gravity);
   if(G.dropHang>0){G.dropHang--;G.vy=Math.min(G.vy,TABLES.TUNING.field_drop_hang_speed);G.vx=0;}
@@ -396,23 +397,29 @@ function drawRaccoon(){
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
   R(G.px-cam-7,fieldGround(),14,1,'rgba(40,24,14,.35)');
   if(rolling){drawRollAt(G.px-cam,G.py,G.form||'',rollAngle);return;}
+  // 결정 D-262: 다람쥐가 줄기를 타는 동안은 몸을 세로로 붙인다(오를 때 머리 위, 내려올 때 머리부터)
+  if(formClimb&&G.form==='squirrel'){drawSquirrelClimbAt(G.px-cam,G.py,Math.floor(G.py/4)%2,isDown()&&!upHeld(),G.face);return;}
   const back=heroBackPose();
   if(back){if(!G.form)drawRaccoonBackAt(G.px-cam,G.py,back.phase);else drawFormBackAt(G.px-cam,G.py,back.phase,G.form);return;}
   const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
   // 결정 D-175: 걷는 동안만 네 박자 걸음(산양). 그린 뒤 되돌려 초상·기어 내려가기 그림에 남지 않게 한다
   formGait=(G.onGround&&Math.abs(G.vx)>0.2&&!phase)?Math.floor(G.anim/TABLES.TUNING.form_gait_frames)%4:-1;
-  drawPlayerAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);formGait=-1;
+  // 결정 D-262: 공중의 네발 변신은 오를 때 다리를 접고 내려올 때 앞다리를 뻗는다
+  formAir=G.onGround||phase?0:G.vy<0?1:2;
+  drawPlayerAt(G.px-cam,G.py,G.face,st,G.attackT,heldTool(),phase);formGait=-1;formAir=0;
 }
 
 /* 결정 D-114: ↓로 발판 아래로 내려올 때와 무언가를 타고 오를 때는 등을 보인다. 점프로 오를 때는 그대로 앞모습이다.
    - 다람쥐가 줄기를 타는 동안(formClimb): 오르내린 거리에 맞춰 팔다리를 번갈아 디딘다.
    - ↓+점프로 발판에서 빠질 때(G.dropBack): 땅에 닿을 때까지.
-   결정 D-144: 오르내릴 때는 지형과 변신에 상관없이 늘 등을 보인다. 수리부엉이가 발판에서 내려와 활공하는 동안도 등이다.
-   땅 밑으로 기어 내려가는 문(drawCrawl)도 다람쥐·산양·수리부엉이·고라니 모두 뒷모습으로 디딘다.
+   결정 D-144(결정 D-262로 너구리만): 오르내릴 때 너구리는 지형에 상관없이 늘 등을 보인다. 변신 모습은 아래 D-262를 따른다.
    빼는 것 둘: 점프는 오르기가 아니라 뛰기라 앞모습이다. 휘두르는 그 순간(G.attackT)만 앞모습으로 휘두름이 보이게 한다. */
+/* 결정 D-262 (사용자 피드백 2026-11-02: 네발 짐승 변신은 실제 움직임을 따른다. 산양은 등을 보이며 내려오지 않는다):
+   등을 보이는 것은 두 발로 서는 너구리뿐이다. 다람쥐는 줄기에 세로로 붙고(drawSquirrelClimbAt), 산양·고라니는 앞을 보고 뛰어내리며,
+   수리부엉이는 날개를 펴고 내려앉는다. 땅 밑으로 기어 내려가는 문도 변신이면 머리부터 비탈을 디뎌 내려간다(drawCrawl). */
 function heroBackPose(){
-  if(formClimb)return {phase:Math.floor(G.py/4)%2};
-  if(G.dropBack&&!G.onGround&&!(G.attackT>0))return {phase:Math.floor(G.anim/5)%2};
+  if(formClimb&&!G.form)return {phase:Math.floor(G.py/4)%2};
+  if(G.dropBack&&!G.form&&!G.onGround&&!(G.attackT>0))return {phase:Math.floor(G.anim/5)%2};
   return null;
 }
 function draw(){
@@ -707,7 +714,11 @@ function drawCrawl(m,t){
   const phase=Math.floor(depth*steps)%2;
   if(down&&t<.18)drawPlayerAt(x,y,m.face,Math.floor(t*20)%2,0,heldTool(),0,m.form);   // 다가서는 반 발
   else if(!m.form)drawRaccoonBackAt(x,y,phase);
-  else drawFormBackAt(x,y,phase,m.form);   // 결정 D-144: 변신해도 등을 보이며 디딘다 (옛 D-44: 다람쥐는 머리부터, 다른 변신은 옆모습)
+  else if(m.form==='squirrel')drawSquirrelClimbAt(x-1,y,phase,down,m.face);   // 결정 D-262: 다람쥐는 뿌리를 머리부터 타고 내려가고, 나올 때는 머리부터 오른다
+  else drawTiltedForm(x,y,(down?.45:-.45)*m.face,(ox,oy)=>{   // 결정 D-262: 산양·고라니·수리부엉이는 앞을 본 채 머리를 숙여(나올 때는 들어) 한 발씩 디딘다
+    formGait=phase?0:2;formAir=0;
+    try{drawPlayerAt(ox,oy,m.face,phase,0,heldTool(),0,m.form);}finally{formGait=-1;}
+  });
   // 내려갈 때는 끝에서 어두워지고, 올라올 때는 어둠에서 밝아진다.
   const dark=down?clamp((t-.55)/.45,0,1):clamp(1-t/.4,0,1);
   if(dark>0){ctx.save();ctx.globalAlpha=dark;R(0,0,W,H,'#211d24');ctx.restore();}
@@ -905,15 +916,33 @@ const peekBox=el('div','peek');peekBox.hidden=true;peekBox.setAttribute('aria-hi
 const peekCv=document.createElement('canvas');peekCv.width=64*3;peekCv.height=44*3;peekBox.appendChild(peekCv);
 $('stage').appendChild(peekBox);
 let peekTimer=0,peekHeld=false,peekPaint=0;
+/* 결정 D-261: 작은 창 속 그림은 굳어 있지 않다(사용자 피드백 2026-11-02: 장승 풍경 들어 보기 창이 너무 경직돼 있다).
+   떠 있는 동안 그림을 다시 그리고, 대화로 필드 시간(G.anim)이 멈춰 있어도 창 안에서는 연 뒤 흐른 시간만큼 G.anim을 잠깐 앞당겨 그린다.
+   그래서 풍경·물·나뭇잎·인물의 숨쉬기가 창 안에서 움직인다. 동작 줄이기면 한 장만 그린다. */
+function peekLive(id,paint){
+  if(Vfx.reducedMotion)return;
+  const base=G.anim,t0=performance.now();let n=0;
+  const step=()=>{
+    if(peekPaint!==id||peekBox.hidden)return;
+    if(++n%2===0){const real=G.anim;G.anim=Math.max(real,base+Math.floor((performance.now()-t0)/16.7));try{paint();}finally{G.anim=real;}}
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
 function peekAt(x,y=fieldGround(),opts={}){
   if(CLASSIC||!Number.isFinite(x))return;
   const full=document.createElement('canvas');full.width=W;full.height=H;
-  const saved=ctx,oldCam=cam;ctx=full.getContext('2d');ctx.imageSmoothingEnabled=false;
-  try{drawFieldScene(false);}finally{ctx=saved;cam=oldCam;}
-  const cw=opts.w||64,ch=opts.h||44,sx=Math.round(clamp(x-G.cam-cw/2,0,W-cw)),sy=Math.round(clamp(y-ch+(opts.below??10),0,H-ch));
-  peekPaint++;peekBox.classList.remove('scene');const pc=peekCv.getContext('2d');pc.imageSmoothingEnabled=false;pc.clearRect(0,0,peekCv.width,peekCv.height);
-  pc.drawImage(full,sx,sy,cw,ch,0,0,peekCv.width,peekCv.height);
-  showPeek(opts);
+  const cw=opts.w||64,ch=opts.h||44,pc=peekCv.getContext('2d');
+  const paint=()=>{
+    const fc=full.getContext('2d');fc.clearRect(0,0,W,H);
+    const saved=ctx,oldCam=cam;ctx=fc;ctx.imageSmoothingEnabled=false;
+    try{drawFieldScene(false);}finally{ctx=saved;cam=oldCam;}
+    const sx=Math.round(clamp(x-G.cam-cw/2,0,W-cw)),sy=Math.round(clamp(y-ch+(opts.below??10),0,H-ch));
+    pc.imageSmoothingEnabled=false;pc.clearRect(0,0,peekCv.width,peekCv.height);
+    pc.drawImage(full,sx,sy,cw,ch,0,0,peekCv.width,peekCv.height);
+  };
+  const id=++peekPaint;peekBox.classList.remove('scene');paint();
+  showPeek(opts);peekLive(id,paint);
 }
 /* 결정 D-151: 장면 그림. draw(w,h,초)는 64×44 칸에 지금 ctx로 그린다(R·M을 그대로 쓴다). {animate:true}면 떠 있는 동안 다시 그린다. */
 function peekPicture(draw,opts={}){
@@ -926,10 +955,13 @@ function peekPicture(draw,opts={}){
     pc.imageSmoothingEnabled=false;pc.clearRect(0,0,peekCv.width,peekCv.height);pc.drawImage(buf,0,0,peekCv.width,peekCv.height);
   };
   peekBox.classList.add('scene');paint();
-  if(opts.animate&&!Vfx.reducedMotion){const step=()=>{if(peekPaint!==id||peekBox.hidden)return;paint();requestAnimationFrame(step);};requestAnimationFrame(step);}
-  showPeek({hold:true,...opts});
+  // 결정 D-261: animate 표시가 없는 장면 그림도 떠 있는 동안 다시 그린다 (G.anim으로 움직이는 그림도 창 안에서 움직이게)
+  showPeek({hold:true,...opts});peekLive(id,paint);
 }
+/* 결정 D-261: 작은 창은 족자처럼 펼쳐지며 열리고(가는 세로 띠 → 옆으로 펼침 → 살짝 넘쳤다 자리), 접히며 닫힌다.
+   그림은 창이 다 펼쳐질 무렵 먹이 번지듯 드러난다. 길이는 tuning.csv peek_open_ms·peek_fade_ms. */
 function showPeek(opts={}){
+  peekBox.style.setProperty('--peek-open',TABLES.TUNING.peek_open_ms+'ms');peekBox.style.setProperty('--peek-fold',TABLES.TUNING.peek_fade_ms+'ms');
   peekBox.hidden=false;placePeek();requestAnimationFrame(placePeek);peekBox.classList.remove('show');void peekBox.offsetWidth;peekBox.classList.add('show');
   // 결정 D-56: 화면 가운데에 작게, 짧게. 끝에서 흐려지며 사라진다.
   peekBox.classList.remove('out');clearTimeout(peekTimer);

@@ -67,7 +67,39 @@ function pine(x,y,s=1,palette=P){x=Math.round(x);y=Math.round(y);const q=(a,b,w,
 }
 function stone(x,y,w,h,seed=0,frost=true){const c=seed%2?P.stone:'#748282';px(x+2,y-h,w-4,1,P.light);px(x,y-h+2,w,h-2,c);px(x+1,y-h,w-2,3,c);px(x+2,y-h+1,w-4,1,frost?P.frost:P.light);px(x+2,y-2,w-4,2,'#626f70');if(w>10){px(x+w-5,y-h+4,1,3,'#5b696a');px(x+4,y-h+3,2,1,'#a2b0ac');}}
 function cairn(x,y,height=22,seed=0,frost=true){const count=Math.max(3,Math.floor(height/5));for(let j=0;j<count;j++){const w=Math.max(3,Math.round((count-j)*3.5)),h=j===count-1?4:5;stone(x-w/2+(j%2),y-j*5,w,h,seed+j,frost);}if(seed%7===0)px(x-1,y-height+3,1,3,'#9d5d48');}
-function gatePost(x,y,tall=false){const h=tall?54:47;px(x-5,y-h,11,h,'#796d58');px(x-6,y-h-4,13,5,'#4b4e46');px(x-5,y-h-4,12,1,P.frost);px(x-3,y-h+8,2,3,'#293736');px(x+2,y-h+8,2,3,'#293736');px(x-2,y-h+16,5,1,'#293736');px(x-3,y-h+15,1,2,'#293736');px(x+3,y-h+15,1,2,'#293736');px(x-1,y-h+24,3,14,'#5e5b4b');px(x-4,y-h,9,2,'#a2765e');}
+/* 결정 D-263: 장승 둘은 실제 장승처럼 다르게 깎는다 (사용자 피드백 2026-11-02: 두 장승이 너무 같은 그림이다).
+   - 천하대장군(tall, 왼쪽): 키가 크고 검은 사모를 쓴다. 굵게 치켜 올린 눈썹, 부릅뜬 왕방울 눈, 큰 코, 이를 드러낸 입과 송곳니, 턱수염. 붉은 칠이 바랜 짙은 나무.
+   - 지하여장군(오른쪽): 작고 갓 없이 둥근 머리에 가르마 탄 검은 머리. 가는 눈썹, 내리감은 순한 눈, 작은 코와 다문 입, 볼에 연지. 밝은 나무.
+   - 몸통 글씨(세로 다섯 자·넷 자)와 나뭇결·갈라진 틈 자리도 서로 다르다. (x,y)는 발치 가운데. */
+function gatePost(x,y,tall=false){
+  const K='#26201b',Wt='#eee5cc';
+  if(tall){
+    const h=56;
+    px(x-5,y-h,11,h,'#6f5f4b');px(x-5,y-h,1,h,'#5c4e3e');px(x+5,y-h+22,1,h-22,'#857257');            // 몸통과 그늘
+    px(x-3,y-h+24,1,22,'#5e503f');px(x+3,y-h+30,1,18,'#5e503f');px(x+2,y-h+44,2,1,'#4a3f33');           // 나뭇결·갈라진 틈
+    px(x-5,y-h,11,21,'#94583f');px(x-5,y-h+19,11,2,'#7a4a36');                                        // 바랜 붉은 얼굴
+    px(x-4,y-h-7,9,6,'#2b2925');px(x-6,y-h-2,13,2,'#2b2925');px(x-9,y-h-5,3,2,'#2b2925');px(x+7,y-h-5,3,2,'#2b2925');   // 사모와 양 날개
+    px(x-4,y-h-7,9,1,P.frost);px(x-6,y-h-2,13,1,'#4a4740');
+    px(x-5,y-h+3,3,1,K);px(x-3,y-h+4,2,1,K);px(x+3,y-h+3,3,1,K);px(x+2,y-h+4,2,1,K);                     // 치켜 올린 눈썹
+    px(x-4,y-h+6,3,3,Wt);px(x+2,y-h+6,3,3,Wt);px(x-3,y-h+7,1,1,K);px(x+3,y-h+7,1,1,K);                  // 부릅뜬 눈
+    px(x-1,y-h+9,3,4,'#7a4532');px(x-1,y-h+12,1,1,K);px(x+1,y-h+12,1,1,K);                              // 큰 코
+    px(x-4,y-h+14,9,3,K);px(x-3,y-h+14,7,1,Wt);px(x-3,y-h+15,1,2,Wt);px(x+3,y-h+15,1,2,Wt);            // 이와 송곳니
+    px(x-3,y-h+18,1,3,'#3d322a');px(x-1,y-h+18,1,4,'#3d322a');px(x+1,y-h+18,1,4,'#3d322a');px(x+3,y-h+18,1,3,'#3d322a');   // 턱수염
+    for(let i=0;i<5;i++){const yy=y-h+24+i*6;px(x-1,yy,3,1,K);px(x,yy-1+(i%2),1,3,K);if(i%2)px(x-1,yy+2,1,1,K);else px(x+1,yy+2,1,1,K);}   // 天下大將軍
+  }else{
+    const h=46;
+    px(x-5,y-h,10,h,'#958467');px(x+4,y-h,1,h,'#7f7057');px(x-4,y-h-2,8,2,'#958467');px(x-3,y-h-3,6,1,'#958467');   // 둥근 머리 몸통
+    px(x-2,y-h+22,1,18,'#83745b');px(x+2,y-h+18,1,14,'#83745b');                                        // 나뭇결
+    px(x-4,y-h-3,8,4,'#2f2924');px(x-3,y-h-3,6,1,P.frost);px(x,y-h-2,1,3,'#958467');                    // 가르마 탄 검은 머리
+    px(x-4,y-h+4,3,1,'#4a3c30');px(x+1,y-h+4,3,1,'#4a3c30');                                            // 가는 눈썹
+    px(x-4,y-h+6,3,1,K);px(x+1,y-h+6,3,1,K);px(x-3,y-h+7,1,1,'#6e5f4a');px(x+2,y-h+7,1,1,'#6e5f4a');     // 내리감은 눈
+    px(x-1,y-h+8,1,3,'#76664f');                                                                       // 작은 코
+    px(x-4,y-h+9,2,2,'#b4513a');px(x+2,y-h+9,2,2,'#b4513a');                                            // 연지
+    px(x-2,y-h+12,3,1,'#7a3326');                                                                      // 다문 입
+    for(let i=0;i<4;i++){const yy=y-h+19+i*6;px(x-2,yy,3,1,K);px(x-1,yy+1,1,2,K);if(i===1||i===3)px(x-2,yy+2,1,1,K);}   // 地下女將軍
+  }
+  px(x-6,y-2,13,2,'#5d6660');px(x-4,y-3,3,1,P.frost);                                                  // 발치에 괸 돌
+}
 /* 결정 D-166: 장승이 비켜 설 때는 발치를 축으로 바깥쪽으로 기운다 (open 0~1) */
 function leanPost(x,y,tall,angle){if(!angle){gatePost(x,y,tall);return;}ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(angle);gatePost(0,0,tall);ctx.restore();}
 const OPEN_PX=14,OPEN_LEAN=.14;
