@@ -2764,7 +2764,10 @@ const TABLES={
   "wish_anim_settle_frames": 24,
   "wish_anim_done_frames": 50,
   "music_duck": 0.72,
-  "music_dialog_hold_ms": 600
+  "music_dialog_hold_ms": 600,
+  "battle_aim_left": 1,
+  "battle_aim_up": 19,
+  "battle_hitstop": 4
  },
  "PROGRESS": [
   {

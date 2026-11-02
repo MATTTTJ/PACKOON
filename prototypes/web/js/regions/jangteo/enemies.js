@@ -19,7 +19,11 @@ defineAttacks({
   broomSweep:{dur:170,tick(t,X,Y,W,Hh){if(t%56===0&&t<150){const dir=(t/56)%2?-1:1;const gh=34;const gy=Y+10+Math.random()*(Hh-gh-20);B.bullets.push({k:'sweepv',x:dir>0?X-10:X+W+10,vx:dir*2.1,gy,gh,th:12});}}},
   beans:{dur:150,tick(t,X,Y,W,Hh){if(t%36===0&&t<120){for(let i=0;i<5;i++){const x=X+16+Math.random()*(W-32);B.bullets.push({k:'bean',x,y:Y-6,vx:(Math.random()-.5)*0.6,vy:-1.4-Math.random(),t:0,tell:26,r:4});}}}},
   roll:{dur:160,tick(t,X,Y,W,Hh){if(t===0||t===80){const s=t===0?(Math.random()<.5?-1:1):-(B.lastRoll||1);B.lastRoll=s;B.bullets.push({k:'roll',side:s,t:0,tell:30,grow:24,hold:20,depth:W*0.46,d:0});}}},
-  wisp:{dur:150,tick(t,X,Y,W,Hh){if(t===0||t===60){const sx=X+W*(t===0?0.25:0.75),sy=Y-6;B.bullets.push({k:'wisp',x:sx,y:sy,t:0,life:130,r:7});}}},
+  /* 결정 D-246: 도깨비불은 상자 네 변 가운데 한 곳에서 나오고, 둘째 불은 그 맞은편에서 나온다 (예전엔 늘 위 두 곳) */
+  wisp:{dur:150,tick(t,X,Y,W,Hh){
+    if(t===0){const E=[[X+W*0.25,Y-6],[X+W*0.75,Y-6],[X-6,Y+Hh*0.35],[X+W+6,Y+Hh*0.65],[X+W*0.3,Y+Hh+6],[X+W*0.7,Y+Hh+6]],a=E[Math.floor(Math.random()*E.length)];
+      B.wispFrom=[a,E.reduce((f,e)=>Math.hypot(e[0]-a[0],e[1]-a[1])>Math.hypot(f[0]-a[0],f[1]-a[1])?e:f,a)];}
+    if(t===0||t===60){const [sx,sy]=B.wispFrom[t?1:0];B.bullets.push({k:'wisp',x:sx,y:sy,t:0,life:130,r:7});}}},
 });
 defineBullets({
   sweepv:{
@@ -126,7 +130,8 @@ defineEnemies({
     // 결정 D-227: 전투 글귀는 일어난 일만 짧게. 피하라·치라는 안내는 쓰지 않는다
     intro:'[시험판] 불이 옮겨 간 헌물이 들썩인다.',
     possession:{order:['ki','meongseok','broom','core'],attacks:{broom:'hauntedSweep',ki:'hauntedBeans',meongseok:'hauntedRoll'},travel:54,wait:114},
-    calmAction:{kind:'return',amount:TABLES.CALM.dokkaebi.memiltteok/4},
+    // 결정 D-243: 장터 물건 돌려놓기(행동 진정)를 뺐다. 달래기는 메밀떡·엿 선물로만 한다
+    markLife:180,
     partPose(id){const p=dokkaebiPose(id);return {x:LW/2+(p.x-LW/2)*0.84,y:EY+(p.y-EY)*0.84};},
     markPosition(p){const pose=this.partPose(p.id),v={broom:0.38,ki:0.3,meongseok:0.7,core:0.19}[p.id];
       return {x:clamp(pose.x,BOX.x+28,BOX.x+BOX.w-28),y:BOX.y+BOX.h*v};},

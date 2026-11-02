@@ -490,7 +490,7 @@ function golemOpenMark(p){
 }
 function strikeGolem(){
   const m=B.mark;if(!m||!m.golem)return false;
-  if(Math.hypot(m.x-B.px,m.y-B.py)>=battleHandProfile().radius)return false;
+  const aim=bAim();if(Math.hypot(m.x-aim.x,m.y-aim.y)>=battleHandProfile().radius)return false;   // 결정 D-240: 판정은 도구 날 자리
   const p=m.part;B.mark=null;B.golemHit=true;
   if(p.id==='leg'&&B.restSole)B.restSole.crack=true;
   if(p.core&&coreHidden()){stoneRoll('head',HIT_TEXT.head,m.x,m.y);B.msg+=' 눈 껍데기가 두꺼워 몸은 버틴다.';renderBHud();return true;}
@@ -736,6 +736,7 @@ defineEnemies({
     intro:'금줄 두른 성황당 돌무더기가 눈을 털며 일어선다.',   // 결정 D-103: 부위는 고르지 않는다(확정 흐름)
     firstPart:'leg',   // 결정 D-227: 안내 글 없이 시작한다
     placeGift:'story_stone',   // 결정 D-252: 진정은 선물로만. 사연 있는 돌은 꼭대기에 얹는다
+    settle:true,   // 결정 D-243: 눈사태·튄 눈덩이가 다 사라진 뒤에 빈틈을 연다
     headPose(){return toScreen(LW/2,bodyY()-46);},
     openMark:golemOpenMark,
     parts:tableParts('golem',{leg:{atk:'golemStomp',mark:'발',tell:'골렘이 구들돌 발을 높이 쳐든다.'},
