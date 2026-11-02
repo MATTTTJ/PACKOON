@@ -48,7 +48,7 @@ function dlgPic(pic){
    여러 가지는 gotLine([['memil',2],['seogi',1]]) → '(메밀 두 개와 석이를 얻었다.)'. */
 const KO_COUNT=['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
 function gotText(list){
-  const words=list.map(([id,n=1])=>{const name=ITEMS[id]?ITEMS[id].n:id;return n>1?name+' '+(KO_COUNT[n]||n)+' 개':name;});
+  const words=list.map(([id,n=1])=>{const name=ITEMS[id]?ITEMS[id].n:id;return n>1?name+' '+(KO_COUNT[n]||n)+' '+(ITEMS[id]?.u||'개'):name;});   // 결정 D-238: 세는 말은 items.csv 세는말 칸
   const joined=words.reduce((a,w,i)=>i?jo(a,'과','와')+' '+w:w,'');
   return '('+jo(joined,'을','를')+' 얻었다.)';
 }
