@@ -812,7 +812,7 @@ if(!CLASSIC){
     if(G.f.galExpBrothersSorted){brothersTalk();return;}
     const pick=side=>{G.f.galExpBrothersSorted=true;G.f.galExpBrothersSide=side;brothersTalk();};
     talk([['다람쥐 형','바구니 두 개 다 가져왔어.\n어떻게 나눌래?',[
-      {t:'큰 것부터 번갈아 고르게 나눈다',go:()=>hands(()=>pick('even'),true)},
+      {t:'큰 것부터 번갈아 고르게 나눈다',go:()=>hands(()=>pick('even'))},
       {t:'형 편을 든다: "일곱 번 오갔으니 큰 건 형 몫이야"',go:()=>pick('hyung')},
       {t:'동생 편을 든다: "낙엽을 걷어 찾았으니 동생 몫이야"',go:()=>pick('dongsaeng')},
       {t:'조금 더 생각해 볼게',go:null}]]]);
