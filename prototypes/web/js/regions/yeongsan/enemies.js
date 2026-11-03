@@ -6,7 +6,22 @@
    결정 D-370: 부서진 부위는 흐리게 남지 않는다. 꼬리는 끊긴 그루터기와 깨진 고드름, 몸통은 힘이 빠져 바닥에 늘어진 똬리,
      입은 금 가 처진 턱으로 그린다. 부서진 부위의 공격은 더 고르지 않는다. */
 (()=>{
+/* 결정 D-435: 달래면 떠난다. '용'이라 불러 주었으면 하늘로 오르고, 불씨·떡이면 남쪽(오른쪽) 바다로 날아간다. 0 → 1 */
+function gangLeave(){return B.st==='end'&&B.result==='calm'?1-Math.max(0,B.t)/80:0;}
+function gangLeaveOffset(){const k=gangLeave();if(!k)return {x:0,y:0};
+  return B.lastGift==='lore:yong'?{x:0,y:-k*k*300}:{x:k*k*320,y:k*24};}
+/* 결정 D-432: 입 자리(이름패가 날아드는 곳, 토해 낸 이름이 나오는 곳). drawGangcheol 의 머리·입 좌표를 전투 화면의 0.84배 축소(bDraw)에 맞춘다 */
+function gangMouth(){
+  const cx=LW/2,cy=EY,wave=Math.sin(B.time*0.04)*8,hidden=coreHidden(),o=gangLeaveOffset();
+  const x=cx-70+32+o.x,y=cy-10+wave*0.5+(hidden?16:0)+10+o.y;
+  return {x:LW/2+(x-LW/2)*0.84,y:EY+(y-EY)*0.84};
+}
 function drawGangcheol(c){
+  const o=gangLeaveOffset();
+  if(!o.x&&!o.y){drawGangcheolBody(c);return;}
+  c.save();c.translate(o.x,o.y);drawGangcheolBody(c);c.restore();
+}
+function drawGangcheolBody(c){
   const cx=LW/2,cy=EY;const mouth=part('mouth'),body=part('body'),tail=part('tail'),head=part('core');
   const wave=Math.sin(B.time*0.04)*8;
   if(B.warm&&B.warm.fire>0){
@@ -31,7 +46,11 @@ function drawGangcheol(c){
   else{const o=shk(body),col=partCol(body);const tight=B.st==='tell'&&B.cur===body?-10:0;
     brush(c,[[cx-150+o,cy+70],[cx-90+o,cy+40+wave+tight],[cx-10+o,cy+80],[cx+60+o,cy+50-wave+tight],[cx+60+o,cy+70]],26,col,0.9);
     brush(c,[[cx-130+o,cy+86],[cx-40+o,cy+92],[cx+40+o,cy+88]],18,col,0.75);
-    for(let i=0;i<9;i++){const sx=cx-130+i*24+o,sy=cy+60+Math.sin(i*1.3)*14;brush(c,[[sx-6,sy],[sx,sy-6],[sx+6,sy]],2,'#efe3c8',0.6);}}
+    for(let i=0;i<9;i++){const sx=cx-130+i*24+o,sy=cy+60+Math.sin(i*1.3)*14;brush(c,[[sx-6,sy],[sx,sy-6],[sx+6,sy]],2,'#efe3c8',0.6);}
+    // 결정 D-435: 삼킨 이름이 똬리 속에서 빛으로 비친다 (몸통을 치면 하나씩 돌아온다)
+    const eaten=B.names?B.names.eaten.length:0;
+    for(let i=0;i<Math.min(eaten,8);i++){const sx=cx-118+i*26+o,sy=cy+66+Math.sin(i*1.3+B.time*0.03)*10,pulse=0.28+0.12*Math.sin(B.time*0.08+i);
+      blob(c,sx,sy,7,5,GOLD,pulse);blob(c,sx,sy,3,2.4,'#fff4cf',pulse+0.2);}}
   // 머리와 입
   {const o=shk(head),col=partCol(head);const hidden=coreHidden();const hx=cx-70+o,hy=cy-10+wave*0.5+(hidden?16:0);
     brush(c,[[cx-120+o,cy+(body.broken?84:50)],[hx-10,hy+30],[hx,hy+6]],20,body.broken?INK:partCol(body),0.9);
@@ -88,6 +107,8 @@ function drawFrozenLake(c){
 }
 defineEnemies({
   gangcheol:{name:'강철이',calmLabel:'진정',coreNeeds:'body',
+    // 결정 D-432~D-435: 이름을 먹는 이무기. 입이 이름을 부르고, 몸통에 삼킨 이름이 비친다 (engine/battle-names.js)
+    names:{part:'mouth',body:'body',mouth:gangMouth},
     // 결정 D-227: 전투 글귀는 일어난 일만 짧게. 피하라·치라는 안내는 쓰지 않는다
     intro:'[시험판] 서리 덮인 호수에 물김이 오른다.',
     // 결정 D-246: 방향(0·1)마다 예고 글. 없는 부위는 parts 의 tell 을 쓴다
@@ -99,7 +120,7 @@ defineEnemies({
       const v=B.warm&&B.warm.current.v<0.5?0.76:0.24;
       return {x:BOX.x+BOX.w*u,y:BOX.y+BOX.h*v};},
     // 결정 D-370: weak 는 부서진 뒤 한 줄
-    parts:tableParts('gangcheol',{mouth:{tell:'서리 띠가 내려온다.',weak:'강철이가 약해졌다. 금 간 턱으로는 서리를 뿜지 못한다.'},
+    parts:tableParts('gangcheol',{mouth:{tell:'서리 띠가 내려온다.',weak:'강철이가 약해졌다. 금 간 턱으로는 서리를 뿜지도, 이름을 부르지도 못한다.'},
       body:{tell:'강철이가 똬리를 조인다.',weak:'강철이가 약해졌다. 풀린 똬리로는 더 조이지 못한다.'},
       tail:{tell:'꼬리에서 고드름이 흩날린다.',weak:'강철이가 약해졌다. 끊긴 꼬리로는 고드름을 흩뿌리지 못한다.'},core:{tell:'눈보라가 돌아온다.'}}),
     likes:TABLES.CALM.gangcheol,likeText:'강철이가 잠시 숨을 멈춘다.',
@@ -107,8 +128,10 @@ defineEnemies({
       patsirutteok:'붉은 팥떡을 내밀자 강철이가 움찔 물러난다. 서리가 조금 걷혔다.'},
     coreHidden:'머리가 똬리 속에 숨어 있다.',
     coreShown:'똬리가 풀려 온기 길이 넓어졌다!',
-    calmWin:'강철이가 서리를 거두고, 따뜻한 남쪽 바다를 향해 천천히 날아오른다.',calmGift:'frost_whisker',
-    win:'여의주에 금이 가자 강철이가 호수를 놓고 물러난다.',
+    // 결정 D-435: 진정이 차면 입을 벌려 삼킨 이름을 토해 낸다. '용'이라 불러 주었으면 하늘로 오른다
+    calmWin:'강철이가 삼킨 이름을 토해 내고, 따뜻한 남쪽 바다를 향해 천천히 날아간다.',calmGift:'frost_whisker',
+    calmWinBy:{'lore:yong':'강철이가 삼킨 이름을 토해 내고, 구름을 가르며 하늘로 오른다.'},
+    win:'여의주에 금이 가자 강철이가 삼킨 이름을 토해 내고 호수를 놓는다.',
     lose:'눈보라에 휩쓸려 호숫가로 밀려났다.',
     backdrop:drawFrozenLake,draw:drawGangcheol},
 });

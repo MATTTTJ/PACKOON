@@ -322,6 +322,14 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 @keyframes bPartHitGood{0%{background:rgba(244,207,99,.9);transform:scale(1.12)}100%{background:transparent;transform:none}}
 .b-part{transform-origin:left center;border-radius:3px}
 .b-part .pp i.half{background:linear-gradient(90deg,var(--meok) var(--f),transparent var(--f));box-shadow:inset 0 0 0 1px rgba(42,32,25,.45)}
+/* 결정 D-432~D-434: 강철이 전투의 이름패 줄. 무엇인지 설명하지 않는다. 먹힌 이름은 얼어 빈 패, 스스로 댄 이름은 못 박힌 패 */
+.b-names{display:flex;flex-wrap:wrap;gap:3px;max-width:min(46vw,260px);margin-top:4px}
+.b-nametag{font-size:.78em;line-height:1.2;padding:1px 5px;background:#d8b98e;border:1px solid var(--meok);border-radius:2px;white-space:nowrap}
+.b-nametag.lost{background:#eef4f8;border-color:#9fb0ba;min-width:2.6em;min-height:1.2em}
+.b-nametag.pinned{box-shadow:inset 0 0 0 1px #7a5520;background:#e6c48c}
+.b-nametag.pinned::before{content:'•';color:#5a3e26;margin-right:2px}
+#bNames.want{border-color:#c98a12;box-shadow:0 0 0 2px rgba(244,207,99,.7);animation:bToolWant .7s ease-in-out infinite alternate}
+.gift.name b{font-family:var(--display);font-size:13px}
 .b-me .hearts .part{background:linear-gradient(90deg,var(--dan) var(--f),rgba(42,32,25,.25) var(--f));-webkit-background-clip:text;background-clip:text;color:transparent}
 .b-me{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
 .b-me{min-width:0;max-width:52%}

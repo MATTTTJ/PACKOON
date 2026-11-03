@@ -69,7 +69,7 @@ function bAim(){
 function battleForm(){const id=G&&G.form;return B&&!B.E.dodge&&!B.noTool&&id&&hasForm(id)?id:'';}
 function battleHandProfile(){
   const id=battleForm(),prefix='battle_'+(id||'bare')+'_',t=TABLES.TUNING;
-  return {speed:t[prefix+'speed'],cooldown:t[prefix+'cooldown'],radius:t[prefix+'radius']};
+  return {speed:t[prefix+'speed']*nameSpeedMul(),cooldown:t[prefix+'cooldown'],radius:t[prefix+'radius']};   // 결정 D-433: 잃은 이름만큼 손이 느려진다 (battle-names.js)
 }
 function battleFormKey(key){
   if(!B||!['0','1','2','3','4'].includes(key))return false;
@@ -178,6 +178,7 @@ function startBattle(kind,onEnd){
   if(E.warmPath)B.warm={current:{u:0.25,v:0.7},next:null,points:[],round:0,fire:0,dir:0};
   // 결정 D-224: 만나기 직전 손에 든 도구를 들고 들어간다. 든 것이 전투 도구가 아니면 가진 첫 도구
   if(!E.dodge){const own=ownedBattleTools();B.tool=own.includes(G.tool)?G.tool:own[0]||null;B.toolSwap=0;}
+  nameBattleStart();$('bNames').hidden=!B.names;   // 결정 D-432~D-435: 강철이 전투의 이름 (battle-names.js)
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
   // 결정 D-227: 전투 중 튜토리얼 같은 안내 글을 띄우지 않는다. 할 일 줄에는 상대 이름만 (피하기 시험은 그 시험의 글)
@@ -205,6 +206,7 @@ function renderBHud(){
     const pp=el('span','pp');for(let i=0;i<p.max;i++){const d=document.createElement('i');const f=clamp(p.hp-i,0,1);if(f<=0)d.className='off';else if(f<1){d.className='half';d.style.setProperty('--f',Math.round(f*100)+'%');}pp.appendChild(d);}r.appendChild(pp);
     if(p.broken)r.appendChild(el('span','tag',B.E.npc?'꺾임':'부러짐'));else if(p.core&&hidden)r.appendChild(el('span','tag','가려짐'));
     wrap.appendChild(r);});
+  renderNameTags(wrap);
   }
   // 결정 D-245: 약한 공격(bHitMe 의 power<1)으로 쌓인 피해(B.hoof)는 남은 마지막 하트를 그만큼 비워 보인다
   const worn=clamp(B.hoof||0,0,1);
@@ -237,7 +239,9 @@ function chooseAttackBase(){
   }
   const L=bLiving();let o=L.filter(p=>p!==B.last);if(!o.length)o=L;
   const first=!B.last&&B.E.firstPart?L.find(q=>q.id===B.E.firstPart):null;
-  const p=first||o[Math.floor(Math.random()*o.length)];B.cur=p;B.last=p;B.st='tell';B.t=first?72:42;B.msg=p.tell;B.hitThis=false;
+  const p=first||o[Math.floor(Math.random()*o.length)];
+  if(nameCallTurn(p))return;   // 결정 D-432: 입 차례 가운데 몇 번은 피할 수 없는 이름 부르기
+  B.cur=p;B.last=p;B.st='tell';B.t=first?72:42;B.msg=p.tell;B.hitThis=false;
   if(B.E.warmPath){prepareWarmPath();B.t=80;}
 }
 /* 온기 길은 비율 좌표로 보관한다. 판정과 그림이 같은 꺾은선을 쓴다. */
@@ -293,16 +297,19 @@ function bStrike(){
   if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||B.st==='finale')return;
   if(B.cool>0)return;
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
+  if(nameLocked())return;   // 결정 D-432: 이름이 불린 순간 손이 잠깐 말을 듣지 않는다
   B.cool=battleHandProfile().cooldown;B.swing=12;
   const aim=bAim(),hits0=B.parts.map(p=>p.hp);
   if(B.E.strike&&B.E.strike()){strikeFeedback(aim,hits0,true);return;}
   const m=B.mark;
   if(m&&Math.hypot(m.x-aim.x,m.y-aim.y)<battleHandProfile().radius){
     const p=m.part;
-    p.hp=Math.max(0,p.hp-toolDamage(p));bSplash(m.x,m.y);B.mark=null;
+    p.hp=Math.max(0,p.hp-nameStrikeDamage(p,toolDamage(p)));bSplash(m.x,m.y);B.mark=null;   // 결정 D-433·D-434: 잃은 이름만큼 약하게, 스스로 댄 이름 뒤 한 번은 잘 먹게
     if(p.hp>0)Sound.playSfx('battle_hit');
-    if(p.hp<=0)breakPart(p);else B.msg=toolHitText(p);
+    const boosted=nameHitText(p);
+    if(p.hp<=0)breakPart(p);else B.msg=boosted||toolHitText(p);
     if(B.E.onMarkHit&&B.st!=='end')B.E.onMarkHit(p,m);
+    if(B.st!=='end')nameOnPartHit(p);   // 결정 D-435: 몸통을 치면 삼킨 이름이 돌아온다
   }   // 결정 D-227: 헛친 때 안내 글을 띄우지 않는다
   strikeFeedback(aim,hits0);
 }
@@ -355,7 +362,8 @@ function bEnd(result){
   if(result==='win'||result==='calm')Sound.playSfx(result==='calm'?'battle_soothe':'battle_victory');
   if(B.E.showHands)B.handShow=0;
   if(B.E.possession)B.attackPlan=null;
-  B.msg=result==='win'?B.E.win:result==='calm'?B.E.calmWin:result==='flee'?'일단 물러나자.':B.E.lose;
+  B.msg=result==='win'?B.E.win:result==='calm'?calmWinText():result==='flee'?'일단 물러나자.':B.E.lose;
+  nameBattleEnd(result);   // 결정 D-435: 이기거나 달래면 이름이 모두 돌아오고, 물러나면 뱃속에 남는다
   if(result==='calm'){learn('calm:'+B.kind);if(B.E.calmGift)B.loot.push(B.E.calmGift);}
   if(result==='calm'&&B.E.onCalm)B.E.onCalm(B);
   if(result==='win'&&B.E.onWin)B.E.onWin(B);
@@ -373,7 +381,8 @@ function bStep(){
   for(const q of B.pops){q.t--;q.y-=0.45;}B.pops=B.pops.filter(q=>q.t>0);
   if(B.slowT>0)B.slowT--;
   if(B.warm&&B.warm.fire>0)B.warm.fire--;
-  if(B.st!=='end'&&B.st!=='giftPlace'&&B.st!=='finale'){
+  nameStep();
+  if(B.st!=='end'&&B.st!=='giftPlace'&&B.st!=='finale'&&!nameLocked()){
     let dx=0,dy=0;
     if(keys['arrowleft']||keys['a']||touch.left)dx-=1;if(keys['arrowright']||keys['d']||touch.right)dx+=1;
     if(keys['arrowup']||keys['w']||touch.up)dy-=1;if(keys['arrowdown']||keys['s']||touch.down)dy+=1;
@@ -393,6 +402,9 @@ function bStep(){
     case 'bonk':if(B.t===60)B.msg='연장을 놓쳤다! 이번엔 피하기만 해야 한다.';if(--B.t<=0){B.st='idle';B.t=20;B.toolFly=null;}break;
     case 'idle':if(--B.t<=0&&!B.later.length)chooseAttack();break;
     case 'tell':if(--B.t<=0){B.st='atk';B.atkT=0;B.atkDur=bAttackDef(B.cur).dur;}break;
+    // 결정 D-432: 이름 부르기 예고(ntell) → 부름(ncall) → 입에 빈틈
+    case 'ntell':if(--B.t<=0)nameCallFire();break;
+    case 'ncall':if(--B.t<=0&&!B.later.length){B.st='open';B.opens=(B.opens||0)+1;openMark();}break;
     case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.possession||B.E.warmPath||B.E.settle||B.E.calmAction)B.st='settle';else{B.st='open';B.opens=(B.opens||0)+1;openMark();}}break;
     case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';B.opens=(B.opens||0)+1;openMark();}break;
     case 'giftPlace':if(--B.t<=0){B.giftPlace=null;bEnd('calm');}break;
@@ -465,6 +477,7 @@ function openGift(){
     B.handShown=true;B.handShow=72;B.handMsg=B.msg;B.msg='빈손을 펴 보였다. 무쇠가 손바닥을 살핀다. "…손은 성하냐. 어디 보자."';renderBattleForms();return;
   }
   B.paused=true;const g=$('bGiftGrid');g.innerHTML='';
+  $('bGiftMenu').querySelector('.b-gift-head span').textContent='무엇을 건넬까?';   // 같은 창을 이름 대기(battle-names.js)도 쓴다
   $('bGiftHint').textContent='좋아하는 걸 주면 마음이 누그러진다. 빈틈 하나에 하나만 건넬 수 있다.';
   // 결정 D-63: 집안 물건·귀한 것은 이 상대가 좋아하는 것만 꺼낸다.
   const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0&&(!keepsake(k)||giftLiked(k)));
@@ -498,7 +511,7 @@ function giveGift(id){
   const v=B.E.likes[id]||(effect?+effect[1]:0);
   // 결정 D-64: 좋아하지 않는 물건은 진정 0, 물건은 보따리에 그대로 둔다. 빈틈도 쓰지 않는다.
   if(!v){$('bGiftHint').textContent=(taste?taste.line:jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.')+' 물건은 보따리에 그대로 두었다.';return;}
-  if(!lore)takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();
+  if(!lore)takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();B.lastGift=id;
   B.calm=Math.min(100,B.calm+v);
   B.msg=taste?taste.line:((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText);
   if(B.warm&&id==='dokkaebibul')B.warm.fire=180;
@@ -508,7 +521,7 @@ function giveGift(id){
     else bEnd('calm');
   }
 }
-$('bGift').onclick=openGift;$('bHit').onclick=()=>bStrike();$('bGiftClose').onclick=closeGift;
+$('bGift').onclick=openGift;$('bHit').onclick=()=>bStrike();$('bGiftClose').onclick=closeGift;$('bNames').onclick=()=>openNameMenu();
 // 결정 D-84: 물러나기는 한 번 더 눌러야 끝난다. 처음 누르면 글이 바뀌고 잠시 뒤 되돌아간다.
 let fleeArmT=null;
 function disarmFlee(){clearTimeout(fleeArmT);fleeArmT=null;const b=$('bFlee');b.classList.remove('armed');b.textContent='물러나기';}
@@ -520,7 +533,7 @@ $('bFlee').onclick=()=>{
 function showResult(){
   const r=B.result,E=B.E;
   $('bResKick').textContent=E.npc?(r==='win'||r==='calm'?'시험 통과':'시험 실패'):(r==='win'?'승리':r==='calm'?'진정':'후퇴');
-  $('bResTitle').textContent=r==='win'?E.win:r==='calm'?E.calmWin:r==='flee'?'일단 물러났다.':E.lose;
+  $('bResTitle').textContent=r==='win'?E.win:r==='calm'?calmWinText():r==='flee'?'일단 물러났다.':E.lose;
   $('bResText').textContent=B.bonus?B.bonus:B.loot.length?'얻은 것은 보따리에 챙겼다.':(r==='lose'||r==='flee')?(E.npc?'다시 말을 걸면 언제든 재도전할 수 있다.':'부위마다 공격이 다르다. 순서를 바꿔 다시 맞서 보자.'):'';
   const L=$('bLoot');L.innerHTML='';
   const cnt={};B.loot.forEach(id=>cnt[id]=(cnt[id]||0)+1);
@@ -541,7 +554,7 @@ $('bResOk').onclick=()=>{
 /* 터치로 손 끌기 */
 let bDrag=null;
 bcv.addEventListener('pointerdown',e=>{if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||bDrag)return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={pointerId:e.pointerId,x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
-bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||e.pointerId!==bDrag.pointerId)return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
+bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||nameLocked()||B.st==='end'||B.st==='giftPlace'||e.pointerId!==bDrag.pointerId)return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
   const speed=battleHandProfile().speed/TABLES.TUNING.battle_bare_speed;
   B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);});
 function endDrag(e){if(e&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;}bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
@@ -684,10 +697,11 @@ function bDraw(){
     drawStrikeSpot(c,m.x,m.y,radius,m.t/m.max,Math.hypot(m.x-a.x,m.y-a.y)<radius,m.part.tool);}
   drawImpact(c);
   if(B.handShow>0)drawOpenHands(c);
-  else if(B.st!=='giftPlace'){drawPaw(c,B.px,B.py);drawAim(c);drawToolSwap(c);}
+  else if(B.st!=='giftPlace'){drawPaw(c,B.px,B.py);drawNameFade(c);drawAim(c);drawToolSwap(c);}
   for(const f of B.fx)blob(c,f.x,f.y,f.r*(f.t/28),f.r*(f.t/28),f.col,Math.min(1,f.t/14));
   c.restore();
   drawPops(c);
+  drawNames(c);   // 결정 D-432~D-435: 이름 예고의 언 가장자리, 날아가는 이름패, 지어 준 이의 목소리, 토해 낸 이름
   if(B.E.drawOver)B.E.drawOver(c);
   if(B.giftPlace)drawPlacedGift(c);
   drawBonk(c);
