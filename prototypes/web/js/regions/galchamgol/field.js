@@ -66,14 +66,55 @@ Rg.drawScenery=()=>{const x=TREE_X-cam;if(x<-120||x>W+120)return;
     if(Math.floor(G.anim/8)%2)R(dx-5,d.y-12,1,1,'#fff3b0');}
 };
 
-/* 도토리 · 밤 · 칡 줄기 */
+/* 도토리 · 밤 · 칡 줄기
+   결정 D-393: 채집물은 실물 꼴을 따른다 (사용자 피드백 2026-11-03: 도토리가 밤처럼 보였다).
+   도토리는 비늘 무늬 깍정이 모자가 몸보다 넓고, 몸은 갸름하다 끝이 뾰족하다. 밤은 끝이 뾰족하고 밑이 넓적하며 밑동(배꼽)이 희다.
+   밤송이는 가시가 사방으로 뻗고 벌어진 틈이 희다. 칡 줄기는 갈색으로 굵게 감긴 줄기에 잎 세 장(세겹잎)이 달린다. */
+function drawAcornAt(x,y){
+  R(x,y-10,1,1,'#4a2e1a');                                                   // 꼭지
+  R(x-2,y-9,5,1,'#7a5a32');R(x-3,y-8,7,2,'#5f4123');                          // 깍정이(비늘 모자)
+  for(const dx of [-2,0,2])R(x+dx,y-8,1,1,'#9a7a48');for(const dx of [-3,-1,1,3])R(x+dx,y-7,1,1,'#8a6a3c');
+  R(x-2,y-6,5,4,'#b8743a');R(x-1,y-2,3,1,'#a8652e');R(x,y-1,1,1,'#7a4a22');   // 갸름한 몸과 뾰족한 끝
+  R(x-1,y-6,1,3,'#dca468');R(x+2,y-5,1,3,'#8a5228');                          // 빛받이와 그늘
+}
 Rg.drawPickup=(a,x,bob)=>{
   if(Rg.arcCache(a)){R(x-5,a.y-3,11,3,'#7a4b2a');R(x-7,a.y-12,3,1,'#fff3b0');R(x+5,a.y-12,3,1,'#fff3b0');}
   // 결정 D-265: 벌어진 밤송이 곁에 굴러 나온 알밤
-  if(a.item==='bam'){R(x-7,a.y-3,5,3,'#7d8a3c');R(x-8,a.y-4,1,1,'#a9b552');R(x-5,a.y-5,1,1,'#a9b552');R(x-3,a.y-4,1,1,'#a9b552');R(x-6,a.y-2,2,1,'#c9a86a');
-    R(x-1,a.y-6+bob,5,5,'#7a4321');R(x,a.y-7+bob,3,1,'#8d5129');R(x,a.y-5+bob,1,2,'#b0703f');R(x-1,a.y-2+bob,5,1,'#e2c79a');return;}
-  if(a.item==='vine'){R(x-6,a.y-3,12,2,'#4f8a35');R(x-4,a.y-5,4,2,'#3f6b2a');R(x+2,a.y-6+bob,3,2,'#7fb069');R(x-7,a.y-2,2,1,'#3f6b2a');return;}
-  R(x-2,a.y-7+bob,5,2,'#6b4423');R(x-2,a.y-5+bob,5,4,'#c9894a');R(x,a.y-8+bob,1,1,'#4a2e1a');};
+  if(a.item==='bam'){
+    R(x-9,a.y-5,6,4,'#7d8a3c');R(x-8,a.y-6,4,1,'#6e7a32');R(x-8,a.y-1,4,1,'#6e7a32');   // 벌어진 밤송이
+    for(const [dx,dy] of [[-10,-6],[-11,-3],[-9,-7],[-6,-7],[-3,-6],[-2,-3],[-10,-1],[-3,-1],[-7,-8],[-11,-5]])R(x+dx,a.y+dy,1,1,'#b5c25a');
+    R(x-7,a.y-5,2,1,'#e8dcb0');R(x-6,a.y-4,2,1,'#e8dcb0');R(x-5,a.y-3,1,1,'#c9b080');   // 벌어진 틈의 흰 속껍질
+    R(x,a.y-8+bob,1,1,'#e8dcc0');R(x-1,a.y-7+bob,3,1,'#6e3a1c');R(x-2,a.y-6+bob,5,1,'#7a4321');   // 뾰족한 끝과 솜털
+    R(x-3,a.y-5+bob,7,3,'#7a4321');R(x-2,a.y-6+bob,1,3,'#a8653a');R(x+3,a.y-4+bob,1,2,'#5c2f16');
+    R(x-3,a.y-2+bob,7,1,'#d9c08a');return;}                                    // 넓적하고 흰 밑동
+  if(a.item==='vine'){
+    for(const [dx,dy] of [[-6,-1],[-5,-2],[-4,-2],[-3,-3],[-2,-4],[-1,-4],[0,-3],[0,-2],[1,-1],[2,-1],[3,-2],[4,-2],[5,-3],[6,-3]])R(x+dx,a.y+dy,1,1,'#6b5a2a');
+    R(x-4,a.y-1,2,1,'#5a4a22');R(x+3,a.y-3,1,1,'#3f6b2a');                     // 감긴 줄기와 잎자루
+    R(x+2,a.y-9+bob,3,3,'#4f8a35');R(x,a.y-6+bob,3,2,'#5d9a40');R(x+4,a.y-6+bob,3,2,'#3f7a2a');R(x+3,a.y-8+bob,1,2,'#7fb069');   // 세겹잎
+    R(x-6,a.y-4,2,2,'#4f8a35');return;}
+  drawAcornAt(x,a.y+bob);};
+/* 결정 D-393: 단풍골 캐는 자리. 흙더미 위로 무엇이 묻혀 있는지 조금 보인다(칡뿌리는 굵은 뿌리 등, 싸리버섯은 가는 갈래, 꾀꼬리버섯은 노란 깔때기 갓) */
+Rg.drawDig=(d,x)=>{
+  if(!['root','ssari','kkoe'].includes(d.item))return false;
+  const y=d.y??GROUND;x=Math.round(x);
+  if(d.done){R(x-6,y-1,12,2,'#3e2615');R(x-4,y-2,8,1,'#5a3a22');return true;}
+  R(x-7,y-4,14,4,'#7a4b2a');R(x-5,y-6,10,2,'#8b5a2b');R(x-4,y-5,2,1,'#a06a38');R(x+3,y-3,2,1,'#5e3a1e');
+  if(d.item==='root'){
+    for(const [dx,dy] of [[-4,-7],[-3,-8],[-2,-9],[-1,-9],[0,-9],[1,-8],[2,-7]])R(x+dx,y+dy,2,2,'#c9a06a');   // 흙 위로 솟은 굵은 칡뿌리 등
+    R(x-3,y-7,1,1,'#9a7040');R(x+1,y-6,1,1,'#9a7040');R(x-1,y-10,2,1,'#e0c08a');
+    R(x+4,y-11,1,4,'#3f6b2a');R(x+3,y-13,3,2,'#4f8a35');}                       // 뿌리에서 난 칡 순
+  else if(d.item==='ssari'){
+    R(x-2,y-8,5,2,'#ecdcc6');
+    for(const [dx,h] of [[-3,4],[-1,6],[1,5],[3,4],[0,3]]){R(x+dx,y-8-h,1,h,'#efd9c2');R(x+dx,y-9-h,1,1,'#d99a7a');}   // 가늘게 갈라진 싸리 가지와 분홍빛 끝
+  }else{
+    R(x-5,y-11,6,1,'#f6c040');R(x-5,y-11,1,1,'#d89a20');R(x,y-11,1,1,'#d89a20');            // 큰 깔때기 갓: 물결진 테두리
+    R(x-4,y-10,4,1,'#e8a828');R(x-3,y-10,1,1,'#c88018');R(x-3,y-9,2,3,'#e0a024');R(x-3,y-9,1,1,'#c88018');   // 주름이 내려간 갓 밑과 대
+    R(x+1,y-9,4,1,'#f2b632');R(x+1,y-9,1,1,'#d8901e');R(x+2,y-8,2,2,'#e09a22');R(x+2,y-8,1,1,'#c88018');   // 작은 갓
+    R(x-4,y-11,2,1,'#ffd870');
+  }
+  if(Math.floor((G.anim+d.x)/14)%3===0)R(x+5,y-12,1,1,'#fff3b0');
+  return true;
+};
 
 /* ---------- 칡덩굴 장애물, 덩굴 몹, 엉킨 칡 ---------- */
 // 결정 D-51: 숲의 장벽은 나무 입구(아치)를 덮은 덩굴 그물이다. 낫질마다 아래로 걷힌다.
@@ -219,7 +260,7 @@ if(!CLASSIC){
     drawBack:()=>A.back(id),drawScenery:()=>A.scenery(id),
     drawFront:()=>A.front(id),weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'maple'),ambient:()=>{migrateHill();placeRoot();},   // 위치 자르기보다 먼저 옛 언덕 좌표를 옮긴다
     
-    drawPickup:Rg.drawPickup,onPickup:a=>Rg.onPickup?.(a),step:commonStep});
+    drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup?.(a),step:commonStep});
   const sign=A.marker;
   const path=(x,to,toX,label,extra={})=>({x,to,toX,label,draw:sign,...extra});
   const cutPath=()=>G.barrier.cut;
@@ -295,21 +336,16 @@ if(!CLASSIC){
       faint:()=>{G.px=1900-HILL_SHIFT;G.py=GROUND;G.vy=0;G.onGround=true;toast('나무 앞 쉼터로 물러났다. 버섯 향으로 달랠 수도 있다.');},
     },
   };
-  /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 단풍 든 참나무·밤나무 아래 도토리와 밤, 무른 흙의 칡뿌리, 늪가 버섯.
-     구역마다 200px 안팎에 하나꼴로, 몇 개는 붙여 두고 사이는 들쭉날쭉하게 비운다. 좌표는 길을 줄인 뒤의 자리.
-     언덕은 엉킨 칡 앞(KUDZU_AT)에 하나, 칡을 푼 뒤 오르는 바위턱에 하나만 둔다. */
+  /* 결정 D-265: 길섶 채집물(사용자 피드백 2026-11-02). 단풍 든 참나무·밤나무 아래 도토리와 밤, 무른 흙의 칡뿌리, 늪가 버섯. 좌표는 길을 줄인 뒤의 자리.
+     결정 D-391: 길섶 채집물을 줄이고 자리에 맞춘다 (사용자 피드백 2026-11-03: 너무 많고 다양하지 않다).
+     도토리는 숲 줄기 자리(구역에 이미 있는 도토리)로 충분해 길섶에는 몇 개만, 밤은 집 둘레 밤나무 아래에만, 늪에는 도토리 대신 젖은 흙의 칡뿌리와 버섯만 둔다.
+     옛 저장은 이미 받아 둔 채집물 목록을 그대로 쓴다(새 게임부터 이 배치). */
   addZoneGather(Rg,'gal_g_',[
-    ['village','p',168,'bam'],['village','p',372,'acorn'],['village','p',701,'bam',{y:118}],['village','p',1205,'acorn'],
-    ['village','p',1336,'bam',{y:152}],['village','d',1560,'root'],['village','p',1618,'acorn'],
-    ['forge','p',128,'bam'],['forge','p',545,'acorn',{y:113}],['forge','p',700,'bam'],['forge','p',1140,'acorn'],
-    ['forge','p',1390,'bam'],['forge','p',1785,'acorn',{y:112}],['forge','p',1846,'bam'],
-    ['forest','p',158,'bam'],['forest','p',1165,'acorn',{y:138}],['forest','d',1360,'root'],['forest','p',1500,'bam'],
-    ['forest','p',1895,'acorn',{y:136}],['forest','p',2080,'bam'],
-    ['marsh','p',140,'acorn'],['marsh','d',250,'root'],['marsh','p',548,'acorn',{y:138}],['marsh','p',735,'acorn',{y:164}],
-    ['marsh','p',1115,'acorn',{y:134}],['marsh','d',1310,'ssari'],['marsh','d',1690,'root'],['marsh','p',1900,'acorn',{y:136}],['marsh','p',2290,'bam'],
-    ['hill','p',410,'acorn'],['hill','p',868,'bam',{y:116}],['hill','p',1522,'bam',{y:150}],
-    // 몰린 자리 (간격이 고르지 않게)
-    ['marsh','p',172,'acorn'],['marsh','p',2322,'bam'],
+    ['village','p',168,'bam'],['village','p',1205,'acorn'],
+    ['forge','p',700,'bam'],['forge','p',1785,'acorn',{y:112}],
+    ['forest','d',1360,'root'],['forest','p',1500,'bam'],['forest','p',1895,'acorn',{y:136}],
+    ['marsh','d',250,'root'],['marsh','d',1310,'ssari'],
+    ['hill','p',410,'acorn'],
   ]);
 
 }

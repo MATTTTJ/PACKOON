@@ -4,10 +4,12 @@
 const Rg=REGIONS.galchamgol;
 Rg.springRevisit=()=>!CLASSIC&&!!G?.f?.spring&&regionCompleted('yeongsan');
 Rg.art={
-  squirrel(ox,oy,f){const O='#c3632d',D='#8e3f1c',C='#f1d7b0',K='#2b1d14';const t=Math.floor(G.anim/20)%2;
-    M(ox,oy,f,-11,-20+t,6,15,O);M(ox,oy,f,-13,-24+t,8,6,O);M(ox,oy,f,-9,-26+t,5,3,D);M(ox,oy,f,-9,-17+t,2,10,D);
-    M(ox,oy,f,-4,-10,8,8,O);M(ox,oy,f,-1,-9,4,6,C);M(ox,oy,f,-2,-17,8,7,O);M(ox,oy,f,-1,-19,2,2,D);M(ox,oy,f,3,-15,1,1,K);M(ox,oy,f,6,-13,1,1,K);
-    M(ox,oy,f,-3,-2,3,2,D);M(ox,oy,f,1,-2,3,2,D);M(ox,oy,f,4,-9,3,3,'#a8743b');M(ox,oy,f,4,-10,3,1,'#6b4423');},
+  // k: 몸 크기 배율. 결정 D-394: 다람쥐 형제 중 형은 동생보다 조금 크다(1.2배, 사용자 피드백 2026-11-03). 칸 끝을 같이 반올림해 틈이 생기지 않는다
+  squirrel(ox,oy,f,k=1){const O='#c3632d',D='#8e3f1c',C='#f1d7b0',K='#2b1d14';const t=Math.floor(G.anim/20)%2;
+    const q=(x,y,w,h,c)=>{const x0=Math.round(x*k),y0=Math.round(y*k);M(ox,oy,f,x0,y0,Math.max(1,Math.round((x+w)*k)-x0),Math.max(1,Math.round((y+h)*k)-y0),c);};
+    q(-11,-20+t,6,15,O);q(-13,-24+t,8,6,O);q(-9,-26+t,5,3,D);q(-9,-17+t,2,10,D);
+    q(-4,-10,8,8,O);q(-1,-9,4,6,C);q(-2,-17,8,7,O);q(-1,-19,2,2,D);q(3,-15,1,1,K);q(6,-13,1,1,K);
+    q(-3,-2,3,2,D);q(1,-2,3,2,D);q(4,-9,3,3,'#a8743b');q(4,-10,3,1,'#6b4423');},
   badger(ox,oy,f){const Gy='#6d6862',B='#2a2522',Wt='#eeeae2',Ap='#7a4b2a';
     M(ox,oy,f,-6,-14,13,12,Gy);M(ox,oy,f,-2,-12,8,10,Ap);M(ox,oy,f,-4,-22,11,8,Wt);M(ox,oy,f,-3,-21,3,5,B);M(ox,oy,f,3,-21,3,5,B);
     M(ox,oy,f,4,-19,1,1,'#ffffff');M(ox,oy,f,7,-16,2,1,B);M(ox,oy,f,-5,-2,4,2,B);M(ox,oy,f,2,-2,4,2,B);
@@ -507,7 +509,7 @@ if(!CLASSIC){
       q(-1,-2,1,2,'#5e4c36');q(5,-2,1,2,'#5e4c36');q(-2,-15,9,5,'#3f6f86');
     },
     brothers(x,y){
-      Rg.art.squirrel(x-17,y,1);Rg.art.squirrel(x+18,y,-1);
+      Rg.art.squirrel(x-18,y,1,1.2);Rg.art.squirrel(x+18,y,-1);   // 왼쪽이 형 (D-394)
       basket(x,y);for(let i=-1;i<=1;i++){px(x+i*5-2,y-12,4,4,'#ba854a');px(x+i*5-2,y-13,4,1,'#68452f');}
     },
     motherPheasant,

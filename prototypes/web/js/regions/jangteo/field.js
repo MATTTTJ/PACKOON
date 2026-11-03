@@ -72,9 +72,11 @@ Rg.drawScenery=()=>{
 };
 Rg.drawPickup=(a,x,bob)=>{
   // 결정 D-318: 짐짝에서 샌 콩과 마구간에서 흘린 짚도 줍는다. 솔방울이 아닌 것은 그 모양으로.
-  if(a.item==='kong'){for(const [dx,dy] of [[-3,-3],[0,-4],[2,-2],[-1,-1]])R(x+dx,a.y+dy+bob,2,2,'#d9c07a');R(x-1,a.y-4+bob,1,1,'#f1e0a6');return;}
+  // 결정 D-393: 콩은 마른 꼬투리 하나가 벌어져 둥근 콩알이 굴러 나왔다(콩알마다 검은 배꼽)
+  if(a.item==='kong'){R(x-6,a.y-2,5,2,'#b89a5a');R(x-6,a.y-2,5,1,'#cdb070');R(x-5,a.y-1,3,1,'#8a7040');
+    for(const [dx,dy] of [[0,-3],[2,-2],[-1,-2]]){R(x+dx,a.y+dy+bob,2,2,'#e2cf8a');R(x+dx,a.y+dy+bob,1,1,'#f4e6b0');R(x+dx+1,a.y+dy+1+bob,1,1,'#6a5a3a');}return;}
   if(a.item==='jip'){R(x-5,a.y-3+bob,10,2,'#d9b860');R(x-4,a.y-5+bob,8,2,'#c9a850');R(x-1,a.y-6+bob,2,6,'#a8883a');return;}
-  R(x-2,a.y-7+bob,5,2,'#8a5a2b');R(x-3,a.y-5+bob,7,2,'#6b4423');R(x-2,a.y-3+bob,5,2,'#8a5a2b');R(x-1,a.y-1,3,1,'#5a3a20');};
+  drawPineCone(x,a.y+bob,true);};   // 결정 D-393
 
 /* 눈 */
 const snow=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H,s:0.25+Math.random()*0.45,p:Math.random()*6}));
@@ -262,7 +264,8 @@ if(!CLASSIC){
       digs:[{id:'j_cache_pine',x:1700,item:'kong',n:2,form:'squirrel',cache:true,done:false},
         {id:'j_pine_shake_1',x:960,item:'solbang',done:false},{id:'j_pine_shake_2',x:1620,item:'solbang',done:false},{id:'j_pine_shake_3',x:2080,item:'solbang',done:false}],
       // 결정 D-207: 솔방울이 같은 간격으로 늘어서지 않게 떨어진 자리를 들쭉날쭉하게 (사용자 피드백 58). 높은 칸의 것은 그 칸 안에서만 옮긴다.
-      pickups:[...cones('pine',[[232,192],[291,192],[318,192],[612,96],[659,96],[700,192],[850,192],[1040,192],[1270,128],[1370,192],[1500,192],[1980,192],[2250,160],[2600,96]]),
+      // 결정 D-391: 열넷은 너무 많았다. 소나무 밑과 바위턱에 여덟만 (엿방울 몫 다섯과 갈래 셋에 넉넉하고, 모자라면 쉬는 사이 다시 떨어진다 D-79)
+      pickups:[...cones('pine',[[232,192],[612,96],[700,192],[1040,192],[1270,128],[1500,192],[2250,160],[2600,96]]),
         {id:'j_owl_roof_cone_1',x:853,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:884,y:124,item:'solbang',got:false}],
       // 결정 D-44: 뒷산에서 장터로는 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
       // 결정 D-319: 올라온 돌계단으로 내려가 거리의 그 돌계단 아래(2180)로 나온다. 지붕길 문(→거리 지붕)은 뺐다(D-316).
@@ -276,7 +279,7 @@ if(!CLASSIC){
     },
     warehouse:{...common('warehouse'),name:TABLES.ZONES.jangteo.warehouse,w:2600,npcs:[],
       platforms:[...stairs(460),...stairs(1230),...stairs(1840),...stairs(2340)],
-      pickups:cones('warehouse',[[676,192],[709,192],[752,192]]),   // D-207
+      pickups:cones('warehouse',[[676,192],[752,192]]),   // D-207 · D-391: 땔감 더미에서 흘린 둘
       exits:{left:{to:'inn',toX:2490}},
       doors:[],   // 결정 D-316·D-317: 숙소로는 들어온 쪽문(왼쪽 가장자리)으로만 돌아간다
       examines:E.examines.warehouse,
@@ -291,19 +294,17 @@ if(!CLASSIC){
   /* 결정 D-265: 장터 골목에도 주울 것을 조금 둔다 (사용자 피드백 2026-11-02 "빈 곳이 너무 많다").
      장터에는 풀숲이 없으니 땔감 지게와 아궁이 장작단에서 흘린 솔방울(불쏘시개)만, 처마 위에는 바람에 얹힌 것만 둔다.
      솔숲은 이미 촘촘해 그대로 둔다. 좌표는 길을 줄인 뒤의 자리. */
+  /* 결정 D-391 (사용자 피드백 2026-11-03: 너무 많고 다양하지 않다): 골목 바닥의 솔방울은 거두고, 처마 위에 바람이 얹은 것만 셋 남긴다
+     (뛰어올라야 닿는 자리). 솔방울은 뒷산 솔숲에서 줍는다(숙소에서 쉬면 다시 떨어진다). */
   addZoneGather(Rg,'j_g_',[
-    ['entrance','p',165,'solbang'],['entrance','p',705,'solbang'],['entrance','p',1080,'solbang',{y:96}],
-    ['street','p',190,'solbang'],['street','p',712,'solbang',{y:96}],['street','p',1790,'solbang'],['street','p',2290,'solbang'],['street','p',2600,'solbang',{y:96}],
-    ['inn','p',160,'solbang'],['inn','p',760,'solbang'],['inn','p',1350,'solbang',{y:96}],['inn','p',1905,'solbang',{y:128}],['inn','p',2170,'solbang'],
-    ['warehouse','p',150,'solbang'],['warehouse','p',590,'solbang',{y:124}],['warehouse','p',1270,'solbang',{y:96}],
-    // 몰린 자리 (간격이 고르지 않게)
-    ['entrance','p',735,'solbang'],['inn','p',2210,'solbang'],
+    ['entrance','p',1080,'solbang',{y:96}],['street','p',2600,'solbang',{y:96}],['inn','p',1905,'solbang',{y:128}],
   ]);
   /* 결정 D-318: 쓸모없이 걷기만 하던 자리에 장터다운 주울 것을 조금 더 (사용자 피드백 2026-11-02 "콘텐츠와 수집품으로 채워라").
-     마구간 여물통 곁에 흘린 짚, 창고 마당 짐짝 틈으로 샌 콩. 장꾼이 팔 물건은 줍지 않는다. 좌표는 길을 줄인 뒤의 자리. */
+     마구간 여물통 곁에 흘린 짚, 창고 마당 짐짝 틈으로 샌 콩. 장꾼이 팔 물건은 줍지 않는다. 좌표는 길을 줄인 뒤의 자리.
+     결정 D-391: 짚 하나, 콩 둘로 줄인다. */
   addZoneGather(Rg,'j_g2_',[
-    ['inn','p',2042,'jip'],['inn','p',2071,'jip'],
-    ['warehouse','p',470,'kong'],['warehouse','p',488,'kong'],['warehouse','p',1150,'kong'],
+    ['inn','p',2042,'jip'],
+    ['warehouse','p',470,'kong'],['warehouse','p',1150,'kong'],
   ]);
   // 길손의 조사에는 배경과 구별되는 작고 일정한 표지를 쓴다. 숨은 도장은 표지를 붙이지 않는다.
   for(const z of Object.values(Rg.zones))for(const p of z.examines)p.draw=p.draw||((x,y)=>{R(x-2,y-6,5,4,'#caa970');R(x,y-10,1,2,'#f6ead0');});
