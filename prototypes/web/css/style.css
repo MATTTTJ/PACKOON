@@ -340,9 +340,6 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
   .b-mask-trait{display:block;font-size:10px;margin-top:2px;font-weight:normal}
   #bMaskHint{display:none}
 }
-@media (pointer:coarse) and (orientation:portrait){
-  #bMasks{position:absolute;bottom:5px;left:2.5%;right:2.5%;max-width:none;align-items:center}
-}
 .b-gift{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92%,440px);max-height:86%;overflow:auto;background:var(--hanji);border:2px solid var(--meok);border-radius:6px;padding:10px 12px 12px;z-index:3;box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .b-gift-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:clamp(14px,1.8vw,17px);margin-bottom:6px}
 .b-gift-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px}
@@ -410,16 +407,6 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .goal-m b{display:block;font-family:var(--ui);font-weight:normal;font-size:11px;color:var(--gold);letter-spacing:.06em}
 .pad-top .chipbtn{display:flex;align-items:center;font-size:14px;padding:0 12px;min-height:44px}
 .pad-main{flex:1;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:150px}
-/* 결정 D-52: 필드에서도 ▲(오르기·들어가기·점프)를 보인다. 전투와 같은 십자 배치 */
-.dpad{display:grid;grid-template-columns:repeat(3,auto);grid-template-areas:". up ." "left down right";gap:6px}
-.dpad .pbtn{width:54px;height:54px}
-.dpad [data-k="left"]{grid-area:left}.dpad [data-k="right"]{grid-area:right}.dpad [data-k="up"]{grid-area:up}.dpad [data-k="down"]{grid-area:down}
-.pbtn.v{display:grid}
-.dpad .pbtn[data-k="down"]{display:grid;justify-self:center}
-body.in-battle .dpad{grid-template-columns:repeat(3,auto);grid-template-areas:". up ." "left down right";gap:6px}
-body.in-battle .dpad .pbtn{width:54px;height:54px}
-body.in-battle .pbtn.v{display:grid}
-body.in-battle .pbtn.talk{visibility:hidden}
 body.in-battle .hud,body.in-battle .prompt{visibility:hidden}
 /* 소리 조절은 별도 윗줄에 두어 체력과 진정 표시를 가리지 않는다. */
 body.in-battle .hud-btns{max-width:none;flex-wrap:nowrap}
@@ -433,10 +420,6 @@ body.in-battle .hud{justify-content:flex-end}
 body.in-battle .hud-btns .chipbtn{white-space:nowrap;flex:none}
 body.in-battle .pad-top .chipbtn{display:none}
 .bbtn.armed{background:#b4432a;color:#fff6e8;border-color:#5a1d10}
-.acts{display:grid;grid-template-columns:auto auto;grid-template-areas:"talk talk" "jump atk";gap:12px;justify-items:center;align-items:center}
-.acts .talk{grid-area:talk;justify-self:end}
-.acts .jump{grid-area:jump}
-.acts .atk{grid-area:atk}
 
 /* 휴대폰 세로 */
 @media (pointer:coarse) and (orientation:portrait){
@@ -462,7 +445,6 @@ body.in-battle .pad-top .chipbtn{display:none}
   .cover{border-radius:0}
   .how-touch{display:block}.how-keys{display:none}
   body.in-battle .stage{aspect-ratio:1/1}
-  body.in-battle .bbtn#bGift,body.in-battle .bbtn#bHit{display:none}
 }
 /* 휴대폰 가로 */
 @media (pointer:coarse) and (orientation:landscape){
@@ -482,7 +464,6 @@ body.in-battle .pad-top .chipbtn{display:none}
   .dialog{left:12%;right:12%}
   .panel{inset:4% 8%}
   .forge{top:10%}
-  body.in-battle .bbtn#bGift,body.in-battle .bbtn#bHit{display:none}
   body.in-battle .pad{z-index:16}
   .how-touch{display:block}.how-keys{display:none}
 }
@@ -693,8 +674,6 @@ body.ending-scene .hud,body.ending-scene #pad,body.ending-scene #toast,body.endi
 /* 잎사귀 변신 (forms.js): HUD 의 지금 모습, 휴대폰 잎사귀 버튼과 변신 고리 */
 .form-now{display:flex;align-items:center;gap:4px;color:var(--hanji);border-left:1px solid #4b3a2e;padding-left:8px;white-space:nowrap}
 .form-leaf{display:inline-block;width:.55em;height:.85em;background:#7fb04a;border-radius:0 80% 0 80%;transform:rotate(25deg)}
-.acts{position:relative;grid-template-areas:"leaf talk" "jump atk"}
-.acts .leaf{grid-area:leaf}
 .pbtn.leaf{width:auto;min-width:52px;height:44px;border-radius:22px;padding:0 12px;font-size:14px;background:#3d5a2a;border-color:#2c4020}
 .form-ring{position:absolute;right:0;bottom:calc(100% + 8px);display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;width:max-content;max-width:min(320px,90vw);padding:6px;background:rgba(26,19,15,.92);border:2px solid #4a372a;border-radius:10px;z-index:20;pointer-events:auto}
 .form-pick{min-width:56px;min-height:44px;padding:0 10px;font-family:var(--ui);font-size:14px;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:8px;touch-action:manipulation}
@@ -734,39 +713,78 @@ body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
 .dev-flags{max-height:240px;overflow:auto;margin:4px 0}
 .dev-flag{display:flex;gap:4px;align-items:center;padding:1px 0}.dev-flag code{flex:1;font-size:11px;overflow-wrap:anywhere}
 .dev-flag input:not([type=checkbox]){width:110px}.dev-panel .dev-x-btn{min-height:20px;padding:0 5px}
-/* 결정 D-260: 휴대폰 단추는 작게, 서로 멀리 (사용자 피드백 2026-11-02: 버튼이 너무 크고 다른 버튼과 가까워 누르기 어렵다).
-   - 누르는 칸은 44px 아래로 줄이지 않는다(자동 검사 mobile). 대신 그림 크기를 그 언저리로 줄이고 단추 사이를 넓힌다.
-   - 십자 단추는 서로 14px 띄우고, 점프·휘두르기는 왼손 십자와 떨어진 오른쪽 아래(엄지 자리)에 비스듬히 둔다.
-   - 터치 화면에서는 키보드 글자(I·N·M·V·J·K)를 숨긴다. 누를 수 없는 키라 단추만 넓힌다. */
+/* 결정 D-380: 휴대폰 조작 배치 (사용자 피드백 2026-11-03: 화살표와 나머지 단추가 양손이 부딪힐 만큼 가깝고 크기가 불편하다. D-260 을 바꿈).
+   - 왼손은 방향 십자 판 하나(밀어서 방향 바꾸기, input.js), 오른손은 동작 묶음. 두 묶음을 화면 양 끝에 붙이고 가운데를 비운다.
+     360px 폭 세로 화면에서도 십자와 오른손 묶음 사이가 엄지 하나(48px) 넘게 빈다 (자동 검사 mobile-layout).
+   - 오른손 묶음: 아래 바깥이 휘두르기(가장 크다), 그 안쪽이 점프, 점프 위가 구르기(D-381). 잎사귀·말걸기는 그 위 줄.
+   - 누르는 칸은 44px 아래로 줄이지 않는다(자동 검사 mobile). 터치 화면에서는 키보드 글자(I·N·M·V·J·K)를 숨긴다. */
 @media (pointer:coarse){
   .chipbtn kbd,.bbtn kbd{display:none}
-  .pbtn{width:48px;height:48px;font-size:18px;box-shadow:0 3px 0 #0d0907}
-  .pbtn.atk{width:58px;height:58px;font-size:13px;padding:0;white-space:nowrap;letter-spacing:-.02em}
-  .pbtn.jump{width:50px;height:50px;font-size:13px}
-  .pbtn.talk{height:44px;border-radius:22px;padding:0 14px;font-size:13px;white-space:nowrap}
-  .pbtn.leaf{font-size:13px;white-space:nowrap}
-  .dpad,body.in-battle .dpad{gap:12px 14px}
-  .dpad .pbtn,body.in-battle .dpad .pbtn{width:48px;height:48px}
-  .acts{gap:10px 18px;align-items:end}
-  .acts .jump{margin-bottom:20px}
+  #pad [hidden]{display:none!important}
+  .pbtn{width:50px;height:50px;font-size:16px;padding:0;white-space:nowrap;box-shadow:0 3px 0 #0d0907}
+  .pad-main{justify-content:space-between;align-items:flex-end;gap:10px}
+  .dpad{display:grid;grid-template-columns:repeat(3,50px);grid-template-rows:repeat(3,50px);grid-template-areas:". up ." "left mid right" ". down .";gap:2px;touch-action:none;flex:none}
+  .dpad::before{content:'';grid-area:mid;margin:9px;border-radius:50%;background:rgba(74,55,42,.45);box-shadow:inset 0 0 0 2px rgba(242,230,204,.12)}   /* 가운데 쉼 자리 */
+  .dpad .pbtn{width:100%;height:100%;border-radius:12px;pointer-events:none}   /* 누름은 판(#dpad)이 받는다 */
+  .dpad [data-k="up"]{grid-area:up}.dpad [data-k="left"]{grid-area:left}.dpad [data-k="right"]{grid-area:right}.dpad [data-k="down"]{grid-area:down}
+  .acts{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex:none}
+  .acts-top{position:relative;display:flex;gap:10px;justify-content:flex-end;align-items:center}
+  .acts-core{display:grid;grid-template-columns:auto auto;grid-template-areas:"roll atk" "jump atk";gap:10px 12px;align-items:center;justify-items:center}
+  .acts .roll,.acts .tool{grid-area:roll}
+  .acts .jump{grid-area:jump}
+  .acts .atk{grid-area:atk;align-self:end}
+  .pbtn.atk{width:66px;height:66px;font-size:14px;letter-spacing:-.02em}
+  .pbtn.jump{width:58px;height:58px;font-size:14px}
+  .pbtn.roll,.pbtn.tool{width:48px;height:48px;font-size:12px;background:#3b2c22}
+  .pbtn.tool{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:11px;line-height:1.05}
+  .pbtn.tool canvas{width:20px;height:20px;image-rendering:pixelated}
+  .pbtn.tool:disabled{opacity:.75;cursor:default}
+  .pbtn.tool.want{background:#c98a12;border-color:#7a5520;color:var(--meok);animation:bToolWant .7s ease-in-out infinite alternate}
+  .pbtn.talk{width:auto;height:44px;border-radius:22px;padding:0 14px;font-size:13px}
+  .pbtn.leaf{height:44px;font-size:13px}
   .hud-btns{gap:8px}
   .hud-btns .chipbtn{font-size:13px;padding:2px 10px}
   .pad-top .chipbtn{font-size:13px}
+  /* 전투: 구르기 자리에 도구 단추(D-383), 점프 자리는 '선물'(D-384). 말걸기·잎사귀 줄은 없다. 전투 그림 위의 도구 줄·선물·치기 단추는 숨긴다 */
+  body:not(.in-battle) #padTool{display:none!important}
+  body.in-battle #padRoll,body.in-battle .acts-top{display:none!important}
+  #bToolButtons,body.in-battle .bbtn#bGift,body.in-battle .bbtn#bHit{display:none!important}
+  /* 결정 D-382: 세로 화면은 변신 단추·물러나기를 전투 그림 밖 패드에. 키 번호(0·1…)는 휴대폰에 없는 키라 숨긴다 */
+  .pad-battle{display:none}
+  .b-mask-key{display:none}
+  .pad-battle .bbtn{background:var(--hanji);min-height:44px}
 }
 @media (pointer:coarse) and (orientation:portrait){
-  .pad-main{align-items:flex-end;padding:0 10px 22px}
+  .pad-main{flex:1;margin-inline:-8px;padding:0 0 18px}   /* 앱 여백(16px)을 반쯤 걷어 두 묶음을 화면 끝 8px에 붙인다 */
   .pad-top{gap:12px}
+  body.in-battle .pad-battle{display:flex;flex-direction:column;gap:10px}
+  /* 결정 D-382: 세로 전투에서는 소리·음량 단추가 정사각 무대의 보스 머리 위를 덮는다. 전투 동안만 숨긴다(필드로 나오면 다시 보인다) */
+  body.in-battle .hud-btns #btnSound,body.in-battle .hud-btns #btnVolume{display:none!important}
+  body.in-battle .b-top{top:2.5%}
+  .pad-battle .b-btns{justify-content:flex-end}
+  .pad-battle #bMasks{max-width:none;align-items:stretch}
+  .pad-battle .b-mask-buttons{justify-content:center;gap:8px}
+  .pad-battle .b-mask-buttons .bbtn{min-width:64px}
 }
 @media (pointer:coarse) and (orientation:landscape){
-  .pbtn{width:46px;height:46px;font-size:16px}
-  .pbtn.atk{width:52px;height:52px;font-size:13px}
-  .pbtn.jump{width:46px;height:46px;font-size:12px}
-  .pbtn.talk{height:44px;font-size:13px}
-  .dpad,body.in-battle .dpad{gap:8px 12px}
-  .dpad .pbtn,body.in-battle .dpad .pbtn{width:46px;height:46px}
-  .acts{gap:6px 14px}
-  .acts .jump{margin-bottom:14px}
-  .pad-main{padding:0 10px}
+  .pad-main{padding:0 max(10px, env(safe-area-inset-right, 0px)) 0 max(10px, env(safe-area-inset-left, 0px))}
+  .pbtn{width:48px;height:48px;font-size:15px}
+  .dpad{grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,48px)}
+  .acts,.acts-core{gap:8px 10px}
+  .pbtn.atk{width:60px;height:60px;font-size:13px}
+  .pbtn.jump{width:52px;height:52px;font-size:13px}
+  .pbtn.roll,.pbtn.tool{width:46px;height:46px}
+  .pbtn.talk,.pbtn.leaf{height:44px}
+  .pbtn.roll,.pbtn.tool,.pbtn.talk,.pbtn.leaf{background:rgba(37,26,20,.62)}
+  .pbtn.atk{background:rgba(180,67,42,.82)}
+  /* 대화 중에는 패드를 숨겨 대화창과 겹치지 않는다 (대화창을 눌러 넘긴다) */
+  .shell:has(>#dlg:not([hidden])) #pad{visibility:hidden}
+  /* 결정 D-382: 가로 화면 전투는 변신 단추 줄을 숨기고, 오른손 묶음 위의 잎사귀 단추 고리로 고른다(누를 때만 잠깐 뜬다) */
+  body.in-battle .b-me #bMasks{display:none}
+  body.in-battle .acts-top{display:flex!important}
+  body.in-battle #padTalk{display:none}
+  body.in-battle .pbtn.leaf:not([hidden]){display:grid}
+  body.in-battle .form-ring:not([hidden]){display:flex}
   .hud-btns{max-width:62%}
   .hud-btns .chipbtn{padding:2px 8px}
 }
