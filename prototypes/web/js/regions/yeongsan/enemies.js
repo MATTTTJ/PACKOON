@@ -1,42 +1,9 @@
 'use strict';
 /* 북쪽 영산 전투: 강철이 (용이 되지 못한 이무기). 원본 표: design/data/bosses.csv · boss_parts.csv
-   부위 공격 넷 (boss_parts.csv 의 공격 칸):
-   frostBreath 입: 상자 위쪽부터 얼어붙는 띠가 내려옴
-   coil        몸통: 양옆에서 휘감아 조여 피할 자리가 좁아짐
-   icicleTail  꼬리: 고드름을 흩뿌리는 꼬리 내려치기
-   blizzard    머리: 손을 노리는 눈보라 소용돌이
+   부위 공격 넷은 온기 길(warmPath)의 gangcheol* 공격이다 (engine/battle-attacks.js, boss_parts.csv 의 공격 칸).
    머리는 몸통을 부숴야 드러난다 (coreNeeds).
-   [시험판] warmPath를 켜면 온기 길을 쓰는 전용 공격으로 바뀐다. 위의 기존 공격은 유지한다. */
+   결정 D-340: 온기 길이 네 부위 공격을 모두 덮어 쓰이지 않던 옛 기본 공격(frostBreath·coil·icicleTail·blizzard)은 지웠다. */
 (()=>{
-defineAttacks({
-  frostBreath:{dur:150,tick(t,X,Y,W,Hh){if(t===0)B.bullets.push({k:'frost',t:0,tell:30,grow:26,hold:30,depth:Hh*0.5,d:0});}},
-  coil:{dur:150,tick(t,X,Y,W,Hh){if(t===0)B.bullets.push({k:'squeeze',t:0,tell:30,grow:30,hold:34,depth:W*0.33,d:0,shift:(Math.random()-.5)*W*0.2});}},
-  icicleTail:{dur:150,tick(t,X,Y,W,Hh){if(t%30===0&&t<120){for(let i=0;i<4;i++){const x=X+14+Math.random()*(W-28);B.bullets.push({k:'icicle',x,y:Y-8,vy:0,t:0,tell:28});}}}},
-  blizzard:{dur:150,tick(t,X,Y,W,Hh){if(t%10===0&&t<120){const sx=X+W/2,sy=Y-10;const a=t*0.09;for(let i=0;i<2;i++){const aa=a+i*Math.PI;const toward=Math.atan2(B.py-sy,B.px-sx);const dir=toward+Math.sin(aa)*0.9;B.bullets.push({k:'seed',x:sx,y:sy,vx:Math.cos(dir)*1.9,vy:Math.sin(dir)*1.9,r:5});}}}},
-});
-defineBullets({
-  frost:{
-    step(b,X1,X2,Y1,Y2){b.t++;const T=b.tell,G2=T+b.grow,H2=G2+b.hold,E=H2+b.grow;
-      b.d=b.t<=T?0:b.t<=G2?b.depth*(b.t-T)/b.grow:b.t<=H2?b.depth:b.t<=E?b.depth*(1-(b.t-H2)/b.grow):0;
-      if(b.t>E){b.dead=1;return;}if(b.d>0&&B.py<Y1+b.d+4)bHitMe();},
-    draw(c,b){const X=BOX.x,Wd=BOX.w,Y=BOX.y;
-      if(b.t<=b.tell){c.save();c.setLineDash([6,4]);c.strokeStyle=RED;c.lineWidth=2;c.globalAlpha=Math.floor(b.t/5)%2?1:0.5;c.beginPath();c.moveTo(X,Y+b.depth);c.lineTo(X+Wd,Y+b.depth);c.stroke();c.restore();return;}
-      c.save();c.fillStyle='rgba(29,24,20,.7)';c.fillRect(X,Y,Wd,b.d);c.restore();
-      for(let x=X+8;x<X+Wd;x+=16)brush(c,[[x,Y+b.d-2],[x+4,Y+b.d+8]],3,INK,0.8);}},
-  squeeze:{
-    step(b,X1,X2,Y1,Y2){b.t++;const T=b.tell,G2=T+b.grow,H2=G2+b.hold,E=H2+b.grow;
-      b.d=b.t<=T?0:b.t<=G2?b.depth*(b.t-T)/b.grow:b.t<=H2?b.depth:b.t<=E?b.depth*(1-(b.t-H2)/b.grow):0;
-      if(b.t>E){b.dead=1;return;}const l=X1+b.d+b.shift,r=X2-b.d+b.shift;if(b.d>0&&(B.px<l+4||B.px>r-4))bHitMe();},
-    draw(c,b){const X=BOX.x,Wd=BOX.w,Y=BOX.y,Hh=BOX.h;const l=X+b.depth+b.shift,r=X+Wd-b.depth+b.shift;
-      if(b.t<=b.tell){c.save();c.setLineDash([6,4]);c.strokeStyle=RED;c.lineWidth=2;c.globalAlpha=Math.floor(b.t/5)%2?1:0.5;c.beginPath();c.moveTo(l,Y);c.lineTo(l,Y+Hh);c.moveTo(r,Y);c.lineTo(r,Y+Hh);c.stroke();c.restore();return;}
-      const L=X+b.d+b.shift,Rr=X+Wd-b.d+b.shift;c.save();c.fillStyle='rgba(29,24,20,.75)';c.fillRect(X,Y,L-X,Hh);c.fillRect(Rr,Y,X+Wd-Rr,Hh);c.restore();
-      for(let y=Y+10;y<Y+Hh;y+=18){brush(c,[[L-10,y],[L,y+8]],4,INK);brush(c,[[Rr+10,y],[Rr,y+8]],4,INK);}}},
-  icicle:{
-    step(b,X1,X2,Y1,Y2){b.t++;if(b.t<=b.tell)return;b.vy=Math.min(4.2,b.vy+0.18);b.y+=b.vy;if(b.y>Y2+10)b.dead=1;else if(Math.abs(b.x-B.px)<6&&Math.abs(b.y-B.py)<12)bHitMe();},
-    draw(c,b){if(b.t<=b.tell){c.save();c.globalAlpha=Math.floor(b.t/4)%2?0.9:0.4;c.fillStyle=RED;c.fillRect(b.x-1,BOX.y+2,2,8);c.restore();return;}
-      c.fillStyle=INK;c.beginPath();c.moveTo(b.x-5,b.y-14);c.lineTo(b.x+5,b.y-14);c.lineTo(b.x,b.y+6);c.closePath();c.fill();}},
-});
-
 function drawGangcheol(c){
   const cx=LW/2,cy=EY;const mouth=part('mouth'),body=part('body'),tail=part('tail'),head=part('core');
   const wave=Math.sin(B.time*0.04)*8;
@@ -119,7 +86,7 @@ defineEnemies({
     markPosition(p){const u=p.id==='mouth'?0.26:p.id==='tail'?0.74:0.5;
       const v=B.warm&&B.warm.current.v<0.5?0.76:0.24;
       return {x:BOX.x+BOX.w*u,y:BOX.y+BOX.h*v};},
-    parts:tableParts('gangcheol',{mouth:{atk:'frostBreath',tell:'서리 띠가 내려온다.'},body:{atk:'coil',tell:'강철이가 똬리를 조인다.'},tail:{atk:'icicleTail',tell:'꼬리에서 고드름이 흩날린다.'},core:{atk:'blizzard',tell:'눈보라가 돌아온다.'}}),
+    parts:tableParts('gangcheol',{mouth:{tell:'서리 띠가 내려온다.'},body:{tell:'강철이가 똬리를 조인다.'},tail:{tell:'꼬리에서 고드름이 흩날린다.'},core:{tell:'눈보라가 돌아온다.'}}),
     likes:TABLES.CALM.gangcheol,likeText:'강철이가 잠시 숨을 멈춘다.',
     likeTexts:{dokkaebibul:'꺼지지 않는 도깨비불씨를 건넸다. 강철이가 그 온기에 눈을 감는다.',
       patsirutteok:'붉은 팥떡을 내밀자 강철이가 움찔 물러난다. 서리가 조금 걷혔다.'},

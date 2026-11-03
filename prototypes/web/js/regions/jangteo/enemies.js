@@ -1,10 +1,8 @@
 'use strict';
 /* 큰 장터 전투: 헌물 도깨비 (낡은 빗자루·키·멍석에 깃든 도깨비). 원본 표: design/data/bosses.csv · boss_parts.csv
-   [시험판] possession 설정으로 불 이동과 헌물별 예고 공격을 켠다. 아래 기존 공격 넷은 보존한다:
-   broomSweep 빗자루가 상자를 가로질러 쓸고 지나감, 쓸리지 않는 줄 하나로 피함
-   beans      키로 까부른 콩이 위에서 흩어져 떨어짐
-   roll       멍석이 한쪽 끝부터 말려 들어와 피할 자리가 좁아짐
-   wisp       도깨비불이 손을 느리게 따라옴
+   possession 설정으로 불 이동과 헌물별 예고 공격(빗자루·키·멍석은 engine/battle-attacks.js 의 haunted* 공격)을 켠다.
+   핵심(도깨비불)만 이 파일의 wisp 를 쓴다: 도깨비불이 손을 느리게 따라옴.
+   결정 D-340: 빙의 공격이 덮어 쓰이지 않던 옛 기본 공격(broomSweep·beans·roll)은 지웠다.
    전투 화면은 흑백 + 단청 붉은색 하나라서, 도깨비불은 필드와 달리 붉게 그린다 */
 (()=>{
 /* 그림과 불 이동·되치기 연결선이 함께 쓰는 실제 헌물 위치. */
@@ -16,9 +14,6 @@ function dokkaebiPose(id){
   return {x:cx+o,y:cy-30-hop};
 }
 defineAttacks({
-  broomSweep:{dur:170,tick(t,X,Y,W,Hh){if(t%56===0&&t<150){const dir=(t/56)%2?-1:1;const gh=34;const gy=Y+10+Math.random()*(Hh-gh-20);B.bullets.push({k:'sweepv',x:dir>0?X-10:X+W+10,vx:dir*2.1,gy,gh,th:12});}}},
-  beans:{dur:150,tick(t,X,Y,W,Hh){if(t%36===0&&t<120){for(let i=0;i<5;i++){const x=X+16+Math.random()*(W-32);B.bullets.push({k:'bean',x,y:Y-6,vx:(Math.random()-.5)*0.6,vy:-1.4-Math.random(),t:0,tell:26,r:4});}}}},
-  roll:{dur:160,tick(t,X,Y,W,Hh){if(t===0||t===80){const s=t===0?(Math.random()<.5?-1:1):-(B.lastRoll||1);B.lastRoll=s;B.bullets.push({k:'roll',side:s,t:0,tell:30,grow:24,hold:20,depth:W*0.46,d:0});}}},
   /* 결정 D-246: 도깨비불은 상자 네 변 가운데 한 곳에서 나오고, 둘째 불은 그 맞은편에서 나온다 (예전엔 늘 위 두 곳) */
   wisp:{dur:150,tick(t,X,Y,W,Hh){
     if(t===0){const E=[[X+W*0.25,Y-6],[X+W*0.75,Y-6],[X-6,Y+Hh*0.35],[X+W+6,Y+Hh*0.65],[X+W*0.3,Y+Hh+6],[X+W*0.7,Y+Hh+6]],a=E[Math.floor(Math.random()*E.length)];
@@ -26,23 +21,6 @@ defineAttacks({
     if(t===0||t===60){const [sx,sy]=B.wispFrom[t?1:0];B.bullets.push({k:'wisp',x:sx,y:sy,t:0,life:130,r:7});}}},
 });
 defineBullets({
-  sweepv:{
-    step(b,X1,X2,Y1,Y2){b.x+=b.vx;if(b.x<X1-20||b.x>X2+20)b.dead=1;else if(Math.abs(B.px-b.x)<b.th/2+4&&!(B.py>b.gy+4&&B.py<b.gy+b.gh-4))bHitMe();},
-    draw(c,b){brush(c,[[b.x,BOX.y-4],[b.x+(b.vx>0?-3:3),b.gy]],b.th,INK);brush(c,[[b.x,b.gy+b.gh],[b.x+(b.vx>0?-3:3),BOX.y+BOX.h+4]],b.th,INK);
-      for(let y=BOX.y+4;y<BOX.y+BOX.h;y+=10){if(y>b.gy-4&&y<b.gy+b.gh+4)continue;brush(c,[[b.x,y],[b.x-(b.vx>0?12:-12),y+4]],2,INK,0.7);}}},
-  bean:{
-    step(b,X1,X2,Y1,Y2){b.t++;if(b.t<=b.tell)return;b.vy+=0.07;b.x+=b.vx;b.y+=b.vy;if(b.y>Y2+10)b.dead=1;else if(b.y>Y1&&Math.hypot(b.x-B.px,b.y-B.py)<b.r+4)bHitMe();},
-    draw(c,b){if(b.t<=b.tell){c.save();c.globalAlpha=Math.floor(b.t/4)%2?0.9:0.4;c.fillStyle=RED;c.fillRect(b.x-1,BOX.y+2,2,6);c.restore();return;}
-      blob(c,b.x,Math.max(b.y,BOX.y-2),b.r,b.r*0.85,INK);blob(c,b.x-1,Math.max(b.y,BOX.y-2)-1,1.4,1.2,'#efe3c8');}},
-  roll:{
-    step(b,X1,X2,Y1,Y2){b.t++;const T=b.tell,G2=T+b.grow,H2=G2+b.hold,E=H2+b.grow;
-      b.d=b.t<=T?0:b.t<=G2?b.depth*(b.t-T)/b.grow:b.t<=H2?b.depth:b.t<=E?b.depth*(1-(b.t-H2)/b.grow):0;
-      if(b.t>E){b.dead=1;return;}
-      if(b.d>0&&(b.side<0?B.px<X1+b.d+4:B.px>X2-b.d-4))bHitMe();},
-    draw(c,b){const X=BOX.x,Wd=BOX.w,Y=BOX.y,Hh=BOX.h;
-      if(b.t<=b.tell){c.save();c.setLineDash([6,4]);c.strokeStyle=RED;c.lineWidth=2;c.globalAlpha=Math.floor(b.t/5)%2?1:0.5;const lx=b.side<0?X+b.depth:X+Wd-b.depth;c.beginPath();c.moveTo(lx,Y);c.lineTo(lx,Y+Hh);c.stroke();c.restore();return;}
-      const x0=b.side<0?X:X+Wd-b.d;c.save();c.fillStyle='rgba(29,24,20,.82)';c.fillRect(x0,Y,b.d,Hh);c.restore();
-      const ex=b.side<0?X+b.d:X+Wd-b.d;blob(c,ex,Y+Hh/2,9,Hh/2,INK);for(let y=Y+6;y<Y+Hh;y+=12)brush(c,[[ex-6,y],[ex+6,y+4]],2,'#efe3c8',0.5);}},
   wisp:{
     step(b,X1,X2,Y1,Y2){b.t++;if(b.t>b.life){b.dead=1;return;}const a=Math.atan2(B.py-b.y,B.px-b.x);const sp=b.t<20?0.4:1.05;b.x+=Math.cos(a)*sp;b.y+=Math.sin(a)*sp;if(b.t>20&&Math.hypot(b.x-B.px,b.y-B.py)<b.r+4)bHitMe();},
     draw(c,b){const f=1-Math.max(0,(b.t-b.life+20)/20);const fl=Math.sin(B.time*0.4+b.x)*2;
@@ -135,7 +113,7 @@ defineEnemies({
     partPose(id){const p=dokkaebiPose(id);return {x:LW/2+(p.x-LW/2)*0.84,y:EY+(p.y-EY)*0.84};},
     markPosition(p){const pose=this.partPose(p.id),v={broom:0.38,ki:0.3,meongseok:0.7,core:0.19}[p.id];
       return {x:clamp(pose.x,BOX.x+28,BOX.x+BOX.w-28),y:BOX.y+BOX.h*v};},
-    parts:tableParts('dokkaebi',{broom:{atk:'broomSweep',tell:'불이 빗자루 손잡이를 탄다.'},ki:{atk:'beans',tell:'불이 키 테두리를 돈다.'},meongseok:{atk:'roll',tell:'불이 멍석 끝으로 스민다.'},core:{atk:'wisp',tell:'헌물에서 나온 불이 손을 따라온다.'}}),
+    parts:tableParts('dokkaebi',{broom:{tell:'불이 빗자루 손잡이를 탄다.'},ki:{tell:'불이 키 테두리를 돈다.'},meongseok:{tell:'불이 멍석 끝으로 스민다.'},core:{atk:'wisp',tell:'헌물에서 나온 불이 손을 따라온다.'}}),
     likes:TABLES.CALM.dokkaebi,likeText:'도깨비가 좋아한다.',
     likeTexts:{memiltteok:'"메밀떡이다, 메밀떡!" 도깨비가 냄새를 맡고 덩실덩실 춤을 춘다.',
       dad_yeot:'아빠가 맡긴 엿을 건넸다. "엿이다, 엿! 내 거지?" 도깨비가 엿가락을 소중히 끌어안는다. 엿은 돌려받지 못한다.'},

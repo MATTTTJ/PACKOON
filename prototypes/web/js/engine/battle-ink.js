@@ -60,18 +60,6 @@ function drawOpenHands(c){
   for(const x of [B.px-19,B.px+19])brush(c,[[x-4,B.py-lift+3],[x,B.py-lift+6],[x+4,B.py-lift+2]],1,'#e2cdb6');
 }
 
-/* 골렘 선택 기능의 수묵 표현. 흰 여백이 엄폐 범위다. */
-function drawBattleCover(c){
-  for(const r of B.covers){const p=coverPoint(r);
-    c.save();c.fillStyle='rgba(255,255,255,.8)';c.fillRect(p.x-22,p.y+10,44,BOX.y+BOX.h-p.y-10);c.restore();
-    blob(c,p.x,p.y+8,30,7,INK,0.14);
-    blob(c,p.x,p.y,25,15,'#55534f');
-    brush(c,[[p.x-23,p.y+3],[p.x-18,p.y-10],[p.x+7,p.y-15],[p.x+23,p.y-3]],3,INK);
-    brush(c,[[p.x-15,p.y-7],[p.x+6,p.y-10]],2,'#f7f4ed',0.8);
-    if(r.cracked)brush(c,[[p.x-4,p.y-12],[p.x+2,p.y-3],[p.x-5,p.y+3],[p.x+4,p.y+12]],2,r.flash>0?RED:INK);
-    if(r.flash>0)blob(c,p.x,p.y,29,19,RED,r.flash/70);
-  }
-}
 function drawPlacedGift(c){
   const f=B.giftPlace,p=B.E.headPose(),t=1-B.t/60,e=t*t*(3-2*t);
   const x=f.x+(p.x-f.x)*e,y=f.y+(p.y-30-f.y)*e;

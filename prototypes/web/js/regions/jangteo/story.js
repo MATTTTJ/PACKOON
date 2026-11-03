@@ -696,7 +696,6 @@ function tFinish(){
     if(typeof grantNickname==='function')grantNickname('jangteo_yut','한판 벗','투호 노인들');
     diary('jx_yut','장터 노인 둘이 항아리에 화살을 던지는 투호를 구경했다. 옛날 이 자리에서 구경하던 보부상 청년이 끈 끝을 한 번 거꾸로 감았단다. 아빠다.');
   }
-  G.f.jxYutPlays=(G.f.jxYutPlays||0)+1;
   tRender();
 }
 function tSkip(){
@@ -1046,7 +1045,6 @@ function finishRhythm(){
   if(rh.reward){F.yeotDone=true;ledgerDone('yeotbang');addItem('ssal',8);
     lines.push(['엿방울',high?'얼쑤, 장단 좀 아는걸? 흥이 제법 나네!':'흥은 좀 덜 났지만, 쌀 준다는 말은 안 바꾸지!'],['엿방울','자, 엿 고고 남은 쌀 여덟 되! 이건 약속한 네 몫이야.'],['너구리','(쌀 여덟 되를 얻었다.)']);}
   rel('yeotbang',high?MG.rhythm_high_relation:MG.rhythm_relation);
-  if(high)F.jxChoraengiEarned=true;
   if(Rg.arcs()){
     if(!F.jangteoArcsYeot1){
       F.jangteoArcsYeot1=true;diary('jangteoArcsYeot1','엿방울의 장단에 맞췄다. 빌린 가위라 손에 덜 익는다고 했다. 쌀 여덟 되는 그대로 받았다.');
@@ -1265,7 +1263,6 @@ Rg.startDokkaebi=()=>{
     if(encounter?.parts.some(p=>p.id==='ki'&&p.broken))addItem('kong',1);
     if(res==='win'||res==='calm'){
       if(res==='calm'){
-        G.f.dokCalm=true;
         if(!has('dokkaebibul'))addItem('dokkaebibul',1);
         diary('j_calm','헌물 도깨비를 부수지 않고 달랬다. 도깨비는 훔친 것을 돌려놓고 고맙다며 도깨비불씨를 건넨 뒤 춤추듯 사라졌다.');
       }
