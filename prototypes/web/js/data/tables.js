@@ -2916,7 +2916,20 @@ const TABLES={
   "music_dialog_hold_ms": 600,
   "battle_aim_left": 1,
   "battle_aim_up": 19,
-  "battle_hitstop": 4
+  "battle_hitstop": 4,
+  "gangcheol_namecall_first": 2,
+  "gangcheol_namecall_every": 3,
+  "gangcheol_namecall_tell_frames": 80,
+  "gangcheol_namecall_after_frames": 60,
+  "gangcheol_namecall_lock_frames": 36,
+  "name_power_loss": 0.12,
+  "name_power_min": 0.5,
+  "name_speed_loss": 0.06,
+  "name_speed_min": 0.6,
+  "name_hand_fade": 0.07,
+  "name_hand_fade_max": 0.5,
+  "name_return_on_body_hit": 1,
+  "name_return_retry_bonus": 2
  },
  "PROGRESS": [
   {
