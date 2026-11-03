@@ -400,7 +400,7 @@ function drawRaccoon(){
   // 결정 D-262: 다람쥐가 줄기를 타는 동안은 몸을 세로로 붙인다(오를 때 머리 위, 내려올 때 머리부터)
   if(formClimb&&G.form==='squirrel'){drawSquirrelClimbAt(G.px-cam,G.py,Math.floor(G.py/4)%2,isDown()&&!upHeld(),G.face);return;}
   const back=heroBackPose();
-  if(back){if(!G.form)drawRaccoonBackAt(G.px-cam,G.py,back.phase);else drawFormBackAt(G.px-cam,G.py,back.phase,G.form);return;}
+  if(back){drawRaccoonBackAt(G.px-cam,G.py,back.phase);return;}   // 뒷모습은 너구리만 (heroBackPose)
   const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
   // 결정 D-175: 걷는 동안만 네 박자 걸음(산양). 그린 뒤 되돌려 초상·기어 내려가기 그림에 남지 않게 한다
   formGait=(G.onGround&&Math.abs(G.vx)>0.2&&!phase)?Math.floor(G.anim/TABLES.TUNING.form_gait_frames)%4:-1;
@@ -599,27 +599,7 @@ function changeZone(to,arrival={}){
   }
   Sound.playSfx(arrival.sound||'zone_travel');return true;
 }
-/* 지역 전용 전환을 다음 패스에서 교체할 공통 틀. 좌표는 필드 px, frames는 CSV에서 읽은 60Hz 갱신 횟수다.
-   확대/세로 화면 넘김은 이전 그림을 보관하고, 흐름은 도착 구역에서 입력 없이 지정 좌표까지 이동한다. */
-function zoneTransition(kind,opts={}){
-  if(!['zoom','flow','climb'].includes(kind)||!opts||typeof opts!=='object'||paused())return false;
-  for(const key of ['x','y','fromX','fromY','focusX','focusY'])if(opts[key]!==undefined&&!Number.isFinite(opts[key]))return false;
-  for(const key of ['draw','onComplete'])if(opts[key]!==undefined&&typeof opts[key]!=='function')return false;
-  if(!usesZones(REG)||!REG.zones[opts.to])return false;
-  const frames=opts.frames??TABLES.TUNING.zone_transition_frames;
-  if(!Number.isInteger(frames)||frames<=0)return false;
-  const image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);
-  if(!changeZone(opts.to,{x:opts.x,y:opts.y,sound:opts.sound}))return false;
-  zoneFade=0;
-  const z=zoneDef(),end={x:G.px,y:G.py};
-  zoneMotion={kind,opts:{...opts},image,frames,tick:0,owner:G,region:G.region,zone:G.zone,end};
-  if(kind==='flow'){
-    G.px=clamp(opts.fromX??end.x,16,z.w-16);G.py=opts.fromY??end.y;
-    zoneMotion.start={x:G.px,y:G.py};
-  }
-  if(Vfx.reducedMotion)finishZoneTransition();
-  return true;
-}
+/* 결정 D-342: 구역 전환 움직임은 옆으로 밀기(slide)와 기어 오르내리기(crawl) 둘이다. 부르는 곳이 없던 확대·흐름·세로 넘김 틀(zoneTransition)은 지웠다. */
 function finishZoneTransition(){
   const m=zoneMotion;if(!m)return;
   zoneMotion=null;
@@ -641,11 +621,6 @@ function stepZoneTransition(){
   if(Vfx.reducedMotion){finishZoneTransition();return;}
   m.tick=Math.min(m.tick+1,m.frames);
   if(m.kind==='crawl')crawlStep(m);
-  if(m.kind==='flow'){
-    const t=m.tick/m.frames;
-    G.px=m.start.x+(m.end.x-m.start.x)*t;G.py=m.start.y+(m.end.y-m.start.y)*t;
-    G.cam=clamp(G.px-W*.42,0,Math.max(0,fieldWidth()-W));
-  }
   if(m.tick===m.frames)finishZoneTransition();
 }
 function drawZoneTransition(){
@@ -664,16 +639,8 @@ function drawZoneTransition(){
     const x=m.start.x+(G.px-cam-m.start.x)*e,y=m.start.y+(G.py-m.start.y)*e;
     const st=G.onGround&&G.vx?Math.floor((G.anim+m.tick)/6)%2:0;
     drawPlayerAt(x,y,G.face,st,0,heldTool());
-  }else if(m.kind==='zoom'){
-    const x=m.opts.focusX??W/2,y=m.opts.focusY??H/2,s=1+(m.opts.reverse?-.16:.18)*e;
-    ctx.globalAlpha=1-e;ctx.translate(x,y);ctx.scale(s,s);ctx.drawImage(m.image,-x,-y);
-  }else if(m.kind==='climb'){
-    const shift=(m.opts.reverse?-1:1)*Math.round(H*e);
-    ctx.drawImage(m.image,0,shift);
   }else if(m.kind==='crawl')drawCrawl(m,t);
-  // 장면별 그림은 지역 쪽에서 넘긴다. 공통 함수는 진행과 입력 정리만 맡는다.
   ctx.restore();
-  if(typeof m.opts.draw==='function'){ctx.save();try{m.opts.draw(t,m.kind);}finally{ctx.restore();}}
 }
 /* 결정 D-44: 내려가는 문(descend)은 그 자리에서 등을 보이며 기어 내려간 뒤 구역을 넘어가고,
    올라가는 문(ascend)은 도착한 곳에서 아래로부터 기어 올라온다 (design/data/decisions.csv).
@@ -697,7 +664,7 @@ function startCrawl(p){
 function crawlStep(m){
   // 팔다리를 한 번 바꿔 디딜 때마다 사각 소리를 낸다.
   const beat=Math.max(1,Math.round(m.frames/8));
-  if(m.tick%beat===0&&m.tick<m.frames)Sound.playSfx(G.region==='jangteo'?'footstep_market':'footstep_leaf',{gain:.45});
+  if(m.tick%beat===0&&m.tick<m.frames)Sound.playSfx(Sound.stepId(),{gain:.45});   // 결정 D-332
 }
 function drawCrawl(m,t){
   const down=m.opts.dir>0,steps=8;

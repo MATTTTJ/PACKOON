@@ -920,50 +920,22 @@ const TABLES={
   "jeolgu": {
    "habit": "엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.",
    "habitKey": "habit:jeolgu",
-   "fail": "절구가 헛돌았다. 엄마도 이 조합은 안 찧었겠지. 재료는 그대로 챙겼다.",
-   "steps": 3,
-   "intervalMs": 650,
-   "windowMs": 280,
-   "restMs": 800,
-   "steamMs": 0,
-   "dragPx": 0,
-   "turnDegrees": 0
+   "fail": "절구가 헛돌았다. 엄마도 이 조합은 안 찧었겠지. 재료는 그대로 챙겼다."
   },
   "maetdol": {
    "habit": "증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.",
    "habitKey": "habit:maetdol",
-   "fail": "맷돌이 꿈쩍도 안 한다. 증조할아버지도 이건 안 갈았겠지. 재료는 그대로 챙겼다.",
-   "steps": 4,
-   "intervalMs": 0,
-   "windowMs": 0,
-   "restMs": 0,
-   "steamMs": 0,
-   "dragPx": 0,
-   "turnDegrees": 90
+   "fail": "맷돌이 꿈쩍도 안 한다. 증조할아버지도 이건 안 갈았겠지. 재료는 그대로 챙겼다."
   },
   "siru": {
    "habit": "잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.",
    "habitKey": "habit:siru",
-   "fail": "시루에서 김만 새어 나왔다. 잔칫날에도 이런 떡은 없었지. 재료는 그대로 챙겼다.",
-   "steps": 1,
-   "intervalMs": 0,
-   "windowMs": 350,
-   "restMs": 0,
-   "steamMs": 1200,
-   "dragPx": 0,
-   "turnDegrees": 0
+   "fail": "시루에서 김만 새어 나왔다. 잔칫날에도 이런 떡은 없었지. 재료는 그대로 챙겼다."
   },
   "yakyeon": {
    "habit": "아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.",
    "habitKey": "habit:yakyeon",
-   "fail": "약연 바퀴가 덜컥 멎었다. 아빠가 고개를 젓는 것 같다. 재료는 그대로 챙겼다.",
-   "steps": 4,
-   "intervalMs": 0,
-   "windowMs": 0,
-   "restMs": 0,
-   "steamMs": 0,
-   "dragPx": 24,
-   "turnDegrees": 0
+   "fail": "약연 바퀴가 덜컥 멎었다. 아빠가 고개를 젓는 것 같다. 재료는 그대로 챙겼다."
   }
  },
  "TASTES": {

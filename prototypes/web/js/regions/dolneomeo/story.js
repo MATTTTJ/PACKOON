@@ -421,9 +421,9 @@ function dolsoeGive(){
 
 /* 돌 쌓기·돌 놓기: 할배 손을 따라 돌을 얹는다. 맷돌이 깨어난다. */
 // 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
-function openStack(task=null){
+function openStack(done=null){
   Sound.stone('tap');
-  if(task){task.done();return;}
+  if(typeof done==='function'){done();return;}
   finishStack();
 }
 Rg.stoneTask=openStack;
@@ -659,11 +659,10 @@ const nickname=(id,text,by)=>{
   const last=text.charCodeAt(text.length-1)-0xAC00;
   diary('nickname:'+id,by+'에게 '+text+(last>=0&&last<11172&&last%28?'이라고':'라고')+' 불렸다.');
 };
-function hands(title,verb,steps,done){
-  Rg.stoneTask({title,verb,steps,hint:'금빛 가운데에 맞춰 보자. 빗나가도 함께 받쳐 주니 떨어지지 않아.',done});
-}
+// 결정 D-343: 함께 돌을 받치는 일은 돌 소리 한 번 뒤 바로 끝난다 (D-88 손일 미니게임의 제목·단계 문구 인자는 지웠다)
+function hands(done){Rg.stoneTask(done);}
 function hareHands(){
-  hands('짐꾼과 등짐 고쳐 묶기','함께 받치기',['등짐 밑을 두 손으로 받치자.','숫돌을 등에 붙여 낮추자.','풀리지 않게 끈을 눌러 매자.'],()=>{
+  hands(()=>{
     finish('dol_hare','짐꾼과 등짐을 함께 받쳐 숫돌을 낮추고 끈을 고쳐 맸다. 장승 뒤 길표 이야기를 들었다. 품값으로 억새 한 단을 받았다. 짐 괴던 돌은 고갯길 돌탑에 보태겠다고 했다.','dolneomeo_pack_help')();
     nickname('dol_pack_friend','짐 동무','산토끼 짐꾼');
     // 결정 D-271: 함께 짐을 고쳐 맨 값. 짐꾼이 지고 가던 억새 한 단 (짐도 덜고 값도 치른다)
@@ -671,14 +670,14 @@ function hareHands(){
   });
 }
 function frogHands(){
-  hands('개구리의 마른 잠자리','돌 밀기',['물 흐르는 홈 옆에 작은 돌을 괴자.','따뜻한 돌을 천천히 밀자.','마른 틈까지 돌을 바짝 붙이자.'],()=>{
+  hands(()=>{
     finish('dol_frog','따뜻한 돌을 개구리에게 밀고 물이 흐르는 홈을 피해 잠자리를 받쳤다. 높은 바위 틈의 붉은 발자국을 알려 줬다. 바람에 날려 와 돌 밑에 끼어 있던 겨우살이를 가져가라고 했다.','dolneomeo_frog_warm')();
     // 결정 D-271: 잠자리를 받쳐 준 값. 바위틈에 사는 개구리가 가진 것 — 바람에 날려 와 걸린 겨우살이
     talk([['움츠린 개구리','…돌 밑에 겨우살이 끼어 있지?\n바람에 날려 와 걸린 거야. 가져가.'],receiveItem('gyeousari',1)]);
   });
 }
 function magpieHands(){
-  hands('까치와 바람막이 놓기','돌 받치기',['담 틈에 넓은 돌을 세우자.','바람 오는 쪽을 한 번 더 받치자.','까치 발 놓을 작은 돌을 놓자.'],()=>{
+  hands(()=>{
     finish('dol_magpie','까치 앞에서 바람을 막아 주고, 돌담 틈을 막고 발 놓을 돌을 놓았다. 돌가루 묻은 손을 보고 돌손이라고 불렀다. 가을에 숨겨 둔 잣을 주었다.','dolneomeo_magpie_rest')();
     nickname('dol_stone_hand','돌손','늙은 까치');
     // 결정 D-271: 바람을 막아 준 값. 까치는 먹이를 숨겨 둔다 — 부리가 무뎌 못 깨는 잣
@@ -846,13 +845,11 @@ function stoneChoice(kind){
     ['꼬마 두더지','쐐기돌이 남으면 고갯길 돌탑에 괼래.\n할배가 그 탑도 쐐기돌로 선 거랬어.']
   ],()=>{
     G.f.dolneomeo_mole_pebble=kind;
-    Rg.stoneTask({title:'꼬마와 돌집 짓기',verb:'문돌 받치기',hint:'금빛 가운데에 맞춰 놓자. 꼬마가 옆에서 받쳐 주니 굴러가지 않아.',
-      steps:['밑돌 두 개를 나란히 놓자.','납작한 문돌을 세워 보자.','반짝돌은 창가에 괴어 놓자.'],
-      done:()=>{
+    Rg.stoneTask(()=>{
         finish('dol_mole','꼬마와 돌집의 밑돌·문돌·창가 돌을 직접 놓았다. 남은 쐐기돌은 고갯길 돌탑에 괴겠다고 한다. 꼬마가 땅을 파다 찾은 도토리를 주었다.')();
         // 결정 D-271: 돌집을 함께 지은 값. 땅 파는 두더지 아이의 보물 — 다람쥐가 묻고 잊은 도토리
         talk([['꼬마 두더지','다 지었다! 이거 너 줘.\n땅 파다 찾았어. 다람쥐가 묻고 잊었나 봐.'],receiveItem('acorn',2)]);
-      }});
+      });
   });
 }
 /* 결정 D-210: 꼬마 두더지 마당의 납작한 돌과 줄무늬 돌을 한 그림에 나란히 띄운다(작은 창 D-152, 사용자 피드백 49).

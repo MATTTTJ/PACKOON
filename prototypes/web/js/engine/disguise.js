@@ -7,6 +7,8 @@
    - 같은 지역에서 그 인물에게 두 번째부터는 짧은 물음(again)과 아이의 짧은 대답만 나온다. 묻는 말은 늘 나온다.
    - 표에 없는 것(물레방아 손일 자리·투호 항아리·등불 꾸러미·쉼터 같은 사물)은 묻지 않고 예전처럼 다룬다.
    - 집안 사람(무쇠·아빠)과 산군(knows)은 잎사귀 둔갑을 알아보니 묻고 나서 바로 본모습으로 돌아온다. story.js 의 if(G.form) 갈래는 이제 닿지 않는다(본모습으로 돌아온 뒤 talk).
+   - 결정 D-345: 손님 첫마디(strangers 의 line)가 있는 인물은 그 첫마디가 묻는 말을 대신한다(forms.js strangerTalk).
+     그래서 그 인물들(날쌘·도담·두꺼비 할멈·돌쇠·뿔영감·꾸벅이·모락·엿방울·부엉 영감·살금이)은 first·ask·again 없이 대답 쪽 줄만 둔다.
    줄 값은 문자열이거나 (변신 id, 인물)→문자열 함수. {f}는 변신 이름, {f이}는 받침에 따라 '이'를 붙인 변신 이름. */
 const DISGUISE_ME={low:'나야, 나.',high:'저예요.'},DISGUISE_ME_FIRST={low:'놀랐지? 미안.',high:'놀라게 해서 죄송해요.'};
 const DISGUISE_ME_AGAIN={low:'나야.',high:'저예요.'};
@@ -14,7 +16,6 @@ const DISGUISE_MAGPIE={tone:'high',
   first:'어디서 온 짐승이냐.\n처음 보는 얼굴이로구나.',ask:'누구냐. …보따리 끈이 낯익은데.',again:'누구냐. …또 너로구나.',
   back:'오냐, 너로구나.\n하마터면 몰라볼 뻔했다.',backFirst:'너구리였구나.'};
 const DISGUISE_NAL={tone:'high',
-  first:'어이, 처음 보는 얼굴인데.\n어디서 왔어?',ask:'…누구야?\n그 보따리 끈, 어디서 봤는데.',again:'이번엔 또 누구… 아, 너지?',
   back:'하, 너였어? 별 재주를 다 부리네.',backFirst:'너구리였어? 별 재주를 다 부리네.'};
 const DISGUISE_LINES={
   /* 단풍골 */
@@ -22,11 +23,9 @@ const DISGUISE_LINES={
     first:'누구냐. …잎 소리.\n삼촌 앞에선 제 모습으로 와라.',ask:'누구냐. …잎 소리.\n삼촌 앞에선 제 모습으로 와라.',again:'누구냐… 또 너구나.',
     back:'그래. 잎은 제법 다루는구나.',backFirst:'그래. 잎은 제법 다루는구나.'},
   nal:DISGUISE_NAL,
-  dodam:{tone:'low',owl:'히익! 누, 누구야?!',
-    first:'어? 누구야? 처음 보는 {f이}네!',ask:'누구야, 누구?\n냄새는 아는 냄새 같은데!',again:'또 누구야? …너지?',
+  dodam:{tone:'low',
     back:'뭐야, 너였어? 깜짝 놀랐잖아!',backFirst:'우와, 너구리가 됐어!'},
   toad:{tone:'high',
-    first:'처음 보는 짐승이로구나.\n…어디서 왔느냐.',ask:'누구냐. …풋잎 냄새가 나는구나.',again:'누구냐. …또 풋잎 냄새로구나.',
     back:'허허, 너였구나. 재주가 늘었구나.',backFirst:'허허, 너구리였구나.'},
   stream_otter:{tone:'low',
     first:'누구야? 함지박 건드리지 마!',ask:'누구야? 처음 보는 애네.\n함지박 탈 거면 도로 올려놔야 해!',again:'또 누구야? …너지!',
@@ -43,19 +42,13 @@ const DISGUISE_LINES={
     back:'뭐야, 너였어?',backFirst:'너구리잖아? 별일이네.'},
   old_magpie:DISGUISE_MAGPIE,
   /* 돌너머 */
-  ppuri:{tone:'high',goat:'처음 보는 산양이로군.\n어느 고개에서 왔느냐.',
-    first:'멈춰라. 처음 보는 짐승이다.\n어디서 왔느냐.',ask:'멈춰라. 누구냐.',again:'멈춰라. 누구냐.',
+  ppuri:{tone:'high',
     back:'…너였군. 다음엔 제 모습으로 와라.',backFirst:'너구리였군. 다음엔 제 모습으로 와라.'},
   // 돌쇠 할배는 눈이 어두워 발소리와 목소리로 안다 (npcs.csv)
-  dolsoe:{tone:'high',owl:'(깃 소리에 할배가 움찔한다.)\n…누, 누구냐.',
-    first:'발소리가 낯설구나. 누구냐.',ask:'발소리가 낯설구나. 누구냐.',again:'발소리가 또 바뀌었구나. 누구냐.',
+  dolsoe:{tone:'high',
     back:'허허, 목소리를 들으니 알겠다.',backFirst:'어린 목소리로구나.'},
   // 꾸벅이는 졸다가 잠깐씩 고개를 든다. 조는 동안엔 잠꼬대처럼 묻는다 (dolneomeo/art.js kkuAwakeNow)
   kkubeogi:{tone:'low',me:'꾸벅아, 나야.',meFirst:'놀랐지? 미안.',
-    owl:'(꾸벅이가 가시를 세우고 동그랗게 몸을 만다.)\n…누, 누구야아…?',
-    first:()=>REG.kkuAwakeNow?.()?'…누구야아…?\n처음 맡는 냄새인데…':'으음… 누구야… 쿨…',
-    ask:()=>REG.kkuAwakeNow?.()?'…누구야아…?\n처음 맡는 냄새인데…':'으음… 누구야… 쿨…',
-    again:()=>REG.kkuAwakeNow?.()?'으음… 또 누구야아…?':'으음… 누구… 쿨…',
     back:()=>REG.kkuAwakeNow?.()?'…아, 너구나…\n냄새가 바뀌어서 몰랐어어…':'…으음… 너구나… 쿨…',
     backFirst:()=>REG.kkuAwakeNow?.()?'…너구리 냄새다아…':'…으음… 너구리… 쿨…'},
   dol_hare:{tone:'high',owl:'히익, 누구야?!',
@@ -77,14 +70,11 @@ const DISGUISE_LINES={
     first:'…누구냐.',ask:'…누구냐.',again:'…누구냐.',back:'…너로구나.',backFirst:'…너구리로구나.'},
   /* 큰 장터 */
   morak:{tone:'high',
-    first:'어이쿠, 누구야?\n떡 냄새 맡고 왔어?',ask:'어이쿠, 누구야? 처음 보는 손님인데!',again:'누구… 아이고, 또 너지?',
     back:'어머나, 너였어? 깜박 속았네!',backFirst:'어머, 너구리였어?'},
   yeotbang:{tone:'high',
-    first:'어라~ 처음 보는 얼굴이네?\n누구셔~',ask:'어라~ 누구셔?\n냄새는 아는 냄샌데~',again:'어라~ 또 누구셔~?',
     back:'역시 너였구나~ 재주 좋네~',backFirst:'너구리였어? 재주 좋네~'},
   // 부엉 영감은 낮엔 존다. 자는 동안엔 묻지 않는다(그대로 원래 대화가 조는 모습을 보인다).
-  bueong:{tone:'high',skip:()=>!G.f.night,owl:'…처음 보는 수리부엉이로군.\n어느 상단에서 왔느냐.',
-    first:'…누구냐. 상단 식구는 아닌 듯한데.',ask:'…누구냐. 장부에 없는 얼굴이다.',again:'…누구냐.',
+  bueong:{tone:'high',skip:()=>!G.f.night,
     back:'…너로구나. 셈은 제 모습으로 하거라.',backFirst:'…너구리로구나.'},
   j_kite:{tone:'low',
     first:'누구야? 처음 보는 얼굴인데.',ask:'누구야? 처음 보는 얼굴인데.',again:'또 누구야?',
@@ -108,8 +98,7 @@ const DISGUISE_LINES={
     first:'(할미가 코를 킁킁거린다.)\n…낯선 짐승이구먼. 누구여.',ask:'(할미가 코를 킁킁거린다.)\n…누구여. 냄새는 아는 냄샌데.',again:'…누구여.',
     back:'…그 꼬마구먼.',backFirst:'…너구리구먼.'},
   // 살금이는 늘 귀를 세운다. 고라니 변신은 살금이를 보고 익혔다.
-  salgeumi:{tone:'low',deer:'고, 고라니…? 이 산에 나 말고 또…?\n누, 누구야?',
-    first:'누, 누구야? 거기 서!',ask:'누, 누구야…?\n발소리가 처음 듣는 건데.',again:'누, 누구야…?',
+  salgeumi:{tone:'low',
     back:'너, 너였어? 귀가 다 쭈뼛했잖아.',backFirst:'너구리구나… 휴.'},
   // 아빠는 말을 잃었다. 몸짓으로만 묻고, 집안 사람이라 잎사귀를 알아본다.
   dad:{tone:'high',knows:true,me:'아빠, 저예요.',meFirst:'아빠, 저예요.',meAgain:'저예요, 아빠.',

@@ -171,7 +171,7 @@ function talkSalg(){
       talk([['살금이','가, 가까이 왔네. 무서운 애는 아니지?'],
         ['살금이','겨울 끝이라… 먹을 게 없어.'],
         ['살금이','마가목 세 알이나 콩 두 알 줄래? 지름길 알려 줄게.']],()=>{
-          F.yArcsSalg1=true;diary('y_arcs_salg1','살금이 가까이 다가가 말을 나눴다. 겨울 끝이라 굶주렸다고 한다.');
+          diary('y_arcs_salg1','살금이 가까이 다가가 말을 나눴다. 겨울 끝이라 굶주렸다고 한다.');
           if(salgCan())salgTrade();
         });return;
     }
@@ -815,7 +815,7 @@ Rg.goHome=()=>{
   if(!CLASSIC&&stampCount()>=12)lines.push(
     ['너구리','(수첩의 열두 도장 위로 아빠 손이 멈췄다.\n빈손으로 돌아온 젊은 날의 길이다.)'],
     ['아빠','(아빠가 내 발 옆에 발을 나란히 놓는다.\n이번에는 둘이서 돌아간다.)']);
-  talk(lines,()=>{G.f.yDadCarrier=true;endGame();});
+  talk(lines,()=>{endGame();});
 };
 /* 엄마의 절정 대사는 decisions.md 그대로. 이름은 이 브라우저의 저장에만 남는다. */
 // 결정 D-04: 엄마의 절정 대사 (design/data/decisions.csv)
