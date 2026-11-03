@@ -12,7 +12,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   const read = async expression => b.eval(expression);
   const wait = async ms => b.wait(ms);
   const log = (action, detail) => trace.push({seconds:+((Date.now()-started)/1000).toFixed(2), scene, action, detail});
-  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade})`);
+  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,note:!$('notebook').hidden||!$('bag').hidden&&bagKind==='중요',who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade})`);
   async function check() {
     if(Date.now()-started>maxRun)throw new Error('연속 플레이 제한 540초를 넘었다');
     const s=await snapshot();
@@ -98,7 +98,8 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
           if(edge){await wait(1100);edgeRegions.add(s.region);log('가장자리 입력 유지',{from:begin.zone,to:s.zone,key:held});}
           return;
         }
-        if(s.dlg||s.mg||s.ink||s.motion||s.fade){if(held){await key(held,'up');held=null;}await settle();continue;}
+        // 쪽지·수첩 창이 걷는 도중에 열려도 닫고 다시 걷는다 (새 게임 첫 프레임의 엄마 쪽지가 늦게 열리는 경우)
+        if(s.dlg||s.note||s.mg||s.ink||s.motion||s.fade){if(held){await key(held,'up');held=null;}await settle();continue;}
         const d=x-s.x;if(Math.abs(d)<=5)return;
         const desiredRate=Math.abs(d)<50||sneak||slow?1:6;
         if(desiredRate!==rate){rate=desiredRate;await read('window.__qaClockRate='+rate);}
@@ -275,7 +276,11 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     // 시계만 가속한다. 게임 상태와 판정 함수를 쓰거나 교체하지 않는다. 미니게임은 원래 속도다.
     await read(`(()=>{if(window.__qaClockInstalled)return;window.__qaClockInstalled=true;window.__qaClockRate=1;let last=null,virtual=null;const raf=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=callback=>raf(now=>{if(last===null){last=now;virtual=now;}else{virtual+=(now-last)*window.__qaClockRate;last=now;}callback(virtual);});})()`);
     if(await read("!$('titleScene').hidden"))await click('#tsNew');
-    await click('#btnStart');await settle();
+    await click('#btnStart');
+    // 엄마 쪽지는 새 게임 첫 필드 프레임에 열린다(field.js showMomNote). 열린 것을 본 뒤 settle이 닫아야 조작할 수 있다.
+    await b.until('G.started&&G.f.momNoteSeen',{label:'새 게임 엄마 쪽지'});
+    await settle();
+    if(await b.eval("!$('bag').hidden||!$('notebook').hidden"))throw new Error('시작 쪽지 창을 닫지 못했다');
     if(await read('G.f.arcs')!==(mode==='expanded'))throw new Error('사연 켬/끔 시작값이 모드와 다르다');
     await stage('단풍골 · 가루와 채집',async()=>{await gather('root',1);await pickup('acorn',6);await gather('ssari',1);if(await read('(G.inv.ssari||0)<2'))await gather('kkoe',1);await craft('jeolgu','powder',2);await npc('dodam');});
     await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);if(!await read('G.f.nalDone&&(G.inv.coal||0)>=2'))throw new Error('허세 흥정 뒤 숯 두 개(덤)를 받지 못했다');await npc('musoe');await battle(['rice'],{sway:true});await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
