@@ -52,8 +52,9 @@ function gotText(list){
   const joined=words.reduce((a,w,i)=>i?jo(a,'과','와')+' '+w:w,'');
   return '('+jo(joined,'을','를')+' 얻었다.)';
 }
-function gotLine(id,n=1){return ['너구리',gotText(Array.isArray(id)?id:[[id,n]])];}
-function receiveItem(id,n=1){const list=Array.isArray(id)?id:[[id,n]];for(const [i,k=1] of list)addItem(i,k);return gotLine(list);}
+// 결정 D-352: gotLine 줄은 받을 물건을 give로 들고 있다. talkGive·arcScene(arcs.js)이 대화 끝에 넣는다. receiveItem 줄은 이미 넣어서 given이다.
+function gotLine(id,n=1){const list=Array.isArray(id)?id:[[id,n]];return Object.assign(['너구리',gotText(list)],{give:list});}
+function receiveItem(id,n=1){const L=gotLine(id,n);for(const [i,k=1] of L.give)addItem(i,k);L.given=true;return L;}
 function advance(){if($('dlgChoices').children.length)return;Sound.paper();showLine();}
 $('dlg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')advance();});
 
