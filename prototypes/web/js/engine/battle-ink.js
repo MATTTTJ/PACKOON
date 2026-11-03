@@ -36,14 +36,7 @@ function drawStrikeSpot(c,x,y,r,k,near,tool){
   c.lineWidth=2;
   for(let i=0;i<4;i++){const a=i*Math.PI/2+Math.PI/4,r1=r+4+pulse*3,r2=r1+5;c.beginPath();c.moveTo(x+Math.cos(a)*r1,y+Math.sin(a)*r1);c.lineTo(x+Math.cos(a)*r2,y+Math.sin(a)*r2);c.stroke();}
   if(near){c.strokeStyle='#fffaf0';c.lineWidth=1.6;c.beginPath();c.arc(x,y,Math.max(4,r-5),0,Math.PI*2);c.stroke();}
-  // 결정 D-224: 그 부위에 잘 먹는 도구를 작게. 지금 든 도구가 아니면 흐리게
-  if(tool){const held=tool===battleTool(),swap=!held&&B&&B.toolWant===tool;
-    c.translate(x+r*0.78,y-r*0.5);
-    // 결정 D-242: 잘 먹는 도구가 따로 있고 가졌으면 그 그림이 금빛으로 깜박이고, 키보드면 옆에 Q 키를 그린다(터치 화면은 도구 단추가 깜박인다)
-    if(swap){c.save();c.globalAlpha=0.45+0.4*pulse;c.fillStyle=GOLD_LT+'1)';c.beginPath();c.arc(0,-9,11,0,Math.PI*2);c.fill();c.restore();
-      if(!TOUCH){c.save();c.translate(15,-20);c.fillStyle='#fffaf0';c.strokeStyle=INK;c.lineWidth=1.4;c.beginPath();c.rect(-7,-7,14,14);c.fill();c.stroke();
-        c.fillStyle=INK;c.font='bold 11px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('Q',0,0.5);c.restore();}}
-    c.scale(0.55,0.55);c.globalAlpha=held||swap?1:0.4;drawTool(c,tool);}
+  // 결정 D-373: 칠 자리 옆에 잘 먹는 도구 그림·Q 키를 그리지 않는다. 어느 도구가 먹는지는 친 뒤의 글로 안다
   c.restore();
 }
 function drawDangerSign(c,x,y,s=1,t=0){
@@ -56,8 +49,9 @@ function drawDangerSign(c,x,y,s=1,t=0){
 
 function drawOpenHands(c){
   const lift=Math.sin((1-B.handShow/72)*Math.PI)*12;
-  drawPaw(c,B.px-19,B.py-lift,true);drawPaw(c,B.px+19,B.py-lift,true);   // 빈손을 펴 보이는 장면만 손바닥
-  for(const x of [B.px-19,B.px+19])brush(c,[[x-4,B.py-lift+3],[x,B.py-lift+6],[x+4,B.py-lift+2]],1,'#e2cdb6');
+  // 결정 D-375: 손은 늘 하나다. 빈손을 펴 보이는 장면도 그 손 하나를 뒤집어 손바닥을 보인다 (손이 둘로 보이던 일, 사용자 피드백 2026-11-03)
+  drawPaw(c,B.px,B.py-lift,true);
+  brush(c,[[B.px-4,B.py-lift+3],[B.px,B.py-lift+6],[B.px+4,B.py-lift+2]],1,'#e2cdb6');
 }
 
 function drawPlacedGift(c){
