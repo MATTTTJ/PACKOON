@@ -30,10 +30,13 @@ Rg.art={
     M(ox,oy,f,4,-16,9,8,Wt);M(ox,oy,f,5,-16,2,8,K);M(ox,oy,f,9,-16,2,7,K);M(ox,oy,f,12,-11,2,2,K);M(ox,oy,f,10,-12,1,1,'#ffffff');
     M(ox,oy,f,3,-18,10,3,Sc);M(ox,oy,f,2,-16,2,3,Sc);
     M(ox,oy,f,-3,-9,4,5,'#c9a45a');M(ox,oy,f,-2,-11,2,2,'#c9a45a');M(ox,oy,f,-2,-6,2,1,'#6a3a2a');},
-  /* 아빠: 말을 잃었다. 모자는 아들이 쓰고 있어서 목도리만 둘렀다 */
+  /* 아빠: 모자는 아들이 쓰고 있어서 목도리만 둘렀다.
+     결정 D-431: 강철이에게 이름을 다 먹혀 넋이 빠졌다(이름이 돌아오기 전). 호수만 보고, 고개를 조금 떨궜고, 눈에 빛이 없다.
+     버릇만 남았다: 보따리 매듭을 묶었다 풀고, 곁에 꽂은 겨울 막대에 금을 긋는다(가을부터 하루 하나, 깊은 금 하나는 강철이와 싸운 날). */
   dad(ox,oy,f){const Gy='#7c7062',K='#2a211b',Wt='#efe6d6',T='#6f6357',Sc='#b4432a';
-    const p=Rg.dadPose||{},t=p.tick||0,a=p.act;
-    const hx=ox+(['retry','mouth'].includes(a)?Math.round(Math.sin(t*.15)*2):0),hy=oy+(['nod','heart'].includes(a)?Math.round((1-Math.cos(t*.12))):0);
+    const p=Rg.dadPose||{},t=p.tick||0,a=p.act,lost=!Rg.namesBack();
+    if(lost&&!a)f=1;   // 다가가도 돌아보지 않는다
+    const hx=ox+(['retry','mouth'].includes(a)?Math.round(Math.sin(t*.15)*2):0),hy=oy+(['nod','heart'].includes(a)?Math.round((1-Math.cos(t*.12))):0)+(lost&&!a?1:0);
     M(ox,oy,f,-14,-10,8,5,T);M(ox,oy,f,-13,-10,1,5,K);M(ox,oy,f,-9,-10,1,5,K);
     M(ox,oy,f,-5,-15,11,11,Gy);M(ox,oy,f,-1,-13,5,8,'#cfc3b2');
     M(hx,hy,f,-4,-24,12,10,Gy);M(hx,hy,f,-3,-20,11,2,K);M(hx,hy,f,5,-20,1,1,'#ffffff');M(hx,hy,f,-3,-18,10,2,Wt);M(hx,hy,f,8,-19,1,2,K);
@@ -50,7 +53,17 @@ Rg.art={
       M(ox,oy,f,1+reach,-14,8,7,'#e6dcc0');M(ox,oy,f,3+reach,-12,4,1,T);M(ox,oy,f,3+reach,-10,3,1,T);
       M(ox,oy,f,-1+reach,-9,3,2,Wt);M(ox,oy,f,8+reach,-9,2,2,Wt);
     }
-    if(a==='retry'||a==='nod')M(ox,oy,f,7,-12,3,2,Wt);},
+    if(a==='retry'||a==='nod')M(ox,oy,f,7,-12,3,2,Wt);
+    if(lost&&!a){
+      const g=Vfx.reducedMotion?0:(typeof G!=='undefined'&&G?G.anim:0),Cord='#8a6a3a',Stick='#8c735d';
+      M(hx,hy,f,5,-20,1,1,K);                                                      // 눈에 빛이 없다
+      M(ox,oy,f,12,-26,2,26,Stick);for(let i=0;i<8;i++)M(ox,oy,f,11,-24+i*3,1,1,'#4a3a2a');M(ox,oy,f,10,-9,4,1,'#1e140c');   // 겨울 막대와 금
+      if(Math.floor(g/300)%2===0){                                                  // 매듭을 묶었다 푼다
+        const tight=Math.floor(g/40)%2;
+        M(ox,oy,f,0,-10,3,2,Wt);M(ox,oy,f,7,-10,3,2,Wt);M(ox,oy,f,3,-10,4,1,Cord);
+        if(tight)M(ox,oy,f,4,-12,2,2,Cord);else{M(ox,oy,f,3,-13,1,3,Cord);M(ox,oy,f,6,-13,1,3,Cord);M(ox,oy,f,4,-14,2,1,Cord);}
+      }else{const s=Math.floor(g/18)%4;M(ox,oy,f,6,-12,4,2,Gy);M(ox,oy,f,9,-21+s*3,3,2,Wt);}   // 막대에 금을 긋는다
+    }},
   /* 산군 할아버지: 호랑이. 느리고 크다 */
   tiger(ox,oy,f){const Or='#d9893a',Dk='#2a1a10',Wt='#f4ecdc',K='#0e0a08';
     M(ox,oy,f,-18,-18,28,14,Or);for(let i=0;i<5;i++)M(ox,oy,f,-15+i*6,-18,2,7,Dk);M(ox,oy,f,-14,-8,22,3,Wt);
@@ -256,8 +269,9 @@ A.scenery=zone=>{
       if(G.f.shortcut)for(let i=0;i<4;i++)px(x+30+i*4,GROUND-10-i*12,8,3,'#6f6b5b');
       rowan(x+93,GROUND,wx);
     }else{
-      if(wx<650||wx>2040){rock(x,GROUND,34+shape*4,12+shape*2);if(wx%460<200)pine(x+28,GROUND,size*.8,!pink(),shape);}
-      else{px(x,GROUND-3,44,3,pink()?'#9ebfc9':'#e4f0f4');if(!pink()){px(x+10,GROUND+3,2,14,'#8daabc');px(x+10,GROUND+16,13,1,'#8daabc');}}
+      // 결정 D-429: 호숫가 서쪽(마을 어귀~집들)에는 바위·솔을 두지 않는다. 마을 그림은 A.village가 그린다
+      if(wx>2040){rock(x,GROUND,34+shape*4,12+shape*2);if(wx%460<200)pine(x+28,GROUND,size*.8,!pink(),shape);}
+      else if(wx>=650){px(x,GROUND-3,44,3,pink()?'#9ebfc9':'#e4f0f4');if(!pink()){px(x+10,GROUND+3,2,14,'#8daabc');px(x+10,GROUND+16,13,1,'#8daabc');}}
     }
   }
   if(zone==='shelter'){
@@ -323,6 +337,118 @@ A.scenery=zone=>{
     px(tx(2108)-cam,GROUND-81,5,4,pink()?'#9dbb76':'#9b7c75');
     if(pink()){px(tx(2097)-cam,GROUND-86,9,3,'#d1dfa1');px(tx(2105)-cam,GROUND-83,10,3,'#d1dfa1');}
   }
+};
+/* ---------- 결정 D-429·D-431: 호숫가 마을 (design/proposals/name-story.md §6) ----------
+   겨울: 문패·장승 글자 자리가 하얗게 매끈하고, 굴뚝에 연기가 없고, 빨랫줄이 비었고, 우물이 얼었다.
+   봄(이름이 돌아온 뒤): 글자가 먹빛으로 돌아오고, 연기가 오르고, 빨래가 널리고, 두레박이 내려간다. */
+function choga(x,y,i,back){
+  if(x<-80||x>W+80)return;
+  const t=Vfx.reducedMotion?0:G.anim,w=64+(i%3)*6,h=26+(i%2)*3,L=Math.round(x-w/2);
+  px(L,y-h,w,h,back?'#c2ab86':'#b3aa9c');                                   // 흙벽
+  px(L,y-h,2,h,'#5d4c3f');px(L+w-2,y-h,2,h,'#5d4c3f');px(L,y-h,w,2,'#5d4c3f');   // 기둥·도리
+  px(L-3,y-3,w+6,3,'#8b8a86');                                               // 돌 기단
+  // 문: 겨울엔 닫혀 있다. 봄엔 문짝을 열어 불빛이 보인다
+  px(x-7,y-h+5,14,h-5,back?'#e3a85e':'#4a4440');
+  if(back)px(x-7,y-h+5,4,h-5,'#7a5a3e');else{px(x-1,y-h+5,1,h-5,'#2f2b28');px(x-5,y-h+9,10,1,'#5d5650');}
+  // 창호지 창
+  px(L+5,y-h+6,9,8,back?'#efe2c0':'#cfcbc2');px(L+9,y-h+6,1,8,'#7d6c5c');px(L+5,y-h+9,9,1,'#7d6c5c');
+  // 문패: 문 오른쪽. 겨울엔 하얗게 매끈하다(이름이 먹혔다). 봄엔 먹 글씨가 돌아온다
+  const nx=x+13,ny=y-h+4;
+  px(nx,ny,6,11,back?'#c9b48c':'#eef0ec');px(nx,ny,6,1,back?'#a68f68':'#ffffff');
+  if(back){px(nx+2,ny+2,2,1,'#2b2420');px(nx+2,ny+3,1,2,'#2b2420');px(nx+1,ny+6,4,1,'#2b2420');px(nx+2,ny+7,2,2,'#2b2420');}
+  // 초가지붕: 둥글게 덮은 짚과 새끼줄. 겨울엔 눈이 얹혔다
+  const straw=back?'#b39a60':'#9b9182',dark=back?'#8a744a':'#7c7468';
+  px(L-8,y-h-8,w+16,8,straw);px(L-4,y-h-13,w+8,5,straw);px(L+4,y-h-17,w-8,4,straw);px(L+14,y-h-19,w-28,2,straw);
+  px(L-8,y-h-1,w+16,1,dark);
+  for(let k=0;k<6;k++){const edge=k===0||k===5;px(Math.round(L-2+k*(w+4)/6),y-h-17+(edge?6:0),1,16-(edge?6:0),dark);}
+  if(!back){px(L-4,y-h-14,w+8,2,'#eef3f5');px(L+4,y-h-18,w-8,2,'#f6f9fa');px(L+14,y-h-20,w-28,2,'#ffffff');}
+  // 굴뚝: 겨울엔 연기가 없다. 봄엔 연기가 오른다
+  const cx=L+w-10;px(cx,y-h-14,6,10,'#7a6a5a');px(cx-1,y-h-15,8,2,back?'#6a5a4a':'#e4ecef');
+  if(back)for(let k=0;k<3;k++){const kk=(t*.5+k*22+i*13)%60;px(cx+1+Math.sin((t+k*30)*.05)*2,y-h-18-kk,4,3,'rgba(232,232,236,'+(0.6-kk/110).toFixed(2)+')');}
+}
+function jangseung(x,y,male,back){
+  if(x<-30||x>W+30)return;
+  const wood=back?'#8c7258':'#a59a8c',face=back?'#a3866a':'#b5ab9e',ink='#2b2420';
+  px(x-5,y-58,10,58,wood);px(x-5,y-58,2,58,back?'#6f5a46':'#8f8578');      // 몸통
+  px(x-6,y-66,12,10,face);                                                   // 머리
+  if(male){const hat=back?'#2f2a26':'#6d6862';px(x-8,y-70,16,4,hat);px(x-5,y-75,10,5,hat);}   // 천하대장군의 관모
+  else px(x-6,y-69,12,3,back?'#3d3530':'#77716b');                           // 지하여장군의 머리
+  // 부릅뜬 눈·주먹코·이. 겨울엔 칠이 바랬다
+  const e=back?ink:'#7f786f';
+  px(x-4,y-63,3,3,e);px(x+1,y-63,3,3,e);px(x-1,y-60,2,3,back?'#a8443a':'#9b8c84');px(x-4,y-57,8,2,e);px(x-3,y-57,1,1,'#efe9df');px(x+2,y-57,1,1,'#efe9df');
+  // 몸통의 이름 글자 자리: 겨울엔 하얗게 매끈하다. 봄엔 먹 글씨가 돌아온다
+  px(x-3,y-50,6,40,back?'#b49a7c':'#e4e2dc');
+  if(back)for(let k=0;k<5;k++){px(x-2,y-48+k*8,4,1,ink);px(x-1,y-47+k*8,1,3,ink);px(x+1,y-46+k*8,1,2,ink);}
+  px(x-7,y-2,14,2,'#7f7d78');
+}
+function well(x,y,back){
+  if(x<-30||x>W+30)return;
+  px(x-14,y-12,28,12,'#7b858c');for(let k=0;k<4;k++)px(x-13+k*7,y-11+(k%2)*5,6,1,'#5f686f');   // 돌 둘레
+  px(x-15,y-14,30,3,back?'#8f979c':'#e7eff2');                                                  // 테두리 (겨울엔 눈)
+  if(back)px(x-11,y-13,22,2,'#3e5868');else{px(x-11,y-13,22,2,'#cfe2ea');px(x-6,y-13,3,1,'#ffffff');}   // 언 물낯 / 봄 물
+  px(x-13,y-36,2,24,'#6f5a46');px(x+11,y-36,2,24,'#6f5a46');px(x-15,y-38,30,3,'#5d4c3f');      // 기둥과 들보
+  // 두레박: 겨울엔 테두리에 얼어붙었다. 봄엔 줄에 매달려 흔들린다
+  if(!back){px(x+4,y-18,6,4,'#7a5e44');px(x+4,y-19,6,1,'#dde8ec');}
+  else{const s=Vfx.reducedMotion?0:Math.round(Math.sin(G.anim*.05));px(x+s,y-35,1,15,'#8a7a68');px(x-3+s,y-21,7,5,'#7a5e44');}
+}
+function clothesline(x1,x2,y,back){
+  if(x2<-20||x1>W+20)return;
+  px(x1,y-40,2,40,'#6f5f4f');px(x2,y-40,2,40,'#6f5f4f');
+  const span=x2-x1,sag=k=>Math.round(Math.sin(k/span*Math.PI)*4);
+  for(let k=0;k<=span;k+=2)px(x1+k,y-38+sag(k),2,1,'#8a7a68');
+  if(!back){for(let k=6;k<span-4;k+=14)px(x1+k,y-39+sag(k),6,1,'#f2f6f7');return;}   // 빈 줄에 눈만 얹혔다
+  const t=Vfx.reducedMotion?0:G.anim;
+  [['#f2eee4',10,14],['#4f668c',30,12],['#c98a7a',50,10],['#e8dfc6',66,9]].forEach(([c,k,h],j)=>{
+    if(k>span-10)return;const sw=Math.round(Math.sin(t*.04+j));
+    px(x1+k+sw,y-37+sag(k),9,h,c);px(x1+k+sw,y-37+sag(k),9,1,'#6f5f4f');});
+}
+A.village=()=>{
+  const V=Rg.VILLAGE,back=Rg.namesBack();
+  for(const [i,hx] of V.houses.entries())choga(hx-cam,GROUND,i,back);
+  well(V.well-cam,GROUND,back);clothesline(V.line[0]-cam,V.line[1]-cam,GROUND,back);
+  jangseung(V.jangseung[0]-cam,GROUND,true,back);jangseung(V.jangseung[1]-cam,GROUND,false,back);
+};
+/* 결정 D-430: 이름 잃은 이들. 넋이 빠져 버릇만 남았다. 다가가도 돌아보지 않는다(눈에 빛이 없다). 봄엔 서로를 마주 본다. */
+// 물레 앞 아주머니(족제비): 실도 없는 물레를 돌린다. 봄엔 물레에 실이 감기고 빨래터 쪽(지게 할아버지)을 본다
+A.drawLostLoom=(x,y)=>{
+  const back=Rg.namesBack(),t=Vfx.reducedMotion?0:G.anim,f=1,K='#1a1410';
+  const B0=back?'#a07a52':'#8f8170',Dk=back?'#6a4c32':'#665c50',Lt=back?'#e2cfa8':'#cfc6b6',Sc=back?'#c46a5a':'#b8b2a6';
+  const cx=Math.round(x+19),cy=y-13,ang=t*.05;
+  px(cx-1,cy,2,13,'#6f5a46');px(cx-9,y-2,24,2,'#6f5a46');px(cx+12,cy-1,2,12,'#6f5a46');   // 물레 받침
+  for(let k=0;k<24;k++){const a=k/24*Math.PI*2;px(cx+Math.round(Math.cos(a)*9),cy+Math.round(Math.sin(a)*9),1,1,'#5a4838');}
+  for(let k=0;k<2;k++){const a=ang+k*Math.PI/2;for(let r=2;r<9;r+=2){
+    px(cx+Math.round(Math.cos(a)*r),cy+Math.round(Math.sin(a)*r),1,1,'#8c735d');px(cx-Math.round(Math.cos(a)*r),cy-Math.round(Math.sin(a)*r),1,1,'#8c735d');}}
+  px(cx+10,cy-2,8,2,'#8c735d');                                                              // 가락
+  if(back){px(cx+15,cy-4,4,6,'#efe8d6');for(let k=0;k<12;k++)px(cx+Math.round(k*15/12),cy-9+Math.round(k*6/12),1,1,'#e8e0cc');}   // 실이 감긴다
+  M(x,y,f,-9,-11,13,11,B0);M(x,y,f,-5,-9,7,8,Lt);M(x,y,f,-14,-6,6,3,Dk);                     // 앉은 몸·꼬리
+  M(x,y,f,-4,-21,11,10,B0);M(x,y,f,-5,-23,12,3,Sc);M(x,y,f,-5,-20,2,6,Sc);                   // 머리·머릿수건
+  M(x,y,f,4,-17,1,1,K);M(x,y,f,7,-15,1,1,K);if(back)M(x,y,f,5,-18,1,1,'#ffffff');
+  const hx=cx-x+Math.round(Math.cos(ang)*4),hy=Math.round(Math.sin(ang)*4)-13;               // 손잡이를 쥔 손
+  M(x,y,f,3,-11,Math.max(2,hx-3),2,B0);M(x,y,f,hx-1,hy-1,3,3,Lt);
+};
+// 빈 지게 할아버지(오소리): 빈 지게를 지고 제 집 문간을 오락가락한다. 말을 걸면 그 자리에 멈춘다. 봄엔 장작을 지고 물레 쪽을 본다
+A.drawLostJige=(x,y,f)=>{
+  const back=Rg.namesBack(),t=Vfx.reducedMotion?0:G.anim,talking=typeof open==='function'&&open('dlg');
+  const walk=!back&&!talking,s=t*.016;
+  const ox=Math.round(x+(walk?Math.sin(s)*14:0)),d=back?-1:walk?(Math.cos(s)>=0?1:-1):(f||1),step=walk?Math.floor(t/12)%2:0;
+  const Gy=back?'#857d70':'#7f7a72',Dk='#4a443d',Wt='#e8e2d6',K='#17120e',Wd=back?'#7a6248':'#6f665c';
+  M(ox,y,d,-13,-36,2,34,Wd);M(ox,y,d,-9,-36,2,34,Wd);M(ox,y,d,-13,-30,6,1,Wd);M(ox,y,d,-13,-22,6,1,Wd);M(ox,y,d,-15,-14,4,2,Wd);   // 지게
+  if(back){M(ox,y,d,-21,-34,12,9,'#8a6a48');for(let k=0;k<3;k++)M(ox,y,d,-21,-33+k*3,1,2,'#c49a6a');}                         // 봄: 장작
+  M(ox,y,d,-8,-15,14,10,Gy);M(ox,y,d,-8,-6,14,2,Dk);
+  M(ox,y,d,-6,-4,3,4+step,K);M(ox,y,d,2,-4,3,5-step,K);
+  M(ox,y,d,3,-21,9,8,Wt);M(ox,y,d,4,-21,2,8,K);M(ox,y,d,8,-21,2,7,K);M(ox,y,d,11,-16,2,2,K);if(back)M(ox,y,d,9,-18,1,1,'#ffffff');
+  M(ox,y,d,-1,-17,4,2,Gy);   // 멜빵 쥔 팔
+};
+// 문간 아이(토끼): 제 집 문패를 손으로 문지른다(왼쪽 집). 봄엔 이름을 되찾아 손을 번쩍 들고 깡충거린다
+A.drawLostKid=(x,y,f)=>{
+  const back=Rg.namesBack(),t=Vfx.reducedMotion?0:G.anim,d=back?(f||1):-1,K='#1a1410';
+  const Wt=back?'#f1ece2':'#d9d5cd',Sh=back?'#cfc6b6':'#b9b3a9',In='#e3b4b0',hop=back?Math.abs(Math.round(Math.sin(t*.12)*2)):0,yy=y-hop;
+  M(x,yy,d,-5,-12,10,10,Wt);M(x,yy,d,-5,-4,10,2,Sh);M(x,yy,d,-8,-9,3,3,Wt);                    // 몸·꼬리
+  M(x,yy,d,-3,-20,9,8,Wt);M(x,yy,d,-2,-29,2,9,Wt);M(x,yy,d,2,-28,2,8,Wt);M(x,yy,d,-2,-27,1,6,In);M(x,yy,d,2,-26,1,5,In);
+  M(x,yy,d,3,-17,1,1,K);M(x,yy,d,6,-15,1,1,'#c08080');if(back)M(x,yy,d,3,-18,1,1,'#ffffff');
+  M(x,yy,d,-4,-2,3,2,Sh);M(x,yy,d,2,-2,3,2,Sh);
+  if(!back){const r=Math.floor(t/9)%3;M(x,y,d,5,-13,4,2,Wt);M(x,y,d,9,-22+r,2,3,Wt);}          // 문패를 문지르는 손
+  else{M(x,yy,d,4,-15,2,4,Wt);M(x,yy,d,5,-19,2,2,Wt);}
 };
 A.ridgeLayers=[
   {speed:.015,draw:c=>{

@@ -206,6 +206,10 @@ if(!CLASSIC){
     a().back(id);
   }
   function front(){
+    // 결정 D-429: 이름 잃은 마을은 영산의 다른 길보다 빛이 더 바랬다. 이름이 돌아오면(봄) 색도 돌아온다.
+    if(G.zone==='shore'&&!Rg.namesBack()){
+      ctx.save();ctx.globalCompositeOperation='saturation';ctx.globalAlpha=.45;ctx.fillStyle='#808080';ctx.fillRect(0,0,W,H);ctx.restore();
+    }
     if(G.f.spring)a().willowSeeds();
     if(Vfx.reducedMotion){zoom=0;return;}
     if(!zoom)return;
@@ -234,6 +238,7 @@ if(!CLASSIC){
     w:2600,startX:70,ground:GROUND,npcs,platforms:platforms(id),exits,doors,
     drawBack:()=>back(id),drawScenery:()=>{
       a().scenery(id);
+      if(id==='shore')a().village();   // 결정 D-429: 호숫가 마을 (장승·초가·우물·빨랫줄)
       fieldItems('pickups').filter(p=>p.item==='magamok').forEach(p=>drawRowan(p.x));
       if(id==='island')drawCoil();
       if(id==='shore'){
@@ -253,22 +258,18 @@ if(!CLASSIC){
     get wanderers(){return content(id,'wanderers');},
     get stamps(){return content(id,'stamps');},
   };}
+  // 결정 D-429: 산막·눈길에서 호숫가로 곧장 옮겨 주던 능선 문 둘(과 호숫가 쪽 짝 문)은 뺐다 (사용자 지시 2026-11-03: 순간이동 기믹 빼기).
+  // 호숫가는 산막 → 눈길 → 비탈 → 호숫가로 걸어서 닿고, 같은 길로 돌아 나온다. 길 막힘 순서(설피·지름길·강철이)는 그대로다.
   Rg.zones={
     // 깊은 눈길은 몸의 문제라 산양이 지난다. 얼어붙은 비탈은 수리부엉이가 날개를 펴고 내려간다 (PA-47).
     shelter:zone('shelter',['nal'],{right:{to:'snow',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'}},[
       {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,draw:sign,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'},
-      {x:1860,to:'shore',toX:680,label:'능선 안쪽 호숫가로',need:ledgeGate,reason:'멀리 보이는 능선이다. 저 안쪽으로 가는 길은 아직 모르겠다.',draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y)},
     ]),
-    snow:zone('snow',['ongdal'],{left:'shelter',right:'slope'},[
-      {x:2000,y:108,to:'shore',toX:2020,toY:108,label:'바라보던 능선 속으로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y),
-        formPass:'owl',formLabel:'수리부엉이로 능선에서 날아 내려가기'},
-    ]),
+    snow:zone('snow',['ongdal'],{left:'shelter',right:'slope'}),
     slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y),formPass:'owl',formLabel:'수리부엉이로 날개 펴고 비탈 내려가기'}},[
       {x:2320,to:'shore',toX:170,label:'바위턱을 디뎌 호숫가로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y),formPass:'owl',formLabel:'수리부엉이로 날개 펴고 비탈 내려가기'},
     ]),
     shore:zone('shore',['dad'],{left:'slope'},[
-      {x:680,to:'shelter',toX:1860,label:'능선 안쪽으로 산막에 돌아가기',need:ledgeGate,reason:iceReason,draw:sign},
-      {x:2020,y:108,to:'snow',toX:2000,toY:108,label:'별을 보던 능선으로',need:ledgeGate,reason:iceReason,draw:sign},
       {x:2320,to:'island',toX:160,get label(){return G.f.spring?'작은 배로 신목 섬에':'언 호수를 걸어 신목 섬에';},
         need:()=>!!G.f.dadDone,reason:'아빠가 기다리고 있다. 먼저 호숫가에서 말을 걸어 보자.',draw:sign},
     ]),
@@ -293,8 +294,18 @@ if(!CLASSIC){
     ['shelter','d',1110,'darae_vine'],['shelter','p',1560,'solbang'],
     ['snow','p',455,'magamok'],['snow','p',960,'solbang'],['snow','p',1420,'jat',{y:108}],
     ['slope','d',1560,'darae_vine'],['slope','p',1800,'magamok'],
-    ['shore','d',1440,'darae_vine'],['shore','p',1610,'jat',{y:108}],
+    // 결정 D-429: 호숫가 덤불은 마을 집 앞(1440)에서 끝 바위 쪽 마른 둑(2040)으로 옮겼다
+    ['shore','d',2040,'darae_vine'],['shore','p',1610,'jat',{y:108}],
   ]);
+  // 결정 D-429: 이름 잃은 마을의 겨울엔 바람 소리만 남는다 (따로 소리 자산을 두지 않고 경치 보기의 바람 소리를 쓴다).
+  // 마을을 벗어나거나 봄이 오면 끈다. 경치 보기는 제 소리를 쓰므로 그동안은 건드리지 않는다.
+  let villageWind=false;
+  setInterval(()=>{
+    if(typeof Sound==='undefined')return;
+    const want=typeof G!=='undefined'&&!!G&&G.started&&!G.ended&&G.region==='yeongsan'&&G.zone==='shore'&&!Rg.namesBack()&&!vistaMode&&!(typeof B!=='undefined'&&B);
+    if(want&&Sound.ambient!=='wind'){Sound.ambience('wind');villageWind=true;}
+    else if(!want&&villageWind){villageWind=false;if(!vistaMode&&Sound.ambient==='wind')Sound.ambience(null);}
+  },400);
   // 겨울에는 오른쪽 얼음길로 걸어 나간다. 봄에는 같은 길이 물에 잠겨 배로만 건넌다.
   Rg.zones.shore.exits.right={to:'island',toX:160,
     need:()=>!G.f.spring&&!!G.f.dadDone,
