@@ -117,7 +117,7 @@ function kiteChild(){
     }
     // 결정 D-321: 연 이벤트는 걸림 → 풀림 → 때움 → 다시 띄움으로 흐르고, 단계마다 연의 모습을 작은 창과 필드에 그린다(art.js kitePics·kiteScene).
     // 결정 D-293 의 지붕길 배우기는 뺐다(장터 순간이동 지붕문을 없앤다). 연 건져 준 값은 한과 좌판 유과(D-290)다.
-    talk([
+    talkGive([
       ['얼레','살았다, 내 방패연!'],
       ['너구리','모서리가 처마 못에 찢겼어.'],
       ['얼레','이 정도는 괜찮아.\n조청 바르고 한지 덧대면 돼.'],
@@ -129,7 +129,7 @@ function kiteChild(){
       Object.assign(['얼레','난 얼레야. 연 날릴 땐 늘 얼레를 끼고 다녀서\n다들 그렇게 불러.'],{pic:null}),
       ['얼레','이건 우리 좌판 유과야. 연 건져 준 값!\n엄마가 파는 거니까 맛은 내가 장담해.'],
       gotLine('yugwa',2)
-    ],()=>{addItem('yugwa',2);G.f.jxKiteDone=true;record('kite','설에 돌아오는 동생에게 보이려고 날린 연이 처마 못에 걸려 있었다. 꼬리를 풀어 주자 얼레가 찢긴 모서리를 한지로 때워 다시 띄웠다. 연 건져 준 값이라며 한과 좌판 유과를 받았다.');finishWanderer('j_kite');
+    ],()=>{G.f.jxKiteDone=true;record('kite','설에 돌아오는 동생에게 보이려고 날린 연이 처마 못에 걸려 있었다. 꼬리를 풀어 주자 얼레가 찢긴 모서리를 한지로 때워 다시 띄웠다. 연 건져 준 값이라며 한과 좌판 유과를 받았다.');finishWanderer('j_kite');
       if(typeof grantNickname==='function')grantNickname('jangteo_kite','연 건지는 손','얼레');});
     return;
   }
@@ -153,12 +153,12 @@ function strawSeller(){
   talk([
     ['청설모 할아범','아이고, 짚신 꿴 끈이 삭아서 끊어졌구먼.\n장 서기 전에 다 주워야 하는데, 허리가 영 안 굽혀져.'],
     ['청설모 할아범','눈에 묻히면 젖어서 못 팔지.',[
-      {t:'흩어진 짚신을 주워 드린다',go:()=>talk([
+      {t:'흩어진 짚신을 주워 드린다',go:()=>talkGive([
         ['너구리','(눈에 반쯤 묻힌 짚신을 한 켤레씩 찾아 털고,\n할아범이 내민 새 끈에 꿰었다.)'],
         ['청설모 할아범','열하나, 열둘… 하나도 안 빠졌구먼.\n남의 장짐 주워 준 걸 그냥 보낼 순 없지.'],
         ['청설모 할아범','짚신 삼고 남은 짚이다.\n불쏘시개로도 끈으로도 쓴다.'],
         gotLine('jip',2)
-      ],()=>{addItem('jip',2);G.f.jxStrawDone=true;record('straw','장터 어귀에서 청설모 할아범이 흘린 짚신을 주워 새 끈에 꿰어 드렸다. 짚신 삼고 남은 짚을 받았다.');finishWanderer('j_straw');})},
+      ],()=>{G.f.jxStrawDone=true;record('straw','장터 어귀에서 청설모 할아범이 흘린 짚신을 주워 새 끈에 꿰어 드렸다. 짚신 삼고 남은 짚을 받았다.');finishWanderer('j_straw');})},
       {t:'다음에',go:null}
     ]]
   ]);
@@ -168,12 +168,12 @@ function beanSeller(){
   talk([
     ['까투리 아주머니','어머, 어머! 자루 밑이 터졌네!\n콩이 눈밭으로 다 굴러간다!'],
     ['까투리 아주머니','새들이 먼저 보면 끝장이야!',[
-      {t:'같이 콩을 쓸어 담는다',go:()=>talk([
+      {t:'같이 콩을 쓸어 담는다',go:()=>talkGive([
         ['너구리','(눈 위에 흩어진 콩을 손바닥으로 쓸어 자루에 담았다.\n아주머니가 터진 데를 짚으로 동여맨다.)'],
         ['까투리 아주머니','휴, 다 건졌네. 혼자였으면 새들 잔치 났겠어!'],
         ['까투리 아주머니','콩장수는 콩으로 갚아야지.\n한 되 넉넉히 담았다!'],
         gotLine('kong')
-      ],()=>{addItem('kong',1);G.f.jxBeanDone=true;record('bean','장터 거리에서 까투리 아주머니의 콩 자루가 터져 같이 쓸어 담았다. 콩 한 되를 받았다.');finishWanderer('j_bean');})},
+      ],()=>{G.f.jxBeanDone=true;record('bean','장터 거리에서 까투리 아주머니의 콩 자루가 터져 같이 쓸어 담았다. 콩 한 되를 받았다.');finishWanderer('j_bean');})},
       {t:'다음에',go:null}
     ]]
   ]);
@@ -199,7 +199,7 @@ function yutElders(){
 function babyBoar(){
   if(G.f.jxBoarScent2){
     if(!G.f.jxBoarBed){Rg.handWork('snow',()=>{G.f.jxBoarBed=true;babyBoar();});return;}
-    talk([
+    talkGive([
       ['알밤이','이 냄새야! 솔잎 아래 마른 풀이 있어.\n아까 엄마랑 여기서 쉬었어.'],
       ['너구리','눈 묻은 솔가지는 치워 둘게.\n바람은 바위가 막아 주네.'],
       ['알밤이','엄마가 찾으러 올 때까지 여기 있을래.\n큰 바위 뒤에 이상한 발자국도 봤어.'],
@@ -208,7 +208,7 @@ function babyBoar(){
       ['알밤이','찾았다! 청설모가 묻어 둔 잣이야.\n엄마가 길에서 도움받으면 꼭 나누랬어.'],
       gotLine('jat',2),
       ['알밤이','이제 장터 냄새는 안 쫓아갈래.\n달콤한 냄새가 나도 여기서 기다릴 거야.']
-    ],()=>{addItem('jat',2);record('boar','장터 냄새를 따라 나온 새끼 멧돼지 알밤이와 솔잎 냄새를 따라 잠자리로 돌아왔다. 멧돼지가 솔잎 밑에서 청설모가 묻은 잣을 파내 나눠 주었다. 바람을 막는 큰 바위 뒤에 발자국이 있다.');finishWanderer('j_boar');});
+    ],()=>{record('boar','장터 냄새를 따라 나온 새끼 멧돼지 알밤이와 솔잎 냄새를 따라 잠자리로 돌아왔다. 멧돼지가 솔잎 밑에서 청설모가 묻은 잣을 파내 나눠 주었다. 바람을 막는 큰 바위 뒤에 발자국이 있다.');finishWanderer('j_boar');});
     return;
   }
   if(G.f.jxBoarStarted){

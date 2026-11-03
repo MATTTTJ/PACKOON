@@ -171,15 +171,15 @@ for(const r of t('trades').filter(r=>r.id.startsWith('t_craft_'))){
 }
 
 /* 수치 표는 한 줄에 값 하나. 필수 id는 웹이 쓰는 계약이며 기본 수치를 복사해 두지 않는다. */
-function numericTable(name,label,required){
+function numericTable(name,label){
   const file=path.join(DATA,name+'.csv'),source=fs.readFileSync(file,'utf8');
   if(source.charCodeAt(0)!==0xFEFF)fail(name+'.csv: UTF-8 BOM이 필요하다');
   const {head,rows}=read(file),columns=['id',label,'값이름','값','단위','설명','상태'];
   if(head.join(',')!==columns.join(','))fail(name+'.csv: 머리줄은 '+columns.join(',')+' 이어야 한다');
-  const keys=required.split(/\s+/),expected=new Set(keys),values={};
+  const values={};
   for(const [i,r] of rows.entries()){
     const where=name+'.csv '+(i+2)+'행 '+r.id;
-    if(!/^[a-z][a-z_]*$/.test(r.id)||!expected.has(r.id))fail(where+': 알 수 없는 id');
+    if(!/^[a-z][a-z_]*$/.test(r.id)||Object.hasOwn(values,r.id))fail(where+': 잘못되거나 겹치는 id');
     if(Object.hasOwn(values,r.id))fail(where+': id 중복');
     for(const key of columns)if(!r[key].trim())fail(where+': '+key+' 칸이 비어 있다');
     if(!['확정','제안','미정'].includes(r['상태']))fail(where+': 상태는 확정/제안/미정이어야 한다');
@@ -189,54 +189,47 @@ function numericTable(name,label,required){
     if(['회','개','단계','인덱스','프레임','남은 프레임','ms','내구도'].includes(r['단위'])&&!Number.isInteger(n))fail(where+': 이 단위는 정수여야 한다');
     values[r.id]=n;
   }
-  for(const id of keys)if(!Object.hasOwn(values,id))fail(name+'.csv: 필수 값 '+id+' 누락');
   return values;
 }
-const MINIGAMES=numericTable('minigames','미니게임',
-  [
-    'handwork_forge_relation handwork_stack_relation handwork_steam_relation rhythm_notes',
-    'rhythm_good rhythm_perfect rhythm_scroll_speed rhythm_bonus_hits rhythm_start_delay rhythm_subbeat',
-    'rhythm_intro_beats rhythm_parts rhythm_normal_gap rhythm_late_gap rhythm_normal_last rhythm_late_hint_delay',
-    'rhythm_finish_delay rhythm_cooldown rhythm_stray_window rhythm_resume_delay rhythm_combo rhythm_relation',
-    'rhythm_high_relation rhythm_note_one rhythm_note_two rhythm_note_three rhythm_note_four rhythm_note_five',
-    'rhythm_note_six rhythm_note_seven rhythm_note_eight salg_graze salg_return_graze salg_moving',
-    'salg_return_speed salg_active_distance salg_arrival_distance salg_grass_interval salg_risk_distance salg_grace',
-    'salg_relief_frames salg_recovery salg_risk_limit salg_startle_frames salg_max_retreat salg_retreat',
-    'salg_warning_frames salg_alert_frames salg_near_distance salg_near_graze salg_near_random dad_steps',
-    'gather_ring_period gather_ring_pad gather_perfect_window gather_good_window gather_perfect_power gather_yield gather_perfect_bonus',
-    'gather_root_hits gather_ssari_hits gather_kkoe_hits gather_eoksae_hits gather_seogi_hits gather_darae_vine_hits',
-    'gather_solbang_hits gather_snow_mound_hits tuho_arrows tuho_ear_points tuho_steady_mouth tuho_steady_ear',
-    'tuho_bold_mouth tuho_bold_ear tuho_stake tuho_steady_pay tuho_bold_pay tuho_bets_per_day tuho_throw_frames tuho_pause_frames'
-  ].join(' '));
-const TUNING=numericTable('tuning','분류',
-  [
-    'kkubeogi_cycle kkubeogi_awake kkubeogi_cue field_move_speed field_swing_speed',
-    'field_jump_velocity field_gravity field_fall_speed field_pickup_x field_pickup_y',
-    'field_talk_distance field_dig_ahead field_dig_distance field_swing_frames field_swing_hit_at field_drop_frames',
-    'field_crawl_frames field_drop_hang_frames field_drop_hang_speed field_drop_hang_ratio field_drop_hang_min_frames',
-    'npc_move_out_ms npc_move_in_ms npc_move_walk_px npc_move_step_ms npc_move_min_px npc_move_window_ms',
-    'field_hit_front field_hit_back field_hit_width field_dig_padding save_interval toast_frames peek_ms peek_fade_ms peek_open_ms hint_range craft_motion_ms',
-    'field_interact_y zone_transition_frames depth_gate_open_frames vista_pan_frames map_flight_ms map_landing_margin',
-    'drop_arc_height drop_flight_frames drop_min_spacing drop_spread drop_bounce_height drop_bounce_frames',
-    'pickup_range pickup_range_y pickup_motion_frames pickup_pull_frames',
-    'battle_bare_speed battle_bare_cooldown battle_bare_radius',
-    'battle_iframes battle_squirrel_speed battle_squirrel_cooldown battle_squirrel_radius',
-    'battle_goat_speed battle_goat_cooldown battle_goat_radius battle_goat_damage_taken',
-    'battle_owl_speed battle_owl_cooldown battle_owl_radius battle_owl_tell_lead',
-    'battle_deer_speed battle_deer_cooldown battle_deer_radius battle_deer_iframes',
-    'battle_base_damage battle_sharp_damage battle_tool_good_damage battle_tool_bad_mult battle_hand_scale kudzu_stem_cut_chance kudzu_root_dig_chance',
-    'battle_aim_left battle_aim_up battle_hitstop',
-    'kudzu_scent_damage kudzu_scent_slow kudzu_scent_slow_frames kudzu_scent_linger',
-    'golem_stone_chance golem_stone_step golem_stone_cap golem_foot_rest golem_arm_rest golem_core_frames golem_barrage_count golem_snowball_damage golem_stomp_clumps',
-    'form_squirrel_speed form_climb_speed form_climb_reach form_goat_jump form_owl_glide_fall',
-    'form_deer_speed form_deer_listen_range form_fx_frames stranger_trade_limit',
-    'form_intro_ms form_gait_frames snow_print_frames snow_print_max',
-    'wish_anim_side wish_anim_hover wish_anim_carry_frames wish_anim_pause_frames wish_anim_lower_frames wish_anim_settle_frames wish_anim_done_frames',
-    'music_duck music_dialog_hold_ms',
-    'roll_hold_ms roll_speed roll_squirrel_speed roll_accel_frames roll_step_frames',
-    'musoe_bonk_tell_first musoe_bonk_tell_last musoe_bonk_drop musoe_bonk_gap musoe_bonk_radius',
-    'musoe_fire_cycle musoe_fire_warn musoe_fire_burn musoe_fire_radius musoe_fire_heat musoe_finale_bonks musoe_finale_gap musoe_finale_hold'
-  ].join(' '));
+/* 결정 D-351: 미니게임·조정값 표의 id를 여기 손으로 적지 않는다 (예전 목록은 브랜치를 합칠 때마다 부딪혔다).
+   웹 코드(js/)가 읽는 id를 찾아 표와 맞춘다. 코드가 읽는데 표에 없으면 실패, 표에만 있고 코드가 안 읽으면 경고한다.
+   읽는 꼴(실패 쪽): TABLES.TUNING.id, TABLES.TUNING['id'], 그 표를 담은 이름(const MG=TABLES.MINIGAMES, const T=()=>TABLES.TUNING, const t=T())의 .id.
+   글자를 이어 붙여 읽는 id(TUNING['battle_'+form+'_speed'])는 앞뒤 조각이 맞는 표 id를 읽는 것으로 본다.
+   경고 쪽은 너그럽게, 코드 어디에든 그 id 낱말이 있으면 읽는 것으로 본다 (wsFrames('wish_anim_carry_frames') 같은 도우미). */
+function codeReads(){
+  const files=[];
+  (function walk(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);
+    if(e.isDirectory())walk(p);else if(e.name.endsWith('.js')&&p!==OUT)files.push(p);}})(path.join(ROOT,'prototypes/web/js'));
+  const out={TUNING:{ids:new Map(),glob:[]},MINIGAMES:{ids:new Map(),glob:[]},words:new Set()};
+  const esc=x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  for(const file of files){
+    const src=fs.readFileSync(file,'utf8'),where=path.relative(ROOT,file).replace(/\\/g,'/');
+    for(const m of src.matchAll(/\b[a-z][a-z_]*_[a-z_]+\b/g))out.words.add(m[0]);
+    const names={TUNING:['TABLES\\.TUNING'],MINIGAMES:['TABLES\\.MINIGAMES']};
+    const decl='(?:\\b(?:const|let|var)\\s+|,\\s*)([A-Za-z_$][\\w$]*)\\s*=\\s*';
+    for(const table of ['TUNING','MINIGAMES']){
+      for(const m of src.matchAll(new RegExp(decl+'\\(\\)\\s*=>\\s*TABLES\\.'+table+'\\b(?!\\s*\\.)','g')))names[table].push(esc(m[1])+'\\(\\)');
+      for(const base of names[table].slice())for(const m of src.matchAll(new RegExp(decl+base+'\\s*(?=[;,)\\n])','g')))names[table].push(esc(m[1]));
+    }
+    for(const table of ['TUNING','MINIGAMES'])for(const n of names[table]){
+      const alias=!n.startsWith('TABLES');   // 담은 이름(t, MG…)은 지역 변수와 겹칠 수 있어 표 id 꼴(밑줄 있음)만 센다
+      for(const m of src.matchAll(new RegExp('(?<![\\w$.])'+n+'(?:\\??\\.([a-z][a-z_]*)\\b(?!\\s*\\()|\\[\\s*\'([a-z][a-z_]*)\'\\s*\\])','g'))){
+        const id=m[1]||m[2];if(alias&&!id.includes('_'))continue;if(!out[table].ids.has(id))out[table].ids.set(id,where);}
+      for(const m of src.matchAll(new RegExp('(?<![\\w$.])'+n+'\\[([^\\]]*\\+[^\\]]*)\\]','g')))
+        out[table].glob.push(new RegExp('^'+m[1].split('+').map(p=>{p=p.trim();const q=p.match(/^'([a-z_]*)'$/);return q?esc(q[1]):'[a-z_]*';}).join('')+'$'));
+    }
+  }
+  return out;
+}
+const READS=codeReads();
+function checkReads(name,table,values){
+  const r=READS[table];
+  for(const [id,where] of r.ids)if(!Object.hasOwn(values,id))fail(name+'.csv: 코드('+where+')가 읽는 값 '+id+' 이 표에 없다');
+  const unused=Object.keys(values).filter(id=>!r.ids.has(id)&&!r.glob.some(g=>g.test(id))&&!READS.words.has(id));
+  if(unused.length)console.warn('경고: '+name+'.csv 에만 있고 웹 코드가 읽지 않는 값 '+unused.length+'개: '+unused.join(' '));
+}
+const MINIGAMES=numericTable('minigames','미니게임');checkReads('minigames','MINIGAMES',MINIGAMES);
+const TUNING=numericTable('tuning','분류');checkReads('tuning','TUNING',TUNING);
 /* 나눗셈·주기·배열 길이와 서로 맞물리는 판정은 실행 전에 확인한다. */
 const requireValue=(ok,message)=>{if(!ok)fail(message);};
 for(const [table,values] of [['minigames',MINIGAMES],['tuning',TUNING]]){

@@ -85,8 +85,8 @@ function jujubeGive(i=0){
 // 결정 D-77: 강철이가 떠난 뒤 남은 얼음 비늘은 산에 두면 또 얼어붙는다. 산지기 살금이가 깊은 물에 돌려보낸다.
 function salgScaleGive(){
   if(G.f.salgScale||!has('ice_scale'))return;
-  takeItem('ice_scale',1);addItem('magamok',2);G.f.salgScale=true;rel('salgeumi',1);
-  talk([['살금이','그, 그거… 강철이 비늘이지?\n산에 두면 녹지 않고 또 얼어붙어.'],['살금이','내가 호수 깊은 물에 돌려보낼게.\n대신 말려 둔 마가목 열매… 가져가.'],['너구리','(마가목 열매 두 알을 얻었다.)']]);
+  takeItem('ice_scale',1);G.f.salgScale=true;rel('salgeumi',1);
+  talk([['살금이','그, 그거… 강철이 비늘이지?\n산에 두면 녹지 않고 또 얼어붙어.'],['살금이','내가 호수 깊은 물에 돌려보낼게.\n대신 말려 둔 마가목 열매… 가져가.'],receiveItem('magamok',2)]);
 }
 const SEOLPI_ASKS=[{darae_vine:2,jip:1},{darae_vine:2,eoksae:2},{broom_sal:1,jip:1},{broom_sal:1,eoksae:2}];
 function nalTrade(i=0){
@@ -324,11 +324,6 @@ function dadMain(){
    ① 아빠: 겨울 막대 → 녹은 땅의 그림 → 수첩의 손도장
    ② 날쌘과 아빠: 아이가 둘 사이에서 말을 나르는 보부상이 된다 (날쌘의 고백 D-03 뒤)
    ③ 늙은 까치: 아빠 소식 부치기 → 엄마의 답 → 마지막 남쪽 길 (아래 길손 블록) */
-function arcScene(flag,lines,record,after){
-  if(!arcs()||G.f[flag])return;
-  talk(lines,()=>{G.f[flag]=true;diary(flag,record);if(after)after();});
-}
-Rg.arcScene=arcScene;
 // 옹달샘 표주박 그림: 박 두 덩이, 나무 마개, 엄마 매듭으로 묶은 끈
 defineIcons({bingeo:P=>{
   P(3,7,9,3,'#c9d6dc');P(2,8,1,1,'#c9d6dc');P(4,6,6,1,'#dfe8ec');P(4,10,6,1,'#9fb3bc');P(12,6,1,5,'#9fb3bc');P(13,5,1,2,'#9fb3bc');P(13,10,1,2,'#9fb3bc');
@@ -461,7 +456,7 @@ function nalDadArcReply(){
     ['날쌘','갚을 게 없으면\n나는 뭘 지고 다니냐.'],
     // 결정 D-301: 아이가 둘 사이에서 말을 날랐으니 보부상답게 삯을 준다
     ['날쌘','(날쌘이 지게를 고쳐 멘다. 작은 병 하나를 꺼내\n내 손에 쥐여 준다.)'],
-    ['날쌘','말 나른 삯이야.\n남한테 공짜로 짐 지우는 법은 없어.'],receiveItem('sesame_oil',1),
+    ['날쌘','말 나른 삯이야.\n남한테 공짜로 짐 지우는 법은 없어.'],gotLine('sesame_oil',1),
     ['날쌘','먼저 내려간다. 고갯길 눈은\n봄이면 위에서부터 녹아. 길 봐 둘게.'],
     ['날쌘','다음엔 단풍골 장에서 보자, 눈길 보부상.\n그땐 제값 받는다.']],
     '아빠의 몸짓을 날쌘에게 그대로 옮겼다. 날쌘은 한참 말이 없다가, 갚을 게 없으면 뭘 지고 다니냐고 했다. 먼저 내려가 고갯길을 봐 두겠다고 했다. 단풍골 장에서 다시 보자고.',
@@ -600,7 +595,7 @@ function ongdalArcSpring(){
     ['너구리','…네.'],
     ['옹달 할미','국물 한 그릇은 내가 빚졌구먼.\n다음에 와. 솥 다시 걸어 놓을 테니.']],
     '봄이 와 옹달샘이 풀렸다. 할미는 첫 샘물을 담은 표주박을 내게 맡겼다. 끈은 매듭 임자한테 돌려주고, 아빠의 물 한 바가지 빚은 집에서 갚게 하라고.',
-    ()=>{if(!has('ongdal_gourd'))addItem('ongdal_gourd',1);learn('ongdal:gourd');});
+    ()=>learn('ongdal:gourd'));
 }
 function talkOngdal(){
   const F=G.f;
@@ -1001,10 +996,9 @@ const done=(id,flag,key,text)=>()=>{
 /* 손으로 하는 짧은 행동이 끝나면 기존 인사·기록으로 잇는다. */
 const act=(id,next)=>{if(typeof Rg.playActivity==='function')Rg.playActivity(id,next);else next();};
 /* 결정 D-301: 길손을 도우면 그 인물다운 물건을 삯으로 받는다. 이미 마친 만남이면 다시 주지 않는다. */
-const pay=(wid,item,n,lines,text)=>{
+const pay=(wid,item,n,lines)=>{
   if(G.f.wanderersDone?.[expansionKey(wid)])return [];
-  if(!text)return [...lines,receiveItem(item,n)];
-  addItem(item,n);return [...lines,['너구리',text]];   // 알·마리로 세는 것은 줄을 직접 쓴다
+  return [...lines,receiveItem(item,n)];   // 결정 D-354: 알·마리도 items.csv 세는말로 gotText가 센다
 };
 function bearSong(){
   talk([
@@ -1019,7 +1013,7 @@ function bearSleep(beat){
   act('bear',()=>talk([
     ['아기 곰',beat?'응, 그거… 엄마도 그렇게 토닥였어.':'바람보다 작아졌다…\n눈이 자꾸 감겨.'],
     ['아기 곰','이번엔… 진짜 봄에 깰래.'],
-    ...pay('y_bear_lullaby','acorn',2,[['아기 곰','(아기 곰이 졸린 손으로 굴 안쪽을 더듬어\n도토리 두 알을 내민다.)'],['아기 곰','가을에 몰래 숨겨 둔 거야… 노래 값.']],'(도토리 두 알을 얻었다.)'),
+    ...pay('y_bear_lullaby','acorn',2,[['아기 곰','(아기 곰이 졸린 손으로 굴 안쪽을 더듬어\n도토리 두 알을 내민다.)'],['아기 곰','가을에 몰래 숨겨 둔 거야… 노래 값.']]),
     ['아기 곰','굴 앞 가지에 털 걸어 둘게.\n그거 보이면… 살살 지나가 줘.']
   ],done('y_bear_lullaby','yBearQuiet','y_bear_lullaby','이른 봄인 줄 알고 깬 아기 곰에게 자장가를 불러 주었다. 소리와 박자를 낮추니 곰이 잠들었다. 굴 앞 나뭇가지에 걸린 털이 조용히 지나가라는 표지가 됐다.')));
 }
@@ -1078,7 +1072,7 @@ function otterWater(still){
       '얼음 아래서 물결이 하나 더 오네. 저기 봐.\n작은 꼬리가 물을 차고 있어. 아직 새끼구나.'],
     ['낚시하는 수달','(수달이 줄을 슬며시 거둔다. 은빛 꼬리가\n한 번 돌더니 어두운 물속으로 사라진다.)'],
     ['낚시하는 수달','낚싯줄만 보던 호수를 네 덕에 좀 넓게 봤어.\n봄엔 이 구멍 자리가 다 물길이 돼. 작은 배도 다녀.'],
-    ...pay('y_otter_wait','bingeo',2,[['낚시하는 수달','(수달이 얼음 옆 눈더미를 헤쳐 꾸러미를 꺼낸다.)'],['낚시하는 수달','아침에 잡은 빙어야. 같이 기다려 준 값.\n눈에 묻어 두면 안 상해.']],'(빙어 두 마리를 얻었다.)')
+    ...pay('y_otter_wait','bingeo',2,[['낚시하는 수달','(수달이 얼음 옆 눈더미를 헤쳐 꾸러미를 꺼낸다.)'],['낚시하는 수달','아침에 잡은 빙어야. 같이 기다려 준 값.\n눈에 묻어 두면 안 상해.']])
   ],done('y_otter_wait','yOtterWait','y_otter_wait','수달 옆에서 기다리니 얼음 아래 어린 물고기가 보였다. 수달은 줄을 풀어 주었다. 겨울의 낚시 구멍은 봄에 배가 다니는 물길과 이어진다.')));
 }
 function talkOtter(){
@@ -1136,7 +1130,7 @@ function magpieArcChoices(){
   return c;
 }
 function magpieArcNews(){
-  Rg.arcScene('yArcsMagpie1',[
+  arcScene('yArcsMagpie1',[
     ['너구리','아빠를 찾았어요.\n호숫가에 있었어요.'],
     ['늙은 까치','그래, 그래. …몸은 성하더냐?'],
     ['너구리','몸은 괜찮아요. 근데 말을 못 해요.'],
@@ -1149,7 +1143,7 @@ function magpieArcNews(){
     '늙은 까치에게 아빠를 찾았다는 소식만 부쳤다. 말을 못 한다는 건 내가 가서 하기로 했다. 기쁜 건 먼저 보내고 무거운 건 제가 지고 가는 거라고 까치가 말했다.');
 }
 function magpieArcReply(){
-  Rg.arcScene('yArcsMagpie2',[
+  arcScene('yArcsMagpie2',[
     ['늙은 까치','아가, 답이 왔단다.'],
     ['너구리','엄마가요?'],
     ['늙은 까치','봄바람 타고 젊은 것이 돌아왔단다.'],
@@ -1161,7 +1155,7 @@ function magpieArcReply(){
     '엄마의 답이 까치 편에 왔다. 엄마는 소식을 듣고 가슴에 손을 대고 있다가, 말없이 문 쪽을 가리켰다고 한다. 문을 열어 두겠다는 뜻이다.');
 }
 function magpieArcLast(){
-  Rg.arcScene('yArcsMagpie3',[
+  arcScene('yArcsMagpie3',[
     ['늙은 까치','약을 지었구나. 냄새가 다르다.'],
     ['너구리','이제 아빠랑 집에 가요.'],
     ['늙은 까치','그럼 내 마지막 남쪽 길도 정해졌구나.'],

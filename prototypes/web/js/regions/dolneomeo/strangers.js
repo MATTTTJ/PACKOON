@@ -3,22 +3,20 @@
    산양 변신은 뿔영감이 장승제를 받고 길을 열 때 열린다 (formCheck). */
 (()=>{
 const Rg=REGIONS.dolneomeo;
-const once=(key)=>{const d=G.f.strangerOnce||(G.f.strangerOnce={});if(d[key])return false;d[key]=true;return true;};
-const say=(lines,next)=>{talk(lines,next);return true;};
 // 결정 D-25: 낯선 손님 (design/data/decisions.csv)
 Rg.strangers={
   dolsoe:{
     line:'발소리가 낯설구나.\n어디서 온 손님이냐.',
     trades:[{give:{rice:1},get:{stonedust:1}}],swapPool:['stonedust','mud','memil'],
     talk(form){
-      if(form==='owl')return say([['너구리','(깃 소리에 돌쇠 할배가 움찔하더니 흙 속으로 고개를 묻는다.)']]);
+      if(form==='owl')return strangerSay([['너구리','(깃 소리에 돌쇠 할배가 움찔하더니 흙 속으로 고개를 묻는다.)']]);
       return false;
     }},
   ppuri:{
     line:'장승제를 올리지 않은 자는\n돌산에 오르지 못한다. 손님도 같다.',
     trades:[],
     talk(form){
-      if(form==='goat'&&once('dol_ppuri_kin'))return say([
+      if(form==='goat'&&strangerOnce('dol_ppuri_kin'))return strangerSay([
         [Rg.npcs.find(n=>n.id==='ppuri').name,'고개 넘는 산양이로군.\n산양끼리는 먹을 데를 나눈다.'],
         [Rg.npcs.find(n=>n.id==='ppuri').name,'절벽 아래 바위에서 뗀 석이다.\n하나 가져가라.'],receiveItem('seogi',1)],()=>{diary('dol_ppuri_kin','산양 모습으로 뿔영감에게 가니 산양끼리 먹을 데를 나눈다며 석이버섯을 줬다.');});
       return false;
@@ -27,8 +25,8 @@ Rg.strangers={
     line:'으음… 누구야…\n처음 맡는 냄새인데…',
     trades:[{give:{acorn:2},get:{eoksae:1}}],swapPool:['eoksae','memil'],
     talk(form){
-      if(form==='owl')return say([['너구리','(꾸벅이가 가시를 세우고 동그랗게 몸을 만다.)']]);
-      if(form==='deer'&&once('dol_kkubeogi_deer'))return say([
+      if(form==='owl')return strangerSay([['너구리','(꾸벅이가 가시를 세우고 동그랗게 몸을 만다.)']]);
+      if(form==='deer'&&strangerOnce('dol_kkubeogi_deer'))return strangerSay([
         ['꾸벅이','고라니구나… 너는 안 찌를게…\n둥지 짓다 남은 거 가져가…'],receiveItem('eoksae',1),
         ['꾸벅이','근데 그 족제비 있잖아…\n너구리 꼬마보다 하루 먼저 왔더라…'],
         ['꾸벅이','쿨…']],()=>{diary('dol_kkubeogi_deer','고라니 모습으로 가니 꾸벅이가 경계를 풀었다. 꾸벅이가 날쌘이 나보다 하루 먼저 마을에 왔다고 했다.');});
@@ -38,7 +36,7 @@ Rg.strangers={
     line:'손님, 돌투성이 마을에서 물건 찾기 힘들지?\n값은 좀 세.',
     price:2,trades:[{give:{memil:2},get:{gyeousari:1}}],swapPool:['gyeousari','mud','eoksae'],
     talk(){
-      if(once('dol_nal_price'))diary('dol_nal_price','돌너머에서도 날쌘은 낯선 손님에게 두 배를 불렀다.');
+      if(strangerOnce('dol_nal_price'))diary('dol_nal_price','돌너머에서도 날쌘은 낯선 손님에게 두 배를 불렀다.');
       return false;
     }},
 };
