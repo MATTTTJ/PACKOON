@@ -13,14 +13,6 @@ const write = (outDir, name, data) => {
   fs.writeFileSync(file, JSON.stringify(data, null, 2) + '\n', 'utf8');
   return file;
 };
-async function until(browser, expression, timeout = 10000, label = expression) {
-  const start = Date.now();
-  while (Date.now() - start < timeout) {
-    if (await browser.eval(expression)) return;
-    await browser.wait(50);
-  }
-  throw new Error(`${label}: ${timeout / 1000}초 안에 도달하지 못했다.`);
-}
 async function visible(browser, selector) {
   return browser.eval(`!!document.querySelector(${JSON.stringify(selector)})?.getClientRects().length`);
 }
@@ -33,7 +25,7 @@ async function tap(browser, selector) {
 async function holdTouch(browser, selector, predicate, timeout = 15000) {
   const p = await browser.eval(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
   await browser.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ ...p, radiusX: 2, radiusY: 2, force: 1, id: 1 }] });
-  try { await until(browser, predicate, timeout, `터치 이동 ${selector}`); }
+  try { await browser.until(predicate, { timeout, label: `터치 이동 ${selector}` }); }
   finally { await browser.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); }
 }
 async function fresh(browser, rules, mobile = false) {
@@ -41,12 +33,12 @@ async function fresh(browser, rules, mobile = false) {
   await browser.eval('localStorage.clear()');
   await browser.reload();
   await installHooks(browser, rules);
-  await until(browser, "!!document.querySelector('#tsNew')?.getClientRects().length", 15000, '첫 화면');
+  await browser.until("!!document.querySelector('#tsNew')?.getClientRects().length", { timeout: 15000, label: '첫 화면' });
   const click = mobile ? tap : (b, s) => b.click(s);
   await click(browser, '#tsNew');
   await click(browser, '#btnStart');
-  await until(browser, 'G.started && !G.ended', 10000, '새 게임');
-  await until(browser, "!document.querySelector('#bag').hidden", 10000, '출발 쪽지');
+  await browser.until('G.started && !G.ended', { timeout: 10000, label: '새 게임' });
+  await browser.until("!document.querySelector('#bag').hidden", { timeout: 10000, label: '출발 쪽지' });
   await click(browser, '#bagClose');
 }
 
@@ -73,7 +65,7 @@ async function runSave({ browser, outDir, rules }) {
     const acorn=await browser.eval("fieldItems('pickups').find(a=>a.item==='acorn'&&!a.got&&a.y===fieldGround())");
     if(!acorn)throw Error('저장 시험용 바닥 도토리가 없다.');
     await browser.key('ArrowRight', 'keyDown');
-    try { await until(browser, 'G.px >= '+acorn.x, 10000, '저장 전 도토리로 이동'); }
+    try { await browser.until('G.px >= '+acorn.x, { timeout: 10000, label: '저장 전 도토리로 이동' }); }
     finally { await browser.key('ArrowRight', 'keyUp'); }
     await browser.wait(100);await browser.key('x');await browser.wait(650);
     await browser.click('#btnSaveHud');
@@ -82,9 +74,9 @@ async function runSave({ browser, outDir, rules }) {
     step('2. 도토리 앞으로 걸어가 Z 키로 줍고 화면의 저장 버튼을 누른다.');
     await browser.reload();
     await installHooks(browser, rules);
-    await until(browser, "!!document.querySelector('#tsContinue')?.getClientRects().length", 15000, '이어서 하기 버튼');
+    await browser.until("!!document.querySelector('#tsContinue')?.getClientRects().length", { timeout: 15000, label: '이어서 하기 버튼' });
     await browser.click('#tsContinue');
-    await until(browser, 'G.started', 10000, '이어서 하기');
+    await browser.until('G.started', { timeout: 10000, label: '이어서 하기' });
     const restored = await browser.eval('JSON.parse(JSON.stringify(G))');
     // README의 쪽지 규칙: 칸이 없으면 첫 지역은 0단계로 읽는다. 복원기가 정상적으로 채우는 칸이다.
     const stable = g => ({ region: g.region, zone: g.zone, inv: g.inv, tool: g.tool, awake: g.awake, clues: g.clues,
@@ -98,10 +90,10 @@ async function runSave({ browser, outDir, rules }) {
     await browser.eval("localStorage.setItem('packoon-save-v1','{broken json')");
     await browser.reload();
     await installHooks(browser, rules);
-    await until(browser, "!!document.querySelector('#tsNew')?.getClientRects().length", 15000, '손상 저장 시작');
+    await browser.until("!!document.querySelector('#tsNew')?.getClientRects().length", { timeout: 15000, label: '손상 저장 시작' });
     if (await visible(browser, '#tsContinue')) findings.push(failure('save-corrupt-continue', '깨진 JSON인데 이어서 하기 버튼이 보인다.'));
     await browser.click('#tsNew'); await browser.click('#btnStart');
-    await until(browser, 'G.started && G.region === "galchamgol"', 10000, '손상 저장 뒤 새 게임');
+    await browser.until('G.started && G.region === "galchamgol"', { timeout: 10000, label: '손상 저장 뒤 새 게임' });
     if (!(await browser.eval('readSave() === null'))) findings.push(failure('save-corrupt-read', '손상 JSON을 유효한 저장으로 읽었다.'));
     corruptCompleted = true;
     // 옛 코드로 만든 저장 표본이 그대로 읽혀야 한다 (fixtures/old-saves.json).
@@ -171,34 +163,31 @@ async function runMobile({ browser, outDir, rules }) {
     await browser.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await browser.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
     await browser.navigate(browser.url); await browser.eval('localStorage.clear()'); await browser.reload(); await installHooks(browser, rules);
-    await until(browser, "!!document.querySelector('#tsNew')?.getClientRects().length", 15000, '휴대폰 첫 화면');
+    await browser.until("!!document.querySelector('#tsNew')?.getClientRects().length", { timeout: 15000, label: '휴대폰 첫 화면' });
     steps.push('1. 390×844, 터치 에뮬레이션, 빈 저장에서 첫 화면을 연다.');
     await measure('title', ['#titleScene']);
     await tap(browser, '#tsNew'); await measure('prologue', ['#titleScreen']);
     await tap(browser, '#btnStart');
-    await until(browser, "!document.querySelector('#bag').hidden", 10000, '휴대폰 출발 쪽지');
+    await browser.until("!document.querySelector('#bag').hidden", { timeout: 10000, label: '휴대폰 출발 쪽지' });
     await tap(browser, '#bagClose');
     const acorn=await browser.eval("fieldItems('pickups').find(a=>a.item==='acorn'&&!a.got&&a.y===fieldGround())");
     if(!acorn)throw Error('휴대폰 줍기 시험용 도토리가 없다.');
     await holdTouch(browser, '#pad [data-k="right"]', 'G.px >= '+acorn.x);
     await tap(browser, '#pad [data-k="atk"]');
-    await until(browser, '(G.inv.acorn||0)>=1', 5000, '휴대폰 휘두르기 버튼으로 도토리 줍기');
+    await browser.until('(G.inv.acorn||0)>=1', { timeout: 5000, label: '휴대폰 휘두르기 버튼으로 도토리 줍기' });
     steps.push('휘두르기 터치 버튼으로 바닥 도토리를 직접 줍는다.');
     await tap(browser, '#pad [data-k="bag"]');
-    await until(browser, "!document.querySelector('#bag').hidden", 5000, '휴대폰 보따리');
+    await browser.until("!document.querySelector('#bag').hidden", { timeout: 5000, label: '휴대폰 보따리' });
     await measure('bag', ['#bag']); await tap(browser, '#bagClose');
     steps.push('2. 터치로 새 게임을 시작하고 출발 쪽지를 닫은 뒤 보따리를 연다.');
     await holdTouch(browser, '#pad [data-k="right"]', 'G.px >= 803');
     await tap(browser, '#padTalk');
-    await until(browser, "!document.querySelector('#dlg').hidden", 5000, '까치 대화');
+    await browser.until("!document.querySelector('#dlg').hidden", { timeout: 5000, label: '까치 대화' });
     await measure('dialog', ['#dlg']);
-    for (let i = 0; i < 8; i++) {
-      if (await browser.eval("!!document.querySelector('#dlgChoices button')")) break;
-      await tap(browser, '#dlg');
-    }
+    await browser.advanceDialogue({ stop: 'choices', press: () => tap(browser, '#dlg') });
     await tap(browser, '#dlgChoices button:first-child');
     // 손일은 미니게임 없이 바로 마치고 대화가 이어진다 (PA-46).
-    await until(browser, "!document.querySelector('#dlg').hidden", 5000, '보자기 손일 뒤 까치 대화');
+    await browser.until("!document.querySelector('#dlg').hidden", { timeout: 5000, label: '보자기 손일 뒤 까치 대화' });
     steps.push('3. 오른쪽 터치 버튼을 누른 채 늙은 까치에게 걸어가 말걸기를 누르고, 대화 뒤 보자기 손일을 고른다 (바로 마침).');
     const hooks = await collectHookFindings(browser);
     for (const f of hooks.speakers) findings.push(f);
