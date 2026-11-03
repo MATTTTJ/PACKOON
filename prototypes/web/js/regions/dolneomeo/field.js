@@ -454,7 +454,8 @@ if(!CLASSIC){
   Rg.zones.cliff.step=()=>{Rg.zones.cliff.platforms=G.boss.dead?cliffBases:cliffBases.filter(p=>p.x<2200);commonStep('cliff');};
   Rg.zones.shrine.doors=[
     {id:'dol_depth_village',depth:true,reverse:true,x:100,to:'village',toX:2440,label:'돌담 마을로 돌아가기 · E',draw:marker},
-    {id:'dol_after_golem',depth:true,x:2630,to:'cliff',toX:2630,toY:112,label:'아까 본 절벽 끝으로 · E',need:calm,reason:'돌무더기가 가라앉으면 절벽 끝으로 이어진다.',draw:marker,drawBlocked:blocked},
+    // 결정 D-427: 성황당 끝에서 절벽길 높은 턱으로 바로 옮기던 문(dol_after_golem)은 뺐다. 돌아오는 문이 없는 한쪽 순간이동이었다(사용자 지시 2026-11-03: 순간이동 기믹 빼기).
+    //   서리다래는 골렘에게서 받는다. 절벽 끝 턱은 왼쪽 출구로 절벽길에 나가 다래길 발판을 올라 걸어서 간다.
   ];
   // 필수 물건은 선택 발견에 기대지 않는다. 기존 여섯 알·두 가지에 정확히 +3/+1.
   Rg.zones.field.pickups=[{id:'dol_memil_extra1',x:818,y:192,item:'memil',got:false},{id:'dol_memil_extra2',x:1943,y:192,item:'memil',got:false},{id:'dol_memil_extra3',x:2003,y:192,item:'memil',got:false}];   // D-207
