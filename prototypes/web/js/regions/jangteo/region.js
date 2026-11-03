@@ -113,7 +113,7 @@ const record=(id,text)=>diary('jx_'+id,text);
 function kiteChild(){
   if(G.f.jxKiteFreed){
     if(!G.f.jxKiteReeled){
-      Rg.handWork('kite',()=>{G.f.jxKiteReeled=true;kiteChild();});return;
+      Rg.handWork(()=>{G.f.jxKiteReeled=true;kiteChild();});return;
     }
     // 결정 D-321: 연 이벤트는 걸림 → 풀림 → 때움 → 다시 띄움으로 흐르고, 단계마다 연의 모습을 작은 창과 필드에 그린다(art.js kitePics·kiteScene).
     // 결정 D-293 의 지붕길 배우기는 뺐다(장터 순간이동 지붕문을 없앤다). 연 건져 준 값은 한과 좌판 유과(D-290)다.
@@ -198,7 +198,7 @@ function yutElders(){
 
 function babyBoar(){
   if(G.f.jxBoarScent2){
-    if(!G.f.jxBoarBed){Rg.handWork('snow',()=>{G.f.jxBoarBed=true;babyBoar();});return;}
+    if(!G.f.jxBoarBed){Rg.handWork(()=>{G.f.jxBoarBed=true;babyBoar();});return;}
     talkGive([
       ['알밤이','이 냄새야! 솔잎 아래 마른 풀이 있어.\n아까 엄마랑 여기서 쉬었어.'],
       ['너구리','눈 묻은 솔가지는 치워 둘게.\n바람은 바위가 막아 주네.'],

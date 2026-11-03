@@ -2761,8 +2761,6 @@ const TABLES={
   "field_crawl_frames": 54,
   "field_gravity": 0.32,
   "field_fall_speed": 6,
-  "field_pickup_x": 10,
-  "field_pickup_y": 16,
   "field_talk_distance": 30,
   "field_dig_ahead": 12,
   "field_dig_distance": 16,

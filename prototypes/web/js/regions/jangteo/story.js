@@ -612,7 +612,7 @@ function makePanel(id,title,btn){
 }
 
 // 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
-Rg.handWork=(kind,after)=>{Sound.gather(true);if(after)after();};
+Rg.handWork=after=>{Sound.gather(true);if(after)after();};   // 결정 D-360: 손일은 소리 한 번 뒤 바로 끝난다 (옛 손일 종류 인자는 지웠다)
 
 /* ---------- 결정 D-325: 투호 내기 (윷놀이를 뺐다, 사용자 지시 2026-11-02) ----------
    두 노인이 장터 한구석에서 항아리에 화살을 번갈아 던진다. 아이는 직접 던지지 않고, 판이 열리기 전에 이길 쪽에 솔방울 하나를 건다.
@@ -827,7 +827,7 @@ Rg.lanternAction=id=>{
   // 결정 D-292: 혼자 하는 말은 괄호 안 독백으로 쓴다
   if(!G.f.jxLanternStarted){if(G.zone==='inn')Rg.lanternTalk();else talk([['너구리','(빈 등걸이다.\n숙소 처마 옆에 등불 꾸러미가 있었는데.)']]);return;}
   if(G.f.jxLanterns?.[id]){talk([['너구리',id==='pine'?'(등 너머로 작은 코가 보인다.\n솔숲 안에 누가 있나 보다.)':'(등이 잘 탄다. 다음 등걸이도 보인다.)']]);return;}
-  Rg.handWork('lantern',()=>{
+  Rg.handWork(()=>{
     const lights=G.f.jxLanterns||(G.f.jxLanterns={});lights[id]=true;
     const done=Rg.lanternPoints.every(p=>lights[p.id]);
     const lines={porch:'(처마 아래 짐꾼들 발이 보인다.\n눈 묻은 신을 벗고 들어온다.)',gate:'(창고문 가는 길이 환해졌다.\n돌아올 땐 이 등을 보고 오면 되겠다.)',alley:'(접힌 좌판 뒤에도 발자국이 있다.\n저쪽이 숙소 지름길이구나.)',pine:'(눈 위에 작은 콧자국이 찍혀 있다.\n솔숲 안에서 킁킁 소리가 난다.)'};
