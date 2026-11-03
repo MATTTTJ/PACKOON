@@ -298,32 +298,26 @@ function drawFormFx(){
   ctx.restore();
   if(++fx.t>=total)formFx=null;
 }
-/* 전투 손 (수묵). battle.js drawPaw 의 1.6배 좌표 안에서 그린다 */
+/* 전투 손 (수묵). battle.js drawPaw 의 1.6배 좌표 안에서 그린다. 결정 D-374: 손목·다리 없이 손바닥(발바닥·발굽)만 */
 function drawFormPaw(c,form){
   c.save();
   if(form==='squirrel'){   // 작고 재빠른 다람쥐 손
-    blob(c,5,9,4.5,4.2,'#6a3a1e');
     c.scale(.82,.86);
     blob(c,0,3,7.5,6.6,'#8a4a22');
     for(let i=0;i<4;i++){blob(c,-5.4+i*3.6,-4.6+(i===0||i===3?1.2:0),1.7,3.8,'#8a4a22');brush(c,[[-5.4+i*3.6,-8+(i===0||i===3?1.2:0)],[-5+i*3.6,-10+(i===0||i===3?1.2:0)]],1,INK);}
     blob(c,0.5,4,3.4,2.6,'#d9b08a');
     c.strokeStyle=INK;c.lineWidth=1.2;c.beginPath();c.ellipse(0,3,7.5,6.6,0,0,Math.PI*2);c.stroke();
-  }else if(form==='goat'){   // 굳은 산양 발굽, 흰 털 손목
-    blob(c,0,10,7.5,5,'#cbc2b0');c.strokeStyle=INK;c.lineWidth=1;c.beginPath();c.ellipse(0,10,7.5,5,0,0,Math.PI);c.stroke();brush(c,[[-6,12],[0,14],[6,12]],1.2,INK);
-    blob(c,-6.5,6,1.8,1.6,'#3a2f28');blob(c,6.5,6,1.8,1.6,'#3a2f28');
+  }else if(form==='goat'){   // 굳은 산양 발굽
     blob(c,-3.8,0,4.6,7.6,'#2e2621');blob(c,3.8,0,4.6,7.6,'#2e2621');
     brush(c,[[-6.5,-4],[-4,-7],[-1.5,-4]],1.2,'#8a7d70');brush(c,[[1.5,-4],[4,-7],[6.5,-4]],1.2,'#8a7d70');
     brush(c,[[0,-6],[0,7]],1.4,'#efe3c8');
   }else if(form==='owl'){   // 깃 달린 수리부엉이 손, 노란 발가락과 발톱
-    blob(c,7,11,6,5.5,'#5a4430');
     for(let i=-2;i<=2;i++){c.save();c.translate(0,4);c.rotate(i*.32);blob(c,0,-9,2.6,8.5,i%2?'#8a6a45':'#6f5436');brush(c,[[0,-14],[0,-4]],.9,'#d8c09a',.8);c.restore();}
     blob(c,0,4,6.5,5,'#d8c09a');for(let i=-1;i<=1;i++)brush(c,[[i*3,2],[i*3,6]],.8,'#6f5436');
     for(let i=-1;i<=1;i++){brush(c,[[i*3.5,7],[i*4.5,10.5]],2,'#c9a040');brush(c,[[i*4.5,10.5],[i*5.5,12.5],[i*5.8+(i||.4),11.5]],1.1,INK);}
-  }else if(form==='deer'){   // 긴 고라니 다리, 갈라진 작은 발굽
-    brush(c,[[3,16],[1.5,8],[0,-1]],5,'#b88a55');brush(c,[[3.5,14],[2,8]],1.4,'#e3c9a0');
-    brush(c,[[-2,1],[2,1]],2,'#f4efe2');
-    blob(c,-2.2,-5,2.4,4.2,'#3a2a1f');blob(c,2.2,-5,2.4,4.2,'#3a2a1f');
-    brush(c,[[0,-8.5],[0,-1.5]],1,'#efe3c8');
+  }else if(form==='deer'){   // 갈라진 고라니 발굽 (다리는 그리지 않는다)
+    blob(c,-3,-1,3.2,5.4,'#3a2a1f');blob(c,3,-1,3.2,5.4,'#3a2a1f');
+    brush(c,[[0,-6],[0,4]],1.2,'#efe3c8');
   }
   c.restore();
 }

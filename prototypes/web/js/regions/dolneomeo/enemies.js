@@ -29,7 +29,11 @@
      칸을 가로지르는 걸음·양옆 조이기 가운데 고르며, 눈폭탄은 손 자리 노리기·가로 훑기·세로 훑기를 돌려 쓴다.
    결정 D-256: 눈폭탄 한 대는 통상 공격 피해의 golem_snowball_damage(1/3)만 깎는다.
    결정 D-257: 서리다래는 골렘의 핵 안에서 나온다(사용자 결정 2026-11-02). 이기면 핵이 갈라지며 굴러 나오고,
-     달래면 골렘이 핵에서 꺼내 내려놓는다. 어느 쪽이든 보따리에 들어온다. */
+     달래면 골렘이 핵에서 꺼내 내려놓는다. 어느 쪽이든 보따리에 들어온다.
+   결정 D-370: 부서진 부위는 흐리게 남지 않는다. 다리를 부수면 구들돌 기둥이 무너져 골렘이 돌무더기 위에 주저앉고 발을 찧지 못한다.
+     팔을 부수면 어깨 아래가 떨어져 나가 차돌 조각이 발치에 흩어지고, 휩쓸기도 눈 퍼 던지기도 못 한다.
+   결정 D-376: 팔이 없으면 눈폭탄 대신 몸을 흔들어 어깨와 등에 쌓인 눈을 털어 낸다. 눈덩이는 칸 위에서 곧장 떨어지고
+     수가 golem_barrage_count_armless 로 적다. 다 버티면 핵이 드러나는 차례는 같다. */
 (()=>{
 const T=()=>TABLES.TUNING;
 const SNOW='#f3f5f4',SNOW_SH='#c9d2d8',SLAB='#5b5048',SLAB_LT='#7d7066',QUARTZ='#d2cdc3',QUARTZ_SH='#a39d92',BODY='#6c6e70';
@@ -214,9 +218,16 @@ function drawGolem(c,noFruit){
   const cx=LW/2,cy=EY,leg=part('leg'),arm=part('arm'),core=part('head'),end=endScene();
   const by=bodyY(),rest=!!(B.mark&&B.mark.rest),GY=cy+124,hurt=B.gHurt&&B.gHurt.t>0?B.gHurt:null;
   const flashOf=id=>hurt&&hurt.id===id?hurt.t/16:0;
+  const shrug=arm.broken&&B.cur&&B.cur.id==='head'&&B.st==='atk'&&!end&&!Vfx.reducedMotion;   // 결정 D-376: 몸을 흔들어 눈을 턴다
+  c.save();if(shrug)c.translate(Math.sin(B.time*0.9)*3.5,Math.abs(Math.sin(B.time*0.45))*-2);
   blob(c,cx,cy+130,150,12,INK,0.1);
   // 다리: 구들돌 기둥과 넓적한 돌 발. 찧을 발은 예고 동안 높이 들리고, 떨어지며 제자리를 꾹 찧는다. 칸으로 뻗지 않는다.
-  {const a=leg.broken?0.35:1,o=shk(leg),flash=partCol(leg)===RED,dmg=leg.max-leg.hp,hf=flashOf('leg');
+  if(leg.broken){   // 결정 D-370: 무너진 구들돌 다리. 짧게 부러진 기둥 위에 몸이 내려앉고 발치에 넓적한 돌이 흩어졌다
+    [-1,1].forEach(s=>{const hipX=cx+s*44,hipY=by+50;legColumn(c,hipX,hipY,hipX+s*6,hipY+22,30,1);
+      poly(c,[[hipX-14+s*4,hipY+20],[hipX-6,hipY+28],[hipX+4,hipY+19],[hipX+14+s*4,hipY+27]],'#efe3c8',0.9);   // 부러진 단면
+      slab(c,hipX+s*30,GY-2,26,9,1,false);slab(c,hipX-s*6,GY+6,20,8,1,s>0);slab(c,hipX+s*58,GY+8,14,6,1,false);
+      for(let i=0;i<4;i++)blob(c,hipX+s*(14+i*11),GY+12+hash(i+s)*3,3,2,SLAB_LT,0.8);});}
+  else{const a=1,o=shk(leg),flash=partCol(leg)===RED,dmg=leg.max-leg.hp,hf=flashOf('leg');
     [-1,1].forEach(s=>{const hipX=cx+s*44+o,hipY=by+50,st=stompOf(s);let lift=0;
       if(st){const p=stompPhase(st);
         if(p.tell)lift=ST.lift*(1-Math.pow(1-p.k,2));
@@ -275,7 +286,14 @@ function drawGolem(c,noFruit){
     if(coreHidden()&&!rest&&!end){c.save();c.strokeStyle=INK;c.globalAlpha=.35;c.lineWidth=2;for(let i=0;i<2;i++){c.beginPath();c.arc(cx,by+18,32+i*7,Math.PI*0.15,Math.PI*0.85);c.stroke();}c.restore();}}
   // 팔: 길게 늘어진 설인 팔, 차돌 마디와 큰 주먹. 가로로 쓸 팔은 옆으로 젖혔다가 몸 앞을 쓸고, 내리쓸 팔은 머리 위로 들었다가 앞으로 내리친다.
   // 던질 팔은 눈덩이를 쥐고 머리 위로 들었다가 앞으로 내던진다.
-  {const a=arm.broken?0.32:1,o=shk(arm),drop=arm.broken?40:0,ab=armBullet(),ra=B.restArm,dmg=arm.max-arm.hp,hf=flashOf('arm');
+  if(arm.broken){   // 결정 D-370: 팔은 어깨 아래가 떨어져 나갔다. 깨진 단면과 발치에 흩어진 차돌
+    [-1,1].forEach(s=>{const shX=cx+s*72,shY=by-20;
+      brush(c,[[shX,shY],[cx+s*88,by+4]],20,QUARTZ_SH,0.9);quartz(c,cx+s*84,by-4,15,13,1,s+2);
+      poly(c,[[cx+s*76,by+8],[cx+s*86,by+14],[cx+s*98,by+6],[cx+s*92,by-2]],'#efe3c8',0.95,INK,1.2);   // 깨진 단면
+      fur(c,shX+s*6,shY-6,3,26,24,1);
+      quartz(c,cx+s*112,GY+4,12,9,1,s+5);quartz(c,cx+s*136,GY+10,9,8,1,s+7);quartz(c,cx+s*96,GY+12,8,6,1,s+9);
+      for(let i=0;i<3;i++)blob(c,cx+s*(104+i*14),GY+16+hash(i*1.3+s)*3,2.4,1.8,QUARTZ_SH,0.8);});}
+  else{const a=1,o=shk(arm),drop=0,ab=armBullet(),ra=B.restArm,dmg=arm.max-arm.hp,hf=flashOf('arm');
     const idleEl=s=>[cx+s*98,by+34+drop*0.6],idleHd=s=>[cx+s*106,by+96+drop];
     [-1,1].forEach(s=>{const shX=cx+s*72+o,shY=by-20;let el=idleEl(s),hd=idleHd(s),ball=null;
       const sweepPose=k=>{const hx=cx+s*(196-366*k);return [[(shX+hx)/2+s*12,by+44],[hx,by+80+6*k]];};
@@ -301,6 +319,7 @@ function drawGolem(c,noFruit){
       if(ball)drawSnowball(c,hd[0],hd[1]-18,16,ball.t*0.05);   // 쥐고 든 눈덩이
       if(partCol(arm)===RED)brush(c,[[shX,shY],el,hd],3,RED,0.7);});}
   for(const ch of B.gChips||[])blob(c,ch.x,ch.y,ch.r,ch.r*0.8,ch.col,Math.min(1,ch.t/14));   // 친 부위에서 떨어지는 돌 부스러기
+  c.restore();
   if(end&&!noFruit)drawEndFruit(c,cx,by+18,GY,end);
 }
 /* 결정 D-257: 끝 장면의 핵. 이기면 금이 번지다 두 쪽으로 갈라지고, 달래면 눈 껍데기가 떨어지고 핵이 환해진다 */
@@ -471,7 +490,7 @@ function stoneRoll(id,hitText,x,y){
   if(r.got>=t.golem_stone_cap){B.msg=hitText;return false;}
   // 결정 D-224: 곡괭이가 아닌 도구로 치면 확률이 battle_tool_bad_mult 배
   if(Math.random()<toolChance(part(id),Math.min(1,t.golem_stone_chance+t.golem_stone_step*r.miss))){r.got++;r.miss=0;B.loot.push(item);B.msg=hitText+' '+ITEMS[item].n+' 한 조각이 떨어졌다!';return true;}
-  r.miss++;B.msg=hitText+(toolFit(part(id))==='bad'?' 도구가 잘 안 먹는다.':' 돌가루만 튄다.');return false;
+  r.miss++;B.msg=hitText+(toolFit(part(id))==='bad'?' 효과가 적은 것 같다.':' 돌가루만 튄다.')   // 결정 D-373;return false;
 }
 const HIT_TEXT={leg:'박힌 발바닥을 쳤다!',arm:'멈춘 차돌 팔을 쳤다!',head:'서리 옥 핵을 쳤다!'};
 const CLOSE_TEXT={leg:'발바닥이 부서져 눈 속에 묻혔다.',arm:'골렘이 팔을 거둬들였다.',head:'골렘이 가슴을 다시 여몄다.'};
@@ -513,7 +532,8 @@ function pickGolem(){
   // 결정 D-255: 같은 모양을 연달아 쓰지 않는다
   if(id==='arm'){B.armOrient=B.armOrient?(B.armOrient==='h'?'v':'h'):(Math.random()<0.5?'h':'v');B.msg=B.armOrient==='v'?'골렘이 차돌 팔을 머리 위로 치켜든다.':p.tell;}
   if(id==='leg'){const o=['aim','march','pincer'].filter(k=>k!==B.stompPat);B.stompPat=B.stompRound?o[Math.floor(Math.random()*o.length)]:'aim';}
-  if(id==='head'){const o=['aim','rowSweep','colSweep'].filter(k=>k!==B.snowPat);B.snowPat=o[Math.floor(Math.random()*o.length)];}
+  if(id==='head'){const o=['aim','rowSweep','colSweep'].filter(k=>k!==B.snowPat);B.snowPat=o[Math.floor(Math.random()*o.length)];
+    if(part('arm').broken)B.msg='골렘이 몸을 흔들어 어깨에 쌓인 눈을 털어 낸다.';}   // 결정 D-376
 }
 
 /* ---------- 공격 ---------- */
@@ -528,6 +548,8 @@ function stompTarget(b){
 }
 const SNOW_STOMP_DUR=n=>(n-1)*ST.gap+ST.tell+ST.drop+Math.max(ST.wave,ST.clumpFly+14)+6;
 const ARM_DUR=orient=>AR.tell+(orient==='v'?AR.vSweep:AR.sweep)+AV.tell+(orient==='v'?Math.ceil((BOX.w+40)/AV.sideSpeed):Math.ceil((BOX.h+28)/AV.speed))+6;
+/* 결정 D-376: 팔이 부서지면 눈을 퍼 던지지 못하고 몸을 털어 떨군다. 수가 적다 */
+const snowCount=()=>part('arm').broken?T().golem_barrage_count_armless:T().golem_barrage_count;
 defineAttacks({
   golemStomp:{get dur(){return SNOW_STOMP_DUR(stompCount());},tick(t){if(t)return;
     const n=stompCount(),start=Math.random()<0.5?-1:1,pat=B.stompPat||'aim',dir=B.px>BOX.x+BOX.w/2?-1:1;B.stompRound=(B.stompRound||0)+1;B.restSole=null;
@@ -536,9 +558,9 @@ defineAttacks({
     const orient=B.armOrient||'h';
     if(orient==='v'){const side=B.px<BOX.x+BOX.w/2?-1:1;B.bullets.push({k:'golemArm',t:0,side,orient});}   // 손이 있는 쪽 절반을 내리친다
     else{const side=Math.random()<0.5?-1:1,cov=Math.random()<0.5?'top':'bottom';B.bullets.push({k:'golemArm',t:0,side,cov,orient});}}},
-  golemSnow:{get dur(){return (T().golem_barrage_count-1)*SB.gap+SB.wind+SB.fly+SB.splat+4;},tick(t){if(t)return;
-    const n=T().golem_barrage_count,s0=Math.random()<0.5?-1:1,pat=B.snowPat||'aim';
-    for(let i=0;i<n;i++)B.bullets.push({k:'golemSnowball',t:0,delay:i*SB.gap,i,n,pat,dir:s0,side:i%2?-s0:s0,tx:null,ty:null});}},
+  golemSnow:{get dur(){return (snowCount()-1)*SB.gap+SB.wind+SB.fly+SB.splat+4;},tick(t){if(t)return;
+    const n=snowCount(),s0=Math.random()<0.5?-1:1,pat=B.snowPat||'aim',drop=part('arm').broken;
+    for(let i=0;i<n;i++)B.bullets.push({k:'golemSnowball',t:0,delay:i*SB.gap,i,n,pat,dir:s0,side:i%2?-s0:s0,tx:null,ty:null,drop});}},
 });
 /* 눈폭탄 떨어질 자리 (결정 D-255). rowSweep 은 손이 있던 줄을 한쪽 끝에서 훑고, 반쯤 던지면 그때 손 줄을 반대로 훑는다. colSweep 은 세로로 */
 function snowTarget(b){
@@ -677,7 +699,8 @@ defineBullets({
     step(b){b.t++;const rel=b.delay+SB.wind,land=rel+SB.fly;
       if(b.tx==null&&b.t>=rel){const [x,y]=snowTarget(b);
         b.tx=clamp(x,BOX.x+20,BOX.x+BOX.w-20);b.ty=clamp(y,BOX.y+18,BOX.y+BOX.h-14);
-        const h=toScreen(LW/2+b.side*80,bodyY()-114);b.sx=h.x;b.sy=h.y;}
+        if(b.drop){b.sx=b.tx+(hash(b.i*1.9)-0.5)*30;b.sy=BOX.y-150;}   // 결정 D-376: 몸에서 털린 눈이 칸 위에서 곧장 떨어진다
+        else{const h=toScreen(LW/2+b.side*80,bodyY()-114);b.sx=h.x;b.sy=h.y;}}
       // 결정 D-256: 눈폭탄 한 대는 통상 피해의 golem_snowball_damage 만큼
       if(b.t===land){Sound.playSfx('battle_hit');snowPowder(b.tx,b.ty);if(Math.hypot(B.px-b.tx,B.py-b.ty)<SB.hit)bHitMe(T().golem_snowball_damage);}
       if(b.t>land+SB.splat)b.dead=1;},
@@ -698,8 +721,8 @@ defineBullets({
 function drawSnowFlights(c){
   for(const b of B.bullets){if(b.k!=='golemSnowball'||b.tx==null)continue;
     const rel=b.delay+SB.wind,land=rel+SB.fly;if(b.t>=land)continue;
-    const k=(b.t-rel)/SB.fly,x=b.sx+(b.tx-b.sx)*k,y=b.sy+(b.ty-b.sy)*k-80*4*k*(1-k);
-    drawSnowball(c,x,y,13+9*k,b.t*0.15);
+    const k=(b.t-rel)/SB.fly,e=b.drop?k*k:k,x=b.sx+(b.tx-b.sx)*e,y=b.sy+(b.ty-b.sy)*e-(b.drop?0:80*4*k*(1-k));
+    drawSnowball(c,x,y,b.drop?11+6*k:13+9*k,b.t*0.15);
   }
   drawImpacts(c);
 }
@@ -739,8 +762,9 @@ defineEnemies({
     settle:true,   // 결정 D-243: 눈사태·튄 눈덩이가 다 사라진 뒤에 빈틈을 연다
     headPose(){return toScreen(LW/2,bodyY()-46);},
     openMark:golemOpenMark,
-    parts:tableParts('golem',{leg:{atk:'golemStomp',mark:'발',tell:'골렘이 구들돌 발을 높이 쳐든다.'},
-      arm:{atk:'golemArm',mark:'팔',tell:'골렘이 차돌 팔을 옆으로 크게 젖힌다.'},
+    // 결정 D-370: weak 는 부서진 뒤 한 줄
+    parts:tableParts('golem',{leg:{atk:'golemStomp',mark:'발',tell:'골렘이 구들돌 발을 높이 쳐든다.',weak:'골렘이 털썩 주저앉았다. 더는 발을 찧지 못한다.'},
+      arm:{atk:'golemArm',mark:'팔',tell:'골렘이 차돌 팔을 옆으로 크게 젖힌다.',weak:'골렘이 약해졌다. 팔이 없어 휩쓸지도, 눈을 던지지도 못한다.'},
       head:{atk:'golemSnow',mark:'핵',tell:'골렘이 두 팔로 눈을 퍼 올린다.'}}),
     likes:TABLES.CALM.golem,likeText:'돌무더기가 잠시 숨을 고른다.',
     likeTexts:{story_stone:'아빠가 못 올린 소원 돌을 건넸다. 돌 골렘이 가만히 내려다본다.'},
