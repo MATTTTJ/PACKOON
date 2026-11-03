@@ -80,10 +80,6 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
         await wait(100);
       }else if(id==='dolDepthTravel') {
         await wait(100);
-      }else if(id==='galTravel') {
-        const trip=await read('REG.expTravel?.()');
-        if(trip?.kind==='tree')throw new Error('필수 경로 밖 나무 속 등반이 열렸다');
-        await wait(150);
       }else throw new Error('처리 방법이 없는 미니게임: '+id);
     }
     throw new Error(`미니게임 ${id}에서 45초 진행하지 못했다`);

@@ -3,7 +3,7 @@
    선물로 진정 게이지를 채워 달랠 수도 있다 (진정은 선물로만, D-243). 상대는 지역 파일이 defineEnemies 로 넣는다.
 
    상대 {name, calmLabel, intro, howto?, npc?, dodge?(피하기만 하는 시험: 버틸 공격 수), bonkText?(dodge 시작 때 연장을 뺏기는 글),
-         parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell}],
+         parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell, weak?(부서진 뒤 약해진 모습 한 줄, 결정 D-370)}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
          settle?:true(공격 탄이 다 사라진 뒤에 빈틈을 연다. 옛 calmAction 도 이 뜻으로만 읽는다, D-243), markLife?:빈틈 유지 프레임, placeGift?:꼭대기에 얹을 선물 id,
          firstPart?:첫 공격 부위 id(첫 예고는 조금 길다), strike?():치기를 상대가 먼저 처리했으면 true, onMarkHit?(부위, 표식):붉은 표식을 친 뒤(재료 얻기 등),
@@ -64,12 +64,8 @@ function bAim(){
   if(!battleTool()||B.handShow>0)return {x:B.px,y:B.py};
   return {x:B.px-t.battle_aim_left*k,y:B.py-t.battle_aim_up*k};
 }
-/* 지금 칠 곳(빈틈)에 잘 먹는 도구가 따로 있고 그 도구를 가졌으면 그 id (결정 D-242) */
-function wantedBattleTool(){
-  if(!B||B.E.dodge||B.noTool)return null;
-  const p=B.mark?B.mark.part:null,own=ownedBattleTools();
-  return p&&p.tool&&p.tool!==battleTool()&&own.includes(p.tool)?p.tool:null;
-}
+/* 결정 D-373: 빈틈마다 잘 먹는 도구를 깜박여 바꾸라고 알리던 표시(D-242 의 깜박임·Q 키 그림)는 뺐다.
+   안 먹는 도구로 치면 "효과가 적은 것 같다"는 글로만 알린다 (사용자 피드백 2026-11-03). */
 function battleForm(){const id=G&&G.form;return B&&!B.E.dodge&&!B.noTool&&id&&hasForm(id)?id:'';}
 function battleHandProfile(){
   const id=battleForm(),prefix='battle_'+(id||'bare')+'_',t=TABLES.TUNING;
@@ -174,7 +170,7 @@ function startBattle(kind,onEnd){
   B={hoof:0,kind,E,parts:E.parts.map(p=>Object.assign({},p,{max:p.hp,broken:false,shake:0})),calm:0,
     px:0,py:0,inv:0,st:'intro',t:90,cur:null,last:null,mark:null,bullets:[],fx:[],cool:0,swing:0,atkT:0,atkDur:0,
     loot:[],msg:E.intro,onEnd,paused:false,time:0,result:null,firstHit:true,hits:0,hitThis:false,survived:0,noTool:false,toolFly:null,bonk:0,bonus:'',
-    hitStop:0,quakeT:0,pops:[],cracks:[],impact:null,toolWant:null};
+    hitStop:0,quakeT:0,pops:[],cracks:[],impact:null,later:[]};
   document.body.classList.add('in-battle');$('battle').hidden=false;
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
   if(E.showHands){B.handShown=false;B.handShow=0;}
@@ -337,7 +333,7 @@ function strikeFeedback(aim,hits0,own){
 /* 결정 D-224: 친 뒤 한 줄. 잘 먹는지 아닌지만 짧게 */
 function toolHitText(p,tool=battleTool()){
   const by=tool?jo(toolName(tool),'으로','로')+' ':'',fit=toolFit(p,tool);
-  return by+jo(p.name,'을','를')+' 쳤다.'+(fit==='good'?' 잘 먹힌다!':fit==='bad'?' 잘 안 먹힌다.':'');
+  return by+jo(p.name,'을','를')+' 쳤다.'+(fit==='good'?' 잘 먹힌다!':fit==='bad'?' 효과가 적은 것 같다.':'');   // 결정 D-373
 }
 function breakPart(p){
   p.broken=true;
@@ -346,8 +342,14 @@ function breakPart(p){
   if(p.mat&&!p.core)B.loot.push(p.mat);
   if(p.core){if(p.mat)B.loot.push(p.mat);bEnd('win');return;}
   B.msg=B.E.npc?jo(p.name,'의','의')+' 기세를 꺾었다!':jo(p.name,'이','가')+' 부러졌다! '+(p.mat?ITEMS[p.mat].n+' 획득.':'');
-  if(B.E.coreNeeds?p.id===B.E.coreNeeds:B.parts.filter(q=>!q.core).filter(q=>q.broken).length===1){learn('core:'+B.kind);setTimeout(()=>{if(B&&B.st!=='end')B.msg=B.E.coreShown;},1300);}
+  // 결정 D-370: 부서진 부위는 그 공격을 더 못 한다(공격은 남은 부위에서만 고른다). 약해진 모습을 한 줄로 알리고, 그림도 부서진 모습으로 바뀐다
+  if(p.weak)bLater(p.weak,T_LATER);
+  if(B.E.coreNeeds?p.id===B.E.coreNeeds:B.parts.filter(q=>!q.core).filter(q=>q.broken).length===1){learn('core:'+B.kind);bLater(B.E.coreShown,p.weak?T_LATER*2:T_LATER);}
 }
+/* 결정 D-370: 부서진 뒤의 글은 차례로 보인다. 남은 글이 있는 동안은 다음 공격을 시작하지 않는다(예고 글을 덮지 않게) */
+const T_LATER=72;
+function bLater(text,delay){if(text)B.later.push({at:B.time+delay,text});}
+function stepLater(){while(B.later.length&&B.time>=B.later[0].at){const q=B.later.shift();if(B.st!=='end')B.msg=q.text;}}
 function bEnd(result){
   if(B.st==='end')return;B.st='end';B.t=80;B.result=result;B.mark=null;B.bullets=[];
   if(result==='win'||result==='calm')Sound.playSfx(result==='calm'?'battle_soothe':'battle_victory');
@@ -365,11 +367,10 @@ function bStep(){
   if(B.handShow>0){if(--B.handShow===0){B.msg=B.handMsg;openGift();}return;}
   // 결정 D-244: 친 순간 잠깐 멈춘다. 멈춘 동안에는 흔들림·튐만 흐르고 공격과 시간은 서 있다
   if(B.hitStop>0){B.hitStop--;if(B.quakeT>0)B.quakeT--;return;}
-  B.time++;if(B.inv>0)B.inv--;if(B.cool>0)B.cool--;if(B.swing>0)B.swing--;if(B.toolSwap>0)B.toolSwap--;if(B.quakeT>0)B.quakeT--;
+  B.time++;stepLater();if(B.inv>0)B.inv--;if(B.cool>0)B.cool--;if(B.swing>0)B.swing--;if(B.toolSwap>0)B.toolSwap--;if(B.quakeT>0)B.quakeT--;
   if(B.impact&&--B.impact.t<=0)B.impact=null;
   for(const k of B.cracks)k.t--;B.cracks=B.cracks.filter(k=>k.t>0);
   for(const q of B.pops){q.t--;q.y-=0.45;}B.pops=B.pops.filter(q=>q.t>0);
-  {const want=wantedBattleTool();if(want!==B.toolWant){B.toolWant=want;renderBattleForms();}}
   if(B.slowT>0)B.slowT--;
   if(B.warm&&B.warm.fire>0)B.warm.fire--;
   if(B.st!=='end'&&B.st!=='giftPlace'&&B.st!=='finale'){
@@ -390,7 +391,7 @@ function bStep(){
     case 'intro':
       if(--B.t<=0){if(B.E.dodge&&!B.noTool){B.st='bonk';B.t=120;B.noTool=true;B.bonk=34;B.msg=B.E.bonkText;B.toolFly={x:B.px+10,y:B.py-12,vx:-3.2,vy:-5.5,rot:0};renderBHud();}else{B.st='idle';B.t=20;}}break;
     case 'bonk':if(B.t===60)B.msg='연장을 놓쳤다! 이번엔 피하기만 해야 한다.';if(--B.t<=0){B.st='idle';B.t=20;B.toolFly=null;}break;
-    case 'idle':if(--B.t<=0)chooseAttack();break;
+    case 'idle':if(--B.t<=0&&!B.later.length)chooseAttack();break;
     case 'tell':if(--B.t<=0){B.st='atk';B.atkT=0;B.atkDur=bAttackDef(B.cur).dur;}break;
     case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.possession||B.E.warmPath||B.E.settle||B.E.calmAction)B.st='settle';else{B.st='open';B.opens=(B.opens||0)+1;openMark();}}break;
     case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';B.opens=(B.opens||0)+1;openMark();}break;
@@ -572,8 +573,7 @@ function drawPaw(c,x,y,palm=false){
   }
   if(form&&!B.handShow)drawFormPaw(c,form);
   else if(palm){
-  // 손목
-  blob(c,7,11,6.5,6,'#3a322b');
+  // 결정 D-374: 손목은 그리지 않는다 (사용자 피드백 2026-11-03: 밑에 붙은 작은 원)
   // 손바닥 (오동통한 너구리 손)
   blob(c,0,2,9.5,8.5,'#4a4038');
   for(let i=0;i<4;i++)blob(c,-7.2+i*4.8,-6.2+(i===0||i===3?1.4:0),3.3,3.8,'#4a4038');
@@ -581,8 +581,7 @@ function drawPaw(c,x,y,palm=false){
   for(let i=0;i<4;i++)blob(c,-7.2+i*4.8,-6.4+(i===0||i===3?1.4:0),1.7,1.9,'#b9a38f');
   c.strokeStyle=INK;c.lineWidth=1.3;c.beginPath();c.ellipse(0,2,9.5,8.5,0,0,Math.PI*2);c.stroke();
   }else{
-  // 손목과 손등: 손바닥 살은 보이지 않고 털 덮인 등만 보인다 (손바닥 그림보다 밝은 갈색 털)
-  blob(c,6,12,6.5,6,'#2e2722');
+  // 손등: 손바닥 살은 보이지 않고 털 덮인 등만 보인다 (손바닥 그림보다 밝은 갈색 털). 결정 D-374: 손목은 그리지 않는다
   blob(c,0,3,9.5,8,'#5d4f43');
   c.strokeStyle=INK;c.lineWidth=1.3;c.beginPath();c.ellipse(0,3,9.5,8,0,0,Math.PI*2);c.stroke();
   // 손등 털결: 손목에서 손가락 쪽으로 짧게

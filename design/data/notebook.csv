@@ -17,7 +17,7 @@ toad,galchamgol,두꺼비 할멈,동물,아빠,,처음부터,"두꺼비 약재�
 toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,엄마의 병을 고치지는 못해도 늦출 수는 있다고 했다. 무언가 알면서 말을 아낀다.,제안,,관찰
 toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,보따리 속 약연을 보더니 아직 쓸 때가 아니라고 했다.,제안,,관찰
 toad,galchamgol,두꺼비 할멈,동물,나,galchamgol:arc-toad-wrap,[시험판] 약을 보낸 뒤 엄마 이야기를 듣고 인사를 드렸을 때,내가 아기였던 겨울에 엄마가 두고 간 포대기 끈을 받았다. 할멈이 내내 간직하고 있었다.,제안,arcs=1 선택 장면 · 교환 품목이 아닌 받은 물건의 기록,관찰
-stream_otter,galchamgol,여울,동물,나,met:stream_otter,처음 만났을 때,"개울의 어린 수달. 밤마다 함지박을 도로 밀어 올려 둔다. 엄마를 ""빨래 아줌마""라고 부른다.",제안,결정 D-117,관찰
+stream_otter,galchamgol,여울,동물,나,met:stream_otter,처음 만났을 때,"개울의 어린 수달. 물이 불어 떠내려간 함지박을 밤마다 도로 이고 올라온다. 엄마를 ""빨래 아줌마""라고 부른다.",제안,결정 D-117,관찰
 stream_otter,galchamgol,여울,동물,나,otter:stone,함지박 밑 낙관을 봤을 때,엄마는 빨래를 마치면 물수제비를 일곱 번 떴다고 한다. 나는 몰랐다.,제안,결정 D-117,관찰
 charcoal_badger,galchamgol,검댕,동물,나,met:charcoal_badger,처음 만났을 때,"참나무 숲에서 숯 굽는 오소리. 흰 연기는 아직, 푸른 연기면 다 된 숯이다.",제안,결정 D-117,관찰
 charcoal_badger,galchamgol,검댕,동물,나,geom:nal,눈을 씻고 연기 빛을 봤을 때,날쌘 아저씨는 값을 깎는 척하고 가마 옆에 몰래 덤을 두고 간다. 모른 척하기로 했다.,제안,결정 D-117,관찰
