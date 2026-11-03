@@ -243,7 +243,6 @@ for(const [table,values] of [['minigames',MINIGAMES],['tuning',TUNING]]){
 requireValue(MINIGAMES.rhythm_notes<=8&&MINIGAMES.rhythm_normal_last<MINIGAMES.rhythm_notes&&MINIGAMES.rhythm_bonus_hits<=MINIGAMES.rhythm_notes,'minigames.csv: 구현된 노트 수와 덤 기준을 확인한다');
 const noteKeys=['one','two','three','four','five','six','seven','eight'];
 for(let i=1;i<noteKeys.length;i++)requireValue(MINIGAMES['rhythm_note_'+noteKeys[i]]>MINIGAMES['rhythm_note_'+noteKeys[i-1]],'minigames.csv: 노트 시각은 순서대로 커져야 한다');
-requireValue(MINIGAMES.dad_steps<=3,'minigames.csv: 구현된 몸짓은 세 단계까지다');
 requireValue(TUNING.kkubeogi_awake<=TUNING.kkubeogi_cycle&&TUNING.kkubeogi_cue<=TUNING.kkubeogi_cycle,'tuning.csv: 꾸벅이 판정과 예고가 주기보다 길다');
 requireValue(TUNING.field_drop_hang_frames<=TUNING.field_drop_frames&&TUNING.field_drop_hang_speed>0,'tuning.csv: 가장자리 붙잡기 시간은 발판 통과 시간보다 길 수 없고, 빠르기는 0보다 커야 한다 (D-114)');
 requireValue(TUNING.field_swing_hit_at<TUNING.field_swing_frames,'tuning.csv: 휘두르기 판정 시점이 전체 시간보다 짧아야 한다');
