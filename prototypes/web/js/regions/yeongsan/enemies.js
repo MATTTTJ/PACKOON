@@ -2,7 +2,9 @@
 /* 북쪽 영산 전투: 강철이 (용이 되지 못한 이무기). 원본 표: design/data/bosses.csv · boss_parts.csv
    부위 공격 넷은 온기 길(warmPath)의 gangcheol* 공격이다 (engine/battle-attacks.js, boss_parts.csv 의 공격 칸).
    머리는 몸통을 부숴야 드러난다 (coreNeeds).
-   결정 D-340: 온기 길이 네 부위 공격을 모두 덮어 쓰이지 않던 옛 기본 공격(frostBreath·coil·icicleTail·blizzard)은 지웠다. */
+   결정 D-340: 온기 길이 네 부위 공격을 모두 덮어 쓰이지 않던 옛 기본 공격(frostBreath·coil·icicleTail·blizzard)은 지웠다.
+   결정 D-370: 부서진 부위는 흐리게 남지 않는다. 꼬리는 끊긴 그루터기와 깨진 고드름, 몸통은 힘이 빠져 바닥에 늘어진 똬리,
+     입은 금 가 처진 턱으로 그린다. 부서진 부위의 공격은 더 고르지 않는다. */
 (()=>{
 function drawGangcheol(c){
   const cx=LW/2,cy=EY;const mouth=part('mouth'),body=part('body'),tail=part('tail'),head=part('core');
@@ -14,22 +16,32 @@ function drawGangcheol(c){
     for(let i=0;i<3;i++)brush(c,[[x-7,y-12],[x+3+i*4,y-17+i*3]],2,INK,0.75);
   }
   // 꼬리 (오른쪽 아래)
-  {const o=shk(tail),col=partCol(tail);const a=tail.broken?0.3:1;const lift=B.st==='tell'&&B.cur===tail?-20:0;
+  if(tail.broken){   // 끊긴 꼬리: 짧은 그루터기와 바닥에 깨져 흩어진 고드름
+    brush(c,[[cx+60,cy+70],[cx+104,cy+70]],10,INK,1);
+    c.save();c.fillStyle='#efe3c8';c.globalAlpha=0.9;c.beginPath();c.moveTo(cx+100,cy+64);c.lineTo(cx+110,cy+67);c.lineTo(cx+104,cy+70);c.lineTo(cx+111,cy+74);c.lineTo(cx+100,cy+76);c.closePath();c.fill();c.restore();
+    for(let i=0;i<5;i++){const tx=cx+122+i*16,ty=cy+98+hash(i*1.7)*4;c.save();c.fillStyle=INK;c.globalAlpha=0.75;c.translate(tx,ty);c.rotate(1.2+hash(i)*1.4);c.beginPath();c.moveTo(-3,0);c.lineTo(3,0);c.lineTo(0,8);c.closePath();c.fill();c.restore();}}
+  else{const o=shk(tail),col=partCol(tail);const a=1;const lift=B.st==='tell'&&B.cur===tail?-20:0;
     brush(c,[[cx+60+o,cy+70],[cx+130+o,cy+60+lift],[cx+170+o,cy+20+lift+wave],[cx+150+o,cy-10+lift]],10,col,a);
-    if(!tail.broken)for(let i=0;i<4;i++){const tx=cx+120+i*14+o,ty=cy+54-i*14+lift;c.save();c.fillStyle=INK;c.globalAlpha=a;c.beginPath();c.moveTo(tx-4,ty);c.lineTo(tx+4,ty);c.lineTo(tx,ty+14);c.closePath();c.fill();c.restore();}}
+    for(let i=0;i<4;i++){const tx=cx+120+i*14+o,ty=cy+54-i*14+lift;c.save();c.fillStyle=INK;c.globalAlpha=a;c.beginPath();c.moveTo(tx-4,ty);c.lineTo(tx+4,ty);c.lineTo(tx,ty+14);c.closePath();c.fill();c.restore();}}
   // 몸통 (휘감은 똬리)
-  {const o=shk(body),col=partCol(body);const a=body.broken?0.3:1;const tight=B.st==='tell'&&B.cur===body?-10:0;
-    brush(c,[[cx-150+o,cy+70],[cx-90+o,cy+40+wave+tight],[cx-10+o,cy+80],[cx+60+o,cy+50-wave+tight],[cx+60+o,cy+70]],26,col,a*0.9);
-    brush(c,[[cx-130+o,cy+86],[cx-40+o,cy+92],[cx+40+o,cy+88]],18,col,a*0.75);
-    if(!body.broken)for(let i=0;i<9;i++){const sx=cx-130+i*24+o,sy=cy+60+Math.sin(i*1.3)*14;brush(c,[[sx-6,sy],[sx,sy-6],[sx+6,sy]],2,'#efe3c8',0.6);}}
+  if(body.broken){   // 풀린 똬리: 힘이 빠져 바닥에 늘어지고, 비늘 몇 장이 떨어져 금이 보인다
+    brush(c,[[cx-150,cy+88],[cx-90,cy+80],[cx-10,cy+92],[cx+60,cy+84],[cx+70,cy+92]],24,INK,0.85);
+    for(let i=0;i<6;i++){const sx=cx-128+i*34,sy=cy+84+Math.sin(i*1.3)*4;brush(c,[[sx-5,sy-4],[sx+2,sy+2],[sx-2,sy+7]],1.6,'#efe3c8',0.8);}
+    for(let i=0;i<5;i++)blob(c,cx-120+i*40+hash(i)*10,cy+104+hash(i*3.1)*3,4,2.4,'#efe3c8',0.5);}
+  else{const o=shk(body),col=partCol(body);const tight=B.st==='tell'&&B.cur===body?-10:0;
+    brush(c,[[cx-150+o,cy+70],[cx-90+o,cy+40+wave+tight],[cx-10+o,cy+80],[cx+60+o,cy+50-wave+tight],[cx+60+o,cy+70]],26,col,0.9);
+    brush(c,[[cx-130+o,cy+86],[cx-40+o,cy+92],[cx+40+o,cy+88]],18,col,0.75);
+    for(let i=0;i<9;i++){const sx=cx-130+i*24+o,sy=cy+60+Math.sin(i*1.3)*14;brush(c,[[sx-6,sy],[sx,sy-6],[sx+6,sy]],2,'#efe3c8',0.6);}}
   // 머리와 입
   {const o=shk(head),col=partCol(head);const hidden=coreHidden();const hx=cx-70+o,hy=cy-10+wave*0.5+(hidden?16:0);
-    brush(c,[[cx-120+o,cy+50],[hx-10,hy+30],[hx,hy+6]],20,partCol(body),body.broken?0.3:0.9);
+    brush(c,[[cx-120+o,cy+(body.broken?84:50)],[hx-10,hy+30],[hx,hy+6]],20,body.broken?INK:partCol(body),0.9);
     blob(c,hx,hy,34,24,col===INK?'#231e19':col,head.broken?0.3:1);
     brush(c,[[hx-26,hy-16],[hx-34,hy-36]],5,INK,head.broken?0.3:1);brush(c,[[hx-6,hy-20],[hx-4,hy-40]],5,INK,head.broken?0.3:1);   // 뿔이 되다 만 혹
     // 입 (서리 숨)
-    const mo=shk(mouth),mc=partCol(mouth);const open=B.st==='tell'&&B.cur===mouth?10:mouth.broken?0:4;
-    brush(c,[[hx+18+mo,hy+6],[hx+38+mo,hy+4+open*0.3]],6,mc,mouth.broken?0.3:1);brush(c,[[hx+18+mo,hy+14],[hx+38+mo,hy+16+open]],6,mc,mouth.broken?0.3:1);
+    const mo=shk(mouth),mc=partCol(mouth);const open=B.st==='tell'&&B.cur===mouth?10:4;
+    if(mouth.broken){brush(c,[[hx+18,hy+6],[hx+36,hy+6]],6,INK,1);brush(c,[[hx+18,hy+16],[hx+30,hy+28],[hx+36,hy+34]],6,INK,1);   // 금 가 처진 턱
+      brush(c,[[hx+26,hy+18],[hx+30,hy+24],[hx+27,hy+29]],1.6,'#efe3c8',0.9);}
+    else{brush(c,[[hx+18+mo,hy+6],[hx+38+mo,hy+4+open*0.3]],6,mc,1);brush(c,[[hx+18+mo,hy+14],[hx+38+mo,hy+16+open]],6,mc,1);}
     if(!mouth.broken){brush(c,[[hx+30,hy+2],[hx+70,hy-10],[hx+96,hy+6]],2,INK,0.6);brush(c,[[hx+30,hy+18],[hx+66,hy+34],[hx+92,hy+28]],2,INK,0.6);}   // 수염
     if(head.broken){brush(c,[[hx-14,hy-2],[hx-4,hy]],3,'#efe3c8');}
     else{const [ex,ey]=lookAt(hx,hy);blob(c,hx-4,hy-4,8,7,'#efe3c8');blob(c,hx-4+ex,hy-4+ey,3.5,4,INK);}
@@ -86,7 +98,10 @@ defineEnemies({
     markPosition(p){const u=p.id==='mouth'?0.26:p.id==='tail'?0.74:0.5;
       const v=B.warm&&B.warm.current.v<0.5?0.76:0.24;
       return {x:BOX.x+BOX.w*u,y:BOX.y+BOX.h*v};},
-    parts:tableParts('gangcheol',{mouth:{tell:'서리 띠가 내려온다.'},body:{tell:'강철이가 똬리를 조인다.'},tail:{tell:'꼬리에서 고드름이 흩날린다.'},core:{tell:'눈보라가 돌아온다.'}}),
+    // 결정 D-370: weak 는 부서진 뒤 한 줄
+    parts:tableParts('gangcheol',{mouth:{tell:'서리 띠가 내려온다.',weak:'강철이가 약해졌다. 금 간 턱으로는 서리를 뿜지 못한다.'},
+      body:{tell:'강철이가 똬리를 조인다.',weak:'강철이가 약해졌다. 풀린 똬리로는 더 조이지 못한다.'},
+      tail:{tell:'꼬리에서 고드름이 흩날린다.',weak:'강철이가 약해졌다. 끊긴 꼬리로는 고드름을 흩뿌리지 못한다.'},core:{tell:'눈보라가 돌아온다.'}}),
     likes:TABLES.CALM.gangcheol,likeText:'강철이가 잠시 숨을 멈춘다.',
     likeTexts:{dokkaebibul:'꺼지지 않는 도깨비불씨를 건넸다. 강철이가 그 온기에 눈을 감는다.',
       patsirutteok:'붉은 팥떡을 내밀자 강철이가 움찔 물러난다. 서리가 조금 걷혔다.'},

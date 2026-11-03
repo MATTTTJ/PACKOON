@@ -1434,7 +1434,7 @@ const TABLES={
    "lines": [
     {
      "who": "me",
-     "text": "개울의 어린 수달. 밤마다 함지박을 도로 밀어 올려 둔다. 엄마를 \"빨래 아줌마\"라고 부른다.",
+     "text": "개울의 어린 수달. 물이 불어 떠내려간 함지박을 밤마다 도로 이고 올라온다. 엄마를 \"빨래 아줌마\"라고 부른다.",
      "section": "관찰",
      "when": "met:stream_otter"
     },
@@ -2825,6 +2825,7 @@ const TABLES={
   "golem_arm_rest": 110,
   "golem_core_frames": 150,
   "golem_barrage_count": 12,
+  "golem_barrage_count_armless": 7,
   "golem_snowball_damage": 0.334,
   "golem_stomp_clumps": 5,
   "kudzu_stem_cut_chance": 0.4,
@@ -2833,6 +2834,7 @@ const TABLES={
   "kudzu_scent_slow": 0.55,
   "kudzu_scent_slow_frames": 80,
   "kudzu_scent_linger": 150,
+  "kudzu_hole_frames": 90,
   "toast_frames": 300,
   "peek_ms": 1400,
   "peek_fade_ms": 240,

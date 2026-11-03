@@ -183,7 +183,8 @@ Rg.onFloorPickup=a=>{
       clue('h1','아빠의 수첩','수첩의 해머루 글 끝, 나중에 덧쓴 빛바랜 아빠 글씨: "여기도 아니다."');
       diary('meoru','해머루를 그려 넣으려고 아빠의 수첩을 펼쳤다. 아빠가 적어 둔 해머루 글 끝에, 나중에 덧쓴 글씨가 그제야 눈에 들어왔다. "여기도 아니다." 먹빛이 많이 바랬다. 아빠는 아주 옛날에 벌써 여기 와 봤구나. 그때도 더 북쪽으로 갔구나.');   // 결정 D-134: 오래된 글씨임을 알아본다
       ledger('toad','두꺼비 할멈','해머루 1','엄마의 병을 늦추는 약');
-      setTimeout(()=>toast('수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 두꺼비 할멈에게 가져가자'),1600);refreshGoal();}
+      if(!CLASSIC)G.f.galToadUphill=true;   // 결정 D-412: 할멈이 금줄 길로 올라와 언덕에 닿는다 (story.js toadUphill)
+      setTimeout(()=>toast(CLASSIC?'수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 두꺼비 할멈에게 가져가자':'수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 금줄 길로 두꺼비 할멈이 올라온다'),1600);refreshGoal();}
 };
 /* 휘두르기: 칡덩굴은 낫으로만 끊긴다 */
 Rg.onHit=(x1,x2,dmg,f)=>{
@@ -260,28 +261,24 @@ if(!CLASSIC){
     drawFront:()=>A.front(id),weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'maple'),ambient:()=>{migrateHill();placeRoot();},   // 위치 자르기보다 먼저 옛 언덕 좌표를 옮긴다
     
     drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup?.(a),step:commonStep});
-  const sign=A.marker,blocked=A.blocked;
+  const sign=A.marker;
   const path=(x,to,toX,label,extra={})=>({x,to,toX,label,draw:sign,...extra});
-  const hasSickle=()=>G.tool==='sickle';
   const cutPath=()=>G.barrier.cut;
   const KILN_X=396;   // 숯가마 아궁이 가운데 (숲 설계 좌표. 첫 자르기 구간보다 앞이라 줄여도 같다)
   let forestTreeDoor=null;   // 숲의 칡에 막힌 나무 입구. trimRegion이 x를 줄인 좌표로 옮긴다
   const syncBarrier=()=>{if(forestTreeDoor&&Number.isFinite(forestTreeDoor.x))G.barrier.x=forestTreeDoor.x;};
   // 칡 덩굴로 막힌 길: 아이가 아는 만큼만 말한다 (도담에게 대장간 이야기를 들었는지, 낫을 받았는지).
-  // 결정 D-51: 무엇이 무엇을 막았는지 먼저 말한다 (칡이 당산나무를 감고 나무 속 입구를 덮었다).
+  // 결정 D-51·D-411: 무엇이 무엇을 막았는지 먼저 말한다 (칡이 금줄 길을 덮었다).
   // 아빠 낫은 무쇠 삼촌을 만나 들은 뒤(단서 m1)에야 안다. 그 전에는 도담에게 들은 대로 '날 선 연장'까지만 안다.
   const knowsSickle=()=>G.clues.some(c=>c.id==='m1');
-  const vineSay=()=>G.tool==='sickle'?'칡이 나무를 감고 입구까지 덮었네.\n금줄 따라 안쪽 덩굴부터 낫으로 걷자.'
-    :knowsSickle()?'칡이 나무 입구를 덮었어. 곡괭이로는 안 끊겨.\n삼촌한테 아빠 낫을 받아야겠어.'
-    :G.f.dodamDone?'칡이 나무 입구를 덮었어. 곡괭이로는 안 끊겨.\n대장간 무쇠 삼촌한테 날 선 연장이 있댔지.':'칡덩굴이 나무를 감고 입구를 막았네.\n날 선 연장이 있어야겠어.';
-  const bankSay=()=>knowsSickle()?'마른 덩굴이 둑길을 덮었네.\n아빠 낫이면 걷을 수 있겠어.':G.f.dodamDone?'마른 덩굴이 둑길을 덮었네.\n대장간 날 선 연장이면 걷을 수 있겠어.':'마른 덩굴이 둑길을 덮었네.\n날 선 연장이 있어야겠어.';
+  const vineSay=()=>G.tool==='sickle'?'칡이 금줄을 타고 길까지 늘어졌네.\n낫으로 걷어 내자.'
+    :knowsSickle()?'칡이 금줄 길을 덮었어. 곡괭이로는 안 끊겨.\n삼촌한테 아빠 낫을 받아야겠어.'
+    :G.f.dodamDone?'칡이 금줄 길을 덮었어. 곡괭이로는 안 끊겨.\n대장간 무쇠 삼촌한테 날 선 연장이 있댔지.':'칡덩굴이 금줄 길을 막았네.\n날 선 연장이 있어야겠어.';
   Rg.zones={
     // 결정 D-48: 발판은 stepRidge()로 오르락내리락 (engine/core.js)
     village:{...basic('village',2600,[...stepRidge(490,11,4),...stepRidge(1370,12,3),...stepRidge(1890,13,5)]),
+      // 결정 D-410: 구역 사이는 이어진 길로만 오간다 (사용자 피드백 2026-11-03: 순간이동 기믹 빼기). 함지박 타기·물 건너 당산나무 문을 뺐다.
       exits:{right:{to:'forge',toX:70}},
-      doors:[path(1150,'forge',380,'함지박에 올라 개울 따라가기',{travel:'stream',draw:A.streamDoor}),
-        path(1710,'hill',180,'물 건너 당산나무 쪽으로',{travel:'depth',need:cutPath,
-          reason:'저 나무로 난 숲길은 칡덩굴에 막혔다. 무쇠의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y)})],   // 결정 D-190: 칡덩굴은 낫으로 걷어야만 지난다 (변신으로도 못 넘는다)
       // 다람쥐의 잊은 몫 (PA-47, 다람쥐 모습에만 보인다)
       digs:[{id:'gal_cache_village',x:880,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
       vistas:[{id:'stream',x:930,from:0,to:140,draw:A.streamDoor,sound:'water',
@@ -289,10 +286,7 @@ if(!CLASSIC){
         diary:'물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.',layers:A.vistaStream}],
     },
     forge:{...basic('forge',2600,[...stepRidge(320,21,4),...stepRidge(1940,22,5)]),
-      npcs:['musoe','nal'],exits:{left:{to:'village',toX:2500},right:{to:'forest',toX:70}},
-      doors:[path(380,'village',1150,'개울 둑길로 돌아가기'),
-        path(1860,'marsh',2040,'약재 나르는 둑길로 약방에',{need:hasSickle,
-          reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',blockedLabel:'마른 덩굴',blockedSay:bankSay,drawBlocked:blocked})],
+      npcs:['musoe','nal'],exits:{left:{to:'village',toX:2500},right:{to:'forest',toX:70}},   // 결정 D-410: 개울 둑길·약재 둑길 문을 뺐다
       stamps:[{id:'anvil',x:1070,note:'stamp:galchamgol:anvil',label:'모루 밑 눌린 자국 살피기'}],
     },
     // 숲 첫 무리는 744 높은 가지(다람쥐만 오르는 자리)에 닿지 않게 낮게 오르내린다.
@@ -305,8 +299,9 @@ if(!CLASSIC){
         {id:'gal_extra_acorn_2',x:471,y:GROUND,item:'acorn',got:false},
         {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false},
         {id:'gal_branch_acorn_1',x:761,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:792,y:96,item:'acorn',got:false}],
-      doors:[forestTreeDoor=path(2420,'hill',180,'덩굴 너머 나무 속으로',{travel:'depth',need:cutPath,
-          reason:'칡덩굴이 나무 구멍을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 나무 입구',blockedSay:vineSay,draw:A.treeDoor,drawBlocked:(x,y)=>A.blockedTree(x,y,false)})],   // 결정 D-190
+      // 결정 D-411: 당산나무 언덕으로는 금줄 친 길로 걸어 오른다 (나무 속을 오르는 길은 뺐다). 덩굴은 금줄에 걸려 늘어진다(drawBarrier).
+      doors:[forestTreeDoor=path(2420,'hill',180,'금줄 따라 당산나무 언덕으로',{need:cutPath,
+          reason:'칡덩굴이 금줄 길을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 금줄 길',blockedSay:vineSay,draw:A.ropeGate,drawBlocked:A.ropeGate})],   // 결정 D-190
       // 다람쥐만 오르는 높은 참나무 가지와 잊은 몫 (PA-47 선택 자리)
       climbs:[{x:752,top:96}],
       digs:[{id:'gal_cache_forest',x:1900,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
@@ -319,23 +314,16 @@ if(!CLASSIC){
     },
     // 1030 디딤돌(반딧불 자리, y158)은 그대로 두고 오르내림을 붙인다.
     marsh:{...basic('marsh',2400,[...stepRidge(420,41,4),{x:980,y:158,w:100},{x:1086,y:134,w:62},{x:1156,y:152,w:58},...stepRidge(1780,43,4)]),
-      npcs:['toad'],exits:{left:{to:'forest',toX:2700}},
-      doors:[path(2040,'forge',1860,'약재 나르는 둑길로 대장간에',{need:hasSickle,
-        reason:'둑길을 뒤덮은 마른 덩굴은 낫으로 걷을 수 있겠다.',blockedLabel:'마른 덩굴',blockedSay:bankSay,drawBlocked:blocked})],
+      npcs:['toad'],exits:{left:{to:'forest',toX:2700}},   // 할멈은 해머루가 떨어지면 언덕으로 올라간다 (story.js 결정 D-412)
       // 선반 뒤 작은 채집 무리. 전부 선택 재료이며, 필수 교환 몫은 앞 구역에 있다.
       pickups:[],
     },
     // 결정 D-45: 2600 → 1900. 뿌리 길·첫 발판은 150, 당산나무 쪽은 HILL_SHIFT(700)만큼 앞당겼다.
     hill:{...basic('hill',2600-HILL_SHIFT,[{x:550,y:160,w:100},...stepRidge(660,51,4),
       {x:2290-HILL_SHIFT,y:160,w:100},{x:2380-HILL_SHIFT,y:126,w:100},{x:2490-HILL_SHIFT,y:150,w:64}]),
+      // 결정 D-410·D-411: 들어온 금줄 길로 나간다. 나무 속 오르기와 약방·개울로 바로 내려가던 길은 뺐다. 북쪽 길은 이 언덕 끝에서 시작한다.
       exits:{left:{to:'forest',toX:2360}},
-      doors:[path(180,'hill',550,'당산나무 속으로 오르기',{travel:'tree',draw:A.treeDoor}),
-        path(550,'forest',2360,'뿌리 바깥 숲길로 돌아가기'),
-        // 결정 D-44: 내려가는 길은 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
-        path(2250-HILL_SHIFT,'marsh',1200,'약초 귀환길로 약방에 내려가기',{descend:true,need:()=>G.boss.dead,
-          reason:'엉킨 칡이 약초 귀환길을 막았다. 나무를 풀어 주면 약방으로 내려갈 수 있겠다.',drawBlocked:blocked}),
-        path(2450-HILL_SHIFT,'village',1710,'보이던 개울 둑으로 내려가기',{descend:true,need:()=>G.boss.dead,
-          reason:'엉킨 칡이 내리막까지 움켜쥐고 있다. 나무를 풀어 주고 내려가자.',drawBlocked:blocked})],
+      doors:[path(180,'forest',2420,'금줄 따라 숲으로 내려가기',{draw:A.ropeGate})],
       pickups:[{id:'gal_extra_acorn_4',x:630,y:160,item:'acorn',got:false},
         {id:'gal_cut_vine',x:340,y:GROUND,item:'vine',got:false}],
       stamps:[{id:'roots',x:2140-HILL_SHIFT,note:'stamp:galchamgol:roots',label:'당산나무 뿌리의 손바닥 자국 살피기'}],
@@ -348,7 +336,6 @@ if(!CLASSIC){
       faint:()=>{G.px=1900-HILL_SHIFT;G.py=GROUND;G.vy=0;G.onGround=true;toast('나무 앞 쉼터로 물러났다. 버섯 향으로 달랠 수도 있다.');},
     },
   };
-  installTravel();
   /* 결정 D-265: 길섶 채집물(사용자 피드백 2026-11-02). 단풍 든 참나무·밤나무 아래 도토리와 밤, 무른 흙의 칡뿌리, 늪가 버섯. 좌표는 길을 줄인 뒤의 자리.
      결정 D-391: 길섶 채집물을 줄이고 자리에 맞춘다 (사용자 피드백 2026-11-03: 너무 많고 다양하지 않다).
      도토리는 숲 줄기 자리(구역에 이미 있는 도토리)로 충분해 길섶에는 몇 개만, 밤은 집 둘레 밤나무 아래에만, 늪에는 도토리 대신 젖은 흙의 칡뿌리와 버섯만 둔다.
@@ -361,133 +348,5 @@ if(!CLASSIC){
     ['hill','p',410,'acorn'],
   ]);
 
-  /* 공통 엔진을 덮어쓰지 않는 지역 연출. 구역 문에서 출발하고 같은 문 API로 도착한다.
-     이동 중 저장은 일반 미니게임과 똑같이 막힌다. 중단하면 출발한 안전한 바닥으로 돌아온다. */
-  function installTravel(){
-    const panel=el('div');panel.id='galTravel';panel.hidden=true;
-    panel.style.cssText='position:absolute;inset:0;z-index:5;background:#231c1a;display:flex;flex-direction:column;justify-content:center;color:#fff0d0';
-    panel.setAttribute('role','region');panel.setAttribute('aria-label','단풍골 풍경 속 이동');
-    const canvas=el('canvas');canvas.width=W;canvas.height=H;
-    canvas.style.cssText='display:block;width:100%;min-height:0;flex:1;object-fit:contain;image-rendering:pixelated';
-    const help=el('div');help.style.cssText='flex:none;padding:3px 6px;text-align:center;font-size:clamp(11px,1.2vw,14px);white-space:pre-line';
-    const actions=el('div');actions.style.cssText='flex:none;display:flex;gap:6px;justify-content:center;padding:3px;flex-wrap:wrap';
-    const pause=el('button','btn','멈춤/계속 · E'),look=el('button','btn','뒤돌아보기 · ←'),leave=el('button','btn','돌아가기 · Esc');
-    for(const b of [pause,look,leave]){b.type='button';b.style.cssText='font-size:12px;padding:4px 7px;line-height:1.3;min-height:28px';}
-    actions.append(pause,look,leave);panel.append(canvas,help,actions);$('stage').appendChild(panel);
-    const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;let trip=null;
-    function begin(p){
-      if(!G||G.region!==Rg.id||paused())return;
-      const start=()=>{
-        if(G.region!==Rg.id)return;
-        trip={owner:G,p,tick:0,hold:false,back:false,x:112,y:GROUND,vy:0,ground:true,view:0};
-        if(Vfx.reducedMotion&&p.travel==='stream'){stop(true);return;}
-        panel.hidden=false;suppressHeldInputs();
-        if(p.travel==='stream'){Sound.ambience('water');Sound.passage('drift');}else Sound.passage('depth_enter');
-        pause.hidden=p.travel==='tree';look.hidden=p.travel!=='stream';
-        leave.textContent=p.travel==='tree'?'밑동으로 · Esc':'출발한 둑으로 · Esc';
-        help.textContent=p.travel==='tree'?'← → 이동 · 점프 버튼 / Space로 오르기\n밝은 구멍이 출구다. 떨어져도 바닥은 안전하다.':
-          p.travel==='stream'?'E · 멈춤/계속   ← · 뒤돌아보기\n물레방아를 지나 다음 둑으로 간다.':'아까 바라본 나무를 향해 풍경 안쪽으로 들어간다.';
-        drawTrip();
-      };
-      const key='galTravelTaught_'+p.travel;
-      if(!G.f[key])talk([['너구리',p.travel==='stream'?'함지박이 둑에 매여 있어.\n물레방아 아래까진 얕네.':p.travel==='tree'?'나무 속이 비었네.\n낮은 가지부터 디뎌 보자.':G.barrier.cut?'개울에서 보던 당산나무다.\n덩굴을 걷으니 안쪽 길이 보여.':'개울에서 보던 당산나무다.\n덩굴 위로 넘어오니 안쪽 길이 보여.'],
-        ['너구리',p.travel==='stream'?'물살이 세면 잠깐 멈춰도 되겠지.\n뒤돌아보면 우리 마을이 보일 거야.':p.travel==='tree'?'나이테가 계단 같아.\n떨어져도 밑이 푹신하네.':'이 길로 가면 나무 밑동에 닿겠어.']],()=>{G.f[key]=true;begin(p);});
-      else start();
-    }
-    function stop(arrive){
-      const t=trip;if(!t)return;trip=null;panel.hidden=true;releaseInputs();Sound.ambience(null);
-      if(t.owner!==G||G.region!==Rg.id)return;
-      if(arrive){
-        changeZone(t.p.to,{x:t.p.toX,y:t.p.toY});
-        if(t.p.travel==='tree'){G.f.galTreeClimbed=true;diary('galTreeClimbed','빈 나무 속 나이테를 딛고 올랐다. 겨울 도토리와 바랜 소원 천 너머로 언덕이 나왔다.');}
-      }
-    }
-    pause.onclick=()=>{if(trip)trip.hold=!trip.hold;};
-    look.onclick=()=>{if(trip)trip.back=!trip.back;};leave.onclick=()=>stop(false);
-    const ledges=[{x:72,y:192,w:220},{x:150,y:158,w:80},{x:210,y:124,w:82},
-      {x:150,y:90,w:80},{x:88,y:56,w:82},{x:150,y:22,w:80},{x:210,y:-12,w:82},
-      {x:148,y:-46,w:84},{x:90,y:-80,w:84},{x:150,y:-114,w:84},{x:210,y:-148,w:90}];
-    function drawTrip(){
-      if(!trip)return;const t=trip,saved=ctx,oldCam=cam;ctx=c;cam=0;
-      try{
-        if(t.p.travel==='tree'){
-          R(0,0,W,H,'#2e211c');const off=t.view;
-          ctx.save();ctx.translate(0,-Math.round(off));
-          R(52,-200,296,430,'#70472e');R(70,-200,260,430,'#392921');
-          for(let y=-192;y<220;y+=16){R(60,y,6,11,'#b18350');R(335,y,5,11,'#4e3426');}
-          // 속살의 휘어진 결, 도토리 저장 틈, 옛 매듭이 위쪽 빛으로 이어진다.
-          for(let i=0;i<9;i++)for(let y=-200;y<225;y+=3){
-            const x=78+i*30+Math.round(Math.sin((y+i*7)/43)*8);
-            R(x,y,1,3,i%2?'#4c3428':'#51382a');
-          }
-          for(const y of [164,42,-90]){
-            R(76,y-15,14,24,'#281f1b');R(78,y-12,9,17,'#5a3c29');
-            R(79,y+3,6,3,'#c49854');R(80,y+2,4,1,'#79522f');
-          }
-          for(const [i,l] of ledges.entries()){
-            R(l.x,l.y,l.w,6,'#bc925b');R(l.x,l.y+1,l.w,1,'#dfbc7b');
-            R(l.x+5,l.y+6,l.w-10,3,'#4a3123');
-            if(i===3||i===7){R(l.x+26,l.y-5,5,4,'#b77f42');R(l.x+24,l.y-7,8,2,'#634222');}
-            if(i===5){R(290,l.y-45,2,43,'#c59b5c');R(292,l.y-43,12,26,'#d1bea0');R(296,l.y-41,2,19,'#ac7552');}
-          }
-          R(220,-194,66,45,'#f2c77f');R(226,-188,54,39,'#f8dea1');
-          drawRaccoonAt(t.x,t.y,t.x<200?1:-1,0,0,heldTool());ctx.restore();
-        }else{
-          const a=clamp(t.tick/TABLES.TUNING.vista_pan_frames,0,1);
-          if(t.p.travel==='stream'){
-            for(const layer of A.vistaStream){cam=Vfx.reducedMotion?0:Math.round((t.back?1-a:a)*140*(layer.speed??1));layer.draw(cam,Vfx.reducedMotion?0:a);}
-            R(164,182,70,7,'#6e4227');R(160,175,78,8,'#b8854c');R(166,175,66,2,'#e7b66e');
-            drawRaccoonAt(198,175,t.back?-1:1,0,0,heldTool());
-            A.magpie(Math.round(65-(Vfx.reducedMotion?0:a)*130),176);A.chick(Math.round(350-(Vfx.reducedMotion?0:a)*120),178);
-            if(Vfx.reducedMotion){ctx.globalAlpha=a;R(0,0,W,H,'#36251e');ctx.globalAlpha=1;}
-          }else{
-            A.back(G.zone);
-            ctx.save();
-            if(!Vfx.reducedMotion){const z=1+a;ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);}
-            A.treeDoor(200,192);ctx.restore();
-            ctx.globalAlpha=a;R(0,0,W,H,'#36251e');ctx.globalAlpha=1;
-          }
-        }
-      }finally{ctx=saved;cam=oldCam;}
-    }
-    defineMinigame({id:'galTravel',hit:()=>{if(trip?.p.travel==='tree'&&trip.ground){trip.vy=TABLES.TUNING.field_jump_velocity;trip.ground=false;}},step:()=>{
-      if(!trip)return;const t=trip;
-      if(t.owner!==G||G.region!==Rg.id){stop(false);return;}
-      if(document.hidden)return;
-      if(Vfx.reducedMotion&&t.p.travel==='stream'){stop(true);return;}
-      if(t.p.travel==='tree'){
-        const before=t.y;t.x=clamp(t.x+((isRight()?1:0)-(isLeft()?1:0))*TABLES.TUNING.field_move_speed,78,322);
-        t.vy=Math.min(TABLES.TUNING.field_fall_speed,t.vy+TABLES.TUNING.field_gravity);t.y+=t.vy;t.ground=false;
-        if(t.vy>=0)for(const l of ledges)if(t.x>l.x-3&&t.x<l.x+l.w+3&&before<=l.y&&t.y>=l.y){t.y=l.y;t.vy=0;t.ground=true;break;}
-        if(t.y>GROUND){t.y=GROUND;t.vy=0;t.ground=true;}
-        t.view=Math.min(0,t.y-140);if(t.y<=-148&&t.x>220){stop(true);return;}
-      }else if(!t.hold){
-        t.tick+=t.p.travel==='stream'&&!Vfx.reducedMotion?1:TABLES.TUNING.vista_pan_frames/TABLES.TUNING.zone_transition_frames;
-        if(t.tick>=TABLES.TUNING.vista_pan_frames){stop(true);return;}
-      }
-      drawTrip();
-    }});
-    function intercept(e){
-      if(e.target instanceof HTMLElement&&e.target.matches('input,textarea,select'))return;
-      const k=e.key?.toLowerCase();
-      if(trip){
-        if(e.repeat&&['e','arrowleft','escape'].includes(k)){e.preventDefault();e.stopImmediatePropagation();return;}
-        if(k==='escape')stop(false);
-        else if(k==='e'&&trip.p.travel==='stream')trip.hold=!trip.hold;
-        else if(k==='arrowleft'&&trip.p.travel==='stream')trip.back=!trip.back;
-        else return;
-        e.preventDefault();e.stopImmediatePropagation();return;
-      }
-      if(k&&!['e','enter','arrowup'].includes(k))return;
-      if(CLASSIC||!G||G.region!==Rg.id||paused()||e.repeat)return;
-      const p=nearInteraction();if(!p?.travel||!pathOpen(p))return;
-      e.preventDefault();e.stopImmediatePropagation();begin(p);
-    }
-    addEventListener('keydown',intercept,true);
-    $('padTalk').addEventListener('pointerdown',intercept,true);
-    $('prompt').addEventListener('click',intercept,true);
-    document.querySelector('#pad [data-k="up"]').addEventListener('pointerdown',intercept,true);
-    Rg.expTravel=()=>trip?{kind:trip.p.travel,tick:trip.tick,x:trip.x,y:trip.y,hold:trip.hold}:null;
-  }
 }
 })();

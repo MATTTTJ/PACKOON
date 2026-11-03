@@ -12,6 +12,10 @@
      덤(흔한 물건 하나 더)이나 호감이 붙고, 싫어하는 말이면 그 지역에서는 흥정만 닫힌다. 값은 그대로라 교환은 언제든 된다.
      흥정은 지역마다 상대 하나에 한 번(좋아함·싫어함으로 끝난다). 본 반응은 버튼에 남는다. 대사는 haggle.csv.
      지역 코드의 REG.onHaggle(npc,방식)이 true를 돌려주면 덤을 지역 이야기가 맡는다(날쌘: 허세 부리면 그 지역 거래에 덤). */
+/* 결정 D-402 (사용자 피드백 2026-11-03): 변신한 채 만난 인물의 손님 교환도 이 창에서 한다(openGuest).
+     대화에는 "도토리 4 → 소금" 같은 목록을 늘어놓지 않고 '보따리를 펼친다'만 둔다. 손님 물건은 부탁처럼 원하는 물건 그림이 붙고,
+     값은 손님 값(strangers.js price)이다. 한 고을에서 바꿀 수 있는 횟수(stranger_trade_limit)를 다 쓰면 목록이 빈다.
+     손님은 아이를 모르니 흥정 줄과 '좋아함' 표시는 두지 않는다. 바꾸고 나도 창은 닫히지 않는다. */
 const Trade=(()=>{
   const WAYS=['허세','사정','칭찬'];
   let S=null;
@@ -36,9 +40,9 @@ const Trade=(()=>{
     return [...story,...common].map((g,i)=>({g,i,k:stateOf(g).k})).filter(x=>x.k!=='done').sort((a,b)=>order[a.k]-order[b.k]||a.i-b.i).map(x=>x.g);
   }
   function stateOf(g){
-    if(g.kind==='story'?g.done?.():stockLeft(g.row)<=0)return {k:'done',why:'다 바꿨다.'};
+    if(asked(g)?g.done?.():stockLeft(g.row)<=0)return {k:'done',why:'다 바꿨다.'};
     const lock=g.locked?.();if(lock)return {k:'lock',why:lock};
-    if(g.kind==='story'){
+    if(asked(g)){
       if(!g.asks.some(a=>Object.entries(a).every(([id,n])=>has(id,n))))return {k:'short',why:'지금 보따리로는 못 바꾼다. 필요한 것: '+g.asks.map(askText).join(', 또는 ')+'.'};
     }else{
       const need=ITEMS[g.item].r,ok=id=>!offerBlock(g,id,{});
@@ -50,6 +54,7 @@ const Trade=(()=>{
     return {k:'open'};
   }
   const npcOf=g=>g.row?.npc||S?.npc;
+  const asked=g=>g.kind!=='common';   // 부탁·손님 교환: 원하는 물건이 정해져 있다
   const priceText=g=>{const r=ITEMS[g.item].r;return r?rank(r)+' 하나, 또는 '+rank(r-1)+' 둘':rank(0)+' 하나';};
   const askText=a=>Object.entries(a).map(([id,n])=>ITEMS[id].n+' '+n).join(' + ');
   /* 결정 D-124: 값은 레어도 단계가 먼저, 수량이 나중이다. 단계가 모자라면 몇 개를 얹었든 단계 이야기만 한다. */
@@ -93,7 +98,7 @@ const Trade=(()=>{
     return offerBlock(g,id,S.offer);
   }
   function offerBlock(g,id,offer){
-    if(g.kind==='story')return g.asks.some(a=>a[id])?null:'이 부탁과는 상관없는 물건이다.';
+    if(asked(g))return g.asks.some(a=>a[id])?null:g.kind==='guest'?'이 교환과는 상관없는 물건이다.':'이 부탁과는 상관없는 물건이다.';
     if(id===g.item)return '같은 물건끼리는 바꾸지 않는다.';
     if(keepsake(id))return /^(dad|mom)_/.test(id)?'집안 물건은 내놓지 않는다.':'귀한 것은 흔한 물건과 바꾸지 않는다.';   // 결정 D-63
     const now={...G.inv,[id]:(G.inv[id]||0)-(offer[id]||0)};
@@ -106,6 +111,19 @@ const Trade=(()=>{
     S.sel=(S.goods.find(g=>g.kind==='story'&&stateOf(g).k==='open')||S.goods.find(g=>stateOf(g).k==='open')||S.goods[0])?.id||null;
     Sound.panel(true);render();$('trade').hidden=false;$('tradeBody').scrollTop=0;
     setTimeout(()=>{const f=$('tradeBody').querySelector('.trade-good');if(f&&matchMedia('(pointer:fine)').matches)f.focus();},0);
+  }
+  function guestGoods(){
+    const {npc,e}=S.guest,limit=TABLES.TUNING.stranger_trade_limit,spent=()=>strangerUsed(npc.id)>=limit;
+    return (Array.isArray(e.trades)?e.trades:[]).filter(t=>validItems(t?.give)&&validItems(t?.get)).map((t,i)=>{
+      const give=priced(e,t.give),[[item,n]]=Object.entries(t.get);
+      return {id:'guest'+i,item,n,kind:'guest',asks:[give],done:spent,accept:()=>strangerTrade(npc,give,t.get)};
+    });
+  }
+  function openGuest(npc,e){
+    closePanels();
+    S={npc:npc.id,name:npc.name||'손님',guest:{npc,e},goods:[],sel:null,offer:{},tried:{},log:[]};
+    S.goods=guestGoods();S.sel=(S.goods.find(g=>stateOf(g).k==='open')||S.goods[0])?.id||null;
+    Sound.panel(true);render();$('trade').hidden=false;$('tradeBody').scrollTop=0;
   }
   function close(){if(!$('trade').hidden){Sound.panel(false);$('trade').hidden=true;}S=null;}
   function picture(id,n){const s=el('span','trade-ask');s.appendChild(icon(id));if(n>1)s.appendChild(el('b',null,'×'+n));s.title=ITEMS[id].n+(n>1?' '+n:'');return s;}
@@ -132,7 +150,7 @@ const Trade=(()=>{
     const wrap=el('div','trade-wrap');
     // 상대가 내놓은 물건과, 그 값으로 원하는 것
     const theirs=el('section','trade-side');theirs.appendChild(el('h3',null,S.name+'의 물건'));
-    if(!S.goods.some(g=>['open','short'].includes(stateOf(g).k)))theirs.appendChild(el('p','small','지금은 바꿀 물건이 없다.'));
+    if(!S.goods.some(g=>['open','short'].includes(stateOf(g).k)))theirs.appendChild(el('p','small',S.guest&&S.goods.length?'이번 고을에서 손님으로 바꿀 만큼은 다 바꿨다.':'지금은 바꿀 물건이 없다.'));
     for(const g of S.goods){
       const st=stateOf(g),lock=st.k==='open'?null:st.why,b=el('button','trade-good'+(st.k==='lock'?' off':''));b.type='button';b.dataset.good=g.id;b.dataset.state=st.k;
       b.setAttribute('aria-pressed',String(S.sel===g.id));
@@ -140,17 +158,18 @@ const Trade=(()=>{
       const head=el('span','trade-good-head');head.appendChild(icon(g.info?'torn_page':(g.icon||g.item)));
       head.appendChild(el('b',null,(g.label||ITEMS[g.item].n)+(g.n>1?' ×'+g.n:'')));
       if(!g.label)head.appendChild(rarityIcon(ITEMS[g.item].r));
-      head.appendChild(el('span','chip',g.info?'정보':g.kind==='story'?'부탁':'흔한 물건'));
+      head.appendChild(el('span','chip',g.info?'정보':g.kind==='story'?'부탁':g.kind==='guest'?'손님 교환':'흔한 물건'));
       b.appendChild(head);
       const asks=el('span','trade-asks');
       if(st.k==='lock')asks.appendChild(el('span','small',lock));
-      else if(g.kind==='story')g.asks.forEach((a,i)=>{
+      else if(asked(g))g.asks.forEach((a,i)=>{
         if(i)asks.appendChild(el('span','small','또는'));
         Object.entries(a).forEach(([id,n],k)=>{if(k)asks.appendChild(el('span','plus','+'));asks.appendChild(st.k==='short'?askPicture(id,n):picture(id,n));});
       });
       else{asks.appendChild(el('span','small',priceText(g)));asks.appendChild(el('span','small','· 남은 '+stockLeft(g.row)+'번'));}
+      if(g.kind==='guest'&&st.k!=='lock')asks.appendChild(el('span','small','· 남은 '+Math.max(0,TABLES.TUNING.stranger_trade_limit-strangerUsed(S.guest.npc.id))+'번'));
       b.appendChild(asks);
-      b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(g.kind==='story'?'원하는 것: '+g.asks.map(askText).join(', 또는 '):priceText(g))));
+      b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(asked(g)?'원하는 것: '+g.asks.map(askText).join(', 또는 '):priceText(g))));
       b.onclick=()=>{if(S.sel!==g.id){S.sel=g.id;S.offer={};}render();};
       theirs.appendChild(b);
     }
@@ -163,7 +182,7 @@ const Trade=(()=>{
       const left=G.inv[id]-(S.offer[id]||0),why=blocked(id);
       const s=el('button','slot');s.type='button';s.dataset.item=id;
       s.appendChild(icon(id));s.appendChild(el('span','n',left));s.appendChild(rarityIcon(ITEMS[id].r));
-      if(liked(S.npc,id))s.appendChild(el('span','trade-like','좋아함'));
+      if(!S.guest&&liked(S.npc,id))s.appendChild(el('span','trade-like','좋아함'));
       s.title=ITEMS[id].n+(why?' — '+why:'');s.setAttribute('aria-label',ITEMS[id].n+' '+left+'개'+(why?'. '+why:''));
       s.disabled=!!why||left<=0;
       s.onclick=()=>{if(blocked(id)||G.inv[id]-(S.offer[id]||0)<=0)return;S.offer[id]=(S.offer[id]||0)+1;render();};
@@ -185,7 +204,7 @@ const Trade=(()=>{
     tray.appendChild(chips);
     const row=el('div','trade-actions');
     // 결정 D-125: 상대에게 지금 바꿀 수 있는 물건(열림·값 부족)이 하나도 없으면 흥정 줄을 숨긴다.
-    if(TABLES.HAGGLE?.[S.npc]&&S.goods.some(g=>['open','short'].includes(stateOf(g).k))){
+    if(!S.guest&&TABLES.HAGGLE?.[S.npc]&&S.goods.some(g=>['open','short'].includes(stateOf(g).k))){
       const hag=el('div','trade-haggle'),closed=!!G.f.haggleUsed?.[key(S.npc)];
       hag.appendChild(el('span','small',haggleState()));
       if(!closed)for(const way of WAYS){
@@ -218,9 +237,13 @@ const Trade=(()=>{
   function propose(){
     const g=S.goods.find(g=>g.id===S.sel);if(!g)return;
     const st=stateOf(g);if(st.k==='done'||st.k==='lock'){S.log.push({who:'',line:st.why});render();return;}
-    const m=g.kind==='story'?storyMatch(g,S.offer):commonMatch(g,S.offer);
+    const m=asked(g)?storyMatch(g,S.offer):commonMatch(g,S.offer);
     if(!m.ok){S.log.push({who:'',line:'('+jo(S.name,'이','가')+' 고개를 젓는다.) '+m.why});render();return;}
     if(g.kind==='story'){close();g.accept(m.alt);return;}
+    if(g.kind==='guest'){
+      if(g.accept())S.log.push({who:'',line:'('+S.name+'에게서 '+ITEMS[g.item].n+' '+g.n+'개를 받았다.)'});
+      S.offer={};S.goods=guestGoods();const cur=S.goods.find(x=>x.id===S.sel);if(!cur||stateOf(cur).k!=='open')S.sel=(S.goods.find(x=>stateOf(x).k==='open')||S.goods[0])?.id||null;render();return;
+    }
     for(const [id,n] of Object.entries(S.offer))takeItem(id,n);
     const bonus=!!G.f.haggleBonus?.[key(S.npc)],n=g.n+(bonus?1:0);
     if(bonus)delete G.f.haggleBonus[key(S.npc)];
@@ -249,5 +272,5 @@ const Trade=(()=>{
   quickBtn.onclick=()=>{const npc=quick.dataset.npc;if(!npc)return;dlgDismiss();open(npc);};   // 결정 D-331
   for(const id of ['dlgWho','dlgChoices'])new MutationObserver(renderQuick).observe($(id),{childList:true,characterData:true,subtree:true});
   new MutationObserver(renderQuick).observe($('dlg'),{attributes:true,attributeFilter:['hidden']});
-  return {open,close,get state(){return S;}};
+  return {open,openGuest,close,get state(){return S;}};
 })();
