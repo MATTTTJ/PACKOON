@@ -206,7 +206,11 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       await click(`#bagBody .recipe:nth-child(${idx+1})`);
       await b.until("!!$('craftBtn')&&!$('craftBtn').disabled",{label:'가공 버튼 풀림'});
       await click('#craftBtn');
-      await wait(80);await unlocked();await click('#bagClose');await wait(100);await settle();
+      // 결정 D-113: 가공은 손 동작 한 번으로 끝난다. 플레이어처럼 첫 동작 단추(맷돌은 왼쪽으로 돌리기)를 누른다.
+      // 예전엔 이 단추를 누르지 않아 가공마다 10초를 기다린 뒤 보따리를 닫아 끝냈다.
+      await b.until("!!document.querySelector('#craftHands [data-craft]')",{label:'가공 손 동작 단추'});
+      await click('#craftHands [data-craft]');
+      await unlocked();await click('#bagClose');await wait(100);await settle();
     }
   }
   // 전투 결과를 돌려준다. 졌다면 뒤 단계의 엉뚱한 오류(예: 해머루 없음)로 번지지 않게 mustWin이 밝힌다.
