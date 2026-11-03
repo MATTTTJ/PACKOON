@@ -7,7 +7,8 @@ function defineMinigame(m){MINIGAMES.push(m);}
 const open=id=>!!$(id)&&!$(id).hidden; // 없어진 패널 id(옛 'book')는 닫힌 것으로 본다
 const openMinigame=()=>MINIGAMES.find(m=>open(m.id))||null;
 
-const keys={};const touch={left:false,right:false,up:false,down:false,jump:false};   // jump: 누르고 있는 동안 (수리부엉이 활공)
+const keys={};const touch={left:false,right:false,up:false,down:false,jump:false,roll:false};   // jump: 누르고 있는 동안 (수리부엉이 활공). roll: 휴대폰 구르기 단추 (D-381)
+const padDirs=new Set();let dpadPointer=null;   // 결정 D-380: 방향 판에서 지금 켜진 방향과 그 판을 누른 손가락
 const suppressedKeys=new Set();
 let jumpQ=false,atkQ=false,dropQ=false;
 const isDown=()=>keys['arrowdown']||keys['s']||touch.down;
@@ -31,6 +32,7 @@ function releaseInputs(){
   jumpQ=atkQ=dropQ=false;
   if(typeof endRoll==='function'){endRoll();rollHold=null;}
   document.querySelectorAll('#pad .on').forEach(b=>b.classList.remove('on'));
+  padDirs.clear();dpadPointer=null;   // 판을 누른 채인 손가락은 한 번 떼고 다시 눌러야 움직인다 (키보드의 눌린 키를 막는 것과 같다)
   if(typeof endDrag==='function')endDrag();
 }
 addEventListener('blur',releaseInputs);
@@ -85,7 +87,9 @@ function padAction(k){
   if(vistaMode){endVista();return;}
   if(zoneFade>0||zoneMotion)return;
   if(!G.started||G.ended)return;
-  if(B){if(!$('bResult').hidden){if(k==='atk')$('bResOk').click();return;}if(B.paused)return;if(k==='atk')bStrike();return;}   // 결정 D-65: 패드 점프도 선물을 열지 않는다(화면의 '선물' 버튼)
+  // 결정 D-65: 키보드 C는 선물을 열지 않는다. 휴대폰은 화면의 선물·치기 단추를 숨기고 패드에 '선물'·'치기'라고 쓰므로,
+  //   결정 D-384: 패드의 '선물'(점프 자리)은 선물을 연다 (전엔 아무 일도 하지 않아 휴대폰에서 선물을 건넬 수 없었다). 결정 D-383: '도구'는 든 도구를 바꾼다
+  if(B){if(!$('bResult').hidden){if(k==='atk')$('bResOk').click();return;}if(B.paused)return;if(k==='atk')bStrike();else if(k==='jump')openGift();else if(k==='tool')switchBattleTool();return;}
   if(inkOn)return;
   const mg=openMinigame();
   if(k==='bag'){if(!open('dlg')&&!mg&&!open('trade'))toggleBag();return;}
@@ -93,19 +97,49 @@ function padAction(k){
   if(mg){if(k==='atk'||k==='jump')mg.hit();return;}
   if(open('dlg')){if(k!=='down')advance();return;}
   if(open('bag')||open('notebook')||open('trade'))return;
-  if(k==='down')return;
+  if(k==='down'||k==='tool')return;
   if(pickupPose)return;
   if(rolling&&k!=='jump')return;
   if(k==='jump')jumpOrDrop();else if(k==='atk')actionPress();else if(k==='talk')tryTalk();
 }
 // 결정 D-52: 휴대폰 ▲은 키보드 ↑과 같다(점프·오르기·↑ 상호작용). 전투에서는 움직임만.
-// 결정 D-260: 단추 크기와 사이 간격은 css/style.css 끝의 D-260 묶음이 정한다 (누르는 칸 44px 이상, 그림은 작게, 사이는 넓게)
+// 결정 D-380: 방향 십자는 판 하나다. 엄지를 떼지 않고 밀면 방향이 바뀐다(◀에서 ▶로, 대각선도). 판 가운데는 쉼.
+//   위·아래는 세로로 분명히 밀었을 때만 켠다. 옆으로 가다 엄지가 조금 들려도 점프하지 않는다. 크기와 자리는 css/style.css 의 D-380 묶음.
+function setPadDir(k,on){
+  if(on===padDirs.has(k))return;
+  if(on)padDirs.add(k);else padDirs.delete(k);
+  document.querySelector('#dpad [data-k="'+k+'"]')?.classList.toggle('on',on);
+  if(k==='left')touch.left=on;
+  else if(k==='right')touch.right=on;
+  else if(k==='up'){
+    if(on){touch.up=true;if(!B)document.body.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true}));}
+    else{if(touch.up&&!B)document.body.dispatchEvent(new KeyboardEvent('keyup',{key:'ArrowUp',bubbles:true}));touch.up=false;}
+  }else if(k==='down'){touch.down=on;if(on)padAction('down');}
+}
+function padDirsAt(x,y){
+  const r=$('dpad').getBoundingClientRect(),dx=x-(r.left+r.width/2),dy=y-(r.top+r.height/2),ax=Math.abs(dx),ay=Math.abs(dy),dead=r.width*0.12;
+  const want=new Set();
+  if(ax>dead&&ax*2>=ay)want.add(dx<0?'left':'right');
+  if(ay>dead&&ay>ax*1.2)want.add(dy<0?'up':'down');
+  return want;
+}
+{
+  const dpad=$('dpad');
+  const update=e=>{const want=padDirsAt(e.clientX,e.clientY);for(const k of ['left','right','up','down'])if(!want.has(k))setPadDir(k,false);for(const k of want)setPadDir(k,true);};
+  const end=e=>{if(e&&e.pointerId!==dpadPointer)return;dpadPointer=null;for(const k of [...padDirs])setPadDir(k,false);};
+  dpad.addEventListener('pointerdown',e=>{e.preventDefault();if(dpadPointer!==null)return;dpadPointer=e.pointerId;try{dpad.setPointerCapture(e.pointerId);}catch(_){}update(e);});
+  dpad.addEventListener('pointermove',e=>{if(e.pointerId===dpadPointer)update(e);});
+  dpad.addEventListener('pointerup',end);dpad.addEventListener('pointercancel',end);dpad.addEventListener('lostpointercapture',end);
+  dpad.addEventListener('contextmenu',e=>e.preventDefault());
+}
+// 결정 D-381: 휴대폰 점프는 기다림 없이 바로 뛴다(구르기는 따로 구르기 단추). 키보드 Space의 꾹 구르기(D-94)는 그대로.
 document.querySelectorAll('#pad [data-k]').forEach(b=>{
-  const k=b.dataset.k;
+  const k=b.dataset.k;if(b.closest('#dpad'))return;
   b.addEventListener('pointerdown',e=>{e.preventDefault();b.classList.add('on');
     try{b.setPointerCapture(e.pointerId);}catch(_){}
-    if(k==='jump')touch.jump=true;if(k==='left')touch.left=true;else if(k==='right')touch.right=true;else if(k==='up'){touch.up=true;if(!B)document.body.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true}));}else if(k==='down'){touch.down=true;padAction(k);}else if(!(k==='jump'&&rollPress()))padAction(k);});
-  const up=()=>{b.classList.remove('on');if(k==='jump'){touch.jump=false;rollRelease();}if(k==='left')touch.left=false;if(k==='right')touch.right=false;if(k==='up'){if(touch.up&&!B)document.body.dispatchEvent(new KeyboardEvent('keyup',{key:'ArrowUp',bubbles:true}));touch.up=false;}if(k==='down')touch.down=false;};
+    if(k==='jump')touch.jump=true;
+    if(k==='roll'){touch.roll=true;rollButtonPress();}else padAction(k);});
+  const up=()=>{b.classList.remove('on');if(k==='jump'){touch.jump=false;rollRelease();}if(k==='roll'){touch.roll=false;rollRelease();}};
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);
   b.addEventListener('contextmenu',e=>e.preventDefault());
 });

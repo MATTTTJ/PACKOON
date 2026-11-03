@@ -91,11 +91,16 @@ function renderBattleForms(){
     const tools=el('div','b-mask-buttons b-tool-buttons');tools.id='bToolButtons';tools.setAttribute('aria-label','전투 도구');wrap.appendChild(tools);
     const buttons=el('div','b-mask-buttons');buttons.id='bFormButtons';buttons.setAttribute('aria-label','전투 변신');
     wrap.appendChild(buttons);const hint=el('p','small');hint.id='bMaskHint';wrap.appendChild(hint);
-    $('bHit').parentElement.parentElement.appendChild(wrap);
+    document.querySelector('.b-me').appendChild(wrap);
   }
-  // 세로 화면에서는 공격 상자 아래 여백에 놓아 적 그림과 예고 글을 가리지 않는다.
-  const parent=TOUCH&&matchMedia('(orientation:portrait)').matches?$('battle'):$('bHit').parentElement.parentElement;
+  // 결정 D-382: 휴대폰은 변신 단추가 전투 그림을 가리지 않게 한다 (사용자 피드백 2026-11-03: 단추가 보스 전투를 가린다).
+  //   세로는 무대 아래 빈자리로 옮긴다(물러나기도 함께). 가로는 이 줄을 숨기고(css) 필드와 같은 잎사귀 단추의 고리로 고른다.
+  //   컴퓨터는 전처럼 오른쪽 위 내 체력 아래.
+  const portrait=TOUCH&&matchMedia('(orientation:portrait)').matches,bme=document.querySelector('.b-me'),btns=$('bFlee').parentElement;
+  const parent=portrait?$('padBattleTop'):bme;
   if(wrap.parentElement!==parent)parent.appendChild(wrap);
+  if(portrait){if(btns.parentElement!==parent)parent.prepend(btns);}
+  else if(btns.parentElement!==bme)bme.insertBefore(btns,wrap.parentElement===bme?wrap:null);
   // 결정 D-224: 도구 단추. 둘 이상 가졌을 때만 바꿀 수 있고, 하나면 든 도구만 보인다
   const own=B.E.dodge?[]:ownedBattleTools(),tools=$('bToolButtons');
   /* 결정 D-242: 도구 바꾸기를 한눈에 (사용자 피드백 2026-11-02: 무기를 어떻게 바꾸는지 안 보인다, D-227 의 키 글 금지보다 앞선다).
@@ -109,13 +114,19 @@ function renderBattleForms(){
       button.onclick=()=>switchBattleTool(id);tools.appendChild(button);});
   }
   tools.hidden=!own.length;
+  // 결정 D-383: 휴대폰은 오른손 묶음의 '도구' 단추로 바꾼다(전투 그림 위의 도구 줄은 css 가 숨긴다). 하나뿐이면 든 것만 보이고 눌리지 않는다
+  const pt=$('padTool');
+  if(pt){const cur=battleTool()||'';pt.hidden=!own.length;pt.disabled=own.length<2;
+    if(pt.dataset.tool!==cur){pt.dataset.tool=cur;pt.innerHTML='';if(cur){pt.appendChild(icon(cur));pt.appendChild(el('span','pt-name',toolName(cur)));}else pt.textContent='도구';}
+    pt.classList.toggle('want',!!B.toolWant);pt.setAttribute('aria-label',cur?(own.length>1?'도구 바꾸기 · 지금 ':'든 도구 · ')+toolName(cur):'도구');}
   tools.querySelectorAll('button').forEach(button=>{const id=button.dataset.tool;button.disabled=own.length<2;
     button.setAttribute('aria-pressed',String(id===battleTool()));button.classList.toggle('want',id===B.toolWant);
     button.title=id===battleTool()?jo(toolName(id),'을','를')+' 들었다':jo(toolName(id),'으로','로')+' 바꾸기'+(TOUCH?'':' (Q)');});
   const ids=['',...(G.forms||[])],buttons=$('bFormButtons');
   if(buttons.dataset.ids!==ids.join(',')){
     buttons.dataset.ids=ids.join(',');buttons.innerHTML='';
-    for(const id of ids){const key=id?FORM_IDS.indexOf(id)+1:0,button=el('button','bbtn',key+' · '+formName(id));button.type='button';button.dataset.form=id;
+    for(const id of ids){const key=id?FORM_IDS.indexOf(id)+1:0,button=el('button','bbtn');button.type='button';button.dataset.form=id;
+      button.append(el('span','b-mask-key',key+' · '),formName(id));button.title=formName(id)+' · '+BATTLE_FORM_TRAITS[id];   // 결정 D-382: 휴대폰은 키 번호를 숨긴다
       button.appendChild(el('small','b-mask-trait',BATTLE_FORM_TRAITS[id]));
       button.onclick=()=>{if(id&&id===G.form)setForm('');else setForm(id);};buttons.appendChild(button);}
   }

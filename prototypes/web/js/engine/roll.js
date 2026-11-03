@@ -1,5 +1,5 @@
 'use strict';
-/* 구르기: 좌우로 움직이며 Space(휴대폰은 점프 버튼)를 꾹 누르면 몸을 말아 공처럼 굴러 빨리 간다. 떼면 일어선다.
+/* 구르기: 좌우로 움직이며 Space를 꾹 누르면(휴대폰은 구르기 단추, 결정 D-381) 몸을 말아 공처럼 굴러 빨리 간다. 떼면 일어선다.
    결정 D-94 (design/data/decisions.csv). 조작감 수치는 tuning.csv 의 roll_* 줄이다.
    - 짧게 누르면 지금처럼 점프한다. 멈춰 있을 때 누르면 바로 점프한다(기다림 없음).
      움직이는 중에 누르면 roll_hold_ms 동안 기다렸다가, 그 전에 떼면 뗄 때 점프하고 계속 누르고 있으면 구른다.
@@ -9,7 +9,7 @@
    - 구르는 동안에는 말걸기·줍기·휘두르기·채집을 하지 않는다. 대화·패널·경치·전투·미니게임·구역 전환 중에는 구르지 않는다.
    - 변신마다 되고 안 되고가 다르다(forms.js ROLL_FORMS). 안 되는 모습으로 처음 해 보면 아이 혼잣말을 한 번 띄운다. */
 let rollHold=null,rolling=false,rollVel=0,rollAngle=0,rollTick=0;
-const spaceHeld=()=>!!(keys[' ']||touch.jump);
+const spaceHeld=()=>!!(keys[' ']||touch.jump||touch.roll);
 const rollSpec=()=>ROLL_FORMS[G?.form||'']||ROLL_FORMS[''];
 const rollAllowedNow=()=>!!G&&G.started&&!G.ended&&!B&&!paused()&&!pickupPose&&!formClimb&&!inkOn&&!openMinigame();
 /* 점프 누름(Space·휴대폰 점프 버튼). 기다리기로 했으면 true(점프는 아직 하지 않는다), 아니면 false(원래대로 점프) */
@@ -23,6 +23,15 @@ function rollPress(){
   if(!spec.roll&&G.f.rollSaid?.[G.form||''])return false;
   rollHold={t0:performance.now(),form:G.form||''};
   return true;
+}
+/* 결정 D-381: 휴대폰 구르기 단추. 기다림 없이 바로 구르고, 누르는 동안 계속 구른다. 방향을 안 누르면 바라보는 쪽으로.
+   공중에서 눌렀으면 내려서자마자 구른다(stepRoll). 못 구르는 모습이면 그 모습의 혼잣말을 띄운다. */
+function rollButtonPress(){
+  if(!rollAllowedNow()||rolling)return;
+  rollHold=null;
+  const spec=rollSpec();
+  if(!spec.roll){toast(spec.say);return;}
+  if(G.onGround)startRoll();
 }
 /* 결정 D-143: C·W·↑ 점프가 나가면 Space 기다림을 거둔다 (뒤늦게 구르거나, 뗄 때 한 번 더 뛰지 않게) */
 function rollCancelHold(){if(rollHold)rollHold.done=true;}
@@ -52,8 +61,10 @@ function stepRoll(ax){
       }
     }
   }
+  if(touch.roll&&!rolling&&G.onGround&&rollAllowedNow()&&rollSpec().roll)startRoll();   // 결정 D-381
   if(!rolling)return;
   if(!spaceHeld()||!rollAllowedNow()||!rollSpec().roll){endRoll();return;}
+  if(!ax&&touch.roll)ax=G.face||1;   // 결정 D-381: 구르기 단추만 누르면 바라보는 쪽으로
   const target=ax*T.field_move_speed*T[rollSpec().speed];
   rollVel+=(target-rollVel)/Math.max(1,T.roll_accel_frames);
   if(Math.abs(rollVel)<0.05&&!ax)rollVel=0;

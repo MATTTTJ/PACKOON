@@ -138,10 +138,108 @@ function measureScene(selectors) {
   return { viewport: [innerWidth, innerHeight], coarse: matchMedia('(pointer:coarse)').matches, roots: roots.filter(isVisible).length, buttons, overflow };
 }
 
+/* 결정 D-380·D-382: 휴대폰 단추 배치를 잰다. 단추 상자, 방향 판과 오른손 묶음, 필드면 주인공 자리, 전투면 싸움 상자와 보스 자리(화면 좌표). */
+function measureLayout() {
+  const vis = e => { if (!e || !e.getClientRects().length) return false; const c = getComputedStyle(e); if (c.visibility === 'hidden' || c.display === 'none') return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+  const rect = e => { const r = e.getBoundingClientRect(); return { x: +r.x.toFixed(1), y: +r.y.toFixed(1), w: +r.width.toFixed(1), h: +r.height.toFixed(1) }; };
+  const name = e => e.id ? '#' + e.id : e.dataset.k ? '[data-k="' + e.dataset.k + '"]' : e.dataset.form !== undefined ? '[data-form="' + e.dataset.form + '"]' : e.tagName.toLowerCase() + '.' + String(e.className).trim().replace(/\s+/g, '.');
+  const buttons = [...document.querySelectorAll('#pad button,.hud-btns button,#battle button')].filter(vis).map(e => ({ id: name(e), text: (e.textContent || '').trim().slice(0, 16), disabled: !!e.disabled, r: rect(e) }));
+  const out = { viewport: [innerWidth, innerHeight], buttons, dpad: vis($('dpad')) ? rect($('dpad')) : null, acts: vis(document.querySelector('.acts-core')) ? rect(document.querySelector('.acts-core')) : null };
+  if (B) {
+    const c = $('bcv').getBoundingClientRect(), sx = c.width / LW, sy = c.height / LH;
+    out.box = { x: c.x + BOX.x * sx, y: c.y + BOX.y * sy, w: BOX.w * sx, h: BOX.h * sy };
+    // 보스 자리: 가운데 40% 폭, 보스 눈높이(EY) 조금 위부터 싸움 상자 위까지
+    out.boss = { x: c.x + LW * 0.3 * sx, y: c.y + (EY - LH * 0.12) * sy, w: LW * 0.4 * sx, h: (BOX.y - EY + LH * 0.12) * sy };
+  } else {
+    const c = $('cv').getBoundingClientRect(), sx = c.width / W, sy = c.height / H;
+    out.hero = { x: c.x + (G.px - cam - 8) * sx, y: c.y + (G.py - 24) * sy, w: 16 * sx, h: 24 * sy };
+  }
+  return out;
+}
+const LAYOUT_SIZES = [[360, 780], [390, 844], [412, 915], [844, 390], [740, 360]];
+const LAYOUT_BOSSES = ['kudzu', 'golem', 'dokkaebi', 'gangcheol'];
+const overlap = (a, b, slack = 1) => a.x + slack < b.x + b.w && b.x + slack < a.x + a.w && a.y + slack < b.y + b.h && b.y + slack < a.y + a.h;
+function judgeLayout(scene, m, findings) {
+  const [vw, vh] = m.viewport, at = { scene, viewport: vw + '×' + vh };
+  for (const b of m.buttons) {
+    if (!b.disabled && (b.r.w < 44 || b.r.h < 44)) findings.push(failure('mobile-layout', `${scene}: ${b.id} '${b.text}' 단추가 ${b.r.w}×${b.r.h}px로 44px보다 작다.`, { ...at, button: b }));
+    if (b.r.x < -1 || b.r.y < -1 || b.r.x + b.r.w > vw + 1 || b.r.y + b.r.h > vh + 1) findings.push(failure('mobile-layout', `${scene}: ${b.id} '${b.text}' 단추가 화면 밖으로 나갔다.`, { ...at, button: b }));
+  }
+  for (let i = 0; i < m.buttons.length; i++) for (let j = i + 1; j < m.buttons.length; j++) {
+    const a = m.buttons[i], b = m.buttons[j];
+    if (overlap(a.r, b.r)) findings.push(failure('mobile-layout', `${scene}: ${a.id} '${a.text}'와 ${b.id} '${b.text}' 단추가 겹친다.`, { ...at, a, b }));
+  }
+  // 두 손 사이: 방향 판 오른쪽 끝과 오른손 묶음 왼쪽 끝 사이가 엄지 하나(48px)보다 넓어야 한다
+  if (m.dpad && m.acts && m.acts.x - (m.dpad.x + m.dpad.w) < 48) findings.push(failure('mobile-layout', `${scene}: 방향 판과 오른손 단추 사이가 ${(m.acts.x - m.dpad.x - m.dpad.w).toFixed(1)}px로 엄지 하나(48px)보다 좁다.`, { ...at, dpad: m.dpad, acts: m.acts }));
+  const pad = m.buttons.filter(b => /^\[data-k|^#pad/.test(b.id));
+  if (m.hero) for (const b of pad) if (overlap(b.r, m.hero)) findings.push(failure('mobile-layout', `${scene}: ${b.id} '${b.text}' 단추가 화면 가운데의 주인공을 덮는다.`, { ...at, button: b, hero: m.hero }));
+  if (m.box) for (const b of m.buttons) {
+    if (overlap(b.r, m.box)) findings.push(failure('mobile-layout', `${scene}: ${b.id} '${b.text}' 단추가 싸움 상자를 덮는다.`, { ...at, button: b, box: m.box }));
+    else if (overlap(b.r, m.boss)) findings.push(failure('mobile-layout', `${scene}: ${b.id} '${b.text}' 단추가 보스 자리를 덮는다.`, { ...at, button: b, boss: m.boss }));
+  }
+}
+async function runMobileLayout(browser, outDir, findings, evidence, steps) {
+  const records = [];
+  for (const [w, h] of LAYOUT_SIZES) {
+    await browser.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: true });
+    await browser.navigate(browser.url); await browser.eval('localStorage.clear()'); await browser.reload();
+    await browser.until("!!document.querySelector('#tsNew')?.getClientRects().length", { timeout: 15000, label: w + '×' + h + ' 첫 화면' });
+    await tap(browser, '#tsNew'); await tap(browser, '#btnStart');
+    await browser.until("!document.querySelector('#bag').hidden", { timeout: 10000, label: w + '×' + h + ' 출발 쪽지' });
+    await tap(browser, '#bagClose');
+    // 주인공을 길 가운데쯤에 세우고 카메라가 따라오게 둔다 (주인공이 화면 가운데 근처에 있을 때 단추가 덮지 않아야 한다)
+    await browser.eval('G.px=Math.min(fieldWidth()-260,640);G.cam=clamp(G.px-W*.42,0,Math.max(0,fieldWidth()-W))');
+    await browser.wait(400);
+    const field = await browser.eval(`(${measureLayout.toString()})()`);
+    judgeLayout(`필드 ${w}×${h}`, field, findings); records.push({ scene: 'field', w, h, ...field });
+    const fieldImage = path.join(outDir, `mobile-layout-field-${w}x${h}.png`); await browser.screenshot(fieldImage); evidence.push(fieldImage);
+    const bosses = (w === 390 || w === 412) ? ['golem'] : LAYOUT_BOSSES;
+    for (const kind of bosses) {
+      // 도구 둘, 변신 넷(가장 많을 때)으로 전투를 연다
+      await browser.eval(`G.tool='sickle';G.f.battleTools=['pickaxe'];G.forms=['squirrel','goat','owl','deer'];refreshFormUi();startBattle('${kind}',()=>{})`);
+      await browser.until("B&&B.st!=='intro'", { timeout: 9000, label: kind + ' 전투 시작' }).catch(() => {});
+      await browser.wait(300);
+      const battle = await browser.eval(`(${measureLayout.toString()})()`);
+      judgeLayout(`전투 ${kind} ${w}×${h}`, battle, findings); records.push({ scene: 'battle-' + kind, w, h, ...battle });
+      const image = path.join(outDir, `mobile-layout-${kind}-${w}x${h}.png`); await browser.screenshot(image); evidence.push(image);
+      if (w === 390 && kind === 'golem') {
+        // 결정 D-383: 도구 단추로 낫↔곡괭이. 결정 D-384: 패드 '선물'이 선물 창을 열거나 다음 빈틈으로 미룬다
+        const before = await browser.eval('B.tool'); await tap(browser, '#padTool');
+        if (await browser.eval('B.tool') === before) findings.push(failure('mobile-layout', '전투 도구 단추를 눌러도 든 도구가 바뀌지 않는다.', { before }));
+        await tap(browser, '#padJump');
+        if (!await browser.eval("!!(B.giftQueued||!$('bGiftMenu').hidden)")) findings.push(failure('mobile-layout', "전투 패드의 '선물'을 눌러도 선물 창이 열리지도, 다음 빈틈으로 미뤄지지도 않는다."));
+        if (!await browser.eval("$('bGiftMenu').hidden")) await tap(browser, '#bGiftClose');
+      }
+      await browser.eval("bEnd('flee')");
+      await browser.until("!$('bResult').hidden", { timeout: 9000, label: kind + ' 전투 끝 창' });
+      await browser.eval("$('bResOk').click()"); await browser.until('!B', { timeout: 5000, label: kind + ' 전투 닫기' });
+    }
+    if (w === 390) {
+      // 결정 D-381: 구르기 단추를 누르는 동안 구른다. 결정 D-380: 방향 판은 떼지 않고 ◀에서 ▶로 밀면 방향이 바뀐다
+      await browser.eval('G.px=Math.min(fieldWidth()-260,640)');await browser.wait(200);
+      await holdTouch(browser, '#padRoll', 'rolling', 3000).catch(e => findings.push(failure('mobile-layout', '구르기 단추를 눌러도 구르지 않는다: ' + e.message)));
+      await browser.wait(200);
+      const l = await browser.eval("(()=>{const r=document.querySelector('#dpad [data-k=\"left\"]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()");
+      const r = await browser.eval("(()=>{const r=document.querySelector('#dpad [data-k=\"right\"]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()");
+      await browser.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ ...l, radiusX: 2, radiusY: 2, force: 1, id: 1 }] });
+      const leftOn = await browser.eval('touch.left&&!touch.right');
+      await browser.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ ...r, radiusX: 2, radiusY: 2, force: 1, id: 1 }] });
+      const rightOn = await browser.eval('touch.right&&!touch.left');
+      await browser.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      const off = await browser.eval('!touch.left&&!touch.right');
+      if (!leftOn || !rightOn || !off) findings.push(failure('mobile-layout', '방향 판을 ◀에서 ▶로 밀어도 방향이 바뀌지 않거나, 떼어도 멈추지 않는다.', { leftOn, rightOn, off }));
+    }
+  }
+  steps.push('4. 360×780·390×844·412×915·844×390·740×360 에서 필드와 보스 전투의 단추 겹침, 두 손 사이, 주인공·싸움 상자·보스 자리 가림을 잰다. 구르기 단추·방향 판 밀기·전투 도구·선물 단추를 눌러 본다.');
+  evidence.push(write(outDir, 'mobile-layout.json', records));
+  return records.length;
+}
+
 // 잴 장면 목록. 손일 미니게임은 PA-46에서 빠져 휴대폰 장면에서도 뺐다. 하나라도 못 재면 실패로 본다.
 const MOBILE_SCENES = ['title', 'prologue', 'bag', 'dialog'];
 async function runMobile({ browser, outDir, rules }) {
   const findings = [], scenes = [], evidence = [], steps = [];
+  let layoutScenes = 0;
   async function measure(name, selectors) {
     const data = await browser.eval(`(${measureScene.toString()})(${JSON.stringify(selectors)})`);
     scenes.push({ name, ...data });
@@ -191,6 +289,7 @@ async function runMobile({ browser, outDir, rules }) {
     steps.push('3. 오른쪽 터치 버튼을 누른 채 늙은 까치에게 걸어가 말걸기를 누르고, 대화 뒤 보자기 손일을 고른다 (바로 마침).');
     const hooks = await collectHookFindings(browser);
     for (const f of hooks.speakers) findings.push(f);
+    layoutScenes = await runMobileLayout(browser, outDir, findings, evidence, steps);
   } catch (error) {
     findings.push(failure('mobile-execution', error.message, { steps }));
     const image = path.join(outDir, 'mobile-failure.png'); await browser.screenshot(image).catch(() => {}); evidence.push(image);
@@ -198,11 +297,12 @@ async function runMobile({ browser, outDir, rules }) {
     await browser.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }).catch(() => {});
   }
   const missing = MOBILE_SCENES.filter(n => !scenes.some(s => s.name === n));
+  if (layoutScenes === 0) missing.push('layout');
   if (missing.length) findings.push(failure('mobile-coverage', '휴대폰 장면을 다 재지 못했다: ' + missing.join(', '), { expected: MOBILE_SCENES, actual: scenes.map(s => s.name) }));
   evidence.push(write(outDir, 'mobile-measurements.json', { input: 'CDP 실제 touchStart/touchEnd, 진행값·위치 주입 없음', steps, scenes, findings }));
   for (const f of findings) if (!f.environment) Object.assign(f, { evidence, steps: (f.steps || steps).map(s => s.replace(/^\d+\.\s*/, '')), reproductions: '이번 실행 1회',
     environment: { url: browser.url, viewport: '390×844, DPR 1', input: 'CDP 실제 터치', start: '빈 격리 저장, 확장판 새 게임' } });
-  return result('mobile', findings, evidence, `390×844 터치 화면 ${scenes.length}/${MOBILE_SCENES.length}장면 측정, 작은 버튼 ${findings.filter(f => f.rule === 'touch-target').length}건, 글 넘침 ${findings.filter(f => f.rule === 'mobile-overflow').length}건. 실기기 조작감은 미확인이다.`);
+  return result('mobile', findings, evidence, `390×844 터치 화면 ${scenes.length}/${MOBILE_SCENES.length}장면 측정, 배치 ${layoutScenes}장면(화면 크기 5), 배치 문제 ${findings.filter(f => f.rule === 'mobile-layout').length}건, 작은 버튼 ${findings.filter(f => f.rule === 'touch-target').length}건, 글 넘침 ${findings.filter(f => f.rule === 'mobile-overflow').length}건. 실기기 조작감은 미확인이다.`);
 }
 
-module.exports = { runEdges, runSave, runMobile, measureScene };
+module.exports = { runEdges, runSave, runMobile, measureScene, judgeLayout };
