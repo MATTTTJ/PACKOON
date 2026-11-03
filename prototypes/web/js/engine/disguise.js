@@ -101,10 +101,11 @@ const DISGUISE_LINES={
   salgeumi:{tone:'low',
     back:'너, 너였어? 귀가 다 쭈뼛했잖아.',backFirst:'너구리구나… 휴.'},
   // 아빠는 말을 잃었다. 몸짓으로만 묻고, 집안 사람이라 잎사귀를 알아본다.
-  dad:{tone:'high',knows:true,me:'아빠, 저예요.',meFirst:'아빠, 저예요.',meAgain:'저예요, 아빠.',
+  // 결정 D-436: 이름을 먹혀 넋이 빠진 동안은 누구에게도 돌아보지 않는다. 그동안은 영산 talkDad 가 맡는다
+  dad:{tone:'high',knows:true,skip:()=>!REGIONS.yeongsan?.namesBack?.(),me:'아빠, 저예요.',meFirst:'아빠, 저예요.',meAgain:'저예요, 아빠.',
     first:'(아빠가 낯선 짐승을 물끄러미 본다.\n누구냐고 묻는 눈이다.)',ask:'(아빠가 짐짓 고개를 갸웃한다.\n어디서 온 손님이냐는 얼굴이다.)',
     again:'(아빠가 또 짐짓 고개를 갸웃한다.)',
-    back:'(아빠가 보따리 끈의 잎사귀를 손가락으로 톡 친다.\n다 안다는 얼굴이다.)',backFirst:null},
+    back:'(아빠가 보따리 끈의 잎사귀를 손가락으로 톡 친다.)\n…다 보인다.',backFirst:null},
   sangun:{tone:'high',knows:true,me:'단풍골 너구리예요.',meFirst:'단풍골 너구리예요.',
     first:'무엇으로 왔느냐. 이름을 대어라.',ask:'무엇으로 왔느냐. 이름을 대어라.',again:'무엇으로 왔느냐.',
     back:'무엇으로 와도 너는 너다.',backFirst:'무엇으로 와도 너는 너다.'},

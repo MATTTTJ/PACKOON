@@ -34,27 +34,16 @@ Rg.art={
      결정 D-431: 강철이에게 이름을 다 먹혀 넋이 빠졌다(이름이 돌아오기 전). 호수만 보고, 고개를 조금 떨궜고, 눈에 빛이 없다.
      버릇만 남았다: 보따리 매듭을 묶었다 풀고, 곁에 꽂은 겨울 막대에 금을 긋는다(가을부터 하루 하나, 깊은 금 하나는 강철이와 싸운 날). */
   dad(ox,oy,f){const Gy='#7c7062',K='#2a211b',Wt='#efe6d6',T='#6f6357',Sc='#b4432a';
-    const p=Rg.dadPose||{},t=p.tick||0,a=p.act,lost=!Rg.namesBack();
-    if(lost&&!a)f=1;   // 다가가도 돌아보지 않는다
-    const hx=ox+(['retry','mouth'].includes(a)?Math.round(Math.sin(t*.15)*2):0),hy=oy+(['nod','heart'].includes(a)?Math.round((1-Math.cos(t*.12))):0)+(lost&&!a?1:0);
+    const lost=!Rg.namesBack();
+    if(lost)f=1;   // 다가가도 돌아보지 않는다
+    const hx=ox,hy=oy+(lost?1:0);
     M(ox,oy,f,-14,-10,8,5,T);M(ox,oy,f,-13,-10,1,5,K);M(ox,oy,f,-9,-10,1,5,K);
     M(ox,oy,f,-5,-15,11,11,Gy);M(ox,oy,f,-1,-13,5,8,'#cfc3b2');
     M(hx,hy,f,-4,-24,12,10,Gy);M(hx,hy,f,-3,-20,11,2,K);M(hx,hy,f,5,-20,1,1,'#ffffff');M(hx,hy,f,-3,-18,10,2,Wt);M(hx,hy,f,8,-19,1,2,K);
     M(hx,hy,f,-4,-26,3,3,Gy);M(hx,hy,f,5,-26,3,3,Gy);
     M(ox,oy,f,-5,-15,12,3,Sc);M(ox,oy,f,-6,-12,3,6,Sc);
     M(ox,oy,f,-4,-4,4,4,K);M(ox,oy,f,2,-4,4,4,K);
-    if(a==='mouth'){M(ox,oy,f,5,-17,3,3,Wt);M(ox,oy,f,5,-14,2,4,Gy);}
-    if(a==='cradle'||a==='heart'){
-      const sway=a==='cradle'?Math.round(Math.sin(t*.07)):0;
-      M(ox+sway,oy,f,-5,-11,4,3,Wt);M(ox+sway,oy,f,5,-11,4,3,Wt);M(ox+sway,oy,f,-1,-9,7,2,Wt);
-      if(a==='heart')M(ox,oy,f,2,-14,3,3,Wt);
-    }
-    if(a==='paper'||a==='offer'){const reach=a==='offer'?2:0;
-      M(ox,oy,f,1+reach,-14,8,7,'#e6dcc0');M(ox,oy,f,3+reach,-12,4,1,T);M(ox,oy,f,3+reach,-10,3,1,T);
-      M(ox,oy,f,-1+reach,-9,3,2,Wt);M(ox,oy,f,8+reach,-9,2,2,Wt);
-    }
-    if(a==='retry'||a==='nod')M(ox,oy,f,7,-12,3,2,Wt);
-    if(lost&&!a){
+    if(lost){
       const g=Vfx.reducedMotion?0:(typeof G!=='undefined'&&G?G.anim:0),Cord='#8a6a3a',Stick='#8c735d';
       M(hx,hy,f,5,-20,1,1,K);                                                      // 눈에 빛이 없다
       M(ox,oy,f,12,-26,2,26,Stick);for(let i=0;i<8;i++)M(ox,oy,f,11,-24+i*3,1,1,'#4a3a2a');M(ox,oy,f,10,-9,4,1,'#1e140c');   // 겨울 막대와 금
