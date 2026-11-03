@@ -200,21 +200,6 @@ if(!CLASSIC){
     for(let i=-15;i<16;i+=6){const h=17+Math.floor(hash(world+i)*14),tip=swayStem(px,x+i,y,h,world+i,'#9f955c',3.2);
       px(x+i+tip-1,y-h-8,3,9,'#bbb180');px(x+i+tip-2,y-h-7,5,3,'#c9bf8e');}
   }
-  function treeHollow(x,y=GROUND){
-    // One hollow trunk, viewed in section. The footholds themselves are engine platforms.
-    px(x-40,4,80,y-4,'#5a3a2c');px(x-31,7,62,y-7,'#997047');px(x-25,9,50,y-9,'#382c28');
-    for(let i=0;i<7;i++){const yy=15+i*25;px(x-39,yy,8,2,'#b18a59');px(x+31,yy+11,8,2,'#b18a59');}
-    px(x-50,y-8,100,8,'#68432e');px(x-45,y-14,13,8,'#68432e');px(x+32,y-14,13,8,'#68432e');
-    for(let i=0;i<5;i++){const yy=23+i*29;px(x-19,yy,9,1,'#775339');px(x+8,yy+15,12,1,'#775339');}
-    px(x-19,35,38,2,'#bba16e');px(x-15,37,5,15,'#d7c6a1');px(x-5,37,4,10,'#cb9477');px(x+6,37,6,18,'#d9cbaa');
-    px(x-2,GROUND-20,6,4,'#aa7842');px(x-3,GROUND-22,8,2,'#68452e');
-    // Broad shoulders and a cut root distinguish the hollow from a wooden pillar.
-    px(x-56,4,16,24,'#67442e');px(x+40,4,21,18,'#67442e');px(x-68,4,18,9,'#8c603b');
-    px(x-52,y-7,13,7,'#b28b56');px(x+40,y-8,16,8,'#b28b56');
-    for(let i=0;i<3;i++){px(x-51+i*3,y-6+i,6-i,1,'#765032');px(x+43+i*3,y-7+i,7-i,1,'#765032');}
-    for(const yy of [86,143]){px(x-23,yy,14,3,'#8e663e');
-      px(x-21,yy-5,4,4,'#c49049');px(x-22,yy-6,6,2,'#6b4730');px(x-14,yy-3,3,3,'#d3a260');}
-  }
   function smallShrine(x,y=GROUND){
     px(x-20,y-21,40,21,'#845535');px(x-27,y-25,54,5,'#68412c');px(x-21,y-30,42,5,'#a77744');
     px(x-8,y-15,16,15,'#4f3829');px(x-18,y-18,4,18,'#b88247');px(x+14,y-18,4,18,'#b88247');
@@ -260,7 +245,7 @@ if(!CLASSIC){
       for(const u of [980,1200,1910]){const x=u-cam;px(x-21,GROUND-5,42,5,'#9d7950');px(x-24,GROUND-6,48,1,'#c3a278');}
     }else if(zone==='hill'){
       // 결정 D-45: 줄인 언덕에 맞춘 사당·둔덕 자리 (galchamgol/field.js HILL_SHIFT)
-      treeHollow(180-cam);smallShrine(810-cam);
+      smallShrine(810-cam);   // 결정 D-411: 들머리(180)는 금줄 길 문(ropeGate)이 그린다
       for(const u of [460,1460]){const x=u-cam;   // D-116: 칡이 300 앞당겨져 둔덕도 옮겼다
         px(x-21,GROUND-9,42,9,'#89795c');px(x-15,GROUND-13,31,4,'#aa956e');px(x-13,GROUND-11,14,1,'#cbb182');}
       // Home has become very small; the vista uses this same bent reed roof.
@@ -293,7 +278,7 @@ if(!CLASSIC){
       }
     }
     if(zone==='forge'){
-      // 함지박 도착 둑 아래의 개울과 낮은 가지. 걷는 바닥은 그대로 둔다.
+      // 마을에서 흘러온 개울과 낮은 가지(물레방아 살이 걸린 곳). 걷는 바닥은 그대로 둔다.
       const sx=430-cam;
       px(sx-75,GROUND+3,120,13,'#73938b');px(sx-75,GROUND,120,3,'#a79669');
       for(let i=0;i<5;i++)px(sx-65+i*23,GROUND+7+i%2*3,13,1,'#c6d7b8');
@@ -563,49 +548,35 @@ if(!CLASSIC){
       px(x-1,y-29,3,29,'#6b4b32');px(x-15,y-30,31,9,'#d2af72');px(x-12,y-28,22,1,'#e8cb91');
       px(x+4,y-27,5,1,'#765237');px(x+7,y-29,1,5,'#765237');
     },
-    blocked(x,y){
-      for(let i=-13;i<=13;i+=6){px(x+i,y-56+Math.abs(i),4,56-Math.abs(i),'#526e3a');
-        for(let j=0;j<4;j++)px(x+i-3,y-43+j*11,10,3,'#7d8d46');}
-      px(x-18,y-32,37,3,'#3c5931');px(x-15,y-20,32,2,'#3c5931');
+    /* 결정 D-411: 당산나무 언덕으로 오르는 금줄 길 들머리. 말뚝 둘에 왼새끼 금줄을 걸고 흰 한지 술을 늘어뜨렸다.
+       숲에서는 이 금줄에 칡이 걸려 늘어지고(vineCurtain, 숲의 drawBarrier), 언덕에서는 같은 들머리로 내려간다. */
+    ropeGate(x,y){
+      x=Math.round(x);y=Math.round(y);
+      for(const dx of [-21,18]){px(x+dx,y-46,4,46,'#6b4b32');px(x+dx+1,y-46,1,44,'#8d6a46');px(x+dx-1,y-48,6,3,'#55392a');}
+      for(let i=-18;i<=18;i+=2){const yy=y-41+Math.round(3*(1-(i/19)**2));px(x+i,yy,2,2,(i/2)%2?'#c9a96a':'#a8874f');}
+      for(const i of [-10,0,10]){const yy=y-38+Math.round(3*(1-(i/19)**2));px(x+i,yy,2,5,'#f4efe4');px(x+i+1,yy+5,2,4,'#e2dccd');}
+      for(const i of [-15,-5,5,15]){const yy=y-38+Math.round(3*(1-(i/19)**2));px(x+i,yy,1,3,'#b89a5e');}
     },
-    treeDoor(x,y){treeHollow(x,y);},
-    /* 결정 D-51: 칡에 막힌 당산나무 (사용자 피드백 "탑을 가리는 건지 입구를 막는 건지 모르겠다").
-       막힌 동안에는 나무 속 단면 대신 겉껍질을 덮어 "나무"로 읽히게 하고, 줄기 밑 구멍 입구를 또렷이 그린 뒤
-       칡이 줄기를 비스듬히 감아 오르고 입구를 덮은 모습으로 그린다. curtain=false면 입구 덮개는 숲의 장벽(drawBarrier)이 맡는다. */
-    blockedTree(x,y,curtain=true){
-      // 겉껍질: 단면(선반)을 가린다
-      px(x-31,7,62,y-7,'#6b4630');
-      for(let i=0;i<9;i++){const bx=x-28+i*7,top=10+Math.floor(hash(i*31+5)*30);px(bx,top,1,y-top-8,'#55372a');px(bx+2,top+20,1,y-top-40,'#82593a');}
-      // 줄기 밑 구멍 입구 (어두운 아치와 나무 테)
-      px(x-14,y-38,28,38,'#21190f');px(x-11,y-42,22,4,'#21190f');px(x-7,y-45,14,3,'#21190f');
-      px(x-17,y-40,3,40,'#a07246');px(x+14,y-40,3,40,'#a07246');px(x-13,y-44,3,3,'#a07246');px(x+10,y-44,3,3,'#a07246');px(x-9,y-47,18,2,'#a07246');
-      // 줄기를 감아 오르는 칡: 비스듬한 굵은 줄 넷 + 곁줄
-      for(let k=0;k<4;k++){const base=y-56-k*34;
-        for(let i=-36;i<=36;i+=2){const yy=base+Math.round(i*.42);px(x+i,yy,2,3,'#3a5a2b');if(i%6===0)px(x+i,yy+3,2,1,'#2a4420');}}
-      for(let k=0;k<3;k++){const base=y-70-k*34;for(let i=-34;i<=34;i+=3)px(x+i,base-Math.round(i*.3),1,2,'#567a39');}
-      // 칡잎(세 갈래)이 줄을 따라 붙는다
-      for(let k=0;k<4;k++)for(const i of [-26,-6,16,32])kudzuLeaf(x+i,y-60-k*34+Math.round(i*.42));
-      if(curtain)Rg.expArt.vineCurtain(x,y,1);
-    },
-    /* 결정 D-156: 입구를 막은 칡 덩굴. 몸통을 감은 맨 아래 칡 줄(y-56, 기울기 .42)에서 줄기가 늘어져
-       아치(x±14, 꼭대기 y-45)를 덮고 땅에 뿌리를 박는다. 그래서 덩굴이 나무와 한 몸으로 보인다.
+    /* 결정 D-156·D-411: 길을 막은 칡 덩굴. 금줄(y-40 언저리, 가운데가 처진다)에 걸려 늘어져 길을 덮고 땅에 뿌리를 박는다.
        k(0~1)는 남은 덩굴. 낫질로 줄면 줄기가 위에서부터 끊겨 아래로 내려앉는다(숲의 drawBarrier). */
     vineCurtain(x,y,k=1){
       x=Math.round(x);y=Math.round(y);k=Math.max(0,Math.min(1,k));
       const ink='#2a4420',dark='#3a5a2b',mid='#4f7434',sway=Vfx.reducedMotion?0:Math.sin((G?.anim||0)/45);
-      const band=i=>y-56+Math.round(i*.42),topAt=i=>Math.round(band(i)+(y-8-band(i))*(1-k));
+      const band=i=>y-39+Math.round(3*(1-(i/19)**2)),topAt=i=>Math.round(band(i)+(y-8-band(i))*(1-k));
       const stems=[-15,-10,-5,0,5,10,14];
-      // 줄기: 칡 줄에 매달려 아치 앞으로 늘어진다. 아래로 갈수록 조금씩 흔들린다
+      // 금줄을 감은 칡 줄기 (남은 만큼)
+      if(k>0)for(let i=-19;i<=19;i+=2)if(i<-19+38*k+1)px(x+i,band(i)-2,2,2,i%4?dark:ink);
+      // 줄기: 금줄에 매달려 길 앞으로 늘어진다. 아래로 갈수록 조금씩 흔들린다
       stems.forEach((i,j)=>{const top=topAt(i);
         for(let yy=top;yy<y;yy+=2){const t=(yy-band(i))/(y-band(i)),xx=x+i+Math.round(Math.sin(t*5.5+j*1.9)*1.6+sway*t*1.4);
           px(xx,yy,j%2?2:3,2,j%3?mid:dark);}
         px(x+i-2,y-2,5,2,ink);px(x+i+(j%2?2:-3),y-1,3,1,ink);});   // 땅을 움켜쥔 뿌리 끝
-      // 줄기끼리 비스듬히 엮인 덩굴손: 입구가 비치지 않을 만큼 촘촘하다
+      // 줄기끼리 엮인 덩굴손: 길 너머가 비치지 않을 만큼 촘촘하다
       const lowTop=Math.min(...stems.map(topAt));
-      for(let r=0;r<6;r++){const yy=y-42+r*7;if(yy<lowTop+2)continue;
+      for(let r=0;r<5;r++){const yy=y-33+r*7;if(yy<lowTop+2)continue;
         for(let i=-14;i<=13;i+=2){const dy=Math.round(Math.sin(i*.45+r*1.3)*2);if(yy+dy>=topAt(i)+1)px(x+i,yy+dy,2,1,ink);}}
       // 잎: 남은 덩굴 위에만 붙는다
-      for(const [lx,ly] of [[-13,-34],[1,-41],[8,-30],[-6,-24],[5,-15],[-12,-12],[9,-6],[-3,-5]])
+      for(const [lx,ly] of [[-13,-32],[1,-34],[8,-27],[-6,-22],[5,-15],[-12,-12],[9,-6],[-3,-5]])
         if(y+ly>=topAt(lx)+2)kudzuLeaf(x+lx,y+ly);
       // 걷힌 만큼 아래에 끊긴 덩굴이 쌓인다
       if(k<1)for(let i=-16;i<=14;i+=3)px(x+i,y-3-Math.round((1-k)*3*((i+16)%7)/6),3,3,((i+16)/3)%2?mid:dark);
