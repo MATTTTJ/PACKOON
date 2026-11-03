@@ -280,6 +280,13 @@ const TABLES={
    "region": "galchamgol",
    "d": "손바닥만 한 박달나무 패. 뒷면에 집안 낙관 流가 지져져 있다. 앞면은 닳아서 매끈하다."
   },
+  "yosul_bottari": {
+   "n": "요술보따리",
+   "r": 2,
+   "kind": "귀한 것",
+   "region": "galchamgol",
+   "d": "流를 수놓은 낡은 보따리. 무엇을 넣어도 납작하고, 메면 깃털처럼 가볍다. 꺼낼 땐 떠올리기만 하면 된다."
+  },
   "broom_sal": {
    "n": "싸리 살",
    "r": 1,
@@ -1512,6 +1519,12 @@ const TABLES={
   },
   {
    "id": "dad_tag",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "yosul_bottari",
    "region": "galchamgol",
    "kind": "item",
    "lines": []
