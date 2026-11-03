@@ -130,6 +130,39 @@ class Browser {
     await this.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   }
   wait(ms) {return sleep(ms);}
+  // 결정 D-335: 기다리기·대화 넘기기·엔딩 넘기기는 여기 하나만 둔다. 끝났는지는 화면 상태로 보고,
+  // 횟수 상한은 무한 루프만 막는 큰 수다. 대사가 몇 줄 늘어도 검사가 깨지지 않는다. 상한에 걸리면 마지막 줄을 오류에 넣는다.
+  async until(expression,{timeout=10000,label=expression,every=25}={}) {
+    const end=Date.now()+timeout;
+    while(Date.now()<end){if(await this.eval(expression))return;await sleep(every);}
+    throw new Error(`${label}: ${timeout/1000}초 안에 도달하지 못했다.`);
+  }
+  // stop 'end'는 대화가 닫힐 때까지, 'choices'는 선택지가 뜰 때까지 넘긴다. each(줄)는 그 줄을 넘기기 전에 부른다.
+  async advanceDialogue({stop='end',press=()=>this.key('e'),each,max=200}={}) {
+    const done=stop==='choices'?"$('dlgChoices').children.length>0":"$('dlg').hidden";
+    let line;
+    for(let i=0;i<max;i++){
+      line=await this.eval(`({done:${done},who:$('dlgWho').textContent,text:$('dlgText').textContent})`);
+      if(line.done)return i;
+      if(each)await each({who:line.who,text:line.text});
+      await press();
+    }
+    throw new Error(`대화를 ${max}번 넘겨도 ${stop==='choices'?'선택지가 나오지':'끝나지'} 않았다. 마지막 줄: ${line.who}: ${line.text}`);
+  }
+  // 결정 D-73: 엔딩은 한 줄씩 넘긴다. endingToName은 이름 칸이 나올 때까지, finishEnding은 이름을 부른 뒤 아래 버튼이 나올 때까지.
+  async endingToName({max=100,gap=80}={}) {
+    for(let i=0;i<max;i++){if(await this.eval("!!$('newName')"))return i;await this.click('#endExtra .end-next');await sleep(gap);}
+    throw new Error(`엔딩을 ${max}번 넘겨도 이름 칸이 나오지 않았다. 마지막 줄: ${await this.endingLine()}`);
+  }
+  async finishEnding({max=100,gap=120}={}) {
+    for(let i=0;i<max;i++){
+      if(!await this.eval("$('endButtons').hidden"))return i;
+      if(await this.eval("!!document.querySelector('#endExtra .end-next')"))await this.click('#endExtra .end-next');
+      await sleep(gap);
+    }
+    throw new Error(`엔딩을 끝까지 넘겨도 아래 버튼이 나오지 않는다. 마지막 줄: ${await this.endingLine()}`);
+  }
+  endingLine() {return this.eval("[...document.querySelectorAll('#endExtra p')].at(-1)?.textContent||'(없음)'");}
   async screenshot(filename) { const result=await this.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(filename,Buffer.from(result.data,'base64')); }
   async close() {
     fs.writeFileSync(path.join(this.outDir,'cdp-log.json'),JSON.stringify({errors:this.errors,networkWarnings:this.networkWarnings,inputs:this.inputs},null,2));

@@ -12,7 +12,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   const read = async expression => b.eval(expression);
   const wait = async ms => b.wait(ms);
   const log = (action, detail) => trace.push({seconds:+((Date.now()-started)/1000).toFixed(2), scene, action, detail});
-  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade})`);
+  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade})`);
   async function check() {
     if(Date.now()-started>maxRun)throw new Error('연속 플레이 제한 540초를 넘었다');
     const s=await snapshot();
@@ -31,8 +31,9 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   }
   const defaults=[/북쪽으로 떠난다/,/아빠와 집으로 돌아간다/,/제 이름을 드릴게요/,/말이… 안 나와/,/내가… 아기였을 때/,/나 주려고/,/건넨다|보따리를 펼친다|달여 드린다|고사상에 올린다|약즙을 맡긴다/,/돌 쌓기를 배운다/,/낫과 시험|낫 이야기/,/하던 이야기 계속/,/해머루 이야기/,/같이 찾아볼게/,/산길로 간다|길을 나선다/,/그만두기|다음에 이야기|다음에 올게|더 둘러|생각해|조금 이따/];
   async function settle(prefer) {
+    let s;
     for(let i=0;i<200;i++) {
-      const s=await check();
+      s=await check();
       if(await read("!$('notebook').hidden")){await click('#noteClose');await wait(40);continue;}
       if(await read("!$('bag').hidden&&bagKind==='중요'")){await click('#bagClose');await wait(40);continue;}
       if(await read("!$('trade').hidden")){await trade(prefer);continue;}
@@ -50,7 +51,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       if(s.ink||s.motion||s.fade){await wait(100);continue;}
       return s;
     }
-    throw new Error('대화/미니게임이 200회 입력 뒤에도 닫히지 않는다');
+    throw new Error('대화/미니게임이 200회 입력 뒤에도 닫히지 않는다'+(s.dlg?'. 마지막 줄: '+s.who+': '+s.text:s.mg?'. 미니게임: '+s.mg:''));
   }
   // 결정 D-39: 교환 화면. 진행에 필요한 부탁(선택 교환 t_craft_ 제외) 중 지금 보따리로 맞출 수 있는 첫 조합을
   // 실제 클릭으로 고르고 얹어 제안한다. prefer가 흥정 방식(허세·사정·칭찬)과 맞으면 먼저 흥정한다.
@@ -200,10 +201,10 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       const idx=await read(`knownRecipes(${json(tool)}).findIndex(r=>r.out===${json(out)})`);
       if(idx<0)throw new Error('배우지 않은 가공법: '+out);
       // 가공 손 연출 동안(brewing)은 버튼이 잠긴다. 느린 환경에서는 앞 가공 연출이 아직 끝나지 않았을 수 있어 풀릴 때까지 기다린다.
-      const unlocked=async()=>{for(let t=0;t<100&&await read('brewing');t++)await wait(100);};
+      const unlocked=()=>b.until('!brewing',{label:'가공 연출 끝'});
       await unlocked();
       await click(`#bagBody .recipe:nth-child(${idx+1})`);
-      for(let t=0;t<50&&await read("!$('craftBtn')||$('craftBtn').disabled");t++)await wait(100);
+      await b.until("!!$('craftBtn')&&!$('craftBtn').disabled",{label:'가공 버튼 풀림'});
       await click('#craftBtn');
       await wait(80);await unlocked();await click('#bagClose');await wait(100);await settle();
     }
@@ -324,11 +325,10 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await stage('영산 · 봄과 열매',async()=>{await npc('sangun');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['dokkaebibul'],toSteel,'강철이');await pickup('legend_fruit');await npc('sangun');});
     const final=await settle();if(!final.ended||final.region!=='yeongsan'||!final.flags.yakDone)throw new Error('마지막 귀향과 엔딩에 도착하지 못했다');
     // 결정 D-73: 엔딩은 한 줄씩 넘긴다. 이름 칸이 나올 때까지 '다음'을 누르고, 이름을 부른 뒤에도 끝까지 넘긴다.
-    for(let i=0;i<20&&!await read("!!$('newName')");i++){await click('#endExtra .end-next');await wait(80);}
+    log('엔딩 넘김',{toName:await b.endingToName()});
     if(!await read("$('endButtons').hidden"))throw new Error('엔딩 대사가 끝나기 전에 아래 버튼이 보인다');
     await click('#newName');await b.send('Input.insertText',{text:'새봄'});await textButton('#endExtra button',/부르기/);await wait(1100);
-    for(let i=0;i<16&&await read("$('endButtons').hidden");i++){if(await read("!!document.querySelector('#endExtra .end-next')"))await click('#endExtra .end-next');await wait(120);}
-    if(await read("$('endButtons').hidden"))throw new Error('엔딩을 끝까지 넘겨도 아래 버튼이 나오지 않는다');
+    log('엔딩 넘김',{toButtons:await b.finishEnding()});
     if(await read('G.f.newName')!=='새봄')throw new Error('엔딩 이름 입력이 저장되지 않았다');
     await b.screenshot(path.join(outDir,mode+'-ending.png'));
   } catch(error) {

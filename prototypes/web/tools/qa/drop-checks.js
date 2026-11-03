@@ -13,9 +13,6 @@ async function ready(b,mode,region){
   await b.eval(`(()=>{localStorage.clear();TitleScreen.close();G=newGame(${j(region)});G.started=true;G.f.momNoteSeen=true;resetScreens();$('dlg').hidden=true;closePanels();G.px=200;G.py=fieldGround();G.cam=40;G.vx=G.vy=0;G.onGround=true;})()`);
   await b.wait(60);
 }
-async function until(b,expression,limit=4000){
-  const end=Date.now()+limit;while(Date.now()<end){if(await b.eval(expression))return;await b.wait(30);}throw Error('바닥 아이템 대기 초과: '+expression);
-}
 function canonical(g){
   const floorItems=Object.fromEntries(Object.entries(g.floorItems||{}).map(([region,zones])=>[region,Object.fromEntries(Object.entries(zones).filter(([,items])=>items.length))]));
   return {region:g.region,zone:g.zone,floorItems,pickups:g.pickups,inv:g.inv};
@@ -32,7 +29,7 @@ async function runDropCheck({browser:b,outDir,name}){
           if(!await b.eval('floorDrops().some(a=>a.flight>0)'))throw Error(region+': 날아가는 아이템이 없어 뿌리기 그림을 확인하지 못했다.');
           await b.wait(100);const file=path.join(outDir,region+'-spawn.png');await b.screenshot(file);images.push(file);captures.push({region,stage:'spawn',file,state:await b.eval('({records:structuredClone(floorDrops()),pose:pickupPose&&{tick:pickupPose.tick}})')});
         }
-        await until(b,"floorDrops().every(a=>!a.flight&&!a.bounce)");
+        await b.until("floorDrops().every(a=>!a.flight&&!a.bounce)");
         if(mode==='expanded'){
           const file=path.join(outDir,region+'-floor.png');await b.screenshot(file);images.push(file);captures.push({region,stage:'floor',file,state:await b.eval('({records:structuredClone(floorDrops()),pose:pickupPose&&{tick:pickupPose.tick}})')});
           await b.eval('G.px=floorDrops().find(a=>!a.got).x;G.py=fieldGround();G.onGround=true');await b.key('x');await b.wait(70);
@@ -50,20 +47,20 @@ async function runDropCheck({browser:b,outDir,name}){
         if(before.records.length!==4)findings.push(fail(name,`${mode}/${region}: 보상 4개가 별도 아이템으로 생성되지 않았다.`,before));
         records.push({mode,region,before,checked});
       }else if(name==='drops-persistence'){
-        await b.eval("spawnDrops('root',4,{x:250,y:fieldGround()})");await until(b,'floorDrops().every(a=>!a.flight&&!a.bounce)');
+        await b.eval("spawnDrops('root',4,{x:250,y:fieldGround()})");await b.until('floorDrops().every(a=>!a.flight&&!a.bounce)');
         const before=canonical(await b.eval('structuredClone(G)'));
         if(mode==='expanded'){
           const changed=await b.eval(`(()=>{const from=G.zone,to=Object.keys(REG.zones).find(id=>id!==from);return {first:changeZone(to),from,to};})()`);
-          await until(b,'!zoneMotion&&zoneFade===0');
+          await b.until('!zoneMotion&&zoneFade===0');
           changed.second=await b.eval('changeZone('+j(changed.from)+')');
-          await until(b,'!zoneMotion&&zoneFade===0');
+          await b.until('!zoneMotion&&zoneFade===0');
           if(!changed.first||!changed.second)throw Error('구역 왕복 시나리오가 실행되지 않았다: '+j(changed));
         }
         const afterRevisit=canonical(await b.eval('structuredClone(G)'));
         if(j(before.floorItems)!==j(afterRevisit.floorItems)||j(before.pickups)!==j(afterRevisit.pickups))findings.push(fail(name,`${mode}/${region}: 구역 왕복 뒤 위치·개수 변경`,{before,afterRevisit}));
         await b.click('#btnSaveHud');const stored=await b.eval("JSON.parse(localStorage.getItem('packoon-save-v1'))");
         if(!stored)throw Error('수동 저장이 작성되지 않았다');
-        await b.reload();await until(b,"!!$('tsContinue')?.getClientRects().length",10000);await b.click('#tsContinue');
+        await b.reload();await b.until("!!$('tsContinue')?.getClientRects().length",{timeout:10000});await b.click('#tsContinue');
         const restored=canonical(await b.eval('structuredClone(G)'));
         if(j(canonical(stored.G))!==j(restored))findings.push(fail(name,`${mode}/${region}: 저장·이어 하기 뒤 바닥 아이템 변경`,{stored:canonical(stored.G),restored}));
         const oldSave=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures','old-saves.json'),'utf8')).saves.find(raw=>JSON.parse(raw).G.region===region);
@@ -79,7 +76,7 @@ async function runDropCheck({browser:b,outDir,name}){
         records.push({mode,region,before,after});
       }else if(name==='drops-full'){
         await b.eval(`(()=>{G.inv={rice:2};G.bagSlots=1;G.pickups=[];spawnDrops('root',2,{x:G.px,y:fieldGround()});})()`);
-        await until(b,'floorDrops().every(a=>!a.flight&&!a.bounce)');
+        await b.until('floorDrops().every(a=>!a.flight&&!a.bounce)');
         await b.eval('G.px=floorDrops()[0].x;G.py=floorDrops()[0].y;G.onGround=true');
         const before=await b.eval('({floor:structuredClone(floorDrops()),inv:{...G.inv}})');
         await b.key('x');await b.wait(650);

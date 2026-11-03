@@ -6,11 +6,6 @@ const path=require('node:path');
 const {measureScene}=require('./runtime-checks');
 const regions=['galchamgol','dolneomeo','jangteo','yeongsan'];
 const j=JSON.stringify;
-async function until(b,expression,limit=8000){
-  const end=Date.now()+limit;
-  while(Date.now()<end){if(await b.eval(expression))return;await b.wait(25);}
-  throw Error('지도 검사 대기 초과: '+expression);
-}
 async function ready(b,classic=false){
   await b.navigate(b.url+(classic?'?classic=1':''));
   await b.eval("(()=>{localStorage.clear();TitleScreen.close();G=newGame();G.started=true;G.f.momNoteSeen=true;resetScreens();closePanels();})()");
@@ -22,21 +17,21 @@ async function runMap({browser:b,outDir}){
   async function picture(name){const file=path.join(outDir,name+'.png');await b.screenshot(file);images.push(file);return file;}
   async function travel(region,zone,{capture=false,touch=false}={}){
     if(await b.eval("$('map').hidden")){if(touch)await b.touch(await b.eval("$('btnMap').getClientRects().length?'#btnMap':'#padMap'"));else await b.key('m');}
-    await until(b,"!$('map').hidden");
+    await b.until("!$('map').hidden");
     if(touch)await b.touch(button(region,zone));else await b.click(button(region,zone));
     const reduced=await b.eval('Vfx.reducedMotion');
     if(touch)await b.touch('#mapTravel');else await b.click('#mapTravel');
     if(reduced)check(await b.eval('!mapTravel'),'map-reduced-immediate','동작 줄이기에서 이동 입력 직후에도 비행 연출이 진행 중이다.');
     if(capture){
-      await until(b,'!!mapTravel&&mapTravel.elapsed/mapTravel.duration>=0.23');
+      await b.until('!!mapTravel&&mapTravel.elapsed/mapTravel.duration>=0.23');
       records.push({stage:'flight-first',state:await b.eval('({elapsed:mapTravel.elapsed,duration:mapTravel.duration,to:mapTravel.to})')});await picture('map-flight-lift');
       const pausedAt=await b.eval("(()=>{dispatchEvent(new Event('blur'));return mapTravel.elapsed;})()");await b.wait(120);
       const resumedAt=await b.eval("(()=>{const elapsed=mapTravel.elapsed;dispatchEvent(new Event('focus'));return elapsed;})()");
       check(pausedAt===resumedAt,'map-flight-pause','창을 떠난 동안 까치 비행 시간이 흘렀다.',{pausedAt,resumedAt});
-      await until(b,'!!mapTravel&&mapTravel.elapsed/mapTravel.duration>=0.59');
+      await b.until('!!mapTravel&&mapTravel.elapsed/mapTravel.duration>=0.59');
       records.push({stage:'flight-second',state:await b.eval('({elapsed:mapTravel.elapsed,duration:mapTravel.duration,to:mapTravel.to})')});await picture('map-flight-ridge');
     }
-    await until(b,`!mapTravel&&G.region===${j(region)}&&G.zone===${j(zone)}`);
+    await b.until(`!mapTravel&&G.region===${j(region)}&&G.zone===${j(zone)}`);
     check(await b.eval("$('map').hidden&&!zoneMotion&&zoneFade===0"),'map-travel-finish','까치 이동 뒤 지도나 전환 상태가 남았다.');
   }
   try{
@@ -47,14 +42,12 @@ async function runMap({browser:b,outDir}){
     records.push({stage:'locked',...locked});
     await b.key('v');check((await b.eval('Sound.enabled'))!==soundBefore,'map-sound-v','V 키로 소리를 켜고 끄지 못했다.');await b.key('v');
     await b.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
-    await b.eval('G.px=820;G.cam=650;G.py=fieldGround();G.onGround=true');await b.key('e');await until(b,"!$('dlg').hidden");
-    for(let i=0;i<8&&!await b.eval("$('dlgChoices').children.length>0");i++)await b.key('e');
+    await b.eval('G.px=820;G.cam=650;G.py=fieldGround();G.onGround=true');await b.key('e');await b.until("!$('dlg').hidden");
+    await b.advanceDialogue({stop:'choices'});
     // 보자기 손일은 미니게임 없이 바로 마친다 (PA-46). 고르면 곧바로 까치 대화가 이어진다.
-    await b.click('#dlgChoices button:first-child');await until(b,"!$('dlg').hidden");
+    await b.click('#dlgChoices button:first-child');await b.until("!$('dlg').hidden");
     const unlockLines=[];
-    for(let i=0;i<20&&await b.eval("!$('dlg').hidden");i++){   // 단풍골 대사 손질(PA-148)로 까치 대화가 12줄을 넘었다
-      unlockLines.push(await b.eval("({who:$('dlgWho').textContent,text:$('dlgText').textContent,unlocked:!!G.f.mapUnlocked})"));await b.key('e');
-    }
+    await b.advanceDialogue({each:async line=>unlockLines.push({...line,unlocked:await b.eval('!!G.f.mapUnlocked')})});
     const supplied=[
       // 결정 D-33: 젊은 까치 둘이 내려앉는 장면
       ['늙은 까치','참, 아가. 길이 멀어 발이 아프거든 하늘을 보고 불러라.'],
@@ -69,9 +62,9 @@ async function runMap({browser:b,outDir}){
     await b.send('Emulation.setEmulatedMedia',{features:[]});await b.eval('G.px=70;G.cam=0');
     // 격리 조건: 출발 구역과 이웃 구역만 실제 changeZone을 거쳐 방문한 상태로 만든다.
     const pair=await b.eval('({region:G.region,from:G.zone,to:Object.keys(REG.zones).find(id=>id!==G.zone)})');
-    await b.eval(`changeZone(${j(pair.to)})`);await until(b,'!zoneMotion&&zoneFade===0');
-    await b.eval(`changeZone(${j(pair.from)})`);await until(b,'!zoneMotion&&zoneFade===0');
-    await b.key('m');await until(b,"!$('map').hidden");
+    await b.eval(`changeZone(${j(pair.to)})`);await b.until('!zoneMotion&&zoneFade===0');
+    await b.eval(`changeZone(${j(pair.from)})`);await b.until('!zoneMotion&&zoneFade===0');
+    await b.key('m');await b.until("!$('map').hidden");
     const entries=await b.eval(`Array.from($('map').querySelectorAll('[data-region][data-zone]')).map(e=>({region:e.dataset.region,zone:e.dataset.zone,disabled:e.disabled,text:e.textContent,current:e.getAttribute('aria-current'),visited:!!G.visitedZones?.[e.dataset.region]?.[e.dataset.zone]}))`);
     check(entries.length>4&&entries.every(e=>e.disabled===!e.visited),'map-visited-only','가 본 구역과 누를 수 있는 지도 구역이 일치하지 않는다.',entries);
     check(entries.filter(e=>!e.visited).every(e=>e.text.includes('？')),'map-unknown-name','가 보지 않은 구역의 이름이 ？로 가려지지 않았다.',entries);
@@ -106,12 +99,12 @@ async function runMap({browser:b,outDir}){
     records.push({stage:'same-region',pair,arrival});
     await b.eval("talk([['너구리','…']])");await b.key('m');
     check(await b.eval("$('map').hidden&&!$('dlg').hidden&&$('toast').textContent.length>0"),'map-busy','대화 중 지도가 열리거나 안내 없이 입력을 버렸다.');
-    await b.key('e');await until(b,"$('dlg').hidden");
+    await b.key('e');await b.until("$('dlg').hidden");
     await b.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
     await b.wait(50);await travel(pair.region,pair.from);
     check(await b.eval('!mapTravel'),'map-reduced-motion','동작 줄이기에서 까치 이동 상태가 남는다.');
     await b.key('m');await b.key('ArrowRight');await b.key('Enter');
-    await until(b,`!mapTravel&&G.zone===${j(pair.to)}`);
+    await b.until(`!mapTravel&&G.zone===${j(pair.to)}`);
     check(await b.eval("$('map').hidden"),'map-keyboard-travel','방향키와 Enter로 고른 구역으로 이동하지 못했다.');
     await travel(pair.region,pair.from);
     await b.send('Emulation.setEmulatedMedia',{features:[]});
@@ -119,11 +112,11 @@ async function runMap({browser:b,outDir}){
     b.scene='map / completed-region forward exit';
     await ready(b);
     await b.eval(`(()=>{G.f.mapUnlocked=true;G.visitedZones.galchamgol[${j(pair.to)}]=true;G.boss.dead=true;G.ended=true;rememberRegion(G);showEnd();})()`);
-    await b.click('#btnMapEnd');await travel('galchamgol',pair.to);await b.key('m');await until(b,"!$('map').hidden");
+    await b.click('#btnMapEnd');await travel('galchamgol',pair.to);await b.key('m');await b.until("!$('map').hidden");
     const forward=await b.eval("({next:!!$('mapNext')?.getClientRects().length,completed:regionCompleted('galchamgol'),ended:G.ended,unknown:[...$('map').querySelectorAll('[data-region=\"dolneomeo\"]')].every(e=>e.disabled)})");
     check(forward.next&&forward.completed&&!forward.ended&&forward.unknown,'map-completed-forward-exit','지역을 끝내고 같은 지역의 다른 구역으로 날아간 뒤 기존 다음 지역 출구를 잃거나 미방문 지역으로 날아갈 수 있다.',forward);
-    await b.click('#mapNext');await until(b,"G.region==='dolneomeo'&&!G.started");
-    await b.click('#btnStart');await until(b,"G.region==='dolneomeo'&&G.started");
+    await b.click('#mapNext');await b.until("G.region==='dolneomeo'&&!G.started");
+    await b.click('#btnStart');await b.until("G.region==='dolneomeo'&&G.started");
     records.push({stage:'completed-forward-exit',...forward,arrived:await b.eval('({region:G.region,started:G.started})')});
 
     // 보스·채집·바닥 물건·지역 완료를 각기 다른 지역에 명시해 심은 뒤 실제 지도 입력으로 왕복한다.
@@ -148,14 +141,14 @@ async function runMap({browser:b,outDir}){
     })()`);
     // 엔딩 이름 입력은 실제 입력으로 끝낸다. 이름을 정하기 전에 지도로 장면을 건너뛰면 안 된다.
     // 결정 D-73: 엔딩은 한 줄씩. 이름 칸까지 넘긴 뒤 M으로 지도를 열어 본다. 버튼 줄은 이름을 부르고 끝날 때까지 숨는다.
-    for(let i=0;i<12&&!await b.eval("!!$('newName')");i++){await b.click('#endExtra .end-next');await b.wait(80);}
+    await b.endingToName();
     check(await b.eval("$('endButtons').hidden"),'map-ending-buttons-hidden','엔딩 대사가 끝나기 전에 아래 버튼이 보인다.');
     await b.key('m');
     check(await b.eval("$('map').hidden&&document.activeElement===$('newName')"),'map-ending-name-gate','엔딩 이름을 정하기 전에 지도 이동이 열렸다.');
-    await b.send('Input.insertText',{text:'봄이'});await b.key('Enter');await until(b,"G.f.newName==='봄이'");await b.wait(1100);
-    for(let i=0;i<8&&await b.eval("$('endButtons').hidden");i++){if(await b.eval("!!document.querySelector('#endExtra .end-next')"))await b.click('#endExtra .end-next');await b.wait(120);}
+    await b.send('Input.insertText',{text:'봄이'});await b.key('Enter');await b.until("G.f.newName==='봄이'");await b.wait(1100);
+    await b.finishEnding();
     seeded.stable=await b.eval('({inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:(({hintsSeen,...f})=>structuredClone(f))(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)})');
-    await b.click('#btnMapEnd');await until(b,"!$('map').hidden");await picture('map-four-regions');
+    await b.click('#btnMapEnd');await b.until("!$('map').hidden");await picture('map-four-regions');
     const comparisons=[];
     for(const region of [...regions,regions[0]]){
       await travel(region,seeded.zones[region]);
@@ -169,7 +162,7 @@ async function runMap({browser:b,outDir}){
     }
     await b.click('#btnSaveHud');const stored=await b.eval("JSON.parse(localStorage.getItem('packoon-save-v1'))");
     check(!!stored&&Object.keys(stored.G.regionStates).length===4,'map-save-regions','저장에 네 지역 상태가 모두 남지 않았다.',stored?.G?.regionStates);
-    await b.reload();await until(b,"!!$('tsContinue')?.getClientRects().length",15000);await b.click('#tsContinue');await until(b,'G.started');
+    await b.reload();await b.until("!!$('tsContinue')?.getClientRects().length",{timeout:15000});await b.click('#tsContinue');await b.until('G.started');
     const restored=await b.eval('({floor:structuredClone(G.floorItems),states:structuredClone(G.regionStates),visited:structuredClone(G.visitedZones)})');
     check(j(restored.floor)===j(stored.G.floorItems)&&j(restored.states)===j(stored.G.regionStates)&&j(restored.visited)===j(stored.G.visitedZones),'map-reload-regions','저장·새로고침 뒤 지역별 상태나 방문 기록이 달라졌다.',{stored:stored.G,restored});
     await travel('yeongsan',seeded.zones.yeongsan);
@@ -179,15 +172,15 @@ async function runMap({browser:b,outDir}){
     b.scene='map / mobile';
     await b.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
     await b.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
-    await b.reload();await until(b,"!!$('tsContinue')?.getClientRects().length",15000);await b.touch('#tsContinue');await until(b,'G.started');
-    await b.touch('#padMap');await until(b,"!$('map').hidden");
+    await b.reload();await b.until("!!$('tsContinue')?.getClientRects().length",{timeout:15000});await b.touch('#tsContinue');await b.until('G.started');
+    await b.touch('#padMap');await b.until("!$('map').hidden");
     const mobile=await b.eval(`(${measureScene.toString()})(['#map'])`);
     check(mobile.coarse&&mobile.viewport[0]===390&&mobile.viewport[1]===844,'map-mobile-emulation','지도 휴대폰 검사 화면 조건이 다르다.',mobile);
     check(mobile.buttons.length>4&&mobile.buttons.filter(e=>!e.disabled).every(e=>e.width>=44&&e.height>=44),'map-touch-target','휴대폰 지도에서 누를 수 있는 표적이 44×44px보다 작다.',mobile.buttons);
     check(!mobile.overflow.length,'map-mobile-overflow','휴대폰 지도 글이 상자 밖으로 넘친다.',mobile.overflow);
     await picture('map-mobile');
     const visibleTarget=button('dolneomeo',seeded.zones.dolneomeo);
-    await b.touch(visibleTarget);await b.touch('#mapTravel');await until(b,'!mapTravel&&G.region==="dolneomeo"');
+    await b.touch(visibleTarget);await b.touch('#mapTravel');await b.until('!mapTravel&&G.region==="dolneomeo"');
     records.push({stage:'mobile',measurements:mobile,region:await b.eval('G.region')});
 
     b.scene='map / old-saves';
@@ -200,10 +193,10 @@ async function runMap({browser:b,outDir}){
       if(id==='dolneomeo')for(const [key,row]of Object.entries(g.f.dolExtraPointState||{}))if(!(key in pickups))pickups[key]=row.got;
       return [id,{completed:s.completed,boss:s.fields.boss.dead,digs:s.fields.digs.map((a,i)=>[a.id||String(i),a.done]).sort(),pickups:Object.entries(pickups).sort(),zoneStates:s.fields.zoneStates}];
     }))});
-    await b.navigate(b.url+'?classic=1');await until(b,"!!$('tsContinue')?.getClientRects().length",15000);await b.click('#tsContinue');await until(b,'G.started');await b.wait(100);await b.click('#btnSaveHud');
+    await b.navigate(b.url+'?classic=1');await b.until("!!$('tsContinue')?.getClientRects().length",{timeout:15000});await b.click('#tsContinue');await b.until('G.started');await b.wait(100);await b.click('#btnSaveHud');
     const classic=await b.eval('structuredClone(G)');
     check(j(retained(classic))===j(retained(expanded)),'map-mode-save-classic','확장판 저장을 classic으로 불러와 저장하면서 방문·바닥 물건·보스·구역 진행이 달라졌다.',{expected:retained(expanded),actual:retained(classic)});
-    await b.navigate(b.url);await until(b,"!!$('tsContinue')?.getClientRects().length",15000);await b.click('#tsContinue');await until(b,'G.started');await b.wait(100);await b.click('#btnSaveHud');
+    await b.navigate(b.url);await b.until("!!$('tsContinue')?.getClientRects().length",{timeout:15000});await b.click('#tsContinue');await b.until('G.started');await b.wait(100);await b.click('#btnSaveHud');
     const again=await b.eval('structuredClone(G)');
     check(j(retained(again))===j(retained(expanded)),'map-mode-save-expanded','classic을 거쳐 확장판으로 돌아왔을 때 방문·바닥 물건·보스·구역 진행이 달라졌다.',{expected:retained(expanded),actual:retained(again)});
     records.push({stage:'mode-roundtrip',before:retained(expanded),classic:retained(classic),expanded:retained(again),note:'각 모드 필드의 크기·발판이 달라 활성 구역·기존 줍기 지점 좌표는 비교하지 않는다. 보스 생존·채집 done·줍기 got은 id별로 비교하고 classic 돌너머가 보관하는 dolExtraPointState의 got도 포함한다. 흩어진 바닥 물건 좌표는 그대로 비교한다.'});
