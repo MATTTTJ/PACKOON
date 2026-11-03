@@ -88,24 +88,15 @@ function cancelPickup(){pickupPose=null;}
 function tryPickup(){
   if(paused()||pickupPose||!G.onGround||G.attackT>0)return false;
   const nearby=nearFloorItems();if(!nearby.length)return false;
-  if(!nearby.some(a=>canPickupItem(a.item))){bagFullWarning();return false;}
+  if(!nearby.some(a=>canPickupItem(a.item)))return false;
   pickupPose={owner:G,region:G.region,zone:G.zone,tick:0,items:null};
   G.vx=0;jumpQ=atkQ=dropQ=false;return true;
 }
-/* X(J) 한 키: 발밑 물건이 있으면 줍고, 없으면 휘두른다. 보따리가 가득하면 휘두르기만 하고 알린다. */
+/* X(J) 한 키: 발밑 물건이 있으면 줍고, 없으면 휘두른다. 보따리는 칸 제한이 없다(결정 D-424). */
 function actionPress(){
   const nearby=!pickupPose&&G.onGround&&G.attackT<=0?nearFloorItems():[];
-  if(nearby.length){
-    if(nearby.some(a=>canPickupItem(a.item))){tryPickup();return;}
-    bagFullWarning();
-  }
+  if(nearby.some(a=>canPickupItem(a.item))){tryPickup();return;}
   atkQ=true;
-}
-let bagFullAt=-1e9;
-function bagFullWarning(){
-  const now=performance.now();if(now-bagFullAt<1500)return;bagFullAt=now;
-  toast('보따리가 가득 찼다. 더는 담을 수 없다.');
-  for(const b of document.querySelectorAll('#btnBag,#pad [data-k="bag"]')){b.classList.remove('warn');void b.offsetWidth;b.classList.add('warn');setTimeout(()=>b.classList.remove('warn'),1200);}
 }
 function finishFloorPickup(a){
   if(a.got||!canPickupItem(a.item))return false;
@@ -123,16 +114,11 @@ function stepPickup(){
   if(p.owner!==G||p.region!==G.region||p.zone!==G.zone){cancelPickup();return;}
   p.tick++;
   if(p.tick===TABLES.TUNING.pickup_motion_frames){
-    const stacks=new Set(Object.keys(G.inv).filter(id=>G.inv[id]>0));p.items=[];
-    for(const a of nearFloorItems()){
-      if(stacks.has(a.item)||!Number.isFinite(G.bagSlots)||stacks.size<G.bagSlots){p.items.push(a);stacks.add(a.item);}
-      else p.full=true;
-    }
+    p.items=nearFloorItems().filter(a=>canPickupItem(a.item));
   }
   if(p.tick>=TABLES.TUNING.pickup_motion_frames+TABLES.TUNING.pickup_pull_frames){
-    let full=!!p.full;
-    for(const a of p.items||[])if(!a.got&&!finishFloorPickup(a))full=true;
-    cancelPickup();if(full)toast('보따리가 가득하다');
+    for(const a of p.items||[])if(!a.got)finishFloorPickup(a);
+    cancelPickup();
   }
 }
 function dropDrawPoint(a){
@@ -339,28 +325,9 @@ function drawNpcs(){drawNpcGhosts();for(const n of fieldNpcs()){const x=n.x-cam;
   n.draw(x,n.y??fieldGround(),f);
   if(a<1)ctx.restore();}}
 
-/* 새 표시가 없는 옛 저장도 도착 지역과 기존 진행을 읽어 겉모습만 복원한다. */
-// 결정 D-12: 보따리 겉모습은 지역 진행에 따라 보따리 → 멜빵 봇짐 → 작은 지게 → 아빠의 지게로 바뀐다. 칸은 무제한 (design/data/decisions.csv)
-function backpackStage(){
-  const f=G.f;
-  if((REGIONS[G.region]?.order||1)>=2)f.bagReachedDolneomeo=true;
-  if(f.bueongDone&&!open('dlg'))f.bagTokenGiven=true;
-  if(f.dadDone&&!open('dlg'))f.bagDadGiven=true;
-  return f.bagDadGiven?3:f.bagTokenGiven?2:f.bagReachedDolneomeo?1:0;
-}
+// 결정 D-424: 요술보따리라 겉모습이 커지지 않는다(D-12의 멜빵 봇짐·작은 지게 단계는 뺐다). 늘 엄마가 싸 준 보따리 하나다
 function drawBackpack(ox,oy,f){
-  const stage=backpackStage();
-  if(stage===0){
-    M(ox,oy,f,-9,-18,8,9,'#d9a441');M(ox,oy,f,-8,-17,1,1,'#8a3b2a');M(ox,oy,f,-5,-14,1,1,'#8a3b2a');M(ox,oy,f,-7,-11,1,1,'#8a3b2a');M(ox,oy,f,-3,-19,3,2,'#b07d26');
-  }else if(stage===1){
-    M(ox,oy,f,-10,-19,8,12,'#99733d');M(ox,oy,f,-9,-18,6,3,'#d9bc82');M(ox,oy,f,-9,-12,6,1,'#5c412a');M(ox,oy,f,-5,-20,2,13,'#563b2b');
-  }else{
-    const dad=stage===3,top=dad?-27:-23,wood=dad?'#61462d':'#a37743';
-    M(ox,oy,f,-11,top,2,-top-3,wood);M(ox,oy,f,-4,top+1,2,-top-4,wood);
-    M(ox,oy,f,-11,top+4,9,2,'#d0a56d');M(ox,oy,f,-12,-8,11,2,wood);
-    M(ox,oy,f,-10,-20,7,11,dad?'#a28661':'#c4a064');M(ox,oy,f,-9,-18,5,1,'#e3c995');M(ox,oy,f,-7,-21,1,14,'#473526');
-    if(dad){M(ox,oy,f,-11,-13,3,2,'#d6c6a3');M(ox,oy,f,-10,-12,1,3,'#403126');}
-  }
+  M(ox,oy,f,-9,-18,8,9,'#d9a441');M(ox,oy,f,-8,-17,1,1,'#8a3b2a');M(ox,oy,f,-5,-14,1,1,'#8a3b2a');M(ox,oy,f,-7,-11,1,1,'#8a3b2a');M(ox,oy,f,-3,-19,3,2,'#b07d26');
 }
 function drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame=0){
   const Gy='#8c8070',K='#2a211b',Wt='#efe6d6',Bl='#d9a441',T='#6f6357';
@@ -532,7 +499,7 @@ function updateOverlay(){
   // 구르는 동안에는 말걸기·줍기·채집 안내를 띄우지 않는다 (D-94)
   const n=paused()||rolling?null:nearInteraction();const dg=n||rolling?null:nearDig();
   const floor=paused()||pickupPose||rolling?null:nearFloorItems()[0];
-  if(floor){pr.hidden=false;const room=nearFloorItems().some(a=>canPickupItem(a.item));pr.textContent=!room?'보따리 가득':TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
+  if(floor){pr.hidden=false;pr.textContent=TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
   else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':gatherCfg(dg)?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';
     // 결정 D-108·D-145: 안내 말풍선은 채집 기준원과 진행 점 위에 띄운다
@@ -705,11 +672,8 @@ function drawRaccoonBackAt(ox,oy,phase){
   R(ox+legL[0],oy+legL[1],legL[2],legL[3],K);R(ox+legR[0],oy+legR[1],legR[2],legR[3],K);
   // 몸통과 등줄기
   R(ox-5,oy-18,10,11,Gy);R(ox-1,oy-17,2,9,Dk);
-  // 보따리 (여행 단계에 따라 겉모습이 바뀐다)
-  const stage=backpackStage();
-  if(stage===0){R(ox-5,oy-19,10,8,'#d9a441');R(ox-4,oy-17,1,1,'#8a3b2a');R(ox+1,oy-15,1,1,'#8a3b2a');R(ox+3,oy-18,1,1,'#8a3b2a');R(ox-2,oy-21,4,2,'#b07d26');}
-  else if(stage===1){R(ox-5,oy-20,10,11,'#99733d');R(ox-4,oy-19,8,3,'#d9bc82');R(ox-4,oy-13,8,1,'#5c412a');}
-  else{const wood=stage===3?'#61462d':'#a37743';R(ox-6,oy-24,2,18,wood);R(ox+4,oy-24,2,18,wood);R(ox-5,oy-20,10,10,stage===3?'#a28661':'#c4a064');R(ox-6,oy-11,12,2,wood);}
+  // 보따리 (결정 D-424: 겉모습은 늘 같다)
+  R(ox-5,oy-19,10,8,'#d9a441');R(ox-4,oy-17,1,1,'#8a3b2a');R(ox+1,oy-15,1,1,'#8a3b2a');R(ox+3,oy-18,1,1,'#8a3b2a');R(ox-2,oy-21,4,2,'#b07d26');
   R(ox-5,oy-21,1,4,'#6e4f22');R(ox+4,oy-21,1,4,'#6e4f22');
   if(G?.forms?.length)drawStrapLeaf(ox,oy,1,-5,-17);
   // 팔: 한쪽은 위로 뻗어 잡고, 다른 쪽은 어깨 아래를 짚는다

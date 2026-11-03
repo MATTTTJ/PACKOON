@@ -93,8 +93,7 @@ function drawRollAt(ox,oy,form,angle){
   // 너구리: 회색 몸을 말고, 줄무늬 꼬리가 공 둘레를 감는다. 등 보따리와 밀짚모자 챙이 공에 붙어 같이 돈다.
   disc(r,'#2a211b');disc(r-1,'#8c8070');
   for(let i=0;i<9;i++){const [x,y]=at(angle+i*0.3,r-2.5);R(x-1,y-1,2,2,Math.floor(i/2)%2?'#2a211b':'#b3a58f');}   // 꼬리 줄무늬 (공 테두리 안쪽을 감는다)
-  const stage=typeof backpackStage==='function'?backpackStage():0;
-  const pack=['#d9a441','#99733d','#a37743','#61462d'][stage]||'#d9a441';
+  const pack='#d9a441';   // 결정 D-424: 보따리 겉모습은 늘 같다
   {const [x,y]=at(angle+Math.PI,r-3);R(x-2,y-2,5,5,pack);R(x-2,y-2,5,1,'#6e4f22');}               // 보따리
   {const [x,y]=at(angle+Math.PI*1.55,r-2);R(x-2,y-1,5,2,'#c39b55');}                              // 모자 챙
   {const [x,y]=at(angle+Math.PI*0.45,r-3);R(x,y,2,1,'#2a211b');R(x,y+1,1,1,'#fbf7ee');}             // 눈가 무늬

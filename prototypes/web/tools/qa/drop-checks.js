@@ -64,38 +64,34 @@ async function runDropCheck({browser:b,outDir,name}){
         const restored=canonical(await b.eval('structuredClone(G)'));
         if(j(canonical(stored.G))!==j(restored))findings.push(fail(name,`${mode}/${region}: 저장·이어 하기 뒤 바닥 아이템 변경`,{stored:canonical(stored.G),restored}));
         const oldSave=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures','old-saves.json'),'utf8')).saves.find(raw=>JSON.parse(raw).G.region===region);
-        const old=await b.eval(`(()=>{const raw=${j(oldSave)},want=JSON.parse(raw).G;localStorage.setItem('packoon-save-v1',raw);const loaded=loadSave();const errors=[];if(!loaded||G.region!==want.region)errors.push('지역');if(JSON.stringify(G.inv)!==JSON.stringify(want.inv))errors.push('소지품');for(const [key,value]of Object.entries(want.f))if(!(CLASSIC&&key==='arcs')&&JSON.stringify(G.f[key])!==JSON.stringify(value))errors.push('진행 '+key);if(!G.floorItems||typeof G.floorItems!=='object')errors.push('새 바닥칸');return {loaded,region:G.region,errors};})()`);
+        const old=await b.eval(`(()=>{const raw=${j(oldSave)},want=JSON.parse(raw).G;localStorage.setItem('packoon-save-v1',raw);const loaded=loadSave();const errors=[];if(!loaded||G.region!==want.region)errors.push('지역');if(JSON.stringify(G.inv)!==JSON.stringify(want.inv.dad_tag?want.inv:{...want.inv,dad_tag:1}))errors.push('소지품');for(const [key,value]of Object.entries(want.f))if(!(CLASSIC&&key==='arcs')&&JSON.stringify(G.f[key])!==JSON.stringify(value))errors.push('진행 '+key);if(!G.floorItems||typeof G.floorItems!=='object')errors.push('새 바닥칸');return {loaded,region:G.region,errors};})()`);
         if(old.errors.length)findings.push(fail(name,`${mode}/${region}: 옛 저장 표본 복원 오류`,old));
         records.push({mode,region,before,afterRevisit,stored:canonical(stored.G),restored,old});
       }else if(name==='drops-departure'){
-        const before=await b.eval(`(()=>{G.bagSlots=0;spawnDrops('root',3,{x:250,y:fieldGround()});if(usesZones(REG)){const here=G.zone;G.zone=Object.keys(REG.zones).find(id=>id!==here);spawnDrops('root',2,{x:120,y:fieldGround()});G.zone=here;}const old={region:G.region,inv:{...G.inv},floor:structuredClone(G.floorItems[G.region]),pickups:structuredClone(G.pickups),next:REG.next,nextInv:REGIONS[REG.next].newState().inv||{}};endGame();return old;})()`);
+        const before=await b.eval(`(()=>{spawnDrops('root',3,{x:250,y:fieldGround()});if(usesZones(REG)){const here=G.zone;G.zone=Object.keys(REG.zones).find(id=>id!==here);spawnDrops('root',2,{x:120,y:fieldGround()});G.zone=here;}const old={region:G.region,inv:{...G.inv},floor:structuredClone(G.floorItems[G.region]),pickups:structuredClone(G.pickups),next:REG.next,nextInv:REGIONS[REG.next].newState().inv||{}};endGame();return old;})()`);
         await b.click('#btnNext');
         const after=await b.eval(`({region:G.region,inv:{...G.inv},old:structuredClone(G.floorItems[${j(region)}]||{}),pickups:structuredClone(G.floorPickups[${j(region)}]||[]),message:$('toast').textContent})`);
         for(const item of new Set([...Object.keys(before.inv),...Object.keys(before.nextInv),...Object.keys(after.inv)]))if((after.inv[item]||0)!==(before.inv[item]||0)+(before.nextInv[item]||0))findings.push(fail(name,`${mode}/${region}: 다음 지역으로 떠날 때 ${item}이 자동 지급되거나 소지품이 바뀌었다.`,{before,after}));
         if(after.region!==before.next||j(before.floor)!==j(after.old)||j(before.pickups)!==j(after.pickups))findings.push(fail(name,`${mode}/${region}: 지난 지역 바닥 물건의 위치·개수·줍기 상태가 바뀌었다.`,{before,after}));
         records.push({mode,region,before,after});
       }else if(name==='drops-full'){
-        await b.eval(`(()=>{G.inv={rice:2};G.bagSlots=1;G.pickups=[];spawnDrops('root',2,{x:G.px,y:fieldGround()});})()`);
+        // 결정 D-424: 보따리는 칸 제한이 없다. 보따리 가득 시험은 지우고, 연속 줍기 입력이 보상을 겹치지 않는지만 본다
+        await b.eval(`(()=>{G.inv={rice:2};G.pickups=[];spawnDrops('root',2,{x:G.px,y:fieldGround()});})()`);
         await b.until('floorDrops().every(a=>!a.flight&&!a.bounce)');
         await b.eval('G.px=floorDrops()[0].x;G.py=floorDrops()[0].y;G.onGround=true');
-        const before=await b.eval('({floor:structuredClone(floorDrops()),inv:{...G.inv}})');
-        await b.key('x');await b.wait(650);
-        const blocked=await b.eval("({floor:structuredClone(floorDrops()),inv:{...G.inv},message:$('toast').textContent})");
-        if(j(before.floor)!==j(blocked.floor)||j(before.inv)!==j(blocked.inv))findings.push(fail(name,`${mode}/${region}: 보따리가 가득 찼는데 바닥 물건이나 소지품이 바뀌었다.`,{before,blocked}));
-        if(!/가득/.test(blocked.message))findings.push(fail(name,`${mode}/${region}: 보따리 가득 안내가 없다.`,blocked));
-        await b.eval('G.bagSlots=2');await b.key('x');await b.key('x');await b.key('x');await b.wait(700);
+        await b.key('x');await b.key('x');await b.key('x');await b.wait(700);
         const freed=await b.eval('({floor:structuredClone(floorDrops()),inv:{...G.inv}})');
-        if(!(freed.inv.root>0))findings.push(fail(name,`${mode}/${region}: 칸을 비운 뒤에도 줍지 못했다.`,freed));
+        if(!(freed.inv.root>0))findings.push(fail(name,`${mode}/${region}: 발밑 물건을 줍지 못했다.`,freed));
         if(freed.inv.root>2)findings.push(fail(name,`${mode}/${region}: 연속 줍기 입력으로 보상이 중복됐다.`,freed));
         const boundaries=await b.eval(`(()=>{G.pickups=[];floorDrops().length=0;G.px=230;G.py=fieldGround();const out=[];for(const axis of ['x','y'])for(const delta of [-0.01,0,0.01]){const a={id:'qa-boundary',item:'acorn',got:false,x:G.px+(axis==='x'?TABLES.TUNING.pickup_range+delta:0),y:G.py+(axis==='y'?TABLES.TUNING.pickup_range_y+delta:0)};G.pickups=[a];out.push({axis,delta,near:nearFloorItems().includes(a),expected:delta<=0});}G.pickups=[];spawnDrops('root',1,{x:G.px,y:G.py});const start=structuredClone(floorDrops());$('bag').hidden=false;for(let i=0;i<40;i++)step();const paused=structuredClone(floorDrops());$('bag').hidden=true;Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});for(let i=0;i<40;i++)step();const hidden=structuredClone(floorDrops());delete document.hidden;return {out,start,paused,hidden};})()`);
         if(boundaries.out.some(a=>a.near!==a.expected)||j(boundaries.start)!==j(boundaries.paused)||j(boundaries.start)!==j(boundaries.hidden))findings.push(fail(name,`${mode}/${region}: 줍기 범위 경계 또는 정지 중 시간 누적 오류`,boundaries));
-        records.push({mode,region,before,blocked,freed,boundaries});
+        records.push({mode,region,freed,boundaries});
       }
     }
   }catch(error){findings.push(fail(name,error.message,{scene:b.scene}));const file=path.join(outDir,'failure.png');await b.screenshot(file).catch(()=>{});images.push(file);}
   const file=path.join(outDir,'scenarios.json');fs.writeFileSync(file,j({method:'격리 상태 주입. 연속 플레이 증거와 별개.',chrome:b.version.product,records,images,captures,findings}));
   for(const f of findings)f.evidence=[file,...images];
-  const descriptions={'drops-floor':'흩뿌리기 최소 간격·유효 바닥, 네 지역 3장면씩 그림','drops-persistence':'구역 왕복·저장·새로고침 위치·개수','drops-departure':'지역 출발 시 전 구역 잔여 물건 보존·자동 회수 없음','drops-full':'보따리 가득 시 잔류·칸을 비운 뒤 줍기'};
+  const descriptions={'drops-floor':'흩뿌리기 최소 간격·유효 바닥, 네 지역 3장면씩 그림','drops-persistence':'구역 왕복·저장·새로고침 위치·개수','drops-departure':'지역 출발 시 전 구역 잔여 물건 보존·자동 회수 없음','drops-full':'연속 줍기 입력 중복 없음·줍기 범위 경계(보따리는 칸 제한 없음)'};
   return {name,status:findings.length?'fail':'pass',summary:descriptions[name]+` (${records.length}개 모드·지역, 문제 ${findings.length}건)`,findings,evidence:[file,...images]};
 }
 module.exports={runDropCheck};

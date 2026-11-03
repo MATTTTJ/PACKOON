@@ -271,7 +271,14 @@ const TABLES={
    "r": 2,
    "kind": "귀한 것",
    "region": "jangteo",
-   "d": "아빠의 글씨. \"글자는 '되돌림'이었다. 값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산.\""
+   "d": "아빠의 글씨. \"값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산. 호수에 이무기가 앉았다 한다. 이름 불러도 돌아보지 말 것.\""
+  },
+  "dad_tag": {
+   "n": "아빠의 짐표",
+   "r": 2,
+   "kind": "귀한 것",
+   "region": "galchamgol",
+   "d": "손바닥만 한 박달나무 패. 뒷면에 집안 낙관 流가 지져져 있다. 앞면은 닳아서 매끈하다."
   },
   "broom_sal": {
    "n": "싸리 살",
@@ -384,7 +391,7 @@ const TABLES={
    "r": 3,
    "kind": "귀한 것",
    "region": "yeongsan",
-   "d": "산군의 장부에서 뜯은 한 장. 지난가을 산군이 아빠에게 건넸다. 엄마의 글씨: \"제 둔갑과 말을 드립니다. 아이의 숨을 주세요.\" 그 아래 아빠의 글씨: \"말 하나 더함.\""
+   "d": "산군의 장부에서 뜯은 한 장. 지난가을 산군이 아빠에게 건넸다. 엄마의 글씨: \"제 둔갑과 말을 드립니다. 아이의 숨을 주세요.\""
   },
   "legend_fruit": {
    "n": "전설의 열매",
@@ -394,11 +401,11 @@ const TABLES={
    "d": "입으로만 전해지는 열매. 소문으로는 부를 준다지만 실은 잃어버린 것을 돌려준다."
   },
   "doerim_yak": {
-   "n": "되돌림 약",
+   "n": "되찾음 약",
    "r": 4,
    "kind": "귀한 것",
    "region": "yeongsan",
-   "d": "아빠와 함께 약연을 굴려 만든 약. 엄마의 둔갑과 말을 되돌린다."
+   "d": "아빠와 함께 엄마의 절구로 찧은 약. 엄마의 둔갑과 말을 되찾아 준다."
   },
   "salt": {
    "n": "소금",
@@ -445,7 +452,7 @@ const TABLES={
    "r": 1,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "산막에서 말린 붉은 대추. 약연에서 지역 재료와 함께 간다. 교환으로만 얻는다.",
+   "d": "산막에서 말린 붉은 대추. 맷돌에서 지역 재료와 함께 간다. 교환으로만 얻는다.",
    "u": "알"
   },
   "acorn_jelly": {
@@ -794,6 +801,13 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:sesame_salt"
+   },
+   {
+    "need": {
+     "legend_fruit": 1
+    },
+    "out": "doerim_yak",
+    "n": 1
    }
   ],
   "maetdol": [
@@ -837,6 +851,27 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:mung_batter"
+   },
+   {
+    "need": {
+     "magamok": 1,
+     "jujube": 1
+    },
+    "out": "magamok_tea",
+    "n": 1,
+    "optional": true
+   },
+   {
+    "need": {
+     "root": 1,
+     "gyeousari": 1,
+     "jujube": 1
+    },
+    "out": "ssanghwa",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:ssanghwa"
    }
   ],
   "siru": [
@@ -884,36 +919,6 @@ const TABLES={
     "hidden": true,
     "discover": "recipe:rainbow_tteok"
    }
-  ],
-  "yakyeon": [
-   {
-    "need": {
-     "legend_fruit": 1
-    },
-    "out": "doerim_yak",
-    "n": 1
-   },
-   {
-    "need": {
-     "magamok": 1,
-     "jujube": 1
-    },
-    "out": "magamok_tea",
-    "n": 1,
-    "optional": true
-   },
-   {
-    "need": {
-     "root": 1,
-     "gyeousari": 1,
-     "jujube": 1
-    },
-    "out": "ssanghwa",
-    "n": 1,
-    "optional": true,
-    "hidden": true,
-    "discover": "recipe:ssanghwa"
-   }
   ]
  },
  "CRAFT": {
@@ -931,11 +936,6 @@ const TABLES={
    "habit": "잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.",
    "habitKey": "habit:siru",
    "fail": "시루에서 김만 새어 나왔다. 잔칫날에도 이런 떡은 없었지. 재료는 그대로 챙겼다."
-  },
-  "yakyeon": {
-   "habit": "아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.",
-   "habitKey": "habit:yakyeon",
-   "fail": "약연 바퀴가 덜컥 멎었다. 아빠가 고개를 젓는 것 같다. 재료는 그대로 챙겼다."
   }
  },
  "TASTES": {
@@ -1195,6 +1195,12 @@ const TABLES={
     "kind": "좋아함",
     "line": "꿀 바른 약과의 단내에 강철이가 언 숨을 길게 내쉰다.",
     "effect": "calm:40"
+   },
+   "lore:yong": {
+    "kind": "아주 좋아함",
+    "line": "\"용이다.\" 강철이가 긴 목을 들어 하늘을 올려다본다.",
+    "effect": "calm:100",
+    "lore": "용이라 불러 준다"
    }
   },
   "jjandol": {
@@ -1301,9 +1307,9 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "아빠의 약연은 받지 않는다. 남의 집 가업 물건은 안 받는 게 보부상 법도라고.",
+     "text": "아빠의 짐표는 받지 않는다. 남의 짐표 받았다간 장사 끝이라고.",
      "section": "관찰",
-     "when": "nal:yakyeon"
+     "when": "nal:dadtag"
     },
     {
      "who": "me",
@@ -1415,7 +1421,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "보따리 속 약연을 보더니 아직 쓸 때가 아니라고 했다.",
+     "text": "짐표 앞면을 손으로 쓸어 보더니 아빠 이름이 혀끝에서 맴돈다고 했다. 늙으면 이름부터 놓친단다.",
      "section": "관찰",
      "when": "met:toad"
     },
@@ -1503,6 +1509,12 @@ const TABLES={
      "when": "calm:kudzu"
     }
    ]
+  },
+  {
+   "id": "dad_tag",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
   },
   {
    "id": "acorn",
@@ -2158,6 +2170,12 @@ const TABLES={
     },
     {
      "who": "me",
+     "text": "하늘로 오르다 누가 \"강철이다!\" 하고 부르는 바람에 떨어졌단다. 그때 누가 \"용이다\" 불러 줬으면 달랐을까.",
+     "section": "관찰",
+     "when": "lore:yong"
+    },
+    {
+     "who": "me",
      "text": "달래면 남쪽 바다로 떠나며 서리 수염을 남긴다.",
      "section": "관찰",
      "when": "calm:gangcheol"
@@ -2275,20 +2293,6 @@ const TABLES={
    "name": "잔칫날의 시루"
   },
   {
-   "id": "yakyeon",
-   "region": "yeongsan",
-   "kind": "item",
-   "lines": [
-    {
-     "who": "me",
-     "text": "아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.",
-     "section": "익힌 솜씨",
-     "when": "habit:yakyeon"
-    }
-   ],
-   "name": "아빠의 약연"
-  },
-  {
    "id": "sesame_salt",
    "region": "galchamgol",
    "kind": "item",
@@ -2334,7 +2338,7 @@ const TABLES={
    "lines": [
     {
      "who": "me",
-     "text": "칡뿌리와 겨우살이, 대추를 함께 갈았다. 아빠의 약연에서 새 향이 났다.",
+     "text": "칡뿌리와 겨우살이, 대추를 함께 갈았다. 증조할아버지의 맷돌에서 새 향이 났다.",
      "section": "숨은 가공법",
      "when": "recipe:ssanghwa"
     }

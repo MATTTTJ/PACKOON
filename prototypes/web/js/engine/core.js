@@ -61,11 +61,11 @@ function baseState(){return{
   runId:Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36),   // 게임 하나를 가리키는 번호 (저장 덮어쓰기 확인용)
   px:0,py:GROUND,vx:0,vy:0,face:1,onGround:true,anim:0,
   hp:5,maxhp:5,attackT:0,hurtT:0,cam:0,
-  inv:{},tool:'pick',sharp:false,
+  inv:{dad_tag:1},tool:'pick',sharp:false,   // 결정 D-422: 아빠의 짐표는 오프닝에서 엄마가 보따리 끈에 매어 준다
   forms:[],form:'',   // 잎사귀 변신: 열린 변신 id 와 지금 모습 (''=너구리, forms.js)
   floorItems:{},floorPickups:{},regionStates:{},visitedZones:{},   // 지역별 필드와 실제로 밟은 구역
   awake:Object.keys(HEIR).filter(k=>HEIR[k].awakeAtStart),   // 깨어난 가보
-  clues:[],diary:[],learned:[],nicknames:[],ledger:{},rel:{},f:{faints:0,arcs:arcsEnabled(null)},   // learned: 수첩·아이의 기록에서 공유하는 발견 키
+  clues:[],diary:[],learned:['got:dad_tag'],nicknames:[],ledger:{},rel:{},f:{faints:0,arcs:arcsEnabled(null)},   // learned: 수첩·아이의 기록에서 공유하는 발견 키
 };}
 /* 보따리·호감·진행 표시는 하나로 이어지고 필드만 지역별로 보관한다.
    새 지역의 시작 물건과 기본 진행값은 첫 입장에만 적용한다. */
@@ -104,7 +104,6 @@ function enterRegion(g,r,options={}){
   if(!saved&&g.floorPickups?.[r.id])g.pickups=structuredClone(g.floorPickups[r.id]);
   Object.assign(g,{form:'',region:r.id,started:!!options.mapTravel,ended:false,hp:options.mapTravel?g.hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,
     zone:options.zone??saved?.fields?.zone??null,zoneStates:saved?.fields?.zoneStates||{}});
-  if(r.order>=REGIONS.dolneomeo?.order)g.f.bagReachedDolneomeo=true;
   prepareZones(g,r,true);rememberRegion(g);return g;
 }
 /* 구역을 선언하지 않은 지역은 기존 REG 경로를 그대로 쓴다. 지역 자체는 바꾸지 않는다. */
@@ -278,12 +277,8 @@ function floorDrops(regionId=G.region,zoneId=G.zone??'classic'){
   const zones=regions[regionId]||(regions[regionId]={});
   return zones[zoneId]||(zones[zoneId]=[]);
 }
-/* 보따리는 현재 무제한이다. 칸 제한이 주어진 경우에도 기존 묶음에는 계속 넣는다. */
-function canPickupItem(id){
-  if(!ITEMS[id])return false;
-  if((G.inv[id]||0)>0||!Number.isFinite(G.bagSlots))return true;
-  return Object.values(G.inv).filter(n=>n>0).length<Math.max(0,Math.floor(G.bagSlots));
-}
+/* 결정 D-424: 요술보따리라 칸 제한이 없다(사용자 지시 2026-11-03). 표에 있는 물건이면 늘 담긴다 */
+function canPickupItem(id){return !!ITEMS[id];}
 function prepareZones(g,r,fresh=false){
   trimRegion(r);if(usesZones(r)&&r.trimCuts)trimMigrate(r,g);
   if(!usesZones(r)){
@@ -371,16 +366,37 @@ function noteRestore(){
   G.f.momNoteFade=0;G.f.momNoteRestored=true;
   if(open('notebook'))renderNotebook();return true;
 }
-// 결정 D-07: 불리는 이름 (design/data/decisions.csv)
+/* 결정 D-421·D-422: 이름 이야기로 바뀐 아빠 단서 글. 장면과 옛 저장 고치기(save.js)가 같은 글을 쓴다.
+   지역 장면을 고쳐 쓰는 갈래는 이 표를 고치고 clue(id,NAME_CLUES[id].who,NAME_CLUES[id].text)로 적는다 */
+const NAME_CLUES={
+  n1:{who:'날쌘',text:'날쌘은 아빠의 짐표를 보더니 "네 아빠 짐표잖아" 하며 받지 않았다. 떠돌이 보부상들도 아빠를 안다.'},
+  s1:{who:'돌쇠 할배',text:'돌쇠 할배가 아빠의 소원 돌을 손끝으로 읽어 주었다. "아내 병 낫기를." 새긴 사람 이름은 없었다.'},
+  k1:{who:'꾸벅이',text:'꾸벅이의 잠꼬대: 보부상 아저씨가 할배네서 겨울 날 것처럼 굴더니, 늙은 까치가 무언가 물어 온 밤에 떠났다.'},
+  j3:{who:'아빠의 메모',text:'아빠가 숙소에 맡긴 짐 속 메모: "값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산. 호수에 이무기가 앉았다 한다. 이름 불러도 돌아보지 말 것."'},
+  y1:{who:'살금이',text:'"가을 끝에 호숫가에서 그놈이 누굴 부르는데, 아줌마 목소리 같았어. 너구리 아저씨가 돌아보더라. 그 뒤로는 불러도 안 돌아봐."'},
+  y2:{who:'아빠의 장부 한 장',text:'엄마의 글씨: "제 둔갑과 말을 드립니다. 아이의 숨을 주세요."'},
+  y3:{who:'산군 할아버지',text:'엄마는 아기였던 나를 살리려고 영산에 올라와 둔갑과 말을 값으로 내놓았다. 아빠는 지난가을 제 것으로 셈을 닫으려다 거절당하고, 봄을 부르려 호수의 이무기에게 갔다.'},
+};
+// 결정 D-07: 불리는 이름 (design/data/decisions.csv). 결정 D-423: 수첩 탭 이름은 '이름', 먹힌 이름은 lost
 function grantNickname(id,text,by){
   if(!G||typeof id!=='string'||!id||typeof text!=='string'||!text.trim())return false;
   const list=G.nicknames||(G.nicknames=[]);
   if(list.some(n=>n.id===id))return false;
-  list.push({id,text:text.trim(),by:by||'',region:G.region});
+  list.push({id,text:text.trim(),by:by||'',region:G.region,lost:false});
   learn('nickname:'+id,true);toast('새로 불린 이름 · '+text.trim());
   if(open('notebook'))renderNotebook();return true;
 }
-function nickname(id){return (G?.nicknames||[]).find(n=>n.id===id)?.text||'';}
+function nickname(id){return (G?.nicknames||[]).find(n=>n.id===id&&!n.lost)?.text||'';}
+/* 결정 D-423: 강철이가 이름을 부르면 그 이름이 먹힌다(lost). 지어 준 이는 수첩에 흐리게 남는다. 되찾으면 lost 를 푼다 */
+function namesHeld(){return (G?.nicknames||[]).filter(n=>!n.lost);}
+function loseName(id){
+  const n=(G?.nicknames||[]).find(n=>n.id===id&&!n.lost);if(!n)return null;
+  n.lost=true;if(open('notebook'))renderNotebook();return n;
+}
+function restoreNames(ids){
+  let k=0;for(const n of G?.nicknames||[])if(n.lost&&(!ids||ids.includes(n.id))){n.lost=false;k++;}
+  if(k&&open('notebook'))renderNotebook();return k;
+}
 function grantBattleGear(field,id,allowed,name){
   if(!G||!allowed.includes(id))return false;
   const owned=G.f[field]||(G.f[field]=[]);if(owned.includes(id))return false;

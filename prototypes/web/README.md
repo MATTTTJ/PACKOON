@@ -156,7 +156,7 @@ js/engine/              모든 지역이 같이 쓰는 것
   battle.js             부위 공략 전투
   battle-attacks.js     부위 공격 목록 (sweep, spike, seed, slam, ember, shout)
   game.js               시작·끝 화면, 게임 루프, 부팅 (맨 마지막에 읽는다)
-js/data/common.js       지역과 상관없는 것: 주먹밥, 연장, 가보 네 개
+js/data/common.js       지역과 상관없는 것: 주먹밥, 연장, 가보 셋(결정 D-421), 아빠의 짐표 그림
 js/regions/<지역 id>/   지역 하나의 데이터와 전용 코드
 ```
 

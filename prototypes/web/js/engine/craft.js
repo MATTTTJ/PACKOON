@@ -14,9 +14,9 @@ function fillCraftRecipe(r){
   selItem=null;lastOut=null;pouchMsg=liveHint();refreshHud();renderBag();
 }
 /* 결정 D-113: 가공은 재료 수와 상관없이 한 번의 동작으로 끝난다(D-54를 대신함). 누르면 동작 한 번(tuning craft_motion_ms)이 돌고 끝난다.
-   도구는 움직이는 부분만 움직인다. 절구는 공이만 위아래로, 맷돌은 윗돌만 어처구니로 한 바퀴, 시루는 그대로 두고 솥에서 김이 올라 뚜껑이 들썩,
-   약연은 홈은 두고 바퀴만 앞으로 굴렀다가 끝에 살짝 되돌린다. 집안 손버릇(D-30)은 동작 횟수가 아니라 이 한 동작 안의 버릇과 말로 남는다:
-   절구는 찧은 뒤 한 박자 쉬고 들어 올리고, 맷돌은 왼쪽으로 돌리면 '증조할아버지처럼', 시루는 김이 오를 때 뚜껑을 톡, 약연은 끝에 한 번 거꾸로. */
+   도구는 움직이는 부분만 움직인다. 절구는 공이만 위아래로, 맷돌은 윗돌만 어처구니로 한 바퀴, 시루는 그대로 두고 솥에서 김이 올라 뚜껑이 들썩.
+   집안 손버릇(D-30)은 동작 횟수가 아니라 이 한 동작 안의 버릇과 말로 남는다:
+   절구는 찧은 뒤 한 박자 쉬고 들어 올리고, 맷돌은 왼쪽으로 돌리면 '증조할아버지처럼', 시루는 김이 오를 때 뚜껑을 톡. (결정 D-421: 아빠의 약연은 뺐다) */
 function startCraftHands(tool,recipe,discovered){
   cancelAnimationFrame(craftFrame);
   craftHands={owner:G,region:G.region,tool,recipe,discovered,time:0,started:null,dir:null,last:performance.now(),
@@ -31,8 +31,7 @@ function finishCraftHands(redraw=true){
   const voices={
     jeolgu:['한 번 힘껏 찧고, 한 박자 쉬고. 엄마처럼 했다.','절구 공이가 손에 꼭 맞는다.'],
     maetdol:['왼쪽으로 한 바퀴. 증조할아버지 손도 이랬겠지.','맷돌이 느긋하게 한 바퀴 돌았다.'],
-    siru:['김이 오를 때 톡. 엄마 냄새가 난다.','뚜껑을 열자 따뜻한 김이 났다.'],
-    yakyeon:['끝에 한 번 거꾸로. 아빠 손을 따라 했다.','약연 바퀴에 아빠 손때가 남아 있다.']
+    siru:['김이 오를 때 톡. 엄마 냄새가 난다.','뚜껑을 열자 따뜻한 김이 났다.']
   };
   // 맷돌만 돌리는 방향을 고른다. 나머지 버릇은 한 동작 안에 들어 있다.
   const matched=h.started!==null&&(h.tool!=='maetdol'||h.dir==='left');
@@ -47,8 +46,7 @@ const craftMotionMs=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?3
 function craftHandInput(direction){
   const h=craftHands;if(!h||h.owner!==G||h.region!==G.region||h.paused||h.started!==null)return;
   h.started=h.time;h.dir=direction;h.parts=[];
-  if(h.tool==='yakyeon')Sound.roller();   // 결정 D-74: 약연은 약연 굴리는 소리
-  else if(h.tool==='maetdol')Sound.stone('place');
+  if(h.tool==='maetdol')Sound.stone('place');
   updateCraftHands();
 }
 function stepCraftHands(now){
@@ -71,11 +69,10 @@ function updateCraftHands(){
   const h=craftHands,box=$('craftHands');if(!h||!box)return;
   const p=h.started===null?0:clamp((h.time-h.started)/craftMotionMs(),0,1);
   const idle={jeolgu:'공이를 들어 한 번에 찧는다 · J / X / Space',maetdol:'어처구니를 잡고 한 바퀴 돌린다 · ← → / A D',
-    siru:'솥에 불을 지펴 김을 올린다 · J / X / Space',yakyeon:'바퀴를 밀어 한 번 굴린다 · J / X / → / D'}[h.tool];
+    siru:'솥에 불을 지펴 김을 올린다 · J / X / Space'}[h.tool];
   const busy={jeolgu:p<.6?'공이를 들어… 쿵!':'한 박자 쉬고 공이를 든다.',
     maetdol:h.dir==='left'?'드르륵… 왼쪽으로 한 바퀴.':'드르륵… 오른쪽으로 한 바퀴.',
-    siru:p<.7?'솥에서 김이 오른다…':'김이 올랐다. 뚜껑을 톡.',
-    yakyeon:p<.8?'데굴데굴… 바퀴를 앞으로 민다.':'끝에서 한 번 거꾸로.'}[h.tool];
+    siru:p<.7?'솥에서 김이 오른다…':'김이 올랐다. 뚜껑을 톡.'}[h.tool];
   const cue=h.paused?'잠깐 손을 쉬는 중. 돌아오면 이어 한다.':h.started===null?idle:busy;
   const caption=$('craftCue');if(caption&&caption.textContent!==cue)caption.textContent=cue;
   const meter=$('craftMeter');if(meter){meter.style.width=(p*100)+'%';meter.parentElement.setAttribute('aria-valuenow',Math.round(p*100));}
@@ -121,16 +118,6 @@ function drawCraftTool(cv,h,p){
     const lift=going&&p>.55?(p>.76&&p<.84?-2:Math.round(Math.sin(h.time/90))*-1):0;
     P(8,11+lift,24,3,'#7a4428');P(8,11+lift,24,1,'#9b5b3a');P(19,9+lift,2,2,GOLD);
     if(going&&p>.25)for(let i=0;i<3;i++){const s=((h.time/600+i/3)%1),x=12+i*8+Math.sin(h.time/200+i)*2;g.globalAlpha=Math.min(1,(p-.25)*3)*(1-s);P(x,10-s*10,1,3,'#e9e3d5');g.globalAlpha=1;}
-  }else{
-    // 약연: 배 모양 홈 (고정), 바퀴만 앞으로 굴렀다가 끝에 살짝 되돌린다
-    P(4,24,32,4,'#5c4a3a');P(4,24,32,1,GOLD);P(8,24,24,1,'#3a2e24');P(6,28,28,2,'#3f3226');P(9,26,1,1,'#e9c8f5');P(30,26,1,1,'#bfe6e0');
-    const x0=12,x1=28,back=24;
-    const wx=!going?x0:p<.8?x0+(x1-x0)*(p/.8):x1+(back-x1)*((p-.8)/.2);
-    const ang=(wx-x0)/6,cy=19,r=6;
-    for(let yy=-r;yy<=r;yy++)for(let xx=-r;xx<=r;xx++){const d=xx*xx+yy*yy;if(d<=r*r)P(wx+xx,cy+yy,1,1,d>(r-1.5)*(r-1.5)?'#7a6a5a':'#8f7f6d');}
-    for(let k=0;k<3;k++){const b=ang+k*Math.PI*2/3;for(let s=1;s<r-1;s++)P(wx+Math.cos(b)*s,cy+Math.sin(b)*s,1,1,'#5c4a3a');}
-    P(wx-1,cy-1,2,2,GOLD);P(wx-10,cy,20,1,'#6b4423');P(wx-11,cy-1,2,3,'#6b4423');P(wx+9,cy-1,2,3,'#6b4423');   // 축 손잡이
-    if(going&&p<.8&&Math.random()<.4)dust(wx-6,24,-.3,-.4,'#b9a98c');
   }
   // 가루 입자
   for(let i=h.parts.length-1;i>=0;i--){const d=h.parts[i];d.x+=d.vx;d.y+=d.vy;d.vy+=.12;d.life-=.03;
@@ -148,7 +135,7 @@ function renderCraftHands(wrap){
   const meter=el('div');meter.id='craftMeter';track.appendChild(meter);box.appendChild(track);
   const actions=el('div','craft-actions');
   const buttons=h.tool==='maetdol'?[['left','왼쪽으로 돌리기'],['right','오른쪽으로 돌리기']]:
-    [['tap',{jeolgu:'공이로 찧기 · J / X',siru:'불 지펴 찌기 · J / X',yakyeon:'바퀴 굴리기 · J / X'}[h.tool]]];
+    [['tap',{jeolgu:'공이로 찧기 · J / X',siru:'불 지펴 찌기 · J / X'}[h.tool]]];
   buttons.forEach(([dir,label],i)=>{const b=el('button',h.tool==='maetdol'?'btn':'btn primary',label);b.type='button';b.dataset.craft=dir;b.onclick=()=>craftHandInput(dir);actions.appendChild(b);});
   box.appendChild(actions);
   wrap.appendChild(box);updateCraftHands();
@@ -162,8 +149,8 @@ addEventListener('keydown',e=>{
   }
   const dir=['arrowleft','a'].includes(k)?'left':['arrowright','d'].includes(k)?'right':null;
   const tap=['j','x',' '].includes(k);
-  // 맷돌은 방향을 고른다. 약연은 앞(→)이나 행동키로 민다. 절구·시루는 행동키.
-  const go=craftHands.tool==='maetdol'?dir:craftHands.tool==='yakyeon'?(tap||dir==='right'?'tap':null):(tap?'tap':null);
+  // 맷돌은 방향을 고른다. 절구·시루는 행동키.
+  const go=craftHands.tool==='maetdol'?dir:(tap?'tap':null);
   if(!go)return;
   if(k===' '&&e.target.matches('button'))return;
   e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)craftHandInput(go);

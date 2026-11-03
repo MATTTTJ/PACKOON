@@ -98,7 +98,7 @@ async function runSave({ browser, outDir, rules }) {
     corruptCompleted = true;
     // 옛 코드로 만든 저장 표본이 그대로 읽혀야 한다 (fixtures/old-saves.json).
     const oldSaves = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'old-saves.json'), 'utf8')).saves;
-    const oldResults = await browser.eval(`(${JSON.stringify(oldSaves)}).map(s=>{localStorage.setItem('packoon-save-v1',s);const want=JSON.parse(s).G;const loaded=loadSave();const errors=[];if(!loaded||G.region!==want.region)errors.push('지역');if(JSON.stringify(G.inv)!==JSON.stringify(want.inv))errors.push('소지품');for(const [key,value]of Object.entries(want.f))if(JSON.stringify(G.f[key])!==JSON.stringify(value))errors.push('진행 '+key);if(!G.floorItems||typeof G.floorItems!=='object')errors.push('새 바닥칸');return {region:want.region,errors};})`);
+    const oldResults = await browser.eval(`(${JSON.stringify(oldSaves)}).map(s=>{localStorage.setItem('packoon-save-v1',s);const want=JSON.parse(s).G;const loaded=loadSave();const errors=[];if(!loaded||G.region!==want.region)errors.push('지역');if(JSON.stringify(G.inv)!==JSON.stringify(want.inv.dad_tag?want.inv:{...want.inv,dad_tag:1}))errors.push('소지품');for(const [key,value]of Object.entries(want.f))if(JSON.stringify(G.f[key])!==JSON.stringify(value))errors.push('진행 '+key);if(!G.floorItems||typeof G.floorItems!=='object')errors.push('새 바닥칸');return {region:want.region,errors};})`);
     oldResults.forEach((r, i) => { if (r.errors.length) findings.push(failure('save-old-format', `옛 저장 표본 ${i + 1}(${r.region}): ${r.errors.join(', ')} 복원 오류.`)); });
     await browser.eval("localStorage.removeItem('packoon-save-v1')");
     step('4. localStorage 저장값을 깨진 JSON으로 바꾸고 새로고침한 뒤 새 게임을 시작한다.');

@@ -3,7 +3,7 @@ dodam,galchamgol,도담,동물,나,met:dodam,처음 말을 걸 때,"단풍골 �
 dodam,galchamgol,도담,동물,나,rule:squirrel_cache,도담이 묻은 자리를 수첩에 그렸을 때 · 다람쥐 몫을 처음 캤을 때,"흙에 발톱으로 긁은 줄이 셋 있으면 다람쥐가 무언가 묻고 잊은 자리다. 너구리 코로는 어디 묻었는지 모르겠다. 다람쥐라면 알겠지.",제안,결정 D-80,관찰
 nal,galchamgol,날쌘,동물,아빠,,처음부터,족제비 떠돌이 보부상. 다들 깍쟁이라 하지만 셈은 바르다. 제 물건을 깎아내리면 오기로 덤을 얹는다.,제안,,아빠 수첩
 nal,galchamgol,날쌘,동물,나,nal:bluff-paid,허세를 부린 뒤 덤을 받았을 때,정말이었다. 촌구석이라고 허세를 부렸더니 숯을 하나 더 줬다.,제안,,관찰
-nal,galchamgol,날쌘,동물,나,nal:yakyeon,아빠의 약연을 내밀었을 때,아빠의 약연은 받지 않는다. 남의 집 가업 물건은 안 받는 게 보부상 법도라고.,제안,,관찰
+nal,galchamgol,날쌘,동물,나,nal:dadtag,아빠의 짐표를 내밀었을 때,아빠의 짐표는 받지 않는다. 남의 짐표 받았다간 장사 끝이라고.,제안,,관찰
 nal,galchamgol,날쌘,동물,나,nal:route-price,날쌘에게 숯값 셈을 물었을 때,"값은 물건이 아니라 길이 정한다. 어디서 사서 어디로 가져가느냐. 공짜가 아니니 적어 두라고 했다.",제안,결정 D-117,관찰
 nal,galchamgol,날쌘,동물,나,nal:hat,날쌘이 모자 챙을 펴 주었을 때,"꺾인 모자 챙을 펴서 도로 씌워 줬다. 보부상은 모자부터 바로 쓴다고. 아빠도 비 오는 날 그렇게 말했다.",제안,결정 D-117,관찰
 nal,galchamgol,날쌘,동물,나,nal:dolneomeo,돌너머에서 날쌘과 거래했을 때,돌너머에서는 단풍골 칡꽃을 귀하게 쳤다. 같은 물건도 마을마다 값이 다르다.,제안,,관찰
@@ -15,7 +15,7 @@ musoe,galchamgol,무쇠,동물,나,musoe:forge,삼촌이 낫을 벼렸을 때,�
 musoe,galchamgol,무쇠,동물,나,musoe:leg,칡뿌리 찜질을 건넸을 때,"삼촌 다리는 비 오기 전에 쑤신다. 할머니가 싸 준 칡뿌리 찜질을 감아 드렸더니 따뜻하다고 했다.",제안,결정 D-117,관찰
 toad,galchamgol,두꺼비 할멈,동물,아빠,,처음부터,"두꺼비 약재상. 약은 잘 짓는데, 아는 걸 다 말하지는 않는다.",제안,,아빠 수첩
 toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,엄마의 병을 고치지는 못해도 늦출 수는 있다고 했다. 무언가 알면서 말을 아낀다.,제안,,관찰
-toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,보따리 속 약연을 보더니 아직 쓸 때가 아니라고 했다.,제안,,관찰
+toad,galchamgol,두꺼비 할멈,동물,나,met:toad,처음 말을 걸 때,짐표 앞면을 손으로 쓸어 보더니 아빠 이름이 혀끝에서 맴돈다고 했다. 늙으면 이름부터 놓친단다.,제안,,관찰
 toad,galchamgol,두꺼비 할멈,동물,나,galchamgol:arc-toad-wrap,[시험판] 약을 보낸 뒤 엄마 이야기를 듣고 인사를 드렸을 때,내가 아기였던 겨울에 엄마가 두고 간 포대기 끈을 받았다. 할멈이 내내 간직하고 있었다.,제안,arcs=1 선택 장면 · 교환 품목이 아닌 받은 물건의 기록,관찰
 stream_otter,galchamgol,여울,동물,나,met:stream_otter,처음 만났을 때,"개울의 어린 수달. 물이 불어 떠내려간 함지박을 밤마다 도로 이고 올라온다. 엄마를 ""빨래 아줌마""라고 부른다.",제안,결정 D-117,관찰
 stream_otter,galchamgol,여울,동물,나,otter:stone,함지박 밑 낙관을 봤을 때,엄마는 빨래를 마치면 물수제비를 일곱 번 떴다고 한다. 나는 몰랐다.,제안,결정 D-117,관찰
@@ -26,6 +26,7 @@ kudzu,galchamgol,엉킨 칡,동물,나,core:kudzu,핵심 부위가 드러날 때
 kudzu,galchamgol,엉킨 칡,동물,나,like:kudzu:ssari,전투에서 싸리버섯을(를) 건넸을 때,싸리버섯 향을 맡으면 덩굴이 느슨해진다.,제안,,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,like:kudzu:kkoe,전투에서 꾀꼬리버섯을(를) 건넸을 때,꾀꼬리버섯 향도 좋아한다.,제안,,관찰
 kudzu,galchamgol,엉킨 칡,동물,나,calm:kudzu,달래서 끝냈을 때,부수지 않고 달래면 보랏빛 칡꽃을 피워 두고 물러난다.,제안,,관찰
+dad_tag,galchamgol,아빠의 짐표,물건,나,got:dad_tag,처음 얻을 때,(items.csv 의 설명),제안,결정 D-422,관찰
 acorn,galchamgol,도토리,물건,나,got:acorn,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
 bam,galchamgol,밤,물건,나,got:bam,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 acorn_gift,galchamgol,다람쥐 형제의 도토리,물건,나,got:acorn_gift,처음 얻을 때,(items.csv 의 설명),제안,,관찰
@@ -122,6 +123,7 @@ gangcheol,yeongsan,강철이,동물,나,fight:gangcheol,처음 맞설 때,"호�
 gangcheol,yeongsan,강철이,동물,나,core:gangcheol,핵심 부위가 드러날 때,몸통을 풀어야 머리가 드러난다.,제안,,관찰
 gangcheol,yeongsan,강철이,동물,나,like:gangcheol:dokkaebibul,전투에서 도깨비불씨를 건넸을 때,도깨비불씨의 온기에 눈을 감았다. 아빠 수첩에 적힌 대로다.,제안,,관찰
 gangcheol,yeongsan,강철이,동물,나,like:gangcheol:patsirutteok,전투에서 팥시루떡을 건넸을 때,붉은 팥 냄새에 움찔 물러났다. 좋아서가 아니라 꺼려서다. 팥은 잡귀를 쫓는다더니.,제안,,관찰
+gangcheol,yeongsan,강철이,동물,나,lore:yong,강철이 이야기를 들었을 때,"하늘로 오르다 누가 ""강철이다!"" 하고 부르는 바람에 떨어졌단다. 그때 누가 ""용이다"" 불러 줬으면 달랐을까.",제안,결정 D-424 배운 것 선물,관찰
 gangcheol,yeongsan,강철이,동물,나,calm:gangcheol,달래서 끝냈을 때,달래면 남쪽 바다로 떠나며 서리 수염을 남긴다.,제안,,관찰
 darae_vine,yeongsan,다래 덩굴,물건,나,got:darae_vine,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 magamok,yeongsan,마가목 열매,물건,나,got:magamok,처음 얻을 때,(items.csv 의 설명),제안,,관찰
@@ -136,11 +138,10 @@ dad_stamps_galchamgol,galchamgol,젊은 아빠의 그날,도장,아빠,stamp:gal
 jeolgu,galchamgol,엄마의 절구,물건,나,habit:jeolgu,가보로 처음 가공했을 때,엄마는 세 번 찧고 한 번 쉬었다. 엄마가 잊어도 내 손은 기억할 거다.,확정,PA-43 크래프팅,익힌 솜씨
 maetdol,dolneomeo,증조할아버지의 맷돌,물건,나,habit:maetdol,가보로 처음 가공했을 때,증조할아버지는 맷돌을 꼭 왼쪽으로 돌렸단다. 자개 발자국을 따라 손을 돌렸다.,확정,PA-43 크래프팅,익힌 솜씨
 siru,jangteo,잔칫날의 시루,물건,나,habit:siru,가보로 처음 가공했을 때,잔칫날이면 엄마는 김이 오를 때 뚜껑을 톡 두드렸다. 나도 같은 소리를 냈다.,확정,PA-43 크래프팅,익힌 솜씨
-yakyeon,yeongsan,아빠의 약연,물건,나,habit:yakyeon,가보로 처음 가공했을 때,아빠는 끝에 한 번 거꾸로 굴렸다. 말 대신 포갠 손으로 그 버릇을 배웠다.,확정,PA-43 크래프팅,익힌 솜씨
 sesame_salt,galchamgol,깨소금,물건,나,recipe:sesame_salt,숨은 가공법을 직접 찾아 만들었을 때,깨와 소금을 함께 찧으니 깨소금이 됐다. 엄마가 밥상에 놓던 냄새다.,확정,PA-43 크래프팅,숨은 가공법
 mung_batter,jangteo,녹두 빈대떡 반죽,물건,나,recipe:mung_batter,숨은 가공법을 직접 찾아 만들었을 때,녹두에 참기름을 더해 갈았다. 장터에서 먹던 빈대떡 반죽이 됐다.,확정,PA-43 크래프팅,숨은 가공법
 rainbow_tteok,yeongsan,무지개떡,물건,나,recipe:rainbow_tteok,숨은 가공법을 직접 찾아 만들었을 때,단풍골 가루에 장터 팥과 영산 열매를 포갰다. 세 계절이 한 떡이 됐다.,확정,PA-43 크래프팅,숨은 가공법
-ssanghwa,yeongsan,쌍화 약재,물건,나,recipe:ssanghwa,숨은 가공법을 직접 찾아 만들었을 때,"칡뿌리와 겨우살이, 대추를 함께 갈았다. 아빠의 약연에서 새 향이 났다.",확정,PA-43 크래프팅,숨은 가공법
+ssanghwa,yeongsan,쌍화 약재,물건,나,recipe:ssanghwa,숨은 가공법을 직접 찾아 만들었을 때,"칡뿌리와 겨우살이, 대추를 함께 갈았다. 증조할아버지의 맷돌에서 새 향이 났다.",확정,PA-43 크래프팅,숨은 가공법
 dolneomeo_jangseung,dolneomeo,장승 뒤 도장,도장,아빠,stamp:dolneomeo:jangseung,장승 뒤 발바닥 도장을 찾았을 때,장승 뒤에서 짚신을 고쳤다. 부를 준다는 열매가 북쪽에 있다니 고개 하나쯤은 더 넘을 수 있다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날,아빠 수첩
 dolneomeo_mill_base,dolneomeo,맷돌 받침돌 도장,도장,아빠,stamp:dolneomeo:mill_base,맷돌 받침돌의 발바닥 도장을 찾았을 때,돌쇠 어른께 돌을 배웠다. 부자가 되면 돌가루 묻힐 일도 없겠지. 그래도 손에 밴 돌 냄새가 싫지는 않다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날,아빠 수첩
 dolneomeo_cliff_crack,dolneomeo,절벽 바위 틈 도장,도장,아빠,stamp:dolneomeo:cliff_crack,절벽 바위 틈의 발바닥 도장을 찾았을 때,구름 아래 마을이 좁쌀만 하다. 부자가 되어 돌아올 길을 잊을까 바위 틈에 발바닥을 찍어 둔다.,제안,PA-43 [개발자 결정] 젊은 아빠의 그날,아빠 수첩
