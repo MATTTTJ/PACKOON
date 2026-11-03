@@ -6,12 +6,20 @@
    수치는 minigames.csv 의 gather_* (원이 커지는 시간·기준원 여유·딱/좋아 판정 창·딱 힘·수량). 처음 캐면 남는 일기는 지역의 gatherDiary:[id, 글] */
 const gatherCue={d:null,start:0,grade:null,pops:[],dirt:[]};
 // 결정 D-108: 원이 기준원에 닿는 프레임(ring_period) 앞뒤로 좋아 창만큼 더 커진 뒤 사라지고 다시 점에서 시작한다.
-function gatherCycle(){const MG=TABLES.MINIGAMES;return MG.gather_ring_period+MG.gather_good_window;}
+/* 결정 D-392: 채집 원은 캐는 것마다 빠르기와 모양이 조금씩 다르다 (사용자 피드백 2026-11-03: 모두 같으면 재미가 없다).
+   minigames.csv 의 gather_<채집 이름>_period(원이 기준원에 닿기까지 프레임), _shape(0 원 · 1 그림에 맞춘 타원 · 2 마름모 · 3 모서리 둥근 네모),
+   _inward(1이면 큰 원이 바깥에서 안으로 좁혀 온다). 없는 값은 공통 값(gather_ring_period, 원, 커지기)을 쓴다.
+   판정 창(딱·좋아)은 모두 같은 프레임이라, 빠르기만 달라도 사람이 맞출 수 있는 폭은 그대로다. */
+function gatherRingCfg(d){
+  const MG=TABLES.MINIGAMES,k=gatherKey(d);
+  return {period:MG['gather_'+k+'_period']||MG.gather_ring_period,shape:MG['gather_'+k+'_shape']||0,inward:MG['gather_'+k+'_inward']===1};
+}
+function gatherCycle(d){return gatherRingCfg(d).period+TABLES.MINIGAMES.gather_good_window;}
 /* 지금 원 상태: r은 0(점)→1(기준원)→조금 넘침. off는 기준원에 닿는 순간과의 프레임 차이 */
-function gatherPhase(){
-  const MG=TABLES.MINIGAMES,f=(G.anim-gatherCue.start)%gatherCycle(),off=f-MG.gather_ring_period;
+function gatherPhase(d){
+  const MG=TABLES.MINIGAMES,period=gatherRingCfg(d).period,f=(G.anim-gatherCue.start)%gatherCycle(d),off=f-period;
   const grade=Math.abs(off)<=MG.gather_perfect_window?'perfect':Math.abs(off)<=MG.gather_good_window?'good':null;
-  return {r:f/MG.gather_ring_period,off,grade,just:grade==='perfect'};
+  return {r:f/period,off,grade,just:grade==='perfect'};
 }
 /* 결정 D-266: 채집 자리의 설정은 보통 나오는 물건(d.item)으로 찾는다. 자리가 gather 이름을 달면 그 설정을 쓴다
    (돌너머 눈 둔덕은 파는 방법이 같고 나오는 물건만 자리마다 다르다). */
@@ -31,7 +39,7 @@ function addZoneGather(r,prefix,rows){
   }
 }
 /* 휘두르기를 누른 순간에 판정한다 (손이 닿는 프레임보다 먼저라 누른 박자가 그대로 맞는다) */
-function gatherPress(){const d=nearDig();gatherCue.grade=d&&!d.cache&&gatherCue.d===d?gatherPhase().grade:null;}
+function gatherPress(){const d=nearDig();gatherCue.grade=d&&!d.cache&&gatherCue.d===d?gatherPhase(d).grade:null;}
 /* 휘두르기가 흙더미에 닿았을 때 (doHit) */
 // 결정 D-31: 채집은 따로 창 없이 필드에서 고리 타이밍. 딱이면 두 몫, 아무 때나 쳐도 한 몫 (design/data/decisions.csv)
 // 결정 D-108: 기준원 하나 + 점에서 커지는 원 하나. 딱이면 두 몫과 +1개, 한 흙더미를 모두 딱으로 캐면 상위 재료 하나 더 (design/data/decisions.csv)
@@ -65,17 +73,37 @@ function finishGather(d){
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);
   if(gatherCue.d===d)gatherCue.d=null;
 }
+/* 결정 D-393: 솔방울(돌너머·큰 장터·영산이 같이 쓴다). 벌어진 비늘이 마름모로 엇갈리고 가운데가 가장 넓다. (x,y)는 바닥 가운데. snow면 위에 눈 */
+function drawPineCone(x,y,snow){
+  for(const [dy,h] of [[-9,1],[-8,2],[-7,3],[-6,3],[-5,3],[-4,2],[-3,1]])R(x-h,y+dy,h*2+1,1,'#6b4423');
+  R(x,y-2,1,1,'#4a2e18');
+  for(const [dy,xs] of [[-8,[-1,1]],[-7,[-2,0,2]],[-6,[-3,-1,1,3]],[-5,[-2,0,2]],[-4,[-1,1]],[-3,[0]]])for(const dx of xs)R(x+dx,y+dy,1,1,'#a8703a');
+  for(const [dy,xs] of [[-7,[-1,1]],[-6,[0]],[-5,[-1,1]]])for(const dx of xs)R(x+dx,y+dy,1,1,'#3e2614');
+  if(snow){R(x-2,y-10,5,1,'#f4f7fa');R(x-1,y-11,3,1,'#ffffff');}
+}
 /* 채집 지점: 흙더미 그림에서 실제로 캐는 곳(뿌리 끝·밑동). 지역이 spot:[dx,dy]로 준다 */
 function gatherSpot(d){const s=gatherCfg(d)?.spot||[0,-8];return {x:d.x+s[0],y:(d.y??fieldGround())+s[1]};}
 /* 결정 D-145: 기준원은 채집물 그림을 다 감싸는 크기에 여유(gather_ring_pad)만 더하고, 가운데는 그 그림 한가운데에 둔다 (피드백: 원이 너무 크다).
    그림 범위는 지역이 defineGather 의 box:[x0,y0,x1,y1](흙더미 x·바닥 y 기준)로 준다. 없으면 엔진이 그리는 기본 흙더미(field.js drawDigs) 범위 */
 const GATHER_DEFAULT_BOX=[-7,-12,7,0];
 function gatherRing(d){
-  const b=gatherCfg(d)?.box||GATHER_DEFAULT_BOX,ground=d.y??fieldGround();
-  return {x:d.x+(b[0]+b[2])/2,y:ground+(b[1]+b[3])/2,r:Math.ceil(Math.hypot((b[2]-b[0])/2,(b[3]-b[1])/2))+TABLES.MINIGAMES.gather_ring_pad};
+  const b=gatherCfg(d)?.box||GATHER_DEFAULT_BOX,ground=d.y??fieldGround(),pad=TABLES.MINIGAMES.gather_ring_pad,rc=gatherRingCfg(d);
+  const a=(b[2]-b[0])/2,h=(b[3]-b[1])/2,r=Math.ceil(Math.hypot(a,h))+pad;
+  // 결정 D-392: 모양마다 그림 범위를 감싸는 크기. 타원·마름모는 그림 꼴(가로로 넓은 흙더미, 세로로 긴 억새)을 따른다
+  const [rx,ry]=rc.shape===1?[Math.ceil(a*1.42)+pad,Math.ceil(h*1.42)+pad]:rc.shape===2?[Math.ceil(a*1.3)+pad,Math.ceil(h*1.3)+pad]:
+    rc.shape===3?[Math.ceil(a)+pad+1,Math.ceil(h)+pad+1]:[r,r];
+  return {x:d.x+(b[0]+b[2])/2,y:ground+(b[1]+b[3])/2,r,rx,ry,shape:rc.shape,inward:rc.inward};
 }
 /* 기준원과 진행 점 맨 위 (말풍선 안내는 그 위에 띄운다) */
-function gatherRingTop(d){const g=gatherRing(d);return g.y-g.r-10;}
+function gatherRingTop(d){const g=gatherRing(d);return g.y-g.ry-10;}
+/* 모양 하나의 길(가운데 x,y, 반지름 rx·ry) */
+function ringPath(c,x,y,rx,ry,shape){
+  c.beginPath();
+  if(shape===1)c.ellipse(x+.5,y+.5,Math.max(.5,rx),Math.max(.5,ry),0,0,Math.PI*2);
+  else if(shape===2){c.moveTo(x+.5,y+.5-ry);c.lineTo(x+.5+rx,y+.5);c.lineTo(x+.5,y+.5+ry);c.lineTo(x+.5-rx,y+.5);c.closePath();}
+  else if(shape===3){const k=Math.min(rx,ry)*.45;c.roundRect(x+.5-rx,y+.5-ry,rx*2,ry*2,k);}
+  else c.arc(x+.5,y+.5,Math.max(.5,rx),0,Math.PI*2);
+}
 /* 커지는 원의 색과 선 무늬: 지금 모습(G.form)마다 다르다 (D-41의 변신별 표현을 원 하나로 옮김) */
 const GATHER_RING_STYLE={
   '':{c:'#f2a24a',dash:[]},            // 너구리: 단풍빛 실선
@@ -85,10 +113,10 @@ const GATHER_RING_STYLE={
   deer:{c:'#b08a5c',dash:[1,2]}         // 고라니: 발굽빛 점선
 };
 /* 원 하나를 어두운 테두리 위에 그린다(흙·풀 위에서도 보이게) */
-function ringStroke(c,x,y,r,color,width,dash){
+function ringStroke(c,x,y,rx,ry,shape,color,width,dash){
   c.save();c.setLineDash(dash||[]);
-  c.lineWidth=width+2;c.strokeStyle='rgba(30,20,12,.7)';c.beginPath();c.arc(x+.5,y+.5,r,0,Math.PI*2);c.stroke();
-  c.lineWidth=width;c.strokeStyle=color;c.beginPath();c.arc(x+.5,y+.5,r,0,Math.PI*2);c.stroke();
+  c.lineWidth=width+2;c.strokeStyle='rgba(30,20,12,.7)';ringPath(c,x,y,rx,ry,shape);c.stroke();
+  c.lineWidth=width;c.strokeStyle=color;ringPath(c,x,y,rx,ry,shape);c.stroke();
   c.restore();
 }
 /* 흙더미 위 고리·진행 점·튀는 흙. 필드 그리기에서 흙더미 다음에 부른다 */
@@ -98,16 +126,17 @@ function drawGatherCue(){
   const c=ctx;
   if(live){
     // 채집물을 감싸는 기준원(가는 실선)과, 그 가운데 점에서 커지는 원 하나. 커지는 원이 기준원에 꼭 맞을 때가 딱이다. (D-145)
-    const cfg=gatherCfg(live),ring=gatherRing(live),x=Math.round(ring.x-cam),ph=gatherPhase(),grade=ph.grade;
-    const r0=ring.r,y=Math.round(ring.y);
+    const cfg=gatherCfg(live),ring=gatherRing(live),x=Math.round(ring.x-cam),ph=gatherPhase(live),grade=ph.grade;
+    const {rx,ry,shape}=ring,y=Math.round(ring.y);
     const just=grade==='perfect',st=GATHER_RING_STYLE[G.form||'']||GATHER_RING_STYLE[''];
-    if(grade){c.save();c.fillStyle=just?'rgba(255,228,138,.32)':'rgba(255,249,232,.14)';c.beginPath();c.arc(x+.5,y+.5,r0,0,Math.PI*2);c.fill();c.restore();}
-    ringStroke(c,x,y,r0,just?'#ffe48a':'#fff9e8',1,[]);
-    const rr=ph.r*r0;
-    if(rr<1.5){R(x-1,y-1,3,3,'rgba(30,20,12,.7)');R(x,y,1,1,st.c);}
-    else ringStroke(c,x,y,rr,just?'#ffe48a':st.c,just?2:1,just?[]:st.dash);
+    if(grade){c.save();c.fillStyle=just?'rgba(255,228,138,.32)':'rgba(255,249,232,.14)';ringPath(c,x,y,rx,ry,shape);c.fill();c.restore();}
+    ringStroke(c,x,y,rx,ry,shape,just?'#ffe48a':'#fff9e8',1,[]);
+    // 결정 D-392: 좁혀 오는 모양은 기준 크기의 두 배에서 시작해 안으로 줄어든다
+    const s=ring.inward?2-ph.r:ph.r;
+    if(s*Math.max(rx,ry)<1.5){R(x-1,y-1,3,3,'rgba(30,20,12,.7)');R(x,y,1,1,st.c);}
+    else ringStroke(c,x,y,s*rx,s*ry,shape,just?'#ffe48a':st.c,just?2:1,just?[]:st.dash);
     // 진행 점: 목표 원 바로 위. 채운 점 = 판 몫
-    const need=cfg.hits,done=Math.min(need,live.prog||0),top=y-r0-9;
+    const need=cfg.hits,done=Math.min(need,live.prog||0),top=y-ry-9;
     R(x-need*2-1,top,need*4+3,6,'rgba(42,30,20,.75)');
     for(let i=0;i<need;i++)R(x-need*2+1+i*4,top+2,3,2,i<done?'#ffe48a':'#7d6a52');
   }

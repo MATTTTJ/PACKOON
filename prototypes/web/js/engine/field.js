@@ -364,17 +364,22 @@ function drawBackpack(ox,oy,f){
 }
 function drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame=0){
   const Gy='#8c8070',K='#2a211b',Wt='#efe6d6',Bl='#d9a441',T='#6f6357';
+  // 결정 D-390: 줍기는 두 발로 선 채 허리를 굽힌다 (사용자 피드백 2026-11-03: 엎드린 모습이 네발짐승 같았다).
+  //   다리와 엉덩이는 서 있을 때 자리 그대로, 몸통·머리만 앞아래로 숙이고 앞발 하나를 땅으로 뻗는다. 1은 숙이는 중, 2는 다 숙임
   if(pickFrame){
-    const bend=pickFrame===2?5:3;
-    M(ox,oy,f,-12,-7,7,4,T);M(ox,oy,f,-10,-7,1,4,K);M(ox,oy,f,-7,-7,1,4,K);
-    drawBackpack(ox-f*2,oy+bend,f);
-    M(ox,oy,f,-4,-4,4,4,K);M(ox,oy,f,2,-4,4,4,K);
-    M(ox,oy,f,-4,-12+bend,10,6,Gy);M(ox,oy,f,3,-15+bend,9,7,Gy);
-    M(ox,oy,f,4,-13+bend,9,2,K);M(ox,oy,f,10,-13+bend,1,1,'#ffffff');
-    M(ox,oy,f,5,-11+bend,8,2,Wt);M(ox,oy,f,12,-12+bend,1,2,K);
-    M(ox,oy,f,0,-17+bend,15,2,'#c39b55');M(ox,oy,f,4,-21+bend,8,4,'#dcbb7a');
-    M(ox,oy,f,4,-18+bend,8,1,'#6e4f22');M(ox,oy,f,10,-23+bend,2,2,'#fbf7ee');
-    M(ox,oy,f,6,-6,3,4,Gy);M(ox,oy,f,8,-3,4,2,K);return;
+    const deep=pickFrame===2,hx=deep?7:4,hy=deep?-12:-17;
+    M(ox,oy,f,-13,-10,7,4,T);M(ox,oy,f,-12,-10,1,4,K);M(ox,oy,f,-9,-10,1,4,K);
+    M(ox,oy,f,-3,-4,3,4,K);M(ox,oy,f,2,-4,3,4,K);
+    M(ox,oy,f,-4,-11,9,7,Gy);
+    if(deep){M(ox,oy,f,0,-13,7,6,Gy);M(ox,oy,f,5,-11,4,5,Gy);}
+    else{M(ox,oy,f,-3,-16,9,7,Gy);M(ox,oy,f,1,-14,4,5,'#cfc3b2');}
+    drawBackpack(ox+f*(deep?5:2),oy+(deep?4:1),f);   // 보따리는 숙인 등 위에 얹힌다
+    M(ox,oy,f,hx,hy,9,7,Gy);M(ox,oy,f,hx+1,hy+2,8,2,K);M(ox,oy,f,hx+6,hy+2,1,1,'#ffffff');
+    M(ox,oy,f,hx+1,hy+4,7,2,Wt);M(ox,oy,f,hx+8,hy+3,1,2,K);
+    M(ox,oy,f,hx-3,hy-1,14,2,'#c39b55');M(ox,oy,f,hx,hy-4,7,3,'#dcbb7a');M(ox,oy,f,hx,hy-2,7,1,'#6e4f22');M(ox,oy,f,hx+5,hy-6,2,2,'#fbf7ee');
+    if(deep){M(ox,oy,f,9,-6,2,5,Gy);M(ox,oy,f,9,-1,3,1,K);}
+    else{M(ox,oy,f,6,-10,2,5,Gy);M(ox,oy,f,6,-5,3,1,K);}
+    return;
   }
   M(ox,oy,f,-13,-9,7,4,T);M(ox,oy,f,-12,-9,1,4,K);M(ox,oy,f,-9,-9,1,4,K);
   drawBackpack(ox,oy,f);

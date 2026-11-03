@@ -104,13 +104,23 @@ function drawMistletoe(x,y,a){
   // 갈래 사이 반투명한 흰 열매
   for(const [dx,dy] of [[-2,-3],[2,-2],[0,-5],[-4,0],[4,-4]])R(cx+dx,cy+dy,1,1,BR);
 }
+/* 결정 D-393: 석이버섯은 바위 면에 붙은 귀 모양 잎. 위는 검은 갈색, 젖혀진 가장자리와 밑면은 잿빛 초록 (x,y는 바위 밑 가운데) */
+function drawSeogiFlaps(x,y){
+  R(x-6,y-8,4,3,'#2e2a26');R(x-5,y-9,2,1,'#2e2a26');R(x-6,y-5,4,1,'#5f6a5c');R(x-3,y-7,1,1,'#6f7a6a');
+  R(x,y-6,5,4,'#35302b');R(x+1,y-7,3,1,'#35302b');R(x,y-2,5,1,'#5f6a5c');R(x+4,y-5,1,2,'#6f7a6a');R(x+1,y-5,1,1,'#4a4440');
+  R(x-3,y-4,2,2,'#2e2a26');R(x-3,y-2,2,1,'#5f6a5c');
+}
 /* 줍는 것 */
 Rg.drawPickup=(a,x,bob)=>{
-  if(a.item==='memil'){R(x-1,a.y-6,1,6,'#9a7a52');R(x-2,a.y-8+bob,3,2,'#2b2522');R(x,a.y-9+bob,2,2,'#3a3330');R(x+1,a.y-7,2,1,'#7a9a5a');}
+  // 결정 D-393: 메밀 이삭 한 줌. 붉은 줄기 셋을 짚으로 묶었고, 끝마다 세모난 검은 낟알이 송이로 달렸다
+  if(a.item==='memil'){
+    R(x-2,a.y-6,1,6,'#a8483a');R(x,a.y-7,1,7,'#b8584a');R(x+2,a.y-6,1,6,'#a8483a');R(x-1,a.y-3,3,1,'#d9b860');
+    R(x-3,a.y-8+bob,2,2,'#3a3028');R(x-1,a.y-9+bob,2,2,'#2b2522');R(x+1,a.y-8+bob,2,2,'#3a3028');
+    R(x-3,a.y-8+bob,1,1,'#6a5a48');R(x,a.y-9+bob,1,1,'#6a5a48');R(x+2,a.y-8+bob,1,1,'#6a5a48');R(x+3,a.y-5,2,1,'#7a9a5a');}
   else if(a.item==='gyeousari')drawMistletoe(x,a.y,a);
   else if(a.item==='seoridarae'){R(x-4,a.y-8+bob,4,4,'#8ab86a');R(x,a.y-8+bob,4,4,'#7fa860');R(x-2,a.y-4+bob,4,4,'#6f9850');R(x-3,a.y-7+bob,1,1,'#f4fbff');R(x+1,a.y-7+bob,1,1,'#f4fbff');R(x-1,a.y-11,2,3,'#5a4a2a');}
-  else if(a.item==='solbang'){R(x-2,a.y-7+bob,5,2,'#8a5a2b');R(x-3,a.y-5+bob,7,2,'#6b4423');R(x-2,a.y-3+bob,5,2,'#8a5a2b');R(x-1,a.y-1,3,1,'#5a3a20');R(x-2,a.y-8+bob,4,1,'#f4f7fa');}   // 결정 D-265
-  else if(!CLASSIC&&a.item==='seogi'){R(x-8,a.y-10,16,10,'#8a9791');R(x-6,a.y-11,12,2,'#e0e8dc');R(x-5,a.y-8,10,6,'#414d47');R(x-2,a.y-9,4,7,'#58655b');R(x+4,a.y-12+bob,1,1,'#fff1bf');}
+  else if(a.item==='solbang')drawPineCone(x,a.y+bob,true);   // 결정 D-265·D-393
+  else if(!CLASSIC&&a.item==='seogi'){R(x-8,a.y-10,16,10,'#8a9791');R(x-6,a.y-11,12,2,'#e0e8dc');R(x-8,a.y-1,16,1,'#6f7a74');drawSeogiFlaps(x,a.y);R(x+4,a.y-12+bob,1,1,'#fff1bf');}
 };
 /* 결정 D-266: 그늘에 녹지 않은 첫눈이 도톰하게 솟은 둔덕(파헤치는 채집 자리). (x,y)는 바닥 가운데. 옛 구성에도 쓰므로 field.js 에 둔다.
    d.prog 만큼 파이면 위가 깎이고, 다 파면 걷어 낸 눈이 양옆에 쌓이고 가운데 검은 흙이 드러난다.
@@ -139,7 +149,7 @@ Rg.drawDig=(d,x)=>{
     return true;}
   if(d.item==='seogi'){
     if(d.done){R(x-6,GROUND-1,12,1,'#5a5650');return true;}
-    R(x-9,GROUND-10,18,10,'#7a766e');R(x-7,GROUND-12,14,2,'#8a8680');R(x-4,GROUND-8,6,4,'#3a3430');R(x+2,GROUND-7,4,3,'#4a4440');
+    R(x-9,GROUND-10,18,10,'#7a766e');R(x-7,GROUND-12,14,2,'#8a8680');drawSeogiFlaps(x,GROUND);   // 결정 D-393
     if(Math.floor((G.anim+d.x)/14)%3===0)R(x,GROUND-15,1,1,'#fff3b0');
     return true;}
   return false;
@@ -461,21 +471,15 @@ if(!CLASSIC){
      솔방울은 소나무 곁 둔덕에서만, 메밀은 밭머리·돌담 밑에서만, 억새는 바람이 쓸어 모으는 바위 밑에서만 나온다. 좌표는 길을 줄인 뒤의 자리. */
   const mound=found=>({gather:'snow_mound',found});
   const PINE='소나무 그늘이라 첫눈이 녹지 않았다. 눈 밑에 가을에 떨어진 솔방울이 묻혀 있었다.';
+  /* 결정 D-391 (사용자 피드백 2026-11-03: 너무 많고 다양하지 않다): 자리마다 그 땅에서 날 것만 하나둘. 고갯길은 억새·겨우살이·솔숲 둔덕,
+     돌담 마을은 메밀 단, 밭은 밭머리 둔덕, 절벽은 바람 맞은 억새와 바위의 석이, 성황당 솔숲은 솔방울·겨우살이 둔덕. 억새는 밭(구역에 이미 있는 넷)에서 주로 벤다. */
   addZoneGather(Rg,'dol_g_',[
-    ['gate','d',150,'eoksae'],['gate','p',545,'gyeousari',{y:115}],['gate','d',765,'solbang',mound(PINE)],
-    ['gate','p',1184,'gyeousari',{y:112}],['gate','d',1585,'solbang',mound(PINE)],['gate','d',2010,'eoksae'],
-    ['village','d',250,'eoksae'],['village','p',610,'memil'],['village','p',672,'memil'],
-    ['village','d',1230,'memil',mound('돌담 밑에 쌓아 두고 잊은 메밀 단이 눈에 덮여 있었다. 이삭이 아직 붙어 있다.')],
-    ['village','d',1940,'eoksae'],['village','p',2300,'memil'],
-    ['field','d',170,'eoksae'],['field','d',455,'memil',mound('밭머리에 남겨 둔 메밀 이삭 단이 첫눈에 덮여 있었다.')],['field','p',1200,'memil'],
-    ['cliff','d',290,'eoksae'],['cliff','d',600,'eoksae',mound('바람에 꺾인 억새가 바위 밑에 쓸려 와 쌓였고, 그 위로 눈이 덮였다.')],
-    ['cliff','p',757,'gyeousari',{y:112}],['cliff','p',1290,'seogi',{y:112}],['cliff','d',1520,'solbang',mound(PINE)],['cliff','d',1700,'eoksae'],
-    ['shrine','d',400,'eoksae'],['shrine','d',690,'solbang',mound(PINE)],
+    ['gate','d',150,'eoksae'],['gate','p',1184,'gyeousari',{y:112}],['gate','d',1585,'solbang',mound(PINE)],
+    ['village','d',1230,'memil',mound('돌담 밑에 쌓아 두고 잊은 메밀 단이 눈에 덮여 있었다. 이삭이 아직 붙어 있다.')],['village','p',2300,'memil'],
+    ['field','d',455,'memil',mound('밭머리에 남겨 둔 메밀 이삭 단이 첫눈에 덮여 있었다.')],
+    ['cliff','d',600,'eoksae',mound('바람에 꺾인 억새가 바위 밑에 쓸려 와 쌓였고, 그 위로 눈이 덮였다.')],['cliff','p',1290,'seogi',{y:112}],['cliff','d',1700,'eoksae'],
+    ['shrine','d',690,'solbang',mound(PINE)],
     ['shrine','d',820,'gyeousari',mound('바람에 꺾여 떨어진 겨우살이 가지가 눈 속에 묻혀 있었다.')],
-    ['shrine','p',1440,'solbang',{y:160}],
-    // 몰린 자리 (간격이 고르지 않게)
-    ['gate','d',196,'eoksae'],
-    ['shrine','p',1180,'solbang',{y:140}],
   ]);
   Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'해 떴다!\n엄마도 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:marker,layers:A.cliffLayers}];
   // 결정 D-83: 밭 둔덕에서 먼 성황당 돌무더기가 꿈틀하는 것이 보인다. 목적지(성황당)와 골렘을 미리 보여 준다.

@@ -80,16 +80,32 @@ function drawCoil(){if(G.boss.dead)return;const x=G.boss.x-RC();   // 강철이 
 Rg.drawBack=()=>{drawSky();drawGround();};
 Rg.drawScenery=()=>{[1000,1140,1280,1360].forEach(drawRowan);drawDrift();drawSlope();drawLake();drawCoil();};
 Rg.drawPickup=(a,x,bob)=>{
-  if(a.item==='magamok'){R(x-1,a.y-9,1,3,'#5a4030');R(x-3,a.y-6+bob,3,3,'#d0302a');R(x+1,a.y-6+bob,3,3,'#e0402a');R(x-1,a.y-3+bob,3,3,'#c02a22');R(x-3,a.y-7,7,1,'#f4f7fa');}
+  // 결정 D-393: 마가목 열매는 갈라진 꽃자루 끝에 작고 둥근 주황빛 열매가 우산처럼 다닥다닥 달린 송이
+  if(a.item==='magamok'){
+    R(x,a.y-11,1,3,'#5a4030');R(x-2,a.y-9,5,1,'#5a4030');R(x-3,a.y-8,1,1,'#5a4030');R(x+3,a.y-8,1,1,'#5a4030');
+    for(const [dx,dy,c] of [[-4,-7,'#d8402a'],[-2,-7,'#f06a3a'],[0,-7,'#d8402a'],[2,-7,'#f06a3a'],[4,-7,'#d8402a'],[-3,-6,'#f06a3a'],[-1,-6,'#c02a22'],[1,-6,'#f06a3a'],[3,-6,'#c02a22'],[-2,-5,'#d8402a'],[0,-5,'#f06a3a'],[2,-5,'#d8402a']])R(x+dx,a.y+dy+bob,1,1,c);
+    R(x-3,a.y-8+bob,2,1,'#f4f7fa');R(x+1,a.y-8+bob,3,1,'#f4f7fa');}
   // 결정 D-265: 눈 위의 솔방울, 청설모가 떨군 잣송이(잣나무는 높은 산에 자란다)
-  else if(a.item==='solbang'){R(x-2,a.y-7+bob,5,2,'#8a5a2b');R(x-3,a.y-5+bob,7,2,'#6b4423');R(x-2,a.y-3+bob,5,2,'#8a5a2b');R(x-1,a.y-1,3,1,'#5a3a20');R(x-2,a.y-8+bob,4,1,'#f4f7fa');}
-  else if(a.item==='jat'){R(x-3,a.y-9+bob,6,8,'#6b4a2a');for(let k=0;k<3;k++){R(x-2,a.y-8+k*3+bob,2,1,'#a0703f');R(x+1,a.y-7+k*3+bob,2,1,'#a0703f');}R(x-1,a.y-1,2,1,'#4f3820');R(x-3,a.y-10+bob,5,1,'#f4f7fa');R(x+3,a.y-3,2,1,'#c79d5c');}
+  else if(a.item==='solbang')drawPineCone(x,a.y+bob,true);   // 결정 D-393
+  // 결정 D-393: 잣송이는 솔방울보다 훨씬 크고 달걀꼴이다. 두꺼운 비늘 끝이 젖혀지고 틈에 송진이 맺힌다
+  else if(a.item==='jat'){
+    for(const [dy,h] of [[-12,1],[-11,2],[-10,3],[-9,3],[-8,4],[-7,4],[-6,4],[-5,3],[-4,3],[-3,2],[-2,1]])R(x-h,a.y+dy+bob,h*2+1,1,'#6b4a2a');
+    for(let dy=-11;dy<=-3;dy++)for(let dx=-4;dx<=4;dx++)if((dx+dy*2+40)%4===0&&Math.abs(dx)<=4)R(x+dx,a.y+dy+bob,1,1,'#a8844e');
+    for(const [dx,dy] of [[-2,-8],[1,-6],[-1,-4],[2,-10]])R(x+dx,a.y+dy+bob,1,1,'#3e2a18');
+    R(x+1,a.y-9+bob,1,1,'#e8d8a0');R(x,a.y-1,1,1,'#4f3820');R(x-2,a.y-13+bob,5,1,'#f4f7fa');R(x+5,a.y-2,2,1,'#c79d5c');}
   else if(a.item==='jip'){R(x-5,a.y-8,10,8,'#d9b860');R(x-5,a.y-8,10,1,'#f4f7fa');R(x-1,a.y-8,2,8,'#a8883a');}
   else if(a.item==='legend_fruit'){const gl=Math.floor(G.anim/8)%2;R(x-4,a.y-9+bob,8,8,'#f0a0b8');R(x-2,a.y-8+bob,3,3,'#fde0ea');R(x-1,a.y-12,2,3,'#6b4423');if(gl){R(x-7,a.y-12,1,1,'#fff6d8');R(x+6,a.y-6,1,1,'#fff6d8');}}
 };
 Rg.drawDig=(d,x)=>{if(d.item!=='darae_vine')return false;
   if(d.done){R(x-8,GROUND-3,16,3,'#8a8a7a');return true;}
-  R(x-10,GROUND-12,20,12,'#eef2f8');R(x-8,GROUND-16,16,6,'#6b5a3a');R(x-6,GROUND-18,4,2,'#7fa860');R(x+2,GROUND-15,5,2,'#7a6a42');R(x-10,GROUND-12,20,2,'#ffffff');
+  // 결정 D-393: 다래 덩굴 덤불. 낮은 눈 둔덕 위로 굵은 덩굴이 고리처럼 얽혀 오르고, 덩굴 위에 눈이 얹혔다(잎은 겨울이라 몇 장 마른 것만)
+  x=Math.round(x);
+  for(let j=0;j<4;j++){const half=10-j*2;R(x-half,GROUND-j-1,half*2+1,1,j===3?'#ffffff':'#e4ecf2');}
+  // 고리 셋: [가운데 dx, dy, 가로 반지름, 세로 반지름, 시작각, 끝각, 색]
+  for(const [cx,cy,rx,ry,a0,a1,c] of [[-3,-6,6,7,Math.PI*.9,Math.PI*2.3,'#6b5238'],[3,-8,5,8,Math.PI*.6,Math.PI*2.1,'#4a3a28'],[0,-4,9,4,Math.PI,Math.PI*2,'#5c4630']])
+    for(let t=a0;t<=a1;t+=0.12)R(x+Math.round(cx+Math.cos(t)*rx),GROUND+Math.round(cy+Math.sin(t)*ry),2,1,c);
+  for(const [dx,dy] of [[-5,-13],[2,-16],[6,-12],[-8,-8],[8,-6]])R(x+dx,GROUND+dy,3,1,'#f4f7fa');
+  R(x+4,GROUND-11,2,2,'#8a7a4a');R(x-7,GROUND-5,2,1,'#8a7a4a');R(x-1,GROUND-12,1,2,'#8a7a4a');
   if(Math.floor((G.anim+d.x)/14)%3===0)R(x+3,GROUND-20,1,1,'#fff3b0');return true;};
 
 /* 눈 / 봄 버들씨 */
@@ -271,16 +287,13 @@ if(!CLASSIC){
   Rg.zones.snow.digs=[{id:'y_cache_snow',x:1260,item:'solbang',n:2,form:'squirrel',cache:true,done:false}];
   /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 눈 덮인 마가목 열매(줍는 자리마다 마가목이 선다), 덤불의 다래 덩굴,
      소나무 밑 솔방울, 높은 바위턱의 잣송이. 살금이 둘레(비탈 900~1350)는 비워 둔다. 좌표는 길을 줄인 뒤의 자리. */
+  /* 결정 D-391 (사용자 피드백 2026-11-03: 너무 많고 다양하지 않다): 구역마다 둘셋. 산막 둘레는 덤불 덩굴과 장작 곁 솔방울,
+     눈길은 마가목·잣송이·솔방울, 비탈은 덤불과 마가목, 호숫가는 덤불과 바위턱 잣송이. 마가목은 비탈의 마가목 나무(구역에 이미 있는 다섯)에서 주로 딴다. */
   addZoneGather(Rg,'y_g_',[
-    ['shelter','p',480,'solbang'],['shelter','d',1110,'darae_vine'],['shelter','p',1300,'magamok'],['shelter','p',1560,'solbang'],['shelter','d',1960,'darae_vine'],
-    ['snow','p',140,'solbang'],['snow','p',455,'magamok'],['snow','d',610,'darae_vine'],['snow','p',960,'solbang'],['snow','p',1120,'magamok'],
-    ['snow','p',1420,'jat',{y:108}],['snow','d',1800,'darae_vine'],
-    ['slope','d',140,'darae_vine'],['slope','p',330,'solbang'],['slope','p',1490,'solbang',{y:108}],['slope','d',1560,'darae_vine'],['slope','p',1800,'magamok'],
-    ['shore','d',140,'darae_vine'],['shore','p',380,'solbang'],['shore','p',1190,'solbang'],['shore','d',1440,'darae_vine'],['shore','p',1610,'jat',{y:108}],
-    ['island','p',860,'magamok'],
-    // 몰린 자리 (간격이 고르지 않게)
-    ['shore','p',1218,'solbang'],
-    ['snow','p',985,'solbang'],
+    ['shelter','d',1110,'darae_vine'],['shelter','p',1560,'solbang'],
+    ['snow','p',455,'magamok'],['snow','p',960,'solbang'],['snow','p',1420,'jat',{y:108}],
+    ['slope','d',1560,'darae_vine'],['slope','p',1800,'magamok'],
+    ['shore','d',1440,'darae_vine'],['shore','p',1610,'jat',{y:108}],
   ]);
   // 겨울에는 오른쪽 얼음길로 걸어 나간다. 봄에는 같은 길이 물에 잠겨 배로만 건넌다.
   Rg.zones.shore.exits.right={to:'island',toX:160,
