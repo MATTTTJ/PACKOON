@@ -148,15 +148,18 @@ const TASTES={},npcIds=new Set(t('npcs').map(r=>r.id)),bossIds=new Set(bosses.ma
 for(const r of t('tastes')){
   const who=r['누가'],item=r['무엇'],kind=r['반응종류'],line=r['반응대사'],effect=r['효과'];
   if(!npcIds.has(who)&&!bossIds.has(who))fail('tastes.csv '+r.id+': NPC·보스 id가 아니다 '+who);
-  if(!ITEMS[item])fail('tastes.csv '+r.id+': 물건 id가 없다 '+item);
+  // 결정 D-424: 무엇 칸이 lore:<키> 이면 물건이 아니라 배운 것(learn 키)이 선물이다. 전투 진정에만 쓰고, 선물이름 칸이 단추 글이다
+  const lore=/^lore:[a-z_]+$/.test(item);
+  if(lore&&(!bossIds.has(who)||!(r['선물이름']||'').trim()||!effect.startsWith('calm:')))fail('tastes.csv '+r.id+': 배운 것 선물은 전투 상대의 진정 맛이고 선물이름이 있어야 한다');
+  if(!lore&&!ITEMS[item])fail('tastes.csv '+r.id+': 물건 id가 없다 '+item);
   if(!['아주 좋아함','좋아함','그저 그럼','싫어함'].includes(kind)||!line)fail('tastes.csv '+r.id+': 반응 종류·대사를 확인한다');
   if(!/^(?:none|calm:(?:[1-9]\d?|100))$/.test(effect))fail('tastes.csv '+r.id+': 효과는 none / calm:1~100이어야 한다');
   if(effect.startsWith('calm:')&&(!bossIds.has(who)||!['아주 좋아함','좋아함'].includes(kind)))fail('tastes.csv '+r.id+': 진정 효과는 전투 상대가 좋아하는 맛에만 쓴다');
   if(TASTES[who]&&TASTES[who][item])fail('tastes.csv '+r.id+': 인물·물건 조합이 겹친다');
   // 결정 D-76: 전투 진정 효과가 있는 맛은 그 전투 때 손에 넣을 수 있어야 한다. 물건을 얻는 지역이 상대의 지역보다 뒤면 안 된다.
-  if(effect.startsWith('calm:')){const ir=ITEMS[item].region,br=bosses.find(b=>b.id===who)?.['지역'],ord=id=>+regions.find(x=>x.id===id)?.['순서'];
+  if(effect.startsWith('calm:')&&!lore){const ir=ITEMS[item].region,br=bosses.find(b=>b.id===who)?.['지역'],ord=id=>+regions.find(x=>x.id===id)?.['순서'];
     if(ir!=='전체'&&br&&ord(ir)>ord(br))fail('tastes.csv '+r.id+': '+item+'는 '+ir+'에서 얻어 '+who+' 전투('+br+') 때 가질 수 없다');}
-  (TASTES[who]||(TASTES[who]={}))[item]={kind,line,effect};
+  (TASTES[who]||(TASTES[who]={}))[item]=lore?{kind,line,effect,lore:r['선물이름'].trim()}:{kind,line,effect};
 }
 for(const id of npcIds){const n=Object.keys(TASTES[id]||{}).length;if(n<2||n>3)fail('tastes.csv: NPC마다 맛 반응이 2~3개 필요하다 '+id);}
 for(const id of bossIds)if(Object.keys(TASTES[id]||{}).length<2)fail('tastes.csv: 전투 상대마다 맛 반응이 2개 이상 필요하다 '+id);

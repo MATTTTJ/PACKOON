@@ -1,5 +1,5 @@
 ﻿'use strict';
-/* 아이가 적은 기록을 그린다: 수첩의 해야 할 일·불리는 이름·물품 장부, 보따리 '중요' 탭의 아빠 단서·엄마의 쪽지.
+/* 아이가 적은 기록을 그린다: 수첩의 해야 할 일·이름·물품 장부, 보따리 '중요' 탭의 아빠 단서·엄마의 쪽지.
    패널과 탭, 동물·물건·도장·숨은 가공법 쪽은 notebook.js 가 맡는다. 여기서는 받은 body 에 아이의 글씨로 그리기만 한다.
    저장 모양(G.diary·G.clues·G.nicknames·G.ledger·G.rel·G.f.momNote*)은 책이 둘이던 때와 같다. */
 function childNoteSection(line){return line.when?.startsWith('habit:')?'익힌 솜씨':line.when?.startsWith('recipe:')?'숨은 가공법':'관찰';}
@@ -44,14 +44,17 @@ function renderTodo(body){
 /* 아이가 적은 장 하나 (tab: todo·clues·nicknames·mom·ledger) */
 function renderChildRecord(body,tab){
   const note=t=>body.appendChild(el('p','empty-note',t));
-  const entry=(label,text)=>{const e=el('div','entry me');e.appendChild(el('small',null,label));e.appendChild(document.createTextNode(text));body.appendChild(e);};
+  const entry=(label,text)=>{const e=el('div','entry me');e.appendChild(el('small',null,label));e.appendChild(document.createTextNode(text));body.appendChild(e);return e;};
   if(tab==='todo')renderTodo(body);
   else if(tab==='clues'){
     if(!G.clues.length)note('아빠의 흔적을 아직 찾지 못했다. '+REG.name+' 동물들에게 말을 걸어 보자.');
     G.clues.forEach(c=>entry(c.who,c.text));
   }else if(tab==='nicknames'){
+    // 결정 D-423: 맨 위는 엄마가 지어 준 이름. 아이가 길에서 한 번도 말하지 않은 이름이라 엔딩에서 새 이름을 받을 때까지 비어 있다
+    entry('엄마가 지어 준 이름',G.f.newName||'(아직 적지 않았다)').classList.add('own-name');
     const list=G.nicknames||[];if(!list.length)note('길에서 누군가 나를 새롭게 불러 주면 적어 두자.');
-    list.forEach(n=>entry((REGIONS[n.region]?.name||'길 위에서')+(n.by?' · '+(npcName(n.by)||n.by):''),n.text));
+    // 먹힌 이름은 글자만 비고, 지어 준 이와 받은 곳은 흐리게 남는다
+    list.forEach(n=>{const e=entry((REGIONS[n.region]?.name||'길 위에서')+(n.by?' · '+(npcName(n.by)||n.by):''),n.lost?'　':n.text);if(n.lost)e.classList.add('lost');});
   }else if(tab==='mom')renderMomNote(body);
   else if(tab==='ledger'){
     const r=el('div','rels');

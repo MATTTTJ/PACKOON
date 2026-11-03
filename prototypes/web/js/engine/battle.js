@@ -468,7 +468,10 @@ function openGift(){
   $('bGiftHint').textContent='좋아하는 걸 주면 마음이 누그러진다. 빈틈 하나에 하나만 건넬 수 있다.';
   // 결정 D-63: 집안 물건·귀한 것은 이 상대가 좋아하는 것만 꺼낸다.
   const ids=Object.keys(G.inv).filter(k=>G.inv[k]>0&&(!keepsake(k)||giftLiked(k)));
-  if(!ids.length)g.appendChild(el('span','small','건넬 물건이 없다.'));
+  // 결정 D-424: 배운 것 선물. 그 이야기를 들어 알게 되었으면(learn 키) 물건 대신 말로 건넨다. 선물 창 맨 위에 둔다
+  const lores=Object.entries(TABLES.TASTES[B.kind]||{}).filter(([k,t])=>t.lore&&knows(k));
+  lores.forEach(([k,t])=>{const b=el('button','gift lore');b.type='button';b.appendChild(el('span',null,t.lore));b.onclick=()=>giveGift(k);g.appendChild(b);});
+  if(!ids.length&&!lores.length)g.appendChild(el('span','small','건넬 물건이 없다.'));
   ids.forEach(id=>{const b=el('button','gift');b.type='button';b.appendChild(icon(id));b.appendChild(el('span',null,ITEMS[id].n+' ×'+G.inv[id]));
     const taste=tasteOf(B.kind,id);
     if(taste&&knows('like:'+B.kind+':'+id))b.appendChild(el('span','small',taste.kind));
@@ -478,21 +481,24 @@ function openGift(){
 }
 function closeGift(){$('bGiftMenu').hidden=true;if(B){B.paused=false;renderBattleForms();}}
 function giveGift(id){
-  if(!B||!B.paused||B.st==='end'||!has(id))return;
+  const lore=id.startsWith('lore:');   // 결정 D-424: 배운 것 선물은 보따리에서 꺼내지 않는다
+  if(!B||!B.paused||B.st==='end'||(!lore&&!has(id)))return;
   const taste=tasteOf(B.kind,id);
   if(taste&&taste.kind==='싫어함'){
     $('bGiftHint').textContent=taste.line+' 물건은 보따리에 그대로 두었다.';return;
   }
-  const after={...G.inv,[id]:G.inv[id]-1};
-  if(progressShortage(after)>progressShortage(G.inv)){
-    $('bGiftHint').textContent='이건 아직 쓸 데가 있어. 다른 걸 건네자.';return;
+  if(!lore){
+    const after={...G.inv,[id]:G.inv[id]-1};
+    if(progressShortage(after)>progressShortage(G.inv)){
+      $('bGiftHint').textContent='이건 아직 쓸 데가 있어. 다른 걸 건네자.';return;
+    }
   }
   // 기존 선물의 진정수치가 우선이다. 새 가공품의 효과만 맛 표에서 더한다.
   const effect=taste&&taste.effect.match(/^calm:(\d+)$/);
   const v=B.E.likes[id]||(effect?+effect[1]:0);
   // 결정 D-64: 좋아하지 않는 물건은 진정 0, 물건은 보따리에 그대로 둔다. 빈틈도 쓰지 않는다.
   if(!v){$('bGiftHint').textContent=(taste?taste.line:jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.')+' 물건은 보따리에 그대로 두었다.';return;}
-  takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();
+  if(!lore)takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();
   B.calm=Math.min(100,B.calm+v);
   B.msg=taste?taste.line:((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText);
   if(B.warm&&id==='dokkaebibul')B.warm.fire=180;

@@ -1,6 +1,6 @@
 'use strict';
 /* 북쪽 영산 진행: 날쌘의 설피, 살금이(살금살금 다가가기), 아빠(몸짓 읽기와 장부 한 장), 산군 할아버지(엄마의 오래된 거래와 마지막 교환),
-   강철이, 전설의 열매, 약연이 깨어남, 집으로. 흐름은 design/narrative/yeongsan-scenario.md (제안).
+   강철이, 전설의 열매, 엄마의 절구로 약 찧기(결정 D-421), 집으로. 흐름은 design/narrative/yeongsan-scenario.md (제안).
    주인공의 이름은 끝까지 나오지 않는다. 끝 화면에서 엄마가 지어 준 새 이름을 플레이어가 적는다 (제안) */
 (()=>{
 const Rg=REGIONS.yeongsan;
@@ -211,7 +211,7 @@ function salgGive(i=0){
     // 결정 D-304: 단풍골 꺼병이의 '사뿐발 보부상'과 겹치지 않게, 귀가 설 때마다 멈춰 준 일에서 '멈춤이' (id는 옛 저장 때문에 그대로)
     nickname('yeongsan_soft_step','멈춤이','살금이');
     if(arcs()){
-      clue('y1','살금이','"가을부터 호숫가에 너구리 하나가 있어. 입은 달싹이는데, 소리가 안 나더라."');
+      clue('y1',NAME_CLUES.y1.who,NAME_CLUES.y1.text);
       diary('y_salg','살금이에게 먹을 것을 주고 비탈의 지름길을 들었다. 가을부터 호숫가에 너구리가 있는데, 입은 달싹여도 소리가 안 난다고 한다. 호수는 강철이가 붙들고 있다.');
       talk([['살금이','고, 고마워. 내 귀가 설 때마다 멈춰 줬지?\n멈춤이라고 불러도 돼?'],
         ['살금이','왼쪽 바위턱을 디디면 호숫가로 올라가.'],
@@ -221,7 +221,7 @@ function salgGive(i=0){
         ['살금이','첫눈 올 무렵 호수에 내려앉는 걸 봤어.\n그 뒤로 얼음을 붙들고 안 놓아줘.',salgArcChoices()]]);
       toast('얼어붙은 비탈을 지날 수 있다');refreshGoal();return;
     }
-    clue('y1','살금이','"가을부터 호숫가에 너구리 하나가 있어. 신목만 바라보는데… 말은 못 하더라."');
+    clue('y1',NAME_CLUES.y1.who,NAME_CLUES.y1.text);
     diary('y_salg','살금이가 얼어붙은 비탈의 지름길을 알려 주었다. 가을부터 호숫가에 말 못 하는 너구리가 머물렀다고 한다.');
     talk([['살금이','고, 고마워… 머, 멈춤이.\n귀 설 때마다 멈춰 줘서.'],['살금이','어, 얼어붙은 비탈 있지?\n왼쪽 바위턱을 디디면 호숫가로 올라갈 수 있어.'],
       ['살금이','가을부터 호숫가에 너구리 하나가 있어.\n신목만 바라보는데… 말은 못 하더라.'],
@@ -290,7 +290,7 @@ function gesture(i){
 }
 function dadLedger(){
   const F=G.f;F.dadDone=true;learn('dad:ledger');
-  clue('y2','아빠의 장부 한 장','엄마의 글씨: "제 둔갑과 말을 드립니다. 아이의 숨을 주세요." 그 아래 아빠의 글씨: "말 하나 더함."');
+  clue('y2',NAME_CLUES.y2.who,NAME_CLUES.y2.text);
   diary('y_ledger','아빠가 내민 장부에 엄마의 글씨가 있었다. "제 둔갑과 말을 드립니다. 아이의 숨을 주세요." 그 아래에는 아빠의 글씨. "말 하나 더함." 엄마가 아픈 건 나를 살린 값이었다.');
   sceneNext('y_dad_ledger');
   talk([receiveItem('dad_ledger',1),['너구리','(낡은 장부다. 이 글씨는…)'],
@@ -316,7 +316,7 @@ function dadMain(){
   if(!F.dadDone){gesture(0);return;}
   if(!F.nameGiven){talk([['아빠','(아빠가 신목 쪽을 가리키다 말고 내 손을 꼭 쥔다.\n한참 만에야 손을 놓고, 내 어깨를 두드린다.)']]);return;}
   if(F.yakDone){returnPrep();return;}
-  talk([['아빠','(아빠가 보따리 속 약연을 가리키며 고개를 끄덕인다.)']]);
+  talk([['아빠','(아빠가 보따리 속 엄마의 절구를 가리키며 고개를 끄덕인다.)']]);   // 결정 D-421 (임시: ⑤ 갈래가 다시 쓴다)
 }
 
 /* ---------- 영산 사연 (결정 D-120) ----------
@@ -468,7 +468,6 @@ function nalDadArcReply(){
    다리가 불편해 비탈까지는 못 간다. 아이(보부상)가 물을 날라 주며 관계가 생긴다.
    숨은 고리: 지난가을 아빠가 이 샘에 들러(그땐 말을 할 수 있었다) 오래전 겨울 아기 업은 너구리를 물었다.
    그 너구리가 할미의 표주박 끈을 매 주었다. 아이가 엄마에게 배운 보따리 매듭과 같은 매듭이다.
-   ('끝에 한 번 거꾸로'는 아빠 손버릇(notebook habit:yakyeon, 확정)이라 엄마를 알아보는 표시로 쓰지 않는다.)
    할미는 그게 누구인지 끝까지 말하지 않는다. 아이만 안다. */
 function ongdalArcMeet(){
   arcScene('yOngdal1',[
@@ -642,7 +641,7 @@ function talkSangun(){
   if(!F.dadDone){talk([['산군 할아버지','(커다란 호랑이가 눈을 감고 앉아 있다.)'],['산군 할아버지','…어린 보부상이로구나.\n네 아비가 호숫가에 있다. 그 얼굴부터 보고 오너라.']]);return;}
   if(!F.sangunMet){F.sangunMet=true;rel('sangun',1);learn('sangun:story');ledger('sangun','산군 할아버지','셈이 맞는 값','되돌림');
     if(arcs()){
-      clue('y3','산군 할아버지','엄마는 아빠가 젊을 때 다녀온 영산 이야기를 듣고 나를 안고 혼자 왔다. 아빠는 지난가을 말을 내놓아 글로도 연락할 수 없게 됐다.');
+      clue('y3',NAME_CLUES.y3.who,NAME_CLUES.y3.text);
       diary('y_sangun','젊은 아빠는 부를 준다는 소문을 좇아 영산에 왔지만 되찾을 것이 없어 빈손으로 돌아갔다. 엄마는 그 이야기를 기억해 나를 안고 혼자 왔다. 그때 아빠는 장삿길에 있었다. 지난가을 아빠가 말을 내놓은 뒤에는 글도 쓸 수 없었다. 장부의 두 글씨는 그 전에 썼을 것이다.');
       // 아이가 아빠에게 받은 장부 한 장을 내밀고 묻는다. 산군은 묻는 것에 답한다.
       sceneNext('y_sangun_story');
@@ -671,7 +670,7 @@ function talkSangun(){
         ['산군 할아버지','바라는 걸 알아 건네는 일은\n값을 아는 이의 몫이지.'],
         ['산군 할아버지','봄이 오거든 다시 오너라.']],()=>refreshGoal());return;
     }
-    clue('y3','산군 할아버지','엄마는 아기였던 나를 살리려고 영산에 올라와, 둔갑과 말을 값으로 내놓았다. 아빠는 그걸 알고 자기 말을 더 얹었다.');
+    clue('y3',NAME_CLUES.y3.who,NAME_CLUES.y3.text);
     diary('y_sangun','산군 할아버지가 엄마의 오래된 거래를 들려주었다. 숨이 다해 가던 아기였던 나를 살리려고, 엄마가 둔갑과 말을 내놓았다. 아빠는 되돌려 달라고 자기 말을 더 얹었다.');
     sceneNext('y_sangun_story');
     talk([['산군 할아버지','네가 그 아기로구나. 숨이 꺼져 가던…'],
@@ -720,18 +719,18 @@ function talkSangun(){
   if(!F.yakDone){makeReturningMedicine();return;}
   returnPrep();
 }
-/* 되돌림 약을 만든 뒤에도 봄길과 선택 가공을 둘러볼 수 있다. 귀향은 직접 고른다. */
+/* 되찾음 약을 만든 뒤에도 봄길과 선택 가공을 둘러볼 수 있다. 귀향은 직접 고른다. */
 function returnPrep(){
   if(!G.f.yakDone||G.ended||regionCompleted(Rg.id))return;
   const first=!G.f.yPrepSeen;G.f.yPrepSeen=true;
   talk([...(first?[['아빠','(아빠가 약을 보자기에 싸 내 손에 쥐여 준다.)']]:[]),
     ['너구리',first?'엄마 약이다. …가자, 아빠.':'…가자, 아빠.',[
       {t:'아빠와 집으로 돌아간다',go:()=>Rg.goHome()},
-      {t:'조금 더 둘러보고 간다',go:()=>toast('약연으로 더 갈거나 봄 호수를 둘러보자 · 돌아갈 땐 아빠나 산군에게 말 걸기')}
+      {t:'조금 더 둘러보고 간다',go:()=>toast('봄 호수를 둘러보자 · 돌아갈 땐 아빠나 산군에게 말 걸기')}
     ]]]);
 }
 Rg.offerReturnPrep=returnPrep;
-// 결정 D-05: 이름을 내놓는 마지막 교환과 약연 장면 (design/data/decisions.csv)
+// 결정 D-05: 이름을 내놓는 마지막 교환과 엄마의 절구로 약 찧는 장면 (design/data/decisions.csv, 결정 D-421)
 function giveName(){
   const F=G.f;if(F.nameGiven)return;
   F.nameGiven=true;ledgerDone('sangun');rel('sangun',1);learn('sangun:name');
@@ -742,28 +741,27 @@ function giveName(){
     ['너구리','(가슴에서 무언가 빠져나갔다. 내 이름… 뭐였지?)'],
     ...(F.jangteoArcsKid2?[['너구리','(부엉 영감 장부의 빈 이름 칸이 떠오른다.\n이제 채울 이름이 없다.)']]:[]),
     ['아빠','(내 손목을 쥔 아빠의 손이 풀린다.\n아빠가 내 이마에 제 이마를 댄다. 오래.)'],
-    ['아빠','(아빠가 내 보따리에서 약연을 꺼내,\n내 손 위에 손을 포갠다.)'],
-    ['너구리','(바퀴의 글자가 빛난다. 되돌림.\n따뜻해진 약연에 전설의 열매를 놓는다.)']],makeReturningMedicine);
+    ['아빠','(아빠가 내 보따리에서 엄마의 절구를 꺼내,\n공이 쥔 내 손 위에 손을 포갠다.)'],
+    ['너구리','(엄마 손때 묻은 절구에 전설의 열매를 놓는다.)']],makeReturningMedicine);
 }
-/* 마지막 교환부터 약연 각성·가공까지 이어지는 한 장면. 가공법과 수량은 CSV를 읽는다. */
+/* 마지막 교환부터 엄마의 절구로 약을 찧기까지 이어지는 한 장면. 가공법과 수량은 CSV(heirlooms.csv 절구 줄)를 읽는다. */
 function makeReturningMedicine(){
   if(G.f.yakDone||!G.f.nameGiven)return;
-  const recipe=RECIPES.yakyeon.find(r=>r.out==='doerim_yak');
+  const recipe=RECIPES.jeolgu.find(r=>r.out==='doerim_yak');
   if(!recipe)return;
   if(typeof returnPouch==='function')returnPouch();
   if(!has(recipe.out,recipe.n)&&Object.entries(recipe.need).some(([id,n])=>!has(id,n))){
-    talk([['아빠','(아빠가 신목의 열매를 가리키고 약연 곁을 가만히 두드린다.)']]);return;
+    talk([['아빠','(아빠가 신목의 열매를 가리키고 절구 곁을 가만히 두드린다.)']]);return;
   }
-  awaken('yakyeon');learn('yakyeon:awake');Sound.roller();
+  learn('yak:withDad');Sound.forge('hit');   // 결정 D-421: 이 장면부터 절구의 마지막 가공법이 보인다
   if(!has(recipe.out,recipe.n)){
     for(const [id,n] of Object.entries(recipe.need))takeItem(id,n);
     addItem(recipe.out,recipe.n);
   }
-  if(!G.f.crafted_yakyeon){G.f.crafted_yakyeon=true;diary('crafted_yakyeon',HEIR.yakyeon.firstCraft);}
-  learn(TABLES.CRAFT.yakyeon.habitKey,true);
+  diary('y_mortar','아빠와 손을 포개 엄마의 절구로 전설의 열매를 찧었다. 세 번 찧고 한 번 쉬었다.');
   G.f.yakDone=true;refreshHud();Sound.craft();
-  talk([['아빠','(아빠 손을 따라 바퀴를 앞으로 굴렸다. 마지막에는 한 번 거꾸로.)'],
-    ['너구리','(열매가 곱게 갈린다. 약연 바퀴에 비친 봄빛이 약에 스며든다.)']],returnPrep);
+  talk([['아빠','(아빠 손을 따라 공이를 내렸다. 세 번 찧고, 한 번 쉬고.)'],
+    ['너구리','(열매가 곱게 찧긴다. 엄마도 꼭 이렇게 찧었다.)']],returnPrep);
 }
 
 /* ---------- 강철이 전투 ---------- */
@@ -807,7 +805,7 @@ Rg.goHome=()=>{
   if(G.f.yHomeScene||G.ended)return;
   G.f.yHomeScene=true;
   G.f.yakDone=true;
-  diary('y_end','아빠와 함께 약연을 굴려 되돌림 약을 만들었다. 이제 집으로 간다.');
+  diary('y_end','아빠와 함께 엄마의 절구로 되찾음 약을 찧었다. 이제 집으로 간다.');
   const lines=[['아빠','(아빠가 제 지게를 내려놓고 내 보따리를 옮겨 싣는다.\n오래된 끈을 풀어 내 어깨에 맞게 고쳐 맨다.)'],
     ['아빠','(등에 닿는 받침을 살피고 끈을 한 번 더 당긴다.\n아빠가 양손을 놓아도 지게가 꼭 붙어 있다.)'],
     ['아빠','(아빠가 내 어깨를 두드리고 남쪽을 가리킨다. 집이다.)'],
@@ -940,7 +938,7 @@ Rg.goal=()=>{
   // 결정 D-67: 앞선 진행부터 거꾸로 본다. 산양·부엉이로 호숫가에 먼저 닿아도 지금 할 일이 나온다.
   // 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
   if(F.yakDone)return '아빠와 집으로 떠나기';
-  if(F.nameGiven)return '아빠와 약연 굴리기';
+  if(F.nameGiven)return '아빠와 약 찧기';
   if(F.fruitGot)return '산군 할아버지께 셈하기';
   if(G.boss.dead)return '전설의 열매 따기';
   if(F.sangunMet)return '강철이와 맞서기';

@@ -201,7 +201,7 @@ async function runMap({browser:b,outDir}){
     check(j(retained(again))===j(retained(expanded)),'map-mode-save-expanded','classic을 거쳐 확장판으로 돌아왔을 때 방문·바닥 물건·보스·구역 진행이 달라졌다.',{expected:retained(expanded),actual:retained(again)});
     records.push({stage:'mode-roundtrip',before:retained(expanded),classic:retained(classic),expanded:retained(again),note:'각 모드 필드의 크기·발판이 달라 활성 구역·기존 줍기 지점 좌표는 비교하지 않는다. 보스 생존·채집 done·줍기 got은 id별로 비교하고 classic 돌너머가 보관하는 dolExtraPointState의 got도 포함한다. 흩어진 바닥 물건 좌표는 그대로 비교한다.'});
     const oldSaves=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures','old-saves.json'),'utf8')).saves;
-    const old=await b.eval(`(${j(oldSaves)}).map(raw=>{localStorage.setItem('packoon-save-v1',raw);const want=JSON.parse(raw).G,ok=loadSave();return {ok,region:G.region,want:want.region,states:Object.keys(G.regionStates||{}),visited:structuredClone(G.visitedZones),inv:JSON.stringify(G.inv)===JSON.stringify(want.inv)};})`);
+    const old=await b.eval(`(${j(oldSaves)}).map(raw=>{localStorage.setItem('packoon-save-v1',raw);const want=JSON.parse(raw).G,ok=loadSave();return {ok,region:G.region,want:want.region,states:Object.keys(G.regionStates||{}),visited:structuredClone(G.visitedZones),inv:JSON.stringify(G.inv)===JSON.stringify(want.inv.dad_tag?want.inv:{...want.inv,dad_tag:1})};})`);
     check(old.length===4&&old.every(s=>s.ok&&s.region===s.want&&s.inv&&j(s.states)===j([s.region])&&Object.keys(s.visited).every(id=>id===s.region)),'map-old-save','지역 보관이 없는 옛 저장에서 현재 지역 외 상태를 만들거나 진행·소지품 복원에 실패했다.',old);
     records.push({stage:'old-saves',old});
     await ready(b);await b.eval("G=newGame('dolneomeo');delete G.f.mapUnlocked;resetScreens()");await b.click('#btnStart');

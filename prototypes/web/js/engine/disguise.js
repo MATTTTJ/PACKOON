@@ -28,7 +28,7 @@ const DISGUISE_LINES={
   toad:{tone:'high',
     back:'허허, 너였구나. 재주가 늘었구나.',backFirst:'허허, 너구리였구나.'},
   stream_otter:{tone:'low',
-    first:'누구야? 함지박 건드리지 마!',ask:'누구야? 처음 보는 애네.\n함지박 탈 거면 도로 올려놔야 해!',again:'또 누구야? …너지!',
+    first:'누구야? 함지박 건드리지 마!',ask:'누구야? 처음 보는 애네.\n이 함지박, 떠내려가면 또 이고 와야 돼!',again:'또 누구야? …너지!',
     back:'뭐야, 너였어? 감쪽같다!',backFirst:'어, 너구리였어?'},
   // 검댕은 연기에 눈이 절어 잘 못 본다 (npcs.csv)
   charcoal_badger:{tone:'high',

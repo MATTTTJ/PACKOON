@@ -49,8 +49,9 @@ function repairSavedState(source,repairRegions=true){
     for(const rows of Object.values(zones))if(!Array.isArray(rows)||rows.some(row=>!validFloorRow(row)))throw Error('floorItems');
   }
   for(const rows of Object.values(g.floorPickups))if(!Array.isArray(rows)||rows.some(row=>!validFloorRow(row)))throw Error('floorPickups');
-  if(g.bagSlots!==undefined&&(!Number.isSafeInteger(g.bagSlots)||g.bagSlots<0))throw Error('bagSlots');
+  delete g.bagSlots;   // 결정 D-424: 보따리 칸 제한은 없어졌다
   if(g.drop!==undefined&&g.drop!==null&&(!saveObject(g.drop)||!['x','y','vy'].every(key=>Number.isFinite(g.drop[key]))))throw Error('drop');
+  if(!Object.hasOwn(TOOLS,g.tool))g.tool='pick';   // 없어진 연장을 든 옛 저장
   if(!Number.isSafeInteger(g.hp)||!Number.isSafeInteger(g.maxhp)||g.hp<0||g.maxhp<=0||g.maxhp>100||g.hp>g.maxhp||!Object.hasOwn(TOOLS,g.tool))throw Error('player');
   for(const row of Object.values(g.ledger))if(!saveObject(row)||typeof row.npc!=='string')throw Error('ledger');
   if(g.zoneStates===undefined)g.zoneStates={};
@@ -66,6 +67,7 @@ function repairSavedState(source,repairRegions=true){
     if(!Object.hasOwn(REGIONS,id)||!saveObject(zones))throw Error('visitedZones');
     for(const [zone,value] of Object.entries(zones))if(!TABLES.ZONES[id]?.[zone]||value!==true)throw Error('visitedZones');
   }
+  if(repairRegions)migrateNameStory(g);   // 한 번만 (지역 보관 칸을 고치는 안쪽 호출은 learned 배열을 함께 쓴다)
   if(repairRegions)for(const [id,snapshot] of Object.entries(g.regionStates)){
     if(!Object.hasOwn(REGIONS,id)||!saveObject(snapshot)||!saveObject(snapshot.fields)||typeof snapshot.completed!=='boolean')throw Error('regionStates');
     const restored=repairSavedState({...g,...snapshot.fields,region:id,ended:snapshot.completed,regionStates:{},visitedZones:{}},false);
@@ -75,6 +77,19 @@ function repairSavedState(source,repairRegions=true){
   normalizeTravelRecords(g);
   if(repairRegions)rememberRegion(g); // 옛 저장은 현재 지역 한 곳만 보관한다.
   return g;
+}
+/* 결정 D-421·D-422·D-423: 이름 이야기(사용자 지시 2026-11-03)로 바뀐 옛 저장을 새 모양으로 읽는다.
+   - 깨어난 가보 목록의 아빠의 약연은 버린다 (learned 의 yakyeon 키는 읽는 데가 없어 둔다)
+   - 아빠의 짐표가 없으면 한 번 넣어 준다 (오프닝을 다시 보지 않아도 된다)
+   - 아빠 단서는 id 로 새 글로 바꿔 끼운다 (core.js NAME_CLUES)
+   - 이름 행에 lost 칸이 없으면 false
+   - 강철이를 이미 물리친(봄이 온) 저장은 이름을 되찾은 것으로 친다 */
+function migrateNameStory(g){
+  g.awake=g.awake.filter(id=>Object.hasOwn(HEIR,id));
+  if(!g.learned.includes('got:dad_tag')){if(!g.inv.dad_tag)g.inv.dad_tag=1;g.learned.push('got:dad_tag');}   // 받은 표시는 got:dad_tag (새 게임은 처음부터 있다)
+  for(const c of g.clues){const v=NAME_CLUES[c.id];if(v){c.who=v.who;c.text=v.text;}}
+  for(const n of g.nicknames)if(typeof n.lost!=='boolean')n.lost=false;
+  if(g.f.spring&&g.f.nameRestored===undefined)g.f.nameRestored=true;
 }
 function readSave(){
   let raw;try{raw=localStorage.getItem(saveKey());}catch(_){return null;}
