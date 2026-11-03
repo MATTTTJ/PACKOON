@@ -335,8 +335,15 @@ function dadMain(){
 }
 /* 결정 D-437: 강철이를 물리치거나 달래면 아빠가 이름을 되찾는다. 아이 보따리 끈의 짐표 앞면에 글씨가 먼저 돌아온다(이름의 규칙 6).
    얼음이 풀린 물을 헤치고 아빠가 섬 기슭으로 올라온다. 이번엔 부르면 돌아본다. 아빠는 말을 값으로 낸 적이 없어 말을 한다. 다만 짧게. */
+/* 결정 D-438: 이름을 되찾는 장면·마지막 셈·절구 약·귀향 대화가 도는 동안은 교환과 건네기 단추를 닫는다(D-197 tradeClosedNow).
+   교환 단추로 장면을 닫으면 셈 뒤 약 장면이 끊긴다. 대화가 닫히면 ambient 에서 푼다. */
+let climax=false;
+const climaxOn=()=>{climax=true;};
+Rg.tradeClosed=()=>climax;
+Rg.clearClimax=()=>{if(climax&&!open('dlg'))climax=false;};
 function dadComesBack(next){
   const F=G.f;if(F.dadBack){next?.();return;}
+  climaxOn();
   F.dadBack=true;learn('dad:back');
   diary('y_dad_back','강철이가 입을 벌리자 삼킨 이름들이 쏟아졌다. 짐표 앞면에 아빠 이름이 돌아왔다. 나는 왜 그걸 잊고 있었을까. 아빠가 물을 헤치고 와서, 이번엔 부르니 돌아보았다.');
   talk([['너구리','(보따리 끈의 짐표가 따뜻하다.\n매끈하던 앞면에… 글씨가 있다.)'],
@@ -736,6 +743,7 @@ function talkSangun(){
   // 결정 D-137 (D-141 "세계가 기억한다"와 공유): 강철이를 달랬는지 부쉈는지에 따라 산군의 봄 인사가 다르다 (불이익 없음)
   if(!F.fruitGot){talk([['산군 할아버지',F.gangCalmYong?'봄이로구나. 그놈이 제 이름을 얻어 올라갔다.\n셈 밖의 일을 잘했다. 신목에 열매가 열렸다. 따 오너라.':F.gangCalm?'봄이로구나. 그놈이 제 발로 떠났다.\n셈 밖의 일을 잘했다. 신목에 열매가 열렸다. 따 오너라.':'봄이로구나. 호수가 조용해졌다.\n신목에 열매가 열렸다. 따 오너라.']]);return;}
   if(!F.nameGiven){
+    climaxOn();
     sceneNext('y_sangun_name');
     // 결정 D-137: 미루고 돌아오면 축약판. 선택지를 고르면 talk 끝 콜백이 불리지 않으므로(dialog.js) 깃발은 첫 재생 때 세운다.
     const ask=['산군 할아버지','그래도 내놓겠느냐?',[{t:'제 이름을 드릴게요',go:giveName},{t:'…조금만 생각할게요',go:null}]];
@@ -775,6 +783,7 @@ Rg.offerReturnPrep=returnPrep;
 // 결정 D-05: 이름을 내놓는 마지막 교환과 엄마의 절구로 약 찧는 장면 (design/data/decisions.csv, 결정 D-421)
 function giveName(){
   const F=G.f;if(F.nameGiven)return;
+  climaxOn();
   F.nameGiven=true;ledgerDone('sangun');rel('sangun',1);learn('sangun:name');
   diary('y_name','산군 할아버지에게 내 이름을 내놓았다. 셈이 맞았다. 무언가가 가슴에서 조용히 빠져나갔다.');
   sceneNext('y_give_name');
@@ -796,6 +805,7 @@ function giveName(){
 /* 마지막 교환부터 엄마의 절구로 약을 찧기까지 이어지는 한 장면. 가공법과 수량은 CSV(heirlooms.csv 절구 줄)를 읽는다. */
 function makeReturningMedicine(){
   if(G.f.yakDone||!G.f.nameGiven)return;
+  climaxOn();
   const recipe=RECIPES.jeolgu.find(r=>r.out==='doerim_yak');
   if(!recipe)return;
   if(typeof returnPouch==='function')returnPouch();
@@ -864,6 +874,7 @@ Rg.offerHomeGift=()=>{
 /* ---------- 끝: 집으로 ---------- */
 Rg.goHome=()=>{
   if(G.f.yHomeScene||G.ended)return;
+  climaxOn();
   G.f.yHomeScene=true;
   G.f.yakDone=true;
   diary('y_end','아빠와 함께 엄마의 절구로 되찾음 약을 찧었다. 이제 집으로 간다.');
@@ -973,7 +984,7 @@ if(!CLASSIC){
   for(const n of Rg.npcs)n.zone=zones[n.id];
   const salg=Rg.npcs.find(n=>n.id==='salgeumi'),salgTalk=salg.talk;
   let salgScene=null;
-  Rg.clearRouteScenes=()=>{if(!open('dlg'))salgScene=null;};
+  Rg.clearRouteScenes=()=>{if(!open('dlg'))salgScene=null;Rg.clearClimax();};
   const location=()=>{
     if(salgScene?.owner===G&&open('dlg'))return salgScene.at;
     if(G.f.spring&&G.zone==='island')return ['island',trimX(330,Rg.trimCuts?.island)];   // 줄인 섬 좌표 (D-116)

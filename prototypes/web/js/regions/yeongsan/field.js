@@ -110,7 +110,7 @@ Rg.drawDig=(d,x)=>{if(d.item!=='darae_vine')return false;
 
 /* 눈 / 봄 버들씨 */
 const fall=Array.from({length:34},(_,i)=>({x:Math.random()*W,y:Math.random()*H,s:0.25+Math.random()*0.4,p:Math.random()*6}));
-Rg.ambient=()=>{for(const l of fall){l.y+=l.s;l.p+=0.025;l.x+=Math.sin(l.p)*0.35-(spring()?0.2:0.05);if(l.y>H){l.y=-3;l.x=Math.random()*W;}if(l.x<-3)l.x=W+2;}};
+Rg.ambient=()=>{Rg.clearClimax?.();for(const l of fall){l.y+=l.s;l.p+=0.025;l.x+=Math.sin(l.p)*0.35-(spring()?0.2:0.05);if(l.y>H){l.y=-3;l.x=Math.random()*W;}if(l.x<-3)l.x=W+2;}};
 Rg.drawFront=()=>{for(const [i,l] of fall.entries())if(!spring()||i%4===0)R(l.x,l.y,spring()?1:2,Math.sin(l.p)>0?2:1,spring()?'#f4efdb':'#ffffff');
   if(!spring()){ctx.fillStyle='rgba(20,28,70,.12)';ctx.fillRect(0,0,W,H);}};
 
