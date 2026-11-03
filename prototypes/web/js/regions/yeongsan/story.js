@@ -779,7 +779,7 @@ function giveName(){
   diary('y_name','산군 할아버지에게 내 이름을 내놓았다. 셈이 맞았다. 무언가가 가슴에서 조용히 빠져나갔다.');
   sceneNext('y_give_name');
   // 결정 D-438: 강철이 앞에서 이름이 불려 나간 걸 겪어서, 이번엔 그 무게를 알고 낸다. 낸 뒤에도 길에서 받은 이름이 남아 무너지지 않는다(규칙 1·7)
-  const salgCalls=!CLASSIC&&!!nickname('yeongsan_soft_step')&&G.zone==='island';
+  const salgCalls=!CLASSIC&&namesHeld().some(n=>n.id==='yeongsan_soft_step')&&G.zone==='island';   // 이 파일의 nickname 은 주는 함수라 namesHeld 로 본다
   talk([['너구리','(이름이 빠져나가는 게 어떤 건지, 이제 안다.)'],
     ['너구리','…아빠가 못 끝낸 셈이잖아요.\n제가 끝낼게요.'],
     ['산군 할아버지','…그 이름이면 셈이 맞는다.'],
