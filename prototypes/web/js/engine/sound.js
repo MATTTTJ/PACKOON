@@ -139,11 +139,9 @@ const Sound=(()=>{
     },0);
   }
   const emit=(key,cool,id,gain=1)=>effect(key,cool,t=>playSfx(id,{when:t,gain}));
-  function footstep(){
-    const region=typeof G!=='undefined'&&G?G.region:null;
-    const id={dolneomeo:'footstep_frost',jangteo:'footstep_market',yeongsan:'footstep_snow'}[region]||'footstep_leaf';
-    emit('footstep',.28,id,.65);
-  }
+  // 결정 D-332: 지역별 발소리는 이 표 하나로. 걷기·구르기·기어가기가 같이 쓴다
+  const stepId=()=>({dolneomeo:'footstep_frost',jangteo:'footstep_market',yeongsan:'footstep_snow'}[typeof G!=='undefined'&&G?G.region:null]||'footstep_leaf');
+  const footstep=()=>emit('footstep',.28,stepId(),.65);
   const jump=()=>emit('jump',.15,'jump');
   const land=()=>emit('land',.15,'land');
   const swing=()=>emit('swing',.16,'sickle');
@@ -189,6 +187,6 @@ const Sound=(()=>{
     voices:sources.size,peakVoices,maxVoices,cached:cache.size,cacheBytes,maxCacheBytes,played,dropped,ambient:!!ambientVoice};}
   return {get enabled(){return enabled;},get volume(){return volume;},get bgmVolume(){return bgmVolume;},get sfxVolume(){return sfxVolume;},
     toggle,toggleVolume,setBgmVolume,setSfxVolume,playSfx,getState,
-    steam,footstep,jump,land,swing,gather,item,exchange,paper,panel,book,choice,roller,passage,tab,craft,travel,forge,stone,yeongsan,leaf,setQuiet,
+    steam,footstep,stepId,jump,land,swing,gather,item,exchange,paper,panel,book,choice,roller,passage,tab,craft,travel,forge,stone,yeongsan,leaf,setQuiet,
     ambience,get ambient(){return ambientKind;},get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
 })();

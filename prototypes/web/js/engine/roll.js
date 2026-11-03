@@ -33,7 +33,7 @@ function rollRelease(){
 }
 function startRoll(){
   rolling=true;rollVel=G.vx;rollTick=0;
-  Sound.playSfx(G.region==='yeongsan'?'footstep_snow':G.region==='jangteo'?'footstep_market':'footstep_leaf',{gain:.7});
+  Sound.playSfx(Sound.stepId(),{gain:.7});
   Vfx.rollStep();   // 결정 D-174: 바닥에 맞는 첫 튐 (눈덩이 / 흙먼지)
 }
 function endRoll(){if(!rolling)return;rolling=false;rollVel=0;rollTick=0;}
@@ -62,7 +62,7 @@ function stepRoll(ax){
   rollAngle+=G.vx/rollSpec().r;rollTick++;
   Vfx.rollTrail();   // 결정 D-174: 눈·서리 위에서는 공 아래 눈보라와 고랑 자국
   if(G.onGround&&Math.abs(G.vx)>.4&&rollTick%T.roll_step_frames===0){
-    Sound.playSfx(G.region==='yeongsan'?'footstep_snow':G.region==='jangteo'?'footstep_market':'footstep_leaf',{gain:.35});
+    Sound.playSfx(Sound.stepId(),{gain:.35});
     Vfx.rollStep();   // 눈덩이 튐(눈) / 흙먼지·흙덩이·잎 부스러기(그 밖)
   }
 }

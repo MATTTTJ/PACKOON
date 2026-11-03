@@ -697,7 +697,7 @@ function startCrawl(p){
 function crawlStep(m){
   // 팔다리를 한 번 바꿔 디딜 때마다 사각 소리를 낸다.
   const beat=Math.max(1,Math.round(m.frames/8));
-  if(m.tick%beat===0&&m.tick<m.frames)Sound.playSfx(G.region==='jangteo'?'footstep_market':'footstep_leaf',{gain:.45});
+  if(m.tick%beat===0&&m.tick<m.frames)Sound.playSfx(Sound.stepId(),{gain:.45});   // 결정 D-332
 }
 function drawCrawl(m,t){
   const down=m.opts.dir>0,steps=8;

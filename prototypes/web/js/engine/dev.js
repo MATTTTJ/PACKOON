@@ -23,7 +23,7 @@ const Dev=(()=>{
     let g=JSON.parse(text);try{g=repairSavedState(g);}catch(_){}
     stopDialog();G=g;resetScreens();
   }
-  function stopDialog(){if(open('dlg')){dlgQ=[];dlgEnd=null;$('dlg').hidden=true;dlgPic(null);}closePanels();}
+  function stopDialog(){if(open('dlg'))dlgDismiss();closePanels();}   // 결정 D-331
   const regionName=id=>REGIONS[id]?.name||id;
   const zoneName=(r,z)=>TABLES.ZONES?.[r]?.[z]||z||'';
 
