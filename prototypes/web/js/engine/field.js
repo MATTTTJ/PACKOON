@@ -189,8 +189,8 @@ function step(){
   // ↓+점프: 땅이 아닌 발판 위에서만 아래로 빠진다. 지나는 동안 그 높이의 발판만 무시한다.
   if(dropQ&&G.onGround&&G.py<fieldGround()-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;
     // 결정 D-114: 발판 가장자리를 붙잡고 등을 보이며 잠깐 미끄러져 내려간 뒤 떨어진다. 공처럼 구르던 중이면 공 모양 그대로 빠진다.
-    // 결정 D-262: 매달려 미끄러지는 것은 너구리뿐이다. 네발 변신은 턱을 붙잡지 않고 앞을 본 채 뛰어내리고, 수리부엉이는 날개를 편다.
-    const clings=!rolling&&!G.form;G.dropBack=clings;G.dropHang=clings?dropHangFrames(G.dropY):0;}dropQ=false;
+    // 결정 D-400: 매달려 미끄러지는 것은 앞발로 턱을 붙잡는 너구리·다람쥐뿐이다. 산양·고라니는 앞을 본 채 뛰어내리고, 수리부엉이는 날개를 편다.
+    const clings=!rolling&&formClings(G.form);G.dropBack=clings;G.dropHang=clings?dropHangFrames(G.dropY):0;}dropQ=false;
   if(G.dropT>0)G.dropT--;
   G.vy=Math.min(TABLES.TUNING.field_fall_speed,G.vy+TABLES.TUNING.field_gravity);
   if(G.dropHang>0){G.dropHang--;G.vy=Math.min(G.vy,TABLES.TUNING.field_drop_hang_speed);G.vx=0;}
@@ -397,10 +397,8 @@ function drawRaccoon(){
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
   R(G.px-cam-7,fieldGround(),14,1,'rgba(40,24,14,.35)');
   if(rolling){drawRollAt(G.px-cam,G.py,G.form||'',rollAngle);return;}
-  // 결정 D-262: 다람쥐가 줄기를 타는 동안은 몸을 세로로 붙인다(오를 때 머리 위, 내려올 때 머리부터)
-  if(formClimb&&G.form==='squirrel'){drawSquirrelClimbAt(G.px-cam,G.py,Math.floor(G.py/4)%2,isDown()&&!upHeld(),G.face);return;}
   const back=heroBackPose();
-  if(back){drawRaccoonBackAt(G.px-cam,G.py,back.phase);return;}   // 뒷모습은 너구리만 (heroBackPose)
+  if(back){if(G.form)drawFormBackAt(G.px-cam,G.py,back.phase,G.form);else drawRaccoonBackAt(G.px-cam,G.py,back.phase);return;}   // 결정 D-400: 두 발로 걷는 모습만 (heroBackPose)
   const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
   // 결정 D-175: 걷는 동안만 네 박자 걸음(산양). 그린 뒤 되돌려 초상·기어 내려가기 그림에 남지 않게 한다
   formGait=(G.onGround&&Math.abs(G.vx)>0.2&&!phase)?Math.floor(G.anim/TABLES.TUNING.form_gait_frames)%4:-1;
@@ -414,12 +412,13 @@ function drawRaccoon(){
    - ↓+점프로 발판에서 빠질 때(G.dropBack): 땅에 닿을 때까지.
    결정 D-144(결정 D-262로 너구리만): 오르내릴 때 너구리는 지형에 상관없이 늘 등을 보인다. 변신 모습은 아래 D-262를 따른다.
    빼는 것 둘: 점프는 오르기가 아니라 뛰기라 앞모습이다. 휘두르는 그 순간(G.attackT)만 앞모습으로 휘두름이 보이게 한다. */
-/* 결정 D-262 (사용자 피드백 2026-11-02: 네발 짐승 변신은 실제 움직임을 따른다. 산양은 등을 보이며 내려오지 않는다):
-   등을 보이는 것은 두 발로 서는 너구리뿐이다. 다람쥐는 줄기에 세로로 붙고(drawSquirrelClimbAt), 산양·고라니는 앞을 보고 뛰어내리며,
-   수리부엉이는 날개를 펴고 내려앉는다. 땅 밑으로 기어 내려가는 문도 변신이면 머리부터 비탈을 디뎌 내려간다(drawCrawl). */
+/* 결정 D-262 (사용자 피드백 2026-11-02: 네발 짐승 변신은 실제 움직임을 따른다. 산양은 등을 보이며 내려오지 않는다)
+   결정 D-400 (사용자 피드백 2026-11-03): 등을 보이는 것은 두 발로도 다닐 수 있는 동물이다(forms.js formShowsBack).
+   너구리·다람쥐는 타고 오르내리거나 발판 턱을 붙잡고 내려올 때 등을 보인다. 산양·고라니는 앞을 보고 뛰어내리며,
+   수리부엉이는 날개를 펴고 내려앉는다. 땅 밑으로 기어 내려가는 문은 두 발로 걷는 모습이면 등을 보이고, 네발 짐승은 머리부터 비탈을 디딘다(drawCrawl). */
 function heroBackPose(){
-  if(formClimb&&!G.form)return {phase:Math.floor(G.py/4)%2};
-  if(G.dropBack&&!G.form&&!G.onGround&&!(G.attackT>0))return {phase:Math.floor(G.anim/5)%2};
+  if(formClimb&&formShowsBack(G.form))return {phase:Math.floor(G.py/4)%2};
+  if(G.dropBack&&formShowsBack(G.form)&&!G.onGround&&!(G.attackT>0))return {phase:Math.floor(G.anim/5)%2};
   return null;
 }
 function draw(){
@@ -681,8 +680,8 @@ function drawCrawl(m,t){
   const phase=Math.floor(depth*steps)%2;
   if(down&&t<.18)drawPlayerAt(x,y,m.face,Math.floor(t*20)%2,0,heldTool(),0,m.form);   // 다가서는 반 발
   else if(!m.form)drawRaccoonBackAt(x,y,phase);
-  else if(m.form==='squirrel')drawSquirrelClimbAt(x-1,y,phase,down,m.face);   // 결정 D-262: 다람쥐는 뿌리를 머리부터 타고 내려가고, 나올 때는 머리부터 오른다
-  else drawTiltedForm(x,y,(down?.45:-.45)*m.face,(ox,oy)=>{   // 결정 D-262: 산양·고라니·수리부엉이는 앞을 본 채 머리를 숙여(나올 때는 들어) 한 발씩 디딘다
+  else if(formShowsBack(m.form))drawFormBackAt(x,y,phase,m.form);   // 결정 D-400·D-401: 다람쥐·수리부엉이는 너구리처럼 등을 보이며 한 칸씩 디딘다
+  else drawTiltedForm(x,y,(down?.45:-.45)*m.face,(ox,oy)=>{   // 결정 D-262: 산양·고라니는 앞을 본 채 머리를 숙여(나올 때는 들어) 한 발씩 디딘다
     formGait=phase?0:2;formAir=0;
     try{drawPlayerAt(ox,oy,m.face,phase,0,heldTool(),0,m.form);}finally{formGait=-1;}
   });
