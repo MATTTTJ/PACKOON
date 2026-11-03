@@ -214,7 +214,7 @@ function install(){
     if(!G.f.yBearQuiet){talk([['너구리','굴 밖에 작은 곰이 나와 있네. 먼저 말을 걸어 볼까?']]);return;}
     if(!G.f.spring){talk([['너구리','굴 앞에 곰 털이 걸려 있다. 발소리를 줄여야지.']]);return;}
     talk([['아기 곰','물소리 들려? 네 노래보다 빨라.\n같이 들어 볼래?']],()=>Rg.playActivity('bearSpring',()=>{
-      G.f.yBearSpring=true;diary('y_bear_spring','봄에 곰 굴로 돌아왔다. 자장가 대신 물소리를 들으며 곰과 보따리를 두드렸다.');
+      diary('y_bear_spring','봄에 곰 굴로 돌아왔다. 자장가 대신 물소리를 들으며 곰과 보따리를 두드렸다.');
       talk([['아기 곰','이번엔 안 졸려! 엄마도 곧 일어나겠지.']]);
     }));
   }));

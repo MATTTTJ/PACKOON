@@ -11,12 +11,6 @@ const MG=TABLES.MINIGAMES;
 const pick=lines=>lines[Math.floor(Math.random()*lines.length)];
 
 /* ---------- 채택된 인물 사연: 필수 진행과 보상은 아래 선택지 밖에서도 열린다 ---------- */
-function arcScene(key,lines,record,after){
-  talk(lines,()=>{
-    G.f[key]=true;diary(key,record);
-    if(after)after();
-  });
-}
 function arcMenu(name,say,normal,choices){
   talk([[name,say,[{t:'하던 이야기 계속하기',go:normal},...choices,{t:'다음에 이야기하기',go:null}]]]);
 }
@@ -82,7 +76,7 @@ function talkKkuArc(){
       ['꾸벅이','이 얼굴들은… 내가 볼게…'],
       // 결정 D-271: 해 준 일에는 값이 있다. 둥지를 짓고 남은 억새꽃 솜(겨울잠 짐승다운 것)
       ['꾸벅이','둥지 깔고 남은 솜이야…\n보따리에 깔면… 따뜻해…'],
-      receiveItem('eoksae_som',1),
+      gotLine('eoksae_som',1),
       ['꾸벅이','이제 정말… 자도 되겠다… 쿨…']
     ],'그림을 억새로 묶어 꾸벅이 둥지 문턱에 괴었다. 봄에 깨면 제일 먼저 보일 자리다. 꾸벅이가 둥지에 깔고 남은 억새꽃 솜을 주었다.',()=>learn('dolneomeo:kku-drawing'))}]);return;
   }
@@ -151,7 +145,7 @@ function talkDolsoeArc(){
       ['꼬마 두더지','할배 눈 대신 내 손으로 볼게.'],
       // 결정 D-271: 손주 마음을 돌려 준 값. 석수가 곱돌로 깎은 잔
       ['돌쇠 할배','녀석 마음을 돌려놓은 값이다.\n곱돌로 깎은 잔이다. 따뜻한 걸 오래 따뜻하게 둔다.'],
-      receiveItem('gopdol_jan',1),
+      gotLine('gopdol_jan',1),
       ['너구리','(돌가루 묻은 손 두 개가\n나란히 돌탑에 얹혀 있었다.)']
     ],'꼬마 두더지가 눈을 감고 꼭대기의 할머니 돌을 알아맞혔다. 돌쇠 할배가 처음으로 소리 내어 웃었다. 녀석 마음을 돌려놓은 값이라며 곱돌 잔을 주었다.',()=>learn('dolneomeo:mole-reads'))});
   }
@@ -231,7 +225,7 @@ function talkPpuriArc(){
     ['뿔영감','길을 열 때마다\n그 이름부터 본다.'],
     // 결정 D-271: 품을 들였으면 값을 받는다(뿔영감다운 셈). 고개 넘는 짐꾼들이 두고 간 소금
     ['뿔영감','품을 들였으면 값을 받는 법이다.\n지나는 짐꾼들이 두고 간 소금이다.'],
-    receiveItem('salt',2)
+    gotLine('salt',2)
   ],'억새 끝을 묶어 붓을 만들고, 뿔영감이 갠 숯물로 장승 눈을 칠했다. 장승 뒤에는 뿔영감 아버지 때 절벽에서 떨어진 짐꾼의 이름이 새겨져 있다. 품을 들였으면 값을 받는 법이라며 소금을 주었다.',()=>learn('dolneomeo:ppuri-eyes'))});
   else if(F.dolneomeo_arc_ppuri6&&!F.dolneomeo_arc_ppuri7&&F.yakMade)c.push({t:'이제 떠나요',go:()=>arcScene('dolneomeo_arc_ppuri7',[
     ['뿔영감','떠날 채비를 하는군.'],
@@ -427,9 +421,9 @@ function dolsoeGive(){
 
 /* 돌 쌓기·돌 놓기: 할배 손을 따라 돌을 얹는다. 맷돌이 깨어난다. */
 // 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
-function openStack(task=null){
+function openStack(done=null){
   Sound.stone('tap');
-  if(task){task.done();return;}
+  if(typeof done==='function'){done();return;}
   finishStack();
 }
 Rg.stoneTask=openStack;
@@ -665,11 +659,10 @@ const nickname=(id,text,by)=>{
   const last=text.charCodeAt(text.length-1)-0xAC00;
   diary('nickname:'+id,by+'에게 '+text+(last>=0&&last<11172&&last%28?'이라고':'라고')+' 불렸다.');
 };
-function hands(title,verb,steps,done){
-  Rg.stoneTask({title,verb,steps,hint:'금빛 가운데에 맞춰 보자. 빗나가도 함께 받쳐 주니 떨어지지 않아.',done});
-}
+// 결정 D-343: 함께 돌을 받치는 일은 돌 소리 한 번 뒤 바로 끝난다 (D-88 손일 미니게임의 제목·단계 문구 인자는 지웠다)
+function hands(done){Rg.stoneTask(done);}
 function hareHands(){
-  hands('짐꾼과 등짐 고쳐 묶기','함께 받치기',['등짐 밑을 두 손으로 받치자.','숫돌을 등에 붙여 낮추자.','풀리지 않게 끈을 눌러 매자.'],()=>{
+  hands(()=>{
     finish('dol_hare','짐꾼과 등짐을 함께 받쳐 숫돌을 낮추고 끈을 고쳐 맸다. 장승 뒤 길표 이야기를 들었다. 품값으로 억새 한 단을 받았다. 짐 괴던 돌은 고갯길 돌탑에 보태겠다고 했다.','dolneomeo_pack_help')();
     nickname('dol_pack_friend','짐 동무','산토끼 짐꾼');
     // 결정 D-271: 함께 짐을 고쳐 맨 값. 짐꾼이 지고 가던 억새 한 단 (짐도 덜고 값도 치른다)
@@ -677,14 +670,14 @@ function hareHands(){
   });
 }
 function frogHands(){
-  hands('개구리의 마른 잠자리','돌 밀기',['물 흐르는 홈 옆에 작은 돌을 괴자.','따뜻한 돌을 천천히 밀자.','마른 틈까지 돌을 바짝 붙이자.'],()=>{
+  hands(()=>{
     finish('dol_frog','따뜻한 돌을 개구리에게 밀고 물이 흐르는 홈을 피해 잠자리를 받쳤다. 높은 바위 틈의 붉은 발자국을 알려 줬다. 바람에 날려 와 돌 밑에 끼어 있던 겨우살이를 가져가라고 했다.','dolneomeo_frog_warm')();
     // 결정 D-271: 잠자리를 받쳐 준 값. 바위틈에 사는 개구리가 가진 것 — 바람에 날려 와 걸린 겨우살이
     talk([['움츠린 개구리','…돌 밑에 겨우살이 끼어 있지?\n바람에 날려 와 걸린 거야. 가져가.'],receiveItem('gyeousari',1)]);
   });
 }
 function magpieHands(){
-  hands('까치와 바람막이 놓기','돌 받치기',['담 틈에 넓은 돌을 세우자.','바람 오는 쪽을 한 번 더 받치자.','까치 발 놓을 작은 돌을 놓자.'],()=>{
+  hands(()=>{
     finish('dol_magpie','까치 앞에서 바람을 막아 주고, 돌담 틈을 막고 발 놓을 돌을 놓았다. 돌가루 묻은 손을 보고 돌손이라고 불렀다. 가을에 숨겨 둔 잣을 주었다.','dolneomeo_magpie_rest')();
     nickname('dol_stone_hand','돌손','늙은 까치');
     // 결정 D-271: 바람을 막아 준 값. 까치는 먹이를 숨겨 둔다 — 부리가 무뎌 못 깨는 잣
@@ -698,9 +691,6 @@ function magpieHands(){
    결정 D-130: 메밀댁은 들쥐다(단풍골 검댕·무쇠와 오소리·다리 아픔이 겹쳐서). 멍석에 메밀을 널어 밭을 못 뜬다. 3막은 아이 보따리 매듭이 계기이고, 보자기도 같은 매듭으로 묶여 있다.
    보자기의 보답(주인에게 돌려주는 장면)은 엔딩에서 거둔다. 여기서는 받아 드는 데서 멈춘다.
    남생이 할미: 지난가을 아빠가 맨 흙빛 천, 백 년 전 북쪽에서 무언가 지나간 가뭄, "샘부터 찾아라"(강철이 복선, 강철이 달래기 D-11). */
-function arcScene(key,lines,record,after){
-  talk(lines,()=>{G.f[key]=true;diary(key,record);if(after)after();});
-}
 function talkBadgerArc(){
   const F=G.f;
   if(!Rg.arcs()){talk([['메밀댁','메밀 거두는 철이라 손이 모자라구나.\n길 조심해 가거라.']]);return;}
@@ -728,7 +718,7 @@ function talkBadgerArc(){
       // 결정 D-271: 날라 준 품삯. 메밀댁은 늘 넘치게 준다(npcs.csv) — 하나는 그 자리에서, 하나는 싸서
       ['너구리','(아주머니가 메밀전을 두 장 접어 내민다.)'],
       ['메밀댁','품삯이다. 한 장은 식기 전에 먹고,\n한 장은 가다가 먹어라.'],
-      receiveItem('memil_jeon',1),
+      gotLine('memil_jeon',1),
       ['너구리','(메밀전을 먹는 동안, 아주머니 눈이 내 보따리\n매듭과 귀퉁이 꽃수에서 멈췄다.)'],   // 결정 D-135: 꽃수를 2막에서 먼저 보인다
       ['메밀댁','그 매듭, 누가 묶어 줬니?'],
       ['너구리','엄마가요. 엄마가 묶는 대로 배웠어요.'],
@@ -797,7 +787,7 @@ function talkTurtleArc(){
           ['남생이 할미','그 뒤로 해마다 빈다.\n그해 같은 여름이 다시 오지 말라고.'],
           // 결정 D-271: 매 준 값. 백 년 엎드려 산 바위에 난 석이(남생이 할미다운 것)
           ['남생이 할미','매 준 값은 해야지.\n내가 백 년 엎드린 바위에 난 석이다.'],
-          receiveItem('seogi',1)
+          gotLine('seogi',1)
         ],'성황당 남생이 할미의 소원 천을 높은 가지에 매어 주었다. 할미의 소원은 비다. 백 년 전 한 해 비가 안 와 샘이 마르고 등딱지가 갈라졌다고 했다. 가장 높은 가지에는 아빠가 지난가을 맨 흙빛 천이 있었다. 매 준 값이라며 석이버섯을 주었다.')},
         {t:'나중에 매 드릴게요',go:null}]]]);
     return;
@@ -855,13 +845,11 @@ function stoneChoice(kind){
     ['꼬마 두더지','쐐기돌이 남으면 고갯길 돌탑에 괼래.\n할배가 그 탑도 쐐기돌로 선 거랬어.']
   ],()=>{
     G.f.dolneomeo_mole_pebble=kind;
-    Rg.stoneTask({title:'꼬마와 돌집 짓기',verb:'문돌 받치기',hint:'금빛 가운데에 맞춰 놓자. 꼬마가 옆에서 받쳐 주니 굴러가지 않아.',
-      steps:['밑돌 두 개를 나란히 놓자.','납작한 문돌을 세워 보자.','반짝돌은 창가에 괴어 놓자.'],
-      done:()=>{
+    Rg.stoneTask(()=>{
         finish('dol_mole','꼬마와 돌집의 밑돌·문돌·창가 돌을 직접 놓았다. 남은 쐐기돌은 고갯길 돌탑에 괴겠다고 한다. 꼬마가 땅을 파다 찾은 도토리를 주었다.')();
         // 결정 D-271: 돌집을 함께 지은 값. 땅 파는 두더지 아이의 보물 — 다람쥐가 묻고 잊은 도토리
         talk([['꼬마 두더지','다 지었다! 이거 너 줘.\n땅 파다 찾았어. 다람쥐가 묻고 잊었나 봐.'],receiveItem('acorn',2)]);
-      }});
+      });
   });
 }
 /* 결정 D-210: 꼬마 두더지 마당의 납작한 돌과 줄무늬 돌을 한 그림에 나란히 띄운다(작은 창 D-152, 사용자 피드백 49).
