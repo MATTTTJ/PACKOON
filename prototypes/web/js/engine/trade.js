@@ -246,7 +246,7 @@ const Trade=(()=>{
     const npc=quickNpc(),dup=[...$('dlgChoices').children].some(b=>b.textContent==='보따리를 펼친다');
     quick.hidden=!npc||dup;quick.dataset.npc=npc||'';
   }
-  quickBtn.onclick=()=>{const npc=quick.dataset.npc;if(!npc)return;$('dlg').hidden=true;dlgQ=[];dlgEnd=null;open(npc);};
+  quickBtn.onclick=()=>{const npc=quick.dataset.npc;if(!npc)return;dlgDismiss();open(npc);};   // 결정 D-331
   for(const id of ['dlgWho','dlgChoices'])new MutationObserver(renderQuick).observe($(id),{childList:true,characterData:true,subtree:true});
   new MutationObserver(renderQuick).observe($('dlg'),{attributes:true,attributeFilter:['hidden']});
   return {open,close,get state(){return S;}};
