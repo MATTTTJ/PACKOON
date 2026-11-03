@@ -44,6 +44,12 @@ const Rg=defineRegion('yeongsan',{
 /* 사연 설정은 새 게임·저장 복원 때 정한 공통 판정을 따른다. */
 Rg.arcsEnabled=arcsEnabled;
 
+/* 결정 D-429: 호숫가 구역은 이름 잃은 마을이다 (사용자 지시 2026-11-03, design/proposals/name-story.md §6). 호숫가 구역 설계 좌표.
+   장승 둘 사이가 비탈에서 내려오는 어귀, 초가 다섯, 우물, 빨랫줄. 아빠는 호숫가 끝 큰 바위 곁 얼음 가에 앉아 있다. */
+Rg.VILLAGE={jangseung:[125,205],houses:[360,640,790,1410,1760],well:470,line:[1805,1885],loom:700,jige:790,kid:1440,dad:2185};
+/* 강철이가 삼킨 이름이 돌아왔는가. 강철이가 떠나 봄이 오면 이름도 돌아온다 (이름의 규칙 6, D-420) */
+Rg.namesBack=()=>!!(typeof G!=='undefined'&&G&&G.f&&(G.f.nameRestored||G.f.spring));
+
 /* PA-43: 옛 배치와 저장은 classic 쪽에 남긴다. 공급은 기존 마가목 넷에 하나를 더한다. */
 if(!CLASSIC){
   // 결정 D-207: 다래 덩굴 셋과 짚단이 30px 간격으로 붙어 있던 것을 들쭉날쭉 떨어뜨린다(사용자 피드백 58). 셋째 덩굴은 다람쥐 숨긴 몫(640)과 붙지 않게.
@@ -186,6 +192,24 @@ function traceStamp(s){
 }
 function install(){
   const shore=Rg.zones.shore,island=Rg.zones.island;
+  // 결정 D-430: 호숫가 마을의 이름 잃은 이들. 이름을 다 먹혀 버릇만 남았다. 길손이라 지역 NPC 넷에 세지 않는다.
+  // 대사는 자리 표시 한 줄이다(design/proposals/name-story.md §6 표). 장면과 봄 사례는 영산 이야기 갈래가 쓴다.
+  // 이름이 여럿이라 버티는 옹달 할미는 마을 위 옹달샘(눈길)에 그대로 둔다. 기존 길손은 옮기지 않는다.
+  {
+    const V=Rg.VILLAGE,back=Rg.namesBack;
+    const lost=(id,x,winterName,springName,draw,winter,spring)=>({id,x,draw,speakers:[winterName,springName],   // 초상은 겨울·봄 이름 모두로 찾는다
+      get name(){return back()?springName:winterName;},
+      talk:()=>talk(back()?spring:winter)});
+    Rg.expContent.wanderers.shore.push(
+      lost('y_lost_loom',V.loom,'물레 앞 아주머니','순덕 아주머니',(x,y)=>Rg.expArt.drawLostLoom(x,y),
+        [['너구리','(실도 없이 물레만 돈다.)']],[['너구리','(물레에 실이 감긴다.)']]),
+      lost('y_lost_jige',V.jige,'빈 지게 할아버지','갑돌 할아버지',(x,y,f)=>Rg.expArt.drawLostJige(x,y,f),
+        [['빈 지게 할아버지','…어디 가던 길이더라.']],[['너구리','(지게에 장작이 얹혀 있다.)']]),
+      lost('y_lost_kid',V.kid,'문간 아이','봉순이',(x,y,f)=>Rg.expArt.drawLostKid(x,y,f),
+        [['문간 아이','내 이름 알아? …나도 몰라.']],[['봉순이','나 봉순이야! 봉순이!']]));
+    // 아빠는 호숫가 끝 큰 바위 곁에 앉아 호수만 본다 (지난가을부터 같은 돌에 앉아 남은 발자국과 같은 자리)
+    const dad=Rg.npcs.find(n=>n.id==='dad');if(dad)dad.x=V.dad;
+  }
   shore.doors=shore.doors.filter(d=>d.to!=='island');island.doors=island.doors.filter(d=>d.to!=='shore');
   shore.npcs.push(...[1350,1900,2240].map((winterX,j)=>({...fixture('y_ice_station_'+j,'얼음길 막대 '+(j+1),winterX,()=>G.f.spring?prepareBoat(['oar','rope','launch'][j]):survey(j+1)),
     get x(){return G.f.spring?[2180,2210,2240][j]:winterX;},
