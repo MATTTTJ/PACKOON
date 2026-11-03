@@ -253,25 +253,43 @@ function drawFormAt(ox,oy,f,st,form,attackT=0,glide=false){
     M(ox,oy,f,4,-19,1,8,STRAP);drawStrapLeaf(ox,oy,f,4,-16);drawSwipe(ox,oy-12,f,attackT,10);return;
   }
 }
-/* 결정 D-262: 다람쥐는 줄기에 배를 붙이고 몸을 세로로 세워 탄다(옛 D-114 뒷모습 대신). 오를 때는 머리가 위이고 꼬리가 아래로 늘어지며,
-   내려올 때는 실제 다람쥐처럼 뒷발을 돌려 잡고 머리부터 내려온다(그림을 위아래로 뒤집는다. 꼬리는 위로).
-   (tx,footY)는 줄기 가운데와 발 높이(G.py), face가 -1이면 줄기 왼쪽에 붙는다. phase(0·1)마다 앞발·뒷발을 번갈아 뻗는다. */
-function drawSquirrelClimbAt(tx,footY,phase,headDown,face=1){
-  const C='#b5652d',L='#e9cfa4',D='#7a3f1c',T='#d08a4f',TL='#f0b878',O='#2a1a10',K='#2a211b';
-  ctx.save();ctx.translate(Math.round(tx),Math.round(footY));
-  if(face<0)ctx.scale(-1,1);
-  if(headDown){ctx.translate(0,-12);ctx.scale(1,-1);ctx.translate(0,12);}
-  const P=(x,y,w,h,c)=>R(x,y,w,h,c);
-  try{
-    P(2,-26,8,21,O);P(6,-8,5,6,O);P(7,-3,6,6,O);                                  // 몸·꼬리 테두리 (줄기 위에서도 보이게)
-    P(7,-7,3,5,T);P(8,-3,4,4,T);P(7,0,4,2,T);P(6,1,3,2,TL);P(10,-2,1,3,TL);        // 아래로 늘어진 꼬리
-    if(phase){P(1,-8,3,3,D);P(1,-5,2,2,D);}else{P(1,-6,3,3,D);P(1,-3,2,2,D);}       // 뒷발: 줄기를 디딘다
-    P(3,-18,6,12,C);P(3,-17,2,10,L);                                               // 몸통과 배
-    P(7,-16,4,6,BUNDLE);P(8,-15,1,1,'#8a3b2a');P(9,-12,1,1,'#8a3b2a');              // 등 보따리
-    P(6,-17,1,1,STRAP);P(5,-15,1,1,STRAP);P(5,-13,2,1,LEAF);
-    if(phase){P(1,-22,3,2,D);P(1,-16,2,2,D);}else{P(1,-20,3,2,D);P(1,-14,2,2,D);}   // 앞발: 하나는 위로 뻗어 잡는다
-    P(3,-23,6,5,C);P(3,-25,3,2,C);P(3,-26,1,1,K);P(5,-22,1,1,K);P(8,-24,2,2,C);P(8,-23,1,1,T);P(3,-20,2,2,L);   // 머리·주둥이·눈·귀
-  }finally{ctx.restore();}
+/* 결정 D-400 (사용자 피드백 2026-11-03): 오르내릴 때 등을 보이는 것은 두 발로도 다닐 수 있는 동물뿐이다.
+   너구리·다람쥐·수리부엉이는 등을 보이고, 산양·고라니처럼 네 발로만 다니는 짐승은 앞을 본 채 머리를 숙여 디딘다(drawTiltedForm).
+   결정 D-401: 수리부엉이는 땅에서 두 발로 걷는 새라 기어 내려가는 문에서는 등을 보인다. 발판에서 빠질 때는 날개를 펴고 내려앉는다(D-262 그대로).
+   발판 턱을 붙잡고 미끄러지는 것(G.dropBack)은 앞발로 붙잡을 수 있는 너구리·다람쥐만 한다. */
+const FORM_UPRIGHT={'':true,squirrel:true,owl:true};
+const formShowsBack=form=>!!FORM_UPRIGHT[form||''];
+const formClings=form=>!form||form==='squirrel';
+/* 변신 모습의 뒷모습(결정 D-114 그림을 D-400으로 되살림). (ox,oy)는 발 아래 가운데, phase(0·1)마다 팔다리를 번갈아 디딘다. */
+function drawFormBackAt(ox,oy,phase,form){
+  ox=Math.round(ox);oy=Math.round(oy);
+  const up=phase?1:-1;
+  const P=(x,y,w,h,c)=>R(ox+x,oy+y,w,h,c);
+  if(form==='squirrel'){
+    // 결정 D-122: 줄기를 탈 때 뒷모습이 작아 안 보였다. 키우고 어두운 테두리를 두른다.
+    // 결정 D-189: 꼬리가 몸보다 커서 어색했다(사용자 피드백 39). 앞모습(drawFormAt) 몸집에 맞춰 1.2배로 줄이고,
+    //   꼬리는 몸 한쪽 옆으로 붙여 귀 높이까지만 올린다(몸통 폭의 절반쯤, 끝만 살짝 바깥으로 말린다).
+    const C='#b5652d',D='#7a3f1c',T='#d08a4f',TL='#f0b878',O='#2a1a10',k=1.2;
+    const Q=(x,y,w,h,c)=>P(Math.round(x*k),Math.round(y*k),Math.max(1,Math.round(w*k)),Math.max(1,Math.round(h*k)),c);
+    // 결정 D-400: 머리·귀가 몸 테두리에 묻혀 상자처럼 보였다. 몸통·머리·귀를 따로 둘러 실루엣이 다람쥐로 읽히게 한다.
+    Q(-9,-17,4,14,O);Q(-5,-12,10,11,O);Q(-4,-18,8,7,O);Q(-4,-21,3,4,O);Q(1,-21,3,4,O);   // 꼬리·몸·머리·귀 테두리(먼저 깐다)
+    Q(-8,-16,3,12,T);Q(-9,-17,2,2,T);Q(-7,-15,1,9,TL);                                    // 몸 왼쪽에 붙은 꼬리, 끝은 바깥으로
+    Q(-4,up<0?-2:-3,3,up<0?2:1,D);Q(1,up>0?-2:-3,3,up>0?2:1,D);                           // 뒷발: 한쪽은 디디고 한쪽은 올린다
+    Q(-4,-11,8,9,C);Q(-1,-11,2,9,D);                                                      // 몸통과 등줄기
+    Q(-3,-17,6,5,C);Q(-3,-20,1,3,C);Q(2,-20,1,3,C);Q(-3,-21,1,1,D);Q(2,-21,1,1,D);        // 뒤통수·귀·귀 끝 털
+    Q(-3,-11,6,4,BUNDLE);Q(-1,-10,2,1,'#8a3b2a');                                         // 등 보따리
+    Q(up<0?-6:4,-19,2,7,D);Q(up<0?4:-6,-14,2,4,D);                                        // 앞발: 한쪽은 위로 뻗어 잡는다
+    return;
+  }
+  if(form==='owl'){   // 접은 날개와 등 보따리, 두 발로 한 칸씩 디딘다
+    const C='#8a6a45',D='#4a3524',E='#c9a040';
+    P(-5,-21,10,19,C);P(-5,-19,2,15,D);P(3,-19,2,15,D);P(-2,-6,4,4,D);
+    P(-3,-16,6,4,BUNDLE);P(-2,-15,1,1,'#8a3b2a');
+    P(-5,-25,10,5,C);P(-5,-27,2,2,C);P(3,-27,2,2,C);
+    P(-3,up<0?-2:-3,2,2,E);P(1,up>0?-2:-3,2,2,E);
+    return;
+  }
+  drawFormAt(ox,oy,1,phase,form);
 }
 /* 결정 D-262: 비탈을 디뎌 내려가는 네발 모습. 옆모습을 한 번 그려 세로 줄마다 기울기만큼 내려 붙인다(돌리지 않아 점이 흐려지지 않는다).
    slope>0이면 오른쪽이 내려간다. (ox,oy)는 발 아래 가운데. */
@@ -369,27 +387,31 @@ function strangerTalk(npc,opts={}){
   else lines.push([who,'…',menu]);
   talk(lines);
 }
+/* 결정 D-402: 대화에는 물건 목록을 늘어놓지 않는다. 교환은 '보따리를 펼친다'로 교환 창(Trade.openGuest)에서,
+   변신만 하는 일(수리부엉이 외상, 산양 같은 품 맞바꾸기)은 한 줄씩 묻고 고른 뒤에 물건을 고른다. */
 function strangerMenu(npc,e){
   const form=G.form,out=[],limit=TABLES.TUNING.stranger_trade_limit,left=strangerUsed(npc.id)<limit;
   const trades=(Array.isArray(e.trades)?e.trades:[]).filter(t=>validItems(t?.give)&&validItems(t?.get));
   const key=strangerKey(npc.id),debt=(G.f.strangerDebt||{})[key];
-  if(form==='owl'&&debt&&validItems(debt.give))out.push({t:'외상 갚기 · '+itemsText(debt.give),go:()=>repayDebt(npc,key)});
+  if(form==='owl'&&debt&&validItems(debt.give))out.push({t:'외상을 갚는다',go:()=>repayDebt(npc,key)});
   if(left){
-    for(const t of trades){const give=priced(e,t.give);
-      out.push({t:itemsText(give)+' → '+itemsText(t.get),go:()=>strangerTrade(npc,give,t.get)});}
-    if(form==='owl'&&creditOpen()&&!regionDebt().length)
-      for(const t of trades){const give=priced(e,t.give);
-        out.push({t:'외상으로 받기 · '+itemsText(t.get),go:()=>takeCredit(npc,key,give,t.get)});}
+    if(trades.length)out.push({t:'보따리를 펼친다',go:()=>Trade.openGuest(npc,e)});
+    if(form==='owl'&&creditOpen()&&!regionDebt().length&&trades.length)out.push({t:'외상으로 받는다',go:()=>creditMenu(npc,e,key)});
     if(form==='goat'&&swapCandidates(e).length)out.push({t:'같은 품 맞바꾸기',go:()=>swapMenu(npc,e)});
   }else if(trades.length||(form==='goat'&&e.swapPool?.length))out.push({t:'(이번 고을 손님 교환은 다 했다)',go:null});
   return out;
 }
+/* 수리부엉이 외상: 고른 뒤에 받을 물건을 고른다 (산양 맞바꾸기와 같은 모양) */
+function creditMenu(npc,e,key){
+  const who=npc.name||'손님',trades=(Array.isArray(e.trades)?e.trades:[]).filter(t=>validItems(t?.give)&&validItems(t?.get));
+  talk([[who,'…',[...trades.map(t=>({t:itemsText(t.get),go:()=>takeCredit(npc,key,priced(e,t.give),t.get)})),{t:'그만두기',go:null}]]]);
+}
 function strangerTrade(npc,give,get){
-  if(!hasAll(give)){toast('가진 것이 모자라다');return;}
-  if(!strangerKeepsProgress(give))return;
+  if(!hasAll(give)){toast('가진 것이 모자라다');return false;}
+  if(!strangerKeepsProgress(give))return false;
   for(const [id,n] of Object.entries(give))takeItem(id,n);
   for(const [id,n] of Object.entries(get))addItem(id,n);
-  Sound.exchange();strangerCount(npc.id);
+  Sound.exchange();strangerCount(npc.id);return true;
 }
 function takeCredit(npc,key,give,get){
   if(regionDebt().length||!creditOpen())return;
@@ -491,8 +513,8 @@ function drawFormDemo(id,t){
     R(42,4,30,4,'#7f9a4a');R(38,7,8,3,'#6a8a3e');R(66,6,10,3,'#6a8a3e');
     const c=t%3.4,top=34;
     if(c<.7)drawFormAt(Math.round(24+c*38),DG,1,walkSt,'squirrel');
-    else if(c<2.6)drawSquirrelClimbAt(56,Math.round(DG-(DG-top)*(c-.7)/1.9),Math.floor(t*7)%2,false);   // 결정 D-262
-    else drawSquirrelClimbAt(56,top,0,false);
+    else if(c<2.6)drawFormBackAt(56,Math.round(DG-(DG-top)*(c-.7)/1.9),Math.floor(t*7)%2,'squirrel');   // 결정 D-400
+    else drawFormBackAt(56,top,0,'squirrel');
     return;
   }
   if(id==='goat'){   // 디딜 데를 보고 바위턱으로 훌쩍
