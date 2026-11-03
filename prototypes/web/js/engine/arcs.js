@@ -20,6 +20,7 @@ function arcScene(flag,lines,record,after){
   if(!arcsEnabled()||G.f[flag])return false;
   if(lines.some(L=>L&&L[2]))console.error('arcScene '+flag+': 장면 줄에 선택지가 있으면 장면이 끝나지 않는다 (D-350)');
   const g=G,region=G.region;
+  dlgScene=flag;   // 결정 D-440: 장면이 도는 동안 교환 단추·물건 건네기를 닫는다 (대화가 닫히면 dlgDismiss 가 푼다)
   talk(lines,()=>{
     if(G!==g)return;
     g.f[flag]=true;diary(flag,record);giveLines(lines);

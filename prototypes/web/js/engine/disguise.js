@@ -153,4 +153,4 @@ function disguiseTalk(p,next){
 }
 /* 결정 D-197: 지금 대화 상대와 보따리를 펴거나 물건을 건넬 수 없는 때 (사용자 피드백 57).
    변신한 채로는 상대가 아이를 모른다(손님 교환은 손님 대화의 선택지로만). 지역은 REG.tradeClosed(id) 로 더 막는다(꾸벅이가 조는 동안). */
-const tradeClosedNow=id=>!!(G?.form||(id&&typeof REG?.tradeClosed==='function'&&REG.tradeClosed(id)));
+const tradeClosedNow=id=>!!(G?.form||(dlgScene&&open('dlg'))||(id&&typeof REG?.tradeClosed==='function'&&REG.tradeClosed(id)));   // 결정 D-440: 사연 장면 도중도 닫는다

@@ -1,13 +1,13 @@
 'use strict';
 /* 대화: talk([[말하는이, 대사, 선택지?], ...], 끝나면). 선택지는 [{t:글, go:고르면 할 일}] */
-let dlgQ=[],dlgEnd=null,dlgMusic=null,dlgPlan=null,dlgNextScene=null,dlgLonging=false,dlgGone={at:-1e9,music:null,longing:false};
+let dlgScene=null,dlgQ=[],dlgEnd=null,dlgMusic=null,dlgPlan=null,dlgNextScene=null,dlgLonging=false,dlgGone={at:-1e9,music:null,longing:false};
 /* 결정 D-233: 콜백·setTimeout으로 잠깐 닫혔다 다시 열리는 이어진 대화를 한 대화로 본다.
    닫힌 뒤 music_dialog_hold_ms 안에 다시 열리면 앞 대화의 곡·그리움을 잇고, 음악(game.js)도 그동안 덕킹과 곡을 그대로 둔다.
    예전엔 그 틈마다 BGM이 커졌다 작아지고, 아빠 곡이 지역 곡으로 갔다 돌아왔다. */
 const dlgHeld=()=>performance.now()-dlgGone.at<TABLES.TUNING.music_dialog_hold_ms;
 function dlgClosed(){dlgGone={at:performance.now(),music:dlgMusic,longing:dlgLonging};dlgMusic=null;dlgLonging=false;}
 /* 결정 D-331: 대화창 닫기는 여기 하나로. 창·장면 그림·남은 줄·음악 기록을 함께 정리한다 (교환 단추·되감기도 이걸 쓴다) */
-function dlgDismiss(){$('dlg').hidden=true;dlgPic(null);dlgQ=[];dlgEnd=null;dlgClosed();dlgPlan=null;}
+function dlgDismiss(){$('dlg').hidden=true;dlgPic(null);dlgQ=[];dlgEnd=null;dlgClosed();dlgPlan=null;dlgScene=null;}
 // 세 번째 인자는 지역의 전용 이야기 장면용이다. 기존 호출·선택지·종료 순서는 유지한다.
 /* 결정 D-72: 장면별 곡(design/data/scene_music.csv). options.scene 또는 바로 앞의 sceneNext(id)로 장면을 고르면
    표의 곡을 시작줄부터 깐다. 장면이 없으면 예전 자동 규칙(아빠가 나오면 아빠 곡, 날쌘과 여러 줄이면 날쌘 곡)이다. */
