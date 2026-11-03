@@ -65,7 +65,7 @@ function baseState(){return{
   forms:[],form:'',   // 잎사귀 변신: 열린 변신 id 와 지금 모습 (''=너구리, forms.js)
   floorItems:{},floorPickups:{},regionStates:{},visitedZones:{},   // 지역별 필드와 실제로 밟은 구역
   awake:Object.keys(HEIR).filter(k=>HEIR[k].awakeAtStart),   // 깨어난 가보
-  clues:[],diary:[],learned:['got:dad_tag'],nicknames:[],ledger:{},rel:{},f:{faints:0,arcs:arcsEnabled(null)},   // learned: 수첩·아이의 기록에서 공유하는 발견 키
+  clues:[],diary:[],learned:['got:dad_tag','got:yosul_bottari'],nicknames:[],ledger:{},rel:{},f:{faints:0,arcs:arcsEnabled(null)},   // learned: 수첩·아이의 기록에서 공유하는 발견 키
 };}
 /* 보따리·호감·진행 표시는 하나로 이어지고 필드만 지역별로 보관한다.
    새 지역의 시작 물건과 기본 진행값은 첫 입장에만 적용한다. */
@@ -369,7 +369,7 @@ function noteRestore(){
 /* 결정 D-421·D-422: 이름 이야기로 바뀐 아빠 단서 글. 장면과 옛 저장 고치기(save.js)가 같은 글을 쓴다.
    지역 장면을 고쳐 쓰는 갈래는 이 표를 고치고 clue(id,NAME_CLUES[id].who,NAME_CLUES[id].text)로 적는다 */
 const NAME_CLUES={
-  n1:{who:'날쌘',text:'날쌘은 아빠의 짐표를 보더니 "네 아빠 짐표잖아" 하며 받지 않았다. 떠돌이 보부상들도 아빠를 안다.'},
+  n1:{who:'날쌘',text:'날쌘은 아빠 짐표의 뒷면 낙관만 보고 알아봤다. 아빠를 봤느냐고 묻자 말을 돌렸다. 떠돌이 보부상들도 아빠를 안다.'},
   s1:{who:'돌쇠 할배',text:'돌쇠 할배가 아빠의 소원 돌을 손끝으로 읽어 주었다. "아내 병 낫기를." 새긴 사람 이름은 없었다.'},
   k1:{who:'꾸벅이',text:'꾸벅이의 잠꼬대: 보부상 아저씨가 할배네서 겨울 날 것처럼 굴더니, 늙은 까치가 무언가 물어 온 밤에 떠났다.'},
   j3:{who:'아빠의 메모',text:'아빠가 숙소에 맡긴 짐 속 메모: "값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산. 호수에 이무기가 앉았다 한다. 이름 불러도 돌아보지 말 것."'},

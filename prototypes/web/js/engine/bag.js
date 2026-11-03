@@ -129,6 +129,9 @@ function renderBag(pop){
     b.onclick=()=>switchTool(t);tabs.appendChild(b);});
   wrap.appendChild(tabs);
   const Hr=HEIR[pouch.tool],awake=isAwake(pouch.tool);
+  // 결정 D-425: 가공대를 처음 볼 때 한 번, 보따리에서 절구가 툭 나온다. 안내는 "떠올려 보자" 한 줄 (요술보따리, name-story.md §5)
+  const pull=pouch.tool==='jeolgu'&&!G.f.jeolguPulled&&!G.f.crafted_jeolgu;
+  if(pull){G.f.jeolguPulled=true;if(!pouchMsg)pouchMsg='절구를 떠올려 보자.';}
   const card=el('div','heir'+(awake?'':' sleep'));
   const art=el('div','art');art.appendChild(icon(pouch.tool));card.appendChild(art);
   const tx=el('div','txt');tx.appendChild(el('span','state',awake?'깨어난 가보':'잠든 가보'));
@@ -144,7 +147,7 @@ function renderBag(pop){
     else{s.textContent='빈칸';s.disabled=true;}
     ins.appendChild(s);}
   bench.appendChild(ins);bench.appendChild(el('span','arrow','→'));
-  const pb=el('div','pouch'+(pouch.items.length?' has':''));pb.style.setProperty('--glow',Hr.glow);
+  const pb=el('div','pouch'+(pouch.items.length?' has':'')+(pull?' pull':''));pb.style.setProperty('--glow',Hr.glow);
   pb.appendChild(el('div','glow'));const relic=icon(pouch.tool);relic.className='relic';pb.appendChild(relic);pb.setAttribute('aria-label',Hr.title);
   [[-34,-30],[30,-34],[-40,4],[40,0],[-18,-46],[16,-48]].forEach(([dx,dy])=>{const k=el('span','spk');k.style.setProperty('--dx',dx+'px');k.style.setProperty('--dy',dy+'px');pb.appendChild(k);});
   bench.appendChild(pb);bench.appendChild(el('span','arrow','→'));

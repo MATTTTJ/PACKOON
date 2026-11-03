@@ -222,6 +222,9 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .pouch.brew .relic{animation:wob .7s steps(8)}
 .pouch.brew .spk{animation:burst .75s ease-out .15s}
 .pouch.fizzle .relic{animation:shake .35s steps(4)}
+/* 결정 D-425: 처음 가공대를 볼 때 보따리에서 절구가 툭 나온다 */
+.pouch.pull .relic{animation:relicPull .7s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes relicPull{0%{transform:translateY(26px) scale(.15);opacity:0}55%{transform:translateY(-8px) scale(1.12);opacity:1}100%{transform:none;opacity:1}}
 .inslot.sucked canvas{animation:suck .45s forwards}
 .inslot.pop canvas,.outslot.got canvas{animation:pop .35s}
 @keyframes glowPulse{0%,100%{opacity:.22;transform:scale(.92)}50%{opacity:.6;transform:scale(1.06)}}

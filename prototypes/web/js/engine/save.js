@@ -86,6 +86,7 @@ function repairSavedState(source,repairRegions=true){
    - 강철이를 이미 물리친(봄이 온) 저장은 이름을 되찾은 것으로 친다 */
 function migrateNameStory(g){
   g.awake=g.awake.filter(id=>Object.hasOwn(HEIR,id));
+  if(!g.learned.includes('got:yosul_bottari'))g.learned.push('got:yosul_bottari');   // 결정 D-425: 요술보따리는 보따리 그 자체라 수첩 쪽만 연다
   if(!g.learned.includes('got:dad_tag')){if(!g.inv.dad_tag)g.inv.dad_tag=1;g.learned.push('got:dad_tag');}   // 받은 표시는 got:dad_tag (새 게임은 처음부터 있다)
   for(const c of g.clues){const v=NAME_CLUES[c.id];if(v){c.who=v.who;c.text=v.text;}}
   for(const n of g.nicknames)if(typeof n.lost!=='boolean')n.lost=false;
