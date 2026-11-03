@@ -90,17 +90,8 @@ for(const r of heirlooms){
   const s=(r['가공법']||'').trim();if(!s)continue;RECIPES[r.id]=[];
   const hidden=(r['숨은가공품']||'').split('·').map(x=>x.trim()).filter(Boolean);
   const optional=(r['선택가공품']||'').split('·').map(x=>x.trim()).filter(Boolean);
-  const profile={habit:r['손버릇기록'],habitKey:r['손버릇키'],fail:r['틀린조합반응']};
+  const profile={habit:r['손버릇기록'],habitKey:r['손버릇키'],fail:r['틀린조합반응']};   // 결정 D-344: 손맛 수치 칸은 읽는 코드가 없어 지웠다
   if(!profile.habit||profile.habitKey!=='habit:'+r.id||!profile.fail)fail('heirlooms.csv '+r.id+': 손버릇 기록·키·틀린 조합 반응을 확인한다');
-  for(const [key,col]of Object.entries({steps:'손맛횟수',intervalMs:'손맛간격ms',windowMs:'손맛여유ms',restMs:'손맛쉼ms',steamMs:'손맛김ms',dragPx:'손맛끌기px',turnDegrees:'손맛회전도'})){
-    if(!/^\d+$/.test(r[col])||!Number.isSafeInteger(+r[col]))fail('heirlooms.csv '+r.id+': '+col+'은 0 이상의 정수여야 한다');
-    profile[key]=+r[col];
-  }
-  if(profile.steps<1||profile.steps>8)fail('heirlooms.csv '+r.id+': 손맛횟수는 1~8이어야 한다');
-  if(r.id==='jeolgu'&&(!(profile.intervalMs>0)||profile.windowMs>profile.intervalMs||profile.restMs<profile.intervalMs))fail('heirlooms.csv jeolgu: 박자 간격·여유·쉼을 확인한다');
-  if(r.id==='siru'&&profile.steamMs<=profile.windowMs)fail('heirlooms.csv siru: 김이 오르는 시각은 판정 여유보다 커야 한다');
-  if(r.id==='yakyeon'&&profile.dragPx<=0)fail('heirlooms.csv yakyeon: 손맛끌기px는 0보다 커야 한다');
-  if(r.id==='maetdol'&&(profile.turnDegrees<=0||profile.turnDegrees>180))fail('heirlooms.csv maetdol: 손맛회전도는 1~180도여야 한다');
   CRAFT[r.id]=profile;
   const outputs=new Set(),combinations=new Set();
   for(const rec of s.split('·')){

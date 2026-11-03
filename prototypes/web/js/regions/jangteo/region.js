@@ -28,7 +28,7 @@ const Rg=defineRegion('jangteo',{
     f:{night:false,bueongMet:false,bueongNight:false,bueongDone:false,guard:false,
       morakMet:false,morakPowder:false,steamDone:false,morakTaught:false,
       yeotMet:false,yeotDone:false,yeotHigh:false,nalJTalk:false,nalJDone:false,nalJBluff:false,
-      dokCalm:false,hongsiMade:false},
+      hongsiMade:false},
     rel:{morak:{t:'호감',v:0},yeotbang:{t:'흥',v:0},bueong:{t:'의리',v:0},nal:{t:'경멸',v:0}},
   }),
   weather:()=>Vfx.setWeather(G.f.night?'market-night':'market-day'),
@@ -240,7 +240,7 @@ function oldMagpie(){
         ['늙은 까치',G.awake.includes('siru')?'네 보따리에서도 김 냄새가 나는구나.\n이제 너도 누굴 먹일 줄 아는구나.':'숙소 마루 끝에서 한번 바라보렴.\n고드름 너머 지붕이 낮은 산처럼 이어진단다.'],
         ['늙은 까치','밤이면 골목 등걸이 반은 비어 있단다. 길손들이 숙소를 못 찾지.\n…이 늙은 날개로는 이제 등을 못 달겠고.'],
         ['너구리','그럼 밤에 제가 달아 드릴게요.']
-      ],()=>{G.f.jxMagpieRest=true;record('magpie','숙소 처마에서 까치와 지붕 위 김을 봤다. 밤에는 등불 꾸러미를 함께 풀기로 했다.');finishWanderer('j_magpie');startVista(Rg.zones.inn.vistas[0]);})},
+      ],()=>{record('magpie','숙소 처마에서 까치와 지붕 위 김을 봤다. 밤에는 등불 꾸러미를 함께 풀기로 했다.');finishWanderer('j_magpie');startVista(Rg.zones.inn.vistas[0]);})},
       {t:'길을 조금 더 둘러볼게요',go:null}
     ]]
   ]);
