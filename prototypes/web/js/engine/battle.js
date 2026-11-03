@@ -288,7 +288,7 @@ function bStrike(){
   if(B.noTool){B.msg='연장이 없다! 피하기만 하자.';B.cool=20;return;}
   B.cool=battleHandProfile().cooldown;B.swing=12;
   const aim=bAim(),hits0=B.parts.map(p=>p.hp);
-  if(B.E.strike&&B.E.strike()){strikeFeedback(aim,hits0);return;}
+  if(B.E.strike&&B.E.strike()){strikeFeedback(aim,hits0,true);return;}
   const m=B.mark;
   if(m&&Math.hypot(m.x-aim.x,m.y-aim.y)<battleHandProfile().radius){
     const p=m.part;
@@ -302,21 +302,24 @@ function bStrike(){
 /* 결정 D-244: 타격감과 '어디를 쳤는지'. 친 뒤 부위 내구도가 줄었으면(상대가 치기를 직접 처리한 경우 포함)
    잠깐 멈춤(battle_hitstop), 친 자리의 먹 튐·금 간 자국·빛살, 부위 이름과 깎인 칸 글, 화면 흔들림, 부위 줄 번쩍임.
    잘 먹는 도구면 금빛이 더 크고, 안 먹는 도구면 잿빛으로 작다. 헛치면 도구 끝 자리에 흙먼지만 인다. */
-function strikeFeedback(aim,hits0){
+/* 결정 D-330: own 이면 보스가 strike() 안에서 제 타격 그림(골렘 golemImpact)을 이미 냈다. 빛 고리·흔들림·금·파편은 건너뛰고 멈칫과 숫자만 낸다 */
+function strikeFeedback(aim,hits0,own){
   if(!B)return;
   const t=TABLES.TUNING;let hit=null,loss=0;
   B.parts.forEach((p,i)=>{const d=hits0[i]-p.hp;if(d>loss){loss=d;hit=p;}});
+  if(!hit&&own)return;
   if(!hit){B.impact={x:aim.x,y:aim.y,t:14,max:14,miss:true};
     for(let i=0;i<5;i++){const a=-Math.PI*(0.15+Math.random()*0.7),s=0.8+Math.random()*1.6;B.fx.push({x:aim.x,y:aim.y+2,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:1.6+Math.random()*2,t:18,col:'#8a7d6e'});}
     return;}
   const good=toolFit(hit)==='good',bad=toolFit(hit)==='bad',seed=Math.random()*6;
   hit.shake=good?22:16;hit.hitAt=B.time;hit.hitGood=good;
   B.hitStop=good?t.battle_hitstop+2:bad?Math.max(1,t.battle_hitstop-2):t.battle_hitstop;
+  const n=Math.round(loss*10)/10;
+  B.pops.push({x:aim.x,y:aim.y-26,t:46,text:hit.name+' −'+n,good,bad});if(B.pops.length>3)B.pops.shift();
+  if(own){renderBHud();return;}
   if(!Vfx.reducedMotion)B.quakeT=good?10:bad?4:7;
   B.impact={x:aim.x,y:aim.y,t:22,max:22,good,bad,seed};
   B.cracks.push({x:aim.x,y:aim.y,t:70,seed,n:good?5:bad?2:4});if(B.cracks.length>4)B.cracks.shift();
-  const n=Math.round(loss*10)/10;
-  B.pops.push({x:aim.x,y:aim.y-26,t:46,text:hit.name+' −'+n,good,bad});if(B.pops.length>3)B.pops.shift();
   for(let i=0;i<(good?14:8);i++){const a=Math.random()*Math.PI*2,s=1.4+Math.random()*(good?3.4:2.2);B.fx.push({x:aim.x,y:aim.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:1.5+Math.random()*3.2,t:24,col:good?'#c98a12':bad?'#8a7d6e':INK});}
   renderBHud();
 }
