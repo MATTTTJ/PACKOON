@@ -98,7 +98,7 @@ Rg.strangerCreditAtNight=true;
 
 /* 결정 D-82: 솔숲의 작은 소나무를 흔들어 솔방울을 떨군다 (채집 고리 D-41) */
 defineGather({
-  solbang:{title:'소나무 흔들기',rare:'jat',verb:'소나무 흔들기',hits:TABLES.MINIGAMES.gather_solbang_hits,spot:[0,-30],box:[-11,-44,11,0],hint:'작은 소나무 줄기를 친다. 커지는 원이 큰 기준원에 꼭 맞을 때 휘두르면 딱! 솔방울이 하나 더 떨어진다.'},
+  solbang:{title:'소나무 흔들기',rare:'jat',verb:'소나무 흔들기',hits:TABLES.MINIGAMES.gather_solbang_hits,spot:[0,-30],box:[-11,-44,11,0],hint:'작은 소나무 줄기를 친다. 도는 표식이 금빛 칸에서 멈추게 휘두르면 솔방울이 하나 더 떨어진다.'},
 });
 })();
 

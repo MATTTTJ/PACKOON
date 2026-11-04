@@ -548,7 +548,7 @@ function golemOpenMark(p){
 }
 function strikeGolem(){
   const m=B.mark;if(!m||!m.golem)return false;
-  const aim=bAim();if(Math.hypot(m.x-aim.x,m.y-aim.y)>=battleHandProfile().radius)return false;   // 결정 D-240: 판정은 도구 날 자리
+  const aim=bAim();if(!bAimOn(m,aim))return false;   // 결정 D-240·D-501: 판정은 도구 날 범위와 칠 자리가 겹치는지
   const p=m.part;B.mark=null;B.golemHit=true;
   if(p.id==='leg'&&B.restSole)B.restSole.crack=true;
   if(p.core&&coreHidden()){stoneRoll('head',HIT_TEXT.head,m.x,m.y);B.msg+=' 눈 껍데기가 두꺼워 몸은 버틴다.';renderBHud();return true;}
