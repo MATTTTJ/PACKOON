@@ -206,7 +206,7 @@ async function runMap({browser:b,outDir}){
     records.push({stage:'old-saves',old});
     await ready(b);await b.eval("G=newGame('dolneomeo');delete G.f.mapUnlocked;resetScreens()");await b.click('#btnStart');
     const fallback=await b.eval("({unlocked:!!G.f.mapUnlocked,toast:$('toast').textContent,done:!!G.f.wanderersDone?.['galchamgol:old_magpie']})");
-    check(fallback.unlocked&&!fallback.done&&fallback.toast==='돌담 위에 까치 떼가 앉아 있다. 지도(M)를 펴면 가 본 곳으로 데려다줄 것 같다','map-fallback','늙은 까치를 만나지 않고 돌너머로 들어간 시작에서 지정 지도 안내가 나오지 않았다.',fallback);
+    check(fallback.unlocked&&!fallback.done&&fallback.toast==='돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도(M)를 펴면 가 본 곳으로 데려다줄 것 같다','map-fallback','늙은 까치를 만나지 않고 돌너머로 들어간 시작에서 지정 지도 안내가 나오지 않았다.',fallback);
     records.push({stage:'dolneomeo-fallback',...fallback});
     await ready(b,true);await b.key('m');
     check(await b.eval("$('map').hidden&&!$('btnMap').getClientRects().length"),'map-classic','classic에서 지도 또는 지도 HUD 버튼이 열렸다.');

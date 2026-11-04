@@ -226,7 +226,7 @@ function startGame(){
   REG.onStart();
   if(!CLASSIC&&G.region==='dolneomeo'&&!G.f.mapUnlocked){
     G.f.mapUnlocked=true;
-    toast('돌담 위에 까치 떼가 앉아 있다. 지도(M)를 펴면 가 본 곳으로 데려다줄 것 같다');
+    toast('돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도(M)를 펴면 가 본 곳으로 데려다줄 것 같다');
   }
   lastGoal='';refreshHud();
 }

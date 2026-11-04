@@ -60,7 +60,7 @@ function mapSeenText(seen){
 // 결정 D-18: M 지도와 까치 떼 이동 (design/data/decisions.csv)
 function openMap(){
   if(CLASSIC)return false;
-  if(mapTravel||mapBlocked()){mapNotice('지금은 까치 떼를 부를 수 없다');return false;}
+  if(mapTravel||mapBlocked()){mapNotice('지금은 까치를 부를 수 없다');return false;}
   if(!G.f.mapUnlocked){mapNotice('아직 길을 함께 다닐 동무가 없다');return false;}
   if(G.ended&&!REG.next&&!G.f.newName){mapNotice('새 이름부터 정하자');$('newName')?.focus();return false;}
   if(!G.started)return false;
@@ -251,32 +251,38 @@ function drawMapTravel(){
   const floor=t<.26?m.from.y:fieldGround(),y=floor+(110-floor)*smooth;
   drawMagpieCarrier(x,y,t);
 }
+/* 결정 D-504: 보자기는 튼튼한 까치 둘이 양쪽에서 맞잡아 나른다 (사용자 피드백 2026-11-04: 늙은 까치 곁에 나오는 두 마리와 맞게,
+   적당히 근육질의 두툼한 까치 둘만). 보자기 두 귀를 묶은 매듭을 굵은 발로 움켜쥐고, 가슴이 두툼하다. 둘은 서로 마주 본다. */
 function drawMagpieCarrier(x,y,t){
-  // 네 귀마다 한 마리의 부리가 직접 천 끝에 닿는다. 나머지 두 마리는 앞장선다.
-  const fold='#ae6757',edge='#713e36',ink='#292d31',white='#f5eedc';
+  const fold='#ae6757',edge='#713e36',ink='#292d31',white='#f5eedc',sheen='#4f6a7a',beak='#3a3530',leg='#2a2420';
   ctx.save();ctx.translate(Math.round(x),Math.round(y));
+  const approach=t<.1?(1-t/.1)*68:t>.94?(t-.94)/.06*68:0,holding=approach===0;
+  // 보자기: 아래가 불룩하고 양쪽 귀를 위로 묶었다. 까치가 쥐고 있을 때만 귀가 위로 당겨진다
   R(-28,-8,56,11,fold);R(-22,3,44,5,fold);R(-17,8,34,3,edge);
-  const corners=[[-31,-23],[-18,-36],[19,-35],[32,-23]];
-  for(const [cx,cy] of corners){
-    const bx=cx<0?-24:24,by=cy<-30?-7:-2;
-    for(let i=0;i<=15;i++){const q=i/15;R(cx+(bx-cx)*q,cy+(by-cy)*q,2,2,fold);}
-    R(cx-1,cy,3,2,edge);
-  }
+  const knots=[[-23,-25],[23,-25]];
+  knots.forEach(([kx,ky],n)=>{const bx=n?24:-24,by=-7,ty=holding?ky:-12;
+    for(let k=0;k<=12;k++){const q=k/12;R(bx+(kx-bx)*q-1,by+(ty-by)*q,3,2,fold);}
+    R(kx-2,ty-1,5,3,edge);});
   // 보따리에 앉은 아이. 머리는 기존 한국 보부상 모자의 평평한 챙을 따른다.
   R(-6,-15,13,12,'#8c8070');R(-4,-12,8,8,'#d9c7a5');R(-10,-3,8,4,ink);R(3,-3,8,4,ink);
   R(-8,-28,17,13,'#8c8070');R(-8,-23,17,4,ink);R(-5,-22,2,1,white);R(4,-22,2,1,white);
   R(-6,-18,13,3,white);R(-10,-30,22,3,'#c39b55');R(-5,-37,12,7,'#dcbb7a');R(-5,-32,12,2,'#6e4f22');
-  const bird=(bx,by,face,i,holding)=>{
-    const flap=Math.sin(t*62+i*1.8),wing=flap>0?-10:4;
-    R(bx-6,by-5,13,7,ink);R(bx-4,by-2,8,4,white);R(bx+face*6-2,by-7,5,5,ink);
-    R(bx+face*8,by-6,1,1,white);R(bx+face*9,by-3,4,2,'#63533d');
-    R(bx-face*13,by+1,10,2,ink);R(bx-face*16,by+3,9,2,ink);
-    R(bx-3,by+wing,5,Math.abs(wing)+2,ink);R(bx-8,by+wing,6,3,ink);R(bx-7,by+wing+3,4,2,'#5e727a');
-    if(holding)R(bx+face*11,by-1,2,2,fold);
+  // 까치 한 마리 (face 1이면 오른쪽을 본다). 발은 (bx+1~6, by+8) 에서 매듭을 쥔다
+  const bird=(bx,by,face,i)=>{
+    const q=(dx,dy,w,h,c)=>R(face>0?bx+dx:bx-dx-w+1,by+dy,w,h,c);
+    const up=Math.sin(t*62+i*1.8)>0;
+    q(-26,-5,12,3,ink);q(-30,-3,9,2,ink);q(-24,-6,8,1,sheen);                    // 긴 꽁지
+    if(!up){q(-11,-3,15,8,ink);q(-14,4,9,3,ink);q(-13,6,5,2,white);q(-9,-2,10,2,sheen);}   // 내린 날개
+    q(-13,-11,23,12,ink);q(5,-10,7,10,ink);                                      // 두툼한 몸과 불룩한 가슴
+    q(-11,-10,9,3,white);                                                        // 어깨의 흰 깃
+    q(-4,-4,14,6,white);q(6,-7,4,5,white);q(5,-4,1,3,'#d6d0c2');q(8,-3,1,2,'#d6d0c2');   // 흰 배와 가슴 근육 결
+    q(7,-14,7,6,ink);q(9,-19,10,9,ink);q(15,-16,1,1,white);                      // 굵은 목과 머리, 눈
+    q(19,-15,5,2,beak);q(19,-14,4,1,leg);                                        // 부리
+    if(up){q(-11,-23,15,12,ink);q(-14,-27,9,5,ink);q(-14,-26,5,2,white);q(-9,-20,11,2,sheen);}   // 든 날개
+    q(0,1,3,7,leg);q(5,1,3,7,leg);q(-1,7,10,2,leg);                              // 굵은 다리와 움켜쥔 발
   };
-  const approach=t<.1?(1-t/.1)*68:t>.94?(t-.94)/.06*68:0;
-  corners.forEach(([cx,cy],i)=>{const face=cx<0?1:-1;bird(cx-face*12,cy+2-approach,face,i,approach===0);});
-  bird(-69,-48,1,4,false);bird(72,-58,1,5,false);ctx.restore();
+  bird(-30,-34-approach,1,0);bird(30,-34-approach,-1,1);
+  ctx.restore();
 }
 $('mapClose').onclick=()=>closeMap();
 $('mapTravel').onclick=()=>{if(mapSelection)startMapTravel(mapSelection.region,mapSelection.zone);};
@@ -295,7 +301,7 @@ addEventListener('keydown',e=>{
     e.preventDefault();e.stopImmediatePropagation();all[next]?.focus();return;
   }
   e.preventDefault();e.stopImmediatePropagation();if(e.repeat)return;
-  if(open('map'))mapKey(k);else if(k==='m')mapNotice('지금은 까치 떼를 부를 수 없다');
+  if(open('map'))mapKey(k);else if(k==='m')mapNotice('지금은 까치를 부를 수 없다');
 },true);
 const pauseMapFlight=paused=>{if(mapTravel){mapTravel.paused=paused;mapTravel.last=performance.now();}};
 addEventListener('blur',()=>pauseMapFlight(true));addEventListener('focus',()=>pauseMapFlight(document.hidden));
