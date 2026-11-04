@@ -561,14 +561,37 @@ function endDrag(e){if(e&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null
 bcv.addEventListener('lostpointercapture',endDrag);
 
 /* ---------- 전투 화면 그리기 ---------- */
-/* 도구 그림. 자루 끝(0,0)에서 위로 len, 날의 가운데가 (0,-len) 이다 */
+/* 도구 그림. 자루 끝(0,0)에서 위로 len, 날의 가운데가 (0,-len) 이다.
+   결정 D-455: 도구마다 생김새가 한눈에 보이게 다시 그린다 (사용자 피드백 2026-11-04: 무기 그림이 너무 구리다).
+   - 낫: 나뭇결 있는 자루 끝에 쇠고리를 끼우고, 휘어 내려간 쇠 날을 단다. 등은 검게 두껍고 안쪽 날은 하얗게 벼려졌다.
+   - 곡괭이: 자루 끝 쇠 머리가 활처럼 휜다. 한쪽은 뾰족한 촉, 다른 쪽은 넓적한 괭이날. 위쪽 면이 밝다. */
 function drawTool(c,kind,len=25){
   const h=-len;
-  c.lineCap='round';
-  c.strokeStyle='#5a3e26';c.lineWidth=3.2;c.beginPath();c.moveTo(0,0);c.lineTo(0,h+1);c.stroke();
-  c.fillStyle=INK;
-  if(kind==='sickle'){c.strokeStyle=INK;c.lineWidth=3.6;c.beginPath();c.arc(6,h+1,7,Math.PI,Math.PI*1.95);c.stroke();c.lineWidth=1.2;c.strokeStyle='#efe3c8';c.beginPath();c.arc(6,h+1,5.5,Math.PI*1.1,Math.PI*1.6);c.stroke();}
-  else{c.beginPath();c.moveTo(-11,h+3);c.quadraticCurveTo(0,h-4,11,h+3);c.lineTo(11,h+0.5);c.quadraticCurveTo(0,h-7,-11,h+0.5);c.closePath();c.fill();}
+  c.save();c.lineCap='round';c.lineJoin='round';
+  // 자루: 밝은 나무에 결, 먹 테두리
+  c.fillStyle='#9a6a3a';c.strokeStyle=INK;c.lineWidth=1;
+  c.beginPath();c.moveTo(-1.9,4);c.lineTo(-1.6,h+3);c.lineTo(1.6,h+3);c.lineTo(1.9,4);c.closePath();c.fill();c.stroke();
+  c.strokeStyle='#6e4520';c.lineWidth=0.6;c.globalAlpha=0.8;c.beginPath();c.moveTo(-0.5,2);c.lineTo(-0.4,h+6);c.moveTo(0.8,-2);c.lineTo(0.7,h+9);c.stroke();c.globalAlpha=1;
+  if(kind==='sickle'){
+    // 쇠고리
+    c.fillStyle='#5b6067';c.fillRect(-2.4,h+1,4.8,3.4);c.strokeStyle=INK;c.lineWidth=0.8;c.strokeRect(-2.4,h+1,4.8,3.4);
+    // 날: 고리에서 왼쪽으로 뻗어 휘어 내려간다. 바깥(등)은 두껍고 검게, 안쪽 날은 하얗게
+    c.beginPath();c.moveTo(1.2,h+1.4);c.quadraticCurveTo(-4,h-6.5,-12.5,h-4.5);c.quadraticCurveTo(-17.5,h-2.5,-18.5,h+5.5);
+    c.quadraticCurveTo(-14,h-0.5,-8,h+0.2);c.quadraticCurveTo(-3,h+0.6,-1.2,h+3.4);c.closePath();
+    const g=c.createLinearGradient(0,h-7,0,h+4);g.addColorStop(0,'#5d646b');g.addColorStop(0.55,'#a9b1b8');g.addColorStop(1,'#dfe5e9');
+    c.fillStyle=g;c.fill();c.strokeStyle=INK;c.lineWidth=1.1;c.stroke();
+    c.strokeStyle='#2c3034';c.lineWidth=1.5;c.beginPath();c.moveTo(0.4,h+0.6);c.quadraticCurveTo(-4,h-5.6,-12.3,h-3.7);c.stroke();   // 두꺼운 등
+    c.strokeStyle='#ffffff';c.lineWidth=0.9;c.globalAlpha=0.95;c.beginPath();c.moveTo(-17.4,h+4.2);c.quadraticCurveTo(-13.6,h+0.2,-8,h+0.9);c.quadraticCurveTo(-3.6,h+1.2,-1.9,h+3);c.stroke();   // 벼린 날
+  }else{
+    // 곡괭이 머리: 가운데 자루 구멍 둘레의 쇠 목, 왼쪽 뾰족한 촉, 오른쪽 넓적한 괭이날
+    c.beginPath();c.moveTo(-3,h-1.6);c.quadraticCurveTo(-10,h-4.2,-16.5,h+1.6);c.lineTo(-15.6,h+2.8);c.quadraticCurveTo(-9.5,h+0.3,-3,h+2.6);
+    c.lineTo(3,h+2.6);c.quadraticCurveTo(8.5,h+1.4,12.6,h+4.2);c.lineTo(15.4,h+0.6);c.quadraticCurveTo(10,h-3.6,3,h-1.6);c.closePath();
+    const g=c.createLinearGradient(0,h-4,0,h+4);g.addColorStop(0,'#c9cfd4');g.addColorStop(0.5,'#8a9299');g.addColorStop(1,'#545b62');
+    c.fillStyle=g;c.fill();c.strokeStyle=INK;c.lineWidth=1.1;c.stroke();
+    c.fillStyle='#3f444a';c.beginPath();c.ellipse(0,h+0.5,3.3,2.9,0,0,Math.PI*2);c.fill();c.strokeStyle=INK;c.lineWidth=0.8;c.stroke();   // 쇠 목
+    c.strokeStyle='#eef2f4';c.lineWidth=0.8;c.globalAlpha=0.9;c.beginPath();c.moveTo(-14.5,h+0.4);c.quadraticCurveTo(-9,h-2.6,-3.4,h-0.6);c.moveTo(3.4,h-0.6);c.quadraticCurveTo(9,h-2,14.4,h+0.4);c.stroke();   // 위 면 빛
+  }
+  c.restore();
 }
 /* 결정 D-240: 손 그림의 도구는 날이 bAim() 자리에 오게 기운다. 손 안 쥔 자리(HAND_GRIP)에서 그 점까지 */
 const HAND_GRIP={x:4,y:1};
@@ -617,15 +640,17 @@ function drawPaw(c,x,y,palm=false){
   }
   c.restore();
 }
-/* 결정 D-240: 도구 날이 꽂힐 자리의 작은 조준 표시. 금빛 칠 곳에 들어가면 하얗게 밝아진다 */
+/* 결정 D-240: 도구 날이 꽂힐 자리 표시. 금빛 칠 곳에 들어가면 하얗게 밝아진다.
+   결정 D-456: 낫 위에 겹쳐 보이던 X 자 표시를 빼고, 치는 범위(손 되치기 반경)를 옅은 점선 원으로 보인다
+   (사용자 피드백 2026-11-04: 낫에 저 X 자는 왜 있나, 공격 범위가 확실히 보이게). 원 안에 칠 곳 가운데가 들어오면 맞는다. */
 function drawAim(c){
   if(!battleTool()||B.handShow>0||B.st==='giftPlace'||B.st==='end')return;
   if(B.inv>0&&Math.floor(B.inv/5)%2)return;
-  const p=bAim(),m=B.mark,on=m&&Math.hypot(m.x-p.x,m.y-p.y)<battleHandProfile().radius,r=on?9:7;
-  c.save();c.lineCap='round';
-  c.strokeStyle=on?'#fffaf0':INK;c.globalAlpha=on?1:0.6;c.lineWidth=on?2.2:1.4;
-  for(let i=0;i<4;i++){const a=i*Math.PI/2+Math.PI/4;c.beginPath();c.moveTo(p.x+Math.cos(a)*(r-3),p.y+Math.sin(a)*(r-3));c.lineTo(p.x+Math.cos(a)*(r+2),p.y+Math.sin(a)*(r+2));c.stroke();}
-  if(on){c.strokeStyle=GOLD;c.lineWidth=1.4;c.beginPath();c.arc(p.x,p.y,r+4,0,Math.PI*2);c.stroke();}
+  const p=bAim(),m=B.mark,R=battleHandProfile().radius,on=m&&Math.hypot(m.x-p.x,m.y-p.y)<R;
+  c.save();
+  c.fillStyle=on?'rgba(255,244,207,.28)':'rgba(29,24,20,.05)';c.beginPath();c.arc(p.x,p.y,R,0,Math.PI*2);c.fill();
+  c.strokeStyle=on?GOLD:INK;c.globalAlpha=on?0.95:0.42;c.lineWidth=on?2:1.2;c.setLineDash(on?[]:[4,4]);c.beginPath();c.arc(p.x,p.y,R,0,Math.PI*2);c.stroke();
+  c.setLineDash([]);c.globalAlpha=on?1:0.55;c.fillStyle=on?'#fffaf0':INK;c.beginPath();c.arc(p.x,p.y,1.6,0,Math.PI*2);c.fill();
   c.restore();
 }
 /* 결정 D-244: 친 자리의 효과. 꽂힌 순간의 고리·빛살, 남는 금 간 자국, 떠오르는 부위 이름과 깎인 칸 */
