@@ -33,7 +33,21 @@
    결정 D-370: 부서진 부위는 흐리게 남지 않는다. 다리를 부수면 구들돌 기둥이 무너져 골렘이 돌무더기 위에 주저앉고 발을 찧지 못한다.
      팔을 부수면 어깨 아래가 떨어져 나가 차돌 조각이 발치에 흩어지고, 휩쓸기도 눈 퍼 던지기도 못 한다.
    결정 D-376: 팔이 없으면 눈폭탄 대신 몸을 흔들어 어깨와 등에 쌓인 눈을 털어 낸다. 눈덩이는 칸 위에서 곧장 떨어지고
-     수가 golem_barrage_count_armless 로 적다. 다 버티면 핵이 드러나는 차례는 같다. */
+     수가 golem_barrage_count_armless 로 적다. 다 버티면 핵이 드러나는 차례는 같다.
+   결정 D-450: 차돌 팔은 크기·모양이 다른 투박한 돌멩이들이 긴 세월 뭉쳐 붙은 것이다(사용자 피드백 2026-11-04: 폴리곤 같다).
+     돌마다 꼭짓점 수·울퉁불퉁함·빛깔이 다르고 위 왼쪽은 밝고 아래 오른쪽은 그늘진다. 돌 사이 틈은 다져진 눈이 메운다.
+     위의 골렘 그림과 칸 안의 팔이 같은 그림(rockArm)이다.
+   결정 D-451: 팔은 채찍처럼 크게 휘두른다(사용자 피드백: 너무 직선적). 칸 위 한쪽 모서리 밖 어깨를 축으로 팔이 큰 부채꼴을 쓸며
+     내려와 눈밭에 쿵 처박힌다. 천천히 뒤로 감았다가(둔탁한 예고) 빠르게 휘두르고, 끝은 늦게 따라와 휜다.
+     넓지만 피할 곳이 있다: 'reach' 는 주먹이 닿지 않는 먼 구석과 다 쓸지 않은 벽 쪽이, 'stop' 은 어깨 밑 벽 쪽 부채꼴이 빈다.
+     예고 동안 쓸릴 부채꼴을 붉게 칠하고 빈 곳 경계를 점선으로 긋는다. 처박힌 팔을 치면 팔이 깎인다.
+   결정 D-452: 팔이 처박힌 뒤의 여진은 눈 파도·산사태다. 밀려오는 눈 더미의 앞머리가 말려 부서지고, 앞에 눈보라가 튀고,
+     속에서 눈덩이와 돌이 구른다. 틈 한 줄은 빈다(판정은 전과 같다).
+   결정 D-453: 서리 옥이 열린 뒤(껍데기가 깨진 뒤) 몸 차례는 눈폭탄과 '서리 옥 빛'을 번갈아 쓴다(발악 패턴). 핵에서 알 수 없는
+     빛줄기가 칸으로 쏟아져 함께 쓸고, 뒤 절반은 가위처럼 엇갈린다. 빛에 닿으면 맞는다. 한 번도 안 맞고 버티면 빛이 사그라들고
+     핵이 칸 한가운데 드러난다(눈폭탄을 버틴 때와 같다). 핵이 반 넘게 깎이면 빛줄기가 셋이 된다. 수치는 tuning.csv golem_light_*.
+   결정 D-454: 눈폭탄은 크기와 날아오는 빠르기가 조금씩 다르다(큰 것은 조금 느리다, golem_snowball_*_jitter). 떨어지는 모양에
+     '흩뿌리기'(손 자리 하나에 나머지는 칸 여기저기)와 '쌍 던지기'(두 팔로 손 양옆을 함께, 세 번째 쌍은 손 자리로)를 더했다. */
 (()=>{
 const T=()=>TABLES.TUNING;
 const SNOW='#f3f5f4',SNOW_SH='#c9d2d8',SLAB='#5b5048',SLAB_LT='#7d7066',QUARTZ='#d2cdc3',QUARTZ_SH='#a39d92',BODY='#6c6e70';
@@ -41,7 +55,8 @@ const GEM='#8fcfcb',GEM_DK='#2c6670',GEM_LT='#e4fbf6',SETTING='#8b8478',SETTING_
 const ROPE='#b39556',ROPE_DK='#7a6232',PAPER='#f8f4e6',PINE='#3f6a3c';
 const CLOTH=['#b8432f','#2f5f9e','#d9a83a','#f2efe6','#3f7d52'];   // 오색 천: 빨강·파랑·노랑·흰색·초록
 const ST={tell:46,drop:9,gap:62,sole:26,wave:34,ringMax:96,ringBand:8,stay:18,crumble:16,lift:40,clumpFly:30,clumpHit:13};   // 발 찧기
-const AR={tell:52,sweep:72,edge:0.62,stop:40,back:16,vSweep:46,vEdge:0.56,vStop:34};             // 팔 휩쓸기·내리쓰기
+const AR={back:16};                                                                                 // 처박힌 팔이 거둬지는 시간
+const WH={lag:0.34,w:30,windup:0.3};                                                                // 결정 D-451: 채찍 휘두르기
 const AV={tell:26,speed:2.6,band:13,gap:66,sideSpeed:3.4,sideGap:56};                            // 쓸려 간 눈
 const SB={gap:17,wind:14,follow:10,fly:36,radius:30,hit:27,splat:34,spread:56};                   // 눈폭탄
 const toScreen=(x,y)=>({x:LW/2+(x-LW/2)*0.84,y:EY+(y-EY)*0.84});
@@ -95,6 +110,43 @@ function legColumn(c,x0,y0,x1,y1,w,alpha=1){
   for(let i=0;i<n;i++){const k=(i+0.5)/n;slab(c,x0+(x1-x0)*k,y0+(y1-y0)*k,w*0.62,w*0.24,alpha,i%2===0);}
 }
 /* 눈덩이: 얼굴 없는 거친 눈뭉치. 가장자리가 울퉁불퉁하다 */
+/* 결정 D-450: 투박한 돌멩이 하나. 꼭짓점 수·울퉁불퉁함·빛깔이 seed 마다 다르다 */
+const ROCK_COL=['#b7b0a3','#a39b8e','#c4beb2','#968d80','#ada595','#8b8377','#bdb6aa','#9d9487'];
+function rockStone(c,x,y,rx,ry,rot,seed,alpha=1,snowTop=0){
+  const n=6+Math.floor(hash(seed*1.37)*4),pts=[];
+  for(let i=0;i<n;i++){const a=rot+i*Math.PI*2/n+(hash(seed+i*1.7)-0.5)*0.55,k=0.76+hash(seed*2.3+i)*0.34;pts.push([Math.cos(a)*rx*k,Math.sin(a)*ry*k]);}
+  const path=(dx,dy,sc)=>{c.beginPath();const P=i=>{const p=pts[(i+n)%n];return [x+p[0]*sc+dx,y+p[1]*sc+dy];};
+    const m=P(0),q=P(1);c.moveTo((m[0]+q[0])/2,(m[1]+q[1])/2);
+    for(let i=1;i<=n;i++){const a=P(i),z=P(i+1);c.quadraticCurveTo(a[0],a[1],(a[0]+z[0])/2,(a[1]+z[1])/2);}c.closePath();};
+  c.save();c.globalAlpha=alpha;
+  path(1.3,1.9,1);c.fillStyle='#5a5249';c.fill();   // 아래 오른쪽 그늘
+  path(0,0,1);c.fillStyle=ROCK_COL[Math.floor(hash(seed*5.1)*ROCK_COL.length)];c.fill();
+  c.globalAlpha=alpha*0.5;path(-rx*0.2,-ry*0.24,0.56);c.fillStyle='#ece8de';c.fill();   // 위 왼쪽 밝은 면
+  c.globalAlpha=alpha*0.78;path(0,0,1);c.strokeStyle=INK;c.lineWidth=1.05;c.stroke();
+  if(hash(seed*7.7)<0.4){const a=rot+hash(seed*3)*3;c.globalAlpha=alpha*0.55;c.strokeStyle='#4f483f';c.lineWidth=0.9;c.beginPath();
+    c.moveTo(x+Math.cos(a)*rx*0.55,y+Math.sin(a)*ry*0.55);c.lineTo(x+Math.cos(a+2.5)*rx*0.12,y+Math.sin(a+2.5)*ry*0.12);c.stroke();}   // 풍화한 금
+  c.restore();
+  if(snowTop>0)blob(c,x-rx*0.08,y-ry*0.7,rx*0.6*snowTop,ry*0.26*snowTop+1,SNOW,0.95*alpha);   // 돌 위에 얹힌 눈
+}
+/* 어깨에서 주먹까지 꺾은선(pts)을 따라 돌을 빽빽이 붙인다. 밑에 다진 눈을 먼저 깔아 돌 사이 틈이 눈으로 메워진다.
+   w 는 팔 굵기, fist 는 주먹 크기(0 이면 주먹 없이 끊긴 팔) */
+function rockArm(c,pts,w,alpha=1,seed=0,fist=1.3){
+  const seg=[];let L=0;for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);L+=d;}
+  if(L<1)return;
+  const at=u=>{let d=u*L;for(let i=0;i<seg.length;i++){if(d<=seg[i]||i===seg.length-1){const k=seg[i]?Math.min(1,d/seg[i]):0,a=pts[i],b=pts[i+1];
+    return {x:a[0]+(b[0]-a[0])*k,y:a[1]+(b[1]-a[1])*k,ang:Math.atan2(b[1]-a[1],b[0]-a[0])};}d-=seg[i];}};
+  c.save();c.globalAlpha=alpha;c.lineCap='round';c.lineJoin='round';c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));
+  c.strokeStyle=INK;c.globalAlpha=alpha*0.5;c.lineWidth=w*0.96;c.stroke();
+  c.globalAlpha=alpha;c.strokeStyle=SNOW_SH;c.lineWidth=w*0.9;c.stroke();c.strokeStyle=SNOW;c.lineWidth=w*0.72;c.stroke();c.restore();
+  const n=Math.max(3,Math.round(L/(w*0.34))),end=fist>0?0.9:1;
+  for(let i=0;i<n;i++){const p=at((i+0.5)/n*end),nx=-Math.sin(p.ang),ny=Math.cos(p.ang);
+    for(let j=0;j<2;j++){const sd=seed*31+i*7+j*3+1,off=(j?0.21:-0.2)*w+(hash(sd)-0.5)*w*0.16,r=w*(0.25+hash(sd*1.3)*0.17);
+      rockStone(c,p.x+nx*off,p.y+ny*off,r*(1.05+hash(sd*2)*0.32),r*(0.78+hash(sd*2.9)*0.26),p.ang+hash(sd*4)*1.4,sd,alpha,hash(sd*6)<0.28&&j===0?0.85:0);}}
+  if(fist<=0)return;
+  const h=pts[pts.length-1],p=at(1),R=w*0.5*fist;
+  for(let j=0;j<5;j++){const sd=seed*53+j*11+2,a=p.ang+(j-2)*0.95,d=j===2?R*0.15:R*0.6;
+    rockStone(c,h[0]+Math.cos(a)*d,h[1]+Math.sin(a)*d,R*(0.52+hash(sd)*0.22),R*(0.46+hash(sd*1.4)*0.2),hash(sd*2)*3,sd,alpha,j===1?0.9:0);}
+}
 function drawSnowball(c,x,y,r,rot,alpha=1){
   blob(c,x,y,r,r*0.94,SNOW,alpha);blob(c,x+r*0.28,y+r*0.32,r*0.68,r*0.52,SNOW_SH,0.6*alpha);
   blob(c,x-r*0.3,y-r*0.34,r*0.36,r*0.24,'#ffffff',0.8*alpha);
@@ -203,13 +255,22 @@ function stompPhase(b){const a=b.delay,tl=a+ST.tell,hit=tl+ST.drop,ring=ringEnd(
   return {wait:b.t<=a,tell:b.t>a&&b.t<=tl,falling:b.t>tl&&b.t<=hit,hit,ring,k:clamp((b.t-a)/ST.tell,0,1),end:b.last?ring:ring+ST.stay+ST.crumble};}
 const stompOf=foot=>B.bullets.find(b=>b.k==='golemStomp'&&b.foot===foot&&b.t>b.delay&&b.t<=stompPhase(b).hit+14);
 const armBullet=()=>B.bullets.find(b=>b.k==='golemArm');
-const armFrom=(side,orient='h')=>orient==='v'?BOX.y-40:side<0?BOX.x-40:BOX.x+BOX.w+40;
-const armTo=(side,orient='h')=>orient==='v'?BOX.y+BOX.h-AR.vStop:side<0?BOX.x+BOX.w-AR.stop:BOX.x+AR.stop;   // 다 쓴 주먹은 칸 끝에 걸쳐 멈춘다
-function armPhase(b){const v=b.orient==='v',sw=v?AR.vSweep:AR.sweep,k=clamp((b.t-AR.tell)/sw,0,1),e=v?k*k:(k<0.5?2*k*k:1-2*(1-k)*(1-k)),from=armFrom(b.side,b.orient),to=armTo(b.side,b.orient);
-  return {tell:b.t<=AR.tell,sweep:b.t>AR.tell,k,e,from,hand:from+(to-from)*e,sw};}
-function armBand(cov){return cov==='top'?[BOX.y,BOX.y+BOX.h*AR.edge]:[BOX.y+BOX.h*(1-AR.edge),BOX.y+BOX.h];}
-function armEdgeY(cov){return cov==='top'?BOX.y+BOX.h*AR.edge:BOX.y+BOX.h*(1-AR.edge);}
-function armBandV(side){return side<0?[BOX.x,BOX.x+BOX.w*AR.vEdge]:[BOX.x+BOX.w*(1-AR.vEdge),BOX.x+BOX.w];}
+/* 결정 D-451: 채찍 휘두르기. 어깨(축)는 칸 위 한쪽 모서리 밖. 그 쪽을 왼쪽에 둔 자리에서 각도는 오른쪽(0)에서 아래(π/2)로 커진다.
+   reach: 팔이 짧아 먼 구석이 빈다(벽 쪽도 다 쓸지 않는다) · stop: 팔이 칸 끝까지 닿지만 벽 쪽 부채꼴 앞에서 멈춘다 */
+function whipPivot(side){return {x:side<0?BOX.x-34:BOX.x+BOX.w+34,y:BOX.y-56};}
+function whipSpec(v){return v==='reach'?{reach:262,a0:-0.3,a1:1.15}:{reach:470,a0:-0.3,a1:0.86};}
+const whipTell=()=>T().golem_whip_tell,whipSweep=()=>T().golem_whip_sweep;
+function whipAngle(b,t,u){   // t 프레임, u 는 어깨(0)에서 주먹(1)까지
+  const sp=whipSpec(b.v),tl=whipTell();
+  if(t<=tl){const w=clamp(t/tl,0,1);return sp.a0-WH.windup*Math.sin(w*Math.PI/2)-0.12*u*w;}   // 천천히 뒤로 감아올린다
+  const k=clamp((t-tl)/whipSweep(),0,1),e=k*k*(3-2*k),vel=6*k*(1-k)/1.5;
+  return sp.a0-WH.windup+(sp.a1-sp.a0+WH.windup)*e-WH.lag*vel*Math.pow(u,1.5);   // 끝이 늦게 따라와 휜다
+}
+function whipPoint(b,ang,r){const p=whipPivot(b.side),dx=Math.cos(ang)*r,dy=Math.sin(ang)*r;return [b.side<0?p.x+dx:p.x-dx,p.y+dy];}
+function whipLocal(side,x,y){const p=whipPivot(side),dx=side<0?x-p.x:p.x-x,dy=y-p.y;return {r:Math.hypot(dx,dy),a:Math.atan2(dy,dx)};}
+function whipArmPts(b,t,reachK=1,n=9){const sp=whipSpec(b.v),out=[];for(let i=0;i<=n;i++){const u=i/n;out.push(whipPoint(b,whipAngle(b,t,u),u*sp.reach*reachK));}return out;}
+function whipMarkPos(ra){const sp=whipSpec(ra.v),[x,y]=whipPoint(ra,sp.a1,sp.reach*(ra.v==='reach'?0.62:0.5));
+  return [clamp(x,BOX.x+26,BOX.x+BOX.w-26),clamp(y,BOX.y+22,BOX.y+BOX.h-18)];}
 const throwOf=s=>B.bullets.find(b=>b.k==='golemSnowball'&&b.side===s&&b.t>b.delay&&b.t<=b.delay+SB.wind+SB.follow);
 
 /* ---------- 골렘 그림 (상대 자리, 0.84배로 그려진다) ---------- */
@@ -250,9 +311,10 @@ function drawGolem(c,noFruit){
     blob(c,x,by-40,74,20,SNOW,0.95*a);blob(c,x-58,by-26,26,13,SNOW,0.9*a);blob(c,x+58,by-26,26,13,SNOW,0.9*a);   // 어깨에 쌓인 눈
     drawRope(c,x,by,a);drawCloth(c,x+64,by-30,a);   // 결정 D-250: 금줄과 오색 천
     // 가슴: 눈 껍데기 속 서리 옥. 다리나 팔을 하나 꺾으면 껍데기가 깨지고, 몸이 빌 때는 껍데기가 벌어져 빛난다.
-    const open=!coreHidden()||(end&&end.kind==='calm'&&end.k>0.15),glow=rest?0.6+0.4*Math.sin(B.time*0.25):0.35+0.15*Math.sin(B.time*0.05),gy=by+18;
+    const lit=B.bullets.some(q=>q.k==='golemLight'),open=!coreHidden()||(end&&end.kind==='calm'&&end.k>0.15),glow=lit?1:rest?0.6+0.4*Math.sin(B.time*0.25):0.35+0.15*Math.sin(B.time*0.05),gy=by+18;
     if(end)drawEndCore(c,x,gy,end,a);
-    else if(open||rest){drawGem(c,x,gy,19+(rest?2:0),glow,a);
+    else if(open||rest){if(lit)blob(c,x,gy,40+6*Math.sin(B.time*0.3),34+5*Math.sin(B.time*0.3),GEM_LT,0.45);   // 결정 D-453: 빛을 쏟는 핵
+      drawGem(c,x,gy,19+(rest?2:0)+(lit?3:0),glow,a);
       const dmg=core.max-core.hp;if(dmg>0)cracks(c,x,gy,40,30,dmg*2,7,a);}
     if(!open&&!end){const sp=rest?5:0;   // 눈 껍데기: 납작한 눈 덩이 하나. 몸이 빌 때는 금이 벌어지고 속빛이 샌다
       c.save();c.globalAlpha=0.97*a;c.fillStyle=SNOW;c.beginPath();c.moveTo(x-30,by+20);c.quadraticCurveTo(x-24,by+2,x-6,by+6);c.quadraticCurveTo(x+8,by-2,x+26,by+8);c.quadraticCurveTo(x+34,by+22,x+22,by+34);c.quadraticCurveTo(x,by+42,x-20,by+34);c.closePath();c.fill();
@@ -288,33 +350,28 @@ function drawGolem(c,noFruit){
   // 던질 팔은 눈덩이를 쥐고 머리 위로 들었다가 앞으로 내던진다.
   if(arm.broken){   // 결정 D-370: 팔은 어깨 아래가 떨어져 나갔다. 깨진 단면과 발치에 흩어진 차돌
     [-1,1].forEach(s=>{const shX=cx+s*72,shY=by-20;
-      brush(c,[[shX,shY],[cx+s*88,by+4]],20,QUARTZ_SH,0.9);quartz(c,cx+s*84,by-4,15,13,1,s+2);
+      rockArm(c,[[shX,shY],[cx+s*86,by+2]],27,1,s>0?2:1,0);   // 결정 D-450: 돌멩이가 뭉친 팔이 어깨 아래에서 끊겼다
       poly(c,[[cx+s*76,by+8],[cx+s*86,by+14],[cx+s*98,by+6],[cx+s*92,by-2]],'#efe3c8',0.95,INK,1.2);   // 깨진 단면
       fur(c,shX+s*6,shY-6,3,26,24,1);
-      quartz(c,cx+s*112,GY+4,12,9,1,s+5);quartz(c,cx+s*136,GY+10,9,8,1,s+7);quartz(c,cx+s*96,GY+12,8,6,1,s+9);
+      rockStone(c,cx+s*112,GY+2,13,10,0.4,s*17+5,1,0.6);rockStone(c,cx+s*138,GY+9,10,8,1.2,s*17+7,1,0);rockStone(c,cx+s*96,GY+12,8,6,2,s*17+9,1,0.5);rockStone(c,cx+s*124,GY+14,7,5,0.8,s*17+11,1,0);
       for(let i=0;i<3;i++)blob(c,cx+s*(104+i*14),GY+16+hash(i*1.3+s)*3,2.4,1.8,QUARTZ_SH,0.8);});}
   else{const a=1,o=shk(arm),drop=0,ab=armBullet(),ra=B.restArm,dmg=arm.max-arm.hp,hf=flashOf('arm');
     const idleEl=s=>[cx+s*98,by+34+drop*0.6],idleHd=s=>[cx+s*106,by+96+drop];
     [-1,1].forEach(s=>{const shX=cx+s*72+o,shY=by-20;let el=idleEl(s),hd=idleHd(s),ball=null;
-      const sweepPose=k=>{const hx=cx+s*(196-366*k);return [[(shX+hx)/2+s*12,by+44],[hx,by+80+6*k]];};
-      const upEl=[cx+s*96,by-70],upHd=[cx+s*84,by-128],downEl=[cx+s*96,by+40],downHd=[cx+s*72,by+124];
-      const chopPose=k=>[lerp2(upEl,downEl,k),lerp2(upHd,downHd,k)];
-      if(ab&&ab.side===s){const p=armPhase(ab);
-        if(p.tell){const e=1-Math.pow(1-clamp(ab.t/AR.tell,0,1),2);
-          if(ab.orient==='v'){el=lerp2(idleEl(s),upEl,e);hd=lerp2(idleHd(s),upHd,e);}
-          else{el=lerp2(idleEl(s),[cx+s*132,by-8],e);hd=lerp2(idleHd(s),[cx+s*196,by+8],e);}}
-        else [el,hd]=ab.orient==='v'?chopPose(p.e):sweepPose(p.e);}
-      else if(ra&&ra.side===s){const u=clamp((ra.back||0)/AR.back,0,1),[e1,h1]=ra.orient==='v'?chopPose(1):sweepPose(1);el=lerp2(e1,idleEl(s),u);hd=lerp2(h1,idleHd(s),u);}
+      // 결정 D-451: 휘두를 팔은 뒤로 높이 감아올렸다가 몸 앞을 가로질러 눈밭에 내리꽂는다
+      const upEl=[cx+s*112,by-58],upHd=[cx+s*136,by-122],endEl=[cx+s*66,by+58],endHd=[cx-s*14,by+128];
+      const slam=k=>[lerp2(upEl,endEl,k),lerp2(upHd,endHd,k)];
+      if(ab&&ab.side===s){const tl=whipTell();
+        if(ab.t<=tl){const e=1-Math.pow(1-clamp(ab.t/tl,0,1),2);el=lerp2(idleEl(s),upEl,e);hd=lerp2(idleHd(s),upHd,e);}
+        else{const k=clamp((ab.t-tl)/whipSweep(),0,1);[el,hd]=slam(k*k*(3-2*k));}}
+      else if(ra&&ra.side===s){const u=clamp((ra.back||0)/AR.back,0,1),[e1,h1]=slam(1);el=lerp2(e1,idleEl(s),u);hd=lerp2(h1,idleHd(s),u);}
       else{const th=throwOf(s);
         if(th){const d=th.t-th.delay,up=[[cx+s*96,by-48],[cx+s*80,by-96]],fw=[[cx+s*70,by+12],[cx+s*34,by+66]];
           if(d<=SB.wind){const e=1-Math.pow(1-d/SB.wind,2);el=lerp2(idleEl(s),up[0],e);hd=lerp2(idleHd(s),up[1],e);ball=th;}
           else{const e=(d-SB.wind)/SB.follow;el=lerp2(up[0],fw[0],e);hd=lerp2(up[1],fw[1],e);}}}
-      brush(c,[[shX,shY],el,hd],20,QUARTZ_SH,0.9*a);
-      quartz(c,(shX+el[0])/2,(shY+el[1])/2,15,13,a,s+2);quartz(c,el[0],el[1],14,12,a,s+4);quartz(c,(el[0]+hd[0])/2,(el[1]+hd[1])/2,13,11,a,s+5);
+      rockArm(c,[[shX,shY],el,hd],27,a,s>0?2:1,1.35);   // 결정 D-450: 돌멩이가 뭉친 팔
       if(dmg>0)cracks(c,el[0],el[1],26,22,dmg*2,s*5+21,a);
       fur(c,shX+s*6,shY-6,3,26,24,a);
-      for(let i=0;i<3;i++)quartz(c,hd[0]+s*(i-1)*9,hd[1]+(i===1?4:0),9,10,a,i+7);   // 주먹 마디
-      quartz(c,hd[0]-s*4,hd[1]-8,14,11,a,s+9);
       if(hf&&ra&&ra.side===s)blob(c,(el[0]+hd[0])/2,(el[1]+hd[1])/2,24,30,'#ffffff',0.55*hf);
       if(ball)drawSnowball(c,hd[0],hd[1]-18,16,ball.t*0.05);   // 쥐고 든 눈덩이
       if(partCol(arm)===RED)brush(c,[[shX,shY],el,hd],3,RED,0.7);});}
@@ -350,30 +407,12 @@ function drawEndFruit(c,cx,y0,GY,end){
   if(!still())for(let i=0;i<5;i++){const a=B.time*0.05+i*1.3;star(c,x+Math.cos(a)*18,y+Math.sin(a)*14,1.8,0.6);}
   drawDarae(c,x,y,s,1);
 }
-/* 상자 안의 차돌 팔: from(칸 밖 팔 뿌리)에서 hand(주먹)까지 띠를 채운다. push 면 주먹 앞에 밀린 눈 */
-function drawArmIn(c,side,cov,hand,alpha,push){
-  const [y0,y1]=armBand(cov),mid=(y0+y1)/2,th=(y1-y0)*0.78,from=armFrom(side);
-  c.save();c.globalAlpha=alpha;c.fillStyle='#bdb7ab';c.fillRect(Math.min(from,hand),mid-th/2,Math.abs(hand-from),th);c.restore();
-  for(let x=from-side*10,n=0;(side<0?x<hand-20:x>hand+20)&&n<30;x-=side*26,n++){quartz(c,x,mid-th*0.22,15,th*0.24,alpha,Math.round(x));quartz(c,x+side*12,mid+th*0.2,14,th*0.22,alpha,Math.round(x)+1);}
-  c.save();c.strokeStyle=INK;c.globalAlpha=0.9*alpha;c.lineWidth=2.6;c.beginPath();c.moveTo(from,mid-th/2);c.lineTo(hand,mid-th/2);c.moveTo(from,mid+th/2);c.lineTo(hand,mid+th/2);c.stroke();c.restore();
-  fur(c,(from+hand)/2,mid-th/2-2,6,Math.abs(hand-from)*0.6,8,0.9*alpha);
-  for(let i=0;i<3;i++)quartz(c,hand+side*8,mid-th*0.34+i*th*0.34,17,th*0.21,alpha,i+5);   // 주먹 마디
-  if(push){const w=12+18*push;blob(c,hand-side*24,mid+th*0.15,w,th*0.4,SNOW,0.95);   // 주먹 앞(가는 쪽)에 밀린 눈
-    c.save();c.strokeStyle=INK;c.globalAlpha=0.5;c.lineWidth=1.2;c.beginPath();c.ellipse(hand-side*24,mid+th*0.15,w,th*0.4,0,Math.PI,Math.PI*2);c.stroke();c.restore();}
-}
-/* 결정 D-255: 위에서 내리쓰는 차돌 팔. 칸 위(from)에서 hand(주먹)까지 세로 띠를 채운다 */
-function drawArmInV(c,side,hand,alpha,push){
-  const [x0,x1]=armBandV(side),mid=(x0+x1)/2,th=(x1-x0)*0.62,from=armFrom(side,'v');
-  c.save();c.globalAlpha=alpha;c.fillStyle='#bdb7ab';c.fillRect(mid-th/2,from,th,Math.max(0,hand-from));c.restore();
-  for(let y=from+8,n=0;y<hand-18&&n<20;y+=24,n++){quartz(c,mid-th*0.2,y,th*0.24,13,alpha,Math.round(y));quartz(c,mid+th*0.22,y+11,th*0.22,12,alpha,Math.round(y)+1);}
-  c.save();c.strokeStyle=INK;c.globalAlpha=0.9*alpha;c.lineWidth=2.6;c.beginPath();c.moveTo(mid-th/2,from);c.lineTo(mid-th/2,hand);c.moveTo(mid+th/2,from);c.lineTo(mid+th/2,hand);c.stroke();c.restore();
-  for(let i=0;i<3;i++)quartz(c,mid-th*0.32+i*th*0.32,hand+8,th*0.19,15,alpha,i+5);   // 주먹 마디
-  if(push){const w=th*0.55+10*push;blob(c,mid,hand+22,w,8+6*push,SNOW,0.95);   // 주먹 밑에 짓눌려 퍼지는 눈
-    c.save();c.strokeStyle=INK;c.globalAlpha=0.5;c.lineWidth=1.2;c.beginPath();c.ellipse(mid,hand+22,w,8+6*push,0,0,Math.PI);c.stroke();c.restore();}
-}
+/* 결정 D-451: 눈밭에 처박힌 팔. 거둘 때는 어깨 쪽으로 끌려 들어간다 */
 function drawRestArm(c,ra){
-  const u=clamp((ra.back||0)/AR.back,0,1),from=armFrom(ra.side,ra.orient);
-  if(ra.orient==='v')drawArmInV(c,ra.side,ra.hand+(from-ra.hand)*u,1,0);else drawArmIn(c,ra.side,ra.cov,ra.hand+(from-ra.hand)*u,1,0);
+  const u=clamp((ra.back||0)/AR.back,0,1),sp=whipSpec(ra.v),tEnd=whipTell()+whipSweep();
+  const pts=whipArmPts(ra,tEnd,1-u*0.9);
+  rockArm(c,pts,WH.w,1,ra.side>0?2:1,1.4);
+  if(!u)for(let i=0;i<4;i++){const [x,y]=whipPoint(ra,sp.a1,sp.reach*(0.35+i*0.17));blob(c,x+(i%2?8:-8),y+10,12,4,SNOW,0.8);}   // 처박힌 팔 둘레로 밀린 눈
 }
 /* 결정 D-62: 모든 전투 배경은 상대 뒤쪽 화면 전체로 그린다 (design/data/decisions.csv).
    돌 골렘은 눈 쌓인 돌산 절벽 길. 양쪽 절벽 턱마다 눈, 길가의 눈 덮인 돌탑과 장승, 굵은 눈발.
@@ -500,12 +539,12 @@ function golemOpenMark(p){
   if(p.id==='leg'){const s=B.restSole;B.mark=null;if(!s)return true;s.marked=true;
     B.mark={x:s.x,y:s.y,t:t.golem_foot_rest,max:t.golem_foot_rest,part:p,golem:true};B.msg='구들돌 발바닥이 눈에 박혀 있다.';return true;}
   if(p.id==='arm'){const a=B.restArm;B.mark=null;if(!a)return true;a.marked=true;
-    let x,y;if(a.orient==='v'){const [x0,x1]=armBandV(a.side);x=(x0+x1)/2;y=a.hand;}else{const [y0,y1]=armBand(a.cov);x=a.hand;y=(y0+y1)/2;}
-    B.mark={x,y,t:t.golem_arm_rest,max:t.golem_arm_rest,part:p,golem:true};B.msg=a.orient==='v'?'내리친 차돌 팔이 칸 밑에 박혀 멈췄다.':'휩쓴 차돌 팔이 바닥에 걸쳐 멈췄다.';return true;}
+    const [x,y]=whipMarkPos(a);
+    B.mark={x,y,t:t.golem_arm_rest,max:t.golem_arm_rest,part:p,golem:true};B.msg='휘두른 차돌 팔이 눈밭에 처박혀 멈췄다.';return true;}
   // 몸: 눈폭탄을 하나도 안 맞고 버텼을 때만 핵이 드러난다
-  if(B.hitThis){B.mark=null;B.msg='눈을 털어 내는 사이 골렘이 숨을 고르고 가슴을 여몄다.';return true;}
+  if(B.hitThis){B.mark=null;B.msg=B.lightTurn?'빛에 휩쓸린 사이 골렘이 가슴을 여몄다.':'눈을 털어 내는 사이 골렘이 숨을 고르고 가슴을 여몄다.';return true;}
   B.mark={x:BOX.x+BOX.w/2,y:BOX.y+BOX.h/2,t:t.golem_core_frames,max:t.golem_core_frames,part:p,golem:true,rest:true};
-  B.msg=coreHidden()?'골렘이 숨을 몰아쉰다. 눈 껍데기 덮인 핵이 들썩인다!':'골렘이 숨을 몰아쉰다. 서리 옥 핵이 드러났다!';return true;
+  B.msg=B.lightTurn?'빛이 사그라들었다. 서리 옥이 잠깐 흐려졌다!':coreHidden()?'골렘이 숨을 몰아쉰다. 눈 껍데기 덮인 핵이 들썩인다!':'골렘이 숨을 몰아쉰다. 서리 옥 핵이 드러났다!';return true;
 }
 function strikeGolem(){
   const m=B.mark;if(!m||!m.golem)return false;
@@ -530,10 +569,14 @@ function pickGolem(){
   const p=part(id),first=!B.last;
   B.cur=p;B.last=p;B.st='tell';B.t=first?72:42;B.msg=p.tell;B.hitThis=false;
   // 결정 D-255: 같은 모양을 연달아 쓰지 않는다
-  if(id==='arm'){B.armOrient=B.armOrient?(B.armOrient==='h'?'v':'h'):(Math.random()<0.5?'h':'v');B.msg=B.armOrient==='v'?'골렘이 차돌 팔을 머리 위로 치켜든다.':p.tell;}
+  if(id==='arm'){B.armVar=B.armVar?(B.armVar==='reach'?'stop':'reach'):(Math.random()<0.5?'reach':'stop');B.msg=p.tell;}   // 결정 D-451: 두 휘두르기를 번갈아
   if(id==='leg'){const o=['aim','march','pincer'].filter(k=>k!==B.stompPat);B.stompPat=B.stompRound?o[Math.floor(Math.random()*o.length)]:'aim';}
-  if(id==='head'){const o=['aim','rowSweep','colSweep'].filter(k=>k!==B.snowPat);B.snowPat=o[Math.floor(Math.random()*o.length)];
-    if(part('arm').broken)B.msg='골렘이 몸을 흔들어 어깨에 쌓인 눈을 털어 낸다.';}   // 결정 D-376
+  if(id==='head'){
+    // 결정 D-453: 서리 옥이 열린 뒤에는 몸 차례마다 눈폭탄과 서리 옥 빛을 번갈아 쓴다(처음 열린 차례가 빛)
+    B.lightTurn=!coreHidden()&&((B.gLightN=(B.gLightN||0)+1)%2===1);
+    if(B.lightTurn)B.msg='서리 옥이 웅웅 울린다. 알 수 없는 빛이 새어 나온다.';
+    else{const o=['aim','rowSweep','colSweep','scatter','pair'].filter(k=>k!==B.snowPat);B.snowPat=o[Math.floor(Math.random()*o.length)];   // 결정 D-454
+      if(part('arm').broken)B.msg='골렘이 몸을 흔들어 어깨에 쌓인 눈을 털어 낸다.';}}   // 결정 D-376
 }
 
 /* ---------- 공격 ---------- */
@@ -547,20 +590,24 @@ function stompTarget(b){
   return clampIn(B.px,B.py);
 }
 const SNOW_STOMP_DUR=n=>(n-1)*ST.gap+ST.tell+ST.drop+Math.max(ST.wave,ST.clumpFly+14)+6;
-const ARM_DUR=orient=>AR.tell+(orient==='v'?AR.vSweep:AR.sweep)+AV.tell+(orient==='v'?Math.ceil((BOX.w+40)/AV.sideSpeed):Math.ceil((BOX.h+28)/AV.speed))+6;
+const ARM_DUR=v=>whipTell()+whipSweep()+AV.tell+(v==='reach'?Math.ceil((BOX.w+40)/AV.sideSpeed):Math.ceil((BOX.h+28)/AV.speed))+6;
+const LIGHT_FADE=24,LIGHT_DUR=()=>T().golem_light_tell+T().golem_light_frames+LIGHT_FADE+2;
 /* 결정 D-376: 팔이 부서지면 눈을 퍼 던지지 못하고 몸을 털어 떨군다. 수가 적다 */
 const snowCount=()=>part('arm').broken?T().golem_barrage_count_armless:T().golem_barrage_count;
 defineAttacks({
   golemStomp:{get dur(){return SNOW_STOMP_DUR(stompCount());},tick(t){if(t)return;
     const n=stompCount(),start=Math.random()<0.5?-1:1,pat=B.stompPat||'aim',dir=B.px>BOX.x+BOX.w/2?-1:1;B.stompRound=(B.stompRound||0)+1;B.restSole=null;
     for(let i=0;i<n;i++)B.bullets.push({k:'golemStomp',t:0,delay:i*ST.gap,foot:i%2?-start:start,x:null,y:null,last:i===n-1,pat,i,n,dir});}},
-  golemArm:{get dur(){return ARM_DUR(B.armOrient||'h');},tick(t){if(t)return;B.restArm=null;
-    const orient=B.armOrient||'h';
-    if(orient==='v'){const side=B.px<BOX.x+BOX.w/2?-1:1;B.bullets.push({k:'golemArm',t:0,side,orient});}   // 손이 있는 쪽 절반을 내리친다
-    else{const side=Math.random()<0.5?-1:1,cov=Math.random()<0.5?'top':'bottom';B.bullets.push({k:'golemArm',t:0,side,cov,orient});}}},
-  golemSnow:{get dur(){return (snowCount()-1)*SB.gap+SB.wind+SB.fly+SB.splat+4;},tick(t){if(t)return;
-    const n=snowCount(),s0=Math.random()<0.5?-1:1,pat=B.snowPat||'aim',drop=part('arm').broken;
-    for(let i=0;i<n;i++)B.bullets.push({k:'golemSnowball',t:0,delay:i*SB.gap,i,n,pat,dir:s0,side:i%2?-s0:s0,tx:null,ty:null,drop});}},
+  golemArm:{get dur(){return ARM_DUR(B.armVar||'reach');},tick(t){if(t)return;B.restArm=null;
+    B.bullets.push({k:'golemArm',t:0,side:Math.random()<0.5?-1:1,v:B.armVar||'reach'});}},
+  golemSnow:{get dur(){return B.lightTurn?LIGHT_DUR():(snowCount()-1)*SB.gap+7+SB.wind+Math.ceil(SB.fly*1.45)+SB.splat+4;},tick(t){if(t)return;
+    if(B.lightTurn){const core=part('head');B.bullets.push({k:'golemLight',t:0,n:core.hp<=core.max/2?T().golem_light_beams_low:T().golem_light_beams});return;}   // 결정 D-453
+    const n=snowCount(),s0=Math.random()<0.5?-1:1,pat=B.snowPat||'aim',drop=part('arm').broken,tt=T();
+    for(let i=0;i<n;i++){
+      // 결정 D-454: 크기와 날아오는 빠르기가 조금씩 다르다. 큰 것은 조금 느리다
+      const sz=0.8+Math.random()*tt.golem_snowball_size_jitter,fly=Math.round(SB.fly*(0.82+Math.random()*tt.golem_snowball_fly_jitter)*(0.92+0.3*(sz-0.8)));
+      const delay=pat==='pair'&&!drop?Math.floor(i/2)*Math.round(SB.gap*1.7)+(i%2)*3:i*SB.gap+Math.floor(Math.random()*7);
+      B.bullets.push({k:'golemSnowball',t:0,delay,i,n,pat,dir:s0,side:pat==='pair'&&!drop?(i%2?-1:1):(i%2?-s0:s0),tx:null,ty:null,drop,sz,fly});}}},
 });
 /* 눈폭탄 떨어질 자리 (결정 D-255). rowSweep 은 손이 있던 줄을 한쪽 끝에서 훑고, 반쯤 던지면 그때 손 줄을 반대로 훑는다. colSweep 은 세로로 */
 function snowTarget(b){
@@ -571,6 +618,8 @@ function snowTarget(b){
     if(b.pat==='rowSweep'){const x=dir>0?BOX.x+24+(BOX.w-48)*k:BOX.x+BOX.w-24-(BOX.w-48)*k;return [x,line+(hash(b.i)-0.5)*8];}
     const y=dir>0?BOX.y+18+(BOX.h-32)*k:BOX.y+BOX.h-14-(BOX.h-32)*k;return [line+(hash(b.i)-0.5)*8,y];
   }
+  if(b.pat==='scatter'){if(b.i%4===0)return [B.px,B.py];return [BOX.x+30+Math.random()*(BOX.w-60),BOX.y+24+Math.random()*(BOX.h-44)];}   // 결정 D-454
+  if(b.pat==='pair'){const k=Math.floor(b.i/2),side=b.i%2?1:-1,o=k%3===2?12:44;return [B.px+side*o,B.py+(Math.random()-0.5)*20];}
   const aim=b.i%3!==1;   // 셋에 둘은 손 자리, 하나는 비켜 갈 만한 옆자리를 노린다
   const ox=aim?0:(Math.random()<0.5?-1:1)*SB.spread,oy=aim?0:(Math.random()-0.5)*SB.spread;
   return [B.px+ox,B.py+oy];
@@ -631,35 +680,34 @@ defineBullets({
       if(k>0.6){c.save();c.strokeStyle=RED;c.globalAlpha=0.5*k;c.lineWidth=1.2;c.beginPath();c.ellipse(b.tx,b.ty+2,ST.clumpHit+3,(ST.clumpHit+3)*0.5,0,0,Math.PI*2);c.stroke();c.restore();}
       drawSnowball(c,x,y,b.r,b.t*0.2,0.95);}},
   golemArm:{
-    step(b){b.t++;const p=armPhase(b),v=b.orient==='v';
-      if(p.sweep){
-        if(v){const [x0,x1]=armBandV(b.side);if(B.px>=x0-4&&B.px<=x1+4&&B.py<=p.hand+16)bHitMe();
-          if(Math.random()<0.5)snowBurst(clamp(B.px,x0,x1),Math.min(p.hand+10,BOX.y+BOX.h),1,true);}
-        else{const [y0,y1]=armBand(b.cov),under=b.side<0?B.px<=p.hand+16:B.px>=p.hand-16;   // 팔이 지나간(덮은) 자리
-          if(B.py>=y0-4&&B.py<=y1+4&&under)bHitMe();
-          if(Math.random()<0.5)snowBurst(p.hand,clamp(B.py<y0||B.py>y1?armEdgeY(b.cov):(y0+y1)/2,BOX.y,BOX.y+BOX.h),1,true);}}
-      if(b.t===AR.tell+p.sw){b.dead=1;B.restArm={side:b.side,cov:b.cov,orient:b.orient,hand:armTo(b.side,b.orient),back:0};B.quake=Math.max(B.quake||0,v?10:4);
-        if(v){   // 내리친 팔이 밀어낸 눈이 옆에서 밀려온다. 한 줄만 빈다
+    step(b){b.t++;const tl=whipTell(),sw=whipSweep(),sp=whipSpec(b.v);
+      if(b.t>tl&&b.t<=tl+sw){const {r,a}=whipLocal(b.side,B.px,B.py);   // 팔이 이번 프레임에 쓸고 지나간 부채꼴 안이면 맞는다
+        if(r<=sp.reach+WH.w*0.5){const u=clamp(r/sp.reach,0,1),a0=whipAngle(b,b.t-1,u),a1=whipAngle(b,b.t,u),tol=WH.w*0.5/Math.max(r,20);
+          if(a>=Math.min(a0,a1)-tol&&a<=Math.max(a0,a1)+tol)bHitMe();}
+        if(Math.random()<0.6){const [x,y]=whipPoint(b,whipAngle(b,b.t,1),sp.reach*(0.5+Math.random()*0.5));
+          if(x>BOX.x&&x<BOX.x+BOX.w&&y>BOX.y&&y<BOX.y+BOX.h)snowBurst(x,y,1,true);}}
+      if(b.t===tl+sw){b.dead=1;B.restArm={side:b.side,v:b.v,back:0};B.quake=Math.max(B.quake||0,12);Sound.playSfx('battle_hit');
+        for(let i=0;i<6;i++){const [x,y]=whipPoint(b,sp.a1,sp.reach*(0.3+i*0.12));if(x>BOX.x&&x<BOX.x+BOX.w&&y>BOX.y&&y<BOX.y+BOX.h)snowBurst(x,y,4,true);}
+        // 결정 D-452: 처박힌 팔이 흔든 눈이 파도처럼 밀려온다. 먼 구석이 빈 휘두르기는 옆에서, 벽 쪽이 빈 휘두르기는 위에서. 한 줄만 빈다
+        if(b.v==='reach'){
           const gy=B.py>BOX.y+BOX.h/2?BOX.y+AV.sideGap/2+10+Math.random()*(BOX.h/2-AV.sideGap-14):BOX.y+BOX.h/2+AV.sideGap/2+4+Math.random()*(BOX.h/2-AV.sideGap-14);
-          B.bullets.push({k:'golemAvalanche',t:0,dir:'side',s:b.side,gy});if(B.st!=='end')B.msg='짓눌린 눈이 옆에서 밀려온다!';}
+          B.bullets.push({k:'golemAvalanche',t:0,dir:'side',s:b.side,gy});if(B.st!=='end')B.msg='처박힌 팔에 눈 더미가 무너져 옆에서 밀려온다!';}
         else{const gx=B.px>BOX.x+BOX.w/2?BOX.x+AV.gap/2+12+Math.random()*(BOX.w/2-AV.gap-24):BOX.x+BOX.w/2+AV.gap/2+12+Math.random()*(BOX.w/2-AV.gap-24);
-          B.bullets.push({k:'golemAvalanche',t:0,dir:'down',gx});if(B.st!=='end')B.msg='쓸려 간 눈이 위에서 쏟아진다!';}}},
-    draw(c,b){const p=armPhase(b);
-      if(b.orient==='v'){const [x0,x1]=armBandV(b.side),edge=b.side<0?x1:x0;
-        if(p.tell){const k=b.t/AR.tell,flash=k>0.75&&Math.floor(b.t/4)%2;
-          c.save();c.fillStyle='rgba(180,67,42,'+(0.05+0.12*k).toFixed(3)+')';c.fillRect(x0,BOX.y,x1-x0,BOX.h);
-          c.strokeStyle=RED;c.globalAlpha=flash?0.95:0.5;c.lineWidth=1.6;c.setLineDash([7,5]);c.beginPath();c.moveTo(edge,BOX.y);c.lineTo(edge,BOX.y+BOX.h);c.stroke();c.restore();
-          for(let i=0;i<5;i++){const y=BOX.y+i*BOX.h/4;brush(c,[[x0+6,y],[x1-6,y+14]],1,RED,0.25*k);}
-          quartz(c,(x0+x1)/2,BOX.y+6-10*k,(x1-x0)*0.2,12,0.5+0.5*k,3);return;}   // 칸 위에서 주먹이 치켜 올라간다
-        drawArmInV(c,b.side,p.hand,1,p.k);return;}
-      const [y0,y1]=armBand(b.cov),edge=armEdgeY(b.cov);
-      if(p.tell){const k=b.t/AR.tell,flash=k>0.75&&Math.floor(b.t/4)%2;
-        c.save();c.fillStyle='rgba(180,67,42,'+(0.05+0.12*k).toFixed(3)+')';c.fillRect(BOX.x,y0,BOX.w,y1-y0);
-        c.strokeStyle=RED;c.globalAlpha=flash?0.95:0.5;c.lineWidth=1.6;c.setLineDash([7,5]);c.beginPath();c.moveTo(BOX.x,edge);c.lineTo(BOX.x+BOX.w,edge);c.stroke();c.restore();
-        for(let i=0;i<6;i++){const x=BOX.x+i*BOX.w/5;brush(c,[[x,y0+6],[x+18,y1-6]],1,RED,0.25*k);}
-        // 칸 가장자리 밖에서 젖혀 둔 주먹이 가로로 뒤로 물러난다
-        const ex=(b.side<0?BOX.x+6:BOX.x+BOX.w-6)+b.side*10*k;quartz(c,ex,(y0+y1)/2,14,(y1-y0)*0.26,0.5+0.5*k,3);return;}
-      drawArmIn(c,b.side,b.cov,p.hand,1,p.k);
+          B.bullets.push({k:'golemAvalanche',t:0,dir:'down',gx});if(B.st!=='end')B.msg='흔들린 비탈에서 눈사태가 쏟아진다!';}}},
+    draw(c,b){const tl=whipTell(),sp=whipSpec(b.v),P=whipPivot(b.side);
+      if(b.t<=tl){const k=b.t/tl,flash=k>0.75&&Math.floor(b.t/4)%2,A0=sp.a0-WH.windup-0.04,A1=sp.a1+0.06,R=sp.reach+WH.w*0.5;
+        // 쓸릴 부채꼴은 붉게, 빈 곳 경계는 점선
+        c.save();c.beginPath();c.moveTo(P.x,P.y);for(let i=0;i<=28;i++){const [x,y]=whipPoint(b,A0+(A1-A0)*i/28,R);c.lineTo(x,y);}c.closePath();
+        c.fillStyle='rgba(180,67,42,'+(0.06+0.14*k).toFixed(3)+')';c.fill();
+        c.strokeStyle=RED;c.globalAlpha=flash?0.95:0.55;c.lineWidth=1.8;c.setLineDash([7,5]);c.beginPath();
+        if(b.v==='reach')for(let i=0;i<=28;i++){const [x,y]=whipPoint(b,A0+(A1-A0)*i/28,R);i?c.lineTo(x,y):c.moveTo(x,y);}
+        const [x0,y0]=whipPoint(b,A1,0),[x1,y1]=whipPoint(b,A1,R);c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.restore();
+        rockArm(c,whipArmPts(b,b.t),WH.w,0.5+0.35*k,b.side>0?2:1,1.4);return;}   // 뒤로 감아올린 팔
+      // 휘두르는 중: 쓸고 간 자리에 눈 자국, 끝을 따라 바람 줄
+      const a0=whipAngle(b,tl,1),a1=whipAngle(b,b.t,1);
+      c.save();c.globalAlpha=0.3;c.fillStyle=SNOW;c.beginPath();c.moveTo(P.x,P.y);for(let i=0;i<=16;i++){const [x,y]=whipPoint(b,a0+(a1-a0)*i/16,sp.reach);c.lineTo(x,y);}c.closePath();c.fill();c.restore();
+      for(let j=1;j<=3;j++){const t2=b.t-j*2;if(t2<=tl)break;brush(c,whipArmPts(b,t2,1,9).slice(4),2.2,INK,0.22/j);}
+      rockArm(c,whipArmPts(b,b.t),WH.w,1,b.side>0?2:1,1.4);
     }},
   golemAvalanche:{
     step(b){b.t++;if(b.t<=AV.tell)return;
@@ -669,43 +717,53 @@ defineBullets({
       const y=BOX.y-8+(b.t-AV.tell)*AV.speed;
       if(Math.abs(B.py-y)<AV.band&&Math.abs(B.px-b.gx)>AV.gap/2)bHitMe();
       if(y>BOX.y+BOX.h+20)b.dead=1;},
-    draw(c,b){const stil=still();
-      if(b.dir==='side'){const sx=b.s<0?BOX.x:BOX.x+BOX.w,inGap=y=>Math.abs(y-b.gy)<AV.sideGap/2;
-        if(b.t<=AV.tell){const k=b.t/AV.tell;
-          for(let y=BOX.y;y<BOX.y+BOX.h;y+=16){if(inGap(y+8))continue;blob(c,sx-b.s*4+(stil?0:Math.sin(b.t*0.9+y)*1.5),y+8,6+4*k,10,SNOW,0.9);}
-          c.save();c.strokeStyle=RED;c.globalAlpha=0.5;c.setLineDash([4,5]);c.lineWidth=1.4;c.beginPath();c.moveTo(BOX.x,b.gy-AV.sideGap/2);c.lineTo(BOX.x+BOX.w,b.gy-AV.sideGap/2);c.moveTo(BOX.x,b.gy+AV.sideGap/2);c.lineTo(BOX.x+BOX.w,b.gy+AV.sideGap/2);c.stroke();c.restore();
-          return;}
-        const x=b.s<0?BOX.x-8+(b.t-AV.tell)*AV.sideSpeed:BOX.x+BOX.w+8-(b.t-AV.tell)*AV.sideSpeed;
-        c.save();c.fillStyle='rgba(243,245,244,.35)';
-        for(const [y0,y1] of [[BOX.y,b.gy-AV.sideGap/2],[b.gy+AV.sideGap/2,BOX.y+BOX.h]])if(y1>y0)c.fillRect(Math.min(sx,x),y0,Math.abs(x-sx),y1-y0);
-        c.restore();
-        for(let y=BOX.y;y<BOX.y+BOX.h;y+=12){if(inGap(y+6))continue;const j=hash(y*0.37),xx=x+(j-0.5)*6;blob(c,xx,y+6,7+j*3,9+j*4,SNOW,0.97);
-          c.save();c.strokeStyle=INK;c.globalAlpha=0.55;c.lineWidth=1.2;c.beginPath();c.ellipse(xx,y+6,7+j*3,9+j*4,0,b.s<0?-Math.PI*0.5:Math.PI*0.5,b.s<0?Math.PI*0.5:Math.PI*1.5);c.stroke();c.restore();}
-        return;}
-      if(b.t<=AV.tell){const k=b.t/AV.tell;
-        for(let x=BOX.x;x<BOX.x+BOX.w;x+=16){if(Math.abs(x+8-b.gx)<AV.gap/2)continue;blob(c,x+8+(stil?0:Math.sin(b.t*0.9+x)*1.5),BOX.y+4,10,6+4*k,SNOW,0.9);}
-        c.save();c.strokeStyle=RED;c.globalAlpha=0.5;c.setLineDash([4,5]);c.lineWidth=1.4;c.beginPath();c.moveTo(b.gx-AV.gap/2,BOX.y);c.lineTo(b.gx-AV.gap/2,BOX.y+BOX.h);c.moveTo(b.gx+AV.gap/2,BOX.y);c.lineTo(b.gx+AV.gap/2,BOX.y+BOX.h);c.stroke();c.restore();
-        return;}
-      const y=BOX.y-8+(b.t-AV.tell)*AV.speed;
-      c.save();c.fillStyle='rgba(243,245,244,.35)';
-      for(const [x0,x1] of [[BOX.x,b.gx-AV.gap/2],[b.gx+AV.gap/2,BOX.x+BOX.w]])if(x1>x0)c.fillRect(x0,BOX.y,x1-x0,Math.max(0,y-BOX.y));
+    draw(c,b){const stil=still(),side=b.dir==='side',len=side?BOX.h:BOX.w,t=b.t;
+      const fwd=side?(b.s<0?1:-1):1,origin=side?(b.s<0?BOX.x:BOX.x+BOX.w):BOX.y;
+      const gc=side?b.gy-BOX.y:b.gx-BOX.x,gh=(side?AV.sideGap:AV.gap)/2,inGap=a=>Math.abs(a-gc)<gh;
+      const F=t<=AV.tell?origin:side?(b.s<0?BOX.x-8+(t-AV.tell)*AV.sideSpeed:BOX.x+BOX.w+8-(t-AV.tell)*AV.sideSpeed):BOX.y-8+(t-AV.tell)*AV.speed;
+      const P=(a,d)=>side?[F-fwd*d,BOX.y+a]:[BOX.x+a,F-d];   // 줄 위 a, 앞머리에서 뒤로 d
+      const Bl=(a,d,ra,rd,col,al)=>{const [x,y]=P(a,d);side?blob(c,x,y,rd,ra,col,al):blob(c,x,y,ra,rd,col,al);};
+      if(t<=AV.tell){const k=t/AV.tell;   // 우르릉: 칸 가장자리로 눈과 잔돌이 흘러내리기 시작한다
+        for(let a=6;a<len;a+=14){if(inGap(a))continue;const j=hash(a*0.31);Bl(a,-(3+6*k+j*4),7+3*k,5+5*k,SNOW,0.92);if(j<0.25){const [x,y]=P(a,-(6+10*k));rockStone(c,x,y,3,2.5,j*9,Math.round(a),0.9);}}
+        if(!stil)for(let i=0;i<6;i++){const a=hash(i*3.7+Math.floor(t/3))*len;if(!inGap(a))Bl(a,-(12+((t*2+i*9)%18)),2,2,SNOW_SH,0.8);}
+        c.save();c.strokeStyle=RED;c.globalAlpha=0.55;c.setLineDash([4,5]);c.lineWidth=1.4;c.beginPath();
+        for(const e of [gc-gh,gc+gh]){const [x0,y0]=side?[BOX.x,BOX.y+e]:[BOX.x+e,BOX.y],[x1,y1]=side?[BOX.x+BOX.w,BOX.y+e]:[BOX.x+e,BOX.y+BOX.h];c.moveTo(x0,y0);c.lineTo(x1,y1);}
+        c.stroke();c.restore();return;}
+      const depth=Math.abs(F-origin)+8;
+      // 지나간 자리: 밀려간 눈이 얇게 깔린다
+      c.save();c.fillStyle='rgba(243,245,244,.42)';
+      for(const [a0,a1] of [[0,gc-gh],[gc+gh,len]])if(a1>a0){const [x0,y0]=P(a0,0),[x1,y1]=P(a1,depth);c.fillRect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1-x0),Math.abs(y1-y0));}
       c.restore();
-      for(let x=BOX.x;x<BOX.x+BOX.w;x+=13){if(Math.abs(x+6-b.gx)<AV.gap/2)continue;
-        const j=hash(x*0.37),yy=y+(j-0.5)*6;blob(c,x+6,yy,9+j*4,7+j*3,SNOW,0.97);
-        c.save();c.strokeStyle=INK;c.globalAlpha=0.55;c.lineWidth=1.2;c.beginPath();c.ellipse(x+6,yy,9+j*4,7+j*3,0,Math.PI*0.9,Math.PI*2.1);c.stroke();c.restore();}
-      for(let i=0;i<4;i++){const x=BOX.x+((i*83+b.t*1.7)%BOX.w);if(Math.abs(x-b.gx)<AV.gap/2)continue;drawSnowball(c,x,y+10,5,b.t*0.2+i,0.8);}
+      // 무너지며 구르는 눈 더미 (앞머리 뒤 40px 남짓)
+      for(let a=4;a<len;a+=11){if(inGap(a))continue;const j=hash(a*0.37);
+        for(let r=0;r<3;r++){const d=14+r*13+j*6;if(d>depth)break;Bl(a+(r%2?5:0),d,9+j*3,6+r,r?SNOW_SH:'#e9eeee',0.85-r*0.2);}}
+      // 앞머리: 솟았다 앞으로 말려 부서지는 눈 물마루
+      const crest=a=>12+6*Math.sin(a*0.09+t*0.32)+5*hash(a*0.13);
+      for(let a=3;a<len;a+=9){if(inGap(a))continue;const h=crest(a);
+        Bl(a,-2,8,h*0.42+2,SNOW_SH,0.95);Bl(a,h*0.3,9,h*0.62,SNOW,1);Bl(a+2,-5,6,3.5,'#ffffff',0.95);}
+      c.save();c.strokeStyle=INK;c.globalAlpha=0.6;c.lineWidth=1.5;c.beginPath();let on=false;
+      for(let a=0;a<=len;a+=6){if(inGap(a)){on=false;continue;}const [x,y]=P(a,-7-2*Math.sin(a*0.21+t*0.4));on?c.lineTo(x,y):c.moveTo(x,y);on=true;}
+      c.stroke();c.restore();
+      // 틈 양쪽 벽: 빈 줄이 또렷하게
+      for(const e of [gc-gh,gc+gh])for(let d=-4;d<Math.min(depth,60);d+=10)Bl(e+(e<gc?-4:4),d,4,6,SNOW,0.95);
+      // 속에서 구르는 눈덩이와 돌
+      for(let i=0;i<6;i++){const a=(i*61+t*1.3)%len;if(inGap(a))continue;const d=8+(i*7)%24,[x,y]=P(a,d);
+        if(i%3===0)rockStone(c,x,y,5,4,t*0.2+i,i*13+5,0.95,0.5);else drawSnowball(c,x,y,4.5+(i%2)*2,t*0.25+i,0.95);}
+      // 앞에 튀는 눈보라와 위로 피는 가루
+      if(!stil)for(let i=0;i<16;i++){const a=hash(i*2.9)*len;if(inGap(a))continue;Bl(a,-(9+((t*3+i*17)%20)),1.8,1.8,i%4?'#ffffff':SNOW_SH,0.85);}
+      for(let a=20;a<len;a+=42){if(!inGap(a))Bl(a,24,22,12,'#ffffff',0.3);}
     }},
   golemSnowball:{
-    step(b){b.t++;const rel=b.delay+SB.wind,land=rel+SB.fly;
+    step(b){b.t++;const rel=b.delay+SB.wind,fly=b.fly||SB.fly,land=rel+fly,sz=b.sz||1;
       if(b.tx==null&&b.t>=rel){const [x,y]=snowTarget(b);
         b.tx=clamp(x,BOX.x+20,BOX.x+BOX.w-20);b.ty=clamp(y,BOX.y+18,BOX.y+BOX.h-14);
         if(b.drop){b.sx=b.tx+(hash(b.i*1.9)-0.5)*30;b.sy=BOX.y-150;}   // 결정 D-376: 몸에서 털린 눈이 칸 위에서 곧장 떨어진다
         else{const h=toScreen(LW/2+b.side*80,bodyY()-114);b.sx=h.x;b.sy=h.y;}}
       // 결정 D-256: 눈폭탄 한 대는 통상 피해의 golem_snowball_damage 만큼
-      if(b.t===land){Sound.playSfx('battle_hit');snowPowder(b.tx,b.ty);if(Math.hypot(B.px-b.tx,B.py-b.ty)<SB.hit)bHitMe(T().golem_snowball_damage);}
+      if(b.t===land){Sound.playSfx('battle_hit');snowPowder(b.tx,b.ty,sz<0.95);if(Math.hypot(B.px-b.tx,B.py-b.ty)<SB.hit*sz)bHitMe(T().golem_snowball_damage);}
       if(b.t>land+SB.splat)b.dead=1;},
-    draw(c,b){if(b.tx==null)return;const rel=b.delay+SB.wind,land=rel+SB.fly,R=SB.radius;
-      if(b.t<land){const k=(b.t-rel)/SB.fly;
+    draw(c,b){if(b.tx==null)return;const rel=b.delay+SB.wind,fly=b.fly||SB.fly,land=rel+fly,R=SB.radius*(b.sz||1);
+      if(b.t<land){const k=(b.t-rel)/fly;
         blob(c,b.tx,b.ty+3,R*(0.35+0.65*k),R*0.45*(0.35+0.65*k),INK,0.08+0.25*k);
         c.save();c.strokeStyle=RED;c.globalAlpha=0.3+0.4*k;c.lineWidth=1.6;c.setLineDash([4,4]);c.beginPath();c.arc(b.tx,b.ty,R,0,Math.PI*2);c.stroke();c.restore();
         if(k>0.75&&Math.floor(b.t/3)%2){c.save();c.strokeStyle=RED;c.lineWidth=2.2;c.beginPath();c.arc(b.tx,b.ty,R,0,Math.PI*2);c.stroke();c.restore();}
@@ -717,12 +775,46 @@ defineBullets({
       for(let i=0;i<12;i++){const ang=i*0.52+b.i,d=rr*(0.7+hash(i+b.i)*0.6);blob(c,b.tx+Math.cos(ang)*d,b.ty+Math.sin(ang)*d*0.55,1.6+hash(i*3+b.i)*1.6,1.4,i%3?SNOW_SH:INK,(i%3?0.9:0.45)*al);}
     }},
 });
+/* 결정 D-453: 서리 옥 빛. 빛줄기는 핵(위 골렘 가슴)에서 칸으로 쏟아진다. 각도는 곧장 아래가 0, 오른쪽이 +.
+   한 바퀴(golem_light_frames) 동안 앞 절반은 함께 쓸고, 뒤 절반은 가위처럼 엇갈린다 */
+function lightApex(){return toScreen(LW/2,bodyY()+18);}
+function lightBeams(b){const n=b.n,S=n>2?0.36:0.42,A=n>2?0.34:0.44,W=T().golem_light_width*(n>2?0.85:1),on=b.t-T().golem_light_tell,P=T().golem_light_frames;
+  const w=on<=0?0:on>=P?0:Math.sin(Math.PI*2*on/P);
+  return Array.from({length:n},(_,i)=>({a:(i-(n-1)/2)*S+A*w*(on>P/2&&i%2?-1:1),W}));}
+function lightAlpha(b){const tl=T().golem_light_tell,P=T().golem_light_frames,on=b.t-tl;
+  return on<=0?0:on<12?on/12:on<=P?1:Math.max(0,1-(on-P)/LIGHT_FADE);}
+function drawBeams(c,b,below){
+  const A=lightApex(),al=lightAlpha(b),tl=T().golem_light_tell,k=clamp(b.t/tl,0,1),dir=a=>[Math.sin(a),Math.cos(a)];
+  for(const bm of lightBeams(b)){const L=560,[l0,l1]=dir(bm.a-bm.W),[r0,r1]=dir(bm.a+bm.W),[m0,m1]=dir(bm.a);
+    if(al<=0){   // 예고: 빛줄기 자리가 옅게 비치고 가운데 점선
+      c.save();c.globalAlpha=(0.06+0.12*k)*(below?1:0.6);c.fillStyle=GEM_LT;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+l0*L,A.y+l1*L);c.lineTo(A.x+r0*L,A.y+r1*L);c.closePath();c.fill();
+      c.globalAlpha=k>0.75&&Math.floor(b.t/4)%2?0.9:0.45;c.strokeStyle=GEM_DK;c.lineWidth=1.3;c.setLineDash([5,5]);c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+m0*L,A.y+m1*L);c.stroke();c.restore();continue;}
+    c.save();
+    c.globalAlpha=0.16*al;c.fillStyle=GEM_LT;const [w0,w1]=dir(bm.a-bm.W*1.4),[z0,z1]=dir(bm.a+bm.W*1.4);
+    c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+w0*L,A.y+w1*L);c.lineTo(A.x+z0*L,A.y+z1*L);c.closePath();c.fill();   // 번진 빛
+    const g=c.createRadialGradient(A.x,A.y,0,A.x,A.y,L*0.75);g.addColorStop(0,'rgba(240,255,252,.95)');g.addColorStop(0.45,'rgba(150,224,216,.62)');g.addColorStop(1,'rgba(110,200,192,.4)');
+    c.globalAlpha=al*(below?1:0.7);c.fillStyle=g;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+l0*L,A.y+l1*L);c.lineTo(A.x+r0*L,A.y+r1*L);c.closePath();c.fill();
+    c.strokeStyle=GEM_DK;c.lineWidth=1.4;c.globalAlpha=0.7*al;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+l0*L,A.y+l1*L);c.moveTo(A.x,A.y);c.lineTo(A.x+r0*L,A.y+r1*L);c.stroke();
+    c.strokeStyle='#ffffff';c.lineWidth=2;c.globalAlpha=0.75*al;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+m0*L,A.y+m1*L);c.stroke();c.restore();
+    if(below&&!still())for(let i=0;i<5;i++){const d=150+((b.t*2.2+i*61)%320),j=(hash(i*3.3)-0.5)*bm.W*1.6;star(c,A.x+Math.sin(bm.a+j)*d,A.y+Math.cos(bm.a+j)*d,2.2,0.8*al);}   // 바닥에 반짝임
+  }
+}
+defineBullets({
+  golemLight:{
+    step(b){b.t++;const tl=T().golem_light_tell,P=T().golem_light_frames,on=b.t-tl;
+      if(b.t===tl+1)Sound.playSfx('battle_warn');
+      if(on>8&&on<=P){const A=lightApex(),ang=Math.atan2(B.px-A.x,B.py-A.y);if(lightBeams(b).some(bm=>Math.abs(ang-bm.a)<bm.W-0.012))bHitMe();}
+      if(on>=P+LIGHT_FADE)b.dead=1;},
+    draw(c,b){const al=lightAlpha(b);if(al>0){c.save();c.fillStyle='rgba(29,24,20,'+(0.13*al).toFixed(3)+')';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();}   // 칸이 어두워지고 빛줄기만 밝다
+      drawBeams(c,b,true);}},
+});
 /* 상자 밖까지 날아가는 눈덩이는 잘리지 않게 상자 위에 그린다 (결정 D-182). 손에서 놓인 뒤부터 그린다. 친 자리 효과도 여기서 (D-253) */
 function drawSnowFlights(c){
+  for(const b of B.bullets)if(b.k==='golemLight'){c.save();c.beginPath();c.rect(0,0,LW,BOX.y-56);c.clip();drawBeams(c,b,false);c.restore();}   // 결정 D-453: 글귀 줄은 가리지 않는다
   for(const b of B.bullets){if(b.k!=='golemSnowball'||b.tx==null)continue;
-    const rel=b.delay+SB.wind,land=rel+SB.fly;if(b.t>=land)continue;
-    const k=(b.t-rel)/SB.fly,e=b.drop?k*k:k,x=b.sx+(b.tx-b.sx)*e,y=b.sy+(b.ty-b.sy)*e-(b.drop?0:80*4*k*(1-k));
-    drawSnowball(c,x,y,b.drop?11+6*k:13+9*k,b.t*0.15);
+    const fly=b.fly||SB.fly,rel=b.delay+SB.wind,land=rel+fly;if(b.t>=land)continue;
+    const k=(b.t-rel)/fly,e=b.drop?k*k:k,x=b.sx+(b.tx-b.sx)*e,y=b.sy+(b.ty-b.sy)*e-(b.drop?0:80*4*k*(1-k));
+    drawSnowball(c,x,y,(b.drop?11+6*k:13+9*k)*(b.sz||1),b.t*0.15);
   }
   drawImpacts(c);
 }
@@ -764,7 +856,7 @@ defineEnemies({
     openMark:golemOpenMark,
     // 결정 D-370: weak 는 부서진 뒤 한 줄
     parts:tableParts('golem',{leg:{atk:'golemStomp',mark:'발',tell:'골렘이 구들돌 발을 높이 쳐든다.',weak:'골렘이 털썩 주저앉았다. 더는 발을 찧지 못한다.'},
-      arm:{atk:'golemArm',mark:'팔',tell:'골렘이 차돌 팔을 옆으로 크게 젖힌다.',weak:'골렘이 약해졌다. 팔이 없어 휩쓸지도, 눈을 던지지도 못한다.'},
+      arm:{atk:'golemArm',mark:'팔',tell:'골렘이 차돌 팔을 뒤로 높이 감아올린다.',weak:'골렘이 약해졌다. 팔이 없어 휩쓸지도, 눈을 던지지도 못한다.'},
       head:{atk:'golemSnow',mark:'핵',tell:'골렘이 두 팔로 눈을 퍼 올린다.'}}),
     likes:TABLES.CALM.golem,likeText:'돌무더기가 잠시 숨을 고른다.',
     likeTexts:{story_stone:'아빠가 못 올린 소원 돌을 건넸다. 돌 골렘이 가만히 내려다본다.'},

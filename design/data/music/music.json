@@ -14769,6 +14769,709 @@
         }
       ],
       "notes": "가야금 독주 두 마디. AudioContext 시계로 이어 붙이고 다음 지역 도입은 0마디부터 시작한다."
+    },
+    {
+      "status": "제안",
+      "meter": [
+        4,
+        4
+      ],
+      "mode": "평조를 C·D·E·G·A로 옮긴 합성 편곡",
+      "loop": null,
+      "id": "sting_kudzu",
+      "name": "칡이 길을 막다",
+      "use": "엉킨 칡 전투가 걸릴 때 한 번",
+      "tempo": 158,
+      "measures": 2,
+      "jangdan": "휘모리 한 장단",
+      "sections": [
+        {
+          "name": "울림 · 걸려듦",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "name": "여음 · 맞섬",
+          "from": 1,
+          "to": 2
+        }
+      ],
+      "notes": "결정 D-457: 엉킨 칡 곡(boss_kudzu)으로 넘어가기 전 걸려드는 순간. 장구가 몰아 들어오고 피리가 이름의 노래 머리(C·D·E·G)를 끊어 올린 뒤 징 한 번. 바로 boss_kudzu 가 이어진다.",
+      "voices": [
+        {
+          "id": "melody",
+          "role": "melody",
+          "instrument": "piri",
+          "gain": 0.5,
+          "pan": -0.08,
+          "patterns": {
+            "s0": [
+              "C4:0.5:0.85",
+              "D4:0.25:0.85",
+              "E4:0.25:0.85",
+              "G4:0.5:0.9",
+              "R:0.5",
+              "A4:0.25:0.85",
+              "G4:0.25:0.85",
+              "E4:0.5:0.85",
+              "D4:1:0.85"
+            ],
+            "s1": [
+              "G4:0.5:0.9",
+              "A4:0.5:0.9",
+              "C5:1.5:0.9",
+              "R:1.5"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "janggu",
+          "role": "percussion",
+          "instrument": "janggu_deong",
+          "gain": 0.4,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "X:0.25:0.5",
+              "X:0.25:0.55",
+              "X:0.25:0.6",
+              "X:0.25:0.65",
+              "X:0.25:0.7",
+              "X:0.25:0.72",
+              "X:0.25:0.76",
+              "X:0.25:0.8",
+              "X:0.5:0.85",
+              "X:0.5:0.6",
+              "X:0.5:0.85",
+              "X:0.5:0.6"
+            ],
+            "s1": [
+              "X:1:0.9",
+              "R:3"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "buk",
+          "role": "percussion",
+          "instrument": "buk",
+          "gain": 0.32,
+          "pan": 0.1,
+          "patterns": {
+            "s0": [
+              "R:2",
+              "X:1:0.7",
+              "X:1:0.8"
+            ],
+            "s1": [
+              "X:1:0.95",
+              "R:3"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "jing",
+          "role": "percussion",
+          "instrument": "jing",
+          "gain": 0.12,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "R:4"
+            ],
+            "s1": [
+              "X:4:0.8"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "low",
+          "role": "bass",
+          "instrument": "ajaeng",
+          "gain": 0.22,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "C2:2:0.6",
+              "G2:2:0.55"
+            ],
+            "s1": [
+              "C2:4:0.7"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "제안",
+      "meter": [
+        4,
+        4
+      ],
+      "mode": "평조를 C·D·E·G·A로 옮긴 합성 편곡",
+      "loop": null,
+      "id": "sting_golem",
+      "name": "성황당 돌이 일어서다",
+      "use": "돌 골렘 전투가 걸릴 때 한 번",
+      "tempo": 132,
+      "measures": 2,
+      "jangdan": "동살풀이 한 장단",
+      "sections": [
+        {
+          "name": "울림 · 걸려듦",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "name": "여음 · 맞섬",
+          "from": 1,
+          "to": 2
+        }
+      ],
+      "notes": "결정 D-457: 돌 골렘 곡(boss_golem)으로 넘어가기 전. 돌 두드림 셋이 무겁게 떨어지고(일어서는 걸음), 아쟁이 낮게 긁고 피리가 내려 꽂힌 뒤 모듬북과 징.",
+      "voices": [
+        {
+          "id": "rock",
+          "role": "percussion",
+          "instrument": "stone",
+          "gain": 0.38,
+          "pan": -0.05,
+          "patterns": {
+            "s0": [
+              "X:1:0.95",
+              "R:0.5",
+              "X:0.5:0.7",
+              "X:1:0.95",
+              "R:1"
+            ],
+            "s1": [
+              "X:0.5:0.8",
+              "X:0.5:0.9",
+              "X:1:1",
+              "R:2"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "moduk",
+          "role": "percussion",
+          "instrument": "moduk_low",
+          "gain": 0.5,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "X:2:0.7",
+              "X:2:0.75"
+            ],
+            "s1": [
+              "X:1:0.95",
+              "R:3"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "melody",
+          "role": "melody",
+          "instrument": "piri",
+          "gain": 0.46,
+          "pan": -0.08,
+          "patterns": {
+            "s0": [
+              "R:2",
+              "G4:0.5:0.85",
+              "E4:0.5:0.85",
+              "D4:1:0.85"
+            ],
+            "s1": [
+              "C4:0.5:0.9",
+              "D4:0.5:0.9",
+              "G3:2:0.85",
+              "R:1"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "low",
+          "role": "bass",
+          "instrument": "ajaeng",
+          "gain": 0.24,
+          "pan": 0.05,
+          "patterns": {
+            "s0": [
+              "C2:4:0.7"
+            ],
+            "s1": [
+              "G1:2:0.75",
+              "C2:2:0.6"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "jing",
+          "role": "percussion",
+          "instrument": "jing",
+          "gain": 0.1,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "R:4"
+            ],
+            "s1": [
+              "X:4:0.85"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "제안",
+      "meter": [
+        4,
+        4
+      ],
+      "mode": "평조를 C·D·E·G·A로 옮긴 합성 편곡",
+      "loop": null,
+      "id": "sting_dokkaebi",
+      "name": "헌물이 들썩이다",
+      "use": "헌물 도깨비 전투가 걸릴 때 한 번",
+      "tempo": 172,
+      "measures": 2,
+      "jangdan": "자진모리 한 장단",
+      "sections": [
+        {
+          "name": "울림 · 걸려듦",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "name": "여음 · 맞섬",
+          "from": 1,
+          "to": 2
+        }
+      ],
+      "notes": "결정 D-457: 도깨비 곡(boss_dokkaebi)으로 넘어가기 전. 꽹과리가 장난스럽게 치고 들어오고 엿가위가 끼어들며, 해금이 비틀어 올라간 뒤 북 한 번.",
+      "voices": [
+        {
+          "id": "kkwaeng",
+          "role": "percussion",
+          "instrument": "kkwaenggwari",
+          "gain": 0.24,
+          "pan": 0.12,
+          "patterns": {
+            "s0": [
+              "X:0.5:0.8",
+              "X:0.25:0.5",
+              "X:0.25:0.6",
+              "X:0.5:0.8",
+              "X:0.5:0.6",
+              "X:0.25:0.7",
+              "X:0.25:0.7",
+              "X:0.5:0.85",
+              "X:0.5:0.6",
+              "X:0.5:0.9"
+            ],
+            "s1": [
+              "X:1:0.95",
+              "R:3"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "scissors",
+          "role": "percussion",
+          "instrument": "yeot_scissors",
+          "gain": 0.22,
+          "pan": -0.15,
+          "patterns": {
+            "s0": [
+              "R:1",
+              "X:0.5:0.7",
+              "X:0.5:0.7",
+              "R:1",
+              "X:0.25:0.6",
+              "X:0.25:0.6",
+              "X:0.5:0.8"
+            ],
+            "s1": [
+              "R:4"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "melody",
+          "role": "melody",
+          "instrument": "haegeum",
+          "gain": 0.4,
+          "pan": -0.05,
+          "patterns": {
+            "s0": [
+              "E4:0.5:0.8",
+              "G4:0.25:0.8",
+              "A4:0.25:0.8",
+              "G4:0.5:0.8",
+              "E4:0.5:0.8",
+              "A4:0.5:0.85",
+              "C5:0.5:0.85",
+              "D5:1:0.85"
+            ],
+            "s1": [
+              "E5:0.5:0.9",
+              "D5:0.5:0.9",
+              "C5:1.5:0.85",
+              "R:1.5"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "buk",
+          "role": "percussion",
+          "instrument": "buk",
+          "gain": 0.32,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "X:1:0.7",
+              "R:1",
+              "X:1:0.75",
+              "X:0.5:0.6",
+              "X:0.5:0.8"
+            ],
+            "s1": [
+              "X:1:0.95",
+              "R:3"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "jing",
+          "role": "percussion",
+          "instrument": "jing",
+          "gain": 0.08,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "R:4"
+            ],
+            "s1": [
+              "X:4:0.7"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "제안",
+      "meter": [
+        4,
+        4
+      ],
+      "mode": "계면조 음정 C·Eb·F·G·Bb",
+      "loop": null,
+      "id": "sting_steel",
+      "name": "얼음이 이름을 부르다",
+      "use": "강철이 전투가 걸릴 때 한 번",
+      "tempo": 120,
+      "measures": 2,
+      "jangdan": "느린 휘몰이 한 장단",
+      "sections": [
+        {
+          "name": "울림 · 걸려듦",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "name": "여음 · 맞섬",
+          "from": 1,
+          "to": 2
+        }
+      ],
+      "notes": "결정 D-457: 강철이 곡(boss_steel)으로 넘어가기 전. 찬바람 위에 대금이 높게 떨다 꺾여 내려오고, 모듬북이 얼음 깨지듯 두 번, 징이 길게 남는다.",
+      "voices": [
+        {
+          "id": "wind",
+          "role": "ambience",
+          "instrument": "wind",
+          "gain": 0.18,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "X:4:0.6"
+            ],
+            "s1": [
+              "X:4:0.5"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "melody",
+          "role": "melody",
+          "instrument": "daegeum",
+          "gain": 0.44,
+          "pan": -0.06,
+          "patterns": {
+            "s0": [
+              "G5:1.5:0.85",
+              "Bb5:0.5:0.85",
+              "G5:0.5:0.8",
+              "F5:0.5:0.8",
+              "Eb5:1:0.8"
+            ],
+            "s1": [
+              "C5:3:0.85",
+              "R:1"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "moduk",
+          "role": "percussion",
+          "instrument": "moduk_low",
+          "gain": 0.5,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "R:3",
+              "X:1:0.85"
+            ],
+            "s1": [
+              "X:1:0.95",
+              "R:3"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "low",
+          "role": "bass",
+          "instrument": "ajaeng",
+          "gain": 0.22,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "C2:4:0.6"
+            ],
+            "s1": [
+              "C2:2:0.7",
+              "G1:2:0.6"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "jing",
+          "role": "percussion",
+          "instrument": "jing",
+          "gain": 0.12,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "R:4"
+            ],
+            "s1": [
+              "X:4:0.9"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "제안",
+      "meter": [
+        4,
+        4
+      ],
+      "mode": "평조를 C·D·E·G·A로 옮긴 합성 편곡",
+      "loop": null,
+      "id": "sting_iron",
+      "name": "모루 앞에 서다",
+      "use": "무쇠 시험이 걸릴 때 한 번",
+      "tempo": 140,
+      "measures": 2,
+      "jangdan": "엇모리 한 장단",
+      "sections": [
+        {
+          "name": "울림 · 걸려듦",
+          "from": 0,
+          "to": 1
+        },
+        {
+          "name": "여음 · 맞섬",
+          "from": 1,
+          "to": 2
+        }
+      ],
+      "notes": "결정 D-457: 무쇠 시험 곡(trial_iron)으로 넘어가기 전. 망치가 모루를 세 번 고르고 북이 받친 뒤 피리 한 마디.",
+      "voices": [
+        {
+          "id": "hammer",
+          "role": "percussion",
+          "instrument": "hammer",
+          "gain": 0.34,
+          "pan": 0.08,
+          "patterns": {
+            "s0": [
+              "X:1:0.9",
+              "X:1:0.7",
+              "X:0.5:0.9",
+              "X:0.5:0.9",
+              "R:1"
+            ],
+            "s1": [
+              "X:1:1",
+              "R:3"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "buk",
+          "role": "percussion",
+          "instrument": "buk",
+          "gain": 0.3,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "R:1",
+              "X:1:0.6",
+              "R:1",
+              "X:1:0.75"
+            ],
+            "s1": [
+              "X:1:0.9",
+              "R:3"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "melody",
+          "role": "melody",
+          "instrument": "piri",
+          "gain": 0.42,
+          "pan": -0.08,
+          "patterns": {
+            "s0": [
+              "R:2",
+              "C4:0.5:0.85",
+              "E4:0.5:0.85",
+              "G4:1:0.85"
+            ],
+            "s1": [
+              "A4:0.5:0.9",
+              "G4:0.5:0.85",
+              "C5:2:0.9",
+              "R:1"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        },
+        {
+          "id": "low",
+          "role": "bass",
+          "instrument": "ajaeng",
+          "gain": 0.2,
+          "pan": 0,
+          "patterns": {
+            "s0": [
+              "C2:4:0.6"
+            ],
+            "s1": [
+              "C2:4:0.65"
+            ]
+          },
+          "sequence": [
+            "s0",
+            "s1"
+          ]
+        }
+      ]
     }
   ],
   "travelInterludes": {

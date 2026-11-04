@@ -210,6 +210,32 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       await unlocked();await click('#bagClose');await wait(100);await settle();
     }
   }
+  // 결정 D-441: 가공법 단추 없이 플레이어처럼 재료를 하나씩 '○○에 넣기'로 넣고 가공한다.
+  // 위 craft()는 가공법 단추로 꼭 한 몫만 채워서, 쌀 셋을 넣으면 맷돌이 안 돌던 버그를 못 잡았다.
+  async function craftByHand(tool,item,put,out,expect) {
+    await settle();await key('i');await wait(50);
+    await b.until('!brewing',{label:'가공 연출 끝'});
+    const toolIndex=await read(`Object.keys(HEIR).indexOf(${json(tool)})`);
+    await click(`#bagBody .tooltab:nth-child(${toolIndex+1})`);
+    const before=await read(`G.inv[${json(out)}]||0`);
+    for(let i=0;i<put;i++){
+      const slot=await read(`[...document.querySelectorAll('#bagBody .bag-grid .slot')].findIndex(s=>(s.getAttribute('aria-label')||'').startsWith(ITEMS[${json(item)}].n+' '))`);
+      if(slot<0)throw new Error('보따리에 없음: '+item);
+      await click(`#bagBody .bag-grid .slot:nth-child(${slot+1})`);
+      const put=await read(`[...document.querySelectorAll('#bagBody .detail .row button')].findIndex(x=>x.textContent.endsWith('에 넣기'))`);
+      if(put<0)throw new Error('넣기 단추 없음: '+item);
+      await click(`#bagBody .detail .row button:nth-child(${put+1})`);
+    }
+    await b.until("!!$('craftBtn')&&!$('craftBtn').disabled",{label:'가공 버튼 풀림'});
+    await click('#craftBtn');
+    const started=await read('brewing');
+    if(!started)throw new Error(`${tool}에 ${item} ${put}개를 넣고 가공했는데 안 됐다: `+await read("$('benchMsg')?.textContent||pouchMsg"));
+    await b.until("!!document.querySelector('#craftHands [data-craft]')",{label:'가공 손 동작 단추'});
+    await click('#craftHands [data-craft]');
+    await b.until('!brewing',{label:'가공 연출 끝'});await click('#bagClose');await wait(100);await settle();
+    const got=await read(`(G.inv[${json(out)}]||0)-${before}`);
+    if(got!==expect)throw new Error(`${item} ${put}개로 ${out}이 ${expect}개 나와야 하는데 ${got}개`);
+  }
   // 전투 결과를 돌려준다. 졌다면 뒤 단계의 엉뚱한 오류(예: 해머루 없음)로 번지지 않게 mustWin이 밝힌다.
   async function battle(gifts,{sway=false}={}) {
     scene=scene.replace(/ · 전투$/,'')+' · 전투';let end=Date.now()+60000;   // 결정 D-64: 선물은 빈틈에만. 선물 버튼을 누르면 다음 빈틈에 창이 열린다
@@ -301,7 +327,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       if(mode==='expanded') {await zone('village');const n=await read("zoneObjects('wanderers').find(n=>n.name==='늙은 까치')&&(({x,y})=>({x,y:y??192}))(zoneObjects('wanderers').find(n=>n.name==='늙은 까치'))");if(!n)throw new Error('약즙 배달 까치가 마을에 없다');await jumpTo(n.x,n.y);await key('e');await settle();}
     });
     await next();
-    await stage('큰 장터 · 장단과 쌀',async()=>{await pickup('solbang',5);await npc('yeotbang');if(!await read('G.f.yeotDone&&(G.inv.ssal||0)===8'))throw new Error('장단 뒤 쌀 8개를 받지 못했다');await craft('maetdol','ssal_powder',7);});
+    await stage('큰 장터 · 장단과 쌀',async()=>{await pickup('solbang',5);await npc('yeotbang');if(!await read('G.f.yeotDone&&(G.inv.ssal||0)===8'))throw new Error('장단 뒤 쌀 8개를 받지 못했다');await craftByHand('maetdol','ssal',3,'ssal_powder',3);await craftByHand('maetdol','ssal',3,'ssal_powder',3);await craft('maetdol','ssal_powder');});
     await stage('큰 장터 · 시루와 고사떡',async()=>{
       for(let i=0;i<3&&!await read('G.f.steamDone');i++)await npc('morak');
       if(!await read('G.f.steamDone'))throw new Error('모락에게 시루를 깨우지 못했다');
