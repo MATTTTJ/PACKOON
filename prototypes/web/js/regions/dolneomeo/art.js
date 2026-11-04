@@ -10,12 +10,23 @@ Rg.kkuAwakeNow=()=>!(Rg.arcs()&&G.f.dolneomeo_arc_kku7)&&(G.anim%NOD)<AWAKE;
 /* 판정은 그대로 두고, 고개 들기 직전 32프레임의 기척만 필드에 알려 준다. */
 Rg.kkuStirNow=()=>Rg.arcs()&&G.f.dolneomeo_arc_kku3?0:Math.max(0,(G.anim%NOD-(NOD-TABLES.TUNING.kkubeogi_cue))/TABLES.TUNING.kkubeogi_cue);
 Rg.art={
-  hedgehog(ox,oy,f){const Sp='#6b5038',Sd='#4a3626',Fc='#d9b892',K='#2b1d14';const awake=Rg.kkuAwakeNow();const dn=awake?0:2;
+  /* 결정 D-485: 고개를 든 때와 조는 때가 한눈에 갈리게 (사용자 피드백 2026-11-04).
+     든 때: 머리를 두 칸 높이 쳐들고 코를 앞으로 내밀며, 눈을 뜨고(흰 눈빛), 가시를 눕히고, 앞발을 딛는다.
+     조는 때: 몸을 말아 머리를 가시 밑으로 묻고(두 칸 아래), 눈을 감고, 가시를 곧추세운다. */
+  hedgehog(ox,oy,f){const Sp='#6b5038',Sd='#4a3626',Fc='#d9b892',K='#2b1d14';const awake=Rg.kkuAwakeNow();const dn=awake?-2:2;
     M(ox,oy,f,-10,-11,15,10,Sp);M(ox,oy,f,-12,-8,3,6,Sp);
-    for(let i=0;i<6;i++){M(ox,oy,f,-11+i*3,-13-(i%2),2,3,Sd);}
+    if(awake)for(let i=0;i<6;i++){M(ox,oy,f,-11+i*3,-12-(i%2),3,2,Sd);}   // 누운 가시
+    else{for(let i=0;i<6;i++){M(ox,oy,f,-11+i*3,-15-(i%2),2,4,Sd);}M(ox,oy,f,-12,-10,1,3,Sd);}   // 곧추선 가시
     M(ox,oy,f,-9,-9,1,1,'#8a6a4a');M(ox,oy,f,-4,-10,1,1,'#8a6a4a');M(ox,oy,f,0,-8,1,1,'#8a6a4a');
-    M(ox,oy,f,3,-8+dn,6,6,Fc);M(ox,oy,f,8,-6+dn,2,2,K);
-    if(awake){M(ox,oy,f,5,-7,1,1,K);}else{M(ox,oy,f,4,-6+dn,2,1,K);}
+    M(ox,oy,f,3,-8+dn,6,6,Fc);
+    if(awake){
+      M(ox,oy,f,9,-6+dn,1,2,Fc);M(ox,oy,f,10,-6+dn,2,2,K);   // 앞으로 내민 코
+      M(ox,oy,f,5,-7+dn,2,2,K);M(ox,oy,f,5,-7+dn,1,1,'#ffffff');M(ox,oy,f,4,-9+dn,2,1,'#b08860');   // 뜬 눈, 귀
+      M(ox,oy,f,6,-2,2,2,Sd);   // 딛은 앞발
+    }else{
+      M(ox,oy,f,8,-6+dn,2,2,K);M(ox,oy,f,4,-6+dn,2,1,K);   // 감은 눈
+      M(ox,oy,f,2,-7+dn,4,2,Sp);M(ox,oy,f,2,-8+dn,2,1,Sd);   // 머리를 덮은 가시
+    }
     M(ox,oy,f,-6,-1,3,1,Sd);M(ox,oy,f,1,-1,3,1,Sd);
     if(!awake&&ctx.canvas===cv){   // 잠꼬대 z (대화 초상에는 안 그림)
 const z=Math.floor(G.anim/24)%3;M(ox,oy,f,8+z,-16-z*3,3,1,'#f4f7fa');M(ox,oy,f,10+z,-15-z*3,1,1,'#f4f7fa');M(ox,oy,f,8+z,-14-z*3,3,1,'#f4f7fa');}},
@@ -208,7 +219,7 @@ function wishSky(w,h){
 }
 function wishTowerPic(stage,drop=false){
   let start=null;
-  return {animate:drop,draw(w,h,t){
+  return {animate:drop,sound:'pic_wish_tower',draw(w,h,t){   // 결정 D-483
     if(start===null){start=t;if(drop)Sound.stone('tap');}
     wishSky(w,h);
     const k=drop?clamp((t-start)/.35,0,1):1;

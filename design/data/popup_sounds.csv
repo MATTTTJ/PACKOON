@@ -1,0 +1,70 @@
+﻿id,지역,연출,소리,되풀이ms,상태
+village_home,galchamgol,열린 방문 들여다보기,door,,제안
+village_well,galchamgol,우물 두레박 살펴보기,water_drop,,제안
+village_wheel,galchamgol,물레방아 물길 살펴보기,water_trickle,1800,제안
+forge_sign,galchamgol,갈림길 팻말 읽기,wood_tap,,제안
+forge_charcoal,galchamgol,식힌 숯가마 살펴보기,fire_crackle,1500,제안
+forge_share,galchamgol,낮은 평상 살펴보기,wood_tap,,제안
+forest_root,galchamgol,드러난 뿌리 살펴보기,leaf_rustle,,제안
+forest_oak,galchamgol,높은 참나무 가지 올려다보기,leaf_rustle,2200,제안
+forest_trail,galchamgol,나뭇가지에 걸린 금줄 보기,cloth_flutter,1900,제안
+forest_mother,galchamgol,갈대 너머 소리 듣기,leaf_rustle,2000,제안
+marsh_shallows,galchamgol,얕은 물 들여다보기,water_trickle,1800,제안
+marsh_shelf,galchamgol,약재 선반 살펴보기,wood_tap,,제안
+marsh_pot,galchamgol,처마 밑 약탕관 자리 보기,clay_ring,,제안
+hill_grass,galchamgol,누운 풀 살펴보기,leaf_rustle,,제안
+hill_cloth,galchamgol,오래된 소원 천 보기,cloth_flutter,1900,제안
+hill_fruit,galchamgol,해머루 자리 올려다보기,leaf_rustle,,제안
+hill_north,galchamgol,북쪽 길 팻말 읽기,wood_tap,,제안
+pic_bojagi,galchamgol,까치의 약보자기 (대사 그림),cloth_flutter,,제안
+pic_hamjibak,galchamgol,개울가 함지박 (대사 그림),water_trickle,,제안
+pic_hamjibak_stamp,galchamgol,함지박 밑바닥 낙관 (대사 그림),wood_tap,,제안
+pic_lantern,galchamgol,반딧불 등롱 (대사 그림),ice_tinkle,2400,제안
+frost_print,dolneomeo,서리 자국 살펴보기,footstep_frost,,제안
+gate_bell,dolneomeo,장승 풍경 들어 보기,wind_bell,1300,제안
+stone_channel,dolneomeo,돌 물길 들여다보기,water_trickle,1800,제안
+mill_edge,dolneomeo,마당 맷돌 받침 만져 보기,stone_knock,,제안
+warm_hearth,dolneomeo,공동 화로 살펴보기,fire_crackle,1400,제안
+memil_stubble,dolneomeo,메밀 그루터기 살펴보기,leaf_rustle,,제안
+tied_reeds,dolneomeo,억새 묶음 살펴보기,leaf_rustle,,제안
+nest_door,dolneomeo,둥지 앞 작은 돌 살펴보기,stone_knock,,제안
+silver_lichen,dolneomeo,은빛 바위 살펴보기,stone_knock,,제안
+frozen_trickle,dolneomeo,얼어붙은 물줄기 살펴보기,ice_tinkle,,제안
+dry_crack,dolneomeo,갈라진 바위 들여다보기,wind_gust,,제안
+wish_cloth,dolneomeo,소원 천 살펴보기,cloth_flutter,1900,제안
+grain_dish,dolneomeo,작은 제기 살펴보기,clay_ring,,제안
+small_tower,dolneomeo,낮은 돌탑 살펴보기,stone_knock,,제안
+pic_wish_tower,dolneomeo,소원 돌탑 (대사 그림),stone_knock,,제안
+j_flag_knot,jangteo,보부상단 깃발,cloth_flutter,1700,제안
+j_jangseung_snow,jangteo,장승 코의 눈,footstep_snow,,제안
+j_stall_gap,jangteo,좌판 사이 골목,cloth_flutter,,제안
+j_onggi,jangteo,옹기전 독,clay_ring,,제안
+j_steam_flour,jangteo,쌀가루 묻은 발판,steamer,,제안
+j_broken_yut,jangteo,반질반질한 화살,wood_tap,,제안
+j_gukbap,jangteo,장국밥 가마솥,fire_crackle,1500,제안
+j_inn_shoes,jangteo,마루 아래 신발,wood_tap,,제안
+j_inn_pillar,jangteo,기둥의 키 자국,wood_tap,,제안
+j_inn_icicle,jangteo,처마 끝 고드름,ice_tinkle,,제안
+j_inn_stable,jangteo,마구간 나귀,leaf_rustle,,제안
+j_pine_scent1,jangteo,부러진 솔가지,leaf_rustle,,제안
+j_pine_scent2,jangteo,눈 아래 마른 솔잎,leaf_rustle,,제안
+j_pine_scale,jangteo,큰 바위의 솔방울 비늘,wood_tap,,제안
+j_warehouse_rope,jangteo,접어 둔 좌판 끈,cloth_flutter,,제안
+j_warehouse_fire,jangteo,짐꾼 화톳불 자리,fire_crackle,,제안
+j_warehouse_scratches,jangteo,창고 문 앞 빗자루 자국,leaf_rustle,,제안
+pic_kite,jangteo,처마에 걸린 연 (연 꼬리 풀기 그림),cloth_flutter,1600,제안
+y_hut_bindings,yeongsan,산막의 매듭 살펴보기,cloth_flutter,,제안
+y_hut_post,yeongsan,닳은 문설주 살펴보기,wood_tap,,제안
+y_hut_smoke,yeongsan,낮게 흐르는 연기 살펴보기,fire_crackle,1500,제안
+y_snow_tunnel,yeongsan,눈 터널 안 들여다보기,wind_gust,,제안
+y_snow_map,yeongsan,눈 위의 선 살펴보기,footstep_snow,,제안
+y_snow_sign,yeongsan,낡은 이정표 살펴보기,wood_tap,,제안
+y_slope_rowan,yeongsan,마가목 밑 살펴보기,leaf_rustle,,제안
+y_slope_hole,yeongsan,얼음 구멍 가장자리 살펴보기,ice_tinkle,,제안
+y_slope_hoof,yeongsan,가느다란 발 디딤 살펴보기,footstep_snow,,제안
+y_shore_boat,yeongsan,호숫가 작은 배 살펴보기,water_trickle,,제안
+y_shore_bowl,yeongsan,열매 놓였던 돌 살펴보기,stone_knock,,제안
+y_shore_prints,yeongsan,크기가 같은 발자국 살펴보기,footstep_snow,,제안
+y_tree_rope,yeongsan,섬 입구의 금줄 살펴보기,cloth_flutter,1900,제안
+y_tree_root,yeongsan,신목 뿌리 살펴보기,wood_tap,,제안
+y_tree_bud,yeongsan,신목 가지 올려다보기,leaf_rustle,,제안

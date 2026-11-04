@@ -331,8 +331,22 @@ const MUSIC_LAYERS={};
     MUSIC_LAYERS[track]={layers,tempos};
   }
 }
+/* 결정 D-483: 작은 창(살펴보기·대사 그림)이 뜰 때 나는 소리(popup_sounds.csv). 소리는 design/data/music/sfx.json 의 효과음 id.
+   되풀이ms가 있으면 창이 떠 있는 동안 그 간격으로 다시 낸다(풍경·물·불처럼 계속 움직이는 것). */
+const POPUP_SOUNDS={};
+{
+  const sfxIds=new Set(JSON.parse(fs.readFileSync(path.join(DATA,'music','sfx.json'),'utf8')).effects.map(e=>e.id));
+  for(const r of t('popup_sounds')){
+    const where='popup_sounds.csv '+r.id,sound=r['소리'].trim(),rep=r['되풀이ms'].trim();
+    if(!regionIds.has(r['지역']))fail(where+': 지역 id를 확인한다');
+    if(!sfxIds.has(sound))fail(where+': sfx.json에 없는 효과음 '+sound);
+    if(rep&&!(+rep>=600&&+rep<=6000))fail(where+': 되풀이ms는 600~6000 사이다');
+    if(POPUP_SOUNDS[r.id])fail(where+': 같은 id가 겹친다');
+    POPUP_SOUNDS[r.id]={sfx:sound,...(rep?{repeat:+rep}:{})};
+  }
+}
 requireValue(TUNING.roll_hold_ms>=80&&TUNING.roll_hold_ms<=400&&TUNING.roll_speed>1&&TUNING.roll_squirrel_speed>1&&TUNING.roll_accel_frames>=1&&TUNING.roll_step_frames>=1,'tuning.csv: 구르기 문턱은 80~400ms, 빠르기는 걷기보다 커야 한다');
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,STAMP_MARKS,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC,MUSIC_LAYERS},null,1)+";\n";
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,STAMP_MARKS,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC,MUSIC_LAYERS,POPUP_SOUNDS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

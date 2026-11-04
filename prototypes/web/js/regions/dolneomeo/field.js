@@ -85,30 +85,44 @@ Rg.drawScenery=()=>{jangseung(96,true);jangseung(122,false);drawTree(670);drawTr
 
 /* 결정 D-208: 채집 전 겨우살이는 덩어리(슬라임처럼 보였다)가 아니라 가지에 붙어 자란 풀 덤불이다(사용자 피드백 47).
    가지 토막에서 누런 초록 줄기가 두 갈래씩 갈라지고, 끝마다 가는 잎이 짝지어 난다. 갈래 사이에 반투명한 흰 열매. 떠오르지 않고 바람에 잎끝만 흔들린다. */
+/* 결정 D-480: 겨우살이가 너무 컸다(사용자 피드백 2026-11-04). 덤불 지름을 약 20px에서 13px로 줄이고, 가지 토막도 짧게. 모양(갈래·잎 짝·흰 열매)은 그대로 */
 function drawMistletoe(x,y,a){
   const S='#7f8a36',L='#a3b04c',LD='#738232',BR='#eeedd2';
-  const sw=Vfx.reducedMotion?0:Math.sin((G.anim+a.x)/38)*0.6;
-  R(x-10,y-2,20,2,'#5a4a3a');R(x-10,y-2,20,1,'#7a6450');R(x+8,y-4,2,2,'#5a4a3a');   // 붙어 자란 가지 토막
-  const cx=x,cy=y-8;R(cx,cy+1,1,5,S);   // 밑동: 가지 껍질을 뚫고 나온 짧은 줄기
+  const sw=Vfx.reducedMotion?0:Math.sin((G.anim+a.x)/38)*0.5;
+  R(x-7,y-2,14,2,'#5a4a3a');R(x-7,y-2,14,1,'#7a6450');R(x+5,y-4,2,2,'#5a4a3a');   // 붙어 자란 가지 토막
+  const cx=x,cy=y-6;R(cx,cy+1,1,3,S);   // 밑동: 가지 껍질을 뚫고 나온 짧은 줄기
   // 속은 겹친 잔가지로 어둡게 차 있다(테두리 빛이 사이로 새지 않게)
-  for(let j=-4;j<=3;j++){const half=Math.round(5.5*Math.sqrt(1-(j/4.6)**2));R(cx-half,cy+j,half*2+1,1,j<-1?'#6f7d30':'#5d6a28');}
-  // 줄기가 둥글게 사방으로 뻗는다. 끝마다 가는 잎 한 쌍, 중간에도 한 쌍.
-  for(const deg of [-180,-155,-130,-108,-90,-72,-50,-25,0,155,25]){
-    const t=deg*Math.PI/180,len=deg>0&&deg<180?5:7,ex=Math.cos(t),ey=Math.sin(t);
-    for(let i=1;i<=len;i++)R(Math.round(cx+ex*i+(i>3?sw:0)),Math.round(cy+ey*i),1,1,S);
-    for(const [d,c1,c2] of [[len,L,LD],[4,LD,L]]){
-      const tx=Math.round(cx+ex*d+(d>3?sw:0)),ty=Math.round(cy+ey*d);
-      for(const k of [-1,1]){const lx=-ey*k+ex*.7,ly=ex*k+ey*.7;R(Math.round(tx+lx),Math.round(ty+ly),1,1,k<0?c1:c2);R(Math.round(tx+lx*2),Math.round(ty+ly*2),1,1,c1);}
-    }
+  for(let j=-3;j<=2;j++){const half=Math.round(3.6*Math.sqrt(1-(j/3.4)**2));R(cx-half,cy+j,half*2+1,1,j<-1?'#6f7d30':'#5d6a28');}
+  // 줄기가 둥글게 사방으로 뻗는다. 끝마다 가는 잎 한 쌍.
+  for(const deg of [-180,-150,-118,-90,-62,-30,0,155,25]){
+    const t=deg*Math.PI/180,len=deg>0&&deg<180?3:5,ex=Math.cos(t),ey=Math.sin(t);
+    for(let i=1;i<=len;i++)R(Math.round(cx+ex*i+(i>2?sw:0)),Math.round(cy+ey*i),1,1,S);
+    const tx=Math.round(cx+ex*len+sw),ty=Math.round(cy+ey*len);
+    for(const k of [-1,1]){const lx=-ey*k+ex*.7,ly=ex*k+ey*.7;R(Math.round(tx+lx),Math.round(ty+ly),1,1,k<0?L:LD);}
   }
   // 갈래 사이 반투명한 흰 열매
-  for(const [dx,dy] of [[-2,-3],[2,-2],[0,-5],[-4,0],[4,-4]])R(cx+dx,cy+dy,1,1,BR);
+  for(const [dx,dy] of [[-1,-2],[2,-1],[0,-4],[-3,0]])R(cx+dx,cy+dy,1,1,BR);
 }
-/* 결정 D-393: 석이버섯은 바위 면에 붙은 귀 모양 잎. 위는 검은 갈색, 젖혀진 가장자리와 밑면은 잿빛 초록 (x,y는 바위 밑 가운데) */
+/* 결정 D-393: 석이버섯은 바위 면에 붙은 귀 모양 잎 (x,y는 바위 밑 가운데). 모양은 D-486으로 다시 그렸다 */
+/* 결정 D-486: 석이는 바위 면에 가운데 배꼽 한 점으로 붙은 납작한 잎 모양 지의류다(사용자 피드백 2026-11-04: 현실 버섯처럼).
+   둥글지만 가장자리가 물결치고, 군데군데 위로 말려 밑면의 거친 잿빛 검정이 보인다. 위는 검은 갈색에 잔주름, 가운데 배꼽이 오목하다. 크기가 다른 셋 */
+function seogiLeaf(cx,cy,rx,ry,seed){
+  const TOP='#2c2622',TOP2='#3b342e',UNDER='#55574f',RIM='#7a7c72',NAVEL='#151210';
+  for(let j=-ry;j<=ry;j++){
+    const base=Math.sqrt(Math.max(0,1-(j/(ry+.4))**2))*rx;
+    const wob=((seed*7+j*13)%5===0)?-1:((seed*3+j*5)%7===0)?1:0;   // 물결치는 가장자리
+    const half=Math.max(0,Math.round(base+wob));if(!half)continue;
+    R(cx-half,cy+j,half*2+1,1,j<0?TOP2:TOP);
+  }
+  // 말려 올라간 가장자리: 아래쪽 테두리와 한쪽 귀퉁이에 밑면 빛깔
+  R(cx-rx+1,cy+ry,rx*2-1,1,UNDER);R(cx-rx,cy+ry-1,1,1,RIM);R(cx+rx,cy+ry-1,1,1,UNDER);
+  if(seed%2){R(cx+rx-1,cy-ry+1,2,1,RIM);R(cx+rx,cy-ry+2,1,1,UNDER);}else{R(cx-rx,cy-ry+1,2,1,RIM);R(cx-rx,cy-ry+2,1,1,UNDER);}
+  // 잔주름과 배꼽
+  R(cx-Math.round(rx/2),cy-1,1,1,'#4a423b');R(cx+Math.round(rx/2),cy+1,1,1,'#4a423b');R(cx-1,cy+Math.min(1,ry-1),1,1,'#4a423b');
+  R(cx,cy,1,1,NAVEL);R(cx+1,cy-1,1,1,'#5c544c');
+}
 function drawSeogiFlaps(x,y){
-  R(x-6,y-8,4,3,'#2e2a26');R(x-5,y-9,2,1,'#2e2a26');R(x-6,y-5,4,1,'#5f6a5c');R(x-3,y-7,1,1,'#6f7a6a');
-  R(x,y-6,5,4,'#35302b');R(x+1,y-7,3,1,'#35302b');R(x,y-2,5,1,'#5f6a5c');R(x+4,y-5,1,2,'#6f7a6a');R(x+1,y-5,1,1,'#4a4440');
-  R(x-3,y-4,2,2,'#2e2a26');R(x-3,y-2,2,1,'#5f6a5c');
+  seogiLeaf(x-4,y-7,3,2,1);seogiLeaf(x+2,y-5,4,3,2);seogiLeaf(x-3,y-3,2,1,3);
 }
 /* 줍는 것 */
 Rg.drawPickup=(a,x,bob)=>{

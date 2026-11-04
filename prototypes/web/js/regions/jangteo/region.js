@@ -260,9 +260,9 @@ Rg.expEncounters={
       {id:'j_flag_knot',x:700,label:'보부상단 깃발',text:['패랭이에 목화송이. 보부상단의 표다.\n내 모자 꼭지의 송이랑 같다.','이 깃발이 선 장에는 상단 숙소가 있다.\n돌받침 안쪽에는 붉은 점이 있다. 손바닥 모양일까?']},
       // 결정 D-321: 연 꼬리는 그 자리 그림 대신 연 장면 그림을 띄운다 (걸림 → 너구리 손이 풀면 줄에 끌려 내려감)
       {id:'j_kite_tail',x:1180,y:128,label:'연 꼬리 풀기',peek:false,get text(){
-        if(!G.f.jxKiteStarted){if(typeof peekPicture==='function')peekPicture(Rg.kitePics.stuck().draw,{animate:true});
+        if(!G.f.jxKiteStarted){if(typeof peekPicture==='function')peekPicture(Rg.kitePics.stuck().draw,{animate:true,sound:'pic_kite'});
           return '방패연 꼬리가 처마 못에 감겼다.\n아래 아이에게 줄을 느슨하게 잡아 달라고 하자.';}
-        if(!G.f.jxKiteFreed&&typeof peekPicture==='function')peekPicture(Rg.kitePics.free().draw,{animate:true});
+        if(!G.f.jxKiteFreed&&typeof peekPicture==='function')peekPicture(Rg.kitePics.free().draw,{animate:true,sound:'pic_kite'});
         G.f.jxKiteFreed=true;return ['줄이 느슨해진 사이 꼬리를 못에서 살짝 뺐다.\n연이 얼레 쪽으로 흔들흔들 내려간다.',
           '처마 못에 연 종이 부스러기가 걸려 있다.\n여기에 모서리가 찢겼구나.'];
       }},

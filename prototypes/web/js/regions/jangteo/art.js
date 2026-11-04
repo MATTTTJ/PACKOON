@@ -544,7 +544,7 @@ function kiteEave(w){
 function kiteFlakes(w,h,t,n=10){if(Vfx.reducedMotion)return;for(let i=0;i<n;i++){const sp=18+(i*7)%11,x=((i*23+t*sp*1.6)%(w+8))-4,y=((i*13+t*sp*0.6)%(h+4))-2;R(Math.round(x),Math.round(y),1,1,'#ffffff');}}
 Rg.kitePics={
   // 처마 못에 꼬리가 감긴 연. 바람이 불 때마다 거꾸로 매달린 연이 휘청이며 모서리가 처마에 부딪힌다
-  stuck(){return {animate:true,draw(w,h,t){
+  stuck(){return {animate:true,sound:'pic_kite',draw(w,h,t){   // 결정 D-483
     kiteSky(w,h);kiteEave(w);const g=kiteGust(t),rm=Vfx.reducedMotion;
     const nx=36,ny=11,sw=rm?0.3:Math.sin(t*2.1)*0.45+g*0.3;R(nx-1,ny-1,2,3,'#2e2826');
     const kx=nx+Math.sin(sw)*14,ky=ny+Math.cos(sw)*14;
@@ -553,7 +553,7 @@ Rg.kitePics={
     kiteLine(kx,ky+4,-2,h+2,8);kiteFlakes(w,h,t);
   }};},
   // 너구리 손이 못에서 꼬리를 풀자 연이 줄에 끌려 얼레 쪽(왼쪽 아래)으로 흔들리며 내려간다
-  free(){let t0=null;return {animate:true,draw(w,h,t){
+  free(){let t0=null;return {animate:true,sound:'pic_kite',draw(w,h,t){
     if(t0===null)t0=t;const k=Vfx.reducedMotion?1.2:Math.min(2.6,t-t0);
     kiteSky(w,h);kiteEave(w);R(35,10,2,3,'#2e2826');
     const reach=Math.min(1,k/0.5),lift=Math.max(0,Math.min(1,(k-0.5)/0.3)),fall=Math.max(0,(k-0.8)/1.4);
