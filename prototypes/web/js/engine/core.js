@@ -161,8 +161,9 @@ function untrimX(t,cuts){if(!cuts||!Number.isFinite(t))return t;let s=0;for(cons
    결정 D-128: 3은 걷기만 하는 길을 콘텐츠 사이 230px 안팎까지 줄인 판이다.
    결정 D-155: 4는 단풍골 숲의 도담~꺼병이 길을 반으로 줄인 판이다.
    결정 D-206: 5는 돌너머 성황당(남생이 할미 구역)을 더 줄인 판이다.
-   지역이 Rg.trimCutsV1·V2·V3·V4(그 판의 자르기)를 두면, 그 판으로 저장한 상태는 그 차이만큼만 옮긴다. */
-const TRIM_VER=5;
+   결정 D-520: 6은 단풍골 마을 개울 뒤 빈 길을 반으로 줄인 판이다.
+   지역이 Rg.trimCutsV1·V2·V3·V4·V5(그 판의 자르기)를 두면, 그 판으로 저장한 상태는 그 차이만큼만 옮긴다. */
+const TRIM_VER=6;
 /* 결정 D-128: 자른 구역의 배경은 남은 구간마다 나눠 그린다(engine/field.js segmentedDraw).
    그리는 동안 TRIM_SEG는 그 구간이 당겨진 만큼이고, cam은 그만큼 옮겨진다. 그래서 설계 좌표로 쓴 그림(u-cam)이 제자리에 온다.
    이미 옮긴 좌표(발판·도장·물건)나 원경 원근(cam*k)은 RC()(실제 카메라)를 쓴다. */
@@ -252,7 +253,7 @@ function trimState(r,s){
 function trimMigrate(r,g){
   if(!r?.trimCuts||CLASSIC||!g||g.trimVer===TRIM_VER)return;
   // 자르기 전 저장은 설계 좌표에서, 첫 판(1) 저장은 첫 판 좌표에서 지금 자르기로 옮긴다.
-  const prev=g.trimVer===1?(r.trimCutsV1||r.trimCuts):g.trimVer===2?(r.trimCutsV2||r.trimCuts):g.trimVer===3?(r.trimCutsV3||r.trimCuts):g.trimVer===4?(r.trimCutsV4||r.trimCuts):null;
+  const prev=g.trimVer===1?(r.trimCutsV1||r.trimCuts):g.trimVer===2?(r.trimCutsV2||r.trimCuts):g.trimVer===3?(r.trimCutsV3||r.trimCuts):g.trimVer===4?(r.trimCutsV4||r.trimCuts):g.trimVer===5?(r.trimCutsV5||r.trimCuts):null;
   const conv=(zone,x)=>trimX(untrimX(x,prev?.[zone]),r.trimCuts[zone]);
   g.trimVer=TRIM_VER;const z0=firstZone(r);
   for(const k of ['pickups','digs'])for(const a of g[k]||[]){const z=a.zone||z0;if(r.trimCuts[z])a.x=conv(z,a.x);}
@@ -426,6 +427,21 @@ function sendHomeGift(regionId,itemId){
   learn(key,true);diary(key,(itemId?ITEMS[itemId].n+' 하나':'이곳에서 그린 그림')+'를 까치 편에 집으로 보냈다.');
   Sound.paper();toast('까치가 집으로 날아갔다.');
   if(open('notebook'))renderNotebook();return true;
+}
+/* 결정 D-525: 엄마의 상태는 아이가 보낸 약에 따라 조금씩 나아진다 (사용자 피드백 2026-11-04).
+   단풍골 해머루 약(일기 end) · 돌너머 서리다래 약즙(dol_home_reply) · 큰 장터 홍시 약떡(jx_home_reply)마다 한 단계,
+   영산을 마치고 봄이 오면 다 나은 4단계다. 병은 늦출 뿐이라(할멈) 앞 세 단계는 조금씩만 나아진다.
+   아이가 집에 들르면 단풍골 집(엄마 방)에서 이 단계가 보인다. 지역 진행값을 새로 두지 않고 이미 남는 기록만 읽는다. */
+function momStage(g=G){
+  if(!g)return 0;
+  if(g.f?.spring||regionCompleted('yeongsan',g))return 4;
+  const has=id=>!!g.diary?.some(d=>d.id===id);
+  return (has('end')||regionCompleted('galchamgol',g)?1:0)+(has('dol_home_reply')||g.f?.dolHomeDelivered?1:0)+(has('jx_home_reply')||g.f?.hongsiMade?1:0);
+}
+/* 엄마 머리맡에 놓인, 아이가 집으로 보낸 것의 수 (약 말고 지역마다 보낸 가공품·그림, 할멈 편에 보낸 묵) */
+function momGiftCount(g=G){
+  const medicine=['darae_yak','hongsi_tteok'];
+  return Object.values(g?.f?.homeGifts||{}).filter(x=>x&&!medicine.includes(x.itemId)).length+(g?.f?.galJellyToMom?1:0);
 }
 /* 다음 지역의 첫 쉼터 또는 까치 길손에서 부른다. 답장을 보이면 true, 없으면 false. */
 function deliverHomeReply(){

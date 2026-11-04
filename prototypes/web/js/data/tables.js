@@ -3931,7 +3931,6 @@ const TABLES={
    "village": "집·마을 어귀",
    "forge": "대장간 길",
    "forest": "참나무 숲",
-   "marsh": "늪가 약방",
    "hill": "당산나무 언덕"
   },
   "dolneomeo": {
@@ -4586,9 +4585,6 @@ const TABLES={
   }
  },
  "POPUP_SOUNDS": {
-  "village_home": {
-   "sfx": "door"
-  },
   "village_well": {
    "sfx": "water_drop"
   },
@@ -4621,16 +4617,6 @@ const TABLES={
    "sfx": "leaf_rustle",
    "repeat": 2000
   },
-  "marsh_shallows": {
-   "sfx": "water_trickle",
-   "repeat": 1800
-  },
-  "marsh_shelf": {
-   "sfx": "wood_tap"
-  },
-  "marsh_pot": {
-   "sfx": "clay_ring"
-  },
   "hill_grass": {
    "sfx": "leaf_rustle"
   },
@@ -4656,6 +4642,15 @@ const TABLES={
   "pic_lantern": {
    "sfx": "ice_tinkle",
    "repeat": 2400
+  },
+  "pic_mom_room": {
+   "sfx": "door"
+  },
+  "pic_leaf": {
+   "sfx": "leaf_rustle"
+  },
+  "pic_cache": {
+   "sfx": "leaf_rustle"
   },
   "frost_print": {
    "sfx": "footstep_frost"

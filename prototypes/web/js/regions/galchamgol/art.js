@@ -220,7 +220,7 @@ if(!CLASSIC){
     if(zone==='village'){
       // The hill is first seen across the wheel's water, long before its path opens.
       const x=1530-RC()*.35;px(x-3,91,6,44,'#6b5340');px(x-23,77,42,19,'#bd7944');px(x-14,68,30,14,'#d28c4b');
-      house(70-cam);house(220-cam,GROUND,.8,false,2);well(440-cam);
+      house(70-cam,GROUND,1,!CLASSIC&&momStage()>=1);house(220-cam,GROUND,.8,false,2);well(440-cam);   // 결정 D-525: 약이 간 뒤로 엄마 방 창이 밝다
       house(1098-cam,GROUND,.78,false,1);wheel(1050-cam);
       for(const u of [330,590,1200,1560,1980,2320]){const x=tx(u);if(visible(x-cam)){   // tx: 줄인 구역 좌표 (D-109)
         fence(x-cam,GROUND,3);if(u!==590)basket(x-cam+53);
