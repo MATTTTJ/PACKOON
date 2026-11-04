@@ -71,6 +71,10 @@ function battleHandProfile(){
   const id=battleForm(),prefix='battle_'+(id||'bare')+'_',t=TABLES.TUNING;
   return {speed:t[prefix+'speed']*nameSpeedMul(),cooldown:t[prefix+'cooldown'],radius:t[prefix+'radius']};   // 결정 D-433: 잃은 이름만큼 손이 느려진다 (battle-names.js)
 }
+/* 결정 D-501: 도구 날이 닿는 범위(battle_<모습>_radius)와 보스에서 칠 자리의 금빛 원 크기(battle_mark_radius)를 따로 둔다
+   (사용자 피드백 2026-11-04: 무기 범위는 1/3로, 보스에서 맞혀야 하는 범위는 반으로). 도구 원 안에 칠 자리 가운데가 들어오면 맞는다. */
+function battleMarkRadius(){return TABLES.TUNING.battle_mark_radius;}
+function bAimOn(m,aim){if(!m)return false;const a=aim||bAim();return Math.hypot(m.x-a.x,m.y-a.y)<battleHandProfile().radius;}
 function battleFormKey(key){
   if(!B||!['0','1','2','3','4'].includes(key))return false;
   if(!G.forms?.length)return true;
@@ -171,6 +175,7 @@ function startBattle(kind,onEnd){
     px:0,py:0,inv:0,st:'intro',t:90,cur:null,last:null,mark:null,bullets:[],fx:[],cool:0,swing:0,atkT:0,atkDur:0,
     loot:[],msg:E.intro,onEnd,paused:false,time:0,result:null,firstHit:true,hits:0,hitThis:false,survived:0,noTool:false,toolFly:null,bonk:0,bonus:'',
     hitStop:0,quakeT:0,pops:[],cracks:[],impact:null,later:[]};
+  // 결정 D-506: 세로 휴대폰에서는 in-battle 동안 제목 줄을 숨기고 전투 그림이 남는 높이만 쓴다 (style.css)
   document.body.classList.add('in-battle');$('battle').hidden=false;
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
   if(E.showHands){B.handShown=false;B.handShow=0;}
@@ -302,7 +307,7 @@ function bStrike(){
   const aim=bAim(),hits0=B.parts.map(p=>p.hp);
   if(B.E.strike&&B.E.strike()){strikeFeedback(aim,hits0,true);return;}
   const m=B.mark;
-  if(m&&Math.hypot(m.x-aim.x,m.y-aim.y)<battleHandProfile().radius){
+  if(bAimOn(m,aim)){
     const p=m.part;
     p.hp=Math.max(0,p.hp-nameStrikeDamage(p,toolDamage(p)));bSplash(m.x,m.y);B.mark=null;   // 결정 D-433·D-434: 잃은 이름만큼 약하게, 스스로 댄 이름 뒤 한 번은 잘 먹게
     if(p.hp>0)Sound.playSfx('battle_hit');
@@ -642,14 +647,14 @@ function drawPaw(c,x,y,palm=false){
 }
 /* 결정 D-240: 도구 날이 꽂힐 자리 표시. 금빛 칠 곳에 들어가면 하얗게 밝아진다.
    결정 D-456: 낫 위에 겹쳐 보이던 X 자 표시를 빼고, 치는 범위(손 되치기 반경)를 옅은 점선 원으로 보인다
-   (사용자 피드백 2026-11-04: 낫에 저 X 자는 왜 있나, 공격 범위가 확실히 보이게). 원 안에 칠 곳 가운데가 들어오면 맞는다. */
+   (사용자 피드백 2026-11-04: 낫에 저 X 자는 왜 있나, 공격 범위가 확실히 보이게). 원 안에 칠 곳 가운데가 들어오면 맞는다 (D-501). */
 function drawAim(c){
   if(!battleTool()||B.handShow>0||B.st==='giftPlace'||B.st==='end')return;
   if(B.inv>0&&Math.floor(B.inv/5)%2)return;
-  const p=bAim(),m=B.mark,R=battleHandProfile().radius,on=m&&Math.hypot(m.x-p.x,m.y-p.y)<R;
+  const p=bAim(),m=B.mark,R=battleHandProfile().radius,on=bAimOn(m,p);
   c.save();
   c.fillStyle=on?'rgba(255,244,207,.28)':'rgba(29,24,20,.05)';c.beginPath();c.arc(p.x,p.y,R,0,Math.PI*2);c.fill();
-  c.strokeStyle=on?GOLD:INK;c.globalAlpha=on?0.95:0.42;c.lineWidth=on?2:1.2;c.setLineDash(on?[]:[4,4]);c.beginPath();c.arc(p.x,p.y,R,0,Math.PI*2);c.stroke();
+  c.strokeStyle=on?GOLD:INK;c.globalAlpha=on?0.95:0.7;c.lineWidth=on?2:1.4;c.setLineDash(on?[]:[3,2]);   // 결정 D-501: 원이 작아져 더 진하게c.beginPath();c.arc(p.x,p.y,R,0,Math.PI*2);c.stroke();
   c.setLineDash([]);c.globalAlpha=on?1:0.55;c.fillStyle=on?'#fffaf0':INK;c.beginPath();c.arc(p.x,p.y,1.6,0,Math.PI*2);c.fill();
   c.restore();
 }
@@ -718,8 +723,8 @@ function bDraw(){
   if(B.warm)drawWarmPath(c);
   // 결정 D-228: 칠 수 있는 곳은 금빛으로만 강조한다(빨강·먹은 피할 것). 도구 날(bAim)이 닿으면 더 밝게 빛난다.
   //   작은 도구 그림은 그 부위에 잘 먹는 도구다.
-  if(B.mark){const m=B.mark,radius=battleHandProfile().radius,a=bAim();
-    drawStrikeSpot(c,m.x,m.y,radius,m.t/m.max,Math.hypot(m.x-a.x,m.y-a.y)<radius,m.part.tool);}
+  if(B.mark){const m=B.mark;
+    drawStrikeSpot(c,m.x,m.y,battleMarkRadius(),m.t/m.max,bAimOn(m),m.part.tool);}   // 결정 D-501: 칠 자리는 battle_mark_radius 크기
   drawImpact(c);
   if(B.handShow>0)drawOpenHands(c);
   else if(B.st!=='giftPlace'){drawPaw(c,B.px,B.py);drawNameFade(c);drawAim(c);drawToolSwap(c);}
