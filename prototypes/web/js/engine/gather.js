@@ -49,12 +49,17 @@ function gatherHit(d){
   if(!G.f.gatherHinted)G.f.gatherHinted={};
   if(!G.f.gatherHinted[gatherKey(d)]){G.f.gatherHinted[gatherKey(d)]=true;toast(cfg.hint);}
   d.prog=(d.prog||0)+(just?MG.gather_perfect_power:1);if(just)d.perfects=(d.perfects||0)+1;
-  Sound.gather(true);
+  // 결정 D-482: 채집 자리마다 칠 때 소리를 따로 줄 수 있다(cfg.hitSound). 눈 둔덕은 쇠 날이 언 눈을 때리는 '팡'
+  if(cfg.hitSound)Sound.hit(cfg.hitSound);else Sound.gather(true);
   const sp=gatherSpot(d),y=sp.y-4;
   Vfx.scatter(d.x,y+6,'scatter' in cfg?cfg.scatter:d.item,just);   // 캐는 물건에 따라 흙먼지 또는 잎 (눈 둔덕은 흙먼지 자리에 눈가루)
   gatherCue.pops.push({x:d.x,y,t:28,text:just?'딱! +'+MG.gather_perfect_bonus:grade==='good'?'좋아':''});
   for(let i=0;i<(just?9:4);i++)gatherCue.dirt.push({x:d.x,y:y+6,vx:(Math.random()-.5)*(just?2.6:1.6),vy:-Math.random()*(just?2.4:1.5),t:22,c:just?'#fff3b0':cfg.dirt||'#8b5a2b'});
-  if(just)shakeT=Math.max(shakeT,4);
+  // 결정 D-482: 눈 둔덕은 칠 때마다 눈이 사방으로 흩어지고(굵은 눈덩이 섞임), 화면이 살짝 흔들린다. 날이 닿은 자리에 하얀 번쩍임 한 번
+  if(cfg.burst==='snow'){const T=TABLES.TUNING,n=just?T.snow_burst_count_just:T.snow_burst_count;
+    for(let i=0;i<n;i++){const ang=-Math.PI*(0.08+Math.random()*0.84),sp2=1.2+Math.random()*(just?2.8:2);gatherCue.dirt.push({x:d.x+(Math.random()-.5)*6,y:y+4,vx:Math.cos(ang)*sp2,vy:Math.sin(ang)*sp2,t:18+Math.floor(Math.random()*10),c:i%4?'#ffffff':'#dfe8ea',s:i%5===0?2:1});}
+    gatherCue.flash={x:d.x,y:y+2,t:6};shakeT=Math.max(shakeT,just?T.snow_burst_shake_just:T.snow_burst_shake);}
+  else if(just)shakeT=Math.max(shakeT,4);
   gatherCue.start=G.anim;   // 한 번 칠 때마다 고리가 점에서 다시 커진다
   if(d.prog>=cfg.hits)finishGather(d);
 }
@@ -142,7 +147,9 @@ function drawGatherCue(){
   }
   for(let i=gatherCue.dirt.length-1;i>=0;i--){const p=gatherCue.dirt[i];
     if(!paused()){p.x+=p.vx;p.y+=p.vy;p.vy+=.15;p.t--;}
-    if(p.t<=0){gatherCue.dirt.splice(i,1);continue;}if(!Vfx.reducedMotion)R(p.x-cam,p.y,1,1,p.c);}
+    if(p.t<=0){gatherCue.dirt.splice(i,1);continue;}if(!Vfx.reducedMotion)R(p.x-cam,p.y,p.s||1,p.s||1,p.c);}
+  const fl=gatherCue.flash;if(fl){if(!paused())fl.t--;if(fl.t<=0)gatherCue.flash=null;else if(!Vfx.reducedMotion){const r=7-fl.t,x=Math.round(fl.x-cam),y=Math.round(fl.y);
+    for(const [ex,ey] of [[1,0],[-1,0],[0,-1],[.7,-.7],[-.7,-.7]])R(x+Math.round(ex*r),y+Math.round(ey*r),1,1,'#ffffff');R(x,y,1,1,'#fff9d8');}}
   for(let i=gatherCue.pops.length-1;i>=0;i--){const p=gatherCue.pops[i];
     if(!paused())p.t--;if(p.t<=0){gatherCue.pops.splice(i,1);continue;}
     if(p.text){c.save();c.font='bold 9px "Gowun Dodum", sans-serif';c.textAlign='center';c.fillStyle='#3a2818';

@@ -350,19 +350,45 @@ function drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame=0){
   }
   M(ox,oy,f,-13,-9,7,4,T);M(ox,oy,f,-12,-9,1,4,K);M(ox,oy,f,-9,-9,1,4,K);
   drawBackpack(ox,oy,f);
+  const shoulder=tool==='pick'&&!(attackT>0);   // 결정 D-481: 멘 곡괭이는 머리·몸 뒤로 지나간다
+  if(shoulder)drawFieldTool(ox,oy,f,st,attackT,tool);
   M(ox,oy,f,-3+st,-4,3,4,K);M(ox,oy,f,2-st,-4,3,4,K);
   M(ox,oy,f,-4,-12,9,8,Gy);M(ox,oy,f,0,-11,4,6,'#cfc3b2');
   M(ox,oy,f,-3,-20,10,8,Gy);M(ox,oy,f,-2,-17,9,2,K);M(ox,oy,f,4,-17,1,1,'#ffffff');M(ox,oy,f,-2,-15,8,2,Wt);M(ox,oy,f,7,-16,1,2,K);
   M(ox,oy,f,-7,-21,16,2,'#c39b55');M(ox,oy,f,-3,-25,8,4,'#dcbb7a');M(ox,oy,f,-3,-22,8,1,'#6e4f22');M(ox,oy,f,4,-27,2,2,'#fbf7ee');
   // 삼촌이 따 준 잎사귀는 보따리 끈에 매단다 (머리에 얹지 않는다)
   if(G?.forms?.length){M(ox,oy,f,-4,-12,1,5,'#6e4f22');drawStrapLeaf(ox,oy,f,-3,-9);}
-  const hx=ox+f*5,hy=oy-10;const a=attackT>0?-0.9+(1-attackT/18)*3.2:0.35;
-  const dx=f*Math.sin(a),dy=-Math.cos(a);
-  for(let i=0;i<10;i++)R(hx+dx*i,hy+dy*i,1,1,'#7a4b2a');
-  const ex=hx+dx*10,ey=hy+dy*10,px=-dy*f,py=dx*f;
-  if(tool==='sickle'){for(let i=0;i<6;i++){const k=i/5;R(ex+px*(i*0.9)+dx*(k*k*4),ey+py*(i*0.9)+dy*(k*k*4),2,2,'#d8dde2');}}
-  else{for(let i=-3;i<=3;i++)R(ex+px*i,ey+py*i,2,2,i===3||i===-3?'#7d8389':'#9aa0a6');}
-  if(!Vfx.reducedMotion&&attackT>4&&attackT<13){for(let i=0;i<12;i++){const a=-1.4+i*.18;R(hx+f*Math.cos(a)*12,hy+Math.sin(a)*12,1,1,'#ecdcb4');}}
+  if(shoulder)M(ox,oy,f,3,-14-(st?1:0)-(formAir===1?1:0),2,2,K);   // 자루를 쥔 앞발만 몸 앞에
+  else drawFieldTool(ox,oy,f,st,attackT,tool);
+}
+/* 결정 D-481: 필드에서 도구마다 드는 모양이 다르다 (사용자 피드백 2026-11-04). 생김새는 전투 그림(D-455·D-456)과 같다.
+   - 곡괭이: 자루를 어깨에 걸쳐 멘다. 머리는 등 뒤 위로, 한쪽은 뾰족한 촉·한쪽은 넓적한 괭이날. 걸으면 어깨와 함께 들썩이고, 뛰면 조금 들린다.
+   - 낫: 자루를 쥐고 옆구리 아래로 늘어뜨린다. 휜 날이 앞을 향하고(검은 등, 흰 날), 걸으면 손에서 흔들리고, 뛰면 날을 몸 쪽으로 당긴다.
+   - 휘두를 때는 둘 다 손에서 앞으로 크게 원을 그린다. 구르기·변신 중에는 그리지 않는다(보따리 속). 등을 보일 때는 등에 비스듬히 멘다(drawRaccoonBackAt). */
+const TOOL_WOOD='#8a5a30',TOOL_WOOD_D='#5e3b1e',TOOL_IRON='#5d646b',TOOL_IRON_L='#a9b1b8',TOOL_EDGE='#eef2f4';
+function drawFieldTool(ox,oy,f,st,attackT,tool){
+  if(!tool)return;
+  const swing=attackT>0,air=typeof formAir!=='undefined'?formAir:0;
+  // 손 자리와 자루 방향(a: 0이면 위, 양수면 앞으로 기운다)
+  let hx=ox+f*5,hy=oy-10,a,len;
+  if(swing){a=-0.9+(1-attackT/18)*3.2;len=tool==='pick'?11:9;}
+  else if(tool==='pick'){hx=ox+f*3;hy=oy-13-(st?1:0)-(air===1?1:0);a=-1.05;len=13;}   // 어깨에 멘다 (자루가 머리 뒤로 지나 머리는 등 위에서 보인다)
+  else{hy=oy-10+(air===1?-1:0);a=air?2.15:2.55+(st?0.12:-0.06);len=6;}   // 옆구리 아래로 늘어뜨린다
+  const dx=f*Math.sin(a),dy=-Math.cos(a),px=-dy*f,py=dx*f;
+  const P=(u,v,w,h,c)=>R(Math.round(hx+dx*u+px*v),Math.round(hy+dy*u+py*v),w,h,c);
+  for(let i=swing?0:-2;i<len;i++){P(i,0,1,1,TOOL_WOOD);if(i%3===1)P(i,0,1,1,TOOL_WOOD_D);}   // 자루 (나뭇결)
+  P(len,0,1,1,'#3f454b');   // 쇠고리
+  if(tool==='pick'){
+    // 활처럼 휜 쇠 머리: 앞(+v)은 뾰족한 촉, 뒤(-v)는 넓적한 괭이날
+    for(let v=-4;v<=5;v++){const bend=Math.round((v/5)**2*1.6);P(len+1-bend,v,1,1,TOOL_IRON);if(v>-3&&v<4)P(len+2-bend,v,1,1,v<0?TOOL_IRON:TOOL_IRON_L);}
+    P(len-1,5,1,1,'#3f454b');P(len,6,1,1,'#3f454b');   // 뾰족한 촉 끝
+    P(len-1,-4,1,1,TOOL_IRON_L);P(len,-5,1,1,TOOL_IRON_L);P(len+1,-5,1,1,TOOL_IRON);   // 넓적한 괭이날
+  }else{
+    // 휜 날: 고리에서 앞으로 나갔다가 안쪽으로 휜다. 바깥은 검은 등, 안쪽은 하얗게 벼린 날
+    const blade=[[1,0],[2,1],[3,2],[3,3],[2,4],[1,5]];
+    for(const [u,v] of blade){P(len+u,v,1,1,'#3f454b');P(len+u-1,v,1,1,v>1?TOOL_EDGE:TOOL_IRON_L);}
+  }
+  if(!Vfx.reducedMotion&&swing&&attackT>4&&attackT<13){for(let i=0;i<12;i++){const s=-1.4+i*.18;R(ox+f*5+f*Math.cos(s)*12,oy-10+Math.sin(s)*12,1,1,'#ecdcb4');}}
 }
 function drawRaccoon(){
   if(!Vfx.reducedMotion&&G.hurtT>0&&Math.floor(G.hurtT/4)%2)return;
@@ -679,6 +705,10 @@ function drawRaccoonBackAt(ox,oy,phase){
   // 팔: 한쪽은 위로 뻗어 잡고, 다른 쪽은 어깨 아래를 짚는다
   const armUp=[up<0?-9:6,-28,3,9],armDown=[up<0?6:-9,-21,3,5];
   R(ox+armUp[0],oy+armUp[1],armUp[2],armUp[3],K);R(ox+armDown[0],oy+armDown[1],armDown[2],armDown[3],K);
+  // 결정 D-481: 등을 보일 때 도구는 보따리 위에 비스듬히 멘다 (곡괭이는 머리가 어깨 위로, 낫은 자루만 보이고 날은 보따리 끈에 꽂는다)
+  const tl=G?.tool;
+  if(tl==='pick'){for(let i=0;i<12;i++)R(ox-6+i,oy-10-i,1,1,i%3===1?TOOL_WOOD_D:TOOL_WOOD);R(ox+4,oy-24,5,1,TOOL_IRON);R(ox+5,oy-25,3,1,TOOL_IRON_L);R(ox+8,oy-23,1,1,'#3f454b');}
+  else if(tl==='sickle'){for(let i=0;i<6;i++)R(ox+3+i,oy-12-i,1,1,TOOL_WOOD);R(ox+8,oy-19,2,1,'#3f454b');R(ox+9,oy-20,1,2,TOOL_IRON_L);}
   // 뒤통수와 모자
   R(ox-4,oy-23,8,4,Gy);R(ox-4,oy-21,8,1,Dk);
   R(ox-7,oy-25,14,2,'#c39b55');R(ox-4,oy-29,8,4,'#dcbb7a');R(ox-4,oy-26,8,1,'#6e4f22');R(ox+2,oy-31,2,2,'#fbf7ee');
@@ -751,7 +781,7 @@ function interactWith(p,kind){
     const texts=Array.isArray(p.text)?p.text:[p.text];
     const visits=G.f.examineVisits||(G.f.examineVisits={}),key=expansionKey(p.id),i=Math.min(visits[key]||0,texts.length-1);
     visits[key]=Math.min(i+1,texts.length-1);
-    if(p.peek!==false)peekAt(p.x,p.y??fieldGround(),{hold:true});   // 결정 D-151: 조사 그림은 대화창이 닫힐 때까지
+    if(p.peek!==false)peekAt(p.x,p.y??fieldGround(),{hold:true,sound:p.sound||p.id});   // 결정 D-151: 조사 그림은 대화창이 닫힐 때까지. D-483: 그 자리 소리
     talk([[p.who||'너구리',texts[i]]]);
   }else if(kind==='wanderers'){
     learn('met:'+p.id,true);
@@ -877,7 +907,7 @@ function peekAt(x,y=fieldGround(),opts={}){
     pc.drawImage(full,sx,sy,cw,ch,0,0,peekCv.width,peekCv.height);
   };
   const id=++peekPaint;peekBox.classList.remove('scene');paint();
-  showPeek(opts);peekLive(id,paint);
+  showPeek(opts);peekLive(id,paint);peekSound(id,opts.sound);
 }
 /* 결정 D-151: 장면 그림. draw(w,h,초)는 64×44 칸에 지금 ctx로 그린다(R·M을 그대로 쓴다). {animate:true}면 떠 있는 동안 다시 그린다. */
 function peekPicture(draw,opts={}){
@@ -891,7 +921,19 @@ function peekPicture(draw,opts={}){
   };
   peekBox.classList.add('scene');paint();
   // 결정 D-261: animate 표시가 없는 장면 그림도 떠 있는 동안 다시 그린다 (G.anim으로 움직이는 그림도 창 안에서 움직이게)
-  showPeek({hold:true,...opts});peekLive(id,paint);
+  showPeek({hold:true,...opts});peekLive(id,paint);peekSound(id,opts.sound||draw.sound);
+}
+/* 결정 D-483: 작은 창이 뜨면 족자 펼치는 소리, 이어서 그 그림에 맞는 소리(popup_sounds.csv)를 낸다.
+   되풀이가 있는 것(풍경·물·불·펄럭이는 천)은 창이 떠 있는 동안 그 간격으로 다시, 조금씩 다른 크기로 낸다. 창이 닫히거나 다른 그림으로 바뀌면 멈춘다.
+   sound 는 표의 id다(살펴보기는 그 id, 대사 그림은 pic_이름). */
+function peekSound(id,key){
+  Sound.cue('peek_unfold',0,.7);
+  const tbl=TABLES.POPUP_SOUNDS||{},spec=key?(tbl[key]||null):null;
+  if(!spec)return;
+  Sound.cue(spec.sfx,TABLES.TUNING.peek_sound_delay_ms/1000);
+  if(!spec.repeat||Vfx.reducedMotion)return;
+  let n=0;const again=()=>{if(peekPaint!==id||peekBox.hidden)return;Sound.cue(spec.sfx,0,.55+((n++*37)%5)*.08);setTimeout(again,spec.repeat);};
+  setTimeout(again,spec.repeat);
 }
 /* 결정 D-261: 작은 창은 족자처럼 펼쳐지며 열리고(가는 세로 띠 → 옆으로 펼침 → 살짝 넘쳤다 자리), 접히며 닫힌다.
    그림은 창이 다 펼쳐질 무렵 먹이 번지듯 드러난다. 길이는 tuning.csv peek_open_ms·peek_fade_ms. */

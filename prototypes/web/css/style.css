@@ -815,3 +815,6 @@ body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
 #btnNote.has-new{position:relative}
 #btnNote.has-new::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px #2a211b}
 @media (prefers-reduced-motion:reduce){.name-card.show{animation:none;opacity:1;transform:translate(-50%,0)}}
+
+/* 결정 D-484: 휴대폰에서 선택지가 막 떴을 때 잠깐 흐리게 두고 눌리지 않게 한다 (넘기던 탭이 선택지를 고르지 않게) */
+#dlgChoices.wait button{opacity:.55;pointer-events:none;transition:opacity .12s}

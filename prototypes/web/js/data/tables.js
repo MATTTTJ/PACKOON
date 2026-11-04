@@ -2944,7 +2944,14 @@ const TABLES={
   "name_hand_fade": 0.07,
   "name_hand_fade_max": 0.5,
   "name_return_on_body_hit": 1,
-  "name_return_retry_bonus": 2
+  "name_return_retry_bonus": 2,
+  "peek_sound_delay_ms": 180,
+  "snow_burst_count": 10,
+  "snow_burst_count_just": 16,
+  "snow_burst_shake": 2,
+  "snow_burst_shake_just": 4,
+  "dlg_touch_advance_lock_ms": 220,
+  "dlg_touch_choice_lock_ms": 450
  },
  "PROGRESS": [
   {
@@ -3800,6 +3807,232 @@ const TABLES={
     1.06,
     1.12
    ]
+  }
+ },
+ "POPUP_SOUNDS": {
+  "village_home": {
+   "sfx": "door"
+  },
+  "village_well": {
+   "sfx": "water_drop"
+  },
+  "village_wheel": {
+   "sfx": "water_trickle",
+   "repeat": 1800
+  },
+  "forge_sign": {
+   "sfx": "wood_tap"
+  },
+  "forge_charcoal": {
+   "sfx": "fire_crackle",
+   "repeat": 1500
+  },
+  "forge_share": {
+   "sfx": "wood_tap"
+  },
+  "forest_root": {
+   "sfx": "leaf_rustle"
+  },
+  "forest_oak": {
+   "sfx": "leaf_rustle",
+   "repeat": 2200
+  },
+  "forest_trail": {
+   "sfx": "cloth_flutter",
+   "repeat": 1900
+  },
+  "forest_mother": {
+   "sfx": "leaf_rustle",
+   "repeat": 2000
+  },
+  "marsh_shallows": {
+   "sfx": "water_trickle",
+   "repeat": 1800
+  },
+  "marsh_shelf": {
+   "sfx": "wood_tap"
+  },
+  "marsh_pot": {
+   "sfx": "clay_ring"
+  },
+  "hill_grass": {
+   "sfx": "leaf_rustle"
+  },
+  "hill_cloth": {
+   "sfx": "cloth_flutter",
+   "repeat": 1900
+  },
+  "hill_fruit": {
+   "sfx": "leaf_rustle"
+  },
+  "hill_north": {
+   "sfx": "wood_tap"
+  },
+  "pic_bojagi": {
+   "sfx": "cloth_flutter"
+  },
+  "pic_hamjibak": {
+   "sfx": "water_trickle"
+  },
+  "pic_hamjibak_stamp": {
+   "sfx": "wood_tap"
+  },
+  "pic_lantern": {
+   "sfx": "ice_tinkle",
+   "repeat": 2400
+  },
+  "frost_print": {
+   "sfx": "footstep_frost"
+  },
+  "gate_bell": {
+   "sfx": "wind_bell",
+   "repeat": 1300
+  },
+  "stone_channel": {
+   "sfx": "water_trickle",
+   "repeat": 1800
+  },
+  "mill_edge": {
+   "sfx": "stone_knock"
+  },
+  "warm_hearth": {
+   "sfx": "fire_crackle",
+   "repeat": 1400
+  },
+  "memil_stubble": {
+   "sfx": "leaf_rustle"
+  },
+  "tied_reeds": {
+   "sfx": "leaf_rustle"
+  },
+  "nest_door": {
+   "sfx": "stone_knock"
+  },
+  "silver_lichen": {
+   "sfx": "stone_knock"
+  },
+  "frozen_trickle": {
+   "sfx": "ice_tinkle"
+  },
+  "dry_crack": {
+   "sfx": "wind_gust"
+  },
+  "wish_cloth": {
+   "sfx": "cloth_flutter",
+   "repeat": 1900
+  },
+  "grain_dish": {
+   "sfx": "clay_ring"
+  },
+  "small_tower": {
+   "sfx": "stone_knock"
+  },
+  "pic_wish_tower": {
+   "sfx": "stone_knock"
+  },
+  "j_flag_knot": {
+   "sfx": "cloth_flutter",
+   "repeat": 1700
+  },
+  "j_jangseung_snow": {
+   "sfx": "footstep_snow"
+  },
+  "j_stall_gap": {
+   "sfx": "cloth_flutter"
+  },
+  "j_onggi": {
+   "sfx": "clay_ring"
+  },
+  "j_steam_flour": {
+   "sfx": "steamer"
+  },
+  "j_broken_yut": {
+   "sfx": "wood_tap"
+  },
+  "j_gukbap": {
+   "sfx": "fire_crackle",
+   "repeat": 1500
+  },
+  "j_inn_shoes": {
+   "sfx": "wood_tap"
+  },
+  "j_inn_pillar": {
+   "sfx": "wood_tap"
+  },
+  "j_inn_icicle": {
+   "sfx": "ice_tinkle"
+  },
+  "j_inn_stable": {
+   "sfx": "leaf_rustle"
+  },
+  "j_pine_scent1": {
+   "sfx": "leaf_rustle"
+  },
+  "j_pine_scent2": {
+   "sfx": "leaf_rustle"
+  },
+  "j_pine_scale": {
+   "sfx": "wood_tap"
+  },
+  "j_warehouse_rope": {
+   "sfx": "cloth_flutter"
+  },
+  "j_warehouse_fire": {
+   "sfx": "fire_crackle"
+  },
+  "j_warehouse_scratches": {
+   "sfx": "leaf_rustle"
+  },
+  "pic_kite": {
+   "sfx": "cloth_flutter",
+   "repeat": 1600
+  },
+  "y_hut_bindings": {
+   "sfx": "cloth_flutter"
+  },
+  "y_hut_post": {
+   "sfx": "wood_tap"
+  },
+  "y_hut_smoke": {
+   "sfx": "fire_crackle",
+   "repeat": 1500
+  },
+  "y_snow_tunnel": {
+   "sfx": "wind_gust"
+  },
+  "y_snow_map": {
+   "sfx": "footstep_snow"
+  },
+  "y_snow_sign": {
+   "sfx": "wood_tap"
+  },
+  "y_slope_rowan": {
+   "sfx": "leaf_rustle"
+  },
+  "y_slope_hole": {
+   "sfx": "ice_tinkle"
+  },
+  "y_slope_hoof": {
+   "sfx": "footstep_snow"
+  },
+  "y_shore_boat": {
+   "sfx": "water_trickle"
+  },
+  "y_shore_bowl": {
+   "sfx": "stone_knock"
+  },
+  "y_shore_prints": {
+   "sfx": "footstep_snow"
+  },
+  "y_tree_rope": {
+   "sfx": "cloth_flutter",
+   "repeat": 1900
+  },
+  "y_tree_root": {
+   "sfx": "wood_tap"
+  },
+  "y_tree_bud": {
+   "sfx": "leaf_rustle"
   }
  }
 };

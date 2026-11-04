@@ -146,6 +146,10 @@ const Sound=(()=>{
   const land=()=>emit('land',.15,'land');
   const swing=()=>emit('swing',.16,'sickle');
   const gather=ok=>emit('gather',.12,ok?'gather':'ui_unavailable');
+  // 결정 D-482: 채집 자리마다 다른 치는 소리 (눈 둔덕의 쇠 '팡' 등)
+  const hit=id=>emit('gather',.1,id);
+  /* 결정 D-483: 작은 창 소리는 효과음 줄(effect)의 우선순위 다툼을 거치지 않고 바로 예약한다. 창 펼침 소리 뒤에 delay초 늦게 낸다 */
+  function cue(id,delay=0,gain=1){if(!ready()||quiet())return false;return playSfx(id,{when:ctx.currentTime+Math.max(0,delay),gain});}
   const item=()=>emit('item',.1,'pickup');
   const exchange=()=>emit('exchange',.1,'exchange');
   const paper=()=>emit('paper',.07,'dialog_next');
@@ -187,6 +191,6 @@ const Sound=(()=>{
     voices:sources.size,peakVoices,maxVoices,cached:cache.size,cacheBytes,maxCacheBytes,played,dropped,ambient:!!ambientVoice};}
   return {get enabled(){return enabled;},get volume(){return volume;},get bgmVolume(){return bgmVolume;},get sfxVolume(){return sfxVolume;},
     toggle,toggleVolume,setBgmVolume,setSfxVolume,playSfx,getState,
-    steam,footstep,stepId,jump,land,swing,gather,item,exchange,paper,panel,book,choice,roller,passage,tab,craft,travel,forge,stone,yeongsan,leaf,setQuiet,
+    steam,footstep,stepId,jump,land,swing,gather,hit,cue,item,exchange,paper,panel,book,choice,roller,passage,tab,craft,travel,forge,stone,yeongsan,leaf,setQuiet,
     ambience,get ambient(){return ambientKind;},get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
 })();

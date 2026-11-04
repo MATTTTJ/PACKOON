@@ -25,14 +25,15 @@ function showLine(){
   if(dlgPlan){const i=dlgPlan.length-dlgQ.length;if(i<dlgPlan.length)dlgMusic=dlgPlan[i];}
   const L=dlgQ.shift();
   if(!L){const f=dlgEnd;dlgDismiss();if(f)f();return;}
-  $('dlg').hidden=false;$('dlgWho').textContent=L[0];$('dlgText').textContent=L[1];
+  $('dlg').hidden=false;$('dlgWho').textContent=L[0];$('dlgText').textContent=L[1];dlgShownAt=performance.now();
   if('pic' in L)dlgPic(L.pic);
   const face=$('dlgFace');face.innerHTML='';face.appendChild(portrait(L[0]));
   const ch=$('dlgChoices');ch.innerHTML='';
   if(L[2]){
     $('dlgNext').hidden=true;
     L[2].forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.textContent=c.t;
-      b.onclick=e=>{e.stopPropagation();Sound.choice(!!c.go);dlgDismiss();if(c.go)c.go();};ch.appendChild(b);});
+      b.onclick=e=>{e.stopPropagation();if(dlgTouchLocked('choice'))return;Sound.choice(!!c.go);dlgDismiss();if(c.go)c.go();};ch.appendChild(b);});
+    if(TOUCH){ch.classList.add('wait');const at=dlgShownAt;setTimeout(()=>{if(dlgShownAt===at)ch.classList.remove('wait');},TABLES.TUNING.dlg_touch_choice_lock_ms);}
     setTimeout(()=>{const f=ch.querySelector('button');if(f&&matchMedia('(pointer:fine)').matches)f.focus();},0);
   }else $('dlgNext').hidden=false;
   if(typeof placePeek==='function'){placePeek();requestAnimationFrame(placePeek);}   // 결정 D-151: 선택지로 대화창이 커지면 그림을 그 위로 비킨다
@@ -57,7 +58,17 @@ function gotText(list){
 // 결정 D-352: gotLine 줄은 받을 물건을 give로 들고 있다. talkGive·arcScene(arcs.js)이 대화 끝에 넣는다. receiveItem 줄은 이미 넣어서 given이다.
 function gotLine(id,n=1){const list=Array.isArray(id)?id:[[id,n]];return Object.assign(['너구리',gotText(list)],{give:list});}
 function receiveItem(id,n=1){const L=gotLine(id,n);for(const [i,k=1] of L.give)addItem(i,k);L.given=true;return L;}
-function advance(){if($('dlgChoices').children.length)return;Sound.paper();showLine();}
+/* 결정 D-484: 휴대폰에서 대화가 너무 급하게 넘어갔다(사용자 피드백 2026-11-04). 글이 한 번에 뜨는데 탭에 아무 쉼이 없어서,
+   빠르게 두 번 누르면 한 줄을 읽기도 전에 지나갔고, 넘기려고 누르던 자리에 선택지가 뜨면 그 탭이 곧바로 선택지를 골랐다.
+   휴대폰(TOUCH)에서만: 새 줄이 뜬 뒤 dlg_touch_advance_lock_ms 동안은 넘기지 않고, 선택지는 dlg_touch_choice_lock_ms 뒤에야 눌린다(그동안 흐리게).
+   키보드·마우스는 그대로다. */
+let dlgShownAt=0;
+function dlgTouchLocked(kind){
+  if(!TOUCH)return false;
+  const T=TABLES.TUNING,ms=kind==='choice'?T.dlg_touch_choice_lock_ms:T.dlg_touch_advance_lock_ms;
+  return performance.now()-dlgShownAt<ms;
+}
+function advance(){if($('dlgChoices').children.length)return;if(dlgTouchLocked('advance'))return;Sound.paper();showLine();}
 $('dlg').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')advance();});
 
 /* 지역의 NPC: {id, name, x, talk(), draw(x,y,방향), props(npc)?, prompt?(말 걸기 대신 쓸 안내 글, 예: 숙소 마루에서 쉬기)} */
