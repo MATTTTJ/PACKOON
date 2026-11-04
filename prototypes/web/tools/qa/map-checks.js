@@ -51,9 +51,9 @@ async function runMap({browser:b,outDir}){
     const supplied=[
       // 결정 D-33: 젊은 까치 둘이 내려앉는 장면
       ['늙은 까치','참, 아가. 길이 멀어 발이 아프거든 하늘을 보고 불러라.'],
-      ['늙은 까치','우리 집 젊은 것들이다.\n이 애들이 데려다줄 게다.'],
-      ['너구리','저를요? 어떻게요?'],
-      ['늙은 까치','네 귀 한쪽씩 잡고 날면 되지.\n…가 본 길로만 다닌단다. 모르는 길은 저 애들도 몰라.']
+      // 결정 D-526: 젊은 까치 소개를 한 대화로 줄였다
+      ['늙은 까치','우리 집 젊은 것들이다. 네 귀 한쪽씩 잡고\n가 본 길이면 어디든 데려다줄 게다.'],
+      ['너구리','…귀요?']
     ];
     check(supplied.every(([who,text])=>unlockLines.some(row=>row.who===who&&row.text===text&&!row.unlocked)),'map-unlock-dialogue','늙은 까치 보자기 완료 뒤 지정 대사가 빠지거나 끝나기 전에 지도가 열렸다.',unlockLines);
     const unlocked=await b.eval("({unlocked:!!G.f.mapUnlocked,done:!!G.f.wanderersDone?.['galchamgol:old_magpie'],toast:$('toast').textContent})");
