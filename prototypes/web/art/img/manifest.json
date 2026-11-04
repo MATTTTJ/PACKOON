@@ -1,4 +1,52 @@
 {
+ "bg_far_ridge": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 446,
+  "kind": "layer",
+  "normal": false,
+  "sh": {
+   "day": 74.3,
+   "dusk": 74.3
+  },
+  "states": [
+   "day",
+   "dusk"
+  ],
+  "units": [
+   556.8,
+   74.3
+  ],
+  "v": 2,
+  "w": 3341
+ },
+ "bg_mid_ridge": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 415,
+  "kind": "layer",
+  "normal": false,
+  "sh": {
+   "day": 69.4,
+   "dusk": 69.2
+  },
+  "states": [
+   "day",
+   "dusk"
+  ],
+  "units": [
+   557.1,
+   69.2
+  ],
+  "v": 2,
+  "w": 3342
+ },
  "bg_sky_day": {
   "anchor": [
    0.5,
@@ -28,6 +76,66 @@
   ],
   "v": 1,
   "w": 1303
+ },
+ "bg_stream": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 326,
+  "kind": "layer",
+  "normal": true,
+  "units": [
+   423.1,
+   54.4
+  ],
+  "v": 1,
+  "w": 2538
+ },
+ "bg_water_marsh": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 307,
+  "kind": "layer",
+  "normal": true,
+  "units": [
+   423.1,
+   51.2
+  ],
+  "v": 1,
+  "w": 2540
+ },
+ "bg_woods_dark": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 562,
+  "kind": "layer",
+  "normal": true,
+  "units": [
+   634.7,
+   93.6
+  ],
+  "v": 1,
+  "w": 3807
+ },
+ "bg_woods_light": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 532,
+  "kind": "layer",
+  "normal": true,
+  "units": [
+   634.7,
+   88.6
+  ],
+  "v": 1,
+  "w": 3809
  },
  "ch_hero": {
   "anchor": [
@@ -82,6 +190,21 @@
   "v": 1,
   "w": 149
  },
+ "cm_mound": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 78,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   37.5,
+   13.0
+  ],
+  "v": 1,
+  "w": 225
+ },
  "cm_north_sign": {
   "anchor": [
    0.5,
@@ -96,6 +219,56 @@
   ],
   "v": 1,
   "w": 77
+ },
+ "cm_reeds": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 216,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 40.0,
+   "b": 36.0
+  },
+  "states": [
+   "a",
+   "b"
+  ],
+  "units": [
+   40.9,
+   36.0
+  ],
+  "v": 2,
+  "w": 245
+ },
+ "cm_shrub": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 96,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 18.0,
+   "b": 16.0,
+   "c": 18.0,
+   "d": 16.0
+  },
+  "states": [
+   "a",
+   "b",
+   "c",
+   "d"
+  ],
+  "units": [
+   21.7,
+   16.0
+  ],
+  "v": 4,
+  "w": 130
  },
  "cm_sign": {
   "anchor": [
@@ -146,17 +319,19 @@
   "kind": "prop",
   "normal": true,
   "sh": {
-   "a": 14.0
+   "a": 14.0,
+   "b": 14.0
   },
   "states": [
-   "a"
+   "a",
+   "b"
   ],
   "units": [
-   21.9,
+   25.6,
    14.0
   ],
-  "v": 1,
-  "w": 131
+  "v": 2,
+  "w": 154
  },
  "cm_woodpile": {
   "anchor": [
@@ -210,6 +385,113 @@
   ],
   "v": 1,
   "w": 411
+ },
+ "dc_ferns": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 60,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 16.0,
+   "b": 10.0
+  },
+  "states": [
+   "a",
+   "b"
+  ],
+  "units": [
+   22.3,
+   10.0
+  ],
+  "v": 2,
+  "w": 134
+ },
+ "dc_fg_maple": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 1350,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   150.8,
+   225.0
+  ],
+  "v": 1,
+  "w": 905
+ },
+ "dc_flowers": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 72,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 12.0,
+   "b": 12.0
+  },
+  "states": [
+   "a",
+   "b"
+  ],
+  "units": [
+   11.3,
+   12.0
+  ],
+  "v": 2,
+  "w": 68
+ },
+ "dc_grass": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 168,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 35.0,
+   "b": 28.0
+  },
+  "states": [
+   "a",
+   "b"
+  ],
+  "units": [
+   36.6,
+   28.0
+  ],
+  "v": 2,
+  "w": 220
+ },
+ "dc_hanging_branch": {
+  "anchor": [
+   0.5,
+   0.0
+  ],
+  "h": 480,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 80.0,
+   "b": 80.0
+  },
+  "states": [
+   "a",
+   "b"
+  ],
+  "units": [
+   66.6,
+   80.0
+  ],
+  "v": 2,
+  "w": 399
  },
  "dc_jars": {
   "anchor": [
@@ -271,17 +553,19 @@
   "kind": "prop",
   "normal": true,
   "sh": {
-   "a": 8.0
+   "a": 8.0,
+   "b": 8.0
   },
   "states": [
-   "a"
+   "a",
+   "b"
   ],
   "units": [
-   10.8,
+   10.3,
    8.0
   ],
-  "v": 1,
-  "w": 65
+  "v": 2,
+  "w": 62
  },
  "dc_persimmon": {
   "anchor": [
@@ -320,6 +604,37 @@
   ],
   "v": 2,
   "w": 187
+ },
+ "fx_leaves": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 18,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 3.0,
+   "b": 3.0,
+   "c": 3.0,
+   "d": 3.0,
+   "e": 3.0,
+   "f": 3.0
+  },
+  "states": [
+   "a",
+   "b",
+   "c",
+   "d",
+   "e",
+   "f"
+  ],
+  "units": [
+   1.2,
+   3.0
+  ],
+  "v": 6,
+  "w": 7
  },
  "gt_acorn": {
   "anchor": [
