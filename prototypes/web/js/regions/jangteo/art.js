@@ -191,11 +191,40 @@ function marketProp(x,y,i){
     for(let j=0;j<3;j++){const xx=x-8+j*8;P(xx,y-18,6,18,n()?'#8a7a52':'#d9b860');P(xx+1,y-18,1,18,n()?'#a8975f':'#ead27a');P(xx-1,y-10,8,2,'#8a6a3a');P(xx,y-20,6,2,t.snow);}
   }
 }
+/* 결정 D-560: 장승을 실제 마을 어귀 장승처럼 다시 그렸다 (사용자 피드백 2026-11-04 "장승들 좀 더 현실적인 이미지로").
+   통나무를 그대로 세워 껍질 결과 갈라진 틈이 남고, 위쪽만 깎아 얼굴을 냈다. 부릅뜬 왕방울 눈, 주먹코, 드러난 이,
+   몸통에는 세로로 먹 글씨(천하대장군·지하여장군) 자리가 있다. f=1 은 관모를 쓴 대장군, f=-1 은 관 없이 가르마를 탄 여장군.
+   발치는 돌무더기로 받치고, 비바람에 바랜 붉은 칠이 눈자위와 입술에만 조금 남았다. */
 function jangseung(x,y,f){
-  P(x-5,y-55,10,55,'#987752');P(x-6,y-58,12,6,'#806143');P(x-4,y-52,8,1,'#d0ad79');
-  P(x-3,y-43,2,3,'#3c3130');P(x+1,y-43,2,3,'#3c3130');P(x-2,y-36,5,2,'#3c3130');P(x,y-39,2,4,'#6c4b37');
-  for(let j=0;j<3;j++)P(x-2+(j%2),y-25+j*7,4,2,'#5e4233');P(x-4,y-59,8,2,tone().snow);
-  P(x+f*12,y-34,19,2,'#7d6650');
+  const dk=n(),wood=dk?'#5e5246':'#8e7a62',shade=dk?'#463c34':'#6c5a46',lite=dk?'#76685a':'#b09a7c',crack=dk?'#2e2722':'#43372c';
+  const red=dk?'#6e3a32':'#a4473a',ink=dk?'#1c1816':'#26201c',tooth=dk?'#b8b0a2':'#e8e0cc',snow=tone().snow;
+  const male=f>0,h=male?66:60,top=y-h,w=12;
+  // 발치 돌무더기
+  P(x-11,y-5,22,5,dk?'#4a4744':'#7d7a74');P(x-9,y-8,9,4,dk?'#56524e':'#8f8b84');P(x+1,y-9,8,5,dk?'#514d49':'#88837c');P(x-8,y-6,4,1,dk?'#6a6560':'#a9a49b');P(x-12,y-1,24,1,snow);
+  // 기둥: 통나무 몸통. 껍질 결(어두운 세로 줄)과 마른 틈
+  P(x-w/2,top+14,w,h-18,wood);P(x-w/2,top+14,2,h-18,shade);P(x+w/2-2,top+14,2,h-18,lite);
+  for(let j=0;j<5;j++)P(x-4+((j*5)%9),top+30+j*6,1,4+(j%2)*3,crack);
+  // 몸통 먹 글씨 자리 (한 줄 세로 글씨를 굵은 획 다섯으로)
+  for(let j=0;j<5;j++){const yy=top+32+j*6;P(x-2,yy,4,1,ink);P(x-1,yy+1,1,3,ink);if(j%2)P(x+1,yy+2,2,1,ink);else P(x-3,yy+3,2,1,ink);}
+  // 머리: 몸통보다 조금 넓게 깎은 얼굴
+  P(x-7,top+2,14,16,wood);P(x-7,top+2,2,16,shade);P(x+5,top+2,2,16,lite);
+  if(male){   // 관모: 위로 솟은 사모와 넓은 챙
+    P(x-6,top-7,12,8,ink);P(x-5,top-6,10,1,'#3c3430');P(x-9,top,18,3,ink);P(x-9,top,18,1,'#3c3430');
+    P(x-5,top-8,10,1,snow);P(x-9,top-1,4,1,snow);P(x+5,top-1,4,1,snow);
+  }else{      // 여장군: 관 없이 가르마 탄 머리, 쪽진 뒤통수 둥근 끝
+    P(x-7,top-2,14,6,ink);P(x,top-2,1,4,wood);P(x-8,top+1,2,4,ink);P(x+6,top+1,2,4,ink);
+    P(x-6,top-3,12,1,snow);
+  }
+  // 왕방울 눈: 붉은 눈자위, 흰 눈알, 가운데 검은 점
+  for(const s of [-1,1]){const ex=x+s*3-(s<0?3:0);P(ex,top+5,4,4,red);P(ex+1,top+6,2,2,tooth);P(ex+1,top+6,1,1,ink);}
+  P(x-6,top+4,4,1,ink);P(x+2,top+4,4,1,ink);   // 부릅뜬 눈썹
+  // 주먹코
+  P(x-2,top+9,4,4,shade);P(x-3,top+12,6,2,lite);P(x-2,top+13,1,1,ink);P(x+1,top+13,1,1,ink);
+  // 입: 여장군은 다문 입, 대장군은 이를 드러내고 웃는다
+  if(male){P(x-5,top+15,10,3,ink);for(let j=0;j<4;j++)P(x-4+j*2+(j>1?1:0),top+15,1,2,tooth);P(x-5,top+18,10,1,red);
+    for(let j=0;j<3;j++)P(x-4+j*3,top+19,1,3,crack);}   // 깎아 낸 수염 결
+  else{P(x-4,top+15,8,2,red);P(x-3,top+16,6,1,ink);P(x-6,top+12,2,2,red);P(x+4,top+12,2,2,red);}   // 바랜 연지 볼
+  P(x-6,top+18,12,1,shade);   // 턱 밑 깎인 자리
 }
 function stall(x,y,i){
   const t=tone(),red=i%3===0?'#ab4d43':i%3===1?'#d1bc8c':'#8d6a55';
@@ -353,8 +382,19 @@ function drawScenery(id){
   if(id==='entrance'){
     const x=tx(240)-cam;P(x-6,GROUND-14,12,8,'#ac8b62');P(x-2,GROUND-18,4,8,'#d1b184');P(x-7,GROUND-15,6,3,'#ccbe95');P(x+1,GROUND-18,6,3,'#ccbe95');
     // 결정 D-314: 눈 장승은 잘라 낸 구간 안(설계 1680)에 있어 그림만 사라지고 조사 자리만 남았었다. 조사 자리(줄인 뒤 좌표)에 그린다.
-    if(!Rg.springRevisit()){const sx=trimX(1680,REG.trimCuts?.entrance)-RC();P(sx-10,GROUND-11,20,11,t.snow);P(sx-7,GROUND-19,14,10,t.snow);P(sx-4,GROUND-18,1,1,'#4c4843');P(sx+3,GROUND-18,1,1,'#4c4843');P(sx,GROUND-14,7,2,'#aa7251');}
+    // 결정 D-560: 눈 쌓인 장승도 진짜 장승 위에 눈을 얹는다. 짐꾼들이 짚고 지나가는 코끝만 맨나무가 드러난다.
+    if(!Rg.springRevisit()){const sx=trimX(1680,REG.trimCuts?.entrance)-RC(),top=GROUND-66;jangseung(sx,GROUND,1);
+      P(sx-9,top-1,18,3,t.snow);P(sx-6,top-8,12,2,t.snow);P(sx-7,top+2,5,3,t.snow);P(sx+2,top+2,5,3,t.snow);P(sx-7,top+14,3,2,t.snow);P(sx+4,top+14,3,2,t.snow);
+      P(sx-6,top+20,12,2,t.snow);for(let j=0;j<4;j++)P(sx-6+((j*7)%10),top+28+j*9,3,1,t.snow);}
   }else if(id==='street'){
+    // 결정 D-561: 조사 '좌판 사이 골목'의 콩알 (사용자 피드백 2026-11-04 "애니메이션에 콩 표현해주기").
+    // 낮에 좌판 밑에서 콩알 넷이 데굴데굴 굴러 나왔다 멈췄다 한다. 둥근 누런 콩에 검은 배꼽, 구를 때마다 배꼽이 돈다.
+    if(!n()){const bx=310-cam,rm=Vfx.reducedMotion;
+      if(bx>-60&&bx<W+60)for(let j=0;j<4;j++){
+        const ph=rm?j*1.3:(G.anim*0.035+j*1.7),roll=Math.sin(ph)*(9+j*2),cx=Math.round(bx-12+j*9+roll),turn=rm?j:Math.floor((ph*4+j)%4);
+        P(cx-1,GROUND-4,4,3,'#d8bf7a');P(cx,GROUND-5,2,1,'#d8bf7a');P(cx-1,GROUND-2,4,1,'#a8904e');P(cx,GROUND-4,1,1,'#f2e2a6');
+        const [hx,hy]=[[2,-3],[2,-2],[0,-2],[0,-3]][turn];P(cx+hx,GROUND+hy,1,1,'#3a2c1c');
+      }}
     const x=1150-cam;P(x-7,GROUND-11,15,11,'#9a8267');P(x-5,GROUND-14,11,4,'#e4dbbb');P(x-3,GROUND-16,7,3,'#f3eee1');P(x-5,GROUND-7,11,1,'#c4aa7e');
     // 결정 D-318: 장국밥 가마솥 (조사 '장국밥 가마솥')
     const gx=2470-cam;P(gx-16,GROUND-14,32,14,'#6b5848');P(gx-13,GROUND-11,26,8,'#4b3a34');if(!n())P(gx-8,GROUND-8,16,5,'#e08a3a');
@@ -451,7 +491,7 @@ const innVista=[
     for(let x=0;x<W;x+=31)P(x-c%31,215,1,10,n()?'#292c34':'#614835');lantern(366-c%23,37,2);
   }}
 ];
-/* 투호 노인 한 사람 (결정 D-325). f는 바라보는 쪽. 흰눈썹은 눈 위에 흰 눈썹, 곰방대는 입에 문 곰방대로 가른다.
+/* 바둑 노인 한 사람 (결정 D-325·D-562). f는 바라보는 쪽. 흰눈썹은 눈 위에 흰 눈썹, 곰방대는 입에 문 곰방대로 가른다.
    거리의 두 노인 그림과 대화 초상(story.js Rg.portraits)이 같은 그림을 쓴다. */
 function elder(ox,y,f,who){
   ox=Math.round(ox);y=Math.round(y);
@@ -599,9 +639,14 @@ function wanderer(kind,x,y,f=1){
     const alone=!!G.f.night&&!!Rg.arcs?.();
     if(alone){P(x-24,y-5,10,5,'#4b3b31');P(x-23,y-8,8,3,'#c4532f');P(x-21,y-10,4,2,'#f0a54e');}
     for(let q=-1;q<=1;q+=2){if(alone&&q<0)continue;elder(x+q*19,y,-q,q<0?'steady':'bold');}   // 왼쪽 흰눈썹, 오른쪽 곰방대
-    // 결정 D-325: 둘 사이에 투호 항아리와 꽂힌 화살 (예전엔 윷판)
-    P(x-14,y-2,28,2,'#d1b991');P(x-4,y-10,8,8,'#5d6a6b');P(x-5,y-8,10,4,'#5d6a6b');P(x-3,y-9,2,4,'#7d8b8a');P(x-1,y-15,3,5,'#5d6a6b');P(x-2,y-16,5,1,'#3f4a4b');P(x-3,y-14,1,2,'#5d6a6b');P(x+3,y-14,1,2,'#5d6a6b');
-    P(x,y-22,1,7,'#6b4a2c');P(x,y-23,1,2,'#b54a34');P(x+2,y-20,1,5,'#6b4a2c');P(x+2,y-21,1,2,'#416c82');
+    // 결정 D-562: 투호 항아리 대신 다리 달린 바둑판 (사용자 지시 2026-11-04 "투호 내기 말고 바둑"). 판 위에 흑백 돌 몇 점, 양옆에 돌 통.
+    // 밤에 혼자 남은 곰방대 노인 곁엔 판을 덮어 둔다(둘이 있어야 두니까).
+    P(x-14,y-2,28,2,'#d1b991');
+    P(x-11,y-9,22,5,'#c99a58');P(x-11,y-9,22,1,'#e3bf7c');P(x-10,y-4,3,4,'#8a6538');P(x+7,y-4,3,4,'#8a6538');
+    if(alone){P(x-11,y-10,22,2,'#7a5a3a');}
+    else{for(let i=0;i<4;i++){P(x-9+i*6,y-8,1,3,'#8a6538');}P(x-10,y-7,20,1,'#8a6538');
+      for(const [dx,dy,c] of [[-7,-8,'#1d1712'],[-2,-7,'#f4efe2'],[3,-8,'#1d1712'],[6,-7,'#f4efe2'],[-5,-6,'#f4efe2'],[1,-6,'#1d1712']])P(x+dx,y+dy,2,1,c);}
+    P(x-19,y-5,5,5,'#7a5232');P(x-18,y-6,3,1,'#1d1712');P(x+14,y-5,5,5,'#7a5232');P(x+15,y-6,3,1,'#f4efe2');
   }else if(kind==='straw'){
     // 결정 D-318: 청설모 짚신장수 할아범. 귀 끝 털, 굽은 등, 등에 짚신 꾸러미. 끝내기 전엔 발치에 짚신이 흩어져 있다.
     p(-6,-15,12,13,'#6f5a4c');p(-4,-11,6,8,'#c9b8a0');p(-3,-24,10,10,'#7a6454');p(-3,-27,2,4,'#4e3e34');p(4,-27,2,4,'#4e3e34');p(-4,-29,1,3,'#4e3e34');p(5,-29,1,3,'#4e3e34');

@@ -1,5 +1,5 @@
 'use strict';
-/* 큰 장터 진행: NPC 대화와 교환, 모락의 김 올리기, 엿방울의 엿가위 장단, 숙소 마루(낮/밤), 헌물 도깨비, 홍시 약떡 보내기, 지금 할 일.
+/* 큰 장터 진행: 보부상 상단의 창고 도둑 이야기(본줄기), NPC 대화와 교환, 모락의 김 올리기, 엿방울, 바둑 노인들, 숙소 마루(낮/밤), 헌물 도깨비, 홍시 약떡 보내기, 지금 할 일.
    흐름은 design/narrative/jangteo-scenario.md (제안), 교환은 design/data/trades.csv
    교환 연쇄: 솔방울 → 쌀 → (맷돌) 쌀가루 → 모락 → 시루 깨어남 → 팥시루떡 → 부엉 영감 → 신표·아빠의 메모 → 창고 지키기 */
 (()=>{
@@ -11,7 +11,7 @@ Rg.onStart=()=>{
   originalStart();
   if(typeof grantNickname==='function'){
     if(G.f.jxKiteDone)grantNickname('jangteo_kite','연 건지는 손','얼레');
-    if(G.f.jxYutReward)grantNickname('jangteo_yut','한판 벗','투호 노인들');
+    if(G.f.jxYutReward)grantNickname('jangteo_yut','한판 벗','바둑 노인들');
   }
 };
 
@@ -39,15 +39,27 @@ function yeotNight(){
 }
 function yeotReturn(){
   // 결정 D-290: 가위를 찾아 준 몫. 되찾은 가위로 처음 끊은 호박엿
+  // 결정 D-565: 엿가위 장단 미니게임을 뺐다 (사용자 지시 2026-11-04). 제 가위를 찾은 엿방울이 장단을 쳐 아이를 한바탕 웃기고(D-22),
+  // 그 자리에서 아빠가 맡긴 엿을 내준다. 옛 저장에서 이미 받은 엿은 다시 주지 않는다.
+  const paid=G.f.yeotHigh||knows('yeotbang:high');
   arcScene('jangteoArcsYeotReturned',[
     ['너구리','창고에 돌아온 물건 사이에\n날이 반질한 엿가위가 있었어요.'],
-    ['너구리','작년 그믐에 빼앗겼다던 그 가위 같아서요.'],
     ['엿방울','어라, 내 엿가위! …손잡이 끈도 내가 감은 그대로네~'],
     ['너구리','(엿방울 아주머니가 그 가위로 호박엿을 툭툭 끊어 내 손에 얹는다.)'],
-    ['엿방울','찾아 준 값은 해야지~ 내 가위로 끊은 첫 엿이야.'],
+    ['엿방울','찾아 준 값이야~ 내 가위로 끊은 첫 엿.'],
     gotLine('hobakyeot',2),
-    ['엿방울','자, 제 소리가 나는지 들어 볼까~']
-  ],'창고에 돌아온 물건 사이에서 엿방울의 엿가위를 찾았다. 엿방울은 그 가위로 처음 끊은 호박엿을 주고, 제 가위로 치는 장단을 함께 맞춰 보자고 했다.',()=>openRhythm(false));
+    ['너구리','(쩔걱, 쩔꺽! 아주머니가 가위 장단에 맞춰 엉덩이를 들썩인다.\n나도 모르게 웃음이 터졌다.)'],
+    ...(paid?[['엿방울','이 소리지~ 빌린 가위로는 이 맛이 안 나.']]:[
+      ['엿방울','웃었다! 그럼 이제 꺼내도 되지~'],
+      ['엿방울','너구리 아저씨가 아들 준다고 맡긴 엿이야.\n한바탕 웃긴 다음에 주랬거든.'],
+      ['엿방울','눈매가 판박이라 진작 알았지~ 웃기기가 어려웠을 뿐.'],
+      gotLine('dad_yeot')])
+  ],paid?'창고에 돌아온 물건 사이에서 엿방울의 엿가위를 찾았다. 엿방울은 그 가위로 처음 끊은 호박엿을 주고, 제 가위로 장단을 쳐 나를 웃겼다.':
+    '창고에 돌아온 물건 사이에서 엿방울의 엿가위를 찾았다. 엿방울은 그 가위로 처음 끊은 호박엿을 주고, 장단을 쳐 나를 웃긴 뒤 아빠가 나 주려고 맡겨 둔 엿을 꺼냈다.',()=>{
+    const F=G.f;F.jangteoArcsYeot3=true;rel('yeotbang',1);
+    // 엿은 위 gotLine 줄이 장면 끝에 넣는다
+    if(!paid){F.yeotHigh=true;learn('yeotbang:high');clue('j2','엿방울','아빠는 아들 주려고 엿을 샀다가, 끝내 못 가져가고 엿방울에게 맡겨 두었다.');}
+  });
 }
 /* 아빠 메모의 "값은 이미 치러졌다"를 묻는다. 영감은 엄마의 거래를 모른다. 자기 장부에 있는 아빠의 셈만 보여 준다. */
 function bueongLedger(){
@@ -85,30 +97,28 @@ function bueongPromise(){
 
 /* ---------- 결정 D-119: 큰 장터 사연 넷 (사용자 지시 "분량은 NPC 서사로", D-98) ----------
    모두 선택이다(?arcs=0이면 열리지 않는다). 막마다 다른 때(낮·밤·그믐 뒤 설날 아침)에 연다.
-   ① 투호 노인들 "부르는 이름": 첫 판 구경 뒤 낮 → 그 밤 → 설날 아침
+   ① 바둑 노인들 "부르는 이름": 첫 판 구경 뒤 낮 → 그 밤 → 설날 아침
    ② 얼레 "멀리서 보이는 표시": 연을 건진 뒤 밤 → 설날 아침
    ③ 부엉 영감 "장부 아랫줄": 신표 뒤 밤 → 그믐 창고를 지킨 밤 → 약떡을 보낸 뒤 밤
    ④ 모락과 엿방울 "작년 그믐의 빚": 낮(떡 심부름) → 밤(엿방울의 속사정) → 엿가위를 찾은 뒤 낮 */
 
-/* ① 투호 노인들(D-325). 흰눈썹 노인은 가을부터 이름을 흘린다. 곰방대 노인은 화살을 던질 때마다 제 이름을 외친다.
+/* ① 바둑 노인들(D-325·D-562). 흰눈썹 노인은 가을부터 이름을 흘린다. 곰방대 노인은 돌을 놓을 때마다 제 이름을 외친다.
    아이는 엄마가 제 이름을 놓치는 걸 안다(출발 일기). 그래서 둘째 막에서 제 얘기를 꺼낸다. */
 function elderArc1(){
   arcScene('jangteoArcsElder1',[
     ['흰눈썹 노인','한 판 더 하자. 이번엔 내가 이긴다.'],
     ['곰방대 노인','그 말은 어제도 했다.'],
-    ['흰눈썹 노인','어제는 어제고. 자, 던져 봐라…'],
+    ['흰눈썹 노인','어제는 어제고. 자, 네 차례다…'],
     ['흰눈썹 노인','…어, 그… 봉구야? 아니, 칠복이…'],
-    ['곰방대 노인','곰방대다. 곰방대.'],
-    ['곰방대 노인','쉰 해를 같이 놀고도 이런다니까.'],
+    ['곰방대 노인','곰방대다. 곰방대.\n쉰 해를 같이 두고도 이런다니까.'],
     ['흰눈썹 노인','안다, 알아. 혀가 꼬여서 그래.'],
     ['너구리','(흰눈썹 할아버지 귀가 빨개졌다.)'],
-    ['곰방대 노인','(화살을 높이 든다.) 곰방대가 던진다!'],
-    ['곰방대 노인','…들었다. 곰방대 하나!'],
-    ['너구리','왜 던질 때마다 이름을 외치세요?'],
-    ['곰방대 노인','투호는 기세지, 기세.'],
+    ['곰방대 노인','(돌을 딱 소리 나게 놓는다.) 곰방대가 둔다!'],
+    ['너구리','왜 둘 때마다 이름을 외치세요?'],
+    ['곰방대 노인','바둑은 기세지, 기세.'],
     ['너구리','(곰방대 할아버지가 곰방대를 물고\n흰눈썹 할아버지 쪽은 보지 않는다.)'],
     ['곰방대 노인','밤에 다시 와 봐라.\n저 양반은 해 지면 일찍 들어가거든.']
-  ],'투호 할아버지 하나가 쉰 해 친구의 이름을 놓쳤다. 곰방대 할아버지는 화살을 던질 때마다 제 이름을 크게 외쳤다. 밤에 다시 오라고 했다.');
+  ],'바둑 두는 할아버지 하나가 쉰 해 친구의 이름을 놓쳤다. 곰방대 할아버지는 돌을 놓을 때마다 제 이름을 크게 외쳤다. 밤에 다시 오라고 했다.');
 }
 function elderArc2(){
   arcScene('jangteoArcsElder2',[
@@ -120,31 +130,30 @@ function elderArc2(){
     ['너구리','…우리 엄마도 그래요.'],
     ['너구리','제 얼굴은 보시는데,\n제 이름만 자꾸 놓쳐요.'],
     ['너구리','(곰방대 할아버지가 한참 말없이 연기만 뿜는다.)'],
-    ['곰방대 노인','그래서 내가 외친다. 던질 때마다.'],
+    ['곰방대 노인','그래서 내가 외친다. 돌 놓을 때마다.'],
     ['곰방대 노인','잊는 건 저 양반 몫이고,\n부르는 건 내 몫이니까.'],
     ['너구리','그러면… 다시 기억하세요?'],
     ['곰방대 노인','모르지. 그래도 들리긴 하겠지.'],
     ['곰방대 노인','들리는 동안은 안 잊은 거다.'],
     ['곰방대 노인','설날 아침에 한 판 하자.\n저 양반, 설엔 꼭 일찍 나온다.']
-  ],'밤에 곰방대 할아버지가 말했다. 흰눈썹 할아버지는 가을부터 이름을 흘린다고. 그래서 던질 때마다 제 이름을 외친다고. 들리는 동안은 안 잊은 거라고. 엄마 생각이 났다.');
+  ],'밤에 곰방대 할아버지가 말했다. 흰눈썹 할아버지는 가을부터 이름을 흘린다고. 그래서 돌 놓을 때마다 제 이름을 외친다고. 들리는 동안은 안 잊은 거라고. 엄마 생각이 났다.');
 }
 function elderArc3(){
   arcScene('jangteoArcsElder3',[
-    ['흰눈썹 노인','왔냐, 꼬마. 설날 첫판이다.'],
-    ['곰방대 노인','네가 먼저 던져라.'],
-    ['너구리','(화살을 던졌다. 항아리 테를 맞고 튕겨 나갔다.)'],
-    ['흰눈썹 노인','이번엔 내 차례지.\n설에 귀에 한 번 꽂으면 한 해가 편하다더라.'],
-    ['너구리','(흰눈썹 할아버지의 화살이 높이 떴다가 항아리 귀에 쏙 꽂힌다.)'],
+    ['흰눈썹 노인','왔냐, 꼬마. 설날 첫판이다.\n첫 돌은 네가 놓아라.'],
+    ['너구리','(한가운데에 돌을 하나 놓았다. 두 분이 동시에 혀를 찬다.)'],
+    ['흰눈썹 노인','설 첫 수는 귀에 두는 거다.\n그래야 한 해가 편하다더라.'],
+    ['너구리','(흰눈썹 할아버지가 판 귀에 돌을 딱 놓는다.)'],
     ['흰눈썹 노인','귀다! 곰방대야, 봤냐!'],
     ['곰방대 노인','…'],
     ['너구리','(곰방대 할아버지가 곰방대를 입에서 떼고 한참 웃는다.)'],
     ['곰방대 노인','봤다. 봤어.'],
-    ['흰눈썹 노인','뭘 그렇게 웃어. 귀 한 번이 그렇게 좋으냐?'],
-    ['곰방대 노인','그래. 귀에 꽂혀서 좋아 그런다.'],
+    ['흰눈썹 노인','뭘 그렇게 웃어. 귀 한 수가 그렇게 좋으냐?'],
+    ['곰방대 노인','그래. 귀에 둬서 좋아 그런다.'],
     ['너구리','(곰방대 할아버지 눈가가 젖었다.)'],
     ['곰방대 노인','꼬마야. 집에 가거든\n네 이름, 네가 자꾸 들려 드려라.'],   // 결정 D-136: 노인의 논리대로 제 이름을 엄마 귀에 들려 드린다
     ['너구리','네.']
-  ],'설날 아침 투호판에서 흰눈썹 할아버지가 곰방대 할아버지의 이름을 불렀다. 화살이 귀에 꽂혀서 웃는 거라고 했지만, 곰방대 할아버지는 한참 웃었다. 집에 가거든 나도 자꾸 불러 드리라고 했다.',()=>learn('arc:jangteo:elder-name'));
+  ],'설날 아침 바둑판에서 흰눈썹 할아버지가 곰방대 할아버지의 이름을 불렀다. 귀에 둬서 웃는 거라고 했지만, 곰방대 할아버지는 한참 웃었다. 집에 가거든 나도 자꾸 불러 드리라고 했다.',()=>learn('arc:jangteo:elder-name'));
 }
 
 /* ② 얼레. 연을 건진 뒤(jxKiteDone)에 이어진다. 동생은 봄에 할머니 댁에 맡겨졌고 설에 온다고 했다.
@@ -163,8 +172,7 @@ function kiteArc2(){
     ['얼레','꼭지라고, 나보다 두 살 아래.\n봄에 할머니 댁에 맡겨졌어.'],   // 결정 D-322: 동생 이름은 꼭지
     ['얼레','설엔 꼭 온댔어. 약속했어.'],
     ['너구리','(…눈 오기 전에 돌아가마.\n아빠 편지도 그랬는데.)'],
-    ['얼레','왜? 무슨 생각 해?'],
-    ['너구리','아냐. 불 안 꺼지게 기름 넉넉히 넣자.']
+    ['얼레','기름 넉넉히 넣자! 동생이 늦게 와도 안 꺼지게.']
   ],'얼레와 붉은 차일 기둥 꼭대기에 등을 걸었다. 설에 온다는 동생이 밤에도 찾아오게. 아빠 편지의 "눈 오기 전에"가 생각났다.');
 }
 function kiteArc3(){
@@ -303,10 +311,10 @@ function pairArc4(){
     ['너구리','(떡집 줄이 엿가위 장단에 맞춰 줄어든다.)']
   ],'엿방울 아주머니가 제 엿가위 장단으로 모락 아주머니네 떡을 팔아 주었다. 작년 그믐 일 고마웠다고, 이제야 말했다. 모락 아주머니는 김이 매워서 운다고 했다.',()=>learn('arc:jangteo:pair'));
 }
-/* 떠돌이(region.js의 투호 노인들·얼레)에 사연 막을 붙인다. 원래 대화는 그대로 두고, 열릴 막이 있을 때만 앞에 고르게 한다.
-   투호 노인들은 한 그림에 둘이 있어 speakers로 한 사람씩 말한다(PA-54 다람쥐 형제와 같은 방식). */
+/* 떠돌이(region.js의 바둑 노인들·얼레)에 사연 막을 붙인다. 원래 대화는 그대로 두고, 열릴 막이 있을 때만 앞에 고르게 한다.
+   바둑 노인들은 한 그림에 둘이 있어 speakers로 한 사람씩 말한다(PA-54 다람쥐 형제와 같은 방식). */
 /* 결정 D-131: 떠돌이는 한 번 마치면(finishWanderer) 엔진이 talk 대신 greeting만 보여 준다(engine/field.js tryInteract).
-   투호 노인·얼레·짠돌의 다음 막은 모두 그 뒤에 열리므로, 열릴 막이 있으면 greeting이 그 막을 고르는 대사가 된다. */
+   바둑 노인·얼레·짠돌의 다음 막은 모두 그 뒤에 열리므로, 열릴 막이 있으면 greeting이 그 막을 고르는 대사가 된다. */
 function arcGreeting(w,rows){
   const d=Object.getOwnPropertyDescriptor(w,'greeting'),base=d?.get?()=>d.get.call(w):()=>d?.value;
   Object.defineProperty(w,'greeting',{configurable:true,enumerable:true,get(){return rows()||base();}});
@@ -315,17 +323,17 @@ function arcGreeting(w,rows){
   const W=Rg.expEncounters?.wanderers||{};
   const elders=(W.street||[]).find(w=>w.id==='j_yut');
   if(elders){
-    elders.speakers=['투호 노인들','흰눈썹 노인','곰방대 노인'];
+    elders.speakers=['바둑 노인들','흰눈썹 노인','곰방대 노인'];
     const base=elders.talk;
     const rows=()=>{
       const F=G.f;if(!Rg.arcs())return null;let act=null,label='',line='';
       if(!night()&&F.jxYutReward&&!F.jangteoArcsElder1){act=elderArc1;label='한 판 더 구경한다';line='꼬마 왔구나. 앉아서 구경이나 하려무나.';}
       else if(night()&&F.jangteoArcsElder1&&!F.jangteoArcsElder2){act=elderArc2;label='곰방대 할아버지 곁에 앉는다';line='(곰방대 할아버지 혼자 화롯불 앞에 앉아 있다.)';}
       else if(!night()&&G.boss.dead&&F.jangteoArcsElder2&&!F.jangteoArcsElder3){act=elderArc3;label='설날 첫판에 앉는다';line=G.f.jxSeollalPast?'설은 지났어도 약속은 약속이지. 첫판 하자.':'설날 아침이다! 약속대로 첫판 하자.';}
-      // 흰눈썹 노인은 해 지면 일찍 들어간다(elderArc1). 밤 투호판엔 곰방대 노인만 남고, 내기는 둘이 있어야 하니 열리지 않는다(D-325).
-      if(!act&&night())return [['곰방대 노인',F.jxYutReward?'저 양반은 들어갔다.\n내기는 둘이 있어야 하지. 날 밝거든 오너라.':'같이 던지는 양반은 해 지면 들어간다.\n내기 구경은 날 밝거든 오너라.']];
+      // 흰눈썹 노인은 해 지면 일찍 들어간다(elderArc1). 밤 바둑판엔 곰방대 노인만 남고, 내기는 둘이 있어야 하니 열리지 않는다(D-325).
+      if(!act&&night())return [['곰방대 노인',F.jxYutReward?'저 양반은 들어갔다.\n내기는 둘이 있어야 하지. 날 밝거든 오너라.':'같이 두는 양반은 해 지면 들어간다.\n내기 구경은 날 밝거든 오너라.']];
       if(!act)return null;
-      return [[act===elderArc2?'너구리':'곰방대 노인',line,[{t:label,go:act},{t:'투호 내기를 건다',go:()=>Rg.playTuho()},{t:'다음에 올게요',go:null}]]];
+      return [[act===elderArc2?'너구리':'곰방대 노인',line,[{t:label,go:act},{t:'바둑 내기에 편을 든다',go:()=>Rg.playBaduk()},{t:'다음에 올게요',go:null}]]];
     };
     elders.talk=()=>{const l=rows();if(l)talk(l);else base();};
     arcGreeting(elders,rows);
@@ -385,11 +393,9 @@ function jjArc2(){
     // 결정 D-290: 떡국 심부름 값. 장사꾼은 한 번 내준 값을 도로 받지 않는다
     ['짠돌','넣어 둬라. 장사꾼은 내준 값 도로 안 받는다.\n심부름 값이다.'],
     gotLine('salt'),
-    ['너구리','(짠돌 아저씨가 김을 한참 쐬다가 천천히 먹는다.)'],
-    ['너구리','(짠돌 아저씨가 숟가락을 멈추고 내 모자를 본다.)'],
+    ['너구리','(짠돌 아저씨가 떡국을 먹다 숟가락을 멈추고 내 모자를 본다.)'],
     ['짠돌','그 모자… 어디서 났냐.'],
     ['너구리','아빠 거예요. 아빠 찾으러 북쪽으로 가요.'],
-    ['짠돌','…'],
     ['너구리','(짠돌 아저씨가 품에서 천에 싼 것을 꺼낸다. 낡은 신표다.)'],
     ['짠돌','지난가을 늦은 밤, 이 문간에서\n이가 덜덜 떨리더라. 신표가 없으니 방엔 못 들고.'],
     ['짠돌','그 모자 쓴 너구리가\n이걸 내 손에 쥐여 주더라.'],
@@ -441,11 +447,8 @@ function jjArc4(){
     ['너구리','(영감님이 신표를 받아 장부를 한 장 넘긴다.)'],
     ['부엉 영감','…네 아비 것이 맞다.'],
     ['부엉 영감','지난가을 신표를 잃었다길래\n새로 내주려 했더니, 됐다고 하더군.'],
-    ['부엉 영감','물어도 웃기만 하더니.'],
     ['짠돌','주인 아들이 왔으니 돌려드립니다.'],
-    ['너구리','아니요. 아빠가 아저씨 드린 거예요.'],
-    ['너구리','그 신표로 들어가 주무세요.\n아빠도 그러라고 드렸을 거예요.'],
-    ['너구리','(영감님이 장부와 짠돌 아저씨와 나를 차례로 본다.)'],
+    ['너구리','아니요. 아빠가 아저씨 드린 거예요.\n그 신표로 들어가 주무세요.'],
     ['부엉 영감','주인의 아들이 그렇다면 셈은 맞다.'],
     ['부엉 영감','들어오시오, 손님.\n방값은 이 아이 아비 셈에서 뺀다.'],
     ['너구리','(짠돌 아저씨가 한참 서 있다가, 처음으로 마루에\n신을 벗고 올라선다. 영감님이 안쪽 방문을 열어 준다.)'],
@@ -483,8 +486,7 @@ function lampArc2(){
     ['너구리','얼레 동생이 밤에 오면 찾으라고요.'],
     ['등잔발','잘했다. 어귀에서도 저 불이 보이더라.'],
     ['등잔발','설 첫새벽엔 어귀에 나가 있을 거야.\n꼭 길 잃는 꼬마가 하나씩 있거든.'],
-    ['너구리','(등잔발 아저씨가 등잔을 흔들어 본다. 찰랑, 바닥 소리가 난다.)'],
-    ['등잔발','…기름이 간당간당하네.'],
+    ['등잔발','(등잔을 흔들어 본다. 찰랑.)\n…기름이 간당간당하네.'],
     ...(spare?[
       ['너구리','참기름도 불이 붙어요?'],
       ['등잔발','붙지! 냄새가 고소해서 그렇지.'],
@@ -519,7 +521,7 @@ function lampArc3(){
 }
 // 결정 D-162: 등잔발은 밤·설날 아침에만 나오니 대화 초상이 언제든 찾게 그림을 올려 둔다
 Rg.portraits={...Rg.portraits,'등잔발':lampDraw,
-  // 결정 D-328: 투호 노인 둘은 한 그림이라, 말하는 사람의 얼굴만 따로 그려 초상으로 쓴다 (예전엔 가운데 항아리가 잘려 나왔다)
+  // 결정 D-328: 바둑 노인 둘은 한 그림이라, 말하는 사람의 얼굴만 따로 그려 초상으로 쓴다 (예전엔 가운데 항아리가 잘려 나왔다)
   '흰눈썹 노인':(x,y,f=1)=>Rg.expArt.elder(x,y,f,'steady'),'곰방대 노인':(x,y,f=1)=>Rg.expArt.elder(x,y,f,'bold')};
 function lampDraw(x,y,f=1){
   const P=(dx,dy,w,h,c)=>R(Math.round(f>0?x+dx:x-dx-w),Math.round(y+dy),w,h,c);
@@ -606,201 +608,207 @@ function jjandolTalk(){
   }
 }
 
-/* ---------- 작은 미니게임 창 만들기 (돌너머 돌 쌓기와 같은 모양) ---------- */
-function makePanel(id,title,btn){
-  const p=el('div','forge');p.id=id;p.hidden=true;
-  p.innerHTML='<h2>'+title+'</h2><canvas id="'+id+'Cv" width="320" height="120" style="display:block;width:min(100%,380px);height:auto;margin:0 auto;image-rendering:pixelated;background:#efe3c8;border:2px solid var(--meok);border-radius:3px;touch-action:none"></canvas><div class="pips" id="'+id+'Pips"></div><div class="fhint" id="'+id+'Hint"></div><button class="btn primary strike" id="'+id+'Btn" type="button">'+btn+' <kbd>Space · J</kbd></button>';
-  $('shell').appendChild(p);return p;
+/* ---------- 결정 D-568: 보부상 상단 이야기 — 큰 장터의 본줄기 (사용자 지시 2026-11-04 "상단(상인단)과의 스토리를 추가해주고 이게 메인이 되게") ----------
+   상단은 설 대목에 장꾼들 물건을 숙소 창고에 맡아 준다. 그런데 밤마다 창고 자루가 하나씩 빈다.
+   - 말뚝 행수(오소리): 상단 행렬을 이끄는 행수. 셈과 눈에 보이는 것만 믿는다. 문을 지킨 막내 종종이를 의심해 설 지나면 집으로 돌려보내려 한다.
+   - 종종이(어린 수달 짐꾼): 그동안의 막내. 밤새 안 졸았는데 새벽마다 자루가 비었고, 빗자루 쓰는 소리만 사락사락 났다고 한다.
+   - 부엉 영감(접장, 밤에만 깬다): "그믐 밤엔 헌것들이 들썩인다"고 믿는다. 고사떡을 올린 아이를 새 막내로 받고 그믐 창고를 맡긴다(기존 진행).
+   흐름: 낮에 숙소에 들면 행수가 창고 일을 말하고, 짐은 밤에 깨는 영감 소관이라고 알려 준다 → 밤에 영감이 신표를 주며 그믐 창고를 맡긴다
+   → 창고에서 헌물 도깨비를 잡는다 → 그 자리로 행수와 종종이가 등불을 들고 달려와 종종이의 누명이 벗겨진다 → 날 밝으면 상단이 셈을 치른다.
+   필수 진행의 조건은 바꾸지 않았다(행수는 길 안내만, 끝 장면은 전투 뒤 저절로). 옛 구성(?classic=1)에는 넣지 않는다. */
+function badgerDraw(x,y,f=1){   // 말뚝 행수: 오소리. 흰 줄이 난 얼굴, 패랭이에 목화송이(보부상 표), 등에 멜빵
+  const P=(dx,dy,w,h,c)=>R(Math.round(f>0?x+dx:x-dx-w),Math.round(y+dy),w,h,c);
+  P(-11,-8,5,3,'#5c5550');                                                   // 짧은 꼬리
+  P(-8,-17,17,15,'#6f6862');P(-6,-14,12,10,'#8a837c');P(-7,-16,2,13,'#4a3426');P(5,-16,2,13,'#4a3426');   // 몸통과 멜빵
+  P(1,-26,11,10,'#2b2724');P(5,-26,3,10,'#f1ece2');P(1,-21,4,3,'#f1ece2');P(9,-21,3,3,'#f1ece2');        // 검은 얼굴에 흰 줄
+  P(11,-19,3,3,'#3a2c24');P(3,-22,1,1,'#f6e7b0');P(9,-22,1,1,'#f6e7b0');                                // 코와 눈
+  P(-1,-31,15,3,'#c8a86a');P(2,-34,9,3,'#d8bc80');P(3,-35,7,1,'#a8884a');P(6,-38,3,3,'#f7f4ee');       // 패랭이와 목화송이
+  P(-6,-3,4,3,'#2b2724');P(3,-3,4,3,'#2b2724');                                                          // 다리
+}
+function otterDraw(x,y,f=1){   // 종종이: 어린 수달 짐꾼. 매끈한 갈색 털, 밝은 턱, 굵은 꼬리, 등에 짐짝
+  const P=(dx,dy,w,h,c)=>R(Math.round(f>0?x+dx:x-dx-w),Math.round(y+dy),w,h,c);
+  P(-14,-6,8,3,'#5a3e2a');P(-16,-4,4,2,'#4a3222');                           // 굵은 꼬리
+  P(-6,-13,11,11,'#6e4c34');P(-3,-11,6,8,'#c9ab86');                         // 몸통과 밝은 배
+  P(2,-20,8,8,'#6e4c34');P(6,-15,4,3,'#d6bc96');P(9,-16,2,2,'#2a1d14');P(6,-18,1,1,'#1a120c');P(2,-21,2,2,'#5a3e2a');   // 머리, 턱, 코, 눈, 귀
+  P(-10,-23,10,10,'#a78a5c');P(-9,-22,8,1,'#c9ab76');P(-10,-18,10,1,'#7a6040');   // 등짐
+  P(-4,-3,3,3,'#4a3222');P(2,-3,3,3,'#4a3222');
+}
+Rg.portraits={...Rg.portraits,'말뚝 행수':badgerDraw,'종종이':otterDraw};
+// 낮, 아직 그믐 창고를 지키기 전: 행수는 상단 짐 곁에서 장꾼들을 달랜다
+function haengsuTalk(){
+  const F=G.f;
+  if(G.boss.dead){haengsuMorning();return;}
+  if(!F.jxSangdanMet){F.jxSangdanMet=true;learn('bueong:night');learn('sangdan:theft');
+    talk([['말뚝 행수','거기 꼬마, 창고 쪽엔 얼씬도 마라.\n요즘 상단 창고에서 밤마다 물건이 샌다.'],
+      ['너구리','저는 아빠가 맡긴 짐을 찾으러 왔어요.\n보부상은 장에 오면 숙소부터 들른다고 해서요.'],
+      ['말뚝 행수','상단에 맡긴 짐이면 접장 영감 소관이다.\n영감은 밤에만 깨신다. 해 지거든 마루로 와라.'],
+      ['말뚝 행수','하필 장꾼들 물건도 못 지키는 때에 오다니.\n상단은 신용으로 먹고사는데.'],
+      ['너구리','누가 훔쳐 가요?'],
+      ['말뚝 행수','막내 종종이가 밤마다 문을 지켰는데도 샜다.\n셈으로 보면 답은 하나지.'],
+      ['너구리','(창고 쪽문 앞에서 어린 수달이 고개를 푹 숙이고 짐을 쌓는다.)'],
+      ['말뚝 행수','설 지나면 그 녀석은 집으로 돌려보낸다.']],
+      ()=>{diary('jx_sangdan1','보부상 숙소의 말뚝 행수가 말했다. 상단 창고에서 밤마다 장꾼들 물건이 없어진다. 문을 지킨 막내 종종이를 의심해 설 지나면 돌려보낸다고 했다. 아빠 짐은 밤에만 깨는 접장 영감 소관이다.');refreshGoal();});
+    return;
+  }
+  talk([['말뚝 행수',F.bueongDone?'영감이 오늘 밤 창고를 네게 맡겼다고?\n…신표가 무겁다. 졸지 마라.':'짐 일은 영감께 여쭈어라. 해 지면 깨신다.\n나는 오늘도 장꾼들한테 머리를 숙여야 하고.']]);
+}
+function jongjongTalk(){
+  const F=G.f;
+  if(G.boss.dead){jongjongMorning();return;}
+  if(!F.jxJongMet){F.jxJongMet=true;
+    talk([['종종이','…난 안 졸았어. 정말이야.'],
+      ['종종이','밤새 눈 뜨고 있었는데, 새벽에 보면\n자루가 하나씩 비어 있어.'],
+      ['종종이','빗자루로 쓰는 소리만 사락사락 났어.\n아무도 안 믿어 주지만.']],
+      ()=>diary('jx_sangdan_jong','상단 막내 종종이는 밤새 졸지 않았다고 했다. 새벽마다 자루가 비고, 빗자루 쓰는 소리만 사락사락 났단다.'));
+    return;
+  }
+  talk([['종종이',F.bueongDone?'네가 오늘 밤 창고를 지킨다며?\n사락사락 소리 나면 빗자루부터 봐.':'설 지나면 집에 가야 해.\n…엄마한테 뭐라고 하지.']]);
+}
+// 그믐 밤 창고: 도깨비를 잡자마자 행수와 종종이가 등불을 들고 달려온다 (Rg.startDokkaebi 결과에서 부른다)
+Rg.sangdanCaught=calm=>{
+  if(CLASSIC||G.f.jxSangdanCleared)return;
+  G.f.jxSangdanCleared=true;
+  // 낮에 행수를 못 만났으면 아이는 둘의 이름을 모른다. 영감 말로 들은 '종종이'만 대화에서 알게 된다.
+  talk([['너구리',G.f.jxSangdanMet?'(등불 둘이 창고 마당으로 뛰어온다.\n말뚝 행수 아저씨와 종종이다.)':'(등불 둘이 창고 마당으로 뛰어온다.\n패랭이 쓴 오소리 아저씨와 어린 수달이다.)'],
+    ['말뚝 행수','이게 무슨 소란이냐! …이건 다 뭐냐?'],
+    ['너구리',calm?'(헌 빗자루랑 키, 멍석이 얌전히 접혀 있다.\n그 곁에 없어졌던 자루들이 돌아와 있다.)':'(부서진 헌 빗자루랑 키, 멍석 곁에\n없어졌던 자루들이 쌓여 있다.)'],
+    ['너구리','헌물 도깨비였어요.\n빗자루로 자루를 쓸어 가고 있었어요.'],
+    ['종종이','사락사락… 그 소리였어!\n거봐요, 나 안 졸았다니까요!'],
+    ['너구리','(행수 아저씨가 종종이 앞에 등불을 내려놓는다.)'],
+    ['말뚝 행수','내 셈이 틀렸다. 미안하다, 종종아.'],
+    ['종종이','…그럼 저 설 지나도 상단에 있어요?'],
+    ['말뚝 행수','있어라. 짐 지는 데 너만 한 녀석이 없다.'],
+    ['말뚝 행수','상단 막내, 장꾼들 물건을 찾았으니 상단 신용도 네가 찾았다.\n날 밝거든 숙소로 오너라. 셈은 맞춰야지.']],
+    ()=>{diary('jx_sangdan2','창고를 털던 헌물 도깨비를 잡자 말뚝 행수와 종종이가 등불을 들고 달려왔다. 종종이가 들었다던 사락사락 소리는 도깨비의 빗자루였다. 행수는 종종이에게 미안하다고 했고, 종종이는 설 지나도 상단에 남는다.');refreshGoal();});
+};
+// 날 밝은 뒤: 상단이 셈을 치른다 (결정 D-290: 해 준 일엔 그 인물다운 물건으로)
+function haengsuMorning(){
+  const F=G.f;
+  if(F.jxSangdanPaid){talk([['말뚝 행수','설 쇠고 떠나는 행렬에 네 자리도 있다.\n…그 보따리면 짐꾼 열은 몫이겠다만.']]);return;}
+  F.jxSangdanPaid=true;
+  talkGive([['말뚝 행수','왔구나. 장꾼들이 물건 찾아가며 너한테 고맙다고들 하더라.'],
+    ['말뚝 행수','상단 고사상에서 물린 곶감이다.\n상단은 셈을 늘 맞춘다.'],
+    gotLine('gotgam',2),
+    ['말뚝 행수','…종종이 일은 내가 장부에 따로 적었다.\n틀린 셈도 적어 둬야 다음에 안 틀리지.']],
+    ()=>diary('jx_sangdan3','날이 밝자 말뚝 행수가 상단 고사상에서 물린 곶감을 셈으로 치러 주었다. 종종이 일은 틀린 셈이라며 장부에 따로 적었다고 했다.'));
+}
+function jongjongMorning(){
+  const F=G.f;
+  if(F.jxJongPaid){talk([['종종이','오늘부터 다시 짐 진다! 어깨가 근질근질해.']]);return;}
+  F.jxJongPaid=true;
+  talkGive([['종종이','엄마한테 할 말이 생겼어. 상단에 남는다고!'],
+    ['종종이','이거, 밤 지킬 때 품에 넣던 군밤이야.\n이제 밤샘은 끝났으니 너 먹어.'],
+    gotLine('gunbam',2)],
+    ()=>diary('jx_sangdan4','종종이가 밤을 지킬 때 품에 넣던 군밤을 주었다. 상단에 남는다고 엄마한테 말할 거라고 했다.'));
+}
+{
+  const W=Rg.expEncounters?.wanderers;
+  if(W){
+    // 낮의 숙소: 행수는 마당 어귀, 종종이는 창고 쪽문 앞. 그믐 밤(도깨비 뒤)엔 창고 마당에 있다가 날이 밝으면 숙소로 돌아온다.
+    // 행수·종종이는 길을 마친 떠돌이로 치지 않는다(finishWanderer를 부르지 않는다). 대화는 늘 talk가 고른다.
+    const haengsu={id:'j_haengsu',name:'말뚝 행수',x:700,talk:haengsuTalk,draw:badgerDraw};
+    const jongjong={id:'j_jongjong',name:'종종이',x:1990,talk:jongjongTalk,draw:otterDraw};
+    // 창고 마당은 STORE_X가 이미 자른 뒤 좌표라 게터로 그대로 돌려준다
+    const haengsuNight={id:'j_haengsu',name:'말뚝 행수',get x(){return Rg.STORE_X-70;},talk:()=>talk([['말뚝 행수','날 밝거든 숙소로 오너라. 셈은 맞춰야지.']]),draw:badgerDraw};
+    const jongNight={id:'j_jongjong',name:'종종이',get x(){return Rg.STORE_X+50;},talk:()=>talk([['종종이','나 안 졸았다고 했지!\n…너도 안 졸았지?']]),draw:otterDraw};
+    const innBase=Object.getOwnPropertyDescriptor(W,'inn'),innGet=innBase.get?()=>innBase.get.call(W):()=>innBase.value;
+    Object.defineProperty(W,'inn',{configurable:true,get(){return night()?innGet():[...innGet(),haengsu,jongjong];}});
+    const whBase=Object.getOwnPropertyDescriptor(W,'warehouse'),whGet=whBase.get?()=>whBase.get.call(W):()=>whBase.value;
+    Object.defineProperty(W,'warehouse',{configurable:true,get(){return night()&&G.f.jxSangdanCleared?[...whGet(),haengsuNight,jongNight]:whGet();}});
+  }
 }
 
 // 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
 Rg.handWork=after=>{Sound.gather(true);if(after)after();};   // 결정 D-360: 손일은 소리 한 번 뒤 바로 끝난다 (옛 손일 종류 인자는 지웠다)
 
-/* ---------- 결정 D-325: 투호 내기 (윷놀이를 뺐다, 사용자 지시 2026-11-02) ----------
-   두 노인이 장터 한구석에서 항아리에 화살을 번갈아 던진다. 아이는 직접 던지지 않고, 판이 열리기 전에 이길 쪽에 솔방울 하나를 건다.
-   솔방울은 곰방대 노인의 화롯불 땔감이 된다. 맞히면 이긴 노인이 제 주머니에서 값을 치른다(흰눈썹은 설에 쓰려던 곶감, 곰방대는 화롯불에 구운 군밤).
-   결정 D-326: 흰눈썹 노인은 고르게 입에 넣고 귀는 드물다. 곰방대 노인은 자주 빗나가지만 귀(세 점)에 곧잘 꽂는다.
-   대략 6 대 4로 흰눈썹이 이기므로 값은 흰눈썹 곶감 하나, 곰방대 군밤 둘이다. 비기면 한 살씩 더 던지고, 세 번을 더 비기면 판돈을 돌려준다.
-   낮마다 tuho_bets_per_day 판까지 건다(해가 지고 다시 밝으면 다시 센다). 구경만 하는 판은 세지 않는다.
-   사연이 켜진 밤에는 흰눈썹 노인이 일찍 들어가 내기가 없다(D-131). 수치는 minigames.csv의 tuho_* 줄. */
-const tuhoP=makePanel('jangteoTuho','투호 구경 · 누가 이길까','건너뛰기');
-const tcv=$('jangteoTuhoCv');tcv.height=150;tcv.style.width='min(100%,560px)';
-Object.assign(tuhoP.style,{position:'fixed',left:'50%',right:'auto',top:'50%',bottom:'auto',transform:'translate(-50%,-50%)',width:'min(92vw,620px)',maxHeight:'92dvh',overflowY:'auto',boxSizing:'border-box',zIndex:'22'});
-const tchoices=el('div');tchoices.id='jangteoTuhoChoices';tuhoP.appendChild(tchoices);
-const TH={steady:{name:'흰눈썹 노인',short:'흰눈썹',x:46,hand:60,pay:'gotgam',fletch:'#b54a34'},
-  bold:{name:'곰방대 노인',short:'곰방대',x:274,hand:260,pay:'gunbam',fletch:'#416c82'}};
-const POT={x:160,mouth:66,ear:80,earDx:13,floor:132};
-let tg=null;   // 지금 판. 판은 짧아서 저장하지 않는다 (창을 닫으면 그 판은 끝난다)
+/* ---------- 결정 D-325·D-562: 바둑 내기 (투호를 바꿈, 사용자 지시 2026-11-04 "투호 내기 말고 바둑으로 하자") ----------
+   두 노인이 장터 한구석에서 바둑을 둔다. 두는 모습은 따로 보여 주지 않고, 두 노인이 티격태격하는 말로 판이 흘러간다.
+   아이는 판이 열리기 전에 이길 쪽에 솔방울 하나로 편을 든다(편 들기는 투호 때 그대로). 솔방울은 곰방대 노인의 화롯불 땔감이다.
+   판이 끝나면 지는 쪽이 판을 엎으려 든다. 아이가 판을 붙잡으면 판이 그대로 남아 편든 쪽이 이겼을 때 값을 받고
+   (흰눈썹은 설에 쓰려던 곶감, 곰방대는 화롯불에 구운 군밤), 못 본 척하면 판이 엎어져 무효가 되고 판돈을 돌려받는다.
+   흰눈썹 노인이 baduk_steady_win 비율로 이긴다(D-326의 6 대 4는 그대로). 낮마다 baduk_bets_per_day 판까지 건다.
+   구경만 하는 판은 세지 않는다. 사연이 켜진 밤에는 흰눈썹 노인이 일찍 들어가 내기가 없다(D-131). 수치는 minigames.csv의 baduk_* 줄. */
 const yAlone=()=>!!G.f.night&&Rg.arcs();
-function tBetsLeft(){const d=G.f.jxTuhoDay;return MG.tuho_bets_per_day-(d&&d.night===!!G.f.night?d.n:0);}
-function tPay(who){return MG['tuho_'+who+'_pay'];}
-function tRoll(who){const r=Math.random(),ear=MG['tuho_'+who+'_ear'],mouth=MG['tuho_'+who+'_mouth'];return r<ear?'ear':r<ear+mouth?'mouth':'miss';}
-const tPoints=r=>r==='ear'?MG.tuho_ear_points:r==='mouth'?1:0;
-function tPlan(){
-  const list=[];for(let i=0;i<MG.tuho_arrows;i++)for(const who of ['steady','bold'])list.push({who,res:tRoll(who)});
-  const sum=who=>list.filter(a=>a.who===who).reduce((n,a)=>n+tPoints(a.res),0);
-  for(let k=0;k<3&&sum('steady')===sum('bold');k++)for(const who of ['steady','bold'])list.push({who,res:tRoll(who),extra:true});
-  // 떨어지는 자리: 귀는 던진 쪽 귀, 입은 가운데에서 조금씩, 빗나가면 항아리 둘레 멍석 위
-  return list.map((a,i)=>Object.assign(a,{seed:hash(i*7.3+Math.random()*99),side:a.who==='steady'?-1:1}));
-}
-function tTarget(a){
-  if(a.res==='ear')return [POT.x+a.side*POT.earDx,POT.ear];
-  if(a.res==='mouth')return [POT.x+Math.round((a.seed-.5)*4),POT.mouth];
-  return [POT.x+a.side*(18+Math.round(a.seed*18)),POT.floor-2];
-}
-function tNew(){tg={phase:'bet',bet:null,plan:[],i:0,t:0,score:{steady:0,bold:0},message:'',story:''};tRender();}
-function tStart(bet){
-  if(bet){if(!has('solbang',MG.tuho_stake)||tBetsLeft()<=0)return;takeItem('solbang',MG.tuho_stake);
-    const d=G.f.jxTuhoDay;G.f.jxTuhoDay={night:!!G.f.night,n:(d&&d.night===!!G.f.night?d.n:0)+1};}
-  Object.assign(tg,{phase:'play',bet,plan:tPlan(),i:0,t:0,score:{steady:0,bold:0},story:''});
-  tg.message=bet?TH[bet].short+' 할아버지에게 솔방울을 걸었다. 흰눈썹 할아버지부터 던진다.':'걸지 않고 구경한다. 흰눈썹 할아버지부터 던진다.';
-  tRender();
-}
-const T_SAY={
-  steady:{mouth:'쏙, 입에 들었다.',ear:'귀에 꽂혔다! 흰눈썹 할아버지가 수염을 쓸어내린다.',miss:'테를 맞고 멍석에 떨어졌다.'},
-  bold:{mouth:'…들었다! 곰방대 하나!',ear:'귀에 꽂혔다! 곰방대 셋!',miss:'…에잇, 바람이 샜다.'}
-};
-function tLand(a){
-  tg.score[a.who]+=tPoints(a.res);
-  tg.message=(a.extra?'비겨서 한 살 더. ':'')+(a.who==='bold'?'곰방대가 던진다! ':'흰눈썹 할아버지가 숨을 고르고 던진다. ')+T_SAY[a.who][a.res];
-  if(tg.i===MG.tuho_arrows)tStory();   // 판 가운데쯤, 노인들이 옛 방석 이야기를 하나 꺼낸다
-}
-// 결정 D-327: 아빠 이야기(D-136 보부상 청년)는 투호 구경판에서 듣는다. 청년은 늘 기복 큰 쪽에 걸었다. 부를 준다는 열매 소문을 쫓던 그때와 같은 결.
+const BD={steady:{name:'흰눈썹 노인',short:'흰눈썹',pay:'gotgam'},bold:{name:'곰방대 노인',short:'곰방대',pay:'gunbam'}};
+function bBetsLeft(){const d=G.f.jxTuhoDay;return MG.baduk_bets_per_day-(d&&d.night===!!G.f.night?d.n:0);}
+const bPay=who=>MG['baduk_'+who+'_pay'];
+// 결정 D-327: 아빠 이야기(D-136 보부상 청년)는 구경판에서 한 판에 하나씩 듣는다. 청년은 늘 기복 큰 쪽 편을 들었다. 부를 준다는 열매 소문을 쫓던 그때와 같은 결.
 const youngStories=[
-  '예전에 보부상 청년 하나가 이 자리에서 구경했지. 보따리 끈 끝을 꼭 한 번 거꾸로 감더라. 그 집 버릇인지.',
-  '그 청년, 앉자마자 북쪽 장날부터 물었어. 장사도 길부터 알아야 한다면서.',
-  '그 청년은 꼭 곰방대 쪽에 걸더라. 한 번에 크게 먹겠다고. 지고는 입이 댓 발 나왔지. 그래도 떨어진 화살은 주워 줬어.',
-  '그땐 부를 준다는 열매 소문이 돌았지. 그 청년도 그 소문을 쫓았고.',
-  '판 끝나니 우리 장보따리 끈도 고쳐 주더군. 손이 야물었어.',
-  '우리가 길을 잘못 들까 봐 해 질 녘 깃대에 헝겊도 묶고 갔지.'
+  '예전에 보부상 청년 하나가 여기서 구경했지.\n보따리 끈 끝을 꼭 한 번 거꾸로 감더라.',
+  '그 청년, 앉자마자 북쪽 장날부터 묻더군.\n장사도 길부터 알아야 한다면서.',
+  '그 청년은 꼭 곰방대 편을 들었어. 크게 먹겠다고.\n지고 입이 댓 발 나와서도 흩어진 돌은 다 주웠지.',
+  '그땐 부를 준다는 열매 소문이 돌았지.\n그 청년도 그 소문을 쫓았고.',
+  '판 끝나니 우리 장보따리 끈도 고쳐 주더군.\n손이 야물었어.',
+  '해 질 녘엔 우리 길 잃을까 봐\n깃대에 헝겊도 묶어 주고 갔지.'
 ];
-function tStory(){
-  const heard=G.f.jxYutHeard||(G.f.jxYutHeard=[]),i=youngStories.findIndex((_,k)=>!heard.includes(k));
-  const who=yAlone()?'곰방대 노인':'흰눈썹 노인';
-  if(i>=0){heard.push(i);tg.story=who+': '+youngStories[i];}
-  else tg.story=G.f.night?'곰방대 노인: 등불이 켜지니 화살 그림자도 길어졌네.':'흰눈썹 노인: 투호는 마음을 고르는 놀이다. 기세만으론 안 들어가.';
+// 판 가운데의 티격태격. 판마다 차례로 돈다.
+const B_MIDDLE=[
+  [['곰방대 노인','(딱!) 곰방대가 둔다! 이 수면 대마가 산다.'],['흰눈썹 노인','산다고? 집이 하나뿐인데.'],['곰방대 노인','…하나면 하나로 사는 거다.']],
+  [['너구리','(흰눈썹 할아버지가 한참 턱을 괴고 있다.)'],['곰방대 노인','그러다 설 지나겠다.'],['흰눈썹 노인','바둑은 생각하는 놀이다.\n기세만으로 두는 게 아니야.']],
+  [['흰눈썹 노인','어, 그 돌 왜 내 집 안에 있어?'],['곰방대 노인','소매에 걸려 굴러갔을 뿐이다.'],['흰눈썹 노인','소매가 왜 남의 집까지 들어와?'],['곰방대 노인','추워서 그렇다.']],
+];
+// 판 끝. 진 쪽이 판을 엎으려 든다. 마지막 줄에서 아이가 고른다.
+const B_END={
+  bold:[['흰눈썹 노인','세어 보자. …내가 다섯 집 이겼다.'],['너구리','(곰방대 할아버지가 바둑판 귀를 슬그머니 잡는다.)'],['흰눈썹 노인','손 떼라! 판 엎는 버릇 또 나온다!']],
+  steady:[['곰방대 노인','세어 보자! 곰방대가 두 집 이겼다!'],['흰눈썹 노인','…눈이 침침해 돌을 잘못 봤다.\n쓸어 담고 다시 두자.'],['곰방대 노인','쓸지 마라! 다 셌다!']]
+};
+Rg.playBaduk=()=>{
+  if(CLASSIC)return;
+  if(yAlone()){talk([['곰방대 노인','저 양반은 들어갔다.\n내기는 둘이 있어야 하지. 날 밝거든 오너라.']]);return;}
+  const left=bBetsLeft(),have=has('solbang',MG.baduk_stake),c=[];
+  if(have&&left>0)for(const who of ['steady','bold'])c.push({t:BD[who].short+' 할아버지 편 (이기면 '+ITEMS[BD[who].pay].n+' '+bPay(who)+')',go:()=>bStart(who)});
+  c.push({t:'걸지 않고 구경만 한다',go:()=>bStart(null)},{t:'일어난다',go:null});
+  talk([['곰방대 노인',left<=0?'오늘 내기는 다 걸었다.\n구경은 얼마든지 해라.':!have?'걸 솔방울이 없구나.\n구경만 해도 된다.':'어느 편 들 테냐? 솔방울 하나다.',c]]);
+};
+function bStart(bet){
+  if(bet){
+    if(!has('solbang',MG.baduk_stake)||bBetsLeft()<=0)return;
+    takeItem('solbang',MG.baduk_stake);
+    const d=G.f.jxTuhoDay;G.f.jxTuhoDay={night:!!G.f.night,n:(d&&d.night===!!G.f.night?d.n:0)+1};   // 옛 저장과 같은 진행값 이름
+  }
+  // 결정 D-326: 흰눈썹 노인은 고르게 두어 6할쯤 이기고, 곰방대 노인은 기세로 두다 드물게 이긴다 (바둑으로 옮긴 뒤에도 그대로)
+  const winner=Math.random()<MG.baduk_steady_win?'steady':'bold',loser=winner==='steady'?'bold':'steady';
+  const k=G.f.jxBadukRound=(G.f.jxBadukRound||0)+1;
+  const heard=G.f.jxYutHeard||(G.f.jxYutHeard=[]),si=youngStories.findIndex((_,i)=>!heard.includes(i));
+  if(si>=0)heard.push(si);
+  const lines=[
+    ...(bet?[['너구리','(솔방울을 '+BD[bet].short+' 할아버지 쪽 바구니에 넣었다.)']]:[]),
+    ...B_MIDDLE[(k-1)%B_MIDDLE.length],
+    ...(si>=0?[['흰눈썹 노인',youngStories[si]]]:[]),
+    ...B_END[loser].map(L=>[...L])
+  ];
+  const last=lines[lines.length-1];
+  last[2]=[{t:'판을 꼭 붙잡는다',go:()=>bResolve(bet,winner,loser,true)},{t:'못 본 척한다',go:()=>bResolve(bet,winner,loser,false)}];
+  talk(lines);
 }
-function tFinish(){
-  const s=tg.score,winner=s.steady>s.bold?'steady':s.bold>s.steady?'bold':null;tg.phase='over';
-  let msg=winner?TH[winner].name+'이 이겼다 ('+s.steady+' 대 '+s.bold+').':'세 번을 더 던져도 비겼다 ('+s.steady+' 대 '+s.bold+').';
-  if(tg.bet&&!winner){addItem('solbang',MG.tuho_stake);msg+=' 판돈 솔방울을 도로 받았다.';}
-  else if(tg.bet&&tg.bet===winner){const n=tPay(winner);addItem(TH[winner].pay,n);
-    msg+=' '+(winner==='bold'?'곰방대 할아버지가 화롯불에서 군밤을 꺼내 준다.':'흰눈썹 할아버지가 소매에서 곶감을 꺼내 준다.')+'\n'+gotText([[TH[winner].pay,n]]);}
-  else if(tg.bet)msg+=' 솔방울은 화롯불 바구니로 들어갔다.';
-  tg.message=msg;
-  if(tg.bet&&!G.f.jxTuhoBetOnce){G.f.jxTuhoBetOnce=true;ledger('t_jangteo_yut','투호 노인들','투호 한 판에 솔방울 걸기','이긴 노인의 곶감 또는 군밤');ledgerDone('t_jangteo_yut');}
+function bResolve(bet,winner,loser,hold){
+  const lines=[];
+  if(hold){
+    lines.push(['너구리','(얼른 바둑판 양쪽을 꼭 붙잡았다.)'],
+      loser==='bold'?['곰방대 노인','…허, 꼬마 손이 맵구나. 졌다, 졌어.']:['흰눈썹 노인','…알았다, 알았어.\n늙은이 손을 다 막는구나.']);
+    if(bet&&bet===winner){
+      lines.push(winner==='bold'?['곰방대 노인','편들었으니 값은 해야지.\n화롯불에 구운 군밤이다.']:['흰눈썹 노인','편든 값이다. 설에 쓰려던 곶감이지.'],gotLine(BD[winner].pay,bPay(winner)));
+    }else if(bet)lines.push(['너구리','(내 솔방울은 화롯불 바구니로 들어갔다.)']);
+  }else{
+    lines.push(['너구리','(못 본 척 고개를 돌렸다. 와르르, 돌 쏟아지는 소리가 난다.)'],
+      [BD[winner].name,'이 양반이 기어이! 판 엎었으니 무효다, 무효!'],[BD[loser].name,'무효면 한 판 더 두면 되지.']);
+    if(bet)lines.push(['너구리','(무효라서 솔방울을 도로 받았다.)']);
+  }
+  talkGive(lines,()=>{if(!hold&&bet)addItem('solbang',MG.baduk_stake);bFinish(bet);});
+}
+function bFinish(bet){
+  if(bet&&!G.f.jxTuhoBetOnce){G.f.jxTuhoBetOnce=true;ledger('t_jangteo_yut','바둑 노인들','바둑 한 판에 솔방울 걸기','편든 노인의 곶감 또는 군밤');ledgerDone('t_jangteo_yut');}
   if(!G.f.jxYutReward){
     // 첫 판을 끝까지 함께 본 뒤에 사연 막(elderArc1)이 열린다. 옛 이름의 진행값을 그대로 쓴다(옛 저장과 맞춘다).
     G.f.jxYutReward=true;finishWanderer('j_yut');
-    if(typeof grantNickname==='function')grantNickname('jangteo_yut','한판 벗','투호 노인들');
-    diary('jx_yut','장터 노인 둘이 항아리에 화살을 던지는 투호를 구경했다. 옛날 이 자리에서 구경하던 보부상 청년이 끈 끝을 한 번 거꾸로 감았단다. 아빠다.');
+    if(typeof grantNickname==='function')grantNickname('jangteo_yut','한판 벗','바둑 노인들');
+    diary('jx_yut','장터 노인 둘이 바둑 두는 걸 구경했다. 진 쪽이 판을 엎으려 들었다. 옛날 이 자리에서 구경하던 보부상 청년이 끈 끝을 한 번 거꾸로 감았단다. 아빠다.');
   }
-  tRender();
-}
-function tSkip(){
-  if(tg?.phase!=='play')return;
-  while(tg.i<tg.plan.length){tLand(tg.plan[tg.i]);tg.i++;}
-  tFinish();
-}
-function tButton(text,go,disabled){const b=el('button','btn',text);b.type='button';b.style.margin='3px';b.disabled=!!disabled;b.onclick=go;tchoices.appendChild(b);return b;}
-function tClose(){
-  const heard=G.f.jxYutHeard||[];tuhoP.hidden=true;tg=null;refreshHud();
+  refreshHud();
   // 결정 D-136: 아이가 먼저 알아본다. 끈 끝을 한 번 거꾸로 감는 건 집에서 본 아빠 손버릇. 노인들은 아이를 알아보지 못했다.
-  if(!G.f.jxYutDadKnown&&heard.includes(0)){G.f.jxYutDadKnown=true;const who=yAlone()?'곰방대 노인':'흰눈썹 노인';
-    talk([['너구리','끈 끝을 한 번 거꾸로 감는 거…\n아빠가 보따리 묶을 때 꼭 그랬어요.'],[who,'…네 아비냐? 그 청년이?'],['너구리','네. 이 모자도 아빠 거예요.'],[who,'허, 그 청년이 그새 아비가 됐구나.\n다음 판엔 그 청년 얘기 더 해 주마.']]);}
+  if(!G.f.jxYutDadKnown&&(G.f.jxYutHeard||[]).includes(0)){G.f.jxYutDadKnown=true;
+    talk([['너구리','끈 끝을 한 번 거꾸로 감는 거…\n아빠가 보따리 묶을 때 꼭 그랬어요.'],['흰눈썹 노인','…네 아비냐? 그 청년이?'],['너구리','네. 이 모자도 아빠 거예요.'],['흰눈썹 노인','허, 그 청년이 그새 아비가 됐구나.\n다음 판엔 그 청년 얘기 더 해 주마.']]);}
 }
-function tRender(){
-  const s=tg;tchoices.replaceChildren();
-  const left=tBetsLeft(),stake=MG.tuho_stake,have=has('solbang',stake);
-  if(s.phase==='bet')s.message=left<=0?'오늘 내기는 다 걸었다. 구경은 얼마든지 된다.':
-    !have?'걸 솔방울이 없다. 구경만 할 수는 있다.':'누가 이길까? 오늘 '+left+'판 더 걸 수 있다.';
-  $('jangteoTuhoHint').textContent=s.message+(s.story?'\n'+s.story:'');$('jangteoTuhoHint').style.whiteSpace='pre-line';
-  $('jangteoTuhoPips').textContent='입 1점 · 귀 '+MG.tuho_ear_points+'점 · 한 사람 '+MG.tuho_arrows+'살';
-  const main=$('jangteoTuhoBtn');main.hidden=s.phase!=='play';main.textContent='끝까지 건너뛰기 · Space / J';
-  if(s.phase==='bet'){
-    for(const who of ['steady','bold'])tButton(TH[who].short+' 할아버지에게 솔방울 걸기 (맞히면 '+ITEMS[TH[who].pay].n+' '+tPay(who)+')',()=>tStart(who),!have||left<=0);
-    tButton('걸지 않고 구경만 하기',()=>tStart(null));
-    tButton('일어나기',tClose);
-  }
-  if(s.phase==='over'){
-    tButton('한 판 더 보기',tNew);
-    tButton('일어나기',tClose);
-  }
-  tuhoP.dataset.phase=s.phase;tDraw();
-}
-function tArrow(c,x,y,ang,color,len=16){
-  const dx=Math.cos(ang),dy=Math.sin(ang);c.strokeStyle='#6b4a2c';c.lineWidth=1.5;
-  c.beginPath();c.moveTo(x,y);c.lineTo(x-dx*len,y-dy*len);c.stroke();
-  c.fillStyle='#2f2a26';c.fillRect(Math.round(x-1),Math.round(y-1),2,2);   // 촉
-  c.fillStyle=color;const fx=x-dx*len,fy=y-dy*len;c.fillRect(Math.round(fx-2),Math.round(fy-2),4,4);   // 깃
-}
-function tElder(c,who){
-  const e=TH[who],x=e.x,f=POT.floor,face=who==='steady'?1:-1;
-  // 거리 그림(art.js expArt.elder)과 같은 노인을 두 배로 그린다: 귀, 눈가 검은 털, 흰 눈썹 또는 곰방대
-  const Q=(dx,dy,w,h,col)=>{c.fillStyle=col;c.fillRect(face>0?x+dx*2:x-(dx+w)*2,f+dy*2,w*2,h*2);};
-  Q(-7,-14,14,14,who==='steady'?'#8b8f88':'#777b75');Q(-6,-22,13,10,'#b6b1a0');Q(-7,-25,4,5,'#605b53');Q(3,-25,4,5,'#605b53');
-  Q(-5,-21,3,6,'#3b3a37');Q(2,-21,3,6,'#3b3a37');Q(-3,-18,1,1,'#eee4cd');Q(3,-18,1,1,'#eee4cd');
-  Q(-4,-14,9,3,who==='steady'?'#a46b54':'#8a7761');
-  if(who==='steady'){Q(-6,-22,4,1,'#f6f1e4');Q(2,-22,4,1,'#f6f1e4');}   // 흰 눈썹
-  else{Q(4,-16,6,1,'#5b4430');Q(9,-18,2,2,'#a5532f');}                  // 입에 문 곰방대
-  // 던지는 차례면 화살 쥔 팔을 항아리 쪽으로 든다
-  const cur=tg.phase==='play'?tg.plan[tg.i]:null,throwing=cur&&cur.who===who&&tg.t<(Vfx.reducedMotion?1:MG.tuho_throw_frames)*0.35;
-  if(throwing)Q(6,-20,5,3,'#777b75');else Q(6,-9,4,3,'#777b75');
-  c.fillStyle='#3b3027';c.font='11px sans-serif';c.textAlign='center';c.fillText(e.short,x,f+14);
-  if(tg.bet===who){c.fillStyle='#8a5a32';c.fillRect(x-3,f-64,6,7);c.fillStyle='#b98a52';c.fillRect(x-2,f-63,4,2);c.fillRect(x-2,f-60,4,2);}   // 건 솔방울
-}
-function tDraw(){
-  if(!tg)return;const c=tcv.getContext('2d');c.save();c.textAlign='left';
-  c.fillStyle='#efe3c8';c.fillRect(0,0,320,150);
-  c.fillStyle='#d9c08a';c.fillRect(0,POT.floor,320,18);c.fillStyle='#c4a66d';for(let x=2;x<320;x+=8)c.fillRect(x,POT.floor+3,5,1);   // 멍석
-  for(const who of ['steady','bold'])tElder(c,who);
-  // 투호 항아리: 둥근 몸, 긴 목, 목 양옆의 귀
-  const P2=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
-  P2(POT.x-12,POT.floor-26,24,26,'#5d6a6b');P2(POT.x-14,POT.floor-20,28,16,'#5d6a6b');P2(POT.x-10,POT.floor-24,6,14,'#7d8b8a');
-  P2(POT.x-4,POT.mouth,8,POT.floor-26-POT.mouth,'#5d6a6b');P2(POT.x-5,POT.mouth-2,10,3,'#3f4a4b');
-  for(const sd of [-1,1]){P2(POT.x+sd*POT.earDx-2,POT.ear-1,4,9,'#5d6a6b');P2(POT.x+sd*POT.earDx-3,POT.ear-2,6,2,'#3f4a4b');P2(POT.x+sd*7-(sd>0?0:3),POT.ear+4,6,2,'#5d6a6b');}
-  // 이미 던진 화살
-  const dur=Vfx.reducedMotion?1:MG.tuho_throw_frames;
-  tg.plan.forEach((a,k)=>{
-    if(k>tg.i||(k===tg.i&&tg.phase==='play'&&tg.t<dur))return;
-    const [tx,ty]=tTarget(a),col=TH[a.who].fletch;
-    if(a.res==='miss')tArrow(c,tx,ty,a.side>0?0.05:Math.PI-0.05,col,14);
-    else tArrow(c,tx,ty+(a.res==='ear'?2:4),Math.PI/2+(a.seed-.5)*0.35,col,16);
-  });
-  // 날아가는 화살
-  if(tg.phase==='play'&&tg.i<tg.plan.length){
-    const a=tg.plan[tg.i],u=Math.min(1,tg.t/dur),x0=TH[a.who].hand,y0=POT.floor-30,[tx,ty]=tTarget(a),H=48;
-    if(u<1){const x=x0+(tx-x0)*u,y=y0+(ty-y0)*u-H*4*u*(1-u),vx=tx-x0,vy=(ty-y0)-H*4*(1-2*u);tArrow(c,x,y,Math.atan2(vy,vx),TH[a.who].fletch);}
-  }
-  // 점수 줄: 이름과 숫자를 따로 놓아 붙어 보이지 않게 (흰눈썹 ··· 3 : 1 ··· 곰방대)
-  c.fillStyle='#3b3027';c.font='12px sans-serif';c.textAlign='right';c.fillText('흰눈썹',128,17);
-  c.textAlign='left';c.fillText('곰방대',192,17);
-  c.font='bold 14px sans-serif';c.textAlign='center';
-  c.fillText(String(tg.score.steady),145,17);c.fillText(':',160,16);c.fillText(String(tg.score.bold),175,17);
-  const thrown=w=>tg.plan.slice(0,tg.i).filter(a=>a.who===w&&!a.extra).length;
-  for(const who of ['steady','bold'])for(let k=0;k<MG.tuho_arrows;k++){c.fillStyle=k<thrown(who)?'#c9b893':TH[who].fletch;c.fillRect(TH[who].x-11+k*6,8,4,8);}
-  c.restore();
-}
-function tStep(){
-  if(tg?.phase!=='play')return;
-  const dur=Vfx.reducedMotion?1:MG.tuho_throw_frames;
-  tg.t++;
-  if(tg.t===dur){tLand(tg.plan[tg.i]);tRender();}
-  if(tg.t>=dur+MG.tuho_pause_frames){tg.i++;tg.t=0;if(tg.i>=tg.plan.length)tFinish();}
-  tDraw();
-}
-function tHit(){if(tuhoP.hidden||!tg)return;if(tg.phase==='play')tSkip();}
-Rg.playTuho=()=>{
-  if(CLASSIC)return;
-  if(yAlone()){talk([['곰방대 노인','저 양반은 들어갔다.\n내기는 둘이 있어야 하지. 날 밝거든 오너라.']]);return;}
-  tuhoP.hidden=false;tNew();
-};
-$('jangteoTuhoBtn').onclick=tHit;
-tuhoP.addEventListener('keydown',e=>{if([' ','Enter'].includes(e.key)&&e.target.matches('button')){e.preventDefault();e.stopPropagation();e.target.click();}});
-addEventListener('keydown',e=>{
-  if(tuhoP.hidden||!['1','2','3','4'].includes(e.key))return;e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)tchoices.children[+e.key-1]?.click();
-},true);
-defineMinigame({id:'jangteoTuho',hit:tHit,step:tStep});
 
 /* 밤에만 다는 등. 불빛은 길 안내이며 본길이나 출구의 조건으로 삼지 않는다. */
 /* 결정 D-290: 등을 다 단 몫. 불빛을 보고 숙소를 찾은 길손이 까치 편에 곶감을 남기고 갔다(까치는 물건을 나르는 우체부다).
@@ -817,23 +825,25 @@ function lanternThanks(){
 Rg.lanternThanks=lanternThanks;
 Rg.lanternTalk=()=>{
   if(lanternThanks())return;
-  if(!night()){talk([['늙은 까치',G.f.jxLanternDone?'밤새 등 따라 길손들이 쉬고 갔단다.\n아침 떡 김이 오르니 나도 떠나야지.':'해 지면 이 꾸러미를 풀자꾸나.\n숙소와 골목의 빈 등걸이에 등을 달아 다오.']]);return;}
-  if(G.f.jxLanternDone){if(!lanternThanks())talk([['늙은 까치','네 등이 솔숲 입구까지 이어졌구나.\n길손들도 제 잠자리를 찾았단다.']]);return;}
-  talk([['늙은 까치',G.f.jxLanternStarted?'남은 등걸이도 밝혀 다오.\n숙소 둘, 거리 골목 하나, 솔숲 입구 하나란다.':'밤 길손들이 숙소를 못 찾는구나.\n등은 네가 달아 주련? 나는 높은 데서 어디가 어두운지 봐 주마.',[
-    {t:'꾸러미를 풀고 등 달기',go:()=>{G.f.jxLanternStarted=true;toast('숙소 기둥·창고문 가는 길·거리 골목·솔숲 입구의 빈 등걸이. E로 등을 달자.');}},
+  // 결정 D-564: 등걸이 넷은 모두 이 숙소 구역 안에 있다(마당 어귀·마루 앞·처마 끝·창고 쪽문 가는 길).
+  if(!night()){talk([['늙은 까치',G.f.jxLanternDone?'밤새 등 따라 길손들이 쉬고 갔단다.\n아침 떡 김이 오르니 나도 떠나야지.':'해 지면 이 꾸러미를 풀자꾸나.\n숙소 빈 등걸이에 등을 달아 다오.']]);return;}
+  if(G.f.jxLanternDone){if(!lanternThanks())talk([['늙은 까치','숙소 마당이 대낮 같구나.\n길손들도 제 잠자리를 찾았단다.']]);return;}
+  talk([['늙은 까치',G.f.jxLanternStarted?'남은 등걸이도 밝혀 다오.\n이 숙소 마당에 넷이란다.':'밤 길손들이 숙소를 못 찾는구나.\n등은 네가 달아 주련? 어두운 데는 내가 봐 주마.',[
+    {t:'꾸러미를 풀고 등 달기',go:()=>{G.f.jxLanternStarted=true;toast('숙소 마당 어귀·마루 앞·처마 끝·창고 쪽문 가는 길의 빈 등걸이 넷. E로 등을 달자.');}},
     {t:'조금 있다 올게요',go:null}
   ]]]);
 };
 Rg.lanternAction=id=>{
   if(!night())return;
   // 결정 D-292: 혼자 하는 말은 괄호 안 독백으로 쓴다
-  if(!G.f.jxLanternStarted){if(G.zone==='inn')Rg.lanternTalk();else talk([['너구리','(빈 등걸이다.\n숙소 처마 옆에 등불 꾸러미가 있었는데.)']]);return;}
-  if(G.f.jxLanterns?.[id]){talk([['너구리',id==='pine'?'(등 너머로 작은 코가 보인다.\n솔숲 안에 누가 있나 보다.)':'(등이 잘 탄다. 다음 등걸이도 보인다.)']]);return;}
+  if(!G.f.jxLanternStarted){Rg.lanternTalk();return;}
+  if(G.f.jxLanterns?.[id]){talk([['너구리','(등이 잘 탄다. 다음 등걸이도 보인다.)']]);return;}
   Rg.handWork(()=>{
     const lights=G.f.jxLanterns||(G.f.jxLanterns={});lights[id]=true;
     const done=Rg.lanternPoints.every(p=>lights[p.id]);
-    const lines={porch:'(처마 아래 짐꾼들 발이 보인다.\n눈 묻은 신을 벗고 들어온다.)',gate:'(창고문 가는 길이 환해졌다.\n돌아올 땐 이 등을 보고 오면 되겠다.)',alley:'(접힌 좌판 뒤에도 발자국이 있다.\n저쪽이 숙소 지름길이구나.)',pine:'(눈 위에 작은 콧자국이 찍혀 있다.\n솔숲 안에서 킁킁 소리가 난다.)'};
-    if(done){G.f.jxLanternDone=true;diary('jx_lanterns','까치와 숙소·골목·솔숲 입구에 등을 달았다. 불빛을 따라 길손들이 돌아왔다. 솔숲 안에서 킁킁 소리가 났다.');}
+    const lines={alley:'(마당 어귀가 밝아졌다.\n골목에서 오는 길손도 대문을 찾겠다.)',porch:'(처마 아래 짐꾼들 발이 보인다.\n눈 묻은 신을 벗고 들어온다.)',
+      pine:'(처마 끝 고드름에 불빛이 맺혔다.\n멀리서도 반짝여 보이겠다.)',gate:'(창고 쪽문 가는 길이 환해졌다.\n돌아올 땐 이 등을 보고 오면 되겠다.)'};
+    if(done){G.f.jxLanternDone=true;diary('jx_lanterns','까치와 숙소 마당에 등 넷을 달았다. 불빛을 따라 늦은 길손들이 숙소로 들어왔다.');}
     talk([['너구리',lines[id]],...(done?[['너구리','(불이 다 이어졌다.\n늙은 까치한테 알려 드려야지.)']]:[])]);
   });
 };
@@ -861,13 +871,17 @@ function finishSteam(){
 function talkMorak(){
   const F=G.f;
   if(!F.morakMet){F.morakMet=true;ledger('morak','모락','쌀가루 3','시루를 깨움');
-    talk([['모락',Rg.arcs()?'어서 와, 꼬마야! 설 대목에 맷돌이 쩍 갈라졌지 뭐야!':'어서 와, 꼬마야!\n아이고, 설 대목에 우리 맷돌이 쩍 갈라져서 정신이 없네.'],
-      ['모락',Rg.arcs()?'쌀가루 세 됫박만 갈아다 줘!\n섭섭잖게 갚을게!':'쌀가루가 모자라 떡을 못 찌네.\n세 됫박만 갈아다 주면 섭섭잖게 갚을게!'],
-      ['모락',Rg.arcs()?'쌀은 엿방울한테 있어, 엿 고고 남은 거!\n갈 맷돌이 문제지만.':'쌀은 엿방울한테 가 봐! 엿 고고 남은 게 있을 거야.\n갈 맷돌이 문제지만.'],
-      ['너구리','(맷돌이라면 내 보따리에 있다. 증조할아버지 맷돌.)']],()=>{if(has('ssal_powder',3))morakGive();});
+    // 결정 D-566: 아이가 맷돌을 가졌으니 걱정 없다는 걸 아이 입으로 꺼내고, 모락이 크게 반긴다 (사용자 피드백 2026-11-04 "멧돌을 가지고 있으니 괜찮다는 걸 좀 더 어필").
+    // 모락은 그 전까지 아이 보따리에 맷돌이 있는 줄 모른다(2026-10-30 글 검수).
+    talk([['모락','어서 와, 꼬마야! 설 대목에 우리 맷돌이 쩍 갈라졌지 뭐야!'],
+      ['모락','쌀가루가 모자라 떡을 못 쪄. 떡을 못 쪄!\n쌀은 엿방울한테 있는데, 갈 맷돌이 없으니….'],
+      ['너구리','맷돌이요? 맷돌은 저한테 있어요!'],
+      ['너구리','(보따리를 열어 증조할아버지 맷돌을 보여 드렸다.)'],
+      ['모락','어머, 진짜 맷돌이네! 그 작은 보따리에서?\n그럼 걱정 끝이다, 걱정 끝!'],
+      ['모락','쌀만 구해서 세 됫박 갈아다 줘.\n섭섭잖게 갚을게!']],()=>{if(has('ssal_powder',3))morakGive();});
     return;
   }
-  if(!F.morakPowder){if(has('ssal_powder',3))morakGive();else talk([['모락','쌀가루 세 됫박만 부탁해, 꼬마야!\n쌀은 엿방울한테 있을 거야!']]);return;}
+  if(!F.morakPowder){if(has('ssal_powder',3))morakGive();else talk([['모락','맷돌은 네가 있으니 됐고! 쌀가루 세 됫박만, 세 됫박만!\n쌀은 엿방울한테 있어!']]);return;}
   if(!F.steamDone){talk([['모락','자, 다시 해 보자! 부채질은 조금씩, 김은 고르게!',[{t:'다시 아궁이 앞에 앉는다',go:openSteam},{t:'조금 이따가요',go:null}]]]);return;}
   if(Rg.arcs()&&F.jangteoArcsPair2&&!F.jangteoArcsPair4&&!F.jxPairBack){
     F.jxPairBack=true;
@@ -911,185 +925,53 @@ function morakGiveNow(){
   }
 }
 
-/* ---------- 엿방울 (여우 엿장수): 엿가위 장단 ---------- */
-/* 엿가위 장단 (제안): 세 박 묶음 반주와 노트가 같은 초 단위 시계를 쓴다.
-   8개 중 5개면 엿 덤. 쌀 8개와 재도전에는 판정에 따른 불이익이 없다. */
-const rhP=makePanel('rhythm','엿가위 장단','쩔꺽');
-const rh={notes:[],hits:0,combo:0,done:true,reward:false,timer:null,bus:null};
-const rcv=$('rhythmCv'),rx=rcv.getContext('2d');
-const HIT_X=64,NOTES=MG.rhythm_notes,RH_GOOD=MG.rhythm_good,RH_PERFECT=MG.rhythm_perfect,RH_SPEED=MG.rhythm_scroll_speed;
-const rhTalk={
-  start:['엿 사려, 엿! 너구리 꼬마, 가위 소리부터 들어 봐.','쌀은 네 몫으로 떼 놨지. 어디, 흥 좀 내 볼까?','내 가위에 장단 맞춰 봐. 덤이 나갈지도 모르잖아?'],
-  good:['얼쑤! 엿보다 네 장단이 더 찰진데?','어라, 이러다 엿은 안 팔고 춤만 추겠네!','얼쑤, 내 흥 돋우는 솜씨 좀 봐!'],
-  danger:['어허, 엿 늘이듯 느긋하게! 내 가위 소릴 들어 봐.','덤이 나갈까, 말까? 다음 장단 잘 들어 봐.','가위 좀 놓친다고 쌀까지 안 줄까 봐? 쌀은 네 몫이지.'],
-  late:['자, 끝 두 박은 살짝 당겨 볼까?','끝 두 박은 좀 빨라! 내 가위 따라와 봐.'],
-  fail:['가위도 숨 좀 돌려야지. 쉬었다 다시 맞춰 볼까?','쌀은 네 몫이고! 덤은 다음 장단에 노려 볼까?','내 가위가 좀 빨랐나? 한 번 더 맞춰 봐.'],
-  close:['어라, 아슬아슬하게 맞췄네! 흥이 안 날 수 없지.','딱 다섯! 내 흥 돋우는 법을 알았구나?','얼쑤, 턱걸이라도 다섯은 다섯이지!']
-};
-function rhSay(kind){const a=rhTalk[kind];return a[Math.floor(Math.random()*a.length)];}
-// WebAudio가 없는 환경에서도 판정/보상은 유지한다. 오디오가 있으면 반드시 그 시계만 쓴다.
-function rhNow(){return rh.audio?rh.audio.currentTime:performance.now()/1000;}
-function rhStop(){clearInterval(rh.timer);rh.timer=null;if(rh.bus)rh.bus.stop();rh.bus=null;}
-function openRhythm(reward){
-  rhStop();Object.assign(rh,{hits:0,combo:0,done:false,reward,ready:false,audio:null,
-    notes:[],beats:[],cursor:0,cool:-1,flashUntil:0,label:'준비',paused:null,late:false});
-  $('rhythmHint').textContent='엿방울: '+rhSay('start');
-  rhP.hidden=false;drawRhythm();
-  // 대화 완료 콜백이 입력 밖에서 실행돼도 오디오 컨텍스트를 여기서 만들지 않는다.
-  if(Sound.context&&Sound.context.state==='running')rhStart();
-}
-function rhStart(){
-  rh.audio=Sound.context;
-  if(rh.audio&&rh.audio.state!=='running')return;
-  rh.ready=true;rh.origin=rhNow()+MG.rhythm_start_delay;rh.bus=Sound.group();
-  // 0.22초 소박 세 개씩. 끝 두 박만 0.66초에서 0.55초로 당긴다.
-  const offsets=[MG.rhythm_note_one,MG.rhythm_note_two,MG.rhythm_note_three,MG.rhythm_note_four,MG.rhythm_note_five,MG.rhythm_note_six,MG.rhythm_note_seven,MG.rhythm_note_eight];
-  rh.notes=offsets.slice(0,NOTES).map(t=>({time:rh.origin+t,st:0}));
-  const beats=[];
-  for(let i=0;i<MG.rhythm_intro_beats;i++)beats.push({time:rh.origin+i*MG.rhythm_subbeat,part:i%MG.rhythm_parts,cue:false});
-  offsets.forEach((t,i)=>{const gap=i<MG.rhythm_normal_last?MG.rhythm_normal_gap:MG.rhythm_late_gap;
-    for(let p=0;p<MG.rhythm_parts;p++)beats.push({time:rh.origin+t+p*gap/MG.rhythm_parts,part:p,cue:p===0});});
-  rh.beats=beats;rh.cursor=0;rh.timer=setInterval(rhSchedule,25);rhSchedule();
-}
-function rhSchedule(){
-  if(rh.done||rhP.hidden){rhStop();return;}
-  if(rh.paused!==null||!rh.ready)return;
-  if(rh.audio&&rh.audio.state!=='running')return;
-  const now=rhNow();
-  while(rh.cursor<rh.beats.length&&rh.beats[rh.cursor].time<now+0.12){
-    const b=rh.beats[rh.cursor++];if(b.time<now)continue; // 밀린 반주를 한꺼번에 재생하지 않는다.
-    Sound.drum(b.time,b.part===0?0.24:0.09,rh.bus,b.part===1);
-    if(b.cue)Sound.metal(b.time,0.12,rh.bus);
-    else Sound.click(b.time,0.045,rh.bus);
-    if(rh.combo>=MG.rhythm_combo){Sound.noise(b.time,0.045,rh.bus);
-      if(b.part===0)Sound.metal(b.time,0.07,rh.bus,true);}
-  }
-}
-function drawRhythm(){
-  const c=rx,now=rh.paused===null?rhNow():rh.paused;
-  c.fillStyle='#efe3c8';c.fillRect(0,0,320,120);c.save();
-  if(now<rh.flashUntil&&rh.label==='잘 맞음')c.translate(0,-Math.sin((rh.flashUntil-now)*45)*2);
-  c.fillStyle='#e3d1ab';c.fillRect(0,46,320,30);
-  c.fillStyle='rgba(180,67,42,.15)';c.fillRect(HIT_X-RH_GOOD*RH_SPEED,40,RH_GOOD*RH_SPEED*2,42);
-  c.fillStyle='#b4432a';c.fillRect(HIT_X-1,38,3,46);c.strokeStyle='#b4432a';c.lineWidth=2;c.beginPath();c.arc(HIT_X,61,12,0,Math.PI*2);c.stroke();
-  rh.notes.forEach(n=>{const x=HIT_X+(n.time-now)*RH_SPEED;
-    if(n.st===1||x<-20||x>340)return;
-    c.fillStyle=n.st===2?'rgba(42,32,25,.3)':'#2a2019';
-    c.fillRect(x-7,54,5,14);c.fillRect(x+2,54,5,14);c.fillRect(x-3,50,6,4);
-    c.fillStyle=n.st===2?'rgba(42,32,25,.2)':'#7a7e84';c.fillRect(x-6,52,12,2);});
-  c.restore();c.font='12px "Gowun Dodum", sans-serif';c.fillStyle='#2a2019';
-  const left=rh.notes.filter(n=>n.st===0).length,need=Math.max(0,MG.rhythm_bonus_hits-rh.hits);
-  c.fillText('흥 '+rh.hits+'/'+NOTES+' · '+(need?'덤까지 '+need+'개':'덤 나간다!'),10,17);
-  c.fillText(rh.ready?'남은 가위 '+left+' · 연속 '+rh.combo:'버튼을 누르면 준비 장단!',10,34);
-  // 5/8의 실제 덤 선. 실패해도 게이지와 보상을 깎지 않는다.
-  c.fillStyle='#d2bb8b';c.fillRect(12,92,208,10);
-  c.fillStyle=need===1&&left>0?(Math.sin(now*15)>0?'#c36a2c':'#e6b54a'):'#c36a2c';
-  c.fillRect(12,92,208*rh.hits/NOTES,10);c.fillStyle='#713b28';c.fillRect(141,88,2,18);
-  c.fillText('덤 선',129,118);
-  c.fillStyle=rh.label==='빗나감'?'#7a6655':'#b4432a';
-  c.fillText(now<rh.flashUntil?rh.label+(rh.combo>=MG.rhythm_combo?' · 얼쑤!':''):'찰칵에 맞춰!',228,99);
-  $('rhythmPips').innerHTML=rh.notes.map(n=>'<span class="pip'+(n.st===1?' on':'')+'"'+(n.st===2?' style="opacity:.3"':'')+'></span>').join('');
-}
-function rhMiss(n,now){if(n)n.st=2;rh.combo=0;rh.label='빗나감';rh.flashUntil=now+0.45;
-  $('rhythmHint').textContent='엿방울: '+rhSay('danger');}
-function rhythmStep(){
-  if(rh.done||rh.paused!==null)return;
-  if(!rh.ready){
-    if(!Sound.initialized)return;
-    if(!Sound.context||Sound.context.state==='running')rhStart();else return;
-  }
-  const now=rhNow();rhSchedule();
-  rh.notes.forEach(n=>{if(n.st===0&&now-n.time>RH_GOOD)rhMiss(n,now);});
-  if(!rh.late&&now>=rh.notes[MG.rhythm_normal_last].time+MG.rhythm_late_hint_delay){rh.late=true;$('rhythmHint').textContent='엿방울: '+rhSay('late');}
-  if(rh.notes.every(n=>n.st!==0)&&now>=rh.notes[NOTES-1].time+MG.rhythm_finish_delay){rh.done=true;rhStop();finishRhythm();}
-  drawRhythm();
-}
-function rhythmHit(){
-  if(rh.done||rhP.hidden||rh.paused!==null)return;
-  if(!rh.ready){rhStart();return;}
-  if(rh.audio&&rh.audio.state!=='running')return;
-  const now=rhNow();if(now-rh.cool<MG.rhythm_cooldown)return;rh.cool=now;
-  // 입력 직전에도 지난 노트를 처리해 프레임이 느려도 판정이 같도록 한다.
-  rh.notes.forEach(n=>{if(n.st===0&&now-n.time>RH_GOOD)rhMiss(n,now);});
-  const n=rh.notes.filter(n=>n.st===0).sort((a,b)=>Math.abs(a.time-now)-Math.abs(b.time-now))[0];
-  if(n&&Math.abs(n.time-now)<=RH_GOOD){
-    const perfect=Math.abs(n.time-now)<=RH_PERFECT;n.st=1;rh.hits++;rh.combo++;
-    rh.label=perfect?'잘 맞음':'맞음';rh.flashUntil=now+0.45;
-    Sound.metal(now,perfect?0.25:0.14,rh.bus,perfect);
-    $('rhythmHint').textContent='엿방울: '+rhSay(rh.hits===MG.rhythm_bonus_hits-1?'danger':'good');
-  }else{
-    // 결정 D-71: 헛가위는 빗나감이다. 가장 가까운 남은 가위가 rhythm_stray_window 안이면 그 가위를 놓친 것으로 센다.
-    // 그래서 쉬지 않고 두드리면 가위가 오기 전에 헛가위가 먼저 나가 맞힌 수가 줄어든다. 쌀 8개는 그대로다(확정).
-    rhMiss(n&&Math.abs(n.time-now)<=MG.rhythm_stray_window?n:null,now);Sound.click(now,0.035,rh.bus);
-  }
-  drawRhythm();
-}
-// 다른 탭을 보는 동안 기회가 사라지지 않게 반주와 노트를 함께 멈춘다.
-document.addEventListener('visibilitychange',()=>{
-  if(rhP.hidden||rh.done||!rh.ready)return;
-  if(document.hidden){rh.paused=rhNow();rhStop();}
-  else if(rh.paused!==null){
-    const gap=rhNow()-rh.paused+MG.rhythm_resume_delay;rh.origin+=gap;
-    rh.notes.forEach(n=>n.time+=gap);rh.beats.forEach(b=>b.time+=gap);
-    rh.cool+=gap;rh.flashUntil+=gap;rh.paused=null;rh.bus=Sound.group();
-    rh.cursor=rh.beats.findIndex(b=>b.time>=rhNow());if(rh.cursor<0)rh.cursor=rh.beats.length;
-    rh.timer=setInterval(rhSchedule,25);rhSchedule();
-  }
-});
-$('rhythmBtn').addEventListener('pointerdown',e=>{e.preventDefault();rhythmHit();});rcv.addEventListener('pointerdown',e=>{e.preventDefault();rhythmHit();});
-defineMinigame({id:'rhythm',step:rhythmStep,hit:rhythmHit});
+/* ---------- 엿방울 (여우 엿장수) ---------- */
+/* 결정 D-565: 엿가위 장단 미니게임을 뺐다 (사용자 지시 2026-11-04 "엿방울 장단 맞추기 미니게임 빼기").
+   솔방울 다섯을 건네면 엿방울이 불을 살리고 쌀 여덟 되를 바로 준다(확정 보상 그대로).
+   아빠가 맡긴 엿은 "한바탕 웃긴 다음에 주라"는 아빠 부탁(D-22)대로, 엿방울이 가위 장단을 쳐 아이를 웃긴 뒤 내준다.
+   사연이 켜진 판은 빌린 가위로는 흥이 안 나서, 빼앗긴 제 가위를 찾아 준 뒤(yeotReturn)에 내준다. 사연을 끈 판은 쌀을 바꾼 그 자리에서. */
 // 결정 D-22: 아빠의 부탁 "한바탕 웃긴 다음에 주라" (design/data/decisions.csv)
-function finishRhythm(){
-  if(rhP.hidden)return;rhStop();rhP.hidden=true;const F=G.f;const high=rh.hits>=MG.rhythm_bonus_hits;learn('yeotbang:rhythm');
-  const lines=[['엿방울',rhSay(high?(rh.hits===MG.rhythm_bonus_hits?'close':'good'):'fail')]];
+function dadYeotLines(){
+  return [['너구리','(쩔걱, 쩔꺽! 엿방울 아주머니가 가위 장단에 맞춰\n엿판을 메고 엉덩이를 들썩인다. 웃음이 터졌다.)'],
+    ['엿방울','웃었다! 그럼 이제 꺼내도 되지~\n팔 건 아니고, 맡아 둔 거야.'],
+    ['엿방울','너구리 아저씨가 아들 준다고 샀다가\n끝내 못 가져가고 맡겼어. 웃긴 다음에 주랬지.'],
+    ['엿방울','눈매가 판박이라 진작 알았어~'],
+    gotLine('dad_yeot')];
+}
+function dadYeotDone(){
+  const F=G.f;if(F.yeotHigh)return;F.yeotHigh=true;learn('yeotbang:high');rel('yeotbang',1);
+  clue('j2','엿방울','아빠는 아들 주려고 엿을 샀다가, 끝내 못 가져가고 엿방울에게 맡겨 두었다.');
+  diary('j_yeot','엿방울이 가위 장단을 쳐 나를 한바탕 웃기더니 숨겨 둔 가락엿을 꺼냈다. 아빠가 나 주려고 샀다가 끝내 못 가져가고 맡긴 엿이다.');
+}
+function yeotTradeDone(){
+  const F=G.f;if(F.yeotDone)return;
+  F.yeotPaid=true;F.yeotDone=true;ledgerDone('yeotbang');rel('yeotbang',1);
+  const hush=Rg.arcs()&&night()&&!G.boss.dead;
   // 결정 D-291: 되·줌으로 세는 물건은 그 단위로 "(○○ 여덟 되를 얻었다.)"라고 적는다 (D-235의 줄과 같은 꼴)
-  if(rh.reward){F.yeotDone=true;ledgerDone('yeotbang');addItem('ssal',8);
-    lines.push(['엿방울',high?'얼쑤, 장단 좀 아는걸? 흥이 제법 나네!':'흥은 좀 덜 났지만, 쌀 준다는 말은 안 바꾸지!'],['엿방울','자, 엿 고고 남은 쌀 여덟 되! 이건 약속한 네 몫이야.'],['너구리','(쌀 여덟 되를 얻었다.)']);}
-  rel('yeotbang',high?MG.rhythm_high_relation:MG.rhythm_relation);
+  const lines=[['엿방울',hush?'(수레 밑에서) 고마워~ 불은 살짝만 올릴게.':'좋아, 불부터 올리고!'],
+    ['너구리','(솔방울을 아궁이에 넣자 엿 솥이 다시 보글보글 끓는다.)'],
+    ['엿방울','자, 엿 고고 남은 쌀 여덟 되. 약속한 네 몫~'],gotLine('ssal',8)];
   if(Rg.arcs()){
-    if(!F.jangteoArcsYeot1){
-      F.jangteoArcsYeot1=true;diary('jangteoArcsYeot1','엿방울의 장단에 맞췄다. 빌린 가위라 손에 덜 익는다고 했다. 쌀 여덟 되는 그대로 받았다.');
-      lines.push(['엿방울','이 가위는 빌린 거라 손에 덜 익어.\n소리가 영 심심하네~']);
-    }
-    if(F.jangteoArcsYeotReturned&&!F.jangteoArcsYeot3&&high){
-      const paid=F.yeotHigh||knows('yeotbang:high');
-      F.jangteoArcsYeot3=true;F.yeotHigh=true;
-      // 옛 저장에서 이미 받은 엿(먹거나 선물한 경우도 포함)은 다시 주지 않는다.
-      if(!paid){
-        addItem('dad_yeot',1);learn('yeotbang:high');
-        clue('j2','엿방울','아빠는 아들 주려고 엿을 샀다가, 끝내 못 가져가고 엿방울에게 맡겨 두었다.');
-      }
-      diary('jangteoArcsYeot3',paid?'제 엿가위로 치니 엿방울의 흥이 올랐다. 전에 받은 엿이 아빠가 맡긴 내 몫이었다고 다시 말해 주었다.':'제 엿가위로 치니 엿방울의 흥이 올랐다. 아빠가 나 주려고 사서 맡겨 둔 엿을 꺼냈다.');
-      lines.push(['엿방울',paid?'얼쑤, 제 가위 소리가 돌아왔네~':'얼쑤, 이 소리지! 흥 난 김에 맡아 둔 엿도 꺼내야겠네~'],
-        ['엿방울',paid?'네 아빠가 맡긴 엿은 전에 줬지? 그건 네 몫이었어.':'너구리 아저씨가 아들 준다고 맡긴 엿이야.']);
-      if(!paid)lines.push(['엿방울','눈매가 아저씨 판박이라 진작 알았지~\n웃긴 다음에 주랬으니 참았고.'],gotLine('dad_yeot'));
-    }else if(!F.jangteoArcsYeot3){
-      lines.push(['엿방울',F.jangteoArcsYeotReturned?'제 가위 소리에 맞춰 보자~\n다섯 번 맞추면 나도 흥이 나겠지!':F.jangteoArcsYeot2?'제 가위만 찾으면 소리가 더 찰질 텐데~':'내 엿가위는 따로 있었지~\n…아니다, 장사나 하자.']);
-    }
-    talk(lines);return;
+    if(!F.jangteoArcsYeot1){F.jangteoArcsYeot1=true;diary('jangteoArcsYeot1','엿방울에게 솔방울을 주고 쌀 여덟 되를 받았다. 빌린 가위라 손에 덜 익는다고 했다.');
+      lines.push(['엿방울','이 가위는 빌린 거라 소리가 영 심심하네~\n장단 한번 쳐 주고 싶어도 흥이 안 나.']);}
+    talkGive(lines);return;
   }
-  if(high&&!F.yeotHigh){F.yeotHigh=true;addItem('dad_yeot',1);learn('yeotbang:high');
-    clue('j2','엿방울','아빠는 아들 주려고 엿을 샀다가, 끝내 못 가져가고 엿방울에게 맡겨 두었다.');
-    diary('j_yeot','장단을 맞췄더니 엿방울이 숨겨 둔 가락엿을 꺼냈다. 아빠가 나 주려고 샀다가 끝내 못 가져가고 맡긴 엿이다.');
-    lines.push(['엿방울','흥 난 김에 이 엿도 꺼내 볼까? 팔 건 아니고, 맡아 둔 거야.'],['엿방울','너구리 아저씨가 아들 준다고 샀다가\n끝내 못 가져가고 내게 맡겼지.'],['엿방울','눈매가 아저씨 판박이라 진작 알았지~\n한바탕 웃긴 다음에 주랬으니 참았고.'],gotLine('dad_yeot'));}
-  else if(!high&&!F.yeotHigh)lines.push(['엿방울','내 흥만 좀 더 나면 꺼낼 게 있는데 말이야.\n다음에 가위 여덟 번 중 다섯 번만 맞춰 봐.']);
-  talk(lines);
+  talkGive([...lines,...(F.yeotHigh?[]:dadYeotLines())],()=>dadYeotDone());
 }
 function talkYeot(){
   const F=G.f;
   if(!F.yeotMet){F.yeotMet=true;ledger('yeotbang','엿방울','솔방울 5','쌀');
     const hush=Rg.arcs()&&night()&&!G.boss.dead;   // 결정 D-136: 밤·도깨비 전엔 필드에서 수레 밑에 웅크리므로(art.js fox) 첫 만남·거래 권유도 속삭인다.
     talk(hush?[['엿방울','(수레 밑에서) 쉿… 밤엔 큰소리 못 내.\n너구리 꼬마구나~'],
-      ['엿방울','불도 꺼졌고 솔방울도 동났어.\n뒷산 솔방울 다섯 개면 다시 살리지.'],
-      ['엿방울','엿 고고 남은 쌀 여덟 되랑 바꾸자~\n가위는 작게 쳐도 장단은 장단이지.']]
+      ['엿방울','불도 꺼졌고 솔방울도 동났어.\n뒷산 솔방울 다섯 개면 쌀 여덟 되랑 바꿔 줄게~']]
     :[['엿방울','엿 사려, 엿! 어라, 불부터 살려야겠네.'],
-      ['엿방울',Rg.arcs()?'엿 고느라 불을 오래 땠더니 솔방울이 동났네~\n뒷산 솔방울 다섯 개면 불을 살리지.':'엿 고느라 불을 오래 땠더니 솔방울이 동났네.\n뒷산 소나무 숲에서 다섯 개만 주워 올래?'],
-      ['엿방울',Rg.arcs()?'엿 고고 남은 쌀 여덟 되랑 바꾸자~\n덤은 엿장수 마음이지!':'대신 남은 쌀 여덟 되를 줄게. 덤?\n그야 엿장수 마음이지. 흥만 나면 또 모르고!']],()=>{if(has('solbang',5))yeotTrade();});
+      ['엿방울','엿 고느라 불을 오래 땠더니 솔방울이 동났지 뭐야~\n뒷산 솔방울 다섯 개면 다시 살리지.'],
+      ['엿방울','엿 고고 남은 쌀 여덟 되랑 바꾸자~\n덤? 그야 엿장수 마음이지!']],()=>{if(has('solbang',5))yeotTrade();});
     return;
   }
-  // 솔방울을 건넨 뒤 장단을 마치지 못했으면(창을 닫고 다시 열었을 때) 장단부터 마저 한다. 쌀은 장단이 끝나면 준다.
-  if(!F.yeotDone&&F.yeotPaid){talk([['엿방울','솔방울은 받았지~ 불 올랐으니 장단 마저 맞춰 볼래?']],()=>openRhythm(true));return;}
-  if(!F.yeotDone){if(has('solbang',5))yeotTrade();else talk([['엿방울',Rg.arcs()&&night()&&!G.boss.dead?'(수레 밑에서) 솔방울 다섯 개야. 조용히 다녀와~':'너구리 꼬마, 솔방울 다섯 개면 돼. 뒷산 소나무 숲에 가 봐.']]);return;}
+  // 옛 저장: 솔방울을 건넨 뒤 장단을 마치지 못했으면 쌀부터 마저 준다(장단은 뺐다, D-565).
+  if(!F.yeotDone&&F.yeotPaid){F.yeotPaid=false;yeotTradeDone();return;}
+  if(!F.yeotDone){if(has('solbang',5))yeotTrade();else talk([['엿방울',Rg.arcs()&&night()&&!G.boss.dead?'(수레 밑에서) 솔방울 다섯 개야. 조용히 다녀와~':'솔방울 다섯 개면 돼~ 뒷산 소나무 숲에 가 봐.']]);return;}
   if(Rg.arcs()){
     const c=[];
     if(night()&&!F.jangteoArcsYeot2)c.push({t:'밤의 엿수레를 살핀다',go:yeotNight});
@@ -1097,22 +979,22 @@ function talkYeot(){
     if(F.jangteoArcsPair1&&!F.jangteoArcsPair2)c.push({t:'모락 아주머니 떡을 건넨다',go:pairArc2});
     if(night()&&F.jangteoArcsPair2&&F.jangteoArcsYeot2&&!F.jangteoArcsPair3)c.push({t:'모락 아주머니 얘기를 묻는다',go:pairArc3});
     if(!night()&&F.jangteoArcsPair3&&F.jangteoArcsYeotReturned&&!F.jangteoArcsPair4)c.push({t:'떡집 앞으로 따라간다',go:pairArc4});
-    c.push({t:'엿가위 장단을 맞춘다',go:()=>openRhythm(false)},{t:'그만두기',go:null});
+    c.push({t:'그만두기',go:null});
     // 도깨비가 남은 밤엔 수레 밑에 숨어 있다. 큰소리 장사는 낮에만.
     const scared=night()&&!G.boss.dead;
-    talk([['엿방울',scared?'누, 누구야? …아, 너구리 꼬마구나~':F.jangteoArcsYeotReturned?'내 가위 소리 들으러 왔어?\n오늘은 가위가 손에 착 붙네~':'엿 사려, 엿! 너구리 꼬마, 무슨 일이야?',c]]);return;
+    talk([['엿방울',scared?'누, 누구야? …아, 너구리 꼬마구나~':F.jangteoArcsYeotReturned?'오늘은 가위가 손에 착 붙네~\n엿 늘이는 소리부터 다르지?':'엿 사려, 엿! 너구리 꼬마, 무슨 일이야?',c]]);return;
   }
-  if(!F.yeotHigh){talk([['엿방울','장단 한 번 더? 여덟 번 중 다섯 번만 맞춰 봐.\n흥이 나면 꺼낼 게 있다니까.',[{t:'엿가위 장단을 맞춘다',go:()=>openRhythm(false)},{t:'그만두기',go:null}]]]);return;}
-  talk([['엿방울','엿 사려, 엿! 어라, 내 흥 돋우던 너구리 꼬마네?'],
+  // 옛 저장: 장단에서 흥이 덜 나 엿을 못 받았으면 이번엔 웃겨서 준다.
+  if(!F.yeotHigh){talkGive([['엿방울','어라, 너구리 꼬마~ 오늘은 꼭 웃겨 줘야겠네.'],...dadYeotLines()],()=>dadYeotDone());return;}
+  talk([['엿방울','엿 사려, 엿! 어라, 웃음 많은 너구리 꼬마네?'],
     hintLine('yaksik',['엿방울','정월엔 약식이지~ 쌀에 밤이랑 대추,\n시루에 쪄 내면 엿보다 달다니까?'])]);   // 결정 D-461: 귀띔
 }
 function yeotTrade(){
-  talk([['엿방울',Rg.arcs()?(night()&&!G.boss.dead?'솔방울 다섯 개랑 쌀 여덟 되. 조용히 바꿀래?':'솔방울 다섯 개랑 쌀 여덟 되, 바꿀래?'):'어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되, 어때?',[{t:'보따리를 펼친다',go:()=>Trade.open('yeotbang')},{t:'아직은 안 줄래',go:null}]]]);
+  talk([['엿방울',Rg.arcs()&&night()&&!G.boss.dead?'솔방울 다섯 개랑 쌀 여덟 되. 조용히 바꿀래?':'어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되~',[{t:'보따리를 펼친다',go:()=>Trade.open('yeotbang')},{t:'아직은 안 줄래',go:null}]]]);
 }
 function yeotGive(){
   if(G.f.yeotDone||G.f.yeotPaid||!has('solbang',5))return;
-  takeItem('solbang',5);G.f.yeotPaid=true;
-  talk([['엿방울',Rg.arcs()?(night()&&!G.boss.dead?'불부터 올리고! 장단은… 작게, 작게~':'불부터 올리고! 가위 장단도 맞춰 볼래?'):'좋아, 불부터 올리고! 엿 고는 동안 내 가위 소리에 장단 맞춰 볼래?']],()=>openRhythm(true));
+  takeItem('solbang',5);yeotTradeDone();
 }
 function yeotMoreGive(){
   if(!G.f.yeotDone||!has('solbang',5))return;
@@ -1140,9 +1022,14 @@ function nalMenu(){
 function marketCraftTrade(){
   G.f.jxCraftMarketHeard=true;
   const enough=has('solbang',G.f.yeotDone?3:8);
+  // 결정 D-567: 엿방울 몫 다섯을 먼저 남기라는 말을 따로 한 줄로 또렷이 (사용자 피드백 2026-11-04).
+  // 날쌘이 그걸 아는 까닭: 엿방울이 솔방울 다섯 찾는다고 장터에 떠들고 다녔다(엿방울은 장터 소식통이고 목소리가 크다).
+  const keep=!G.f.yeotDone;
   talk([['날쌘','꿀, 참기름, 녹두, 팥. 한 줌씩 남았어.\n떡 찌기엔 모자라지 않을걸.'],['너구리','뭐랑 바꿔 줘요?'],
     ['날쌘','솔방울 셋. 밤에 불 피울 데가 있어서.'],
-    ['날쌘',enough?'넷 다 묶어 줄게. 바꿀래?':G.f.yeotDone?'솔숲에서 셋만 주워 와.':'엿방울한테 줄 다섯은 남겨 두고,\n솔숲에서 셋 더 주워 와.',
+    ...(keep?[['날쌘','아, 하나 더. 엿방울이 솔방울 다섯 찾는다고\n온 장에 떠들던데. 그 다섯엔 손대지 마.'],
+      ['날쌘','엿방울 몫 다섯 먼저, 내 셋은 그다음.\n모두 여덟이야.']]:[]),
+    ['날쌘',enough?(keep?'여덟 다 있네. 다섯은 엿방울 거고, 셋만 내.':'넷 다 묶어 줄게. 바꿀래?'):keep?'다섯은 꼭 남겨 두고, 솔숲에서 셋 더 주워 와.':'솔숲에서 셋만 주워 와.',
     enough?[{t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'다음에',go:null}]:[{t:'알겠어요',go:null}]]]);
 }
 function nalMarketGive(){
@@ -1237,6 +1124,9 @@ function bueongGiveNow(){
     // 결정 D-421·D-428: 메모의 '되돌림' 줄을 빼고 이무기와 "이름 불러도 돌아보지 말 것"을 넣었다.
     // 결정 D-428: 영감이 짐을 내주며 장부의 아빠 줄을 짚는다. 이름 칸만 하얗다(이름의 규칙 3: 영감도 지워진 줄 모르고 제가 비워 둔 줄 안다).
     //   아이는 짐표를 쥐어 본다. 둘을 잇는 말은 하지 않는다. 이름을 묻지 않은 영감은 아이를 '상단 막내'라 부른다(꼭 거치는 길의 셋째 이름).
+    // 결정 D-568: 영감이 그믐 창고를 새 막내에게 맡기는 까닭. 지난밤들은 종종이가 섰고, 행수는 그 아이를 의심한다(상단 본줄기).
+    const watchLines=CLASSIC?[]:[['부엉 영감','지난밤들은 종종이가 섰다.\n행수는 그 아이를 의심하지.'],
+      ['부엉 영감','행수는 그믐 헌것 얘기를 늙은이 헛소리로 안다.\n네 눈으로 보고 와라.']];
     const maknae=()=>{if(grantNickname('jang_sangdan_maknae','상단 막내','부엉 영감'))diary('nickname:jang_sangdan_maknae','부엉 영감에게 상단 막내라고 불렸다.');};
     clue('j3',NAME_CLUES.j3.who,NAME_CLUES.j3.text);
     diary('j_memo','보부상 신표를 받았다. 아빠의 짐 속에 메모가 있었다. "값은 이미 치러졌다. 이번엔 내가 치른다." 누가, 무슨 값을 치렀다는 걸까.');
@@ -1253,7 +1143,8 @@ function bueongGiveNow(){
         ['너구리','"북쪽 영산. 호수에 이무기가 앉았다 한다.\n이름 불러도 돌아보지 말 것."'],
         ['부엉 영감','이제 상단 식구다. 막내지.'],
         ['부엉 영감','상단 막내, 오늘이 섣달그믐이다.\n그믐 밤엔 헌것들이 들썩이고, 창고 물건이 없어진다.'],
-        ['부엉 영감','오늘 밤 창고 문 앞을 지켜라. 보부상의 일이다.']
+        ['부엉 영감','오늘 밤 창고 문 앞을 지켜라. 보부상의 일이다.'],
+        ...watchLines
       ],()=>{maknae();toast('숙소 창고를 지키자');refreshGoal();});return;
     }
     talk([['부엉 영감','붉은 팥이 제대로 들었구나. 고사상에 올릴 만하다.'],['너구리','(영감님이 떡을 올리고 장부에 신표 표시를 한다.)'],
@@ -1264,7 +1155,7 @@ function bueongGiveNow(){
       ['너구리','(짐 속에 접힌 종이가 있다. 아빠 글씨다.)'],
       ['너구리','"값은 이미 치러졌다. 이번엔 내가 치른다.\n북쪽 영산. 호수에 이무기가 앉았다 한다."'],
       ['너구리','"이름 불러도 돌아보지 말 것."'],
-      ['부엉 영감','상단 막내, 오늘은 섣달그믐이다. 밤마다 장터 물건이 사라진다.\n보부상의 의무로 오늘 밤 숙소 창고를 지켜라.']],()=>{maknae();toast('숙소 창고를 지키자');refreshGoal();});
+      ['부엉 영감','상단 막내, 오늘은 섣달그믐이다. 밤마다 장터 물건이 사라진다.\n보부상의 의무로 오늘 밤 숙소 창고를 지켜라.'],...watchLines],()=>{maknae();toast('숙소 창고를 지키자');refreshGoal();});
   }
 }
 
@@ -1282,6 +1173,7 @@ Rg.startDokkaebi=()=>{
         diary('j_calm','헌물 도깨비를 부수지 않고 달랬다. 도깨비는 훔친 것을 돌려놓고 고맙다며 도깨비불씨를 건넨 뒤 춤추듯 사라졌다.');
       }
       Rg.bossDie(res==='calm');
+      Rg.sangdanCaught?.(res==='calm');   // 결정 D-568: 상단 행수와 종종이가 달려와 누명이 벗겨진다
     }else{
       G.px=Rg.STORE_X-70;G.f.faints+=res==='lose'?1:0;
       diary('j_hint','헌물 도깨비는 빗자루로 쓸고, 키로 콩을 뿌리고, 멍석을 말아 온다. 헌물을 하나 부수면 도깨비불이 드러난다. 도깨비는 메밀을 좋아한다는 말이 있다.');
@@ -1292,7 +1184,7 @@ Rg.startDokkaebi=()=>{
 
 /* ---------- 끝: 홍시 약떡을 까치 편에 보내기 ---------- */
 // 결정 D-131: 약떡은 그믐밤에 쪄도 설날 아침에 맡긴다. 늙은 까치는 밤길을 못 난다(region.js 첫 만남 "날개가 예전 같지 않아서").
-// 그래서 아이는 마루에서 하룻밤을 더 자고, 그 아침에 장터 사연의 마지막 막(투호 첫판·얼레 동생 꼭지·등잔발·영감 도장 등)이 열린다.
+// 그래서 아이는 마루에서 하룻밤을 더 자고, 그 아침에 장터 사연의 마지막 막(바둑 첫판·얼레 동생 꼭지·등잔발·영감 도장 등)이 열린다.
 Rg.magpieTteok=()=>{
   if(CLASSIC||!G.boss.dead||!has('hongsi_tteok')||G.f.hongsiMade||regionCompleted(Rg.id))return null;
   if(night())return [['늙은 까치','아가, 늙은 날개로 밤길은 못 난단다.\n마루에서 한숨 자고, 아침 김 오를 때 떠나자꾸나.',
@@ -1366,7 +1258,7 @@ if(!CLASSIC){
       if(!G.f.yeotDone){n.talk();return;}
       const hide=night()&&!G.boss.dead&&Rg.arcs();
       talk([[hide?'너구리':'엿방울',hide?'(엿방울 아주머니는 수레 밑에서 꼬리 끝만 비죽 보인다.)':(Rg.riceNeeded()?'불쏘시개는 늘 필요하지~\n솔방울을 더 주우면 쌀도 더 바꿔 줄게.':'쌀은 넉넉해 보이는데~\n떡 찌다 모자라면 그때 와.'),[
-        {t:'가위 장단과 이야기',go:n.talk},
+        {t:'이야기',go:n.talk},
         // 결정 D-79: 쌀이 진행에 모자랄 때만 더 바꿔 준다.
         ...(Rg.riceNeeded()?[{t:'솔방울 5개로 쌀 8개 더 구하기',go:()=>{
           if(!has('solbang',5)){talk([['엿방울','솔방울 다섯 개면 쌀 여덟 되야~\n솔숲이 비었으면 숙소에서 쉬고 와. 그새 또 떨어지거든.']]);return;}
@@ -1425,12 +1317,11 @@ defineSideQuests(Rg.id,[
 
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
-   엿방울의 쌀 8되는 솔방울을 받은 뒤 장단이 끝나면 준다(확정. 장단은 덤 엿에만 영향).
+   엿방울의 쌀 8되는 솔방울을 받으면 바로 준다(확정. 장단 미니게임은 뺐다, D-565).
    결정 D-40: 날쌘에게 허세가 통하면 팥을 한 되 더 얹는다(경멸 축). 그 뒤 다시 바꾸는 팥에도 같은 셈이다. */
 Rg.trade={
   yeotbang:()=>[
     ...(G.f.yeotMet?[{id:'t_yeotbang',item:'ssal',n:8,asks:[{solbang:5}],
-      locked:()=>G.f.yeotPaid?'솔방울은 벌써 건넸다. 엿 고는 동안 장단을 맞추면 쌀을 준다.':null,
       done:()=>G.f.yeotDone,accept:yeotGive}]:[]),
     // 결정 D-123: 엿방울이 "쌀은 넉넉해 보인다"고 말한 뒤에도 그 쌀은 보따리에 보인다. 모자랄 때만 바꾼다.
     ...(!CLASSIC&&G.f.yeotDone?[{id:'t_yeotbang_more',item:'ssal',n:8,asks:[{solbang:5}],
@@ -1443,7 +1334,7 @@ Rg.trade={
     ]:[]),
     // 결정 D-147: 떡 재료 묶음은 처음부터 날쌘 지게에 있다. 엿방울 몫을 아직 모르면 까닭은 말하지 않고 남겨 두기만 한다.
     ...(!CLASSIC?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 녹두 · 팥',asks:[{solbang:3}],
-      locked:()=>!G.f.yeotDone&&has('solbang',3)&&(G.inv.solbang||0)<8?(G.f.yeotMet?'엿방울한테 줄 솔방울 다섯은 남겨 둬야 한다.':'솔방울은 아직 쓸 데가 있다.'):null,
+      locked:()=>!G.f.yeotDone&&has('solbang',3)&&(G.inv.solbang||0)<8?(G.f.yeotMet||G.f.jxCraftMarketHeard?'솔방울 다섯은 엿방울 몫이다. 모두 여덟이 되면 셋을 내자.':'솔방울은 아직 쓸 데가 있다.'):null,
       done:()=>G.f.jxCraftMarket,accept:nalMarketGive}]:[])
   ],
   morak:()=>G.f.morakMet?[{id:'t_morak',item:'patsirutteok',label:'시루를 깨우는 김 다루기',asks:[{ssal_powder:3}],done:()=>G.f.morakPowder,accept:morakGiveNow},

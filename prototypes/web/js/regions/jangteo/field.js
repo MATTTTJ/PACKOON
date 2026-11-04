@@ -194,11 +194,14 @@ if(!CLASSIC){
     },
   });
   const E=Rg.expEncounters;
+  /* 결정 D-564: 늙은 까치의 등 달기는 까치가 앉은 숙소 구역 안에서 끝낸다 (사용자 지시 2026-11-04 "딱 그 지역에서 완료할 수 있게").
+     예전엔 거리 골목과 솔숲 입구에도 하나씩 있어 등 꾸러미를 들고 구역을 둘 건너야 했다. 길손이 찾는 건 숙소라 숙소 마당 어귀·마루 앞·처마 끝·창고 쪽문 가는 길에 단다.
+     id는 옛 저장과 맞추려고 그대로 둔다(alley·pine은 이제 숙소 마당 어귀와 처마 끝 걸이다). */
   Rg.lanternPoints=[
+    {id:'alley',zone:'inn',x:800,y:GROUND},
     {id:'porch',zone:'inn',x:1380,y:GROUND},
+    {id:'pine',zone:'inn',x:1690,y:GROUND},
     {id:'gate',zone:'inn',x:2000,y:GROUND},
-    {id:'alley',zone:'street',x:2250,y:GROUND},
-    {id:'pine',zone:'pine',x:450,y:GROUND},
   ];
   // getter를 다시 읽어도 같은 대상을 찾도록 활동 오브젝트는 한 번만 만든다.
   const lanterns=Rg.lanternPoints.map(p=>({
@@ -209,15 +212,13 @@ if(!CLASSIC){
     talk:()=>Rg.lanternAction(p.id),
   }));
   const nightLanterns=zone=>night()?lanterns.filter(p=>p.zone===zone):[];
-  // 결정 D-325: 윷판 대신 투호 판돈 바구니(항아리는 노인들 그림에 있다). 말을 걸면 노인들의 투호 내기 판이 열린다 (story.js Rg.playTuho)
-  const yutBoard={id:'j_yut_board',name:'판돈 바구니',prompt:'투호 내기 구경하기',x:1960,y:GROUND,
+  // 결정 D-325·D-562: 노인들 곁의 판돈 바구니. 말을 걸면 바둑 내기에 편을 든다 (story.js Rg.playBaduk). 화살통은 투호와 함께 뺐다.
+  const yutBoard={id:'j_yut_board',name:'판돈 바구니',prompt:'바둑 내기에 편 들기',x:1960,y:GROUND,
     draw(x,y){
       R(x-7,y-7,14,7,'#a07a4a');R(x-8,y-8,16,2,'#c39b62');for(let i=0;i<4;i++)R(x-6+i*4,y-5,2,4,'#8a6538');   // 짚 바구니
       R(x-5,y-11,4,4,'#7a5232');R(x,y-12,4,5,'#8a5a32');R(x+3,y-10,3,3,'#7a5232');R(x-4,y-10,2,1,'#b98a52');R(x+1,y-11,2,1,'#b98a52');   // 솔방울
-      R(x+10,y-14,4,14,'#6f5a3c');R(x+10,y-15,4,1,'#4f3f2a');                // 화살통
-      R(x+11,y-21,1,7,'#6b4a2c');R(x+11,y-22,1,2,'#b54a34');R(x+13,y-20,1,6,'#6b4a2c');R(x+13,y-21,1,2,'#416c82');   // 꽂아 둔 화살
     },
-    talk:()=>Rg.playTuho(),
+    talk:()=>Rg.playBaduk(),
   };
   const lanternBundle={id:'j_lantern_bundle',name:'등불 꾸러미',prompt:'까치와 등불 꾸러미 풀기',x:1610,y:GROUND,
     draw(x,y){
@@ -230,7 +231,8 @@ if(!CLASSIC){
   Rg.zones={
     entrance:{...common('entrance'),name:TABLES.ZONES.jangteo.entrance,w:2600,npcs:[],
       platforms:[...stairs(1040),...stairs(1980)],
-      pickups:cones('entrance',[[355,192]]),   // 결정 D-82: 솔방울은 뒷산 솔숲에서 모은다
+      // 결정 D-82: 솔방울은 뒷산 솔숲에서 모은다. 결정 D-563: 어귀의 첫 솔방울은 청설모 할아범(360) 발치와 겹쳐 있어 길 안쪽(460)으로 옮겼다 (사용자 피드백 2026-11-04)
+      pickups:cones('entrance',[[460,192]]),
       exits:{right:{to:'street',toX:60}},
       doors:[],   // 결정 D-316: 지붕길 문(→거리 지붕)은 뺐다
       wanderers:E.wanderers.entrance,examines:E.examines.entrance,
@@ -283,6 +285,7 @@ if(!CLASSIC){
       exits:{left:{to:'inn',toX:2490}},
       doors:[],   // 결정 D-316·D-317: 숙소로는 들어온 쪽문(왼쪽 가장자리)으로만 돌아간다
       examines:E.examines.warehouse,
+      get wanderers(){return E.wanderers.warehouse||[];},   // 결정 D-568: 도깨비를 잡은 그믐 밤엔 상단 행수와 종종이가 창고 마당에 있다 (story.js)
       drawActors(){
         const x=Rg.STORE_X-cam;R(x-38,GROUND-58,76,58,'#493d3b');R(x-44,GROUND-62,88,5,'#243b48');R(x-44,GROUND-64,88,2,'#dbe8ed');
         R(x-15,GROUND-41,30,41,'#222f3a');R(x-2,GROUND-41,3,41,'#678393');
