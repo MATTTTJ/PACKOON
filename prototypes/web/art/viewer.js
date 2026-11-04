@@ -216,7 +216,8 @@ function drawProp(id,v,x,y,s,p,flip,dark,fogAmt){
   if(wx>camX+viewW||wx+w<camX)return;
   const f=PRESETS[S.preset].fog,fa=fogAmt||0;
   if(e){bindTex(e);const d=dark||1;
-    setCommon(0,1,e.n?1:0,flip,[d,d,d,1],[f[0],f[1],f[2],fa]);
+    if(m&&m.baked){const P=PRESETS[S.preset];setCommon(0,0,0,flip,[P.sky[0]*d,P.sky[1]*d,P.sky[2]*d,1],[f[0],f[1],f[2],fa]);}   // 빛 칠한 임시 그림(첫 시안)은 조명을 다시 입히지 않는다
+    else setCommon(0,1,e.n?1:0,flip,[d,d,d,1],[f[0],f[1],f[2],fa]);
     if(flip<0)rect(wx,wy,w,h,1,0,0,1);else rect(wx,wy,w,h,0,0,1,1);}
   else{const c=colOf(id);setCommon(2,0,0,1,[c[0],c[1],c[2],dark?0.7:1],noFog);rect(wx,wy,w,h,0,0,1,1);
     if(S.labels)label(px(wx+w/2,1),py(wy)+12,nameOf(id)+(v?' '+v:''),cssCol(c));}
@@ -230,7 +231,8 @@ function drawLayer(id,cfg,x0,x1){
   const lo=x0<0?L0:Math.max(L0,x0+camX*(1-p)), hi=x1<0?L1:Math.min(L1,x1+camX*(1-p));
   if(hi<=lo)return;
   if(e){const P=PRESETS[S.preset];bindTex(e);
-    if(baked)setCommon(0,0,0,1,[P.sky[0],P.sky[1],P.sky[2],1],[f[0],f[1],f[2],fa*0.4]);else setCommon(0,1,e.n?1:0,1,tint,[f[0],f[1],f[2],fa]);
+    const dk=Z.dim?0.45+0.55*Z.dim:1;
+    if(baked)setCommon(0,0,0,1,[P.sky[0]*dk,P.sky[1]*dk,P.sky[2]*dk,1],[f[0],f[1],f[2],fa*0.4]);else setCommon(0,1,e.n?1:0,1,tint,[f[0],f[1],f[2],fa]);
     const tw=(m&&m.units)?m.units[0]:h*e.w/e.h;
     const off=((camX*p)%tw+tw)%tw;let sx=camX-off;
     for(;sx<hi;sx+=tw){const a=Math.max(sx,lo),b=Math.min(sx+tw,hi);if(b<=a)continue;
@@ -239,8 +241,8 @@ function drawLayer(id,cfg,x0,x1){
     if(S.labels)label(px(lo,1)+70,py(y)+14,nameOf(id),cssCol(c));}
 }
 function drawSky(){
-  const id=L.SKY[Z.sky],e=texOf(id,null),P=PRESETS[S.preset];
-  if(e){bindTex(e);setCommon(1,0,0,1,[P.sky[0],P.sky[1],P.sky[2],1],noFog);
+  const id=L.SKY[Z.sky],e=texOf(id,null),P=PRESETS[S.preset],dk=Z.dim?0.45+0.55*Z.dim:1;   // 우거진 구역은 하늘과 먼 겹도 조금 어둡게
+  if(e){bindTex(e);setCommon(1,0,0,1,[P.sky[0]*dk,P.sky[1]*dk,P.sky[2]*dk,1],noFog);
     // 화면을 덮도록 가운데 맞춰 자른다
     const ar=e.w/e.h, vr=viewW/VIEW_H;let u0=0,u1=1,v0=0,v1=1;
     if(ar>vr){const k=vr/ar;u0=(1-k)/2;u1=u0+k;}else{const k=ar/vr;v0=(1-k)/2;v1=v0+k;}
@@ -260,7 +262,8 @@ function drawPlatform(p){
   if(e){let hh=h,off=w*sw,body=hh-off;
     if(body<need){const r=Math.min(1.35,need/body);hh*=r;off*=r;body*=r;
       if(body<need){const k=need/body;w*=k;hh*=k;off*=k;}}
-    bindTex(e);setCommon(0,1,e.n?1:0,1,tint,noFog);rect(p.x+p.w/2-w/2,p.y-off,w,hh,0,0,1,1);}
+    const f=PRESETS[S.preset].fog;   // 발판은 길 뒤에 선 지형처럼 보이게 조금 어둡고 흐리게 (사용자 결정 2026-11-04: 발판이 벽처럼 보이는 문제)
+    bindTex(e);setCommon(0,1,e.n?1:0,1,[0.8,0.8,0.84,1],[f[0],f[1],f[2],0.14]);rect(p.x+p.w/2-w/2,p.y-off,w,hh,0,0,1,1);}
   else{const c=PF_COL[p.kind]||[0.5,0.4,0.3];setCommon(3,1,0,1,[c[0],c[1],c[2],1],noFog);rect(p.x-2,p.y,p.w+4,need,0,0,1,1);
     setCommon(3,1,0,1,[c[0]*1.3,c[1]*1.3,c[2]*1.2,1],noFog);rect(p.x-3,p.y-1.5,p.w+6,3,0,0,1,1);
     if(S.labels)label(px(p.x+p.w/2,1),py(p.y)+14,nameOf(id),cssCol(c));}
@@ -332,7 +335,8 @@ function drawLeaves(){for(const l of LEAF)if(l.on){const c=LEAF_C[l.c];setCommon
 
 function setLights(){
   const P=PRESETS[S.preset];
-  gl.uniform3f(U.uAmb,P.amb[0],P.amb[1],P.amb[2]);gl.uniform3f(U.uSunL,P.sun[0],P.sun[1],P.sun[2]);gl.uniform3f(U.uSunC,P.sunC[0],P.sunC[1],P.sunC[2]);
+  const dm=Z.dim||1;   // 숲처럼 우거진 구역은 빛을 덜 받는다
+  gl.uniform3f(U.uAmb,P.amb[0]*dm,P.amb[1]*dm,P.amb[2]*dm);gl.uniform3f(U.uSunL,P.sun[0],P.sun[1],P.sun[2]);gl.uniform3f(U.uSunC,P.sunC[0]*dm,P.sunC[1]*dm,P.sunC[2]*dm);
   let n=0;for(const l of Z.lights||[]){if(n>=16)break;if(l.when&&S.states[l.when[0]]!==l.when[1])continue;
     LP[n*4]=l.x;LP[n*4+1]=l.y+gy(l.x)-G;LP[n*4+2]=l.r;LP[n*4+3]=14;
     const k=l.i*P.pt;LC[n*3]=l.c[0]*k;LC[n*3+1]=l.c[1]*k;LC[n*3+2]=l.c[2]*k;n++;}
