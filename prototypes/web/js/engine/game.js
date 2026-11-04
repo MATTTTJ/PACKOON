@@ -17,6 +17,11 @@ const GameMusic=(()=>{
   PackoonMusic.attachSound(Sound,player);
   const ids=new Set(PackoonAudioData.score.tracks.map(t=>t.id));
   const bosses={kudzu:'boss_kudzu',golem:'boss_golem',dokkaebi:'boss_dokkaebi',gangcheol:'boss_steel',musoe:'trial_iron'};
+  /* 결정 D-457: 보스 전투가 걸리면 그 보스다운 짧은 등장 곡(2~4초, 합성 악보 music.json sting_*)을 한 번 틀고,
+     끝나면 그 보스의 곡(bosses)으로 넘긴다. 등장 곡 길이는 악보에서 잰다 (사용자 피드백 2026-11-04) */
+  const stings={kudzu:'sting_kudzu',golem:'sting_golem',dokkaebi:'sting_dokkaebi',gangcheol:'sting_steel',musoe:'sting_iron'};
+  const stingSeconds=id=>{const t=PackoonAudioData.score.tracks.find(t=>t.id===id);return t?t.measures*t.meter[0]*4/t.meter[1]*60/t.tempo:0;};
+  let stingFor=null,stingEnd=0;
   const scenery={galchamgol:'scenery_danpunggol',dolneomeo:'scenery_dolneomeo',jangteo:'scenery_market',yeongsan:'scenery_yeongsan'};
   let owner=null,region=null,scene=null,requested=undefined,pending=false,duck=1,requestCount=0,travelTo=null,arrival=false;
   /* 결정 D-37: 주인공의 마음 상태에 따라 음악이 바뀐다 (design/data/decisions.csv).
@@ -45,7 +50,12 @@ const GameMusic=(()=>{
   }
   function selection(){
     if(G.ended&&!REG.next)return {id:'ending',kind:'ending'};
-    if(B&&!B.result)return {id:valid(B.E.music,bosses[B.kind]||regionTrack()),kind:'battle'};
+    if(B&&!B.result){
+      const sting=stings[B.kind];
+      if(sting&&ids.has(sting)&&stingFor!==B){stingFor=B;stingEnd=performance.now()+stingSeconds(sting)*1000;}
+      if(sting&&stingFor===B&&performance.now()<stingEnd)return {id:sting,kind:'sting'};
+      return {id:valid(B.E.music,bosses[B.kind]||regionTrack()),kind:'battle'};
+    }
     // 장단의 예약 반주만 들린다. 이야기 훅이 있어도 장단 위에 BGM을 겹치지 않는다.
     const mg=openMinigame();
     if(mg?.id==='rhythm')return {id:null,kind:'rhythm'};
@@ -73,7 +83,7 @@ const GameMusic=(()=>{
     if(factor!==duck){duck=factor;player.setDucking(duck,.18);}
     const travelling=player.getState().travel;
     // 도착 대화·패널·경치는 길 위 간주를 지우지 않는다. 전투와 장단은 먼저 들려주고 끝난 뒤 한 번 잇는다.
-    const sceneFirst=['battle','rhythm','ending'].includes(target.kind);
+    const sceneFirst=['battle','sting','rhythm','ending'].includes(target.kind);
     if(travelling&&!sceneFirst)return;
     if(travelTo&&!sceneFirst){
       if(!Sound.enabled||!Sound.context||Sound.context.state!=='running'||document.hidden||!player.getState().unlocked)return;
@@ -111,7 +121,7 @@ const GameMusic=(()=>{
     requested=target.id;pending=false;const ticket=++requestCount;
     const row={id:target.id,kind:target.kind,region:G.region,zone:G.zone,audioTime:Sound.context.currentTime};
     history.push(row);if(history.length>80)history.shift();
-    const settings={crossfade:['battle','scenery'].includes(target.kind)?.35:1.5};
+    const settings={crossfade:target.kind==='sting'?.05:['battle','scenery'].includes(target.kind)?.35:1.5};
     if(afterGap){settings.crossfade=.6;gapFor=null;}
     const spec=ADAPTIVE[target.id];
     if(spec&&['region','battle'].includes(target.kind)){
