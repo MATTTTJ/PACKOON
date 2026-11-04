@@ -32,7 +32,17 @@ function selectBagKind(kind){
 }
 function cycleBagKind(step){selectBagKind(BAG_KINDS[(BAG_KINDS.indexOf(bagKind)+step+BAG_KINDS.length)%BAG_KINDS.length]);}
 function pouchCount(){const c={};pouch.items.forEach(i=>c[i]=(c[i]||0)+1);return c;}
-function matchRecipe(){const c=pouchCount(),ck=Object.keys(c);if(!isAwake(pouch.tool))return null;for(const r of availableRecipes(pouch.tool)){const k=Object.keys(r.need);if(ck.length===k.length&&k.every(x=>c[x]===r.need[x]))return r;}return null;}
+/* 결정 D-441: 같은 재료를 가공법의 정수배로 넣으면 그 배수만큼 한 번에 만든다 (쌀 셋 → 쌀가루 셋).
+   예전엔 꼭 한 몫만 맞아서, "쌀가루 세 됫박"을 들은 아이가 쌀 셋을 넣으면 맷돌이 꿈쩍도 안 했다. 돌려주는 것은 배수를 곱한 사본(times 칸) */
+function matchRecipe(){
+  const c=pouchCount(),ck=Object.keys(c);if(!isAwake(pouch.tool))return null;
+  for(const r of availableRecipes(pouch.tool)){
+    const k=Object.keys(r.need);if(ck.length!==k.length||!k.every(x=>c[x]))continue;
+    const times=c[k[0]]/r.need[k[0]];
+    if(Number.isInteger(times)&&times>=1&&k.every(x=>c[x]===r.need[x]*times))return times===1?r:{...r,n:r.n*times,times};
+  }
+  return null;
+}
 function returnPouch(){if(!pouch.items.length)return;pouch.items.forEach(id=>{G.inv[id]=(G.inv[id]||0)+1;});pouch.items=[];refreshHud();}
 function liveHint(){
   if(!pouch.items.length)return '';
