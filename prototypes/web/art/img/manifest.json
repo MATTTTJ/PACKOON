@@ -23,6 +23,51 @@
   "v": 2,
   "w": 3341
  },
+ "bg_fg_foliage": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 386,
+  "kind": "layer",
+  "normal": true,
+  "units": [
+   423.1,
+   64.3
+  ],
+  "v": 1,
+  "w": 2539
+ },
+ "bg_ground_marsh": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 341,
+  "kind": "layer",
+  "normal": true,
+  "units": [
+   634.7,
+   56.9
+  ],
+  "v": 1,
+  "w": 3809
+ },
+ "bg_ground_soil": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 316,
+  "kind": "layer",
+  "normal": true,
+  "units": [
+   634.7,
+   52.6
+  ],
+  "v": 1,
+  "w": 3808
+ },
  "bg_mid_ridge": {
   "anchor": [
    0.5,
@@ -702,5 +747,135 @@
   ],
   "v": 1,
   "w": 64
+ },
+ "pf_marsh_stone": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 540,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "high": 90.0,
+   "low": 40.0,
+   "mid": 60.0
+  },
+  "states": [
+   "high",
+   "low",
+   "mid"
+  ],
+  "surfW": 0.07,
+  "units": [
+   60.9,
+   90.0
+  ],
+  "v": 3,
+  "w": 365
+ },
+ "pf_mound": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 329,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "high": 90.0,
+   "low": 40.0,
+   "mid": 60.0
+  },
+  "states": [
+   "high",
+   "low",
+   "mid"
+  ],
+  "surfW": 0.07,
+  "units": [
+   112.2,
+   90.0
+  ],
+  "v": 3,
+  "w": 410
+ },
+ "pf_rock": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 540,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "high": 90.0,
+   "low": 40.0,
+   "mid": 60.0
+  },
+  "states": [
+   "high",
+   "low",
+   "mid"
+  ],
+  "surfW": 0.07,
+  "units": [
+   72.2,
+   90.0
+  ],
+  "v": 3,
+  "w": 433
+ },
+ "pf_scaffold": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 540,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "high": 90.0,
+   "low": 40.0,
+   "mid": 60.0
+  },
+  "states": [
+   "high",
+   "low",
+   "mid"
+  ],
+  "surfW": 0.07,
+  "units": [
+   54.1,
+   90.0
+  ],
+  "v": 3,
+  "w": 325
+ },
+ "pf_stump": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 540,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "high": 90.0,
+   "low": 40.0,
+   "mid": 60.0
+  },
+  "states": [
+   "high",
+   "low",
+   "mid"
+  ],
+  "surfW": 0.07,
+  "units": [
+   52.3,
+   90.0
+  ],
+  "v": 3,
+  "w": 314
  }
 }

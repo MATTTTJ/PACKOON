@@ -3,7 +3,8 @@
 (function(){
 'use strict';
 const L=window.ART_STAGE1, G=L.G;
-const VIEW_H=280, TOP=G-240;                 // 카메라가 보는 높이(게임 단위)와 화면 윗변
+const VIEW_H=280, CAM0=G-226;                // 카메라가 보는 높이(게임 단위)와 기준 윗변 (땅이 평평할 때)
+let camY=CAM0;                               // 지금 화면 윗변. 땅 높이와 주인공을 따라 위아래로 움직인다
 const MOVE={speed:1.7,jump:-5.4,grav:0.32,fall:6,step:1000/60};   // tuning.csv 의 필드 조작 값
 const CSV_URL='../../../assets-godot/art/stage1/assets.csv', MAN_URL='img/manifest.json';
 const $=id=>document.getElementById(id);
@@ -47,9 +48,11 @@ function colOf(id){const g=INFO[id]?.group;return GROUP_COL[g]||(g?ZONE_COL:[0.7
 const VS=`#version 300 es
 precision highp float;
 in vec2 aP;
+in vec3 aUV;
 uniform vec4 uRect,uUV,uView;
+uniform float uStrip;
 out vec2 vUV,vW,vL;
-void main(){vec2 w=uRect.xy+aP*uRect.zw;vW=w;vL=aP;vUV=mix(uUV.xy,uUV.zw,aP);
+void main(){bool st=uStrip>0.5;vec2 w=st?aP:uRect.xy+aP*uRect.zw;vW=w;vL=st?aUV.yz:aP;vUV=st?aUV.xy:mix(uUV.xy,uUV.zw,aP);
   vec2 c=(w-uView.xy)/uView.zw;gl_Position=vec4(c.x*2.-1.,1.-c.y*2.,0.,1.);}`;
 const FS=`#version 300 es
 precision highp float;
@@ -58,7 +61,8 @@ uniform vec4 uRect,uView;
 uniform sampler2D uD,uN;
 uniform int uMode,uNL;
 uniform vec4 uTint,uFog,uC2;
-uniform float uHasN,uFlip,uLit;
+uniform float uHasN,uFlip,uLit,uStrip;
+uniform vec2 uDeep;
 uniform vec3 uAmb,uSunL,uSunC;
 uniform vec4 uLP[16];
 uniform vec3 uLC[16];
@@ -82,17 +86,25 @@ void main(){
     if(uHasN>0.5){n=texture(uN,vUV).rgb*2.-1.;n.y=-n.y;n.x*=uFlip;n=normalize(n);}
     col*=shade(n,vW);}
   if(uMode!=3)col*=uTint.rgb;
+  if(uStrip>0.5){float k=smoothstep(uDeep.x,uDeep.x+uDeep.y,vL.y);col*=mix(1.,0.16,k);}   // 땅속으로 갈수록 짙게 (오리처럼 깊이)
   col=mix(col,uFog.rgb,uFog.a);
   o=vec4(col,d.a*(uMode==3?1.:uTint.a));}`;
 function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);
   if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
 const prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,VS));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,FS));
-gl.bindAttribLocation(prog,0,'aP');gl.linkProgram(prog);
+gl.bindAttribLocation(prog,0,'aP');gl.bindAttribLocation(prog,1,'aUV');gl.linkProgram(prog);
 if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(prog));
 gl.useProgram(prog);
-const U={};for(const k of['uRect','uUV','uView','uD','uN','uMode','uNL','uTint','uFog','uC2','uHasN','uFlip','uLit','uAmb','uSunL','uSunC','uLP','uLC'])U[k]=gl.getUniformLocation(prog,k);
+const U={};for(const k of['uRect','uUV','uView','uD','uN','uMode','uNL','uTint','uFog','uC2','uHasN','uFlip','uLit','uAmb','uSunL','uSunC','uLP','uLC','uStrip','uDeep'])U[k]=gl.getUniformLocation(prog,k);
 const vbo=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([0,0,1,0,0,1,1,1]),gl.STATIC_DRAW);
-gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+// 휘는 띠용 버퍼: 꼭짓점마다 x, y, u, v, 깊이. 매 프레임 같은 배열을 다시 채운다
+const SB_MAX=900, sdata=new Float32Array(SB_MAX*5), sbo=gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER,sbo);gl.bufferData(gl.ARRAY_BUFFER,sdata.byteLength,gl.DYNAMIC_DRAW);
+let geo='';
+function useQuad(){if(geo==='q')return;geo='q';gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);gl.disableVertexAttribArray(1);gl.uniform1f(U.uStrip,0);}
+function useStrip(){if(geo==='s')return;geo='s';gl.bindBuffer(gl.ARRAY_BUFFER,sbo);gl.vertexAttribPointer(0,2,gl.FLOAT,false,20,0);
+  gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,3,gl.FLOAT,false,20,8);gl.uniform1f(U.uStrip,1);}
+gl.enableVertexAttribArray(0);gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
 gl.uniform1i(U.uD,0);gl.uniform1i(U.uN,1);
 gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 const blank=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,blank);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([128,128,255,255]));
@@ -107,17 +119,18 @@ function fileKey(id,v){
   return id;
 }
 function loadImg(src){return new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=no;im.src=src;});}
-function upload(im){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
+function upload(im,repeat){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
   gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);gl.generateMipmap(gl.TEXTURE_2D);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t;}
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,repeat?gl.REPEAT:gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t;}
 function want(id,v){
   const key=fileKey(id,v);if(!key||TEX.has(key))return;
+  const rep=MAN[id].kind==='layer';
   const e={ok:false,d:null,n:null,w:0,h:0};TEX.set(key,e);
   const ver=MAN[id].v?('?v='+MAN[id].v):'';
-  loadImg('img/'+key+'.d.webp'+ver).then(im=>{e.d=upload(im);e.w=im.width;e.h=im.height;e.ok=true;
-    if(MAN[id].normal!==false)loadImg('img/'+key+'.n.webp'+ver).then(n=>{e.n=upload(n);}).catch(()=>{});
+  loadImg('img/'+key+'.d.webp'+ver).then(im=>{e.d=upload(im,rep);e.w=im.width;e.h=im.height;e.ok=true;
+    if(MAN[id].normal!==false)loadImg('img/'+key+'.n.webp'+ver).then(n=>{e.n=upload(n,rep);}).catch(()=>{});
   }).catch(()=>{e.fail=true;});
 }
 function texOf(id,v){const k=fileKey(id,v);if(!k)return null;const e=TEX.get(k);return e&&e.ok?e:null;}
@@ -138,6 +151,14 @@ let Z=L.ZONES.village, deco=[], camX=0, viewW=500, scale=1, dpr=1;
 const keys=Object.create(null), touch={l:false,r:false,j:false,u:false};
 let jumpHeld=false,useHeld=false;
 
+// 땅 높이: 구역의 ground 꺾은선 (없으면 웹 게임처럼 평평한 192)
+function gy(x){const g=Z.ground;if(!g||!g.length)return G;
+  if(x<=g[0][0])return g[0][1];
+  for(let i=1;i<g.length;i++)if(x<=g[i][0]){const a=g[i-1],b=g[i];return a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0]);}
+  return g[g.length-1][1];}
+const yOn=o=>o.y!=null?o.y:gy(o.x)+(o.dy||0);   // 물건 바닥: y 가 없으면 땅 위 (dy 만큼 아래)
+const vpar=p=>(camY-CAM0)*(1-p);                 // 세로 시차: 먼 겹은 카메라가 오르내려도 덜 움직인다
+
 // 길섶 덤불과 돌: 웹 게임처럼 170마다 (늪은 갈대)
 function hash(n){n=Math.sin(n*127.1+311.7)*43758.5453;return n-Math.floor(n);}
 function makeDeco(z,zid){const out=[],seed=zid.length*17;
@@ -148,20 +169,20 @@ function makeDeco(z,zid){const out=[],seed=zid.length*17;
   return out;}
 
 function zoneIds(z){const ids=[];
-  ids.push([L.SKY[z.sky]],['bg_far_ridge',z.sky],['bg_mid_ridge',z.sky],[z.woods],[z.ground],['cm_log_platform'],['ch_hero']);
+  ids.push([L.SKY[z.sky]],['bg_far_ridge',z.sky],['bg_mid_ridge',z.sky],[z.woods],[z.groundArt],['bg_fg_foliage'],['ch_hero']);
   for(const b of z.bands||[])ids.push([b.id]);
   for(const o of z.objects)ids.push([o.id,o.v||(o.st?S.states[o.st]:null)]);
   for(const n of z.npcs||[])ids.push([n.id,n.v||(n.st?S.states[n.st]:null)]);
   for(const p of z.pickups||[])ids.push([p.item]);
   if((z.digs||[]).length)ids.push(['gt_dig']);
   for(const d of deco)ids.push([d.id,d.v]);
-  for(const k of['short','mid','long'])ids.push(['cm_log_platform',k]);
+  for(const p of z.platforms)for(const k of PF_STATES)ids.push(['pf_'+p.kind,k]);
   return ids;}
 function preload(){for(const [id,v] of zoneIds(Z))want(id,v);}
 
 function enterZone(zid,x){
   Z=L.ZONES[zid];S.zone=zid;deco=makeDeco(Z,zid);
-  hero.x=x??Z.startX;hero.y=G;hero.vy=0;hero.on=true;hero.drop=0;
+  hero.x=x??Z.startX;hero.y=gy(hero.x);hero.vy=0;hero.on=true;hero.drop=0;camY=camTarget();
   preload();
   $('zoneName').textContent='단풍골 · '+Z.name;
   for(const b of document.querySelectorAll('#zones button'))b.classList.toggle('on',b.dataset.z===zid);
@@ -180,7 +201,7 @@ function bindTex(e){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,e
 // 이름표는 그리기 끝에 겹 캔버스에 쓴다 (매 프레임 새 객체를 만들지 않게 미리 만든 칸을 돌려쓴다)
 const LBL=[];for(let i=0;i<400;i++)LBL.push({x:0,y:0,t:'',c:''});let nLbl=0;
 function label(x,y,t,c){if(nLbl>=LBL.length)return;const l=LBL[nLbl++];l.x=x;l.y=y;l.t=t;l.c=c;}
-const px=(x,p)=>(x-camX*p)*scale, py=y=>(y-TOP)*scale;
+const px=(x,p)=>(x-camX*p)*scale, py=y=>(y-camY)*scale;
 const cssCol=c=>'rgb('+(c[0]*255|0)+','+(c[1]*255|0)+','+(c[2]*255|0)+')';
 
 // 소품 하나: x는 가운데, y는 바닥. p는 시차(1이 땅과 같이 움직임)
@@ -191,7 +212,7 @@ function drawProp(id,v,x,y,s,p,flip,dark,fogAmt){
   else{const i=INFO[id]||{w:30,h:30};w=i.w;h=i.h;}
   if(e){if(m&&m.sh&&v&&m.sh[v])h=m.sh[v];w=h*e.w/e.h;}   // 그림이 있으면 갈래마다 제 비율로 (높이는 갈래별 sh 가 있으면 그것)
   w*=s;h*=s;
-  const wx=x+camX*(1-p)-w*ax, wy=y-h*ay;
+  const wx=x+camX*(1-p)-w*ax, wy=y-h*ay+vpar(p);
   if(wx>camX+viewW||wx+w<camX)return;
   const f=PRESETS[S.preset].fog,fa=fogAmt||0;
   if(e){bindTex(e);const d=dark||1;
@@ -203,7 +224,7 @@ function drawProp(id,v,x,y,s,p,flip,dark,fogAmt){
 // 가로로 이어지는 겹 (하늘 제외). 그림이 있으면 타일로 잇고, 없으면 띠 상자
 function drawLayer(id,cfg,x0,x1){
   const m=MAN[id],baked=!!(m&&m.baked),e=texOf(id,baked?Z.sky:null),p=cfg.p??1;   // baked: 빛까지 칠한 먼 겹. 구역 하늘(낮·노을) 판을 고르고 조명을 다시 입히지 않는다
-  const y=(m&&m.y!=null)?m.y:cfg.y, h=(m&&m.units)?m.units[1]:cfg.h;
+  const y=((m&&m.y!=null)?m.y:cfg.y)+vpar(p), h=(m&&m.units)?m.units[1]:cfg.h;
   const f=PRESETS[S.preset].fog,fa=cfg.fog||0;
   const L0=camX, L1=camX+viewW;
   const lo=x0<0?L0:Math.max(L0,x0+camX*(1-p)), hi=x1<0?L1:Math.min(L1,x1+camX*(1-p));
@@ -223,24 +244,68 @@ function drawSky(){
     // 화면을 덮도록 가운데 맞춰 자른다
     const ar=e.w/e.h, vr=viewW/VIEW_H;let u0=0,u1=1,v0=0,v1=1;
     if(ar>vr){const k=vr/ar;u0=(1-k)/2;u1=u0+k;}else{const k=ar/vr;v0=(1-k)/2;v1=v0+k;}
-    gl.uniform1i(U.uMode,1);rect(camX,TOP,viewW,VIEW_H,u0,v0,u1,v1);}
+    gl.uniform1i(U.uMode,1);rect(camX,camY,viewW,VIEW_H,u0,v0,u1,v1);}
   else{setCommon(4,0,0,1,[P.skyA[0],P.skyA[1],P.skyA[2],1],noFog);gl.uniform4f(U.uC2,P.skyB[0],P.skyB[1],P.skyB[2],1);
-    rect(camX,TOP,viewW,VIEW_H,0,0,1,1);if(S.labels)label(cv.clientWidth-70,22,nameOf(id),'#bcd');}
+    rect(camX,camY,viewW,VIEW_H,0,0,1,1);if(S.labels)label(cv.clientWidth-70,22,nameOf(id),'#bcd');}
 }
+// 발판: 땅에서 솟은 지형(바위 턱, 흙 둔덕, 고목 그루터기, 말뚝 위 판, 늪 디딤돌). 윗면이 p.y, 몸통은 땅 띠 밑으로 묻힌다.
+// 낮은·중간·높은 그림 가운데 땅까지 닿는 가장 낮은 것을 고르고, 모자라면 세로로 조금 늘이고 그래도 모자라면 넓힌다.
+const PF_STATES=['low','mid','high'], PF_COL={rock:[0.5,0.48,0.44],mound:[0.42,0.47,0.27],stump:[0.45,0.32,0.2],scaffold:[0.55,0.4,0.24],marsh_stone:[0.36,0.42,0.38]};
 function drawPlatform(p){
-  const k=p.w<62?'short':p.w<82?'mid':'long',e=texOf('cm_log_platform',k);
-  if(p.x>camX+viewW||p.x+p.w<camX)return;
-  if(e){bindTex(e);setCommon(0,1,e.n?1:0,1,tint,noFog);
-    const h=p.w*e.h/e.w;rect(p.x,p.y-1,p.w,Math.max(5,h),0,0,1,1);}
-  else{setCommon(3,1,0,1,[0.48,0.3,0.17,1],noFog);rect(p.x,p.y,p.w,5,0,0,1,1);
-    setCommon(3,1,0,1,[0.66,0.45,0.23,1],noFog);rect(p.x,p.y,p.w,1.2,0,0,1,1);}
+  if(p.x>camX+viewW+20||p.x+p.w<camX-20)return;
+  const id='pf_'+p.kind,m=MAN[id],need=gy(p.x+p.w/2)-p.y+10;   // 윗면에서 땅 밑 10단위까지
+  // 윗면은 살짝 위에서 본 납작한 타원이라, 걷는 선은 그림 윗변에서 폭의 surfW 만큼 아래다
+  let e=null,w=p.w*1.16,h=0;const sw=(m&&m.surfW)||0.07;
+  for(const k of PF_STATES){const t=texOf(id,k);if(!t)continue;e=t;h=w*t.h/t.w;if(h-w*sw>=need)break;}
+  if(e){let hh=h,off=w*sw,body=hh-off;
+    if(body<need){const r=Math.min(1.35,need/body);hh*=r;off*=r;body*=r;
+      if(body<need){const k=need/body;w*=k;hh*=k;off*=k;}}
+    bindTex(e);setCommon(0,1,e.n?1:0,1,tint,noFog);rect(p.x+p.w/2-w/2,p.y-off,w,hh,0,0,1,1);}
+  else{const c=PF_COL[p.kind]||[0.5,0.4,0.3];setCommon(3,1,0,1,[c[0],c[1],c[2],1],noFog);rect(p.x-2,p.y,p.w+4,need,0,0,1,1);
+    setCommon(3,1,0,1,[c[0]*1.3,c[1]*1.3,c[2]*1.2,1],noFog);rect(p.x-3,p.y-1.5,p.w+6,3,0,0,1,1);
+    if(S.labels)label(px(p.x+p.w/2,1),py(p.y)+14,nameOf(id),cssCol(c));}
+}
+// 땅 띠: 꺾은선을 따라 휘어 깐다. 그림 윗변은 걷는 선보다 lip 만큼 위, 그림 밑은 땅속으로 더 이어 화면 끝까지 짙게 채운다
+function stripPush(n,x,y,u,v,d){const i=n*5;sdata[i]=x;sdata[i+1]=y;sdata[i+2]=u;sdata[i+3]=v;sdata[i+4]=d;return n+1;}
+function drawGround(){
+  const id=Z.groundArt,cfg=L.LAYERS[id]||{},m=MAN[id],e=texOf(id,null);
+  const lip=cfg.lip??4, h=(m&&m.units)?m.units[1]:(cfg.h||60), tw=(m&&m.units)?m.units[0]:400;
+  const bottom=camY+VIEW_H+4, x0=camX-8, x1=camX+viewW+8, stepX=6;
+  const P=PRESETS[S.preset];
+  if(e)bindTex(e);
+  useStrip();gl.uniform2f(U.uDeep,cfg.deep?cfg.deep[0]:12,cfg.deep?cfg.deep[1]:48);
+  // 1) 그림이 있는 띠
+  let n=0;
+  for(let x=x0;x<=x1+stepX&&n<SB_MAX-2;x+=stepX){const g=gy(x),u=x/tw;
+    n=stripPush(n,x,g-lip,u,0,-lip);n=stripPush(n,x,g-lip+h,u,1,h-lip);}
+  if(e)setCommon(0,1,e.n?1:0,1,tint,noFog);else setCommon(3,1,0,1,[0.36,0.27,0.18,1],noFog);
+  gl.bufferSubData(gl.ARRAY_BUFFER,0,sdata,0,n*5);gl.drawArrays(gl.TRIANGLE_STRIP,0,n);
+  // 2) 그 아래 화면 끝까지: 그림 맨 아랫줄을 늘여 짙게
+  n=0;
+  for(let x=x0;x<=x1+stepX&&n<SB_MAX-2;x+=stepX){const g=gy(x),u=x/tw,yb=g-lip+h;
+    n=stripPush(n,x,yb-0.5,u,0.995,h-lip);n=stripPush(n,x,Math.max(bottom,yb+1),u,0.999,h-lip+60);}
+  gl.bufferSubData(gl.ARRAY_BUFFER,0,sdata,0,n*5);gl.drawArrays(gl.TRIANGLE_STRIP,0,n);
+  useQuad();
+  if(!e&&S.labels)label(px(camX+60,1),py(gy(camX+60))+18,nameOf(id),'#e9c');
+}
+// 앞 수풀: 화면 맨 아래, 주인공 앞. 어둡고 흐리게 (세 번 살짝 어긋나게 겹쳐 흐림을 흉내 낸다)
+function drawFg(){
+  const id='bg_fg_foliage',cfg=L.LAYERS[id]||{},m=MAN[id],e=texOf(id,null);if(!e)return;
+  const p=cfg.p??1.15,h=(m&&m.units)?m.units[1]:50,tw=(m&&m.units)?m.units[0]:h*e.w/e.h;
+  const y=camY+VIEW_H-(cfg.show??42), d=cfg.dark??0.3, P=PRESETS[S.preset];
+  bindTex(e);
+  const shift=camX*(p-1);
+  for(const [ox,a] of [[-1.3,0.45],[1.3,0.45],[0,0.7]]){
+    setCommon(0,1,e.n?1:0,1,[d,d,d,a],[P.fog[0]*0.2,P.fog[1]*0.2,P.fog[2]*0.25,0.25]);
+    const off=(((camX+shift)%tw)+tw)%tw;
+    for(let sx=camX-off+ox;sx<camX+viewW;sx+=tw)rect(sx,y,tw,h,0,0,1,1);}
 }
 const visible=o=>!o.when||S.states[o.when[0]]===o.when[1];
 function drawObjects(layer){
   for(const o of Z.objects){if((o.layer||'mid')!==layer||!visible(o))continue;
     const v=o.st?S.states[o.st]:o.v;
     if(o.id==='fr_vine_curtain'&&v==='gone'&&!texOf(o.id,v))continue;
-    drawProp(o.id,v,o.x,o.y??G,o.s||1,o.p??1,1,o.dark||0,layer==='far'?0.35:0);}
+    drawProp(o.id,v,o.x,yOn(o),o.s||1,o.p??1,1,o.dark||0,layer==='far'?0.35:0);}
 }
 function drawHero(){
   const bob=hero.on&&Math.abs(hero.vxShow)>0.1?Math.abs(Math.sin(hero.walk*0.35))*1.4:0;
@@ -260,8 +325,8 @@ const LEAF_C=[[0.8,0.41,0.22],[0.87,0.6,0.24],[0.73,0.54,0.27]];
 let leafT=0;
 function stepLeaves(){
   if(Z.sky!=='day'&&S.zone!=='hill'&&S.zone!=='marsh')return;
-  if(++leafT%12===0){const l=LEAF.find(q=>!q.on);if(l){l.on=true;l.x=camX+Math.random()*viewW*1.1;l.y=TOP+10;l.vx=-0.15-Math.random()*0.2;l.vy=0.45+Math.random()*0.25;l.a=Math.random()*6;l.c=(Math.random()*3)|0;}}
-  for(const l of LEAF)if(l.on){l.a+=0.05;l.x+=l.vx+Math.sin(l.a)*0.3;l.y+=l.vy;if(l.y>G+2||l.x<camX-20)l.on=false;}
+  if(++leafT%12===0){const l=LEAF.find(q=>!q.on);if(l){l.on=true;l.x=camX+Math.random()*viewW*1.1;l.y=camY+10;l.vx=-0.15-Math.random()*0.2;l.vy=0.45+Math.random()*0.25;l.a=Math.random()*6;l.c=(Math.random()*3)|0;}}
+  for(const l of LEAF)if(l.on){l.a+=0.05;l.x+=l.vx+Math.sin(l.a)*0.3;l.y+=l.vy;if(l.y>gy(l.x)+2||l.x<camX-20)l.on=false;}
 }
 function drawLeaves(){for(const l of LEAF)if(l.on){const c=LEAF_C[l.c];setCommon(3,1,0,1,[c[0],c[1],c[2],1],noFog);rect(l.x,l.y,2.2,1.6+Math.abs(Math.sin(l.a))*0.8,0,0,1,1);}}
 
@@ -269,7 +334,7 @@ function setLights(){
   const P=PRESETS[S.preset];
   gl.uniform3f(U.uAmb,P.amb[0],P.amb[1],P.amb[2]);gl.uniform3f(U.uSunL,P.sun[0],P.sun[1],P.sun[2]);gl.uniform3f(U.uSunC,P.sunC[0],P.sunC[1],P.sunC[2]);
   let n=0;for(const l of Z.lights||[]){if(n>=16)break;if(l.when&&S.states[l.when[0]]!==l.when[1])continue;
-    LP[n*4]=l.x;LP[n*4+1]=l.y;LP[n*4+2]=l.r;LP[n*4+3]=14;
+    LP[n*4]=l.x;LP[n*4+1]=l.y+gy(l.x)-G;LP[n*4+2]=l.r;LP[n*4+3]=14;
     const k=l.i*P.pt;LC[n*3]=l.c[0]*k;LC[n*3+1]=l.c[1]*k;LC[n*3+2]=l.c[2]*k;n++;}
   gl.uniform1i(U.uNL,n);gl.uniform4fv(U.uLP,LP);gl.uniform3fv(U.uLC,LC);
 }
@@ -280,7 +345,10 @@ function drawOverlay(){
   c.strokeStyle='#5ff';c.setLineDash([6,4]);c.beginPath();c.moveTo(0,py(G));c.lineTo(ov.clientWidth,py(G));c.stroke();c.setLineDash([]);
   c.fillStyle='#5ff';c.fillText('땅 y=192',60,py(G)-4);
   c.strokeStyle='#4ff';c.fillStyle='rgba(80,255,255,.12)';
-  for(const p of Z.platforms){const x=px(p.x,1),w=p.w*scale;c.fillRect(x,py(p.y),w,5*scale);c.strokeRect(x,py(p.y),w,5*scale);}
+  for(const p of (Z.web&&Z.web.platforms)||[]){const x=px(p.x,1),w=p.w*scale;c.fillRect(x,py(p.y),w,5*scale);c.strokeRect(x,py(p.y),w,5*scale);}
+  c.strokeStyle='#ffd34d';c.setLineDash([2,3]);c.beginPath();
+  for(let x=Math.floor(camX);x<=camX+viewW;x+=8){const X=px(x,1),Y=py(gy(x));x===Math.floor(camX)?c.moveTo(X,Y):c.lineTo(X,Y);}
+  c.stroke();c.setLineDash([]);
   const mark=(x,y,txt,col,shape)=>{const X=px(x,1),Y=py(y);c.fillStyle=col;c.strokeStyle=col;
     if(shape==='dot'){c.beginPath();c.arc(X,Y-3,3.5,0,7);c.fill();}
     else if(shape==='tri'){c.beginPath();c.moveTo(X-5,Y);c.lineTo(X+5,Y);c.lineTo(X,Y-8);c.fill();}
@@ -304,23 +372,26 @@ function render(){
   if(cv.width!==Math.round(cw*dpr)||cv.height!==Math.round(ch*dpr)){cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);ov.width=cv.width;ov.height=cv.height;}
   viewW=VIEW_H*cw/ch;scale=ch/VIEW_H;
   camX=Z.w<=viewW?(Z.w-viewW)/2:Math.max(0,Math.min(Z.w-viewW,hero.x-viewW*0.42));
+  camY+=(camTarget()-camY)*0.08;
   gl.viewport(0,0,cv.width,cv.height);gl.clearColor(0.05,0.05,0.07,1);gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.uniform4f(U.uView,camX,TOP,viewW,VIEW_H);nLbl=0;setLights();
+  gl.uniform4f(U.uView,camX,camY,viewW,VIEW_H);nLbl=0;setLights();
   drawSky();
   for(const id of['bg_far_ridge','bg_mid_ridge'])drawLayer(id,L.LAYERS[id],-1,-1);
   drawObjects('far');
   drawLayer(Z.woods,L.LAYERS[Z.woods],-1,-1);
-  drawLayer(Z.ground,L.LAYERS[Z.ground],-1,-1);
-  for(const b of Z.bands||[])drawLayer(b.id,{y:b.y,h:b.h,p:b.p??1,fog:0},b.x0,b.x1);
+  for(const b of Z.bands||[])if(b.behind)drawLayer(b.id,{y:b.y,h:b.h,p:b.p??1,fog:0},b.x0,b.x1);
   drawObjects('back');
   for(const p of Z.platforms)drawPlatform(p);
-  for(const d of deco)drawProp(d.id,d.v,d.x,G,1,1,1,0,0);
+  drawGround();
+  for(const b of Z.bands||[])if(!b.behind)drawLayer(b.id,{y:b.y,h:b.h,p:b.p??1,fog:0},b.x0,b.x1);
+  for(const d of deco)drawProp(d.id,d.v,d.x,gy(d.x)+1,1,1,1,0,0);
   drawObjects('mid');
-  for(const p of Z.pickups||[])drawProp(p.item,null,p.x,p.y??G,1,1,1,0,0);
-  for(const d of Z.digs||[])drawProp('gt_dig',null,d.x,G+1,1,1,1,0,0);
-  for(const n of Z.npcs||[])drawProp(n.id,n.v||(n.st?S.states[n.st]:null),n.x,G,n.s||1,1,hero.x<n.x?-1:1,0,0);
+  for(const p of Z.pickups||[])drawProp(p.item,null,p.x,yOn(p),1,1,1,0,0);
+  for(const d of Z.digs||[])drawProp('gt_dig',null,d.x,gy(d.x)+1,1,1,1,0,0);
+  for(const n of Z.npcs||[])drawProp(n.id,n.v||(n.st?S.states[n.st]:null),n.x,yOn(n),n.s||1,1,hero.x<n.x?-1:1,0,0);
   drawHero();
   drawObjects('front');
+  drawFg();
   drawLeaves();
   // 겹 캔버스
   oc.setTransform(dpr,0,0,dpr,0,0);oc.clearRect(0,0,cw,ch);
@@ -328,6 +399,9 @@ function render(){
   if(nLbl){oc.font='11px sans-serif';oc.textAlign='center';
     for(let i=0;i<nLbl;i++){const l=LBL[i];const w=oc.measureText(l.t).width+6;oc.fillStyle='#000a';oc.fillRect(l.x-w/2,l.y-11,w,14);oc.fillStyle=l.c;oc.fillText(l.t,l.x,l.y);}}
 }
+
+// 세로 카메라: 주인공 발밑 땅이 화면 아래 5분의 1쯤에 오게. 높은 발판에 오르면 그만큼 따라 오른다
+function camTarget(){const g=gy(hero.x);return Math.min(g-226,hero.y-200);}
 
 // ---------- 움직임 ----------
 const down=k=>!!keys[k];
@@ -345,13 +419,14 @@ function step(){
   if(jump&&!jumpHeld&&hero.on){hero.vy=MOVE.jump;hero.on=false;}
   jumpHeld=jump;
   if(use&&!useHeld){const d=nearDoor();if(d)useDoor(d);
-    else if(hero.on&&hero.y<G-0.5){hero.drop=12;hero.on=false;hero.y+=1;}}
+    else if(hero.on&&hero.y<gy(hero.x)-0.5){hero.drop=12;hero.on=false;hero.y+=1;}}
   useHeld=use;
-  const py0=hero.y;hero.vy=Math.min(hero.vy+MOVE.grav,MOVE.fall);hero.y+=hero.vy;hero.on=false;
+  const wasOn=hero.on, py0=hero.y;hero.vy=Math.min(hero.vy+MOVE.grav,MOVE.fall);hero.y+=hero.vy;hero.on=false;
   if(hero.drop>0)hero.drop--;
   if(hero.vy>=0&&hero.drop<=0)for(const p of Z.platforms){
     if(hero.x>=p.x-2&&hero.x<=p.x+p.w+2&&py0<=p.y+0.01&&hero.y>=p.y){hero.y=p.y;hero.vy=0;hero.on=true;break;}}
-  if(hero.y>=G){hero.y=G;hero.vy=0;hero.on=true;}
+  const g=gy(hero.x);
+  if(hero.y>=g||(wasOn&&hero.vy>=0&&!hero.on&&hero.drop<=0&&py0>=g-6&&hero.y>=g-6)){hero.y=g;hero.vy=0;hero.on=true;}
   // 구역 끝: 출구가 있으면 다음 구역으로
   if(hero.x<0){if(Z.exits.left){const e=Z.exits.left;enterZone(e.to,e.toX);toast(L.ZONES[e.to].name);return;}hero.x=0;}
   if(hero.x>Z.w){if(Z.exits.right){const e=Z.exits.right;enterZone(e.to,e.toX);toast(L.ZONES[e.to].name);return;}hero.x=Z.w;}
