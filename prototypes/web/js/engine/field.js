@@ -204,7 +204,7 @@ function step(){
   for(const s of zoneObjects('stamps'))if(s.auto&&pointNear(s))findStamp(s);
   for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.vy+=0.15;if(--s.t<=0)sparks.splice(i,1);}
   if(shakeT>0)shakeT--;
-  const target=G.px-W*0.42;G.cam+=(target-G.cam)*0.12;G.cam=clamp(G.cam,0,Math.max(0,fieldWidth()-W));
+  const target=G.px-W*0.42+(fieldCall('camLead')||0);G.cam+=(target-G.cam)*0.12;   // camLead: 구역이 화면을 앞서 보여 줄 때 (결정 D-547)G.cam=clamp(G.cam,0,Math.max(0,fieldWidth()-W));
 }
 
 /* 결정 D-188: 발판 가장자리를 붙잡고 미끄러지는 시간은 내려갈 높이에 맞춘다(사용자 피드백 38).

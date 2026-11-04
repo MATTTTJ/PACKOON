@@ -3,7 +3,7 @@
 (()=>{
 /* ---------- 엉킨 칡 ----------
    결정 D-157: 엉킨 칡은 당산나무 줄기를 감아 오른 뱀 같은 덩굴이다 (사용자 피드백 13, 2026-11-01).
-   몸통 덩굴이 줄기를 두 바퀴 반 감고, 위로 쳐든 머리(두 눈) 정수리에 칡꽃송이가 선다. 부위는 셋:
+   몸통 덩굴이 줄기를 두 바퀴 반 감고 머리를 쳐든다. 칡꽃송이는 결정 D-542 로 머리가 아니라 앞쪽 몸 마디에 핀다. 부위는 셋:
    칡줄기(털 난 덩굴과 세 갈래 잎. 꼬리 쪽 줄기로 채찍질), 칡뿌리(밑동의 굵은 덩이뿌리. 위에서 내리찍기), 칡꽃(핵심. 달큰한 향).
    칡꽃과 그 향만 연보라 담채로 칠한다. 먹·붉은색 원칙(D-102)에 불처럼 둔 예외다. */
 const KPUR='#7d5096',KPUR_LT='#b791cc',KPUR_DK='#4c2b5e',KSTEM='#23221a',KLEAF='#2e3527',KROOT='#8a6a4a';
@@ -41,93 +41,186 @@ function kFlower(c,x,y,len,lean,petal,alpha=1){
     }else blob(c,px+s*z*0.3,py,z*0.36,z*0.58,KPUR_DK,alpha);              // 봉오리
   }
 }
-/* 덩이뿌리: 머리(-x)가 굵고 꼬리(+x)로 가늘어지는 길쭉한 뿌리. 울퉁불퉁한 겉, 세로 결, 꼬리 끝의 실뿌리 */
+/* 결정 D-541: 칡뿌리는 오래 묵어 흙투성이다 (사용자 피드백 2026-11-04 단풍골 12). 겉껍질이 갈라지고 벗겨졌으며,
+   아래쪽은 젖은 흙이 덩어리째 들러붙어 있고 실뿌리에도 흙이 매달려 있다. */
+const KROOT_OLD='#76593f',KSOIL='#4b3a2a',KSOIL_LT='#6e5640';
+function kSoil(c,x,y,r,alpha=1,seed=0){   // 들러붙은 흙덩이 하나: 짙은 덩이에 옅은 알갱이 두엇
+  blob(c,x,y,r,r*0.75,KSOIL,0.92*alpha);blob(c,x-r*0.3,y-r*0.25,r*0.35,r*0.28,KSOIL_LT,0.8*alpha);
+  if(hash(seed+x*0.13)>0.5)blob(c,x+r*0.5,y+r*0.35,r*0.22,r*0.2,'#2f241a',0.8*alpha);
+}
+/* 덩이뿌리: 머리(-x)가 굵고 꼬리(+x)로 가늘어지는 길쭉한 뿌리. 갈라진 겉, 벗겨진 껍질, 아래쪽에 들러붙은 흙, 흙 매단 실뿌리 */
 function kTuber(c,x,y,len,wid,rot,fill,line,alpha=1){
   c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=alpha;
   const n=14,top=[],bot=[];
-  for(let i=0;i<=n;i++){const s=i/n,px=-len/2+s*len,w=wid*Math.pow(Math.sin(Math.PI*Math.min(1,s*0.85+0.08)),0.7)*(1.05-0.75*s)*(1+(hash(i*1.7+len)-0.5)*0.22);
+  for(let i=0;i<=n;i++){const s=i/n,px=-len/2+s*len,w=wid*Math.pow(Math.sin(Math.PI*Math.min(1,s*0.85+0.08)),0.7)*(1.05-0.75*s)*(1+(hash(i*1.7+len)-0.5)*0.3);
     top.push([px,-w]);bot.push([px,w*(0.85+hash(i*2.9+wid)*0.2)]);}
-  c.fillStyle=fill;c.beginPath();c.moveTo(top[0][0],top[0][1]);for(const p of top)c.lineTo(p[0],p[1]);
-  for(let i=bot.length-1;i>=0;i--)c.lineTo(bot[i][0],bot[i][1]);c.closePath();c.fill();
+  const shape=()=>{c.beginPath();c.moveTo(top[0][0],top[0][1]);for(const p of top)c.lineTo(p[0],p[1]);for(let i=bot.length-1;i>=0;i--)c.lineTo(bot[i][0],bot[i][1]);c.closePath();};
+  const g=c.createLinearGradient(0,-wid,0,wid);g.addColorStop(0,fill===KROOT?KROOT_OLD:fill);g.addColorStop(0.55,fill===KROOT?'#6a4f37':fill);g.addColorStop(1,KSOIL);
+  c.fillStyle=g;shape();c.fill();
   c.strokeStyle=line;c.lineWidth=1.8;c.lineJoin='round';c.stroke();
-  c.strokeStyle='rgba(29,24,20,.35)';c.lineWidth=1;c.beginPath();
+  // 갈라진 겉: 가로로 터진 금과 세로 결
+  c.strokeStyle='rgba(29,24,20,.5)';c.lineWidth=1;c.beginPath();
   for(let k=-1;k<=1;k++){c.moveTo(-len*0.38,k*wid*0.35);c.quadraticCurveTo(0,k*wid*0.42+1,len*0.3,k*wid*0.18);}
+  for(let i=0;i<5;i++){const px=-len*0.36+i*len*0.16,h=wid*(0.5-i*0.06);c.moveTo(px,-h);c.lineTo(px+2,-h*0.2);c.lineTo(px-1,h*0.3);}
   c.stroke();
-  // 꼬리 끝에서 이어지는 가는 뿌리와 실뿌리 두어 가닥
+  // 벗겨진 껍질 조각
+  for(let i=0;i<3;i++){const px=-len*0.3+i*len*0.22,py=-wid*0.35+hash(i+len)*wid*0.3;
+    c.fillStyle='rgba(176,148,110,.55)';c.beginPath();c.moveTo(px,py);c.lineTo(px+5,py-1.5);c.lineTo(px+4,py+2.5);c.closePath();c.fill();}
+  // 아래쪽에 들러붙은 흙덩이
+  for(let i=0;i<6;i++){const s=0.08+i*0.15,b=bot[Math.round(s*n)];kSoil(c,b[0],b[1]-1,2.2+hash(i*3.7+len)*2.2,1,i);}
+  // 꼬리 끝에서 이어지는 가는 뿌리와 흙 매단 실뿌리
   brush(c,[[len/2-2,0],[len/2+10,3],[len/2+20,-1]],1.6,line,0.8);
   c.strokeStyle=line;c.globalAlpha=alpha*0.6;c.lineWidth=0.9;c.beginPath();
-  c.moveTo(len*0.32,wid*0.3);c.quadraticCurveTo(len*0.38,wid+4,len*0.46,wid+8);c.moveTo(len*0.1,-wid*0.6);c.quadraticCurveTo(len*0.14,-wid-3,len*0.2,-wid-6);c.stroke();
+  c.moveTo(len*0.32,wid*0.3);c.quadraticCurveTo(len*0.38,wid+4,len*0.46,wid+8);c.moveTo(len*0.1,-wid*0.6);c.quadraticCurveTo(len*0.14,-wid-3,len*0.2,-wid-6);
+  c.moveTo(-len*0.2,wid*0.8);c.quadraticCurveTo(-len*0.24,wid+5,-len*0.18,wid+9);c.moveTo(len*0.05,wid*0.7);c.lineTo(len*0.07,wid+6);c.stroke();
+  c.globalAlpha=alpha;kSoil(c,len*0.46,wid+8,1.6,1,7);kSoil(c,-len*0.18,wid+9,1.8,1,8);
   c.restore();
 }
-/* 머리: 납작한 뱀 머리 같은 덩굴 끝. 두 눈은 손을 본다. 가끔 덩굴손 혀를 날름 */
-function kHead(c,hx,hy,col,closed){
-  c.save();c.translate(hx,hy);c.rotate(0.38);
-  c.fillStyle=col;c.beginPath();c.ellipse(0,0,21,13,0,0,Math.PI*2);c.fill();
-  c.strokeStyle='rgba(239,227,200,.22)';c.lineWidth=1;for(const d of [-8,0,8]){c.beginPath();c.moveTo(d-4,-10);c.quadraticCurveTo(d+3,0,d-2,10);c.stroke();}
+/* ---------- 칡빛 독사의 몸 ----------
+   결정 D-540: 엉킨 칡은 칡 빛깔의 독사다 (사용자 피드백 2026-11-04 단풍골 12). 칡줄기의 올리브 갈색 몸에 짙은 마름모 무늬,
+   옅은 배비늘 줄, 칡의 잔털. 굵은 몸은 원을 이어 그려 마디 없이 둥글게 보인다. */
+const KBODY='#5b5833',KBODY_DK='#2a2818',KBELLY='#a39769',KHAIR='#7f6b45',KEYE='#c4a548';
+/* 꺾은선을 같은 간격의 점(x, y, 방향)으로 */
+function kPath(pts,step){
+  const out=[];let carry=0;
+  for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i],len=Math.hypot(x1-x0,y1-y0)||1,ux=(x1-x0)/len,uy=(y1-y0)/len;let d=carry;
+    for(;d<len;d+=step)out.push([x0+ux*d,y0+uy*d,ux,uy]);carry=d-len;}
+  return out;
+}
+/* 몸 한 토막. w0 에서 w1 로 가늘어진다. col 은 몸빛(시들면 흐린 빛) */
+function kSnake(c,pts,w0,w1=w0,alpha=1,col=KBODY){
+  const S=kPath(pts,2.5),n=S.length;if(!n)return;
+  const R=i=>(w0+(w1-w0)*i/Math.max(1,n-1))/2;
+  c.save();c.globalAlpha=alpha;
+  c.fillStyle=INK;for(let i=0;i<n;i++){c.beginPath();c.arc(S[i][0],S[i][1],R(i)+1.6,0,Math.PI*2);c.fill();}
+  c.fillStyle=col;for(let i=0;i<n;i++){c.beginPath();c.arc(S[i][0],S[i][1],R(i),0,Math.PI*2);c.fill();}
+  c.fillStyle=KBELLY;c.globalAlpha=alpha*0.45;   // 아래쪽 배비늘 줄
+  for(let i=0;i<n;i++){const [x,y,tx,ty]=S[i],s=tx>=0?1:-1,r=R(i);c.beginPath();c.arc(x-ty*s*r*0.5,y+tx*s*r*0.5,r*0.36,0,Math.PI*2);c.fill();}
+  c.fillStyle=KBODY_DK;c.globalAlpha=alpha*0.92;   // 등의 마름모 무늬
+  for(let i=3;i<n-2;i+=6){const [x,y,tx,ty]=S[i],r=R(i);c.save();c.translate(x,y);c.rotate(Math.atan2(ty,tx));
+    c.beginPath();c.moveTo(-r*0.95,-r*0.1);c.lineTo(0,-r*0.8);c.lineTo(r*0.95,-r*0.1);c.lineTo(0,r*0.45);c.closePath();c.fill();c.restore();}
+  c.strokeStyle=KHAIR;c.globalAlpha=alpha*0.6;c.lineWidth=1;c.lineCap='round';c.beginPath();   // 칡의 잔털
+  for(let i=0;i<n;i+=2){const [x,y,tx,ty]=S[i],s=(i>>1)%2?1:-1,r=R(i)+1;c.moveTo(x-ty*s*r,y+tx*s*r);c.lineTo(x-ty*s*(r+3)+tx*2,y+tx*s*(r+3)+ty*2);}
+  c.stroke();c.restore();
+}
+/* 독사 머리: 뒤가 넓은 세모꼴. 눈두덩이 눈을 내리눌러 노려보고, 동공은 세로로 가늘다. 오래된 흉터 두 줄.
+   rot 은 주둥이가 향하는 쪽(아래가 0). open 이면 입을 벌려 송곳니를 보인다. closed 면 눈을 감는다 */
+function kViper(c,hx,hy,rot,col,closed,open){
+  c.save();c.translate(hx,hy);c.rotate(rot);
+  const head=()=>{c.beginPath();c.moveTo(0,-15);c.quadraticCurveTo(18,-16,20,-3);c.quadraticCurveTo(19,10,8,21);c.quadraticCurveTo(0,27,-8,21);c.quadraticCurveTo(-19,10,-20,-3);c.quadraticCurveTo(-18,-16,0,-15);c.closePath();};
+  if(open){c.fillStyle='#3a1f1c';c.beginPath();c.moveTo(-7,19);c.quadraticCurveTo(0,33,7,19);c.closePath();c.fill();   // 벌린 입 속
+    for(const s of [-1,1]){c.fillStyle='#efe3c8';c.beginPath();c.moveTo(s*5,20);c.lineTo(s*3.2,30);c.lineTo(s*2.4,20.5);c.closePath();c.fill();}}
+  c.fillStyle=INK;c.save();c.scale(1.08,1.07);head();c.fill();c.restore();
+  c.fillStyle=col;head();c.fill();
+  blob(c,0,-3,11,8,KBODY_DK,0.55);   // 정수리의 짙은 큰 비늘
+  for(const s of [-1,1]){
+    brush(c,[[s*8,4],[s*14,-1],[s*19,-7]],3.2,KBODY_DK,0.85);   // 눈 뒤로 이어지는 짙은 띠
+    blob(c,s*5.5,14,1.6,1.3,INK,0.85);blob(c,s*2.8,20.5,1.1,0.9,INK,0.9);   // 열 구멍과 콧구멍
+    brush(c,[[s*7,21],[s*13,13],[s*18,4]],1,INK,0.6);   // 입선
+  }
+  brush(c,[[-13,-12],[-4,-2],[1,3]],1.5,'#cbbf98',0.75);brush(c,[[6,-13],[10,-6]],1.3,'#cbbf98',0.6);   // 오래된 흉터
+  if(closed){for(const s of [-1,1])brush(c,[[s*13,4],[s*5,6]],2.2,'#efe3c8');}
+  else{const [ex,ey]=lookAt(hx,hy),ca=Math.cos(-rot),sa=Math.sin(-rot),lx=(ex*ca-ey*sa)*0.4,ly=(ex*sa+ey*ca)*0.4;
+    for(const s of [-1,1]){blob(c,s*9,4,4.4,3.6,KEYE);blob(c,s*9,4,4.4,3.6,'#7a5a20',0.18);blob(c,s*9+lx,4+ly,0.9,3.1,INK);}}
+  for(const s of [-1,1])brush(c,[[s*16,-1],[s*10,1.5],[s*3.5,5]],3.4,INK);   // 내리누른 눈두덩
   c.restore();
-  if(closed){brush(c,[[hx-13,hy-5],[hx-5,hy-3]],2.5,'#efe3c8');brush(c,[[hx+3,hy-1],[hx+11,hy+2]],2.5,'#efe3c8');return;}
-  const [ex,ey]=lookAt(hx,hy);
-  for(const [dx,dy] of [[-9,-5],[7,0]]){blob(c,hx+dx,hy+dy,5.5,4.5,'#efe3c8');blob(c,hx+dx+ex*0.7,hy+dy+ey*0.7,2.4,3.2,INK);}
-  brush(c,[[hx-15,hy-11],[hx-4,hy-9]],2.5,INK);brush(c,[[hx+2,hy-6],[hx+12,hy-3]],2.5,INK);
-  if(!Vfx.reducedMotion&&Math.floor(B.time/40)%4===0){const sx=hx+16,sy=hy+12;
-    brush(c,[[sx,sy],[sx+4,sy+8],[sx+3,sy+14]],1.4,KSTEM);brush(c,[[sx+3,sy+14],[sx-2,sy+18],[sx-1,sy+21]],1,KSTEM);brush(c,[[sx+3,sy+14],[sx+8,sy+18],[sx+6,sy+21]],1,KSTEM);}
+}
+/* 당산나무 앞 줄기: 늙고 굵은 느티나무. 밑동이 퍼져 땅을 움켜쥐고, 깊게 팬 껍질과 옹이, 이끼. 위는 화면 밖으로 이어진다 */
+function kTrunk(c,cx,cy,TW){
+  const top=cy-180,base=cy+101;
+  c.save();
+  const g=c.createLinearGradient(cx-TW,0,cx+TW,0);g.addColorStop(0,'#3a2e25');g.addColorStop(0.4,'#64503f');g.addColorStop(0.75,'#7a6550');g.addColorStop(1,'#43362b');
+  c.fillStyle=g;c.globalAlpha=0.96;c.beginPath();
+  c.moveTo(cx-TW-42,base+2);c.quadraticCurveTo(cx-TW-8,base-4,cx-TW-3,base-50);c.lineTo(cx-TW+5,top);c.lineTo(cx+TW-5,top);
+  c.lineTo(cx+TW+3,base-50);c.quadraticCurveTo(cx+TW+8,base-4,cx+TW+44,base+2);c.closePath();c.fill();c.restore();
+  brush(c,[[cx-TW-42,base+2],[cx-TW-8,base-6],[cx-TW-3,base-50],[cx-TW+5,top]],3.6,INK,0.85);
+  brush(c,[[cx+TW+44,base+2],[cx+TW+8,base-6],[cx+TW+3,base-50],[cx+TW-5,top]],3.6,INK,0.85);
+  // 땅을 움켜쥔 굵은 뿌리 둘
+  brush(c,[[cx-TW*0.4,base-18],[cx-TW*0.7,base-6],[cx-TW-24,base+2]],7,'#4d3d30',0.8);brush(c,[[cx+TW*0.3,base-16],[cx+TW*0.75,base-4],[cx+TW+26,base+3]],7,'#4d3d30',0.8);
+  // 깊게 팬 껍질 골
+  for(let i=0;i<9;i++){const x=cx-TW*0.82+i*TW*0.205,w=hash(i*3.1)*6-3;
+    brush(c,[[x+w,base-8],[x-w*0.6+hash(i)*4,cy+20],[x+w,cy-60],[x-w+2,top]],1.6+hash(i*7.7)*1.4,INK,0.3);}
+  for(let i=0;i<14;i++){const x=cx-TW*0.8+hash(i*5.3)*TW*1.6,y=top+30+hash(i*2.2)*(base-top-60);brush(c,[[x,y],[x+5,y+1.5]],1.1,INK,0.28);}   // 껍질 비늘 틈
+  // 옹이와 이끼
+  {const ox=cx-TW*0.42,oy=cy+64;blob(c,ox,oy,9,12,'#3a2e25',0.85);c.save();c.strokeStyle=INK;c.globalAlpha=0.5;c.lineWidth=1.2;for(const r of [5,8,11]){c.beginPath();c.ellipse(ox,oy,r*0.75,r,0,0,Math.PI*2);c.stroke();}c.restore();}
+  for(let i=0;i<7;i++)blob(c,cx-TW-10+hash(i*1.9)*(2*TW+20),base-4-hash(i*4.4)*30,6+hash(i)*5,3,'#68704a',0.32);
+}
+/* 금줄: 줄기를 가로지른 왼새끼와 지그재그로 접은 한지 술. 몸에 짓눌린 술은 찢겨 늘어졌다 */
+function kRope(c,cx,y,TW){
+  const L=cx-TW-2,Rr=cx+TW+2,P=t=>[L+(Rr-L)*t,y+Math.sin(t*Math.PI)*9];
+  const pts=Array.from({length:9},(_,i)=>P(i/8));
+  brush(c,pts,5.5,'#8a7454',0.95);
+  c.save();c.strokeStyle='#4f4030';c.globalAlpha=0.8;c.lineWidth=1.2;c.beginPath();
+  for(let i=1;i<24;i++){const [x,yy]=P(i/24);c.moveTo(x-2,yy-2.5);c.lineTo(x+2,yy+2.5);}c.stroke();c.restore();   // 꼬인 결
+  for(let i=0;i<6;i++){const t=0.1+i*0.16,[x,yy]=P(t),torn=i===2||i===4,len=torn?7:15,lean=torn?0.35:0;
+    c.save();c.translate(x,yy+2);c.rotate(lean);
+    const z=[[0,0],[3.5,len*0.33],[-1,len*0.66],[2.5,len]];
+    c.strokeStyle=INK;c.globalAlpha=0.55;c.lineWidth=4.6;c.lineJoin='miter';c.beginPath();z.forEach((p,k)=>k?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+    c.strokeStyle='#f3eee0';c.globalAlpha=0.95;c.lineWidth=3;c.beginPath();z.forEach((p,k)=>k?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();c.restore();}
 }
 function drawKudzu(c){
   const cx=LW/2,cy=EY,arm=part('arm'),root=part('root'),core=part('core');
   const still=Vfx.reducedMotion,t=B.time,sway=still?0:Math.sin(t*0.03)*6;
   const acting=id=>B.cur&&B.cur.id===id&&(B.st==='tell'||B.st==='atk');
   const end=B.st==='end'&&B.result!=='lose';
+  const TW=56,CR=TW+10;   // 줄기 반폭, 감은 몸이 도는 반지름
   // 땅과 그늘
-  blob(c,cx,cy+104,200,15,INK,0.1);brush(c,[[cx-220,cy+102],[cx,cy+98],[cx+220,cy+103]],3,INK,0.35);
-  // 당산나무 줄기: 칡이 감은 몸
-  const TW=27;
-  c.save();c.fillStyle='rgba(91,70,52,.5)';c.beginPath();c.moveTo(cx-TW-7,cy+100);c.lineTo(cx-TW,cy-132);c.lineTo(cx+TW,cy-132);c.lineTo(cx+TW+7,cy+100);c.closePath();c.fill();c.restore();
-  brush(c,[[cx-TW-7,cy+100],[cx-TW-2,cy-20],[cx-TW,cy-132]],3,INK,0.5);brush(c,[[cx+TW+7,cy+100],[cx+TW+2,cy-20],[cx+TW,cy-132]],3,INK,0.5);
-  for(let i=0;i<4;i++)brush(c,[[cx-15+i*10,cy+92],[cx-13+i*10+hash(i*2.1)*4,cy-20],[cx-15+i*10,cy-126]],1.2,INK,0.22);
-  // 감아 오른 몸통 덩굴: 줄기 뒤로 도는 마디는 옅게 먼저, 앞으로 도는 마디는 나중에
+  blob(c,cx,cy+104,250,16,INK,0.12);brush(c,[[cx-260,cy+102],[cx,cy+98],[cx+260,cy+103]],3,INK,0.35);
+  // 밑동의 돌무더기(서낭 돌탑)와 정화수를 올린 제단 돌
+  {const sx=cx-TW-150,sy=cy+100;for(const [dx,dy,rx,ry] of [[0,0,16,7],[2,-11,12,6],[-1,-20,9,5],[1,-27,6,4]]){blob(c,sx+dx,sy+dy,rx,ry,'#8d8678',0.85);c.save();c.strokeStyle=INK;c.globalAlpha=0.6;c.lineWidth=1.3;c.beginPath();c.ellipse(sx+dx,sy+dy,rx,ry,0,0,Math.PI*2);c.stroke();c.restore();}}
+  {const ax=cx+TW+96,ay=cy+98;c.save();c.fillStyle='#9a9384';c.globalAlpha=0.9;c.beginPath();c.moveTo(ax-34,ay+4);c.lineTo(ax-30,ay-8);c.lineTo(ax+32,ay-10);c.lineTo(ax+36,ay+4);c.closePath();c.fill();c.restore();
+    brush(c,[[ax-34,ay+4],[ax-30,ay-8],[ax+32,ay-10],[ax+36,ay+4]],2,INK,0.7);blob(c,ax+6,ay-13,7,3.5,'#efe8d8',0.95);brush(c,[[ax-1,ay-13],[ax+6,ay-17],[ax+13,ay-13]],1.2,INK,0.6);}
+  // 감은 몸: 줄기 뒤로 도는 마디는 줄기보다 먼저(줄기에 가린다), 앞으로 도는 마디는 나중에
   const aO=shk(arm),wob=still?0:Math.sin(t*0.02)*0.08,H=[];
-  for(let i=0;i<=60;i++){const s=i/60,a=s*Math.PI*4+0.4+wob;H.push([cx+aO+Math.sin(a)*(TW+12),cy+84-s*140,Math.cos(a)]);}
+  for(let i=0;i<=60;i++){const s=i/60,a=s*Math.PI*4+0.4+wob;H.push([cx+aO+Math.sin(a)*CR,cy+84-s*150,Math.cos(a)]);}
   const runs=front=>{const out=[];let cur=null;
     for(let i=1;i<H.length;i++){const f=(H[i-1][2]+H[i][2])>0;if(f===front){if(!cur){cur=[[H[i-1][0],H[i-1][1]]];out.push(cur);}cur.push([H[i][0],H[i][1]]);}else cur=null;}
     return out.filter(r=>r.length>1);};
-  const body=end?'rgba(35,34,26,.55)':KSTEM;
-  for(const r of runs(false))kStem(c,r,9,body,0.42);
-  for(const i of [6,19,31,45])if(H[i][2]<=0)kLeaf(c,H[i][0],H[i][1],0.8,i%2?-0.8:0.9,KLEAF,0.35);
+  const body=end?'#4b4834':KBODY;
+  for(const r of runs(false))kSnake(c,r,16,16,0.95,end?'#3f3d2c':'#47452a');
+  kTrunk(c,cx,cy,TW);
+  kRope(c,cx,cy+50,TW);
   // 칡뿌리: 밑동에 드러난 굵은 덩이뿌리. 가운데 것이 쳐들려 내리찍는다
-  {const o=shk(root),col=partCol(root),dim=root.broken?0.35:1,line=col===INK?INK:col;
-    // 밑동에서 뻗은 뿌리줄과 땅 위로 드러난 덩이뿌리 둘
-    brush(c,[[cx-26+o,cy+94],[cx-58+o,cy+99],[cx-80+o,cy+97]],5,KROOT,0.85*dim);brush(c,[[cx+26+o,cy+94],[cx+44+o,cy+98]],5,KROOT,0.85*dim);
-    kTuber(c,cx-102+o,cy+97,44,11,Math.PI+0.06,KROOT,INK,0.85*dim);kTuber(c,cx+66+o,cy+98,40,10,-0.05,KROOT,INK,0.85*dim);
-    if(acting('root')&&B.st==='tell'){brush(c,[[cx-26+o,cy+92],[cx-86+o,cy+66],[cx-118+o,cy+16]],13,KROOT,0.95);kTuber(c,cx-122+o,cy-12,62,18,Math.PI/2+0.12,KROOT,line,1);}
-    else if(acting('root'))brush(c,[[cx-26+o,cy+92],[cx-56+o,cy+122],[cx-66+o,cy+152]],13,KROOT,0.9);
+  {const o=shk(root),col=partCol(root),dim=root.broken?0.35:1,line=col===INK?INK:col,L=cx-TW-24,Rx=cx+TW+24;
+    brush(c,[[L+o,cy+96],[L-32+o,cy+100],[L-54+o,cy+98]],5,KROOT_OLD,0.85*dim);brush(c,[[Rx+o,cy+96],[Rx+18+o,cy+99]],5,KROOT_OLD,0.85*dim);
+    kTuber(c,L-76+o,cy+98,44,11,Math.PI+0.06,KROOT,INK,0.85*dim);kTuber(c,Rx+40+o,cy+99,40,10,-0.05,KROOT,INK,0.85*dim);
+    if(acting('root')&&B.st==='tell'){brush(c,[[L+o,cy+92],[L-60+o,cy+66],[L-92+o,cy+16]],13,KROOT_OLD,0.95);kTuber(c,L-96+o,cy-12,62,18,Math.PI/2+0.12,KROOT,line,1);
+      if(!still)for(let i=0;i<4;i++){const k=((t*0.06+i*0.25)%1);kSoil(c,L-96+o+(hash(i)-0.5)*14,cy+20+k*80,1.6,1-k,i);}}   // 쳐든 뿌리에서 흙이 떨어진다
+    else if(acting('root'))brush(c,[[L+o,cy+92],[L-30+o,cy+122],[L-40+o,cy+152]],13,KROOT_OLD,0.9);
     else if(root.broken){   // 결정 D-370: 부러진 덩이뿌리는 두 동강 나 땅에 떨어져 있다 (흐리게 붙어 있지 않다)
-      kTuber(c,cx-20,cy+106,34,13,Math.PI-0.1,KROOT,INK,0.8);kTuber(c,cx-76,cy+112,30,12,Math.PI+0.35,KROOT,INK,0.75);
-      blob(c,cx-38,cy+107,4,7,'#efe3c8',0.85);blob(c,cx-58,cy+111,4,6,'#efe3c8',0.8);   // 부러진 단면
-      for(let i=0;i<5;i++)blob(c,cx-50+i*7+hash(i)*4,cy+116+hash(i*2.3)*3,2,1.4,'#6f5a44',0.7);}
-    else kTuber(c,cx-38+o,cy+104,62,16,Math.PI-0.04,KROOT,line,dim);}
-  // 줄기 앞으로 도는 마디와 잎
-  for(const r of runs(true))kStem(c,r,12,body,1);
-  for(const i of [6,19,31,45])if(H[i][2]>0)kLeaf(c,H[i][0],H[i][1],0.9,i%2?-0.8:0.9,KLEAF,0.95);
-  // 칡줄기: 꼬리 쪽 줄기가 채찍이다. 예고 때 뒤로 감기고, 후려칠 땐 상자 쪽으로 뻗는다
-  {const o=shk(arm),col=partCol(arm),sx=cx+TW+8+o,sy=cy+64;let pts;
-    if(arm.broken)pts=[[sx,sy],[cx+50+o,cy+80],[cx+62+o,cy+92]];   // 결정 D-370: 끊긴 줄기는 짧은 그루터기만 남는다
-    else if(acting('arm')&&B.st==='tell')pts=[[sx,sy],[cx+82+o,cy+12],[cx+112+o,cy-50],[cx+152+o,cy-90],[cx+190+o,cy-76],[cx+184+o,cy-52]];
-    else if(acting('arm'))pts=[[sx,sy],[cx+104+o,cy+70],[cx+172+o,cy+112],[cx+222+o,cy+152]];
-    else pts=[[sx,sy],[cx+92+o,cy+40],[cx+150+o,cy+5+sway],[cx+170+o,cy-40+sway],[cx+148+o,cy-66+sway],[cx+132+o,cy-54+sway]];
-    kStem(c,pts,arm.broken?8:10,col===INK?body:col,1);
-    const n=pts.length;if(!arm.broken)for(let i=1;i<n-1;i++)kLeaf(c,pts[i][0],pts[i][1]-4,0.85,i%2?-0.7:0.7,col===INK?KLEAF:col,0.9);
+      kTuber(c,L+6,cy+106,34,13,Math.PI-0.1,KROOT,INK,0.8);kTuber(c,L-50,cy+112,30,12,Math.PI+0.35,KROOT,INK,0.75);
+      blob(c,L-12,cy+107,4,7,'#efe3c8',0.85);blob(c,L-32,cy+111,4,6,'#efe3c8',0.8);   // 부러진 단면
+      for(let i=0;i<5;i++)kSoil(c,L-24+i*7+hash(i)*4,cy+116+hash(i*2.3)*3,2,0.8,i);}
+    else kTuber(c,L-12+o,cy+104,62,16,Math.PI-0.04,KROOT,line,dim);}
+  // 줄기 앞으로 도는 마디와 몸에서 돋은 칡잎
+  for(const r of runs(true))kSnake(c,r,17,17,1,body);
+  for(const i of [6,19,45])if(H[i][2]>0)kLeaf(c,H[i][0],H[i][1]-6,0.85,i%2?-0.8:0.9,end?'#55503a':KLEAF,0.9);
+  // 칡줄기: 꼬리가 칡줄기로 가늘어진 채찍이다. 예고 때 뒤로 감기고, 후려칠 땐 상자 쪽으로 뻗는다
+  {const o=shk(arm),col=partCol(arm),sx=H[0][0]+o,sy=H[0][1],X=cx+TW-27;let pts;
+    if(arm.broken)pts=[[sx,sy],[X+50+o,cy+82],[X+62+o,cy+92]];   // 결정 D-370: 끊긴 줄기는 짧은 그루터기만 남는다
+    else if(acting('arm')&&B.st==='tell')pts=[[sx,sy],[X+82+o,cy+12],[X+112+o,cy-50],[X+152+o,cy-90],[X+190+o,cy-76],[X+184+o,cy-52]];
+    else if(acting('arm'))pts=[[sx,sy],[X+104+o,cy+70],[X+172+o,cy+112],[X+222+o,cy+152]];
+    else pts=[[sx,sy],[X+92+o,cy+40],[X+150+o,cy+5+sway],[X+170+o,cy-40+sway],[X+148+o,cy-66+sway],[X+132+o,cy-54+sway]];
+    const red=col!==INK&&!arm.broken;
+    kSnake(c,pts.slice(0,3),16,9,1,red?col:body);kStem(c,pts.slice(2),arm.broken?7:9,red?col:KSTEM,1);
+    const n=pts.length;if(!arm.broken)for(let i=2;i<n-1;i++)kLeaf(c,pts[i][0],pts[i][1]-4,0.85,i%2?-0.7:0.7,red?col:KLEAF,0.9);
     if(arm.broken){const [ex,ey]=pts[n-1];blob(c,ex,ey,4.5,3.5,'#efe3c8',0.95);blob(c,ex,ey,2,1.6,'#9c8a62',0.9);   // 잘린 단면
-      kStem(c,[[cx+92,cy+104],[cx+130,cy+106],[cx+168,cy+102],[cx+204,cy+106]],6,'#3b3a2c',0.75);   // 땅에 떨어져 시든 덩굴
-      for(const [lx,ly,r] of [[cx+118,cy+100,0.4],[cx+160,cy+98,-0.5],[cx+194,cy+101,0.3]])kLeaf(c,lx,ly,0.7,r,'#6b5a3a',0.6);}}
-  // 쳐든 목과 머리, 정수리의 칡꽃
-  {const o=shk(core),hx=cx-84+o+sway*0.4,hy=cy-34,top=H[H.length-1];
-    kStem(c,[[top[0],top[1]],[cx-4+o,cy-88],[cx-46+o,cy-92],[cx-74+o+sway*0.3,cy-66],[hx+6,hy-10]],12,body,1);
-    kHead(c,hx,hy,end||core.broken?'#3a382e':'#25231b',end||core.broken);
-    const col=partCol(core),petal=col===RED?RED:KPUR;
-    if(core.broken){kFlower(c,hx-4,hy-10,-34,-16,KPUR_LT,0.35);for(let i=0;i<6;i++)blob(c,hx-40+i*14+hash(i)*6,cy+98-hash(i*3.1)*4,3,2,KPUR_LT,0.5);}
-    else kFlower(c,hx-4,hy-11,60,-6+sway*0.5,petal,1);
+      kStem(c,[[X+92,cy+104],[X+130,cy+106],[X+168,cy+102],[X+204,cy+106]],6,'#3b3a2c',0.75);   // 땅에 떨어져 시든 덩굴
+      for(const [lx,ly,r] of [[X+118,cy+100,0.4],[X+160,cy+98,-0.5],[X+194,cy+101,0.3]])kLeaf(c,lx,ly,0.7,r,'#6b5a3a',0.6);}}
+  // 결정 D-542: 칡꽃(핵심)은 머리가 아니라 줄기 앞을 도는 몸 마디에 핀다 (사용자 피드백 2026-11-04 단풍골 14)
+  {const fi=28,[fx,fy]=H[fi],o=shk(core),col=partCol(core),petal=col===RED?RED:KPUR;
+    if(core.broken){kFlower(c,fx+o,fy-4,-30,-12,KPUR_LT,0.35);for(let i=0;i<6;i++)blob(c,fx-40+i*14+hash(i)*6,cy+98-hash(i*3.1)*4,3,2,KPUR_LT,0.5);}
+    else{kLeaf(c,fx-12+o,fy-2,0.8,-1.1,KLEAF,0.9);kFlower(c,fx-2+o,fy-7,56,-12+sway*0.5,petal,1);kFlower(c,fx+9+o,fy-5,38,10-sway*0.3,petal,0.9);}
     // 핵심이 가려져 있는 동안은 큰 잎이 꽃송이를 덮는다
-    if(coreHidden()){kLeaf(c,hx-14,hy-18,1.5,-0.5,KLEAF,0.96);kLeaf(c,hx+6,hy-30,1.6,0.35,KLEAF,0.96);kLeaf(c,hx-8,hy-46,1.35,-0.1,KLEAF,0.96);}}
+    if(coreHidden()){kLeaf(c,fx-10,fy-10,1.6,-0.5,KLEAF,0.97);kLeaf(c,fx+10,fy-24,1.7,0.35,KLEAF,0.97);kLeaf(c,fx-4,fy-42,1.45,-0.1,KLEAF,0.97);kLeaf(c,fx+14,fy-6,1.3,0.9,KLEAF,0.97);}}
+  // 쳐든 목과 독사 머리. 공격하는 동안은 입을 벌린다
+  {const top=H[H.length-1],hx=cx-TW-60+sway*0.4,hy=cy-34,o=shk(core);
+    kSnake(c,[[top[0],top[1]],[cx-4+o,cy-96],[cx-TW-14+o,cy-98],[hx+18+o+sway*0.3,cy-72],[hx+6,hy-12]],17,13,1,body);
+    const aim=Math.atan2(B.py-hy,B.px-hx)-Math.PI/2,rot=clamp(aim,-0.7,0.5)+(still?0:Math.sin(t*0.05)*0.04);
+    const open=!end&&!core.broken&&(B.st==='tell'||B.st==='atk');
+    kViper(c,hx+o,hy,rot,end||core.broken?'#47452f':body,end||core.broken,open);
+    if(!still&&!open&&!end&&Math.floor(t/40)%4===0){const sx=hx+o-Math.sin(rot)*26,sy=hy+Math.cos(rot)*26;   // 덩굴손 혀를 날름
+      brush(c,[[sx,sy],[sx+2,sy+7],[sx+1,sy+12]],1.4,KSTEM);brush(c,[[sx+1,sy+12],[sx-3,sy+16],[sx-2,sy+19]],1,KSTEM);brush(c,[[sx+1,sy+12],[sx+5,sy+16],[sx+4,sy+19]],1,KSTEM);}}
 }
 /* ---------- 무쇠의 시험 ----------
    결정 D-58: 배경은 무쇠 뒤쪽 화면 전체가 대장간이다. 벽돌 벽, 화덕과 풀무, 모루, 벽에 걸린 연장, 숯 더미.
@@ -322,6 +415,29 @@ function drawSmithy(c){
     c.save();c.fillStyle='rgba(110,80,52,.35)';c.fillRect(wx-30,cy-28,60,28);c.restore();
     brush(c,[[wx-30,cy-28],[wx-30,cy],[wx+30,cy],[wx+30,cy-28]],4,INK,0.75);brush(c,[[wx-26,cy-22],[wx+26,cy-22]],2,'#9fb4c0',0.6);}
 }
+/* 결정 D-546: 무쇠를 실제 너구리에 가깝게 다시 그린다 (사용자 피드백 2026-11-04 단풍골 5).
+   눈가를 가로지르던 검은 띠가 안대처럼 보였다. 이제 너구리의 탈무늬는 두 눈가에 따로 진 짙은 얼룩이고, 볼에는 북슬한 털이 옆으로 뻗는다.
+   이마에는 대장장이가 땀받이로 두르는 무명 머리띠를 매고, 매듭 끝이 옆으로 늘어진다.
+   몸은 선이 아니라 털빛을 칠한 덩어리다. 넓은 어깨와 굵은 팔에 잔근육이 지고, 너구리답게 가슴과 팔다리 털이 짙다. 가죽 앞치마를 둘렀다. */
+const MFUR='#7a6e5f',MFUR_LT='#a99c86',MFUR_DK='#3a322b',MBAND='#e7ddc6',MLEATHER='#6e4529';
+/* 털 덮인 팔다리: 마디마다 굵기가 바뀌는 둥근 관. 바깥에 먹 테두리, 가장자리에 털 */
+function mTube(c,pts,ws,fill,alpha=1){
+  const S=[];for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i],n=Math.max(2,Math.ceil(Math.hypot(x1-x0,y1-y0)/2.5));
+    for(let k=0;k<=n;k++){const u=k/n;S.push([x0+(x1-x0)*u,y0+(y1-y0)*u,(ws[i-1]+(ws[i]-ws[i-1])*u)/2,x1-x0,y1-y0]);}}
+  c.save();c.globalAlpha=alpha;
+  c.fillStyle=INK;for(const [x,y,r] of S){c.beginPath();c.arc(x,y,r+2,0,Math.PI*2);c.fill();}
+  c.fillStyle=fill;for(const [x,y,r] of S){c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
+  c.strokeStyle=fill;c.lineWidth=1.3;c.lineCap='round';c.beginPath();   // 테두리 밖으로 삐친 털
+  S.forEach(([x,y,r,dx,dy],i)=>{if(i%3)return;const l=Math.hypot(dx,dy)||1,s=(i/3)%2?1:-1,nx=-dy/l*s,ny=dx/l*s;c.moveTo(x+nx*(r+1),y+ny*(r+1));c.lineTo(x+nx*(r+4)+dx/l*2,y+ny*(r+4)+dy/l*2);});
+  c.stroke();c.restore();
+}
+/* 굵은 주먹: 짙은 털 주먹에 마디 셋 */
+function mFist(c,x,y,r,rot=0){
+  c.save();c.translate(x,y);c.rotate(rot);
+  blob(c,0,0,r+2,r*0.85+2,INK);blob(c,0,0,r,r*0.85,MFUR_DK);
+  c.strokeStyle='rgba(169,156,134,.55)';c.lineWidth=1.2;c.beginPath();for(const k of [-0.5,0,0.5]){c.moveTo(k*r,-r*0.6);c.quadraticCurveTo(k*r+2,-r*0.2,k*r,r*0.1);}c.stroke();
+  c.restore();
+}
 function drawMusoe(c){
   const cx=LW/2,cy=EY,bob=Math.sin(B.time*0.05)*2;
   // 내리꽂는 주먹이 있으면 오른팔이 그쪽으로 뻗는다. 그림이 0.84배로 줄어 그려지므로 상자 좌표를 되돌려 쓴다.
@@ -329,29 +445,70 @@ function drawMusoe(c){
   const live=fists.find(b=>{const f=fistAt(b);return f.falling||(f.after&&b.t<f.hit+8);});
   const raised=!live&&fists.some(b=>fistAt(b).shadow);
   const inv=(x,y)=>[cx+(x-cx)/0.84,cy+(y-cy)/0.84];
-  c.save();c.fillStyle='rgba(29,24,20,.14)';c.beginPath();c.ellipse(cx,cy+60+bob,92,62,0,0,Math.PI*2);c.fill();c.restore();
-  // 몸통과 가죽 앞치마
-  brush(c,[[cx-88,cy+82],[cx-92,cy+40+bob],[cx-50,cy+4+bob],[cx+50,cy+4+bob],[cx+92,cy+40+bob],[cx+88,cy+82]],6,INK);
-  c.save();c.fillStyle='rgba(110,72,44,.55)';c.beginPath();c.moveTo(cx-40,cy+22+bob);c.lineTo(cx-46,cy+92);c.lineTo(cx+46,cy+92);c.lineTo(cx+40,cy+22+bob);c.closePath();c.fill();c.restore();
-  brush(c,[[cx-40,cy+22+bob],[cx-46,cy+92],[cx+46,cy+92],[cx+40,cy+22+bob]],4,'#5a3a24',0.9);
-  brush(c,[[cx-40,cy+22+bob],[cx-24,cy+4+bob]],3,'#5a3a24',0.8);brush(c,[[cx+40,cy+22+bob],[cx+24,cy+4+bob]],3,'#5a3a24',0.8);
-  // 왼팔: 허리에 짚은 주먹
-  brush(c,[[cx-80,cy+30+bob],[cx-112,cy+58],[cx-80,cy+76]],13,INK);blob(c,cx-76,cy+76,11,9,'#4a4038');
-  // 오른팔: 평소엔 옆에, 예고 땐 머리 위로 쳐들고, 내리꽂을 땐 상자 쪽으로
-  const sx=cx+80,sy=cy+30+bob;
-  if(live){const [tx,ty]=inv(live.x,BOX.y-30);brush(c,[[sx,sy],[(sx+tx)/2+12,(sy+ty)/2-10],[tx,ty]],15,INK,0.9);}
-  else if(raised){brush(c,[[sx,sy],[cx+124,cy-20+bob],[cx+112,cy-78+bob]],14,INK);blob(c,cx+112,cy-86+bob,14,12,'#4a4038');
-    c.save();c.strokeStyle=Math.floor(B.time/5)%2?RED:INK;c.lineWidth=2.4;c.beginPath();c.ellipse(cx+112,cy-86+bob,15,13,0,0,Math.PI*2);c.stroke();c.restore();}
-  else{brush(c,[[sx,sy],[cx+112,cy+56],[cx+88,cy+80]],13,INK);blob(c,cx+86,cy+80,11,9,'#4a4038');}
-  // 머리: 너구리 삼촌. 눈가를 가로지르는 검은 탈무늬와 작은 귀
-  const hx=cx,hy=cy-38+bob,end=B.st==='end'&&B.result!=='lose'||B.st==='finale'&&B.finaleT>=B.finaleEnd-30;
-  blob(c,hx,hy,46,38,'#f4ead4');brush(c,[[hx-44,hy+6],[hx-40,hy-26],[hx,hy-40],[hx+40,hy-26],[hx+44,hy+6],[hx+20,hy+34],[hx-20,hy+34],[hx-44,hy+6]],4,INK);
-  brush(c,[[hx-40,hy-2],[hx-22,hy-9],[hx-6,hy-2],[hx+6,hy-2],[hx+22,hy-9],[hx+40,hy-2]],13,INK);
-  brush(c,[[hx-36,hy-26],[hx-30,hy-48],[hx-18,hy-36]],5,INK);brush(c,[[hx+36,hy-26],[hx+30,hy-48],[hx+18,hy-36]],5,INK);
-  blob(c,hx,hy+16,7,5,INK);
-  if(end){brush(c,[[hx-28,hy-2],[hx-16,hy+2]],3,'#f4ead4');brush(c,[[hx+16,hy+2],[hx+28,hy-2]],3,'#f4ead4');brush(c,[[hx-12,hy+26],[hx,hy+29],[hx+12,hy+26]],3,INK);}
-  else{const [ex,ey]=lookAt(hx,hy);blob(c,hx-21+ex,hy-2+ey,3.5,3.5,'#f4ead4');blob(c,hx+21+ex,hy-2+ey,3.5,3.5,'#f4ead4');
-    brush(c,[[hx-34,hy-18],[hx-12,hy-10]],4,INK);brush(c,[[hx+34,hy-18],[hx+12,hy-10]],4,INK);brush(c,[[hx-10,hy+26],[hx+10,hy+26]],3,INK);}
+  const end=B.st==='end'&&B.result!=='lose'||B.st==='finale'&&B.finaleT>=B.finaleEnd-30;
+  c.save();c.fillStyle='rgba(29,24,20,.14)';c.beginPath();c.ellipse(cx,cy+64+bob,104,60,0,0,Math.PI*2);c.fill();c.restore();
+  // 몸통: 넓은 어깨에서 허리로 좁아지는 털 덩어리
+  const y0=cy+bob;
+  const torso=[[cx-92,cy+100],[cx-100,y0+48],[cx-90,y0+16],[cx-52,y0+2],[cx+52,y0+2],[cx+90,y0+16],[cx+100,y0+48],[cx+92,cy+100]];
+  c.save();const g=c.createLinearGradient(0,y0,0,cy+100);g.addColorStop(0,MFUR);g.addColorStop(1,'#62584b');c.fillStyle=g;c.beginPath();c.moveTo(torso[0][0],torso[0][1]);
+  for(let i=1;i<torso.length-1;i++){const m=[(torso[i][0]+torso[i+1][0])/2,(torso[i][1]+torso[i+1][1])/2];c.quadraticCurveTo(torso[i][0],torso[i][1],m[0],m[1]);}
+  c.lineTo(torso[torso.length-1][0],torso[torso.length-1][1]);c.closePath();c.fill();c.restore();
+  brush(c,torso.slice(0,4),4,INK,0.9);brush(c,torso.slice(4),4,INK,0.9);
+  for(let i=0;i<14;i++){const s=i<7?-1:1,k=(i%7)/6,x=cx+s*(56+k*40),y=y0+3+k*k*40;brush(c,[[x,y],[x+s*4,y-3]],1.3,MFUR_LT,0.7);}   // 어깨 털
+  // 너구리답게 짙은 가슴 털과 어깨·가슴 근육 결
+  blob(c,cx,y0+22,40,24,MFUR_DK,0.75);
+  for(const s of [-1,1]){brush(c,[[cx+s*58,y0+12],[cx+s*78,y0+24],[cx+s*80,y0+44]],1.8,INK,0.5);brush(c,[[cx+s*10,y0+34],[cx+s*30,y0+40],[cx+s*46,y0+34]],1.6,INK,0.35);}
+  // 가죽 앞치마: 목끈, 허리끈, 불똥 자국, 집게 꽂은 주머니
+  {c.save();const ag=c.createLinearGradient(0,y0+28,0,cy+102);ag.addColorStop(0,'#7c5033');ag.addColorStop(1,'#5a3820');c.fillStyle=ag;c.globalAlpha=0.95;
+    c.beginPath();c.moveTo(cx-40,y0+30);c.lineTo(cx-52,cy+102);c.lineTo(cx+52,cy+102);c.lineTo(cx+40,y0+30);c.quadraticCurveTo(cx,y0+24,cx-40,y0+30);c.closePath();c.fill();c.restore();
+    brush(c,[[cx-40,y0+30],[cx-52,cy+102],[cx+52,cy+102],[cx+40,y0+30]],3,'#3e2614',0.9);
+    brush(c,[[cx-38,y0+31],[cx-26,y0+6]],3,'#4a2e1a',0.85);brush(c,[[cx+38,y0+31],[cx+26,y0+6]],3,'#4a2e1a',0.85);
+    brush(c,[[cx-42,y0+58],[cx-80,y0+60]],2.6,'#4a2e1a',0.8);brush(c,[[cx+42,y0+58],[cx+80,y0+60]],2.6,'#4a2e1a',0.8);
+    for(const [x,y,r] of [[cx-18,y0+52,3],[cx+22,y0+70,2.4],[cx-6,y0+84,2],[cx+30,y0+46,1.6]])blob(c,x,y,r,r*0.8,'#2a1a10',0.7);
+    brush(c,[[cx-24,y0+66],[cx-24,y0+90],[cx+4,y0+90],[cx+4,y0+66]],1.4,'#2e1c10',0.7);brush(c,[[cx-16,y0+70],[cx-14,y0+56],[cx-10,y0+52]],2,INK,0.8);brush(c,[[cx-8,y0+70],[cx-6,y0+56],[cx-2,y0+52]],2,INK,0.8);}
+  // 왼팔: 허리에 짚은 주먹. 위팔은 털빛, 팔꿈치 아래는 너구리답게 짙은 털
+  {const s=[cx-86,y0+22],e=[cx-124,y0+60],h=[cx-86,y0+80];
+    mTube(c,[s,e],[30,24],MFUR);mTube(c,[e,h],[24,19],MFUR_DK);
+    brush(c,[[s[0]-8,s[1]+8],[s[0]-24,s[1]+18],[e[0]+6,e[1]-8]],1.6,INK,0.45);   // 위팔 근육 결
+    mFist(c,h[0]+2,h[1],11,0.3);}
+  // 오른팔: 평소엔 옆으로 내리고, 예고 땐 주먹을 머리 위로, 내리꽂을 땐 상자 쪽으로
+  {const s=[cx+86,y0+22];
+    if(live){const [tx,ty]=inv(live.x,BOX.y-30),e=[(s[0]+tx)/2+16,(s[1]+ty)/2-12];mTube(c,[s,e],[30,24],MFUR,0.95);mTube(c,[e,[tx,ty]],[24,20],MFUR_DK,0.95);mFist(c,tx,ty,13,0);}
+    else if(raised){const e=[cx+132,y0-12],f=[cx+114,y0-84];mTube(c,[s,e],[30,25],MFUR);mTube(c,[e,f],[25,20],MFUR_DK);
+      brush(c,[[s[0]+10,s[1]-4],[s[0]+30,s[1]-14],[e[0]-4,e[1]+6]],1.8,INK,0.5);   // 불끈 선 알통
+      mFist(c,f[0],f[1],13,-0.2);
+      c.save();c.strokeStyle=Math.floor(B.time/5)%2?RED:INK;c.lineWidth=2.4;c.beginPath();c.ellipse(f[0],f[1],17,15,0,0,Math.PI*2);c.stroke();c.restore();}
+    else{const e=[cx+122,y0+60],h=[cx+94,y0+84];mTube(c,[s,e],[30,24],MFUR);mTube(c,[e,h],[24,19],MFUR_DK);
+      brush(c,[[s[0]+8,s[1]+8],[s[0]+24,s[1]+18],[e[0]-6,e[1]-8]],1.6,INK,0.45);mFist(c,h[0]-2,h[1],11,-0.3);}}
+  // 머리: 너구리. 옆으로 뻗은 북슬한 볼털, 작고 둥근 귀, 눈가마다 따로 진 탈무늬, 흰 주둥이
+  const hx=cx,hy=cy-40+bob;
+  for(const s of [-1,1]){c.save();c.translate(hx+s*27,hy-30);c.rotate(s*0.35);blob(c,0,0,13,14,INK);blob(c,0,0,11,12,MFUR_DK);blob(c,0,2,6,7,'#cbbfa8');c.restore();}   // 귀
+  {c.save();c.fillStyle=MFUR_LT;c.beginPath();   // 볼털: 아래와 옆으로 삐죽삐죽 뻗는다
+    for(let i=0;i<=26;i++){const a=-0.25+i/26*(Math.PI+0.5),r=i%2?1:0.82,x=hx+Math.cos(a)*62*r,y=hy+6+Math.sin(a)*40*r;i?c.lineTo(x,y):c.moveTo(x,y);}
+    c.closePath();c.fill();c.strokeStyle=INK;c.globalAlpha=0.55;c.lineWidth=1.6;c.stroke();c.restore();
+    for(let i=0;i<10;i++){const s=i<5?-1:1,k=(i%5)/4;brush(c,[[hx+s*(34+k*8),hy+8+k*20],[hx+s*(50+k*8),hy+14+k*16]],1.2,'#6e6252',0.55);}}
+  blob(c,hx,hy-4,40,33,INK);blob(c,hx,hy-4,38,31,'#b3a690');   // 머리
+  blob(c,hx,hy-30,15,9,'#5d5348',0.55);   // 정수리의 짙은 털
+  for(const s of [-1,1]){   // 눈가의 짙은 탈무늬: 두 눈에 따로, 볼 쪽으로 처진다
+    c.save();c.translate(hx+s*17,hy+5);c.rotate(s*0.42);blob(c,0,0,13,9.5,'#29231e');c.restore();blob(c,hx+s*28,hy+15,9,6.5,'#29231e',0.95);}
+  blob(c,hx,hy+16,18,13,'#ece3cf');blob(c,hx,hy-1,6,11,'#ddd2bc');   // 흰 주둥이와 콧등
+  blob(c,hx,hy+10,6.5,4.8,INK);blob(c,hx-2,hy+8.6,1.8,1.1,'#8f8579');   // 코
+  // 대장장이 무명 머리띠: 이마에 감고 오른쪽에서 맨 매듭 끝이 늘어진다
+  {const wave=Vfx.reducedMotion?0:Math.sin(B.time*0.07)*2;
+    c.save();c.fillStyle=MBAND;c.beginPath();c.moveTo(hx-39,hy-22);c.quadraticCurveTo(hx,hy-34,hx+39,hy-22);c.lineTo(hx+40,hy-11);c.quadraticCurveTo(hx,hy-22,hx-40,hy-11);c.closePath();c.fill();
+    c.strokeStyle=INK;c.lineWidth=2;c.stroke();c.restore();
+    blob(c,hx-14,hy-23,8,3,'#c9b991',0.55);   // 땀 밴 자국
+    brush(c,[[hx-26,hy-20],[hx-4,hy-24],[hx+22,hy-21]],1,INK,0.3);
+    const kx=hx+40,ky=hy-16;
+    brush(c,[[kx,ky],[kx+10,ky+7+wave],[kx+15,ky+17+wave]],5.5,INK,0.9);brush(c,[[kx,ky],[kx+10,ky+7+wave],[kx+15,ky+17+wave]],3.6,MBAND);
+    brush(c,[[kx,ky],[kx+15,ky+1+wave*0.6],[kx+24,ky+6+wave]],5.5,INK,0.9);brush(c,[[kx,ky],[kx+15,ky+1+wave*0.6],[kx+24,ky+6+wave]],3.6,MBAND);
+    blob(c,kx,ky,6.5,5.5,INK);blob(c,kx,ky,5,4.2,MBAND);}
+  if(end){for(const s of [-1,1])brush(c,[[hx+s*22,hy+3],[hx+s*16,hy+5],[hx+s*10,hy+3]],2.4,'#ece3cf');
+    brush(c,[[hx-7,hy+19],[hx,hy+22],[hx+7,hy+19]],2.2,INK);}
+  else{const [ex,ey]=lookAt(hx,hy);
+    for(const s of [-1,1]){blob(c,hx+s*16,hy+4,3.8,3.6,'#c9b48a');blob(c,hx+s*16+ex*0.6,hy+4+ey*0.6,2.1,2.3,INK);blob(c,hx+s*16+ex*0.6-0.8,hy+3+ey*0.6,0.7,0.7,'#f4ead4');
+      brush(c,[[hx+s*28,hy-7],[hx+s*18,hy-6],[hx+s*8,hy-3]],3.2,INK);}   // 엄한 눈썹
+    brush(c,[[hx,hy+14],[hx,hy+18]],1.6,INK,0.8);brush(c,[[hx-8,hy+21],[hx,hy+18],[hx+8,hy+21]],2.2,INK);}
 }
 
 /* 결정 D-62: 모든 전투 배경은 상대 뒤쪽 화면 전체로 그린다 (design/data/decisions.csv).
@@ -377,26 +534,21 @@ function drawKudzuHill(c){
   };
   // 왼쪽은 부위 글 뒤라 옅게 둔다
   maple(LW*0.03,gy+6,1.05,0.5);maple(LW*0.2,gy+2,0.75,0.55);maple(LW*0.88,gy+4,1.2);maple(LW*0.97,gy,0.85);
-  // 당산나무: 칡 뒤 가운데의 굵은 줄기와 가지
-  const tx=LW/2,tw=Math.min(118,LW*0.15);
-  c.save();c.fillStyle='rgba(84,66,50,.17)';c.beginPath();c.moveTo(tx-tw*0.62,gy);c.lineTo(tx-tw*0.42,0);c.lineTo(tx+tw*0.42,0);c.lineTo(tx+tw*0.62,gy);c.closePath();c.fill();c.restore();
-  brush(c,[[tx-tw*0.62,gy],[tx-tw*0.5,gy*0.5],[tx-tw*0.42,0]],5,INK,0.4);
-  brush(c,[[tx+tw*0.62,gy],[tx+tw*0.5,gy*0.5],[tx+tw*0.42,0]],5,INK,0.4);
-  for(let i=0;i<5;i++){const x=tx-tw*0.36+i*tw*0.18;brush(c,[[x,gy-12],[x+hash(i)*6-3,gy*0.55],[x+hash(i+9)*8-4,6]],1.4,INK,0.15);}
-  brush(c,[[tx-tw*0.4,44],[tx-tw*1.4,14],[tx-tw*2.3,-8]],7,INK,0.3);brush(c,[[tx-tw*1.2,22],[tx-tw*1.5,-6]],3,INK,0.25);
-  brush(c,[[tx+tw*0.4,34],[tx+tw*1.5,8],[tx+tw*2.4,-10]],7,INK,0.3);brush(c,[[tx+tw*1.3,16],[tx+tw*1.7,-8]],3,INK,0.25);
-  // 금줄: 줄기를 가로지른 새끼줄과 흰 종이 술
-  const ry=gy*0.4;brush(c,[[tx-tw*0.58,ry],[tx,ry+10],[tx+tw*0.58,ry]],3,'#6b5540',0.65);
-  for(let i=0;i<5;i++){const x=tx-tw*0.4+i*tw*0.2,y=ry+3+Math.sin((i/4)*Math.PI)*7;
-    c.save();c.fillStyle='rgba(250,246,236,.8)';c.fillRect(x-3,y,6,12);c.restore();brush(c,[[x-3,y],[x+3,y],[x+3,y+12],[x-3,y+12],[x-3,y]],1,INK,0.3);}
-  // 줄기 밑 입구 아치와 그것을 덮은 칡 그물
-  const aw=tw*0.36,ah=tw*0.56;
-  c.save();c.fillStyle='rgba(29,24,20,.3)';c.beginPath();c.moveTo(tx-aw,gy);c.lineTo(tx-aw,gy-ah*0.6);c.quadraticCurveTo(tx,gy-ah*1.25,tx+aw,gy-ah*0.6);c.lineTo(tx+aw,gy);c.closePath();c.fill();c.restore();
-  for(let i=0;i<6;i++)brush(c,[[tx-aw+i*aw*0.4,gy],[tx-aw*0.7+i*aw*0.3,gy-ah*0.45],[tx-aw+hash(i*3.3)*aw*2,gy-ah*0.95]],2,VINE,0.5);
-  // 줄기를 비스듬히 감아 오르는 칡
-  for(let k=0;k<4;k++){const pts=[];for(let s=0;s<=12;s++){const y=gy-s*gy/12-k*16;pts.push([tx+Math.sin(s*0.85+k*1.7)*tw*0.56,y]);}
-    brush(c,pts,3,VINE,0.32);
-    for(let s=1;s<12;s+=3)blob(c,pts[s][0],pts[s][1],5,3,VINE,0.28);}
+  /* 결정 D-545: 당산나무를 크고 신성하게 (사용자 피드백 2026-11-04 단풍골 12). 몇백 년 묵은 느티나무 한 그루가 화면 위를 다 덮는다.
+     굵은 가지가 양옆으로 크게 뻗고, 누렇고 붉게 물든 잎 그늘이 하늘을 가린다. 줄기 앞쪽(금줄·제단 돌·돌무더기)은 상대 그림(drawKudzu)이 그린다. */
+  const tx=LW/2;
+  c.save();c.fillStyle='rgba(70,55,42,.35)';c.beginPath();c.moveTo(tx-70,gy);c.lineTo(tx-52,0);c.lineTo(tx+52,0);c.lineTo(tx+70,gy);c.closePath();c.fill();c.restore();
+  // 양옆으로 뻗은 굵은 가지와 잔가지
+  const limbs=[[[tx-40,60],[tx-150,30],[tx-260,8],[tx-370,-6]],[[tx+40,52],[tx+160,24],[tx+280,4],[tx+390,-8]],[[tx-30,30],[tx-110,-4]],[[tx+30,26],[tx+120,-6]],
+    [[tx-150,30],[tx-200,58],[tx-236,80]],[[tx+160,24],[tx+214,52],[tx+250,74]],[[tx-260,8],[tx-300,36]],[[tx+280,4],[tx+330,30]]];
+  limbs.forEach((l,i)=>brush(c,l,i<2?13:i<4?9:4,INK,i<4?0.42:0.3));
+  // 잎 그늘: 짙은 먹 덩이 위에 누렇고 붉은 잎 무리
+  for(let i=0;i<34;i++){const u=hash(i*2.31),v=hash(i*5.17),x=LW*(0.02+0.96*u),y=-14+v*78-Math.cos((u-0.5)*Math.PI)*22,r=26+hash(i*7.3)*22;
+    blob(c,x,y,r,r*0.62,INK,0.07);}
+  for(let i=0;i<70;i++){const u=hash(i*3.71+1),v=hash(i*1.93+2),x=LW*(0.01+0.98*u),y=-10+v*84-Math.cos((u-0.5)*Math.PI)*20,left=x<LW*0.26;
+    blob(c,x,y,9+hash(i)*9,6+hash(i*2)*5,i%4===0?RED:i%4===1?'#c98a3a':i%4===2?'#a8743a':'#d6a640',(left?0.1:0.2)+hash(i*9.1)*0.12);}
+  // 가지에 걸린 오래된 소원 천 둘
+  for(const [x,y,col] of [[tx-200,58,'#e8dfcc'],[tx+214,52,'#d8d2c0']]){brush(c,[[x,y],[x+2,y+10],[x-1,y+22]],4,col,0.75);brush(c,[[x+3,y+1],[x+6,y+14]],3,col,0.6);}
   // 떨어지는 단풍잎
   for(let i=0;i<10;i++){
     const sp=0.3+hash(i*2.7)*0.4,y=still?hash(i*4.1)*gy:((t*sp+i*53)%(gy+40))-20,x=hash(i*1.3)*LW+(still?0:Math.sin(t*0.03+i)*14);
@@ -459,13 +611,14 @@ function kudzuMark(p){
   if(p.id==='root'){const b=B.bullets.find(q=>q.k==='kudzuSlam'&&q.last&&q.x!=null);
     if(b){B.kHold={b};return {x:b.x,y:clamp(b.y-10,BOX.y+18,BOX.y+BOX.h-18)};}}
   if(p.core){const puffs=B.bullets.filter(q=>q.k==='kudzuScent'&&q.x!=null);let x,y;
-    for(let n=0;n<24;n++){x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+26+Math.random()*(BOX.h-52);
+    for(let n=0;n<24;n++){x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+36+Math.random()*(BOX.h-66);   // 솟는 꽃이 칸 안에 들게
       if(Math.hypot(x-B.px,y-B.py)>=70&&puffs.every(q=>Math.hypot(x-q.x,y-q.y)>SCENT.radius+20))break;}
     return {x,y};}
   return null;
 }
 /* 표식을 친 뒤: 연장이 있으면 줄기를 끊거나 뿌리를 캐고, 확률로 재료를 얻는다 */
 function kudzuMarkHit(p,m){
+  if(p.core&&B.kWeak){bSplash(m.x,m.y,KMUD);B.kWeak.fade=Math.max(B.kWeak.fade,6);}   // 친 탁한 꽃이 터져 시든다
   const h=B.kHold;B.kHold=null;if(!h||(p.id!=='arm'&&p.id!=='root'))return;
   const b=h.b,arm=p.id==='arm',tool=battleTool();
   if(!tool){if(!p.broken)B.msg=arm?'칡줄기를 쳤다. 맨손으로는 질긴 줄기를 못 끊는다.':'칡뿌리를 쳤다. 맨손으로는 박힌 뿌리를 못 캔다.';return;}
@@ -487,8 +640,10 @@ function slamLiftAt(b){return b.liftAt??slamAt(b).hit+(b.last?14:8);}
 /* 결정 D-178: 칡꽃 꽃가루. 손 자리 바닥에 칡꽃송이가 솟아(예고) 꽃가루를 터뜨리면 동그란 잔향이 바닥에 번진다.
    예전의 향 줄기·끌어당김은 없앴다. 번질 때도, 남은 잔향에 들어가도 맞는다. 피해는 kudzu_scent_damage(하트 반 칸)로 다른 공격보다 약하고,
    맞으면 kudzu_scent_slow_frames 동안 손이 kudzu_scent_slow 배로 느려진다. 연달아 깎이지 않게 맞은 뒤 무적(battle_iframes)을 그대로 쓴다.
-   첫 꽃은 손 자리, 둘째·셋째는 그 양옆에 핀다 */
-const SCENT={gap:44,tell:40,burst:20,fade:30,radius:30};
+   첫 꽃은 손 자리, 둘째·셋째는 그 양옆에 핀다.
+   결정 D-543: 칡꽃은 빨리 솟아 팡 터진다 (사용자 피드백 2026-11-04 단풍골 13). 예고 40→22, 터짐 20→10, 간격 44→30 프레임.
+   터지는 순간 흰 테가 퍼지고 꽃잎이 사방으로 튄다. D-179 의 숨 돌릴 틈은 채찍·뿌리에 그대로 남는다 */
+const SCENT={gap:30,tell:22,burst:10,fade:26,radius:30};
 function scentAt(b){const a=b.delay,tl=a+SCENT.tell,bu=tl+SCENT.burst,li=bu+T().kudzu_scent_linger,end=li+SCENT.fade;
   return {wait:b.t<=a,tell:b.t>a&&b.t<=tl,burst:b.t>tl&&b.t<=bu,linger:b.t>bu&&b.t<=li,fade:b.t>li,
     k:b.t<=tl?clamp((b.t-a)/SCENT.tell,0,1):b.t<=bu?(b.t-tl)/SCENT.burst:b.t<=li?(b.t-bu)/T().kudzu_scent_linger:(b.t-li)/SCENT.fade,end};}
@@ -497,27 +652,67 @@ function scentHit(){
   B.slowT=T().kudzu_scent_slow_frames;B.slowK=T().kudzu_scent_slow;
   if(!B.scentNoted&&B.st!=='end'){B.scentNoted=true;B.msg='달큰한 꽃가루에 손이 무거워졌다.';}
 }
-/* 결정 D-372: 내리꽂히는 칡뿌리 끝. 굵은 쪽은 칸 위로 잘려 보이지 않고, 끝으로 갈수록 가늘어져 뾰족하다. (x,y) 는 끝 자리 */
+/* 결정 D-372: 내리꽂히는 칡뿌리 끝. 굵은 쪽은 칸 위로 잘려 보이지 않고, 끝으로 갈수록 가늘어져 뾰족하다. (x,y) 는 끝 자리.
+   결정 D-541: 오래 묵은 뿌리라 겉이 갈라지고 흙덩이가 들러붙어 있다. 떨어질 때 흙 부스러기가 함께 떨어진다 */
 function kSpike(c,x,y,lean,alpha){
-  const len=58,tx=x+lean*16,ty=y-len,w=9;
+  const len=58,tx=x+lean*16,ty=y-len,w=9.5;
   // 위쪽은 옅어지며 사라져 굵은 뿌리 몸은 보이지 않는다
   const fade=(r,g,b)=>{const q=c.createLinearGradient(tx,ty,x,y);q.addColorStop(0,`rgba(${r},${g},${b},0)`);q.addColorStop(0.45,`rgba(${r},${g},${b},1)`);q.addColorStop(1,`rgba(${r},${g},${b},1)`);return q;};
-  c.save();c.globalAlpha=alpha;c.fillStyle=fade(138,106,74);c.strokeStyle=fade(29,24,20);c.lineWidth=1.6;c.lineJoin='round';
+  c.save();c.globalAlpha=alpha;c.fillStyle=fade(112,86,60);c.strokeStyle=fade(29,24,20);c.lineWidth=1.6;c.lineJoin='round';
   c.beginPath();c.moveTo(tx-w,ty);c.quadraticCurveTo(x-w*0.55+lean*6,y-len*0.45,x,y);c.quadraticCurveTo(x+w*0.55+lean*6,y-len*0.45,tx+w,ty);c.closePath();c.fill();c.stroke();
   c.strokeStyle='#5c4630';c.lineWidth=1;c.beginPath();
   for(const k of [0.5,0.68,0.82]){const yy=ty+len*k,xx=tx+(x-tx)*k,hw=w*(1-k)*0.9;c.moveTo(xx-hw,yy);c.quadraticCurveTo(xx,yy+2,xx+hw,yy-1);}   // 뿌리 마디
   c.stroke();
-  c.strokeStyle='#efe3c8';c.globalAlpha=alpha*0.7;c.lineWidth=1.1;c.beginPath();c.moveTo(tx+(x-tx)*0.45-w*0.3,ty+len*0.45);c.quadraticCurveTo(x-w*0.25,y-len*0.3,x-0.6,y-4);c.stroke();   // 끝의 날 선 빛
+  c.strokeStyle='rgba(29,24,20,.55)';c.beginPath();   // 갈라진 겉
+  for(const k of [0.48,0.6,0.74]){const yy=ty+len*k,xx=tx+(x-tx)*k;c.moveTo(xx-1,yy-4);c.lineTo(xx+1.5,yy);c.lineTo(xx-0.5,yy+3);}
+  c.stroke();
   c.restore();
+  {const P=k=>[tx+(x-tx)*k,ty+len*k];   // 들러붙은 흙덩이와 벗겨진 껍질
+    for(const [k,side,r] of [[0.5,-1,2.6],[0.62,1,2.2],[0.78,-1,1.9],[0.88,1,1.4],[0.56,1,1.6]]){const [px,py]=P(k);kSoil(c,px+side*w*(1-k)*0.8,py,r,alpha,k*10);}
+    const [qx,qy]=P(0.66);c.save();c.globalAlpha=alpha*0.6;c.fillStyle='#b0946e';c.beginPath();c.moveTo(qx-2,qy-3);c.lineTo(qx+2,qy-1);c.lineTo(qx-1,qy+2);c.closePath();c.fill();c.restore();}
   {const P=k=>[tx+(x-tx)*k,ty+len*k];const a=P(0.55),b=P(0.7);brush(c,[[a[0]-w*0.4,a[1]],[a[0]-w*1.1,a[1]+5]],1,INK,0.5*alpha);brush(c,[[b[0]+w*0.3,b[1]],[b[0]+w*0.9,b[1]+4]],1,INK,0.5*alpha);}   // 잔뿌리
 }
 /* 찍힌 자리의 구멍: 작고 동그랗게 남았다가 흙이 메워지듯 옅어진다 */
+function drawKudzuFloor(c){drawKudzuHoles(c);drawWeakFlower(c);}
 function drawKudzuHoles(c){
   for(const h of B.kHoles||[]){const a=Math.min(1,h.t/30);
     blob(c,h.x,h.y,8.5,3.8,'#8a6a4a',0.45*a);blob(c,h.x,h.y+0.3,6,2.6,'#2a2118',0.85*a);
     c.save();c.strokeStyle=INK;c.globalAlpha=0.45*a;c.lineWidth=1;c.beginPath();c.ellipse(h.x,h.y,8.5,3.8,0,Math.PI*0.05,Math.PI*0.95);c.stroke();c.restore();}
 }
-function tickKudzu(){for(const h of B.kHoles||[])h.t--;if(B.kHoles)B.kHoles=B.kHoles.filter(h=>h.t>0);}
+/* 결정 D-544: 칡꽃의 빈틈은 빈 곳이 아니라 꽃 공격이 끝난 뒤 바닥에서 솟는 크고 탁한 칡꽃이다 (사용자 피드백 2026-11-04 단풍골 13).
+   다른 꽃보다 크고 빛이 흐리며, 벌어진 꽃잎 속에 당산나무 꼭대기에서 감아 온 해머루 송이를 품고 있다. 빈틈 표식은 그 해머루 자리에 뜬다.
+   빈틈이 닫히거나 맞으면 시들어 가라앉는다. */
+const KMUD='#6b5662',KMUD_DK='#3d2f37',KMUD_LT='#8f7b86';
+function kudzuOpenMark(p){
+  if(!p.core||coreHidden())return false;
+  const pos=kudzuMark(p),life=B.E.markLife||120;
+  B.mark={x:pos.x,y:pos.y,t:life,max:life,part:p};B.kWeak={x:pos.x,y:pos.y,t:0,fade:0};
+  B.msg=B.kWeakSeen?'탁한 칡꽃이 솟았다.':'탁한 칡꽃이 솟았다. 속에 해머루가 비친다.';B.kWeakSeen=true;
+  return true;
+}
+function drawWeakFlower(c){
+  const w=B.kWeak;if(!w)return;
+  const rise=Math.min(1,w.t/9),pop=rise<1?rise*(1+0.25*Math.sin(rise*Math.PI)):1,a=1-w.fade/16,x=w.x,y=w.y,still=Vfx.reducedMotion;
+  if(a<=0)return;
+  const sway=still?0:Math.sin(B.time*0.06)*1.5,gy=y+24;
+  // 갈라진 흙 틈과 솟은 굵은 꽃대, 잎 둘
+  blob(c,x,gy,16,4.5,KSOIL,0.6*a);brush(c,[[x-12,gy],[x-4,gy-1],[x+3,gy+1],[x+12,gy-1]],1.2,INK,0.5*a);
+  c.save();c.globalAlpha=a;c.translate(x,gy);c.scale(pop,pop);c.translate(-x,-gy);
+  brush(c,[[x,gy],[x-1+sway*0.3,y+12],[x+sway,y+2]],4,KSTEM);
+  kLeaf(c,x-6,gy-6,0.9,-1.1,KLEAF);kLeaf(c,x+6,gy-9,0.8,1.0,KLEAF);
+  // 크고 탁한 꽃송이: 꽃잎이 벌어져 속이 보인다
+  for(let i=0;i<10;i++){const ang=-Math.PI/2+(i-4.5)*0.42,r=13+(i%2)*3,px=x+sway+Math.cos(ang)*r*0.95,py=y-2+Math.sin(ang)*r*0.8+6;
+    blob(c,px,py,7.5,5.5,i%3?KMUD:KMUD_DK,0.95);blob(c,px-Math.cos(ang)*1.5,py-Math.sin(ang)*1.5,3,2.2,KMUD_LT,0.6);}
+  for(let i=0;i<5;i++){const k=i/4,px=x+sway*(1+k)-4+k*7,py=y-22-k*12;blob(c,px,py,4.5-k*1.6,5.5-k*2,KMUD_DK,0.9);}   // 위로 맺힌 탁한 봉오리
+  blob(c,x+sway,y+1,11,9,'#2a1d26',0.85);   // 벌어진 꽃 속의 그늘
+  // 꽃 속에 품은 해머루 송이: 짙은 보랏빛 알 일곱과 흰 분, 작은 빛
+  for(const [dx,dy,r] of [[-4,-3,3.4],[3,-3.5,3.4],[0,1,3.6],[-6,3,3.1],[6,3,3.1],[-2,6.5,3],[3.5,7,2.8]]){
+    blob(c,x+sway+dx,y+dy,r,r,'#2d1d3d');blob(c,x+sway+dx,y+dy,r,r,'#7c6a96',0.22);blob(c,x+sway+dx-r*0.35,y+dy-r*0.4,r*0.32,r*0.28,'#d8cde6',0.85);}
+  brush(c,[[x+sway,y-6],[x+sway+1,y-10]],1.4,KSTEM);
+  c.restore();
+}
+function tickKudzu(){for(const h of B.kHoles||[])h.t--;if(B.kHoles)B.kHoles=B.kHoles.filter(h=>h.t>0);
+  const w=B.kWeak;if(w){w.t++;if(!B.mark||!B.mark.part.core)w.fade++;if(w.fade>16)B.kWeak=null;}}
 defineAttacks({
   kudzuWhip:{dur:2*WHIP.gap+WHIP.tell+WHIP.swing,tick(t){if(t)return;B.kHold=null;
     // 결정 D-371: 여덟 방향 가운데 무작위. 바로 앞 줄기와 같은 방향이나 맞은편 방향은 피한다
@@ -570,7 +765,7 @@ defineBullets({
     step(b){const held=b.last&&!b.dug&&heldBy(b);b.t++;
       if(b.x==null&&b.t>b.delay){b.x=B.px;b.y=B.py;}
       const f=slamAt(b);
-      if(b.t===f.hit){Sound.playSfx('battle_hit');bSplash(b.x,b.y,'#6f6357');if(Math.hypot(B.px-b.x,B.py-b.y)<SLAM.radius)bHitMe();
+      if(b.t===f.hit){Sound.playSfx('battle_hit');bSplash(b.x,b.y,KSOIL);if(Math.hypot(B.px-b.x,B.py-b.y)<SLAM.radius)bHitMe();
         (B.kHoles||(B.kHoles=[])).push({x:b.x,y:b.y+4,t:T().kudzu_hole_frames,max:T().kudzu_hole_frames,seed:Math.random()*6});if(B.kHoles.length>6)B.kHoles.shift();}
       if(held&&b.t>f.hit)b.liftAt=b.t+1;   // 표식이 열린 동안 땅에 박힌 채로 둔다
       if(!held&&b.t>Math.max(f.hit+SLAM.stay,slamLiftAt(b)+18))b.dead=1;},
@@ -578,7 +773,8 @@ defineBullets({
       if(f.shadow||f.falling){const k=f.shadow?(b.t-b.delay)/SLAM.tell:1;
         blob(c,b.x,b.y+6,R*(0.45+0.55*k),R*0.42*(0.45+0.55*k),INK,0.12+0.3*k);
         if(k>0.7&&Math.floor(b.t/4)%2){c.save();c.strokeStyle=RED;c.lineWidth=2;c.globalAlpha=0.8;c.beginPath();c.ellipse(b.x,b.y+6,R,R*0.42,0,0,Math.PI*2);c.stroke();c.restore();}}
-      if(f.falling){const k=(b.t-b.delay-SLAM.tell)/SLAM.drop;kSpike(c,b.x,BOX.y-6+(b.y+4-BOX.y+6)*k*k,b.lean||0.3,1);
+      if(f.falling){const k=(b.t-b.delay-SLAM.tell)/SLAM.drop,ty=BOX.y-6+(b.y+4-BOX.y+6)*k*k;kSpike(c,b.x,ty,b.lean||0.3,1);
+        for(let i=0;i<3;i++)kSoil(c,b.x+(i-1)*7+(b.lean||0.3)*6,ty-34-i*9+k*6,1.3,0.8,i);   // 함께 떨어지는 흙 부스러기
         for(let i=-1;i<=1;i++)brush(c,[[b.x+i*9,b.y-46],[b.x+i*9,b.y-24]],1.1,INK,0.3);}   // 내리꽂히는 줄
       if(f.after){const a=b.t-f.hit,lift=clamp((b.t-slamLiftAt(b))/16,0,1);
         kSpike(c,b.x,b.y+4-(b.y-BOX.y+40)*lift*lift,b.lean||0.3,1-lift*0.6);
@@ -610,10 +806,14 @@ defineBullets({
         if(k>0.75&&Math.floor(b.t/4)%2){c.save();c.strokeStyle=RED;c.globalAlpha=0.8;c.lineWidth=1.8;c.beginPath();c.arc(x,y,R,0,Math.PI*2);c.stroke();c.restore();}
         const sway=still?0:Math.sin(b.t*0.25)*2;
         kLeaf(c,x-10,y+9,0.75,-0.9,KLEAF,0.4+0.5*k);kLeaf(c,x+10,y+9,0.7,0.9,KLEAF,0.4+0.5*k);
-        bloom(10+22*k,sway,0.35+0.65*k);return;}
+        const pop=k<0.7?k/0.7:1+Math.sin((k-0.7)/0.3*Math.PI)*0.12;   // 빨리 솟아 터지기 직전에 한 번 부푼다
+        bloom(6+28*Math.min(pop,1.12),sway,0.45+0.55*k);return;}
       if(s.burst){const k=s.k,e=1-(1-k)*(1-k);
         pool(R*e,1);
-        bloom(32,still?0:Math.sin(b.t*0.9)*4,1-k*0.7);   // 꽃가루를 터뜨리며 흔들린다
+        if(k<0.6)bloom(34*(1-k),still?0:Math.sin(b.t*0.9)*4,1-k*1.4);   // 팡 터지며 꽃송이가 흩어진다
+        c.save();c.strokeStyle='#fffaf0';c.globalAlpha=Math.max(0,0.9-k*1.1);c.lineWidth=3*(1-k)+1;c.beginPath();c.arc(x,y,R*(0.35+1.05*e),0,Math.PI*2);c.stroke();c.restore();
+        for(let i=0;i<9;i++){const a=i*0.7+b.seed,d=R*(0.25+1.25*e),px2=x+Math.cos(a)*d,py2=y+Math.sin(a)*d*0.85;   // 사방으로 튀는 꽃잎
+          c.save();c.translate(px2,py2);c.rotate(a+k*3);c.globalAlpha=Math.max(0,1-k*0.9);c.fillStyle=i%3?KPUR:KPUR_LT;c.beginPath();c.ellipse(0,0,4.2,2.4,0,0,Math.PI*2);c.fill();c.restore();}
         motes(24,R*1.05*e,6*k,0.9-0.3*k);return;}
       const a=s.fade?1-s.k:1,pulse=still?1:1+Math.sin(b.t*0.12+b.seed)*0.04;
       pool(R*pulse,a);
@@ -639,7 +839,7 @@ defineEnemies({
     calmWin:'엉킨 칡이 스르르 풀리며 당산나무를 놓아준다.',calmGift:'kflower',
     win:'칡꽃송이가 꺾이자 덩굴이 힘없이 흘러내린다.',
     lose:'덩굴에 밀려 숲 어귀로 물러났다.',
-    markPosition:kudzuMark,onMarkHit:kudzuMarkHit,drawFloor:drawKudzuHoles,tickHazards:tickKudzu,
+    markPosition:kudzuMark,openMark:kudzuOpenMark,onMarkHit:kudzuMarkHit,drawFloor:drawKudzuFloor,tickHazards:tickKudzu,
     backdrop:drawKudzuHill,draw:drawKudzu},
   /* 무쇠는 피하기만 하는 시험이다. 꿀밤으로 연장을 놓치고 여섯 판을 버틴다 (결정 D-59·D-60). */
   musoe:{name:'무쇠',calmLabel:'마음',npc:true,dodge:6,showHands:true,
