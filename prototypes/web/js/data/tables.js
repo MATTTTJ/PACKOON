@@ -1665,7 +1665,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "돌탑은 돌 마음부터 읽고, 하나씩 천천히 얹는다.",
+     "text": "돌은 돌리기 전에 먼저 소리를 듣는다. 소리 나는 쪽, 왼쪽으로 한 바퀴.",
      "section": "관찰",
      "when": "dolsoe:stack"
     },
@@ -2867,6 +2867,7 @@ const TABLES={
   "kudzu_scent_linger": 150,
   "kudzu_hole_frames": 90,
   "toast_frames": 300,
+  "name_card_ms": 3600,
   "peek_ms": 1400,
   "peek_fade_ms": 240,
   "peek_open_ms": 460,

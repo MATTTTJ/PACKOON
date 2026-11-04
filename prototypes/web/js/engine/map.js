@@ -53,7 +53,7 @@ function mapSeenAt(region,zone){
 }
 function mapSeenText(seen){
   const parts=[];
-  if(seen.who.length)parts.push('만난 이 '+seen.who.join('·'));
+  if(seen.who.length)parts.push(seen.who.join('·'));   // 결정 D-448: '만난 이' 말 없이 그 구역에서 만난 이름만
   if(seen.items.length)parts.push('채집물 '+seen.items.map(i=>ITEMS[i.id].n+(i.spent?'(다 거둠)':'')).join('·'));
   return parts.join(' · ');
 }
@@ -164,7 +164,7 @@ function showMapTip(button){
   if(!tip){tip=el('div','map-tip');tip.id='mapTip';tip.setAttribute('aria-hidden','true');$('map').appendChild(tip);}
   const who=button&&!button.disabled&&open('map')?button.dataset.who:'';
   tip.hidden=!who;if(!who)return;
-  tip.textContent='만난 이 · '+who;tip.style.left='0px';   // 너비를 잴 때 오른쪽 끝에 눌려 접히지 않게
+  tip.textContent=who;   // 결정 D-448tip.style.left='0px';   // 너비를 잴 때 오른쪽 끝에 눌려 접히지 않게
   const box=$('map').getBoundingClientRect(),r=button.getBoundingClientRect(),above=r.top-box.top>48;
   const view=$('mapBody').getBoundingClientRect();if(r.bottom<view.top||r.top>view.bottom){tip.hidden=true;return;}   // 굴러서 안 보이는 칸
   tip.classList.toggle('below',!above);

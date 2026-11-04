@@ -1386,11 +1386,13 @@ Rg.goal=()=>{
     return '시루에 눈홍시와 쌀가루 넣어 약떡 찌기';
   }
   if(F.bueongDone)return toNight('창고 문 앞 지키기');
-  if(!F.bueongNight)return night()?'부엉 영감님께 말 걸기':knows('bueong:night')?'마루에서 쉬며 밤 기다리기':'부엉 영감님 찾아가기';
+  // 결정 D-447: 아직 말을 나눠 보지 않은 인물은 이름 대신 아이가 아는 것(숙소, 떡집)으로 부른다. 시작 글: "보부상은 장터에 오면 숙소부터 들른다"
+  const bueongKnown=knows('met:bueong')||knows('bueong:night');
+  if(!F.bueongNight)return night()?(bueongKnown?'부엉 영감님께 말 걸기':'보부상 숙소 주인께 말 걸기'):knows('bueong:night')?'마루에서 쉬며 밤 기다리기':'보부상 숙소 찾아가기';
   if(!F.bueongDone){
     if(has('patsirutteok'))return toNight('부엉 영감님께 팥시루떡 올리기');
     if(!isAwake('siru')){
-      if(!F.morakMet)return '떡집 모락 찾아가기';
+      if(!F.morakMet)return '떡집 찾아가기';
       const sp=G.inv.ssal_powder||0,s=G.inv.ssal||0;
       if(sp>=3)return '모락에게 쌀가루 3개 건네기';
       if(sp+s>=3)return '맷돌에 쌀 갈기 ('+sp+'/3)';

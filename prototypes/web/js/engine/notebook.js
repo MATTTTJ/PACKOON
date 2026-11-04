@@ -171,7 +171,22 @@ Object.defineProperty(window,'bookTab',{configurable:true,get:()=>noteTab,set:v=
     tabs.appendChild(b);
   });
 }
-function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){Sound.book(true);collectFreshDrawings();renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;}}
+function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){Sound.book(true);collectFreshDrawings();
+  if(nameCardUnseen){nameCardUnseen=false;noteTab='nicknames';$('btnNote').classList.remove('has-new');}   // 결정 D-449: 새 이름을 받은 뒤 처음 열면 '이름' 장부터
+  const card=$('nameCard');if(card){clearTimeout(nameCardTimer);card.classList.remove('show');card.hidden=true;}   // 수첩 탭을 가리지 않게 쪽지는 내린다
+  renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;}}
+/* 결정 D-449: 이름을 받는 순간 화면 위에 작은 이름 쪽지를 띄운다 (사용자 피드백 2026-11-04: 얻었다는 걸 친숙하게).
+   쪽지 = "새로 불린 이름" · 큰 글씨 이름 · "○○이 지어 준 이름 · 수첩에 적었다". 맑은 소리 한 번, 수첩 단추에 금빛 점(열면 '이름' 장이 먼저 열린다). */
+let nameCardUnseen=false,nameCardTimer=0;
+function showNameCard(text,by){
+  let card=$('nameCard');
+  if(!card){card=el('div','name-card');card.id='nameCard';card.setAttribute('role','status');card.setAttribute('aria-live','polite');$('stage').appendChild(card);}
+  card.innerHTML='';
+  card.append(el('small',null,'새로 불린 이름'),el('b',null,text),el('span',null,(by?jo(by,'이','가')+' 지어 준 이름 · ':'')+'수첩에 적었다'));
+  card.hidden=false;card.classList.remove('show');void card.offsetWidth;card.classList.add('show');
+  Sound.craft();nameCardUnseen=true;$('btnNote').classList.add('has-new');
+  clearTimeout(nameCardTimer);nameCardTimer=setTimeout(()=>{card.classList.remove('show');card.hidden=true;},TABLES.TUNING.name_card_ms);
+}
 /* 옛 이름: 너구리의 책이 따로 있던 때 부르던 함수도 이 수첩을 연다 */
 function toggleBook(){toggleNote();}
 function renderBook(){renderNotebook();}

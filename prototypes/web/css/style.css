@@ -802,3 +802,16 @@ body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
   .hud-btns{max-width:62%}
   .hud-btns .chipbtn{padding:2px 8px}
 }
+/* 결정 D-449: 이름을 받을 때 뜨는 이름 쪽지 (한지 쪽지가 내려와 도장처럼 멈춘다) */
+.name-card{position:absolute;top:13%;left:50%;transform:translate(-50%,-14px) rotate(-1.5deg);opacity:0;z-index:27;pointer-events:none;
+  background:var(--hanji);color:#2a211b;border:2px solid #2a211b;border-radius:3px;box-shadow:0 4px 0 rgba(26,19,15,.35);
+  padding:8px 20px 9px;text-align:center;min-width:180px;max-width:80%;font-family:var(--display);display:flex;flex-direction:column;gap:2px}
+.name-card[hidden]{display:none}
+.name-card small{font-family:var(--ui);font-size:clamp(10px,1.2vw,12px);color:#8a3b2a;letter-spacing:.08em}
+.name-card b{font-size:clamp(18px,2.8vw,28px);line-height:1.2}
+.name-card span{font-family:var(--ui);font-size:clamp(10px,1.2vw,12px);color:#5a4a3c}
+.name-card.show{animation:name-card-in .55s cubic-bezier(.2,1.3,.4,1) forwards}
+@keyframes name-card-in{0%{opacity:0;transform:translate(-50%,-18px) rotate(-6deg) scale(.92)}70%{opacity:1;transform:translate(-50%,2px) rotate(-1deg) scale(1.03)}100%{opacity:1;transform:translate(-50%,0) rotate(-1.5deg) scale(1)}}
+#btnNote.has-new{position:relative}
+#btnNote.has-new::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px #2a211b}
+@media (prefers-reduced-motion:reduce){.name-card.show{animation:none;opacity:1;transform:translate(-50%,0)}}
