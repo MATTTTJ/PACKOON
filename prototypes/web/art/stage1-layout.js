@@ -112,7 +112,7 @@ const ZONES={
     web:{platforms:[{x:320,y:158,w:86},{x:412,y:130,w:84},{x:502,y:113,w:86},{x:594,y:112,w:54},{x:1580,y:159,w:84},{x:1679,y:129,w:63},{x:1759,y:112,w:58}]},
   },
   // 이끼 뿌리와 숯가마·검댕 → 도담과 다람쥐만 오르는 높은 그루터기 → 금줄 기둥 → 쓰러진 통나무 → 꺼병이·꿩 어미 → 높은 참나무 → 금줄 길 문
-  forest:{name:'참나무 숲',w:2190,sky:'day',woods:'bg_woods_dark',groundArt:'bg_ground_soil',startX:70,
+  forest:{name:'참나무 숲',w:2190,sky:'day',dim:0.62,woods:'bg_woods_dark',groundArt:'bg_ground_soil',startX:70,
     ground:[[0,192],[150,190],[260,196],[350,194],[440,188],[600,186],[700,190],[820,194],[950,190],[1100,198],[1240,196],[1400,188],[1550,184],[1650,190],[1800,192],[1960,190],[2190,194]],
     platforms:[{x:410,y:160,w:70,kind:'rock'},{x:486,y:138,w:70,kind:'stump'},{x:566,y:152,w:66,kind:'rock'},{x:744,y:96,w:64,kind:'stump'},
       {x:1070,y:168,w:70,kind:'mound'},{x:1146,y:142,w:62,kind:'rock'},{x:1250,y:154,w:85,kind:'stump'},

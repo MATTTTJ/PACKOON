@@ -650,6 +650,54 @@
   "v": 2,
   "w": 187
  },
+ "fg_smithy": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 546,
+  "kind": "prop",
+  "normal": false,
+  "units": [
+   181.1,
+   91.0
+  ],
+  "v": 1,
+  "w": 1087
+ },
+ "fr_high_oak": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 840,
+  "kind": "prop",
+  "normal": false,
+  "units": [
+   130.7,
+   140.0
+  ],
+  "v": 1,
+  "w": 784
+ },
+ "fr_oak": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 660,
+  "kind": "prop",
+  "normal": false,
+  "units": [
+   102.7,
+   110.0
+  ],
+  "v": 1,
+  "w": 616
+ },
  "fx_leaves": {
   "anchor": [
    0.5,
@@ -747,6 +795,38 @@
   ],
   "v": 1,
   "w": 64
+ },
+ "hl_dangsan": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 1071,
+  "kind": "prop",
+  "normal": false,
+  "units": [
+   190.1,
+   200.0
+  ],
+  "v": 1,
+  "w": 1018
+ },
+ "ms_apothecary": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 432,
+  "kind": "prop",
+  "normal": false,
+  "units": [
+   143.3,
+   72.0
+  ],
+  "v": 1,
+  "w": 860
  },
  "pf_marsh_stone": {
   "anchor": [
@@ -877,5 +957,53 @@
   ],
   "v": 3,
   "w": 314
+ },
+ "vl_home": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 330,
+  "kind": "prop",
+  "normal": false,
+  "units": [
+   109.5,
+   55.0
+  ],
+  "v": 1,
+  "w": 657
+ },
+ "vl_house_b": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 264,
+  "kind": "prop",
+  "normal": false,
+  "units": [
+   87.6,
+   44.0
+  ],
+  "v": 1,
+  "w": 525
+ },
+ "vl_mill_house": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "baked": true,
+  "h": 258,
+  "kind": "prop",
+  "normal": false,
+  "units": [
+   85.6,
+   43.0
+  ],
+  "v": 1,
+  "w": 513
  }
 }
