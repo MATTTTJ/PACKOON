@@ -26,6 +26,7 @@ function showLine(){
   const L=dlgQ.shift();
   if(!L){const f=dlgEnd;dlgDismiss();if(f)f();return;}
   $('dlg').hidden=false;$('dlgWho').textContent=L[0];$('dlgText').textContent=L[1];dlgShownAt=performance.now();
+  if(L.hint)learn(L.hint);   // 결정 D-461: 숨은 가공법 귀띔은 그 줄을 들은 순간 수첩에 적힌다 (arcs.js hintLine)
   if('pic' in L)dlgPic(L.pic);
   const face=$('dlgFace');face.innerHTML='';face.appendChild(portrait(L[0]));
   const ch=$('dlgChoices');ch.innerHTML='';

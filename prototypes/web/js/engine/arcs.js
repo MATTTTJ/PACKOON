@@ -29,6 +29,10 @@ function arcScene(flag,lines,record,after){
   return true;
 }
 
+/* 결정 D-461: 숨은 가공법 귀띔. 인물이 지나가며 하는 한마디 줄에 붙이면, 그 줄을 들을 때 'hint:<결과물>'을 배워
+   수첩 숨은 가공법 장에 적히고 가공대 가공법 목록에 보인다. 만들어 보면 원래대로 'recipe:<결과물>'도 배운다. */
+function hintLine(out,line){return Object.assign(line,{hint:'hint:'+out});}
+
 /* 결정 D-353: 길손(strangers.js)의 한 번만 하는 말. 저장의 G.f.strangerOnce에 남는다. */
 function strangerOnce(key){const d=G.f.strangerOnce||(G.f.strangerOnce={});if(d[key])return false;d[key]=true;return true;}
 function strangerSay(lines,next){talk(lines,next);return true;}
