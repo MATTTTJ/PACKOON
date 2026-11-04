@@ -117,7 +117,7 @@ const ZONES={
     platforms:[{x:410,y:160,w:70,kind:'rock'},{x:486,y:138,w:70,kind:'stump'},{x:566,y:152,w:66,kind:'rock'},{x:744,y:96,w:64,kind:'stump'},
       {x:1070,y:168,w:70,kind:'mound'},{x:1146,y:142,w:62,kind:'rock'},{x:1250,y:154,w:85,kind:'stump'},
       {x:1610,y:158,w:84,kind:'rock'},{x:1700,y:126,w:64,kind:'stump'},{x:1770,y:112,w:90,kind:'rock'},{x:1874,y:138,w:66,kind:'mound'}],
-    exits:{left:{to:'forge',toX:1770},right:{to:'marsh',toX:70}},
+    exits:{left:{to:'forge',toX:1770}},   // 늪가 약방 구역은 게임에서 뺐다 (결정 D-521)
     doors:[{x:1960,to:'hill',toX:180,label:'금줄 따라 당산나무 언덕으로',id:'fr_rope_gate',block:'vine'}],
     npcs:[{id:'ch_geomdaeng',x:430,name:'검댕'},{id:'ch_dodam',x:700,name:'도담'},{id:'ch_pheasant',x:1080,name:'꺼병이',v:'chick',s:0.45},{id:'ch_pheasant',x:1630,name:'꿩 어미',v:'mother'}],
     objects:[
@@ -155,48 +155,6 @@ const ZONES={
     web:{platforms:[{x:410,y:160,w:70},{x:486,y:138,w:70},{x:566,y:152,w:66},{x:744,y:96,w:64},{x:1070,y:164,w:70},{x:1146,y:138,w:62},{x:1250,y:152,w:85},
       {x:1610,y:158,w:84},{x:1700,y:124,w:64},{x:1770,y:112,w:90},{x:1874,y:136,w:66}]},
   },
-  // 디딤돌 웅덩이 → 반딧불 자리들 → 말림 판 → 약초 선반 → 두꺼비 약방과 등롱 → 갈림길 팻말
-  marsh:{name:'늪가 약방',w:2400,sky:'dusk',woods:'bg_woods_dark',groundArt:'bg_ground_marsh',startX:70,
-    ground:[[0,194],[300,198],[420,200],[800,198],[1000,196],[1200,192],[1400,190],[1560,188],[1700,190],[1900,196],[2200,198],[2400,194]],
-    bands:[{id:'bg_water_marsh',x0:-1,x1:-1,y:174,h:24,p:0.7,behind:true}],
-    platforms:[{x:420,y:160,w:80,kind:'marsh_stone'},{x:518,y:140,w:66,kind:'marsh_stone'},{x:608,y:160,w:80,kind:'mound'},{x:700,y:166,w:64,kind:'marsh_stone'},
-      {x:980,y:160,w:96,kind:'scaffold'},{x:1086,y:136,w:62,kind:'marsh_stone'},{x:1156,y:154,w:58,kind:'stump'},
-      {x:1780,y:160,w:80,kind:'marsh_stone'},{x:1869,y:138,w:66,kind:'rock'},{x:1945,y:166,w:66,kind:'marsh_stone'},{x:2021,y:166,w:62,kind:'mound'}],
-    exits:{left:{to:'forest',toX:2090}},
-    npcs:[{id:'ch_toad',x:1600,name:'두꺼비 할멈'}],
-    objects:[
-      {id:'cm_reeds',x:160,v:'a'},
-      {id:'ms_stepping',x:320,dy:2},
-      {id:'cm_reeds',x:470,v:'b',layer:'back'},
-      {id:'ms_firefly_reed',x:520},
-      {id:'cm_reeds',x:800,v:'a'},
-      {id:'ms_drying_board',x:900,layer:'back'},
-      {id:'ms_firefly_reed',x:1030,y:160},
-      {id:'cm_reeds',x:1090,v:'b',layer:'back'},
-      {id:'ms_drying_board',x:1250},
-      {id:'ms_herb_shelf',x:1220,layer:'back'},
-      {id:'cm_reeds',x:1370,v:'a'},
-      {id:'ms_firefly_reed',x:1450},
-      {id:'cm_fence',x:1510},
-      {id:'ms_apothecary',x:1607,layer:'back'},
-      {id:'ms_lantern',x:1644,y:178,st:'lantern'},
-      {id:'cm_reeds',x:1850,v:'b',layer:'back'},
-      {id:'ms_drying_board',x:1910},
-      {id:'cm_reeds',x:2140,v:'a'},
-      {id:'cm_sign',x:2180},
-      {id:'cm_reeds',x:2340,v:'b'},
-      {id:'dc_mushrooms',x:600,v:'b'},{id:'dc_mushrooms',x:1700,v:'a'},{id:'dc_flowers',x:1300,v:'a'},{id:'dc_grass',x:960,v:'b',layer:'back'},{id:'dc_grass',x:2250,v:'a',layer:'back'},
-      {id:'dc_ferns',x:1990,v:'b'},{id:'dc_roots',x:700,v:'b',layer:'back'},
-      {id:'dc_hanging_branch',x:400,y:24,layer:'front',p:1.25,dark:0.4,v:'b'},
-      {id:'dc_hanging_branch',x:1800,y:20,layer:'front',p:1.25,dark:0.4,v:'a'},
-    ],
-    pickups:[],
-    digs:[{x:900,label:'꾀꼬리버섯'},{x:250,label:'칡뿌리'},{x:1310,label:'싸리버섯'}],
-    marks:[{type:'npc',x:1760,label:'반딧불'},{type:'work',x:520,label:'반딧불 자리'},{type:'work',x:1030,y:160,label:'반딧불 자리'},{type:'work',x:1450,label:'반딧불 자리'}],
-    lights:[{x:1600,y:160,r:60,c:[1,0.72,0.4],i:0.7,kind:'window'},{x:1644,y:165,r:70,c:[0.85,1,0.55],i:1.0,kind:'lantern',when:['lantern','on']}],
-    web:{platforms:[{x:420,y:157,w:87},{x:518,y:138,w:70},{x:608,y:157,w:86},{x:700,y:164,w:67},{x:980,y:158,w:100},{x:1086,y:134,w:62},{x:1156,y:152,w:58},
-      {x:1780,y:158,w:83},{x:1869,y:136,w:69},{x:1945,y:164,w:70},{x:2021,y:164,w:64}]},
-  },
   // 금줄 길 문 → 둔덕 → 서낭당과 소원 천 → 언덕 마루의 당산나무와 엉킨 칡 → 집 돌아보는 자리 → 북쪽 길 팻말
   hill:{name:'당산나무 언덕',w:1600,sky:'dusk',woods:'bg_woods_light',groundArt:'bg_ground_soil',startX:180,
     ground:[[0,194],[180,192],[350,190],[460,186],[600,184],[800,180],[950,176],[1100,172],[1214,170],[1330,172],[1450,176],[1600,180]],
@@ -228,5 +186,5 @@ const ZONES={
   },
 };
 
-window.ART_STAGE1={G,STATES,SKY,LAYERS,ZONES,order:['village','forge','forest','marsh','hill']};
+window.ART_STAGE1={G,STATES,SKY,LAYERS,ZONES,order:['village','forge','forest','hill']};
 })();

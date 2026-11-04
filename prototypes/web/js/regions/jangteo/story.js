@@ -1131,7 +1131,7 @@ function bueongGiveNow(){
     clue('j3',NAME_CLUES.j3.who,NAME_CLUES.j3.text);
     diary('j_memo','보부상 신표를 받았다. 아빠의 짐 속에 메모가 있었다. "값은 이미 치러졌다. 이번엔 내가 치른다." 누가, 무슨 값을 치렀다는 걸까.');
     if(Rg.arcs()){
-      F.jangteoArcsBueong1=true;diary('jangteoArcsBueong1','부엉 영감이 장부에 표시하고 신표를 내주었다. 아빠가 맡긴 짐도 몇 달째 보관하고 있었다.');
+      F.jangteoArcsBueong1=true;diary('jangteoArcsBueong1','부엉 영감이 장부에 표시하고 신표를 내주었다. 아빠가 맡긴 짐도 한 해째 보관하고 있었다.');
       talk([['너구리','(영감님이 고사떡을 올리고 장부 한 줄에 표시만 한다.\n내 이름은 묻지 않는다.)'],
         ['부엉 영감','신표다. 네 아비 짐도 받아라.\n보관 값은 안 받으마.'],   // 결정 D-424: 작은 지게는 뺐다(요술보따리)
         ['너구리','(보부상 신표와 아빠가 맡긴 짐을 얻었다.)'],
