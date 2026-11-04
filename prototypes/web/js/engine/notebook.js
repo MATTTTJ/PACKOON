@@ -178,6 +178,7 @@ function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){Sound.boo
 /* 결정 D-449: 이름을 받는 순간 화면 위에 작은 이름 쪽지를 띄운다 (사용자 피드백 2026-11-04: 얻었다는 걸 친숙하게).
    쪽지 = "새로 불린 이름" · 큰 글씨 이름 · "○○이 지어 준 이름 · 수첩에 적었다". 맑은 소리 한 번, 수첩 단추에 금빛 점(열면 '이름' 장이 먼저 열린다). */
 let nameCardUnseen=false,nameCardTimer=0;
+// 결정 D-503: 쪽지는 절반 크기에 기울이지 않는다 (style.css .name-card)
 function showNameCard(text,by){
   let card=$('nameCard');
   if(!card){card=el('div','name-card');card.id='nameCard';card.setAttribute('role','status');card.setAttribute('aria-live','polite');$('stage').appendChild(card);}

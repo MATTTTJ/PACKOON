@@ -231,6 +231,7 @@ function drawLogs(){for(const p of fieldPlatforms()){const x=p.x-cam;if(x>W||x+p
 /* 바닥 물건이 배경에 묻히지 않게 (피드백 16): 그림 둘레에 한지빛 1px 테두리, 밑에 그림자, 가끔 반짝임 한 번.
    y는 물건이 놓인 바닥, h는 그림 높이. 반짝임은 물건마다 때를 엇갈리고, 움직임 줄이기에서는 끈다. */
 const OUTLINE_W=40,OUTLINE_H=34,OUTLINE_OX=20,OUTLINE_OY=30,OUTLINE_COLOR='#fff4d6';
+const OUTLINE_DARK='#2a1a0e';let outlineDark=null;
 const outlineBuf=document.createElement('canvas'),outlineSil=document.createElement('canvas');
 outlineBuf.width=outlineSil.width=OUTLINE_W;outlineBuf.height=outlineSil.height=OUTLINE_H;
 /* draw(ox,oy): (ox,oy)를 바닥 가운데로 삼아 물건을 그린다. 화면의 (x,y)에 테두리와 함께 옮겨 찍는다 */
@@ -241,9 +242,15 @@ function drawOutlined(x,y,draw){
   s.globalCompositeOperation='source-over';s.clearRect(0,0,OUTLINE_W,OUTLINE_H);s.drawImage(outlineBuf,0,0);
   s.globalCompositeOperation='source-in';s.fillStyle=OUTLINE_COLOR;s.fillRect(0,0,OUTLINE_W,OUTLINE_H);
   const dx=Math.round(x)-OUTLINE_OX,dy=Math.round(y)-OUTLINE_OY;
-  ctx.save();ctx.globalAlpha=.9;
-  for(const [ox,oy] of [[1,0],[-1,0],[0,1],[0,-1]])ctx.drawImage(outlineSil,dx+ox,dy+oy);
-  ctx.globalAlpha=1;ctx.drawImage(outlineBuf,dx,dy);ctx.restore();
+  // 결정 D-502: 윤곽을 두 겹으로 또렷하게. 바깥은 옅은 테(밝은 흙·풀 위에서도), 안쪽은 진한 선 (사용자 피드백 2026-11-04)
+  ctx.save();ctx.globalAlpha=.75;
+  for(const [ox,oy] of [[2,0],[-2,0],[0,2],[0,-2],[1,1],[-1,1],[1,-1],[-1,-1]])ctx.drawImage(outlineSil,dx+ox,dy+oy);
+  if(!outlineDark){outlineDark=document.createElement('canvas');outlineDark.width=OUTLINE_W;outlineDark.height=OUTLINE_H;}
+  const k=outlineDark.getContext('2d');k.globalCompositeOperation='source-over';k.clearRect(0,0,OUTLINE_W,OUTLINE_H);k.drawImage(outlineBuf,0,0);
+  k.globalCompositeOperation='source-in';k.fillStyle=OUTLINE_DARK;k.fillRect(0,0,OUTLINE_W,OUTLINE_H);
+  ctx.globalAlpha=1;
+  for(const [ox,oy] of [[1,0],[-1,0],[0,1],[0,-1]])ctx.drawImage(outlineDark,dx+ox,dy+oy);
+  ctx.drawImage(outlineBuf,dx,dy);ctx.restore();
 }
 function floorShadow(x,y){R(x-6,y,12,1,'rgba(30,18,10,.38)');R(x-4,y+1,8,1,'rgba(30,18,10,.2)');}
 /* 캐는 자리: 흙더미 밑에 옅은 빛 한 줄 (그림은 지역마다 달라 테두리 대신) */
@@ -350,19 +357,17 @@ function drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame=0){
   }
   M(ox,oy,f,-13,-9,7,4,T);M(ox,oy,f,-12,-9,1,4,K);M(ox,oy,f,-9,-9,1,4,K);
   drawBackpack(ox,oy,f);
-  const shoulder=tool==='pick'&&!(attackT>0);   // 결정 D-481: 멘 곡괭이는 머리·몸 뒤로 지나간다
-  if(shoulder)drawFieldTool(ox,oy,f,st,attackT,tool);
   M(ox,oy,f,-3+st,-4,3,4,K);M(ox,oy,f,2-st,-4,3,4,K);
   M(ox,oy,f,-4,-12,9,8,Gy);M(ox,oy,f,0,-11,4,6,'#cfc3b2');
   M(ox,oy,f,-3,-20,10,8,Gy);M(ox,oy,f,-2,-17,9,2,K);M(ox,oy,f,4,-17,1,1,'#ffffff');M(ox,oy,f,-2,-15,8,2,Wt);M(ox,oy,f,7,-16,1,2,K);
   M(ox,oy,f,-7,-21,16,2,'#c39b55');M(ox,oy,f,-3,-25,8,4,'#dcbb7a');M(ox,oy,f,-3,-22,8,1,'#6e4f22');M(ox,oy,f,4,-27,2,2,'#fbf7ee');
   // 삼촌이 따 준 잎사귀는 보따리 끈에 매단다 (머리에 얹지 않는다)
   if(G?.forms?.length){M(ox,oy,f,-4,-12,1,5,'#6e4f22');drawStrapLeaf(ox,oy,f,-3,-9);}
-  if(shoulder)M(ox,oy,f,3,-14-(st?1:0)-(formAir===1?1:0),2,2,K);   // 자루를 쥔 앞발만 몸 앞에
-  else drawFieldTool(ox,oy,f,st,attackT,tool);
+  drawFieldTool(ox,oy,f,st,attackT,tool);
 }
 /* 결정 D-481: 필드에서 도구마다 드는 모양이 다르다 (사용자 피드백 2026-11-04). 생김새는 전투 그림(D-455·D-456)과 같다.
-   - 곡괭이: 자루를 어깨에 걸쳐 멘다. 머리는 등 뒤 위로, 한쪽은 뾰족한 촉·한쪽은 넓적한 괭이날. 걸으면 어깨와 함께 들썩이고, 뛰면 조금 들린다.
+   - 곡괭이: 앞발로 자루 가운데를 쥐고 몸 앞으로 비스듬히 낮게 든다. 쇠 머리는 발 앞 낮은 곳에, 한쪽은 뾰족한 촉·한쪽은 넓적한 괭이날.
+     걸으면 손에서 조금 흔들리고, 뛰면 몸 쪽으로 당긴다 (결정 D-505: 어깨에 멘 곡괭이가 보따리와 엉켜 보였다, 사용자 피드백 2026-11-04).
    - 낫: 자루를 쥐고 옆구리 아래로 늘어뜨린다. 휜 날이 앞을 향하고(검은 등, 흰 날), 걸으면 손에서 흔들리고, 뛰면 날을 몸 쪽으로 당긴다.
    - 휘두를 때는 둘 다 손에서 앞으로 크게 원을 그린다. 구르기·변신 중에는 그리지 않는다(보따리 속). 등을 보일 때는 등에 비스듬히 멘다(drawRaccoonBackAt). */
 const TOOL_WOOD='#8a5a30',TOOL_WOOD_D='#5e3b1e',TOOL_IRON='#5d646b',TOOL_IRON_L='#a9b1b8',TOOL_EDGE='#eef2f4';
@@ -372,7 +377,7 @@ function drawFieldTool(ox,oy,f,st,attackT,tool){
   // 손 자리와 자루 방향(a: 0이면 위, 양수면 앞으로 기운다)
   let hx=ox+f*5,hy=oy-10,a,len;
   if(swing){a=-0.9+(1-attackT/18)*3.2;len=tool==='pick'?11:9;}
-  else if(tool==='pick'){hx=ox+f*3;hy=oy-13-(st?1:0)-(air===1?1:0);a=-1.05;len=13;}   // 어깨에 멘다 (자루가 머리 뒤로 지나 머리는 등 위에서 보인다)
+  else if(tool==='pick'){hx=ox+f*6;hy=oy-10+(air===1?-1:0);a=air?2.2:2.6+(st?0.08:-0.04);len=7;}   // 결정 D-505: 몸 앞으로 낮게 든다
   else{hy=oy-10+(air===1?-1:0);a=air?2.15:2.55+(st?0.12:-0.06);len=6;}   // 옆구리 아래로 늘어뜨린다
   const dx=f*Math.sin(a),dy=-Math.cos(a),px=-dy*f,py=dx*f;
   const P=(u,v,w,h,c)=>R(Math.round(hx+dx*u+px*v),Math.round(hy+dy*u+py*v),w,h,c);
@@ -528,7 +533,7 @@ function updateOverlay(){
   if(floor){pr.hidden=false;pr.textContent=TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
   else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':gatherCfg(dg)?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';
-    // 결정 D-108·D-145: 안내 말풍선은 채집 기준원과 진행 점 위에 띄운다
+    // 결정 D-500·D-145: 안내 말풍선은 채집 원과 진행 점 위에 띄운다
     const ringTop=!dg.cache&&gatherCfg(dg)?gatherRingTop(dg):GROUND-14;
     pr.style.top=(Math.min(GROUND-14,ringTop)/H*100)+'%';}
   else if(!paused()&&!rolling&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}

@@ -1698,6 +1698,30 @@ const TABLES={
     "line": "샘 둑 틈을 메우면 되겠구나. 고맙다, 아가.",
     "effect": "none"
    }
+  },
+  "haengsu": {
+   "yakgwa": {
+    "kind": "좋아함",
+    "line": "약과라. 장꾼 셈엔 단 게 약이지.",
+    "effect": "none"
+   },
+   "salt": {
+    "kind": "그저 그럼",
+    "line": "소금이야 상단 짐에도 넘친다.",
+    "effect": "none"
+   }
+  },
+  "jongjong": {
+   "gunbam": {
+    "kind": "좋아함",
+    "line": "군밤! 밤샘엔 이게 최고예요.",
+    "effect": "none"
+   },
+   "injeolmi": {
+    "kind": "아주 좋아함",
+    "line": "인절미다! 엄마가 해 주던 맛이야.",
+    "effect": "none"
+   }
   }
  },
  "NOTES": [
@@ -2273,7 +2297,7 @@ const TABLES={
    "lines": [
     {
      "who": "dad",
-     "text": "여우 엿장수. 엿장수 마음대로다. 가위 장단을 맞춰 주면 흥이 나서 덤을 준다.",
+     "text": "여우 엿장수. 엿장수 마음대로다. 흥이 나면 덤을 준다.",
      "section": "아빠 수첩"
     },
     {
@@ -2284,7 +2308,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "장단이 맞자 흥이 올라, 숨겨 둔 아빠의 엿을 내줬다.",
+     "text": "가위 장단으로 나를 웃기더니, 숨겨 둔 아빠의 엿을 내줬다.",
      "section": "관찰",
      "when": "yeotbang:high"
     },
@@ -2541,7 +2565,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "한참 들여다보더니 도로 쥐여 주었다. \"네 거다.\" 신표는 다시 내 보따리 끈에.",
+     "text": "한참 들여다보더니 내 보따리 끈에 도로 매 주었다. \"네 거다.\"",
      "section": "관찰",
      "when": "dad:sinpyo"
     },
@@ -3484,34 +3508,6 @@ const TABLES={
   "handwork_forge_relation": 2,
   "handwork_stack_relation": 2,
   "handwork_steam_relation": 1,
-  "rhythm_notes": 8,
-  "rhythm_good": 0.18,
-  "rhythm_perfect": 0.075,
-  "rhythm_scroll_speed": 145,
-  "rhythm_bonus_hits": 5,
-  "rhythm_start_delay": 0.15,
-  "rhythm_subbeat": 0.22,
-  "rhythm_intro_beats": 6,
-  "rhythm_parts": 3,
-  "rhythm_normal_gap": 0.66,
-  "rhythm_late_gap": 0.55,
-  "rhythm_normal_last": 5,
-  "rhythm_late_hint_delay": 0.2,
-  "rhythm_finish_delay": 0.65,
-  "rhythm_cooldown": 0.12,
-  "rhythm_stray_window": 0.36,
-  "rhythm_resume_delay": 0.3,
-  "rhythm_combo": 3,
-  "rhythm_relation": 1,
-  "rhythm_high_relation": 2,
-  "rhythm_note_one": 1.32,
-  "rhythm_note_two": 1.98,
-  "rhythm_note_three": 2.64,
-  "rhythm_note_four": 3.3,
-  "rhythm_note_five": 3.96,
-  "rhythm_note_six": 4.62,
-  "rhythm_note_seven": 5.17,
-  "rhythm_note_eight": 5.72,
   "salg_graze": 108,
   "salg_return_graze": 114,
   "salg_moving": 0.2,
@@ -3532,10 +3528,13 @@ const TABLES={
   "salg_near_distance": 100,
   "salg_near_graze": 90,
   "salg_near_random": 31,
-  "gather_ring_period": 54,
+  "gather_spin_period": 96,
   "gather_ring_pad": 3,
-  "gather_perfect_window": 3,
-  "gather_good_window": 9,
+  "gather_perfect_zone": 5,
+  "gather_good_zone": 8,
+  "gather_zone_min": 30,
+  "gather_zone_max": 85,
+  "gather_stop_frames": 24,
   "gather_perfect_power": 2,
   "gather_yield": 1,
   "gather_perfect_bonus": 1,
@@ -3547,35 +3546,19 @@ const TABLES={
   "gather_darae_vine_hits": 2,
   "gather_solbang_hits": 2,
   "gather_snow_mound_hits": 2,
-  "gather_root_period": 62,
-  "gather_root_shape": 1,
-  "gather_ssari_period": 48,
-  "gather_ssari_shape": 0,
-  "gather_kkoe_period": 44,
-  "gather_kkoe_shape": 1,
-  "gather_eoksae_period": 50,
-  "gather_eoksae_shape": 1,
-  "gather_seogi_period": 56,
-  "gather_seogi_shape": 3,
-  "gather_snow_mound_period": 56,
-  "gather_snow_mound_shape": 1,
-  "gather_solbang_period": 48,
-  "gather_solbang_shape": 2,
-  "gather_darae_vine_period": 52,
-  "gather_darae_vine_shape": 2,
-  "gather_snow_mound_inward": 1,
-  "tuho_arrows": 4,
-  "tuho_ear_points": 3,
-  "tuho_steady_mouth": 0.6,
-  "tuho_steady_ear": 0.05,
-  "tuho_bold_mouth": 0.3,
-  "tuho_bold_ear": 0.12,
-  "tuho_stake": 1,
-  "tuho_steady_pay": 1,
-  "tuho_bold_pay": 2,
-  "tuho_bets_per_day": 3,
-  "tuho_throw_frames": 42,
-  "tuho_pause_frames": 26
+  "gather_root_period": 104,
+  "gather_ssari_period": 88,
+  "gather_kkoe_period": 84,
+  "gather_eoksae_period": 92,
+  "gather_seogi_period": 100,
+  "gather_snow_mound_period": 100,
+  "gather_solbang_period": 88,
+  "gather_darae_vine_period": 96,
+  "baduk_steady_win": 0.6,
+  "baduk_stake": 1,
+  "baduk_steady_pay": 1,
+  "baduk_bold_pay": 2,
+  "baduk_bets_per_day": 3
  },
  "TUNING": {
   "kkubeogi_cycle": 200,
@@ -3610,22 +3593,23 @@ const TABLES={
   "map_landing_margin": 40,
   "battle_bare_speed": 2.7,
   "battle_bare_cooldown": 16,
-  "battle_bare_radius": 26,
+  "battle_bare_radius": 9,
+  "battle_mark_radius": 13,
   "battle_iframes": 60,
   "battle_squirrel_speed": 3.3,
   "battle_squirrel_cooldown": 10,
-  "battle_squirrel_radius": 20,
+  "battle_squirrel_radius": 7,
   "battle_goat_speed": 2.2,
   "battle_goat_cooldown": 18,
-  "battle_goat_radius": 26,
+  "battle_goat_radius": 9,
   "battle_goat_damage_taken": 0.5,
   "battle_owl_speed": 2.5,
   "battle_owl_cooldown": 24,
-  "battle_owl_radius": 36,
+  "battle_owl_radius": 12,
   "battle_owl_tell_lead": 30,
   "battle_deer_speed": 3.2,
   "battle_deer_cooldown": 16,
-  "battle_deer_radius": 24,
+  "battle_deer_radius": 8,
   "battle_deer_iframes": 96,
   "battle_base_damage": 1,
   "battle_sharp_damage": 2,
@@ -4737,9 +4721,6 @@ const TABLES={
   },
   "j_steam_flour": {
    "sfx": "steamer"
-  },
-  "j_broken_yut": {
-   "sfx": "wood_tap"
   },
   "j_gukbap": {
    "sfx": "fire_crackle",
