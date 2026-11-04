@@ -184,7 +184,8 @@ Rg.onFloorPickup=a=>{
       diary('meoru','해머루를 그려 넣으려고 아빠의 수첩을 펼쳤다. 아빠가 적어 둔 해머루 글 끝에, 나중에 덧쓴 글씨가 그제야 눈에 들어왔다. "여기도 아니다." 먹빛이 많이 바랬다. 아빠는 아주 옛날에 벌써 여기 와 봤구나. 그때도 더 북쪽으로 갔구나.');   // 결정 D-134: 오래된 글씨임을 알아본다
       ledger('toad','두꺼비 할멈','해머루 1','엄마의 병을 늦추는 약');
       if(!CLASSIC)G.f.galToadUphill=true;   // 결정 D-412: 할멈이 금줄 길로 올라와 언덕에 닿는다 (story.js toadUphill)
-      setTimeout(()=>toast(CLASSIC?'수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 두꺼비 할멈에게 가져가자':'수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 금줄 길로 두꺼비 할멈이 올라온다'),1600);refreshGoal();}
+      // 결정 D-522: 약방 구역이 없으니 할멈이 먼저 아이를 부른다. 대화가 열려 있으면 알림만 띄우고, 아이가 다가가 말을 건다.
+      setTimeout(()=>{if(!CLASSIC&&Rg.toadArrive?.())return;toast(CLASSIC?'수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 두꺼비 할멈에게 가져가자':'수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 금줄 길로 두꺼비 할멈이 올라온다');},1600);refreshGoal();}
 };
 /* 휘두르기: 칡덩굴은 낫으로만 끊긴다 */
 Rg.onHit=(x1,x2,dmg,f)=>{
@@ -224,12 +225,15 @@ if(!CLASSIC){
   // 결정 D-155: 숲의 도담(700)에서 꺼병이(1540)까지 걷는 길을 반으로 (758px → 380px). 들르는 자리(참나무 가지 ~808, 도토리 1120,
   // 금줄 1180, 캐기 1370, 발판 무리 1530)는 그대로 두고 그 사이 빈 길만 지운다. 나무(1040)·그루터기(920)는 첫 구간과 함께 빠지고,
   // 나무(1420)는 걸리지 않게 둘째·셋째 구간을 그 양옆에 둔다.
-  Rg.trimCuts={village:[[1310,250],[1800,590],[2410,70]],forge:[[1110,330],[1670,30],[2150,350]],forest:[[830,280],[1230,130],[1472,50],[2530,150]]};
+  Rg.trimCutsV4=Rg.trimCutsV5={village:[[1310,250],[1800,590],[2410,70]],forge:[[1110,330],[1670,30],[2150,350]],forest:[[830,280],[1230,130],[1472,50],[2530,150]]};   // 넷째·다섯째 판 — 옛 저장을 옮길 때 쓴다
+  // 결정 D-520: 마을 개울(여울) 지나 대장간 길로 넘어가는 빈 길을 반으로 (사용자 피드백 2026-11-04). 울타리(1560) 뒤 1580~1780을 지운다.
+  Rg.trimCuts={village:[[1310,250],[1580,200],[1800,590],[2410,70]],forge:[[1110,330],[1670,30],[2150,350]],forest:[[830,280],[1230,130],[1472,50],[2530,150]]};
   const A=Rg.expArt;
   const oldState=Rg.newState,oldStep=Rg.step,oldHit=Rg.onHit;
   const acorns=[['village',280,GROUND],['village',530,160],['village',1260,GROUND],
     ['forge',330,GROUND],['forge',2050,122],['forest',350,GROUND],['forest',1120,GROUND],['forest',2250,112]];
-  const digs=[['village',600],['forest',1370],['forge',1700],['marsh',900]];
+  // 결정 D-521: 늪가 약방 구역을 뺐다. 늪에 있던 꾀꼬리버섯 흙더미는 숲 안쪽 높은 발판 아래로 옮긴다.
+  const digs=[['village',600],['forest',1370],['forge',1700],['forest',2300]];
   const placeRoot=()=>{
     const d=G.digs.find(d=>d.id==='gal_dig_2'||(d.zone==='forest'&&d.x===1020&&d.item==='root'));
     if(d)Object.assign(d,{id:'gal_dig_2',zone:'forge',x:trimX(1700,Rg.trimCuts.forge)});   // 게임 도중 옮기므로 줄인 좌표로 (D-128)
@@ -293,7 +297,7 @@ if(!CLASSIC){
     forest:{...basic('forest',2800,[{x:410,y:160,w:90},{x:486,y:138,w:70},{x:566,y:152,w:66},
       {x:1530,y:164,w:70},{x:1606,y:138,w:62},{x:1710,y:152,w:85},{x:2070,y:158,w:90},{x:2160,y:124,w:75},{x:2230,y:112,w:90},{x:2334,y:136,w:66},
       {x:744,y:96,w:64}]),
-      npcs:['dodam'],exits:{left:{to:'forge',toX:2480},right:{to:'marsh',toX:70}},
+      npcs:['dodam'],exits:{left:{to:'forge',toX:2480}},   // 결정 D-521: 늪가 약방으로 가던 오른쪽 길은 뺐다
       // 결정 D-207: 도토리가 같은 간격으로 늘어서지 않게 (사용자 피드백 58). 가지 위 둘은 가지(744~808) 안에서만 옮긴다.
       pickups:[{id:'gal_extra_acorn_1',x:396,y:GROUND,item:'acorn',got:false},
         {id:'gal_extra_acorn_2',x:471,y:GROUND,item:'acorn',got:false},
@@ -312,12 +316,7 @@ if(!CLASSIC){
       drawActors:()=>{syncBarrier();drawBarrier();},onHit:(...a)=>{syncBarrier();return oldHit(...a);},
       step:()=>{commonStep();syncBarrier();if(G.barrier.shake>0)G.barrier.shake--;},
     },
-    // 1030 디딤돌(반딧불 자리, y158)은 그대로 두고 오르내림을 붙인다.
-    marsh:{...basic('marsh',2400,[...stepRidge(420,41,4),{x:980,y:158,w:100},{x:1086,y:134,w:62},{x:1156,y:152,w:58},...stepRidge(1780,43,4)]),
-      npcs:['toad'],exits:{left:{to:'forest',toX:2700}},   // 할멈은 해머루가 떨어지면 언덕으로 올라간다 (story.js 결정 D-412)
-      // 선반 뒤 작은 채집 무리. 전부 선택 재료이며, 필수 교환 몫은 앞 구역에 있다.
-      pickups:[],
-    },
+    // 결정 D-521: 늪가 약방 구역은 뺐다 (사용자 피드백 2026-11-04). 할멈은 엉킨 칡이 풀린 뒤 언덕으로 찾아온다 (story.js).
     // 결정 D-45: 2600 → 1900. 뿌리 길·첫 발판은 150, 당산나무 쪽은 HILL_SHIFT(700)만큼 앞당겼다.
     hill:{...basic('hill',2600-HILL_SHIFT,[{x:550,y:160,w:100},...stepRidge(660,51,4),
       {x:2290-HILL_SHIFT,y:160,w:100},{x:2380-HILL_SHIFT,y:126,w:100},{x:2490-HILL_SHIFT,y:150,w:64}]),
@@ -344,7 +343,8 @@ if(!CLASSIC){
     ['village','p',168,'bam'],['village','p',1205,'acorn'],
     ['forge','p',700,'bam'],['forge','p',1785,'acorn',{y:112}],
     ['forest','d',1360,'root'],['forest','p',1500,'bam'],['forest','p',1895,'acorn',{y:136}],
-    ['marsh','d',250,'root'],['marsh','d',1310,'ssari'],
+    // 결정 D-521: 늪에 있던 칡뿌리·싸리버섯은 숲 첫 발판 무리 뒤와 숲 안쪽으로
+    ['forest','d',640,'root'],['forest','d',1680,'ssari'],
     ['hill','p',410,'acorn'],
   ]);
 

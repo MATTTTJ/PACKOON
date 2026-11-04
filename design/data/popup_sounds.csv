@@ -1,5 +1,4 @@
 ﻿id,지역,연출,소리,되풀이ms,상태
-village_home,galchamgol,열린 방문 들여다보기,door,,제안
 village_well,galchamgol,우물 두레박 살펴보기,water_drop,,제안
 village_wheel,galchamgol,물레방아 물길 살펴보기,water_trickle,1800,제안
 forge_sign,galchamgol,갈림길 팻말 읽기,wood_tap,,제안
@@ -9,9 +8,6 @@ forest_root,galchamgol,드러난 뿌리 살펴보기,leaf_rustle,,제안
 forest_oak,galchamgol,높은 참나무 가지 올려다보기,leaf_rustle,2200,제안
 forest_trail,galchamgol,나뭇가지에 걸린 금줄 보기,cloth_flutter,1900,제안
 forest_mother,galchamgol,갈대 너머 소리 듣기,leaf_rustle,2000,제안
-marsh_shallows,galchamgol,얕은 물 들여다보기,water_trickle,1800,제안
-marsh_shelf,galchamgol,약재 선반 살펴보기,wood_tap,,제안
-marsh_pot,galchamgol,처마 밑 약탕관 자리 보기,clay_ring,,제안
 hill_grass,galchamgol,누운 풀 살펴보기,leaf_rustle,,제안
 hill_cloth,galchamgol,오래된 소원 천 보기,cloth_flutter,1900,제안
 hill_fruit,galchamgol,해머루 자리 올려다보기,leaf_rustle,,제안
@@ -20,6 +16,9 @@ pic_bojagi,galchamgol,까치의 약보자기 (대사 그림),cloth_flutter,,제�
 pic_hamjibak,galchamgol,개울가 함지박 (대사 그림),water_trickle,,제안
 pic_hamjibak_stamp,galchamgol,함지박 밑바닥 낙관 (대사 그림),wood_tap,,제안
 pic_lantern,galchamgol,반딧불 등롱 (대사 그림),ice_tinkle,2400,제안
+pic_mom_room,galchamgol,엄마 방 들여다보기 (대사 그림),door,,제안
+pic_leaf,galchamgol,무쇠가 꺼낸 당산나무 잎 (대사 그림),leaf_rustle,,제안
+pic_cache,galchamgol,도담이 묻은 도토리 자리 (대사 그림),leaf_rustle,,제안
 frost_print,dolneomeo,서리 자국 살펴보기,footstep_frost,,제안
 gate_bell,dolneomeo,장승 풍경 들어 보기,wind_bell,1300,제안
 stone_channel,dolneomeo,돌 물길 들여다보기,water_trickle,1800,제안
