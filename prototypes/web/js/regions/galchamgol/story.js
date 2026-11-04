@@ -708,6 +708,8 @@ if(!CLASSIC){
       R(17,33,7,6,'#5a4030');R(18,33,5,2,'#7a5a42');R(40,33,7,6,'#5a4030');R(41,33,5,2,'#7a5a42');   // 받쳐 든 두 손
     }}
   };
+  // 결정 D-483: 대사 그림이 뜰 때의 소리 (design/data/popup_sounds.csv 의 pic_이름)
+  for(const k of Object.keys(scenePic))scenePic[k].sound='pic_'+k.replace(/[A-Z]/g,c=>'_'+c.toLowerCase());
   function magpieTalk(){
     talk([['늙은 까치','에구, 이 바람아.\n빈 보자기까지 채 가려고.'],
       ['늙은 까치','아가, 이 끝 좀 눌러 다오.\n발이 예전 같지 않아서 매듭이 자꾸 도망가는구나.'],

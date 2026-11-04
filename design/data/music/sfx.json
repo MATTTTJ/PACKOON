@@ -486,6 +486,112 @@
         {"instrument":"gayageum","note":"G4","start":0.1,"duration":0.18,"gain":0.14,"pan":0,"patch":{"fixedDuration":0.18,"attack":0.002,"decay":0.099,"sustain":0,"release":0.035,"tail":0.06}},
         {"instrument":"wind","note":"C4","start":0,"duration":0.08,"gain":0.03,"pan":0,"patch":{"fixedDuration":0.08,"kind":"noise","attack":0.003,"decay":0.08,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":1000,"partials":[]}}
       ]
+    },
+    {
+      "id": "snow_clang", "name": "눈 둔덕 쇠 날 팡", "category": "이동·채집", "status": "제안", "duration": 0.6, "gain": 0.8,
+      "layers": [
+        {"instrument":"kkwaenggwari","note":"A5","start":0,"duration":0.18,"gain":0.2,"pan":0,"patch":{"fixedDuration":0.18,"attack":0.002,"decay":0.108,"sustain":0,"release":0.05,"tail":0.08},"seed":9000},
+        {"instrument":"hammer","note":"E5","start":0,"duration":0.12,"gain":0.18,"pan":0,"patch":{"fixedDuration":0.12,"attack":0.002,"decay":0.072,"sustain":0,"release":0.05,"tail":0.08},"seed":9001},
+        {"instrument":"stone","note":"C5","start":0.005,"duration":0.06,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.06,"attack":0.002,"decay":0.036,"sustain":0,"release":0.05,"tail":0.08},"seed":9002},
+        {"instrument":"wind","note":"C4","start":0.01,"duration":0.22,"gain":0.3,"pan":-0.1,"patch":{"fixedDuration":0.22,"kind":"noise","attack":0.003,"decay":0.077,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":3800,"partials":[]},"seed":9003},
+        {"instrument":"wind","note":"C4","start":0.07,"duration":0.32,"gain":0.14,"pan":0.15,"patch":{"fixedDuration":0.32,"kind":"noise","attack":0.003,"decay":0.112,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1400,"partials":[]},"seed":9004}
+      ]
+    },
+    {
+      "id": "peek_unfold", "name": "작은 창 펼침", "category": "발견·전환", "status": "제안", "duration": 0.5, "gain": 0.7,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.16,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.16,"kind":"noise","attack":0.003,"decay":0.056,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2600,"partials":[]},"seed":9010},
+        {"instrument":"wind","note":"C4","start":0.07,"duration":0.2,"gain":0.08,"pan":0,"patch":{"fixedDuration":0.2,"kind":"noise","attack":0.003,"decay":0.07,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1200,"partials":[]},"seed":9011},
+        {"instrument":"gayageum_harmonic","note":"G5","start":0.12,"duration":0.3,"gain":0.07,"pan":0,"patch":{"fixedDuration":0.3,"attack":0.002,"decay":0.18,"sustain":0,"release":0.05,"tail":0.08},"seed":9012}
+      ]
+    },
+    {
+      "id": "wind_bell", "name": "풍경 흔들림", "category": "작은 연출", "status": "제안", "duration": 1.15, "gain": 0.75,
+      "layers": [
+        {"instrument":"windchime","note":"E6","start":0,"duration":0.9,"gain":0.2,"pan":-0.1,"patch":{"fixedDuration":0.9,"attack":0.002,"decay":0.54,"sustain":0,"release":0.05,"tail":0.08},"seed":9020},
+        {"instrument":"windchime","note":"B6","start":0.14,"duration":0.8,"gain":0.12,"pan":0.15,"patch":{"fixedDuration":0.8,"attack":0.002,"decay":0.48,"sustain":0,"release":0.05,"tail":0.08},"seed":9021},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.5,"gain":0.05,"pan":0,"patch":{"fixedDuration":0.5,"kind":"noise","attack":0.003,"decay":0.175,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":900,"partials":[]},"seed":9022}
+      ]
+    },
+    {
+      "id": "water_trickle", "name": "졸졸 흐르는 물", "category": "작은 연출", "status": "제안", "duration": 0.85, "gain": 0.75,
+      "layers": [
+        {"instrument":"water","note":"C5","start":0,"duration":0.25,"gain":0.18,"pan":0,"patch":{"fixedDuration":0.25,"attack":0.002,"decay":0.15,"sustain":0,"release":0.05,"tail":0.08},"seed":9030},
+        {"instrument":"water","note":"G5","start":0.18,"duration":0.2,"gain":0.12,"pan":0.1,"patch":{"fixedDuration":0.2,"attack":0.002,"decay":0.12,"sustain":0,"release":0.05,"tail":0.08},"seed":9031},
+        {"instrument":"water","note":"E5","start":0.38,"duration":0.22,"gain":0.1,"pan":-0.1,"patch":{"fixedDuration":0.22,"attack":0.002,"decay":0.132,"sustain":0,"release":0.05,"tail":0.08},"seed":9032},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.7,"gain":0.05,"pan":0,"patch":{"fixedDuration":0.7,"kind":"noise","attack":0.003,"decay":0.245,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1800,"partials":[]},"seed":9033}
+      ]
+    },
+    {
+      "id": "water_drop", "name": "물방울", "category": "작은 연출", "status": "제안", "duration": 0.42, "gain": 0.75,
+      "layers": [
+        {"instrument":"water","note":"A5","start":0,"duration":0.2,"gain":0.2,"pan":0,"patch":{"fixedDuration":0.2,"attack":0.002,"decay":0.12,"sustain":0,"release":0.05,"tail":0.08},"seed":9040},
+        {"instrument":"water","note":"E6","start":0.12,"duration":0.15,"gain":0.08,"pan":0,"patch":{"fixedDuration":0.15,"attack":0.002,"decay":0.09,"sustain":0,"release":0.05,"tail":0.08},"seed":9041}
+      ]
+    },
+    {
+      "id": "fire_crackle", "name": "불씨 타닥", "category": "작은 연출", "status": "제안", "duration": 0.58, "gain": 0.7,
+      "layers": [
+        {"instrument":"stone","note":"A5","start":0,"duration":0.03,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.03,"attack":0.002,"decay":0.018,"sustain":0,"release":0.05,"tail":0.08},"seed":9050},
+        {"instrument":"stone","note":"E6","start":0.09,"duration":0.025,"gain":0.09,"pan":0.1,"patch":{"fixedDuration":0.025,"attack":0.002,"decay":0.015,"sustain":0,"release":0.05,"tail":0.08},"seed":9051},
+        {"instrument":"stone","note":"C6","start":0.2,"duration":0.03,"gain":0.1,"pan":-0.1,"patch":{"fixedDuration":0.03,"attack":0.002,"decay":0.018,"sustain":0,"release":0.05,"tail":0.08},"seed":9052},
+        {"instrument":"stone","note":"G5","start":0.33,"duration":0.03,"gain":0.07,"pan":0,"patch":{"fixedDuration":0.03,"attack":0.002,"decay":0.018,"sustain":0,"release":0.05,"tail":0.08},"seed":9053},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.45,"gain":0.07,"pan":0,"patch":{"fixedDuration":0.45,"kind":"noise","attack":0.003,"decay":0.158,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":700,"partials":[]},"seed":9054}
+      ]
+    },
+    {
+      "id": "leaf_rustle", "name": "잎·풀 바스락", "category": "작은 연출", "status": "제안", "duration": 0.46, "gain": 0.7,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.14,"gain":0.22,"pan":-0.1,"patch":{"fixedDuration":0.14,"kind":"noise","attack":0.003,"decay":0.049,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":3000,"partials":[]},"seed":9060},
+        {"instrument":"wind","note":"C4","start":0.08,"duration":0.18,"gain":0.16,"pan":0.1,"patch":{"fixedDuration":0.18,"kind":"noise","attack":0.003,"decay":0.063,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2200,"partials":[]},"seed":9061},
+        {"instrument":"wind","note":"C4","start":0.2,"duration":0.12,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.12,"kind":"noise","attack":0.003,"decay":0.042,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":2600,"partials":[]},"seed":9062}
+      ]
+    },
+    {
+      "id": "cloth_flutter", "name": "천 펄럭", "category": "작은 연출", "status": "제안", "duration": 0.48, "gain": 0.7,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.1,"gain":0.2,"pan":0,"patch":{"fixedDuration":0.1,"kind":"noise","attack":0.003,"decay":0.035,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1500,"partials":[]},"seed":9070},
+        {"instrument":"wind","note":"C4","start":0.12,"duration":0.1,"gain":0.16,"pan":0.1,"patch":{"fixedDuration":0.1,"kind":"noise","attack":0.003,"decay":0.035,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1500,"partials":[]},"seed":9071},
+        {"instrument":"wind","note":"C4","start":0.24,"duration":0.12,"gain":0.12,"pan":-0.1,"patch":{"fixedDuration":0.12,"kind":"noise","attack":0.003,"decay":0.042,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1300,"partials":[]},"seed":9072}
+      ]
+    },
+    {
+      "id": "wood_tap", "name": "나무 톡톡", "category": "작은 연출", "status": "제안", "duration": 0.36, "gain": 0.75,
+      "layers": [
+        {"instrument":"moduk_mid","note":"D5","start":0,"duration":0.12,"gain":0.25,"pan":0,"patch":{"fixedDuration":0.12,"attack":0.002,"decay":0.072,"sustain":0,"release":0.05,"tail":0.08},"seed":9080},
+        {"instrument":"moduk_low","note":"A4","start":0.1,"duration":0.12,"gain":0.15,"pan":0,"patch":{"fixedDuration":0.12,"attack":0.002,"decay":0.072,"sustain":0,"release":0.05,"tail":0.08},"seed":9081}
+      ]
+    },
+    {
+      "id": "stone_knock", "name": "돌 똑", "category": "작은 연출", "status": "제안", "duration": 0.32, "gain": 0.75,
+      "layers": [
+        {"instrument":"stone","note":"D4","start":0,"duration":0.1,"gain":0.28,"pan":0,"patch":{"fixedDuration":0.1,"attack":0.002,"decay":0.06,"sustain":0,"release":0.05,"tail":0.08},"seed":9090},
+        {"instrument":"stone","note":"A4","start":0.07,"duration":0.08,"gain":0.14,"pan":0,"patch":{"fixedDuration":0.08,"attack":0.002,"decay":0.048,"sustain":0,"release":0.05,"tail":0.08},"seed":9091},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.06,"gain":0.05,"pan":0,"patch":{"fixedDuration":0.06,"kind":"noise","attack":0.003,"decay":0.021,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":900,"partials":[]},"seed":9092}
+      ]
+    },
+    {
+      "id": "clay_ring", "name": "독 퉁기기", "category": "작은 연출", "status": "제안", "duration": 0.72, "gain": 0.7,
+      "layers": [
+        {"instrument":"gayageum_harmonic","note":"A5","start":0,"duration":0.5,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.5,"attack":0.002,"decay":0.3,"sustain":0,"release":0.05,"tail":0.08},"seed":9100},
+        {"instrument":"stone","note":"F5","start":0,"duration":0.04,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.04,"attack":0.002,"decay":0.024,"sustain":0,"release":0.05,"tail":0.08},"seed":9101},
+        {"instrument":"windchime","note":"D6","start":0.02,"duration":0.4,"gain":0.05,"pan":0,"patch":{"fixedDuration":0.4,"attack":0.002,"decay":0.24,"sustain":0,"release":0.05,"tail":0.08},"seed":9102}
+      ]
+    },
+    {
+      "id": "ice_tinkle", "name": "얼음 쨍", "category": "작은 연출", "status": "제안", "duration": 0.52, "gain": 0.7,
+      "layers": [
+        {"instrument":"windchime","note":"C7","start":0,"duration":0.3,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.3,"attack":0.002,"decay":0.18,"sustain":0,"release":0.05,"tail":0.08},"seed":9110},
+        {"instrument":"windchime","note":"G6","start":0.08,"duration":0.3,"gain":0.1,"pan":0.1,"patch":{"fixedDuration":0.3,"attack":0.002,"decay":0.18,"sustain":0,"release":0.05,"tail":0.08},"seed":9111},
+        {"instrument":"stone","note":"E6","start":0.02,"duration":0.03,"gain":0.06,"pan":0,"patch":{"fixedDuration":0.03,"attack":0.002,"decay":0.018,"sustain":0,"release":0.05,"tail":0.08},"seed":9112}
+      ]
+    },
+    {
+      "id": "wind_gust", "name": "바람 한 줄기", "category": "작은 연출", "status": "제안", "duration": 0.92, "gain": 0.7,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.7,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.7,"kind":"noise","attack":0.003,"decay":0.245,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":700,"partials":[]},"seed":9120},
+        {"instrument":"wind","note":"C4","start":0.2,"duration":0.6,"gain":0.1,"pan":0.2,"patch":{"fixedDuration":0.6,"kind":"noise","attack":0.003,"decay":0.21,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1200,"partials":[]},"seed":9121}
+      ]
     }
   ]
 }
