@@ -60,7 +60,7 @@ Rg.drawBack=()=>{drawSky();drawHouse(26);drawHouse(130);drawWheel(620);drawGroun
 
 /* 당산나무: 엉킨 칡이 풀리기 전에는 칡이 줄기를 감고 있고, 꼭대기에서 익던 해머루는 칡이 꽃 속에 감싸 쥐었다(D-544).
    결정 D-545: 크고 신성하게 (사용자 피드백 2026-11-04 단풍골 12). 몇백 년 묵은 느티나무. 밑동이 퍼져 땅을 움켜쥐고 굵은 가지가 양옆으로 뻗으며,
-   누렇고 붉은 잎 그늘이 화면 위까지 덮는다. 줄기에 왼새끼 금줄과 지그재그 한지 술, 밑동에 정화수 올린 제단 돌과 서낭 돌무더기. */
+   누렇고 붉은 잎 그늘이 화면 위까지 덮는다. 줄기에 한지 조각을 끼운 왼새끼 금줄, 밑동에 정화수 올린 제단 돌과 서낭 돌무더기. */
 Rg.drawScenery=()=>{const x=TREE_X-cam;if(x<-190||x>W+190)return;
   const TB='#4a3121',TL='#5d3e2a',TD='#33210f';
   // 양옆으로 뻗은 굵은 가지
@@ -80,9 +80,10 @@ Rg.drawScenery=()=>{const x=TREE_X-cam;if(x<-190||x>W+190)return;
   R(x-16,GROUND-150,3,120,TL);R(x+8,GROUND-120,3,90,TL);
   R(x+10,GROUND-48,9,11,TD);R(x+12,GROUND-46,5,7,'#2a1a0c');   // 옹이
   for(let i=0;i<6;i++)R(x-26+((i*11)%50),GROUND-12-((i*7)%16),5,2,'#6d7350');   // 밑동 이끼
-  // 금줄: 왼새끼와 지그재그 한지 술
+  // 금줄: 왼새끼에 끼운 흰 한지 조각과 솔가지
   for(let i=0;i<60;i+=2){const yy=GROUND-70+Math.round(Math.sin(i/58*Math.PI)*4);R(x-30+i,yy,2,3,i%4?'#b89a6a':'#8a7050');}
-  for(let i=0;i<6;i++){const sx=x-24+i*10,sy=GROUND-67+Math.round(Math.sin((i*10+6)/58*Math.PI)*4);R(sx,sy,2,3,'#f4efe4');R(sx+2,sy+3,2,3,'#f4efe4');R(sx,sy+6,2,3,'#f4efe4');R(sx+1,sy+9,2,2,'#e6dfcf');}
+  for(let i=0;i<6;i++){const sx=x-24+i*10,sy=GROUND-67+Math.round(Math.sin((i*10+6)/58*Math.PI)*4);
+    if(i%3===1){R(sx,sy,1,5,'#3f5a33');R(sx+2,sy+1,1,5,'#3f5a33');}else{R(sx,sy,3,9,'#f4efe4');R(sx,sy+8,3,1,'#e6dfcf');}}
   // 밑동 앞: 정화수를 올린 제단 돌과 서낭 돌무더기
   R(x+42,GROUND-7,30,7,'#8d8678');R(x+40,GROUND-8,34,2,'#a8a194');R(x+52,GROUND-11,8,3,'#efe8d8');
   R(x-74,GROUND-6,16,6,'#8d8678');R(x-72,GROUND-11,12,5,'#9a9384');R(x-70,GROUND-15,8,4,'#8d8678');R(x-68,GROUND-18,4,3,'#a8a194');
@@ -163,30 +164,34 @@ function drawMobs(){for(const m of G.mobs){if(m.dead)continue;const x=m.x-cam;if
 function drawBoss(){const b=G.boss;if(b.dead)return;const x=b.x-cam;if(x<-120||x>W+120)return;
   const BODY='#5d5a33',DK='#2b2919',BELLY='#a39769',HAIR='#8f8a5a',tx=TREE_X-cam,near=clamp(1-(b.x-G.px)/260,0,1);
   const flow=Math.floor(G.anim*(0.06+near*0.08)),squeeze=Math.round(Math.sin(G.anim*0.05)*near);
-  const N=70,pts=[];for(let i=0;i<=N;i++){const s=i/N,a=s*Math.PI*5+0.5;pts.push({x:tx+Math.sin(a)*(31-squeeze),y:GROUND-10-s*128,f:Math.cos(a),i});}
-  const seg=(p,col)=>{const blot=((p.i+flow)%7)<2;R(p.x-3,p.y-3,7,7,'#1d1814');R(p.x-2,p.y-2,5,5,blot?DK:col);R(p.x-2,p.y+2,5,1,BELLY);if(p.i%3===0)R(p.x-3,p.y-4,1,1,HAIR);};
-  for(const p of pts)if(p.f<=0&&Math.abs(p.x-tx)>24)seg(p,'#47452a');   // 줄기 뒤로 도는 마디(양옆만 보인다)
-  for(const p of pts)if(p.f>0)seg(p,BODY);
-  for(const i of [8,36,62]){const p=pts[i];if(p.f>0){R(p.x-6,p.y-7,4,3,'#4f8a35');R(p.x-3,p.y-9,3,3,'#5f9a3c');R(p.x,p.y-7,4,3,'#3f6b2a');}}   // 몸에서 돋은 칡잎
+  const N=280,pts=[];for(let i=0;i<=N;i++){const s=i/N,a=s*Math.PI*5+0.5;pts.push({x:tx+Math.sin(a)*(31-squeeze),y:GROUND-10-s*128,f:Math.cos(a),i});}
+  // 먹 테두리를 먼저 다 깔고 몸빛을 덮어 마디 없이 이어진 몸으로 보이게 한다. 무늬는 몸을 따라 흐른다
+  const blot=p=>Math.floor((p.i+flow*4)/9)%3===0;
+  const back=pts.filter(p=>p.f<=0&&Math.abs(p.x-tx)>24),front=pts.filter(p=>p.f>0);
+  for(const p of back)R(p.x-4,p.y-4,8,8,'#1d1814');for(const p of back)R(p.x-3,p.y-3,6,6,blot(p)?DK:'#47452a');   // 줄기 뒤로 도는 마디(양옆만 보인다)
+  for(const p of front)R(p.x-4,p.y-4,8,8,'#1d1814');
+  for(const p of front){R(p.x-3,p.y-3,6,6,blot(p)?DK:BODY);R(p.x-3,p.y+2,6,1,BELLY);if(p.i%9===0)R(p.x-4,p.y-5,1,1,HAIR);}
+  for(const i of [32,144,248]){const p=pts[i];if(p.f>0){R(p.x-6,p.y-8,4,3,'#4f8a35');R(p.x-3,p.y-10,3,3,'#5f9a3c');R(p.x,p.y-8,4,3,'#3f6b2a');}}   // 몸에서 돋은 칡잎
   // 앞 마디에 핀 칡꽃과 그 속의 해머루
-  {const p=pts.reduce((m,q)=>q.f>0&&q.i>28&&q.i<44&&Math.abs(q.x-tx)<Math.abs(m.x-tx)?q:m,pts[34]),fx=p.x,fy=p.y-4;
+  {const p=pts.reduce((m,q)=>q.f>0&&q.i>112&&q.i<176&&Math.abs(q.x-tx)<Math.abs(m.x-tx)?q:m,pts[136]),fx=p.x,fy=p.y-4;
     for(let i=0;i<6;i++){const w=i<4?6:7-i;R(fx-3-Math.floor(w/2)+(i%2),fy-4-i*3,w,3,['#7d4aa6','#6b3f8f','#8e5cb8'][i%3]);}
     R(fx-2,fy-2,4,4,'#2d1d3d');R(fx-1,fy-2,1,1,Math.floor(G.anim/12)%3?'#d8cde6':'#fff3b0');}
   // 꼭대기 마디에서 뻗어 나와 쳐든 목
   const top=pts[N],hx=x-30+Math.round(Math.sin(G.anim*0.04)*2),hy=GROUND-74+Math.round(Math.sin(G.anim*0.06)*2);
-  for(let j=0;j<=20;j++){const u=j/20,nx=top.x+(hx+10-top.x)*u,ny=top.y+(hy-top.y)*u-Math.sin(u*Math.PI)*16;R(nx-3,ny-3,7,7,'#1d1814');R(nx-2,ny-2,5,5,((j+flow)%7)<2?DK:BODY);}
+  const neck=[];for(let j=0;j<=60;j++){const u=j/60;neck.push({x:top.x+(hx+10-top.x)*u,y:top.y+(hy-top.y)*u-Math.sin(u*Math.PI)*16,i:j*3});}
+  for(const p of neck)R(p.x-4,p.y-4,8,8,'#1d1814');for(const p of neck)R(p.x-3,p.y-3,6,6,blot(p)?DK:BODY);
   // 세모꼴 독사 머리: 주둥이가 너구리 쪽(왼쪽)을 향한다. 뒤가 넓고 눈두덩이 눈을 내리누른다
-  const rows=[[2,10],[-2,12],[-6,13],[-8,13],[-9,13],[-8,12],[-5,11],[-1,10]];
-  rows.forEach(([a,e],k)=>{R(hx+a-1,hy-4+k,e-a+2,1,'#1d1814');});
-  R(hx+1,hy-5,10,1,'#1d1814');R(hx-1,hy+4,12,1,'#1d1814');
-  rows.forEach(([a,e],k)=>{R(hx+a,hy-4+k,e-a,1,k<3?'#4a4829':BODY);});
-  R(hx+3,hy-1,8,1,DK);R(hx-3,hy-4,6,1,'#1d1814');   // 눈 뒤 짙은 띠와 눈두덩
-  R(hx-2,hy-2,3,2,'#c4a548');R(hx-1,hy-2,1,2,'#1d1814');   // 세로 동공
-  R(hx+5,hy-3,1,1,'#cbbf98');R(hx+6,hy-2,1,1,'#cbbf98');R(hx+7,hy-1,1,1,'#cbbf98');   // 오래된 흉터
-  R(hx-8,hy+1,1,1,'#1d1814');   // 콧구멍
+  const rows=[[3,14],[-1,16],[-5,17],[-8,17],[-10,17],[-12,17],[-11,16],[-9,15],[-6,14],[-2,13],[2,12]];
+  rows.forEach(([a,e],k)=>R(hx+a-1,hy-6+k,e-a+2,1,'#1d1814'));R(hx+2,hy-7,13,1,'#1d1814');R(hx+1,hy+5,12,1,'#1d1814');
+  rows.forEach(([a,e],k)=>R(hx+a,hy-6+k,e-a,1,k<4?'#4a4829':k>8?BELLY:BODY));
+  R(hx+1,hy-4,6,4,DK);R(hx+3,hy-1,11,2,DK);   // 정수리 큰 비늘과 눈 뒤 짙은 띠
+  R(hx-7,hy-5,8,1,'#1d1814');R(hx-6,hy-6,6,1,'#1d1814');   // 내리누른 눈두덩
+  R(hx-4,hy-4,3,3,'#c4a548');R(hx-3,hy-4,1,3,'#1d1814');   // 세로 동공
+  R(hx+6,hy-5,1,1,'#cbbf98');R(hx+7,hy-4,1,1,'#cbbf98');R(hx+8,hy-3,1,1,'#cbbf98');R(hx+9,hy-2,1,1,'#cbbf98');   // 오래된 흉터
+  R(hx-11,hy-1,1,1,'#1d1814');R(hx-7,hy+1,1,1,'#1d1814');   // 콧구멍과 열 구멍
   const hiss=near>0.35&&Math.floor(G.anim/24)%3===0;
-  if(hiss){R(hx-8,hy+2,8,2,'#3a1f1c');R(hx-7,hy+2,1,3,'#efe3c8');R(hx-3,hy+2,1,3,'#efe3c8');}   // 벌린 입과 송곳니
-  else if(Math.floor(G.anim/30)%3===0){R(hx-13,hy,4,1,'#5f9a3c');R(hx-15,hy-1,2,1,'#5f9a3c');R(hx-15,hy+1,2,1,'#5f9a3c');}   // 덩굴손 혀
+  if(hiss){R(hx-11,hy+1,10,3,'#3a1f1c');R(hx-10,hy+1,1,4,'#efe3c8');R(hx-5,hy+1,1,4,'#efe3c8');}   // 벌린 입과 송곳니
+  else{R(hx-10,hy+2,14,1,'#2b2919');if(Math.floor(G.anim/30)%3===0){R(hx-17,hy,5,1,'#5f9a3c');R(hx-19,hy-1,2,1,'#5f9a3c');R(hx-19,hy+1,2,1,'#5f9a3c');}}   // 입선과 덩굴손 혀
 }
 Rg.drawActors=()=>{drawBarrier();drawMobs();drawBoss();};
 
