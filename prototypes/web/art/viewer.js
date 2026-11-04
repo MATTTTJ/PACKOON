@@ -148,7 +148,7 @@ function makeDeco(z,zid){const out=[],seed=zid.length*17;
   return out;}
 
 function zoneIds(z){const ids=[];
-  ids.push([L.SKY[z.sky]],[ 'bg_far_ridge'],['bg_mid_ridge'],[z.woods],[z.ground],['cm_log_platform'],['ch_hero']);
+  ids.push([L.SKY[z.sky]],['bg_far_ridge',z.sky],['bg_mid_ridge',z.sky],[z.woods],[z.ground],['cm_log_platform'],['ch_hero']);
   for(const b of z.bands||[])ids.push([b.id]);
   for(const o of z.objects)ids.push([o.id,o.v||(o.st?S.states[o.st]:null)]);
   for(const n of z.npcs||[])ids.push([n.id,n.v||(n.st?S.states[n.st]:null)]);
@@ -189,6 +189,7 @@ function drawProp(id,v,x,y,s,p,flip,dark,fogAmt){
   let w,h,ax=0.5,ay=1;
   if(m&&m.units){w=m.units[0];h=m.units[1];if(m.anchor){ax=m.anchor[0];ay=m.anchor[1];}}
   else{const i=INFO[id]||{w:30,h:30};w=i.w;h=i.h;}
+  if(e){if(m&&m.sh&&v&&m.sh[v])h=m.sh[v];w=h*e.w/e.h;}   // 그림이 있으면 갈래마다 제 비율로 (높이는 갈래별 sh 가 있으면 그것)
   w*=s;h*=s;
   const wx=x+camX*(1-p)-w*ax, wy=y-h*ay;
   if(wx>camX+viewW||wx+w<camX)return;
@@ -201,13 +202,14 @@ function drawProp(id,v,x,y,s,p,flip,dark,fogAmt){
 }
 // 가로로 이어지는 겹 (하늘 제외). 그림이 있으면 타일로 잇고, 없으면 띠 상자
 function drawLayer(id,cfg,x0,x1){
-  const m=MAN[id],e=texOf(id,null),p=cfg.p??1;
+  const m=MAN[id],baked=!!(m&&m.baked),e=texOf(id,baked?Z.sky:null),p=cfg.p??1;   // baked: 빛까지 칠한 먼 겹. 구역 하늘(낮·노을) 판을 고르고 조명을 다시 입히지 않는다
   const y=(m&&m.y!=null)?m.y:cfg.y, h=(m&&m.units)?m.units[1]:cfg.h;
   const f=PRESETS[S.preset].fog,fa=cfg.fog||0;
   const L0=camX, L1=camX+viewW;
   const lo=x0<0?L0:Math.max(L0,x0+camX*(1-p)), hi=x1<0?L1:Math.min(L1,x1+camX*(1-p));
   if(hi<=lo)return;
-  if(e){bindTex(e);setCommon(0,1,e.n?1:0,1,tint,[f[0],f[1],f[2],fa]);
+  if(e){const P=PRESETS[S.preset];bindTex(e);
+    if(baked)setCommon(0,0,0,1,[P.sky[0],P.sky[1],P.sky[2],1],[f[0],f[1],f[2],fa*0.4]);else setCommon(0,1,e.n?1:0,1,tint,[f[0],f[1],f[2],fa]);
     const tw=(m&&m.units)?m.units[0]:h*e.w/e.h;
     const off=((camX*p)%tw+tw)%tw;let sx=camX-off;
     for(;sx<hi;sx+=tw){const a=Math.max(sx,lo),b=Math.min(sx+tw,hi);if(b<=a)continue;

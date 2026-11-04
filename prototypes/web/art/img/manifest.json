@@ -1,1 +1,391 @@
-{}
+{
+ "bg_sky_day": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 733,
+  "kind": "sky",
+  "normal": false,
+  "units": [
+   217.1,
+   122.2
+  ],
+  "v": 1,
+  "w": 1303
+ },
+ "bg_sky_dusk": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 733,
+  "kind": "sky",
+  "normal": false,
+  "units": [
+   217.1,
+   122.2
+  ],
+  "v": 1,
+  "w": 1303
+ },
+ "ch_hero": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 228,
+  "kind": "char",
+  "normal": true,
+  "units": [
+   28.8,
+   38.0
+  ],
+  "v": 1,
+  "w": 173
+ },
+ "cm_basket": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 54,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 11.0,
+   "b": 9.0
+  },
+  "states": [
+   "a",
+   "b"
+  ],
+  "units": [
+   19.9,
+   9.0
+  ],
+  "v": 2,
+  "w": 120
+ },
+ "cm_fence": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 102,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   24.9,
+   17.0
+  ],
+  "v": 1,
+  "w": 149
+ },
+ "cm_north_sign": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 240,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   12.8,
+   40.0
+  ],
+  "v": 1,
+  "w": 77
+ },
+ "cm_sign": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 180,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   24.6,
+   30.0
+  ],
+  "v": 1,
+  "w": 148
+ },
+ "cm_stone": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 36,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 9.0,
+   "b": 6.0,
+   "c": 12.0
+  },
+  "states": [
+   "a",
+   "b",
+   "c"
+  ],
+  "units": [
+   15.0,
+   6.0
+  ],
+  "v": 3,
+  "w": 90
+ },
+ "cm_stump": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 84,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 14.0
+  },
+  "states": [
+   "a"
+  ],
+  "units": [
+   21.9,
+   14.0
+  ],
+  "v": 1,
+  "w": 131
+ },
+ "cm_woodpile": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 90,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 15.0,
+   "b": 15.0
+  },
+  "states": [
+   "a",
+   "b"
+  ],
+  "units": [
+   21.0,
+   15.0
+  ],
+  "v": 2,
+  "w": 126
+ },
+ "dc_cairn": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 120,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   22.3,
+   20.0
+  ],
+  "v": 1,
+  "w": 134
+ },
+ "dc_far_village": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 180,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   68.6,
+   30.0
+  ],
+  "v": 1,
+  "w": 411
+ },
+ "dc_jars": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 108,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   24.8,
+   18.0
+  ],
+  "v": 1,
+  "w": 149
+ },
+ "dc_leaf_litter": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 36,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 6.0
+  },
+  "states": [
+   "a"
+  ],
+  "units": [
+   6.7,
+   6.0
+  ],
+  "v": 1,
+  "w": 40
+ },
+ "dc_log": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 72,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   28.3,
+   12.0
+  ],
+  "v": 1,
+  "w": 170
+ },
+ "dc_mushrooms": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 48,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 8.0
+  },
+  "states": [
+   "a"
+  ],
+  "units": [
+   10.8,
+   8.0
+  ],
+  "v": 1,
+  "w": 65
+ },
+ "dc_persimmon": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 480,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   61.3,
+   80.0
+  ],
+  "v": 1,
+  "w": 368
+ },
+ "dc_roots": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 96,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "a": 20.0,
+   "b": 16.0
+  },
+  "states": [
+   "a",
+   "b"
+  ],
+  "units": [
+   31.2,
+   16.0
+  ],
+  "v": 2,
+  "w": 187
+ },
+ "gt_acorn": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 30,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   6.5,
+   5.0
+  ],
+  "v": 1,
+  "w": 39
+ },
+ "gt_bam": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 36,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   7.0,
+   6.0
+  ],
+  "v": 1,
+  "w": 42
+ },
+ "gt_dig": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "base": true,
+  "h": 48,
+  "kind": "prop",
+  "normal": true,
+  "sh": {
+   "dug": 8.0
+  },
+  "states": [
+   "dug"
+  ],
+  "units": [
+   13.5,
+   8.0
+  ],
+  "v": 2,
+  "w": 81
+ },
+ "gt_vine": {
+  "anchor": [
+   0.5,
+   1.0
+  ],
+  "h": 36,
+  "kind": "prop",
+  "normal": true,
+  "units": [
+   10.7,
+   6.0
+  ],
+  "v": 1,
+  "w": 64
+ }
+}
