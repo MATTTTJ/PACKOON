@@ -2,7 +2,7 @@
 /* 아이가 적은 기록을 그린다: 수첩의 해야 할 일·이름·물품 장부, 보따리 '중요' 탭의 아빠 단서·엄마의 쪽지.
    패널과 탭, 동물·물건·도장·숨은 가공법 쪽은 notebook.js 가 맡는다. 여기서는 받은 body 에 아이의 글씨로 그리기만 한다.
    저장 모양(G.diary·G.clues·G.nicknames·G.ledger·G.rel·G.f.momNote*)은 책이 둘이던 때와 같다. */
-function childNoteSection(line){return line.when?.startsWith('habit:')?'익힌 솜씨':line.when?.startsWith('recipe:')?'숨은 가공법':'관찰';}
+function childNoteSection(line){return line.when?.startsWith('habit:')?'익힌 솜씨':/^(recipe|hint):/.test(line.when||'')?'숨은 가공법':'관찰';}   // 결정 D-461: 귀띔(hint:)도 숨은 가공법 장
 function renderMomNote(body){
   const stage=G.f.momNoteRestored?0:(G.f.momNoteFade||0),paper=el('div','mom-note');
   // 결정 D-38: 받는 이의 이름은 번져서 읽히지 않는다. 아이의 이름은 엔딩에서야 나온다. 엔딩 뒤에는 새 이름이 또렷하게 보인다.

@@ -219,6 +219,25 @@ new MutationObserver(renderFieldTaste).observe($('dlg'),{attributes:true,attribu
     ssanghwa:P=>{bowl(P,'#75543d');P(5,4,2,4,'#c8a36c');P(9,5,2,3,'#9f794b');},
     salt:P=>bowl(P,'#f2eee2'),sesame:P=>bowl(P,'#d0b375'),
     sesame_oil:P=>bottle(P,'#c3943f'),honey:P=>bottle(P,'#d6a147'),
-    mung:P=>bowl(P,'#8f9c56'),jujube:P=>{P(4,5,8,7,'#9b4538');P(6,4,4,9,'#ac5040');P(5,6,2,2,'#d9956d');}
+    mung:P=>bowl(P,'#8f9c56'),jujube:P=>{P(4,5,8,7,'#9b4538');P(6,4,4,9,'#ac5040');P(5,6,2,2,'#d9956d');},
+    // 결정 D-460: 모든 재료에 가공법을 두며 생긴 가공품 (design/proposals/recipes.md)
+    gyeol_hwan:P=>{bowl(P,'#d8c7a0');for(const [x,y] of [[5,6],[8,5],[10,7],[6,8],[9,8]])P(x,y,2,2,'#6b4a2a');},
+    kkot_cheong:P=>{bottle(P,'#8a5ca8');P(7,10,2,2,'#c79ad8');},
+    solbang_cheong:P=>{bottle(P,'#7a6a32');P(7,10,2,2,'#4f4420');},
+    sirumit:P=>{P(2,6,12,6,'#8a6a3a');P(3,7,10,4,'#c9a35e');for(let x=4;x<12;x+=2)P(x,7,1,4,'#9b7a45');P(3,9,10,1,'#e0c27a');},
+    heuk_banjuk:P=>{P(3,7,10,6,'#7a5636');P(4,6,8,2,'#93683f');P(5,8,3,1,'#c9b48a');P(9,10,3,1,'#d9c58c');P(6,11,1,1,'#b9b2a6');P(10,8,1,1,'#b9b2a6');},
+    jjimjil_dol:P=>{P(3,6,10,7,'#f4efe0');P(4,5,8,2,'#fbf8ee');P(5,8,6,3,'#6b625a');P(6,8,4,1,'#8a8178');P(4,12,8,1,'#d9d0b8');},
+    dol_mulgam:P=>{P(4,8,8,4,'#684b37');P(5,7,6,2,'#2f6a5e');P(6,7,2,1,'#5aa08e');P(5,12,6,1,'#4a3526');},
+    okgaru:P=>{bowl(P,'#d9ead9');P(6,6,1,1,'#ffffff');P(9,7,1,1,'#ffffff');},
+    dubu:P=>{P(3,6,10,7,'#f2eee2');P(3,6,10,1,'#ffffff');P(3,12,10,1,'#d6cfbd');P(7,6,1,7,'#e2dccb');},
+    jatjuk:P=>{bowl(P,'#efe4c8');P(6,7,1,1,'#c9a35e');P(9,7,1,1,'#c9a35e');},
+    songibap:P=>{bowl(P,'#f4f0e4');P(6,4,4,2,'#9b6a3d');P(7,6,2,2,'#e6d6b8');},
+    beoseot_jjim:P=>{bowl(P,'#c9a36a');P(5,6,2,2,'#e7c34a');P(9,6,2,2,'#e7c34a');P(7,5,2,2,'#efe2c8');},
+    seogibyeong:P=>{for(const [x,y] of [[3,6],[8,8]]){P(x,y,6,5,'#4b4744');P(x,y,6,1,'#6b6763');P(x+1,y+2,1,1,'#8a8580');}},
+    yaksik:P=>{P(3,5,10,8,'#7a4a24');P(3,5,10,1,'#9b6a3d');P(5,7,2,2,'#c99a5c');P(9,8,2,2,'#9b3a2c');P(6,10,2,1,'#c99a5c');},
+    chik_sil:P=>{P(3,5,10,8,'#a88a5a');P(4,6,8,6,'#c9ad7a');P(5,7,6,4,'#a88a5a');P(6,8,4,2,'#d9c08a');P(12,11,2,1,'#c9ad7a');},
+    darae_cha:P=>{bowl(P,'#7a7f3a');P(13,9,2,3,'#a77b52');P(7,7,2,1,'#b9452f');},
+    hwachae:P=>{bowl(P,'#c5503a');P(5,6,2,2,'#e8f2fa');P(9,7,2,1,'#ffffff');P(7,5,2,1,'#d8e8f4');},
+    bigeul_garu:P=>{bowl(P,'#bcdcee');P(6,6,1,1,'#ffffff');P(9,7,1,1,'#ffffff');P(7,8,1,1,'#88b0c8');}
   });
 })();

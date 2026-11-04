@@ -176,3 +176,59 @@ ongdal,yeongsan,옹달 할미,동물,나,ongdal:gourd,봄에 샘이 풀렸을 �
 dad,yeongsan,아빠,동물,나,dad:gourd,옹달샘 표주박을 보여 줄 때,엄마가 맨 매듭에서 손을 멈췄다. 물 한 바가지 빚은 셋이서 갚으러 오자고.,제안,결정 D-120 사연,관찰
 salgeumi,yeongsan,살금이,동물,나,ongdal:salg_goes,할미가 알고 있었다고 전했을 때,봄이니까 제 발로 샘까지 가겠단다. 그동안 가져간 물을 갚으러.,제안,결정 D-120 사연,관찰
 ongdal,yeongsan,옹달 할미,동물,나,ongdal:bye,내려가기 전,샘이 풀렸는데도 솥을 다시 걸어 빚진 국물을 끓였다. 솥 걸어 놓고 기다리겠단다.,제안,결정 D-120 새 인물,관찰
+gyeol_hwan,dolneomeo,결명자 환,물건,나,got:gyeol_hwan,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+kkot_cheong,galchamgol,칡꽃청,물건,나,got:kkot_cheong,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+solbang_cheong,jangteo,솔방울청,물건,나,got:solbang_cheong,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+sirumit,jangteo,시룻밑,물건,나,got:sirumit,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+heuk_banjuk,dolneomeo,흙반죽,물건,나,got:heuk_banjuk,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+jjimjil_dol,dolneomeo,찜질 돌,물건,나,got:jjimjil_dol,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+dol_mulgam,dolneomeo,돌 물감,물건,나,got:dol_mulgam,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+okgaru,dolneomeo,옥가루,물건,나,got:okgaru,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+dubu,jangteo,두부,물건,나,got:dubu,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+jatjuk,jangteo,잣죽,물건,나,got:jatjuk,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+songibap,galchamgol,송이밥,물건,나,got:songibap,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+beoseot_jjim,galchamgol,버섯찜,물건,나,got:beoseot_jjim,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+seogibyeong,dolneomeo,석이병,물건,나,got:seogibyeong,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+yaksik,jangteo,약식,물건,나,got:yaksik,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+chik_sil,galchamgol,칡 실,물건,나,got:chik_sil,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+darae_cha,yeongsan,다래 줄기차,물건,나,got:darae_cha,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+hwachae,yeongsan,마가목 화채,물건,나,got:hwachae,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+bigeul_garu,yeongsan,비늘 가루,물건,나,got:bigeul_garu,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+sesame_salt,galchamgol,깨소금,물건,나,hint:sesame_salt,누가 지나가며 일러 줬을 때,날쌘 아저씨가 볶은 깨를 소금이랑 같이 찧어 보라고 했다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+ssanghwa,yeongsan,쌍화 약재,물건,나,hint:ssanghwa,누가 지나가며 일러 줬을 때,할머니가 칡뿌리는 겨우살이에 대추 하나 넣고 갈면 겨울 약이 된다고 했다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+chik_sil,galchamgol,칡 실,물건,나,hint:chik_sil,누가 지나가며 일러 줬을 때,아빠 낫 자루에 감긴 끈은 칡 실이다. 칡 줄기를 쪄서 뽑는다고 삼촌이 그랬다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+kkot_cheong,galchamgol,칡꽃청,물건,나,hint:kkot_cheong,누가 지나가며 일러 줬을 때,할머니 말로는 칡꽃을 꿀에 재워 두면 겨울 내내 목이 안 붓는다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+jjimjil_dol,dolneomeo,찜질 돌,물건,나,hint:jjimjil_dol,누가 지나가며 일러 줬을 때,아빠는 겨울이면 구들돌을 데워 솜에 싸서 삼촌 다리에 대 줬다고 한다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+beoseot_jjim,galchamgol,버섯찜,물건,나,hint:beoseot_jjim,누가 지나가며 일러 줬을 때,검댕 아저씨는 싸리버섯 꾀꼬리버섯에 깨소금을 쳐서 쪄 먹으며 가마를 지킨다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+gyeol_hwan,dolneomeo,결명자 환,물건,나,hint:gyeol_hwan,누가 지나가며 일러 줬을 때,날쌘 아저씨가 결명자는 꿀에 개어 환으로 빚어 두면 길에서도 먹는다고 했다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+gongi,dolneomeo,공깃돌,물건,나,hint:gongi,누가 지나가며 일러 줬을 때,돌쇠 할배는 차돌 쪼가리를 찧어 공깃돌로 다듬는다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+heuk_banjuk,dolneomeo,흙반죽,물건,나,hint:heuk_banjuk,누가 지나가며 일러 줬을 때,"돌쇠 할배는 담 틈을 진흙에 돌가루, 썬 억새를 넣고 찧어 메운다.",제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+dol_mulgam,dolneomeo,돌 물감,물건,나,hint:dol_mulgam,누가 지나가며 일러 줬을 때,뿔영감 아버지는 이끼 앉은 돌을 갈아 기름에 개서 장승 눈을 칠했다고 한다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+seogibyeong,dolneomeo,석이병,물건,나,hint:seogibyeong,누가 지나가며 일러 줬을 때,메밀댁 아주머니는 잔칫날이면 쌀가루에 석이를 섞어 떡을 쪘다고 했다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+sirumit,jangteo,시룻밑,물건,나,hint:sirumit,누가 지나가며 일러 줬을 때,모락 아주머니 시룻밑이 해졌다. 싸리 살에 짚을 엮어 새로 깔아야 한단다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+mung_batter,jangteo,녹두 빈대떡 반죽,물건,나,hint:mung_batter,누가 지나가며 일러 줬을 때,모락 아주머니 말로는 녹두에 참기름을 넣고 갈아야 빈대떡 부치기 좋다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+gangjeong,jangteo,깨강정,물건,나,hint:gangjeong,누가 지나가며 일러 줬을 때,얼레네 할머니는 깨를 꿀에 버무려 꾹꾹 눌러 강정을 굳힌다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+dubu,jangteo,두부,물건,나,hint:dubu,누가 지나가며 일러 줬을 때,짠돌 아저씨 말로는 콩 갈아 두부 앉힐 때도 소금이 든다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+jatjuk,jangteo,잣죽,물건,나,hint:jatjuk,누가 지나가며 일러 줬을 때,부엉 영감님은 쌀에 잣을 같이 갈아 쑨 잣죽이 늙은 속에 낫다고 하셨다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+yaksik,jangteo,약식,물건,나,hint:yaksik,누가 지나가며 일러 줬을 때,엿방울 아주머니 말로는 정월엔 쌀에 밤이랑 대추를 넣어 시루에 찐 약식을 먹는다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+darae_cha,yeongsan,다래 줄기차,물건,나,hint:darae_cha,누가 지나가며 일러 줬을 때,옹달 할미는 추울 때 다래 덩굴을 찧어 대추 하나 넣고 달여 먹는다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
+gangjeong,jangteo,깨강정,물건,나,recipe:gangjeong,숨은 가공법을 직접 만들었을 때,깨에 꿀을 버무려 찧었더니 강정이 굳었다. 얼레네 할머니 솜씨엔 아직 못 미친다.,제안,PA-176 가공법,숨은 가공법
+gongi,dolneomeo,공깃돌,물건,나,recipe:gongi,숨은 가공법을 직접 만들었을 때,차돌을 찧으니 결대로 갈라졌다. 모난 데를 갈아 공깃돌 다섯 알.,제안,PA-176 가공법,숨은 가공법
+gyeol_hwan,dolneomeo,결명자 환,물건,나,recipe:gyeol_hwan,숨은 가공법을 직접 만들었을 때,결명자를 꿀에 개어 빚었다. 콩알만 한 환이 됐다.,제안,PA-176 가공법,숨은 가공법
+kkot_cheong,galchamgol,칡꽃청,물건,나,recipe:kkot_cheong,숨은 가공법을 직접 만들었을 때,칡꽃을 찧어 꿀에 재웠다. 단풍골 냄새가 난다.,제안,PA-176 가공법,숨은 가공법
+solbang_cheong,jangteo,솔방울청,물건,나,recipe:solbang_cheong,숨은 가공법을 직접 만들었을 때,솔방울을 찧어 석청에 재워 봤다. 송진 냄새가 단맛 속에 숨었다.,제안,PA-176 가공법,숨은 가공법
+sirumit,jangteo,시룻밑,물건,나,recipe:sirumit,숨은 가공법을 직접 만들었을 때,싸리 살에 짚을 두드려 엮었다. 시루 바닥에 꼭 맞는다.,제안,PA-176 가공법,숨은 가공법
+heuk_banjuk,dolneomeo,흙반죽,물건,나,recipe:heuk_banjuk,숨은 가공법을 직접 만들었을 때,진흙에 돌가루와 억새를 넣고 찧었다. 손에 쩍쩍 붙는다.,제안,PA-176 가공법,숨은 가공법
+jjimjil_dol,dolneomeo,찜질 돌,물건,나,recipe:jjimjil_dol,숨은 가공법을 직접 만들었을 때,구들돌을 숯불 김에 데워 억새꽃 솜에 쌌다. 한참 따뜻하다.,제안,PA-176 가공법,숨은 가공법
+dol_mulgam,dolneomeo,돌 물감,물건,나,recipe:dol_mulgam,숨은 가공법을 직접 만들었을 때,이끼 낀 눈돌을 기름에 갈았다. 푸른 먹빛 물감이 됐다.,제안,PA-176 가공법,숨은 가공법
+okgaru,dolneomeo,옥가루,물건,나,recipe:okgaru,숨은 가공법을 직접 만들었을 때,옥돌을 맷돌에 갈아 봤다. 손등에 바르니 뽀얗다.,제안,PA-176 가공법,숨은 가공법
+dubu,jangteo,두부,물건,나,recipe:dubu,숨은 가공법을 직접 만들었을 때,콩을 갈고 소금으로 앉혔더니 두부가 됐다. 말랑하다.,제안,PA-176 가공법,숨은 가공법
+jatjuk,jangteo,잣죽,물건,나,recipe:jatjuk,숨은 가공법을 직접 만들었을 때,쌀과 잣을 같이 갈았다. 죽이 곱게 쒀졌다.,제안,PA-176 가공법,숨은 가공법
+songibap,galchamgol,송이밥,물건,나,recipe:songibap,숨은 가공법을 직접 만들었을 때,송이를 찢어 쌀에 얹고 쪄 봤다. 시루 김에 송이 냄새가 가득하다.,제안,PA-176 가공법,숨은 가공법
+beoseot_jjim,galchamgol,버섯찜,물건,나,recipe:beoseot_jjim,숨은 가공법을 직접 만들었을 때,버섯 두 가지에 깨소금을 쳐서 쪘다. 검댕 아저씨네 저녁 맛이다.,제안,PA-176 가공법,숨은 가공법
+seogibyeong,dolneomeo,석이병,물건,나,recipe:seogibyeong,숨은 가공법을 직접 만들었을 때,석이를 쌀가루에 섞어 쪘다. 거무스름한 잔치떡이 됐다.,제안,PA-176 가공법,숨은 가공법
+yaksik,jangteo,약식,물건,나,recipe:yaksik,숨은 가공법을 직접 만들었을 때,쌀에 밤과 대추를 넣어 쪘다. 엿보다 달다는 말이 맞다.,제안,PA-176 가공법,숨은 가공법
+chik_sil,galchamgol,칡 실,물건,나,recipe:chik_sil,숨은 가공법을 직접 만들었을 때,칡 줄기를 쪄서 껍질을 벗기니 실이 나왔다. 아빠 낫 자루의 그 끈이다.,제안,PA-176 가공법,숨은 가공법
+darae_cha,yeongsan,다래 줄기차,물건,나,recipe:darae_cha,숨은 가공법을 직접 만들었을 때,다래 덩굴을 찧어 대추와 달였다. 속이 풀린다.,제안,PA-176 가공법,숨은 가공법
+hwachae,yeongsan,마가목 화채,물건,나,recipe:hwachae,숨은 가공법을 직접 만들었을 때,고드름을 깨 넣고 마가목을 으깨 띄웠다. 이가 시리다.,제안,PA-176 가공법,숨은 가공법
+bigeul_garu,yeongsan,비늘 가루,물건,나,recipe:bigeul_garu,숨은 가공법을 직접 만들었을 때,얼음 비늘과 서리 수염을 같이 갈았다. 가루가 손끝에서 서늘하다.,제안,PA-176 가공법,숨은 가공법

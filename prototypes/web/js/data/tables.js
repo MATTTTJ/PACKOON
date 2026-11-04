@@ -575,7 +575,7 @@ const TABLES={
   "gopdol_jan": {
    "n": "곱돌 잔",
    "r": 1,
-   "kind": "재료",
+   "kind": "귀한 것",
    "region": "dolneomeo",
    "d": "돌쇠 할배가 곱돌로 깎은 작은 잔. 따뜻한 것을 오래 따뜻하게 둔다."
   },
@@ -637,6 +637,149 @@ const TABLES={
    "kind": "먹을거리",
    "region": "jangteo",
    "d": "엿방울이 되찾은 제 가위로 툭툭 끊어 준 호박엿. 이에 쩍 달라붙는다. 먹으면 기운이 조금 난다."
+  },
+  "gyeol_hwan": {
+   "n": "결명자 환",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "볶은 결명자를 꿀에 개어 콩알만 하게 빚었다. 하나씩 먹으면 눈이 맑아진다.",
+   "u": "알"
+  },
+  "kkot_cheong": {
+   "n": "칡꽃청",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "칡꽃을 찧어 꿀에 재웠다. 한 숟갈 떠 먹으면 목이 시원하다.",
+   "u": "병"
+  },
+  "solbang_cheong": {
+   "n": "솔방울청",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "푸른 솔방울을 찧어 석청에 재웠다. 기침 날 때 한 숟갈.",
+   "u": "병"
+  },
+  "sirumit": {
+   "n": "시룻밑",
+   "r": 1,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "싸리 살에 짚을 두드려 엮은 시루 바닥 깔개. 김이 고르게 오른다.",
+   "u": "장"
+  },
+  "heuk_banjuk": {
+   "n": "흙반죽",
+   "r": 1,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "진흙에 돌가루와 썬 억새를 넣고 찧었다. 돌담 틈을 메우면 겨울을 난다.",
+   "u": "덩이"
+  },
+  "jjimjil_dol": {
+   "n": "찜질 돌",
+   "r": 1,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "숯불 김에 데운 구들돌을 억새꽃 솜에 쌌다. 쑤시는 데 대면 오래 따뜻하다."
+  },
+  "dol_mulgam": {
+   "n": "돌 물감",
+   "r": 1,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "이끼 낀 돌을 갈아 기름에 갰다. 칠하면 오래 바래지 않는 푸른 먹빛이다.",
+   "u": "종지"
+  },
+  "okgaru": {
+   "n": "옥가루",
+   "r": 2,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "옥돌을 곱게 갈았다. 손등에 바르면 뽀얗게 빛난다.",
+   "u": "줌"
+  },
+  "dubu": {
+   "n": "두부",
+   "r": 1,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "콩을 갈아 끓이고 소금 간수로 앉혔다. 말랑하고 고소하다.",
+   "u": "모"
+  },
+  "jatjuk": {
+   "n": "잣죽",
+   "r": 1,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "쌀과 잣을 함께 곱게 갈아 쑨 죽. 앓던 사람도 넘기기 쉽다.",
+   "u": "그릇"
+  },
+  "songibap": {
+   "n": "송이밥",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "쌀에 송이를 찢어 얹고 시루에 쪘다. 김만 맡아도 배가 부르다.",
+   "u": "그릇"
+  },
+  "beoseot_jjim": {
+   "n": "버섯찜",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "싸리버섯과 꾀꼬리버섯에 깨소금을 쳐서 쪘다. 숯 굽는 날 저녁 같은 맛.",
+   "u": "그릇"
+  },
+  "seogibyeong": {
+   "n": "석이병",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "석이를 곱게 다져 쌀가루에 섞어 찐 떡. 잔칫상에나 오르던 거무스름한 떡이다.",
+   "u": "조각"
+  },
+  "yaksik": {
+   "n": "약식",
+   "r": 1,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "쌀에 밤과 대추를 넣어 시루에 쪘다. 정월에 먹는 달큰한 밥.",
+   "u": "덩이"
+  },
+  "chik_sil": {
+   "n": "칡 실",
+   "r": 1,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "칡 줄기를 쪄서 껍질을 벗겨 뽑은 실. 연장 자루에 감으면 손에 안 미끄러진다.",
+   "u": "타래"
+  },
+  "darae_cha": {
+   "n": "다래 줄기차",
+   "r": 1,
+   "kind": "먹을거리",
+   "region": "yeongsan",
+   "d": "다래 덩굴을 찧어 대추와 달였다. 속이 풀리는 산사람 차.",
+   "u": "잔"
+  },
+  "hwachae": {
+   "n": "마가목 화채",
+   "r": 1,
+   "kind": "먹을거리",
+   "region": "yeongsan",
+   "d": "고드름을 깨 넣고 마가목 열매를 으깨 띄웠다. 이가 시리게 새콤하다.",
+   "u": "그릇"
+  },
+  "bigeul_garu": {
+   "n": "비늘 가루",
+   "r": 2,
+   "kind": "재료",
+   "region": "yeongsan",
+   "d": "얼음 비늘과 서리 수염을 함께 갈았다. 가루가 손끝에서 서늘하다. 열 내리는 데 좋을 것 같다.",
+   "u": "줌"
   }
  },
  "BOSS_PARTS": {
@@ -815,6 +958,105 @@ const TABLES={
     },
     "out": "doerim_yak",
     "n": 1
+   },
+   {
+    "need": {
+     "sesame": 1,
+     "honey": 1
+    },
+    "out": "gangjeong",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:gangjeong"
+   },
+   {
+    "need": {
+     "gyeolmyeongja": 1,
+     "honey": 1
+    },
+    "out": "gyeol_hwan",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:gyeol_hwan"
+   },
+   {
+    "need": {
+     "kflower": 1,
+     "honey": 1
+    },
+    "out": "kkot_cheong",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:kkot_cheong"
+   },
+   {
+    "need": {
+     "solbang": 2,
+     "seokcheong": 1
+    },
+    "out": "solbang_cheong",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:solbang_cheong"
+   },
+   {
+    "need": {
+     "broom_sal": 1,
+     "jip": 1
+    },
+    "out": "sirumit",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:sirumit"
+   },
+   {
+    "need": {
+     "mud": 1,
+     "stonedust": 1,
+     "eoksae": 1
+    },
+    "out": "heuk_banjuk",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:heuk_banjuk"
+   },
+   {
+    "need": {
+     "chadol": 2
+    },
+    "out": "gongi",
+    "n": 5,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:gongi"
+   },
+   {
+    "need": {
+     "darae_vine": 1,
+     "jujube": 1
+    },
+    "out": "darae_cha",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:darae_cha"
+   },
+   {
+    "need": {
+     "icicle": 1,
+     "magamok": 2
+    },
+    "out": "hwachae",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:hwachae"
    }
   ],
   "maetdol": [
@@ -879,6 +1121,60 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:ssanghwa"
+   },
+   {
+    "need": {
+     "mossy_eye": 1,
+     "sesame_oil": 1
+    },
+    "out": "dol_mulgam",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:dol_mulgam"
+   },
+   {
+    "need": {
+     "okdol": 1
+    },
+    "out": "okgaru",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:okgaru"
+   },
+   {
+    "need": {
+     "kong": 2,
+     "salt": 1
+    },
+    "out": "dubu",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:dubu"
+   },
+   {
+    "need": {
+     "ssal": 1,
+     "jat": 1
+    },
+    "out": "jatjuk",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:jatjuk"
+   },
+   {
+    "need": {
+     "frost_whisker": 1,
+     "ice_scale": 1
+    },
+    "out": "bigeul_garu",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:bigeul_garu"
    }
   ],
   "siru": [
@@ -925,6 +1221,74 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:rainbow_tteok"
+   },
+   {
+    "need": {
+     "ssal": 2,
+     "songi": 1
+    },
+    "out": "songibap",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:songibap"
+   },
+   {
+    "need": {
+     "ssari": 1,
+     "kkoe": 1,
+     "sesame_salt": 1
+    },
+    "out": "beoseot_jjim",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:beoseot_jjim"
+   },
+   {
+    "need": {
+     "ssal_powder": 1,
+     "seogi": 1
+    },
+    "out": "seogibyeong",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:seogibyeong"
+   },
+   {
+    "need": {
+     "ssal": 1,
+     "bam": 1,
+     "jujube": 1
+    },
+    "out": "yaksik",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:yaksik"
+   },
+   {
+    "need": {
+     "vine": 2
+    },
+    "out": "chik_sil",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:chik_sil"
+   },
+   {
+    "need": {
+     "gudeuldol": 1,
+     "coal": 1,
+     "eoksae_som": 1
+    },
+    "out": "jjimjil_dol",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:jjimjil_dol"
    }
   ]
  },
@@ -956,6 +1320,11 @@ const TABLES={
     "kind": "좋아함",
     "line": "고소해! 도토리랑 같이 숨겨 둬야지.",
     "effect": "none"
+   },
+   "kkot_cheong": {
+    "kind": "아주 좋아함",
+    "line": "칡꽃청! 달다! 한 숟갈만 더!",
+    "effect": "none"
    }
   },
   "nal": {
@@ -967,6 +1336,11 @@ const TABLES={
    "sesame_salt": {
     "kind": "아주 좋아함",
     "line": "흥, 길에서 밥 먹을 때 딱이겠네.",
+    "effect": "none"
+   },
+   "chik_sil": {
+    "kind": "좋아함",
+    "line": "칡 실이네. 바구니 테 감기 좋겠어. …덤은 없다.",
     "effect": "none"
    }
   },
@@ -1026,6 +1400,11 @@ const TABLES={
     "kind": "그저 그럼",
     "line": "고소하군. 숯내에 묻혀 맛은 잘 모르겠다.",
     "effect": "none"
+   },
+   "gyeol_hwan": {
+    "kind": "아주 좋아함",
+    "line": "…눈이 시원하다. 이거면 연기 빛도 보겠다.",
+    "effect": "none"
    }
   },
   "dolsoe": {
@@ -1054,6 +1433,11 @@ const TABLES={
    "yakgwa": {
     "kind": "그저 그럼",
     "line": "정갈하게 빚었군. 마음은 받겠다.",
+    "effect": "none"
+   },
+   "dol_mulgam": {
+    "kind": "아주 좋아함",
+    "line": "이 빛이다. 아버지가 장승 눈에 올리던 빛.",
     "effect": "none"
    }
   },
@@ -1084,6 +1468,11 @@ const TABLES={
     "kind": "싫어함",
     "line": "에구, 쓴 건 사양! 네가 잘 챙겨 둬.",
     "effect": "none"
+   },
+   "okgaru": {
+    "kind": "좋아함",
+    "line": "옥가루? 분 바르면 장날에 손님 몰리겠는걸~",
+    "effect": "none"
    }
   },
   "morak": {
@@ -1113,6 +1502,11 @@ const TABLES={
     "kind": "좋아함",
     "line": "장부는 덮고 먹어야겠군. 손에 묻겠다.",
     "effect": "none"
+   },
+   "jatjuk": {
+    "kind": "아주 좋아함",
+    "line": "…잣죽이로구나. 늙은이 속을 아는구나.",
+    "effect": "none"
    }
   },
   "salgeumi": {
@@ -1124,6 +1518,11 @@ const TABLES={
    "sesame_salt": {
     "kind": "그저 그럼",
     "line": "고소한 냄새네… 마음은 고마워.",
+    "effect": "none"
+   },
+   "hwachae": {
+    "kind": "좋아함",
+    "line": "시, 시원해… 이가 시려…",
     "effect": "none"
    }
   },
@@ -1153,6 +1552,11 @@ const TABLES={
    "ssanghwa": {
     "kind": "좋아함",
     "line": "여러 향이 한데 머무는구나. 잠시 쉬어라.",
+    "effect": "none"
+   },
+   "bigeul_garu": {
+    "kind": "좋아함",
+    "line": "그놈 비늘을 갈았구나. 서늘한 약이다.",
     "effect": "none"
    }
   },
@@ -1237,6 +1641,11 @@ const TABLES={
     "kind": "아주 좋아함",
     "line": "고소한 등잔! 이걸로 밤새 비추지.",
     "effect": "none"
+   },
+   "yaksik": {
+    "kind": "좋아함",
+    "line": "약식이네. 짐 나르다 먹으면 힘 나겠다.",
+    "effect": "none"
    }
   },
   "ongdal": {
@@ -1248,6 +1657,11 @@ const TABLES={
    "magamok_tea": {
     "kind": "아주 좋아함",
     "line": "…끓인 걸 받아 보는 건 몇 해 만이여.",
+    "effect": "none"
+   },
+   "jjimjil_dol": {
+    "kind": "아주 좋아함",
+    "line": "뜨끈하구먼. 언 무릎엔 이게 최고여.",
     "effect": "none"
    }
   },
@@ -1261,6 +1675,11 @@ const TABLES={
     "kind": "그저 그럼",
     "line": "내 눈은 멀쩡하다. 돌쇠 할배나 드려라.",
     "effect": "none"
+   },
+   "sirumit": {
+    "kind": "아주 좋아함",
+    "line": "시룻밑이구나. 메밀떡 찔 때 요긴하겠다.",
+    "effect": "none"
    }
   },
   "dol_turtle": {
@@ -1272,6 +1691,11 @@ const TABLES={
    "stonedust": {
     "kind": "그저 그럼",
     "line": "돌가루는… 내 등딱지에도 잔뜩 붙어 있다.",
+    "effect": "none"
+   },
+   "heuk_banjuk": {
+    "kind": "좋아함",
+    "line": "샘 둑 틈을 메우면 되겠구나. 고맙다, 아가.",
     "effect": "none"
    }
   }
@@ -2321,6 +2745,12 @@ const TABLES={
      "text": "깨와 소금을 함께 찧으니 깨소금이 됐다. 엄마가 밥상에 놓던 냄새다.",
      "section": "숨은 가공법",
      "when": "recipe:sesame_salt"
+    },
+    {
+     "who": "me",
+     "text": "날쌘 아저씨가 볶은 깨를 소금이랑 같이 찧어 보라고 했다.",
+     "section": "숨은 가공법",
+     "when": "hint:sesame_salt"
     }
    ]
   },
@@ -2334,6 +2764,12 @@ const TABLES={
      "text": "녹두에 참기름을 더해 갈았다. 장터에서 먹던 빈대떡 반죽이 됐다.",
      "section": "숨은 가공법",
      "when": "recipe:mung_batter"
+    },
+    {
+     "who": "me",
+     "text": "모락 아주머니 말로는 녹두에 참기름을 넣고 갈아야 빈대떡 부치기 좋다.",
+     "section": "숨은 가공법",
+     "when": "hint:mung_batter"
     }
    ]
   },
@@ -2360,6 +2796,12 @@ const TABLES={
      "text": "칡뿌리와 겨우살이, 대추를 함께 갈았다. 증조할아버지의 맷돌에서 새 향이 났다.",
      "section": "숨은 가공법",
      "when": "recipe:ssanghwa"
+    },
+    {
+     "who": "me",
+     "text": "할머니가 칡뿌리는 겨우살이에 대추 하나 넣고 갈면 겨울 약이 된다고 했다.",
+     "section": "숨은 가공법",
+     "when": "hint:ssanghwa"
     }
    ]
   },
@@ -2634,6 +3076,356 @@ const TABLES={
      "text": "샘이 풀렸는데도 솥을 다시 걸어 빚진 국물을 끓였다. 솥 걸어 놓고 기다리겠단다.",
      "section": "관찰",
      "when": "ongdal:bye"
+    }
+   ]
+  },
+  {
+   "id": "gyeol_hwan",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "날쌘 아저씨가 결명자는 꿀에 개어 환으로 빚어 두면 길에서도 먹는다고 했다.",
+     "section": "숨은 가공법",
+     "when": "hint:gyeol_hwan"
+    },
+    {
+     "who": "me",
+     "text": "결명자를 꿀에 개어 빚었다. 콩알만 한 환이 됐다.",
+     "section": "숨은 가공법",
+     "when": "recipe:gyeol_hwan"
+    }
+   ]
+  },
+  {
+   "id": "kkot_cheong",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "할머니 말로는 칡꽃을 꿀에 재워 두면 겨울 내내 목이 안 붓는다.",
+     "section": "숨은 가공법",
+     "when": "hint:kkot_cheong"
+    },
+    {
+     "who": "me",
+     "text": "칡꽃을 찧어 꿀에 재웠다. 단풍골 냄새가 난다.",
+     "section": "숨은 가공법",
+     "when": "recipe:kkot_cheong"
+    }
+   ]
+  },
+  {
+   "id": "solbang_cheong",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "솔방울을 찧어 석청에 재워 봤다. 송진 냄새가 단맛 속에 숨었다.",
+     "section": "숨은 가공법",
+     "when": "recipe:solbang_cheong"
+    }
+   ]
+  },
+  {
+   "id": "sirumit",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "모락 아주머니 시룻밑이 해졌다. 싸리 살에 짚을 엮어 새로 깔아야 한단다.",
+     "section": "숨은 가공법",
+     "when": "hint:sirumit"
+    },
+    {
+     "who": "me",
+     "text": "싸리 살에 짚을 두드려 엮었다. 시루 바닥에 꼭 맞는다.",
+     "section": "숨은 가공법",
+     "when": "recipe:sirumit"
+    }
+   ]
+  },
+  {
+   "id": "heuk_banjuk",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "돌쇠 할배는 담 틈을 진흙에 돌가루, 썬 억새를 넣고 찧어 메운다.",
+     "section": "숨은 가공법",
+     "when": "hint:heuk_banjuk"
+    },
+    {
+     "who": "me",
+     "text": "진흙에 돌가루와 억새를 넣고 찧었다. 손에 쩍쩍 붙는다.",
+     "section": "숨은 가공법",
+     "when": "recipe:heuk_banjuk"
+    }
+   ]
+  },
+  {
+   "id": "jjimjil_dol",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "아빠는 겨울이면 구들돌을 데워 솜에 싸서 삼촌 다리에 대 줬다고 한다.",
+     "section": "숨은 가공법",
+     "when": "hint:jjimjil_dol"
+    },
+    {
+     "who": "me",
+     "text": "구들돌을 숯불 김에 데워 억새꽃 솜에 쌌다. 한참 따뜻하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:jjimjil_dol"
+    }
+   ]
+  },
+  {
+   "id": "dol_mulgam",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "뿔영감 아버지는 이끼 앉은 돌을 갈아 기름에 개서 장승 눈을 칠했다고 한다.",
+     "section": "숨은 가공법",
+     "when": "hint:dol_mulgam"
+    },
+    {
+     "who": "me",
+     "text": "이끼 낀 눈돌을 기름에 갈았다. 푸른 먹빛 물감이 됐다.",
+     "section": "숨은 가공법",
+     "when": "recipe:dol_mulgam"
+    }
+   ]
+  },
+  {
+   "id": "okgaru",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "옥돌을 맷돌에 갈아 봤다. 손등에 바르니 뽀얗다.",
+     "section": "숨은 가공법",
+     "when": "recipe:okgaru"
+    }
+   ]
+  },
+  {
+   "id": "dubu",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "짠돌 아저씨 말로는 콩 갈아 두부 앉힐 때도 소금이 든다.",
+     "section": "숨은 가공법",
+     "when": "hint:dubu"
+    },
+    {
+     "who": "me",
+     "text": "콩을 갈고 소금으로 앉혔더니 두부가 됐다. 말랑하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:dubu"
+    }
+   ]
+  },
+  {
+   "id": "jatjuk",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "부엉 영감님은 쌀에 잣을 같이 갈아 쑨 잣죽이 늙은 속에 낫다고 하셨다.",
+     "section": "숨은 가공법",
+     "when": "hint:jatjuk"
+    },
+    {
+     "who": "me",
+     "text": "쌀과 잣을 같이 갈았다. 죽이 곱게 쒀졌다.",
+     "section": "숨은 가공법",
+     "when": "recipe:jatjuk"
+    }
+   ]
+  },
+  {
+   "id": "songibap",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "송이를 찢어 쌀에 얹고 쪄 봤다. 시루 김에 송이 냄새가 가득하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:songibap"
+    }
+   ]
+  },
+  {
+   "id": "beoseot_jjim",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "검댕 아저씨는 싸리버섯 꾀꼬리버섯에 깨소금을 쳐서 쪄 먹으며 가마를 지킨다.",
+     "section": "숨은 가공법",
+     "when": "hint:beoseot_jjim"
+    },
+    {
+     "who": "me",
+     "text": "버섯 두 가지에 깨소금을 쳐서 쪘다. 검댕 아저씨네 저녁 맛이다.",
+     "section": "숨은 가공법",
+     "when": "recipe:beoseot_jjim"
+    }
+   ]
+  },
+  {
+   "id": "seogibyeong",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "메밀댁 아주머니는 잔칫날이면 쌀가루에 석이를 섞어 떡을 쪘다고 했다.",
+     "section": "숨은 가공법",
+     "when": "hint:seogibyeong"
+    },
+    {
+     "who": "me",
+     "text": "석이를 쌀가루에 섞어 쪘다. 거무스름한 잔치떡이 됐다.",
+     "section": "숨은 가공법",
+     "when": "recipe:seogibyeong"
+    }
+   ]
+  },
+  {
+   "id": "yaksik",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "엿방울 아주머니 말로는 정월엔 쌀에 밤이랑 대추를 넣어 시루에 찐 약식을 먹는다.",
+     "section": "숨은 가공법",
+     "when": "hint:yaksik"
+    },
+    {
+     "who": "me",
+     "text": "쌀에 밤과 대추를 넣어 쪘다. 엿보다 달다는 말이 맞다.",
+     "section": "숨은 가공법",
+     "when": "recipe:yaksik"
+    }
+   ]
+  },
+  {
+   "id": "chik_sil",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "아빠 낫 자루에 감긴 끈은 칡 실이다. 칡 줄기를 쪄서 뽑는다고 삼촌이 그랬다.",
+     "section": "숨은 가공법",
+     "when": "hint:chik_sil"
+    },
+    {
+     "who": "me",
+     "text": "칡 줄기를 쪄서 껍질을 벗기니 실이 나왔다. 아빠 낫 자루의 그 끈이다.",
+     "section": "숨은 가공법",
+     "when": "recipe:chik_sil"
+    }
+   ]
+  },
+  {
+   "id": "darae_cha",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "옹달 할미는 추울 때 다래 덩굴을 찧어 대추 하나 넣고 달여 먹는다.",
+     "section": "숨은 가공법",
+     "when": "hint:darae_cha"
+    },
+    {
+     "who": "me",
+     "text": "다래 덩굴을 찧어 대추와 달였다. 속이 풀린다.",
+     "section": "숨은 가공법",
+     "when": "recipe:darae_cha"
+    }
+   ]
+  },
+  {
+   "id": "hwachae",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "고드름을 깨 넣고 마가목을 으깨 띄웠다. 이가 시리다.",
+     "section": "숨은 가공법",
+     "when": "recipe:hwachae"
+    }
+   ]
+  },
+  {
+   "id": "bigeul_garu",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "얼음 비늘과 서리 수염을 같이 갈았다. 가루가 손끝에서 서늘하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:bigeul_garu"
+    }
+   ]
+  },
+  {
+   "id": "gongi",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "돌쇠 할배는 차돌 쪼가리를 찧어 공깃돌로 다듬는다.",
+     "section": "숨은 가공법",
+     "when": "hint:gongi"
+    },
+    {
+     "who": "me",
+     "text": "차돌을 찧으니 결대로 갈라졌다. 모난 데를 갈아 공깃돌 다섯 알.",
+     "section": "숨은 가공법",
+     "when": "recipe:gongi"
+    }
+   ]
+  },
+  {
+   "id": "gangjeong",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "얼레네 할머니는 깨를 꿀에 버무려 꾹꾹 눌러 강정을 굳힌다.",
+     "section": "숨은 가공법",
+     "when": "hint:gangjeong"
+    },
+    {
+     "who": "me",
+     "text": "깨에 꿀을 버무려 찧었더니 강정이 굳었다. 얼레네 할머니 솜씨엔 아직 못 미친다.",
+     "section": "숨은 가공법",
+     "when": "recipe:gangjeong"
     }
    ]
   }

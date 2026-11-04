@@ -16,7 +16,8 @@ const RECIPES={};
 function defineRecipes(map){for(const k in map)RECIPES[k]=(RECIPES[k]||[]).concat(map[k]);}
 const isAwake=t=>G.awake.includes(t);
 const availableRecipes=t=>(RECIPES[t]||[]).filter(r=>!r.know||knows(r.know));
-const knownRecipes=t=>availableRecipes(t).filter(r=>!r.hidden||knows(r.discover));
+const recipeKnown=r=>!r.hidden||knows(r.discover)||knows('hint:'+r.out);   // 결정 D-461: 귀띔으로 들은 숨은 가공법도 안다 (결정 D-460: 새 가공법은 모두 숨은 선택 가공법)
+const knownRecipes=t=>availableRecipes(t).filter(recipeKnown);
 function awaken(t){if(!isAwake(t))G.awake.push(t);}
 const pouch={tool:'jeolgu',items:[]};
 let selItem=null,pouchMsg='',lastOut=null,brewing=false;
@@ -161,14 +162,14 @@ function renderBag(pop){
   pb.appendChild(el('div','glow'));const relic=icon(pouch.tool);relic.className='relic';pb.appendChild(relic);pb.setAttribute('aria-label',Hr.title);
   [[-34,-30],[30,-34],[-40,4],[40,0],[-18,-46],[16,-48]].forEach(([dx,dy])=>{const k=el('span','spk');k.style.setProperty('--dx',dx+'px');k.style.setProperty('--dy',dy+'px');pb.appendChild(k);});
   bench.appendChild(pb);bench.appendChild(el('span','arrow','→'));
-  const matched=matchRecipe(),r=matched&&(!matched.hidden||knows(matched.discover))?matched:null;
+  const matched=matchRecipe(),r=matched&&recipeKnown(matched)?matched:null;
   const out=el('div','outslot'+(lastOut?' got':r?' ghost':''));
   if(lastOut)out.appendChild(icon(lastOut));else if(r)out.appendChild(icon(r.out));else out.textContent='?';
   out.setAttribute('aria-label',lastOut?ITEMS[lastOut].n+' 완성':r?ITEMS[r.out].n+' 예정':'결과');
   bench.appendChild(out);wrap.appendChild(bench);
   const msg=el('div','bench-msg',pouchMsg||(awake?(Hr.prompt||'넣을 것을 골라 보자.'):'쓰는 법을 아직 모른다. 무엇을 넣으면 반응할까?'));msg.id='benchMsg';wrap.appendChild(msg);
   const rl=el('div','recipes');
-  if(awake)knownRecipes(pouch.tool).forEach(rc=>{const it=el('button','recipe');it.type='button';it.disabled=brewing;it.onclick=()=>fillCraftRecipe(rc);it.appendChild(el('span',null,rc.hidden?'직접 찾은 맛 ·':rc.know?'귀띔으로 배운 맛 ·':'가족의 기억 ·'));
+  if(awake)knownRecipes(pouch.tool).forEach(rc=>{const it=el('button','recipe');it.type='button';it.disabled=brewing;it.onclick=()=>fillCraftRecipe(rc);it.appendChild(el('span',null,rc.hidden?(knows(rc.discover)?'직접 찾은 맛 ·':'귀띔으로 들은 맛 ·'):rc.know?'귀띔으로 배운 맛 ·':'가족의 기억 ·'));
     Object.keys(rc.need).forEach(k=>{it.appendChild(icon(k));it.appendChild(el('span',null,ITEMS[k].n+' ×'+rc.need[k]));});
     it.appendChild(el('span',null,'→'));it.appendChild(icon(rc.out));it.appendChild(el('span',null,ITEMS[rc.out].n));rl.appendChild(it);});
   else rl.appendChild(el('span',null,'아직 깨어나지 않은 가보다. 넣어 보는 건 자유다.'));
