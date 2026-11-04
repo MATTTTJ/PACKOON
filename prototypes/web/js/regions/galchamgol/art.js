@@ -15,10 +15,13 @@ Rg.art={
     M(ox,oy,f,4,-19,1,1,'#ffffff');M(ox,oy,f,7,-16,2,1,B);M(ox,oy,f,-5,-2,4,2,B);M(ox,oy,f,2,-2,4,2,B);
     const up=Math.floor(G.anim/30)%2;M(ox,oy,f,8,-15-up,2,8,'#6b4423');M(ox,oy,f,7,-18-up,5,3,'#4a4a4a');},
   // 무쇠 삼촌: 아빠와 같은 너구리 털빛, 가죽 앞치마, 붕대 감은 다리, 망치.
-  uncle(ox,oy,f){const Gy='#8c8070',K='#2a211b',Wt='#efe6d6',Ap='#7a4b2a',T='#6f6357';
-    M(ox,oy,f,-12,-11,5,4,Gy);M(ox,oy,f,-12,-10,5,1,K);M(ox,oy,f,-12,-8,5,1,K);
-    M(ox,oy,f,-6,-14,13,12,Gy);M(ox,oy,f,-2,-12,8,10,Ap);M(ox,oy,f,-4,-22,11,8,Gy);
-    M(ox,oy,f,-4,-24,2,2,K);M(ox,oy,f,5,-24,2,2,K);M(ox,oy,f,-4,-20,11,3,K);
+  // 결정 D-546: 눈가를 가로지른 검은 띠가 안대처럼 보여, 탈무늬를 두 눈가에 따로 두고 이마에 무명 머리띠를 맸다 (사용자 피드백 2026-11-04 단풍골 5).
+  //   너구리답게 꼬리에 고리 무늬가 없고 끝만 짙다. 팔은 짙은 털이다.
+  uncle(ox,oy,f){const Gy='#8c8070',K='#2a211b',Wt='#efe6d6',Ap='#7a4b2a',T='#6f6357',Bd='#e7ddc6';
+    M(ox,oy,f,-12,-11,5,4,Gy);M(ox,oy,f,-12,-11,2,4,K);
+    M(ox,oy,f,-6,-14,13,12,Gy);M(ox,oy,f,-7,-13,15,3,Gy);M(ox,oy,f,-2,-12,8,10,Ap);M(ox,oy,f,-8,-12,3,8,K);M(ox,oy,f,-4,-22,11,8,Gy);
+    M(ox,oy,f,-4,-24,2,2,K);M(ox,oy,f,5,-24,2,2,K);M(ox,oy,f,-3,-20,3,3,K);M(ox,oy,f,3,-20,3,3,K);
+    M(ox,oy,f,-5,-23,13,2,Bd);M(ox,oy,f,-7,-23,2,1,Bd);M(ox,oy,f,-8,-22,2,2,Bd);
     M(ox,oy,f,-2,-19,1,1,Wt);M(ox,oy,f,4,-19,1,1,Wt);M(ox,oy,f,0,-17,6,3,Wt);M(ox,oy,f,6,-17,2,1,K);
     M(ox,oy,f,-5,-2,4,2,K);M(ox,oy,f,2,-2,4,2,T);M(ox,oy,f,2,-5,4,3,'#d8cfbd');
     const up=Math.floor(G.anim/30)%2;M(ox,oy,f,8,-15-up,2,8,'#6b4423');M(ox,oy,f,7,-18-up,5,3,'#4a4a4a');},
