@@ -383,7 +383,7 @@ function grantNickname(id,text,by){
   const list=G.nicknames||(G.nicknames=[]);
   if(list.some(n=>n.id===id))return false;
   list.push({id,text:text.trim(),by:by||'',region:G.region,lost:false});
-  learn('nickname:'+id,true);toast('새로 불린 이름 · '+text.trim());
+  learn('nickname:'+id,true);showNameCard(text.trim(),by);   // 결정 D-449
   if(open('notebook'))renderNotebook();return true;
 }
 function nickname(id){return (G?.nicknames||[]).find(n=>n.id===id&&!n.lost)?.text||'';}
