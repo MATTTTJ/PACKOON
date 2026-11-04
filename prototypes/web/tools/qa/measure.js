@@ -31,7 +31,7 @@ const HUMAN={
   stamp:3,                   // 도장 하나
   wanderer:20,               // 떠돌이 하나 (손일 한 번 + 반응 보기)
   arcScene:10,               // 사연 장면 하나의 손(가서 말 걸기·물건 보여 주기)
-  minigame:{jangteoTuho:20,rhythm:20,sneak:40,yActivity:30,dad:45,dolDepthTravel:15,dolWishStack:8,default:25},
+  minigame:{sneak:40,yActivity:30,dad:45,dolDepthTravel:15,dolWishStack:8,default:25},
   battleCycle:5,             // 전투 한 차례: 예고 0.7 + 공격 2.5 + 빈틈 1.2 + 대기 0.6
   battleMiss:1.3,            // 초행이 되치기를 놓치는 몫
   musoeRounds:6,musoeRound:6,musoeFinale:5

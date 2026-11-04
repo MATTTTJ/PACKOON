@@ -1698,6 +1698,30 @@ const TABLES={
     "line": "샘 둑 틈을 메우면 되겠구나. 고맙다, 아가.",
     "effect": "none"
    }
+  },
+  "haengsu": {
+   "yakgwa": {
+    "kind": "좋아함",
+    "line": "약과라. 장꾼 셈엔 단 게 약이지.",
+    "effect": "none"
+   },
+   "salt": {
+    "kind": "그저 그럼",
+    "line": "소금이야 상단 짐에도 넘친다.",
+    "effect": "none"
+   }
+  },
+  "jongjong": {
+   "gunbam": {
+    "kind": "좋아함",
+    "line": "군밤! 밤샘엔 이게 최고예요.",
+    "effect": "none"
+   },
+   "injeolmi": {
+    "kind": "아주 좋아함",
+    "line": "인절미다! 엄마가 해 주던 맛이야.",
+    "effect": "none"
+   }
   }
  },
  "NOTES": [
@@ -2273,7 +2297,7 @@ const TABLES={
    "lines": [
     {
      "who": "dad",
-     "text": "여우 엿장수. 엿장수 마음대로다. 가위 장단을 맞춰 주면 흥이 나서 덤을 준다.",
+     "text": "여우 엿장수. 엿장수 마음대로다. 흥이 나면 덤을 준다.",
      "section": "아빠 수첩"
     },
     {
@@ -2284,7 +2308,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "장단이 맞자 흥이 올라, 숨겨 둔 아빠의 엿을 내줬다.",
+     "text": "가위 장단으로 나를 웃기더니, 숨겨 둔 아빠의 엿을 내줬다.",
      "section": "관찰",
      "when": "yeotbang:high"
     },
@@ -3484,34 +3508,6 @@ const TABLES={
   "handwork_forge_relation": 2,
   "handwork_stack_relation": 2,
   "handwork_steam_relation": 1,
-  "rhythm_notes": 8,
-  "rhythm_good": 0.18,
-  "rhythm_perfect": 0.075,
-  "rhythm_scroll_speed": 145,
-  "rhythm_bonus_hits": 5,
-  "rhythm_start_delay": 0.15,
-  "rhythm_subbeat": 0.22,
-  "rhythm_intro_beats": 6,
-  "rhythm_parts": 3,
-  "rhythm_normal_gap": 0.66,
-  "rhythm_late_gap": 0.55,
-  "rhythm_normal_last": 5,
-  "rhythm_late_hint_delay": 0.2,
-  "rhythm_finish_delay": 0.65,
-  "rhythm_cooldown": 0.12,
-  "rhythm_stray_window": 0.36,
-  "rhythm_resume_delay": 0.3,
-  "rhythm_combo": 3,
-  "rhythm_relation": 1,
-  "rhythm_high_relation": 2,
-  "rhythm_note_one": 1.32,
-  "rhythm_note_two": 1.98,
-  "rhythm_note_three": 2.64,
-  "rhythm_note_four": 3.3,
-  "rhythm_note_five": 3.96,
-  "rhythm_note_six": 4.62,
-  "rhythm_note_seven": 5.17,
-  "rhythm_note_eight": 5.72,
   "salg_graze": 108,
   "salg_return_graze": 114,
   "salg_moving": 0.2,
@@ -3564,18 +3560,11 @@ const TABLES={
   "gather_darae_vine_period": 52,
   "gather_darae_vine_shape": 2,
   "gather_snow_mound_inward": 1,
-  "tuho_arrows": 4,
-  "tuho_ear_points": 3,
-  "tuho_steady_mouth": 0.6,
-  "tuho_steady_ear": 0.05,
-  "tuho_bold_mouth": 0.3,
-  "tuho_bold_ear": 0.12,
-  "tuho_stake": 1,
-  "tuho_steady_pay": 1,
-  "tuho_bold_pay": 2,
-  "tuho_bets_per_day": 3,
-  "tuho_throw_frames": 42,
-  "tuho_pause_frames": 26
+  "baduk_steady_win": 0.6,
+  "baduk_stake": 1,
+  "baduk_steady_pay": 1,
+  "baduk_bold_pay": 2,
+  "baduk_bets_per_day": 3
  },
  "TUNING": {
   "kkubeogi_cycle": 200,
@@ -4737,9 +4726,6 @@ const TABLES={
   },
   "j_steam_flour": {
    "sfx": "steamer"
-  },
-  "j_broken_yut": {
-   "sfx": "wood_tap"
   },
   "j_gukbap": {
    "sfx": "fire_crackle",

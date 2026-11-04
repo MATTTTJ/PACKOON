@@ -68,14 +68,10 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   }
   async function minigame(id) {
     log('미니게임',id);const end=Date.now()+45000;
-    const missRhythm=id==='rhythm'&&!await read('G.f.yeotDone');
-    if(missRhythm){log('장단 의도된 실패','준비 입력 한 번 뒤 모든 박자를 놓친다');await key('j');}
     while(Date.now()<end) {
-      const s=await check();if(s.mg!==id){if(missRhythm){const hits=await read("document.querySelectorAll('#rhythmPips .on').length");log('장단 실패 결과',{hits,expectedHits:0,rice:s.inv.ssal||0});if(hits!==0)throw new Error('장단 전부 실패 시험에서 입력이 맞았다: '+hits);}return;}
-      // 손일 미니게임(쇠 벼리기·돌 쌓기·김 올리기·함께 하는 일)은 PR #81(D-88)에서 지웠다. 남은 놀이는 장단·이동 연출뿐이다.
-      if(id==='rhythm') {
-        if(!missRhythm)await key('j');await wait(75);
-      }else if(id==='dolWishStack') {
+      const s=await check();if(s.mg!==id)return;
+      // 손일 미니게임(쇠 벼리기·돌 쌓기·김 올리기·함께 하는 일)은 PR #81(D-88)에서 지웠다. 엿가위 장단은 D-565에서 뺐다. 남은 것은 이동 연출뿐이다.
+      if(id==='dolWishStack') {
         // 결정 D-229: 돌 셋을 얹는 장면은 저절로 흐른다. 아무것도 누르지 않고 끝날 때까지 기다린다.
         await wait(100);
       }else if(id==='dolDepthTravel') {
@@ -327,7 +323,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       if(mode==='expanded') {await zone('village');const n=await read("zoneObjects('wanderers').find(n=>n.name==='늙은 까치')&&(({x,y})=>({x,y:y??192}))(zoneObjects('wanderers').find(n=>n.name==='늙은 까치'))");if(!n)throw new Error('약즙 배달 까치가 마을에 없다');await jumpTo(n.x,n.y);await key('e');await settle();}
     });
     await next();
-    await stage('큰 장터 · 장단과 쌀',async()=>{await pickup('solbang',5);await npc('yeotbang');if(!await read('G.f.yeotDone&&(G.inv.ssal||0)===8'))throw new Error('장단 뒤 쌀 8개를 받지 못했다');await craftByHand('maetdol','ssal',3,'ssal_powder',3);await craftByHand('maetdol','ssal',3,'ssal_powder',3);await craft('maetdol','ssal_powder');});
+    await stage('큰 장터 · 솔방울과 쌀',async()=>{await pickup('solbang',5);await npc('yeotbang');if(!await read('G.f.yeotDone&&(G.inv.ssal||0)===8'))throw new Error('솔방울 다섯을 주고 쌀 8개를 받지 못했다');await craftByHand('maetdol','ssal',3,'ssal_powder',3);await craftByHand('maetdol','ssal',3,'ssal_powder',3);await craft('maetdol','ssal_powder');});
     await stage('큰 장터 · 시루와 고사떡',async()=>{
       for(let i=0;i<3&&!await read('G.f.steamDone');i++)await npc('morak');
       if(!await read('G.f.steamDone'))throw new Error('모락에게 시루를 깨우지 못했다');
