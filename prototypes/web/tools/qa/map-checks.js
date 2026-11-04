@@ -57,7 +57,7 @@ async function runMap({browser:b,outDir}){
     ];
     check(supplied.every(([who,text])=>unlockLines.some(row=>row.who===who&&row.text===text&&!row.unlocked)),'map-unlock-dialogue','늙은 까치 보자기 완료 뒤 지정 대사가 빠지거나 끝나기 전에 지도가 열렸다.',unlockLines);
     const unlocked=await b.eval("({unlocked:!!G.f.mapUnlocked,done:!!G.f.wanderersDone?.['galchamgol:old_magpie'],toast:$('toast').textContent})");
-    check(unlocked.unlocked&&unlocked.done&&unlocked.toast==='지도(M)를 펴면 가 본 곳으로 까치 떼를 부를 수 있다','map-unlock-complete','늙은 까치 보자기·대사를 실제 완료한 뒤 지도 해금 또는 지정 알림이 없다.',unlocked);
+    check(unlocked.unlocked&&unlocked.done&&unlocked.toast==='지도(M)를 펴면 가 본 곳으로 젊은 까치 둘을 부를 수 있다','map-unlock-complete','늙은 까치 보자기·대사를 실제 완료한 뒤 지도 해금 또는 지정 알림이 없다.',unlocked);
     records.push({stage:'magpie-unlock',lines:unlockLines,...unlocked});
     await b.send('Emulation.setEmulatedMedia',{features:[]});await b.eval('G.px=70;G.cam=0');
     // 격리 조건: 출발 구역과 이웃 구역만 실제 changeZone을 거쳐 방문한 상태로 만든다.
