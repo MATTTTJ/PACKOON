@@ -854,6 +854,7 @@ body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
    독백이 끝나면 다시 접혀 오른쪽 위(보따리 단추 쪽)로 들어간다. 길이는 tuning.csv mom_letter_open_ms·mom_letter_fold_ms (notebook.js showMomNote) */
 .mom-letter{position:absolute;left:50%;top:19%;z-index:7;width:min(21em,62%);pointer-events:none;font-size:clamp(9px,1.45vw,16px);
   transform:translate(-50%,40%) scale(.35,.04) rotate(-4deg);opacity:0;transform-origin:50% 50%}
+.stage:has(>.mom-letter) .hud{opacity:0;pointer-events:none;transition:opacity .4s}   /* 쪽지를 읽는 동안 화면 단추가 쪽지를 덮지 않게 (휴대폰 세로) */
 .mom-letter .mom-note{margin:0;max-width:none;box-shadow:3px 5px 0 rgba(42,32,25,.35),0 10px 30px rgba(0,0,0,.35)}
 .mom-letter .mom-note small{display:none}
 .mom-letter .mom-note p{font-size:1.15em;line-height:1.55}
