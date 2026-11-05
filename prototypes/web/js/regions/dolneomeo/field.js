@@ -4,6 +4,7 @@
 const Rg=REGIONS.dolneomeo;
 const GATE_X=1590;     // 뿔영감이 지키는 돌산 길목 (장승과 금줄)
 const GOLEM_AT=1860;   // 이보다 오른쪽으로 가면 돌 골렘과 전투
+const GOLEM_SIGHT=2190;   // 확장판 성황당에서 골렘을 처음 보고 한마디 하는 자리(설계 좌표, 결정 D-645)
 // 결정 D-87: 뿔영감이 돌산 길을 열어 준 뒤, 성황당 끝 돌 골렘 쪽으로 다가갈수록 긴장이 오른다. 골렘이 잠들면 0.
 // 결정 D-116: 확장판 구역의 설계 좌표를 줄인 좌표로 (Rg.trimCuts, engine/core.js trimX). 옛 구성은 그대로다.
 const Z=(zone,x)=>CLASSIC?x:trimX(x,Rg.trimCuts?.[zone]);
@@ -103,26 +104,20 @@ function drawMistletoe(x,y,a){
   // 갈래 사이 반투명한 흰 열매
   for(const [dx,dy] of [[-1,-2],[2,-1],[0,-4],[-3,0]])R(cx+dx,cy+dy,1,1,BR);
 }
-/* 결정 D-393: 석이버섯은 바위 면에 붙은 귀 모양 잎 (x,y는 바위 밑 가운데). 모양은 D-486으로 다시 그렸다 */
-/* 결정 D-486: 석이는 바위 면에 가운데 배꼽 한 점으로 붙은 납작한 잎 모양 지의류다(사용자 피드백 2026-11-04: 현실 버섯처럼).
-   둥글지만 가장자리가 물결치고, 군데군데 위로 말려 밑면의 거친 잿빛 검정이 보인다. 위는 검은 갈색에 잔주름, 가운데 배꼽이 오목하다. 크기가 다른 셋 */
-function seogiLeaf(cx,cy,rx,ry,seed){
-  const TOP='#2c2622',TOP2='#3b342e',UNDER='#55574f',RIM='#7a7c72',NAVEL='#151210';
-  for(let j=-ry;j<=ry;j++){
-    const base=Math.sqrt(Math.max(0,1-(j/(ry+.4))**2))*rx;
-    const wob=((seed*7+j*13)%5===0)?-1:((seed*3+j*5)%7===0)?1:0;   // 물결치는 가장자리
-    const half=Math.max(0,Math.round(base+wob));if(!half)continue;
-    R(cx-half,cy+j,half*2+1,1,j<0?TOP2:TOP);
-  }
-  // 말려 올라간 가장자리: 아래쪽 테두리와 한쪽 귀퉁이에 밑면 빛깔
-  R(cx-rx+1,cy+ry,rx*2-1,1,UNDER);R(cx-rx,cy+ry-1,1,1,RIM);R(cx+rx,cy+ry-1,1,1,UNDER);
-  if(seed%2){R(cx+rx-1,cy-ry+1,2,1,RIM);R(cx+rx,cy-ry+2,1,1,UNDER);}else{R(cx-rx,cy-ry+1,2,1,RIM);R(cx-rx,cy-ry+2,1,1,UNDER);}
-  // 잔주름과 배꼽
-  R(cx-Math.round(rx/2),cy-1,1,1,'#4a423b');R(cx+Math.round(rx/2),cy+1,1,1,'#4a423b');R(cx-1,cy+Math.min(1,ry-1),1,1,'#4a423b');
-  R(cx,cy,1,1,NAVEL);R(cx+1,cy-1,1,1,'#5c544c');
+/* 결정 D-393·D-486: 석이버섯은 바위 면에 붙은 납작한 잎 모양으로 그렸었다. D-641 로 땅에서 돋은 버섯 무더기로 바꿨다 */
+/* 결정 D-641: 필드의 석이는 땅에서 돋은 버섯 한 무더기로 그린다(사용자 피드백 2026-11-05 "그냥 버섯이 땅에서 자란 것처럼").
+   이끼 낀 흙 위에 키가 다른 버섯 셋. 갓은 석이 빛깔(검은 갈색)이고 밑에 잿빛 주름, 대는 희다. (x,y)는 바닥 가운데 */
+function seogiMushroom(cx,base,h,r){
+  const STEM='#e2dccd',STEM_D='#aea694',TOP='#3b342e',TOP2='#4d453d',RIM='#2c2622',GILL='#7a7c72',HI='#76695c';
+  R(cx,base-h,2,h,STEM);R(cx+1,base-h+1,1,h-1,STEM_D);R(cx-1,base-1,4,1,STEM_D);
+  for(let j=0;j<3;j++){const half=[r-2,r-1,r][j];R(cx+1-half,base-h-3+j,half*2,1,j===0?TOP2:j===2?RIM:TOP);}
+  R(cx+2-r,base-h,r*2-2,1,GILL);R(cx+2-r,base-h-3,1,1,HI);R(cx,base-h-3,1,1,HI);
 }
-function drawSeogiFlaps(x,y){
-  seogiLeaf(x-4,y-7,3,2,1);seogiLeaf(x+2,y-5,4,3,2);seogiLeaf(x-3,y-3,2,1,3);
+function drawSeogiClump(x,y,done=false){
+  R(x-9,y-1,18,1,'#55603f');R(x-7,y-2,14,1,'#6f7d5a');R(x-5,y-3,3,1,'#86946a');R(x+5,y-3,2,1,'#86946a');   // 이끼 낀 흙
+  if(done){R(x-3,y-4,2,2,'#e2dccd');R(x+3,y-3,2,1,'#e2dccd');R(x-7,y-3,2,1,'#e2dccd');return;}   // 딴 자리: 잘린 대 밑동
+  seogiMushroom(x-7,y-2,4,3);seogiMushroom(x+4,y-2,6,4);seogiMushroom(x-2,y-2,9,5);
+  R(x+8,y-4,1,2,'#6f7d5a');R(x-10,y-3,1,2,'#6f7d5a');   // 풀 몇 가닥
 }
 /* 줍는 것 */
 Rg.drawPickup=(a,x,bob)=>{
@@ -134,7 +129,7 @@ Rg.drawPickup=(a,x,bob)=>{
   else if(a.item==='gyeousari')drawMistletoe(x,a.y,a);
   else if(a.item==='seoridarae'){R(x-4,a.y-8+bob,4,4,'#8ab86a');R(x,a.y-8+bob,4,4,'#7fa860');R(x-2,a.y-4+bob,4,4,'#6f9850');R(x-3,a.y-7+bob,1,1,'#f4fbff');R(x+1,a.y-7+bob,1,1,'#f4fbff');R(x-1,a.y-11,2,3,'#5a4a2a');}
   else if(a.item==='solbang')drawPineCone(x,a.y+bob,true);   // 결정 D-265·D-393
-  else if(!CLASSIC&&a.item==='seogi'){R(x-8,a.y-10,16,10,'#8a9791');R(x-6,a.y-11,12,2,'#e0e8dc');R(x-8,a.y-1,16,1,'#6f7a74');drawSeogiFlaps(x,a.y);R(x+4,a.y-12+bob,1,1,'#fff1bf');}
+  else if(!CLASSIC&&a.item==='seogi'){drawSeogiClump(x,a.y);R(x+5,a.y-16+bob,1,1,'#fff1bf');}   // 결정 D-641
 };
 /* 결정 D-266: 그늘에 녹지 않은 첫눈이 도톰하게 솟은 둔덕(파헤치는 채집 자리). (x,y)는 바닥 가운데. 옛 구성에도 쓰므로 field.js 에 둔다.
    d.prog 만큼 파이면 위가 깎이고, 다 파면 걷어 낸 눈이 양옆에 쌓이고 가운데 검은 흙이 드러난다.
@@ -151,7 +146,7 @@ function drawSnowMound(x,y,d){
   if(!cut){R(x-2,y-h-2,5,2,'#f4f8f9');R(x-1,y-h-3,3,1,'#ffffff');R(x+2,y-h-1,1,1,'#c6d3d6');}
   else{R(x-4,y-h,8,2,'#8f8576');R(x-3,y-h+1,6,1,'#5c4a38');for(const [dx,dy] of [[-8,-h-2],[7,-h-1],[-5,-h-4]])R(x+dx,y+dy,2,2,'#ffffff');}
 }
-/* 억새 무더기와 바위의 석이버섯 */
+/* 억새 무더기와 땅에서 돋은 석이버섯 (D-641) */
 Rg.drawDig=(d,x)=>{
   // 결정 D-266: 눈 둔덕 파기 자리. 나오는 물건(d.item)과 상관없이 둔덕으로 그린다
   if(d.gather==='snow_mound'){drawSnowMound(Math.round(x),d.y??GROUND,d);return true;}
@@ -162,9 +157,8 @@ Rg.drawDig=(d,x)=>{
     if(Math.floor((G.anim+d.x)/14)%3===0)R(x+2,GROUND-22,1,1,'#fff3b0');
     return true;}
   if(d.item==='seogi'){
-    if(d.done){R(x-6,GROUND-1,12,1,'#5a5650');return true;}
-    R(x-9,GROUND-10,18,10,'#7a766e');R(x-7,GROUND-12,14,2,'#8a8680');drawSeogiFlaps(x,GROUND);   // 결정 D-393
-    if(Math.floor((G.anim+d.x)/14)%3===0)R(x,GROUND-15,1,1,'#fff3b0');
+    drawSeogiClump(x,GROUND,d.done);if(d.done)return true;   // 결정 D-641: 땅에서 돋은 버섯 무더기
+    if(Math.floor((G.anim+d.x)/14)%3===0)R(x+1,GROUND-17,1,1,'#fff3b0');
     return true;}
   return false;
 };
@@ -198,6 +192,8 @@ function drawCairn(){const b=G.boss;const x=b.x-cam;if(x<-60||x>W+60)return;
   R(x-12,hy+4,24,2,'#4a4c50');R(x-12,hy+3,24,1,'#8a8c90');R(x-2,hy+6,4,1,'#4a4c50');   // 가운데로 처진 눈썹돌
   R(x-9,hy+6,6,2,'#3a3c40');R(x+3,hy+6,6,2,'#3a3c40');                                 // 눈썹돌 밑 그늘
   R(x-8,hy+7,4,1,'#16120f');R(x+4,hy+7,4,1,'#16120f');                                 // 그늘 속 가는 눈(잠들어 감았다)
+  if(G.f.dolGolemSeen){const on=Math.floor(G.anim/10)%3!==0;R(x-8,hy+7,4,1,'#9fe3dc');R(x+4,hy+7,4,1,'#9fe3dc');   // 결정 D-645: 아이를 본 뒤로 눈을 뜨고
+    R(x-4,GROUND-31-br,8,4,on?'#8fcfcb':'#6aa9a6');R(x-2,GROUND-32-br,4,1,'#e4fbf6');}   // 가슴께 서리빛이 비친다
   R(x-1,hy+7,2,4,'#4c4e52');R(x-2,hy+10,4,1,'#3e4044');                                // 넓적한 코
   R(x-5,hy+12,10,1,'#211c18');                                                          // 곧게 다문 입
   R(x+6,hy+1,1,3,'#3d3f43');R(x+7,hy+4,1,2,'#3d3f43');R(x-10,hy+10,3,2,'#5f7a48');     // 금과 볼의 이끼
@@ -407,9 +403,16 @@ if(!CLASSIC){
   function commonStep(id){
     applySteps();if(Rg.arcs())G.f.arcs=true;
     // 방문 구역은 엔진의 G.visitedZones가 기록한다. 매 프레임 진행값을 쓰지 않는다(지도 왕복 검사가 흔들렸다).
-    if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed&&G.px>Z('shrine',2310))Rg.startGolem();
+    // 결정 D-645: 골렘을 처음 보면 아이가 한마디 하고(GOLEM_SIGHT), 두 걸음쯤 더 다가가야(2310) 전투가 열린다 (단풍골 D-547 과 같은 방식)
+    if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed){
+      if(!G.f.dolGolemSeen&&G.px>Z('shrine',GOLEM_SIGHT)&&$('dlg').hidden){G.f.dolGolemSeen=true;G.vx=0;
+        talk([['너구리','(저게 뒤척인다던 성황당 돌무더기구나.\n돌 틈으로 하얀 김이 새어 나와.)'],
+          ['너구리','(가슴께가 파랗게 비쳐. 서리다래가 저기 있어.\n…무서워도 엄마 약이야. 가 보자.)']]);}
+      else if(G.f.dolGolemSeen&&G.px>Z('shrine',2310)&&$('dlg').hidden)Rg.startGolem();
+    }
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
+    camLead:()=>id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed?70*clamp((G.px-Z('shrine',2120))/160,0,1):0,   // 결정 D-645: 골렘에 다가가는 동안 화면이 골렘 쪽을 앞서 보여 준다
     // 옛 저장의 옛 다리 기억(D-116) 표시는 지운다 (결정 D-165)
     weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),surface:()=>Rg.springRevisit()?'':'frost',ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);if(G.f.dolMemory)delete G.f.dolMemory;Rg.ambient();applySteps();},
     drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);drawStonePlatforms(id);},
@@ -428,7 +431,9 @@ if(!CLASSIC){
   Rg.trimCutsV4=Rg.trimCutsV3;
   // 결정 D-206: 남생이 할미가 있는 성황당 구역을 더 줄인다(사용자 피드백 54). 들어선 자리와 소원 천 사이, 바라보기 앞, 골렘 자리 뒤 절벽 끝 문 앞.
   // 골렘 자리·석이 바위·작은 돌탑은 그대로다.
-  Rg.trimCuts={...Rg.trimCutsV3,shrine:[[150,110],[430,360],[1730,80],[2440,110]]};
+  Rg.trimCutsV5=Rg.trimCutsV6={...Rg.trimCutsV3,shrine:[[150,110],[430,360],[1730,80],[2440,110]]};   // 다섯째·여섯째 판(D-206). 옛 저장을 옮길 때 쓴다
+  // 결정 D-640: 돌쇠 할배(1080)에서 날쌘(1640)까지 560px 을 2/3(373px)로. 다람쥐 도토리 자리(1420)와 날쌘 집(1640) 사이 빈 돌담길을 지운다.
+  Rg.trimCuts={...Rg.trimCutsV6,village:[[110,280],[1440,187]]};
   // 구역에 들어설 때 applyMemory가 bases로 발판을 다시 깐다. 그래서 bases도 같은 좌표로 자르고 정리해 둔다 (D-109·D-110).
   Rg.trimHook=tX=>{
     for(const id of Object.keys(bases)){
