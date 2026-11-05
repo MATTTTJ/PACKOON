@@ -33,10 +33,9 @@ wish_cloth,dolneomeo,소원 천 살펴보기,cloth_flutter,1900,제안
 grain_dish,dolneomeo,작은 제기 살펴보기,clay_ring,,제안
 small_tower,dolneomeo,낮은 돌탑 살펴보기,stone_knock,,제안
 pic_wish_tower,dolneomeo,소원 돌탑 (대사 그림),stone_knock,,제안
-j_flag_knot,jangteo,보부상단 깃발,cloth_flutter,1700,제안
-j_jangseung_snow,jangteo,장승 코의 눈,footstep_snow,,제안
+j_jangseung_snow,jangteo,작은 장승 (아이 손이 코를 톡 짚는 순간 그림이 낸다),wood_tap,,제안
 j_stall_gap,jangteo,좌판 사이 골목,cloth_flutter,,제안
-j_onggi,jangteo,옹기전 독,clay_ring,,제안
+j_onggi,jangteo,옹기전 독 (손끝으로 퉁기는 순간 그림이 낸다),onggi_ring,,제안
 j_steam_flour,jangteo,쌀가루 묻은 발판,steamer,,제안
 j_gukbap,jangteo,장국밥 가마솥,fire_crackle,1500,제안
 j_inn_shoes,jangteo,마루 아래 신발,wood_tap,,제안
@@ -50,6 +49,7 @@ j_warehouse_rope,jangteo,접어 둔 좌판 끈,cloth_flutter,,제안
 j_warehouse_fire,jangteo,짐꾼 화톳불 자리,fire_crackle,,제안
 j_warehouse_scratches,jangteo,창고 문 앞 빗자루 자국,leaf_rustle,,제안
 pic_kite,jangteo,처마에 걸린 연 (연 꼬리 풀기 그림),cloth_flutter,1600,제안
+pic_siru_steam,jangteo,김이 오르며 깨어나는 시루 (모락과 김 올리기 그림),steamer,1800,제안
 y_hut_bindings,yeongsan,산막의 매듭 살펴보기,cloth_flutter,,제안
 y_hut_post,yeongsan,닳은 문설주 살펴보기,wood_tap,,제안
 y_hut_smoke,yeongsan,낮게 흐르는 연기 살펴보기,fire_crackle,1500,제안

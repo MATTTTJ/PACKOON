@@ -4705,18 +4705,14 @@ const TABLES={
   "pic_wish_tower": {
    "sfx": "stone_knock"
   },
-  "j_flag_knot": {
-   "sfx": "cloth_flutter",
-   "repeat": 1700
-  },
   "j_jangseung_snow": {
-   "sfx": "footstep_snow"
+   "sfx": "wood_tap"
   },
   "j_stall_gap": {
    "sfx": "cloth_flutter"
   },
   "j_onggi": {
-   "sfx": "clay_ring"
+   "sfx": "onggi_ring"
   },
   "j_steam_flour": {
    "sfx": "steamer"
@@ -4758,6 +4754,10 @@ const TABLES={
   "pic_kite": {
    "sfx": "cloth_flutter",
    "repeat": 1600
+  },
+  "pic_siru_steam": {
+   "sfx": "steamer",
+   "repeat": 1800
   },
   "y_hut_bindings": {
    "sfx": "cloth_flutter"
