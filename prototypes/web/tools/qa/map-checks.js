@@ -56,8 +56,9 @@ async function runMap({browser:b,outDir}){
       ['너구리','…귀요?']
     ];
     check(supplied.every(([who,text])=>unlockLines.some(row=>row.who===who&&row.text===text&&!row.unlocked)),'map-unlock-dialogue','늙은 까치 보자기 완료 뒤 지정 대사가 빠지거나 끝나기 전에 지도가 열렸다.',unlockLines);
-    const unlocked=await b.eval("({unlocked:!!G.f.mapUnlocked,done:!!G.f.wanderersDone?.['galchamgol:old_magpie'],toast:$('toast').textContent})");
-    check(unlocked.unlocked&&unlocked.done&&unlocked.toast==='지도(M)를 펴면 가 본 곳으로 젊은 까치 둘을 부를 수 있다','map-unlock-complete','늙은 까치 보자기·대사를 실제 완료한 뒤 지도 해금 또는 지정 알림이 없다.',unlocked);
+    const unlocked=await b.eval("({unlocked:!!G.f.mapUnlocked,done:!!G.f.wanderersDone?.['galchamgol:old_magpie'],toast:document.querySelector('.hero-thought')?.textContent})");
+    // 결정 D-706: 지도 해금 안내는 검은 띠(toast)가 아니라 주인공 속말(.hero-thought)로 뜬다
+    check(unlocked.unlocked&&unlocked.done&&unlocked.toast==='지도를 펴면 젊은 까치 둘을 부를 수 있겠다.','map-unlock-complete','늙은 까치 보자기·대사를 실제 완료한 뒤 지도 해금 또는 지정 알림이 없다.',unlocked);
     records.push({stage:'magpie-unlock',lines:unlockLines,...unlocked});
     await b.send('Emulation.setEmulatedMedia',{features:[]});await b.eval('G.px=70;G.cam=0');
     // 격리 조건: 출발 구역과 이웃 구역만 실제 changeZone을 거쳐 방문한 상태로 만든다.
@@ -205,8 +206,8 @@ async function runMap({browser:b,outDir}){
     check(old.length===4&&old.every(s=>s.ok&&s.region===s.want&&s.inv&&j(s.states)===j([s.region])&&Object.keys(s.visited).every(id=>id===s.region)),'map-old-save','지역 보관이 없는 옛 저장에서 현재 지역 외 상태를 만들거나 진행·소지품 복원에 실패했다.',old);
     records.push({stage:'old-saves',old});
     await ready(b);await b.eval("G=newGame('dolneomeo');delete G.f.mapUnlocked;resetScreens()");await b.click('#btnStart');
-    const fallback=await b.eval("({unlocked:!!G.f.mapUnlocked,toast:$('toast').textContent,done:!!G.f.wanderersDone?.['galchamgol:old_magpie']})");
-    check(fallback.unlocked&&!fallback.done&&fallback.toast==='돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도(M)를 펴면 가 본 곳으로 데려다줄 것 같다','map-fallback','늙은 까치를 만나지 않고 돌너머로 들어간 시작에서 지정 지도 안내가 나오지 않았다.',fallback);
+    const fallback=await b.eval("({unlocked:!!G.f.mapUnlocked,toast:document.querySelector('.hero-thought')?.textContent,done:!!G.f.wanderersDone?.['galchamgol:old_magpie']})");
+    check(fallback.unlocked&&!fallback.done&&fallback.toast==='돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도를 펴면 데려다줄 것 같다.','map-fallback','늙은 까치를 만나지 않고 돌너머로 들어간 시작에서 지정 지도 안내가 나오지 않았다.',fallback);
     records.push({stage:'dolneomeo-fallback',...fallback});
     await ready(b,true);await b.key('m');
     check(await b.eval("$('map').hidden&&!$('btnMap').getClientRects().length"),'map-classic','classic에서 지도 또는 지도 HUD 버튼이 열렸다.');
