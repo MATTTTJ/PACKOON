@@ -96,13 +96,13 @@ Rg.step=()=>{
   if(has('hongsi_tteok')&&!G.f.hongsiMade)Rg.sendMedicine();
 };
 Rg.onHit=()=>{};
-Rg.faint=()=>{G.px=Math.max(60,G.px-80);toast('눈길에 미끄러져 물러났다');};
+Rg.faint=()=>{G.px=Math.max(60,G.px-80);think('아이코, 미끄러졌다. 살살 다시 가자.');};
 /* 도깨비를 이기거나 달래면 훔쳐 간 설 제수가 돌아온다. 눈홍시는 보따리로 */
 Rg.bossDie=calm=>{
   G.boss.dead=true;addItem('nunhongsi',1);
   if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
   diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔고, 발자국은 밤새 내린 눈이 덮었다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
-  toast('눈홍시를 얻었다! 시루로 홍시 약떡을 찌자');refreshGoal();
+  think('눈홍시다! 시루에 찌면 홍시 약떡이 되겠다.');refreshGoal();
 };
 Rg.STORE_X=STORE_X;
 
@@ -118,7 +118,7 @@ const ENC={delay:34,speed:0.8,start:300,stop:84,reveal:72,stride:16};   // 결�
 Rg.snowEncounter=()=>{
   if(!G.f.guard||!night()||G.boss.dead||B||inkOn){if(G.boss.dead)snowEnc=null;return;}
   if(!snowEnc){
-    if(Math.abs(G.px-Rg.STORE_X)<24&&$('dlg').hidden){
+    if(Math.abs(G.px-Rg.STORE_X)<24&&encounterReady()){   // 결정 D-719: 땅에 디딘 뒤에
       if(!hasForm('owl'))unlockForm('owl');
       snowEnc={t:0,x:Rg.STORE_X+ENC.start,said:0,reveal:0,steps:[]};G.vx=0;
     }
@@ -289,7 +289,7 @@ if(!CLASSIC){
     drawPickup:Rg.drawPickup,onHit:Rg.onHit,ambient:Rg.ambient,
     weather:()=>{if(Rg.springRevisit())Vfx.setWeather('');else Rg.weather();},
     weatherFront(){Rg.expArt.drawFront?.(id);},
-    faint(){G.px=Math.max(60,G.px-80);G.py=GROUND;G.vy=0;toast('눈을 털고 다시 걸었다.');},
+    faint(){G.px=Math.max(60,G.px-80);G.py=GROUND;G.vy=0;think('눈을 털고 다시 걷자.');},
     step(){
       const legacy=G.pickups.filter(a=>a.item==='solbang'&&!a.zone);
       if(legacy.length){
@@ -315,7 +315,7 @@ if(!CLASSIC){
       if(id==='warehouse')Rg.snowEncounter();   // 결정 D-684
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
         G.f.jxHubChanged=true;diary('jx_hub','모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.');
-        toast('떡집 앞 줄이 짧아졌다.');
+        think('떡집 앞 줄이 짧아졌네.');
       }
     },
   });

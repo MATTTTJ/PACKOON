@@ -101,7 +101,7 @@ Rg.strangerCreditAtNight=true;
 
 /* 결정 D-82: 솔숲의 작은 소나무를 흔들어 솔방울을 떨군다 (채집 고리 D-41) */
 defineGather({
-  solbang:{title:'소나무 흔들기',rare:'jat',verb:'소나무 흔들기',hits:TABLES.MINIGAMES.gather_solbang_hits,spot:[0,-30],box:[-11,-44,11,0],hint:'작은 소나무 줄기를 친다. 도는 표식이 금빛 칸에서 멈추게 휘두르면 솔방울이 하나 더 떨어진다.'},
+  solbang:{title:'소나무 흔들기',rare:'jat',verb:'소나무 흔들기',hits:TABLES.MINIGAMES.gather_solbang_hits,spot:[0,-30],box:[-11,-44,11,0],hint:'작은 소나무 줄기를 쳐서 솔방울을 떨군다.'},
 });
 })();
 
@@ -296,7 +296,7 @@ function babyBoar(){
     // 결정 D-322: '새끼 멧돼지'를 알밤이로 부른다. 밤빛 줄무늬에 동글동글해서 엄마가 붙인 이름이다
     ['알밤이','알밤이. 엄마가 그렇게 불러.\n집 냄새는 마른 풀하고 솔잎 냄새였어.'],
     ['알밤이','뛰지 말고 옆에서 같이 찾아줄래?',[
-      {t:'솔가지부터 함께 살펴본다',go:()=>{G.f.jxBoarStarted=true;toast('오른쪽의 부러진 솔가지 → 마른 솔잎. E로 냄새 살펴보기');}},
+      {t:'솔가지부터 함께 살펴본다',go:()=>{G.f.jxBoarStarted=true;think('오른쪽 부러진 솔가지부터 냄새를 맡아 보자.');}},
       {t:'잠깐 길부터 살펴볼게',go:null}
     ]]
   ]);

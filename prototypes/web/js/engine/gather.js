@@ -1,6 +1,6 @@
 'use strict';
-/* 채집: 따로 창을 띄우지 않는다. 흙더미(G.digs) 앞에 서면 그 채집물을 거의 감싸는 원이 뜨고,
-   12시 방향에서 표식 하나가 원을 따라 시계 방향으로 돈다. 원 위에는 금빛 칸(정확)과 그 양옆의 옅은 칸(근접)이 있다.
+/* 채집: 따로 창을 띄우지 않는다. 흙더미(G.digs) 앞에 서면 그 채집물을 거의 감싸는 원을 붓끝이 12시에서부터 먹으로 그어 간다(D-715).
+   원 위에는 붉은 인주 도장(정확)과 그 양옆의 옅은 인주물(근접)이 있다. 아래 설명의 금빛 칸은 도장, 옅은 칸은 인주물이다.
    휘두르면 표식이 그 자리에서 멈추고, 멈춘 칸에 따라 캐는 몫이 다르다. 아무 데서 멈춰도 한 몫은 판다(벌 없음).
    아이템별 설정은 defineGather 로 지역이 넣는다: {title, hits:보통 타수, hint, spot:[dx,dy] 캐는 자리(흙먼지·글자), box?:[x0,y0,x1,y1] 그림 범위, rare?:보통 칸에서 한 번도 멈추지 않을 때 덤으로 나오는 상위 재료}
    수치는 minigames.csv 의 gather_* (한 바퀴 시간·칸 넓이·칸 자리·정확 힘·수량). 처음 캐면 남는 일기는 지역의 gatherDiary:[id, 글] */
@@ -47,7 +47,9 @@ function gatherHit(d){
   const cfg=gatherCfg(d),MG=TABLES.MINIGAMES;if(!cfg||d.done)return;
   const grade=gatherCue.grade,just=grade==='perfect';gatherCue.grade=null;if(!grade)d.flaw=true;
   if(!G.f.gatherHinted)G.f.gatherHinted={};
-  if(!G.f.gatherHinted[gatherKey(d)]){G.f.gatherHinted[gatherKey(d)]=true;toast(cfg.hint);}
+  // 결정 D-716: 채집 설명은 짧게. 자리마다 한 줄(cfg.hint)이고, 붓·도장 규칙은 처음 캘 때 한 번만 덧붙인다 (사용자 피드백 2026-11-05 "설명이 너무 길다")
+  if(!G.f.gatherHinted[gatherKey(d)]){const first=!G.f.gatherRuleSaid;G.f.gatherHinted[gatherKey(d)]=true;G.f.gatherRuleSaid=true;
+    think(first?cfg.hint+' 붓끝이 붉은 도장에 닿을 때 치면 더 나오겠다.':cfg.hint);}
   d.prog=(d.prog||0)+(just?MG.gather_perfect_power:1);if(just)d.perfects=(d.perfects||0)+1;
   // 결정 D-482: 채집 자리마다 칠 때 소리를 따로 줄 수 있다(cfg.hitSound). 눈 둔덕은 쇠 날이 언 눈을 때리는 '팡'
   if(cfg.hitSound)Sound.hit(cfg.hitSound);else Sound.gather(true);
@@ -71,9 +73,9 @@ function finishGather(d){
   const cfg=gatherCfg(d)||{},rare=!d.flaw&&d.perfects&&cfg.rare&&ITEMS[cfg.rare]?cfg.rare:null;
   if(rare){spawnDrops(rare,1,{x:d.x+6,y:d.y??fieldGround(),zone:d.zone});learn('gather:rare:'+id);}
   // 결정 D-266: 무엇이 왜 묻혀 있었는지 자리가 알려 준다(눈 둔덕). 칸을 맞춘 알림은 그 뒤에 띄운다.
-  if(d.found)setTimeout(()=>toast(d.found),250);
-  if(rare)setTimeout(()=>toast('한 번도 칸을 놓치지 않았다. '+ITEMS[id].n+' ×'+n+' · '+ITEMS[rare].n+'도 나왔다'),d.found?1700:700);
-  else if(extra)setTimeout(()=>toast('금빛 칸에 맞춰 더 캐냈다. '+ITEMS[id].n+' ×'+n),d.found?1700:700);
+  if(d.found)setTimeout(()=>think(d.found),250);
+  if(rare)setTimeout(()=>toast(ITEMS[id].n+' ×'+n+' · '+ITEMS[rare].n+'도 나왔다'),d.found?1700:700);
+  else if(extra)setTimeout(()=>toast('도장에 맞춰 더 캐냈다. '+ITEMS[id].n+' ×'+n),d.found?1700:700);
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);
   if(gatherCue.d===d)gatherCue.d=null;
 }
@@ -98,48 +100,72 @@ function gatherRing(d){
 }
 /* 원과 진행 점 맨 위 (말풍선 안내는 그 위에 띄운다) */
 function gatherRingTop(d){const g=gatherRing(d);return g.y-g.r-10;}
-/* 원 둘레의 한 구간(12시에서 잰 비율 a~b)을 어두운 테두리 위에 호로 긋는다 */
-function arcStroke(c,x,y,r,a,b,color,width){
+/* 결정 D-715: 채집 표식은 수묵화풍이다 (사용자 피드백 2026-11-05 "너무 데바데 같다. 이 게임만의 스타일").
+   원은 미리 그려 두지 않고, 붓끝이 12시에서 출발해 돌면서 먹선을 그어 간다(지나온 길은 가늘어지고 마른 붓처럼 군데군데 끊긴다).
+   맞출 칸은 원 위에 찍힌 붉은 인주 도장(정확)과 그 양옆의 옅은 붉은 물(근접)이다. 휘두르면 붓이 멈추고,
+   도장에 맞으면 붉은 인주가 번지고, 근접이면 먹이 번지고, 보통이면 먹점 하나만 떨어진다. 조작과 판정(D-500)은 그대로다. */
+const G_INK='#1d1714',G_INK_SOFT='rgba(29,23,20,.55)',G_PAPER='rgba(246,238,216,.6)',G_SEAL='#b8291f',G_SEAL_L='#e2584a';
+/* 원 둘레의 한 구간(12시에서 잰 비율 a~b)을 옅은 종이빛 테두리 위에 호로 긋는다 */
+function arcStroke(c,x,y,r,a,b,color,width,halo=G_PAPER){
   const A=-Math.PI/2+a*Math.PI*2,B=-Math.PI/2+b*Math.PI*2;
-  c.lineWidth=width+2;c.strokeStyle='rgba(30,20,12,.75)';c.beginPath();c.arc(x+.5,y+.5,r,A-.04,B+.04);c.stroke();
+  if(halo){c.lineWidth=width+2;c.strokeStyle=halo;c.beginPath();c.arc(x+.5,y+.5,r,A-.03,B+.03);c.stroke();}
   c.lineWidth=width;c.strokeStyle=color;c.beginPath();c.arc(x+.5,y+.5,r,A,B);c.stroke();
 }
-/* 도는 표식의 색: 지금 모습(G.form)마다 다르다 (D-41의 변신별 표현을 표식 하나로 옮김). dash는 옛 값이라 쓰지 않는다 */
+/* 붓끝의 테 색: 지금 모습(G.form)마다 다르다 (D-41의 변신별 표현을 붓끝 하나로 옮김). dash는 옛 값이라 쓰지 않는다 */
 const GATHER_RING_STYLE={
-  '':{c:'#f2a24a',dash:[]},            // 너구리: 단풍빛 실선
-  squirrel:{c:'#c8893f',dash:[3,1]},    // 다람쥐: 도토리빛 촘촘한 끊긴 선
-  goat:{c:'#efe6d2',dash:[]},           // 산양: 뿔빛 실선
-  owl:{c:'#e8d6b0',dash:[4,2]},         // 수리부엉이: 깃털빛 긴 끊긴 선
-  deer:{c:'#b08a5c',dash:[1,2]}         // 고라니: 발굽빛 점선
+  '':{c:'#f2a24a',dash:[]},            // 너구리: 단풍빛
+  squirrel:{c:'#c8893f',dash:[3,1]},    // 다람쥐: 도토리빛
+  goat:{c:'#efe6d2',dash:[]},           // 산양: 뿔빛
+  owl:{c:'#e8d6b0',dash:[4,2]},         // 수리부엉이: 깃털빛
+  deer:{c:'#b08a5c',dash:[1,2]}         // 고라니: 발굽빛
 };
-/* 흙더미 위 원·칸·도는 표식·진행 점·튀는 흙. 필드 그리기에서 흙더미 다음에 부른다 */
+/* 붓이 지나온 먹선: 0에서 p까지. 붓끝에 가까울수록 굵고 진하며, 지나온 길은 가늘어지고 마른 붓 자국처럼 군데군데 빈다 */
+function drawInkTrail(c,x,y,r,p){
+  const N=Math.max(1,Math.ceil(p*48));
+  // 종이빛 테두리를 먼저 한 번에 깔고(밤 배경에서도 먹선이 보이게) 그 위에 먹을 긋는다
+  arcStroke(c,x,y,r,0,p,G_PAPER,3,null);
+  for(let i=0;i<N;i++){
+    const a=i/48,b=Math.min(p,(i+1)/48),near=1-(p-b)/Math.max(p,.0001);
+    if(near<.55&&(i*7+3)%11===0)continue;   // 비백: 마른 붓이 종이를 스친 빈 자리
+    const w=near>.85?3:near>.4?2:1;
+    arcStroke(c,x,y,r,a,b+.004,near>.4?G_INK:G_INK_SOFT,w,null);
+  }
+}
+/* 붉은 인주 도장: 원 위 정확 칸 가운데에 찍힌 작은 네모. 안에 흰 획 셋 (글자처럼 보이게) */
+function drawSeal(x,y,r,z,lit){
+  const A=-Math.PI/2+z*Math.PI*2,sx=Math.round(x+Math.cos(A)*r),sy=Math.round(y+Math.sin(A)*r);
+  R(sx-3,sy-3,7,7,'rgba(246,238,216,.75)');
+  R(sx-2,sy-2,5,5,lit?G_SEAL_L:G_SEAL);
+  R(sx-1,sy-1,1,3,'#f6e7d6');R(sx+1,sy-1,1,1,'#f6e7d6');R(sx+1,sy+1,1,1,'#f6e7d6');
+}
+/* 흙더미 위 붓 원·도장·붓끝·진행 먹점·튀는 흙. 필드 그리기에서 흙더미 다음에 부른다 */
 function drawGatherCue(){
   const d=nearDig(),live=d&&!d.cache&&gatherCfg(d)?d:null;
   if(live!==gatherCue.d){gatherCue.d=live;gatherCue.start=G.anim;gatherCue.stop=null;gatherNewZone();}
   const c=ctx,MG=TABLES.MINIGAMES;
-  // 멈춘 표식은 잠깐 머문 뒤 12시로 돌아가 다시 돈다. 칸 자리도 새로 정한다 (D-500)
+  // 멈춘 붓은 잠깐 머문 뒤 12시로 돌아가 새 원을 긋는다. 도장 자리도 새로 정한다 (D-500)
   if(gatherCue.stop&&!paused()&&--gatherCue.stop.t<=0){gatherCue.stop=null;gatherCue.start=G.anim;gatherNewZone();}
   if(live){
     const cfg=gatherCfg(live),ring=gatherRing(live),x=Math.round(ring.x-cam),y=Math.round(ring.y),r=ring.r,ph=gatherPhase(live);
     const st=GATHER_RING_STYLE[G.form||'']||GATHER_RING_STYLE[''],z=gatherCue.zone,hp=MG.gather_perfect_zone/200,gd=MG.gather_good_zone/100;
-    c.save();
-    // 바탕 원: 어두운 테두리 위 옅은 실선
-    c.lineWidth=3;c.strokeStyle='rgba(30,20,12,.5)';c.beginPath();c.arc(x+.5,y+.5,r,0,Math.PI*2);c.stroke();
-    c.lineWidth=1;c.strokeStyle='rgba(255,249,232,.45)';c.beginPath();c.arc(x+.5,y+.5,r,0,Math.PI*2);c.stroke();
-    // 근접 칸(양옆, 흰색)과 정확 칸(가운데, 진한 금빛). 바탕 원보다 굵어 한눈에 보인다
-    arcStroke(c,x,y,r,z-hp-gd,z+hp+gd,'#fffdf4',3);
-    arcStroke(c,x,y,r,z-hp,z+hp,'#ffc21a',4);
-    // 도는 표식: 원을 가로지르는 짧은 바늘. 멈추면 맞춘 칸의 색으로 빛난다
-    const A=-Math.PI/2+ph.p*Math.PI*2,cs=Math.cos(A),sn=Math.sin(A),sg=gatherCue.stop?.grade;
-    const col=sg==='perfect'?'#fff3a0':sg==='good'?'#ffffff':st.c,x0=x+.5+cs*(r-4),y0=y+.5+sn*(r-4),x1=x+.5+cs*(r+4),y1=y+.5+sn*(r+4);
-    c.lineCap='round';
-    c.lineWidth=4;c.strokeStyle='rgba(30,20,12,.8)';c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();
-    c.lineWidth=2;c.strokeStyle=col;c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();
+    const sg=gatherCue.stop?.grade;
+    c.save();c.lineCap='round';
+    // 붓이 갈 길: 아주 옅은 종이빛 점선 (어디로 돌지 미리 보이게)
+    c.setLineDash([1,3]);c.lineWidth=1;c.strokeStyle='rgba(246,238,216,.35)';c.beginPath();c.arc(x+.5,y+.5,r,0,Math.PI*2);c.stroke();c.setLineDash([]);
+    // 근접 칸: 도장 양옆에 번진 옅은 인주물
+    arcStroke(c,x,y,r,z-hp-gd,z+hp+gd,'rgba(200,60,45,.55)',3);
+    // 지나온 먹선
+    drawInkTrail(c,x,y,r,ph.p);
     c.restore();
-    // 진행 점: 원 바로 위. 채운 점 = 판 몫
-    const need=cfg.hits,done=Math.min(need,live.prog||0),top=y-r-9;
-    R(x-need*2-1,top,need*4+3,6,'rgba(42,30,20,.75)');
-    for(let i=0;i<need;i++)R(x-need*2+1+i*4,top+2,3,2,i<done?'#ffe48a':'#7d6a52');
+    drawSeal(x,y,r,z,sg==='perfect');
+    // 붓끝: 먹을 머금은 둥근 끝. 테는 지금 모습의 빛깔, 멈추면 맞춘 칸 빛깔
+    const A=-Math.PI/2+ph.p*Math.PI*2,bx=Math.round(x+Math.cos(A)*r),by=Math.round(y+Math.sin(A)*r);
+    const rim=sg==='perfect'?G_SEAL_L:sg==='good'?'#f6eee0':st.c;
+    R(bx-2,by-1,5,3,rim);R(bx-1,by-2,3,5,rim);R(bx-1,by-1,3,3,G_INK);
+    // 진행 먹점: 원 바로 위 종이 띠. 채운 점 = 판 몫
+    const need=cfg.hits,done=Math.min(need,live.prog||0),top=y-r-10;
+    R(x-need*2-1,top,need*4+3,6,'rgba(246,238,216,.8)');
+    for(let i=0;i<need;i++)R(x-need*2+1+i*4,top+2,3,2,i<done?G_INK:'#c8b896');
   }
   for(let i=gatherCue.dirt.length-1;i>=0;i--){const p=gatherCue.dirt[i];
     if(!paused()){p.x+=p.vx;p.y+=p.vy;p.vy+=.15;p.t--;}
@@ -149,7 +175,8 @@ function drawGatherCue(){
   for(let i=gatherCue.pops.length-1;i>=0;i--){const p=gatherCue.pops[i];
     if(!paused())p.t--;if(p.t<=0){gatherCue.pops.splice(i,1);continue;}
     if(Vfx.reducedMotion)continue;
-    const k=16-p.t,x=Math.round(p.x-cam),y=Math.round(p.y),n=p.just?8:4,col=p.just?'#fff3a0':'#fff9e8';
-    for(let j=0;j<n;j++){const a=j/n*Math.PI*2;R(x+Math.round(Math.cos(a)*k*.5),y+Math.round(Math.sin(a)*k*.5),1,1,col);}
+    const k=16-p.t,x=Math.round(p.x-cam),y=Math.round(p.y),n=p.just?10:6,col=p.just?G_SEAL:G_INK;
+    // 결정 D-715: 도장에 맞으면 붉은 인주가, 근접이면 먹이 둘레로 번진다 (바깥으로 갈수록 성기다)
+    for(let j=0;j<n;j++){const a=j/n*Math.PI*2+(j%2)*.3,dd=k*(.35+(j%3)*.12);R(x+Math.round(Math.cos(a)*dd),y+Math.round(Math.sin(a)*dd),k<8?2:1,k<8?2:1,j%3?col:'rgba(246,238,216,.8)');}
   }
 }

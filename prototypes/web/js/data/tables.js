@@ -737,7 +737,7 @@ const TABLES={
    "n": "석이병",
    "r": 2,
    "kind": "먹을거리",
-   "region": "dolneomeo",
+   "region": "jangteo",
    "d": "석이를 곱게 다져 쌀가루에 섞어 찐 떡. 잔칫상에나 오르던 거무스름한 떡이다.",
    "u": "조각"
   },
@@ -1736,6 +1736,11 @@ const TABLES={
     "kind": "그저 그럼",
     "line": "소금이야 상단 짐에도 넘친다.",
     "effect": "none"
+   },
+   "songibap": {
+    "kind": "좋아함",
+    "line": "송이를 이만큼 얹었으면 장터 셈으로도 귀한 밥이다. 잘 먹으마.",
+    "effect": "none"
    }
   },
   "jongjong": {
@@ -1747,6 +1752,11 @@ const TABLES={
    "injeolmi": {
     "kind": "아주 좋아함",
     "line": "인절미다! 엄마가 해 주던 맛이야.",
+    "effect": "none"
+   },
+   "beoseot_jjim": {
+    "kind": "아주 좋아함",
+    "line": "따뜻하다… 문 지키는 밤에 이거면 안 졸겠어요.",
     "effect": "none"
    }
   }
@@ -3630,6 +3640,7 @@ const TABLES={
   "field_talk_distance": 30,
   "field_dig_ahead": 12,
   "field_dig_distance": 16,
+  "field_dig_height": 10,
   "field_swing_frames": 18,
   "field_swing_hit_at": 9,
   "field_hit_front": 2,
@@ -3639,6 +3650,9 @@ const TABLES={
   "save_interval": 30000,
   "field_interact_y": 24,
   "zone_transition_frames": 18,
+  "zone_slide_frames": 30,
+  "zone_fade_out_frames": 16,
+  "zone_fade_in_frames": 22,
   "depth_gate_open_frames": 20,
   "vista_pan_frames": 480,
   "map_flight_ms": 2000,
@@ -3717,6 +3731,8 @@ const TABLES={
   "form_climb_reach": 10,
   "form_goat_jump": 1.4,
   "form_owl_glide_fall": 0.9,
+  "form_owl_flap_velocity": 3.6,
+  "form_owl_flaps": 1,
   "form_owl_sense_range": 56,
   "form_deer_speed": 1.45,
   "form_deer_listen_range": 360,
@@ -3744,6 +3760,11 @@ const TABLES={
   "roll_squirrel_speed": 2,
   "roll_accel_frames": 10,
   "roll_step_frames": 9,
+  "roll_boost_after": 60,
+  "roll_boost_ramp": 40,
+  "roll_boost_mult": 1.3,
+  "roll_dizzy_after": 240,
+  "roll_dizzy_frames": 75,
   "npc_move_out_ms": 1000,
   "npc_move_in_ms": 450,
   "npc_move_walk_px": 36,

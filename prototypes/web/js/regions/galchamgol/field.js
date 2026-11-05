@@ -213,9 +213,9 @@ Rg.step=()=>{
   if(G.barrier.shake>0)G.barrier.shake--;
   // 칡덩굴을 끊었거나 언덕에 와 있으면(옛 저장 포함) 엉킨 칡은 같은 자리에서 깨어난다 (PA-47, D-190)
   // 결정 D-547: 확장판 언덕에서는 칡을 먼저 보고 한마디 한 뒤, 칡 곁까지 더 다가가야 전투가 열린다
-  if(!G.boss.dead&&!G.f.galKudzuSeen&&!CLASSIC&&G.zone==='hill'&&G.px>SIGHT_X&&$('dlg').hidden){G.f.galKudzuSeen=true;G.vx=0;
+  if(!G.boss.dead&&!G.f.galKudzuSeen&&!CLASSIC&&G.zone==='hill'&&G.px>SIGHT_X&&encounterReady()){G.f.galKudzuSeen=true;G.vx=0;
     talk([['너구리','(저게 엉킨 칡이구나…\n큰 뱀이 당산나무를 칭칭 감은 것 같아.)'],['너구리','(꽃 속에 보랏빛 알이 비쳐. 해머루야!\n무서워도… 가까이 가 보자.)']]);}
-  else if(!G.boss.dead&&(G.barrier.cut||G.zone==='hill')&&(CLASSIC||G.f.galKudzuSeen)&&G.px>KUDZU_AT&&$('dlg').hidden)Rg.startKudzu();
+  else if(!G.boss.dead&&(G.barrier.cut||G.zone==='hill')&&(CLASSIC||G.f.galKudzuSeen)&&G.px>KUDZU_AT&&encounterReady())Rg.startKudzu();   // 결정 D-719: 땅에 디딘 뒤에
   // 옛 저장에 남은 해머루도 같은 바닥 아이템으로 한 번만 옮긴다.
   if(G.drop){const d=G.drop;G.drop=null;spawnDrops('meoru',1,{x:d.x,y:d.y});}
 };

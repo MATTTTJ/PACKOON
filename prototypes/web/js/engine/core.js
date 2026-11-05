@@ -102,7 +102,8 @@ function enterRegion(g,r,options={}){
   Object.assign(g,saved?.fields||{});
   if(saved&&saved.fields.trimVer===undefined)delete g.trimVer;   // 자르기 전에 저장한 지역은 prepareZones에서 한 번 옮긴다 (D-109)
   if(!saved&&g.floorPickups?.[r.id])g.pickups=structuredClone(g.floorPickups[r.id]);
-  Object.assign(g,{form:'',region:r.id,started:!!options.mapTravel,ended:false,hp:options.mapTravel?g.hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,
+  Object.assign(g,{form:options.mapTravel?(g.form||''):'',region:r.id,   // 결정 D-722: 길 지도로 마을을 넘어가도 변신은 그대로
+    started:!!options.mapTravel,ended:false,hp:options.mapTravel?g.hp:g.maxhp,px:r.startX,py:GROUND,vx:0,vy:0,face:1,onGround:true,attackT:0,hurtT:0,cam:0,
     zone:options.zone??saved?.fields?.zone??null,zoneStates:saved?.fields?.zoneStates||{}});
   prepareZones(g,r,true);rememberRegion(g);return g;
 }
