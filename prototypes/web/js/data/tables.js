@@ -292,7 +292,7 @@ const TABLES={
    "r": 1,
    "kind": "재료",
    "region": "jangteo",
-   "d": "헌물 도깨비의 빗자루에서 빠진 싸리 살.",
+   "d": "눈도깨비가 멧돼지로 둔갑할 때 곤두선 갈기가 되던 싸리비 살.",
    "u": "단"
   },
   "kong": {
@@ -300,7 +300,7 @@ const TABLES={
    "r": 1,
    "kind": "재료",
    "region": "jangteo",
-   "d": "헌물 도깨비가 키로 까불던 콩. 장터에서 훔쳐 온 것이다.",
+   "d": "눈도깨비가 곰 발톱으로 긁어 도롱이 속에 담아 간 콩. 장터에서 훔쳐 온 것이다.",
    "u": "되"
   },
   "jip": {
@@ -308,7 +308,7 @@ const TABLES={
    "r": 1,
    "kind": "재료",
    "region": "jangteo",
-   "d": "헌물 도깨비의 멍석에서 풀려나온 짚.",
+   "d": "눈도깨비가 독수리 깃 속에 둥지처럼 쑤셔 넣었던 짚. 상단 창고 짚단에서 뽑아 간 것이다.",
    "u": "단"
   },
   "dokkaebibul": {
@@ -840,29 +840,29 @@ const TABLES={
   ],
   "dokkaebi": [
    {
-    "id": "broom",
-    "name": "빗자루",
-    "hp": 3,
-    "mat": "broom_sal",
-    "tool": "pick"
-   },
-   {
-    "id": "ki",
-    "name": "키",
-    "hp": 3,
-    "mat": "kong",
-    "tool": "sickle"
-   },
-   {
-    "id": "meongseok",
-    "name": "멍석",
+    "id": "eagle",
+    "name": "독수리",
     "hp": 3,
     "mat": "jip",
     "tool": "sickle"
    },
    {
+    "id": "bear",
+    "name": "곰",
+    "hp": 3,
+    "mat": "kong",
+    "tool": "pick"
+   },
+   {
+    "id": "boar",
+    "name": "멧돼지",
+    "hp": 3,
+    "mat": "broom_sal",
+    "tool": "sickle"
+   },
+   {
     "id": "core",
-    "name": "도깨비불",
+    "name": "심장",
     "hp": 4,
     "mat": "dokkaebibul",
     "core": true,
@@ -2419,18 +2419,18 @@ const TABLES={
    "lines": [
     {
      "who": "dad",
-     "text": "장터 도깨비 이야기: 헌것에 깃들어 장난을 친다. 메밀 한 그릇이면 순해진다더라.",
+     "text": "장터 도깨비 이야기: 그믐 눈밤엔 닳은 헌것이 도깨비가 되어 몸을 감추고 다닌다. 메밀 한 그릇이면 순해진다더라.",
      "section": "아빠 수첩"
     },
     {
      "who": "me",
-     "text": "낡은 빗자루·키·멍석에 깃든 도깨비. 빗자루는 쓸고, 키는 콩을 뿌리고, 멍석은 말려 든다.",
+     "text": "까치 깃 도롱이를 두른 눈도깨비. 독수리는 깃털 바람을 날리고, 곰은 발톱 세 줄로 긁고, 멧돼지는 한 줄로 내닫는다. 둔갑이 끝날 때마다 푸른 심장이 튀어나온다.",
      "section": "관찰",
      "when": "fight:dokkaebi"
     },
     {
      "who": "me",
-     "text": "헌물을 하나 부수면 도깨비불이 드러난다.",
+     "text": "둔갑 둘이 풀리면 숨어 버린다. 보이지 않는 빙산이 발밑에서 솟는데 수리부엉이 눈에는 보인다.",
      "section": "관찰",
      "when": "core:dokkaebi"
     },
@@ -3642,6 +3642,7 @@ const TABLES={
   "kudzu_scent_slow_frames": 80,
   "kudzu_scent_linger": 150,
   "kudzu_hole_frames": 90,
+  "nundok_spill_chance": 0.35,
   "toast_frames": 300,
   "name_card_ms": 3600,
   "peek_ms": 1400,

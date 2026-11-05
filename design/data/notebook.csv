@@ -91,12 +91,12 @@ jjandol,jangteo,짠돌,동물,나,arc:jangteo:jjandol,마루에 올라섰을 때
 jjandol,jangteo,짠돌,동물,나,arc:jangteo:jjandol-name,방에서 잔 다음 날,부엉 영감이 손님 장부에 짠돌 말고 본이름을 적었단다. 무슨 이름인지는 비밀.,제안,D-119 새 인물,관찰
 deungjan,jangteo,등잔발,동물,나,met:j_deungjan,처음 말을 걸 때,생쥐 밤짐꾼. 해 지고 들어오는 길손 짐을 나르고 허리 등잔으로 길을 비춘다.,제안,D-119 새 인물,관찰
 deungjan,jangteo,등잔발,동물,나,arc:jangteo:deungjan,설날 아침에 깨었을 때,내 보따리 약초 냄새로 알아봤다. 지난가을 밤 아빠 짐을 날랐단다. 무거웠고 아빠는 한참 남쪽 하늘만 봤다고. 우리 집이 있는 쪽이다.,제안,D-119 새 인물,관찰
-dokkaebi,jangteo,헌물 도깨비,동물,아빠,,처음부터,장터 도깨비 이야기: 헌것에 깃들어 장난을 친다. 메밀 한 그릇이면 순해진다더라.,제안,,아빠 수첩
-dokkaebi,jangteo,헌물 도깨비,동물,나,fight:dokkaebi,처음 맞설 때,"낡은 빗자루·키·멍석에 깃든 도깨비. 빗자루는 쓸고, 키는 콩을 뿌리고, 멍석은 말려 든다.",제안,,관찰
-dokkaebi,jangteo,헌물 도깨비,동물,나,core:dokkaebi,핵심 부위가 드러날 때,헌물을 하나 부수면 도깨비불이 드러난다.,제안,,관찰
-dokkaebi,jangteo,헌물 도깨비,동물,나,like:dokkaebi:memiltteok,전투에서 메밀떡을(를) 건넸을 때,메밀떡을 주니 덩실덩실 춤을 췄다. 아빠 수첩에 적힌 대로다.,제안,,관찰
-dokkaebi,jangteo,헌물 도깨비,동물,나,like:dokkaebi:dad_yeot,전투에서 아빠가 맡긴 엿을(를) 건넸을 때,아빠의 엿을 주자 꼭 끌어안고 돌려주지 않았다.,제안,,관찰
-dokkaebi,jangteo,헌물 도깨비,동물,나,calm:dokkaebi,달래서 끝냈을 때,달래면 훔친 것을 제자리에 돌려놓고 눈홍시를 하나 더 준다.,제안,,관찰
+dokkaebi,jangteo,눈도깨비,동물,아빠,,처음부터,장터 도깨비 이야기: 그믐 눈밤엔 닳은 헌것이 도깨비가 되어 몸을 감추고 다닌다. 메밀 한 그릇이면 순해진다더라.,제안,,아빠 수첩
+dokkaebi,jangteo,눈도깨비,동물,나,fight:dokkaebi,처음 맞설 때,"까치 깃 도롱이를 두른 눈도깨비. 독수리는 깃털 바람을 날리고, 곰은 발톱 세 줄로 긁고, 멧돼지는 한 줄로 내닫는다. 둔갑이 끝날 때마다 푸른 심장이 튀어나온다.",제안,,관찰
+dokkaebi,jangteo,눈도깨비,동물,나,core:dokkaebi,몸을 감출 때,둔갑 둘이 풀리면 숨어 버린다. 보이지 않는 빙산이 발밑에서 솟는데 수리부엉이 눈에는 보인다.,제안,,관찰
+dokkaebi,jangteo,눈도깨비,동물,나,like:dokkaebi:memiltteok,전투에서 메밀떡을(를) 건넸을 때,메밀떡을 주니 덩실덩실 춤을 췄다. 아빠 수첩에 적힌 대로다.,제안,,관찰
+dokkaebi,jangteo,눈도깨비,동물,나,like:dokkaebi:dad_yeot,전투에서 아빠가 맡긴 엿을(를) 건넸을 때,아빠의 엿을 주자 꼭 끌어안고 돌려주지 않았다.,제안,,관찰
+dokkaebi,jangteo,눈도깨비,동물,나,calm:dokkaebi,달래서 끝냈을 때,달래면 훔친 것을 제자리에 돌려놓고 눈홍시를 하나 더 준다.,제안,,관찰
 solbang,jangteo,솔방울,물건,나,got:solbang,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 pat,jangteo,팥,물건,나,got:pat,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
 pat,jangteo,팥,물건,아빠,,처음부터,설 고사떡에는 붉은 팥. 잡귀를 쫓는다.,제안,,아빠 수첩

@@ -337,7 +337,11 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       for(let i=0;i<3&&!await read('G.f.guard');i++)await npc('bueong');
       if(!await read('G.f.guard'))throw new Error('부엉 영감의 창고 지키기 허락을 받지 못했다');
     });
-    await stage('큰 장터 · 도깨비와 약떡',async()=>{if(mode==='expanded')await zone('warehouse');const toStore=async()=>{await moveX(await read('REG.STORE_X'));};await toStore();await mustWin(['memiltteok','dad_yeot'],toStore,'헌물 도깨비');if(!await read("has('dokkaebibul')"))throw new Error('도깨비 달래기 뒤 불씨가 없다');await craft('siru','hongsi_tteok');
+    await stage('큰 장터 · 도깨비와 약떡',async()=>{if(mode==='expanded')await zone('warehouse');const toStore=async()=>{await moveX(await read('REG.STORE_X'));
+        // 결정 D-684: 창고 앞엔 기척만 다가온다. 플레이어처럼 수리부엉이(3)로 변신해 모습을 밝혀야 전투가 열린다
+        for(let i=0;i<80&&!await read('!!B');i++){const s=await settle();if(s.battle)break;if(await read("!B&&G.form!=='owl'&&formChangeAllowed()"))await key('3');await wait(120);}
+        if(!await read('!!B'))throw new Error('수리부엉이로 변신해도 눈도깨비 전투가 열리지 않았다');};
+      await toStore();await mustWin(['memiltteok','dad_yeot'],toStore,'눈도깨비');if(!await read("has('dokkaebibul')"))throw new Error('도깨비 달래기 뒤 불씨가 없다');await craft('siru','hongsi_tteok');
       // 결정 D-131: 그믐밤엔 늙은 까치가 밤길을 못 난다. 마루에서 자고 설날 아침에 맡긴다(그 아침에 사연 마지막 막이 열린다).
       if(mode==='expanded'&&!await read('G.ended')){
         await zone('inn');const magpie="REG.zones.inn.wanderers.find(w=>w.id==='j_magpie').x";
