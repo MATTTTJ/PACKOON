@@ -28,7 +28,7 @@ node prototypes/web/tools/qa/run.js --only play-expanded
 node prototypes/web/tools/qa/run.js --only save,mobile
 ```
 
-`--quick`은 브라우저를 열지 않는다. `--only` 이름은 `syntax`, `data`, `versions`, `csv`, `dialogue`, `play-expanded`, `play-classic`, `speakers`, `edges`, `save`, `mobile`, `map`, `drops-floor`, `drops-persistence`, `drops-departure`, `drops-full`이다. `static`과 `runtime`은 각각의 묶음이며 쉼표로 여러 검사를 고를 수 있다. `speakers`는 두 모드를, `edges`는 확장판 연속 플레이를 먼저 실행한다.
+`--quick`은 브라우저를 열지 않는다. `--only` 이름은 `syntax`, `data`, `versions`, `csv`, `dialogue`, `play-expanded`, `play-classic`, `speakers`, `edges`, `save`, `mobile`, `talk-esc`, `map`, `drops-floor`, `drops-persistence`, `drops-departure`, `drops-full`이다. `static`과 `runtime`은 각각의 묶음이며 쉼표로 여러 검사를 고를 수 있다. `speakers`는 두 모드를, `edges`는 확장판 연속 플레이를 먼저 실행한다.
 
 | 검사 | 확인하는 것 |
 |---|---|

@@ -153,6 +153,7 @@ function step(){
   if(zoneMotion){stepZoneTransition();return;}
   if(zoneFade>0){zoneFade=Vfx.reducedMotion?0:zoneFade-1;return;}
   if(toastT>0){toastT--;if(toastT===0)$('toast').hidden=true;}
+  if(thoughtT>0&&!paused())thoughtT--;   // 결정 D-706: 속말은 대화·패널 동안 멈췄다가 이어서 사라진다
   Vfx.update();
   const mg=openMinigame();if(mg){mg.step();return;}
   fieldCall('ambient');   // 현재 구역의 날씨·진행만 갱신한다
@@ -521,11 +522,30 @@ function updateHints(){
     if(seen[key]||knows('met:'+p.id)||G.f.wanderersDone?.[expansionKey(p.id)])continue;
     if(p.hintWhen&&!p.hintWhen())continue;
     if(Math.abs(p.x-G.px)>(p.hintRange||TABLES.TUNING.hint_range))continue;
-    seen[key]=true;toast(typeof p.hint==='function'?p.hint():p.hint);return;
+    seen[key]=true;think(typeof p.hint==='function'?p.hint():p.hint);return;   // 결정 D-706
   }
 }
 function nearDig(){if(paused()||(typeof rolling!=="undefined"&&rolling))return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
+/* 결정 D-706: 주인공의 짧은 속말. 사용자 규칙(2026-11-05): 검은 띠(toast)를 따로 띄워 설명하는 일은 게임 어디에도 없어야 하고,
+   필요할 때만 주인공이 "이렇게 하면 되겠다" 정도로 혼잣말한다. 그래서 길 안내·막힘·사건의 한 줄은 주인공 머리 위 한지 말풍선으로 띄운다.
+   대화·패널·전투·경치 보기 동안은 숨고 시간도 멈춘다. 보이는 시간은 tuning.csv think_base_ms + 글자 수 × think_char_ms.
+   toast 는 저장·소리·물건을 얻었다 같은 짧은 알림에만 남긴다. */
+const heroThought=el('div','hero-thought');heroThought.hidden=true;heroThought.setAttribute('role','status');$('stage').appendChild(heroThought);
+let thoughtT=0;
+function think(text){
+  if(!text)return;
+  const t=String(text).replace(/\s*\n\s*/g,' ');
+  heroThought.textContent=t;
+  thoughtT=Math.round((TABLES.TUNING.think_base_ms+TABLES.TUNING.think_char_ms*[...t].length)*60/1000);
+  heroThought.classList.remove('pop');void heroThought.offsetWidth;heroThought.classList.add('pop');placeThought();
+}
+function placeThought(){
+  if(thoughtT<=0||!G||!G.started||G.ended||B||inkOn||vistaMode||zoneFade>0||zoneMotion||mapTravel||open('dlg')||open('map')||open('bag')||open('trade')||open('notebook')||openMinigame()){heroThought.hidden=true;return;}
+  heroThought.hidden=false;
+  heroThought.style.left=(clamp(G.px-cam,70,W-70)/W*100)+'%';heroThought.style.top=(Math.max(34,G.py-($('prompt').hidden?36:54))/H*100)+'%';   // 말걸기 안내가 떠 있으면 그 위로
+}
 function updateOverlay(){
+  placeThought();
   trackNpcMoves();   // D-126: 안내를 고르기 전에 자리 바뀜을 먼저 본다
   const pr=$('prompt');
   // 구르는 동안에는 말걸기·줍기·채집 안내를 띄우지 않는다 (D-94)
@@ -725,10 +745,10 @@ function zoneEdge(){
   if(!side){blockedEdge=null;return false;}
   const p=exitSpec(z.exits?.[side]);if(!p)return false;
   if(!pathOpen(p)){
-    if(blockedEdge!==side)toast(p.reason||'아직 지나갈 수 없는 길이다');
+    if(blockedEdge!==side)think(p.reason||'여긴 아직 못 지나가겠다.');   // 결정 D-706
     blockedEdge=side;return false;
   }
-  if(!needMet(p))toast(p.formLabel||formTo(p.formPass)+' 지나간다');
+  if(!needMet(p))think(p.formLabel||formTo(p.formPass)+' 지나간다');
   const dest=REG.zones[p.to];if(!dest)return false;
   const direction=side==='right'?1:-1;
   return changeZone(p.to,{x:direction>0?16:dest.w-16,y:p.toY,edgeDirection:direction});
@@ -778,7 +798,7 @@ function interactWith(p,kind){
   if(kind==='npc'){learn('met:'+p.id);if(p.peek)peekAt(p.x,p.y??fieldGround());p.talk();}
   else if(kind==='doors'){
     if(!pathOpen(p)){const say=typeof p.blockedSay==='function'?p.blockedSay():p.blockedSay;
-      if(say)talk([['너구리',say]]);else toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
+      if(say)talk([['너구리',say]]);else think(p.reason||'여긴 아직 못 지나가겠다.');return;}
     if((p.descend||p.ascend)&&startCrawl(p))return;
     changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});
   }else if(kind==='vistas')startVista(p);
@@ -856,7 +876,7 @@ function findStamp(s){
   G.f.stampCount=stampCount();G.f.stampsByRegion=G.f.stampsByRegion||{};G.f.stampsByRegion[REG.id]=stampCount(REG.id);
   learn(s.note,true);Vfx.burst(s.x,s.y??fieldGround());Sound.playSfx('stamp_found');
   peekStamp(s);
-  toast('아빠의 손바닥 도장이다. 수첩에 그날 이야기가 보인다.');return true;
+  think('아빠 손바닥 도장이다! 수첩에 그날 이야기가 있을 거야.');return true;   // 결정 D-706
 }
 function drawZoneObjects(){
   for(const p of zoneObjects('wanderers'))if(p.draw){const a=npcMoveAlpha(p.id);if(a<=0)continue;   // D-126

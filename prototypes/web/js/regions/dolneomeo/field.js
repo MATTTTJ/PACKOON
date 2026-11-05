@@ -232,14 +232,14 @@ Rg.step=()=>{
   if(has('darae_yak')&&!G.f.yakMade)Rg.sendMedicine();
 };
 Rg.onHit=()=>{};
-Rg.faint=()=>{G.px=Math.max(60,Math.min(G.px,GOLEM_AT)-80);toast('찬바람에 휘청여 물러났다');};
+Rg.faint=()=>{G.px=Math.max(60,Math.min(G.px,GOLEM_AT)-80);think('찬바람에 휘청여 물러났다…');};
 /* 결정 D-257: 서리다래는 골렘의 핵 안에서 나온다(사용자 결정 2026-11-02). 이기면 갈라진 핵에서 굴러 나오고,
    달래면 골렘이 꺼내 내려놓는다. 전투 끝에 보따리에 들어오고, 받아 든 장면이 곧바로 이어진다. 그 뒤 성황당 뒤 절벽 길이 열린다.
    옛 저장(예전처럼 절벽 바위턱에 서리다래가 놓인 채 끝난 저장)은 그 자리에서 그대로 딴다(onPickup). */
 Rg.bossDie=()=>{
   G.boss.dead=true;
   diary('d_boss',G.f.golemCalm?'성황당 돌무더기가 가슴의 핵에서 서리다래를 꺼내 내려놓고 다시 조용해졌다.':'성황당 돌무더기의 핵이 갈라지며 서리다래가 굴러 나왔다. 돌무더기는 무너졌다.');
-  toast('성황당 뒤 절벽 길이 열렸다');refreshGoal();
+  think('성황당 뒤 절벽 길이 열렸다!');refreshGoal();
   if(has('seoridarae'))daraeGot(G.f.golemCalm?'calm':'win');
 };
 Rg.onPickup=a=>{if(a.item==='seoridarae')daraeGot('ledge');};
@@ -252,7 +252,7 @@ function daraeGot(how){
   const first=how==='calm'?['너구리','(돌무더기가 내려놓은 서리다래다.\n서리가 하얗게 앉아 손끝이 시리다.)']
     :how==='win'?['너구리','(무너진 돌 틈에서 서리다래를 주웠다.\n서리가 하얗게 앉아 손끝이 시리다.)']:null;
   // 결정 D-130: 약을 직접 갈기로 아이가 정한다. 열매째로는 까치 발에 묶어 보낼 수 없다.
-  talk([...(first?[first]:[]),['너구리','(열매째 까치 발에 묶으면\n가는 길에 다 짓무르겠다.)'],['너구리','(맷돌이 깨어났으니…\n이번엔 내가 갈아서 약즙으로 보내자.)']],()=>toast('보따리 속 맷돌로 서리다래를 갈아 약즙을 만들자'));refreshGoal();
+  talk([...(first?[first]:[]),['너구리','(열매째 까치 발에 묶으면\n가는 길에 다 짓무르겠다.)'],['너구리','(맷돌이 깨어났으니…\n이번엔 내가 갈아서 약즙으로 보내자.)']]);refreshGoal();
 }
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:1770,item:'seogi',done:false});};
 
@@ -322,7 +322,7 @@ if(!CLASSIC){
     g.boss.x=Z('shrine',2400);
   }
   Rg.newState=()=>{const s=originalNewState();placeOld(s);return s;};
-  Rg.onStart=()=>{originalStart();placeOld(G);toast('장승 안쪽은 아직 닫혔다. 오른쪽 돌담길이 마을로 이어진다.');};
+  Rg.onStart=()=>{originalStart();placeOld(G);think('장승 안쪽은 닫혔네. 오른쪽 돌담길로 가 보자.');};
 
   const platform=(x,y,w)=>({x,y,w});
   const bases={
@@ -365,7 +365,7 @@ if(!CLASSIC){
   /* 장승 문이 비켜 선 정도 (0~1). 장승 그림(고갯길 경치·돌계단 문)이 읽는다 */
   Rg.depthOpen=id=>!depthFx||depthFx.door.id!==id?0:depthFx.image?1:clamp(depthFx.open/TABLES.TUNING.depth_gate_open_frames,0,1);
   function enterDepth(p){
-    if(!pathOpen(p)){toast(p.reason);return;}
+    if(!pathOpen(p)){think(p.reason);return;}
     const gate=!!p.gate&&!Vfx.reducedMotion;
     depthFx={door:p,tick:0,open:0,image:gate?null:snapshot(),pivot:Math.round(p.x-G.cam)};suppressHeldInputs();travel.hidden=false;
   }
@@ -419,7 +419,7 @@ if(!CLASSIC){
     drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);drawStonePlatforms(id);},
     drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
     weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),
-    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?Z('shrine',2240):80;G.py=GROUND;G.vy=0;applySteps();toast('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
+    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?Z('shrine',2240):80;G.py=GROUND;G.vy=0;applySteps();think('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
   };}
   Rg.startZone='gate';
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
@@ -536,7 +536,7 @@ if(!CLASSIC){
           if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
           Rg.bossDie();
         }else{G.px=Z('shrine',2240);G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
-          talk([['너구리','(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>toast('성황당 앞에서 숨을 골랐다. 준비되면 다시 다가가자.'));}
+          talk([['너구리','(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>think('숨 좀 고르자. 준비되면 다시 가 보자.'));}
       }));
     };
     Rg.sendMedicine=()=>{

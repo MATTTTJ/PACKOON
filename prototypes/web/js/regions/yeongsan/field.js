@@ -153,14 +153,14 @@ Rg.step=()=>{
   if(has('doerim_yak')&&!G.f.yakDone){G.f.yakDone=true;Rg.offerReturnPrep();}
 };
 Rg.onHit=()=>{};
-Rg.faint=()=>{G.px=Math.max(60,G.px-90);toast('눈보라에 밀려 물러났다');};
+Rg.faint=()=>{G.px=Math.max(60,G.px-90);think('눈보라에 밀려났다…');};
 Rg.onPickup=a=>{if(a.item==='legend_fruit'&&!G.f.fruitGot){G.f.fruitGot=true;Rg.fruitFound();}};
 /* 이기든 달래든 호수의 얼음이 풀리고 봄이 온다. 신목에 전설의 열매가 열린다 */
 Rg.bringSpring=()=>{
   G.boss.dead=true;G.f.spring=true;
   G.pickups.push({x:TREE_X,y:150,item:'legend_fruit',got:false});
   diary('y_spring','강철이가 떠나자 호수의 얼음이 풀렸다. 느티나무에 새잎이 돋고 산자락에 진달래가 폈다. 신목 가지에 무언가 열렸다.');
-  toast('봄이 왔다! 신목에 열매가 열렸다');refreshGoal();
+  think('봄이 왔다! 신목에 열매가 열렸어!');refreshGoal();
 };
 Rg.SLOPE_X=SLOPE_X;Rg.TREE_X=TREE_X;
 

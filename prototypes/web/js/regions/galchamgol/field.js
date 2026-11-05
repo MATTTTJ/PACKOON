@@ -227,29 +227,29 @@ Rg.onFloorPickup=a=>{
       ledger('toad','두꺼비 할멈','해머루 1','엄마의 병을 늦추는 약');
       if(!CLASSIC)G.f.galToadUphill=true;   // 결정 D-412: 할멈이 금줄 길로 올라와 언덕에 닿는다 (story.js toadUphill)
       // 결정 D-522: 약방 구역이 없으니 할멈이 먼저 아이를 부른다. 대화가 열려 있으면 알림만 띄우고, 아이가 다가가 말을 건다.
-      setTimeout(()=>{if(!CLASSIC&&Rg.toadArrive?.())return;toast(CLASSIC?'수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 두꺼비 할멈에게 가져가자':'수첩의 아빠 해머루 글 끝에 덧쓴 글씨가 있다… 금줄 길로 두꺼비 할멈이 올라온다');},1600);refreshGoal();}
+      setTimeout(()=>{if(!CLASSIC&&Rg.toadArrive?.())return;think(CLASSIC?'아빠 해머루 글 끝에 덧쓴 글씨가 있다… 두꺼비 할멈께 가져가자.':'아빠 해머루 글 끝에 덧쓴 글씨가 있다… 금줄 길로 할멈이 올라오신다!');},1600);refreshGoal();}
 };
 /* 휘두르기: 칡덩굴은 낫으로만 끊긴다 */
 Rg.onHit=(x1,x2,dmg,f)=>{
   const Bq=G.barrier;
   if(!Bq.cut&&Bq.x>x1-10&&Bq.x<x2+10){
-    if(heldTool()!=='sickle')toast('곡괭이로는 칡덩굴이 안 끊긴다. 날 선 연장이 필요하다.');
-    else{Bq.hp-=dmg;Bq.shake=10;if(Bq.hp<=0){Bq.cut=true;diary('barrier','칡덩굴을 끊고 당산나무로 가는 길을 열었다.');toast('칡덩굴을 끊었다! 길이 열렸다');refreshGoal();}}
+    if(heldTool()!=='sickle')think('곡괭이로는 안 끊겨. 날 선 연장이 있어야겠다.');
+    else{Bq.hp-=dmg;Bq.shake=10;if(Bq.hp<=0){Bq.cut=true;diary('barrier','칡덩굴을 끊고 당산나무로 가는 길을 열었다.');think('끊었다! 길이 열렸어.');refreshGoal();}}
   }
-  for(const m of G.mobs){if(!m.dead&&m.x>x1-8&&m.x<x2+8){if(heldTool()!=='sickle'){toast('너무 질기다!');continue;}m.hp-=dmg;m.x+=f*10;m.flash=8;if(m.hp<=0){m.dead=true;toast('칡덩굴을 걷어냈다');}}}
+  for(const m of G.mobs){if(!m.dead&&m.x>x1-8&&m.x<x2+8){if(heldTool()!=='sickle'){think('너무 질기다!');continue;}m.hp-=dmg;m.x+=f*10;m.flash=8;if(m.hp<=0){m.dead=true;think('칡덩굴을 걷어냈다.');}}}
 };
 /* 체력이 다 떨어지면 */
 Rg.faint=()=>{
   if(G.px>1930){G.px=1905;
     diary('hint','엉킨 칡에게 밀려났다. 덩굴 채찍은 뛰어서 피하고, 땅에 그림자가 비치면 자리를 옮길 것.');
     talk([['너구리','(밀려났다… 덩굴 채찍은 뛰어서 피하고,\n땅에 그림자가 비치면 자리를 옮기자.)']]);
-  }else{G.px=Math.max(60,G.barrier.x-30);toast('칡덩굴에 밀려 물러났다');}
+  }else{G.px=Math.max(60,G.barrier.x-30);think('칡덩굴에 밀려났다…');}
 };
 Rg.bossDie=()=>{
   const b=G.boss;b.dead=true;
   spawnDrops('meoru',1,{x:TREE_X-2,y:GROUND-70});   // 결정 D-544: 칡이 꽃 속에 품고 있던 해머루가 풀려 떨어진다
   diary('boss','엉킨 칡이 풀렸다. 당산나무가 크게 숨을 쉬는 것 같았다.');
-  toast('엉킨 칡이 풀렸다! 해머루가 떨어진다');refreshGoal();
+  think('엉킨 칡이 풀렸다! 해머루가 떨어진다!');refreshGoal();
 };
 
 /* PA-43: 나뭇가지와 잘린 덩굴, 물길을 따라 풍경 안쪽으로 들어간다.
@@ -375,7 +375,7 @@ if(!CLASSIC){
       drawActors:drawBoss,onHit:oldHit,
       camLead:()=>G.boss.dead?0:60*clamp((G.px-800)/160,0,1),   // 결정 D-547: 칡에 다가가는 동안 화면이 칡 쪽을 조금 앞서 보여 준다
       step:()=>{commonStep();oldStep();},
-      faint:()=>{G.px=1900-HILL_SHIFT;G.py=GROUND;G.vy=0;G.onGround=true;toast('나무 앞 쉼터로 물러났다. 버섯 향으로 달랠 수도 있다.');},
+      faint:()=>{G.px=1900-HILL_SHIFT;G.py=GROUND;G.vy=0;G.onGround=true;think('쉼터까지 물러났다. 버섯 향으로 달래 볼까.');},
     },
   };
   /* 결정 D-265: 길섶 채집물(사용자 피드백 2026-11-02). 단풍 든 참나무·밤나무 아래 도토리와 밤, 무른 흙의 칡뿌리, 늪가 버섯. 좌표는 길을 줄인 뒤의 자리.

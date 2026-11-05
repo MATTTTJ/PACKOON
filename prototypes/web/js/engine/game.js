@@ -221,12 +221,15 @@ function fillCover(){
   $('endKicker').textContent=C.end.kicker;$('endHead').textContent=C.end.head;
   const eb=$('endBody');eb.innerHTML='';C.end.body.forEach(t=>eb.appendChild(el('p',null,t)));
 }
+/* 결정 D-705: 프롤로그 화면이 떠 있는 동안 body.prologue 를 단다 (style.css 가 게임 UI 를 숨긴다) */
+function syncPrologue(){document.body.classList.toggle('prologue',!$('titleScreen').hidden&&!!G&&!G.started&&!G.ended);}
+new MutationObserver(syncPrologue).observe($('titleScreen'),{attributes:true,attributeFilter:['hidden']});
 function startGame(){
-  G.started=true;$('titleScreen').hidden=true;
+  G.started=true;$('titleScreen').hidden=true;syncPrologue();
   REG.onStart();
   if(!CLASSIC&&G.region==='dolneomeo'&&!G.f.mapUnlocked){
     G.f.mapUnlocked=true;
-    toast('돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도(M)를 펴면 가 본 곳으로 데려다줄 것 같다');
+    think('돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도를 펴면 데려다줄 것 같다.');   // 결정 D-706
   }
   lastGoal='';refreshHud();
 }
@@ -256,7 +259,7 @@ function showEnd(){
 function resetScreens(){
   GameMusic.reset();
   resetFieldModes();REG=REGIONS[G.region];prepareZones(G,REG);fillCover();closePanels();
-  $('endScreen').hidden=true;$('titleScreen').hidden=G.started;document.body.classList.remove('ending-scene');
+  $('endScreen').hidden=true;$('titleScreen').hidden=G.started;syncPrologue();document.body.classList.remove('ending-scene');
   lastGoal='';lastTool='';lastNear=null;refreshHud();refreshSaveUI();
 }
 $('btnStart').onclick=startOrConfirm;   // 처음부터(btnRestart)는 save.js
@@ -282,6 +285,7 @@ function boot(data){
   prepareZones(G,REG);
   fillCover();
   if(G.started)$('titleScreen').hidden=true;
+  syncPrologue();
   if(G.ended)showEnd();
   refreshHud();refreshSaveUI();requestAnimationFrame(loop);
   /* 첫 화면: 처음 들어올 때만. 개발용 ?region= 이나 이어 붙인 상태로 열 때는 건너뛴다 */

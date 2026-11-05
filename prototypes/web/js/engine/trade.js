@@ -265,12 +265,16 @@ const Trade=(()=>{
     // 결정 D-77: 부탁이 남은 상대(눈돌·진흙·비늘 같은 뒤늦은 부탁)도 대화창에서 바로 펼친다.
     return n&&(stockOf(n.id).some(r=>stockLeft(r)>0)||(REG.trade?.[n.id]?.()||[]).some(g=>!g.done?.()))?n.id:null;
   }
+  /* 결정 D-702: '보따리 펼치기'는 대화의 마지막 줄(뒤에 남은 줄도, 끝나고 할 일도 없을 때)에만 둔다.
+     예전엔 대화 중간에도 떠서, 누르면 대화가 끊긴 채 진행값만 남아 그 인물이 다음 단계로 건너뛰었다
+     (사용자 피드백 2026-11-05: 대화 중간에 끊으면 NPC가 다음 걸 강제로 진행한다). 이야기가 진행값을 먼저 세우고 talk 하는 곳이 많다. */
+  const dlgLastLine=()=>!dlgQ.length&&!dlgEnd;
   function renderQuick(){
     const npc=quickNpc(),dup=[...$('dlgChoices').children].some(b=>b.textContent==='보따리를 펼친다');
-    quick.hidden=!npc||dup;quick.dataset.npc=npc||'';
+    quick.hidden=!npc||dup||!dlgLastLine();quick.dataset.npc=npc||'';
   }
-  quickBtn.onclick=()=>{const npc=quick.dataset.npc;if(!npc)return;dlgDismiss();open(npc);};   // 결정 D-331
-  for(const id of ['dlgWho','dlgChoices'])new MutationObserver(renderQuick).observe($(id),{childList:true,characterData:true,subtree:true});
+  quickBtn.onclick=()=>{const npc=quick.dataset.npc;if(!npc||!dlgLastLine())return;dlgDismiss();open(npc);};   // 결정 D-331
+  for(const id of ['dlgWho','dlgText','dlgChoices'])new MutationObserver(renderQuick).observe($(id),{childList:true,characterData:true,subtree:true});
   new MutationObserver(renderQuick).observe($('dlg'),{attributes:true,attributeFilter:['hidden']});
   return {open,openGuest,close,get state(){return S;}};
 })();

@@ -21,9 +21,9 @@ const knownRecipes=t=>availableRecipes(t).filter(recipeKnown);
 function awaken(t){if(!isAwake(t))G.awake.push(t);}
 const pouch={tool:'jeolgu',items:[]};
 let selItem=null,pouchMsg='',lastOut=null,brewing=false;
-/* '중요'는 물건이 아니라 아빠 단서와 엄마의 쪽지를 모아 둔 탭이다 (수첩에서 옮겨 옴) */
-// 결정 D-30: 수첩에서 일기·까치 답장을 빼고, 아빠 단서·엄마의 쪽지는 보따리 '중요' 탭으로. 손버릇은 '익힌 솜씨' (design/data/decisions.csv)
-const BAG_KINDS=['전체','재료','먹을거리','도구','귀한 것','중요'];
+// 결정 D-703: 보따리 '중요' 탭을 없앴다 (사용자 피드백 2026-11-05: 첫 화면이 보따리 '중요'에서 시작한다, 이야기에 꼭 필요하지 않으면 지우자).
+//   보따리는 물건만 담는다. 엄마의 쪽지는 수첩 '이름' 장 아래, 아빠 단서는 수첩 '아빠 단서' 장으로 옮겼다 (notebook.js·book.js).
+const BAG_KINDS=['전체','재료','먹을거리','도구','귀한 것'];
 let bagKind='전체';
 function selectBagKind(kind){
   if(!BAG_KINDS.includes(kind))return;
@@ -86,13 +86,6 @@ function craft(){
   pouchMsg='손에 익은 대로 움직여 보자.';startCraftHands(tool,r,discovered);renderBag();
   $('craftHands')?.scrollIntoView({block:'nearest',behavior:'instant'});
 }
-/* 보따리 '중요' 탭: 아빠 단서 목록과 엄마의 쪽지 (그리기는 book.js) */
-function renderImportant(body){
-  const box=el('div','important');
-  box.appendChild(el('div','sub','엄마의 쪽지'));renderMomNote(box);
-  box.appendChild(el('div','sub','아빠 단서'));renderChildRecord(box,'clues');
-  body.appendChild(box);
-}
 function renderBag(pop){
   const body=$('bagBody');const sc=body.scrollTop;body.innerHTML='';
   body.appendChild(el('div','sub','소지품'));
@@ -100,7 +93,6 @@ function renderBag(pop){
   BAG_KINDS.forEach(kind=>{const b=el('button','bag-tab',kind);b.type='button';b.setAttribute('aria-pressed',kind===bagKind);
     b.onclick=()=>selectBagKind(kind);filters.appendChild(b);});
   body.appendChild(filters);body.appendChild(el('div','small bag-key-hint','Q · 이전 종류 / R · 다음 종류'));
-  if(bagKind==='중요'){renderImportant(body);body.scrollTop=sc;return;}
   const items=Object.keys(G.inv).filter(k=>G.inv[k]>0&&(bagKind==='전체'||ITEMS[k].kind===bagKind));
   const grid=el('div','bag-grid');
   /* 칸은 12개부터, 물건 종류가 많으면 한 줄(6칸)씩 늘어난다. 가진 물건이 안 보이는 일이 없게 */

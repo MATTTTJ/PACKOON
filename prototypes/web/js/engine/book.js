@@ -1,9 +1,10 @@
 ﻿'use strict';
-/* 아이가 적은 기록을 그린다: 수첩의 해야 할 일·이름·물품 장부, 보따리 '중요' 탭의 아빠 단서·엄마의 쪽지.
+/* 아이가 적은 기록을 그린다: 수첩의 해야 할 일·아빠 단서·이름(아래에 엄마의 쪽지)·물품 장부 (결정 D-703).
    패널과 탭, 동물·물건·도장·숨은 가공법 쪽은 notebook.js 가 맡는다. 여기서는 받은 body 에 아이의 글씨로 그리기만 한다.
    저장 모양(G.diary·G.clues·G.nicknames·G.ledger·G.rel·G.f.momNote*)은 책이 둘이던 때와 같다. */
 function childNoteSection(line){return line.when?.startsWith('habit:')?'익힌 솜씨':/^(recipe|hint):/.test(line.when||'')?'숨은 가공법':'관찰';}   // 결정 D-461: 귀띔(hint:)도 숨은 가공법 장
-function renderMomNote(body){
+/* 쪽지 종이 한 장 (수첩과 첫 출발 장면이 함께 쓴다, 결정 D-704) */
+function momNotePaper(){
   const stage=G.f.momNoteRestored?0:(G.f.momNoteFade||0),paper=el('div','mom-note');
   // 결정 D-38: 받는 이의 이름은 번져서 읽히지 않는다. 아이의 이름은 엔딩에서야 나온다. 엔딩 뒤에는 새 이름이 또렷하게 보인다.
   // 결정 D-132: 산군에게 이름을 내놓은 뒤부터 엔딩 전까지는 번진 자국도 없이 이름 자리가 빈다.
@@ -17,7 +18,14 @@ function renderMomNote(body){
     const glyph=el('span',row===0&&!named&&!blank&&col<recipient.length?'smudge':null,ch);glyph.setAttribute('aria-hidden','true');
     const wear=(index++*7+3)%11;glyph.style.opacity=stage===0?'1':String(Math.max(.08,1-stage*(.15+wear*.025)));line.appendChild(glyph);
   });paper.appendChild(line);});
-  body.appendChild(paper);
+  return paper;
+}
+function renderMomNote(body){
+  const stage=G.f.momNoteRestored?0:(G.f.momNoteFade||0);
+  const named=!!(G.f.momNoteRestored&&G.f.newName),blank=!named&&!!G.f.nameGiven;
+  const recipient=named?G.f.newName:blank?'　　　':'아무개';
+  const spoken=[(named?recipient:blank?'(빈자리)':'(번진 이름)')+'에게',...MOM_NOTE];
+  body.appendChild(momNotePaper());
   if(blank)body.appendChild(el('p','small','받는 이 자리가 하얗게 비었다. 번진 자국도 없다.'));
   body.appendChild(el('p','small',stage?'길을 옮길 때마다 글씨가 조금씩 흐려졌다. 엄마가 건넨 마음은 남아 있다.':'접힌 자리에 엄마 손때가 남아 있다.'));
   // 흐려짐은 그림 연출뿐이다. 쪽지 내용을 다시 읽을 수 있다.
@@ -55,6 +63,8 @@ function renderChildRecord(body,tab){
     const list=G.nicknames||[];if(!list.length)note('길에서 누군가 나를 새롭게 불러 주면 적어 두자.');
     // 먹힌 이름은 글자만 비고, 지어 준 이와 받은 곳은 흐리게 남는다
     list.forEach(n=>{const e=entry((REGIONS[n.region]?.name||'길 위에서')+(n.by?' · '+(npcName(n.by)||n.by):''),n.lost?'　':n.text);if(n.lost)e.classList.add('lost');});
+    // 결정 D-703: 엄마의 쪽지는 이름 장 아래. 받는 이 자리(번진 이름)가 이 장 맨 위 '엄마가 지어 준 이름'과 짝을 이룬다
+    body.appendChild(el('div','sub mom-note-head','엄마의 쪽지'));renderMomNote(body);
   }else if(tab==='mom')renderMomNote(body);
   else if(tab==='ledger'){
     const r=el('div','rels');
