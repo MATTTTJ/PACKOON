@@ -70,7 +70,7 @@ const TABLES={
    "r": 3,
    "kind": "귀한 것",
    "region": "galchamgol",
-   "d": "당산나무 꼭대기에만 열리는 머루. 해를 머금은 듯 알이 따뜻하다."
+   "d": "당산나무를 감은 늙은 칡이 꽃 속에 품어 맺는 머루. 해를 머금은 듯 알이 따뜻하다."
   },
   "rice": {
    "n": "주먹밥",
@@ -4638,10 +4638,6 @@ const TABLES={
   },
   "pic_hamjibak_stamp": {
    "sfx": "wood_tap"
-  },
-  "pic_lantern": {
-   "sfx": "ice_tinkle",
-   "repeat": 2400
   },
   "pic_mom_room": {
    "sfx": "door"
