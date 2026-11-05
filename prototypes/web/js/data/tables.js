@@ -4656,6 +4656,9 @@ const TABLES={
   "pic_cache": {
    "sfx": "leaf_rustle"
   },
+  "pic_gam_pole": {
+   "sfx": "leaf_rustle"
+  },
   "frost_print": {
    "sfx": "footstep_frost"
   },
@@ -4703,6 +4706,13 @@ const TABLES={
    "sfx": "stone_knock"
   },
   "pic_wish_tower": {
+   "sfx": "stone_knock"
+  },
+  "pic_maetdol_turn": {
+   "sfx": "mill",
+   "repeat": 3200
+  },
+  "pic_mole_chisel": {
    "sfx": "stone_knock"
   },
   "j_flag_knot": {
