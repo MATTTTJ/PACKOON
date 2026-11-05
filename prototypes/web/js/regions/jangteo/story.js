@@ -798,6 +798,53 @@ function bStart(bet){
   last[2]=[{t:'판을 꼭 붙잡는다',go:()=>bResolve(bet,winner,loser,true)},{t:'못 본 척한다',go:()=>bResolve(bet,winner,loser,false)}];
   talk(lines);
 }
+/* 결정 D-788: 판을 엎는 대목의 장면 그림과 소리 (사용자 피드백 2026-11-05 "진짜 바둑판 엎어야 하고 바둑알이 사방으로 튀어야 한다. 소리도").
+   진 쪽 노인 손이 판 귀를 들어 올리면 판이 한쪽으로 기울며 뒤집히고, 판 위 흑백 돌이 사방으로 튀어 눈밭에 흩어진다.
+   돌은 포물선으로 날아 바닥에서 한 번 튀고 멈춘다. 소리는 판이 넘어가는 둔탁한 나무 소리 뒤에 돌 쏟아지는 소리(sfx baduk_scatter). 64×44 칸. */
+function badukFlipPic(loser){
+  let t0=null;
+  const left=loser==='steady';   // 흰눈썹(왼쪽)이 엎으면 판이 오른쪽으로 넘어가고, 곰방대(오른쪽)가 엎으면 왼쪽으로
+  const dir=left?1:-1;
+  const stones=Array.from({length:22},(_,i)=>({w:i%2===0,vx:(((i*37)%23)-11)*3.4+dir*9,vy:-(18+((i*53)%19)),x0:22+((i*7)%20),y0:27+((i*5)%4)}));
+  return {animate:true,sound:'pic_baduk_flip',draw(w,h,t){
+    if(t0===null)t0=t;
+    const k=t-t0,rm=Vfx.reducedMotion,g=38;
+    R(0,0,w,h,'#d9e3e6');R(0,g,w,h-g,'#eef2f2');R(0,g,w,1,'#ffffff');
+    // 두 노인의 무릎과 소매 (양옆). 엎는 쪽 소매가 판 귀를 쳐든다
+    const lift=rm?1:Math.min(1,k/0.35);
+    R(0,24,9,14,'#7e8a96');R(55,24,9,14,'#6a5a48');
+    const hx=left?9:48,hy=Math.round(31-lift*8);R(hx,hy,7,4,left?'#7e8a96':'#6a5a48');R(left?hx+6:hx-1,hy+1,2,3,'#c9b8a0');
+    // 판: 0.35초까지 귀가 들리고, 0.75초까지 넘어가 뒤집힌 채 눈에 떨어진다
+    const flip=rm?1:Math.min(1,Math.max(0,(k-0.25)/0.5)),cx=32+Math.round(dir*flip*10);
+    if(flip<0.5){
+      const tiltH=Math.round(lift*3+flip*10),top=30-tiltH;
+      for(let x=0;x<24;x++){const lean=left?x:23-x,yy=Math.round(top+(30-top)*(lean/23));R(cx-12+x,yy,1,4,'#c99a58');R(cx-12+x,yy,1,1,'#e3bf7c');}
+      R(cx-11,34,2,4,'#8a6538');R(cx+9,34,2,4,'#8a6538');
+      if(flip<0.15)for(const [dx,dy,c] of [[-7,29,'#1d1712'],[-2,29,'#f4efe2'],[3,29,'#1d1712'],[7,29,'#f4efe2']])R(cx+dx,dy,2,1,c);
+    }else{
+      // 뒤집혀 다리가 하늘로 선 판
+      const land=Math.min(1,(flip-0.5)/0.5),y=Math.round(30+land*4);
+      R(cx-12,y,24,4,'#a07a4a');R(cx-12,y+3,24,1,'#7a5a3a');R(cx-10,y-3,2,3,'#8a6538');R(cx+8,y-3,2,3,'#8a6538');
+    }
+    // 돌 통: 하나가 쓰러져 구른다
+    R(left?2:56,g-5,5,5,'#7a5232');R(left?57:2,g-3,6,3,'#7a5232');
+    // 튀는 돌: 판이 기울기 시작하면 사방으로 날아 바닥에서 한 번 튀고 선다
+    const ts=rm?1.4:Math.max(0,k-0.3);
+    for(const st of stones){
+      let x,y;
+      if(ts<=0){x=st.x0;y=st.y0;}
+      else{const tt=Math.min(ts,1.4);const tf=(-st.vy+Math.sqrt(st.vy*st.vy+2*70*(g-1-st.y0)))/70;x=st.x0+st.vx*Math.min(tt,tf)+(tt>tf?st.vx*0.35*Math.min(tt-tf,0.45):0);   // 땅에 닿은 뒤엔 조금 미끄러지다 선다
+        const t1=Math.max(0.05,(-st.vy+Math.sqrt(st.vy*st.vy+2*70*(g-1-st.y0)))/70);   // 바닥에 닿는 때
+        if(tt<t1)y=st.y0+st.vy*tt+35*tt*tt;
+        else{const b=tt-t1,bv=-st.vy*0.25-6;y=Math.min(g-1,g-1-(bv*b-35*b*b));if(b>0.4)y=g-1;}
+      }
+      x=Math.max(0,Math.min(w-2,Math.round(x)));y=Math.round(Math.min(g,y));
+      R(x,y,2,2,st.w?'#f4efe2':'#1d1712');if(st.w)R(x,y+1,2,1,'#c9c2b0');
+    }
+    // 튄 눈가루
+    if(!rm&&k>0.6&&k<1.4){const p=(k-0.6)/0.8;for(let i=0;i<6;i++)R(Math.round(cx-10+i*4+dir*p*4),Math.round(g-2-p*(3+i%3*2)),1,1,'#ffffff');}
+  }};
+}
 function bResolve(bet,winner,loser,hold){
   const lines=[];
   if(hold){
@@ -807,8 +854,9 @@ function bResolve(bet,winner,loser,hold){
       lines.push(winner==='bold'?['곰방대 노인','편들었으니 값은 해야지.\n화롯불에 구운 군밤이다.']:['흰눈썹 노인','편든 값이다. 설에 쓰려던 곶감이지.'],gotLine(BD[winner].pay,bPay(winner)));
     }else if(bet)lines.push(['너구리','(내 솔방울은 화롯불 바구니로 들어갔다.)']);
   }else{
-    lines.push(['너구리','(못 본 척 고개를 돌렸다. 와르르, 돌 쏟아지는 소리가 난다.)'],
-      [BD[winner].name,'이 양반이 기어이! 판 엎었으니 무효다, 무효!'],[BD[loser].name,'무효면 한 판 더 두면 되지.']);
+    lines.push(Object.assign(['너구리','(못 본 척 고개를 돌리는 순간,\n쾅! 판이 뒤집히고 바둑알이 사방으로 튄다.)'],{pic:badukFlipPic(loser)}),
+      [BD[winner].name,'이 양반이 기어이! 판 엎었으니 무효다, 무효!'],[BD[loser].name,'무효면 한 판 더 두면 되지.'],
+      ['너구리','(눈밭에 흩어진 바둑알을 같이 주워 통에 담았다.)']);
     if(bet)lines.push(['너구리','(무효라서 솔방울을 도로 받았다.)']);
   }
   talkGive(lines,()=>{if(!hold&&bet)addItem('solbang',MG.baduk_stake);bFinish(bet);});
@@ -829,7 +877,7 @@ function bFinish(bet){
 
 /* 밤에만 다는 등. 불빛은 길 안내이며 본길이나 출구의 조건으로 삼지 않는다. */
 /* 결정 D-290: 등을 다 단 몫. 불빛을 보고 숙소를 찾은 길손이 까치 편에 곶감을 남기고 갔다(까치는 물건을 나르는 우체부다).
-   등을 다 단 뒤 까치 곁에 오거나 꾸러미에 말을 걸면 한 번 준다. 까치는 길을 마친 떠돌이라 인사(greeting)만 하므로 field.js가 곁에 오면 부른다. */
+   등을 다 단 뒤 까치 곁에 오면 한 번 준다. 까치는 길을 마친 떠돌이라 인사(greeting)만 하므로 field.js가 곁에 오면 부른다. */
 function lanternThanks(){
   if(!G.f.jxLanternDone||G.f.jxLanternPaid)return false;
   G.f.jxLanternPaid=true;
@@ -840,20 +888,26 @@ function lanternThanks(){
   return true;
 }
 Rg.lanternThanks=lanternThanks;
-Rg.lanternTalk=()=>{
-  if(lanternThanks())return;
-  // 결정 D-564: 등걸이 넷은 모두 이 숙소 구역 안에 있다(마당 어귀·마루 앞·처마 끝·창고 쪽문 가는 길).
-  if(!night()){talk([['늙은 까치',G.f.jxLanternDone?'밤새 등 따라 길손들이 쉬고 갔단다.\n아침 떡 김이 오르니 나도 떠나야지.':'해 지면 이 꾸러미를 풀자꾸나.\n숙소 빈 등걸이에 등을 달아 다오.']]);return;}
-  if(G.f.jxLanternDone){if(!lanternThanks())talk([['늙은 까치','숙소 마당이 대낮 같구나.\n길손들도 제 잠자리를 찾았단다.']]);return;}
-  talk([['늙은 까치',G.f.jxLanternStarted?'남은 등걸이도 밝혀 다오.\n이 숙소 마당에 넷이란다.':'밤 길손들이 숙소를 못 찾는구나.\n등은 네가 달아 주련? 어두운 데는 내가 봐 주마.',[
-    {t:'꾸러미를 풀고 등 달기',go:()=>{G.f.jxLanternStarted=true;toast('숙소 마당 어귀·마루 앞·처마 끝·창고 쪽문 가는 길의 빈 등걸이 넷. E로 등을 달자.');}},
+/* 결정 D-797: 등불 꾸러미 풀기(따로 있던 꾸러미 자리)를 뺐다 (사용자 피드백 2026-11-05 "이건 이미 늙은 까치와의 이벤트에서 시작해야 한다").
+   늙은 까치가 처마에서 함께 지붕을 본 뒤(region.js oldMagpie) 등 넷을 직접 건넨다. 낮에 만났으면 밤에 까치에게 가면 건넨다.
+   결정 D-792: 어디에 달지는 까치가 말로 일러 준다. 검은 안내 글(toast)은 띄우지 않는다. */
+Rg.lanternHandLines=()=>[
+  ['늙은 까치','종이등은 내가 낮에 처마 밑에 모아 두었단다.'],
+  ['너구리','(까치가 부리로 등 꾸러미 끈을 당겨 풀어 준다.\n종이등 넷을 품에 안았다.)'],
+  ['늙은 까치','마당 어귀, 마루 앞, 처마 끝, 창고 쪽문 가는 길.\n빈 등걸이가 넷이란다. 하나씩 달아 다오.']
+];
+Rg.lanternGreeting=()=>{
+  if(!night()||G.f.jxLanternStarted||!G.f.wanderersDone?.[expansionKey('j_magpie')])return null;
+  return [['늙은 까치','해가 졌구나, 아가. 약속한 등을 달아 주련?',[
+    {t:'등을 받는다',go:()=>talk(Rg.lanternHandLines(),()=>{G.f.jxLanternStarted=true;refreshGoal();})},
     {t:'조금 있다 올게요',go:null}
-  ]]]);
+  ]]];
 };
 Rg.lanternAction=id=>{
   if(!night())return;
   // 결정 D-292: 혼자 하는 말은 괄호 안 독백으로 쓴다
-  if(!G.f.jxLanternStarted){Rg.lanternTalk();return;}
+  // 결정 D-792: 늙은 까치에게 등을 받기 전에는 등걸이가 말을 받지 않는다(field.js). 혹시 닿아도 독백만 한다.
+  if(!G.f.jxLanternStarted){talk([['너구리','(빈 등걸이다. 걸 등이 없다.)']]);return;}
   if(G.f.jxLanterns?.[id]){talk([['너구리','(등이 잘 탄다. 다음 등걸이도 보인다.)']]);return;}
   Rg.handWork(()=>{
     const lights=G.f.jxLanterns||(G.f.jxLanterns={});lights[id]=true;
@@ -864,6 +918,37 @@ Rg.lanternAction=id=>{
     talk([['너구리',lines[id]],...(done?[['너구리','(불이 다 이어졌다.\n늙은 까치한테 알려 드려야지.)']]:[])]);
   });
 };
+
+/* 결정 D-791: 숙소 아궁이 불 지피기 ('마루 아래 신발' 조사를 바꿈, 사용자 피드백 2026-11-05 "좀 필요한 이벤트로 대체").
+   밤에 숙소 아궁이 불이 꺼져 간다. 설 대목에 길손이 곱절이라 땔감이 달려 부엉 영감이 아껴 때던 참이다.
+   아이가 솔방울(송진이 있어 불쏘시개로 그만이다, items.csv) 둘을 넣어 불을 살리면 방고래로 불길이 들어가 방이 데워진다.
+   마루 쪽에서 보던 부엉 영감(밤눈이 밝다)이 셈은 셈이라며 부엌에서 쓰고 남은 쌀 한 되를 치른다. 한 번만. 낮에는 재 속에 불씨만 묻어 둔다. */
+Rg.innFirePrompt=()=>G.f.jxInnFireDone?'아궁이 살펴보기':night()?'아궁이 불 살리기':'아궁이 살펴보기';
+Rg.innFire=()=>{
+  const F=G.f;
+  if(!night()){talk([['너구리',F.jxInnFireDone?'(재 속에 불씨를 묻어 두었다.\n밤에 또 살려 때겠지.)':'(재 속에 불씨를 묻어 두었다.\n밤에 다시 살려 때는가 보다.)']]);return;}
+  if(F.jxInnFireDone){talk([['너구리','(불이 잘 탄다.\n아궁이 앞에 쭈그려 앉으니 볼이 다 뜨겁다.)']]);return;}
+  const n=2,have=has('solbang',n),met=!!F.bueongMet;
+  const last=have?['너구리','(이대로면 방바닥이 식겠다.\n솔방울 두 개면 불이 살겠는데.)',[{t:'솔방울 두 개를 넣는다',go:()=>innFireLit(n,met)},{t:'그냥 둔다',go:null}]]
+    :['너구리','(이대로면 방바닥이 식겠다.\n솔방울이 있으면 불쏘시개로 넣을 텐데.)'];
+  talk([['너구리','(숙소 아궁이 불이 꺼져 간다.\n솔가지 몇 개가 겨우 타닥거린다.)'],last]);
+};
+function innFireLit(n,met){
+  if(!has('solbang',n))return;
+  takeItem('solbang',n);
+  Sound.cue?.('fire_crackle',0,1);
+  const who=met?'부엉 영감':'마루 위 수리부엉이';
+  talkGive([
+    ['너구리','(솔방울을 넣고 후 불었다.\n송진에 불이 타닥 붙더니 불길이 확 일어난다.)'],
+    ['너구리','(불길이 방고래 안으로 쭉 빨려 들어간다.\n방이 데워지겠다.)'],
+    ...(met?[]:[['너구리','(마루 쪽에서 큰 수리부엉이가 이쪽을 보고 있었다.)']]),
+    [who,'…누가 아궁이를 살렸나 했더니 너로구나.'],
+    [who,'설 대목이라 길손이 곱절이다.\n땔감이 달려 아껴 때던 참이지.'],
+    [who,'셈은 셈이다. 솔방울 두 개 값으로\n부엌에서 쓰고 남은 쌀 한 되를 치르마.'],
+    gotLine('ssal',1)
+  ],()=>{G.f.jxInnFireDone=true;refreshHud();
+    diary('jx_inn_fire','밤에 꺼져 가던 숙소 아궁이에 솔방울을 넣어 불을 살렸다. 설 대목이라 길손이 많아 땔감이 달렸단다. 부엉 영감이 솔방울 값으로 쌀 한 되를 치렀다.');});
+}
 
 /* ---------- 모락 (반달가슴곰 떡집): 김 올리기 ---------- */
 /* 김 올리기: 모락 곁에서 아궁이 김을 올린다. 시루가 깨어난다. */
@@ -1286,6 +1371,9 @@ if(!CLASSIC){
     const p=Object.defineProperties({},Object.getOwnPropertyDescriptors(n));
     Object.defineProperty(p,'x',{value:place[1],writable:true,enumerable:true,configurable:true});
     p.zone=place[0];p.y=place[2];
+    // 결정 D-796: 밤에 엿수레 밑에 웅크린 엿방울(art.js fox: 발 자리에서 오른쪽 29px, 키 8px)을 이름표가 따라간다 (사용자 피드백 2026-11-05)
+    if(n.id==='yeotbang'){const hid=()=>Rg.arcs()&&night()&&!G.boss.dead;
+      Object.defineProperties(p,{tagDx:{get(){return hid()?29:0;}},tagY:{get(){return hid()?13:undefined;}}});}
     if(n.id==='morak')p.props=null; // 결정 D-315: 떡집은 확장 배경(art.js)이 땅 위 가게로 그리고, 모락은 그 안 땅에 선다.
     if(n.id==='yeotbang')p.talk=()=>{
       if(!G.f.yeotDone){n.talk();return;}

@@ -72,15 +72,38 @@ const tone=()=>Rg.springRevisit()?(n()?{sky:'#141c34',mist:'#343d5c',mount:'#253
 function steppedRidge(offset,base,amp,color,seed){
   for(let x=-2;x<W+2;x+=2){const u=x+offset,h=Math.round(base-Math.sin(u*.008+seed)*amp-Math.sin(u*.021+seed*2)*amp*.35);P(x,h,2,H-h,color);}
 }
+/* 결정 D-795: 하늘의 달과 해를 다시 그렸다 (사용자 피드백 2026-11-05 "3막 배경에 달 그림이 좀 이상하다. 제대로 다시 그려라").
+   예전엔 네모 몇 개를 겹친 꼴이라 달은 꺾인 막대처럼, 낮의 해는 흰 십자처럼 보였다. 이제 줄마다 원의 폭을 재어 둥글게 칠한다.
+   설을 앞둔 그믐 무렵이라 밤엔 왼쪽이 빛나는 가는 그믐달(어두운 쪽에 희미한 지구빛), 낮엔 엷은 겨울 해와 흐린 햇무리. */
+function disc(cx,cy,r,color,cut=null){
+  for(let dy=-r;dy<=r;dy++){
+    const half=Math.sqrt(Math.max(0,r*r-dy*dy)),x0=Math.round(cx-half),x1=Math.round(cx+half);
+    if(!cut){if(x1>x0)P(x0,cy+dy,x1-x0,1,color);continue;}
+    // cut: 같은 반지름의 원을 오른쪽으로 밀어 겹치는 부분을 뺀다 (그믐달)
+    const cHalf=Math.abs(dy)<r?Math.sqrt(r*r-dy*dy):0,c0=Math.round(cx+cut-cHalf);
+    const end=Math.min(x1,c0);if(end>x0)P(x0,cy+dy,end-x0,1,color);
+  }
+}
+function moon(cx,cy,r){
+  disc(cx,cy,r+6,'rgba(245,232,190,.03)');disc(cx,cy,r+3,'rgba(245,232,190,.05)');disc(cx,cy,r+1,'rgba(245,232,190,.06)');   // 달무리
+  disc(cx,cy,r,'#22304e');   // 어두운 쪽 지구빛
+  disc(cx,cy,r,'#f5e8be',Math.round(r*0.62));
+  disc(cx-1,cy,r-1,'#fff6d8',Math.round(r*0.78));   // 안쪽 밝은 테
+  P(cx-r+2,cy-2,1,2,'#e2d3a4');P(cx-r+3,cy+3,1,1,'#e2d3a4');   // 엷은 얼룩
+}
+function winterSun(cx,cy,r){
+  disc(cx,cy,r+7,'rgba(255,250,232,.18)');disc(cx,cy,r+3,'rgba(255,250,232,.32)');   // 흐린 햇무리
+  disc(cx,cy,r,'#fbf6e2');disc(cx-1,cy-1,r-3,'#fffdf2');
+}
 function sky(offset=0){
   const t=tone();P(0,0,W,H,t.sky);
   const bands=n()?['#17213b','#1b2844','#24334e','#344259']:Rg.springRevisit()?['#dce8df','#e2eadb','#e9edda','#f1eee2']:['#dce8ef','#e2eaed','#e9edec','#f1eee2'];
   bands.forEach((c,i)=>P(0,35+i*30,W,31,c));
   if(n()){
     for(let i=0;i<61;i++){const x=((Math.round(hash(i*9.3)*1200-offset*.02)%W)+W)%W,y=8+Math.round(hash(i*3.7)*81);P(x,y,1,i%11===0?2:1,i%7?'#9eaec4':'#fff0c0');}
-    P(312,21,3,11,'#f5e8be');P(309,24,3,6,'#f5e8be');P(312,23,2,7,'#17213b');
+    moon(318,30,9);
   }else{
-    P(295,23,18,14,'#faf5df');P(298,20,12,20,'#faf5df');
+    winterSun(304,30,9);
     for(let i=0;i<4;i++){const x=((i*143-offset*.025)%550+550)%550-70;P(x,47+i%2*13,48,2,'#f2f5f3');P(x+12,44+i%2*13,24,3,'#f2f5f3');}
   }
 }
@@ -417,7 +440,7 @@ function drawScenery(id){
       P(nx+10,GROUND-30+sl,7,10,'#7d746c');P(nx+15,GROUND-24+sl,5,5,'#b9b0a6');P(nx+11,GROUND-37+sl,2,8,'#5e5650');P(nx+14,GROUND-36+sl,2,7,'#5e5650');P(nx+15,GROUND-28+sl,1,1,'#1a1410');
       P(nx-14,GROUND-21,3,8,'#5e5650');P(nx-10,GROUND-25,14,3,'#a8432f');P(nx-9,GROUND-27,6,2,'#c9a06a');   // 꼬리와 길마
       P(sx+20,GROUND-14,22,10,'#6b4c36');P(sx+21,GROUND-16,20,3,n()?'#8a7a52':'#d9b860');}   // 여물통
-    const x=350-cam;P(x-9,GROUND-5,8,4,'#77796b');P(x+2,GROUND-5,8,4,'#77796b');P(x-8,GROUND-7,5,3,'#bdb8a1');P(x+3,GROUND-7,5,3,'#bdb8a1');
+    // 결정 D-791: 마루 아래 신발 그림은 뺐다. 그 자리의 숙소 아궁이는 field.js j_inn_fire가 그린다
   }else if(id==='pine'){
     // 결정 D-319: 솔숲 왼쪽 끝은 장터에서 올라온 돌계단의 꼭대기다. 계단이 왼쪽 아래 장터 지붕 쪽으로 내려간다.
     {const sx=-cam,dark=n()?'#2f3a44':'#6c7672',stone=n()?'#77736c':'#c2bcae',riser=n()?'#4e4b47':'#8d877b';
@@ -687,6 +710,15 @@ function wanderer(kind,x,y,f=1){
     p(-3,-2,2,3,'#c9a06a');p(3,-2,2,3,'#c9a06a');
     p(10,-12,12,12,'#b9a27a');p(11,-14,10,3,'#d6be8c');p(15,-15,2,2,'#8a6a3a');
     if(!G.f.jxBeanDone){p(11,-1,10,1,'#8a6a3a');for(const [dx,dy] of [[24,-1],[28,-2],[33,-1],[19,-1],[37,-1]])p(dx,dy,2,2,'#d9c07a');}
+  }else if(kind==='gorani'){
+    // 결정 D-790: 장국밥 가마솥의 뭉근 할멈. 고라니(뿔 없는 사슴)라 귀가 크고 둥글다. 흰 머릿수건과 행주치마, 손에 긴 국자. 주둥이 끝이 희끗하다.
+    p(-5,-6,2,6,'#6b5644');p(3,-6,2,6,'#6b5644');p(-5,-1,2,1,'#2a211b');p(3,-1,2,1,'#2a211b');   // 가는 다리와 발굽
+    p(-7,-19,13,12,'#9a7f62');p(-7,-9,13,3,'#6a4a5a');p(-4,-17,9,11,'#ece4d2');p(-7,-17,13,1,'#b9a888');   // 몸, 치마, 행주치마
+    p(-9,-18,2,2,'#f2ece0');   // 짧은 흰 꼬리
+    p(1,-24,4,6,'#a98c6c');p(0,-30,9,7,'#a98c6c');p(7,-27,4,3,'#c9b090');p(10,-27,1,1,'#1a1410');p(8,-25,3,1,'#ddd5c8');p(5,-28,1,1,'#1a1410');   // 목, 머리, 주둥이, 코, 눈
+    p(-2,-35,3,6,'#a98c6c');p(3,-36,3,6,'#a98c6c');p(-1,-34,1,4,'#d9b8a0');p(4,-35,1,4,'#d9b8a0');   // 큰 귀
+    p(-1,-31,9,2,'#f2ece0');p(-2,-30,2,3,'#f2ece0');   // 머릿수건
+    p(4,-18,8,2,'#a98c6c');p(12,-27,1,11,'#8a6a3a');p(11,-17,3,2,'#5a5450');   // 팔과 국자
   }else if(kind==='boar'){
     p(-10,-13,18,12,'#9b765c');p(-10,-11,13,2,'#d1b17b');p(-9,-7,12,2,'#d1b17b');p(3,-17,11,12,'#b18a6a');p(3,-21,4,6,'#98745b');p(10,-21,3,6,'#98745b');p(12,-11,6,5,'#c99a81');p(16,-10,1,2,'#60483e');p(9,-15,1,2,'#2d3033');p(-7,-2,3,2,'#55463e');p(4,-2,3,2,'#55463e');p(-14,-10,4,2,'#9b765c');
   }else{

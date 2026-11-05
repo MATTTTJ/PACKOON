@@ -469,6 +469,26 @@
       ]
     },
     {
+      "id": "baduk_scatter", "name": "바둑판 엎어져 돌 쏟아짐", "category": "작은 연출", "status": "제안",
+      "duration": 1.05, "gain": 0.85,
+      "layers": [
+        {"instrument":"moduk_low","note":"D3","start":0,"duration":0.16,"gain":0.3,"pan":0,"patch":{"fixedDuration":0.16,"attack":0.002,"decay":0.09,"sustain":0,"release":0.04,"tail":0.07},"seed":9200},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.12,"gain":0.08,"pan":0,"patch":{"fixedDuration":0.12,"kind":"noise","attack":0.003,"decay":0.05,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":700,"partials":[]},"seed":9201},
+        {"instrument":"stone","note":"A5","start":0.100,"duration":0.05,"gain":0.11,"pan":-0.4,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9210},
+        {"instrument":"stone","note":"E6","start":0.135,"duration":0.05,"gain":0.105,"pan":-0.3,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9211},
+        {"instrument":"stone","note":"C6","start":0.206,"duration":0.05,"gain":0.1,"pan":-0.2,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9212},
+        {"instrument":"stone","note":"G5","start":0.253,"duration":0.05,"gain":0.095,"pan":-0.1,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9213},
+        {"instrument":"stone","note":"D6","start":0.336,"duration":0.05,"gain":0.09,"pan":0.0,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9214},
+        {"instrument":"stone","note":"B5","start":0.395,"duration":0.05,"gain":0.085,"pan":0.1,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9215},
+        {"instrument":"stone","note":"F6","start":0.430,"duration":0.05,"gain":0.08,"pan":0.2,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9216},
+        {"instrument":"stone","note":"A5","start":0.501,"duration":0.05,"gain":0.075,"pan":0.3,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9217},
+        {"instrument":"stone","note":"E6","start":0.548,"duration":0.05,"gain":0.07,"pan":0.4,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9218},
+        {"instrument":"stone","note":"C6","start":0.631,"duration":0.05,"gain":0.065,"pan":-0.4,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9219},
+        {"instrument":"stone","note":"G6","start":0.690,"duration":0.05,"gain":0.06,"pan":-0.3,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9220},
+        {"instrument":"stone","note":"D6","start":0.725,"duration":0.05,"gain":0.055,"pan":-0.2,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9221}
+      ]
+    },
+    {
       "id": "stone_sleep", "name": "졸음에 잠기기", "category": "미니게임", "status": "제안",
       "duration": 0.66, "gain": 0.85,
       "layers": [
