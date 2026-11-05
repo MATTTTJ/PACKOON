@@ -872,14 +872,14 @@ Rg.lanternAction=id=>{
    엄마 시루를 모락네 가마솥에 얹고 → 솥과 시루 틈에 쌀가루 반죽(시룻번)을 붙이고 → 부채로 불을 살살 올리면 → 김이 고르게 오르며 금빛 테가 환해진다(깨어남).
    반죽은 아이가 갈아다 준 쌀가루로 모락이 갠다. 그림은 art.js Rg.siruPics */
 function openSteam(){
-  const S=Rg.siruPics;
+  const S=n=>Rg.siruPics?{pic:Rg.siruPics.stage(n)}:{};   // 옛 구성에는 그림(art.js 확장)이 없다
   talk([
-    Object.assign(['모락','자, 네 시루를 우리 가마솥에 얹고!\n솥이랑 시루 사이 틈부터 막아야 해.'],{pic:S.stage(0)}),
+    Object.assign(['모락','자, 네 시루를 우리 가마솥에 얹고!\n솥이랑 시루 사이 틈부터 막아야 해.'],S(0)),
     ['모락','네가 갈아 온 쌀가루로 반죽을 갰어.\n길게 밀어서 틈에 붙여. 시룻번이야, 시룻번!'],
-    Object.assign(['너구리','(반죽을 길게 밀어 솥과 시루가 맞닿은 틈에\n꼭꼭 눌러 붙였다.)'],{pic:S.stage(1)}),
-    Object.assign(['모락','이제 불이야!\n부채는 조금씩, 조금씩 부쳐.'],{pic:S.stage(2)}),
+    Object.assign(['너구리','(반죽을 길게 밀어 솥과 시루가 맞닿은 틈에\n꼭꼭 눌러 붙였다.)'],S(1)),
+    Object.assign(['모락','이제 불이야!\n부채는 조금씩, 조금씩 부쳐.'],S(2)),
     ['모락','김이 고르게 올라야 떡이 안 설어.\n한쪽으로 쏠리면 떡이 반만 익는다고!'],
-    Object.assign(['너구리','(부채를 살랑살랑 부치자 시루 구멍마다\n김이 고르게 올라온다.)'],{pic:S.stage(3)}),
+    Object.assign(['너구리','(부채를 살랑살랑 부치자 시루 구멍마다\n김이 고르게 올라온다.)'],S(3)),
     ['너구리','(시루 테가 금빛으로 환해진다.\n엄마가 떡 찌던 날처럼 따뜻하다.)']
   ],()=>{Sound.steam?.('fan');finishSteam();});
 }
@@ -889,8 +889,8 @@ function finishSteam(){
   diary('j_siru','모락에게 김 올리는 법을 배웠다. 보따리 속 시루에 처음으로 김이 서렸다. 잔칫날의 시루가 깨어났다.');
   toast('잔칫날의 시루가 깨어났다! 쌀가루 2 + 팥 1 → 팥시루떡');refreshHud();
   // 결정 D-786: 깨어난 시루 그림을 이어 보여 주고, 다음 이야기로 넘어가면 그림을 접는다
-  const lines=[Object.assign(['모락','옳지, 바로 그거야! 떡은 김이 반이지!'],{pic:Rg.siruPics.stage(3)}),['너구리','(시루가 따뜻해졌다. 이제 떡을 찔 수 있다.)'],
-    Object.assign(hintLine('sirumit',['모락','우리 시룻밑은 해져서 김이 새.\n싸리 살에 짚 엮어 새로 깔아야 하는데.']),{pic:null})];   // 결정 D-461: 귀띔
+  const lines=[Object.assign(['모락','옳지, 바로 그거야! 떡은 김이 반이지!'],Rg.siruPics?{pic:Rg.siruPics.stage(3)}:{}),['너구리','(시루가 따뜻해졌다. 이제 떡을 찔 수 있다.)'],
+    Object.assign(hintLine('sirumit',['모락','우리 시룻밑은 해져서 김이 새.\n싸리 살에 짚 엮어 새로 깔아야 하는데.']),Rg.siruPics?{pic:null}:{})];   // 결정 D-461: 귀띔
   if(G.rel.morak.v>=2&&!F.morakTaught){F.morakTaught=true;learn('morak:memiltteok');addItem('memil_powder',1);
     lines.push(['모락',Rg.arcs()?'메밀가루 둘로 메밀떡을 쪄! 하나는 내가 줄게.':'시루에 메밀가루 두 됫박이면 메밀떡이지! 한 됫박은 내가 얹어 줄게.'],gotLine('memil_powder'),
       ['모락',Rg.arcs()?'밤마다 물건이 없어지잖아.\n도깨비 짓이면 메밀떡이 약이래. 챙겨 둬!':'할머니들 말로는 도깨비가 메밀을 좋아한대.\n밤마다 장터 물건이 사라지니, 메밀떡 좀 챙겨 둬 봐!']);}
