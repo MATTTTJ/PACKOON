@@ -33,7 +33,11 @@ h1 span{color:var(--gold)}
 /* HUD */
 .hud{position:absolute;top:2.4%;left:1.8%;right:1.8%;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none;font-size:clamp(10px,1.45vw,14px)}
 .hud-left{display:flex;flex-direction:column;gap:5px;min-width:0}
-.status{display:flex;align-items:center;gap:8px;background:rgba(26,19,15,.78);padding:3px 9px 3px 6px;border-radius:4px;width:max-content;max-width:100%}
+/* 결정 D-602: 하트는 첫 줄에 홀로 두고, 든 도구와 지금 모습(변신) 칸은 그 아래 둘째 줄로 내린다 (사용자 피드백 2026-11-05) */
+.status{display:grid;grid-template-columns:repeat(2,max-content);align-items:center;justify-items:start;column-gap:8px;row-gap:3px;background:rgba(26,19,15,.78);padding:3px 9px 4px 6px;border-radius:4px;width:max-content;max-width:100%}
+.status .hearts{grid-column:1/-1}
+.status .tool{border-left:none;padding-left:0}
+.status .tool:empty,.status .form-now[hidden]{display:none}
 .hearts{display:flex;gap:1px;font-size:1.25em;line-height:1;color:#e0573a}
 .hearts .off{color:#4b3a2e}
 .tool{display:flex;align-items:center;gap:4px;color:var(--hanji);border-left:1px solid #4b3a2e;padding-left:8px;white-space:nowrap}
@@ -73,18 +77,22 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .vista-thought{margin:0;padding:8px 12px 6px;background:rgba(26,19,15,.86);font-size:clamp(13px,1.8vw,18px);white-space:pre-line}
 .vista-return{width:max-content;max-width:100%;margin:0 0 0 auto;padding:3px 10px 4px;background:rgba(26,19,15,.78);text-align:right;font-family:var(--ui);font-size:clamp(10px,1.25vw,12px)}
 
-/* 대화 시트 */
-.dialog{position:absolute;left:2.5%;right:2.5%;bottom:3.5%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(8px,1.6vw,16px);align-items:center;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;padding:clamp(8px,1.6vw,16px);box-shadow:0 6px 0 rgba(0,0,0,.35);cursor:pointer;z-index:5}
-.face{width:clamp(48px,8vw,76px);aspect-ratio:1;background:var(--hanji-2);border:2px solid var(--meok);border-radius:4px;display:grid;place-items:end center;overflow:hidden}
+/* 대화 시트
+   결정 D-600: 대화창 높이를 반쯤으로 줄였다 (사용자 피드백 2026-11-05: NPC 대화칸이 너무 크다, 높이를 반으로, 글씨도 맞춰서).
+   이름은 창 위 테두리에 걸친 작은 꼬리표로, 넘김 안내는 오른쪽 위 테두리로 올려 한 줄을 덜었다. 초상·여백·글씨를 함께 줄였고,
+   두 줄 대사가 초상 높이 안에 들어간다. 고르기는 컴퓨터·휴대폰 가로에서 두 개씩 나란히 둔다. */
+.dialog{--fw:clamp(30px,3.3vw,42px);--px:clamp(8px,1.2vw,12px);--gp:clamp(6px,1vw,10px);position:absolute;left:2.5%;right:2.5%;bottom:3%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--gp);align-items:center;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;padding:clamp(6px,.75vw,8px) var(--px) clamp(5px,.6vw,7px);box-shadow:0 4px 0 rgba(0,0,0,.35);cursor:pointer;z-index:5}
+.face{width:var(--fw);aspect-ratio:1;background:var(--hanji-2);border:2px solid var(--meok);border-radius:4px;display:grid;place-items:end center;overflow:hidden}
 .face canvas{width:100%;height:auto;image-rendering:pixelated;display:block}
-.dbody{min-width:0;display:flex;flex-direction:column;gap:4px;position:relative}
-.who{font-family:var(--ui);font-size:clamp(11px,1.4vw,14px);color:var(--dan);letter-spacing:.04em}
-.text{font-family:var(--display);font-size:clamp(13px,1.85vw,18px);line-height:1.6;max-width:62ch;min-height:2.4em}
-.choices{display:flex;flex-direction:column;gap:5px;margin-top:4px}
-.choices button{font-family:var(--display);font-size:clamp(13px,1.7vw,16px);text-align:left;background:#f8eed8;border:1px solid #cdb98f;border-radius:4px;padding:6px 12px;color:var(--meok);cursor:pointer;min-height:36px;touch-action:manipulation}
+.dbody{min-width:0;display:flex;flex-direction:column;gap:2px}
+.who{position:absolute;top:0;left:calc(var(--px) + var(--fw) + var(--gp));transform:translateY(-82%);font-family:var(--ui);font-size:clamp(10px,1vw,12px);line-height:1.5;color:var(--dan);letter-spacing:.04em;background:var(--hanji);border:2px solid var(--meok);border-radius:4px;padding:0 7px;white-space:nowrap}
+.who:empty{display:none}
+.text{font-family:var(--display);font-size:clamp(13px,1.2vw,15px);line-height:1.45;max-width:66ch}
+.choices{display:flex;flex-direction:row;flex-wrap:wrap;gap:4px;margin-top:2px}
+.choices button{flex:1 1 calc(50% - 4px);font-family:var(--display);font-size:clamp(12px,1.1vw,14px);line-height:1.3;text-align:left;background:#f8eed8;border:1px solid #cdb98f;border-radius:4px;padding:3px 10px;color:var(--meok);cursor:pointer;min-height:28px;touch-action:manipulation}
 .choices button:hover,.choices button:focus-visible{background:var(--hanji-2);border-color:var(--meok)}
-/* 넘김 안내는 이름 줄 오른쪽에 둔다. 아래에 한 줄을 더 쌓지 않아 초상 위아래 여백이 같아진다 (피드백 11) */
-.next{position:absolute;top:0;right:0;font-size:clamp(10px,1.2vw,12px);color:var(--dim);line-height:1.6}
+/* 넘김 안내는 창 오른쪽 위 테두리에 걸친다. 글 줄을 하나 더 쌓지 않는다 (피드백 11, 결정 D-600) */
+.next{position:absolute;top:0;right:var(--px);transform:translateY(-82%);font-size:clamp(9px,.9vw,11px);color:var(--dim);line-height:1.5;background:var(--hanji);border-radius:4px;padding:0 6px}
 
 /* 한지 패널 */
 .panel{position:absolute;inset:5%;background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:6px;display:flex;flex-direction:column;overflow:hidden;font-size:clamp(12px,1.5vw,14px);z-index:6;box-shadow:0 10px 30px rgba(0,0,0,.45)}
@@ -446,9 +454,13 @@ body.in-battle .pad-top .chipbtn{display:none}
   .hud-btns #btnSound,.hud-btns #btnVolume{display:block;min-height:32px}
   .pad{display:flex;flex-direction:column;gap:12px;flex:1;padding-top:12px;touch-action:none}
   .keys{display:none}
-  .dialog{left:0;right:0;bottom:0;border-radius:12px 12px 0 0;padding:16px 16px max(16px, env(safe-area-inset-bottom, 0px));border-bottom:none;box-shadow:0 -8px 24px rgba(0,0,0,.4)}
-  .text{font-size:16px}
-  .choices button{font-size:15px;min-height:44px}
+  /* 결정 D-600: 세로 화면의 아래 대화 시트도 반쯤 낮게. 초상 44px에 두 줄 대사가 들어간다. 고르기는 손가락 높이(44px)를 지키고 한 줄에 하나 */
+  .dialog{--fw:44px;--px:12px;--gp:10px;left:0;right:0;bottom:0;border-radius:12px 12px 0 0;padding:12px var(--px) max(10px, env(safe-area-inset-bottom, 0px));border-bottom:none;box-shadow:0 -8px 24px rgba(0,0,0,.4)}
+  .who{font-size:12px}
+  .next{font-size:11px}
+  .text{font-size:15px}
+  .choices{flex-direction:column;gap:6px}
+  .choices button{flex:none;font-size:15px;min-height:44px}
   .panel{inset:auto 0 0 0;height:90%;border-radius:12px 12px 0 0;border-bottom:none}
   .grip{display:block;width:40px;height:4px;border-radius:2px;background:#cdb98f;margin:8px auto 0}
   .bag-grid{grid-template-columns:repeat(auto-fill,minmax(48px,56px))}
@@ -472,7 +484,11 @@ body.in-battle .pad-top .chipbtn{display:none}
   .pbtn.atk{width:62px;height:62px;background:rgba(180,67,42,.82)}
   .pbtn.talk{height:38px}
   .pbtn.on{transform:none;background:rgba(80,58,44,.8)}
-  .dialog{left:12%;right:12%}
+  /* 결정 D-600: 가로 화면 대화창. 글씨 14px, 초상 40px, 고르기는 두 개씩 나란히(손가락 높이 44px) */
+  .dialog{--fw:40px;--px:10px;--gp:8px;left:12%;right:12%;bottom:max(8px, env(safe-area-inset-bottom, 0px))}
+  .who{font-size:11px}
+  .text{font-size:14px}
+  .choices button{font-size:13px;padding:2px 10px}
   .panel{inset:4% 8%}
   .forge{top:10%}
   body.in-battle .pad{z-index:16}
@@ -806,8 +822,13 @@ body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
   body.in-battle #padTalk{display:none}
   body.in-battle .pbtn.leaf:not([hidden]){display:grid}
   body.in-battle .form-ring:not([hidden]){display:flex}
-  .hud-btns{max-width:62%}
-  .hud-btns .chipbtn{padding:2px 8px}
+  /* 결정 D-600: 가로 화면 위 단추(보따리·수첩·지도·소리·음량·저장)는 한 줄에 작게. 누르는 자리는 손가락 높이(44px)를 지키고,
+     보이는 한지 조각만 30px로 줄인다. 대화 중에는 대화창 위로 올라오지 않게 숨긴다(대화창을 눌러 넘긴다, 패드와 같다) */
+  .hud-btns{max-width:72%;flex-wrap:nowrap;gap:2px}
+  .hud-btns .chipbtn{position:relative;isolation:isolate;background:none;border:none;padding:0 7px;font-size:12px;white-space:nowrap;line-height:1}
+  .hud-btns .chipbtn::before{content:'';position:absolute;inset:7px 0;z-index:-1;background:var(--hanji);border:2px solid var(--meok);border-radius:4px}
+  .hud-btns .chipbtn:active::before{background:#fff6e0}
+  .shell:has(>#dlg:not([hidden])) .hud-btns,.shell:has(>#dlg:not([hidden])) .hud #btnSound,.shell:has(>#dlg:not([hidden])) .hud #btnVolume{visibility:hidden;pointer-events:none}
 }
 /* 결정 D-449: 이름을 받을 때 뜨는 이름 쪽지 (한지 쪽지가 내려와 도장처럼 멈춘다) */
 /* 결정 D-503: 이름 쪽지를 절반쯤 크기로, 기울이지 않는다 (사용자 피드백 2026-11-04: 너무 크다, 기울이지 마라) */

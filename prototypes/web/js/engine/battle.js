@@ -570,13 +570,15 @@ bcv.addEventListener('lostpointercapture',endDrag);
    결정 D-455: 도구마다 생김새가 한눈에 보이게 다시 그린다 (사용자 피드백 2026-11-04: 무기 그림이 너무 구리다).
    - 낫: 나뭇결 있는 자루 끝에 쇠고리를 끼우고, 휘어 내려간 쇠 날을 단다. 등은 검게 두껍고 안쪽 날은 하얗게 벼려졌다.
    - 곡괭이: 자루 끝 쇠 머리가 활처럼 휜다. 한쪽은 뾰족한 촉, 다른 쪽은 넓적한 괭이날. 위쪽 면이 밝다. */
-function drawTool(c,kind,len=25){
+function drawTool(c,kind,len=25,hs=1){
   const h=-len;
   c.save();c.lineCap='round';c.lineJoin='round';
   // 자루: 밝은 나무에 결, 먹 테두리
   c.fillStyle='#9a6a3a';c.strokeStyle=INK;c.lineWidth=1;
   c.beginPath();c.moveTo(-1.9,4);c.lineTo(-1.6,h+3);c.lineTo(1.6,h+3);c.lineTo(1.9,4);c.closePath();c.fill();c.stroke();
   c.strokeStyle='#6e4520';c.lineWidth=0.6;c.globalAlpha=0.8;c.beginPath();c.moveTo(-0.5,2);c.lineTo(-0.4,h+6);c.moveTo(0.8,-2);c.lineTo(0.7,h+9);c.stroke();c.globalAlpha=1;
+  // 결정 D-601: 전투 손 그림에서는 머리(날)를 hs 배로 줄여 그린다. 날끝 자리는 toolTip() 과 같은 배율을 쓴다
+  c.save();if(hs!==1){c.translate(0,h);c.scale(hs,hs);c.translate(0,-h);}
   if(kind==='sickle'){
     // 쇠고리
     c.fillStyle='#5b6067';c.fillRect(-2.4,h+1,4.8,3.4);c.strokeStyle=INK;c.lineWidth=0.8;c.strokeRect(-2.4,h+1,4.8,3.4);
@@ -597,12 +599,21 @@ function drawTool(c,kind,len=25){
     c.strokeStyle='#eef2f4';c.lineWidth=0.8;c.globalAlpha=0.9;c.beginPath();c.moveTo(-14.5,h+0.4);c.quadraticCurveTo(-9,h-2.6,-3.4,h-0.6);c.moveTo(3.4,h-0.6);c.quadraticCurveTo(9,h-2,14.4,h+0.4);c.stroke();   // 위 면 빛
   }
   c.restore();
+  c.restore();
 }
-/* 결정 D-240: 손 그림의 도구는 날이 bAim() 자리에 오게 기운다. 손 안 쥔 자리(HAND_GRIP)에서 그 점까지 */
-const HAND_GRIP={x:4,y:1};
-function toolPose(){
-  const t=TABLES.TUNING,dx=-t.battle_aim_left-HAND_GRIP.x,dy=-t.battle_aim_up-HAND_GRIP.y;
-  return {a:Math.atan2(dx,-dy),len:Math.hypot(dx,dy)};
+/* 결정 D-240: 손 그림의 도구는 날이 bAim() 자리에 오게 기운다. 손 안 쥔 자리(HAND_GRIP)에서 그 점까지.
+   결정 D-601: bAim() 에 오는 것은 도구 머리의 가운데가 아니라 가장 날카로운 끝이다 (사용자 피드백 2026-11-05: 공격 범위가 애매하다, 도구 끝으로 친다는 느낌).
+   곡괭이는 왼쪽 뾰족한 촉 끝, 낫은 휘어 내려간 날의 끝. 변신해도 도구는 그 모습의 손(앞발·발굽·발톱)이 쥐므로 끝은 똑같이 도구 날끝이다.
+   끝 자리(TOOL_TIP, 머리 가운데 기준)를 머리 배율 BATTLE_HEAD 로 줄인 뒤, 그 끝이 bAim() 에 닿도록 자루 길이와 기울기를 푼다. */
+const HAND_GRIP={x:4,y:1},BATTLE_HEAD=0.72;
+const TOOL_TIP={sickle:{x:-18.5,y:5.5},pick:{x:-16.3,y:2}};
+const toolTip=kind=>kind==='sickle'?TOOL_TIP.sickle:TOOL_TIP.pick;
+function toolPose(kind){
+  const t=TABLES.TUNING,dx=-t.battle_aim_left-HAND_GRIP.x,dy=-t.battle_aim_up-HAND_GRIP.y,d=Math.hypot(dx,dy);
+  const tip=toolTip(kind),tx=tip.x*BATTLE_HEAD,ty=tip.y*BATTLE_HEAD;
+  // 도구 좌표에서 끝은 (tx, ty-len). 그 거리가 d 가 되는 자루 길이를 고르고, 그 벡터가 (dx,dy) 쪽을 보게 돌린다
+  const len=ty+Math.sqrt(Math.max(36,d*d-tx*tx));
+  return {a:Math.atan2(dy,dx)-Math.atan2(ty-len,tx),len,hs:BATTLE_HEAD};
 }
 /* 너구리 손. palm 이면 손바닥(무쇠에게 빈손을 펴 보일 때), 아니면 결정 D-241: 도구를 쥔 손을 위에서 본 손등 */
 function drawPaw(c,x,y,palm=false){
@@ -615,8 +626,9 @@ function drawPaw(c,x,y,palm=false){
   const holding=tool&&!B.noTool&&!B.handShow;
   if(holding){
     /* 내리꽂기: 누른 순간 날이 조준 자리에 꽂혀 눌린 채(납작하게) 멈춤 동안 머물고, 그 뒤 반동으로 살짝 들렸다가 제자리로 온다 */
-    const pose=toolPose(),s=B.swing/12,stuck=s>0.75,lift=stuck?0:Math.sin(Math.PI*(1-s/0.75))*0.45,sq=stuck?0.9:1+lift*0.5;
-    c.save();c.translate(HAND_GRIP.x,HAND_GRIP.y);c.rotate(pose.a+lift);c.scale(sq,sq);drawTool(c,tool,pose.len);c.restore();
+    // 결정 D-601: 꽂힌 동안은 날끝이 판정 점에 그대로 머문다(예전엔 0.9배로 눌려 끝이 손 쪽으로 물러났다)
+    const pose=toolPose(tool),s=B.swing/12,stuck=s>0.75,lift=stuck?0:Math.sin(Math.PI*(1-s/0.75))*0.45,sq=stuck?1:1+lift*0.5;
+    c.save();c.translate(HAND_GRIP.x,HAND_GRIP.y);c.rotate(pose.a+lift);c.scale(sq,sq);drawTool(c,tool,pose.len,pose.hs);c.restore();
   }
   if(form&&!B.handShow)drawFormPaw(c,form);
   else if(palm){
@@ -654,8 +666,14 @@ function drawAim(c){
   const p=bAim(),m=B.mark,R=battleHandProfile().radius,on=bAimOn(m,p);
   c.save();
   c.fillStyle=on?'rgba(255,244,207,.28)':'rgba(29,24,20,.05)';c.beginPath();c.arc(p.x,p.y,R,0,Math.PI*2);c.fill();
-  c.strokeStyle=on?GOLD:INK;c.globalAlpha=on?0.95:0.7;c.lineWidth=on?2:1.4;c.setLineDash(on?[]:[3,2]);   // 결정 D-501: 원이 작아져 더 진하게c.beginPath();c.arc(p.x,p.y,R,0,Math.PI*2);c.stroke();
-  c.setLineDash([]);c.globalAlpha=on?1:0.55;c.fillStyle=on?'#fffaf0':INK;c.beginPath();c.arc(p.x,p.y,1.6,0,Math.PI*2);c.fill();
+  // 결정 D-501: 원이 작아져 더 진하게. 결정 D-601: 이 줄의 원 테두리가 주석에 묻혀 그려지지 않던 것을 고쳤다
+  c.strokeStyle=on?GOLD:INK;c.globalAlpha=on?0.95:0.6;c.lineWidth=on?2:1.2;c.setLineDash(on?[]:[2.5,2]);c.beginPath();c.arc(p.x,p.y,R,0,Math.PI*2);c.stroke();
+  c.setLineDash([]);
+  // 결정 D-601: 날끝 반짝임. 판정 점이 도구의 가장 날카로운 끝이라는 것을 네 갈래 빛으로 보인다. 칠 곳에 닿으면 금빛으로 커진다
+  const tw=on?1:0.6+0.3*Math.sin(performance.now()/120),L=on?7:5.5;
+  c.globalAlpha=tw;c.strokeStyle=on?GOLD:'#a8771e';c.lineWidth=on?1.8:1.3;c.lineCap='round';c.beginPath();
+  c.moveTo(p.x-L,p.y);c.lineTo(p.x+L,p.y);c.moveTo(p.x,p.y-L);c.lineTo(p.x,p.y+L);c.stroke();
+  c.globalAlpha=1;c.fillStyle=on?'#fffaf0':'#fffaf0';c.strokeStyle=INK;c.lineWidth=0.8;c.beginPath();c.arc(p.x,p.y,on?2.2:1.7,0,Math.PI*2);c.fill();c.stroke();
   c.restore();
 }
 /* 결정 D-244: 친 자리의 효과. 꽂힌 순간의 고리·빛살, 남는 금 간 자국, 떠오르는 부위 이름과 깎인 칸 */

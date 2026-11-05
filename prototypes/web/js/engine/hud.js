@@ -45,7 +45,7 @@ function refreshHud(){
   $('btnMap').hidden=CLASSIC;$('padMap').hidden=CLASSIC;$('btnMapEnd').hidden=CLASSIC;
   $('mapKeyHint').hidden=CLASSIC;$('mapCoverKeys').hidden=CLASSIC;
   $('hearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('');
-  const t=heldTool();
+  const t=heldTool();   // 결정 D-602: 도구·모습 칸은 하트 아래 둘째 줄에 놓인다 (style.css .status)
   if(t+G.sharp!==lastTool){lastTool=t+G.sharp;const e=$('toolLabel');e.innerHTML='';e.appendChild(icon(t));e.appendChild(document.createTextNode(TOOLS[t].n+(G.sharp?' +':'')));}
   if(G){refreshGoal();refreshFormUi();}
   if(typeof B!=='undefined'&&B)renderBHud();
