@@ -852,7 +852,7 @@ body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
 
 /* 결정 D-704: 첫 출발 때 엄마의 쪽지가 화면 가운데에 펼쳐진다. 띠처럼 접힌 채 올라와 세로로 펼쳐지고,
    독백이 끝나면 다시 접혀 오른쪽 위(보따리 단추 쪽)로 들어간다. 길이는 tuning.csv mom_letter_open_ms·mom_letter_fold_ms (notebook.js showMomNote) */
-.mom-letter{position:absolute;left:50%;top:19%;z-index:4;width:min(21em,62%);pointer-events:none;font-size:clamp(9px,1.45vw,16px);
+.mom-letter{position:absolute;left:50%;top:19%;z-index:7;width:min(21em,62%);pointer-events:none;font-size:clamp(9px,1.45vw,16px);
   transform:translate(-50%,40%) scale(.35,.04) rotate(-4deg);opacity:0;transform-origin:50% 50%}
 .mom-letter .mom-note{margin:0;max-width:none;box-shadow:3px 5px 0 rgba(42,32,25,.35),0 10px 30px rgba(0,0,0,.35)}
 .mom-letter .mom-note small{display:none}
