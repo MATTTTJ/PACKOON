@@ -300,7 +300,7 @@ const TABLES={
    "r": 1,
    "kind": "재료",
    "region": "jangteo",
-   "d": "눈도깨비가 곰 발톱으로 긁어 도롱이 속에 담아 간 콩. 장터에서 훔쳐 온 것이다.",
+   "d": "눈도깨비가 곰 발톱으로 긁어 소매 속에 담아 간 콩. 장터에서 훔쳐 온 것이다.",
    "u": "되"
   },
   "jip": {
@@ -2430,7 +2430,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "까치 깃 도롱이를 두른 눈도깨비. 독수리는 깃털 바람을 날리고, 곰은 발톱 세 줄로 긁고, 멧돼지는 한 줄로 내닫는다. 둔갑이 끝날 때마다 푸른 심장이 튀어나온다.",
+     "text": "서리 뿔을 이고 어깨옷을 빳빳이 세운 눈도깨비. 독수리는 날갯짓으로 땅에서 솟는 소용돌이를 일으키고, 곰은 굵은 발톱 세 줄로 긁고, 멧돼지는 보이지 않게 날뛰며 발자국만 찍는다. 둔갑이 끝날 때마다 얼음이 갈라지며 푸른 심장이 드러난다.",
      "section": "관찰",
      "when": "fight:dokkaebi"
     },
@@ -4656,6 +4656,9 @@ const TABLES={
   "pic_cache": {
    "sfx": "leaf_rustle"
   },
+  "pic_gam_pole": {
+   "sfx": "leaf_rustle"
+  },
   "frost_print": {
    "sfx": "footstep_frost"
   },
@@ -4703,6 +4706,13 @@ const TABLES={
    "sfx": "stone_knock"
   },
   "pic_wish_tower": {
+   "sfx": "stone_knock"
+  },
+  "pic_maetdol_turn": {
+   "sfx": "mill",
+   "repeat": 3200
+  },
+  "pic_mole_chisel": {
    "sfx": "stone_knock"
   },
   "j_jangseung_snow": {

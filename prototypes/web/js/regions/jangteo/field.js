@@ -101,20 +101,20 @@ Rg.faint=()=>{G.px=Math.max(60,G.px-80);toast('눈길에 미끄러져 물러났�
 Rg.bossDie=calm=>{
   G.boss.dead=true;addItem('nunhongsi',1);
   if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
-  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 싸리비로 제 발자국을 쓸며 물건을 가져갔다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
+  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔고, 발자국은 밤새 내린 눈이 덮었다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
   toast('눈홍시를 얻었다! 시루로 홍시 약떡을 찌자');refreshGoal();
 };
 Rg.STORE_X=STORE_X;
 
 /* ---------- 결정 D-684: 눈도깨비와 만나기 (사용자 지시 2026-11-05 큰 장터 23) ----------
    창고 문 앞에 서면 잠깐 뒤 오른쪽에서 무언가 천천히 다가온다. 몸을 감춘 눈도깨비라 모습은 없고,
-   눈 위에 발자국이 찍혔다가 싸리비에 쓸리는 자국, 휘도는 눈발, 찬 입김만 보인다.
+   눈 위에 찍혀 남는 큰 발자국과 옷자락 끌린 자국, 보이지 않는 몸에 휘감기는 눈발, 찬 입김만 보인다(결정 D-766).
    수리부엉이로 변신하면 밤눈에 정체가 드러나고(서리 빛이 번지며 모습이 나타난다), 잠깐 뒤 전투가 열린다.
    결정 D-687: 창고 지키기(G.f.guard)는 부엉 영감의 신표와 함께 켜지고, 수리부엉이 변신도 그 직후(formCheck)에 열린다.
    그래서 수리부엉이 없이 이 자리에 오는 길은 없다. 혹시 없으면(옛 저장) 여기서 연다. 아이는 혼잣말로 '밤눈'을 떠올린다.
    멀리 걸어가면 기척은 물러났다가 다시 오면 처음부터 다가온다. */
 let snowEnc=null;
-const ENC={delay:34,speed:0.8,start:300,stop:62,reveal:72};
+const ENC={delay:34,speed:0.8,start:300,stop:84,reveal:72,stride:16};   // 결정 D-766: 덩치가 커서 조금 떨어져 서고 보폭이 크다
 Rg.snowEncounter=()=>{
   if(!G.f.guard||!night()||G.boss.dead||B||inkOn){if(G.boss.dead)snowEnc=null;return;}
   if(!snowEnc){
@@ -128,44 +128,98 @@ Rg.snowEncounter=()=>{
   if(Math.abs(G.px-Rg.STORE_X)>240){snowEnc=null;return;}
   e.t++;
   if(!e.reveal&&e.t>ENC.delay){const nx=Math.max(Rg.STORE_X+ENC.stop,e.x-ENC.speed);
-    if(Math.floor(nx/12)!==Math.floor(e.x/12))e.steps.push({x:Math.round(nx),t:0});e.x=nx;}
-  for(const s of e.steps)s.t++;e.steps=e.steps.filter(s=>s.t<120);
+    if(Math.floor(nx/ENC.stride)!==Math.floor(e.x/ENC.stride))e.steps.push({x:Math.round(nx),t:0,foot:e.steps.length%2});e.x=nx;}
+  for(const s of e.steps)s.t++;if(e.steps.length>40)e.steps.shift();   // 결정 D-766: 발자국은 지워지지 않고 남는다
   if(e.said===0&&e.t>ENC.delay+20){e.said=1;
-    talk([['너구리','(…사박, 사박. 창고 앞 눈이 밟힌다.\n아무도 없는데 발자국만 다가와.)']]);return;}
+    talk([['너구리','(…사박, 사락. 사박, 사락. 창고 앞 눈이 밟힌다.\n아무도 없는데 큰 발자국만 다가와.)']]);return;}
   if(e.said===1&&e.x<=Rg.STORE_X+ENC.stop&&G.form!=='owl'){e.said=2;
     talk([['너구리','(코앞에서 찬 숨이 느껴져. 뭐가 서 있어.\n밤눈이 밝다면… 보일 텐데.)']]);return;}
   if(!e.reveal&&owlSenses()&&e.t>ENC.delay+10){e.reveal=1;Sound.playSfx?.('battle_warn');}
   if(e.reveal){
-    if(e.reveal===1&&!G.f.jxSnowSeen){G.f.jxSnowSeen=true;diary('jx_snow_seen','창고 앞에 발자국만 다가왔다. 수리부엉이 눈으로 보니, 까치 깃 도롱이를 두르고 싸리비를 쥔 눈도깨비가 서 있었다.');}
-    if(e.reveal===8)talk([['너구리','(보인다! 까치 깃 도롱이에 싸리비…\n눈도깨비야! 싸리비로 발자국을 쓸고 있었어.)']]);
+    if(e.reveal===1&&!G.f.jxSnowSeen){G.f.jxSnowSeen=true;diary('jx_snow_seen','창고 앞에 큰 발자국만 다가왔다. 수리부엉이 눈으로 보니, 서리 뿔을 이고 어깨옷을 빳빳이 세운 커다란 눈도깨비가 서 있었다. 긴 옷자락이 눈 위에 끌렸다.');}
+    if(e.reveal===8)talk([['너구리','(보인다! 서리 뿔에 빳빳한 어깨옷…\n눈도깨비야! 긴 옷자락이 눈에 끌리고 있었어.)']]);
     if(++e.reveal>ENC.reveal){snowEnc=null;Rg.startDokkaebi();}
   }
 };
-/* 도트 눈도깨비: 까치 깃 도롱이, 흰 머리와 고드름 수염, 뭉툭한 뿔 하나, 싸리비 */
+/* 결정 D-766: 도트 눈도깨비. 아이보다 훨씬 큰 덩치로 어깨를 웅크리고 선다 (사용자 지시 2026-11-05 "설화에 나올 만한 모습, 덩치,
+   옛 전설의 큰 산짐승 같은 위압감, 그래도 도깨비에 가깝게"). 전투 그림(enemies.js 결정 D-760)과 같은 차림:
+   빳빳한 어깨옷과 얼음 비늘 어깨받이, 깃 여민 겉옷과 띠, 눈에 끌리는 통 넓은 바지, 서리 머리와 수염, 가늘게 빛나는 눈, 엄니, 얼음 뿔 하나 */
 function nundokSprite(x,a){
-  ctx.save();ctx.globalAlpha=a;const g=GROUND,b=Math.floor(G.anim/16)%2;
-  R(x+16,g-48,2,46,'#6b4e33');for(let i=-3;i<=3;i++)R(x+17+i*2,g-6+Math.abs(i),2,6,'#b9874a');   // 싸리비
-  R(x-14,g-36,28,34,'#1d1814');for(let k=0;k<4;k++){R(x-14+k*7,g-30,6,3,k%2?'#2b4a6a':'#f8f6f0');R(x-12+k*7,g-18,5,3,k%2?'#f8f6f0':'#2b4a6a');}   // 까치 깃 도롱이
-  R(x-6,g-30,12,20,'#f8f6f0');R(x-16,g-38,32,4,'#f8f6f0');   // 흰 앞섶, 어깨 눈
-  R(x+10,g-60,3,22,'#2b4a6a');R(x+12,g-66,2,10,'#1d1814');   // 꽁지
-  R(x-11,g-56,22,18,'#c3ced2');R(x-13,g-58,26,4,'#f8f6f0');R(x-14,g-54,3,10,'#f8f6f0');R(x+11,g-54,3,10,'#f8f6f0');   // 얼굴과 흰 머리
-  R(x-1,g-64,4,7,'#d6ebf2');R(x,g-65,2,2,'#ffffff');   // 뿔 하나
-  R(x-8,g-52,6,5,'#fbf7ec');R(x+2,g-52,6,5,'#fbf7ec');R(x-6+b,g-51,2,3,'#1d1814');R(x+4+b,g-51,2,3,'#1d1814');   // 부리부리한 눈
-  R(x-2,g-47,4,3,'#8396a0');R(x-7,g-43,14,3,'#3a1e1a');R(x-5,g-43,2,2,'#fbf7ec');R(x+3,g-43,2,2,'#fbf7ec');   // 코와 입
-  for(let i=-2;i<=2;i++)R(x+i*3,g-40,2,4+(i%2?2:4),'#f8f6f0');R(x-4,g-34,2,3,'#d6ebf2');R(x+3,g-33,2,3,'#d6ebf2');   // 수염과 고드름
+  ctx.save();ctx.globalAlpha=a;const g=GROUND,breath=Math.floor(G.anim/50)%2;
+  const INKC='#1d1814',ROBE='#1a2230',ROBE_LT='#2a3850',HAK='#222a38',SKIN='#aebcc4',SKIN_DK='#6f8592',SNOW='#f8f6f0',ICE='#d6ebf2',FDK='#4d6c80',GLOW='#a6d6f4',OBI='#5e4a2e',TUSK='#efe8d6';
+  {const gl=ctx.createRadialGradient(x,g-60,6,x,g-60,80);gl.addColorStop(0,'rgba(150,200,235,.22)');gl.addColorStop(1,'rgba(150,200,235,0)');ctx.fillStyle=gl;ctx.fillRect(x-80,g-140,160,140);}   // 찬 기운
+  // 통 넓은 바지: 아래로 퍼지고 단이 눈에 끌린다
+  for(let i=0;i<40;i++){const hw=22+Math.floor(i*0.5);R(x-hw,g-44+i,hw*2,1,HAK);}
+  R(x-1,g-16,3,12,'#141a24');for(const dx of [-14,13,-28,27])R(x+dx,g-40+(Math.abs(dx)>20?14:0),1,Math.abs(dx)>20?22:34,ROBE_LT);
+  for(let i=0;i<8;i++)R(x-44+i*11,g-5,9,2,SNOW);   // 단에 묻은 눈
+  R(x-34,g-4,14,4,SKIN_DK);R(x+20,g-4,14,4,SKIN_DK);for(let k=0;k<3;k++){R(x-35-k*0,g-2+k*0,1,2,INKC);R(x-34+k*4,g-1,2,1,INKC);R(x+30+k*0,g-2,1,2,INKC);R(x+21+k*4,g-1,2,1,INKC);}   // 큰 맨발과 발톱
+  // 띠와 겉옷, 흰 깃
+  R(x-24,g-51,48,7,OBI);R(x-24,g-48,48,1,'#8a6e44');R(x+8,g-50,6,12,OBI);
+  R(x-26,g-82,52,31,ROBE);
+  for(let i=0;i<24;i++){R(x-12+i,g-82+i,3,1,SNOW);if(i<16)R(x+12-Math.floor(i*0.75),g-82+i,3,1,SNOW);}
+  // 빳빳한 어깨옷: 바깥 끝이 솟는다
+  R(x-52,g-90,104,9,INKC);R(x-52,g-91,104,2,SNOW);R(x-48,g-85,96,2,'#2b4a6a');
+  R(x-58,g-94,8,9,INKC);R(x+50,g-94,8,9,INKC);R(x-58,g-95,8,1,SNOW);R(x+50,g-95,8,1,SNOW);R(x-58,g-94,1,9,SNOW);R(x+57,g-94,1,9,SNOW);
+  for(let i=0;i<5;i++)R(x-50+i*21,g-93,9,2,SNOW);   // 어깨에 앉은 눈
+  // 얼음 비늘 어깨받이
+  for(const s of [-1,1]){const bx=s<0?x-54:x+38;R(bx,g-81,16,15,ICE);R(bx,g-76,16,1,FDK);R(bx,g-71,16,1,FDK);R(bx+5,g-81,1,15,INKC);R(bx+11,g-81,1,15,INKC);}
+  // 굵은 팔과 큰 주먹
+  for(const s of [-1,1]){const ax=s<0?x-50:x+40;R(ax,g-66,10,26,SKIN_DK);R(ax+(s<0?2:0),g-60,1,8,INKC);
+    const fx=s<0?x-54:x+38;R(fx,g-42,16,14,SKIN);R(fx,g-37,16,1,SKIN_DK);R(fx,g-33,16,1,SKIN_DK);for(let k=0;k<3;k++)R(fx+2+k*5,g-28,2,3,INKC);}
+  // 서리 머리: 날 선 가닥이 위로 뻗친다
+  R(x-24,g-118,48,8,SNOW);R(x-28,g-124,5,10,SNOW);R(x-19,g-128,5,10,SNOW);R(x+14,g-128,5,10,SNOW);R(x+23,g-124,5,10,SNOW);R(x-9,g-122,4,6,SNOW);
+  R(x-26,g-112,9,26,SNOW);R(x+17,g-112,9,26,SNOW);R(x-24,g-104,1,16,'#9dbccb');R(x+23,g-104,1,16,'#9dbccb');
+  // 각진 얼굴 (어깨 사이로 낮게)
+  R(x-15,g-112,30,16,SKIN);R(x-17,g-100,34,12,SKIN);R(x-15,g-88,30,2,SKIN_DK);
+  R(x-12,g-110,24,1,SKIN_DK);R(x-10,g-108,20,1,SKIN_DK);   // 이마 주름
+  // 찌푸린 눈두덩과 가늘게 빛나는 눈
+  R(x-14,g-106,5,2,INKC);R(x-10,g-105,5,2,INKC);R(x-6,g-104,4,2,INKC);R(x+9,g-106,5,2,INKC);R(x+5,g-105,5,2,INKC);R(x+2,g-104,4,2,INKC);
+  R(x-15,g-108,7,2,SNOW);R(x+8,g-108,7,2,SNOW);
+  R(x-13,g-102,10,3,'#2a3138');R(x+3,g-102,10,3,'#2a3138');
+  {const gl=ctx.createRadialGradient(x,g-101,1,x,g-101,16);gl.addColorStop(0,'rgba(166,214,244,.5)');gl.addColorStop(1,'rgba(166,214,244,0)');ctx.fillStyle=gl;ctx.fillRect(x-16,g-117,32,32);}
+  R(x-12,g-101,8,1,GLOW);R(x+4,g-101,8,1,GLOW);R(x-9,g-101,2,1,'#eaf7ff');R(x+7,g-101,2,1,'#eaf7ff');
+  // 넓은 코, 다문 입, 솟은 엄니
+  R(x-3,g-99,6,4,SKIN_DK);R(x-4,g-96,2,1,INKC);R(x+2,g-96,2,1,INKC);
+  R(x-10,g-92,20,2,INKC);R(x-11,g-91,2,1,INKC);R(x+9,g-91,2,1,INKC);
+  R(x-10,g-96,2,4,TUSK);R(x+8,g-96,2,4,TUSK);
+  // 가슴까지 내려온 흰 수염과 고드름
+  R(x-14,g-89,28,6,SNOW);R(x-11,g-83,22,6,SNOW);R(x-7,g-77,14,5,SNOW);R(x-3,g-72,6,4,SNOW);
+  R(x-8,g-71,2,4,ICE);R(x+5,g-71,2,3,ICE);R(x,g-68,2,4,ICE);
+  // 얼음 뿔: 이마에서 솟아 뒤로 휜다, 곁가지 송곳
+  for(let i=0;i<26;i++){const w=Math.max(1,Math.round(7-i*0.26)),ox=Math.round(Math.pow(i/26,2)*13);
+    R(x-4+ox,g-114-i,w,1,ICE);R(x-4+ox,g-114-i,1,1,FDK);if(i%3===0&&w>2)R(x-2+ox,g-114-i,1,1,'#ffffff');}
+  R(x+6,g-127,4,2,ICE);R(x+9,g-129,2,2,ICE);R(x+9,g-136,3,1,ICE);
+  R(x-8,g-116,12,3,SNOW);
+  if(breath){const k=(G.anim%50)/50;ctx.globalAlpha=a*0.45*(1-k);R(x+12+k*12,g-92-k*8,5+k*6,3,'#f4f6f8');}   // 찬 입김
   ctx.restore();
 }
+/* 결정 D-766: 몸을 감춘 동안. 큰 발자국이 찍혀 남고(옷자락이 끌린 자국이 곁에 남는다), 보이지 않는 큰 몸에 눈발이
+   세차게 휘감기고 미끄러져 떨어진다. 옆으로는 눈바람이 날린다. 수리부엉이 눈이면 서리 빛 속에 모습이 드러난다 */
 Rg.drawSnowPresence=()=>{
   const e=snowEnc;if(!e)return;const x=e.x-cam;
-  for(const s of e.steps){const a=Math.max(0,1-s.t/90);ctx.save();ctx.globalAlpha=a;R(s.x-cam-3,GROUND+1,4,2,'#5a6a80');R(s.x-cam+3,GROUND+2,4,2,'#5a6a80');
-    if(s.t>18){ctx.globalAlpha=a*0.8;R(s.x-cam-6,GROUND,14,1,'#e8ecf4');}ctx.restore();}   // 찍혔다가 싸리비에 쓸리는 발자국
+  for(const s of e.steps){const sx=s.x-cam,o=s.foot?0:3;ctx.save();ctx.globalAlpha=0.85;
+    R(sx-8,GROUND+o,16,4,'#eef3f8');R(sx-6,GROUND+1+o,12,2,'#262d3a');R(sx-7,GROUND+o,2,1,'#262d3a');R(sx-3,GROUND+o-1,2,1,'#262d3a');R(sx+1,GROUND+o-1,2,1,'#262d3a');R(sx+5,GROUND+o,2,1,'#262d3a');   // 큰 맨발 자국과 밀려난 눈
+    ctx.globalAlpha=0.7;R(sx-14,GROUND+6,22,1,'#dfe7ef');R(sx-12,GROUND+7,18,1,'#9aa8b8');   // 옷자락이 끌린 자국
+    if(s.t<10){ctx.globalAlpha=0.8*(1-s.t/10);R(sx-8-s.t,GROUND-3-s.t,3,3,'#f4f6f8');R(sx+6+s.t,GROUND-2-s.t,3,3,'#f4f6f8');}
+    ctx.restore();}
   if(!e.reveal){
-    for(let i=0;i<10;i++){const q=G.anim*0.06+i*0.63,r=10+(i%3)*5;R(x+Math.cos(q)*r,GROUND-30+Math.sin(q*1.3)*22,1,1,i%2?'#f4f6f8':'#c8d4e4');}   // 휘도는 눈발
-    if(Math.floor(G.anim/40)%2===0){const k=(G.anim%40)/40;ctx.save();ctx.globalAlpha=0.5*(1-k);R(x-8-k*8,GROUND-48-k*6,4+k*6,3,'#f4f6f8');ctx.restore();}   // 찬 입김
+    const t=G.anim;
+    ctx.save();
+    {const fl=0.1+0.05*Math.sin(t*0.08);ctx.globalAlpha=fl;ctx.fillStyle='#e6eef6';   // 큰 몸 꼴로 어리는 눈 안개 (어깨가 넓고 머리가 낮다)
+      ctx.beginPath();ctx.ellipse(x,GROUND-50,32,50,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x,GROUND-88,52,9,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x,GROUND-104,16,14,0,0,Math.PI*2);ctx.fill();}
+    for(let i=0;i<80;i++){const q=t*0.09*(i%2?1:-0.8)+i*0.55,rx=26+(i%5)*7,ry=44+(i%3)*10,sz=i%4?2:3;   // 보이지 않는 몸을 휘감는 눈발
+      ctx.globalAlpha=0.65+0.35*hash(i);R(x+Math.cos(q)*rx,GROUND-60+Math.sin(q*1.15)*ry,sz,sz,i%2?'#ffffff':'#d6e2ee');}
+    for(let i=0;i<24;i++){const k=((t*0.025+hash(i*3.7))%1),px=x-52+hash(i*5.1)*104,top=GROUND-92+Math.abs(px-x)*0.1;   // 어깨에서 미끄러져 떨어지는 눈
+      ctx.globalAlpha=0.9*(1-k);R(px,top+k*86,3,3,'#ffffff');}
+    for(let i=0;i<30;i++){const k=((t*0.035+hash(i*9.1))%1),sx=x+110-k*240,sy=GROUND-130+hash(i*2.9)*126;   // 옆으로 날리는 눈바람
+      ctx.globalAlpha=0.75*Math.sin(k*Math.PI);R(sx,sy,10+Math.floor(hash(i)*10),i%3?1:2,'#f4f6f8');}
+    for(let i=0;i<8;i++){const q=t*0.15+i*0.8;ctx.globalAlpha=0.7;R(x-30+i*8+Math.cos(q)*3,GROUND-4-Math.abs(Math.sin(q))*7,4,3,'#f4f6f8');}   // 발치에서 이는 눈
+    if(Math.floor(t/40)%2===0){const k=(t%40)/40;ctx.globalAlpha=0.6*(1-k);R(x-10-k*10,GROUND-96-k*8,6+k*8,4,'#f4f6f8');}   // 찬 입김
+    ctx.restore();
     return;}
   const k=Math.min(1,e.reveal/24);
-  {const gl=ctx.createRadialGradient(x,GROUND-34,4,x,GROUND-34,56);gl.addColorStop(0,'rgba(166,214,244,'+(0.55*(1-k*0.6)).toFixed(3)+')');gl.addColorStop(1,'rgba(166,214,244,0)');
-    ctx.save();ctx.fillStyle=gl;ctx.fillRect(Math.round(x-58),GROUND-92,116,92);ctx.restore();}   // 서리 빛이 번지며 드러난다
+  {const gl=ctx.createRadialGradient(x,GROUND-60,4,x,GROUND-60,90);gl.addColorStop(0,'rgba(166,214,244,'+(0.6*(1-k*0.6)).toFixed(3)+')');gl.addColorStop(1,'rgba(166,214,244,0)');
+    ctx.save();ctx.fillStyle=gl;ctx.fillRect(Math.round(x-92),GROUND-150,184,150);ctx.restore();}   // 서리 빛이 번지며 드러난다
   nundokSprite(Math.round(x),k);
 };
 

@@ -556,6 +556,14 @@
       ]
     },
     {
+      "id": "bonk_kong", "name": "꿀밤 콩", "category": "전투", "status": "제안", "duration": 0.42, "gain": 0.95,
+      "layers": [
+        {"instrument":"moduk_low","note":"E4","start":0,"duration":0.16,"gain":0.42,"pan":0,"patch":{"fixedDuration":0.16,"attack":0.001,"decay":0.11,"sustain":0,"release":0.06,"tail":0.1},"seed":9130},
+        {"instrument":"buk","note":"G2","start":0.004,"duration":0.09,"gain":0.22,"pan":0,"patch":{"attack":0.002,"decay":0.05,"sustain":0,"release":0.03,"tail":0.05,"fixedDuration":0.09},"seed":9131},
+        {"instrument":"moduk_mid","note":"B4","start":0.012,"duration":0.08,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.08,"attack":0.001,"decay":0.05,"sustain":0,"release":0.04,"tail":0.06},"seed":9132}
+      ]
+    },
+    {
       "id": "wood_tap", "name": "나무 톡톡", "category": "작은 연출", "status": "제안", "duration": 0.36, "gain": 0.75,
       "layers": [
         {"instrument":"moduk_mid","note":"D5","start":0,"duration":0.12,"gain":0.25,"pan":0,"patch":{"fixedDuration":0.12,"attack":0.002,"decay":0.072,"sustain":0,"release":0.05,"tail":0.08},"seed":9080},
