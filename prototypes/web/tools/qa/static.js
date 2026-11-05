@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const {spawnSync} = require('node:child_process');
+const {checkCraft} = require('./craft-checks');
 
 const slash = value => value.split(path.sep).join('/');
 const location = (source, offset) => source.slice(0, offset).split('\n').length;
@@ -259,7 +260,11 @@ async function runStatic({root, rules, only} = {}) {
       'CSV와 생성물이 다르거나 변환 검사가 실패했다: ' + (check.stderr || check.stdout || String(check.error)).trim())];
     const decisions = checkDecisions(root, files.length ? files : sourceFiles(root));
     findings.push(...decisions.findings);
-    results.push(result('data', 'CSV와 tables.js 일치 · 결정 ' + decisions.rows + '개, 코드 표시 ' + decisions.tags + '곳', findings, {output: (check.stdout + check.stderr).trim()}));
+    // 결정 D-724: 가공법 전수 점검 (재료 얻는 곳·결과물 쓰임·배워야 하는 키·배수 겹침)
+    let craft = {recipes: 0, findings: []};
+    try { craft = checkCraft(root); } catch (error) { findings.push(finding('craft', 'prototypes/web/tools/qa/craft-checks.js', 1, '가공법 점검 실패: ' + error.message)); }
+    findings.push(...craft.findings.map(f => finding(f.rule, f.file, 1, f.message)));
+    results.push(result('data', 'CSV와 tables.js 일치 · 결정 ' + decisions.rows + '개, 코드 표시 ' + decisions.tags + '곳 · 가공법 ' + craft.recipes + '개 점검', findings, {output: (check.stdout + check.stderr).trim()}));
   }
   if (wants('versions')) {
     const file = 'prototypes/web/index.html', source = fs.readFileSync(path.join(root, file), 'utf8'), findings = [];

@@ -3,7 +3,7 @@
    상태: G.forms(열린 변신 id, squirrel·goat·owl·deer 순서), G.form(지금 모습, ''=너구리).
    - unlockForm(id), setForm(id), hasForm(id), formName(id)
    - 숫자 0(너구리)·1 다람쥐·2 산양·3 수리부엉이·4 고라니. 같은 키를 다시 누르면 너구리로 돌아온다.
-   - 대화·미니게임·지도·경치·가방·책 중에는 바뀌지 않는다. 구역·지역을 옮기거나 전투에서 지면 너구리로 돌아온다.
+   - 대화·미니게임·지도·경치·가방·책 중에는 바뀌지 않는다. 전투에서 지면 너구리로 돌아온다. 구역·마을을 옮겨도 그대로다(결정 D-722).
    필드 능력 수치와 손님 교환 횟수는 tuning.csv 의 form_*·stranger_* 줄이다. 전투는 battle.js 가 battle_<id>_* 줄을 읽는다.
 
    구역 오브젝트 (zone 또는 classic REG 에 둔다)
@@ -60,7 +60,7 @@ function setForm(id,opts={}){
   refreshFormUi();if(typeof B!=='undefined'&&B)renderBattleForms();
   return true;
 }
-/* 구역·지역을 옮기거나 전투에서 지면 부른다 */
+/* 전투에서 지면 부른다 (구역·마을을 옮길 때는 부르지 않는다, D-722) */
 function revertForm(){if(G&&G.form)setForm('',{force:true,quiet:true});formClimb=null;formIntroHide();}
 function formIdForKey(k){return k==='0'?'':FORM_IDS[+k-1];}
 /* 숫자 키. 처리했으면 true */
@@ -141,9 +141,23 @@ function stepClimb(ax){
   else if(G.py>=formClimb.bottom){G.py=formClimb.bottom;formClimb=null;G.onGround=G.py>=fieldGround()-.01;}
   return true;
 }
+/* 결정 D-720: 수리부엉이는 공중에서 점프를 한 번 더 누르면 날개를 한 번 쳐 살짝 더 떠오른다 (사용자 피드백 2026-11-05 "약간 낮은 턱은 날아서 올라갈 수 있게").
+   땅에 닿을 때까지 form_owl_flaps 번. 날갯짓 높이는 form_owl_flap_velocity 로, 산양만 오르는 높은 턱(약 80px)에는 못 미친다(바닥 점프 꼭대기에서 쳐도 약 65px). */
+let owlFlaps=0,owlFlapT=0;
+function owlFlap(){
+  const T=TABLES.TUNING;
+  if(!G||G.form!=='owl'||G.onGround||G.dropHang>0||owlFlaps>=T.form_owl_flaps)return false;
+  if(G.vy<=-T.form_owl_flap_velocity)return false;   // 아직 날갯짓보다 빠르게 오르는 중이면 아끼고 넘긴다
+  owlFlaps++;owlFlapT=12;G.vy=-T.form_owl_flap_velocity;
+  Sound.jump();Vfx.burst?.(G.px,G.py-8);
+  return true;
+}
 /* 수리부엉이: 떨어지는 동안 점프 키를 누르고 있으면 천천히 내려온다 */
 function formFallCap(){
-  formGlide=G.form==='owl'&&!G.onGround&&G.vy>0&&jumpHeld();
+  if(G.onGround||G.form!=='owl')owlFlaps=0;
+  if(owlFlapT>0)owlFlapT--;
+  formGlide=G.form==='owl'&&!G.onGround&&(owlFlapT>0||G.vy>0&&jumpHeld());
+  if(owlFlapT>0)return;
   if(formGlide)G.vy=Math.min(G.vy,TABLES.TUNING.form_owl_glide_fall);
 }
 /* 다람쥐 잊은 몫: 채집 놀이 없이 바로 나온다 */

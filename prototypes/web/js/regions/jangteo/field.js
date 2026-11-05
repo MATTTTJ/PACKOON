@@ -118,7 +118,7 @@ const ENC={delay:34,speed:0.8,start:300,stop:84,reveal:72,stride:16};   // 결�
 Rg.snowEncounter=()=>{
   if(!G.f.guard||!night()||G.boss.dead||B||inkOn){if(G.boss.dead)snowEnc=null;return;}
   if(!snowEnc){
-    if(Math.abs(G.px-Rg.STORE_X)<24&&$('dlg').hidden){
+    if(Math.abs(G.px-Rg.STORE_X)<24&&encounterReady()){   // 결정 D-719: 땅에 디딘 뒤에
       if(!hasForm('owl'))unlockForm('owl');
       snowEnc={t:0,x:Rg.STORE_X+ENC.start,said:0,reveal:0,steps:[]};G.vx=0;
     }

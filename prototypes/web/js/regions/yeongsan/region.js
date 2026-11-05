@@ -90,7 +90,7 @@ defineIcons({
 /* 다래 덩굴은 낫으로 벤다 */
 defineGather({
   // 결정 D-500: 한 번도 칸을 놓치지 않으면 덤불에 얽힌 마가목 가지가 흔들려 열매 하나가 떨어진다 (영산 비탈의 마가목, 한 단계 위)
-  darae_vine:{title:'다래 덩굴 베기',hits:TABLES.MINIGAMES.gather_darae_vine_hits,spot:[-2,-14],box:[-10,-18,10,0],rare:'magamok',hint:'눈 덮인 덤불 속 덩굴을 낫으로 벤다. 도는 표식이 금빛 칸에서 멈추게 휘두르면 한 줄기가 더 베인다. 한 번도 칸을 놓치지 않으면 얽힌 마가목 가지에서 열매도 떨어진다.'},
+  darae_vine:{title:'다래 덩굴 베기',hits:TABLES.MINIGAMES.gather_darae_vine_hits,spot:[-2,-14],box:[-10,-18,10,0],rare:'magamok',hint:'눈 덮인 덤불 속 덩굴을 낫으로 벤다.'},
 });
 
 /* 결정 D-421: 마지막 약은 아빠와 함께 엄마의 절구로 찧는다(story.js makeReturningMedicine). 가공법은 heirlooms.csv 절구 줄 */

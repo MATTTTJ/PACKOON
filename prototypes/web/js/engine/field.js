@@ -18,7 +18,7 @@ let shakeT=0;
 function doHit(){
   Vfx.slash();
   const f=G.face,x1=f>0?G.px+TABLES.TUNING.field_hit_front:G.px-TABLES.TUNING.field_hit_back,x2=x1+TABLES.TUNING.field_hit_width;const dmg=G.sharp?2:1;
-  for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&d.x>x1-TABLES.TUNING.field_dig_padding&&d.x<x2+TABLES.TUNING.field_dig_padding&&G.onGround){if(d.cache)openCache(d);else gatherHit(d);return;}}
+  for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&d.x>x1-TABLES.TUNING.field_dig_padding&&d.x<x2+TABLES.TUNING.field_dig_padding&&G.onGround&&Math.abs((d.y??fieldGround())-G.py)<=TABLES.TUNING.field_dig_height){if(d.cache)openCache(d);else gatherHit(d);return;}}
   fieldCall('onHit',x1,x2,dmg,f);
 }
 const sparks=[];
@@ -172,6 +172,7 @@ function step(){
   stepRoll(ax);   // 결정 D-94: 구르는 중이면 G.vx를 구르기 빠르기로 (roll.js)
   const climbing=stepClimb(ax);
   if(!climbing){
+  if(jumpQ&&!G.onGround&&owlFlap())jumpQ=false;   // 결정 D-720: 수리부엉이 날갯짓 (forms.js)
   if(jumpQ&&G.onGround){Sound.jump();G.vy=TABLES.TUNING.field_jump_velocity*formJumpMul();G.onGround=false;}jumpQ=false;
   // ↓+점프: 땅이 아닌 발판 위에서만 아래로 빠진다. 지나는 동안 그 높이의 발판만 무시한다.
   if(dropQ&&G.onGround&&G.py<fieldGround()-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;
@@ -372,8 +373,11 @@ function drawRaccoonAt(ox,oy,f,st,attackT,tool,pickFrame=0){
    - 낫: 자루를 쥐고 옆구리 아래로 늘어뜨린다. 휜 날이 앞을 향하고(검은 등, 흰 날), 걸으면 손에서 흔들리고, 뛰면 날을 몸 쪽으로 당긴다.
    - 휘두를 때는 둘 다 손에서 앞으로 크게 원을 그린다. 구르기·변신 중에는 그리지 않는다(보따리 속). 등을 보일 때는 등에 비스듬히 멘다(drawRaccoonBackAt). */
 const TOOL_WOOD='#8a5a30',TOOL_WOOD_D='#5e3b1e',TOOL_IRON='#5d646b',TOOL_IRON_L='#a9b1b8',TOOL_EDGE='#eef2f4';
+/* 결정 D-718: 연장(낫·곡괭이)은 평소엔 보따리에 넣어 두어 보이지 않는다. 휘두를 때와 채집 자리 앞에 섰을 때(붓 원이 뜰 때)만 손에 꺼내 든다
+   (사용자 피드백 2026-11-05 "낫 들고 있는 거 너무 어색하다. 채집할 때만 나오게"). 등을 보일 때도 메지 않는다 */
+const toolOut=attackT=>attackT>0||(typeof gatherCue!=='undefined'&&!!gatherCue.d);
 function drawFieldTool(ox,oy,f,st,attackT,tool){
-  if(!tool)return;
+  if(!tool||!toolOut(attackT))return;
   const swing=attackT>0,air=typeof formAir!=='undefined'?formAir:0;
   // 손 자리와 자루 방향(a: 0이면 위, 양수면 앞으로 기운다)
   let hx=ox+f*5,hy=oy-10,a,len;
@@ -401,6 +405,14 @@ function drawRaccoon(){
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
   R(G.px-cam-7,fieldGround(),14,1,'rgba(40,24,14,.35)');
   if(rolling){drawRollAt(G.px-cam,G.py,G.form||'',rollAngle);return;}
+  // 결정 D-721: 너무 오래 굴러 어지러우면 그 자리에서 몸이 좌우로 휘청이고, 머리 위로 별 셋이 돈다. 바라보는 쪽도 이리저리 바뀐다
+  if(rollDizzy>0){
+    const sway=Vfx.reducedMotion?0:Math.round(Math.sin(G.anim*.3)*2),face=Math.floor(G.anim/14)%2?-G.face:G.face;
+    drawPlayerAt(G.px-cam+sway,G.py,face,0,0,null);
+    if(!Vfx.reducedMotion)for(let i=0;i<3;i++){const a=G.anim*.18+i*Math.PI*2/3,x=Math.round(G.px-cam+sway+Math.cos(a)*7),y=Math.round(G.py-31+Math.sin(a)*2);
+      R(x,y-1,1,3,'#ffe27a');R(x-1,y,3,1,'#ffe27a');R(x,y,1,1,'#fff8d2');}
+    return;
+  }
   const back=heroBackPose();
   if(back){if(G.form)drawFormBackAt(G.px-cam,G.py,back.phase,G.form);else drawRaccoonBackAt(G.px-cam,G.py,back.phase);return;}   // 결정 D-400: 두 발로 걷는 모습만 (heroBackPose)
   const phase=pickupPose?(pickupPose.tick<TABLES.TUNING.pickup_motion_frames/3?1:pickupPose.tick<TABLES.TUNING.pickup_motion_frames*2/3?2:1):0;
@@ -431,7 +443,7 @@ function draw(){
   const hideHero=zoneMotion&&['slide','crawl'].includes(zoneMotion.kind);
   drawFieldScene(!hideHero);
   updateOverlay();
-  if(zoneFade>0){ctx.save();ctx.globalAlpha=zoneFade/TABLES.TUNING.zone_transition_frames;R(0,0,W,H,'#211d24');ctx.restore();}
+  if(zoneFade>0){const t=zoneFade/TABLES.TUNING.zone_fade_in_frames;ctx.save();ctx.globalAlpha=t*t*(3-2*t);R(0,0,W,H,'#211d24');ctx.restore();}   // 결정 D-723: 부드럽게 밝아진다
   drawZoneTransition();
 }
 /* 결정 D-128: 자른 구역의 배경·장식은 남은 구간마다 나눠 그린다. 구간마다 그 구간이 당겨진 만큼 카메라를 옮기고,
@@ -525,7 +537,8 @@ function updateHints(){
     seen[key]=true;toast(typeof p.hint==='function'?p.hint():p.hint);return;
   }
 }
-function nearDig(){if(paused()||(typeof rolling!=="undefined"&&rolling))return null;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*TABLES.TUNING.field_dig_ahead))<TABLES.TUNING.field_dig_distance)return d;}return null;}
+// 결정 D-717: 채집 자리는 높이(발 높이 차이)도 가까워야 뜬다. 난간·발판 위에 올라가 있으면 바로 아래 흙더미의 원이 뜨지 않는다 (사용자 피드백 2026-11-05)
+function nearDig(){if(paused()||(typeof rolling!=="undefined"&&rolling))return null;const T=TABLES.TUNING;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*T.field_dig_ahead))<T.field_dig_distance&&Math.abs((d.y??fieldGround())-G.py)<=T.field_dig_height)return d;}return null;}
 function updateOverlay(){
   trackNpcMoves();   // D-126: 안내를 고르기 전에 자리 바뀜을 먼저 본다
   const pr=$('prompt');
@@ -557,6 +570,9 @@ function zoneObjects(kind){
   const z=zoneDef();
   return [...(z?.[kind]||[]),...(REG[kind]||[]).filter(a=>!usesZones(REG)||(a.zone||firstZone(REG))===G.zone)];
 }
+/* 결정 D-719: 보스를 처음 보고 멈추는 혼잣말과 보스 전투는 아이가 땅(발판)에 발을 딛고 있을 때만 열린다.
+   뛰는 중에 문턱을 넘으면 내려선 뒤에 열린다 (사용자 피드백 2026-11-05 "공중에서 멈추면 어색하다"). 지역 field.js 의 보스 조건이 부른다 */
+function encounterReady(){return !!G&&G.onGround&&!formClimb&&!(G.dropT>0)&&$('dlg').hidden;}
 const pointNear=p=>Math.abs(p.x-G.px)<(p.distance??TABLES.TUNING.field_talk_distance)&&Math.abs((p.y??fieldGround())-G.py)<TABLES.TUNING.field_interact_y;
 /* 원래 조건(need) 또는 몸으로 넘는 변신(formPass). formNeed 는 변신으로도 남는 약속 조건이다 (forms.js) */
 const needMet=p=>!p.need||p.need();
@@ -579,7 +595,7 @@ function changeZone(to,arrival={}){
     image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);
   }
   const z=REG.zones[to];
-  revertForm();   // 구역을 옮기면 너구리로 돌아온다
+  formClimb=null;   // 결정 D-722: 구역을 옮겨도 변신은 그대로다 (사용자 피드백 2026-11-05 "굳이 너구리로 풀릴 필요 없다"). 줄기를 잡던 것만 놓는다
   G.zone=to;G.px=clamp(arrival.x??z.startX??70,16,z.w-16);G.py=arrival.y??z.ground??GROUND;
   markZoneVisited();
   if(!edge)G.vx=0;
@@ -593,11 +609,11 @@ function changeZone(to,arrival={}){
     document.querySelectorAll('#pad .on').forEach(b=>{if(!['left','right'].includes(b.dataset.k))b.classList.remove('on');});
   }else suppressHeldInputs();
   hidePeek();sparks.length=0;shakeT=0;lastNear=null;blockedEdge=null;Vfx.clear();
-  zoneFade=edge||Vfx.reducedMotion?0:TABLES.TUNING.zone_transition_frames;
+  zoneFade=edge||Vfx.reducedMotion?0:TABLES.TUNING.zone_fade_in_frames;
   if(image){
     const incoming=document.createElement('canvas');incoming.width=W;incoming.height=H;
     zoneMotion={kind:'slide',opts:{direction:arrival.edgeDirection},image,incoming,start,
-      frames:TABLES.TUNING.zone_transition_frames,tick:0,owner:G,region:G.region,zone:G.zone,end:{x:G.px,y:G.py}};
+      frames:TABLES.TUNING.zone_slide_frames,tick:0,owner:G,region:G.region,zone:G.zone,end:{x:G.px,y:G.py}};
     // 지역이 자체 보관하는 이전 화면에도 가장자리 전환 그림이 겹치지 않게 한다.
     ctx.clearRect(0,0,W,H);
   }
@@ -644,7 +660,17 @@ function drawZoneTransition(){
     const st=G.onGround&&G.vx?Math.floor((G.anim+m.tick)/6)%2:0;
     drawPlayerAt(x,y,G.face,st,0,heldTool());
   }else if(m.kind==='crawl')drawCrawl(m,t);
+  else if(m.kind==='fade'){ctx.globalAlpha=e;R(0,0,W,H,'#211d24');}
   ctx.restore();
+}
+/* 결정 D-723: 문으로 구역을 넘을 때는 화면이 먼저 천천히 어두워진 뒤(zone_fade_out_frames) 새 구역에서 천천히 밝아진다(zone_fade_in_frames).
+   예전에는 누르자마자 새 구역이 까맣게 떴다가 밝아져 뚝 끊겨 보였다. 가장자리 밀기도 길게(zone_slide_frames) 늘렸다 (사용자 피드백 2026-11-05 "맵 넘어갈 때 부드럽게") */
+function startDoorFade(p){
+  if(Vfx.reducedMotion||paused())return false;
+  G.vx=0;suppressHeldInputs();
+  zoneMotion={kind:'fade',opts:{onComplete:()=>changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'})},
+    frames:TABLES.TUNING.zone_fade_out_frames,tick:0,owner:G,region:G.region,zone:G.zone,start:{x:G.px,y:G.py},end:{x:G.px,y:G.py}};
+  return true;
 }
 /* 결정 D-44: 내려가는 문(descend)은 그 자리에서 등을 보이며 기어 내려간 뒤 구역을 넘어가고,
    올라가는 문(ascend)은 도착한 곳에서 아래로부터 기어 올라온다 (design/data/decisions.csv).
@@ -662,7 +688,7 @@ function startCrawl(p){
   if(!changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'}))return false;
   zoneFade=0;   // 도착 화면은 모션이 직접 밝힌다
   zoneMotion={kind:'crawl',opts:{dir:-1,x:G.px},frames,tick:0,owner:G,region:G.region,zone:G.zone,
-    start:{x:G.px,y:G.py},end:{x:G.px,y:G.py},form:'',face};
+    start:{x:G.px,y:G.py},end:{x:G.px,y:G.py},form:G.form||'',face};   // 결정 D-722: 올라오는 모습도 지금 변신 그대로
   return true;
 }
 function crawlStep(m){
@@ -713,7 +739,7 @@ function drawRaccoonBackAt(ox,oy,phase){
   const armUp=[up<0?-9:6,-28,3,9],armDown=[up<0?6:-9,-21,3,5];
   R(ox+armUp[0],oy+armUp[1],armUp[2],armUp[3],K);R(ox+armDown[0],oy+armDown[1],armDown[2],armDown[3],K);
   // 결정 D-481: 등을 보일 때 도구는 보따리 위에 비스듬히 멘다 (곡괭이는 머리가 어깨 위로, 낫은 자루만 보이고 날은 보따리 끈에 꽂는다)
-  const tl=G?.tool;
+  const tl=toolOut(0)?G?.tool:null;   // 결정 D-718: 평소엔 보따리 속
   if(tl==='pick'){for(let i=0;i<12;i++)R(ox-6+i,oy-10-i,1,1,i%3===1?TOOL_WOOD_D:TOOL_WOOD);R(ox+4,oy-24,5,1,TOOL_IRON);R(ox+5,oy-25,3,1,TOOL_IRON_L);R(ox+8,oy-23,1,1,'#3f454b');}
   else if(tl==='sickle'){for(let i=0;i<6;i++)R(ox+3+i,oy-12-i,1,1,TOOL_WOOD);R(ox+8,oy-19,2,1,'#3f454b');R(ox+9,oy-20,1,2,TOOL_IRON_L);}
   // 뒤통수와 모자
@@ -781,6 +807,7 @@ function interactWith(p,kind){
     if(!pathOpen(p)){const say=typeof p.blockedSay==='function'?p.blockedSay():p.blockedSay;
       if(say)talk([['너구리',say]]);else toast(p.reason||'아직 지나갈 수 없는 길이다');return;}
     if((p.descend||p.ascend)&&startCrawl(p))return;
+    if(startDoorFade(p))return;
     changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});
   }else if(kind==='vistas')startVista(p);
   else if(kind==='stamps')findStamp(p);

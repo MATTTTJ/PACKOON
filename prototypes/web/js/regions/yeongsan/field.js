@@ -161,7 +161,7 @@ Rg.maxX=()=>!G.f.seolpi?SNOW_X-6:!G.f.shortcut?SLOPE_X-12:!G.f.sangunMet?BOSS_AT
 Rg.step=()=>{
   Rg.arcsEnabled();
   stepSalg();
-  if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT)Rg.startGangcheol();
+  if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT&&encounterReady())Rg.startGangcheol();   // 결정 D-719
   if(has('doerim_yak')&&!G.f.yakDone){G.f.yakDone=true;Rg.offerReturnPrep();}
 };
 Rg.onHit=()=>{};
@@ -329,7 +329,7 @@ if(!CLASSIC){
     reason:'얼음길이 물에 잠겼다. 오른쪽 선착장에서 배를 타자.'};
   Rg.zones.island.step=()=>{
     stepCommon();
-    if(!G.boss.dead&&G.f.sangunMet&&G.px>isl(BOSS_AT))Rg.startGangcheol();
+    if(!G.boss.dead&&G.f.sangunMet&&G.px>isl(BOSS_AT)&&encounterReady())Rg.startGangcheol();
   };
   Rg.zones.island.maxX=()=>G.f.sangunMet?2584:BOSS_AT-30;   // trimRegion이 이 값도 섬 좌표로 옮긴다
   // 겨울에는 얼음길, 봄에는 배로 같은 선착장을 잇는다.
