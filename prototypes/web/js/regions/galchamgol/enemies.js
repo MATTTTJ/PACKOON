@@ -306,8 +306,9 @@ function stepFist(b){
   if(b.x==null&&b.t>b.delay){b.x=B.px;b.y=B.py;}
   const f=fistAt(b);
   if(b.t===f.hit){
-    Sound.playSfx('battle_hit');bSplash(b.x,b.y,b.final?RED:'#6f6357');
-    if(b.final){B.bonk=34;B.msg='딱! 손등에 꿀밤 한 대가 떨어졌다.';}
+    // 결정 D-731: 마지막 피할 수 없는 꿀밤은 '딱'이 아니라 '콩' 소리가 난다 (사용자 피드백 2026-11-05 단풍골 2). 글자도 '콩!'
+    Sound.playSfx(b.final?'bonk_kong':'battle_hit');bSplash(b.x,b.y,b.final?RED:'#6f6357');
+    if(b.final){B.bonk=34;B.bonkWord='콩!';B.msg='콩! 손등에 꿀밤 한 대가 떨어졌다.';}
     else if(!b.near&&Math.hypot(B.px-b.x,B.py-b.y)<T().musoe_bonk_radius)bHitMe();
   }
   if(b.t>f.hit+22)b.dead=1;

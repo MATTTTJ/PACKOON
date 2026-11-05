@@ -19,7 +19,8 @@
 const NAME_VOICES={
   gal_powder_pedlar:{call:'가루 보부상! 이리 와 봐, 빨리!',own:'맞아, 가루 보부상! 내가 지었거든!'},
   gal_quiet_steps:{call:'사뿐발 보부상… 나 여기 있어…',own:'사뿐발 보부상! 발소리 작게!'},
-  gal_water_hands:{call:'물소리 보부상, 이리 오너라.',own:'그래, 물소리 보부상. 물길은 네 손이 안다.'},
+  gal_water_hands:{call:'물소리 보부상, 이리 오너라.',own:'그래, 물소리 보부상. 물길은 네 손이 안다.'},   // 옛 저장 (물레방아를 뺐다, D-730)
+  gal_kkachibap:{call:'까치밥 보부상, 이리 오너라.',own:'그래, 까치밥 보부상. 꼭대기 몇 알은 남길 줄 알지.'},   // 결정 D-730
   dol_stone_hand:{call:'돌손아.',own:'…그래. 돌손이로구나.'},
   dol_pack_friend:{call:'짐 동무! 이쪽 좀 받쳐 줘!',own:'그렇지, 짐 동무! 같이 받치자고!'},
   dol_windbreak:{call:'바람막이야, 이리 와 손 녹여라.',own:'그래, 바람막이. 바람 오는 쪽은 네가 막지.'},

@@ -720,6 +720,23 @@ if(!CLASSIC){
       R(28,20,9,9,'#b0402c');const s='#f1d9c8';
       R(29,21,1,1,s);R(29,23,1,1,s);R(29,26,1,2,s);R(31,21,5,1,s);R(33,22,1,2,s);R(31,24,5,1,s);R(31,25,1,3,s);R(33,25,1,3,s);R(35,25,1,3,s);
     },
+    // 결정 D-730: 감 따는 장대. 끝이 갈라진 대나무 장대가 올라가 감꼭지를 틈에 끼우고 비틀어 꺾은 뒤, 감을 문 채 내려온다 (2.6초마다 되풀이).
+    gamPole(w,h,t){
+      R(0,0,w,h,'#e9dcc0');R(0,40,w,4,'#c9b48c');
+      // 잎 진 감나무 가지와 남은 감 (꼭대기 쪽은 까치밥)
+      R(0,6,40,2,'#5b3d2a');R(14,4,12,2,'#5b3d2a');R(26,8,2,9,'#5b3d2a');R(38,4,2,5,'#5b3d2a');R(40,3,16,2,'#5b3d2a');
+      const gam=(x,y)=>{R(x,y,5,5,'#e8792b');R(x+1,y+4,3,1,'#c95a1d');R(x+1,y+1,1,1,'#f6b46a');R(x+1,y-1,3,1,'#4f6b2c');};
+      gam(11,7);gam(44,5);gam(52,5);R(18,8,4,2,'#b2492a');   // 한 잎만 남았다
+      const c=(t%2.6)/2.6,ease=k=>k*k*(3-2*k);
+      // 장대 끝 높이: 올라감 → 비틀기 → 감을 물고 내려옴
+      const up=c<.35?ease(c/.35):c<.58?1:1-ease((c-.58)/.42);
+      const twist=c>=.35&&c<.58&&!Vfx.reducedMotion?((Math.floor(t*14)%2)?1:-1):0;
+      const tipY=Math.round(40-(40-19)*up),tipX=27+twist;
+      R(tipX-1,tipY,3,h-tipY,'#a98a4e');R(tipX,tipY,1,h-tipY,'#cdb27a');for(let y=tipY+6;y<h;y+=7)R(tipX-1,y,3,1,'#7f6636');   // 대 마디
+      R(tipX-2,tipY-3,1,4,'#a98a4e');R(tipX+2,tipY-3,1,4,'#a98a4e');                                                        // 갈라진 끝
+      if(c<.58)gam(25,17);else gam(tipX-2,tipY-6);   // 꺾이기 전엔 가지에, 꺾인 뒤엔 장대 틈에
+      if(c>=.5&&c<.62)R(30,15,2,1,'#5b3d2a');      // 꼭지 꺾이는 '톡'
+    },
   };
   // 결정 D-483: 대사 그림이 뜰 때의 소리 (design/data/popup_sounds.csv 의 pic_이름)
   for(const k of Object.keys(scenePic))scenePic[k].sound='pic_'+k.replace(/[A-Z]/g,c=>'_'+c.toLowerCase());
@@ -973,12 +990,14 @@ if(!CLASSIC){
   // 결정 D-17: 늙은 까치는 네 지역에 걸친 한 인물 (design/data/decisions.csv)
   const drawMagpies=(x,y,f)=>{Rg.expArt.magpie(x,y,f);if(G.f.galMagpieYoung){Rg.expArt.youngMagpie(x-32,y,1);Rg.expArt.youngMagpie(x+34,y,-1);}};
   const magpie={id:'old_magpie',name:'늙은 까치',x:820,draw:drawMagpies,talk:magpieTalk,
-    get greeting(){return G.f.galWheelDone?'쿵, 쿵, 쿵. 이 소리는 내가 안 날라도\n네 집까지 가겠구나.':G.tool==='sickle'?'그게 네 아비 낫이구나.\n무쇠가 날을 잘 세웠네.':'날개 좀 말리고 가련다.\n저 방아가 멈춘 뒤로 개울이 너무 조용해.';}};
+    get greeting(){return G.f.galGamDone?'꼭대기 네 알이면 올겨울은 넉넉하다.\n네 어미 소식은 내가 날라 주마.':G.tool==='sickle'?'그게 네 아비 낫이구나.\n무쇠가 날을 잘 세웠네.':'날개 좀 말리고 가련다.\n올해는 저 감나무에 아무도 장대를 안 대는구나.';}};
   const hubMagpie={id:magpie.id,name:magpie.name,x:480,draw:magpie.draw,talk:magpie.talk};
   Object.defineProperty(hubMagpie,'greeting',{get:()=>magpie.greeting});
-  // 만난 뒤로 까치는 물레방아 곁에 앉아 있다. 방아를 같이 고치고, 다 고친 뒤에도 그 소리를 듣는다.
-  const wheelMagpie={id:magpie.id,name:magpie.name,x:1120,draw:magpie.draw,talk:magpie.talk};
-  Object.defineProperty(wheelMagpie,'greeting',{get:()=>magpie.greeting});
+  // 결정 D-730: 만난 뒤로 까치는 집 옆 감나무 낮은 가지에 앉아 있다 (예전엔 물레방아 곁). 젊은 까치 둘은 나무 밑에 내려앉는다.
+  const GAM_X=300;
+  const gamMagpie={id:magpie.id,name:magpie.name,x:GAM_X+18,y:GROUND-46,talk:magpie.talk,
+    draw:(x,y,f)=>{Rg.expArt.magpie(x,y,f);if(G.f.galMagpieYoung){Rg.expArt.youngMagpie(x+34,GROUND,-1);Rg.expArt.youngMagpie(x+72,GROUND,-1);}}};
+  Object.defineProperty(gamMagpie,'greeting',{get:()=>magpie.greeting});
   const brothers={id:'squirrel_brothers',name:'다람쥐 형제',speakers:['다람쥐 형','다람쥐 동생'],x:620,draw:picture('brothers'),talk:brothersTalk,
     get greeting(){
       const base=({
@@ -990,86 +1009,46 @@ if(!CLASSIC){
     }};
   const chick={id:'lost_chick',name:'꺼병이',hint:'삐약… 삐약… 어디선가 엄마를 찾는 병아리 소리가 들린다.',get x(){const x=G.f.galExpChickX??1540;return CLASSIC?x:trimX(x,Rg.trimCuts?.forest);}   /* 결정 D-128: galExpChickX는 설계 좌표로 두고 자리만 줄인 숲 좌표로 */,draw:picture('chick'),talk:chickTalk,
     greeting:'이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!'};
-  function wheelStage(){
-    if(G.f.galWheelDone)return 5;
-    if((G.f.galWheelStage||0)>=4)return 4;
-    return G.f.galWheelSpoke&&G.f.galWheelAxle?3:G.f.galWheelSpoke?2:G.f.galWheelStage||0;
-  }
-  function wheelTalk(){
-    const F=G.f,stage=wheelStage();
-    if(F.galWheelDone){
-      talk([['너구리','쿵, 쿵, 쿵… 한 번 쉬고.\n오늘도 잘 도네.'],
-        ['너구리','엄마, 이제 혼자 절구 안 찧어도 돼.',[
-          {t:'물소리에 맞춰 절구 손버릇을 해 본다',go:()=>hands(()=>{
-              diary('galWheelReturn','돌아와 물레방아 소리에 맞춰 엄마의 절구 손짓을 해 봤다. 세 번 찧고 한 번 쉬는 버릇이 물소리에도 맞았다.');
-              talk([['너구리','손이 먼저 쉬네.\n엄마가 하던 대로.']]);
-            })},{t:'소리만 듣고 간다',go:null}]]]);return;
-    }
+  /* 결정 D-730: 물레방아 고치기를 뺐다 (사용자 피드백 2026-11-05 단풍골 1). 대신 집 옆 감나무의 까치밥 이야기를 둔다.
+     엄마는 해마다 감을 따며 꼭대기 몇 알을 까치밥으로 남겼다. 늙은 까치 식구는 그 감으로 겨울을 났고, 그래서 이 집 문턱을 알고 약과 소식을 나른다
+     (첫 만남의 "네 집 문턱도 내가 안단다"가 여기서 풀린다). 올해는 엄마가 앓아 아무도 장대를 못 댔다.
+     아이가 장대로 아래 감을 따고 꼭대기 네 알은 남긴다. 홍시는 엄마 방 문턱 안에, 단단한 감은 처마 밑 바구니에 둔다.
+     값은 까치가 지붕 틈에 묻어 둔 도토리 2 (까치는 먹이를 숨겨 둔다). 칡이 풀린 뒤 다시 오면, 엄마를 들여다보던 삼촌이 감을 깎아 처마에 매달아 두었다. */
+  function gamStage(){return G.f.galGamDone?2:done('old_magpie')?1:0;}
+  function gamTalk(){
+    const F=G.f,stage=gamStage();
     if(stage===0){
-      talk([['너구리','살이 빠지고 굴대도 갈라졌네.\n물만 흘러가고 있어.'],
-        ['늙은 까치','방아가 멈춘 뒤로 밤마다 네 엄마 절구 소리가\n개울까지 들렸단다. 아프기 전까지.'],
-        ['너구리','제가 고쳐 볼게요.\n같이 해 주세요.'],
-        ['늙은 까치','낙엽은 내가 부리로 물어내마.\n너는 손으로 물받이를 긁어 주렴.',[
-          {t:'물받이 낙엽부터 함께 걷는다',go:()=>hands(()=>{
-              F.galWheelStage=1;diary('galWheelStart','오래 멈춰 있던 물레방아를 고치기로 했다. 엄마는 아프기 전까지 마을 곡식을 혼자 절구에 찧었다. 까치와 물받이를 비웠다.');
-              talk([['늙은 까치','살 하나는 물에 떠내려갔을 게다. 개울 아래로.\n굴대는… 무쇠가 새로 깎아 뒀다더라.']]);
-            })},{t:'어디가 고장 났는지 보고 간다',go:null}]]]);return;
+      talk([['너구리','(홍시가 툭 떨어져 터졌다.\n올해는 엄마가 장대를 못 들었지.)']]);return;
     }
-    if(stage<3){
-      talk([['너구리',F.galWheelAxle?'굴대는 개울 받침에 왔어.\n떠내려간 살만 찾으면 돼. 개울 아래로 갔댔지.':!F.galWheelSpoke?'살은 물살 따라 개울 아래로 갔대.\n굴대는 무쇠 삼촌이 깎아 뒀다고 했어.':'살은 찾았어.\n이제 무쇠 삼촌이 깎아 둔 굴대만 있으면 돼.']]);return;
+    if(stage===2){
+      talk([['너구리',G.boss.dead&&F.musoeAfterLeaf?'(처마 밑에 깎은 감이 줄줄이 매달렸다.\n엄마를 들여다보러 온 삼촌이 깎아 달았나 보다.)':'(꼭대기 네 알이 그대로 매달려 있다.\n까치가 한 알을 쪼다 말고 나를 본다.)']]);return;
     }
-    if(stage===3){
-      talk([['너구리','살도 굴대도 다 왔어요.'],['늙은 까치','쐐기는 내가 부리로 물고 있으마.\n넌 살을 홈에 맞춰 끼우렴.',[
-        {t:'받쳐 주는 손에 맞춰 조립한다',go:()=>hands(()=>{
-            F.galWheelStage=4;diary('galWheelFit','까치가 쐐기를 물고 있는 동안 개울가에서 찾은 살을 끼웠다. 물레방아가 다시 한 몸이 됐다.');
-            talk([['너구리','이제 물만 돌리면 돼요.'],['늙은 까치','물길 위에 칡이 엉켰구나.\n날 선 것이 있어야 걷히겠다.']]);
-          })},{t:'조금 쉬고 맞춘다',go:null}]]]);return;
-    }
-    if(G.tool!=='sickle'){
-      talk([['너구리','물길 위를 마른 칡이 막았어요.'],['늙은 까치','무쇠가 네 아비 낫을 맡아 두고 있다더라.\n그게 오면 이 칡도 걷히겠지.']]);return;
-    }
-    talk([['너구리','낫으로 덩굴부터 걷을게요.'],['늙은 까치','수문은 조금씩 열렴.\n내가 물을 볼 테니 넌 손잡이를 잡아.',[
-      {t:'덩굴을 걷고 수문을 함께 연다',go:()=>hands(()=>{
-          F.galWheelStage=5;F.galWheelDone=true;
-          if(typeof grantNickname==='function')grantNickname('gal_water_hands','물소리 보부상','늙은 까치');
-          diary('galWheelDone','물레방아를 고쳐 마을에 방아 소리가 돌아왔다. 방아 공이가 세 번 내려갔다가 쉬었다. 엄마가 절구 찧던 손버릇에 내 손도 맞춰 움직였다.');
-          // 결정 D-288: 물레방아를 고친 값. 까치가 겨울 먹이로 묻어 둔 도토리를 첫 방아에 찧어 가루로 준다 (까치는 먹이를 숨겨 둔다).
-          talk([['너구리','우와, 돌아요! …쿵, 쿵, 쿵.'],['늙은 까치','그러고 한 번 쉬지.\n네 엄마 손도 꼭 저랬단다.'],['너구리','(절구질하듯 오므린 손을 펴고, 한 박자 쉰다.)'],
-            ['늙은 까치','지붕 틈에 겨울에 먹을 도토리를 묻어 뒀지.\n한 줌 꺼내 첫 방아에 찧어 주마.'],
-            ['너구리','(까치가 물어 온 도토리를 확에 넣자\n공이가 쿵, 쿵, 쿵 찧는다.)'],
-            ['늙은 까치','첫 방아는 고친 손 몫이란다. 가져가렴.'],receiveItem('powder',1),
-            ['늙은 까치','개울 소리를 네가 돌려놨구나.\n물소리 보부상이라 불러야겠다.',[
-            {t:'방아 소리에 엄마의 절구 손짓을 맞춘다',go:()=>hands(()=>{
-                diary('galWheelMom','물레방아 옆에서 엄마의 절구 손짓을 따라 했다. 세 번 찧은 뒤 저절로 손바닥을 폈다. 엄마가 쉬던 한 박자가 내 손에도 남았다.');
-                talk([['너구리','세 번 찧고 한 번 쉬기.\n엄마는 이 쉬는 틈에 숨을 골랐구나.'],['늙은 까치','이젠 마을 곡식은 방아가 찧는다.\n네 엄마 몫이 하나 줄었구나.']]);
-              })},{t:'물소리를 더 듣고 간다',go:null}]]]);
-        })},{t:'물소리를 먼저 들어 본다',go:null}]]]);
+    talk([['너구리','(감이 익다 못해 툭툭 떨어진다.\n늙은 까치가 터진 홍시를 쪼고 있다.)'],
+      ['늙은 까치','올해는 아무도 장대를 안 대는구나.\n떨어진 것만 이리 아깝게 터지고.'],
+      ['너구리','엄마가 해마다 따던 감이에요.\n올해는 엄마가 못 일어나서요.'],
+      ['늙은 까치','알지. 이 집은 해마다 꼭대기 몇 알을 남겼다.\n눈 오는 날 우리 식구가 그걸로 겨울을 났지.'],
+      ['너구리','엄마가 그걸 까치밥이라고 했어요.\n그래서 우리 집 문턱을 아셨구나.'],
+      ['늙은 까치','그래. 받은 게 있으니\n약도 소식도 날라 주는 게지.'],
+      ['너구리','제가 딸게요. 장대는 처마 밑에 있어요.\n꼭대기는 엄마처럼 남겨 둘게요.',[
+        {t:'장대로 아래 감부터 딴다',go:()=>hands(()=>talk([
+            withPic(['너구리','(장대 끝 갈라진 틈에 감꼭지를 끼우고\n살짝 비틀었다. 톡, 감이 장대에 걸린다.)'],scenePic.gamPole),
+            ['너구리','(하나, 둘. 아래 가지 감을 다 땄다.\n꼭대기 네 알은 그대로 두었다.)'],
+            withPic(['늙은 까치','네 어미 손이랑 똑같이 남기는구나.'],null),
+            ['너구리','(말랑한 홍시 둘은 엄마 방 문턱 안에 들여놓고,\n단단한 감은 처마 밑 바구니에 담았다.)'],
+            ['늙은 까치','꼭대기를 남겨 줬으니 올겨울 걱정은 덜었다.\n지붕 틈에 묻어 둔 도토리를 좀 내주마.'],receiveItem('acorn',2),
+            ['늙은 까치','네 어미 버릇을 네가 이었구나.\n까치밥 보부상이라 불러야겠다.']
+          ],()=>{
+            F.galGamDone=true;
+            if(typeof grantNickname==='function')grantNickname('gal_kkachibap','까치밥 보부상','늙은 까치');
+            diary('galGamDone','엄마 대신 집 감나무의 감을 땄다. 엄마가 해마다 남기던 꼭대기 네 알은 까치밥으로 두었다. 늙은 까치 식구는 그 감으로 겨울을 나서 우리 집 문턱을 안다고 했다. 까치가 묻어 둔 도토리를 주었다.');
+          }))},
+        {t:'다음에 딴다',go:null}]]]);
   }
-  function wheelSpoke(){
-    const F=G.f;
-    if(F.galWheelSpoke){talk([['너구리','이 가지에 물레방아 살이 걸려 있었지.\n끝에 빗금이 남아 있었어.']]);return;}
-    if(!F.galWheelStage){talk([['너구리','나뭇가지에 긴 나무 살이 걸렸네.\n집 앞 물레방아에서 본 빗금인데.']]);return;}
-    talk([['너구리','물레방아 살이다.\n물에 떠내려가다 가지에 걸렸구나.',[
-      {t:'가지가 내려올 때 두 손으로 받는다',go:()=>hands(()=>{
-          F.galWheelSpoke=true;F.galWheelStage=wheelStage();
-          diary('galWheelSpoke','대장간 아래 개울가 낮은 가지에서 물레방아 살을 받았다. 물에 쓸려도 끝의 빗금은 남아 있었다.');
-          talk([['너구리',F.galWheelAxle?'굴대도 개울 받침에 왔지.\n물레방아로 돌아가자.':'굴대는 무쇠 삼촌이 깎아 뒀다고 했지.\n대장간 쪽에서 찾아보자.']]);
-        })},{t:'먼저 가지 모양을 살핀다',go:null}]]]);
-  }
-  function wheelAxle(){
-    const F=G.f;
-    if(!F.galExpBrothersSorted){shareBaskets();return;}
+  // 평상 자리는 형제의 도토리 나누기만 맡는다 (굴대 들기는 물레방아와 함께 뺐다, D-730).
+  function basketsTalk(){
+    if(!G.f.galExpBrothersSorted){shareBaskets();return;}
     if(!done('squirrel_brothers')){brothersTalk();return;}
-    if(F.galWheelAxle){talk([['다람쥐 형','굴대는 물레방아 받침에 올려 뒀어.'],['다람쥐 동생','셋이 드니 하나도 안 무거웠지?']]);return;}
-    if(!F.galWheelStage){talk([['다람쥐 형','이 통나무는 물레방아 굴대야.'],['다람쥐 동생','근데 고칠 사람이 없어.\n무쇠 아저씨는 다리가 아프대.']]);return;}
-    talk([['다람쥐 형','무쇠 아저씨가 깎아 둔 굴대야.'],['다람쥐 동생','우린 둘이 들어도 한쪽이 자꾸 처져.'],
-      ['너구리',(F.galExpBrothersSide||'even')==='even'?'내가 가운데를 들게.\n아까 도토리처럼 양쪽을 맞추자.':'내가 가운데를 들게.\n이번엔 양쪽 높이를 똑같이 맞추자.',[
-        {t:'형제와 굴대 무게를 나눠 든다',go:()=>hands(()=>{
-            F.galWheelAxle=true;F.galWheelStage=wheelStage();
-            diary('galWheelAxle','형제와 굴대를 나눠 들고 개울 받침까지 옮겼다. 셋이 드니 한쪽으로 처지지 않았다.');
-            talk(F.galWheelSpoke?[['다람쥐 형','굴대는 개울 받침에 왔어.'],['다람쥐 동생','살도 찾았으니 이제 끼우자!']]
-              :[['다람쥐 형','굴대는 개울 받침에 올려 뒀어.'],['다람쥐 동생','살만 오면 끼우기만 하면 돼!']]);
-          })},{t:'손 놓을 자리를 먼저 본다',go:null}]]]);
+    talk([['다람쥐 형','바구니는 이제 우리끼리 나눌 수 있어.'],['다람쥐 동생','겨울엔 한 바구니에서 먹을 거야!']]);
   }
   // 결정 D-624: 두꺼비 할멈의 반딧불 부탁을 뺐다 (사용자 피드백 2026-11-05 단풍골 8). 등롱·반딧불 자리·싸리버섯 답례(D-285)도 함께 뺐다.
   Rg.expWanderers={village:[magpie,otter],forge:[brothers],forest:[chick,badger],hill:[]};
@@ -1081,8 +1060,8 @@ if(!CLASSIC){
 
       examine('village_well',440,'우물 두레박 살펴보기',()=>G.tool==='sickle'?
         '두레박 줄이 반들반들하다. 엄마 손이 닿던 자리.\n아빠 낫 자루도 꼭 이렇게 닳았네.':'떠나기 전에 물독을 가득 채워 놨다.\n엄마가 물 길으러 나오지 않아도 되게.'),
-      examine('village_wheel',990,'물레방아 물길 살펴보기',()=>G.f.galWheelDone?
-        '쿵, 쿵, 쿵. 나무 공이도 한 번 쉬네.\n엄마는 혼자 이 소리를 다 냈구나.':'빠진 살 사이로 물만 흘러간다. 굴대도 갈라졌다.\n이 방아가 멈춘 뒤로 엄마가 절구질을 도맡았지.')],
+      // 결정 D-730: 물레방아는 멈춘 채 풍경으로만 남는다. 고치는 일은 없다.
+      examine('village_wheel',990,'물레방아 물길 살펴보기',()=>'빠진 살 사이로 물만 흘러간다. 굴대도 갈라졌다.\n이 방아가 멈춘 뒤로 엄마가 절구질을 도맡았지.')],
     forge:[
       examine('forge_sign',230,'갈림길 팻말 읽기',()=> '왼쪽은 집과 개울, 오른쪽은 참나무 숲.\n숯 냄새가 난다. 삼촌이 불을 올렸구나.'),
       examine('forge_charcoal',1820,'식힌 숯가마 살펴보기',()=> '재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 삼촌 불씨도 여기서 시작했겠지.'),
@@ -1116,15 +1095,17 @@ if(!CLASSIC){
   // 집에서 묶은 보자기를 들고 대장간 거점으로 날아온다. 같은 id라 만남은 한 번만 센다.
   for(const [zone,list] of Object.entries(Rg.expWanderers))if(Rg.zones?.[zone]){
     Object.defineProperty(Rg.zones[zone],'wanderers',{configurable:true,get:()=>
-      (zone==='village'&&done('old_magpie')?[wheelMagpie,...list.filter(w=>w!==magpie)]:list).filter(w=>!w.when||w.when())});
+      (zone==='village'&&done('old_magpie')?[gamMagpie,...list.filter(w=>w!==magpie)]:list).filter(w=>!w.when||w.when())});
     Rg.zones[zone].examines=Rg.expExamines[zone];
   }
   // 주연 NPC 목록은 그대로다. 이 객체들은 E로 만지는 작업 자리이며 인물·만남 수에 더하지 않는다.
   const work=(id,x,label,talk,y=GROUND)=>({id:'gal_work_'+id,name:label,x,y,prompt:label,talk,peek:true,
-    draw:(sx,sy)=>{if(id==='wheel')Rg.expArt.marker(sx,sy);}});
-  Rg.zones.village.npcs.push(work('wheel',1050,'물레방아 함께 고치기',wheelTalk));
-  Rg.zones.forge.npcs.push(work('baskets',810,'평상에서 도토리 나누기 · 굴대 함께 들기',wheelAxle));
-  Rg.zones.forge.npcs.push(work('spoke',430,'낮은 가지의 물레방아 살 받기',wheelSpoke));
+    draw:()=>{}});
+  // 결정 D-730: 감나무 자리. 까치를 만나기 전과 감을 딴 뒤에는 올려다보기만 한다.
+  const gamWork=work('gam',GAM_X,'',gamTalk);
+  Object.defineProperties(gamWork,{name:{get:()=>gamStage()===1?'감나무 감 따기':'감나무 올려다보기'},prompt:{get:()=>gamWork.name}});
+  Rg.zones.village.npcs.push(gamWork);
+  Rg.zones.forge.npcs.push(work('baskets',810,'평상에서 도토리 나누기',basketsTalk));
   Object.defineProperty(Rg.zones.hill,'npcs',{configurable:true,enumerable:true,get:()=>toadUphill()?['toad']:[]});
   // 결정 D-525: 엄마 방. 아이가 보낸 약에 따라 엄마 모습이 달라진다 (engine/core.js momStage). 열린 방문으로 들여다본다.
   const MOM_LINES=[
