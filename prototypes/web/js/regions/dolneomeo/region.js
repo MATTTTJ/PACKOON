@@ -99,12 +99,12 @@ defineIcons({
 
 /* 채집 (낫으로 억새 베기, 절벽의 석이버섯 따기) */
 defineGather({
-  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],box:[-10,-26,12,0],rare:'eoksae_som',hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 도는 표식이 금빛 칸에서 멈추게 휘두르면 한 단이 더 베인다.'},
-  seogi:{title:'석이버섯 따기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-8],box:[-10,-13,10,0],rare:'seokcheong',hint:'절벽 밑 이끼 낀 땅에 돋은 버섯이다. 낫 끝으로 밑동을 끊자. 도는 표식이 금빛 칸에서 멈추게 휘두르면 한 송이가 더 나온다.'},   // 결정 D-641
+  eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],box:[-10,-26,12,0],rare:'eoksae_som',hint:'아빠의 낫으로 밑동을 비스듬히 벤다.'},
+  seogi:{title:'석이버섯 따기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-8],box:[-10,-13,10,0],rare:'seokcheong',hint:'이끼 낀 땅에 돋은 석이버섯이다.'},   // 결정 D-641
   // 결정 D-266: 그늘에 녹지 않은 첫눈이 도톰하게 솟은 둔덕. 걷어 내면 눈에 덮였던 것이 나온다(자리마다 다르다. field.js 의 found 글)
   // 결정 D-482: 쇠 날이 언 눈을 때리는 '팡'과 흩어지는 눈 (engine/gather.js hitSound·burst)
   snow_mound:{title:'눈 둔덕 파기',verb:'눈 둔덕 파헤치기',hits:TABLES.MINIGAMES.gather_snow_mound_hits,spot:[0,-6],box:[-12,-11,12,0],scatter:null,dirt:'#f4f8f9',hitSound:'snow_clang',burst:'snow',
-    hint:'눈이 유난히 도톰하게 솟았다. 밑에 무언가 묻혀 있는 모양이다. 도는 표식이 금빛 칸에서 멈추게 휘두르면 한 움큼 더 나온다.'},
+    hint:'눈 밑에 무언가 묻혀 있는 모양이다.'},
 });
 
 /* 증조할아버지의 맷돌: 돌쇠 할배에게 돌 목소리 듣는 법을 배우면 깨어난다 (결정 D-443). 가공법은 heirlooms.csv */

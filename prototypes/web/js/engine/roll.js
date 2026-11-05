@@ -9,9 +9,14 @@
    - 구르는 동안에는 말걸기·줍기·휘두르기·채집을 하지 않는다. 대화·패널·경치·전투·미니게임·구역 전환 중에는 구르지 않는다.
    - 변신마다 되고 안 되고가 다르다(forms.js ROLL_FORMS). 안 되는 모습으로 처음 해 보면 아이 혼잣말을 한 번 띄운다. */
 let rollHold=null,rolling=false,rollVel=0,rollAngle=0,rollTick=0;
+/* 결정 D-721: 오래 구르면 탄력이 붙어 살짝 빨라지고(roll_boost_*), 너무 오래 구르면 어지러워 멈춰 선다(roll_dizzy_*).
+   rollRun 은 쉬지 않고 굴러간 프레임 수(거의 멈추면 다시 센다), rollDizzy 는 남은 어지럼 프레임. 어지러운 동안은 걷지도 뛰지도 않고,
+   어지럼이 풀린 뒤에는 구르기 단추·Space 를 한 번 뗐다 눌러야 다시 구른다 (사용자 피드백 2026-11-05) */
+let rollRun=0,rollDizzy=0,rollNeedRelease=false;
+const rollDizzyNow=()=>rollDizzy>0;
 const spaceHeld=()=>!!(keys[' ']||touch.jump||touch.roll);
 const rollSpec=()=>ROLL_FORMS[G?.form||'']||ROLL_FORMS[''];
-const rollAllowedNow=()=>!!G&&G.started&&!G.ended&&!B&&!paused()&&!pickupPose&&!formClimb&&!inkOn&&!openMinigame();
+const rollAllowedNow=()=>!!G&&G.started&&!G.ended&&!B&&!paused()&&!pickupPose&&!formClimb&&!inkOn&&!openMinigame()&&!rollDizzy&&!rollNeedRelease;
 /* 점프 누름(Space·휴대폰 점프 버튼). 기다리기로 했으면 true(점프는 아직 하지 않는다), 아니면 false(원래대로 점프) */
 function rollPress(){
   if(!rollAllowedNow()||!G.onGround||isDown())return false;
@@ -45,10 +50,18 @@ function startRoll(){
   Sound.playSfx(Sound.stepId(),{gain:.7});
   Vfx.rollStep();   // 결정 D-174: 바닥에 맞는 첫 튐 (눈덩이 / 흙먼지)
 }
-function endRoll(){if(!rolling)return;rolling=false;rollVel=0;rollTick=0;}
+function endRoll(){if(!rolling)return;rolling=false;rollVel=0;rollTick=0;rollRun=0;}
+/* 너무 오래 굴렀다: 공을 풀고 그 자리에 서서 어질어질 흔들린다 */
+function startDizzy(){
+  const T=TABLES.TUNING;endRoll();rollHold=null;rollDizzy=T.roll_dizzy_frames;rollNeedRelease=true;G.vx=0;
+  Sound.land();
+  if(!G.f.rollDizzySaid){G.f.rollDizzySaid=true;toast('어질어질… 너무 오래 굴렀다');}
+}
 /* step()에서 G.vx를 정한 뒤 부른다. 구르는 중이면 G.vx를 구르기 빠르기로 바꾼다. ax: 좌우 입력 -1·0·1 */
 function stepRoll(ax){
   const T=TABLES.TUNING;
+  if(rollNeedRelease&&!spaceHeld()&&!rollDizzy)rollNeedRelease=false;
+  if(rollDizzy>0){if(!paused())rollDizzy--;G.vx=0;jumpQ=false;rollHold=null;if(!spaceHeld()&&rollDizzy<=0)rollNeedRelease=false;return;}
   if(rollHold&&!rollHold.done){
     if(!spaceHeld()||!rollAllowedNow()){rollHold=null;}
     else if(performance.now()-rollHold.t0>=T.roll_hold_ms){
@@ -65,7 +78,11 @@ function stepRoll(ax){
   if(!rolling)return;
   if(!spaceHeld()||!rollAllowedNow()||!rollSpec().roll){endRoll();return;}
   if(!ax&&touch.roll)ax=G.face||1;   // 결정 D-381: 구르기 단추만 누르면 바라보는 쪽으로
-  const target=ax*T.field_move_speed*T[rollSpec().speed];
+  // 결정 D-721: 쉬지 않고 구른 시간이 roll_boost_after 를 넘으면 roll_boost_ramp 동안 roll_boost_mult 배까지 빨라진다
+  rollRun=ax&&Math.abs(rollVel)>.4?rollRun+1:Math.max(0,rollRun-3);
+  if(rollRun>=T.roll_dizzy_after){startDizzy();return;}
+  const boost=1+(T.roll_boost_mult-1)*clamp((rollRun-T.roll_boost_after)/T.roll_boost_ramp,0,1);
+  const target=ax*T.field_move_speed*T[rollSpec().speed]*boost;
   rollVel+=(target-rollVel)/Math.max(1,T.roll_accel_frames);
   if(Math.abs(rollVel)<0.05&&!ax)rollVel=0;
   G.vx=rollVel;if(ax)G.face=ax>0?1:-1;

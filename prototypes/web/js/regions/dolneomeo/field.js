@@ -227,7 +227,7 @@ Rg.drawFront=()=>{for(const l of frost)R(l.x,l.y,1,1,Math.sin(l.p)>0?'#ffffff':'
 Rg.maxX=()=>G.f.ppuriPassed?2330:GATE_X-14;
 Rg.step=()=>{
   if(Rg.arcs())G.f.arcs=true;
-  if(!G.boss.dead&&G.f.ppuriPassed&&G.px>GOLEM_AT)Rg.startGolem();
+  if(!G.boss.dead&&G.f.ppuriPassed&&G.px>GOLEM_AT&&encounterReady())Rg.startGolem();   // 결정 D-719
   /* 서리다래 약즙을 만들면 까치 편에 보내고 지역이 끝난다 */
   if(has('darae_yak')&&!G.f.yakMade)Rg.sendMedicine();
 };
@@ -406,10 +406,10 @@ if(!CLASSIC){
     // 방문 구역은 엔진의 G.visitedZones가 기록한다. 매 프레임 진행값을 쓰지 않는다(지도 왕복 검사가 흔들렸다).
     // 결정 D-645: 골렘을 처음 보면 아이가 한마디 하고(GOLEM_SIGHT), 두 걸음쯤 더 다가가야(2310) 전투가 열린다 (단풍골 D-547 과 같은 방식)
     if(id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed){
-      if(!G.f.dolGolemSeen&&G.px>Z('shrine',GOLEM_SIGHT)&&$('dlg').hidden){G.f.dolGolemSeen=true;G.vx=0;
+      if(!G.f.dolGolemSeen&&G.px>Z('shrine',GOLEM_SIGHT)&&encounterReady()){G.f.dolGolemSeen=true;G.vx=0;
         talk([['너구리','(저게 뒤척인다던 성황당 돌무더기구나.\n돌 틈으로 하얀 김이 새어 나와.)'],
           ['너구리','(가슴께가 파랗게 비쳐. 서리다래가 저기 있어.\n…무서워도 엄마 약이야. 가 보자.)']]);}
-      else if(G.f.dolGolemSeen&&G.px>Z('shrine',2310)&&$('dlg').hidden)Rg.startGolem();
+      else if(G.f.dolGolemSeen&&G.px>Z('shrine',2310)&&encounterReady())Rg.startGolem();   // 결정 D-719
     }
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
