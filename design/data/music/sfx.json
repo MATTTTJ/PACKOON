@@ -607,6 +607,16 @@
       ]
     },
     {
+      "id": "onggi_ring", "name": "옹기 독 손끝으로 퉁김 (결정 D-784)", "category": "작은 연출", "status": "제안", "duration": 2.1, "gain": 0.78,
+      "layers": [
+        {"instrument":"stone","note":"C6","start":0,"duration":0.03,"gain":0.13,"pan":0.1,"patch":{"fixedDuration":0.03,"attack":0.001,"decay":0.016,"sustain":0,"release":0.02,"tail":0.04},"seed":9160},
+        {"instrument":"windchime","note":"E5","start":0.004,"duration":1.6,"gain":0.2,"pan":0,"patch":{"fixedDuration":1.6,"attack":0.002,"decay":1.15,"sustain":0,"release":0.35,"tail":0.5,"partials":[[1,1,1],[2.34,0.34,0.75],[4.06,0.1,1.5]],"vibratoHz":4.5,"vibratoCents":3,"vibratoDelay":0.15},"seed":9161},
+        {"instrument":"gayageum_harmonic","note":"B5","start":0.006,"duration":0.9,"gain":0.06,"pan":0,"patch":{"fixedDuration":0.9,"attack":0.002,"decay":0.6,"sustain":0,"release":0.2,"tail":0.2},"seed":9162},
+        {"instrument":"windchime","note":"E5","start":0.24,"duration":1.2,"gain":0.075,"pan":-0.55,"patch":{"fixedDuration":1.2,"attack":0.01,"decay":0.9,"sustain":0,"release":0.3,"tail":0.4,"partials":[[1,1,1],[2.34,0.25,0.75]]},"seed":9163},
+        {"instrument":"windchime","note":"E5","start":0.46,"duration":1.1,"gain":0.045,"pan":0.55,"patch":{"fixedDuration":1.1,"attack":0.01,"decay":0.85,"sustain":0,"release":0.3,"tail":0.4,"partials":[[1,1,1],[2.34,0.2,0.75]]},"seed":9164}
+      ]
+    },
+    {
       "id": "ice_tinkle", "name": "얼음 쨍", "category": "작은 연출", "status": "제안", "duration": 0.52, "gain": 0.7,
       "layers": [
         {"instrument":"windchime","note":"C7","start":0,"duration":0.3,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.3,"attack":0.002,"decay":0.18,"sustain":0,"release":0.05,"tail":0.08},"seed":9110},

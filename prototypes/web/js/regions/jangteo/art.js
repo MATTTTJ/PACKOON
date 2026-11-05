@@ -200,6 +200,14 @@ function flag(x,y,h=64){
   P(cx-8,cy-1,3,3,'#fbf7ee');P(cx+6,cy-1,3,3,'#fbf7ee');P(cx-7,cy,1,1,'#d9d2c0');P(cx+7,cy,1,1,'#d9d2c0');
   P(cx-1,cy+6,3,Math.max(2,bh-Math.round(bh*.42)-12),edge);   // 아래로 내린 쪽빛 줄
   P(x-6,y-4,16,4,'#807c78');P(x-7,y-5,18,2,tone().snow);P(x-4,y-8,10,4,'#6f6b66');
+  /* 결정 D-778: 깃대 밑동을 두 쪽 나무판(지주)으로 감싸 짚 끈으로 묶었다. 높은 깃대가 바람에 흔들리지 않게 붙든다.
+     가는 깃대(3px)보다 손바닥 자국(9px)이 넓어 자국이 깃대 밖으로 삐져나왔다. 아빠 도장(face 18)은 이 판 앞면에 찍힌다 (사용자 피드백 2026-11-05) */
+  const pl=n()?'#5e4a3a':'#8c6a4c',pf=n()?'#6e5844':'#a98258',pd=n()?'#3e3028':'#5e4534',rope=n()?'#8a7a52':'#d2b46a';
+  P(x-7,y-36,17,28,pd);P(x-6,y-35,15,27,pl);P(x-5,y-35,13,26,pf);   // 판 둘레(어두운 테)와 앞면
+  P(x-6,y-37,15,2,pd);P(x-6,y-38,15,1,tone().snow);   // 판 윗머리와 눈
+  P(x+1,y-35,1,27,pd);   // 두 쪽 판이 맞닿은 금
+  for(const yy of [y-31,y-12]){P(x-7,yy,17,2,rope);P(x-7,yy+2,17,1,n()?'#5e5236':'#a8883a');}   // 짚 끈 두 줄 (도장 자리를 비켜 묶었다)
+  P(x-4,y-34,1,3,n()?'#7a6450':'#c49a6c');P(x+5,y-17,1,4,n()?'#7a6450':'#c49a6c');   // 나뭇결
 }
 /* 결정 D-311: 장터 어귀 집 사이에 되풀이되던 작은 붉은 깃발 대신, 장날 어귀에 실제로 놓였을 짐을 번갈아 둔다.
    지게에 얹은 짐, 장작더미, 옹기 독, 짚단. 길을 막지 않게 낮게 그린다. */
@@ -339,7 +347,8 @@ function drawScenery(id){
     const zw=zoneDef().w,busy=[[95,275],[550,630],[Rg.snowJangseungX()-35,Rg.snowJangseungX()+35],...fieldPlatforms().map(p=>[p.x-14,p.x+p.w+14])];
     for(const {rx,i,w} of rowSlots(zw,150,150,i=>i%2?58:72+(i%3)*11,busy)){const x=rx-RC();if(x<-110||x>W+110)continue;
       if(i%2===0){const h=32+(i%4)*5;house(x,GROUND-h,w,h,n(),undefined,i/2);}else{bundle(x+6,GROUND,rx);marketProp(x+38,GROUND,i>>1);}}
-    jangseung(tx(125)-cam,GROUND,1);jangseung(tx(242)-cam,GROUND,-1);flag(tx(720)-cam,GROUND,96);
+    // 결정 D-776: 어귀 장승 둘은 길 양옆에서 입구를 지키게 가까이 붙여 세운다 (예전 125·242, 사용자 피드백 2026-11-05 "너무 떨어져 있다")
+    jangseung(tx(150)-cam,GROUND,1);jangseung(tx(206)-cam,GROUND,-1);flag(tx(720)-cam,GROUND,96);
     // 결정 D-320: 연과 연줄은 얼레 그림(wanderer 'kite')이 얼레 손에서부터 함께 그린다.
   }else if(id==='street'){
     // 결정 D-315: 떡집 자리(1220~1560)와 뒷산 돌계단 자리(2140~2300)에는 좌판을 세우지 않는다 (예전엔 떡집 밑·골목 문 뒤에 좌판이 겹쳤다).
@@ -416,15 +425,22 @@ function drawScenery(id){
       P(sx-9,top-1,18,3,t.snow);P(sx-6,top-8,12,2,t.snow);P(sx-7,top+2,4,1,t.snow);P(sx+3,top+2,4,1,t.snow);P(sx-7,top+14,3,2,t.snow);P(sx+4,top+14,3,2,t.snow);
       P(sx-6,top+18,12,2,t.snow);P(sx-5,top+24,3,1,t.snow);}
   }else if(id==='street'){
-    // 결정 D-561: 조사 '좌판 사이 골목'의 콩알 (사용자 피드백 2026-11-04 "애니메이션에 콩 표현해주기").
-    // 낮에 좌판 밑에서 콩알 넷이 데굴데굴 굴러 나왔다 멈췄다 한다. 둥근 누런 콩에 검은 배꼽, 구를 때마다 배꼽이 돈다.
-    if(!n()){const bx=310-cam,rm=Vfx.reducedMotion;
-      if(bx>-60&&bx<W+60)for(let j=0;j<4;j++){
-        const ph=rm?j*1.3:(G.anim*0.035+j*1.7),roll=Math.sin(ph)*(9+j*2),cx=Math.round(bx-12+j*9+roll),turn=rm?j:Math.floor((ph*4+j)%4);
-        P(cx-1,GROUND-4,4,3,'#d8bf7a');P(cx,GROUND-5,2,1,'#d8bf7a');P(cx-1,GROUND-2,4,1,'#a8904e');P(cx,GROUND-4,1,1,'#f2e2a6');
-        const [hx,hy]=[[2,-3],[2,-2],[0,-2],[0,-3]][turn];P(cx+hx,GROUND+hy,1,1,'#3a2c1c');
+    // 결정 D-561·D-783: 조사 '좌판 사이 골목'의 콩알 (사용자 피드백 2026-11-05 "외계인 같다. 더 동그랗게, 굴러다니지 말고 기둥 밑에 몇 알 정체되어 있게").
+    // 둘째 좌판 왼쪽 기둥(설계 355) 밑에 동그란 콩알 여덟이 소복이 모여 있다. 굴러가지 않는다. 검은 배꼽(눈처럼 보였다)은 뺐다.
+    // 밤에 도둑이 기둥에 기대 둔 콩 자루에서 샌 것이다(눈도깨비를 물리친 뒤엔 치워져 없다).
+    if(!G.boss.dead){const px=355-cam;
+      if(px>-60&&px<W+60){
+        const bean=(bx,by)=>{const lit=n()?'#9a8a5c':'#e2c983',mid=n()?'#7d6f4a':'#cdb06a',dk=n()?'#5a5036':'#9c8248',hi=n()?'#b4a476':'#f6e8b8';
+          P(bx+1,by,3,1,mid);P(bx,by+1,5,2,lit);P(bx+1,by+3,3,1,dk);P(bx,by+2,1,1,mid);P(bx+4,by+1,1,2,mid);P(bx+1,by+1,1,1,hi);};
+        P(px-19,GROUND-1,19,1,n()?'#3e3a36':'#b6ada0');   // 콩이 깔린 자리의 옅은 그늘
+        for(const [dx,dy] of [[-18,-4],[-14,-4],[-10,-4],[-6,-4],[-13,-7],[-9,-7],[-5,-7],[-7,-10]])bean(px+dx,GROUND+dy);   // 기둥 쪽으로 쌓였다
+        bean(px-25,GROUND-4);   // 조금 떨어진 한 알
       }}
-    const x=1150-cam;P(x-7,GROUND-11,15,11,'#9a8267');P(x-5,GROUND-14,11,4,'#e4dbbb');P(x-3,GROUND-16,7,3,'#f3eee1');P(x-5,GROUND-7,11,1,'#c4aa7e');
+    // 결정 D-785: 조사 '쌀가루 묻은 발판'은 떡집 아궁이 앞(설계 1446~1500)에 깐 나무 발판이다. 쌀가루가 하얗게 앉고 곰 발자국이 찍혔다.
+    // 예전엔 떡 좌판 앞(1150)에 쌀가루 자루 같은 것이 놓여 글과 그림이 맞지 않았다
+    {const x=1446-cam;P(x,GROUND-3,54,3,'#7a5032');P(x+1,GROUND-3,52,1,'#a97a51');
+      for(const [dx,ww] of [[3,12],[19,15],[38,13]])P(x+dx,GROUND-4,ww,2,n()?'#c9c2b4':'#efe8da');
+      for(const dx of [8,24,44])P(x+dx,GROUND-4,3,1,n()?'#8f8574':'#a8987a');}
     // 결정 D-318: 장국밥 가마솥 (조사 '장국밥 가마솥')
     const gx=2470-cam;P(gx-16,GROUND-14,32,14,'#6b5848');P(gx-13,GROUND-11,26,8,'#4b3a34');if(!n())P(gx-8,GROUND-8,16,5,'#e08a3a');
     P(gx-14,GROUND-24,28,10,'#3e3834');P(gx-16,GROUND-25,32,2,'#5e5652');P(gx-6,GROUND-28,12,3,'#3e3834');
@@ -567,6 +583,20 @@ function kiteLine(x1,y1,x2,y2,sag){
   const n=Math.max(4,Math.ceil(Math.hypot(x2-x1,y2-y1)/1.5)),mx=(x1+x2)/2,my=(y1+y2)/2+sag;
   for(let i=0;i<=n;i++){const u=i/n,a=(1-u)*(1-u),b=2*u*(1-u),c=u*u;P(a*x1+b*mx+c*x2,a*y1+b*my+c*y2,1,1,KITE.line);}
 }
+/* 결정 D-780: 처마 못에 감긴 연 꼬리 (사용자 피드백 2026-11-05 "연 꼬리가 실제로 묶여 있는 건지 모르겠다").
+   처마 밑으로 삐죽 나온 쇠못을 대가리까지 또렷이 그리고, 꼬리가 못에 감긴 바퀴(loops)를 띠로 보인다.
+   늘어진 꼬리에는 어두운 테를 둘러 처마 벽·하늘 어디서든 보이게 한다. (nx,ny) 못 밑동, (kx,ky) 연 머리 쪽 꼬리 끝.
+   lift 는 손이 쥐고 들어 올린 높이(풀 때) */
+function kiteSnag(nx,ny,kx,ky,t,loops,lift=0){
+  const rm=Vfx.reducedMotion,OUT='#2a1f18';
+  R(nx-1,ny-1,3,8,'#2e2826');R(nx-2,ny+6,5,2,'#55504b');R(nx,ny,1,6,'#6c6660');   // 쇠못 (대가리가 아래)
+  for(let j=0;j<loops;j++){const yy=ny+1+j*3;R(nx-3,yy-1,8,4,OUT);R(nx-2,yy,6,2,j%2?KITE.tail2:KITE.tail1);}   // 못에 감긴 바퀴
+  const top=ny+1+Math.max(0,loops)*3-lift,n=9,pts=[];
+  for(let i=0;i<=n;i++){const u=i/n;pts.push([nx+(kx-nx)*u+(rm?0:Math.sin(t*6+i)*0.9*u),top+(ky-top)*u]);}
+  for(const [x,y] of pts)R(x-1,y-1,4,4,OUT);
+  pts.forEach(([x,y],i)=>R(x,y,2,2,i%4<2?KITE.tail1:KITE.tail2));
+  const [bx,by]=pts[5];R(bx-2,by,6,1,OUT);R(bx-1,by,4,1,KITE.tail1);   // 꼬리 가운데 매듭
+}
 // 얼레(실 감는 틀)를 쥔 손. 줄은 여기서 나간다
 function kiteReel(hx,hy){P(hx-2,hy-3,5,6,'#87694e');P(hx-1,hy-2,3,4,'#d8c7a3');P(hx-3,hy-1,7,1,'#6c5139');P(hx,hy+3,1,3,'#6c5139');}
 /* 필드의 연 장면. (x,y)는 얼레 발밑 화면 좌표, f 는 얼레가 바라보는 쪽 */
@@ -575,9 +605,8 @@ function kiteScene(x,y,f){
   if(!F.jxKiteFreed){
     // 처마 못에 걸림: 꼬리가 못에 감기고 연은 거꾸로 매달려 흔들린다
     const nx=tx(1223)-cam,ny=98,sw=Vfx.reducedMotion?0.2:Math.sin(t*2.1)*0.35+g*0.25;
-    P(nx-1,ny-2,2,3,'#3a3330');
-    const kx=nx+Math.sin(sw)*13,ky=ny+Math.cos(sw)*13;
-    for(let i=0;i<6;i++){const u=i/6;P(nx+(kx-nx)*u+(Vfx.reducedMotion?0:Math.sin(t*6+i)*0.8),ny+(ky-6-ny)*u,2,2,i%4<2?KITE.tail1:KITE.tail2);}
+    const kx=nx+Math.sin(sw)*16,ky=ny+4+Math.cos(sw)*16;
+    kiteSnag(nx,ny,kx,ky-7,t,2);   // 결정 D-780: 못에 두 바퀴 감긴 꼬리를 또렷이
     kitePaper(kx,ky,Math.PI+sw*0.8,1.2,{torn:true});
     kiteLine(hx,hy,kx,ky+3,26);
     return;
@@ -613,29 +642,44 @@ function kiteEave(w){
 function kiteFlakes(w,h,t,n=10){if(Vfx.reducedMotion)return;for(let i=0;i<n;i++){const sp=18+(i*7)%11,x=((i*23+t*sp*1.6)%(w+8))-4,y=((i*13+t*sp*0.6)%(h+4))-2;R(Math.round(x),Math.round(y),1,1,'#ffffff');}}
 Rg.kitePics={
   // 처마 못에 꼬리가 감긴 연. 바람이 불 때마다 거꾸로 매달린 연이 휘청이며 모서리가 처마에 부딪힌다
+  // 결정 D-780: 못(46,12)에 꼬리가 두 바퀴 감긴 모습이 또렷이 보이게 (kiteSnag). 줄은 왼쪽 아래 얼레에게로 처진다
   stuck(){return {animate:true,sound:'pic_kite',draw(w,h,t){   // 결정 D-483
     kiteSky(w,h);kiteEave(w);const g=kiteGust(t),rm=Vfx.reducedMotion;
-    const nx=36,ny=11,sw=rm?0.3:Math.sin(t*2.1)*0.45+g*0.3;R(nx-1,ny-1,2,3,'#2e2826');
-    const kx=nx+Math.sin(sw)*14,ky=ny+Math.cos(sw)*14;
-    for(let i=0;i<7;i++){const u=i/7;R(Math.round(nx+(kx-nx)*u+(rm?0:Math.sin(t*6+i)*0.8)),Math.round(ny+(ky-7-ny)*u),2,2,i%4<2?KITE.tail1:KITE.tail2);}
-    kitePaper(kx,ky,Math.PI+sw*0.8,1.45,{torn:true});
+    const nx=46,ny=12,sw=rm?0.3:Math.sin(t*2.1)*0.45+g*0.3;
+    const kx=nx+Math.sin(sw)*12,ky=ny+19+Math.cos(sw)*2;
+    kiteSnag(nx,ny,kx,ky-8,t,2);
+    kitePaper(kx,ky,Math.PI+sw*0.8,1.2,{torn:true});
     kiteLine(kx,ky+4,-2,h+2,8);kiteFlakes(w,h,t);
   }};},
-  // 너구리 손이 못에서 꼬리를 풀자 연이 줄에 끌려 얼레 쪽(왼쪽 아래)으로 흔들리며 내려간다
+  /* 결정 D-780: 푸는 그림을 글("못에 감긴 꼬리를 한 바퀴, 두 바퀴 풀었다. 꼬리가 빠지자 연이 얼레 쪽으로 흔들흔들 내려간다")에 맞췄다.
+     처마에 붙어 선 아이의 짧고 뭉툭한 앞발이 오른쪽에서 들어와(가까이서 본 손이라 팔뚝은 몇 칸뿐) 못을 한 바퀴씩 돌며 꼬리를 푼다.
+     바퀴가 하나 풀릴 때마다 연이 조금씩 처지고, 다 풀리면 꼬리 끝을 쥐었다 놓는다. 연은 줄에 끌려 왼쪽 아래 얼레 쪽으로 흔들리며 내려간다 */
   free(){let t0=null;return {animate:true,sound:'pic_kite',draw(w,h,t){
-    if(t0===null)t0=t;const k=Vfx.reducedMotion?1.2:Math.min(2.6,t-t0);
-    kiteSky(w,h);kiteEave(w);R(35,10,2,3,'#2e2826');
-    const reach=Math.min(1,k/0.5),lift=Math.max(0,Math.min(1,(k-0.5)/0.3)),fall=Math.max(0,(k-0.8)/1.4);
-    // 너구리 팔 (오른쪽 위 처마 너머에서 뻗어 온다). 회색 털 팔, 검은 손, 앞으로 내민 손가락
-    const px=Math.round(56-reach*17),py=Math.round(6+reach*4-lift*3);
-    for(let i=0;i<5;i++)R(px+4+i*3,py-3-i*2,5,4,i%2?'#7d7163':'#8c8070');   // 팔 (어깨 쪽으로 비스듬히)
-    R(px+1,py-2,6,5,'#3b332e');R(px,py-1,1,3,'#3b332e');R(px-2,py,2,1,'#2a2420');R(px-2,py+2,2,1,'#2a2420');R(px+2,py+3,1,1,'#2a2420');   // 손과 손가락
-    R(px+3,py-1,2,1,'#5a5049');
-    let kx=36,ky=25,ang=Math.PI;
-    if(fall>0){const e=Math.min(1,fall);kx=36-e*30+Math.sin(fall*5)*4*(1-e*0.5);ky=25+e*26;ang=Math.PI*(1-e)+Math.sin(fall*5)*0.5;}
-    if(fall<0.05)for(let i=0;i<6;i++)R(36+(i%2),Math.round(11+i*1.6-lift*2),2,2,i%4<2?KITE.tail1:KITE.tail2);
-    else kiteTail(kx,ky-6,t,8,0.6,-1);
-    kitePaper(kx,ky,ang,1.45,{torn:true});kiteLine(kx,ky,-2,h+2,Math.max(2,10-fall*6));kiteFlakes(w,h,t,6);
+    if(t0===null)t0=t;const rm=Vfx.reducedMotion,k=rm?1.3:Math.min(3.4,t-t0);
+    kiteSky(w,h);kiteEave(w);
+    const nx=46,ny=12,ss=e=>e*e*(3-2*e);
+    const reach=ss(Math.min(1,k/0.45)),un=Math.max(0,Math.min(1,(k-0.45)/0.8)),loops=k<0.45?2:Math.max(0,2-Math.floor(un*2.0001)),
+      pull=Math.max(0,Math.min(1,(k-1.25)/0.2)),fall=Math.max(0,(k-1.45)/1.4);
+    // 손 자리: 못으로 다가와 → 못을 두 바퀴 돌며 풀고 → 꼬리 끝을 쥐고 살짝 당긴다
+    let px=w+8-(w+8-(nx+4))*reach,py=ny+4;
+    if(un>0&&un<1){const a=un*Math.PI*4;px=nx+4+Math.cos(a)*3;py=ny+4+Math.sin(a)*2;}
+    if(pull>0){px=nx+4+pull*3;py=ny+4-pull*2;}
+    if(fall>0.25){const back=Math.min(1,(fall-0.25)/0.5);px+=back*16;}
+    let kx=nx+(rm?0:Math.sin(t*2.6)*2),ky=ny+17+(2-loops)*2,ang=Math.PI;
+    if(fall>0){const e=Math.min(1,fall);kx=nx-e*38+Math.sin(fall*5)*4*(1-e*0.5);ky=ny+19+e*24;ang=Math.PI*(1-e)+Math.sin(fall*5)*0.5;}
+    if(fall<0.02)kiteSnag(nx,ny,kx,ky-8,t,loops,pull*2);
+    else{R(nx-1,ny-1,3,8,'#2e2826');R(nx-2,ny+6,5,2,'#55504b');R(nx,ny,1,6,'#6c6660');kiteTail(kx,ky-6,t,9,0.7,-1);}
+    kitePaper(kx,ky,ang,1.2,{torn:true});kiteLine(kx,ky,-2,h+2,Math.max(2,10-fall*6));
+    // 아이의 앞발 (가까이서 본 손). 회색 팔뚝 몇 칸에 검고 오동통한 손, 손끝 볼록한 발가락 셋
+    px=Math.round(px);py=Math.round(py);
+    if(px<w+6){
+      R(px+4,py-4,w-px,9,'#4a4038');R(px+4,py-3,w-px,7,'#8c8070');R(px+4,py-3,w-px,2,'#a89d8c');   // 통통한 회색 팔뚝
+      R(px+3,py-4,2,9,'#efe6d6');   // 손목의 흰 털
+      R(px-2,py-4,6,9,'#2a211b');R(px-3,py-3,1,7,'#2a211b');R(px-1,py-3,4,7,'#3b332e');   // 둥근 손
+      for(const dy of [-3,0,3])R(px-5,py+dy,3,2,'#2a211b');   // 오동통한 발가락 셋
+      R(px-1,py-2,2,2,'#5a4f45');   // 손바닥 볼록살
+    }
+    kiteFlakes(w,h,t,6);
   }};},
   // 얼레가 찢긴 모서리를 한지로 때운 연을 다시 띄운다. 몇 걸음 달리자 줄이 팽팽해지고 연이 바람을 타고 솟는다
   rise(){let t0=null;return {animate:true,draw(w,h,t){
@@ -655,25 +699,160 @@ Rg.kitePics={
     kitePaper(kx,ky,ang,1.3,{patched:true});
   }};}
 };
-/* 결정 D-661: 장승 코의 눈 작은 창. 아이 키만 한 장승에 눈이 소복한데 코끝만 반들반들하다.
-   짐 진 장꾼의 손이 오른쪽에서 쑥 들어와 코를 톡 짚고 나가면, 그 바람에 눈가루가 조금 날린다. 몇 초마다 되풀이한다 */
-Rg.jangseungPic=()=>({animate:true,sound:'j_jangseung_snow',draw(w,h,t){
-  const rm=Vfx.reducedMotion,snow='#f6f8fa',g=h-3;
+/* 결정 D-781·D-784: 작은 창 그림 속 손짓(톡 짚기·퉁기기)에 맞춰 소리를 낸다. 창이 열릴 때가 아니라 손이 닿는 그 순간에.
+   소리는 popup_sounds.csv 의 그 줄(row)이다. 한 바퀴(cyc)에 한 번만 */
+function picCue(st,row,cyc){
+  if(st.cyc===cyc)return;st.cyc=cyc;
+  const s=TABLES.POPUP_SOUNDS?.[row];if(s&&typeof Sound!=='undefined')Sound.cue(s.sfx,0,1);
+}
+/* 결정 D-661·D-781: 작은 장승 작은 창. 아이 키만 한 장승에 눈이 소복한데 코끝만 반들반들하다.
+   장승 곁에 붙어 선 아기 너구리가 짧고 뭉툭한 앞발을 들어 코를 톡 짚는다 (사용자 피드백 2026-11-05 "팔이 젓가락처럼 길다. 오동통한 손이 코를 톡").
+   짚는 순간 '톡' 소리가 나고 장승 머리의 눈가루가 날린다. 다른 모습으로 둔갑해 있으면 그 모습으로 코앞에 몸을 내밀어 콕 댄다 */
+Rg.jangseungPic=()=>{let t0=null;const st={};return {animate:true,draw(w,h,t){
+  if(t0===null)t0=t;
+  const rm=Vfx.reducedMotion,snow='#f6f8fa',g=h-3,P0=2.4,el=t-t0,k=rm?0.75:el%P0,cyc=Math.floor(el/P0);
   R(0,0,w,h,'#c9d6de');R(0,0,w,7,'#bccbd5');
   for(let x=0;x<w;x+=13){R(x+2,g-15,10,9,'#a39b8f');R(x,g-18,14,3,'#5b6670');R(x,g-18,14,1,snow);}   // 먼 장터 지붕
   R(0,g,w,3,'#e9edf0');R(0,g,w,1,snow);
-  const x=22,top=g-Rg.SNOW_JANGSEUNG_H;jangseung(x,g,1,Rg.SNOW_JANGSEUNG_H);
+  const x=20,top=g-Rg.SNOW_JANGSEUNG_H;jangseung(x,g,1,Rg.SNOW_JANGSEUNG_H);
   R(x-9,top-1,18,3,snow);R(x-6,top-8,12,2,snow);R(x-7,top+2,4,1,snow);R(x+3,top+2,4,1,snow);R(x-7,top+14,3,2,snow);R(x+4,top+14,3,2,snow);R(x-6,top+18,12,2,snow);
   R(x-2,top+9,4,1,'#c9b392');   // 짚여서 반들반들한 코끝
-  const k=rm?0.75:(t%2.8),reach=k<0.55?k/0.55:k<0.95?1:k<1.4?1-(k-0.95)/0.45:0,e=reach*reach*(3-2*reach);
-  if(e>0){
-    const tipX=Math.round(w+2-(w+2-(x+3))*e),ny=top+10;
-    R(tipX+4,ny-2,w-tipX,5,'#d9cbb0');R(tipX+4,ny-2,w-tipX,1,'#efe4cc');R(tipX+4,ny+2,w-tipX,1,'#b8a888');   // 무명 소매
-    R(tipX,ny-1,5,4,'#4a3a30');R(tipX-1,ny,2,2,'#4a3a30');R(tipX+1,ny-1,2,1,'#6a5646');   // 털 난 손, 뻗은 손가락
+  // 손을 드는 정도: 쉼 → 들기(0.35~0.65) → 톡(0.7) → 내리기(0.9~1.2)
+  const up=k<0.35?0:k<0.65?(k-0.35)/0.3:k<0.9?1:k<1.2?1-(k-0.9)/0.3:0,e=up*up*(3-2*up),tap=!rm&&k>=0.7&&k<0.8;
+  if(!rm&&k>=0.7)picCue(st,'j_jangseung_snow',cyc);
+  const ox=x+16,tip=e>0.9?1:0,form=G?.form||'';
+  if(form)drawPlayerAt(ox+(tap?-3:0),g,-1,0,0,null,0,form);
+  else{
+    drawRaccoonAt(ox,g-tip,-1,0,0,null,0);   // 장승 바로 곁에 붙어 서서 발끝을 살짝 든다
+    if(e>0){
+      // 몸 앞쪽 어깨에서 코끝까지 짧고 굵은 팔(털 소시지처럼 통통하게)과 검고 둥근 손
+      const sx=ox-5,sy=g-10-tip,ex=x+4+(tap?0:1),ey=top+11,ax=Math.round(sx+(ex-sx)*e),ay=Math.round(sy+(ey-sy)*e);
+      const n=Math.max(1,Math.round(Math.hypot(ax-sx,ay-sy)/2));
+      for(let i=0;i<=n;i++){const u=i/n,px=Math.round(sx+(ax-sx)*u),py=Math.round(sy+(ay-sy)*u);R(px-2,py-1,4,4,'#5a5046');}
+      for(let i=0;i<=n;i++){const u=i/n,px=Math.round(sx+(ax-sx)*u),py=Math.round(sy+(ay-sy)*u);R(px-1,py-1,3,3,'#8c8070');R(px-1,py-1,2,1,'#a89d8c');}
+      R(ax-3,ay-2,5,5,'#2a211b');R(ax-2,ay-1,3,3,'#3b332e');R(ax-4,ay-1,1,1,'#2a211b');R(ax-4,ay+1,1,1,'#2a211b');R(ax-2,ay-1,1,1,'#5a4f45');   // 오동통한 손과 발가락
+    }
   }
-  if(!rm&&k>0.55&&k<1.3){const p=(k-0.55)/0.75;for(let i=0;i<4;i++)R(Math.round(x+2+i*2-p*3),Math.round(top+8-p*(4+i*2)),1,1,snow);}   // 짚을 때 날린 눈가루
+  if(tap){R(x+3,top+7,1,1,'#ffffff');R(x+5,top+8,1,1,'#ffffff');R(x+5,top+12,1,1,'#ffffff');}   // 톡 하고 닿은 자리
+  if(!rm&&k>0.7&&k<1.35){const p=(k-0.7)/0.65;for(let i=0;i<4;i++)R(Math.round(x-3+i*2-p*3),Math.round(top-2-p*(4+i*2)),1,1,snow);}   // 짚는 바람에 머리 눈가루가 날린다
   kiteFlakes(w,h,t,8);
-}});
+}};};
+/* 결정 D-784: 옹기전 독 작은 창 (사용자 피드백 2026-11-05 "독을 손으로 실제 튕긴 것처럼 맑은 소리가 퍼지게").
+   좌판 널 위의 큰 독. 아이의 뭉툭한 앞발이 오른쪽에서 들어와 손끝을 살짝 젖혔다가 독 어깨를 톡 퉁긴다.
+   닿는 순간 맑은 울림(onggi_ring)이 나고, 독이 가늘게 떨며 울림 고리가 둘레로 번져 나간다. 2.2초마다 되풀이한다 */
+function onggiJar(cx,base,s,shake){
+  const x=cx+shake,body='#6b4a34',lite='#9a6e4c',dark='#4a3428',rim='#3a2a20';
+  const rows=[[0,6,rim],[2,7,dark],[3,9,body],[5,11,body],[8,12,body],[14,12,body],[19,11,body],[22,10,body],[24,8,dark]];   // [위에서부터 y, 반너비]
+  const hgt=Math.round(26*s);
+  for(let i=0;i<rows.length-1;i++){const [y0,w0,c]=rows[i],[y1]=rows[i+1];const a=Math.round(y0*s),b=Math.round(y1*s),hw=Math.round(w0*s);R(x-hw,base-hgt+a,hw*2,Math.max(1,b-a),c);}
+  R(x-Math.round(8*s),base-2,Math.round(16*s),2,rim);
+  R(x-Math.round(10*s),base-hgt+Math.round(7*s),2,Math.round(13*s),lite);   // 왼쪽 윤기
+  R(x+Math.round(9*s),base-hgt+Math.round(8*s),2,Math.round(12*s),dark);    // 오른쪽 그늘
+  if(s>0.8)for(let j=0;j<16;j+=2)R(x-8+j,base-hgt+13+((j/2)%2),2,1,'#8a6448');   // 손가락으로 그은 물결무늬 (큰 독만, 이어진 물결로)
+}
+Rg.onggiPic=()=>{let t0=null;const st={};return {animate:true,draw(w,h,t){
+  if(t0===null)t0=t;
+  const rm=Vfx.reducedMotion,P0=2.2,el=t-t0,k=rm?0.62:el%P0,cyc=Math.floor(el/P0),g=h-5;
+  R(0,0,w,h,'#d8cbb6');R(0,0,w,6,'#ab4d43');for(let i=0;i<w;i+=8)R(i,6,5,2,'#ab4d43');   // 좌판 차일
+  R(0,g,w,5,'#8a6448');R(0,g,w,1,'#b8875c');R(0,g+4,w,1,'#5a3a26');   // 좌판 널
+  onggiJar(9,g,0.55,0);onggiJar(55,g,0.5,0);
+  const cx=29,hit=k>=0.6,ring=hit&&k<0.9&&!rm,shake=ring?((Math.floor(k*40)%2)?1:-1)*(k<0.75?1:0):0;
+  onggiJar(cx,g,1,shake);
+  if(hit&&k<1.0&&!rm){const a=(1-(k-0.6)/0.4)*0.8;ctx.fillStyle='rgba(255,236,200,'+a.toFixed(2)+')';ctx.fillRect(cx-8,g-23,3,10);}   // 울릴 때 윤기가 반짝
+  if(!rm&&k>=0.6)picCue(st,'j_onggi',cyc);
+  // 울림 고리: 퉁긴 자리에서 셋이 차례로 번진다
+  const hx=cx+12,hy=g-19;
+  if(!rm)for(let r=0;r<3;r++){const p=(k-0.6-r*0.14)/0.9;if(p<=0||p>=1)continue;
+    ctx.strokeStyle='rgba(255,248,222,'+(0.85*(1-p)).toFixed(2)+')';ctx.lineWidth=1;ctx.beginPath();ctx.arc(hx,hy,3+p*30,0,Math.PI*2);ctx.stroke();}
+  // 아이의 앞발: 다가와 → 손끝을 젖혀 → 톡 → 살짝 튕겨 나옴
+  let px;
+  if(rm)px=hx+6;
+  else if(k<0.3)px=w+6-(w+6-(hx+10))*(k/0.3);
+  else if(k<0.5)px=hx+10+((k-0.3)/0.2)*3;
+  else if(k<0.6)px=hx+13-((k-0.5)/0.1)*8;
+  else if(k<0.8)px=hx+5+((k-0.6)/0.2)*5;
+  else px=hx+10;
+  px=Math.round(px);const py=hy,flick=k>=0.5&&k<0.66;
+  R(px+4,py-4,w-px,9,'#4a4038');R(px+4,py-3,w-px,7,'#8c8070');R(px+4,py-3,w-px,2,'#a89d8c');   // 통통한 팔뚝 (가까이서 본 손이라 몇 칸뿐)
+  R(px+3,py-4,2,9,'#efe6d6');   // 손목의 흰 털
+  R(px-2,py-4,6,9,'#2a211b');R(px-3,py-3,1,7,'#2a211b');R(px-1,py-3,4,7,'#3b332e');R(px-1,py-2,2,2,'#5a4f45');   // 둥근 손
+  if(flick){R(px-6,py-1,4,2,'#2a211b');R(px-6,py-1,1,1,'#5a4f45');R(px-5,py+2,3,2,'#2a211b');}   // 젖혔다 퉁기는 손끝
+  else for(const dy of [-3,0,3])R(px-5,py+dy,3,2,'#2a211b');   // 오동통한 발가락 셋
+}};};
+/* 결정 D-785: 쌀가루 묻은 발판 작은 창 (사용자 피드백 2026-11-05 "나오는 내용과 이미지가 최대한 매칭되게").
+   글은 "아궁이 앞 발판에 쌀가루가 하얗게 묻었고 그 위에 큰 곰 발자국이 어지럽다". 그대로 그린다:
+   위쪽은 아궁이 불빛과 김, 아래는 쌀가루가 하얗게 앉은 나무 발판. 큰 곰 발자국 여럿이 이리저리 찍혀 있고,
+   모락의 검은 발이 내려와 가루를 폭 날리며 새 발자국을 찍고 올라간다(3초마다 자리를 바꿔). 시루를 깨운 뒤엔 아이의 작은 발자국도 섞였다 */
+function bearPrint(x,y,f){
+  // 가루에 눌린 곰 발자국: 가로로 넓은 발바닥 + 부채꼴 발가락 다섯 + 발톱 자국. f=-1 이면 반대쪽(아래)을 향해 찍혔다
+  const d='#9c8b6e',dd='#7a6a50',s=f<0?-1:1;
+  R(x-3,y,7,3,d);R(x-2,y+(s>0?3:-1),5,1,d);
+  for(const [dx,dy] of [[-4,2],[-2,3],[0,4],[2,3],[4,2]]){const ty=s>0?y-dy:y+2+dy;R(x+dx,ty,1,2,d);R(x+dx,s>0?ty-2:ty+3,1,1,dd);}
+}
+function kidPrint(x,y){const d='#a8987a';R(x-1,y,3,2,d);R(x-2,y-2,1,1,d);R(x,y-3,1,1,d);R(x+2,y-2,1,1,d);}
+Rg.flourPic=()=>{let t0=null;return {animate:true,sound:'j_steam_flour',draw(w,h,t){
+  if(t0===null)t0=t;
+  const rm=Vfx.reducedMotion,P0=3,el=t-t0,k=rm?1.4:el%P0,cyc=rm?0:Math.floor(el/P0);
+  // 아궁이 앞 흙바닥과 아궁이 (위쪽)
+  R(0,0,w,h,'#b89a78');R(30,0,30,16,'#8c6651');R(34,2,22,3,'#b79b78');R(39,7,13,9,'#4b3a34');R(41,9,9,7,'#ecaa58');R(43,11,5,4,'#ffe0a0');
+  if(!rm)for(let j=0;j<3;j++){const q=((t*0.6+j*0.33)%1);R(Math.round(44+Math.sin((t+j)*2)*3),Math.round(6-q*8),4-q*2,2,'rgba(255,255,255,'+(0.6-q*0.6).toFixed(2)+')');}   // 아궁이 김
+  // 나무 발판에 쌀가루
+  R(0,19,w,22,'#7a5032');R(0,20,w,20,'#a97a51');for(let x=0;x<w;x+=16)R(x,20,1,20,'#7a5032');R(0,30,w,1,'#8f6542');
+  for(const [x,y,ww,hh] of [[2,22,18,7],[14,27,22,10],[30,21,20,8],[40,29,22,9],[0,33,12,6],[52,22,12,6]])R(x,y,ww,hh,'#efe8da');
+  for(const [x,y] of [[7,24],[22,31],[34,23],[47,33],[57,24],[12,36]])R(x,y,2,1,'#fbf8f0');
+  // 오가며 찍힌 큰 곰 발자국 (방향이 엇갈린다)
+  const spots=[[10,26,1],[24,33,-1],[38,25,1],[52,34,-1]];
+  for(const [x,y,f] of spots)bearPrint(x,y,f);
+  if(isAwake('siru'))for(const [x,y] of [[17,24],[31,30],[45,25],[58,30]])kidPrint(x,y);   // 아이의 작은 발자국
+  // 모락의 발이 내려와 찍고 올라간다
+  const [sx,sy]=spots[cyc%spots.length],down=k<0.4?0:k<0.7?(k-0.4)/0.3:k<1.0?1:k<1.4?1-(k-1.0)/0.4:0;
+  if(down>0){
+    const fy=Math.round(sy-26+down*22);
+    R(sx-4,fy-16,9,12,'#1f1a18');R(sx-2,fy-15,2,10,'#3a302a');   // 검은 털 다리
+    R(sx-6,fy-5,13,5,'#1f1a18');R(sx-5,fy,11,2,'#1f1a18');R(sx-4,fy-4,3,1,'#3a302a');   // 둥근 발등
+    for(const dx of [-5,-3,-1,1,3])R(sx+dx+1,fy+2,1,2,'#e8dcc6');   // 발톱 다섯
+  }
+  if(!rm&&k>0.68&&k<1.2){const p=(k-0.68)/0.52;for(let i=0;i<5;i++)R(Math.round(sx-6+i*3+(i-2)*p*4),Math.round(sy+1-p*(3+i%3*2)),1,1,'rgba(255,255,255,'+(1-p).toFixed(2)+')');}   // 폭 날리는 쌀가루
+}};};
+/* 결정 D-786: 모락과 김 올리기 대화 그림 (사용자 피드백 2026-11-05 "시루가 쓰이면서 깨어 가는 과정을 애니메이션으로, 모락과의 대화 중 맞는 대목에서").
+   0 아궁이 가마솥 위에 얹은 엄마 시루(금빛 테). 아직 차다.
+   1 솥과 시루가 맞닿은 틈에 쌀가루 반죽(시룻번)을 아이 손이 꼭꼭 눌러 붙여 간다.
+   2 모락의 부채가 아궁이를 살살 부치고, 불이 커지며 시루 구멍에서 첫 김이 오른다.
+   3 김이 고르게 오르고 금빛 테가 환해지며 시루 몸에 빛이 타고 오른다. 시루가 깨어난다 */
+function siruScene(w,h,t,k,stage){
+  const g=h,rm=Vfx.reducedMotion;
+  R(0,0,w,h,'#e2c79b');R(0,0,w,3,'#b8946a');R(0,3,w,1,'#8d6850');   // 떡집 안 벽
+  R(8,30,48,14,'#8c6651');R(10,32,44,2,'#b79b78');for(let x=10;x<54;x+=9)R(x,36,1,8,'#6f4e3c');   // 아궁이 벽돌
+  const fire=stage===0?0.35:stage===1?0.45:stage===2?0.45+Math.min(0.55,k/2.2):1;
+  R(24,35,16,9,'#3a2c26');
+  const fh=Math.round(3+fire*5);R(26,44-fh,12,fh,'#e0782a');R(28,44-fh+1,8,fh-1,'#ecaa58');R(30,44-Math.max(2,fh-2),4,Math.max(2,fh-2),'#ffe0a0');
+  if(!rm)for(let i=0;i<3;i++){const fl=Math.sin(t*12+i*2)>0?1:0;R(27+i*4,44-fh-1-fl,2,1+fl,'#ecaa58');}   // 날름거리는 불
+  R(12,24,40,7,'#3e3834');R(10,23,44,2,'#5e5652');   // 가마솥
+  // 시루: 위로 벌어진 질그릇, 양옆 손잡이, 금빛 테
+  for(let y=8;y<24;y++){const hw=Math.round(13+(24-y)*0.25);R(32-hw,y,hw*2,1,y%5===0?'#8a5232':'#a0623e');}
+  R(17,9,30,1,'#7a4428');R(12,14,3,3,'#8a5232');R(49,14,3,3,'#8a5232');
+  const glow=stage===3?0.6+(rm?0.3:Math.sin(t*4)*0.3):stage===2?Math.min(0.5,k/4):0;
+  R(16,10,32,2,glow>0.5?'#ffd66a':glow>0.2?'#e8b850':'#d9a441');R(16,12,32,1,'#9a7428');   // 금빛 테
+  if(stage===3)for(let i=0;i<6;i++){const q=rm?0.5:((t*0.5+i/6)%1);R(19+((i*7)%26),Math.round(23-q*14),1,1,'rgba(255,230,140,'+(1-q).toFixed(2)+')');}   // 시루 몸을 타고 오르는 빛
+  return {fire};
+}
+Rg.siruPics={
+  stage(stage){let t0=null;return {animate:true,sound:stage>=2?'pic_siru_steam':undefined,draw(w,h,t){
+    if(t0===null)t0=t;const rm=Vfx.reducedMotion,k=rm?3:t-t0;
+    siruScene(w,h,t,k,stage);
+    // 시룻번: 솥과 시루가 맞닿은 틈(y 23~25)에 흰 반죽 띠
+    const band=stage===0?0:stage===1?Math.min(1,k/1.8):1;
+    if(band>0){const bw=Math.round(32*band);R(16,23,bw,2,'#f3eee1');R(16,25,bw,1,'#d8cfbf');}
+    if(stage===1&&band<1){const px=16+Math.round(32*band);R(px-1,19,4,4,'#2a211b');R(px,18,3,1,'#2a211b');R(px+3,20,6,3,'#8c8070');R(px+3,20,6,1,'#a89d8c');}   // 아이 손이 눌러 붙인다
+    if(stage===2){   // 모락의 부채 (아궁이 앞에서 살랑)
+      const a=rm?0:Math.sin(k*5)*0.5;ctx.save();ctx.translate(14,38);ctx.rotate(a);R(-1,-1,2,8,'#5a361e');ctx.fillStyle='#d9c8a0';ctx.beginPath();ctx.arc(0,-5,6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#b44d48';ctx.fillRect(-1,-7,3,3);ctx.restore();
+      R(0,30,8,14,'#1f1a18');R(2,29,6,3,'#2e2622');   // 부채를 쥔 검은 곰 손
+    }
+    // 김: 2에선 몇 가닥, 3에선 고르게 다섯 줄기
+    if(stage>=2&&!rm){const cols=stage===3?5:Math.min(3,1+Math.floor(k/1.2));
+      for(let c=0;c<cols;c++){const x0=stage===3?20+c*6:24+c*8;for(let j=0;j<3;j++){const q=((t*0.7+j/3+c*0.17)%1);R(Math.round(x0+Math.sin((t+c+j)*3)*1.5),Math.round(7-q*9),stage===3?3:2,2,'rgba(255,255,255,'+(0.75-q*0.75).toFixed(2)+')');}}}
+  }};}
+};
 function wanderer(kind,x,y,f=1){
   x=Math.round(x);y=Math.round(y);const p=(a,b,w,h,c)=>M(x,y,f,a,b,w,h,c);
   if(kind==='kite'){

@@ -5,7 +5,7 @@
    상대 {name, calmLabel, intro, howto?, npc?, dodge?(피하기만 하는 시험: 버틸 공격 수), bonkText?(dodge 시작 때 연장을 뺏기는 글),
          parts:[{id, name, hp, atk(battle-attacks.js), mat?(부수면 얻는 아이템), core?, tell, weak?(부서진 뒤 약해진 모습 한 줄, 결정 D-370)}],
          coreNeeds?(이 부위를 꺾어야 핵심이 드러남), likes:{아이템:진정 오름}, likeText, likeTexts?:{아이템:그 선물만의 글}, coreHidden, coreShown, calmWin, calmGift?, win, lose,
-         settle?:true(공격 탄이 다 사라진 뒤에 빈틈을 연다. 옛 calmAction 도 이 뜻으로만 읽는다, D-243), markLife?:빈틈 유지 프레임, placeGift?:꼭대기에 얹을 선물 id,
+         settle?:true(공격 탄이 다 사라진 뒤에 빈틈을 연다. 옛 calmAction 도 이 뜻으로만 읽는다, D-243), markLife?:빈틈 유지 프레임, quietHits?:true(친 뒤 부위 이름과 깎인 수를 띄우지 않는다, D-765), placeGift?:꼭대기에 얹을 선물 id,
          firstPart?:첫 공격 부위 id(첫 예고는 조금 길다), strike?():치기를 상대가 먼저 처리했으면 true, onMarkHit?(부위, 표식):붉은 표식을 친 뒤(재료 얻기 등),
          부위의 mark?:붉은 표식에 쓸 글자(없으면 이름 첫 글자),
          backdrop?(c):상대 뒤쪽 화면 전체 배경(결정 D-58. 판정 상자와 글귀 줄 위로는 상자·글이 덮는다), goalText?:지금 할 일 글,
@@ -334,7 +334,7 @@ function strikeFeedback(aim,hits0,own){
   hit.shake=good?22:16;hit.hitAt=B.time;hit.hitGood=good;
   B.hitStop=good?t.battle_hitstop+2:bad?Math.max(1,t.battle_hitstop-2):t.battle_hitstop;
   const n=Math.round(loss*10)/10;
-  B.pops.push({x:aim.x,y:aim.y-26,t:46,text:hit.name+' −'+n,good,bad});if(B.pops.length>3)B.pops.shift();
+  if(!B.E.quietHits){B.pops.push({x:aim.x,y:aim.y-26,t:46,text:hit.name+' −'+n,good,bad});if(B.pops.length>3)B.pops.shift();}   // 결정 D-765: quietHits 면 부위 이름과 깎인 수를 띄우지 않는다
   if(own){renderBHud();return;}
   if(!Vfx.reducedMotion)B.quakeT=good?10:bad?4:7;
   B.impact={x:aim.x,y:aim.y,t:22,max:22,good,bad,seed};
