@@ -165,6 +165,7 @@ function step(){
   if(usesZones(REG)&&['inn','shelter'].includes(G.zone)&&deliverHomeReply())return;
   REG.formCheck?.();   // 지역이 이야기 진행에 맞춰 변신을 여는 자리 (forms.js)
   formIntroTick();     // 결정 D-173: 새 변신 알림 카드는 대화가 끝난 뒤에 (forms.js)
+  owlSenseTick();      // 결정 D-665: 수리부엉이가 숨은 물건 곁을 지나면 드러난다 (forms.js)
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
   G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed*formMoveMul());if(ax)G.face=ax>0?1:-1;
