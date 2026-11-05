@@ -805,11 +805,11 @@ function badukFlipPic(loser){
   let t0=null;
   const left=loser==='steady';   // 흰눈썹(왼쪽)이 엎으면 판이 오른쪽으로 넘어가고, 곰방대(오른쪽)가 엎으면 왼쪽으로
   const dir=left?1:-1;
-  const stones=Array.from({length:22},(_,i)=>({w:i%2===0,vx:(((i*37)%23)-11)*3.4+dir*9,vy:-(18+((i*53)%19)),x0:22+((i*7)%20),y0:27+((i*5)%4)}));
+  const stones=Array.from({length:22},(_,i)=>({w:i%2===0,vx:(((i*37)%23)-11)*3.4+dir*9,vy:-(18+((i*53)%19)),x0:22+((i*7)%20),y0:27+((i*5)%4),gy:37+((i*3)%5)}));   // gy: 돌마다 멈추는 깊이(눈밭 앞뒤)
   return {animate:true,sound:'pic_baduk_flip',draw(w,h,t){
     if(t0===null)t0=t;
     const k=t-t0,rm=Vfx.reducedMotion,g=38;
-    R(0,0,w,h,'#d9e3e6');R(0,g,w,h-g,'#eef2f2');R(0,g,w,1,'#ffffff');
+    R(0,0,w,h,'#d9e3e6');R(0,g,w,h-g,'#d5dcdc');R(0,g,w,1,'#ffffff');
     // 두 노인의 무릎과 소매 (양옆). 엎는 쪽 소매가 판 귀를 쳐든다
     const lift=rm?1:Math.min(1,k/0.35);
     R(0,24,9,14,'#7e8a96');R(55,24,9,14,'#6a5a48');
@@ -833,13 +833,13 @@ function badukFlipPic(loser){
     for(const st of stones){
       let x,y;
       if(ts<=0){x=st.x0;y=st.y0;}
-      else{const tt=Math.min(ts,1.4);const tf=(-st.vy+Math.sqrt(st.vy*st.vy+2*70*(g-1-st.y0)))/70;x=st.x0+st.vx*Math.min(tt,tf)+(tt>tf?st.vx*0.35*Math.min(tt-tf,0.45):0);   // 땅에 닿은 뒤엔 조금 미끄러지다 선다
-        const t1=Math.max(0.05,(-st.vy+Math.sqrt(st.vy*st.vy+2*70*(g-1-st.y0)))/70);   // 바닥에 닿는 때
+      else{const tt=Math.min(ts,1.4);const tf=(-st.vy+Math.sqrt(st.vy*st.vy+2*70*(st.gy-st.y0)))/70;x=st.x0+st.vx*Math.min(tt,tf)+(tt>tf?st.vx*0.35*Math.min(tt-tf,0.45):0);   // 땅에 닿은 뒤엔 조금 미끄러지다 선다
+        const t1=Math.max(0.05,(-st.vy+Math.sqrt(st.vy*st.vy+2*70*(st.gy-st.y0)))/70);   // 바닥에 닿는 때
         if(tt<t1)y=st.y0+st.vy*tt+35*tt*tt;
-        else{const b=tt-t1,bv=-st.vy*0.25-6;y=Math.min(g-1,g-1-(bv*b-35*b*b));if(b>0.4)y=g-1;}
+        else{const b=tt-t1,bv=-st.vy*0.25-6;y=Math.min(st.gy,st.gy-(bv*b-35*b*b));if(b>0.4)y=st.gy;}
       }
-      x=Math.max(0,Math.min(w-2,Math.round(x)));y=Math.round(Math.min(g,y));
-      R(x,y,2,2,st.w?'#f4efe2':'#1d1712');if(st.w)R(x,y+1,2,1,'#c9c2b0');
+      x=Math.max(0,Math.min(w-2,Math.round(x)));y=Math.round(Math.min(st.gy,y));
+      R(x,y,2,2,st.w?'#f4efe2':'#1d1712');if(st.w){R(x,y+1,2,1,'#c9c2b0');R(x,y+2,2,1,'#9a9a90');}
     }
     // 튄 눈가루
     if(!rm&&k>0.6&&k<1.4){const p=(k-0.6)/0.8;for(let i=0;i<6;i++)R(Math.round(cx-10+i*4+dir*p*4),Math.round(g-2-p*(3+i%3*2)),1,1,'#ffffff');}
