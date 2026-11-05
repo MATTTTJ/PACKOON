@@ -97,10 +97,10 @@ defineIcons({
   gopdol_jan:P=>{P(3,6,10,2,'#6e6a64');P(4,8,8,4,'#7d7972');P(5,12,6,2,'#5d5a55');P(4,6,8,1,'#3e3b38');P(5,9,2,2,'#9a958d');P(6,14,4,1,'#4a4743');},
 });
 
-/* 채집 (낫으로 억새 베기, 절벽의 석이버섯 떼기) */
+/* 채집 (낫으로 억새 베기, 절벽의 석이버섯 따기) */
 defineGather({
   eoksae:{title:'마른 억새 베기',hits:TABLES.MINIGAMES.gather_eoksae_hits,spot:[0,-6],box:[-10,-26,12,0],rare:'eoksae_som',hint:'아빠의 낫으로 밑동을 비스듬히 벤다. 도는 표식이 금빛 칸에서 멈추게 휘두르면 한 단이 더 베인다.'},
-  seogi:{title:'석이버섯 떼기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-7],box:[-9,-12,9,0],rare:'seokcheong',hint:'바위에 바짝 붙은 버섯이다. 낫 끝으로 떼어 내자. 도는 표식이 금빛 칸에서 멈추게 휘두르면 한 장이 더 떨어진다.'},
+  seogi:{title:'석이버섯 따기',hits:TABLES.MINIGAMES.gather_seogi_hits,spot:[-1,-8],box:[-10,-13,10,0],rare:'seokcheong',hint:'절벽 밑 이끼 낀 땅에 돋은 버섯이다. 낫 끝으로 밑동을 끊자. 도는 표식이 금빛 칸에서 멈추게 휘두르면 한 송이가 더 나온다.'},   // 결정 D-641
   // 결정 D-266: 그늘에 녹지 않은 첫눈이 도톰하게 솟은 둔덕. 걷어 내면 눈에 덮였던 것이 나온다(자리마다 다르다. field.js 의 found 글)
   // 결정 D-482: 쇠 날이 언 눈을 때리는 '팡'과 흩어지는 눈 (engine/gather.js hitSound·burst)
   snow_mound:{title:'눈 둔덕 파기',verb:'눈 둔덕 파헤치기',hits:TABLES.MINIGAMES.gather_snow_mound_hits,spot:[0,-6],box:[-12,-11,12,0],scatter:null,dirt:'#f4f8f9',hitSound:'snow_clang',burst:'snow',
