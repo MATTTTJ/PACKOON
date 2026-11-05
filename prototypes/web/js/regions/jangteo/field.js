@@ -304,6 +304,14 @@ if(!CLASSIC){
         // 결정 D-290: 등을 다 단 뒤 까치 곁에 오면 길손이 맡긴 곶감을 건넨다(한 번)
         else if(G.f.jxLanternDone&&!G.f.jxLanternPaid&&!open('dlg'))Rg.lanternThanks?.();
       }
+      // 결정 D-777: 보부상단 깃발 가까이 오면 한 번 혼잣말을 한다 (눌러서 여는 조사 창은 뺐다, 사용자 피드백 2026-11-05).
+      // 아이는 보부상 집 아이라 상단 깃발과 숙소의 관계를 아빠에게서 들어 안다. 도장을 아직 못 찾았으면 깃대 판의 붉은 자국에 눈이 간다.
+      if(id==='entrance'&&!G.f.jxFlagSeen&&!Rg.springRevisit()&&G.onGround&&!paused()&&G.px>tx(700)-60&&G.px<tx(720)+50){
+        G.f.jxFlagSeen=true;
+        talk([['너구리','(패랭이에 목화송이. 보부상단 깃발이다.\n내 모자 꼭지에 단 송이랑 똑같네.)'],
+          ['너구리','(아빠가 그랬어. 이 깃발이 선 장에는\n상단 숙소가 있다고. 숙소부터 찾아가자.)'],
+          ...(stampFound('flag')?[]:[['너구리','(깃대를 붙든 나무판에 붉은 자국이 있다.\n손바닥 모양인가?)']])],refreshGoal);
+      }
       if(id==='warehouse')Rg.snowEncounter();   // 결정 D-684
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
         G.f.jxHubChanged=true;diary('jx_hub','모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.');
@@ -354,7 +362,7 @@ if(!CLASSIC){
       exits:{right:{to:'street',toX:60}},
       doors:[],   // 결정 D-316: 지붕길 문(→거리 지붕)은 뺐다
       wanderers:E.wanderers.entrance,examines:E.examines.entrance,
-      stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint,base:'none',face:18}],   // D-116: 깃대에 바로 찍는다(받침 겹침 없음)
+      stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint,base:'none',face:18}],   // D-116·D-778: 깃대 밑동을 감싼 나무판 앞면에 찍는다(판은 art.js flag)
     },
     street:{...common('street'),name:TABLES.ZONES.jangteo.street,w:2800,npcs:['morak','yeotbang','nal'],
       // 결정 D-315·D-316: 공중에 뜬 긴 지붕(610·2550)과 떡집 높은 마루(1250, y110)는 뺐다. 처마 계단 둘만 남는다.

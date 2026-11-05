@@ -868,14 +868,29 @@ Rg.lanternAction=id=>{
 /* ---------- 모락 (반달가슴곰 떡집): 김 올리기 ---------- */
 /* 김 올리기: 모락 곁에서 아궁이 김을 올린다. 시루가 깨어난다. */
 // 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
-function openSteam(){Sound.steam?.('fan');finishSteam();}
+/* 결정 D-786: 김 올리기를 대화 속 그림으로 보여 준다 (사용자 피드백 2026-11-05 "시루가 쓰이면서 깨어 가는 과정을 애니메이션으로, 모락과의 대화 중 맞는 대목에서").
+   엄마 시루를 모락네 가마솥에 얹고 → 솥과 시루 틈에 쌀가루 반죽(시룻번)을 붙이고 → 부채로 불을 살살 올리면 → 김이 고르게 오르며 금빛 테가 환해진다(깨어남).
+   반죽은 아이가 갈아다 준 쌀가루로 모락이 갠다. 그림은 art.js Rg.siruPics */
+function openSteam(){
+  const S=n=>Rg.siruPics?{pic:Rg.siruPics.stage(n)}:{};   // 옛 구성에는 그림(art.js 확장)이 없다
+  talk([
+    Object.assign(['모락','자, 네 시루를 우리 가마솥에 얹고!\n솥이랑 시루 사이 틈부터 막아야 해.'],S(0)),
+    ['모락','네가 갈아 온 쌀가루로 반죽을 갰어.\n길게 밀어서 틈에 붙여. 시룻번이야, 시룻번!'],
+    Object.assign(['너구리','(반죽을 길게 밀어 솥과 시루가 맞닿은 틈에\n꼭꼭 눌러 붙였다.)'],S(1)),
+    Object.assign(['모락','이제 불이야!\n부채는 조금씩, 조금씩 부쳐.'],S(2)),
+    ['모락','김이 고르게 올라야 떡이 안 설어.\n한쪽으로 쏠리면 떡이 반만 익는다고!'],
+    Object.assign(['너구리','(부채를 살랑살랑 부치자 시루 구멍마다\n김이 고르게 올라온다.)'],S(3)),
+    ['너구리','(시루 테가 금빛으로 환해진다.\n엄마가 떡 찌던 날처럼 따뜻하다.)']
+  ],()=>{Sound.steam?.('fan');finishSteam();});
+}
 function finishSteam(){
   const F=G.f;if(F.steamDone)return;
   F.steamDone=true;awaken('siru');ledgerDone('morak');rel('morak',MG.handwork_steam_relation);learn('morak:steam');
   diary('j_siru','모락에게 김 올리는 법을 배웠다. 보따리 속 시루에 처음으로 김이 서렸다. 잔칫날의 시루가 깨어났다.');
   toast('잔칫날의 시루가 깨어났다! 쌀가루 2 + 팥 1 → 팥시루떡');refreshHud();
-  const lines=[['모락','옳지, 바로 그거야! 떡은 김이 반이지!'],['너구리','(시루가 따뜻해졌다. 이제 떡을 찔 수 있다.)'],
-    hintLine('sirumit',['모락','우리 시룻밑은 해져서 김이 새.\n싸리 살에 짚 엮어 새로 깔아야 하는데.'])];   // 결정 D-461: 귀띔
+  // 결정 D-786: 깨어난 시루 그림을 이어 보여 주고, 다음 이야기로 넘어가면 그림을 접는다
+  const lines=[Object.assign(['모락','옳지, 바로 그거야! 떡은 김이 반이지!'],Rg.siruPics?{pic:Rg.siruPics.stage(3)}:{}),['너구리','(시루가 따뜻해졌다. 이제 떡을 찔 수 있다.)'],
+    Object.assign(hintLine('sirumit',['모락','우리 시룻밑은 해져서 김이 새.\n싸리 살에 짚 엮어 새로 깔아야 하는데.']),Rg.siruPics?{pic:null}:{})];   // 결정 D-461: 귀띔
   if(G.rel.morak.v>=2&&!F.morakTaught){F.morakTaught=true;learn('morak:memiltteok');addItem('memil_powder',1);
     lines.push(['모락',Rg.arcs()?'메밀가루 둘로 메밀떡을 쪄! 하나는 내가 줄게.':'시루에 메밀가루 두 됫박이면 메밀떡이지! 한 됫박은 내가 얹어 줄게.'],gotLine('memil_powder'),
       ['모락',Rg.arcs()?'밤마다 물건이 없어지잖아.\n도깨비 짓이면 메밀떡이 약이래. 챙겨 둬!':'할머니들 말로는 도깨비가 메밀을 좋아한대.\n밤마다 장터 물건이 사라지니, 메밀떡 좀 챙겨 둬 봐!']);}
@@ -1057,20 +1072,24 @@ function marketCraftTrade(){
   // 결정 D-567: 엿방울 몫 다섯을 먼저 남기라는 말을 따로 한 줄로 또렷이 (사용자 피드백 2026-11-04).
   // 날쌘이 그걸 아는 까닭: 엿방울이 솔방울 다섯 찾는다고 장터에 떠들고 다녔다(엿방울은 장터 소식통이고 목소리가 크다).
   const keep=!G.f.yeotDone;
-  talk([['날쌘','꿀, 참기름, 녹두, 팥. 한 줌씩 남았어.\n떡 찌기엔 모자라지 않을걸.'],['너구리','뭐랑 바꿔 줘요?'],
-    ['날쌘','솔방울 셋. 밤에 불 피울 데가 있어서.'],
+  // 결정 D-782: 묶음에서 녹두를 뺐다(녹두는 날쌘의 흔한 물건에 따로 있다). 솔방울 셋이 꿀·참기름·팥 값이 되는 까닭을 날쌘이 말한다 (사용자 피드백 2026-11-05)
+  talk([['날쌘','꿀, 참기름, 팥. 한 줌씩 남았어.\n떡 찌기엔 모자라지 않을걸.'],['너구리','뭐랑 바꿔 줘요?'],
+    ['날쌘','솔방울 셋.'],
+    ['너구리','솔방울 셋에 세 가지를 다요?'],
+    ['날쌘','눈 온 뒤로 장터 땔감이 죄다 젖었어.\n마른 솔방울은 송진이 배어서 젖은 장작에도 불을 붙이지.'],
+    ['날쌘','그러니 이 대목엔 솔방울이 금값이야.\n마침 나도 밤에 불 피울 데가 있고.'],
     ...(keep?[['날쌘','아, 하나 더. 엿방울이 솔방울 다섯 찾는다고\n온 장에 떠들던데. 그 다섯엔 손대지 마.'],
       ['날쌘','엿방울 몫 다섯 먼저, 내 셋은 그다음.\n모두 여덟이야.']]:[]),
-    ['날쌘',enough?(keep?'여덟 다 있네. 다섯은 엿방울 거고, 셋만 내.':'넷 다 묶어 줄게. 바꿀래?'):keep?'다섯은 꼭 남겨 두고, 솔숲에서 셋 더 주워 와.':'솔숲에서 셋만 주워 와.',
+    ['날쌘',enough?(keep?'여덟 다 있네. 다섯은 엿방울 거고, 셋만 내.':'셋 다 묶어 줄게. 바꿀래?'):keep?'다섯은 꼭 남겨 두고, 솔숲에서 셋 더 주워 와.':'솔숲에서 셋만 주워 와.',
     enough?[{t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'다음에',go:null}]:[{t:'알겠어요',go:null}]]]);
 }
 function nalMarketGive(){
   if(G.f.jxCraftMarket||!has('solbang',G.f.yeotDone?3:8))return;
   // 결정 D-147: 묻기 전에 보따리에서 바로 바꾸면, 날쌘이 솔방울을 받는 말을 먼저 한다(까닭은 여전히 흐린다. nalLedger 복선).
   const first=!G.f.jxCraftMarketHeard;G.f.jxCraftMarketHeard=true;
-  takeItem('solbang',3);for(const id of ['honey','sesame_oil','mung','pat'])addItem(id,1);
+  takeItem('solbang',3);for(const id of ['honey','sesame_oil','pat'])addItem(id,1);   // 결정 D-782: 녹두는 뺐다
   G.f.jxCraftMarket=true;ledger('t_craft_market','날쌘','솔방울 3','떡 재료 묶음');ledgerDone('t_craft_market');
-  talk([...(first?[['날쌘','솔방울 셋이라. 마침 밤에 불 피울 데가 있어.\n한 줌씩 남은 거 묶어 줄게.']]:[]),['너구리','(꿀, 참기름, 녹두, 팥을 하나씩 얻었다.)'],['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
+  talk([...(first?[['날쌘','마른 솔방울 셋이라. 눈 온 뒤론 이게 금값이야.\n젖은 장작에도 불을 붙이거든.'],['날쌘','마침 밤에 불 피울 데가 있어.\n한 줌씩 남은 거 묶어 줄게.']]:[]),['너구리','(꿀, 참기름, 팥을 하나씩 얻었다.)'],['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
 }
 // 결정 D-78: 쌀가루에 약과를 얹으면 날쌘이 제 몫으로 먹고 팥 한 되를 더 준다(날쌘은 약과를 좋아한다, tastes.csv).
 function nalTrade(id,yak=false){
@@ -1366,7 +1385,7 @@ Rg.trade={
       {id:'t_nal_jangteo_memil',item:'pat',n:2+(G.f.nalJBluff?1:0),asks:[{memil_powder:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:()=>nalTrade('memil_powder')}
     ]:[]),
     // 결정 D-147: 떡 재료 묶음은 처음부터 날쌘 지게에 있다. 엿방울 몫을 아직 모르면 까닭은 말하지 않고 남겨 두기만 한다.
-    ...(!CLASSIC?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 녹두 · 팥',asks:[{solbang:3}],
+    ...(!CLASSIC?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 팥',asks:[{solbang:3}],
       locked:()=>!G.f.yeotDone&&has('solbang',3)&&(G.inv.solbang||0)<8?(G.f.yeotMet||G.f.jxCraftMarketHeard?'솔방울 다섯은 엿방울 몫이다. 모두 여덟이 되면 셋을 내자.':'솔방울은 아직 쓸 데가 있다.'):null,
       done:()=>G.f.jxCraftMarket,accept:nalMarketGive}]:[])
   ],
