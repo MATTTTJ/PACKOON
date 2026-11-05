@@ -18,6 +18,7 @@ pic_hamjibak_stamp,galchamgol,함지박 밑바닥 낙관 (대사 그림),wood_ta
 pic_mom_room,galchamgol,엄마 방 들여다보기 (대사 그림),door,,제안
 pic_leaf,galchamgol,무쇠가 꺼낸 당산나무 잎 (대사 그림),leaf_rustle,,제안
 pic_cache,galchamgol,도담이 묻은 도토리 자리 (대사 그림),leaf_rustle,,제안
+pic_gam_pole,galchamgol,감 따는 장대 (대사 그림),leaf_rustle,,제안
 frost_print,dolneomeo,서리 자국 살펴보기,footstep_frost,,제안
 gate_bell,dolneomeo,장승 풍경 들어 보기,wind_bell,1300,제안
 stone_channel,dolneomeo,돌 물길 들여다보기,water_trickle,1800,제안
@@ -33,6 +34,8 @@ wish_cloth,dolneomeo,소원 천 살펴보기,cloth_flutter,1900,제안
 grain_dish,dolneomeo,작은 제기 살펴보기,clay_ring,,제안
 small_tower,dolneomeo,낮은 돌탑 살펴보기,stone_knock,,제안
 pic_wish_tower,dolneomeo,소원 돌탑 (대사 그림),stone_knock,,제안
+pic_maetdol_turn,dolneomeo,맷돌 왼쪽으로 한 바퀴 (대사 그림),mill,3200,제안
+pic_mole_chisel,dolneomeo,꼬마 두더지가 감춘 정 (대사 그림),stone_knock,,제안
 j_flag_knot,jangteo,보부상단 깃발,cloth_flutter,1700,제안
 j_jangseung_snow,jangteo,장승 코의 눈,footstep_snow,,제안
 j_stall_gap,jangteo,좌판 사이 골목,cloth_flutter,,제안

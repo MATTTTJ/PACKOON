@@ -144,8 +144,10 @@ function scenery(zone,fixtures={}){const sx=x=>Math.round(tx(x)-cam);const visib
     for(const [i,x] of [220,1020,1640,2240].entries())if(visible(x,110)){house(sx(x),GROUND-2,x===1020,i);smoke(sx(x+7),GROUND-55-i%3*4,i*9);}
     for(const x of [430,1320,2020,2590])if(visible(x))wall(sx(x),GROUND-2,83);
     const mx=sx(fixtures.millX??1160);stone(mx-29,GROUND,58,36);px(mx-25,GROUND-40,50,5,'#a6b0a7');px(mx-23,GROUND-41,46,1,P.frost);px(mx-2,GROUND-48,4,8,'#746f57');px(mx-4,GROUND-50,8,3,'#746f57');px(mx+17,GROUND-46,2,6,'#5a5f50');
-    const ax=sx(fixtures.workshopX??1080);px(ax-25,GROUND-5,48,5,'#5e665c');px(ax-17,GROUND-14,31,9,'#85918a');px(ax-15,GROUND-15,27,2,'#c4cdc1');px(ax+1,GROUND-24,2,9,'#645b47');px(ax-2,GROUND-26,8,3,'#a5b3ab');
-    if(visible(740)){const x=sx(772),door=G.f.dolneomeo_mole_pebble;stone(x-18,GROUND,36,5,0);stone(x-16,GROUND-5,8,9,1);stone(x+9,GROUND-5,8,9,0);stone(x-19,GROUND-14,38,4,0);px(x-7,GROUND-13,15,12,'#505e58');px(x+10,GROUND-11,4,2,'#dfe4d2');if(door){px(x-5,GROUND-10,9,10,door==='flat'?'#9eaca1':'#82948c');if(door==='stripe')for(let i=0;i<3;i++)px(x-5,GROUND-9+i*3,9,1,'#bec6b2');px(x+10,GROUND-11,1,1,'#f9edbe');}else{stone(x-33,GROUND,10,4,0);stone(x+27,GROUND,10,4,1);}px(x+12,GROUND-9,1,1,'#f7edc5');}
+    const ax=sx(fixtures.workshopX??1080);px(ax-25,GROUND-5,48,5,'#5e665c');px(ax-17,GROUND-14,31,9,'#85918a');px(ax-15,GROUND-15,27,2,'#c4cdc1');px(ax+1,GROUND-24,2,9,'#645b47');px(ax-2,GROUND-26,8,3,'#a5b3ab');   // 결정 D-735: 할배의 정. 꼬마가 감춘 동안엔 없고, 돌려드린 뒤엔 받침돌 모서리 홈에 꽂혀 있다
+    {const m=G.f.dolMoleChisel;if(m===2){px(ax-17,GROUND-15,3,2,'#4e5554');px(ax-16,GROUND-25,1,11,'#6f7a7a');px(ax-16,GROUND-25,1,1,'#c9d0cc');}else if(m!==1){px(ax+5,GROUND-16,11,1,'#6f7a7a');px(ax+15,GROUND-16,1,1,'#c9d0cc');}}
+    // 결정 D-735: 꼬마 두더지가 노는 자리. 돌집 대신 줄지어 놓은 조약돌과 반짝돌
+    if(visible(740)){const x=sx(772);for(let i=0;i<6;i++)stone(x-26+i*9,GROUND,6+(i%3),3+(i%2),i,false);px(x+12,GROUND-4,4,3,'#59626a');px(x+13,GROUND-5,2,1,'#6e7880');px(x+13,GROUND-4,1,1,'#fff6c8');}
     if(visible(2080))wall(sx(2055),GROUND-2,67);
     if(visible(2290))hearth(sx(2290),GROUND);
   }else if(zone==='field'){
@@ -228,7 +230,7 @@ function wishTowerPic(stage,drop=false){
   }};
 }
 /* 결정 D-229: 소원 돌탑 얹기 장면. s={n:얹은 수, offs, cx, ground, stone:{x,y,paws}}.
-   든 돌은 아이 두 앞발에 들려 내려오고, 맨 위 돌에 앉을 자리의 옅은 그림자가 진다. */
+   든 돌은 아이 한 손에 들려 내려오고(D-733), 맨 위 돌에 앉을 자리의 옅은 그림자가 진다. */
 const WISH_ARM='#3d332b',WISH_PAD='#7a6656';
 /* 맨 위 돌 윗면의 [왼쪽, 오른쪽] (든 돌이 닿을 자리) */
 function wishStackSpan(cx,n,offs){
@@ -242,10 +244,69 @@ function wishStackPaint(w,h,s){
   const [sw,sh]=TOWER_ADD[s.n],l=Math.round(b.x-sw/2);
   if(b.paws){const [sl,sr]=wishStackSpan(s.cx,s.n,s.offs),x0=Math.max(l,sl),x1=Math.min(l+sw,sr);if(x1>x0)px(x0,top-1,x1-x0,1,'rgba(40,52,56,.35)');}
   stone(l,Math.round(b.y),sw,sh,s.n,false);
-  // 아이의 두 앞발(화면 위에서 뻗어 내려온 팔)이 돌 양옆을 쥐고 있다
-  if(b.paws){const y=Math.round(b.y)-sh;
-    for(const ax of [l-2,l+sw]){px(ax,0,2,y+1,WISH_ARM);px(ax,y+1,2,2,WISH_ARM);}
-    px(l-1,y+1,1,1,WISH_PAD);px(l+sw,y+1,1,1,WISH_PAD);}
+  if(b.paws)carryHand(G.form||'',l,Math.round(b.y)-sh,sw);
+}
+/* 결정 D-733: 작은 돌은 한 손으로 조심히 집어 올린다 (사용자 피드백 2026-11-05 돌너머 2: 돌 크기에 비해 두 손이 어색하다).
+   화면 위에서 팔 하나가 내려와 손바닥을 돌 위에 얹고, 손끝을 돌 양옆에 걸어 쥔다. 손은 지금 모습을 따른다.
+   너구리는 짧고 뭉툭한 검은 손, 다람쥐는 가는 팔과 작은 발톱, 수리부엉이는 노란 발가락과 발톱으로 움켜쥔다.
+   산양·고라니는 발굽으로 쥘 수 없어 돌을 입에 물고 내려놓는다. (l: 돌 왼쪽, top: 돌 윗면, sw: 돌 너비) */
+function carryHand(form,l,top,sw){
+  const cx=l+Math.floor(sw/2),half=Math.min(4,Math.ceil(sw/2)+1),pl=cx-half,pw=half*2+1;
+  if(form==='goat'||form==='deer'){
+    const C=form==='goat'?'#ebe5d9':'#b88a55',S=form==='goat'?'#b9b0a0':'#8a6440',D='#3a2f28';
+    px(cx-2,0,5,top-6,C);px(cx+2,0,1,top-6,S);            // 목
+    px(cx-3,top-7,7,6,C);px(cx-3,top-7,1,6,S);            // 주둥이
+    px(cx-1,top-6,1,1,D);px(cx+2,top-6,1,1,D);            // 콧구멍
+    px(cx-3,top-1,7,1,D);                                 // 돌 윗면을 문 입술
+    return;
+  }
+  if(form==='owl'){
+    px(cx-1,0,3,top-3,'#6f5436');px(cx,0,1,top-3,'#8a6a45');           // 깃털 덮인 다리
+    px(pl,top-3,pw,2,'#c9a040');px(pl+1,top-3,pw-2,1,'#d8b65a');         // 돌을 덮은 발가락
+    px(pl,top-1,1,3,'#c9a040');px(pl+pw-1,top-1,1,3,'#c9a040');          // 옆을 감싼 발가락
+    px(pl,top+2,1,1,'#2a211b');px(pl+pw-1,top+2,1,1,'#2a211b');          // 발톱 끝
+    return;
+  }
+  if(form==='squirrel'){
+    px(cx-1,0,2,top-2,'#8a4a22');
+    px(pl,top-2,pw,2,'#8a4a22');px(pl+1,top-1,pw-2,1,'#d9b08a');
+    px(pl,top,1,2,'#8a4a22');px(pl+pw-1,top,1,2,'#8a4a22');px(pl,top+2,1,1,'#2b1d14');px(pl+pw-1,top+2,1,1,'#2b1d14');
+    return;
+  }
+  // 너구리: 짧고 뭉툭한 손 하나
+  px(cx-1,0,3,top-4,WISH_ARM);
+  px(pl+1,top-4,pw-2,1,WISH_ARM);px(pl,top-3,pw,2,WISH_ARM);                         // 둥근 손등
+  for(let x=pl+1;x<pl+pw-1;x+=2)px(x,top-1,1,1,WISH_ARM);                            // 돌 위에 얹은 뭉툭한 손가락 끝
+  px(pl+2,top-2,pw-4,1,WISH_PAD);                                                     // 손바닥 살 (쥘 때 비친다)
+  px(pl,top-1,1,3,WISH_ARM);px(pl+pw-1,top-1,1,3,WISH_ARM);                           // 양옆으로 감싼 엄지와 새끼손가락
+}
+/* 결정 D-734: 맷돌 배우기의 가장 중요한 장면(왼쪽으로 한 바퀴)에 맷돌 돌리는 그림 (사용자 피드백 2026-11-05 돌너머 4).
+   옆에서 조금 위로 본 맷돌. 아이 손이 어처구니를 쥐고 왼쪽으로 한 바퀴 돌린다. 윗돌 옆의 자개 발자국이 따라 돈다.
+   한 바퀴를 다 돌면 잠깐 멈추고, 돌이 낮게 우는 결이 둘레에 번진다. 3.2초마다 되풀이. 손은 지금 모습을 따른다. */
+const MILL_HAND={'':['#3d332b','#7a6656'],squirrel:['#8a4a22','#d9b08a'],owl:['#6f5436','#c9a040'],goat:['#ebe5d9','#2e2621'],deer:['#b88a55','#3a2a1f']};
+function maetdolTurnPic(){
+  return {sound:'pic_maetdol_turn',draw(w,h,t){
+    px(0,0,w,h,'#dcd8c8');px(0,36,w,8,'#a39b8a');px(0,36,w,1,'#857d6e');
+    const cx=32,r=15,still=Vfx.reducedMotion,c=still?.2:(t%3.2)/3.2,turn=Math.min(1,c/.75),k=turn*turn*(3-2*turn);
+    const a=Math.PI*.35+k*Math.PI*2;   // 각이 커질수록 앞쪽에서 왼쪽으로 간다 (위에서 보면 왼쪽 돌기)
+    // 아랫돌과 받침
+    px(cx-19,30,38,6,'#7d8584');px(cx-18,29,36,1,'#a7b0ad');px(cx-21,35,42,2,'#5f6665');
+    // 윗돌: 옆면 띠와 위로 보이는 둥근 윗면
+    px(cx-r,21,r*2,8,'#8f9695');px(cx-r,28,r*2,1,'#6d7473');
+    for(const [dy,hw] of [[16,9],[17,13],[18,15],[19,15],[20,13],[21,9]])px(cx-hw,dy,hw*2,1,dy<18?'#c3cbc7':'#b2b9b6');
+    px(cx-2,18,4,2,'#4e5554');   // 구멍
+    // 자개 발자국: 윗돌 옆면을 따라 돈다 (앞쪽일 때만 보인다)
+    const fa=a+Math.PI*.8;if(Math.sin(fa)>.15){const fx=Math.round(cx+Math.cos(fa)*(r-3));px(fx-1,23,3,2,'#e8f0ee');px(fx-2,22,1,1,'#e8f0ee');px(fx+2,22,1,1,'#e8f0ee');px(fx,21,1,1,'#f8fbfa');}
+    // 어처구니(손잡이)와 쥔 손
+    const hx=Math.round(cx+Math.cos(a)*(r-3)),hy=Math.round(18.5+Math.sin(a)*2.6);
+    px(hx-1,hy-8,3,8,'#8a6a45');px(hx,hy-8,1,8,'#a9875a');
+    const [arm,paw]=MILL_HAND[G.form||'']||MILL_HAND[''];
+    {const ox=50,dx=ox-(hx+1),dy=-(hy-9),n=Math.ceil(Math.hypot(dx,dy)/1.5);   // 위쪽에서 뻗어 내려온 팔 (끊기지 않게 촘촘히)
+      for(let i=0;i<=n;i++)px(Math.round(hx+dx*i/n),Math.round(hy-10+dy*i/n),3,3,arm);}
+    px(hx-2,hy-11,5,4,arm);px(hx-2,hy-8,5,1,paw);
+    // 한 바퀴를 다 돌면 돌이 낮게 운다
+    if(!still&&c>.78){const q=(c-.78)/.22,rr=Math.round(r+3+q*8);px(cx-rr,13,1,1,'#f4e9b8');px(cx+rr,13,1,1,'#f4e9b8');px(cx-rr-1,24,1,2,'#f4e9b8');px(cx+rr,24,1,2,'#f4e9b8');px(cx-rr+3,9,2,1,'#f4e9b8');px(cx+rr-4,9,2,1,'#f4e9b8');}
+  }};
 }
 /* 지금 맨 위 돌의 윗면 높이 (든 돌이 내려앉을 높이) */
 function wishStackTop(ground,n){let top=ground;TOWER_ROWS.forEach(([,h])=>top-=h);for(let i=0;i<n;i++)top-=TOWER_ADD[i][1];return top;}
@@ -312,7 +373,7 @@ function stirFar(){
 }
 function stirMid(){px(0,158,W,30,'#9c9a7b');for(let i=0;i<70;i++){const x=mod(i*13-cam,460)-20,y=160+(i%6)*4;px(x,y,2,1,i%3?'#f1efe2':'#d9d3bf');}}
 function stirNear(){for(let x=-20;x<W+20;x+=4){const y=194-Math.round(Math.sin((x+cam)/58)*7);px(x,y,4,H-y,'#7d7a5c');px(x,y,4,2,'#aaa77d');if(hash(x+cam)>.72)px(x,y-2,1,2,'#c9c492');}stone(30-mod(RC()*.2,40),214,22,8,3);}
-Rg.expansionArt={drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawGateRope,drawWishTower,wishTowerPic,wishStackPaint,wishStackTop,wishStackSpan,TOWER_ADD,TOWER_OFFS,drawBoulder,drawWanderer,
+Rg.expansionArt={maetdolTurnPic,drawBack:backdrop,drawScenery:scenery,drawFront:front,drawBlocked,drawDepthGate,drawGateRope,drawWishTower,wishTowerPic,wishStackPaint,wishStackTop,wishStackSpan,TOWER_ADD,TOWER_OFFS,drawBoulder,drawWanderer,
   cliffLayers:[{speed:.04,draw:cliffSky},{speed:.14,draw:cliffFar},{speed:.4,draw:cliffSea},{speed:.83,draw:cliffNear}],
   shrineLayers:[{speed:.04,draw:shrineSky},{speed:.16,draw:shrineFar},{speed:.43,draw:shrineMid},{speed:.86,draw:shrineNear}],
   stirLayers:[{speed:.04,draw:shrineSky},{speed:.14,draw:stirFar},{speed:.45,draw:stirMid},{speed:.86,draw:stirNear}],

@@ -7,13 +7,14 @@
      입은 금 가 처진 턱으로 그린다. 부서진 부위의 공격은 더 고르지 않는다. */
 (()=>{
 /* 결정 D-435: 달래면 떠난다. '용'이라 불러 주었으면 하늘로 오르고, 불씨·떡이면 남쪽(오른쪽) 바다로 날아간다. 0 → 1 */
+const GHEAD=1.25;   // 결정 D-746: 머리 그림 배율 (몸에 비해 작아 보이던 머리를 키운다)
 function gangLeave(){return B.st==='end'&&B.result==='calm'?1-Math.max(0,B.t)/80:0;}
 function gangLeaveOffset(){const k=gangLeave();if(!k)return {x:0,y:0};
   return B.lastGift==='lore:yong'?{x:0,y:-k*k*300}:{x:k*k*320,y:k*24};}
 /* 결정 D-432: 입 자리(이름패가 날아드는 곳, 토해 낸 이름이 나오는 곳). drawGangcheol 의 머리·입 좌표를 전투 화면의 0.84배 축소(bDraw)에 맞춘다 */
 function gangMouth(){
   const cx=LW/2,cy=EY,wave=Math.sin(B.time*0.04)*8,hidden=coreHidden(),o=gangLeaveOffset();
-  const x=cx-70+32+o.x,y=cy-10+wave*0.5+(hidden?16:0)+10+o.y;
+  const x=cx-70+32*GHEAD+o.x,y=cy-10+wave*0.5+(hidden?16:0)+10*GHEAD+o.y;   // 결정 D-746: 머리를 GHEAD 배로 키워 그린다
   return {x:LW/2+(x-LW/2)*0.84,y:EY+(y-EY)*0.84};
 }
 function drawGangcheol(c){
@@ -44,30 +45,67 @@ function drawGangcheolBody(c){
     for(let i=0;i<6;i++){const sx=cx-128+i*34,sy=cy+84+Math.sin(i*1.3)*4;brush(c,[[sx-5,sy-4],[sx+2,sy+2],[sx-2,sy+7]],1.6,'#efe3c8',0.8);}
     for(let i=0;i<5;i++)blob(c,cx-120+i*40+hash(i)*10,cy+104+hash(i*3.1)*3,4,2.4,'#efe3c8',0.5);}
   else{const o=shk(body),col=partCol(body);const tight=B.st==='tell'&&B.cur===body?-10:0;
-    brush(c,[[cx-150+o,cy+70],[cx-90+o,cy+40+wave+tight],[cx-10+o,cy+80],[cx+60+o,cy+50-wave+tight],[cx+60+o,cy+70]],26,col,0.9);
+    const coil=[[cx-150+o,cy+70],[cx-90+o,cy+40+wave+tight],[cx-10+o,cy+80],[cx+60+o,cy+50-wave+tight],[cx+60+o,cy+70]];
+    // 결정 D-746: 등줄기를 따라 톱니 같은 등지느러미가 돋는다 (사용자 피드백 2026-11-05: 보스는 귀엽지 않게, 설화 속 악룡답게)
+    for(let i=0;i<coil.length-2;i++){const [x0,y0]=coil[i],[x1,y1]=coil[i+1];
+      for(let k=0;k<4;k++){const u=(k+0.5)/4,x=x0+(x1-x0)*u,y=y0+(y1-y0)*u-12,h=9+((i+k)%2)*5;
+        gPoly(c,[[x-6,y+4],[x-1,y-h],[x+7,y+3]],col===INK?'#2a2420':col,0.9);}}
+    brush(c,coil,26,col,0.9);
     brush(c,[[cx-130+o,cy+86],[cx-40+o,cy+92],[cx+40+o,cy+88]],18,col,0.75);
-    for(let i=0;i<9;i++){const sx=cx-130+i*24+o,sy=cy+60+Math.sin(i*1.3)*14;brush(c,[[sx-6,sy],[sx,sy-6],[sx+6,sy]],2,'#efe3c8',0.6);}
+    for(let i=0;i<9;i++){const sx=cx-130+i*24+o,sy=cy+60+Math.sin(i*1.3)*14;brush(c,[[sx-6,sy],[sx,sy-6],[sx+6,sy]],2,'#efe3c8',0.6);
+      brush(c,[[sx-4,sy+8],[sx+4,sy+8]],1.2,'#8a8f96',0.45);}   // 배 비늘 마디
     // 결정 D-435: 삼킨 이름이 똬리 속에서 빛으로 비친다 (몸통을 치면 하나씩 돌아온다)
     const eaten=B.names?B.names.eaten.length:0;
     for(let i=0;i<Math.min(eaten,8);i++){const sx=cx-118+i*26+o,sy=cy+66+Math.sin(i*1.3+B.time*0.03)*10,pulse=0.28+0.12*Math.sin(B.time*0.08+i);
       blob(c,sx,sy,7,5,GOLD,pulse);blob(c,sx,sy,3,2.4,'#fff4cf',pulse+0.2);}}
-  // 머리와 입
+  // 머리와 입. 결정 D-746: 용이 되지 못한 이무기의 머리. 길게 뻗은 주둥이, 눈을 내리누르는 두툼한 눈두덩,
+  // 그 밑에 세로로 찢어진 동공이 서리처럼 차갑게 빛난다. 뿔은 자라다 만 울퉁불퉁한 혹 둘이 뒤로 휘었고, 목덜미엔 갈기가 곤두섰다.
+  // 둥근 머리·큰 동그란 눈(귀여워 보이던 그림)은 버렸다.
   {const o=shk(head),col=partCol(head);const hidden=coreHidden();const hx=cx-70+o,hy=cy-10+wave*0.5+(hidden?16:0);
-    brush(c,[[cx-120+o,cy+(body.broken?84:50)],[hx-10,hy+30],[hx,hy+6]],20,body.broken?INK:partCol(body),0.9);
-    blob(c,hx,hy,34,24,col===INK?'#231e19':col,head.broken?0.3:1);
-    brush(c,[[hx-26,hy-16],[hx-34,hy-36]],5,INK,head.broken?0.3:1);brush(c,[[hx-6,hy-20],[hx-4,hy-40]],5,INK,head.broken?0.3:1);   // 뿔이 되다 만 혹
-    // 입 (서리 숨)
+    const dim=head.broken?0.3:1,HC=col===INK?'#231e19':col,calm=B.st==='end'&&B.result==='calm';
+    const neckCol=body.broken?INK:partCol(body);
+    brush(c,[[cx-120+o,cy+(body.broken?84:50)],[hx-22,hy+34],[hx-14,hy+8]],22,neckCol,0.9);
+    c.save();c.translate(hx,hy);c.scale(GHEAD,GHEAD);c.translate(-hx,-hy);
+    // 목덜미 갈기: 뒤로 날리는 거친 털 다발
+    for(let i=0;i<6;i++){const u=i/5,bx=hx-30-u*26,by=hy-4+u*30,fl=Math.sin(B.time*0.05+i)*3;
+      brush(c,[[bx,by],[bx-12-u*6,by-8+fl],[bx-24-u*8,by-4+fl*1.4]],3.2-u,INK,0.85*dim);}
+    // 자라다 만 뿔: 울퉁불퉁한 혹 둘이 뒤로 휜다
+    const horn=(x0,y0,x1,y1,w)=>{const mx=(x0+x1)/2+3,my=(y0+y1)/2-6;
+      gPoly(c,[[x0-w,y0],[mx-w*0.6,my],[x1,y1],[mx+w*0.5,my+4],[x0+w,y0+2]],HC,dim,INK,1.4);
+      for(let k=1;k<4;k++){const u=k/4,x=x0+(x1-x0)*u,y=y0+(y1-y0)*u;brush(c,[[x-w*(1-u)*0.8,y+1],[x+w*(1-u)*0.8,y-1]],1.1,'#6b625a',0.8*dim);}};
+    horn(hx-8,hy-18,hx-40,hy-44,6);horn(hx-20,hy-12,hx-54,hy-28,5);
+    // 머리뼈: 뒤가 넓고 주둥이로 갈수록 길게 좁아진다
+    const P=pts=>pts.map(([dx,dy])=>[hx+dx,hy+dy]);
+    gPoly(c,P([[-34,-4],[-28,-16],[-12,-22],[2,-21],[12,-15],[26,-9],[42,-5],[48,1],[42,7],[16,10],[-4,16],[-24,14],[-34,6]]),HC,dim,INK,2);
+    gPoly(c,P([[-26,-14],[-10,-20],[4,-18],[-2,-12],[-22,-8]]),'#4a423b',0.55*dim);   // 정수리 큰 비늘판
+    for(const [dx,dy] of [[-18,0],[-8,4],[-26,6],[24,-3],[32,-1]])brush(c,[[hx+dx-3,hy+dy],[hx+dx,hy+dy-3],[hx+dx+3,hy+dy]],1.2,'#8a8f96',0.6*dim);   // 비늘 무늬
+    blob(c,hx+42,hy-1,2.4,1.2,'#0c0907',dim);   // 콧구멍
+    // 입 (서리 숨). 아래턱이 벌어지면 송곳니가 보인다
     const mo=shk(mouth),mc=partCol(mouth);const open=B.st==='tell'&&B.cur===mouth?10:4;
-    if(mouth.broken){brush(c,[[hx+18,hy+6],[hx+36,hy+6]],6,INK,1);brush(c,[[hx+18,hy+16],[hx+30,hy+28],[hx+36,hy+34]],6,INK,1);   // 금 가 처진 턱
-      brush(c,[[hx+26,hy+18],[hx+30,hy+24],[hx+27,hy+29]],1.6,'#efe3c8',0.9);}
-    else{brush(c,[[hx+18+mo,hy+6],[hx+38+mo,hy+4+open*0.3]],6,mc,1);brush(c,[[hx+18+mo,hy+14],[hx+38+mo,hy+16+open]],6,mc,1);}
-    if(!mouth.broken){brush(c,[[hx+30,hy+2],[hx+70,hy-10],[hx+96,hy+6]],2,INK,0.6);brush(c,[[hx+30,hy+18],[hx+66,hy+34],[hx+92,hy+28]],2,INK,0.6);}   // 수염
-    if(head.broken){brush(c,[[hx-14,hy-2],[hx-4,hy]],3,'#efe3c8');}
-    else{const [ex,ey]=lookAt(hx,hy);blob(c,hx-4,hy-4,8,7,'#efe3c8');blob(c,hx-4+ex,hy-4+ey,3.5,4,INK);}
-    if(B.st==='end'&&B.result==='calm'){brush(c,[[hx-10,hy-4],[hx+2,hy-2]],3,'#efe3c8');}
+    if(mouth.broken){brush(c,[[hx+14,hy+10],[hx+38,hy+8]],5,INK,1);brush(c,[[hx+12,hy+16],[hx+28,hy+28],[hx+36,hy+34]],6,INK,1);   // 금 가 처진 턱
+      brush(c,[[hx+22,hy+18],[hx+26,hy+24],[hx+23,hy+29]],1.6,'#efe3c8',0.9);}
+    else{const jaw=P([[12,12],[40+mo,10+open],[36+mo,16+open],[8,20]]);
+      gPoly(c,P([[14,10],[42+mo,8],[40+mo,10+open*0.8],[14,14]]),'#3a1f1c',1);   // 벌린 입 속
+      for(const fx of [22,32])gPoly(c,P([[fx-2+mo,8],[fx+2+mo,8],[fx+mo,13+open*0.25]]),'#efe3c8',1);   // 위 송곳니
+      gPoly(c,jaw,mc===INK?'#231e19':mc,1,INK,1.6);
+      gPoly(c,P([[28+mo,10+open],[31+mo,10+open],[29.5+mo,5+open]]),'#efe3c8',1);}   // 아래 송곳니
+    if(!mouth.broken){const sw=Math.sin(B.time*0.03)*4;   // 길게 늘어진 수염
+      brush(c,[[hx+38,hy+2],[hx+64,hy-12+sw],[hx+88,hy-4+sw],[hx+100,hy+8+sw]],2,INK,0.7);
+      brush(c,[[hx+34,hy+12],[hx+58,hy+30-sw],[hx+82,hy+28-sw],[hx+96,hy+40-sw]],2,INK,0.7);}
+    // 눈: 두툼한 눈두덩이 내리누르고, 그 밑에 세로로 찢어진 동공
+    brush(c,[[hx-14,hy-14],[hx-2,hy-15],[hx+12,hy-9]],5,INK,dim);   // 눈두덩
+    if(head.broken){brush(c,[[hx-8,hy-7],[hx+6,hy-6]],3,'#efe3c8');}
+    else if(calm){brush(c,[[hx-8,hy-7],[hx+6,hy-6]],2.4,'#efe3c8');}
+    else{const [ex]=lookAt(hx,hy);
+      blob(c,hx,hy-8,9,4,'#bfe6ef',0.14);   // 서리 같은 눈빛
+      gPoly(c,P([[-8,-7.5],[-1,-10.5],[7,-9.5],[3,-7],[-5,-6]]),'#d8f0f4',1);   // 가늘게 찢어진 눈
+      gPoly(c,[[hx+0.4+ex*0.4,hy-10.6],[hx+1.6+ex*0.4,hy-10.6],[hx+1.4+ex*0.4,hy-6.2],[hx+0.6+ex*0.4,hy-6.2]],INK,1);}
+    c.restore();
     if(hidden){brush(c,[[hx-50,hy-10],[hx,hy+20],[hx+50,hy-12]],10,INK,0.8);}
   }
 }
+function gPoly(c,pts,fill,alpha=1,stroke,lw=1.6){c.save();c.globalAlpha=alpha;c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();
+  c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=lw;c.lineJoin='round';c.stroke();}c.restore();}
 
 /* 결정 D-62: 모든 전투 배경은 상대 뒤쪽 화면 전체로 그린다 (design/data/decisions.csv).
    강철이는 영산 호숫가. 지나는 곳마다 가뭄이 드는 악룡이라 겨울인데도 눈이 말랐다. 마른 겨울 산, 얼어붙은 호수, 금줄 두른 신목(잎 없는 가지),

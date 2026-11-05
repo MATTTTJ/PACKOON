@@ -709,7 +709,7 @@ function drawToolSwap(c){
 function drawBonk(c){
   if(B.bonk>0){const x=B.px,y=B.py-24;c.save();c.strokeStyle=RED;c.lineWidth=2.4;c.globalAlpha=Math.min(1,B.bonk/12);
     for(let i=0;i<8;i++){const a=i*Math.PI/4;c.beginPath();c.moveTo(x+Math.cos(a)*8,y+Math.sin(a)*8);c.lineTo(x+Math.cos(a)*(16+(34-B.bonk)*0.4),y+Math.sin(a)*(16+(34-B.bonk)*0.4));c.stroke();}
-    c.fillStyle=RED;c.font='bold 20px "Gowun Batang", serif';c.textAlign='center';c.fillText('딱!',x+26,y-6);c.restore();}
+    c.fillStyle=RED;c.font='bold 20px "Gowun Batang", serif';c.textAlign='center';c.fillText(B.bonkWord||'딱!',x+26,y-6);c.restore();}   // 결정 D-731: 무쇠의 마지막 꿀밤은 '콩!'
   if(B.toolFly){const f=B.toolFly;c.save();c.translate(f.x,f.y);c.rotate(f.rot);c.globalAlpha=0.9;drawTool(c,heldTool());c.restore();}
 }
 function bDraw(){
