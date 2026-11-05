@@ -61,7 +61,7 @@ function startDizzy(){
 function stepRoll(ax){
   const T=TABLES.TUNING;
   if(rollNeedRelease&&!spaceHeld()&&!rollDizzy)rollNeedRelease=false;
-  if(rollDizzy>0){if(!paused())rollDizzy--;G.vx=0;jumpQ=false;rollHold=null;if(!spaceHeld()&&rollDizzy<=0)rollNeedRelease=false;return;}
+  if(rollDizzy>0){if(!paused())rollDizzy--;G.vx=0;jumpQ=atkQ=false;rollHold=null;if(!spaceHeld()&&rollDizzy<=0)rollNeedRelease=false;return;}
   if(rollHold&&!rollHold.done){
     if(!spaceHeld()||!rollAllowedNow()){rollHold=null;}
     else if(performance.now()-rollHold.t0>=T.roll_hold_ms){
