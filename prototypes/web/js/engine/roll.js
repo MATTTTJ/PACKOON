@@ -35,7 +35,7 @@ function rollButtonPress(){
   if(!rollAllowedNow()||rolling)return;
   rollHold=null;
   const spec=rollSpec();
-  if(!spec.roll){toast(spec.say);return;}
+  if(!spec.roll){think(spec.say);return;}
   if(G.onGround)startRoll();
 }
 /* 결정 D-143: C·W·↑ 점프가 나가면 Space 기다림을 거둔다 (뒤늦게 구르거나, 뗄 때 한 번 더 뛰지 않게) */
@@ -55,7 +55,7 @@ function endRoll(){if(!rolling)return;rolling=false;rollVel=0;rollTick=0;rollRun
 function startDizzy(){
   const T=TABLES.TUNING;endRoll();rollHold=null;rollDizzy=T.roll_dizzy_frames;rollNeedRelease=true;G.vx=0;
   Sound.land();
-  if(!G.f.rollDizzySaid){G.f.rollDizzySaid=true;toast('어질어질… 너무 오래 굴렀다');}
+  if(!G.f.rollDizzySaid){G.f.rollDizzySaid=true;think('어질어질… 너무 오래 굴렀다.');}
 }
 /* step()에서 G.vx를 정한 뒤 부른다. 구르는 중이면 G.vx를 구르기 빠르기로 바꾼다. ax: 좌우 입력 -1·0·1 */
 function stepRoll(ax){
@@ -70,7 +70,7 @@ function stepRoll(ax){
       if(spec.roll&&G.onGround)startRoll();
       else if(!spec.roll){
         const said=G.f.rollSaid||(G.f.rollSaid={});
-        if(!said[G.form||'']){said[G.form||'']=true;toast(spec.say);}
+        if(!said[G.form||'']){said[G.form||'']=true;think(spec.say);}
       }
     }
   }

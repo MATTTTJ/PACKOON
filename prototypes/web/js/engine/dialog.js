@@ -26,19 +26,36 @@ function showLine(){
   const L=dlgQ.shift();
   if(!L){const f=dlgEnd;dlgDismiss();if(f)f();return;}
   // 결정 D-600: 이름(#dlgWho)은 창 위 테두리의 꼬리표로 그린다(style.css). 이름이 빈 줄(지문)은 꼬리표도 숨는다
-  $('dlg').hidden=false;$('dlgWho').textContent=L[0];$('dlgText').textContent=L[1];dlgShownAt=performance.now();
+  $('dlg').hidden=false;$('dlgWho').textContent=L[0];fillDlgText($('dlgText'),L[1]);dlgShownAt=performance.now();
   if(L.hint)learn(L.hint);   // 결정 D-461: 숨은 가공법 귀띔은 그 줄을 들은 순간 수첩에 적힌다 (arcs.js hintLine)
   if('pic' in L)dlgPic(L.pic);
   const face=$('dlgFace');face.innerHTML='';face.appendChild(portrait(L[0]));
   const ch=$('dlgChoices');ch.innerHTML='';
   if(L[2]){
     $('dlgNext').hidden=true;
+    // 결정 D-701: 고르기 단추는 글 길이만큼, 가운데 정렬 (style.css .choices)
     L[2].forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.textContent=c.t;
       b.onclick=e=>{e.stopPropagation();if(dlgTouchLocked('choice'))return;Sound.choice(!!c.go);dlgDismiss();if(c.go)c.go();};ch.appendChild(b);});
     if(TOUCH){ch.classList.add('wait');const at=dlgShownAt;setTimeout(()=>{if(dlgShownAt===at)ch.classList.remove('wait');},TABLES.TUNING.dlg_touch_choice_lock_ms);}
     setTimeout(()=>{const f=ch.querySelector('button');if(f&&matchMedia('(pointer:fine)').matches)f.focus();},0);
   }else $('dlgNext').hidden=false;
   if(typeof placePeek==='function'){placePeek();requestAnimationFrame(placePeek);}   // 결정 D-151: 선택지로 대화창이 커지면 그림을 그 위로 비킨다
+}
+/* 결정 D-700: 대사는 문장 단위로 줄을 바꾼다 (사용자 피드백 2026-11-05: '개울 소리가 들'에서 줄이 끝난다).
+   문장마다 한 덩어리(span.sent, style.css)로 감싸 그 줄에 다 들어가면 잇고, 안 들어가면 문장째 다음 줄로 넘긴다.
+   문장 끝은 . ? ! … ~ 와 대사 속 줄바꿈(\n). 글자는 그대로 두어 textContent 는 원래 대사와 같다. 낱말 안에서는 끊지 않는다(keep-all). */
+function fillDlgText(box,text){
+  box.textContent='';
+  let sent=null;
+  const close=()=>{sent=null;};
+  for(const part of String(text??'').split(/(\s+)/)){
+    if(!part)continue;
+    if(/^\s+$/.test(part)){box.appendChild(document.createTextNode(part));if(part.includes('\n'))close();continue;}
+    if(!sent){sent=document.createElement('span');sent.className='sent';box.appendChild(sent);}
+    else if(sent.lastChild&&sent.nextSibling)sent.appendChild(box.lastChild);   // 문장 안의 띄어쓰기는 그 문장 덩어리 안으로
+    sent.appendChild(document.createTextNode(part));
+    if(/[.?!…~][”"'’)\]」』]*$/.test(part))close();
+  }
 }
 /* 결정 D-151: 대사 줄의 장면 그림. 줄 배열에 pic을 달면 그 줄부터 화면 가운데 작은 창에 띄우고,
    pic:null인 줄이 오거나 대화창이 닫히면 내린다. pic은 그리기 함수이거나 {draw, animate}. */

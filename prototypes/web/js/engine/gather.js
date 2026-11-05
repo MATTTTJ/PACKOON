@@ -49,7 +49,7 @@ function gatherHit(d){
   if(!G.f.gatherHinted)G.f.gatherHinted={};
   // 결정 D-716: 채집 설명은 짧게. 자리마다 한 줄(cfg.hint)이고, 붓·도장 규칙은 처음 캘 때 한 번만 덧붙인다 (사용자 피드백 2026-11-05 "설명이 너무 길다")
   if(!G.f.gatherHinted[gatherKey(d)]){const first=!G.f.gatherRuleSaid;G.f.gatherHinted[gatherKey(d)]=true;G.f.gatherRuleSaid=true;
-    toast(first?cfg.hint+' 붓끝이 붉은 도장에 닿을 때 치면 더 나온다.':cfg.hint);}
+    think(first?cfg.hint+' 붓끝이 붉은 도장에 닿을 때 치면 더 나오겠다.':cfg.hint);}
   d.prog=(d.prog||0)+(just?MG.gather_perfect_power:1);if(just)d.perfects=(d.perfects||0)+1;
   // 결정 D-482: 채집 자리마다 칠 때 소리를 따로 줄 수 있다(cfg.hitSound). 눈 둔덕은 쇠 날이 언 눈을 때리는 '팡'
   if(cfg.hitSound)Sound.hit(cfg.hitSound);else Sound.gather(true);
@@ -73,7 +73,7 @@ function finishGather(d){
   const cfg=gatherCfg(d)||{},rare=!d.flaw&&d.perfects&&cfg.rare&&ITEMS[cfg.rare]?cfg.rare:null;
   if(rare){spawnDrops(rare,1,{x:d.x+6,y:d.y??fieldGround(),zone:d.zone});learn('gather:rare:'+id);}
   // 결정 D-266: 무엇이 왜 묻혀 있었는지 자리가 알려 준다(눈 둔덕). 칸을 맞춘 알림은 그 뒤에 띄운다.
-  if(d.found)setTimeout(()=>toast(d.found),250);
+  if(d.found)setTimeout(()=>think(d.found),250);
   if(rare)setTimeout(()=>toast(ITEMS[id].n+' ×'+n+' · '+ITEMS[rare].n+'도 나왔다'),d.found?1700:700);
   else if(extra)setTimeout(()=>toast('도장에 맞춰 더 캐냈다. '+ITEMS[id].n+' ×'+n),d.found?1700:700);
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);

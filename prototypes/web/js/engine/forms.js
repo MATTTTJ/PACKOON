@@ -110,7 +110,7 @@ function owlSenseTick(){
     a.found=true;learn('rule:owl_sense');
     Vfx.burst(a.x,(a.y??fieldGround())-6);Sound.leaf?.('owl');
     const n=ITEMS[a.item]?.n||'무언가';
-    toast('…무언가 느껴진다. 숨어 있던 '+jo(n,'이','가')+' 드러났다');
+    think('…뭔가 느껴진다. 숨어 있던 '+jo(n,'이','가')+' 보인다.');
   }
 }
 function climbNear(){
@@ -164,7 +164,7 @@ function formFallCap(){
 function openCache(d){
   d.done=true;Sound.gather(true);Vfx.gather(d.x,(d.y??fieldGround())-4);learn('rule:squirrel_cache');
   spawnDrops(d.item,d.n||2,{x:d.x,y:d.y??fieldGround(),zone:d.zone});
-  toast('묻어 두고 잊은 몫을 찾았다');
+  think('묻어 두고 잊은 몫을 찾았다!');
 }
 function drawCache(d,x){
   const y=d.y??fieldGround();

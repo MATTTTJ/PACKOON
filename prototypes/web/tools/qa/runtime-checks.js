@@ -38,8 +38,14 @@ async function fresh(browser, rules, mobile = false) {
   await click(browser, '#tsNew');
   await click(browser, '#btnStart');
   await browser.until('G.started && !G.ended', { timeout: 10000, label: '새 게임' });
-  await browser.until("!document.querySelector('#bag').hidden", { timeout: 10000, label: '출발 쪽지' });
-  await click(browser, '#bagClose');
+  await readStartLetter(browser, mobile);
+}
+// 결정 D-704: 출발 쪽지는 화면 가운데에 펼쳐지고 아이의 독백 대화로 읽는다. 끝까지 넘기고 쪽지가 접혀 사라질 때까지 기다린다
+async function readStartLetter(browser, mobile = false, label = '') {
+  await browser.until("G.f.momNoteSeen && !document.querySelector('#dlg').hidden && !!document.querySelector('.mom-letter')", { timeout: 10000, label: label + '출발 쪽지 독백' });
+  const press = async () => { if (mobile) await tap(browser, '#dlg'); else await browser.key('e'); await browser.wait(120); };
+  await browser.advanceDialogue({ press });
+  await browser.until("!document.querySelector('.mom-letter')", { timeout: 5000, label: label + '출발 쪽지 접힘' });
 }
 
 async function runEdges({ outDir, evidence = [] }) {
@@ -185,8 +191,7 @@ async function runMobileLayout(browser, outDir, findings, evidence, steps) {
     await browser.navigate(browser.url); await browser.eval('localStorage.clear()'); await browser.reload();
     await browser.until("!!document.querySelector('#tsNew')?.getClientRects().length", { timeout: 15000, label: w + '×' + h + ' 첫 화면' });
     await tap(browser, '#tsNew'); await tap(browser, '#btnStart');
-    await browser.until("!document.querySelector('#bag').hidden", { timeout: 10000, label: w + '×' + h + ' 출발 쪽지' });
-    await tap(browser, '#bagClose');
+    await readStartLetter(browser, true, w + '×' + h + ' ');
     // 주인공을 길 가운데쯤에 세우고 카메라가 따라오게 둔다 (주인공이 화면 가운데 근처에 있을 때 단추가 덮지 않아야 한다)
     await browser.eval('G.px=Math.min(fieldWidth()-260,640);G.cam=clamp(G.px-W*.42,0,Math.max(0,fieldWidth()-W))');
     await browser.wait(400);
@@ -247,7 +252,7 @@ async function runMobile({ browser, outDir, rules }) {
     const image = path.join(outDir, `mobile-${name}.png`);
     const sceneSteps = ['390×844 터치 에뮬레이션과 빈 격리 저장에서 첫 화면을 연다.',
       ...(['prologue', 'bag', 'dialog'].includes(name) ? ['새로 시작을 누른다.'] : []),
-      ...(['bag', 'dialog'].includes(name) ? ['길을 나서기를 누르고 엄마 쪽지를 닫는다.'] : []),
+      ...(['bag', 'dialog'].includes(name) ? ['길을 나서기를 누르고 엄마 쪽지 독백을 넘긴다.'] : []),
       ...(name === 'bag' ? ['보따리 버튼을 누른다.'] : []),
       ...(name === 'dialog' ? ['오른쪽 터치 버튼을 유지해 마을 x803까지 걷고 말걸기를 누른다.'] : [])];
     const context = { evidence: image, steps: sceneSteps, reproductions: '이번 실행 1회', environment: { url: browser.url, viewport: '390×844, DPR 1', input: 'CDP 실제 터치', start: '빈 격리 저장, 확장판 새 게임' } };
@@ -266,8 +271,7 @@ async function runMobile({ browser, outDir, rules }) {
     await measure('title', ['#titleScene']);
     await tap(browser, '#tsNew'); await measure('prologue', ['#titleScreen']);
     await tap(browser, '#btnStart');
-    await browser.until("!document.querySelector('#bag').hidden", { timeout: 10000, label: '휴대폰 출발 쪽지' });
-    await tap(browser, '#bagClose');
+    await readStartLetter(browser, true, '휴대폰 ');
     const acorn=await browser.eval("fieldItems('pickups').find(a=>a.item==='acorn'&&!a.got&&a.y===fieldGround())");
     if(!acorn)throw Error('휴대폰 줍기 시험용 도토리가 없다.');
     await holdTouch(browser, '#pad [data-k="right"]', 'G.px >= '+acorn.x);
@@ -277,7 +281,7 @@ async function runMobile({ browser, outDir, rules }) {
     await tap(browser, '#pad [data-k="bag"]');
     await browser.until("!document.querySelector('#bag').hidden", { timeout: 5000, label: '휴대폰 보따리' });
     await measure('bag', ['#bag']); await tap(browser, '#bagClose');
-    steps.push('2. 터치로 새 게임을 시작하고 출발 쪽지를 닫은 뒤 보따리를 연다.');
+    steps.push('2. 터치로 새 게임을 시작하고 출발 쪽지 독백을 넘긴 뒤 보따리를 연다.');
     await holdTouch(browser, '#pad [data-k="right"]', 'G.px >= 803');
     await tap(browser, '#padTalk');
     await browser.until("!document.querySelector('#dlg').hidden", { timeout: 5000, label: '까치 대화' });
@@ -305,4 +309,64 @@ async function runMobile({ browser, outDir, rules }) {
   return result('mobile', findings, evidence, `390×844 터치 화면 ${scenes.length}/${MOBILE_SCENES.length}장면 측정, 배치 ${layoutScenes}장면(화면 크기 5), 배치 문제 ${findings.filter(f => f.rule === 'mobile-layout').length}건, 작은 버튼 ${findings.filter(f => f.rule === 'touch-target').length}건, 글 넘침 ${findings.filter(f => f.rule === 'mobile-overflow').length}건. 실기기 조작감은 미확인이다.`);
 }
 
-module.exports = { runEdges, runSave, runMobile, measureScene, judgeLayout };
+/* 결정 D-702: 대화 중 ESC. 예전엔 대화가 중간에 끊긴 채 미리 세운 진행값만 남아 인물이 다음 단계로 건너뛰었다.
+   1) 단풍골 날쌘 첫 만남(진행값을 먼저 세우고 말하는 대화)에서 줄마다 ESC 를 눌러도 같은 줄이 남고, 중간 줄에는 '보따리 펼치기'가 없는지 본다.
+   2) 네 지역 모든 구역의 인물·길손·조사에 말을 걸고 앞 몇 줄마다 ESC 를 눌러 대화·진행값·보따리가 그대로인지 본다. */
+async function runTalkEsc({ browser, outDir, rules }) {
+  const findings = [], steps = [];
+  const state = "({dlg:!$('dlg').hidden,t:$('dlgText').textContent,ch:$('dlgChoices').children.length,f:JSON.stringify(G.f),inv:JSON.stringify(G.inv),panel:!$('bag').hidden||!$('trade').hidden||!$('notebook').hidden,quick:!!document.querySelector('.trade-quick:not([hidden])'),left:dlgQ.length})";
+  const settle = async () => {
+    for (let i = 0; i < 40 && await browser.eval('inkOn||zoneFade>0||!!zoneMotion'); i++) await browser.wait(60);
+    await browser.eval("if(B){B=null;$('battle').hidden=true;document.body.classList.remove('in-battle');}if(!$('dlg').hidden)dlgDismiss();closePanels();");
+  };
+  let lines = 0, things = 0;
+  try {
+    await fresh(browser, rules);steps.push('새 게임, 출발 쪽지 독백을 넘김');
+    await browser.eval("changeZone('forge',{x:100})");await browser.until("G.zone==='forge'&&!zoneFade&&!zoneMotion", { label: '대장간 길' });
+    await browser.eval("(()=>{const p=fieldNpcs().find(p=>p.id==='nal');G.px=p.x;interactWith(p,'npc');})()");steps.push('날쌘에게 처음 말을 건다');
+    for (let i = 0; i < 12; i++) {
+      const a = await browser.eval(state);if (!a.dlg) break;
+      if (a.left && a.quick) findings.push(failure('talk-esc-quick', '날쌘 첫 만남 중간 줄에 보따리 펼치기 단추가 떠 있다: ' + a.t));
+      await browser.key('Escape');await browser.wait(80);
+      const c = await browser.eval(state);
+      if (!c.dlg || c.t !== a.t) { findings.push(failure('talk-esc', `날쌘 첫 만남 ${i + 1}번째 줄에서 ESC 로 대화가 바뀌거나 닫혔다: ${a.t}`));break; }
+      if (a.ch) break;
+      await browser.key('e');await browser.wait(80);
+    }
+    const menu = await browser.eval(state);
+    if (!menu.dlg || !menu.ch) findings.push(failure('talk-esc', '날쌘 첫 만남을 끝까지 들은 뒤 고르기 대화로 이어지지 않았다: ' + menu.t));
+    for (const region of regions) {
+      await browser.navigate(browser.url.replace(/\?.*$/, '') + '?region=' + region);
+      await browser.eval("TitleScreen.close();startGame();G.f.momNoteSeen=true;closePanels();");
+      const zones = await browser.eval('REG.zones?Object.keys(REG.zones):[null]');
+      for (const zone of zones) {
+        await settle();
+        if (zone) { await browser.eval(`changeZone(${JSON.stringify(zone)},{x:100})`);await browser.until(`G.zone===${JSON.stringify(zone)}&&!zoneFade&&!zoneMotion`, { label: region + '/' + zone }); }
+        const list = await browser.eval("[...fieldNpcs().map(p=>['npc',p.id]),...zoneObjects('wanderers').map(p=>['wanderers',p.id]),...zoneObjects('examines').map(p=>['examines',p.id])]");
+        for (const [kind, id] of list) {
+          await settle();things++;
+          const opened = await browser.eval(`(()=>{const all={npc:fieldNpcs(),wanderers:zoneObjects('wanderers'),examines:zoneObjects('examines')};const p=all[${JSON.stringify(kind)}].find(p=>p.id===${JSON.stringify(id)});if(!p)return false;G.px=p.x;interactWith(p,${JSON.stringify(kind)});return !$('dlg').hidden;})()`);
+          if (!opened) continue;
+          for (let i = 0; i < 6; i++) {
+            const a = await browser.eval(state);if (!a.dlg) break;lines++;
+            await browser.key('Escape');await browser.wait(60);
+            const c = await browser.eval(state);
+            if (!c.dlg || c.t !== a.t || c.f !== a.f || c.inv !== a.inv || c.panel) {
+              findings.push(failure('talk-esc', `${region}/${zone || '-'} ${kind} ${id}: ${i + 1}번째 줄에서 ESC 뒤 대화·진행값·보따리가 바뀌었다: ${a.t.slice(0, 40)}`, { scene: { region, zone, kind, id } }));break;
+            }
+            if (a.ch) break;   // 고르기는 사람이 고른다. ESC 로 지나가지 않는 것만 본다
+            await browser.key('e');await browser.wait(60);
+            if (await browser.eval("!!B||inkOn||!$('trade').hidden||!$('bag').hidden||!!openMinigame()")) break;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    findings.push(failure('talk-esc-execution', error.message, { steps }));
+    const image = path.join(outDir, 'talk-esc-failure.png'); await browser.screenshot(image).catch(() => {});
+  }
+  const file = write(outDir, 'talk-esc.json', { steps, things, lines, findings });
+  return result('talk-esc', findings, [file], `날쌘 첫 만남 줄마다 ESC, 네 지역 말 걸 거리 ${things}곳의 대사 ${lines}줄에서 ESC 를 눌러 보았다`);
+}
+
+module.exports = { runEdges, runSave, runMobile, runTalkEsc, measureScene, judgeLayout };

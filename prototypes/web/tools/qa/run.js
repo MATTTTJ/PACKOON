@@ -7,7 +7,7 @@ const {execFileSync}=require('node:child_process');
 const {createHash}=require('node:crypto');
 const {launchBrowser,startServer}=require('./browser');
 const root=path.resolve(__dirname,'../../../..');
-const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','map','drops-floor','drops-persistence','drops-departure','drops-full'];
+const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','talk-esc','map','drops-floor','drops-persistence','drops-departure','drops-full'];
 const staticNames=names.slice(0,5);
 const args=process.argv.slice(2);
 let quick=false,only=null;
@@ -117,7 +117,7 @@ const watchdog=setTimeout(async()=>{
   if([...selected].some(n=>!staticNames.includes(n))) {
     server=await startServer(root);metadata.url=server.url;
     const {installHooks,collectHookFindings}=require('./hooks');
-    const {runEdges,runSave,runMobile}=require('./runtime-checks');
+    const {runEdges,runSave,runMobile,runTalkEsc}=require('./runtime-checks');
     const hookEvidence=[];
     for(const mode of ['expanded','classic']) {
       const name='play-'+mode;
@@ -159,6 +159,7 @@ const watchdog=setTimeout(async()=>{
     if(selected.has('edges'))add(await runEdges({outDir,rules,evidence:hookEvidence}));
     if(selected.has('save'))add(await withBrowser('save',(browser,directory)=>runSave({browser,outDir:directory,rules})));
     if(selected.has('mobile'))add(await withBrowser('mobile',(browser,directory)=>runMobile({browser,outDir:directory,rules})));
+    if(selected.has('talk-esc'))add(await withBrowser('talk-esc',(browser,directory)=>runTalkEsc({browser,outDir:directory,rules})));   // 결정 D-702
     if(selected.has('map')){
       const {runMap}=require('./map-checks');
       add(await withBrowser('map',(browser,directory)=>runMap({browser,outDir:directory})));

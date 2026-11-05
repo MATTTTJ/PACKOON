@@ -3,7 +3,7 @@
    동물·물건·도장 쪽에는 아빠의 줄(흐린 옛 먹, 글만)과 아이의 줄(새 먹)이 한 쪽에 같이 놓인다.
    결정 D-61: 그림은 아이가 직접 보고 겪은 것만 아이 손으로 그린다(크레용 그림). 보기 전에는 빈 칸이다.
    해야 할 일·이름·숨은 가공법·장부는 아이가 이어 적은 장이다 (그리기는 book.js).
-   아빠 단서와 엄마의 쪽지는 보따리의 '중요' 탭에 있다 (bag.js). 일기·까치 답장 장은 없앴고 기록(G.diary)은 진행 판정에 그대로 쓴다.
+   아빠 단서는 '아빠 단서' 장, 엄마의 쪽지는 '이름' 장 아래에 있다 (결정 D-703, 예전엔 보따리 '중요' 탭). 일기·까치 답장 장은 없앴고 기록(G.diary)은 진행 판정에 그대로 쓴다.
 
    쪽 하나: {id, kind:'animal'|'item'|'stamp', name?, lines:[{who:'dad'|'me', text, when?, section}], dadDrawing?:true}
    - id 는 NPC·전투 상대·아이템 id (npcs.csv · bosses.csv · items.csv, 원본은 design/data/notebook.csv)
@@ -153,11 +153,12 @@ function collectFreshDrawings(){
 }
 
 /* 탭: 앞의 셋은 아빠와 같이 쓰는 쪽, 나머지는 아이가 이어 적은 장. 탭 선택은 저장하지 않는다 */
-// 결정 D-30: 수첩에서 일기·까치 답장을 빼고, 아빠 단서·엄마의 쪽지는 보따리 '중요' 탭으로 (design/data/decisions.csv)
+// 결정 D-30: 수첩에서 일기·까치 답장을 뺐다 (design/data/decisions.csv)
+// 결정 D-703: 보따리 '중요' 탭을 없애고 아빠 단서는 수첩 '아빠 단서' 장으로, 엄마의 쪽지는 '이름' 장 아래로 돌아왔다
 // 결정 D-150: 아이가 적는 장 맨 앞에 '해야 할 일'(중요·잔일로 나눈 할 일, 끝낸 일)을 두고, '익힌 솜씨' 장은 없앤다.
 //   손버릇 줄은 그 가보의 물건 쪽에 아이 줄로 남는다(myTexts). 탭 이름이 같은 보따리 '중요' 탭과 헷갈리지 않게 '해야 할 일'로 부른다.
 const NOTE_TABS=[['animal','동물',1],['item','물건',1],...(CLASSIC?[]:[['stamp','도장',1]]),
-  ['todo','해야 할 일'],['nicknames','이름']   /* 결정 D-423 */,['recipes','숨은 가공법'],['ledger','물품 장부']];
+  ['todo','해야 할 일'],['clues','아빠 단서']   /* 결정 D-703 */,['nicknames','이름']   /* 결정 D-423 */,['recipes','숨은 가공법'],['ledger','물품 장부']];
 const PAGE_SECTION={animal:'관찰',item:'관찰',stamp:'관찰',recipes:'숨은 가공법'};
 let noteTab='animal';
 // 너구리의 책이 따로 있던 때의 이름(bookTab)도 같은 탭을 가리킨다. 없어진 관찰 탭은 동물 쪽으로 간다
@@ -193,10 +194,31 @@ function toggleBook(){toggleNote();}
 function renderBook(){renderNotebook();}
 $('btnNote').onclick=()=>{if(G.started&&!open('dlg')&&!openMinigame())toggleNote();};
 $('noteClose').onclick=closePanels;
-/* 첫 지역에 처음 들어설 때 한 번: 보따리의 '중요' 탭에서 엄마의 쪽지를 펼친다 */
+/* 결정 D-704: 첫 지역에 처음 들어설 때 한 번, 엄마의 쪽지가 화면 가운데에 펼쳐지고 아이가 속으로 읽는다
+   (사용자 피드백 2026-11-05: 보따리를 여는 대신 애니메이션으로 편지를 띄우고, 내용은 주인공의 독백으로).
+   쪽지 그림은 수첩과 같은 것(book.js momNotePaper)이고, 대화가 끝나면 접혀 보따리 단추 쪽으로 들어간다.
+   독백 줄: 쪽지는 떠나는 날 아침 엄마가 썼다(프롤로그). 이름 자리가 번진 까닭은 아이가 본 것(엄마 붓이 거기서 멈췄다)으로만 말한다 (D-38). */
+const MOM_LETTER_LINES=[
+  ['너구리','(떠나기 전에 엄마가 겨우 써서 건넨 쪽지다.)'],
+  ['너구리','엄마 걱정은 하지 말고…\n아빠 만나면, 손 꼭 잡고 와.'],
+  ['너구리','…엄마가 기다릴게.'],
+  ['너구리','(맨 위 내 이름 자리는 먹이 번졌다.\n엄마 붓이 거기서 한참 멈춰 있었다.)'],
+  ['너구리','(쪽지를 접어 보따리 안쪽에 넣었다.\n해머루부터 찾자.)'],
+];
 function showMomNote(){
   if(G.f.momNoteSeen)return false;
-  G.f.momNoteSeen=true;openBag('중요');Sound.paper();return true;
+  G.f.momNoteSeen=true;closePanels();
+  const box=el('div','mom-letter');box.setAttribute('aria-hidden','true');box.appendChild(momNotePaper());
+  box.style.setProperty('--mom-open',TABLES.TUNING.mom_letter_open_ms+'ms');box.style.setProperty('--mom-fold',TABLES.TUNING.mom_letter_fold_ms+'ms');
+  $('stage').appendChild(box);Sound.paper();
+  requestAnimationFrame(()=>box.classList.add('open'));
+  const owner=G;
+  talk(MOM_LETTER_LINES,()=>{
+    box.classList.remove('open');box.classList.add('away');Sound.paper();
+    setTimeout(()=>box.remove(),TABLES.TUNING.mom_letter_fold_ms);
+    if(G===owner)refreshHud();
+  });
+  return true;
 }
 
 /* 보이는 것만 센다: 아빠가 적어 둔 쪽 수와 아이가 이어 적은 줄 수 */

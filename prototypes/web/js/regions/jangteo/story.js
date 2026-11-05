@@ -972,7 +972,7 @@ function finishSteam(){
   const F=G.f;if(F.steamDone)return;
   F.steamDone=true;awaken('siru');ledgerDone('morak');rel('morak',MG.handwork_steam_relation);learn('morak:steam');
   diary('j_siru','모락에게 김 올리는 법을 배웠다. 보따리 속 시루에 처음으로 김이 서렸다. 잔칫날의 시루가 깨어났다.');
-  toast('잔칫날의 시루가 깨어났다! 쌀가루 2 + 팥 1 → 팥시루떡');refreshHud();
+  think('시루가 깨어났다! 쌀가루 둘에 팥 하나면 팥시루떡이다.');refreshHud();
   // 결정 D-786: 깨어난 시루 그림을 이어 보여 주고, 다음 이야기로 넘어가면 그림을 접는다
   const lines=[Object.assign(['모락','옳지, 바로 그거야! 떡은 김이 반이지!'],Rg.siruPics?{pic:Rg.siruPics.stage(3)}:{}),['너구리','(시루가 따뜻해졌다. 이제 떡을 찔 수 있다.)'],
     Object.assign(hintLine('sirumit',['모락','우리 시룻밑은 해져서 김이 새.\n싸리 살에 짚 엮어 새로 깔아야 하는데.']),Rg.siruPics?{pic:null}:{})];   // 결정 D-461: 귀띔
@@ -1212,8 +1212,8 @@ function restMaru(){
       // 결정 D-79: 진행에 필요한 몫(엿방울 몫, 모자란 쌀)이 모자랄 때만 다시 떨어진다.
       const refill=!toNight&&conesNeeded();
       if(refill)for(const a of G.pickups)if(a.zone==='pine'&&a.item==='solbang')a.got=false;
-      toast(toNight?'밤이 되었다. 좌판이 접히고 골목이 열렸다.':refill?morning+' 솔숲에 새 솔방울이 떨어졌다.':morning);
-    }else toast(toNight?'밤이 되었다':morning);refreshGoal();});
+      think(toNight?'밤이 됐다. 좌판이 접히니 골목이 트였네.':refill?morning+' 솔숲에 새 솔방울이 떨어졌겠다.':morning);
+    }else think(toNight?'밤이 됐다.':morning);refreshGoal();});
 }
 
 /* ---------- 부엉 영감 (보부상단 접장): 밤에만 깨어 있다 ---------- */
@@ -1281,7 +1281,7 @@ function bueongGiveNow(){
         ['부엉 영감','상단 막내, 오늘이 섣달그믐이다.\n그믐 밤엔 헌것들이 들썩이고, 창고 물건이 없어진다.'],
         ['부엉 영감','오늘 밤 창고 문 앞을 지켜라. 보부상의 일이다.'],
         ...watchLines
-      ],()=>{maknae();toast('숙소 창고를 지키자');refreshGoal();});return;
+      ],()=>{maknae();think('오늘 밤은 숙소 창고를 지키자.');refreshGoal();});return;
     }
     talk([['부엉 영감','붉은 팥이 제대로 들었구나. 고사상에 올릴 만하다.'],['너구리','(영감님이 떡을 올리고 장부에 신표 표시를 한다.)'],
       ['부엉 영감','이제 너도 보부상단 식구다. 막내지.\n신표를 받아라.'],['부엉 영감','이건 네 아비가 맡긴 짐이다.'],
@@ -1313,7 +1313,7 @@ Rg.startDokkaebi=()=>{
     }else{
       G.px=Rg.STORE_X-70;G.f.faints+=res==='lose'?1:0;
       diary('j_hint','눈도깨비는 독수리·곰·멧돼지로 둔갑한다. 둔갑이 끝날 때마다 푸른 심장이 튀어나온다. 둔갑 둘이 풀리면 숨어 버리는데, 수리부엉이 눈에는 보인다. 도깨비는 메밀을 좋아한다는 말이 있다.');
-      talk([['너구리','(둔갑이 끝날 때마다 심장이 튀어나왔어.\n숨으면 밤눈으로 봐야 해. 메밀도 좋아한댔지.)']],()=>toast('준비되면 다시 창고 문 앞으로'));
+      talk([['너구리','(둔갑이 끝날 때마다 심장이 튀어나왔어.\n숨으면 밤눈으로 봐야 해. 메밀도 좋아한댔지.)']],()=>think('준비되면 다시 창고 문 앞으로 가자.'));
     }
   });encounter=B;});
 };

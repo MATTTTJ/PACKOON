@@ -341,7 +341,7 @@ function addItem(id,n){
 }
 function takeItem(id,n){G.inv[id]=(G.inv[id]||0)-n;if(G.inv[id]<=0)delete G.inv[id];refreshHud();}
 function diary(id,text){if(G.diary.some(d=>d.id===id))return;G.diary.push({id,text});}
-// 결정 D-140: 단서에 숫자를 붙이지 않는다 (확정 "사연은 은근히, 탐색 퍼즐이 되면 안 된다"). 세는 것은 보따리 '중요' 탭과 끝 화면에서만.
+// 결정 D-140: 단서에 숫자를 붙이지 않는다 (확정 "사연은 은근히, 탐색 퍼즐이 되면 안 된다"). 세는 것은 수첩 '아빠 단서' 장과 끝 화면에서만 (결정 D-703).
 function clue(id,who,text){if(G.clues.some(c=>c.id===id))return;G.clues.push({id,who,text});setTimeout(()=>toast('아빠 단서를 찾았다'),900);}
 function ledger(id,npc,want,give){if(!G.ledger[id])G.ledger[id]={npc,want,give,done:false};}
 function ledgerDone(id){if(G.ledger[id]&&!G.ledger[id].done){Vfx.burst(G.px,G.py-12);Sound.exchange();G.ledger[id].done=true;}}
@@ -427,7 +427,7 @@ function sendHomeGift(regionId,itemId){
   gifts[regionId]={itemId:itemId||null,to:next,delivered:false};
   if(itemId!=null)takeItem(itemId,1);
   learn(key,true);diary(key,(itemId?ITEMS[itemId].n+' 하나':'이곳에서 그린 그림')+'를 까치 편에 집으로 보냈다.');
-  Sound.paper();toast('까치가 집으로 날아갔다.');
+  Sound.paper();think('까치가 집으로 날아갔다. 엄마가 좋아하겠지.');
   if(open('notebook'))renderNotebook();return true;
 }
 /* 결정 D-525: 엄마의 상태는 아이가 보낸 약에 따라 조금씩 나아진다 (사용자 피드백 2026-11-04).

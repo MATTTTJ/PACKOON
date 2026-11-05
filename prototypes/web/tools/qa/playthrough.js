@@ -12,7 +12,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   const read = async expression => b.eval(expression);
   const wait = async ms => b.wait(ms);
   const log = (action, detail) => trace.push({seconds:+((Date.now()-started)/1000).toFixed(2), scene, action, detail});
-  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,note:!$('notebook').hidden||!$('bag').hidden&&bagKind==='중요',who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade})`);
+  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,note:!$('notebook').hidden,who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade})`);
   async function check() {
     if(Date.now()-started>maxRun)throw new Error('연속 플레이 제한 540초를 넘었다');
     const s=await snapshot();
@@ -35,7 +35,6 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     for(let i=0;i<200;i++) {
       s=await check();
       if(await read("!$('notebook').hidden")){await click('#noteClose');await wait(40);continue;}
-      if(await read("!$('bag').hidden&&bagKind==='중요'")){await click('#bagClose');await wait(40);continue;}
       if(await read("!$('trade').hidden")){await trade(prefer);continue;}
       if(s.dlg) {
         if(s.choices.length) {
@@ -267,7 +266,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await read(`(()=>{if(window.__qaClockInstalled)return;window.__qaClockInstalled=true;window.__qaClockRate=1;let last=null,virtual=null;const raf=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=callback=>raf(now=>{if(last===null){last=now;virtual=now;}else{virtual+=(now-last)*window.__qaClockRate;last=now;}callback(virtual);});})()`);
     if(await read("!$('titleScene').hidden"))await click('#tsNew');
     await click('#btnStart');
-    // 엄마 쪽지는 새 게임 첫 필드 프레임에 열린다(field.js showMomNote). 열린 것을 본 뒤 settle이 닫아야 조작할 수 있다.
+    // 엄마 쪽지는 새 게임 첫 필드 프레임에 펼쳐지고 독백 대화가 붙는다(notebook.js showMomNote, 결정 D-704). settle이 대화를 넘긴다.
     await b.until('G.started&&G.f.momNoteSeen',{label:'새 게임 엄마 쪽지'});
     await settle();
     if(await b.eval("!$('bag').hidden||!$('notebook').hidden"))throw new Error('시작 쪽지 창을 닫지 못했다');

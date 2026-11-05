@@ -359,7 +359,7 @@ function finishStack(){
   const F=G.f;
   F.stackDone=true;awaken('maetdol');learn('dolsoe:stack');ledgerDone('dolsoe');rel('dolsoe',MG.handwork_stack_relation);
   diary('d_maetdol','돌쇠 할배가 맷돌 윗돌에 내 손을 얹어 주었다. 가만히 있으니 돌이 우웅, 낮게 울었다. 그 소리 따라 왼쪽으로 한 바퀴 돌리자 증조할아버지의 맷돌이 깨어났다.');
-  toast('증조할아버지의 맷돌이 깨어났다! 메밀 3 → 메밀가루 1');refreshHud();
+  think('증조할아버지 맷돌이 깨어났다! 메밀 셋이면 메밀가루 하나가 나오겠다.');refreshHud();
   // 결정 D-427: 맷돌을 깨운 손에 할배가 이름을 붙인다(꼭 거치는 길의 둘째 이름). 눈이 어두운 할배는 손끝으로 아이 손의 돌가루를 만져 보고 부른다.
   const stoneHand=[Object.assign(['너구리','(할배가 내 손을 더듬어 쥔다.)'],{pic:null}),['돌쇠 할배','돌가루가 하얗게 앉았구나.\n돌손이로구나.']];
   // 결정 D-443: 왼쪽으로 돌리는 건 집안 손버릇(맷돌 가공 동작, D-113)과 같다. 할배가 처음 그 버릇을 일러 준다.
@@ -445,7 +445,7 @@ function ppuriGive(i=0){
     const F=G.f,jelly=i===1&&has('memil_jelly');takeItem('memil_powder',1);F.ppuriPassed=true;ledgerDone('ppuri');rel('ppuri',1);tellSeogi();
     if(jelly)takeItem('memil_jelly',1);
     diary('d_ppuri','맷돌로 간 메밀가루로 내가 장승제 메밀전을 부쳤다. 뿔영감이 산에 올리고 절하자 금줄이 걷히고 돌산 길이 열렸다.');
-    toast('돌산 길이 열렸다');refreshGoal();
+    think('돌산 길이 열렸다!');refreshGoal();
     // 결정 D-130: 전은 아이가 부친다. 오르는 이가 제물을 마련하는 규칙이다.
     // 결정 D-274: "규칙대로·~하는 법이다"를 한 장면에 몰아 쓰지 않는다. 석이 자리 안내(D-78·석이 채집)는 그대로 둔다.
     talk([['뿔영감','좋다. 장승제를 올린다.'],...(jelly?[['뿔영감','메밀묵까지 쑤어 왔군. 상에 함께 올리지.']]:[]),['뿔영감','번철은 내주마. 전은 네가 부쳐라.'],
@@ -470,7 +470,7 @@ Rg.startGolem=()=>{
     }else{
       G.px=1790;G.f.faints+=res==='lose'?1:0;
       diary('d_hint','돌 골렘의 가슴 핵은 처음엔 눈 껍데기에 덮여 있다. 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
-      talk([['너구리','(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>toast('준비되면 다시 다가가자'));
+      talk([['너구리','(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>think('준비되면 다시 다가가자.'));
     }
   }));
 };
@@ -778,7 +778,7 @@ function meetMole(){
     ['꼬마 두더지','…아까부터 마당을 손으로 더듬고 계셔.'],
     ['너구리','그럼 찾느라 눈을 더 쓰시잖아.\n같이 돌려드리자. 내가 옆에 있을게.'],
     ['꼬마 두더지','…혼나면 네가 같이 혼나 줘야 돼.']
-  ],()=>{F.dolMoleChisel=1;toast('꼬마 두더지가 정을 안고 할배 마당 쪽으로 간다');});
+  ],()=>{F.dolMoleChisel=1;think('꼬마가 정을 안고 할배 마당 쪽으로 간다. 따라가자.');});
 }
 function chiselReturn(){
   const F=G.f;

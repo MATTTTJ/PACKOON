@@ -3802,7 +3802,11 @@ const TABLES={
   "snow_burst_shake": 2,
   "snow_burst_shake_just": 4,
   "dlg_touch_advance_lock_ms": 220,
-  "dlg_touch_choice_lock_ms": 450
+  "dlg_touch_choice_lock_ms": 450,
+  "mom_letter_open_ms": 900,
+  "mom_letter_fold_ms": 700,
+  "think_base_ms": 1800,
+  "think_char_ms": 75
  },
  "PROGRESS": [
   {

@@ -622,7 +622,7 @@ Rg.startKudzu=()=>{
     }else{
       G.px=1900-(Rg.hillShift||0);G.f.faints+=res==='lose'?1:0;
       diary('hint','엉킨 칡에게 밀려났다. 서두르지 말고 칡이 틈을 보일 때를 노리자. 버섯 향을 좋아하는 것 같았다.');
-      talk([['너구리','(…서두르지 말자. 버섯 향을 좋아하는 것 같았어.)']],()=>toast('준비되면 다시 다가가자'));
+      talk([['너구리','(…서두르지 말자. 버섯 향을 좋아하는 것 같았어.)']],()=>think('준비되면 다시 다가가자.'));
     }
   }));
 };
@@ -762,7 +762,7 @@ if(!CLASSIC){
               ['너구리','(늙은 까치가 짧게 울자, 덩치 큰 까치 둘이\n지붕에서 내려앉았다.)'],
               ['늙은 까치','우리 집 젊은 것들이다. 네 귀 한쪽씩 잡고\n가 본 길이면 어디든 데려다줄 게다.'],
               ['너구리','…귀요?']
-            ],()=>{G.f.mapUnlocked=true;toast('지도(M)를 펴면 가 본 곳으로 젊은 까치 둘을 부를 수 있다');});
+            ],()=>{G.f.mapUnlocked=true;think('지도를 펴면 젊은 까치 둘을 부를 수 있겠다.');});
         }))},{t:'바람이 잦아들면 도와드릴게요',go:null}]]]);
   }
   function brothersTalk(){
@@ -804,7 +804,7 @@ if(!CLASSIC){
       ['너구리','겨울에 먹을 거야?\n큰 건 다 한쪽 바구니에만 있네.'],
       ['다람쥐 형','큰 건 몇 알 안 되는데, 둘 다 욕심이 나서.'],['다람쥐 동생','형은 큰 걸 자기가 다 묻겠대!\n도담처럼 묻어 놓고 잊으면 어쩌려고.'],
       ['다람쥐 형','오른쪽 낮은 평상으로 바구니를 옮겨 둘게.\n어떻게 나누면 좋을지 같이 봐 줄래?',[
-        {t:'좋아, 같이 봐 줄게',go:()=>{G.f.galExpBrothersAsked=true;toast('오른쪽 낮은 평상에서 바구니를 나누자 · E');}},
+        {t:'좋아, 같이 봐 줄게',go:()=>{G.f.galExpBrothersAsked=true;think('오른쪽 낮은 평상에서 바구니를 나누자.');}},
         {t:'다음에 같이 보자',go:null}]]]);
   }
   /* 결정 D-117: 다람쥐 형제 후일담. 누구 편을 들었는지(galExpBrothersSide)가 그 뒤의 관계를 바꾼다.
@@ -873,7 +873,7 @@ if(!CLASSIC){
       ['너구리','어디서 만나기로 했어?\n엄마가 뭐라고 했는데?'],
       ['꺼병이','해 지면 물가의 갈대 아래. 울음으로 부르랬어.\n근데 내 발소리가 너무 커서 대답이 안 들려.'],
       ['너구리','같이 천천히 걷자.\n네가 멈추면 나도 멈출게.',[
-        {t:'꺼병이 곁에서 물가 쪽으로 걷는다',go:()=>{G.f.galExpChickWith=true;G.f.galExpChickX=1540;toast('오른쪽 갈대까지 함께 걷자. 멀어지면 꺼병이는 기다린다');}},
+        {t:'꺼병이 곁에서 물가 쪽으로 걷는다',go:()=>{G.f.galExpChickWith=true;G.f.galExpChickX=1540;think('오른쪽 갈대까지 같이 걷자. 너무 앞서면 꺼병이가 멈춘다.');}},
         {t:'여기서 기다려. 길부터 살필게',go:null}]]]);
   }
   /* 결정 D-117: 새 떠돌이 둘. 아이가 날라 주는 것으로 관계가 생긴다.
@@ -1143,7 +1143,7 @@ if(!CLASSIC){
     if(Math.abs(dx)>TABLES.TUNING.field_talk_distance&&Math.abs(dx)<W*.5){
       G.f.galExpChickX=clamp(x+Math.sign(dx)*TABLES.TUNING.field_move_speed,1540,2090);
     }
-    if(G.f.galExpChickX>=2090&&!G.f.galExpChickArrived){G.f.galExpChickArrived=true;toast('갈대 너머에서 어미가 답한다. 꺼병이에게 말을 걸자');}
+    if(G.f.galExpChickX>=2090&&!G.f.galExpChickArrived){G.f.galExpChickArrived=true;think('갈대 너머에서 어미가 답한다! 꺼병이한테 말해 주자.');}
   };
   for(const n of Rg.npcs){
     const positions={dodam:['forest',700],nal:['forge',1560],musoe:['forge',1040],toad:['hill',TOAD_HILL_X]};   // 결정 D-521
