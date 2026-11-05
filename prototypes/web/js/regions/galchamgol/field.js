@@ -58,7 +58,7 @@ function drawWheel(wx){const x=wx-cam;if(x<-40||x>W+40)return;const cy=GROUND-24
 }
 Rg.drawBack=()=>{drawSky();drawHouse(26);drawHouse(130);drawWheel(620);drawGround();};
 
-/* 당산나무: 엉킨 칡이 풀리기 전에는 칡이 줄기를 감고 있고, 꼭대기에서 익던 해머루는 칡이 꽃 속에 감싸 쥐었다(D-544).
+/* 당산나무: 엉킨 칡이 풀리기 전에는 칡이 줄기를 감고 있고, 해머루는 그 칡이 꽃 속에 품어 맺은 열매다(D-544·D-623).
    결정 D-545: 크고 신성하게 (사용자 피드백 2026-11-04 단풍골 12). 몇백 년 묵은 느티나무. 밑동이 퍼져 땅을 움켜쥐고 굵은 가지가 양옆으로 뻗으며,
    누렇고 붉은 잎 그늘이 화면 위까지 덮는다. 줄기에 한지 조각을 끼운 왼새끼 금줄, 밑동에 정화수 올린 제단 돌과 서낭 돌무더기. */
 Rg.drawScenery=()=>{const x=TREE_X-cam;if(x<-190||x>W+190)return;

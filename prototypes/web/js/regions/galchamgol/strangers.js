@@ -7,15 +7,13 @@ const Rg=REGIONS.galchamgol;
 // 결정 D-25: 낯선 손님 (design/data/decisions.csv)
 Rg.strangers={
   dodam:{
-    line:'어, 처음 보는 얼굴이네!\n도토리 바꿀래?',
+    // 결정 D-621: 다람쥐로 가면 같은 종족을 만나 반가워하다가 누구냐고 묻는 데서 끝난다 (사용자 피드백 2026-11-05 단풍골 3).
+    //   예전(D-280)엔 묻은 도토리를 같이 찾는 일이 갑자기 벌어졌다. 그 일은 너구리 모습의 사연(도담의 겨울 도토리)에만 둔다.
+    get line(){return G.form==='squirrel'?'어? 다람쥐다! 반가워!\n꼬리 털 좋다. 어느 숲에서 왔어?':'어, 처음 보는 얼굴이네!\n도토리 바꿀래?';},
+    kin:'squirrel',kinLine:'근데 넌 누구야?\n이 숲 다람쥐는 내가 다 아는데.',
     trades:[{give:{rice:1},get:{acorn:3}}],swapPool:['acorn','powder'],
     talk(form){
       if(form==='owl')return strangerSay([['너구리','(도담이 꼬리를 말고 나무 구멍으로 쏙 숨는다.)']]);
-      if(form==='squirrel'&&strangerOnce('gal_dodam_kin'))return strangerSay([
-        ['도담','어? 다람쥐 손님이다!\n나 묻어 둔 데를 또 잊었어.'],
-        ['도담','같이 찾아 주면 반 줄게.'],
-        ['너구리','(둘이 낙엽을 헤집자 묻어 둔 도토리가 나왔다.)'],
-        ['도담','찾았다! 자, 반!'],receiveItem('acorn',2)],()=>{diary('gal_dodam_kin','다람쥐 모습으로 도담과 잊은 도토리를 찾아 반씩 나눴다.');});   // 결정 D-280
       if(form==='deer'&&strangerOnce('gal_dodam_deer'))return strangerSay([
         ['도담','고라니 손님은 하나도 안 무서워.\n이거 하나 먹어 봐.'],receiveItem('acorn',1)]);
       return false;
