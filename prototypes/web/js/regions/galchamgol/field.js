@@ -298,9 +298,6 @@ if(!CLASSIC){
   };
   const commonStep=()=>{
     Rg.expStep?.();
-    // Reuse the mortar's wooden beat near the repaired mill; do not replace the zone music.
-    if(G.zone==='village'&&G.f.galWheelDone&&Math.abs(G.px-1050)<W*.6&&G.anim%120===0)
-      Sound.playSfx('mortar',{gain:.25});
   };
   const basic=(id,w,platforms)=>({w,startX:70,ground:GROUND,platforms,npcs:[],
     drawBack:()=>A.back(id),drawScenery:()=>A.scenery(id),

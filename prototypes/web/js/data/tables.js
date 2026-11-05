@@ -300,7 +300,7 @@ const TABLES={
    "r": 1,
    "kind": "재료",
    "region": "jangteo",
-   "d": "눈도깨비가 곰 발톱으로 긁어 도롱이 속에 담아 간 콩. 장터에서 훔쳐 온 것이다.",
+   "d": "눈도깨비가 곰 발톱으로 긁어 소매 속에 담아 간 콩. 장터에서 훔쳐 온 것이다.",
    "u": "되"
   },
   "jip": {
@@ -780,6 +780,22 @@ const TABLES={
    "region": "yeongsan",
    "d": "얼음 비늘과 서리 수염을 함께 갈았다. 가루가 손끝에서 서늘하다. 열 내리는 데 좋을 것 같다.",
    "u": "줌"
+  },
+  "meju": {
+   "n": "메주",
+   "r": 1,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "삶은 콩을 찧어 덩이로 빚고 짚으로 묶었다. 매달아 띄우면 장맛이 된다.",
+   "u": "덩이"
+  },
+  "nurungji": {
+   "n": "누룽지",
+   "r": 0,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "장국밥 가마솥 바닥에서 긁어 말린 누룽지. 고소하고 바삭하다. 먹으면 기운이 조금 난다.",
+   "u": "조각"
   }
  },
  "BOSS_PARTS": {
@@ -1057,6 +1073,17 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:hwachae"
+   },
+   {
+    "need": {
+     "kong": 2,
+     "jip": 1
+    },
+    "out": "meju",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:meju"
    }
   ],
   "maetdol": [
@@ -2440,7 +2467,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "까치 깃 도롱이를 두른 눈도깨비. 독수리는 깃털 바람을 날리고, 곰은 발톱 세 줄로 긁고, 멧돼지는 한 줄로 내닫는다. 둔갑이 끝날 때마다 푸른 심장이 튀어나온다.",
+     "text": "서리 뿔을 이고 어깨옷을 빳빳이 세운 눈도깨비. 독수리는 날갯짓으로 땅에서 솟는 소용돌이를 일으키고, 곰은 굵은 발톱 세 줄로 긁고, 멧돼지는 보이지 않게 날뛰며 발자국만 찍는다. 둔갑이 끝날 때마다 얼음이 갈라지며 푸른 심장이 드러난다.",
      "section": "관찰",
      "when": "fight:dokkaebi"
     },
@@ -3466,6 +3493,25 @@ const TABLES={
      "text": "깨에 꿀을 버무려 찧었더니 강정이 굳었다. 얼레네 할머니 솜씨엔 아직 못 미친다.",
      "section": "숨은 가공법",
      "when": "recipe:gangjeong"
+    }
+   ]
+  },
+  {
+   "id": "meju",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "뭉근 할멈 말로는 콩 두 됫박을 절구에 찧어 덩이를 빚고 짚으로 묶으면 메주가 된다.",
+     "section": "숨은 가공법",
+     "when": "hint:meju"
+    },
+    {
+     "who": "me",
+     "text": "콩을 찧어 덩이를 빚고 짚으로 묶었다. 할멈 말대로 매달아 띄우면 장이 된다.",
+     "section": "숨은 가공법",
+     "when": "recipe:meju"
     }
    ]
   }
@@ -4677,6 +4723,9 @@ const TABLES={
   "pic_cache": {
    "sfx": "leaf_rustle"
   },
+  "pic_gam_pole": {
+   "sfx": "leaf_rustle"
+  },
   "frost_print": {
    "sfx": "footstep_frost"
   },
@@ -4726,34 +4775,27 @@ const TABLES={
   "pic_wish_tower": {
    "sfx": "stone_knock"
   },
-  "j_flag_knot": {
-   "sfx": "cloth_flutter",
-   "repeat": 1700
+  "pic_maetdol_turn": {
+   "sfx": "mill",
+   "repeat": 3200
+  },
+  "pic_mole_chisel": {
+   "sfx": "stone_knock"
   },
   "j_jangseung_snow": {
-   "sfx": "footstep_snow"
+   "sfx": "wood_tap"
   },
   "j_stall_gap": {
    "sfx": "cloth_flutter"
   },
   "j_onggi": {
-   "sfx": "clay_ring"
+   "sfx": "onggi_ring"
   },
   "j_steam_flour": {
    "sfx": "steamer"
   },
-  "j_gukbap": {
-   "sfx": "fire_crackle",
-   "repeat": 1500
-  },
-  "j_inn_shoes": {
-   "sfx": "wood_tap"
-  },
   "j_inn_pillar": {
    "sfx": "wood_tap"
-  },
-  "j_inn_icicle": {
-   "sfx": "ice_tinkle"
   },
   "j_inn_stable": {
    "sfx": "leaf_rustle"
@@ -4779,6 +4821,10 @@ const TABLES={
   "pic_kite": {
    "sfx": "cloth_flutter",
    "repeat": 1600
+  },
+  "pic_siru_steam": {
+   "sfx": "steamer",
+   "repeat": 1800
   },
   "y_hut_bindings": {
    "sfx": "cloth_flutter"
@@ -4826,6 +4872,16 @@ const TABLES={
   },
   "y_tree_bud": {
    "sfx": "leaf_rustle"
+  },
+  "pic_baduk_flip": {
+   "sfx": "baduk_scatter"
+  },
+  "pic_magpie_roofs": {
+   "sfx": "wind_gust"
+  },
+  "pic_gukbap": {
+   "sfx": "fire_crackle",
+   "repeat": 1500
   }
  }
 };

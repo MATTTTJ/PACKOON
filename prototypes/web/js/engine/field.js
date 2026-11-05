@@ -508,7 +508,8 @@ function updateNpcTags(near){
       if(!e){e=el('span','npc-tag');npcTagEls.set(key,e);npcTagLayer.appendChild(e);}
       const text=npcTagText(n);if(e.textContent!==text)e.textContent=text;
       e.classList.toggle('unknown',text==='?');
-      e.style.left=(x/W*100)+'%';e.style.top=(((n.y??fieldGround())-npcTagHeight(n))/H*100)+'%';e.hidden=false;shown.add(key);
+      e.style.left=((x+(n.tagDx||0))/W*100)+'%';   // 결정 D-796: 그림이 발 자리에서 비켜 서는 인물(밤에 수레 밑에 숨은 엿방울)은 tagDx만큼 이름표를 옮긴다
+      e.style.top=(((n.y??fieldGround())-npcTagHeight(n))/H*100)+'%';e.hidden=false;shown.add(key);
       e.style.opacity=String(npcMoveAlpha(n.id));   // D-126: 자리를 옮기는 동안 이름표도 같이 흐려진다
     }
     // 걸어 나가며 흐려지는 옛 모습에도 이름표가 따라가며 흐려진다

@@ -140,9 +140,8 @@ if(!CLASSIC){
     px(x-18,y-48,37,4,'#c39b58');px(x-9,y-51,19,3,'#d9b76d');
     px(x,y-39,1,27,'#c9ad7b');px(x-4,y-17,9,6,'#a27547');px(x-3,y-19,7,2,'#d1ae72');
   }
+  // 결정 D-730: 물레방아는 멈춘 채 풍경으로만 남는다 (고치기를 뺐다). 살 둘이 빠졌고 물만 흘러간다.
   function wheel(x,y=GROUND){
-    const stage=G.f.galWheelStage||0,working=!!G.f.galWheelDone;
-    const phase=working&&!Vfx.reducedMotion?G.anim*Math.PI/240:0;
     px(x-47,y-2,104,11,'#5c847f');px(x-40,y+2,32,1,'#b5c5a7');px(x+7,y+5,39,1,'#b5c5a7');
     px(x+18,y-54,39,4,'#8d643a');px(x+25,y-50,4,48,'#5b4130');
     // Stepped rim and spokes keep the large wheel on the same pixel grid as the stream.
@@ -152,26 +151,39 @@ if(!CLASSIC){
       px(x+xx-1,cy+yy-1,3,3,'#855833');
     }
     for(let i=0;i<8;i++){
-      if(!working&&stage<4&&(i===1||i===5))continue;
-      const a=i*Math.PI/4+phase;
+      if(i===1||i===5)continue;
+      const a=i*Math.PI/4;
       for(let r=0;r<24;r+=2)px(x+Math.round(Math.cos(a)*r),cy+Math.round(Math.sin(a)*r),2,2,'#a07646');
       px(x+Math.round(Math.cos(a)*26)-3,cy+Math.round(Math.sin(a)*26)-2,6,4,'#6e4a30');
     }
     px(x-3,cy-3,6,6,'#4a3428');px(x-1,cy-1,2,2,'#d1ab6b');
-    // A loose axle waits on trestles until the neighbours lift it into place.
-    if(G.f.galWheelAxle&&stage<4&&!working){px(x-52,y-11,6,11,'#67482f');px(x-23,y-11,6,11,'#67482f');px(x-56,y-14,44,5,'#a78350');px(x-54,y-13,39,1,'#d4ad6b');}
-    if(working){
-      const shift=Vfx.reducedMotion?0:Math.floor(G.anim/5)%8;
-      for(let i=0;i<5;i++){px(x+18,cy-22+i*7+shift,3,4,'#c1d2ae');px(x-23+i*11,y+8+(i%2),7,1,'#bcd0ae');}
+  }
+  /* 결정 D-730: 집 옆 감나무. 잎이 거의 지고 주홍 감만 남았다. 감을 따기 전엔 홍시가 떨어져 터져 있고,
+     딴 뒤엔 꼭대기 네 알(까치밥)만 남는다. 칡이 풀린 뒤에는 삼촌이 깎아 단 곶감 줄이 집 처마에 걸린다(gotgam). */
+  const GAM=[[-26,-44],[-18,-50],[-9,-41],[6,-47],[15,-40],[24,-49],[-31,-35],[29,-38],[-14,-58],[12,-56]];
+  const GAM_TOP=[[-6,-71],[4,-74],[-17,-66],[16,-68]];
+  function gamTree(x,y=GROUND){
+    x=Math.round(x);
+    const bark='#5b3d2a',dark='#47301f';
+    // 굽은 줄기와 갈래 가지 (까치가 앉는 낮은 가지는 오른쪽 y-46)
+    px(x-3,y-40,6,40,bark);px(x-2,y-46,5,7,bark);px(x-1,y-6,2,6,dark);
+    px(x-30,y-37,28,3,bark);px(x-32,y-40,4,4,bark);px(x+2,y-44,32,3,bark);px(x+31,y-48,3,5,bark);
+    px(x-20,y-52,18,3,bark);px(x+3,y-58,18,3,bark);px(x-1,y-70,3,25,bark);px(x-18,y-64,16,2,bark);px(x+2,y-70,15,2,bark);
+    px(x-10,y-75,3,6,dark);px(x+5,y-77,2,5,dark);
+    // 남은 잎 몇 장
+    for(const [a,b] of [[-23,-41],[19,-47],[-6,-62],[10,-61],[26,-52]])px(x+a,y+b,4,2,'#b2492a');
+    const gam=(a,b)=>{px(x+a,y+b,5,5,'#e8792b');px(x+a+1,y+b+4,3,1,'#c95a1d');px(x+a+1,y+b+1,1,1,'#f6b46a');px(x+a+1,y+b-1,3,1,'#4f6b2c');};
+    for(const [a,b] of GAM_TOP)gam(a,b);
+    if(!G.f.galGamDone){
+      for(const [a,b] of GAM)gam(a,b+3);
+      // 떨어져 터진 홍시
+      px(x-22,y-2,7,2,'#c9541f');px(x-20,y-3,3,1,'#e8792b');px(x+14,y-2,6,2,'#c9541f');px(x+15,y-3,2,1,'#e8792b');
     }
-    if(stage>=4||working){
-      // The wheel's shaft drives a wooden pounder; the player's heirloom stays in the bundle.
-      const lift=!working||Vfx.reducedMotion?0:Math.max(0,Math.round(Math.sin(phase*2)*7));
-      px(x+34,y-26,4,26,'#694a30');px(x+33,y-29-lift,42,4,'#9b7645');
-      px(x+68,y-25-lift,4,15,'#a4804e');px(x+62,y-11,16,11,'#77715b');px(x+65,y-12,10,3,'#3e3f35');
-      // Brief drawn sound strokes remain legible when sound is switched off.
-      if(working&&!lift){px(x+62,y-18,2,3,'#dec690');px(x+76,y-17,2,3,'#dec690');}
-    }
+  }
+  // 처마 밑 곶감 줄: 껍질 깎은 감 넷을 꿴 새끼줄 셋
+  function gotgam(x,y){
+    for(let i=0;i<3;i++){const sx=Math.round(x+i*9);px(sx,y,1,20,'#a88a55');
+      for(let j=0;j<4;j++){px(sx-2,y+2+j*5,5,4,'#d9823a');px(sx-1,y+2+j*5,1,1,'#f0b26a');}}
   }
   function farAir(dusk=false){
     // Low autumn vapour separates the two ridgelines without covering footholds.
@@ -220,7 +232,9 @@ if(!CLASSIC){
     if(zone==='village'){
       // The hill is first seen across the wheel's water, long before its path opens.
       const x=1530-RC()*.35;px(x-3,91,6,44,'#6b5340');px(x-23,77,42,19,'#bd7944');px(x-14,68,30,14,'#d28c4b');
+      gamTree(300-cam);   // 결정 D-730: 집 옆 감나무 (story.js GAM_X)
       house(70-cam,GROUND,1,!CLASSIC&&momStage()>=1);house(220-cam,GROUND,.8,false,2);well(440-cam);   // 결정 D-525: 약이 간 뒤로 엄마 방 창이 밝다
+      if(G.f.galGamDone&&G.boss.dead&&G.f.musoeAfterLeaf)gotgam(70+33-cam,GROUND-25);
       house(1098-cam,GROUND,.78,false,1);wheel(1050-cam);
       for(const u of [330,590,1200,1560,1980,2320]){const x=tx(u);if(visible(x-cam)){   // tx: 줄인 구역 좌표 (D-109)
         fence(x-cam,GROUND,3);if(u!==590)basket(x-cam+53);
@@ -271,27 +285,17 @@ if(!CLASSIC){
         for(let i=0;i<14;i++){let x=740+i*31-cam;px(x,GROUND+15+i%3*4,15,1,'#88aaa0');leaf(x+11,GROUND+13+i%2*8,['#dba448','#d0753d','#a85834'][i%3]);}}
       // The door leaves a small view of bedding; no new family portrait or names.
       const x=70-cam;px(x+22,GROUND-16,8,16,'#49372e');px(x+22,GROUND-8,7,4,'#cbad7b');px(x+23,GROUND-9,4,2,'#8c8070');
-      // Leaves, missing spokes and the axle show three separate causes of the stopped mill.
+      // 결정 D-730: 멈춘 물레방아의 물받이에는 낙엽이 쌓여 있다 (고치는 일은 없다).
       px(956-cam,138,107,4,'#8e6b42');px(957-cam,138,104,1,'#9ca889');
       px(998-cam,142,3,50,'#745536');px(1059-cam,142,3,50,'#745536');
-      if(!G.f.galWheelStage)for(let i=0;i<5;i++)leaf(1037+i*4-cam,137+i%2*2,['#b86a38','#d39a43','#9f5836'][i%3]);
-      else px(1038-cam,140,24,1,'#c7cdb0');
-      if(G.f.galWheelDone){
-        const fall=Vfx.reducedMotion?0:Math.floor(G.anim/5)%7;
-        px(1030-cam,142,3,19,'#89aba0');
-        for(let i=0;i<3;i++)px(1030-cam,142+i*6+fall,2,3,'#c6d7b8');
-      }
+      for(let i=0;i<5;i++)leaf(1037+i*4-cam,137+i%2*2,['#b86a38','#d39a43','#9f5836'][i%3]);
     }
     if(zone==='forge'){
-      // 마을에서 흘러온 개울과 낮은 가지(물레방아 살이 걸린 곳). 걷는 바닥은 그대로 둔다.
+      // 마을에서 흘러온 개울과 낮은 가지. 걷는 바닥은 그대로 둔다.
       const sx=430-cam;
       px(sx-75,GROUND+3,120,13,'#73938b');px(sx-75,GROUND,120,3,'#a79669');
       for(let i=0;i<5;i++)px(sx-65+i*23,GROUND+7+i%2*3,13,1,'#c6d7b8');
-      if(!G.f.galWheelSpoke){
-        px(sx-17,GROUND-31,4,31,'#725038');px(sx-29,GROUND-27,16,3,'#725038');
-        px(sx-25,GROUND-24,48,5,'#bd945d');px(sx-23,GROUND-23,43,1,'#dfba7d');
-        for(let i=0;i<3;i++){px(sx+11+i*3,GROUND-24,1,2,'#725032');px(sx+12+i*3,GROUND-22,1,2,'#725032');}
-      }
+      px(sx-17,GROUND-31,4,31,'#725038');px(sx-29,GROUND-27,16,3,'#725038');
       for(let i=0;i<3;i++){const x=1008-cam+i*9;px(x,GROUND-90-i*8,5,3,'#d3b9a0');px(x+2,GROUND-95-i*8,4,3,'#d3b9a0');}
       for(const u of [1340,1830]){const x=tx(u)-cam;px(x-6,GROUND-11,12,11,'#514132');px(x-8,GROUND-12,16,2,'#a18b62');px(x-4,GROUND-14,8,2,'#3f3934');}
       Rg.expArt.marker(230-cam,GROUND);
@@ -304,12 +308,6 @@ if(!CLASSIC){
           const xx=bx-18+side*27+(i%3)*5,yy=GROUND-24-Math.floor(i/3)*4;
           px(xx,yy,4,4,'#bc8648');px(xx-1,yy-1,6,2,'#68482e');
         }
-      }
-      if(!G.f.galWheelAxle){
-        // The replacement axle rests on the low shelf beneath the sorting baskets.
-        px(bx-26,GROUND-6,52,6,'#987347');px(bx-24,GROUND-5,48,1,'#c8a269');
-        px(bx-26,GROUND-6,3,6,'#694a30');px(bx+23,GROUND-6,3,6,'#694a30');
-        px(bx+13,GROUND-6,2,6,'#6c4f32');
       }
       const kx=tx(1860)-cam;
       px(kx-22,GROUND-19,44,19,'#87745a');px(kx-17,GROUND-25,34,6,'#9b8767');px(kx-11,GROUND-29,22,4,'#ad9672');
