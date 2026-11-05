@@ -207,6 +207,71 @@ function yutElders(){
   ]);
 }
 
+/* 결정 D-790: 장국밥 가마솥 곁의 고라니 뭉근 할멈 (사용자 피드백 2026-11-05 "장국밥 가마솥에도 npc 하나 두고 장국밥 맛 보여주는 쪽으로, 조합법 하나 배울 수 있게").
+   지나가는 아이에게 국물 한 종지를 거저 떠 준다. 국밥 맛은 장맛이고 장은 메주에서 난다. 설 대목에 국밥이 하도 나가 정월에 장 담글 콩이 떨어졌다.
+   메주 쑤는 법(콩 2 + 짚 1, 엄마의 절구 숨은 가공법)을 일러 주고 묶을 짚 한 단을 준다. 메주를 쑤어다 주면 가마솥 바닥 누룽지로 갚는다. */
+function gukbapPic(){
+  let t0=null;
+  return {animate:true,sound:'pic_gukbap',draw(w,h,t){
+    if(t0===null)t0=t;
+    const k=t-t0,rm=Vfx.reducedMotion,pour=rm?1:Math.min(1,k/1.3),fl=rm?0:Math.floor(k*6)%2;
+    R(0,0,w,h,'#d6dde0');R(0,0,w,3,'#c4ccd0');R(0,38,w,6,'#b8ab96');R(0,38,w,1,'#ece6da');
+    // 흙 아궁이와 그 안의 불
+    R(3,26,32,12,'#8a6a52');R(3,26,32,1,'#a8846a');R(12,30,14,8,'#2a1a14');
+    R(14,32,10,6,fl?'#e0782e':'#f2a64a');R(16,33,6,4,fl?'#ffcc79':'#ffe2a0');R(10,28,18,10,'rgba(255,160,80,.10)');
+    // 가마솥: 무쇠 몸통, 넓은 전, 위에서 본 국물
+    R(5,17,28,9,'#2a2624');R(7,26,24,1,'#2a2624');R(2,15,34,3,'#4a4442');R(2,15,34,1,'#6a6462');
+    R(5,14,28,2,'#8a5a2e');R(7,14,8,1,'#b07a40');R(20,15,2,1,'#e9e1cf');R(25,14,2,1,'#3c7a3a');   // 국물, 건더기, 파
+    // 솥에서 오르는 김
+    for(let j=0;j<5;j++){const ph=rm?j*0.18:((k*0.45+j*0.21)%1),sz=2+Math.round(ph*3);R(7+j*5+Math.round(Math.sin((k+j)*1.8)*2*ph),12-Math.round(ph*11),sz,sz-1,'rgba(255,255,255,'+(0.85-ph*0.75).toFixed(2)+')');}
+    // 오른쪽 작은 상 위 흰 종지
+    R(40,34,22,2,'#7a5a3a');R(42,36,2,2,'#5a4028');R(58,36,2,2,'#5a4028');
+    R(44,29,14,5,'#f4eee0');R(45,34,12,1,'#c4b494');R(44,29,14,1,'#ffffff');
+    const fill=rm?1:Math.min(1,Math.max(0,(k-1.3)/0.7));
+    if(fill>0){R(45,30,12,Math.max(1,Math.round(fill*2)),'#8a5a2e');if(fill>0.6){R(48,30,2,1,'#3c7a3a');R(53,30,1,1,'#e9e1cf');}}
+    if(fill>0.5)for(let j=0;j<2;j++){const ph=rm?0.4:((k*0.6+j*0.5)%1);R(47+j*5,27-Math.round(ph*9),2,2,'rgba(255,255,255,'+(0.75-ph*0.7).toFixed(2)+')');}
+    // 놋쇠 국자: 솥에서 떠 올라 종지 위로 건너가 기울인다
+    const bx=Math.round(14+pour*36),by=Math.round(13-Math.sin(pour*Math.PI)*9-(pour>0.9?2:0)),tip=pour>0.9;
+    for(let i=0;i<9;i++)R(bx-2-i,by-1-Math.round(i*0.6),1,1,'#a07a3a');   // 자루
+    R(bx-2,by-1,5,3,'#c9a24a');R(bx-1,by+2,3,1,'#9a7a32');if(!tip)R(bx-1,by-1,3,1,'#8a5a2e');
+    if(tip&&!rm&&fill<1)R(bx+2,by+2,1,29-by-2,'#9a6a3a');   // 국물 줄기
+  }};
+}
+function gukbapCook(){
+  const F=G.f;
+  if(F.night){talk([['뭉근 할멈','불은 죽여 뒀다. 내일 장에 끓일 뼈를 절이는 중이야.\n국물 생각나면 날 밝거든 와.']]);return;}
+  if(F.jxGukbapAsked){
+    if(!has('meju',1)){talk([['뭉근 할멈','콩 두 됫박을 찧어 짚으로 묶으면 메주야.\n천천히 해. 장은 정월에 담그니까.']]);return;}
+    talk([
+      ['너구리','(보따리에서 짚으로 묶은 메주 덩이를 꺼냈다.)'],
+      ['뭉근 할멈','어이구, 모양도 반듯하고 짚도 야무지게 묶었네.\n이 메주면 내년 국밥도 걱정 없겠다.'],
+      ['너구리','(할멈이 메주를 받아 처마 밑 짚 줄에 매단다.)'],
+      ['뭉근 할멈','약속한 누룽지다. 가마솥 바닥에서 긁어 말린 거야.\n길에서 출출할 때 하나씩 씹어.'],
+      gotLine('nurungji',2)
+    ],()=>{takeItem('meju',1);addItem('nurungji',2);refreshHud();
+      record('gukbap','장국밥 가마솥의 뭉근 할멈에게 메주를 쑤어다 드렸다. 정월에 장을 담글 메주다. 가마솥 바닥 누룽지를 받았다.');finishWanderer('j_gukbap_cook');});
+    return;
+  }
+  talk([
+    ['뭉근 할멈','어이 추워라. 꼬마도 한 숟갈 떠 보련?\n국물 맛은 거저다.'],
+    Object.assign(['너구리','(할멈이 가마솥에서 국물을 떠 작은 종지에 부어 준다.)'],{pic:gukbapPic()}),
+    ['너구리','(후후 불어 한 모금 마셨다.\n짭짤하고 구수한 김이 코끝까지 오른다.)'],
+    ['너구리','속까지 따뜻해요!\n어떻게 이렇게 맛이 깊어요?'],
+    Object.assign(['뭉근 할멈','장맛이지. 국밥은 장이 반이고 불이 반이야.\n장맛은 묵은 메주에서 나고.'],{pic:null}),
+    ['뭉근 할멈','설 대목이라 국밥이 하도 나가서 콩이 다 떨어졌어.\n정월에 장 담글 메주가 한 덩이 모자라.'],
+    hintLine('meju',['뭉근 할멈','메주야 별거 없다. 콩 두 됫박을 절구에 찧어\n덩이를 빚고 짚으로 묶으면 돼. 띄우는 건 내가 하고.']),
+    ['너구리','절구라면 제 보따리에 있어요.\n엄마가 쓰던 절구예요.'],
+    ['뭉근 할멈','그 작은 보따리에 절구가? 허, 별 아이 다 보겠네.\n그럼 하나 쑤어다 주련? 가마솥 누룽지로 갚으마.',[
+      {t:'콩을 구해 메주를 쑤어 올게요',go:()=>talkGive([
+        ['뭉근 할멈','묶을 짚은 내 걸 가져가.\n장날엔 짚이 귀하거든.'],
+        gotLine('jip',1),
+        ['너구리','(콩 두 됫박에 짚 한 단.\n엄마 절구로 찧으면 되겠다.)']
+      ],()=>{F.jxGukbapAsked=true;})},
+      {t:'다음에 올게요',go:null}
+    ]]
+  ]);
+}
+
 function babyBoar(){
   if(G.f.jxBoarScent2){
     if(!G.f.jxBoarBed){Rg.handWork(()=>{G.f.jxBoarBed=true;babyBoar();});return;}
@@ -237,6 +302,51 @@ function babyBoar(){
   ]);
 }
 
+/* 결정 D-793: 늙은 까치와 숙소 처마에 나란히 앉아 장터 지붕 위로 오르는 밥 김을 보는 장면 그림 (사용자 피드백 2026-11-05
+   "바람막이 이름을 얻을 때처럼 같이 앉아서 바라보는 애니메이션"). 돌너머 magpieWindPic과 같은 64×44 칸.
+   아이와 까치가 처마 끝에 등을 보이고 나란히 앉고(까치는 왼쪽, 아이는 오른쪽), 눈 덮인 지붕들 굴뚝에서 김이 하나둘 오른다.
+   조금 지나면 까치가 고개를 들어 김 쪽을 가리키고 아이도 고개를 그쪽으로 기울인다. 밤이면 김 대신 지붕 아래 불빛이 하나씩 켜진다. */
+function magpieRoofPic(){
+  let t0=null;
+  const roofs=[[-2,20,16],[13,17,14],[26,21,12],[37,16,15],[51,19,15]];
+  return {animate:true,sound:'pic_magpie_roofs',draw(w,h,t){
+    if(t0===null)t0=t;
+    const k=t-t0,rm=Vfx.reducedMotion,nt=!!G.f.night;
+    R(0,0,w,h,nt?'#1b2844':'#dbe6ee');R(0,0,w,6,nt?'#141c34':'#cddce7');
+    if(nt)for(let i=0;i<9;i++)R((i*23+5)%w,1+(i*7)%9,1,1,'#9eaec4');
+    // 먼 장터 지붕들: 벽, 기와, 눈 덮인 용마루, 굴뚝. 낮엔 굴뚝마다 김이 피어오르고, 밤엔 창에 불이 하나씩 켜진다
+    roofs.forEach(([x,y,rw],i)=>{
+      R(x+1,y+4,rw-2,h-y,nt?'#3b3a44':'#b2a796');R(x,y,rw,4,nt?'#273346':'#56636f');R(x,y-1,rw,1,nt?'#c0cedb':'#ffffff');
+      const cx=x+Math.round(rw*0.7);R(cx,y-4,2,4,nt?'#4a4048':'#7a6a5a');
+      const on=rm||k>0.5+i*0.45;
+      if(nt){R(x+3,y+6,3,3,on?'#ffcc79':'#2e2a34');if(on)R(x+1,y+5,7,6,'rgba(255,190,100,.16)');}
+      else if(on)for(let j=0;j<4;j++){const ph=rm?j*0.22:((k*0.4+j*0.25+i*0.17)%1),yy=y-6-Math.round(ph*14),a=(0.85-ph*0.75).toFixed(2),sz=2+Math.round(ph*3);
+        R(cx-1+Math.round(Math.sin((k*1.3+i+j)*1.4)*2.5*ph),yy,sz,sz-1,'rgba(255,255,255,'+a+')');}
+    });
+    // 앞의 숙소 처마: 쌓인 눈, 기와 끝 막새, 서까래
+    R(0,33,w,11,nt?'#3a2e2e':'#6b4a36');R(0,31,w,3,nt?'#273346':'#4b5965');R(0,30,w,1,nt?'#c0cedb':'#ffffff');
+    for(let x=1;x<w;x+=5)R(x,33,3,2,nt?'#2e3a52':'#3e4a56');
+    for(let x=3;x<w;x+=7)R(x,36,2,5,nt?'#2a2222':'#4e3626');
+    const look=rm?1:Math.min(1,Math.max(0,(k-1.4)/0.5));   // 조금 지나 까치가 고개를 들어 김 쪽을 가리키고 아이가 따라 본다
+    // 까치 (왼쪽, 등을 보이고 앉음): 검은 등, 어깨의 흰 깃, 처마 끝으로 늘어진 긴 꼬리
+    const mx=17,mh=look>0.5?-1:0;
+    R(mx-4,20,9,11,'#1c2228');R(mx-3,19,7,1,'#1c2228');R(mx+4,22,2,6,'#eef1f2');R(mx-5,22,2,6,'#eef1f2');   // 몸, 양 어깨 흰 깃
+    R(mx-1,30,3,12,'#22303a');R(mx,31,1,10,'#3a5a6a');   // 꼬리 (푸른 윤기)
+    R(mx-3,13+mh,7,7,'#1c2228');R(mx-2,13+mh,4,1,'#6a7680');   // 머리 (희끗한 정수리)
+    if(look>0.5){R(mx-5,13,2,1,'#3a3a3a');R(mx-6,12,1,1,'#3a3a3a');}else R(mx+4,16,2,1,'#3a3a3a');   // 부리: 처음엔 아이 쪽, 나중엔 왼쪽 위 김 쪽
+    // 아이 (오른쪽, 등을 보이고 앉음): 둥근 등, 둥근 귀, 갓 모양 패랭이, 고리 무늬 꼬리가 처마 아래로
+    const hx=42,tilt=look>0.5?-1:0;
+    R(hx-6,20,13,11,'#8c8070');R(hx-5,19,11,1,'#8c8070');R(hx-1,22,3,8,'#7a6e60');
+    R(hx+5,29,3,12,'#6f6357');for(let y=31;y<41;y+=3)R(hx+5,y,3,1,'#2a211b');   // 꼬리
+    R(hx-5+tilt,11,11,9,'#8c8070');R(hx-5+tilt,9,3,3,'#8c8070');R(hx+3+tilt,9,3,3,'#8c8070');R(hx-5+tilt,9,2,2,'#2a211b');R(hx+4+tilt,9,2,2,'#2a211b');   // 머리·귀
+    R(hx-8+tilt,8,17,2,'#c39b55');R(hx-4+tilt,4,9,4,'#dcbb7a');R(hx-4+tilt,7,9,1,'#6e4f22');   // 패랭이
+    R(hx-6,21,2,6,'#a89c8c');R(hx+5,21,2,6,'#a89c8c');   // 팔 (무릎에 손)
+    // 둘 사이 처마 위에 내려놓은 보따리
+    R(26,24,9,7,'#d9a441');R(27,23,7,1,'#e8bd62');R(29,21,3,2,'#b07d26');for(const [dx,dy] of [[1,26],[5,28],[3,29]])R(26+dx,dy,1,1,'#8a3b2a');
+    // 입김
+    if(!rm){const b=(k*0.7)%1;if(b<0.55)R(hx-7+tilt,16-Math.round(b*6),2,1,'rgba(255,255,255,'+(0.7-b).toFixed(2)+')');}
+  }};
+}
 function oldMagpie(){
   const south=G.diary.some(e=>e.id==='end'||e.id==='d_end');
   const earlier=Object.keys(G.f.wanderersDone||{}).some(k=>!k.startsWith('jangteo:')&&/magpie|kkachi|까치/.test(k));
@@ -245,13 +355,20 @@ function oldMagpie(){
     ['너구리',south?'엄마 약은 잘 갔어요?':'남쪽 단풍골에 우리 집이 있어요.\n여기 앉으면 그쪽 하늘도 보일까요?'],
     ['늙은 까치',south?'잘 갔지. 네 엄마가 통을 품에 안고 한참 있더라.\n…이번 길은 쉬엄쉬엄 왔다. 날개가 예전 같지 않아서.':'굴뚝 김이 낮게 눕는 쪽이 남쪽이란다.\n지붕에 가렸어도, 조금 높이 앉으면 보이지.'],
     ['늙은 까치','발 녹을 동안만 같이 앉아 있자꾸나.',[
-      {t:'곁에 앉아 지붕을 본다',go:()=>talk([
-        ['너구리','지붕 위에서 김이 이어지네.\n엄마 시루에서도 저렇게 났는데.'],
-        ['늙은 까치','눈 오는 날 하늘에서 보면 김부터 보인단다.\n저기 따뜻한 밥 짓는 집이 있다고.'],
-        ['늙은 까치',G.awake.includes('siru')?'네 보따리에서도 김 냄새가 나는구나.\n이제 너도 누굴 먹일 줄 아는구나.':'숙소 마루 끝에서 한번 바라보렴.\n고드름 너머 지붕이 낮은 산처럼 이어진단다.'],
-        ['늙은 까치','밤이면 이 숙소 등걸이가 다 비어 있단다.\n늦은 길손들이 숙소를 못 찾지. 내 날개로는 이제 못 달고.'],
-        ['너구리','그럼 밤에 제가 달아 드릴게요.']
-      ],()=>{record('magpie','숙소 처마에서 까치와 지붕 위 김을 봤다. 밤에는 등불 꾸러미를 함께 풀기로 했다.');finishWanderer('j_magpie');startVista(Rg.zones.inn.vistas[0]);})},
+      // 결정 D-793: 끝에 경치(startVista)로 넘기던 것을 대사와 같은 장면 그림으로 바꿨다. 앉아 있는 동안 떠 있다가 대화가 닫히면 내린다.
+      // 결정 D-797: 등불 꾸러미 풀기를 따로 두지 않고 이 대화에서 시작한다. 밤이면 바로 등을 건네고, 낮이면 밤에 달기로 한다.
+      {t:'곁에 앉아 지붕을 본다',go:()=>{const nt=!!G.f.night;talk([
+        Object.assign(['너구리','(까치 곁, 처마 끝에 나란히 앉았다.\n보따리는 둘 사이에 내려놓았다.)'],{pic:magpieRoofPic()}),
+        nt?['너구리','지붕 아래 불빛이 하나둘 켜지네.\n엄마 방에도 저렇게 불이 켜졌을까.']:['너구리','지붕 위에서 김이 이어지네.\n엄마 시루에서도 저렇게 났는데.'],
+        nt?['늙은 까치','밤 하늘에서 보면 불빛부터 보인단다.\n저기 따뜻한 방이 있다고.']:['늙은 까치','눈 오는 날 하늘에서 보면 김부터 보인단다.\n저기 따뜻한 밥 짓는 집이 있다고.'],
+        ['늙은 까치',G.awake.includes('siru')?'네 보따리에서도 김 냄새가 나는구나.\n이제 너도 누굴 먹일 줄 아는구나.':'지붕이 낮은 산처럼 이어지지?\n까치는 저 산마루를 따라 남쪽으로 간단다.'],
+        ['늙은 까치','그런데 이 숙소 등걸이는 밤이면 다 비어 있단다.\n늦은 길손들이 숙소를 못 찾지. 내 날개로는 이제 못 달고.'],
+        ...(nt?[['너구리','그럼 지금 제가 달아 드릴게요.'],...Rg.lanternHandLines()]:[['너구리','그럼 밤에 제가 달아 드릴게요.'],['늙은 까치','고맙구나. 해 지거든 이리 오렴.\n등은 내가 챙겨 두마.']])
+      ],()=>{
+        record('magpie',nt?'숙소 처마에서 늙은 까치와 나란히 앉아 장터 지붕을 봤다. 까치가 등 넷을 건네며 숙소 빈 등걸이에 달아 달라고 했다.':'숙소 처마에서 늙은 까치와 나란히 앉아 지붕 위로 오르는 김을 봤다. 밤에 숙소 빈 등걸이에 등을 달아 드리기로 했다.');
+        if(nt)G.f.jxLanternStarted=true;
+        finishWanderer('j_magpie');
+      });}},
       {t:'길을 조금 더 둘러볼게요',go:null}
     ]]
   ]);
@@ -260,8 +377,9 @@ function oldMagpie(){
 Rg.expEncounters={
   wanderers:{
     entrance:[{id:'j_straw',name:'청설모 할아범',x:360,talk:strawSeller,draw:draw('straw'),greeting:'새 끈은 질기구먼.\n오늘 장은 짚신 흘릴 걱정이 없겠어.'},{id:'j_kite',name:'얼레',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
-    street:[{id:'j_bean',name:'까투리 아주머니',x:880,talk:beanSeller,draw:draw('bean'),greeting:'자루 밑을 두 번 꿰맸어.\n이제 장 끝날 때까지 끄떡없지!'},{id:'j_yut',name:'바둑 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':Rg.badukBetting?.()===false?'내기는 접었다. 구경은 공짜다.':'또 걸 테냐? 솔방울 하나면 된다.\n화롯불은 늘 배가 고프거든.';}}],
-    inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:()=>{const l=Rg.magpieTteok?.();if(l)talk(l);else oldMagpie();},draw:draw('magpie'),get greeting(){const l=Rg.magpieTteok?.();if(l)return l;return G.f.night?(G.f.jxLanternDone?'네가 단 등을 따라 길손들이 찾아왔구나.\n아침 떡 김이 오르면 다들 또 떠나겠지.':'밤이 됐구나. 등불 꾸러미는 처마 옆에 있단다.\n등은 네가 달고, 길은 내가 일러 주마.'):G.f.jxLanternDone?'밤새 길손들이 쉬고 갔단다.\n이제 나도 남쪽으로 날아갈 차례구나.':'해 지면 다시 오려무나.\n골목 등 다는 걸 좀 거들어 다오.';}}],
+    street:[{id:'j_bean',name:'까투리 아주머니',x:880,talk:beanSeller,draw:draw('bean'),greeting:'자루 밑을 두 번 꿰맸어.\n이제 장 끝날 때까지 끄떡없지!'},{id:'j_gukbap_cook',name:'뭉근 할멈',x:2440,talk:gukbapCook,draw:draw('gorani'),get greeting(){return G.f.night?'불은 죽여 뒀다. 내일 장에 끓일 뼈를 절이는 중이야.\n국물 생각나면 날 밝거든 와.':'정월에 장 담그면 네 메주가 맨 앞이다.\n국물 맛 생각나면 또 와.';}},{id:'j_yut',name:'바둑 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':Rg.badukBetting?.()===false?'내기는 접었다. 구경은 공짜다.':'또 걸 테냐? 솔방울 하나면 된다.\n화롯불은 늘 배가 고프거든.';}}],
+    // 결정 D-797: 등은 까치가 직접 건넨다. 밤에 아직 등을 받지 않았으면 인사 대신 등을 건네는 대화가 열린다 (story.js Rg.lanternGreeting)
+    inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:()=>{const l=Rg.magpieTteok?.();if(l)talk(l);else oldMagpie();},draw:draw('magpie'),get greeting(){const l=Rg.magpieTteok?.();if(l)return l;const g=Rg.lanternGreeting?.();if(g)return g;return G.f.night?(G.f.jxLanternDone?'네가 단 등을 따라 길손들이 찾아왔구나.\n아침 떡 김이 오르면 다들 또 떠나겠지.':'남은 등걸이도 밝혀 다오.\n마당 어귀, 마루 앞, 처마 끝, 창고 쪽문 가는 길이란다.'):G.f.jxLanternDone?'밤새 길손들이 쉬고 갔단다.\n이제 나도 남쪽으로 날아갈 차례구나.':'해 지면 다시 오려무나.\n숙소 등 다는 걸 좀 거들어 다오.';}}],
     pine:[{id:'j_boar',name:'알밤이',hint:'킁킁, 킁킁. 솔숲 쪽에서 무언가 냄새를 쫓는 소리가 난다.',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
     warehouse:[]
   },
@@ -306,12 +424,12 @@ Rg.expEncounters={
         return G.awake.includes('siru')?['아궁이 앞 발판에 쌀가루가 하얗다.\n큰 곰 발자국 사이에 내 작은 발자국도 섞였다.','모락이랑 김을 올린 자리라\n발판이 아직 따뜻하다.']:
           ['아궁이 앞 발판에 쌀가루가 하얗게 앉았다.\n그 위에 큰 곰 발자국이 이리저리 어지럽다.','모락이 아궁이 앞을 몇 번이나 오갔을까.'];}},
       // 결정 D-562: 투호와 함께 '반질반질한 화살' 조사를 뺐다 (뒤 이야기와 이어지는 데가 없었다, 사용자 지시 2026-11-04)
-      {id:'j_gukbap',x:2470,label:'장국밥 가마솥',get text(){return G.f.night?'불 꺼진 가마솥에 아직 온기가 남았다.\n내일 장에 끓일 뼈가 소금에 절여 있다.':'가마솥에서 장국밥 김이 오른다.\n장꾼들이 선 채로 한 그릇씩 비우고 다시 짐을 진다.';}}
+      // 결정 D-790: '장국밥 가마솥' 조사는 가마솥 곁에 선 뭉근 할멈(떠돌이 j_gukbap_cook)으로 바꿨다
     ],
     inn:[
-      {id:'j_inn_shoes',x:350,label:'마루 아래 신발',text:'눈 묻은 신발은 코를 바깥으로 돌려 뒀다.\n내일 갈 길을 향해 벌써 줄을 섰네.'},
+      // 결정 D-791: '마루 아래 신발'은 숙소 아궁이 불 지피기(field.js j_inn_fire)로 바꿨다 (사용자 피드백 2026-11-05 "뭘 위해서 있는건지 모르겠음")
       {id:'j_inn_pillar',x:1210,label:'기둥의 키 자국',text:'기둥에 작은 금이 층층이 그어져 있다.\n짐 높이를 잰 걸까, 해마다 온 아이들 키일까?'},
-      {id:'j_inn_icicle',x:1780,label:'처마 끝 고드름',text:'고드름 끝에 지붕이 거꾸로 매달렸다.\n물방울이 떨어지자 지붕도 잠깐 흔들린다.'},
+      // 결정 D-794: '처마 끝 고드름' 조사를 뺐다 (사용자 피드백 2026-11-05 "필요없다")
       {id:'j_inn_stable',x:2110,label:'마구간 나귀',get text(){return G.f.night?'나귀가 선 채로 졸다가 귀만 쫑긋한다.\n여물통에 짚이 반쯤 남았다.':'짐을 부린 나귀가 여물을 씹는다.\n숙소에 묵는 보부상들은 짐을 나귀에 실어 온다.';}}
     ],
     pine:[

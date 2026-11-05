@@ -336,23 +336,24 @@ if(!CLASSIC){
     get prompt(){return G.f.jxLanterns?.[p.id]?'등불 아래 살펴보기':'등걸이에 등 달기';},
     draw:(x,y)=>Rg.expArt.drawWorkLantern(x,y,!!G.f.jxLanterns?.[p.id]),
     talk:()=>Rg.lanternAction(p.id),
+    // 결정 D-792: 늙은 까치에게 등을 받기 전에는 빈 등걸이가 그려지기만 하고 '등걸이에 등 달기'가 뜨지 않는다 (사용자 피드백 2026-11-05)
+    get distance(){return G.f.jxLanternStarted?undefined:0;},
   }));
   const nightLanterns=zone=>night()?lanterns.filter(p=>p.zone===zone):[];
-  // 결정 D-325·D-562: 노인들 곁의 판돈 바구니. 말을 걸면 바둑 내기에 편을 든다 (story.js Rg.playBaduk). 화살통은 투호와 함께 뺐다.
-  const yutBoard={id:'j_yut_board',name:'판돈 바구니',get prompt(){return Rg.badukBetting?.()===false?'바둑 구경하기':'바둑 내기에 편 들기';},x:1960,y:GROUND,
+  // 결정 D-789: 노인들 곁의 판돈 바구니('바둑 내기에 편 들기')를 뺐다. 노인들에게 말을 걸면 같은 내기가 열려 두 번 겹쳤다 (사용자 피드백 2026-11-05)
+  // 결정 D-797: 숙소의 '까치와 등불 꾸러미 풀기' 자리를 뺐다. 등은 늙은 까치가 대화에서 직접 건넨다 (story.js Rg.lanternHandLines)
+  // 결정 D-791: 숙소 아궁이. '마루 아래 신발' 조사 자리(설계 350)에 둔다. 밤에 솔방울로 불을 살린다 (story.js Rg.innFire)
+  const innFire={id:'j_inn_fire',name:'숙소 아궁이',get prompt(){return Rg.innFirePrompt();},x:350,y:GROUND,
     draw(x,y){
-      R(x-7,y-7,14,7,'#a07a4a');R(x-8,y-8,16,2,'#c39b62');for(let i=0;i<4;i++)R(x-6+i*4,y-5,2,4,'#8a6538');   // 짚 바구니
-      R(x-5,y-11,4,4,'#7a5232');R(x,y-12,4,5,'#8a5a32');R(x+3,y-10,3,3,'#7a5232');R(x-4,y-10,2,1,'#b98a52');R(x+1,y-11,2,1,'#b98a52');   // 솔방울
+      const lit=!!G.f.jxInnFireDone&&night(),low=night()&&!G.f.jxInnFireDone,fl=Vfx.reducedMotion?0:Math.floor(G.anim/6)%2;
+      R(x-14,y-18,28,18,'#8a7a6a');R(x-15,y-19,30,2,'#a89a88');for(let i=0;i<3;i++)R(x-13+i*9,y-14+(i%2)*5,8,1,'#6f6052');   // 돌 아궁이 벽
+      R(x-6,y-11,12,11,'#1a1210');R(x-7,y-12,14,2,'#5a4a3e');   // 아궁이 입
+      if(lit){R(x-15,y-24,30,24,'rgba(255,170,80,.12)');R(x-5,y-8,10,8,fl?'#e0782e':'#f2a64a');R(x-3,y-10,6,6,fl?'#ffcc79':'#ffe2a0');}
+      else if(low){R(x-3,y-3,6,3,'#7a3a1e');if(fl)R(x-1,y-4,2,1,'#c9603a');}
+      else{R(x-4,y-3,8,3,'#4a3e38');R(x-2,y-4,2,1,'#8a3a1e');}   // 낮: 재 속 불씨
+      R(x+16,y-6,12,6,'#7a5232');R(x+17,y-9,10,3,'#8a6538');   // 곁의 솔가지 단(얼마 안 남았다)
     },
-    talk:()=>Rg.playBaduk(),
-  };
-  const lanternBundle={id:'j_lantern_bundle',name:'등불 꾸러미',prompt:'까치와 등불 꾸러미 풀기',x:1610,y:GROUND,
-    draw(x,y){
-      R(x-9,y-10,18,10,'#91704f');R(x-7,y-13,14,4,'#c3a26f');
-      R(x-1,y-12,2,12,'#dfc88e');R(x-4,y-14,8,2,'#69523b');
-      Rg.expArt.lantern(x+6,y-18,1,false);
-    },
-    talk:()=>Rg.lanternTalk(),
+    talk:()=>Rg.innFire(),
   };
   Rg.zones={
     entrance:{...common('entrance'),name:TABLES.ZONES.jangteo.entrance,w:2600,npcs:[],
@@ -371,7 +372,7 @@ if(!CLASSIC){
       exits:{left:{to:'entrance',toX:2530},right:{to:'inn',toX:60}},
       // 결정 D-316·D-319: 문은 뒷산 돌계단 하나. 솔숲에서 내려오면 같은 돌계단 아래로 나온다.
       doors:[{x:2180,to:'pine',toX:70,label:'뒷산 돌계단 오르기',ascend:true,draw:stairPost}],
-      get wanderers(){return [...E.wanderers.street,yutBoard,...nightLanterns('street')];},examines:E.examines.street,
+      get wanderers(){return [...E.wanderers.street,...nightLanterns('street')];},examines:E.examines.street,
     },
     inn:{...common('inn'),name:TABLES.ZONES.jangteo.inn,w:2600,npcs:['bueong','maru'],
       platforms:[...stairs(1160),{x:1340,y:96,w:100},...stairs(1590,128),{x:1770,y:128,w:200},...stairs(2220)],
@@ -379,7 +380,7 @@ if(!CLASSIC){
       digs:[{id:'j_cache_inn',x:560,item:'solbang',n:2,form:'squirrel',cache:true,done:false}],
       exits:{left:{to:'street',toX:2720},right:{to:'warehouse',toX:60,need:needWarehouse,reason:warehouseReason,drawBlocked:gate}},
       doors:[],   // 결정 D-316·D-317: 숙소 문·마당 문(같은 구역 안 건너뛰기), 밤 골목 지름길, 창고문(창고 마당 엉뚱한 자리로)은 뺐다. 창고는 오른쪽 끝 쪽문으로
-      get wanderers(){return [...E.wanderers.inn,lanternBundle,...nightLanterns('inn')];},examines:E.examines.inn,
+      get wanderers(){return [...E.wanderers.inn,innFire,...nightLanterns('inn')];},examines:E.examines.inn,
       stamps:[{id:'pillar',x:1280,y:128,note:'stamp:jangteo:pillar',draw:glint,base:'none',face:10}],   // D-116: 숙소 기둥에 바로 찍는다
       vistas:[{id:'icicles',x:1850,y:128,from:0,to:420,sound:'wind',draw:peg,
         thought:'고드름 속 지붕이다.\n저 푸른 문도 가 보고 싶어.',

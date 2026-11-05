@@ -780,6 +780,22 @@ const TABLES={
    "region": "yeongsan",
    "d": "얼음 비늘과 서리 수염을 함께 갈았다. 가루가 손끝에서 서늘하다. 열 내리는 데 좋을 것 같다.",
    "u": "줌"
+  },
+  "meju": {
+   "n": "메주",
+   "r": 1,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "삶은 콩을 찧어 덩이로 빚고 짚으로 묶었다. 매달아 띄우면 장맛이 된다.",
+   "u": "덩이"
+  },
+  "nurungji": {
+   "n": "누룽지",
+   "r": 0,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "장국밥 가마솥 바닥에서 긁어 말린 누룽지. 고소하고 바삭하다. 먹으면 기운이 조금 난다.",
+   "u": "조각"
   }
  },
  "BOSS_PARTS": {
@@ -1057,6 +1073,17 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:hwachae"
+   },
+   {
+    "need": {
+     "kong": 2,
+     "jip": 1
+    },
+    "out": "meju",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:meju"
    }
   ],
   "maetdol": [
@@ -3458,6 +3485,25 @@ const TABLES={
      "when": "recipe:gangjeong"
     }
    ]
+  },
+  {
+   "id": "meju",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "뭉근 할멈 말로는 콩 두 됫박을 절구에 찧어 덩이를 빚고 짚으로 묶으면 메주가 된다.",
+     "section": "숨은 가공법",
+     "when": "hint:meju"
+    },
+    {
+     "who": "me",
+     "text": "콩을 찧어 덩이를 빚고 짚으로 묶었다. 할멈 말대로 매달아 띄우면 장이 된다.",
+     "section": "숨은 가공법",
+     "when": "recipe:meju"
+    }
+   ]
   }
  ],
  "STAMP_MARKS": {
@@ -4727,18 +4773,8 @@ const TABLES={
   "j_steam_flour": {
    "sfx": "steamer"
   },
-  "j_gukbap": {
-   "sfx": "fire_crackle",
-   "repeat": 1500
-  },
-  "j_inn_shoes": {
-   "sfx": "wood_tap"
-  },
   "j_inn_pillar": {
    "sfx": "wood_tap"
-  },
-  "j_inn_icicle": {
-   "sfx": "ice_tinkle"
   },
   "j_inn_stable": {
    "sfx": "leaf_rustle"
@@ -4815,6 +4851,16 @@ const TABLES={
   },
   "y_tree_bud": {
    "sfx": "leaf_rustle"
+  },
+  "pic_baduk_flip": {
+   "sfx": "baduk_scatter"
+  },
+  "pic_magpie_roofs": {
+   "sfx": "wind_gust"
+  },
+  "pic_gukbap": {
+   "sfx": "fire_crackle",
+   "repeat": 1500
   }
  }
 };

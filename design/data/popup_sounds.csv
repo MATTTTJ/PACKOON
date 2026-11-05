@@ -40,10 +40,7 @@ j_jangseung_snow,jangteo,작은 장승 (아이 손이 코를 톡 짚는 순간 �
 j_stall_gap,jangteo,좌판 사이 골목,cloth_flutter,,제안
 j_onggi,jangteo,옹기전 독 (손끝으로 퉁기는 순간 그림이 낸다),onggi_ring,,제안
 j_steam_flour,jangteo,쌀가루 묻은 발판,steamer,,제안
-j_gukbap,jangteo,장국밥 가마솥,fire_crackle,1500,제안
-j_inn_shoes,jangteo,마루 아래 신발,wood_tap,,제안
 j_inn_pillar,jangteo,기둥의 키 자국,wood_tap,,제안
-j_inn_icicle,jangteo,처마 끝 고드름,ice_tinkle,,제안
 j_inn_stable,jangteo,마구간 나귀,leaf_rustle,,제안
 j_pine_scent1,jangteo,부러진 솔가지,leaf_rustle,,제안
 j_pine_scent2,jangteo,눈 아래 마른 솔잎,leaf_rustle,,제안
@@ -68,3 +65,6 @@ y_shore_prints,yeongsan,크기가 같은 발자국 살펴보기,footstep_snow,,�
 y_tree_rope,yeongsan,섬 입구의 금줄 살펴보기,cloth_flutter,1900,제안
 y_tree_root,yeongsan,신목 뿌리 살펴보기,wood_tap,,제안
 y_tree_bud,yeongsan,신목 가지 올려다보기,leaf_rustle,,제안
+pic_baduk_flip,jangteo,바둑판 엎기 (대사 그림),baduk_scatter,,제안
+pic_magpie_roofs,jangteo,늙은 까치와 처마에서 지붕 보기 (대사 그림),wind_gust,,제안
+pic_gukbap,jangteo,장국밥 한 종지 (대사 그림),fire_crackle,1500,제안

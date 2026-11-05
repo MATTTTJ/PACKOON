@@ -233,3 +233,6 @@ chik_sil,galchamgol,칡 실,물건,나,recipe:chik_sil,숨은 가공법을 직�
 darae_cha,yeongsan,다래 줄기차,물건,나,recipe:darae_cha,숨은 가공법을 직접 만들었을 때,다래 덩굴을 찧어 대추와 달였다. 속이 풀린다.,제안,PA-176 가공법,숨은 가공법
 hwachae,yeongsan,마가목 화채,물건,나,recipe:hwachae,숨은 가공법을 직접 만들었을 때,고드름을 깨 넣고 마가목을 으깨 띄웠다. 이가 시리다.,제안,PA-176 가공법,숨은 가공법
 bigeul_garu,yeongsan,비늘 가루,물건,나,recipe:bigeul_garu,숨은 가공법을 직접 만들었을 때,얼음 비늘과 서리 수염을 같이 갈았다. 가루가 손끝에서 서늘하다.,제안,PA-176 가공법,숨은 가공법
+meju,jangteo,메주,물건,나,got:meju,처음 얻을 때,(items.csv 의 설명),제안,결정 D-790,관찰
+meju,jangteo,메주,물건,나,hint:meju,누가 지나가며 일러 줬을 때,뭉근 할멈 말로는 콩 두 됫박을 절구에 찧어 덩이를 빚고 짚으로 묶으면 메주가 된다.,제안,결정 D-790,숨은 가공법
+meju,jangteo,메주,물건,나,recipe:meju,숨은 가공법을 직접 만들었을 때,콩을 찧어 덩이를 빚고 짚으로 묶었다. 할멈 말대로 매달아 띄우면 장이 된다.,제안,결정 D-790,숨은 가공법
