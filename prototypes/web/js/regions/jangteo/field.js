@@ -213,7 +213,7 @@ if(!CLASSIC){
   }));
   const nightLanterns=zone=>night()?lanterns.filter(p=>p.zone===zone):[];
   // 결정 D-325·D-562: 노인들 곁의 판돈 바구니. 말을 걸면 바둑 내기에 편을 든다 (story.js Rg.playBaduk). 화살통은 투호와 함께 뺐다.
-  const yutBoard={id:'j_yut_board',name:'판돈 바구니',prompt:'바둑 내기에 편 들기',x:1960,y:GROUND,
+  const yutBoard={id:'j_yut_board',name:'판돈 바구니',get prompt(){return Rg.badukBetting?.()===false?'바둑 구경하기':'바둑 내기에 편 들기';},x:1960,y:GROUND,
     draw(x,y){
       R(x-7,y-7,14,7,'#a07a4a');R(x-8,y-8,16,2,'#c39b62');for(let i=0;i<4;i++)R(x-6+i*4,y-5,2,4,'#8a6538');   // 짚 바구니
       R(x-5,y-11,4,4,'#7a5232');R(x,y-12,4,5,'#8a5a32');R(x+3,y-10,3,3,'#7a5232');R(x-4,y-10,2,1,'#b98a52');R(x+1,y-11,2,1,'#b98a52');   // 솔방울
@@ -308,6 +308,12 @@ if(!CLASSIC){
   addZoneGather(Rg,'j_g2_',[
     ['inn','p',2042,'jip'],
     ['warehouse','p',470,'kong'],['warehouse','p',1150,'kong'],
+  ]);
+  /* 결정 D-665: 수리부엉이만 느끼는 숨은 물건 (사용자 피드백 2026-11-05). 수리부엉이로 곁을 지나면 "무언가 느껴진다"며 드러난다.
+     장꾼이 흘리고 잊은 녹두, 장꾼 아이가 떨군 약과, 숙소 처마 밑에 숨겨 둔 꿀, 솔숲 솔가리 밑 송이. 좌표는 길을 줄인 뒤의 자리 */
+  addZoneGather(Rg,'j_owl_',[
+    ['entrance','p',700,'mung',{hidden:'owl'}],['street','p',1040,'yakgwa',{hidden:'owl'}],
+    ['inn','p',1350,'honey',{hidden:'owl'}],['pine','p',1390,'songi',{hidden:'owl'}],
   ]);
   // 길손의 조사에는 배경과 구별되는 작고 일정한 표지를 쓴다. 숨은 도장은 표지를 붙이지 않는다.
   for(const z of Object.values(Rg.zones))for(const p of z.examines)p.draw=p.draw||((x,y)=>{R(x-2,y-6,5,4,'#caa970');R(x,y-10,1,2,'#f6ead0');});

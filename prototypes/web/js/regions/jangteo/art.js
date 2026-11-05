@@ -3,6 +3,9 @@
 (()=>{
 const Rg=REGIONS.jangteo;
 Rg.springRevisit=()=>!CLASSIC&&!!G?.f?.spring&&regionCompleted('yeongsan');
+// 결정 D-661·D-662: 눈 장승은 아이 키만 한 작은 장승(높이 30)이고, 날쌘까지 길을 반으로 줄이려 장터 거리로 나가는 출구 가까이(설계 2340) 선다.
+Rg.SNOW_JANGSEUNG_DX=2340;Rg.SNOW_JANGSEUNG_H=30;
+Rg.snowJangseungX=()=>trimX(Rg.SNOW_JANGSEUNG_DX,Rg.trimCuts?.entrance);
 const night=()=>G&&G.f&&G.f.night;
 Rg.art={
   /* 부엉 영감: 수리부엉이. 낮에는 눈을 감고 존다 */
@@ -195,17 +198,19 @@ function marketProp(x,y,i){
    통나무를 그대로 세워 껍질 결과 갈라진 틈이 남고, 위쪽만 깎아 얼굴을 냈다. 부릅뜬 왕방울 눈, 주먹코, 드러난 이,
    몸통에는 세로로 먹 글씨(천하대장군·지하여장군) 자리가 있다. f=1 은 관모를 쓴 대장군, f=-1 은 관 없이 가르마를 탄 여장군.
    발치는 돌무더기로 받치고, 비바람에 바랜 붉은 칠이 눈자위와 입술에만 조금 남았다. */
-function jangseung(x,y,f){
+/* 결정 D-661: hh 를 주면 그 키로 깎은 작은 장승이다 (장승 코의 눈: 짐꾼이 지나가며 코를 짚으려면 키가 아이만 해야 한다). 얼굴은 같은 크기, 몸통만 짧다 */
+function jangseung(x,y,f,hh){
   const dk=n(),wood=dk?'#5e5246':'#8e7a62',shade=dk?'#463c34':'#6c5a46',lite=dk?'#76685a':'#b09a7c',crack=dk?'#2e2722':'#43372c';
   const red=dk?'#6e3a32':'#a4473a',ink=dk?'#1c1816':'#26201c',tooth=dk?'#b8b0a2':'#e8e0cc',snow=tone().snow;
-  const male=f>0,h=male?66:60,top=y-h,w=12;
+  const male=f>0,h=hh||(male?66:60),top=y-h,w=12;
   // 발치 돌무더기
   P(x-11,y-5,22,5,dk?'#4a4744':'#7d7a74');P(x-9,y-8,9,4,dk?'#56524e':'#8f8b84');P(x+1,y-9,8,5,dk?'#514d49':'#88837c');P(x-8,y-6,4,1,dk?'#6a6560':'#a9a49b');P(x-12,y-1,24,1,snow);
   // 기둥: 통나무 몸통. 껍질 결(어두운 세로 줄)과 마른 틈
   P(x-w/2,top+14,w,h-18,wood);P(x-w/2,top+14,2,h-18,shade);P(x+w/2-2,top+14,2,h-18,lite);
-  for(let j=0;j<5;j++)P(x-4+((j*5)%9),top+30+j*6,1,4+(j%2)*3,crack);
+  const l0=top+(h<40?21:32),lines=hh?Math.max(0,Math.min(5,Math.floor((y-12-l0)/6)+1)):5;
+  for(let j=0;j<lines;j++)P(x-4+((j*5)%9),l0-2+j*6,1,4+(j%2)*3,crack);
   // 몸통 먹 글씨 자리 (한 줄 세로 글씨를 굵은 획 다섯으로)
-  for(let j=0;j<5;j++){const yy=top+32+j*6;P(x-2,yy,4,1,ink);P(x-1,yy+1,1,3,ink);if(j%2)P(x+1,yy+2,2,1,ink);else P(x-3,yy+3,2,1,ink);}
+  for(let j=0;j<lines;j++){const yy=l0+j*6;P(x-2,yy,4,1,ink);P(x-1,yy+1,1,3,ink);if(j%2)P(x+1,yy+2,2,1,ink);else P(x-3,yy+3,2,1,ink);}
   // 머리: 몸통보다 조금 넓게 깎은 얼굴
   P(x-7,top+2,14,16,wood);P(x-7,top+2,2,16,shade);P(x+5,top+2,2,16,lite);
   if(male){   // 관모: 위로 솟은 사모와 넓은 챙
@@ -308,7 +313,7 @@ function drawScenery(id){
   const t=tone();
   if(id==='entrance'){
     // 결정 D-314: 되풀이 집은 줄인 뒤의 실제 좌표로 늘어놓는다. 설계 좌표로 그리면 잘라 낸 자리(trimCuts)에서 집이 반쪽으로 잘려 보였다.
-    const zw=zoneDef().w,busy=[[95,275],[550,630],[1170,1240],...fieldPlatforms().map(p=>[p.x-14,p.x+p.w+14])];
+    const zw=zoneDef().w,busy=[[95,275],[550,630],[Rg.snowJangseungX()-35,Rg.snowJangseungX()+35],...fieldPlatforms().map(p=>[p.x-14,p.x+p.w+14])];
     for(const {rx,i,w} of rowSlots(zw,150,150,i=>i%2?58:72+(i%3)*11,busy)){const x=rx-RC();if(x<-110||x>W+110)continue;
       if(i%2===0){const h=32+(i%4)*5;house(x,GROUND-h,w,h,n(),undefined,i/2);}else{bundle(x+6,GROUND,rx);marketProp(x+38,GROUND,i>>1);}}
     jangseung(tx(125)-cam,GROUND,1);jangseung(tx(242)-cam,GROUND,-1);flag(tx(720)-cam,GROUND,96);
@@ -383,9 +388,10 @@ function drawScenery(id){
     const x=tx(240)-cam;P(x-6,GROUND-14,12,8,'#ac8b62');P(x-2,GROUND-18,4,8,'#d1b184');P(x-7,GROUND-15,6,3,'#ccbe95');P(x+1,GROUND-18,6,3,'#ccbe95');
     // 결정 D-314: 눈 장승은 잘라 낸 구간 안(설계 1680)에 있어 그림만 사라지고 조사 자리만 남았었다. 조사 자리(줄인 뒤 좌표)에 그린다.
     // 결정 D-560: 눈 쌓인 장승도 진짜 장승 위에 눈을 얹는다. 짐꾼들이 짚고 지나가는 코끝만 맨나무가 드러난다.
-    if(!Rg.springRevisit()){const sx=trimX(1680,REG.trimCuts?.entrance)-RC(),top=GROUND-66;jangseung(sx,GROUND,1);
-      P(sx-9,top-1,18,3,t.snow);P(sx-6,top-8,12,2,t.snow);P(sx-7,top+2,5,3,t.snow);P(sx+2,top+2,5,3,t.snow);P(sx-7,top+14,3,2,t.snow);P(sx+4,top+14,3,2,t.snow);
-      P(sx-6,top+20,12,2,t.snow);for(let j=0;j<4;j++)P(sx-6+((j*7)%10),top+28+j*9,3,1,t.snow);}
+    // 결정 D-661: 이 장승은 아이 키만 한 작은 장승이다. 짐꾼이 지나가며 손을 뻗지 않고도 코를 짚는다 (사용자 피드백 2026-11-05)
+    if(!Rg.springRevisit()){const sx=Rg.snowJangseungX()-RC(),top=GROUND-Rg.SNOW_JANGSEUNG_H;jangseung(sx,GROUND,1,Rg.SNOW_JANGSEUNG_H);
+      P(sx-9,top-1,18,3,t.snow);P(sx-6,top-8,12,2,t.snow);P(sx-7,top+2,4,1,t.snow);P(sx+3,top+2,4,1,t.snow);P(sx-7,top+14,3,2,t.snow);P(sx+4,top+14,3,2,t.snow);
+      P(sx-6,top+18,12,2,t.snow);P(sx-5,top+24,3,1,t.snow);}
   }else if(id==='street'){
     // 결정 D-561: 조사 '좌판 사이 골목'의 콩알 (사용자 피드백 2026-11-04 "애니메이션에 콩 표현해주기").
     // 낮에 좌판 밑에서 콩알 넷이 데굴데굴 굴러 나왔다 멈췄다 한다. 둥근 누런 콩에 검은 배꼽, 구를 때마다 배꼽이 돈다.
@@ -626,6 +632,25 @@ Rg.kitePics={
     kitePaper(kx,ky,ang,1.3,{patched:true});
   }};}
 };
+/* 결정 D-661: 장승 코의 눈 작은 창. 아이 키만 한 장승에 눈이 소복한데 코끝만 반들반들하다.
+   짐 진 장꾼의 손이 오른쪽에서 쑥 들어와 코를 톡 짚고 나가면, 그 바람에 눈가루가 조금 날린다. 몇 초마다 되풀이한다 */
+Rg.jangseungPic=()=>({animate:true,sound:'j_jangseung_snow',draw(w,h,t){
+  const rm=Vfx.reducedMotion,snow='#f6f8fa',g=h-3;
+  R(0,0,w,h,'#c9d6de');R(0,0,w,7,'#bccbd5');
+  for(let x=0;x<w;x+=13){R(x+2,g-15,10,9,'#a39b8f');R(x,g-18,14,3,'#5b6670');R(x,g-18,14,1,snow);}   // 먼 장터 지붕
+  R(0,g,w,3,'#e9edf0');R(0,g,w,1,snow);
+  const x=22,top=g-Rg.SNOW_JANGSEUNG_H;jangseung(x,g,1,Rg.SNOW_JANGSEUNG_H);
+  R(x-9,top-1,18,3,snow);R(x-6,top-8,12,2,snow);R(x-7,top+2,4,1,snow);R(x+3,top+2,4,1,snow);R(x-7,top+14,3,2,snow);R(x+4,top+14,3,2,snow);R(x-6,top+18,12,2,snow);
+  R(x-2,top+9,4,1,'#c9b392');   // 짚여서 반들반들한 코끝
+  const k=rm?0.75:(t%2.8),reach=k<0.55?k/0.55:k<0.95?1:k<1.4?1-(k-0.95)/0.45:0,e=reach*reach*(3-2*reach);
+  if(e>0){
+    const tipX=Math.round(w+2-(w+2-(x+3))*e),ny=top+10;
+    R(tipX+4,ny-2,w-tipX,5,'#d9cbb0');R(tipX+4,ny-2,w-tipX,1,'#efe4cc');R(tipX+4,ny+2,w-tipX,1,'#b8a888');   // 무명 소매
+    R(tipX,ny-1,5,4,'#4a3a30');R(tipX-1,ny,2,2,'#4a3a30');R(tipX+1,ny-1,2,1,'#6a5646');   // 털 난 손, 뻗은 손가락
+  }
+  if(!rm&&k>0.55&&k<1.3){const p=(k-0.55)/0.75;for(let i=0;i<4;i++)R(Math.round(x+2+i*2-p*3),Math.round(top+8-p*(4+i*2)),1,1,snow);}   // 짚을 때 날린 눈가루
+  kiteFlakes(w,h,t,8);
+}});
 function wanderer(kind,x,y,f=1){
   x=Math.round(x);y=Math.round(y);const p=(a,b,w,h,c)=>M(x,y,f,a,b,w,h,c);
   if(kind==='kite'){
