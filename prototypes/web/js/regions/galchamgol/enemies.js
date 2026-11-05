@@ -115,11 +115,13 @@ function kSnake(c,pts,w0,w1=w0,alpha=1,col=KBODY){
    rot 은 주둥이가 향하는 쪽(아래가 0). open 이면 입을 벌려 송곳니를 보인다. closed 면 눈을 감는다 */
 function kViper(c,hx,hy,rot,col,closed,open){
   c.save();c.translate(hx,hy);c.rotate(rot);c.scale(1.4,1.4);
-  const head=()=>{c.beginPath();c.moveTo(0,-15);c.quadraticCurveTo(18,-16,20,-3);c.quadraticCurveTo(19,10,8,21);c.quadraticCurveTo(0,27,-8,21);c.quadraticCurveTo(-19,10,-20,-3);c.quadraticCurveTo(-18,-16,0,-15);c.closePath();};
+  // 결정 D-748: 둥글던 머리를 모난 세모꼴로 깎았다. 턱 뒤가 넓게 각지고 주둥이로 날카롭게 좁아진다 (사용자 피드백 2026-11-05: 보스는 귀엽지 않게)
+  const HP=[[0,-16],[13,-15.5],[21,-8],[22.5,1],[14,15],[5,24],[0,25.5],[-5,24],[-14,15],[-22.5,1],[-21,-8],[-13,-15.5]];
+  const head=()=>{c.beginPath();HP.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();};
   if(open){c.fillStyle='#3a1f1c';c.beginPath();c.moveTo(-7,19);c.quadraticCurveTo(0,33,7,19);c.closePath();c.fill();   // 벌린 입 속
     for(const s of [-1,1]){c.fillStyle='#efe3c8';c.beginPath();c.moveTo(s*5,20);c.lineTo(s*3.2,30);c.lineTo(s*2.4,20.5);c.closePath();c.fill();}}
   c.fillStyle=INK;c.save();c.scale(1.08,1.07);head();c.fill();c.restore();
-  c.fillStyle=col;head();c.fill();
+  c.fillStyle=col;c.lineJoin='round';head();c.fill();
   blob(c,0,-3,11,8,KBODY_DK,0.55);   // 정수리의 짙은 큰 비늘
   for(const s of [-1,1]){
     brush(c,[[s*8,4],[s*14,-1],[s*19,-7]],3.2,KBODY_DK,0.85);   // 눈 뒤로 이어지는 짙은 띠
@@ -129,8 +131,11 @@ function kViper(c,hx,hy,rot,col,closed,open){
   brush(c,[[-13,-12],[-4,-2],[1,3]],1.5,'#cbbf98',0.75);brush(c,[[6,-13],[10,-6]],1.3,'#cbbf98',0.6);   // 오래된 흉터
   if(closed){for(const s of [-1,1])brush(c,[[s*13,4],[s*5,6]],2.2,'#efe3c8');}
   else{const [ex,ey]=lookAt(hx,hy),ca=Math.cos(-rot),sa=Math.sin(-rot),lx=(ex*ca-ey*sa)*0.4,ly=(ex*sa+ey*ca)*0.4;
-    for(const s of [-1,1]){blob(c,s*9,4,4.4,3.6,KEYE);blob(c,s*9,4,4.4,3.6,'#7a5a20',0.18);blob(c,s*9+lx,4+ly,0.9,3.1,INK);}}
-  for(const s of [-1,1])brush(c,[[s*16,-1],[s*10,1.5],[s*3.5,5]],3.4,INK);   // 내리누른 눈두덩
+    for(const s of [-1,1]){   // 결정 D-748: 가늘게 찢어진 눈. 바깥 끝이 치켜 올라가 노려본다
+      c.save();c.translate(s*9.5,4.6);c.rotate(s*-0.32);blob(c,0,0,4.2,2.1,KEYE);blob(c,0,0,4.2,2.1,'#7a5a20',0.2);c.restore();
+      blob(c,s*9.5+lx,4.6+ly,0.7,2.2,INK);}}
+  for(const s of [-1,1]){brush(c,[[s*20,-3],[s*12,0.5],[s*3.5,4.5]],4.2,INK);   // 내리누른 눈두덩
+    brush(c,[[s*15,-1.5],[s*19,-8.5],[s*21,-12]],2.6,INK);brush(c,[[s*15.5,-2],[s*18.5,-8]],1.1,KBODY_DK,0.9);}   // 눈 위로 돋은 뿔비늘
   c.restore();
 }
 /* 당산나무 앞 줄기: 늙고 굵은 느티나무. 밑동이 퍼져 땅을 움켜쥐고, 깊게 팬 껍질과 옹이, 이끼. 위는 화면 밖으로 이어진다 */
@@ -706,11 +711,14 @@ function kudzuOpenMark(p){
 }
 function drawWeakFlower(c){
   const w=B.kWeak;if(!w)return;
-  const rise=Math.min(1,w.t/9),pop=rise<1?rise*(1+0.25*Math.sin(rise*Math.PI)):1,a=1-w.fade/16,x=w.x,y=w.y,still=Vfx.reducedMotion;
+  const rise=Math.min(1,w.t/9),pop=rise<1?rise*(1+0.25*Math.sin(rise*Math.PI)):1,a=1-w.fade/16,x=w.x,still=Vfx.reducedMotion;let y=w.y;
   if(a<=0)return;
-  const sway=still?0:Math.sin(B.time*0.06)*1.2,gy=y+24,fx=x+sway*0.4;
-  blob(c,x,gy,16,4.5,KSOIL,0.55*a);brush(c,[[x-12,gy],[x-3,gy-1],[x+3,gy+1],[x+12,gy-1]],1.1,INK,0.45*a);   // 갈라진 흙 틈
-  c.save();c.globalAlpha=a;c.translate(x,gy);c.scale(pop*1.2,pop*1.2);c.translate(-x,-gy);
+  // 결정 D-745: 약점 꽃을 예전(1.2배)의 2/3 크기(0.8배)로 줄인다 (사용자 피드백 2026-11-05 단풍골 3). 해머루 송이가 칠 자리(w.x, w.y)에
+  // 꼭 겹치게, 줄인 그림의 해머루가 y 에 오도록 꽃 전체를 그 아래에서 그린다. 칠 자리 판정은 그 점 그대로다.
+  const S=0.8,gy=y+16,y0=gy-(gy-y)/S;
+  const sway=still?0:Math.sin(B.time*0.06)*1.2,fx=x+sway*0.4;
+  blob(c,x,gy,11,3.2,KSOIL,0.55*a);brush(c,[[x-9,gy],[x-2,gy-1],[x+2,gy+1],[x+9,gy-1]],1.1,INK,0.45*a);   // 갈라진 흙 틈
+  c.save();c.globalAlpha=a;c.translate(x,gy);c.scale(pop*S,pop*S);c.translate(-x,-gy);y=y0;
   brush(c,[[x,gy],[x+sway*0.2,y+12],[fx,y+5]],3.6,KFRESH.stem);   // 곧은 푸른 꽃대
   kLeaf(c,x-8,gy-6,0.95,-1.15,KFRESH_LEAF);kLeaf(c,x+8,gy-9,0.85,1.05,KFRESH_LEAF);
   // 꽃받침 위로 곧게 솟은 싱싱한 꽃송이 (아래는 활짝, 위로 갈수록 봉오리)

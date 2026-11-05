@@ -63,7 +63,17 @@ const toScreen=(x,y)=>({x:LW/2+(x-LW/2)*0.84,y:EY+(y-EY)*0.84});
 const lerp2=(p,q,k)=>[p[0]+(q[0]-p[0])*k,p[1]+(q[1]-p[1])*k];
 const legBroken=()=>part('leg').broken;
 const still=()=>Vfx.reducedMotion;
-function bodyY(){return EY+2+(legBroken()?22:0)+Math.sin(B.time*0.04)*2+(B.quake>9?3:0);}   // 발을 찧으면 몸이 살짝 내려앉는다
+/* 결정 D-747: 다리를 잃은 골렘 (사용자 피드백 2026-11-05 돌너머 6: 다리가 깨지면 공중에 떠 있는 것 같다).
+   구들돌 기둥이 무너지면 몸통이 그대로 내려앉아 눈밭에 쿵 엎어진다(LEG_FALL 프레임, 살짝 튀었다가 가라앉는다). 그 뒤로 몸은 땅에 붙어 있고,
+   두 팔이 번갈아 앞으로 뻗어 눈밭을 짚고 몸을 끈다(기는 모습). 팔 공격·눈 던지기는 그대로 쓰고 발 찧기만 못 한다(D-370). */
+const LEG_FALL=34,LEG_DROP=40;
+function legFall(){return legBroken()?clamp((B.gFall||0)/LEG_FALL,0,1):0;}
+function legDrop(){if(!legBroken())return 0;const k=legFall();
+  return LEG_DROP*(k<0.8?Math.pow(k/0.8,2)*1.08:1.08-0.08*(k-0.8)/0.2);}   // 떨어지다 눈에 박히며 살짝 더 꺼졌다가 자리 잡는다
+function crawlPhase(){return still()?0:B.time*0.045;}
+function bodyY(){const fallen=legBroken()&&legFall()>=1;
+  const bob=fallen?-Math.abs(Math.sin(crawlPhase()))*2.5:Math.sin(B.time*0.04)*2;   // 엎어진 뒤에는 숨 대신 몸을 끌 때마다 들썩인다
+  return EY+2+legDrop()+bob+(B.quake>9?3:0);}   // 발을 찧으면 몸이 살짝 내려앉는다
 
 /* ---------- 그림 조각 ---------- */
 function poly(c,pts,fill,alpha=1,stroke,lw=1.6){
@@ -280,11 +290,16 @@ function drawGolem(c,noFruit){
   const by=bodyY(),rest=!!(B.mark&&B.mark.rest),GY=cy+124,hurt=B.gHurt&&B.gHurt.t>0?B.gHurt:null;
   const flashOf=id=>hurt&&hurt.id===id?hurt.t/16:0;
   const shrug=arm.broken&&B.cur&&B.cur.id==='head'&&B.st==='atk'&&!end&&!Vfx.reducedMotion;   // 결정 D-376: 몸을 흔들어 눈을 턴다
+  const crawl=leg.broken&&legFall()>=1&&!arm.broken&&!end;   // 결정 D-747: 엎어진 뒤 팔로 몸을 끈다
   c.save();if(shrug)c.translate(Math.sin(B.time*0.9)*3.5,Math.abs(Math.sin(B.time*0.45))*-2);
+  else if(crawl)c.translate(Math.sin(crawlPhase())*3,0);
   blob(c,cx,cy+130,150,12,INK,0.1);
   // 다리: 구들돌 기둥과 넓적한 돌 발. 찧을 발은 예고 동안 높이 들리고, 떨어지며 제자리를 꾹 찧는다. 칸으로 뻗지 않는다.
-  if(leg.broken){   // 결정 D-370: 무너진 구들돌 다리. 짧게 부러진 기둥 위에 몸이 내려앉고 발치에 넓적한 돌이 흩어졌다
-    [-1,1].forEach(s=>{const hipX=cx+s*44,hipY=by+50;legColumn(c,hipX,hipY,hipX+s*6,hipY+22,30,1);
+  if(leg.broken){   // 결정 D-370·D-747: 무너진 구들돌 다리. 몸통이 눈밭까지 내려앉고 부러진 기둥 토막과 넓적한 돌이 양옆으로 흩어졌다
+    const k=legFall();
+    [-1,1].forEach(s=>{const hipX=cx+s*44,hipY=by+50;
+      if(k<1){const tilt=k*k;legColumn(c,hipX,hipY,hipX+s*(6+tilt*40),Math.min(GY-4,hipY+22+(1-k)*30),30,1);}   // 무너지는 동안 기둥이 옆으로 꺾인다
+      else legColumn(c,hipX+s*58,GY-8,hipX+s*86,GY-2,22,1);   // 바깥으로 쓰러진 기둥 토막
       poly(c,[[hipX-14+s*4,hipY+20],[hipX-6,hipY+28],[hipX+4,hipY+19],[hipX+14+s*4,hipY+27]],'#efe3c8',0.9);   // 부러진 단면
       slab(c,hipX+s*30,GY-2,26,9,1,false);slab(c,hipX-s*6,GY+6,20,8,1,s>0);slab(c,hipX+s*58,GY+8,14,6,1,false);
       for(let i=0;i<4;i++)blob(c,hipX+s*(14+i*11),GY+12+hash(i+s)*3,3,2,SLAB_LT,0.8);});}
@@ -356,7 +371,10 @@ function drawGolem(c,noFruit){
       rockStone(c,cx+s*112,GY+2,13,10,0.4,s*17+5,1,0.6);rockStone(c,cx+s*138,GY+9,10,8,1.2,s*17+7,1,0);rockStone(c,cx+s*96,GY+12,8,6,2,s*17+9,1,0.5);rockStone(c,cx+s*124,GY+14,7,5,0.8,s*17+11,1,0);
       for(let i=0;i<3;i++)blob(c,cx+s*(104+i*14),GY+16+hash(i*1.3+s)*3,2.4,1.8,QUARTZ_SH,0.8);});}
   else{const a=1,o=shk(arm),drop=0,ab=armBullet(),ra=B.restArm,dmg=arm.max-arm.hp,hf=flashOf('arm');
-    const idleEl=s=>[cx+s*98,by+34+drop*0.6],idleHd=s=>[cx+s*106,by+96+drop];
+    // 결정 D-747: 엎어진 뒤의 팔은 땅을 짚는다. 한 팔이 들려 앞으로 뻗는 동안 다른 팔은 눈밭을 짚고 몸을 끈다
+    const lift=s=>crawl?Math.max(0,Math.sin(crawlPhase()+(s>0?Math.PI:0))):0;
+    const idleEl=s=>crawl?[cx+s*(100+lift(s)*6),by+10-lift(s)*14]:[cx+s*98,by+34+drop*0.6],
+      idleHd=s=>crawl?[cx+s*(116+lift(s)*16),GY-4-lift(s)*24]:[cx+s*106,by+96+drop];
     [-1,1].forEach(s=>{const shX=cx+s*72+o,shY=by-20;let el=idleEl(s),hd=idleHd(s),ball=null;
       // 결정 D-451: 휘두를 팔은 뒤로 높이 감아올렸다가 몸 앞을 가로질러 눈밭에 내리꽂는다
       const upEl=[cx+s*112,by-58],upHd=[cx+s*136,by-122],endEl=[cx+s*66,by+58],endHd=[cx-s*14,by+128];
@@ -369,6 +387,8 @@ function drawGolem(c,noFruit){
         if(th){const d=th.t-th.delay,up=[[cx+s*96,by-48],[cx+s*80,by-96]],fw=[[cx+s*70,by+12],[cx+s*34,by+66]];
           if(d<=SB.wind){const e=1-Math.pow(1-d/SB.wind,2);el=lerp2(idleEl(s),up[0],e);hd=lerp2(idleHd(s),up[1],e);ball=th;}
           else{const e=(d-SB.wind)/SB.follow;el=lerp2(up[0],fw[0],e);hd=lerp2(up[1],fw[1],e);}}}
+      if(crawl&&!(ab&&ab.side===s)&&!(ra&&ra.side===s)&&!throwOf(s)&&lift(s)<0.15){   // 짚은 손 앞에 밀린 눈 둔덕과 끌린 자국
+        blob(c,hd[0]+s*14,GY+2,14,4,SNOW,0.95);brush(c,[[hd[0]-s*8,GY+6],[hd[0]-s*30,GY+8]],2,SNOW_SH,0.8);}
       rockArm(c,[[shX,shY],el,hd],27,a,s>0?2:1,1.35);   // 결정 D-450: 돌멩이가 뭉친 팔
       if(dmg>0)cracks(c,el[0],el[1],26,22,dmg*2,s*5+21,a);
       fur(c,shX+s*6,shY-6,3,26,24,a);
@@ -858,6 +878,9 @@ function drawSnowFlights(c){
 }
 function tickGolem(){
   if(B.quake>0)B.quake--;
+  if(legBroken()&&(B.gFall||0)<LEG_FALL){B.gFall=(B.gFall||0)+1;   // 결정 D-747: 무너져 엎어지는 순간 눈밭이 크게 울린다
+    if(B.gFall===Math.round(LEG_FALL*0.8)){const g=toScreen(LW/2,EY+124);Sound.playSfx('battle_hit');B.quake=16;
+      for(const s of [-1,1]){const p=toScreen(LW/2+s*70,EY+124);snowBurst(p.x,p.y,12,true);plume(p.x,p.y);}snowBurst(g.x,g.y,8,true);}}
   for(const cr of B.craters||[])cr.t--;if(B.craters)B.craters=B.craters.filter(cr=>cr.t>0);
   for(const sp of B.snowSpots||[])sp.t--;if(B.snowSpots)B.snowSpots=B.snowSpots.filter(sp=>sp.t>0);
   for(const s of B.gShards||[]){s.x+=s.vx;s.y+=s.vy;s.vy+=s.dust?-0.02:0.22;s.vx*=0.96;s.rot+=s.vr||0;s.t--;}if(B.gShards)B.gShards=B.gShards.filter(s=>s.t>0);
@@ -893,7 +916,7 @@ defineEnemies({
     headPose(){return toScreen(LW/2,bodyY()-46);},
     openMark:golemOpenMark,
     // 결정 D-370: weak 는 부서진 뒤 한 줄
-    parts:tableParts('golem',{leg:{atk:'golemStomp',mark:'발',tell:'골렘이 구들돌 발을 높이 쳐든다.',weak:'골렘이 털썩 주저앉았다. 더는 발을 찧지 못한다.'},
+    parts:tableParts('golem',{leg:{atk:'golemStomp',mark:'발',tell:'골렘이 구들돌 발을 높이 쳐든다.',weak:'다리가 무너져 골렘이 눈밭에 엎어졌다. 이제 팔로 몸을 끈다.'},
       arm:{atk:'golemArm',mark:'팔',tell:'골렘이 차돌 팔을 뒤로 높이 감아올린다.',weak:'골렘이 약해졌다. 팔이 없어 휩쓸지도, 눈을 던지지도 못한다.'},
       head:{atk:'golemSnow',mark:'핵',tell:'골렘이 두 팔로 눈을 퍼 올린다.'}}),
     likes:TABLES.CALM.golem,likeText:'돌무더기가 잠시 숨을 고른다.',
