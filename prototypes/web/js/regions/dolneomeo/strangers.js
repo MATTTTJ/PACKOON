@@ -18,7 +18,7 @@ Rg.strangers={
     talk(form){
       if(form==='goat'&&strangerOnce('dol_ppuri_kin'))return strangerSay([
         [Rg.npcs.find(n=>n.id==='ppuri').name,'고개 넘는 산양이로군.\n산양끼리는 먹을 데를 나눈다.'],
-        [Rg.npcs.find(n=>n.id==='ppuri').name,'절벽 아래 바위에서 뗀 석이다.\n하나 가져가라.'],receiveItem('seogi',1)],()=>{diary('dol_ppuri_kin','산양 모습으로 뿔영감에게 가니 산양끼리 먹을 데를 나눈다며 석이버섯을 줬다.');});
+        [Rg.npcs.find(n=>n.id==='ppuri').name,'절벽 밑에서 따 말린 석이다.\n하나 가져가라.'],receiveItem('seogi',1)],()=>{diary('dol_ppuri_kin','산양 모습으로 뿔영감에게 가니 산양끼리 먹을 데를 나눈다며 석이버섯을 줬다.');});
       return false;
     }},
   kkubeogi:{

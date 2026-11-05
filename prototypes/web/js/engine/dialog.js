@@ -25,6 +25,7 @@ function showLine(){
   if(dlgPlan){const i=dlgPlan.length-dlgQ.length;if(i<dlgPlan.length)dlgMusic=dlgPlan[i];}
   const L=dlgQ.shift();
   if(!L){const f=dlgEnd;dlgDismiss();if(f)f();return;}
+  // 결정 D-600: 이름(#dlgWho)은 창 위 테두리의 꼬리표로 그린다(style.css). 이름이 빈 줄(지문)은 꼬리표도 숨는다
   $('dlg').hidden=false;$('dlgWho').textContent=L[0];$('dlgText').textContent=L[1];dlgShownAt=performance.now();
   if(L.hint)learn(L.hint);   // 결정 D-461: 숨은 가공법 귀띔은 그 줄을 들은 순간 수첩에 적힌다 (arcs.js hintLine)
   if('pic' in L)dlgPic(L.pic);

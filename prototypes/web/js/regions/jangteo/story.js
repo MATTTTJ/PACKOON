@@ -333,7 +333,7 @@ function arcGreeting(w,rows){
       // 흰눈썹 노인은 해 지면 일찍 들어간다(elderArc1). 밤 바둑판엔 곰방대 노인만 남고, 내기는 둘이 있어야 하니 열리지 않는다(D-325).
       if(!act&&night())return [['곰방대 노인',F.jxYutReward?'저 양반은 들어갔다.\n내기는 둘이 있어야 하지. 날 밝거든 오너라.':'같이 두는 양반은 해 지면 들어간다.\n내기 구경은 날 밝거든 오너라.']];
       if(!act)return null;
-      return [[act===elderArc2?'너구리':'곰방대 노인',line,[{t:label,go:act},{t:'바둑 내기에 편을 든다',go:()=>Rg.playBaduk()},{t:'다음에 올게요',go:null}]]];
+      return [[act===elderArc2?'너구리':'곰방대 노인',line,[{t:label,go:act},{t:Rg.badukBetting?.()===false?'바둑 두는 걸 구경한다':'바둑 내기에 편을 든다',go:()=>Rg.playBaduk()},{t:'다음에 올게요',go:null}]]];
     };
     elders.talk=()=>{const l=rows();if(l)talk(l);else base();};
     arcGreeting(elders,rows);
@@ -726,11 +726,27 @@ Rg.handWork=after=>{Sound.gather(true);if(after)after();};   // 결정 D-360: �
    아이는 판이 열리기 전에 이길 쪽에 솔방울 하나로 편을 든다(편 들기는 투호 때 그대로). 솔방울은 곰방대 노인의 화롯불 땔감이다.
    판이 끝나면 지는 쪽이 판을 엎으려 든다. 아이가 판을 붙잡으면 판이 그대로 남아 편든 쪽이 이겼을 때 값을 받고
    (흰눈썹은 설에 쓰려던 곶감, 곰방대는 화롯불에 구운 군밤), 못 본 척하면 판이 엎어져 무효가 되고 판돈을 돌려받는다.
-   흰눈썹 노인이 baduk_steady_win 비율로 이긴다(D-326의 6 대 4는 그대로). 낮마다 baduk_bets_per_day 판까지 건다.
+   흰눈썹 노인이 baduk_steady_win 비율로 이긴다(D-326의 6 대 4는 그대로). 판돈은 통틀어 baduk_bets_total 판까지 건다(D-664).
    구경만 하는 판은 세지 않는다. 사연이 켜진 밤에는 흰눈썹 노인이 일찍 들어가 내기가 없다(D-131). 수치는 minigames.csv의 baduk_* 줄. */
 const yAlone=()=>!!G.f.night&&Rg.arcs();
 const BD={steady:{name:'흰눈썹 노인',short:'흰눈썹',pay:'gotgam'},bold:{name:'곰방대 노인',short:'곰방대',pay:'gunbam'}};
-function bBetsLeft(){const d=G.f.jxTuhoDay;return MG.baduk_bets_per_day-(d&&d.night===!!G.f.night?d.n:0);}
+// 결정 D-664: 판돈 거는 내기는 통틀어 baduk_bets_total 판까지다 (사용자 피드백 2026-11-05). 그 뒤로는 판돈도 판 엎기도 없이 두는 모습만 본다.
+function bBetsLeft(){return MG.baduk_bets_total-(G.f.jxBadukBets||0);}
+Rg.badukBetting=()=>bBetsLeft()>0;
+// 두 노인이 두는 모습. 판돈이 끝난 뒤 말을 걸면 이 가운데 하나를 보고 지나간다. 아빠 이야기(D-327)가 남았으면 그것도 듣는다
+const B_WATCH=[
+  [['너구리','(곰방대 할아버지가 돌을 딱! 소리 나게 놓는다.\n흰눈썹 할아버지는 눈썹만 한 번 올린다.)']],
+  [['너구리','(흰눈썹 할아버지가 한참 턱을 괴고 있다.\n곰방대 할아버지가 그사이 곰방대를 두 번 채운다.)']],
+  [['너구리','(두 할아버지가 같은 자리를 동시에 짚는다.\n…둘 다 손을 안 뗀다.)'],['곰방대 노인','내가 먼저 짚었다.'],['흰눈썹 노인','내 손톱이 먼저 닿았다.']]
+];
+function bWatch(){
+  const k=G.f.jxBadukWatch=(G.f.jxBadukWatch||0)+1;
+  const heard=G.f.jxYutHeard||(G.f.jxYutHeard=[]),si=youngStories.findIndex((_,i)=>!heard.includes(i));
+  if(si>=0)heard.push(si);
+  const out=!G.f.jxBadukOutSaid;G.f.jxBadukOutSaid=true;   // 값으로 줄 곶감·군밤이 동나 내기를 접었다
+  talk([...(out?[['곰방대 노인','곶감도 군밤도 동났다.\n이젠 내기 없이 둔다. 구경이나 해라.']]:[]),
+    ...B_WATCH[(k-1)%B_WATCH.length].map(L=>[...L]),...(si>=0?[['흰눈썹 노인',youngStories[si]]]:[])]);
+}
 const bPay=who=>MG['baduk_'+who+'_pay'];
 // 결정 D-327: 아빠 이야기(D-136 보부상 청년)는 구경판에서 한 판에 하나씩 듣는다. 청년은 늘 기복 큰 쪽 편을 들었다. 부를 준다는 열매 소문을 쫓던 그때와 같은 결.
 const youngStories=[
@@ -756,15 +772,16 @@ Rg.playBaduk=()=>{
   if(CLASSIC)return;
   if(yAlone()){talk([['곰방대 노인','저 양반은 들어갔다.\n내기는 둘이 있어야 하지. 날 밝거든 오너라.']]);return;}
   const left=bBetsLeft(),have=has('solbang',MG.baduk_stake),c=[];
-  if(have&&left>0)for(const who of ['steady','bold'])c.push({t:BD[who].short+' 할아버지 편 (이기면 '+ITEMS[BD[who].pay].n+' '+bPay(who)+')',go:()=>bStart(who)});
+  if(left<=0){bWatch();return;}   // 결정 D-664: 판돈 내기는 끝났다. 두는 모습만 본다
+  if(have)for(const who of ['steady','bold'])c.push({t:BD[who].short+' 할아버지 편 (이기면 '+ITEMS[BD[who].pay].n+' '+bPay(who)+')',go:()=>bStart(who)});
   c.push({t:'걸지 않고 구경만 한다',go:()=>bStart(null)},{t:'일어난다',go:null});
-  talk([['곰방대 노인',left<=0?'오늘 내기는 다 걸었다.\n구경은 얼마든지 해라.':!have?'걸 솔방울이 없구나.\n구경만 해도 된다.':'어느 편 들 테냐? 솔방울 하나다.',c]]);
+  talk([['곰방대 노인',!have?'걸 솔방울이 없구나.\n구경만 해도 된다.':left===1?'곶감도 군밤도 한 판 몫만 남았다.\n어느 편 들 테냐? 솔방울 하나다.':'어느 편 들 테냐? 솔방울 하나다.',c]]);
 };
 function bStart(bet){
   if(bet){
     if(!has('solbang',MG.baduk_stake)||bBetsLeft()<=0)return;
     takeItem('solbang',MG.baduk_stake);
-    const d=G.f.jxTuhoDay;G.f.jxTuhoDay={night:!!G.f.night,n:(d&&d.night===!!G.f.night?d.n:0)+1};   // 옛 저장과 같은 진행값 이름
+    G.f.jxBadukBets=(G.f.jxBadukBets||0)+1;
   }
   // 결정 D-326: 흰눈썹 노인은 고르게 두어 6할쯤 이기고, 곰방대 노인은 기세로 두다 드물게 이긴다 (바둑으로 옮긴 뒤에도 그대로)
   const winner=Math.random()<MG.baduk_steady_win?'steady':'bold',loser=winner==='steady'?'bold':'steady';
@@ -979,15 +996,30 @@ function talkYeot(){
     if(F.jangteoArcsPair1&&!F.jangteoArcsPair2)c.push({t:'모락 아주머니 떡을 건넨다',go:pairArc2});
     if(night()&&F.jangteoArcsPair2&&F.jangteoArcsYeot2&&!F.jangteoArcsPair3)c.push({t:'모락 아주머니 얘기를 묻는다',go:pairArc3});
     if(!night()&&F.jangteoArcsPair3&&F.jangteoArcsYeotReturned&&!F.jangteoArcsPair4)c.push({t:'떡집 앞으로 따라간다',go:pairArc4});
-    c.push({t:'그만두기',go:null});
     // 도깨비가 남은 밤엔 수레 밑에 숨어 있다. 큰소리 장사는 낮에만.
     const scared=night()&&!G.boss.dead;
-    talk([['엿방울',scared?'누, 누구야? …아, 너구리 꼬마구나~':F.jangteoArcsYeotReturned?'오늘은 가위가 손에 착 붙네~\n엿 늘이는 소리부터 다르지?':'엿 사려, 엿! 너구리 꼬마, 무슨 일이야?',c]]);return;
+    // 결정 D-663: 할 일이 남았을 때만 고르게 하고, 없으면 바로 엿방울다운 수다로 받는다 ("무슨 일이야? · 그만두기"만 뜨던 게 딱딱했다, 사용자 피드백 2026-11-05)
+    if(c.length&&!scared){c.push({t:'그냥 수다나 떨래요',go:yeotChat},{t:'그만두기',go:null});
+      talk([['엿방울',F.jangteoArcsYeotReturned?'오늘은 가위가 손에 착 붙네~\n엿 늘이는 소리부터 다르지?':'엿 사려, 엿! 어라, 너구리 꼬마~\n엿 사러 왔어, 소문 사러 왔어?',c]]);return;}
+    if(scared){c.push({t:'그만두기',go:null});talk([['엿방울','누, 누구야? …아, 너구리 꼬마구나~\n밤엔 엿 소리도 소곤소곤 내야 해.',c]]);return;}
+    yeotChat();return;
   }
   // 옛 저장: 장단에서 흥이 덜 나 엿을 못 받았으면 이번엔 웃겨서 준다.
   if(!F.yeotHigh){talkGive([['엿방울','어라, 너구리 꼬마~ 오늘은 꼭 웃겨 줘야겠네.'],...dadYeotLines()],()=>dadYeotDone());return;}
-  talk([['엿방울','엿 사려, 엿! 어라, 웃음 많은 너구리 꼬마네?'],
-    hintLine('yaksik',['엿방울','정월엔 약식이지~ 쌀에 밤이랑 대추,\n시루에 쪄 내면 엿보다 달다니까?'])]);   // 결정 D-461: 귀띔
+  yeotChat();
+}
+/* 결정 D-663: 엿방울의 수다. 말 걸 때마다 다음 이야기로 넘어간다. 장터 소식통이라 말끝을 늘이며 농을 섞는다 (npcs.csv 말투) */
+function yeotChat(){
+  const F=G.f,i=(F.yeotChat||0)%4;F.yeotChat=(F.yeotChat||0)+1;
+  const chat=[
+    [['엿방울','설 쇠러 온 손님들이 요새 뭘 찾는 줄 알아?'],
+      hintLine('yaksik',['엿방울','정월엔 약식이지~ 쌀에 밤이랑 대추,\n시루에 쪄 내면 엿보다 달다니까?'])],   // 결정 D-461: 귀띔
+    [['엿방울','엿 늘이는 거 봤어? 당기고 접고, 당기고 접고~\n그래야 속에 구멍이 숭숭 나서 바삭해.'],
+      ['엿방울','사람도 좀 당겨 봐야 속을 알지~\n…너무 당기면 끊어지는 것도 똑같고.']],
+    [['엿방울','모락 떡이 달아, 내 엿이 달아?'],['너구리','…둘 다요.'],['엿방울','어라, 벌써 장꾼 말솜씨네~\n그 대답이면 둘 다한테서 덤 받겠다.']],
+    [['엿방울','장터에선 귀로 먼저 장을 보는 거야~\n어디서 웃음이 나나, 어디서 한숨이 나나.'],['엿방울','웃음 나는 좌판이 덤도 후하지.\n…내 좌판처럼~']]
+  ];
+  talk(chat[i]);
 }
 function yeotTrade(){
   talk([['엿방울',Rg.arcs()&&night()&&!G.boss.dead?'솔방울 다섯 개랑 쌀 여덟 되. 조용히 바꿀래?':'어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되~',[{t:'보따리를 펼친다',go:()=>Trade.open('yeotbang')},{t:'아직은 안 줄래',go:null}]]]);
@@ -1249,7 +1281,8 @@ Rg.npcs=[
 
 if(!CLASSIC){
   Rg.npcs=Rg.npcs.map(n=>{
-    const place={morak:['street',1380,GROUND],yeotbang:['street',1660,GROUND],nal:['street',430,GROUND],maru:['inn',1080,GROUND],bueong:['inn',920,GROUND]}[n.id];
+    // 결정 D-662: 날쌘은 거리 첫 좌판 앞(200)에 선다. 장승 코의 눈에서 날쌘까지 길을 반으로 줄였다 (사용자 피드백 2026-11-05)
+    const place={morak:['street',1380,GROUND],yeotbang:['street',1660,GROUND],nal:['street',200,GROUND],maru:['inn',1080,GROUND],bueong:['inn',920,GROUND]}[n.id];
     const p=Object.defineProperties({},Object.getOwnPropertyDescriptors(n));
     Object.defineProperty(p,'x',{value:place[1],writable:true,enumerable:true,configurable:true});
     p.zone=place[0];p.y=place[2];
@@ -1258,7 +1291,7 @@ if(!CLASSIC){
       if(!G.f.yeotDone){n.talk();return;}
       const hide=night()&&!G.boss.dead&&Rg.arcs();
       talk([[hide?'너구리':'엿방울',hide?'(엿방울 아주머니는 수레 밑에서 꼬리 끝만 비죽 보인다.)':(Rg.riceNeeded()?'불쏘시개는 늘 필요하지~\n솔방울을 더 주우면 쌀도 더 바꿔 줄게.':'쌀은 넉넉해 보이는데~\n떡 찌다 모자라면 그때 와.'),[
-        {t:'이야기',go:n.talk},
+        {t:'수다 떨기',go:n.talk},   // 결정 D-663: '이야기'가 딱딱해 엿방울답게
         // 결정 D-79: 쌀이 진행에 모자랄 때만 더 바꿔 준다.
         ...(Rg.riceNeeded()?[{t:'솔방울 5개로 쌀 8개 더 구하기',go:()=>{
           if(!has('solbang',5)){talk([['엿방울','솔방울 다섯 개면 쌀 여덟 되야~\n솔숲이 비었으면 숙소에서 쉬고 와. 그새 또 떨어지거든.']]);return;}

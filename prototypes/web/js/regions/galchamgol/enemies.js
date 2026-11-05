@@ -28,17 +28,24 @@ function kLeaf(c,x,y,s,rot,col=KLEAF,alpha=1){
   leaflet(-1.2,13*s,7*s);leaflet(1.2,13*s,7*s);leaflet(0,17*s,9*s);
   c.restore();
 }
-/* 칡꽃송이: 꽃대 아래부터 나비 모양 꽃이 피고 위로 갈수록 봉오리. lean 은 꽃대 끝이 기우는 정도, len<0 이면 아래로 늘어진다 */
-function kFlower(c,x,y,len,lean,petal,alpha=1){
-  const A=[x,y],Bp=[x+lean*0.35,y-len*0.5],C=[x+lean,y-len];
+/* 칡꽃송이: 꽃대 아래부터 나비 모양 꽃이 피고 위로 갈수록 봉오리. lean 은 꽃대 끝이 기우는 정도, len<0 이면 아래로 늘어진다.
+   결정 D-620: wilt(0~1)를 주면 시든 꽃이다. 꽃대 끝이 고개를 숙이고, 꽃잎이 작아져 아래로 처지며 빛이 바랜다 (사용자 피드백 2026-11-05 단풍골 6).
+   pal 을 주면 꽃 빛깔을 바꾼다 (싱싱한 약점 꽃). */
+const KWILT='#a28c97',KWILT_DK='#5e4c55',KWILT_EDGE='#8a6a4e';
+function kFlower(c,x,y,len,lean,petal,alpha=1,wilt=0,pal=null){
+  const droop=wilt*Math.abs(len)*0.55*(lean<0?-1:1);
+  const A=[x,y],Bp=[x+lean*0.35+droop*0.25,y-len*0.5],C=[x+lean+droop,y-len*(1-wilt*0.45)];
   const at=k=>[(1-k)*(1-k)*A[0]+2*(1-k)*k*Bp[0]+k*k*C[0],(1-k)*(1-k)*A[1]+2*(1-k)*k*Bp[1]+k*k*C[1]];
-  brush(c,[A,Bp,C],2.2,KSTEM,alpha);
-  for(let i=0;i<11;i++){const k=0.06+i*0.09,[px,py]=at(k),s=Math.sign(len)*(i%2?1:-1),z=8.4*(1-k*0.55);
+  brush(c,[A,Bp,C],2.2*(1-wilt*0.25),wilt?'#3a3528':(pal?.stem||KSTEM),alpha);
+  const dk=pal?.dk||(wilt?KWILT_DK:KPUR_DK),col=wilt&&!pal?KWILT:petal,spot=pal?.spot||'#efe3c8';
+  const n=wilt?8:11;
+  for(let i=0;i<n;i++){const k=0.06+i*0.09,[px,py]=at(k),s=Math.sign(len)*(i%2?1:-1),z=8.4*(1-k*0.55)*(1-wilt*0.3),sag=wilt*z*0.55;
     if(k<0.66){
-      blob(c,px+s*z*0.9,py+z*0.35,z*0.5,z*0.34,KPUR_DK,alpha);            // 용골·날개 꽃잎
-      blob(c,px+s*z*0.55,py-z*0.1,z*0.78,z*0.66,petal,alpha);             // 기 꽃잎
-      blob(c,px+s*z*0.5,py-z*0.12,z*0.22,z*0.2,'#efe3c8',alpha*0.7);      // 기 꽃잎 가운데의 옅은 무늬
-    }else blob(c,px+s*z*0.3,py,z*0.36,z*0.58,KPUR_DK,alpha);              // 봉오리
+      blob(c,px+s*z*0.9,py+z*0.35+sag,z*0.5,z*0.34,dk,alpha);                    // 용골·날개 꽃잎
+      blob(c,px+s*z*0.55,py-z*0.1+sag,z*0.78,z*(0.66-wilt*0.22),col,alpha);      // 기 꽃잎 (시들면 납작하게 처진다)
+      if(wilt)blob(c,px+s*z*0.95,py+sag*1.2,z*0.3,z*0.18,KWILT_EDGE,alpha*0.7);  // 마른 꽃잎 끝
+      else blob(c,px+s*z*0.5,py-z*0.12,z*0.18,z*0.16,spot,alpha*(pal?0.6:0.75));            // 기 꽃잎 가운데의 무늬
+    }else blob(c,px+s*z*0.3,py+sag,z*0.36,z*0.58,dk,alpha);                      // 봉오리
   }
 }
 /* 결정 D-541: 칡뿌리는 오래 묵어 흙투성이다 (사용자 피드백 2026-11-04 단풍골 12). 겉껍질이 갈라지고 벗겨졌으며,
@@ -214,7 +221,8 @@ function drawKudzu(c){
   // 결정 D-542: 칡꽃(핵심)은 머리가 아니라 줄기 앞을 도는 몸 마디에 핀다 (사용자 피드백 2026-11-04 단풍골 14)
   {const fi=28,[fx,fy]=H[fi],o=shk(core),col=partCol(core),petal=col===RED?RED:KPUR;
     if(core.broken){kFlower(c,fx+o,fy-4,-30,-12,KPUR_LT,0.35);for(let i=0;i<6;i++)blob(c,fx-40+i*14+hash(i)*6,cy+98-hash(i*3.1)*4,3,2,KPUR_LT,0.5);}
-    else{kLeaf(c,fx-12+o,fy-2,0.8,-1.1,KLEAF,0.9);kFlower(c,fx-2+o,fy-7,56,-12+sway*0.5,petal,1);kFlower(c,fx+9+o,fy-5,38,10-sway*0.3,petal,0.9);}
+    else{kLeaf(c,fx-12+o,fy-2,0.8,-1.1,KLEAF,0.9);const w=col===RED?0:0.55;   // 결정 D-620: 몸에 핀 칡꽃도 시들어 고개를 숙였다
+      kFlower(c,fx-2+o,fy-7,56,-12+sway*0.5,petal,1,w);kFlower(c,fx+9+o,fy-5,38,10-sway*0.3,petal,0.9,w);}
     // 핵심이 가려져 있는 동안은 큰 잎이 꽃송이를 덮는다
     if(coreHidden()){kLeaf(c,fx-10,fy-10,1.6,-0.5,KLEAF,0.97);kLeaf(c,fx+10,fy-24,1.7,0.35,KLEAF,0.97);kLeaf(c,fx-4,fy-42,1.45,-0.1,KLEAF,0.97);kLeaf(c,fx+14,fy-6,1.3,0.9,KLEAF,0.97);}}
   // 쳐든 목과 독사 머리. 공격하는 동안은 입을 벌린다
@@ -622,7 +630,7 @@ function kudzuMark(p){
 }
 /* 표식을 친 뒤: 연장이 있으면 줄기를 끊거나 뿌리를 캐고, 확률로 재료를 얻는다 */
 function kudzuMarkHit(p,m){
-  if(p.core&&B.kWeak){bSplash(m.x,m.y,KMUD);B.kWeak.fade=Math.max(B.kWeak.fade,6);}   // 친 탁한 꽃이 터져 시든다
+  if(p.core&&B.kWeak){bSplash(m.x,m.y,KMUD);B.kWeak.fade=Math.max(B.kWeak.fade,6);}   // 친 약점 꽃이 터져 시든다
   const h=B.kHold;B.kHold=null;if(!h||(p.id!=='arm'&&p.id!=='root'))return;
   const b=h.b,arm=p.id==='arm',tool=battleTool();
   if(!tool){if(!p.broken)B.msg=arm?'칡줄기를 쳤다. 맨손으로는 질긴 줄기를 못 끊는다.':'칡뿌리를 쳤다. 맨손으로는 박힌 뿌리를 못 캔다.';return;}
@@ -683,40 +691,40 @@ function drawKudzuHoles(c){
     blob(c,h.x,h.y,8.5,3.8,'#8a6a4a',0.45*a);blob(c,h.x,h.y+0.3,6,2.6,'#2a2118',0.85*a);
     c.save();c.strokeStyle=INK;c.globalAlpha=0.45*a;c.lineWidth=1;c.beginPath();c.ellipse(h.x,h.y,8.5,3.8,0,Math.PI*0.05,Math.PI*0.95);c.stroke();c.restore();}
 }
-/* 결정 D-544: 칡꽃의 빈틈은 빈 곳이 아니라 꽃 공격이 끝난 뒤 바닥에서 솟는 크고 탁한 칡꽃이다 (사용자 피드백 2026-11-04 단풍골 13).
-   다른 꽃보다 크고 빛이 흐리며, 벌어진 꽃잎 속에 당산나무 꼭대기에서 감아 온 해머루 송이를 품고 있다. 빈틈 표식은 그 해머루 자리에 뜬다.
-   빈틈이 닫히거나 맞으면 시들어 가라앉는다. */
-const KMUD='#76587a',KMUD_DK='#4a3349',KMUD_LT='#a68ba6';   // 탁한 보랏빛
+/* 결정 D-544: 칡꽃의 빈틈은 빈 곳이 아니라 꽃 공격이 끝난 뒤 바닥에서 솟는 칡꽃이다 (사용자 피드백 2026-11-04 단풍골 13).
+   결정 D-620: 공격하는 꽃들은 시들어 힘이 없고, 해머루를 품은 이 꽃만 싱싱하다 (사용자 피드백 2026-11-05 단풍골 6. 예전의 크고 탁한 꽃은 징그러웠다).
+   곧게 선 꽃대에 맑은 자줏빛 꽃이 층층이 피고, 밑동의 푸른 꽃받침이 해머루 송이를 그릇처럼 받쳐 든다. 알은 해를 머금은 듯 따뜻하게 빛난다.
+   빈틈 표식은 그 해머루 자리에 뜬다. 빈틈이 닫히거나 맞으면 시들어 가라앉는다. */
+const KFRESH={dk:'#7b2f6e',spot:'#f2cf5a',stem:'#3f5a2a'},KFRESH_PET='#c45ea6',KFRESH_LEAF='#4f7a35',KMEORU='#4b2f78';
+const KMUD=KFRESH_PET;   // 친 꽃이 터질 때 튀는 빛깔
 function kudzuOpenMark(p){
   if(!p.core||coreHidden())return false;
   const pos=kudzuMark(p),life=B.E.markLife||120;
   B.mark={x:pos.x,y:pos.y,t:life,max:life,part:p};B.kWeak={x:pos.x,y:pos.y,t:0,fade:0};
-  B.msg=B.kWeakSeen?'탁한 칡꽃이 솟았다.':'탁한 칡꽃이 솟았다. 속에 해머루가 비친다.';B.kWeakSeen=true;
+  B.msg=B.kWeakSeen?'싱싱한 칡꽃이 솟았다.':'싱싱한 칡꽃이 솟았다. 꽃받침에 해머루가 담겼다.';B.kWeakSeen=true;
   return true;
 }
 function drawWeakFlower(c){
   const w=B.kWeak;if(!w)return;
   const rise=Math.min(1,w.t/9),pop=rise<1?rise*(1+0.25*Math.sin(rise*Math.PI)):1,a=1-w.fade/16,x=w.x,y=w.y,still=Vfx.reducedMotion;
   if(a<=0)return;
-  const sway=still?0:Math.sin(B.time*0.06)*1.5,gy=y+26,fx=x+sway;
-  // 갈라진 흙 틈과 솟은 굵은 꽃대, 잎 둘
-  blob(c,x,gy,18,5,KSOIL,0.6*a);brush(c,[[x-14,gy],[x-4,gy-1],[x+3,gy+1],[x+14,gy-1]],1.2,INK,0.5*a);
-  c.save();c.globalAlpha=a;c.translate(x,gy);c.scale(pop*1.25,pop*1.25);c.translate(-x,-gy);
-  brush(c,[[x,gy],[x-1+sway*0.3,y+14],[fx,y+6]],4.5,KSTEM);
-  kLeaf(c,x-7,gy-5,0.95,-1.1,KLEAF);kLeaf(c,x+7,gy-8,0.85,1.0,KLEAF);
-  // 뒤로 솟은 탁한 봉오리 줄
-  for(let i=0;i<5;i++){const k=i/4;blob(c,fx-2+k*5,y-18-k*11,5-k*2,6-k*2.2,KMUD_DK,0.95);}
-  // 크게 벌어진 기 꽃잎(뒤)과 양쪽 날개 꽃잎: 탁한 보랏빛에 짙은 잎맥
-  blob(c,fx,y-3,21,17,INK,0.9);blob(c,fx,y-3,19.5,15.5,KMUD);
-  c.save();c.strokeStyle=KMUD_DK;c.globalAlpha=0.6;c.lineWidth=1;c.beginPath();for(const d of [-12,-6,0,6,12]){c.moveTo(fx,y+6);c.quadraticCurveTo(fx+d*0.6,y-6,fx+d,y-15);}c.stroke();c.restore();
-  blob(c,fx-1,y-11,6,3,KMUD_LT,0.5);
-  for(const s of [-1,1]){c.save();c.translate(fx+s*14,y+5);c.rotate(s*0.55);blob(c,0,0,9.5,15,INK,0.9);blob(c,0,0,8,13.5,KMUD_DK);blob(c,-s*2,-4,3,5,KMUD_LT,0.35);c.restore();}
-  // 벌어진 속의 그늘과 그 안에 품은 해머루 송이: 짙은 보랏빛 알에 흰 분과 작은 빛
-  blob(c,fx,y+2,13,12,'#24171f',0.95);
-  for(const [dx,dy,r] of [[-4.5,-4,4],[4,-4.5,4],[0,0.5,4.3],[-7,3.5,3.6],[7,3.5,3.6],[-2.5,7.5,3.5],[3.5,8,3.3],[0,12,2.8]]){
-    blob(c,fx+dx,y+dy,r+0.6,r+0.6,INK,0.7);blob(c,fx+dx,y+dy,r,r,'#3a2550');blob(c,fx+dx,y+dy,r,r,'#9b86bb',0.18);
-    blob(c,fx+dx-r*0.35,y+dy-r*0.4,r*0.34,r*0.3,'#ece4f4',0.9);}
-  brush(c,[[fx,y-7],[fx+1,y-11]],1.6,KSTEM);
+  const sway=still?0:Math.sin(B.time*0.06)*1.2,gy=y+24,fx=x+sway*0.4;
+  blob(c,x,gy,16,4.5,KSOIL,0.55*a);brush(c,[[x-12,gy],[x-3,gy-1],[x+3,gy+1],[x+12,gy-1]],1.1,INK,0.45*a);   // 갈라진 흙 틈
+  c.save();c.globalAlpha=a;c.translate(x,gy);c.scale(pop*1.2,pop*1.2);c.translate(-x,-gy);
+  brush(c,[[x,gy],[x+sway*0.2,y+12],[fx,y+5]],3.6,KFRESH.stem);   // 곧은 푸른 꽃대
+  kLeaf(c,x-8,gy-6,0.95,-1.15,KFRESH_LEAF);kLeaf(c,x+8,gy-9,0.85,1.05,KFRESH_LEAF);
+  // 꽃받침 위로 곧게 솟은 싱싱한 꽃송이 (아래는 활짝, 위로 갈수록 봉오리)
+  kFlower(c,fx,y-4,34,sway*1.5,KFRESH_PET,1,0,KFRESH);
+  // 해를 머금은 듯한 따뜻한 빛 (해머루)
+  {const g=c.createRadialGradient(fx,y+3,1,fx,y+3,15);g.addColorStop(0,'rgba(255,214,120,.55)');g.addColorStop(1,'rgba(255,214,120,0)');
+    c.save();c.fillStyle=g;c.beginPath();c.arc(fx,y+3,15,0,Math.PI*2);c.fill();c.restore();}
+  // 해머루 송이: 알 다섯이 꽃받침 그릇에 소복이 담겼다
+  for(const [dx,dy,r] of [[-4,-1,3.5],[3.6,-1.4,3.5],[0,-4.8,3.5],[-1.8,1.8,3.2],[2.6,2,3.1]]){
+    blob(c,fx+dx,y+dy,r+0.5,r+0.5,INK,0.55);blob(c,fx+dx,y+dy,r,r,KMEORU);
+    blob(c,fx+dx-r*0.3,y+dy-r*0.35,r*0.32,r*0.28,'#f4e9ff',0.85);}
+  // 꽃받침: 해머루를 아래에서 감싸 드는 푸른 잎 그릇
+  for(const s of [-1,1]){c.save();c.translate(fx+s*6.5,y+7);c.rotate(s*0.85);blob(c,0,0,4.2,8.5,INK,0.8);blob(c,0,0,3.4,7.6,KFRESH_LEAF);blob(c,-s*0.8,-2,1.2,3,'#9cc27a',0.6);c.restore();}
+  blob(c,fx,y+9.5,8,3,INK,0.75);blob(c,fx,y+9.2,7,2.4,KFRESH_LEAF);
   c.restore();
 }
 function tickKudzu(){for(const h of B.kHoles||[])h.t--;if(B.kHoles)B.kHoles=B.kHoles.filter(h=>h.t>0);
@@ -808,7 +816,7 @@ defineBullets({
       const pool=(r,alpha)=>{const g=c.createRadialGradient(x,y,2,x,y,r);
         g.addColorStop(0,'rgba(125,80,150,'+(0.5*alpha).toFixed(3)+')');g.addColorStop(0.75,'rgba(183,145,204,'+(0.38*alpha).toFixed(3)+')');g.addColorStop(1,'rgba(183,145,204,0)');
         c.save();c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.restore();};
-      const bloom=(len,lean,alpha)=>{c.save();c.translate(x,y+8);c.scale(1.4,1.4);kFlower(c,0,0,len,lean,KPUR_LT,alpha);c.restore();};   // 바닥에서 솟은 칡꽃송이
+      const bloom=(len,lean,alpha)=>{c.save();c.translate(x,y+8);c.scale(1.4,1.4);kFlower(c,0,0,len,lean,KPUR_LT,alpha,0.7);c.restore();};   // 바닥에서 솟은 칡꽃송이. 결정 D-620: 힘없이 시든 꽃
       if(s.tell){const k=s.k;
         c.save();c.strokeStyle=KPUR;c.globalAlpha=0.35+0.2*k;c.lineWidth=1.2;c.setLineDash([3,4]);c.beginPath();c.arc(x,y,R*(0.55+0.45*k),0,Math.PI*2);c.stroke();c.restore();
         if(k>0.75&&Math.floor(b.t/4)%2){c.save();c.strokeStyle=RED;c.globalAlpha=0.8;c.lineWidth=1.8;c.beginPath();c.arc(x,y,R,0,Math.PI*2);c.stroke();c.restore();}

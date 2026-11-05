@@ -468,6 +468,7 @@ function drawStoneCliff(c){
   const n=stil?0:34;
   for(let i=0;i<n;i++){const sp=0.35+hash(i)*0.5,y=((t*sp+i*41)%(LH+20))-10,x=(hash(i*2.9)*LW+Math.sin(t*0.02+i)*12+t*0.2*(1+hash(i)))%LW;
     c.save();c.globalAlpha=0.55;c.fillStyle='#f4f6f2';const r=1.5+hash(i*1.3)*2;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.restore();}
+  drawLightVeil(c);   // 결정 D-642: 빛 공격 예고 동안 배경이 밝아진다
 }
 /* 결정 D-254: 찧은 자리. 발이 눌러 다진 우묵한 자리, 둘레에 솟은 눈 둔덕, 바깥으로 긁힌 자국, 눈 물결이 멈춘 자리의 낮은 둔덕 */
 function drawCrater(c,cr){
@@ -783,29 +784,66 @@ function lightBeams(b){const n=b.n,S=n>2?0.36:0.42,A=n>2?0.34:0.44,W=T().golem_l
   return Array.from({length:n},(_,i)=>({a:(i-(n-1)/2)*S+A*w*(on>P/2&&i%2?-1:1),W}));}
 function lightAlpha(b){const tl=T().golem_light_tell,P=T().golem_light_frames,on=b.t-tl;
   return on<=0?0:on<12?on/12:on<=P?1:Math.max(0,1-(on-P)/LIGHT_FADE);}
+/* 결정 D-643: 빛을 색종이 띠가 아니라 서리 옥에서 쏟아지는 신비로운 빛으로 (사용자 피드백 2026-11-05).
+   겹겹이 번지는 빛(보랏빛 바깥 → 푸른 서리빛 → 흰 심지), 빛줄기를 타고 내려가는 물결, 그 속을 떠도는 얼음 알갱이.
+   칸은 푸르스름하게 가라앉아 빛만 떠오른다. 판정(bm.W)은 그대로다 */
+function beamWedge(c,A,a,w,L){const l=[Math.sin(a-w),Math.cos(a-w)],r=[Math.sin(a+w),Math.cos(a+w)];
+  c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+l[0]*L,A.y+l[1]*L);c.lineTo(A.x+r[0]*L,A.y+r[1]*L);c.closePath();}
 function drawBeams(c,b,below){
-  const A=lightApex(),al=lightAlpha(b),tl=T().golem_light_tell,k=clamp(b.t/tl,0,1),dir=a=>[Math.sin(a),Math.cos(a)];
-  for(const bm of lightBeams(b)){const L=560,[l0,l1]=dir(bm.a-bm.W),[r0,r1]=dir(bm.a+bm.W),[m0,m1]=dir(bm.a);
-    if(al<=0){   // 예고: 빛줄기 자리가 옅게 비치고 가운데 점선
-      c.save();c.globalAlpha=(0.06+0.12*k)*(below?1:0.6);c.fillStyle=GEM_LT;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+l0*L,A.y+l1*L);c.lineTo(A.x+r0*L,A.y+r1*L);c.closePath();c.fill();
-      c.globalAlpha=k>0.75&&Math.floor(b.t/4)%2?0.9:0.45;c.strokeStyle=GEM_DK;c.lineWidth=1.3;c.setLineDash([5,5]);c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+m0*L,A.y+m1*L);c.stroke();c.restore();continue;}
-    c.save();
-    c.globalAlpha=0.16*al;c.fillStyle=GEM_LT;const [w0,w1]=dir(bm.a-bm.W*1.4),[z0,z1]=dir(bm.a+bm.W*1.4);
-    c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+w0*L,A.y+w1*L);c.lineTo(A.x+z0*L,A.y+z1*L);c.closePath();c.fill();   // 번진 빛
-    const g=c.createRadialGradient(A.x,A.y,0,A.x,A.y,L*0.75);g.addColorStop(0,'rgba(240,255,252,.95)');g.addColorStop(0.45,'rgba(150,224,216,.62)');g.addColorStop(1,'rgba(110,200,192,.4)');
-    c.globalAlpha=al*(below?1:0.7);c.fillStyle=g;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+l0*L,A.y+l1*L);c.lineTo(A.x+r0*L,A.y+r1*L);c.closePath();c.fill();
-    c.strokeStyle=GEM_DK;c.lineWidth=1.4;c.globalAlpha=0.7*al;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+l0*L,A.y+l1*L);c.moveTo(A.x,A.y);c.lineTo(A.x+r0*L,A.y+r1*L);c.stroke();
-    c.strokeStyle='#ffffff';c.lineWidth=2;c.globalAlpha=0.75*al;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+m0*L,A.y+m1*L);c.stroke();c.restore();
-    if(below&&!still())for(let i=0;i<5;i++){const d=150+((b.t*2.2+i*61)%320),j=(hash(i*3.3)-0.5)*bm.W*1.6;star(c,A.x+Math.sin(bm.a+j)*d,A.y+Math.cos(bm.a+j)*d,2.2,0.8*al);}   // 바닥에 반짝임
+  const A=lightApex(),al=lightAlpha(b),tl=T().golem_light_tell,k=clamp(b.t/tl,0,1),L=560,tm=b.t,stl=still();
+  for(const [bi,bm] of lightBeams(b).entries()){const [m0,m1]=[Math.sin(bm.a),Math.cos(bm.a)];
+    if(al<=0){   // 결정 D-642: 예고. 빛줄기 자리에 서리빛이 점점 차오르고 물결이 칸 쪽으로 흘러내린다. 끝 무렵 가장자리가 깜박인다
+      c.save();const g=c.createLinearGradient(A.x,A.y,A.x+m0*L*0.8,A.y+m1*L*0.8);
+      g.addColorStop(0,'rgba(228,251,246,'+(0.25+0.5*k).toFixed(3)+')');g.addColorStop(1,'rgba(160,226,220,'+(0.06+0.3*k).toFixed(3)+')');
+      c.globalAlpha=below?1:0.7;c.fillStyle=g;beamWedge(c,A,bm.a,bm.W*(0.55+0.45*k),L);c.fill();
+      if(!stl)for(let i=0;i<3;i++){const d=((tm*3.2+i*70)%220)+40,hw=Math.tan(bm.W)*d;   // 흘러내리는 물결
+        c.globalAlpha=(0.25+0.5*k)*(1-(d-40)/220);c.strokeStyle='#ffffff';c.lineWidth=1.6;c.beginPath();
+        c.moveTo(A.x+m0*d-m1*hw*0.8,A.y+m1*d+m0*hw*0.8);c.lineTo(A.x+m0*d+m1*hw*0.8,A.y+m1*d-m0*hw*0.8);c.stroke();}
+      const blink=k>0.6&&Math.floor(tm/4)%2;c.globalAlpha=blink?0.95:0.5+0.3*k;c.strokeStyle=GEM_DK;c.lineWidth=blink?2:1.3;c.setLineDash([6,4]);
+      const [l0,l1]=[Math.sin(bm.a-bm.W),Math.cos(bm.a-bm.W)],[r0,r1]=[Math.sin(bm.a+bm.W),Math.cos(bm.a+bm.W)];
+      c.beginPath();c.moveTo(A.x,A.y);c.lineTo(A.x+l0*L,A.y+l1*L);c.moveTo(A.x,A.y);c.lineTo(A.x+r0*L,A.y+r1*L);c.stroke();c.restore();continue;}
+    const hue=stl?0:Math.sin(tm*0.05+bi*1.7);   // 빛깔이 보랏빛과 푸른빛 사이를 천천히 오간다
+    c.save();c.globalAlpha=al*(below?1:0.75);
+    c.filter='blur(9px)';c.fillStyle='rgba('+Math.round(196+24*hue)+','+Math.round(184-10*hue)+',255,.3)';beamWedge(c,A,bm.a,bm.W*2.1,L);c.fill();   // 보랏빛 바깥 번짐(흐리게 번진다)
+    c.filter='blur(4px)';c.fillStyle='rgba(150,236,226,.4)';beamWedge(c,A,bm.a,bm.W*1.3,L);c.fill();c.filter='none';                              // 푸른 서리빛
+    const g=c.createRadialGradient(A.x,A.y,0,A.x,A.y,L*0.8);g.addColorStop(0,'rgba(255,255,255,.98)');g.addColorStop(0.5,'rgba(214,250,244,.75)');g.addColorStop(1,'rgba(176,236,230,.45)');
+    c.fillStyle=g;beamWedge(c,A,bm.a,bm.W*0.85,L);c.fill();
+    c.fillStyle='rgba(255,255,255,.85)';beamWedge(c,A,bm.a,bm.W*0.22,L);c.fill();                                             // 흰 심지
+    if(!stl)for(let i=0;i<4;i++){const d=((tm*4.5+i*80)%320)+30,hw=Math.tan(bm.W*0.9)*d;   // 빛을 타고 내려가는 물결
+      c.globalAlpha=al*0.55*(1-(d-30)/320);c.strokeStyle='#ffffff';c.lineWidth=2.2;c.beginPath();
+      c.moveTo(A.x+m0*d-m1*hw,A.y+m1*d+m0*hw);c.quadraticCurveTo(A.x+m0*(d+8),A.y+m1*(d+8),A.x+m0*d+m1*hw,A.y+m1*d-m0*hw);c.stroke();}
+    c.restore();
+    if(!stl)for(let i=0;i<9;i++){const d=60+((tm*1.4+i*37)%300),j=(hash(i*3.3+bi)-0.5)*bm.W*1.7,tw=0.5+0.5*Math.sin(tm*0.3+i*2.1);   // 얼음 알갱이
+      star(c,A.x+Math.sin(bm.a+j)*d+Math.sin(tm*0.04+i)*3,A.y+Math.cos(bm.a+j)*d,1.4+tw*1.4,al*(0.35+0.55*tw)*(below?1:0.7));}
   }
+  if(al>0&&!below){c.save();c.translate(A.x,A.y);c.rotate(stl?0:tm*0.02);c.globalAlpha=0.8*al;c.strokeStyle='#ffffff';c.lineWidth=1.4;   // 핵 앞의 얼음꽃
+    for(let i=0;i<6;i++){c.rotate(Math.PI/3);c.beginPath();c.moveTo(0,0);c.lineTo(0,-14);c.moveTo(0,-8);c.lineTo(-4,-12);c.moveTo(0,-8);c.lineTo(4,-12);c.stroke();}c.restore();}
+}
+/* 결정 D-642: 빛 공격 예고를 또렷하게 (사용자 피드백 2026-11-05: 전조가 애매하다).
+   예고 동안 뒤 배경 전체가 서리빛으로 밝아지고, 빛 고리가 핵으로 모여들며, 핵에서 가는 빛살이 사방으로 돈다.
+   빛이 쏟아지는 동안 배경은 푸르스름하게 가라앉는다. 배경 그림(drawStoneCliff) 끝에서 부른다 */
+function drawLightVeil(c){
+  const b=B.bullets.find(x=>x.k==='golemLight');if(!b)return;
+  const tl=T().golem_light_tell,k=clamp(b.t/tl,0,1),al=lightAlpha(b),A=lightApex(),stl=still();
+  c.save();
+  if(al<=0){const e=k*k*(3-2*k);
+    c.globalAlpha=0.55*e;c.fillStyle='#f7fffb';c.fillRect(0,0,LW,LH);   // 배경이 밝아진다
+    const g=c.createRadialGradient(A.x,A.y,4,A.x,A.y,LW*0.75);g.addColorStop(0,'rgba(228,251,246,.95)');g.addColorStop(1,'rgba(228,251,246,0)');
+    c.globalAlpha=0.75*e;c.fillStyle=g;c.fillRect(0,0,LW,LH);
+    for(let i=0;i<3;i++){const f=stl?0.5:((b.t*0.018+i/3)%1),r=20+(1-f)*LW*0.45;   // 핵으로 모여드는 빛 고리
+      c.globalAlpha=e*0.6*f;c.strokeStyle='#ffffff';c.lineWidth=2+3*f;c.beginPath();c.ellipse(A.x,A.y,r,r*0.62,0,0,Math.PI*2);c.stroke();}
+    c.globalAlpha=0.35*e;c.strokeStyle='#ffffff';c.lineWidth=1.2;   // 사방으로 도는 가는 빛살
+    for(let i=0;i<12;i++){const a=i*Math.PI/6+(stl?0:b.t*0.012);c.beginPath();c.moveTo(A.x+Math.cos(a)*24,A.y+Math.sin(a)*18);c.lineTo(A.x+Math.cos(a)*LW*0.6,A.y+Math.sin(a)*LW*0.42);c.stroke();}
+  }else{c.globalAlpha=0.22*al;c.fillStyle='#24344a';c.fillRect(0,0,LW,LH);}   // 빛이 쏟아지는 동안 배경이 가라앉는다
+  c.restore();
 }
 defineBullets({
   golemLight:{
     step(b){b.t++;const tl=T().golem_light_tell,P=T().golem_light_frames,on=b.t-tl;
-      if(b.t===tl+1)Sound.playSfx('battle_warn');
+      if(b.t===1)Sound.playSfx('wind_bell');if(b.t===tl+1)Sound.playSfx('battle_warn');   // 결정 D-642: 예고가 시작될 때 풍경 소리
       if(on>8&&on<=P){const A=lightApex(),ang=Math.atan2(B.px-A.x,B.py-A.y);if(lightBeams(b).some(bm=>Math.abs(ang-bm.a)<bm.W-0.012))bHitMe();}
       if(on>=P+LIGHT_FADE)b.dead=1;},
-    draw(c,b){const al=lightAlpha(b);if(al>0){c.save();c.fillStyle='rgba(29,24,20,'+(0.13*al).toFixed(3)+')';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();}   // 칸이 어두워지고 빛줄기만 밝다
+    draw(c,b){const al=lightAlpha(b);if(al>0){c.save();c.fillStyle='rgba(30,44,66,'+(0.3*al).toFixed(3)+')';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();}   // 칸이 푸르스름하게 가라앉고 빛줄기만 밝다 (D-643)
       drawBeams(c,b,true);}},
 });
 /* 상자 밖까지 날아가는 눈덩이는 잘리지 않게 상자 위에 그린다 (결정 D-182). 손에서 놓인 뒤부터 그린다. 친 자리 효과도 여기서 (D-253) */

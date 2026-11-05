@@ -67,7 +67,7 @@ function talkDodam(){
   const F=G.f,c=[{t:F.dodamDone?'해머루 가는 길 묻기':'해머루 이야기하기',go:dodamMain}];
   if(!F.galArcDodam1&&F.dodamTalk)c.push({t:'도토리 걱정을 들어 본다',go:dodamCacheAsk});
   else if(!F.galArcDodam2&&(F.galArcDodamFound||G.pickups[F.galArcDodamCache]?.got))c.push({t:'찾은 자리를 수첩에 그려 준다',go:dodamCacheDraw});
-  else if(F.galArcDodam2&&F.dodamDone&&!F.galArcDodam3)c.push({t:'도담 이야기를 더 듣는다',go:dodamOldStory});   // 옛 저장: 찾은 자리를 그린 뒤 따로 듣던 이야기
+  else if(F.galArcDodam2&&F.dodamDone&&!F.galArcDodam3)c.push({t:'도담이 뭔가 내민다',go:dodamOldStory});   // 옛 저장: 찾은 자리를 그린 뒤 따로 받던 답례 (D-622: 할머니 이야기는 뺐다)
   if(c.length===1){dodamMain();return;}
   c.push({t:'다음에 이야기하자',go:null});
   talk([['도담','응? 나한테 물어볼 거 있어?',c]]);
@@ -101,19 +101,18 @@ Rg.onPickup=a=>{
 function dodamCacheDraw(){
   if(!(G.f.galArcDodamFound||G.pickups[G.f.galArcDodamCache]?.got))return;
   // 결정 D-134: 가루를 값으로 받는 도담은 답례로 가루가 아니라 도토리를 준다. 결정 D-280: 받은 물건은 그 대화에 "(○○을 얻었다.)"로.
-  // 결정 D-526: 자리를 그려 주는 장면에 답례와 할머니 이야기를 합친다 (사용자 피드백 2026-11-04: 대화가 끝나면 또 생기는 게 많다).
+  // 결정 D-526: 자리를 그려 주는 장면에 답례를 합친다 (사용자 피드백 2026-11-04: 대화가 끝나면 또 생기는 게 많다).
+  // 결정 D-622: '해머루만 보고 돌아선 너구리' 할머니 이야기는 뺐다 (사용자 피드백 2026-11-05 단풍골 4).
   arcScene('galArcDodam2',[['너구리','네 도토리, 참나무 밑에 소복이 있었어.\n수첩에 그려 줄게. 보부상은 다 적거든.'],
     ['도담','여기에 동그라미! 적어 두면 안 잊겠다!\n…근데 그 수첩은 어디 묻어 둬?'],
-    ['도담','찾아 준 값이야! 큰 도토리 세 알!\n빻으면 가루 하나야.'],gotLine('acorn',3),
-    ['도담','참, 할머니가 그랬는데, 옛날에 너구리 하나가\n해머루만 보고 돌아섰대. 네가 태어나기도 전에!']],
-    '도담이 도토리 묻은 자리를 수첩에 그려 주었다. 찾아 준 값으로 큰 도토리 세 알을 받았다. 할머니에게 들었다며 아주 옛날 해머루만 보고 돌아선 너구리 이야기를 했다.',
+    ['도담','찾아 준 값이야! 큰 도토리 세 알!\n빻으면 가루 하나야.'],gotLine('acorn',3)],
+    '도담이 도토리 묻은 자리를 수첩에 그려 주었다. 찾아 준 값으로 큰 도토리 세 알을 받았다.',
     ()=>{learn('rule:squirrel_cache');G.f.galArcDodam3=true;});
 }
 function dodamOldStory(){
   if(!G.f.galArcDodam2||!G.f.dodamDone||!arcOpen('galArcDodam3'))return;
-  arcScene('galArcDodam3',[['도담','아, 맞다! 찾아 주면 갚기로 했지!\n자, 큰 도토리 세 알!'],gotLine('acorn',3),
-    ['도담','참, 할머니가 그랬는데, 옛날에 너구리 하나가\n해머루만 보고 돌아섰대. 네가 태어나기도 전에!']],
-    '도담이 도토리 찾아 준 값이라며 큰 도토리 세 알을 주었다. 할머니에게 들었다며 아주 옛날 해머루만 보고 돌아선 너구리 이야기를 했다.');
+  arcScene('galArcDodam3',[['도담','아, 맞다! 찾아 주면 갚기로 했지!\n자, 큰 도토리 세 알!'],gotLine('acorn',3)],
+    '도담이 도토리 찾아 준 값이라며 큰 도토리 세 알을 주었다.');
 }
 function dodamMain(){
   const F=G.f;
@@ -138,7 +137,7 @@ function dodamFruit(){
   const dad=G.clues.some(c=>c.id==='d1');
   const worry=Rg.arcsEnabled()&&!G.f.galArcDodam1?[['도담','아, 도토리 하니까 생각났다!\n내 겨울 도토리, 어디 묻었더라…']]:[];
   // 결정 D-281: 해머루는 보랏빛이다(그림·아이템 설명). 다람쥐는 절구가 없어 가루를 못 빻는다.
-  talk([...(dad?[['너구리','나도 해머루 찾고 있어.\n당산나무까지 어떻게 가?']]:[]),['도담',dad?'가는 길? 그럼, 내가 알지!\n이번엔 익었어. 보랏빛 알이 달렸더라!':'가는 길? 그럼, 내가 알지!'],
+  talk([...(dad?[['너구리','나도 해머루 찾고 있어.\n당산나무까지 어떻게 가?']]:[]),['도담',dad?'가는 길? 그럼, 내가 알지!\n이번엔 익었어. 칡꽃 속에 보랏빛 알이 비치더라!':'가는 길? 그럼, 내가 알지!'],
     ['도담','대신 도토리 가루 하나 줘! 세 알이면 가루 하나야.\n우린 절구가 없어서 못 빻거든!'],...worry],()=>{if(has('powder'))dodamTrade();});
 }
 function dodamTrade(){
@@ -153,11 +152,12 @@ function dodamGive(){
   {
     takeItem('powder',1);G.f.dodamDone=true;ledgerDone('dodam');rel('dodam',1);
     // 결정 D-411: 나무 속을 오르는 길은 없다. 숲 안쪽 금줄 길을 따라 언덕의 당산나무까지 걸어간다.
-    diary('dodam',CLASSIC?'해머루는 마을 끝 당산나무 꼭대기에 열린다. 요즘 칡덩굴이 나무를 꽁꽁 감았다고 한다.':'당산나무 언덕으로는 숲 안쪽 금줄 친 길로 간다. 해머루는 그 꼭대기에 열린다. 요즘 칡덩굴이 길이며 나무를 꽁꽁 감았다고 한다.');
+    // 결정 D-623: 해머루는 당산나무를 감은 늙은 칡이 꽃 속에 품어 맺는 열매다 (사용자 피드백 2026-11-05 단풍골 7). 나무 꼭대기에 열린다는 말은 뺐다
+    diary('dodam',CLASSIC?'해머루는 마을 끝 당산나무를 감은 칡이 꽃 속에 품고 있다. 요즘 그 칡덩굴이 나무를 꽁꽁 감았다고 한다.':'당산나무 언덕으로는 숲 안쪽 금줄 친 길로 간다. 해머루는 당산나무를 감은 칡이 꽃 속에 품고 있다. 요즘 그 칡덩굴이 길이며 나무를 꽁꽁 감았다고 한다.');
     // 결정 D-426: 길에서 받는 첫 이름. 해머루 길을 알려면 꼭 거치는 교환이라, 누구나 이 이름을 받는다 (name-story.md §7.7)
     if(typeof grantNickname==='function')grantNickname('gal_powder_pedlar','가루 보부상','도담');
     talk([['도담','와, 고마워! 너 이제 가루 보부상이다!\n내가 지었어!'],['너구리','…그게 뭐야.'],
-      ['도담',CLASSIC?'아무튼! 해머루는 마을 끝 당산나무 꼭대기에 열려!\n근데 칡덩굴이 나무를 꽁꽁 감았어.':'아무튼! 숲 안쪽 금줄 친 길로 가면 당산나무 언덕이야!\n근데 칡덩굴이 길이며 나무를 꽁꽁 감았어.'],
+      ['도담',CLASSIC?'아무튼! 해머루는 마을 끝 당산나무 칡꽃 속에 있어!\n근데 그 칡덩굴이 나무를 꽁꽁 감았어.':'아무튼! 숲 안쪽 금줄 친 길로 가면 당산나무 언덕이야!\n근데 칡덩굴이 길이며 나무를 꽁꽁 감았어.'],
       ['도담','곡괭이로는 안 끊길걸? 날 선 연장은\n대장간 무쇠 아저씨한테밖에 없어!']],()=>{if(!G.clues.some(c=>c.id==='d1'))dodamDad();});
   }
 }
@@ -488,7 +488,7 @@ function finishForge(){
 /* 결정 D-412: 1장의 끝은 엉킨 칡이다(사용자 피드백 2026-11-03). 할멈은 약방 마당에서 당산나무 꼭대기가 크게 흔들리는 걸 보고,
    칡이 풀렸으면 칡꽃·칡뿌리를 거둘 수 있겠다 싶어 약탕관째 언덕으로 올라온다. 아이가 해머루를 주울 즈음 닿는다.
    결정 D-521: 늪가 약방 구역을 뺐다 (사용자 피드백 2026-11-04). 할멈은 칡이 풀린 뒤에야 언덕에서 처음 만난다.
-   해머루를 주우면 할멈이 먼저 아이를 불러 사정을 말하고 약 교환을 연다. 첫 만남·찜질·눈약·반딧불 부탁도 모두 언덕에서 한다. */
+   해머루를 주우면 할멈이 먼저 아이를 불러 사정을 말하고 약 교환을 연다. 첫 만남·찜질·눈약도 모두 언덕에서 한다 (반딧불 부탁은 D-624로 뺐다). */
 const TOAD_HILL_X=1060;
 function toadUphill(){
   if(CLASSIC||!G)return false;
@@ -546,7 +546,7 @@ function talkToad(){
     talk([...intro,['두꺼비 할멈',intro.length?'네가 그 집 아이로구나. 까치가 말을 잘 전했구나.':'어서 오렴. 까치가 말을 잘 전했구나.'],
       ['두꺼비 할멈','편지 나르는 그 까치가 그러더구나.\n네 엄마가 이젠 말까지 잃어 간다고.'],
       ['두꺼비 할멈','그건… 병이라기보다는…\n…아니다. 늙으니 헛말이 나오는구나.'],
-      ['두꺼비 할멈',fruit?'해머루… 이거면 병을 늦출 수는 있단다.':CLASSIC?'내 손으로 고치진 못해도 병을 늦출 수는 있단다.\n당산나무 꼭대기 해머루를 가져오렴.':'내 손으로 고치진 못해도 병을 늦출 수는 있단다.\n떨어진 해머루부터 주워 오렴.'],
+      ['두꺼비 할멈',fruit?'해머루… 이거면 병을 늦출 수는 있단다.':CLASSIC?'내 손으로 고치진 못해도 병을 늦출 수는 있단다.\n당산나무 칡꽃 속 해머루를 가져오렴.':'내 손으로 고치진 못해도 병을 늦출 수는 있단다.\n떨어진 해머루부터 주워 오렴.'],
       ['너구리','아빠가 찾으러 간 만병통치약은요?\n그거면 엄마가 나아요?'],
       ['두꺼비 할멈','전설의 열매 말이로구나. 남들은 부자가 된다지만,\n나는 잃어버린 걸 돌려준다고 들었단다.'],
       ['두꺼비 할멈','작년 가을 네 아빠도 그 열매가 병에도 듣느냐고 묻더구나.\n해머루가 익기도 전에 북쪽으로 갔단다.'],
@@ -556,14 +556,13 @@ function talkToad(){
       ...(fruit?[['두꺼비 할멈','자, 해머루를 보자꾸나.',trade]]:[])]);
     return;
   }
-  const c=Rg.expLanternChoice?.(),leg=toadLegChoice(),geom=Rg.toadGeomChoice?.();
-  talk([['두꺼비 할멈',CLASSIC?'해머루를 가져오렴. 당산나무 꼭대기란다.':'떨어진 해머루부터 주워 오렴.\n그 나무 밑에 있을 게다.',[...(c?[c]:[]),...(leg?[leg]:[]),...(geom?[geom]:[]),{t:'보따리를 펼친다',go:()=>Trade.open('toad')},{t:'다녀올게요',go:null}]]]);
+  const leg=toadLegChoice(),geom=Rg.toadGeomChoice?.();
+  talk([['두꺼비 할멈',CLASSIC?'해머루를 가져오렴. 당산나무 칡꽃 속이란다.':'떨어진 해머루부터 주워 오렴.\n그 나무 밑에 있을 게다.',[...(leg?[leg]:[]),...(geom?[geom]:[]),{t:'보따리를 펼친다',go:()=>Trade.open('toad')},{t:'다녀올게요',go:null}]]]);
 }
 function toadFarewell(){
   const F=G.f,c=[{t:'북쪽으로 떠난다',go:endGame}];
   if(Rg.arcsEnabled()&&!F.galArcToad2&&G.rel.toad.v>=1)c.push({t:'엄마를 아는지 묻는다',go:toadWinter});
   if(Rg.arcsEnabled()&&F.galArcToad2&&!F.galArcToad3)c.push({t:'떠나기 전에 인사를 드린다',go:toadWrap});   // 옛 저장: 따로 열리던 포대기 끈 장면
-  {const lc=Rg.expLanternChoice?.();if(lc)c.push(lc);}
   if(!knows('home:'+Rg.id))for(const item of ['acorn_jelly','sesame_salt'])if(has(item))
     c.push({t:ITEMS[item].n+'을 까치 편에 보낸다',go:()=>galSendHome(item)});
   c.push({t:'보따리를 펼친다',go:()=>Trade.open('toad')});
@@ -721,22 +720,6 @@ if(!CLASSIC){
       R(28,20,9,9,'#b0402c');const s='#f1d9c8';
       R(29,21,1,1,s);R(29,23,1,1,s);R(29,26,1,2,s);R(31,21,5,1,s);R(33,22,1,2,s);R(31,24,5,1,s);R(31,25,1,3,s);R(33,25,1,3,s);R(35,25,1,3,s);
     },
-    // 반딧불 세 마리가 든 등롱. 숨 쉬듯 은은하게 밝았다 어두워진다
-    lantern:{animate:true,draw(w,h,t){
-      R(0,0,w,h,'#2b2a35');
-      const glow=.5+.5*Math.sin(t*1.6);
-      ctx.save();ctx.globalAlpha=.10+.08*glow;R(14,4,36,36,'#f3e7a0');ctx.globalAlpha=.16+.10*glow;R(18,8,28,28,'#f3e7a0');ctx.restore();
-      R(31,2,2,6,'#5a4030');R(24,8,16,2,'#5a4030');R(24,34,16,2,'#5a4030');
-      ctx.save();ctx.globalAlpha=.75+.2*glow;R(23,10,18,24,'#e9d9a6');ctx.restore();
-      R(23,10,1,24,'#8d6a48');R(40,10,1,24,'#8d6a48');R(23,18,18,1,'#c9b685');R(23,26,18,1,'#c9b685');
-      R(40,15,1,6,'#2b2a35');                                                 // 열어 둔 입구
-      [[28,15,0],[35,21,2.1],[29,28,4.2]].forEach(([x,y,p])=>{
-        const k=.5+.5*Math.sin(t*2.3+p),dx=Math.round(Math.sin(t*.9+p)),dy=Math.round(Math.cos(t*.7+p));
-        ctx.save();ctx.globalAlpha=.25+.35*k;R(x-1+dx,y-1+dy,4,4,'#f6f2a2');ctx.restore();
-        R(x+dx,y+dy,2,2,k>.4?'#f4fb9c':'#c9d97a');
-      });
-      R(17,33,7,6,'#5a4030');R(18,33,5,2,'#7a5a42');R(40,33,7,6,'#5a4030');R(41,33,5,2,'#7a5a42');   // 받쳐 든 두 손
-    }}
   };
   // 결정 D-483: 대사 그림이 뜰 때의 소리 (design/data/popup_sounds.csv 의 pic_이름)
   for(const k of Object.keys(scenePic))scenePic[k].sound='pic_'+k.replace(/[A-Z]/g,c=>'_'+c.toLowerCase());
@@ -1088,55 +1071,8 @@ if(!CLASSIC){
               :[['다람쥐 형','굴대는 개울 받침에 올려 뒀어.'],['다람쥐 동생','살만 오면 끼우기만 하면 돼!']]);
           })},{t:'손 놓을 자리를 먼저 본다',go:null}]]]);
   }
-  // 반딧불 부탁은 할멈 대화에서만 연다 (할멈이 곁에 없을 때 할멈 대사가 나오지 않게).
-  // 결정 D-521: 약방이 없으니 언덕에서 부탁한다. 해 질 녘 약탕관 곁에서 칡꽃·칡뿌리를 추리는데 어둡다. 반딧불은 언덕 풀숲에 앉는다.
-  const FLY_SPOTS='누운 풀숲, 소원 천 옆, 북쪽 길 팻말 곁';
-  function lanternTalk(){
-    const F=G.f;
-    if(F.galLanternAsked&&!F.galLanternLit&&(F.galLanternCount||0)<3){
-      talk([['두꺼비 할멈',FLY_SPOTS+'이란다.\n등롱 입구만 열어 두면 제 발로 들어오지.']]);return;
-    }
-    if(F.galLanternLit){talk([['두꺼비 할멈','문을 열어 뒀으니 아침이면 풀숲으로 돌아가겠지.\n덕분에 약재를 다 추렸다.']]);return;}
-    if(F.galLanternCount>=3){
-      // 결정 D-153: 반딧불을 다 모아 왔다고 아이가 말하고, 건네는 동안 등롱의 은은한 빛을 작은 창에 보인다.
-      talk([withPic(['너구리','할머니, 반딧불 세 마리 다 모아 왔어요.'],scenePic.lantern),['두꺼비 할멈','…곱게도 앉았구나.\n뚜껑은 닫지 마렴. 들어앉을 자리만 내어 주면 된단다.',[
-        {t:'반딧불이 든 등롱을 나뭇가지에 건다',go:()=>hands(()=>{
-            F.galLanternLit=true;finishWanderer('reed_fireflies');
-            diary('galLanternLit','언덕 풀숲의 반딧불을 등롱에 잠깐 불러 할머니 약탕관 옆 나뭇가지에 걸었다. 입구는 열어 두었다. 밤마다 반딧불로 방을 밝혀 주던 엄마가 생각났다.');
-            // 결정 D-285: 반딧불 심부름의 값. 불빛 아래 할멈이 약재를 추리고, 약재 틈에서 나온 싸리버섯을 준다.
-            talk([['너구리','엄마도 밤마다 반딧불이 돼서\n내 방을 밝혀 줬는데.'],['두꺼비 할멈','…그랬구나.\n덕분에 약재 빛깔이 잘 보이겠다.'],
-              ['두꺼비 할멈','약재 틈에 싸리버섯이 섞여 있었구나.\n약으론 못 쓰니 네가 먹으렴.'],receiveItem('ssari',1)]);
-          })},{t:'먼저 불빛을 보고 있는다',go:null}]]]);return;
-    }
-    talk([['두꺼비 할멈','약재를 추려야 하는데 해가 지는구나.\n언덕 반딧불한테 잠깐 빛을 빌려 볼까.'],
-      ['너구리','잡아 와요?'],['두꺼비 할멈','아니, 빈 등롱을 내밀렴. 앉으면 같이 오는 거지.\n'+FLY_SPOTS+'에 한 마리씩 있단다.',[
-        {t:'빈 등롱을 받아 풀숲으로 간다',go:()=>{F.galLanternAsked=true;toast('누운 풀숲, 소원 천 옆, 북쪽 길 팻말 곁 불빛 · E');}},
-        {t:'약 이야기부터 할게요',go:talkToad}]]]);
-  }
-  Rg.expLanternChoice=()=>{
-    const F=G.f;if(CLASSIC||F.galLanternLit||!toadUphill())return null;
-    return {t:(F.galLanternCount||0)>=3?'반딧불을 다 모아 왔다고 말씀드린다':F.galLanternAsked?'반딧불 자리를 다시 묻는다':'어둑해진 약재 이야기를 한다',go:lanternTalk};
-  };
-  // 반딧불 표식과 불빛 자리는 아이 혼자 보는 곳이다. 할멈 대사를 부르지 않는다.
-  function fireflyLook(){
-    const F=G.f;
-    if((F.galLanternCount||0)>=3){talk([['너구리','세 마리 다 등롱에 있어.\n할머니께 가져가자.']]);return;}
-    if(F.galLanternAsked){talk([['너구리','풀숲, 소원 천 옆, 팻말 곁.\n불빛부터 마저 데려오자.']]);return;}
-    talk([['너구리','풀숲에 작은 불빛이 들락거린다.\n해가 지니까 하나둘 나오네.']]);
-  }
-  function inviteFirefly(i){
-    const F=G.f;
-    if(!F.galLanternAsked){talk([['너구리','작은 불빛이 깜박인다.\n빈손으로 다가가면 날아가 버리겠지.']]);return;}
-    if(F['galLanternFly'+i]){talk([['너구리','여기 앉던 반딧불은 등롱에 있어.\n다른 데도 둘러보자.']]);return;}
-    hands(()=>{
-      F['galLanternFly'+i]=true;F.galLanternCount=[0,1,2].filter(n=>F['galLanternFly'+n]).length;
-      talk([['너구리',F.galLanternCount===3?'다 왔네.\n할머니께 가져가자.':'앉았다. 꽉 쥐지는 않을게.\n다음 불빛도 찾아보자.']]);
-    });
-  }
-  // 결정 D-521: 반딧불은 칡이 풀린 언덕 풀숲에 나온다 (할멈이 올라온 뒤에만)
-  const fireflies={id:'reed_fireflies',name:'반딧불',tag:false,hint:'풀숲 사이로 작은 불빛이 깜박인다.',x:480,when:()=>toadUphill(),draw:(x,y)=>Rg.expArt.marker(x,y),talk:fireflyLook,
-    greeting:[['너구리','등롱 입구로 작은 빛이 드나든다.\n잡아 두지 않아도 환하네.']]};
-  Rg.expWanderers={village:[magpie,otter],forge:[brothers],forest:[chick,badger],hill:[fireflies]};
+  // 결정 D-624: 두꺼비 할멈의 반딧불 부탁을 뺐다 (사용자 피드백 2026-11-05 단풍골 8). 등롱·반딧불 자리·싸리버섯 답례(D-285)도 함께 뺐다.
+  Rg.expWanderers={village:[magpie,otter],forge:[brothers],forest:[chick,badger],hill:[]};
   function examine(id,x,label,read,y){
     return {id,x,label,...(y===undefined?{}:{y}),get text(){return read();}};
   }
@@ -1170,8 +1106,9 @@ if(!CLASSIC){
       // 결정 D-411: 나무 속 나이테 대신, 칡이 훑고 지나간 들머리 풀
       examine('hill_grass',225,'누운 풀 살펴보기',()=> '풀이 한쪽으로 다 누웠다.\n칡덩굴이 이 언덕을 훑고 지나갔구나.'),
       examine('hill_cloth',810,'오래된 소원 천 보기',()=> '매듭은 낡았는데 천은 덜 바랬다.\n잎 그늘이 볕을 대신 맞아 줬나 봐.'),
-      examine('hill_fruit',2310-(Rg.hillShift||0),'해머루 자리 올려다보기',()=>G.boss.dead?
-        '열매가 있던 꼭지가 노을을 보고 있다.\n다음 가을에도 여기서 익겠지.':'잎 뒤에 보랏빛 알 하나. 해를 오래 받는 자리네.\n저기까지 엉킨 칡을 풀어 줘야겠다.'),
+      // 결정 D-623: 해머루는 칡꽃 속에 맺힌다. 나무 꼭대기의 열매 꼭지 이야기를 칡꽃 자리로 바꿨다
+      examine('hill_fruit',2310-(Rg.hillShift||0),'칡꽃 자리 올려다보기',()=>G.boss.dead?
+        '칡이 풀린 자리에 시든 꽃대만 걸려 있다.\n나무가 한결 숨을 쉬는 것 같다.':'칡꽃 속에 보랏빛 알이 비친다. 해머루다.\n저 칡을 풀어 줘야 꺼낼 수 있겠다.'),
       // 결정 D-410: 북쪽 길은 당산나무 언덕 끝에서 시작한다 (예전엔 약방 끝 팻말). 집 쪽 일기 'start'의 "단풍골 끝에서 시작된다"와 같은 길.
       examine('hill_north',1520,'북쪽 길 팻말 읽기',()=>G.f.galArcToad1||G.diary.some(d=>d.id==='end')?
         '약은 집으로 갔다. 이 길은 북쪽으로 간다.\n다음엔 아빠한테도 집 이야기를 해 줘야지.':'돌너머로 가는 북쪽 길.\n먼저 할머니께 해머루를 드리자.')]
@@ -1188,12 +1125,7 @@ if(!CLASSIC){
   Rg.zones.village.npcs.push(work('wheel',1050,'물레방아 함께 고치기',wheelTalk));
   Rg.zones.forge.npcs.push(work('baskets',810,'평상에서 도토리 나누기 · 굴대 함께 들기',wheelAxle));
   Rg.zones.forge.npcs.push(work('spoke',430,'낮은 가지의 물레방아 살 받기',wheelSpoke));
-  const flySpot=(id,x,where,i,y)=>{const w=work(id,x,'',()=>inviteFirefly(i),y);
-    const label=()=>where+(G.f.galLanternAsked?' 불빛에 등롱 내밀기':' 불빛 보기');
-    Object.defineProperty(w,'name',{get:label});Object.defineProperty(w,'prompt',{get:label});return w;};
-  // 결정 D-521: 반딧불 자리는 언덕에. 부탁을 들은 뒤에만 보인다 (그 전엔 할멈도 등롱도 없다).
-  const flies=[flySpot('fly_grass',280,'누운 풀숲',0),flySpot('fly_cloth',880,'소원 천 옆',1),flySpot('fly_sign',1440,'북쪽 길 팻말 곁',2)];
-  Object.defineProperty(Rg.zones.hill,'npcs',{configurable:true,enumerable:true,get:()=>toadUphill()?['toad',...(G.f.galLanternAsked&&!G.f.galLanternLit?flies:[])]:[]});
+  Object.defineProperty(Rg.zones.hill,'npcs',{configurable:true,enumerable:true,get:()=>toadUphill()?['toad']:[]});
   // 결정 D-525: 엄마 방. 아이가 보낸 약에 따라 엄마 모습이 달라진다 (engine/core.js momStage). 열린 방문으로 들여다본다.
   const MOM_LINES=[
     '엄마가 이불 끝을 꼭 쥐고 잔다. 금방 올게, 엄마.\n문은 조금 열어 두자. 개울 소리가 들리게.',
@@ -1201,10 +1133,23 @@ if(!CLASSIC){
     '엄마가 벽에 기대 앉아 있다. 나를 보고 한참 만에 웃었다.\n볼에 핏기가 조금 돈다.',
     '엄마가 볕 드는 문가에서 콩을 고른다. 손은 아직 느리다.\n"…왔니." 한마디가 또렷했다.',
     '엄마가 마당에서 빨래를 갠다. 나를 보더니 이름을 부른다.\n…몇 번을 들어도 좋다.'];
+  // 결정 D-625: 돌너머에 들어선 뒤 처음 엄마를 보러 오면, 아이가 엄마 얼굴을 보고 다시 떠나기 힘들어한다 (사용자 피드백 2026-11-05 단풍골 9).
+  //   엄마는 말 대신 손으로 보낸다. 떠나던 날 씌워 준 아빠 모자(프롤로그)를 바로 씌우고, 손수 매어 준 아빠 짐표(D-422)를 친다.
+  //   아이는 쪽지 둘째·셋째 줄(MOM_NOTE)을 떠올리고 다시 길을 나선다. 한 번만 나온다. 영산을 마친 뒤(엄마가 나음)에는 나오지 않는다.
+  const momLeaveOpen=st=>!G.f.galMomLeave&&st>0&&st<4&&Object.keys(G.visitedZones?.dolneomeo||{}).length>0;
   function momVisit(){
     const st=momStage(),gifts=momGiftCount();
-    talk([withPic(['너구리',MOM_LINES[st]],momRoomPic),
-      ...(gifts&&st>0&&st<4?[['너구리','(머리맡에 내가 보낸 것들이 가지런히 놓였다.\n엄마가 하나하나 만져 봤나 보다.)']]:[])]);
+    const lines=[withPic(['너구리',MOM_LINES[st]],momRoomPic),
+      ...(gifts&&st>0&&st<4?[['너구리','(머리맡에 내가 보낸 것들이 가지런히 놓였다.\n엄마가 하나하나 만져 봤나 보다.)']]:[])];
+    if(!momLeaveOpen(st)){talk(lines);return;}
+    G.f.galMomLeave=true;
+    talk([...lines,
+      ['너구리','(엄마 얼굴을 보니 발이 안 떨어진다.\n…그냥 집에 있을까. 물도 길어 드리고.)'],
+      ['너구리',st<=1?'(엄마가 눈을 뜨고 손을 뻗어 내 모자를 바로 씌워 준다.\n떠나던 날 아침처럼.)':'(엄마가 손을 뻗어 내 모자를 바로 씌워 준다.\n떠나던 날 아침처럼.)'],
+      ['너구리','(그러고는 보따리 끈의 아빠 짐표를 톡톡 친다.\n쪽지 글씨가 귀에 들리는 것 같다.)'],
+      ['너구리','…응. 아빠 만나면 손 꼭 잡고 올게.\n그때까지 약 잘 드세요, 엄마.'],
+      ['너구리','(문은 조금 열어 두고 나왔다.\n개울 소리가 들리게.)']],
+      ()=>diary('galMomLeave','엄마를 보러 집에 들렀다. 발이 안 떨어졌는데, 엄마가 내 모자를 바로 씌워 주고 보따리 끈의 아빠 짐표를 톡톡 쳤다. 쪽지 글씨가 생각났다. 다시 길을 나섰다.'));
   }
   Rg.zones.village.npcs.push(Object.assign(work('home',95,'열린 방문 들여다보기',momVisit),{peek:false}));
   Rg.expStep=()=>{

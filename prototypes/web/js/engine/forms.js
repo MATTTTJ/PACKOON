@@ -92,7 +92,27 @@ const formMoveMul=()=>G.form==='squirrel'?TABLES.TUNING.form_squirrel_speed:G.fo
 const formJumpMul=()=>G.form==='goat'?TABLES.TUNING.form_goat_jump:1;
 const upHeld=()=>!!(keys['arrowup']||keys['w']||touch.up);
 const jumpHeld=()=>!!(keys['c']||keys[' ']||keys['arrowup']||keys['w']||touch.jump);
-const formVisible=a=>!a||!a.form||a.form===G.form;
+// 결정 D-665: hidden:'owl' 인 물건은 수리부엉이가 느껴 드러내기(found) 전에는 어떤 모습에게도 보이지 않는다
+const formVisible=a=>!a||((!a.form||a.form===G.form)&&(!a.hidden||!!a.found));
+/* 결정 D-665: 수리부엉이는 다른 모습으로는 못 보는 것을 느낀다 (사용자 피드백 2026-11-05).
+   owlSenses() 는 지금 그런 눈을 가졌는지(수리부엉이 모습인지), owlSenses(x) 는 그 눈으로 x 를 느낄 만큼 가까운지.
+   다른 코드(숨은 물건, 보스의 모습 드러내기 등)가 이 함수 하나로 판정한다. range 를 주지 않으면 tuning.csv form_owl_sense_range */
+function owlSenses(x,range){
+  if(!G||G.form!=='owl')return false;
+  if(x==null)return true;
+  return Math.abs(G.px-x)<=(range??TABLES.TUNING.form_owl_sense_range);
+}
+/* 필드가 돌 때마다: 수리부엉이가 숨은 물건 곁을 지나면 무언가 느껴진다는 알림과 함께 드러난다 (한 번 드러난 것은 그대로 보인다) */
+function owlSenseTick(){
+  if(!owlSenses()||paused())return;
+  for(const a of fieldItems('pickups')){
+    if(a.hidden!=='owl'||a.found||a.got||!owlSenses(a.x))continue;
+    a.found=true;learn('rule:owl_sense');
+    Vfx.burst(a.x,(a.y??fieldGround())-6);Sound.leaf?.('owl');
+    const n=ITEMS[a.item]?.n||'무언가';
+    toast('…무언가 느껴진다. 숨어 있던 '+jo(n,'이','가')+' 드러났다');
+  }
+}
 function climbNear(){
   if(G.form!=='squirrel')return null;
   return zoneObjects('climbs').find(c=>Math.abs(c.x-G.px)<TABLES.TUNING.form_climb_reach&&G.py>c.top+.5&&G.py<=(c.bottom??fieldGround())+.5)||null;
@@ -489,7 +509,7 @@ function refreshFormUi(){
 const FORM_INTRO={
   squirrel:{line:'줄기를 타고 높은 데까지 오른다'},
   goat:{line:'디딜 데를 보고 훌쩍 높이 뛴다'},
-  owl:{line:'점프를 누른 채 떨어지면 천천히 내려앉는다'},
+  owl:{line:'남들 눈엔 안 보이는 것을 느끼고, 천천히 내려앉는다'},   // 결정 D-665
   deer:{line:'날쌔게 달리고, 숨은 소리를 먼저 듣는다'}
 };
 const formIntroBox=el('div','form-intro');formIntroBox.hidden=true;formIntroBox.setAttribute('role','status');
@@ -527,12 +547,15 @@ function drawFormDemo(id,t){
     drawFormAt(Math.round(x),y,1,0,'goat');formGait=-1;
     return;
   }
-  if(id==='owl'){   // 떨어지며 날개를 펴고 천천히 내려앉는다
+  if(id==='owl'){   // 떨어지며 날개를 펴고 천천히 내려앉으면, 곁에 숨어 있던 물건이 반짝 드러난다 (결정 D-665)
     R(0,30,22,4,'#8a6a48');R(0,34,5,DG-34,'#7a5c3c');
     const c=t%3.6;
     if(c<.6)drawFormAt(9,30,1,walkSt,'owl');
     else if(c<3){const k=(c-.6)/2.4;drawFormAt(Math.round(18+k*56),Math.round(30+k*(DG-30)),1,0,'owl',0,true);}
     else drawFormAt(74,DG,1,0,'owl');
+    if(c>2.2){const k=Math.min(1,(c-2.2)/.5),gx=87,gy=DG-4;
+      ctx.save();ctx.globalAlpha=k;R(gx-2,gy-2,5,4,'#8a5a2c');R(gx-1,gy-3,3,1,'#5a3a1c');R(gx-1,gy-1,1,1,'#c99a5a');ctx.restore();   // 드러난 알밤
+      if(c<3.2){const s=Math.round((c-2.2)*6)%3+2;R(gx,gy-4-s,1,2*s+1,'#fbf2c8');R(gx-s,gy-4,2*s+1,1,'#fbf2c8');}}   // 반짝
     return;
   }
   if(id==='deer'){   // 날쌔게 달리다 덤불 속 소리를 먼저 듣는다
@@ -580,6 +603,7 @@ function formHintSpots(id){
   if(id==='squirrel')for(const c of zoneObjects('climbs'))out.push({x:c.x,y:c.top+6});
   for(const d of fieldItems('digs'))if(d.form===id&&!d.done)out.push({x:d.x,y:(d.y??gy)-12});
   for(const a of fieldItems('pickups'))if(a.form===id&&!a.got)out.push({x:a.x,y:(a.y??gy)-12});
+  if(id==='owl')for(const a of fieldItems('pickups'))if(a.hidden==='owl'&&!a.found&&!a.got)out.push({x:a.x,y:(a.y??gy)-12});   // 결정 D-665: 수리부엉이만 느끼는 숨은 물건
   return out;
 }
 /* 작은 잎빛: 서너 초에 한 번 십자로 반짝인다. 처음 써 보면(setForm) 그친다 */

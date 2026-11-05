@@ -134,13 +134,13 @@ function kiteChild(){
     return;
   }
   if(G.f.jxKiteStarted){
-    talk([['얼레','상자 위에서 낮은 처마로 올라가 봐.\n꼬리만 살살 빼면 돼!']]);return;
+    talk([['얼레','좌판 딛고 처마로 올라가 봐.\n꼬리만 살살 빼면 돼!']]);return;   // 결정 D-660: 상자는 없다. 좌판·처마 계단을 딛는다
   }
   talk([
     Object.assign(['얼레','줄을 당길수록 더 걸려.\n설 전에 동생한테 보여 줘야 하는 연인데…'],{pic:Rg.kitePics.stuck()}),
     ['너구리','꼬리가 처마 못에 감겼네.\n바람 불 때마다 연이 처마에 부딪혀.'],
     ['얼레','줄은 내가 느슨하게 잡고 있을게.\n올라가서 꼬리만 살짝 빼 줄래?',[
-      {t:'상자를 밟고 올라간다',go:()=>{G.f.jxKiteStarted=true;toast('상자 → 낮은 처마 → 연. 가까이서 E · 연 꼬리 풀기');}},
+      {t:'처마로 올라가 본다',go:()=>{G.f.jxKiteStarted=true;toast('좌판 → 낮은 처마 → 연. 가까이서 E · 연 꼬리 풀기');}},
       {t:'잠깐 둘러보고 올게',go:null}
     ]]
   ]);
@@ -182,6 +182,7 @@ function beanSeller(){
 // 결정 D-562: 투호 대신 바둑 (사용자 지시 2026-11-04). 두는 모습은 보여 주지 않는다. 노인 둘이 티격태격하다 지는 쪽이 판을 엎으려 들고,
 // 아이는 판이 열리기 전에 이길 쪽에 솔방울 하나로 편을 든다 (판은 story.js Rg.playBaduk)
 function yutElders(){
+  if(Rg.badukBetting?.()===false){Rg.playBaduk();return;}   // 결정 D-664: 판돈 내기가 끝난 뒤엔 두는 모습만 본다
   talk([
     ['너구리','(할아버지 둘이 바둑판을 사이에 두고 마주 앉았다.)'],
     ['곰방대 노인','(돌을 딱 놓는다.) 곰방대가 둔다! 이 수면 끝났다.'],
@@ -191,7 +192,7 @@ function yutElders(){
     ['곰방대 노인','솔방울 하나. 화롯불 땔 거다.\n편든 쪽이 이기면 그 사람이 값을 치른다.'],
     ['흰눈썹 노인','내가 이기면 곶감 하나, 저 양반이 이기면 군밤 둘.\n저 양반이 이기는 날이 드무니 그렇다.'],
     ['곰방대 노인','드물어도 이기면 크게 이기지.',[
-      {t:'바둑 내기에 편을 든다',go:()=>Rg.playBaduk()},
+      {t:Rg.badukBetting?.()===false?'바둑 두는 걸 구경한다':'바둑 내기에 편을 든다',go:()=>Rg.playBaduk()},
       {t:'이번엔 그냥 지나갈게요',go:null}
     ]]
   ]);
@@ -250,7 +251,7 @@ function oldMagpie(){
 Rg.expEncounters={
   wanderers:{
     entrance:[{id:'j_straw',name:'청설모 할아범',x:360,talk:strawSeller,draw:draw('straw'),greeting:'새 끈은 질기구먼.\n오늘 장은 짚신 흘릴 걱정이 없겠어.'},{id:'j_kite',name:'얼레',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
-    street:[{id:'j_bean',name:'까투리 아주머니',x:880,talk:beanSeller,draw:draw('bean'),greeting:'자루 밑을 두 번 꿰맸어.\n이제 장 끝날 때까지 끄떡없지!'},{id:'j_yut',name:'바둑 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':'또 걸 테냐? 솔방울 하나면 된다.\n화롯불은 늘 배가 고프거든.';}}],
+    street:[{id:'j_bean',name:'까투리 아주머니',x:880,talk:beanSeller,draw:draw('bean'),greeting:'자루 밑을 두 번 꿰맸어.\n이제 장 끝날 때까지 끄떡없지!'},{id:'j_yut',name:'바둑 노인들',x:1900,talk:yutElders,draw:draw('yut'),get greeting(){return G.awake.includes('siru')?'보따리에서 떡 김 냄새가 나네.\n설 준비가 한결 든든하겠구나.':Rg.badukBetting?.()===false?'내기는 접었다. 구경은 공짜다.':'또 걸 테냐? 솔방울 하나면 된다.\n화롯불은 늘 배가 고프거든.';}}],
     inn:[{id:'j_magpie',name:'늙은 까치',x:1530,talk:()=>{const l=Rg.magpieTteok?.();if(l)talk(l);else oldMagpie();},draw:draw('magpie'),get greeting(){const l=Rg.magpieTteok?.();if(l)return l;return G.f.night?(G.f.jxLanternDone?'네가 단 등을 따라 길손들이 찾아왔구나.\n아침 떡 김이 오르면 다들 또 떠나겠지.':'밤이 됐구나. 등불 꾸러미는 처마 옆에 있단다.\n등은 네가 달고, 길은 내가 일러 주마.'):G.f.jxLanternDone?'밤새 길손들이 쉬고 갔단다.\n이제 나도 남쪽으로 날아갈 차례구나.':'해 지면 다시 오려무나.\n골목 등 다는 걸 좀 거들어 다오.';}}],
     pine:[{id:'j_boar',name:'알밤이',hint:'킁킁, 킁킁. 솔숲 쪽에서 무언가 냄새를 쫓는 소리가 난다.',get x(){return G.f.jxBoarScent2?1980:G.f.jxBoarScent1?1780:1600;},talk:babyBoar,draw:draw('boar'),greeting:'엄마가 오면 여기서 코를 맞댈 거야.\n이번엔 달콤한 냄새가 나도 기다릴래.'}],
     warehouse:[]
@@ -267,7 +268,13 @@ Rg.expEncounters={
         G.f.jxKiteFreed=true;return ['줄이 느슨해진 사이 꼬리를 못에서 살짝 뺐다.\n연이 얼레 쪽으로 흔들흔들 내려간다.',
           '처마 못에 연 종이 부스러기가 걸려 있다.\n여기에 모서리가 찢겼구나.'];
       }},
-      {id:'j_jangseung_snow',x:1680,label:'장승 코의 눈',text:'장승 코에만 눈이 안 쌓였다.\n지나가는 짐꾼들이 코를 톡 짚고 들어오나 봐.'}
+      // 결정 D-661: 내 키만 한 작은 장승이라 코를 짚을 수 있다. 작은 창에서 짐꾼 손이 코를 톡 짚고 지나간다.
+      // 결정 D-662: 날쌘까지 길을 반으로 줄이려 장터 거리로 나가는 출구 가까이(설계 2340)로 옮겼다 (사용자 피드백 2026-11-05).
+      {id:'j_jangseung_snow',x:Rg.SNOW_JANGSEUNG_DX??2340,label:'장승 코의 눈',peek:false,get text(){
+        if(typeof peekPicture==='function'&&Rg.jangseungPic)peekPicture(Rg.jangseungPic().draw,{animate:true,sound:'j_jangseung_snow'});
+        return ['내 키만 한 작은 장승이다. 머리에도 어깨에도 눈인데\n코끝만 맨나무가 드러나 반들반들하다.',
+          '짐꾼들이 지나가며 코를 톡 짚고 들어가나 봐.\n나도 톡 짚었다. …차갑다.'];
+      }}
     ],
     street:[
       {id:'j_stall_gap',x:310,label:'좌판 사이 골목',get text(){return G.f.night?'차일을 걷고 판을 접으니 골목이 휑하다.\n낮에 북적이던 자리에 발자국만 남았다.':'좌판 아래로 콩알 몇 개가 굴러다닌다.\n어디 자루가 샜나?';}},   // 결정 D-316: 밤 골목 지름길을 뺐다

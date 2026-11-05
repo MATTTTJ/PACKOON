@@ -70,7 +70,7 @@ const TABLES={
    "r": 3,
    "kind": "귀한 것",
    "region": "galchamgol",
-   "d": "당산나무 꼭대기에만 열리는 머루. 해를 머금은 듯 알이 따뜻하다."
+   "d": "당산나무를 감은 늙은 칡이 꽃 속에 품어 맺는 머루. 해를 머금은 듯 알이 따뜻하다."
   },
   "rice": {
    "n": "주먹밥",
@@ -2365,6 +2365,12 @@ const TABLES={
      "text": "수첩 장부 끝장에 상단 도장. 보부상끼리는 이 도장을 알아본다.",
      "section": "관찰",
      "when": "arc:jangteo:stamp"
+    },
+    {
+     "who": "me",
+     "text": "수리부엉이 눈으로 걸으면 남들 눈엔 안 보이던 것이 느껴진다. 영감님이 밤마다 깨어 장부를 넘기는 까닭을 조금 알 것 같다.",
+     "section": "관찰",
+     "when": "rule:owl_sense"
     }
    ]
   },
@@ -3558,7 +3564,7 @@ const TABLES={
   "baduk_stake": 1,
   "baduk_steady_pay": 1,
   "baduk_bold_pay": 2,
-  "baduk_bets_per_day": 3
+  "baduk_bets_total": 2
  },
  "TUNING": {
   "kkubeogi_cycle": 200,
@@ -3616,9 +3622,9 @@ const TABLES={
   "battle_tool_good_damage": 2,
   "battle_tool_bad_mult": 0.5,
   "battle_hand_scale": 1.2,
-  "golem_stone_chance": 0.2,
-  "golem_stone_step": 0.15,
-  "golem_stone_cap": 2,
+  "golem_stone_chance": 0.1,
+  "golem_stone_step": 0.075,
+  "golem_stone_cap": 1,
   "golem_foot_rest": 110,
   "golem_arm_rest": 110,
   "golem_core_frames": 150,
@@ -3628,7 +3634,7 @@ const TABLES={
   "golem_stomp_clumps": 5,
   "golem_whip_tell": 58,
   "golem_whip_sweep": 30,
-  "golem_light_tell": 50,
+  "golem_light_tell": 72,
   "golem_light_frames": 300,
   "golem_light_beams": 2,
   "golem_light_beams_low": 3,
@@ -3665,6 +3671,7 @@ const TABLES={
   "form_climb_reach": 10,
   "form_goat_jump": 1.4,
   "form_owl_glide_fall": 0.9,
+  "form_owl_sense_range": 56,
   "form_deer_speed": 1.45,
   "form_deer_listen_range": 360,
   "form_fx_frames": 24,
@@ -4639,10 +4646,6 @@ const TABLES={
   },
   "pic_hamjibak_stamp": {
    "sfx": "wood_tap"
-  },
-  "pic_lantern": {
-   "sfx": "ice_tinkle",
-   "repeat": 2400
   },
   "pic_mom_room": {
    "sfx": "door"
