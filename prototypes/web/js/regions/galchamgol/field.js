@@ -390,6 +390,8 @@ if(!CLASSIC){
     ['forest','d',640,'root'],['forest','d',1680,'ssari'],
     ['hill','p',410,'acorn'],
   ]);
+  // 결정 D-665: 수리부엉이만 느끼는 숨은 물건 (사용자 피드백 2026-11-05). 수리부엉이로 곁을 지나면 드러난다. 좌표는 길을 줄인 뒤의 자리
+  addZoneGather(Rg,'gal_owl_',[['forest','p',1000,'kkoe',{hidden:'owl'}],['hill','p',1000,'songi',{hidden:'owl'}]]);
 
 }
 })();

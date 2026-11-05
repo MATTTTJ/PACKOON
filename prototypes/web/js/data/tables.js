@@ -2365,6 +2365,12 @@ const TABLES={
      "text": "수첩 장부 끝장에 상단 도장. 보부상끼리는 이 도장을 알아본다.",
      "section": "관찰",
      "when": "arc:jangteo:stamp"
+    },
+    {
+     "who": "me",
+     "text": "수리부엉이 눈으로 걸으면 남들 눈엔 안 보이던 것이 느껴진다. 영감님이 밤마다 깨어 장부를 넘기는 까닭을 조금 알 것 같다.",
+     "section": "관찰",
+     "when": "rule:owl_sense"
     }
    ]
   },
@@ -3558,7 +3564,7 @@ const TABLES={
   "baduk_stake": 1,
   "baduk_steady_pay": 1,
   "baduk_bold_pay": 2,
-  "baduk_bets_per_day": 3
+  "baduk_bets_total": 2
  },
  "TUNING": {
   "kkubeogi_cycle": 200,
@@ -3664,6 +3670,7 @@ const TABLES={
   "form_climb_reach": 10,
   "form_goat_jump": 1.4,
   "form_owl_glide_fall": 0.9,
+  "form_owl_sense_range": 56,
   "form_deer_speed": 1.45,
   "form_deer_listen_range": 360,
   "form_fx_frames": 24,

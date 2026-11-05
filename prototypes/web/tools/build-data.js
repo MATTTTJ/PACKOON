@@ -257,7 +257,7 @@ requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.bat
 requireValue(TUNING.kudzu_stem_cut_chance>0&&TUNING.kudzu_stem_cut_chance<=1&&TUNING.kudzu_root_dig_chance>0&&TUNING.kudzu_root_dig_chance<=1,'tuning.csv: 칡줄기 끊기·칡뿌리 캐기 확률은 0보다 크고 1 이하여야 한다');
 requireValue(TUNING.kudzu_scent_damage>0&&TUNING.kudzu_scent_damage<1&&TUNING.kudzu_scent_slow>0&&TUNING.kudzu_scent_slow<1&&TUNING.kudzu_scent_slow_frames>0&&TUNING.kudzu_scent_linger>0,'tuning.csv: 칡꽃 꽃가루 피해는 0~1칸, 느려짐 배수는 0~1, 시간은 0보다 커야 한다');
 requireValue(TUNING.golem_stone_chance>0&&TUNING.golem_stone_chance<=1&&TUNING.golem_stone_step>0&&Number.isInteger(TUNING.golem_stone_cap)&&TUNING.golem_stone_cap>=1&&Number.isInteger(TUNING.golem_barrage_count)&&TUNING.golem_barrage_count>=1,'tuning.csv: 돌 골렘 돌 확률은 0~1, 오름은 0보다 크고, 돌 수·눈폭탄 수는 1 이상 정수여야 한다 (D-184)');
-requireValue(MINIGAMES.baduk_steady_win>0&&MINIGAMES.baduk_steady_win<1&&MINIGAMES.baduk_bets_per_day>=1&&MINIGAMES.baduk_stake>=1&&MINIGAMES.baduk_steady_pay>=1&&MINIGAMES.baduk_bold_pay>=1,'minigames.csv: 바둑 내기 이기는 비율은 0~1 사이, 판 수·판돈·값은 1 이상이어야 한다 (D-562)');
+requireValue(MINIGAMES.baduk_steady_win>0&&MINIGAMES.baduk_steady_win<1&&MINIGAMES.baduk_bets_total>=1&&MINIGAMES.baduk_stake>=1&&MINIGAMES.baduk_steady_pay>=1&&MINIGAMES.baduk_bold_pay>=1,'minigames.csv: 바둑 내기 이기는 비율은 0~1 사이, 판 수·판돈·값은 1 이상이어야 한다 (D-562)');
 
 /* 결정 D-39: 교환 화면의 흔한 물건. 값은 레어도 단계로만 맞추므로 표에는 내놓는 물건·개수·횟수만 적는다. */
 const STOCK=[];
