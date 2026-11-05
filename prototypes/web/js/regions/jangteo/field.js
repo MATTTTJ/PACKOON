@@ -198,19 +198,22 @@ function nundokSprite(x,a){
 Rg.drawSnowPresence=()=>{
   const e=snowEnc;if(!e)return;const x=e.x-cam;
   for(const s of e.steps){const sx=s.x-cam,o=s.foot?0:3;ctx.save();ctx.globalAlpha=0.85;
-    R(sx-6,GROUND+1+o,12,2,'#5a6a80');R(sx-7,GROUND+o,2,1,'#5a6a80');R(sx-3,GROUND+o,1,1,'#5a6a80');R(sx+1,GROUND+o,1,1,'#5a6a80');   // 큰 맨발 자국
-    ctx.globalAlpha=0.5;R(sx-12,GROUND+5,20,1,'#c8d4e4');   // 옷자락이 끌린 자국
+    R(sx-8,GROUND+o,16,4,'#eef3f8');R(sx-6,GROUND+1+o,12,2,'#262d3a');R(sx-7,GROUND+o,2,1,'#262d3a');R(sx-3,GROUND+o-1,2,1,'#262d3a');R(sx+1,GROUND+o-1,2,1,'#262d3a');R(sx+5,GROUND+o,2,1,'#262d3a');   // 큰 맨발 자국과 밀려난 눈
+    ctx.globalAlpha=0.7;R(sx-14,GROUND+6,22,1,'#dfe7ef');R(sx-12,GROUND+7,18,1,'#9aa8b8');   // 옷자락이 끌린 자국
     if(s.t<10){ctx.globalAlpha=0.8*(1-s.t/10);R(sx-8-s.t,GROUND-3-s.t,3,3,'#f4f6f8');R(sx+6+s.t,GROUND-2-s.t,3,3,'#f4f6f8');}
     ctx.restore();}
   if(!e.reveal){
     const t=G.anim;
     ctx.save();
-    for(let i=0;i<46;i++){const q=t*0.07*(i%2?1:-0.8)+i*0.55,rx=24+(i%4)*6,ry=46+(i%3)*8;   // 보이지 않는 몸을 휘감는 눈발
-      ctx.globalAlpha=0.55+0.4*hash(i);R(x+Math.cos(q)*rx,GROUND-62+Math.sin(q*1.15)*ry,i%3?1:2,i%3?1:2,i%2?'#f4f6f8':'#c8d4e4');}
-    for(let i=0;i<14;i++){const k=((t*0.02+hash(i*3.7))%1),px=x-48+hash(i*5.1)*96,top=GROUND-92+Math.abs(px-x)*0.1;   // 어깨에서 미끄러져 떨어지는 눈
-      ctx.globalAlpha=0.8*(1-k);R(px,top+k*80,2,2,'#f4f6f8');}
-    for(let i=0;i<18;i++){const k=((t*0.03+hash(i*9.1))%1),sx=x+90-k*200,sy=GROUND-120+hash(i*2.9)*116;   // 옆으로 날리는 눈바람
-      ctx.globalAlpha=0.6*Math.sin(k*Math.PI);R(sx,sy,6+Math.floor(hash(i)*6),1,'#f4f6f8');}
+    {const fl=0.1+0.05*Math.sin(t*0.08);ctx.globalAlpha=fl;ctx.fillStyle='#e6eef6';   // 큰 몸 꼴로 어리는 눈 안개 (어깨가 넓고 머리가 낮다)
+      ctx.beginPath();ctx.ellipse(x,GROUND-50,32,50,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x,GROUND-88,52,9,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x,GROUND-104,16,14,0,0,Math.PI*2);ctx.fill();}
+    for(let i=0;i<80;i++){const q=t*0.09*(i%2?1:-0.8)+i*0.55,rx=26+(i%5)*7,ry=44+(i%3)*10,sz=i%4?2:3;   // 보이지 않는 몸을 휘감는 눈발
+      ctx.globalAlpha=0.65+0.35*hash(i);R(x+Math.cos(q)*rx,GROUND-60+Math.sin(q*1.15)*ry,sz,sz,i%2?'#ffffff':'#d6e2ee');}
+    for(let i=0;i<24;i++){const k=((t*0.025+hash(i*3.7))%1),px=x-52+hash(i*5.1)*104,top=GROUND-92+Math.abs(px-x)*0.1;   // 어깨에서 미끄러져 떨어지는 눈
+      ctx.globalAlpha=0.9*(1-k);R(px,top+k*86,3,3,'#ffffff');}
+    for(let i=0;i<30;i++){const k=((t*0.035+hash(i*9.1))%1),sx=x+110-k*240,sy=GROUND-130+hash(i*2.9)*126;   // 옆으로 날리는 눈바람
+      ctx.globalAlpha=0.75*Math.sin(k*Math.PI);R(sx,sy,10+Math.floor(hash(i)*10),i%3?1:2,'#f4f6f8');}
+    for(let i=0;i<8;i++){const q=t*0.15+i*0.8;ctx.globalAlpha=0.7;R(x-30+i*8+Math.cos(q)*3,GROUND-4-Math.abs(Math.sin(q))*7,4,3,'#f4f6f8');}   // 발치에서 이는 눈
     if(Math.floor(t/40)%2===0){const k=(t%40)/40;ctx.globalAlpha=0.6*(1-k);R(x-10-k*10,GROUND-96-k*8,6+k*8,4,'#f4f6f8');}   // 찬 입김
     ctx.restore();
     return;}
