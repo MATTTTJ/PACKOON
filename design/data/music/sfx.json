@@ -469,6 +469,26 @@
       ]
     },
     {
+      "id": "baduk_scatter", "name": "바둑판 엎어져 돌 쏟아짐", "category": "작은 연출", "status": "제안",
+      "duration": 1.05, "gain": 0.85,
+      "layers": [
+        {"instrument":"moduk_low","note":"D3","start":0,"duration":0.16,"gain":0.3,"pan":0,"patch":{"fixedDuration":0.16,"attack":0.002,"decay":0.09,"sustain":0,"release":0.04,"tail":0.07},"seed":9200},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.12,"gain":0.08,"pan":0,"patch":{"fixedDuration":0.12,"kind":"noise","attack":0.003,"decay":0.05,"sustain":0.12,"release":0.035,"tail":0.045,"noise":1,"noiseCutoff":700,"partials":[]},"seed":9201},
+        {"instrument":"stone","note":"A5","start":0.100,"duration":0.05,"gain":0.11,"pan":-0.4,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9210},
+        {"instrument":"stone","note":"E6","start":0.135,"duration":0.05,"gain":0.105,"pan":-0.3,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9211},
+        {"instrument":"stone","note":"C6","start":0.206,"duration":0.05,"gain":0.1,"pan":-0.2,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9212},
+        {"instrument":"stone","note":"G5","start":0.253,"duration":0.05,"gain":0.095,"pan":-0.1,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9213},
+        {"instrument":"stone","note":"D6","start":0.336,"duration":0.05,"gain":0.09,"pan":0.0,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9214},
+        {"instrument":"stone","note":"B5","start":0.395,"duration":0.05,"gain":0.085,"pan":0.1,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9215},
+        {"instrument":"stone","note":"F6","start":0.430,"duration":0.05,"gain":0.08,"pan":0.2,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9216},
+        {"instrument":"stone","note":"A5","start":0.501,"duration":0.05,"gain":0.075,"pan":0.3,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9217},
+        {"instrument":"stone","note":"E6","start":0.548,"duration":0.05,"gain":0.07,"pan":0.4,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9218},
+        {"instrument":"stone","note":"C6","start":0.631,"duration":0.05,"gain":0.065,"pan":-0.4,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9219},
+        {"instrument":"stone","note":"G6","start":0.690,"duration":0.05,"gain":0.06,"pan":-0.3,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9220},
+        {"instrument":"stone","note":"D6","start":0.725,"duration":0.05,"gain":0.055,"pan":-0.2,"patch":{"fixedDuration":0.05,"attack":0.001,"decay":0.03,"sustain":0,"release":0.03,"tail":0.05},"seed":9221}
+      ]
+    },
+    {
       "id": "stone_sleep", "name": "졸음에 잠기기", "category": "미니게임", "status": "제안",
       "duration": 0.66, "gain": 0.85,
       "layers": [
@@ -556,6 +576,14 @@
       ]
     },
     {
+      "id": "bonk_kong", "name": "꿀밤 콩", "category": "전투", "status": "제안", "duration": 0.42, "gain": 0.95,
+      "layers": [
+        {"instrument":"moduk_low","note":"E4","start":0,"duration":0.16,"gain":0.42,"pan":0,"patch":{"fixedDuration":0.16,"attack":0.001,"decay":0.11,"sustain":0,"release":0.06,"tail":0.1},"seed":9130},
+        {"instrument":"buk","note":"G2","start":0.004,"duration":0.09,"gain":0.22,"pan":0,"patch":{"attack":0.002,"decay":0.05,"sustain":0,"release":0.03,"tail":0.05,"fixedDuration":0.09},"seed":9131},
+        {"instrument":"moduk_mid","note":"B4","start":0.012,"duration":0.08,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.08,"attack":0.001,"decay":0.05,"sustain":0,"release":0.04,"tail":0.06},"seed":9132}
+      ]
+    },
+    {
       "id": "wood_tap", "name": "나무 톡톡", "category": "작은 연출", "status": "제안", "duration": 0.36, "gain": 0.75,
       "layers": [
         {"instrument":"moduk_mid","note":"D5","start":0,"duration":0.12,"gain":0.25,"pan":0,"patch":{"fixedDuration":0.12,"attack":0.002,"decay":0.072,"sustain":0,"release":0.05,"tail":0.08},"seed":9080},
@@ -576,6 +604,16 @@
         {"instrument":"gayageum_harmonic","note":"A5","start":0,"duration":0.5,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.5,"attack":0.002,"decay":0.3,"sustain":0,"release":0.05,"tail":0.08},"seed":9100},
         {"instrument":"stone","note":"F5","start":0,"duration":0.04,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.04,"attack":0.002,"decay":0.024,"sustain":0,"release":0.05,"tail":0.08},"seed":9101},
         {"instrument":"windchime","note":"D6","start":0.02,"duration":0.4,"gain":0.05,"pan":0,"patch":{"fixedDuration":0.4,"attack":0.002,"decay":0.24,"sustain":0,"release":0.05,"tail":0.08},"seed":9102}
+      ]
+    },
+    {
+      "id": "onggi_ring", "name": "옹기 독 손끝으로 퉁김 (결정 D-784)", "category": "작은 연출", "status": "제안", "duration": 2.1, "gain": 0.78,
+      "layers": [
+        {"instrument":"stone","note":"C6","start":0,"duration":0.03,"gain":0.13,"pan":0.1,"patch":{"fixedDuration":0.03,"attack":0.001,"decay":0.016,"sustain":0,"release":0.02,"tail":0.04},"seed":9160},
+        {"instrument":"windchime","note":"E5","start":0.004,"duration":1.6,"gain":0.2,"pan":0,"patch":{"fixedDuration":1.6,"attack":0.002,"decay":1.15,"sustain":0,"release":0.35,"tail":0.5,"partials":[[1,1,1],[2.34,0.34,0.75],[4.06,0.1,1.5]],"vibratoHz":4.5,"vibratoCents":3,"vibratoDelay":0.15},"seed":9161},
+        {"instrument":"gayageum_harmonic","note":"B5","start":0.006,"duration":0.9,"gain":0.06,"pan":0,"patch":{"fixedDuration":0.9,"attack":0.002,"decay":0.6,"sustain":0,"release":0.2,"tail":0.2},"seed":9162},
+        {"instrument":"windchime","note":"E5","start":0.24,"duration":1.2,"gain":0.075,"pan":-0.55,"patch":{"fixedDuration":1.2,"attack":0.01,"decay":0.9,"sustain":0,"release":0.3,"tail":0.4,"partials":[[1,1,1],[2.34,0.25,0.75]]},"seed":9163},
+        {"instrument":"windchime","note":"E5","start":0.46,"duration":1.1,"gain":0.045,"pan":0.55,"patch":{"fixedDuration":1.1,"attack":0.01,"decay":0.85,"sustain":0,"release":0.3,"tail":0.4,"partials":[[1,1,1],[2.34,0.2,0.75]]},"seed":9164}
       ]
     },
     {

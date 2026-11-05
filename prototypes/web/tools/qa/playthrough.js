@@ -232,53 +232,21 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     if(got!==expect)throw new Error(`${item} ${put}개로 ${out}이 ${expect}개 나와야 하는데 ${got}개`);
   }
   // 전투 결과를 돌려준다. 졌다면 뒤 단계의 엉뚱한 오류(예: 해머루 없음)로 번지지 않게 mustWin이 밝힌다.
-  async function battle(gifts,{sway=false}={}) {
-    scene=scene.replace(/ · 전투$/,'')+' · 전투';let end=Date.now()+60000;   // 결정 D-64: 선물은 빈틈에만. 선물 버튼을 누르면 다음 빈틈에 창이 열린다
-    let result=null,startHp=null,steer=null;
-    const release=async()=>{if(steer){for(const k of steer)if(k)await key(k,'up');steer=null;}};
-    while(Date.now()<end) {
-      const s=await check();
-      if(!s.battle){if(s.ink){await wait(100);continue;}await release();await settle();log('전투 결과',{result,startHp});return {result,startHp};}
-      if(startHp===null)startHp=await read('G.hp');
-      if(await read("!$('bResult').hidden")){await release();result=await read('B&&B.result');await click('#bResOk');await wait(80);continue;}
-      if(!s.battle.paused){
-        if(await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)')){
-          if(sway){
-            const h=await read('({x:B.px,l:BOX.x+BOX.w*0.2,r:BOX.x+BOX.w*0.8})');
-            if(!steer||h.x<h.l||h.x>h.r){const k=h.x>(h.l+h.r)/2?'ArrowLeft':'ArrowRight';if(!steer||steer[0]!==k){await release();await key(k,'down');steer=[k,null];}}
-          }else await release();
-          await click('#bGift');await wait(120);continue;
-        }
-        // 선물이 없으면 친다: 빈틈 표식으로 도구 날 자리(bAim, 결정 D-240)를 옮겨 J. 표식이 없으면 손을 멈추고 기다린다.
-        const m=await read("B&&B.mark&&B.st==='open'?{dx:B.mark.x-bAim().x,dy:B.mark.y-bAim().y,r:battleHandProfile().radius}:null");
-        // 결정 D-501: 도구 범위가 좁아져(너구리 손 9px) 멀면 누르고 있고, 10px 안에서는 짧게 톡톡 눌러 3px 안까지 맞춘다
-        const far=(d,lo,hi)=>d<-10?lo:d>10?hi:null,near=(d,lo,hi)=>d<-3?lo:d>3?hi:null;
-        const want=m?[far(m.dx,'ArrowLeft','ArrowRight'),far(m.dy,'ArrowUp','ArrowDown')]:[null,null];
-        const prev=steer||[null,null];
-        for(let i=0;i<2;i++)if(prev[i]!==want[i]){if(prev[i])await key(prev[i],'up');if(want[i])await key(want[i],'down');}
-        steer=want[0]||want[1]?want:null;
-        if(m&&!steer){const taps=[near(m.dx,'ArrowLeft','ArrowRight'),near(m.dy,'ArrowUp','ArrowDown')].filter(Boolean);
-          for(const k of taps){await key(k,'down');await wait(12);await key(k,'up');}}
-        if(m&&!steer&&await read("B&&B.mark&&Math.hypot(B.mark.x-bAim().x,B.mark.y-bAim().y)<battleHandProfile().radius-1"))await key('j');
-        await wait(40);continue;
-      }
-      await release();
-      const gift=await read(`(${json(gifts)}).find(id=>(G.inv[id]||0)>0)`);
-      if(!gift)throw new Error('달래기 선물 부족: '+gifts.join(','));
-      const name=await read(`ITEMS[${json(gift)}].n`);
-      await textButton('#bGiftGrid button',new RegExp(name));await wait(150);
-    }
-    throw new Error('전투 선물/결과 처리가 60초 안에 끝나지 않았다');
+  // 손 조종은 battleLoop(아래, 모듈 밖에서도 같은 코드로 시험한다)가 한다.
+  async function battle(gifts,opts={}) {
+    scene=scene.replace(/ · 전투$/,'')+' · 전투';
+    const r=await battleLoop({read,wait,key,click,textButton,tick:check},gifts,opts);
+    await settle();log('전투 결과',r);return r;
   }
   // 꼭 이기거나 달래야 하는 전투. 지면 게임 규칙대로 체력이 찬 채 한 번 더 다가가 다시 싸운다(최대 세 번).
   // 선물을 다 썼으면 표식을 쳐서 싸운다(잘 이기지 못한다). 세 번 다 지면 결과와 시작 체력을 밝히고 멈춘다.
-  async function mustWin(gifts,approach,label) {
+  async function mustWin(gifts,approach,label,opts={}) {
     for(let i=0;i<3;i++) {
       if(i){
         const giftsLeft=await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)');
         log('전투에서 짐, 다시 도전',{label,try:i+1,how:giftsLeft?'선물':'치기'});await approach();
       }
-      const {result,startHp}=await battle(gifts);
+      const {result,startHp}=await battle(gifts,opts);
       if(result==='win'||result==='calm')return result;
       if(i===2)throw new Error(label+': 세 번 싸워도 이기거나 달래지 못했다 (마지막 결과 '+result+', 시작 체력 '+startHp+')');
     }
@@ -310,7 +278,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       for(let i=0;i<5&&!await read('G.barrier.cut');i++){await key('j');await wait(400);}
       if(mode==='expanded')await zone('hill');
       const toKudzu=async()=>{await moveX(2020,{attack:true,slow:true});};
-      await toKudzu();await mustWin(['ssari','kkoe'],toKudzu,'엉킨 칡');
+      await toKudzu();await mustWin(['ssari','kkoe'],toKudzu,'엉킨 칡',{dodge:true});
       await gather('meoru',1);
       // 처음 만남이 먼저다(해머루를 들고 와도). 두 번째에 보따리를 펼쳐 해머루를 건넨다.
       for(let i=0;i<3&&!await read("G.diary.some(d=>d.id==='end')");i++)await npc('toad');
@@ -374,4 +342,61 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   fs.writeFileSync(path.join(outDir,mode+'-trace.json'),JSON.stringify({evidence,trace,findings},null,2)+'\n','utf8');
   return {name:'playthrough-'+mode,status:findings.length?'fail':'pass',summary:findings.length?`${mode} 연속 플레이 실패: ${scene}`:`${mode} 새 게임 → 네 지역 → 엔딩·새 이름 통과`,findings,evidence};
 }
-module.exports={runPlaythrough};
+/* PA-201: 전투 손 조종. 상태를 읽고 키·클릭만 보낸다 (게임 상태·판정은 건드리지 않는다).
+   선물이 있으면 선물 버튼을 눌러 두고 다음 빈틈을 기다린다. 선물이 없으면 빈틈 표식으로 도구 날(bAim, 결정 D-240)을 옮겨 친다.
+   sway: 기다리는 동안 칸 가운데를 좌우로 오간다 (무쇠 꿀밤처럼 손 자리를 노리는 공격).
+   dodge: 기다리는 동안 칸 안의 공격 예고를 읽고 피한다. 예전에는 선물을 기다리는 내내 손을 세워 두어 엉킨 칡의 채찍·뿌리·꽃가루를
+     다 맞고 가끔 졌다(자동 검사 연속 플레이가 칡에게 지던 문제). 띠 공격(ox·dx·L)은 띠 밖 옆쪽으로, 자리 공격(x·y)은 그 자리에서 멀어진다. */
+const DODGE_KEYS=`(()=>{if(!B)return [null,null];const h={x:B.px,y:B.py},half=0.21*BOX.h+12,R=44;let vx=0,vy=0,n=0;
+  for(const b of B.bullets){if(b.dead)continue;
+    if(b.ox!=null&&b.dx!=null&&b.L!=null){if(b.t>(b.delay||0)+60)continue;
+      const rx=h.x-b.ox,ry=h.y-b.oy,s=rx*b.dx+ry*b.dy,d=-rx*b.dy+ry*b.dx;
+      if(s>-half&&s<b.L+half&&Math.abs(d)<half){const sg=d>=0?1:-1,w=1+(half-Math.abs(d))/half;vx+=-b.dy*sg*w;vy+=b.dx*sg*w;n++;}}
+    else if(b.x!=null&&b.y!=null){const rx=h.x-b.x,ry=h.y-b.y,dd=Math.hypot(rx,ry);
+      if(dd<R){const u=dd<1?{x:h.x<BOX.x+BOX.w/2?1:-1,y:0}:{x:rx/dd,y:ry/dd},w=1+(R-dd)/R;vx+=u.x*w;vy+=u.y*w;n++;}}}
+  const m=24;if(h.x<BOX.x+m)vx+=1.5;if(h.x>BOX.x+BOX.w-m)vx-=1.5;if(h.y<BOX.y+m)vy+=1.5;if(h.y>BOX.y+BOX.h-m)vy-=1.5;
+  if(!n){const cx=BOX.x+BOX.w/2,cy=BOX.y+BOX.h/2;if(Math.abs(h.x-cx)>BOX.w*0.2)vx+=Math.sign(cx-h.x)*0.6;if(Math.abs(h.y-cy)>BOX.h*0.2)vy+=Math.sign(cy-h.y)*0.6;}
+  return [vx<-0.3?'ArrowLeft':vx>0.3?'ArrowRight':null,vy<-0.3?'ArrowUp':vy>0.3?'ArrowDown':null];})()`;
+async function battleLoop(io,gifts,{sway=false,dodge=false}={}) {
+  const {read,wait,key,click,textButton}=io,json=JSON.stringify;
+  const end=Date.now()+60000;   // 결정 D-64: 선물은 빈틈에만. 선물 버튼을 누르면 다음 빈틈에 창이 열린다
+  let result=null,startHp=null,steer=null;
+  const release=async()=>{if(steer){for(const k of steer)if(k)await key(k,'up');steer=null;}};
+  const hold=async want=>{const prev=steer||[null,null];
+    for(let i=0;i<2;i++)if(prev[i]!==want[i]){if(prev[i])await key(prev[i],'up');if(want[i])await key(want[i],'down');}
+    steer=want[0]||want[1]?want:null;};
+  while(Date.now()<end) {
+    if(io.tick)await io.tick();
+    const s=await read('({battle:!!B,ink:inkOn,paused:!!(B&&B.paused)})');
+    if(!s.battle){if(s.ink){await wait(100);continue;}await release();return {result,startHp};}
+    if(startHp===null)startHp=await read('G.hp');
+    if(await read("!$('bResult').hidden")){await release();result=await read('B&&B.result');await click('#bResOk');await wait(80);continue;}
+    if(!s.paused){
+      if(await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)')){
+        if(dodge)await hold(await read(DODGE_KEYS));
+        else if(sway){
+          const h=await read('({x:B.px,l:BOX.x+BOX.w*0.2,r:BOX.x+BOX.w*0.8})');
+          if(!steer||h.x<h.l||h.x>h.r){const k=h.x>(h.l+h.r)/2?'ArrowLeft':'ArrowRight';if(!steer||steer[0]!==k){await release();await key(k,'down');steer=[k,null];}}
+        }else await release();
+        await click('#bGift');await wait(dodge?40:120);continue;
+      }
+      // 선물이 없으면 친다: 빈틈 표식으로 도구 날 자리(bAim, 결정 D-240)를 옮겨 J. 표식이 없으면 손을 멈추고 기다린다(dodge 면 피한다).
+      const m=await read("B&&B.mark&&B.st==='open'?{dx:B.mark.x-bAim().x,dy:B.mark.y-bAim().y,r:battleHandProfile().radius}:null");
+      // 결정 D-501: 도구 범위가 좁아져(너구리 손 9px) 멀면 누르고 있고, 10px 안에서는 짧게 톡톡 눌러 3px 안까지 맞춘다
+      const far=(d,lo,hi)=>d<-10?lo:d>10?hi:null,near=(d,lo,hi)=>d<-3?lo:d>3?hi:null;
+      const want=m?[far(m.dx,'ArrowLeft','ArrowRight'),far(m.dy,'ArrowUp','ArrowDown')]:dodge?await read(DODGE_KEYS):[null,null];
+      await hold(want);
+      if(m&&!steer){const taps=[near(m.dx,'ArrowLeft','ArrowRight'),near(m.dy,'ArrowUp','ArrowDown')].filter(Boolean);
+        for(const k of taps){await key(k,'down');await wait(12);await key(k,'up');}}
+      if(m&&!steer&&await read("B&&B.mark&&Math.hypot(B.mark.x-bAim().x,B.mark.y-bAim().y)<battleHandProfile().radius-1"))await key('j');
+      await wait(40);continue;
+    }
+    await release();
+    const gift=await read(`(${json(gifts)}).find(id=>(G.inv[id]||0)>0)`);
+    if(!gift)throw new Error('달래기 선물 부족: '+gifts.join(','));
+    const name=await read(`ITEMS[${json(gift)}].n`);
+    await textButton('#bGiftGrid button',new RegExp(name));await wait(150);
+  }
+  throw new Error('전투 선물/결과 처리가 60초 안에 끝나지 않았다');
+}
+module.exports={runPlaythrough,battleLoop};

@@ -59,6 +59,8 @@ function talkKkuArc(){
 const moleMet=()=>!!G.f.wanderersDone?.['dolneomeo:dol_mole'];
 function talkDolsoeArc(){
   const F=G.f;
+  // 결정 D-735: 꼬마가 감춘 정을 찾는 동안에는 그 일부터 (확장판 길손 이야기, story.js 아래 블록)
+  if(F.dolMoleChisel===1&&Rg.moleChiselReturn){Rg.moleChiselReturn();return;}
   const atYard=true;   // 결정 D-164: 할배가 다리 현장에 나가던 일(옛 돌다리 복원)이 없어져 늘 마당에 있다
   const sack=Rg.arcs()&&atYard&&F.dolneomeo_badger1&&!F.dolneomeo_badger_sent;   // 결정 D-118: 메밀댁의 햇메밀 자루
   // 결정 D-130: 처음 인사를 나눈 뒤에야 메밀댁 이름을 꺼낸다.
@@ -359,14 +361,15 @@ function finishStack(){
   diary('d_maetdol','돌쇠 할배가 맷돌 윗돌에 내 손을 얹어 주었다. 가만히 있으니 돌이 우웅, 낮게 울었다. 그 소리 따라 왼쪽으로 한 바퀴 돌리자 증조할아버지의 맷돌이 깨어났다.');
   think('증조할아버지 맷돌이 깨어났다! 메밀 셋이면 메밀가루 하나가 나오겠다.');refreshHud();
   // 결정 D-427: 맷돌을 깨운 손에 할배가 이름을 붙인다(꼭 거치는 길의 둘째 이름). 눈이 어두운 할배는 손끝으로 아이 손의 돌가루를 만져 보고 부른다.
-  const stoneHand=[['너구리','(할배가 내 손을 더듬어 쥔다.)'],['돌쇠 할배','돌가루가 하얗게 앉았구나.\n돌손이로구나.']];
+  const stoneHand=[Object.assign(['너구리','(할배가 내 손을 더듬어 쥔다.)'],{pic:null}),['돌쇠 할배','돌가루가 하얗게 앉았구나.\n돌손이로구나.']];
   // 결정 D-443: 왼쪽으로 돌리는 건 집안 손버릇(맷돌 가공 동작, D-113)과 같다. 할배가 처음 그 버릇을 일러 준다.
   const learnLines=[
     ['너구리','(맷돌을 떠올리자 보따리에서 쑥 나왔다.\n할배가 윗돌에 내 손을 얹어 준다. 돌이 차다.)'],
     ['돌쇠 할배','돌리지 말고. 가만히.'],
     ['너구리','(…우웅. 손바닥 밑에서\n낮은 소리가 올라온다.)'],
     ['돌쇠 할배','그게 돌 목소리다.\n그 소리 나는 쪽으로, 왼쪽으로 한 바퀴.'],
-    ['너구리','(어처구니를 잡고 왼쪽으로 돌렸다. 드르륵.\n생각보다 가볍게 돈다.)']];
+    // 결정 D-734: 왼쪽으로 한 바퀴 돌리는 줄부터 맷돌 돌리는 그림을 띄운다 (할배가 손을 쥐는 줄에서 내린다)
+    Object.assign(['너구리','(어처구니를 잡고 왼쪽으로 돌렸다. 드르륵.\n생각보다 가볍게 돈다.)'],{pic:Rg.expansionArt?.maetdolTurnPic?.()})];
   const lines=Rg.arcs()?[
     ...learnLines,['돌쇠 할배','됐다. 맷돌이 네 손을 알아보는구나.'],...stoneHand
   ]:[...learnLines,['돌쇠 할배','한 번에 도는구나. 네 아비보다 낫다.'],...stoneHand,
@@ -741,52 +744,65 @@ function helpHare(){
   ]);
 }
 
-function stoneChoice(kind){
-  const flat=kind==='flat';
-  // 결정 D-275: 반짝돌을 바꿔 받았다가 도로 창가에 두던 앞뒤 안 맞는 흐름을 지웠다. 아이가 돌을 골라 주고, 반짝돌은 창가에 괸다.
-  talk([
-    ['너구리',flat?'(마당에서 납작한 돌을 골라 내밀었다.)':'(마당에서 줄무늬 돌을 골라 내밀었다.)'],
-    ['꼬마 두더지',flat?'납작해서 내 돌집 문이 되겠다!':'줄무늬는 담에 끼우면 딱이겠다!'],
-    ['너구리','반짝돌은 창가에 괴어 두자.\n그럼 안 굴러가잖아.'],
-    ['꼬마 두더지','창문까지 생겼다!\n할배가 그랬어. 구르는 돌도 괴면 선다고.'],
-    ['꼬마 두더지','쐐기돌이 남으면 고갯길 돌탑에 괼래.\n할배가 그 탑도 쐐기돌로 선 거랬어.']
-  ],()=>{
-    G.f.dolneomeo_mole_pebble=kind;
-    Rg.stoneTask(()=>{
-        finish('dol_mole','꼬마와 돌집의 밑돌·문돌·창가 돌을 직접 놓았다. 남은 쐐기돌은 고갯길 돌탑에 괴겠다고 한다. 꼬마가 땅을 파다 찾은 도토리를 주었다.')();
-        // 결정 D-271: 돌집을 함께 지은 값. 땅 파는 두더지 아이의 보물 — 다람쥐가 묻고 잊은 도토리
-        talk([['꼬마 두더지','다 지었다! 이거 너 줘.\n땅 파다 찾았어. 다람쥐가 묻고 잊었나 봐.'],receiveItem('acorn',2)]);
-      });
-  });
-}
-/* 결정 D-210: 꼬마 두더지 마당의 납작한 돌과 줄무늬 돌을 한 그림에 나란히 띄운다(작은 창 D-152, 사용자 피드백 49).
-   아이가 두 돌을 견주어 말하는 줄부터 고르는 줄까지 떠 있고, 고르면 내린다. 가운데 작은 것은 꼬마의 반짝돌. */
-const moleStonesPic=(w,h)=>{
-  R(0,0,w,h,'#dcd8c8');R(0,29,w,15,'#a39b8a');R(0,29,w,1,'#857d6e');
-  for(const [x,y] of [[3,35],[13,40],[31,37],[47,41],[59,34]])R(x,y,2,1,'#8a8273');
-  // 납작한 돌: 넓고 얇은 판돌. 윗면이 매끈하게 밝다
-  R(4,31,26,2,'#7a7466');R(6,25,22,6,'#8f9695');R(5,26,24,4,'#8f9695');R(7,24,20,1,'#c9d0cc');R(6,25,22,1,'#b2b9b6');R(10,26,9,1,'#a7aeab');
-  R(5,29,24,1,'#747b7a');R(6,30,22,1,'#5f6665');
-  // 줄무늬 돌: 둥근 몸에 흰 띠가 비스듬히 감긴다
-  R(38,31,22,2,'#7a7466');
-  for(let j=0;j<16;j++){const half=Math.round(10*Math.sqrt(Math.max(0,1-((j-8)/8.5)**2)));
-    for(let i=-half;i<half;i++){const band=(j+Math.floor((i+20)/2))%6;R(49+i,15+j,1,1,band<2?'#ebe5d6':j<4?'#8b827b':'#6f6660');}}
-  R(45,16,3,1,'#a39a92');
-  // 가운데 꼬마의 반짝돌
-  R(31,27,5,4,'#59626a');R(32,26,3,1,'#6e7880');R(33,27,1,1,'#fff6c8');R(34,28,1,1,'#e9f0f2');
+/* 결정 D-735: 꼬마 두더지 만남을 돌집 돌 고르기에서 할배의 정 이야기로 바꿨다 (사용자 피드백 2026-11-05 돌너머 3: 돌 고르기가 난해하다. 할배와 이어진 부탁으로).
+   꼬마는 할배가 정으로 돌을 쪼다 돌가루에 눈을 비비는 게 싫어 정을 몰래 감췄다(뒤 사연 D-118의 '할배 눈이 멀까 봐'와 같은 걱정).
+   정이 없으면 할배는 마당을 손으로 더듬어 찾는다. 아이는 그게 눈을 더 쓰는 일이라 말하고, 꼬마와 함께 정을 돌려드린다.
+   할배는 자루에 묻은 떡고물로 손주 짓인 걸 손끝으로 알아본다. 아이는 엄마가 약사발을 늘 머리맡 같은 자리에 두는 걸 떠올려
+   정 자리를 정해 두자고 하고, 할배가 받침돌에 홈을 판다. 꼬마는 일이 끝나면 정을 그 홈에 꽂아 두기로 한다. 값은 꼬마가 땅 파다 찾은 도토리 2(D-271 그대로).
+   진행값 dolMoleChisel: 1 정을 감춘 걸 들음(꼬마가 할배 곁으로 감) · 2 돌려드림. 할배를 먼저 만나야(dolsoeMet) 이야기가 열린다. */
+const moleChiselPic=(w,h)=>{
+  R(0,0,w,h,'#dcd8c8');R(0,30,w,14,'#a39b8a');R(0,30,w,1,'#857d6e');
+  for(const [x,y] of [[6,36],[19,40],[44,38],[57,35]])R(x,y,2,1,'#8a8273');
+  // 꼬마 두더지가 등 뒤로 감춘 긴 정 (몸보다 길다)
+  R(14,8,3,26,'#6f7a7a');R(14,8,3,2,'#c9d0cc');R(15,30,1,4,'#4c5554');R(13,24,5,8,'#8a6a45');R(14,25,1,6,'#a9875a');
+  R(20,16,16,15,'#70675b');R(23,12,11,8,'#8a7967');R(32,15,5,3,'#d6ab8d');R(31,14,1,1,'#2e3834');R(20,16,14,3,'#a2926c');
+  R(18,29,5,3,'#4e5549');R(30,29,5,3,'#4e5549');R(17,20,4,4,'#c5ab86');   // 정을 쥔 작은 손
+  // 꼬마의 반짝돌
+  R(42,27,5,4,'#59626a');R(43,26,3,1,'#6e7880');R(44,27,1,1,'#fff6c8');R(45,28,1,1,'#e9f0f2');
+  // 정 자루에 묻은 떡고물
+  R(15,26,1,1,'#e8c46a');R(16,28,1,1,'#e8c46a');
 };
 function meetMole(){
+  const F=G.f;
+  if(!F.dolsoeMet){
+    talk([['꼬마 두더지','이 반짝돌 봐! 씻으니까 별이 나왔어.'],
+      ['꼬마 두더지','돌은 우리 할배가 다 알아.\n탁, 탁 소리 나는 마당 있지? 거기가 할배네야.']]);return;
+  }
+  if(F.dolMoleChisel===1){chiselReturn();return;}
   talk([
-    ['꼬마 두더지','이 돌 봐! 씻으니까 별이 나왔어.\n우리 할배 마당에는 이런 돌이 많아.'],
-    ['꼬마 두더지','나는 돌집을 짓는데 문이랑 담이 비었어.\n이 반짝돌은 예쁘지만 자꾸 굴러가.'],
-    Object.assign(['너구리','저 납작한 건 문이 되겠네.\n줄무늬 돌은 담으로 쓰고.'],{pic:moleStonesPic}),
-    ['꼬마 두더지','어느 돌로 할까?\n네가 골라 줘!',[
-      {t:'납작한 돌로 문을 단다',go:()=>stoneChoice('flat')},
-      {t:'줄무늬 돌로 담을 쌓는다',go:()=>stoneChoice('stripe')},
-      {t:'돌집을 좀 더 구경한다',go:null}
-    ]]
-  ]);
+    Object.assign(['너구리','(꼬마 두더지가 반짝돌을 굴리다가\n긴 쇠꼬챙이를 얼른 등 뒤로 감춘다.)'],{pic:moleChiselPic}),
+    ['너구리','그거 할배 정 아니야?\n아까 할배가 그걸로 돌을 쪼시던데.'],
+    ['꼬마 두더지','쉿! 할배 쉬실 때 몰래 가져왔어.'],
+    ['꼬마 두더지','할배는 정 들면 자꾸 눈을 비벼.\n돌가루가 들어가서. 정이 없으면 쉬실 거야.'],
+    Object.assign(['너구리','정이 없어지면 할배는 어떻게 하셔?'],{pic:null}),
+    ['꼬마 두더지','…아까부터 마당을 손으로 더듬고 계셔.'],
+    ['너구리','그럼 찾느라 눈을 더 쓰시잖아.\n같이 돌려드리자. 내가 옆에 있을게.'],
+    ['꼬마 두더지','…혼나면 네가 같이 혼나 줘야 돼.']
+  ],()=>{F.dolMoleChisel=1;toast('꼬마 두더지가 정을 안고 할배 마당 쪽으로 간다');});
 }
+function chiselReturn(){
+  const F=G.f;
+  talk([
+    ['너구리','(할배가 무릎을 꿇고 받침돌 둘레를\n손바닥으로 더듬고 있다.)'],
+    ['돌쇠 할배','정을 어디 뒀더라.\n분명 받침돌 위에 뒀는데.'],
+    ['꼬마 두더지','…할배, 여기.'],
+    ['너구리','(꼬마가 내민 정을 할배가 받아 쥐고\n자루를 손끝으로 쓸어 본다.)'],
+    ['돌쇠 할배','자루에 떡고물이 묻었구나.\n시렁에 숨겨 둔 떡 꺼내 먹은 손이지?'],
+    ['꼬마 두더지','할배가 정 들면 눈을 비비니까….\n정이 없으면 쉬실 줄 알았어.'],
+    ['돌쇠 할배','녀석. 정이 없으면 이 늙은이는\n마당을 기어서 찾는다. 그게 눈을 더 쓰는 거다.'],
+    ['너구리','할아버지, 정 자리를 정해 두면 어때요?\n우리 엄마도 약사발은 늘 머리맡 같은 데 둬요.'],
+    ['너구리','늘 같은 데 있으면\n눈 감고도 손만 뻗으면 잡히잖아요.'],
+    ['돌쇠 할배','허허, 그 말이 맞다.\n받침돌 모서리에 홈을 하나 파 두마. 정은 늘 거기다.'],
+    ['꼬마 두더지','그럼 할배 일 끝나면\n정은 내가 맨날 거기 꽂아 둘게!'],
+    ['너구리','(할배가 정 끝으로 받침돌 모서리를 몇 번 쪼아\n정이 꼭 들어갈 홈을 냈다.)'],
+    ['꼬마 두더지','고마워. 이거 너 줘.\n땅 파다 찾았어. 다람쥐가 묻고 잊었나 봐.'],receiveItem('acorn',2)
+  ],()=>{
+    F.dolMoleChisel=2;Sound.stone('tap');
+    finish('dol_mole','꼬마 두더지가 할배 눈이 걱정돼 감춘 정을 같이 돌려드렸다. 정 자리를 늘 같은 데 두자고 하니 할배가 받침돌에 홈을 팠다. 꼬마는 일이 끝나면 정을 거기 꽂아 두기로 했다. 꼬마가 땅을 파다 찾은 도토리를 주었다.')();
+  });
+}
+Rg.moleChiselReturn=chiselReturn;
+moleChiselPic.sound='pic_mole_chisel';   // 결정 D-483: 대사 그림 소리 (popup_sounds.csv)
 
 function warmFrog(){
   talk([
@@ -910,7 +926,10 @@ Rg.wishTower=()=>{
    시간은 tuning.csv wish_anim_*. 움직임 줄이기에서는 절반. */
 const TU=TABLES.TUNING,WS_W=64,WS_H=50,WS_SCALE=5,WS_CX=32,WS_GROUND=46;
 // 결정 D-214: 돌마다 짧은 혼잣말 한 줄.
-const WS_HINT=['(길섶에서 주운 납작한 돌. 맨 위 한가운데에, 살며시.)','(하나 더. 흔들리지 않게.)','(마지막 작은 돌. 까치발을 들었다.)'];
+// 결정 D-733: 작은 돌이라 한 손으로 집는다. 산양·고라니 모습이면 입에 물고 내려놓는다 (art.js carryHand).
+const WS_HINT_HAND=['(길섶에서 주운 납작한 돌. 한 손으로 집어 맨 위 한가운데에, 살며시.)','(하나 더. 흔들리지 않게 손끝으로.)','(마지막 작은 돌. 까치발을 들었다.)'];
+const WS_HINT_MOUTH=['(길섶에서 주운 납작한 돌을 입에 물었다. 맨 위 한가운데에, 살며시.)','(하나 더. 흔들리지 않게 고개를 천천히.)','(마지막 작은 돌. 목을 길게 뺐다.)'];
+const wsHintFor=n=>(G.form==='goat'||G.form==='deer'?WS_HINT_MOUTH:WS_HINT_HAND)[n];
 const wsP=el('div','forge');wsP.id='dolWishStack';wsP.hidden=true;
 wsP.innerHTML='<h2>소원 돌탑</h2><canvas id="dolWishStackCv" width="'+WS_W*WS_SCALE+'" height="'+WS_H*WS_SCALE+'" style="display:block;width:min(100%,320px);height:auto;margin:0 auto;image-rendering:pixelated;border:2px solid var(--meok);border-radius:3px"></canvas>'
   +'<div class="fhint" id="dolWishStackHint"></div>';
@@ -926,7 +945,7 @@ const wsEase=k=>k*k*(3-2*k);
 function wsHint(t){$('dolWishStackHint').textContent=t;}
 function wsSpawn(){
   const side=ws.n%2?1:-1,from=wsSupport()+side*TU.wish_anim_side;
-  ws.stone={x:from,y:4,from,paws:true};ws.phase='carry';ws.t=0;wsHint(WS_HINT[ws.n]);
+  ws.stone={x:from,y:4,from,paws:true};ws.phase='carry';ws.t=0;wsHint(wsHintFor(ws.n));
 }
 function wsPaint(){
   const g=wsBuf.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,WS_W,WS_H);
@@ -966,7 +985,7 @@ function stackWish(){
 function finishWishStack(){
   const A=Rg.expansionArt;
   wsP.hidden=true;ws=null;
-  talk([withPic(['너구리','(두 손을 모았다.)'],A.wishTowerPic(3)),
+  talk([withPic(['너구리',G.form==='goat'||G.form==='deer'?'(돌탑 앞에서 눈을 감았다.)':'(두 손을 모았다.)'],A.wishTowerPic(3)),
     ['너구리','아빠를… 빨리 만나게 해 주세요.']],()=>{
     G.f.dolWishTower=true;
     diary('dol_wish_tower','고갯길 돌탑에 돌 셋을 얹었다. 아빠가 그랬다. 돌탑을 쌓으면 소원이 이뤄진다고. 아빠를 빨리 만나게 해 달라고 빌었다.');
@@ -1053,7 +1072,7 @@ Rg.expansionContent=()=>({
       examine('warm_hearth',2290,'공동 화로 살펴보기','bowl','석수들이 일을 마치고 손을 녹이는 화로다.\n재 속 돌은 불이 꺼진 뒤에도 미지근하다.')
     ],
     wanderers:[
-      {id:'dol_mole',name:'꼬마 두더지',hint:'달그락, 달그락. 누가 돌멩이를 굴리며 노는 소리가 난다.',x:740,draw:drawGuest('mole'),talk:meetMole,greeting:'우리 돌집에 문이 생겼어!\n반짝돌도 이제 안 굴러가.'},
+      {id:'dol_mole',name:'꼬마 두더지',hint:'달그락, 달그락. 누가 돌멩이를 굴리며 노는 소리가 난다.',get x(){const x=G?.f.dolMoleChisel===1?1020:740;   /* 결정 D-735: 정을 돌려드리러 할배 곁으로 */return CLASSIC?x:trimX(x,Rg.trimCuts?.village);},draw:drawGuest('mole'),talk:meetMole,greeting:'정은 받침돌 홈에 꽂아 뒀어!\n할배가 손만 뻗으면 돼.'},
       {id:'dol_magpie',name:'늙은 까치',x:2080,draw:drawGuest('magpie'),talk:restMagpie,greeting:'바람막이야, 좀 쉬어 가거라.\n담 뒤는 바람이 덜하단다.'}
     ],
     stamps:[{...stamp('mill_base',1160,156),base:'none',face:-12}]   // D-116: 맷돌 그림 앞면에 바로 찍는다(받침 겹침 없음)

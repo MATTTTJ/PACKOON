@@ -75,7 +75,19 @@ function drawLake(){const x=LAKE_X-cam;if(x>W+10)return;
 function drawCoil(){if(G.boss.dead)return;const x=G.boss.x-RC();   // 강철이 자리는 이미 옮긴 좌표 (D-128)
  if(x<-120||x>W+120)return;const b=Math.floor(G.anim/20)%2;
   for(let i=0;i<7;i++){const a=i/7*Math.PI*2;R(x+Math.cos(a)*70+40,GROUND-18-Math.sin(a)*10-b,22,10,'#7a8ca8');R(x+Math.cos(a)*70+42,GROUND-18-Math.sin(a)*10-b,18,2,'#b8c8dc');}
-  R(x-38,GROUND-34-b,22,14,'#6a7c98');R(x-34,GROUND-30-b,4,3,'#e8f2fa');R(x-26,GROUND-30-b,4,3,'#e8f2fa');R(x-40,GROUND-26-b,8,1,'#e8f2fa');R(x-44,GROUND-24-b,6,1,'#e8f2fa');
+  for(let i=0;i<7;i++){const a=i/7*Math.PI*2;if(Math.sin(a)<-0.2)continue;R(x+Math.cos(a)*70+48,GROUND-24-Math.sin(a)*10-b,3,6,'#3e4a62');R(x+Math.cos(a)*70+49,GROUND-27-Math.sin(a)*10-b,1,3,'#3e4a62');}   // 등지느러미
+  // 결정 D-746: 잠든 이무기 머리. 길게 뻗은 주둥이, 눈을 내리누른 눈두덩 밑으로 감긴 눈, 뒤로 휜 자라다 만 뿔, 늘어진 수염
+  // (예전의 네모난 머리와 하얀 네모 눈은 귀여워 보였다. 사용자 피드백 2026-11-05)
+  const K='#3e4a62',HD='#5a6a86';
+  R(x-22,GROUND-44-b,3,7,K);R(x-19,GROUND-48-b,3,5,K);R(x-17,GROUND-50-b,2,3,K);R(x-28,GROUND-42-b,3,5,K);R(x-26,GROUND-45-b,2,3,K);   // 뿔
+  R(x-14,GROUND-34-b,8,4,K);R(x-12,GROUND-38-b,6,4,K);R(x-10,GROUND-41-b,4,3,K);   // 목덜미 갈기
+  R(x-34,GROUND-38-b,24,13,HD);R(x-52,GROUND-33-b,20,8,HD);R(x-54,GROUND-31-b,3,5,HD);   // 머리뼈와 주둥이
+  R(x-50,GROUND-26-b,36,3,'#4a5874');R(x-34,GROUND-38-b,24,2,'#6a7c98');   // 아래턱과 정수리 빛
+  R(x-36,GROUND-37-b,12,3,K);R(x-38,GROUND-36-b,3,2,K);   // 눈두덩
+  R(x-35,GROUND-33-b,8,1,'#e8f2fa');R(x-34,GROUND-32-b,6,1,'#9fb4cc');   // 감긴 눈 (얇게 빛이 샌다)
+  R(x-51,GROUND-31-b,2,1,'#232a3a');R(x-46,GROUND-26-b,1,2,'#e8f2fa');R(x-40,GROUND-26-b,1,2,'#e8f2fa');   // 콧구멍과 송곳니
+  for(const [dx,dy,w] of [[-58,-29,5],[-64,-27,5],[-69,-24,4],[-72,-21,3],[-58,-24,4],[-63,-21,4],[-66,-18,3]])R(x+dx,GROUND+dy-b,w,1,'#b8c8dc');   // 수염
+  if(b)R(x-58,GROUND-34,4,2,'#e8f2fa');   // 잠든 숨에 서리김
 }
 Rg.drawBack=()=>{drawSky();drawGround();};
 Rg.drawScenery=()=>{[1000,1140,1280,1360].forEach(drawRowan);drawDrift();drawSlope();drawLake();drawCoil();};
