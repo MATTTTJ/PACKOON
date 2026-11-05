@@ -4,7 +4,7 @@
 (()=>{
 const Rg=REGIONS.jangteo;
 const INN_X0=1010,INN_X1=1270;     // 보부상 숙소
-const STORE_X=1500;                // 숙소 창고 (그믐 밤에 헌물 도깨비가 나타난다)
+const STORE_X=1500;                // 숙소 창고 (그믐 밤에 눈도깨비가 나타난다)
 const FOREST_X=1640;               // 뒷산 소나무 숲
 const night=()=>G.f.night;
 // 결정 D-87: 그믐밤 창고 지키기를 맡은 뒤, 창고에 다가갈수록 긴장이 오른다. 도깨비를 달래거나 이기면 0.
@@ -58,6 +58,7 @@ function drawStore(){const x=STORE_X-cam;if(x<-60||x>W+60)return;
   R(x-40,GROUND-40,80,40,night()?'#3a3028':'#8a6a4a');R(x-46,GROUND-50,92,10,'#4a3a30');R(x-46,GROUND-51,92,2,'#f4f6f8');
   R(x-12,GROUND-30,24,30,night()?'#1a1410':'#4a2e1f');R(x-1,GROUND-30,2,30,'#2a1a10');R(x-4,GROUND-18,8,3,'#9aa0a6');
   if(G.f.guard&&!G.boss.dead&&night()){const fl=Math.floor(G.anim/8)%2;R(x-30+fl,GROUND-26,4,4,'#4a90d0');R(x+24-fl,GROUND-34,3,3,'#7ab8e8');}   // 창고 안에서 푸른 불빛
+  Rg.drawSnowPresence();
 }
 /* 뒷산 소나무 숲 */
 function drawForest(){for(let wx=FOREST_X;wx<2400;wx+=64){const x=wx-cam;if(x<-40||x>W+40)continue;const r=hash(wx);const h=60+r*30;
@@ -91,7 +92,7 @@ Rg.step=()=>{
   if(CLASSIC&&G.pickups.some(a=>a.zone)){
     G.pickups=Rg.newState().pickups;G.px=60;G.py=GROUND;G.vy=0;G.cam=0;
   }
-  if(G.f.guard&&night()&&!G.boss.dead&&Math.abs(G.px-STORE_X)<24)Rg.startDokkaebi();
+  Rg.snowEncounter();   // 결정 D-684: 창고를 지키면 기척이 먼저 다가온다
   if(has('hongsi_tteok')&&!G.f.hongsiMade)Rg.sendMedicine();
 };
 Rg.onHit=()=>{};
@@ -100,10 +101,73 @@ Rg.faint=()=>{G.px=Math.max(60,G.px-80);toast('눈길에 미끄러져 물러났�
 Rg.bossDie=calm=>{
   G.boss.dead=true;addItem('nunhongsi',1);
   if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
-  diary('j_boss','창고를 털던 범인은 낡은 빗자루·키·멍석에 깃든 헌물 도깨비였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
+  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 싸리비로 제 발자국을 쓸며 물건을 가져갔다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
   toast('눈홍시를 얻었다! 시루로 홍시 약떡을 찌자');refreshGoal();
 };
 Rg.STORE_X=STORE_X;
+
+/* ---------- 결정 D-684: 눈도깨비와 만나기 (사용자 지시 2026-11-05 큰 장터 23) ----------
+   창고 문 앞에 서면 잠깐 뒤 오른쪽에서 무언가 천천히 다가온다. 몸을 감춘 눈도깨비라 모습은 없고,
+   눈 위에 발자국이 찍혔다가 싸리비에 쓸리는 자국, 휘도는 눈발, 찬 입김만 보인다.
+   수리부엉이로 변신하면 밤눈에 정체가 드러나고(서리 빛이 번지며 모습이 나타난다), 잠깐 뒤 전투가 열린다.
+   결정 D-687: 창고 지키기(G.f.guard)는 부엉 영감의 신표와 함께 켜지고, 수리부엉이 변신도 그 직후(formCheck)에 열린다.
+   그래서 수리부엉이 없이 이 자리에 오는 길은 없다. 혹시 없으면(옛 저장) 여기서 연다. 아이는 혼잣말로 '밤눈'을 떠올린다.
+   멀리 걸어가면 기척은 물러났다가 다시 오면 처음부터 다가온다. */
+let snowEnc=null;
+const ENC={delay:34,speed:0.8,start:300,stop:62,reveal:72};
+Rg.snowEncounter=()=>{
+  if(!G.f.guard||!night()||G.boss.dead||B||inkOn){if(G.boss.dead)snowEnc=null;return;}
+  if(!snowEnc){
+    if(Math.abs(G.px-Rg.STORE_X)<24&&$('dlg').hidden){
+      if(!hasForm('owl'))unlockForm('owl');
+      snowEnc={t:0,x:Rg.STORE_X+ENC.start,said:0,reveal:0,steps:[]};G.vx=0;
+    }
+    return;
+  }
+  const e=snowEnc;
+  if(Math.abs(G.px-Rg.STORE_X)>240){snowEnc=null;return;}
+  e.t++;
+  if(!e.reveal&&e.t>ENC.delay){const nx=Math.max(Rg.STORE_X+ENC.stop,e.x-ENC.speed);
+    if(Math.floor(nx/12)!==Math.floor(e.x/12))e.steps.push({x:Math.round(nx),t:0});e.x=nx;}
+  for(const s of e.steps)s.t++;e.steps=e.steps.filter(s=>s.t<120);
+  if(e.said===0&&e.t>ENC.delay+20){e.said=1;
+    talk([['너구리','(…사박, 사박. 창고 앞 눈이 밟힌다.\n아무도 없는데 발자국만 다가와.)']]);return;}
+  if(e.said===1&&e.x<=Rg.STORE_X+ENC.stop&&G.form!=='owl'){e.said=2;
+    talk([['너구리','(코앞에서 찬 숨이 느껴져. 뭐가 서 있어.\n밤눈이 밝다면… 보일 텐데.)']]);return;}
+  if(!e.reveal&&owlSenses()&&e.t>ENC.delay+10){e.reveal=1;Sound.playSfx?.('battle_warn');}
+  if(e.reveal){
+    if(e.reveal===1&&!G.f.jxSnowSeen){G.f.jxSnowSeen=true;diary('jx_snow_seen','창고 앞에 발자국만 다가왔다. 수리부엉이 눈으로 보니, 까치 깃 도롱이를 두르고 싸리비를 쥔 눈도깨비가 서 있었다.');}
+    if(e.reveal===8)talk([['너구리','(보인다! 까치 깃 도롱이에 싸리비…\n눈도깨비야! 싸리비로 발자국을 쓸고 있었어.)']]);
+    if(++e.reveal>ENC.reveal){snowEnc=null;Rg.startDokkaebi();}
+  }
+};
+/* 도트 눈도깨비: 까치 깃 도롱이, 흰 머리와 고드름 수염, 뭉툭한 뿔 하나, 싸리비 */
+function nundokSprite(x,a){
+  ctx.save();ctx.globalAlpha=a;const g=GROUND,b=Math.floor(G.anim/16)%2;
+  R(x+16,g-48,2,46,'#6b4e33');for(let i=-3;i<=3;i++)R(x+17+i*2,g-6+Math.abs(i),2,6,'#b9874a');   // 싸리비
+  R(x-14,g-36,28,34,'#1d1814');for(let k=0;k<4;k++){R(x-14+k*7,g-30,6,3,k%2?'#2b4a6a':'#f8f6f0');R(x-12+k*7,g-18,5,3,k%2?'#f8f6f0':'#2b4a6a');}   // 까치 깃 도롱이
+  R(x-6,g-30,12,20,'#f8f6f0');R(x-16,g-38,32,4,'#f8f6f0');   // 흰 앞섶, 어깨 눈
+  R(x+10,g-60,3,22,'#2b4a6a');R(x+12,g-66,2,10,'#1d1814');   // 꽁지
+  R(x-11,g-56,22,18,'#c3ced2');R(x-13,g-58,26,4,'#f8f6f0');R(x-14,g-54,3,10,'#f8f6f0');R(x+11,g-54,3,10,'#f8f6f0');   // 얼굴과 흰 머리
+  R(x-1,g-64,4,7,'#d6ebf2');R(x,g-65,2,2,'#ffffff');   // 뿔 하나
+  R(x-8,g-52,6,5,'#fbf7ec');R(x+2,g-52,6,5,'#fbf7ec');R(x-6+b,g-51,2,3,'#1d1814');R(x+4+b,g-51,2,3,'#1d1814');   // 부리부리한 눈
+  R(x-2,g-47,4,3,'#8396a0');R(x-7,g-43,14,3,'#3a1e1a');R(x-5,g-43,2,2,'#fbf7ec');R(x+3,g-43,2,2,'#fbf7ec');   // 코와 입
+  for(let i=-2;i<=2;i++)R(x+i*3,g-40,2,4+(i%2?2:4),'#f8f6f0');R(x-4,g-34,2,3,'#d6ebf2');R(x+3,g-33,2,3,'#d6ebf2');   // 수염과 고드름
+  ctx.restore();
+}
+Rg.drawSnowPresence=()=>{
+  const e=snowEnc;if(!e)return;const x=e.x-cam;
+  for(const s of e.steps){const a=Math.max(0,1-s.t/90);ctx.save();ctx.globalAlpha=a;R(s.x-cam-3,GROUND+1,4,2,'#5a6a80');R(s.x-cam+3,GROUND+2,4,2,'#5a6a80');
+    if(s.t>18){ctx.globalAlpha=a*0.8;R(s.x-cam-6,GROUND,14,1,'#e8ecf4');}ctx.restore();}   // 찍혔다가 싸리비에 쓸리는 발자국
+  if(!e.reveal){
+    for(let i=0;i<10;i++){const q=G.anim*0.06+i*0.63,r=10+(i%3)*5;R(x+Math.cos(q)*r,GROUND-30+Math.sin(q*1.3)*22,1,1,i%2?'#f4f6f8':'#c8d4e4');}   // 휘도는 눈발
+    if(Math.floor(G.anim/40)%2===0){const k=(G.anim%40)/40;ctx.save();ctx.globalAlpha=0.5*(1-k);R(x-8-k*8,GROUND-48-k*6,4+k*6,3,'#f4f6f8');ctx.restore();}   // 찬 입김
+    return;}
+  const k=Math.min(1,e.reveal/24);
+  {const gl=ctx.createRadialGradient(x,GROUND-34,4,x,GROUND-34,56);gl.addColorStop(0,'rgba(166,214,244,'+(0.55*(1-k*0.6)).toFixed(3)+')');gl.addColorStop(1,'rgba(166,214,244,0)');
+    ctx.save();ctx.fillStyle=gl;ctx.fillRect(Math.round(x-58),GROUND-92,116,92);ctx.restore();}   // 서리 빛이 번지며 드러난다
+  nundokSprite(Math.round(x),k);
+};
 
 /* PA-43 [개발자 결정]. 옛 장터는 위에 그대로 두고, 확장에서는 구역 안 좌표만 쓴다.
    필수: 입구 → 거리 → 숙소(밤) → 거리/솔숲 → 시루/고사떡 → 숙소 → 창고.
@@ -186,7 +250,7 @@ if(!CLASSIC){
         // 결정 D-290: 등을 다 단 뒤 까치 곁에 오면 길손이 맡긴 곶감을 건넨다(한 번)
         else if(G.f.jxLanternDone&&!G.f.jxLanternPaid&&!open('dlg'))Rg.lanternThanks?.();
       }
-      if(id==='warehouse'&&G.f.guard&&night()&&!G.boss.dead&&Math.abs(G.px-Rg.STORE_X)<24)Rg.startDokkaebi();
+      if(id==='warehouse')Rg.snowEncounter();   // 결정 D-684
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
         G.f.jxHubChanged=true;diary('jx_hub','모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.');
         toast('떡집 앞 줄이 짧아졌다.');
@@ -291,6 +355,7 @@ if(!CLASSIC){
         R(x-15,GROUND-41,30,41,'#222f3a');R(x-2,GROUND-41,3,41,'#678393');
         if(!G.boss.dead){R(x-24,GROUND-27,4,5,'#72b4c7');R(x+22,GROUND-18,3,5,'#a8d4d6');}
         else{R(x-21,GROUND-11,13,10,'#9b724c');R(x+9,GROUND-13,12,12,'#d1ab67');}
+        Rg.drawSnowPresence();
       },
     },
   };
