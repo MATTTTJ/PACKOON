@@ -594,15 +594,24 @@ function updateNpcTags(near){
 }
 /* 결정 D-55: 가까이 가면 들리는·보이는 기척. 인물·떠돌이에 hint:'…'(아이가 아는 말로)와 hintRange?(px), hintWhen?()을 두면
    처음 그 거리 안에 들어올 때 한 번 알림으로 띄운다. 이미 만났거나(met), 떠돌이 일을 마쳤거나, 한 번 띄운 뒤에는 나오지 않는다. */
+let hintThought=null;   // 결정 D-831: 지금 떠 있는 속말이 기척 알림이면 {p, text}
+const hintSettled=p=>knows('met:'+p.id)||!!G.f.wanderersDone?.[expansionKey(p.id)]||(p.hintWhen&&!p.hintWhen());
 function updateHints(){
-  if(!G||!G.started||G.ended||paused())return;
+  if(!G||!G.started||G.ended)return;
+  /* 결정 D-831: 기척 알림은 대화가 열리거나 그 인물의 일이 끝나면 거둔다 (사용자 피드백 2026-11-06 8).
+     속말은 대화 동안 멈췄다가 대화가 끝나면 남은 시간만큼 다시 뜬다(D-706). 그래서 다가가자마자 말을 걸어 일을 마치면,
+     대화가 끝난 뒤에 "끙끙대는 소리가 들린다" 같은 기척이 그제야 보였다 (산토끼 짐꾼 등 기척이 있는 모든 인물). */
+  if(hintThought){
+    if(heroThought.textContent!==hintThought.text||thoughtT<=0)hintThought=null;   // 다른 속말로 바뀌었거나 이미 사라짐
+    else if(open('dlg')||hintSettled(hintThought.p)){thoughtT=0;heroThought.hidden=true;hintThought=null;}
+  }
+  if(paused())return;
   for(const p of [...fieldNpcs(),...zoneObjects('wanderers')]){
     if(!p.hint)continue;
     const key=G.region+':'+p.id,seen=G.f.hintsSeen||(G.f.hintsSeen={});
-    if(seen[key]||knows('met:'+p.id)||G.f.wanderersDone?.[expansionKey(p.id)])continue;
-    if(p.hintWhen&&!p.hintWhen())continue;
+    if(seen[key]||hintSettled(p))continue;
     if(Math.abs(p.x-G.px)>(p.hintRange||TABLES.TUNING.hint_range))continue;
-    seen[key]=true;think(typeof p.hint==='function'?p.hint():p.hint);return;   // 결정 D-706
+    seen[key]=true;think(typeof p.hint==='function'?p.hint():p.hint);hintThought={p,text:heroThought.textContent};return;   // 결정 D-706
   }
 }
 /* 결정 D-706: 주인공의 짧은 속말. 사용자 규칙(2026-11-05): 검은 띠(toast)를 따로 띄워 설명하는 일은 게임 어디에도 없어야 하고,
