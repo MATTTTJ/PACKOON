@@ -886,7 +886,7 @@ const TABLES={
    },
    {
     "id": "core",
-    "name": "심장",
+    "name": "눈홍시",
     "hp": 4,
     "mat": "dokkaebibul",
     "core": true,
@@ -3973,7 +3973,9 @@ const TABLES={
   "name_final_lock_frames": 150,
   "name_final_damage": 2,
   "name_final_open_bonus": 150,
-  "y_lure_range": 90
+  "y_lure_range": 90,
+  "nundok_gloat_hits": 1,
+  "nundok_gloat_frames": 45
  },
  "PROGRESS": [
   {
