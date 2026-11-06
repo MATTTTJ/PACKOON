@@ -938,33 +938,43 @@ Rg.goal=()=>{
   if(!G.started)return '';
   if(G.ended)return '너구리 보부상 · 끝';
   // 결정 D-67: 앞선 진행부터 거꾸로 본다. 산양·부엉이로 호숫가에 먼저 닿아도 지금 할 일이 나온다.
-  // 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
-  if(F.yakDone)return '아빠와 집으로 떠나기';
-  if(F.nameGiven)return '아빠와 약 찧기';
-  if(F.fruitGot)return '산군 할아버지께 셈하기';
-  if(G.boss.dead)return '전설의 열매 따기';
-  if(F.sangunMet)return '강철이와 맞서기';
-  if(F.dadDone)return '산군 할아버지 만나기';
-  if(F.dadMet)return '아빠 곁에 다시 가기';
-  if(mapVisited(Rg.id,'shore'))return '호숫가 너구리에게 다가가기';
-  if(!F.nalYTalk)return '산막 불빛 따라가기';
+  // 결정 D-890: 목표(화면)와 길잡이(수첩)를 함께 돌려준다 (goalLine). 길잡이는 아이가 들은 말과 본 것만 쓴다.
+  const Q=goalLine;
+  if(F.yakDone)return Q('집으로 돌아가기','약이 다 됐다. 아빠와 함께 엄마가 기다리는 집으로 떠나자.');
+  if(F.nameGiven)return Q('엄마 약 만들기','셈을 치렀다. 아빠와 함께 전설의 열매를 찧어 엄마 약을 만들자.');
+  if(F.fruitGot)return Q('열매 값 치르기','전설의 열매를 땄다. 열매 값은 셈이 맞아야 한다. 신목 섬의 산군 할아버지께 셈하러 가자.');
+  if(G.boss.dead)return Q('전설의 열매 얻기','강철이가 물러났다. 신목 섬에서 전설의 열매를 따자.');
+  if(F.sangunMet)return Q('전설의 열매 얻기','산군 할아버지께 강철이 이야기를 들었다. 신목 섬에서 강철이와 맞서자.');
+  if(F.dadDone)return Q('신목 섬 건너기','아빠 손에서 엄마 글씨가 적힌 장부 한 장이 내게 남았다. 호수 건너 신목 섬의 산군 할아버지를 뵙자.');
+  if(F.dadMet)return Q('아빠 만나기','아빠는 불러도 돌아보지 않는다. 호숫가 끝 얼음 가의 아빠 곁에 다시 가 보자.');
+  if(mapVisited(Rg.id,'shore'))return Q('아빠 찾기','호숫가 끝 얼음 가에 너구리 하나가 앉아 있다. 다가가 보자.');
+  if(!F.nalYTalk)return Q('아빠 찾기','아빠는 북쪽 영산으로 갔다. 눈 덮인 산에 산막 불빛이 보인다. 불빛을 따라가 보자.');
   if(!F.seolpi){
-    if(vineOK()&&bindOK())return '날쌘에게 설피 재료 건네기';
-    if(!vineOK())return '다래 덩굴 베기 ('+(G.inv.darae_vine||0)+'/2)';
-    return '짚 한 줌 구하기';
+    // 날쌘: "다래 덩굴 둘에 짚 하나. 덩굴 대신 싸리 살 하나, 짚 대신 마른 억새 둘도 받아."
+    const why='눈이 허리까지 쌓여 설피가 있어야 한다. 날쌘 아저씨가 다래 덩굴 둘에 짚 하나면 엮어 주신단다.';
+    if(vineOK()&&bindOK())return Q('설피 마련하기','설피 재료가 모였다. 산막의 날쌘 아저씨께 건네자.');
+    if(!vineOK())return Q('설피 마련하기',why+' 눈 밑에 묻힌 다래 덩굴을 베자. 싸리 살 하나로도 된다. ('+(G.inv.darae_vine||0)+'/2)');
+    return Q('설피 마련하기',why+' 짚 한 줌을 구하자. 마른 억새 둘로도 된다.');
   }
-  if(!F.salgMet)return '고라니에게 살금살금 다가가기';
-  if(!F.salgDone){const m=G.inv.magamok||0;return m>=3||has('kong',2)?'살금이에게 마가목 열매 건네기':'마가목 열매 따기 ('+m+'/3)';}
-  return '얼어붙은 비탈 지나기';
+  if(!F.salgMet)return Q('호숫가 가는 길 찾기','설피를 신었다. 얼어붙은 비탈에서 고라니를 보면 놀라지 않게 살금살금 다가가 길을 물어보자. 귀를 세우면 멈추자.');
+  if(!F.salgDone){const m=G.inv.magamok||0;const why='살금이가 마가목 열매 세 알이나 콩 두 알을 주면 호숫가 지름길을 알려 준댔다.';
+    return Q('호숫가 가는 길 찾기',m>=3||has('kong',2)?why+' 살금이에게 건네자.':why+' 비탈 나무의 빨간 마가목 열매를 따자. ('+m+'/3)');}
+  return Q('호숫가 가는 길 찾기','살금이에게 호숫가 지름길을 들었다. 얼어붙은 비탈을 지나 호숫가로 가자.');
 };
-/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+Rg.iceGoal=()=>goalLine('신목 섬 건너기','호수 얼음이 얇다. 선착장 앞 막대에서 얼음길을 살피고, 두드려 본 얼음만 밟고 건너자.');   // 결정 D-890 (region.js 확장판)
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다.
+   결정 D-890: 이름(title)이 목표이고, text 는 수첩에 적는 지금 단계의 길잡이다. */
 defineSideQuests(Rg.id,[
   {id:'y_ongdal_water',title:'고라니에게 옹달샘 물 날라 주기',start:F=>F.yOngdal1,done:F=>F.yOngdal2,
-    text:F=>F.salgMet?'살금이에게 표주박 물 갖다주기':'고라니에게 표주박 물 갖다주기'},
+    text:F=>(F.salgMet?'옹달 할머니가 비탈의 살금이 몫으로 표주박 물을 맡기셨다. 너구리 모습으로 살금이에게 갖다주자.'
+      :'옹달 할머니가 비탈의 겁 많은 고라니 몫으로 표주박 물을 맡기셨다. 고라니에게 살금살금 다가가 말을 트고 물을 건네자.')},
   {id:'y_nal_jujube',title:'날쌘 아저씨와 아빠 사이 말 나르기',start:F=>F.yArcsNalDad1,done:F=>F.yArcsNalDad3,
-    text:F=>F.yArcsNalDad2?'날쌘에게 아빠 말 전하기':Rg.namesBack()?'아빠께 대추 갖다드리기':'아빠가 나를 알아보면 대추 드리기'},
+    text:F=>F.yArcsNalDad2?'아빠가 날쌘 아저씨께 "갚을 거 없다"고 전하라 하셨다. 산막의 날쌘 아저씨께 그 말을 전하자.'
+      :Rg.namesBack()?'아빠가 나를 알아본다. 날쌘 아저씨가 맡긴 대추 두 알을 아빠께 드리자. 산에서 주웠다고 하랬다.'
+      :'날쌘 아저씨가 대추 두 알을 맡기셨다. 아빠가 나를 알아보거든 갖다드리랬다.'},
   // 옹달 할미가 맡긴 표주박은 매듭 임자(엄마) 손에 쥐여 드릴 때(영산을 마칠 때) 끝난다.
-  {id:'y_ongdal_gourd',title:'표주박 매듭 임자에게 돌려주기',start:F=>F.yOngdal4,done:()=>regionCompleted('yeongsan'),text:()=>'표주박 매듭 임자에게 돌려주기'},
+  {id:'y_ongdal_gourd',title:'표주박 매듭 임자에게 돌려주기',start:F=>F.yOngdal4,done:()=>regionCompleted('yeongsan'),
+    text:()=>'옹달 할머니가 첫 샘물을 담은 표주박을 맡기셨다. 끈은 매듭 임자한테 돌려주랬다. 집에 가면 쥐여 드리자.'},
 ]);
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤(장부에 적힌 뒤)에만 보인다. 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.

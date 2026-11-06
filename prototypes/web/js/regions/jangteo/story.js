@@ -1413,49 +1413,82 @@ if(!CLASSIC){
 }
 
 /* ---------- 지금 할 일 ---------- */
+/* 결정 D-890: 목표(화면)와 길잡이(수첩)를 함께 돌려준다 (goalLine). "맷돌에 쌀 갈기" 같은 행동은 목표가 아니라 길잡이다.
+   길잡이는 아이가 들은 말과 본 것만 쓰고, 어른은 이름만 부르지 않는다(아주머니·아저씨·영감님·어르신). 옛 구성은 구역 이름을 뺀다.
+   결정 D-892: 모든 단계는 지금 가진 물건과 이미 일어난 일로만 고른다. 예전엔 쌀가루를 모락에게 건넨 뒤 김 올리기를 마치지 않으면
+   다시 "맷돌에 쌀 갈기"가 떠서, 쌀을 갈아도 다음으로 넘어가지 않았다. 쌀이 다 떨어졌는데 "쌀 갈기"만 뜨던 자리도 쌀 구하기로 잇는다. */
+const where=(expanded,classic='')=>CLASSIC?classic:expanded;
+// 쌀가루 need 됫박을 채우는 길. 쌀이 있으면 갈고, 모자라면 엿방울 아주머니의 솔방울 셈으로 잇는다 (모락: "쌀은 엿방울한테 있어")
+function ricePowderGuide(need,why){
+  const F=G.f,sp=G.inv.ssal_powder||0,s=G.inv.ssal||0,sb=G.inv.solbang||0,pre=why?why+' ':'';
+  if(sp+s>=need)return pre+'쌀을 맷돌에 갈아 쌀가루 '+(need===1?'한':need===2?'두':'세')+' 됫박을 채우자. 보따리를 열면 맷돌이 있다. ('+sp+'/'+need+')';
+  if(!F.yeotMet)return pre+'쌀은 엿방울 아주머니한테 있다고 모락 아주머니가 그러셨다. '+where('장터 거리의 ')+'엿방울 아주머니를 찾아가자.';
+  const more=F.yeotDone?'더 ':'';
+  if(sb>=5)return pre+'쌀이 모자란다. 엿방울 아주머니께 솔방울 다섯을 드리고 쌀 여덟 되를 '+more+'받자.';
+  return pre+'쌀이 모자란다. 엿방울 아주머니는 솔방울 다섯에 쌀 여덟 되를 '+more+'바꿔 주신다. '+where('뒷산 솔숲에서 ')+'솔방울을 줍자. ('+sb+'/5)';
+}
+const goalSteps={
+  magpie:()=>goalLine('엄마께 약떡 보내기',night()&&G.f.jxMagpieNight?'까치 어르신은 늙은 날개로 밤길은 못 난다고 하셨다. 숙소 마루에서 하룻밤 자고, 아침에 홍시 약떡을 맡기자.'
+    :'홍시 약떡을 쪘다. '+where('숙소 처마의 ')+'늙은 까치 어르신께 맡기면 엄마께 날라다 주신다.'),
+  hongsiRice:()=>goalLine('홍시 약떡 만들기',ricePowderGuide(1,'눈홍시 하나에 쌀가루 하나면 홍시 약떡이다.')),
+  hongsi:()=>goalLine('홍시 약떡 만들기','눈홍시와 쌀가루가 있다. 보따리를 열고 엄마 시루에 넣어 홍시 약떡을 찌자.'),
+  guard:()=>goalLine('창고 지키기',night()?'부엉 영감님이 오늘 밤 숙소 창고 문 앞을 지키라고 하셨다. '+where('창고 뒷길로 가 ')+'창고 문 앞에 서자.'
+    :'부엉 영감님이 그믐 밤 숙소 창고 문 앞을 지키라고 하셨다. 숙소 마루에서 쉬며 밤을 기다리자.'),
+  // 결정 D-447: 아직 말을 나눠 보지 않은 인물은 이름 대신 아이가 아는 것(숙소, 떡집)으로 부른다. 시작 글: "보부상은 장터에 오면 숙소부터 들른다"
+  inn:()=>{
+    const known=knows('met:bueong')||knows('bueong:night');
+    return goalLine('아빠 소식 묻기',night()?'밤이 되었다. '+(known?'숙소의 부엉 영감님께':'보부상 숙소 주인께')+' 말을 걸자.'
+      :knows('bueong:night')?'숙소 주인 부엉 영감님은 낮엔 주무신다. 숙소 마루에서 해 질 때까지 쉬자.'
+      :'보부상은 장터에 오면 숙소부터 들른다. 아빠도 여기 묵었을지 모른다. '+where('장터 거리 너머 ','장터의 ')+'보부상 숙소를 찾아가자.');
+  },
+  // 부엉 영감: "설 고사에 팥시루떡을 올려라" "쌀가루 두 됫박에 팥 한 되다. 시루에 쪄서"
+  offer:()=>goalLine('고사떡 올리기','팥시루떡을 쪘다. '+(night()?'숙소의 부엉 영감님께 설 고사떡으로 올리자.':'부엉 영감님은 밤에만 깨어 계신다. 숙소 마루에서 쉬며 밤을 기다렸다가 올리자.')),
+  bakery:()=>goalLine('떡 찌는 법 배우기','부엉 영감님이 팥시루떡을 쪄 오라셨다. 그런데 엄마 시루는 아직 깨어나지 않아 김이 오르지 않는다. '+where('장터 거리의 ')+'떡집에 가서 떡 찌는 법을 여쭙자.'),
+  morakPowder:()=>goalLine('떡 찌는 법 배우기',(G.inv.ssal_powder||0)>=3?'쌀가루 세 됫박이 모였다. 떡집 모락 아주머니께 건네자.'
+    :ricePowderGuide(3,'모락 아주머니네 맷돌이 깨져 떡을 못 찌신단다. 쌀가루 세 됫박을 갈아다 드리면 갚아 주신다고 했다.')),
+  steam:()=>goalLine('떡 찌는 법 배우기','모락 아주머니가 시루에 김 올리는 법을 가르쳐 주신다고 했다. 떡집에 가서 아궁이 앞에 다시 앉자.'),
+  pat:()=>goalLine('떡 재료 구하기','시루가 깨어났다. 팥시루떡은 쌀가루 둘에 팥 하나다. 팥은 '+where('장터 거리 ')+'날쌘 아저씨 좌판에서 쌀가루나 메밀가루와 바꾸자.'),
+  rice:()=>goalLine('떡 재료 구하기',ricePowderGuide(2,'팥은 구했다. 팥시루떡에는 쌀가루 두 됫박이 든다.')),
+  steamCake:()=>goalLine('팥시루떡 찌기','쌀가루 둘과 팥 하나가 모였다. 보따리를 열고 엄마 시루에 넣어 팥시루떡을 찌자.'),
+};
 Rg.goal=()=>{
-  const F=G.f;
+  const F=G.f,S=goalSteps;
   if(!G.started)return '';
   if(G.ended)return '큰 장터 체험판 완료';
-  // 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다. 밤에만 되는 일은 낮에 '밤에'를 앞에 붙인다.
-  const toNight=s=>night()?s:'밤에 '+s;
   // 결정 D-67: 앞선 진행부터 거꾸로 본다
   if(G.boss.dead){
-    if(!CLASSIC&&has('hongsi_tteok'))return night()&&G.f.jxMagpieNight?'아침에 늙은 까치에게 약떡 맡기기':'늙은 까치에게 홍시 약떡 맡기기';
-    if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return '맷돌에 쌀 갈기';
-    return '시루에 눈홍시와 쌀가루 넣어 약떡 찌기';
+    if(!CLASSIC&&has('hongsi_tteok'))return S.magpie();
+    if((G.inv.ssal_powder||0)<1&&!has('hongsi_tteok'))return S.hongsiRice();
+    return S.hongsi();
   }
-  if(F.bueongDone)return toNight('창고 문 앞 지키기');
-  // 결정 D-447: 아직 말을 나눠 보지 않은 인물은 이름 대신 아이가 아는 것(숙소, 떡집)으로 부른다. 시작 글: "보부상은 장터에 오면 숙소부터 들른다"
-  const bueongKnown=knows('met:bueong')||knows('bueong:night');
-  if(!F.bueongNight)return night()?(bueongKnown?'부엉 영감님께 말 걸기':'보부상 숙소 주인께 말 걸기'):knows('bueong:night')?'마루에서 쉬며 밤 기다리기':'보부상 숙소 찾아가기';
-  if(!F.bueongDone){
-    if(has('patsirutteok'))return toNight('부엉 영감님께 팥시루떡 올리기');
-    if(!isAwake('siru')){
-      if(!F.morakMet)return '떡집 찾아가기';
-      const sp=G.inv.ssal_powder||0,s=G.inv.ssal||0;
-      if(sp>=3)return '모락에게 쌀가루 3개 건네기';
-      if(sp+s>=3)return '맷돌에 쌀 갈기 ('+sp+'/3)';
-      if(!F.yeotMet)return '엿방울에게 쌀 구하기';
-      const sb=G.inv.solbang||0;
-      return sb>=5?'엿방울에게 솔방울 건네기':'솔방울 줍기 ('+sb+'/5)';
-    }
-    if(!has('pat'))return '날쌘에게 팥 구하기';
-    if((G.inv.ssal_powder||0)<2)return '맷돌에 쌀 갈기';
-    return '시루에 쌀가루 2개와 팥 1개 찌기';
+  if(F.bueongDone)return S.guard();
+  if(!F.bueongNight)return S.inn();
+  if(has('patsirutteok'))return S.offer();
+  if(!isAwake('siru')){
+    if(!F.morakMet)return S.bakery();
+    if(!F.morakPowder)return S.morakPowder();
+    return S.steam();   // 결정 D-892: 쌀가루는 건넸고 김 올리기만 남았다
   }
-  return toNight('창고 문 앞 지키기');
+  if(!has('pat'))return S.pat();
+  if((G.inv.ssal_powder||0)<2)return S.rice();
+  return S.steamCake();
 };
-/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다.
+   결정 D-890: 이름(title)이 목표이고, text 는 수첩에 적는 지금 단계의 길잡이다. */
 defineSideQuests(Rg.id,[
   {id:'jang_jj_soup',title:'짠돌 아저씨께 떡국 날라 드리기',start:F=>F.jangteoArcsJj1,done:F=>F.jangteoArcsJj2,
-    text:F=>F.jangteoArcsJjSoup?'짠돌 아저씨께 떡국 갖다드리기':'모락에게 떡국 부탁하기'},
-  {id:'jang_jj_salt',title:'모락에게 짠돌 아저씨 소금 전하기',start:F=>F.jangteoArcsJj3,done:F=>F.jangteoArcsJjSalt,text:()=>'모락에게 짠돌 아저씨 소금 전하기'},
-  {id:'jang_scissors',title:'엿방울의 엿가위 찾기',start:F=>F.jangteoArcsYeot2,done:F=>F.jangteoArcsYeotReturned,
-    text:F=>F.jangteoArcsScissorsFound?'엿방울에게 엿가위 돌려주기':'엿방울의 엿가위 찾기'},
-  {id:'jang_pair_tteok',title:'엿방울에게 모락 떡 전하기',start:F=>F.jangteoArcsPair1,done:F=>F.jangteoArcsPair2,text:()=>'엿방울에게 모락 떡 전하기'},
+    text:F=>F.jangteoArcsJjSoup?'모락 아주머니가 떡국을 듬뿍 싸 주셨다. 식기 전에 숙소 문간의 짠돌 아저씨께 갖다드리자.'
+      :F.steamDone?'숙소 문밖의 짠돌 아저씨가 떡집 떡국 한 그릇을 부탁했다. 밤에 떡집 모락 아주머니께 떡국을 부탁하자.'
+      :'숙소 문밖의 짠돌 아저씨가 떡집 떡국 한 그릇을 부탁했다. 그런데 떡집은 지금 떡을 못 찐다. 떡집 일을 먼저 거든 뒤 밤에 부탁하자.'},
+  {id:'jang_jj_salt',title:'모락 아주머니께 짠돌 아저씨 소금 전하기',start:F=>F.jangteoArcsJj3,done:F=>F.jangteoArcsJjSalt,
+    text:()=>'짠돌 아저씨가 떡 간 맞출 소금 한 봉을 슬쩍 밀어 주셨다. 낮에 떡집 모락 아주머니께 전하자. 값은 안 받으신단다.'},
+  {id:'jang_scissors',title:'엿방울 아주머니 엿가위 찾기',start:F=>F.jangteoArcsYeot2,done:F=>F.jangteoArcsYeotReturned,
+    text:F=>F.jangteoArcsScissorsFound||G.boss.dead?'창고에서 엿가위를 찾았다. '+where('장터 거리의 ')+'엿방울 아주머니께 돌려드리자.'
+      :'엿방울 아주머니는 작년 그믐 밤 도깨비에게 엿가위를 빼앗겼단다. 밤마다 물건이 사라지는 창고의 도둑을 잡으면 엿가위도 찾을지 모른다.'},
+  {id:'jang_pair_tteok',title:'엿방울 아주머니께 모락 아주머니 떡 전하기',start:F=>F.jangteoArcsPair1,done:F=>F.jangteoArcsPair2,
+    text:()=>'모락 아주머니가 따끈한 떡 보자기를 엿방울 아주머니께 갖다 달라고 하셨다. 직접 주면 안 받는단다. 바로 옆 엿수레로 가자.'},
   {id:'jang_elder_night',title:'곰방대 할아버지 밤 이야기 듣기',start:F=>F.jangteoArcsElder1,done:F=>F.jangteoArcsElder2,
-    text:()=>night()?'곰방대 할아버지께 말 걸기':'밤에 곰방대 할아버지 찾아가기'},
+    text:()=>'곰방대 할아버지가 밤에 다시 와 보라고 하셨다. '+(night()?'바둑판 곁 화롯불 앞의 할아버지께 가자.':'숙소 마루에서 쉬며 밤을 기다리자.')},
 ]);
 
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
