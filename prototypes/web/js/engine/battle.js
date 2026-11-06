@@ -31,10 +31,15 @@ const BATTLE_FORM_HINTS={'':'너구리 · 익숙한 몸놀림',squirrel:'다람�
    - 부위마다 잘 먹는 도구는 boss_parts.csv 잘먹는도구 칸(p.tool). 잘 먹으면 battle_tool_good_damage 만큼 깎고
      (날 세운 낫이 더 크면 그 값), 안 먹으면 피해와 재료 확률에 battle_tool_bad_mult 를 곱한다. 칸이 비면 가리지 않는다. */
 const BATTLE_TOOL_ORDER=['sickle','pick'];
+/* 결정 D-945: 컴퓨터·휴대폰 모두 보스 전투에서 도구를 바꾸지 못하던 문제 (사용자 지시 2026-11-06 다섯 번째 묶음 16).
+   원인: 전투 곡괭이는 무쇠 시험 끝(grantTool)에만 들어왔다. 바로가기(앞 지역을 마친 것으로 치는 시작)는 무쇠를 마친 것으로 치면서
+   곡괭이를 넣지 않아, 들고 있는 도구가 낫 하나뿐이라 Q 키·도구 단추가 아무 일도 하지 않았다.
+   이제 무쇠 시험을 마쳤거나(musoeTested) 낫을 받았으면(musoeDone) 전투 곡괭이도 가진 것으로 본다. 단풍골 처음 길(낫을 받기 전)은 그대로다. */
 function ownedBattleTools(){
   const own=new Set();
   if(G.tool==='sickle'||G.tool==='pick')own.add(G.tool);
   if(Array.isArray(G.f.battleTools)&&G.f.battleTools.includes('pickaxe'))own.add('pick');
+  if(G.f.musoeTested||G.f.musoeDone)own.add('pick');
   return BATTLE_TOOL_ORDER.filter(id=>own.has(id));
 }
 function battleTool(){return B&&!B.E.dodge&&!B.noTool?B.tool||null:null;}
@@ -207,7 +212,8 @@ function renderBHud(){
   // 결정 D-244: 방금 맞은 부위 줄은 이름과 내구도 칸이 한 번 번쩍인다 (친 바로 그 그리기에만 붙여 다시 그려도 되풀이하지 않는다)
   B.parts.forEach(p=>{const r=el('div','b-part'+(p.broken?' broken':'')+(p.hitAt!=null&&B.time-p.hitAt<2?' hit'+(p.hitGood?' good':''):''));r.appendChild(el('span','nm',p.name));
     // 결정 D-224: 부위 옆 작은 그림이 잘 먹는 도구다. 지금 든 도구와 맞으면 진하게
-    if(p.tool&&!p.broken){const k=el('span','b-fit'+(p.tool===battleTool()?' on':''));k.title=toolName(p.tool)+'이 잘 먹는다';k.appendChild(icon(p.tool));r.appendChild(k);}
+    // 결정 D-944: 든 도구와 같으면 금빛 바탕에 이름까지 밝게(css .b-fit.on), 다르면 잿빛으로 흐리게
+    if(p.tool&&!p.broken){const on=p.tool===battleTool(),k=el('span','b-fit'+(on?' on':''));k.dataset.tool=p.tool;k.title=toolName(p.tool)+(on?'을 들었다 · 잘 먹는다':'이 잘 먹는다');k.appendChild(icon(p.tool));k.appendChild(el('span','b-fit-name',toolName(p.tool)));r.appendChild(k);}
     // 안 먹는 도구로 친 반 칸은 칸의 반만 채운다
     const pp=el('span','pp');for(let i=0;i<p.max;i++){const d=document.createElement('i');const f=clamp(p.hp-i,0,1);if(f<=0)d.className='off';else if(f<1){d.className='half';d.style.setProperty('--f',Math.round(f*100)+'%');}pp.appendChild(d);}r.appendChild(pp);
     if(p.broken)r.appendChild(el('span','tag',B.E.npc?'꺾임':'부러짐'));else if(p.core&&hidden)r.appendChild(el('span','tag','가려짐'));
@@ -434,7 +440,9 @@ function bStep(){
     case 'finale':if(B.E.finale.step())bEnd('win');break;
     case 'open':
       if(B.mark&&--B.mark.t<=0){B.mark=null;B.msg='빈틈이 닫혔다.';}
-      if(!B.mark&&!B.bullets.length){B.st='idle';B.t=36;}break;
+      // 결정 D-940: 상대가 B.openHold 를 두면 표식이 없어도 그만큼 빈틈(선물 건넬 틈)이 이어진다 (눈도깨비가 기세를 올릴 때)
+      if(B.openHold>0)B.openHold--;
+      if(!B.mark&&!B.bullets.length&&!(B.openHold>0)){B.st='idle';B.t=36;}break;
     case 'end':if(--B.t<=0)showResult();return;
   }
   const X1=BOX.x,X2=BOX.x+BOX.w,Y1=BOX.y,Y2=BOX.y+BOX.h;

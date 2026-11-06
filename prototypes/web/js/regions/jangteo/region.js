@@ -177,10 +177,11 @@ function beanSeller(){
   if(G.f.jxBeanDone){talk([['까투리 아주머니','자루 밑을 두 번 꿰맸어.\n이제 장 끝날 때까지 끄떡없지!']]);return;}
   talk([
     ['까투리 아주머니','어머, 어머! 자루 밑이 터졌네!\n콩이 눈밭으로 다 굴러간다!'],
-    ['까투리 아주머니','새들이 먼저 보면 끝장이야!',[
+    // 결정 D-964: 까투리도 새라 '새들이'는 이상하다 (사용자 피드백 2026-11-06 큰 장터 4). 콩밭을 터는 멧비둘기를 콕 집어 말한다
+    ['까투리 아주머니','멧비둘기 떼가 먼저 보면 끝장이야!\n그 녀석들은 콩 한 알에 눈밭도 다 파헤친다니까!',[
       {t:'같이 콩을 쓸어 담는다',go:()=>talkGive([
         ['너구리','(눈 위에 흩어진 콩을 손바닥으로 쓸어 자루에 담았다.\n아주머니가 터진 데를 짚으로 동여맨다.)'],
-        ['까투리 아주머니','휴, 다 건졌네. 혼자였으면 새들 잔치 났겠어!'],
+        ['까투리 아주머니','휴, 다 건졌네. 혼자였으면 멧비둘기들 잔치 났겠어!'],
         ['까투리 아주머니','콩장수는 콩으로 갚아야지.\n한 되 넉넉히 담았다!'],
         gotLine('kong')
       ],()=>{G.f.jxBeanDone=true;record('bean','장터 거리에서 까투리 아주머니의 콩 자루가 터져 같이 쓸어 담았다. 콩 한 되를 받았다.');finishWanderer('j_bean');})},
@@ -375,6 +376,86 @@ function oldMagpie(){
   ]);
 }
 
+/* 결정 D-970: 살펴보기 장면 그림 (사용자 피드백 2026-11-06 "애니메이션이랑 말하는 내용이랑 맞는 게 하나도 없다. 미니 애니메이션은 내용을 더 자세히 보게 하는 장치").
+   필드를 잘라 확대하던 그림이 글이 말하는 것을 담지 못하던 살펴보기에 64×44 장면 그림을 단다(엔진 PA-229: 살펴보기의 pic).
+   글이 진행에 따라 바뀌는 곳은 그림도 같은 조건으로 바꾼다. */
+const EP={};
+const snowFloor=(w,h,g)=>{R(0,g,w,h-g,'#e4eaec');R(0,g,w,1,'#ffffff');for(let x=3;x<w;x+=9)R(x,g+3+(x%3),4,1,'#cfd8db');};
+EP.pillar=()=>({animate:true,draw(w,h,t){
+  const k=t%4,rm=Vfx.reducedMotion,nt=!!G.f.night;
+  R(0,0,w,h,nt?'#3a3240':'#d9c9aa');R(0,0,w,3,nt?'#2a2430':'#c4b08c');
+  R(26,0,12,h,'#8a6448');R(27,0,2,h,'#b08a62');R(36,0,2,h,'#6a4a34');   // 숙소 기둥
+  // 층층이 그은 금. 아래 것은 낮고 촘촘하고(아이들 키), 위 것은 띄엄띄엄 굵다(짐 높이)
+  for(const [y,len,thick] of [[36,7,1],[33,6,1],[31,8,1],[28,6,1],[25,7,1],[18,12,2],[10,12,2]])R(26+Math.round((12-len)/2),y,len,thick,'#3e2a1c');
+  R(27,18,10,1,'#c9a06a');R(27,10,10,1,'#c9a06a');
+  // 아이 손이 제 키 높이의 금에 닿는다 (아래에서 올라와 멈춘다)
+  const up=rm?1:Math.min(1,(k%4)/1.2),hy=Math.round(44-up*16);
+  R(39,hy,6,4,'#8c8070');R(39,hy,2,2,'#5a5048');R(43,hy+4,4,h-hy,'#8c8070');
+  if(up>=1)R(25,28,1,1,'#ffffff');
+  snowFloor(w,h,41);
+}});
+EP.branch=()=>({animate:true,draw(w,h,t){
+  const k=t%5,rm=Vfx.reducedMotion,started=!!G.f.jxBoarStarted;
+  R(0,0,w,h,'#c9d6d6');R(0,0,w,8,'#b8c8ca');
+  for(let i=0;i<4;i++)R(i*18-4,4,14,18,'#46664f');   // 뒤 솔숲
+  snowFloor(w,h,30);
+  // 꺾여 눈에 반쯤 묻힌 솔가지: 갈라진 생나무 속, 송진 방울
+  R(10,27,30,3,'#6b4423');R(38,24,4,4,'#d9b77a');R(39,25,2,2,'#f1dcae');
+  for(let x=12;x<36;x+=5){R(x,24,1,3,'#2f5a3a');R(x+2,25,1,2,'#4f7a4f');}
+  R(40,28,1,1,'#f0c040');R(41,29,1,1,'#f8e080');
+  const swept=started?(rm?1:Math.min(1,k/1.2)):0;
+  if(swept<1)R(10+Math.round(swept*28),22,30-Math.round(swept*28),3,'#ffffff');   // 가지 위 눈
+  if(started){   // 아이 손바닥이 눈을 쓸고, 알밤이 코가 냄새를 맡는다
+    const hx=10+Math.round(swept*28);R(hx,18,5,4,'#8c8070');
+    R(48,30,12,8,'#7a5a3a');R(46,32,3,3,'#5a3e28');R(46,33,1,1,'#1a120c');for(let x=50;x<58;x+=3)R(x,31,1,6,'#9a7a52');
+  }
+  // 송진 냄새가 피어오른다
+  if(!rm)for(let j=0;j<3;j++){const ph=(k*0.5+j*0.33)%1;R(36+j*3,20-Math.round(ph*14),1,2,'rgba(240,200,90,'+(0.7-ph*0.6).toFixed(2)+')');}
+}});
+EP.needles=()=>({animate:true,draw(w,h,t){
+  const k=t%5,rm=Vfx.reducedMotion,found=!!G.f.jxBoarScent1;
+  R(0,0,w,h,'#c9d6d6');
+  R(30,8,30,26,'#8a9490');R(32,6,26,4,'#9ea8a4');R(30,6,30,2,'#ffffff');R(46,14,2,14,'#6f7a76');   // 큰 바위
+  snowFloor(w,h,33);
+  // 바위 밑 바람 그늘에 모인 마른 솔잎
+  for(let x=14;x<36;x+=2)R(x,31-(x%3),1,3,'#9b8357');R(12,33,26,1,'#78684c');
+  // 바람 줄기가 바위에 막혀 비켜 간다
+  if(!rm)for(let j=0;j<3;j++){const ph=(k*0.6+j*0.3)%1,x=Math.round(2+ph*26);R(x,10+j*5,5,1,'rgba(255,255,255,'+(0.8-ph*0.5).toFixed(2)+')');}
+  if(found){const ph=rm?0.5:(k*0.4)%1;for(let j=0;j<3;j++)R(18+j*5,27-Math.round(ph*10)-j,1,2,'rgba(200,170,110,'+(0.7-ph*0.6).toFixed(2)+')');}   // 따뜻한 풀 냄새
+}});
+EP.storeDoor=()=>({animate:true,draw(w,h,t){
+  const k=t%5,rm=Vfx.reducedMotion,nt=!!G.f.night,done=!!G.boss.dead;
+  R(0,0,w,h,nt?'#1b2440':'#cdd8de');
+  R(16,0,32,32,'#493d3b');R(22,6,20,26,'#222f3a');R(31,6,2,26,'#678393');R(14,0,36,3,'#243b48');   // 창고 큰 문
+  snowFloor(w,h,32);
+  if(!done){
+    // 큰 발자국이 문 앞을 빙 돈다. 하나씩 차례로 드러난다
+    const steps=[[6,38],[13,35],[21,39],[29,36],[37,39],[45,35],[53,38]];
+    steps.forEach(([x,y],i)=>{if(rm||k>i*0.35){R(x,y,4,3,'#9fb0b8');R(x,y-1,1,1,'#9fb0b8');R(x+3,y-1,1,1,'#9fb0b8');}});
+    // 빗자루로 쓴 듯 끌린 자국
+    for(let x=4;x<60;x+=2)R(x,41+(x%4===0?1:0),1,1,'#b8c6cc');
+  }else{
+    // 돌아온 물건: 자루, 짐짝, 그 사이 날 반질한 엿가위
+    R(4,25,10,8,'#c9b991');R(5,24,8,2,'#d8caa4');R(50,24,10,9,'#9b724c');R(51,23,8,2,'#b88e62');
+    if(Rg.arcs()&&!G.f.jangteoArcsYeotReturned){const gl=rm?0:Math.floor(k*3)%2;R(36,34,10,1,'#c9ced2');R(36,36,10,1,'#c9ced2');R(45,34,3,3,'#8a3b2a');if(gl)R(38,34,1,1,'#ffffff');}
+  }
+}});
+EP.beans=()=>({animate:true,draw(w,h,t){
+  const k=t%4,rm=Vfx.reducedMotion,nt=!!G.f.night,done=!!G.boss.dead;
+  R(0,0,w,h,nt?'#2a2a3a':'#e8e0d0');
+  R(8,0,6,34,'#6b4934');R(9,0,2,34,'#8a6448');   // 좌판 기둥
+  if(!nt){R(0,4,40,4,'#a8432f');R(0,8,40,1,'#7a2f22');}   // 낮엔 차일
+  snowFloor(w,h,33);
+  if(!done){
+    const bean=(x,y)=>{R(x+1,y,2,1,'#cdb06a');R(x,y+1,4,1,'#e2c983');R(x+1,y+2,2,1,'#9c8248');};
+    for(const [x,y] of [[15,30],[19,30],[23,30],[17,27],[21,27],[19,24]])bean(x,y);
+    // 기둥 둘레 눈밭의 큰 발자국 (내 발 셋 만큼)
+    for(const [x,y] of [[32,37],[44,35],[56,38]]){R(x,y,6,3,nt?'#7a8494':'#b8c4ca');R(x,y-1,1,1,nt?'#7a8494':'#b8c4ca');R(x+5,y-1,1,1,nt?'#7a8494':'#b8c4ca');}
+    const pw=rm?1:Math.min(1,k/1.2);R(36,37,2,2,'#5a5048');R(38,37,2,2,'#5a5048');if(pw>0.6)R(32+Math.round(pw*4),34,1,1,'#ffffff');   // 견주어 본 내 작은 발자국
+  }
+}});
+Rg.examinePics=EP;
+
 Rg.expEncounters={
   wanderers:{
     entrance:[{id:'j_straw',name:'청설모 할아범',x:360,talk:strawSeller,draw:draw('straw'),greeting:'새 끈은 질기구먼.\n오늘 장은 짚신 흘릴 걱정이 없겠어.'},{id:'j_kite',name:'얼레',x:1010,talk:kiteChild,draw:draw('kite'),greeting:'이번엔 줄을 짧게 잡았어!\n붉은 차일 뒤에서 동생을 기다릴 거야.'}],
@@ -409,12 +490,13 @@ Rg.expEncounters={
       // 결정 D-316: 밤 골목 지름길을 뺐다.
       // 결정 D-783: 좌판 기둥 밑에 모인 콩알 (사용자 피드백 2026-11-05). 장터 바닥에 있을 리 없는 콩이 왜 여기 모였는지 아이가 궁금해한다.
       // 밤마다 몸을 감춘 도둑(눈도깨비)이 훔친 콩 자루를 기둥에 기대 두었다 가져가며 샌 콩이다. 결정 D-860: 기둥 둘레엔 그 큰 발자국이 남았다(모습만 안 보인다). 도깨비를 물리친 뒤엔 치워졌다.
-      {id:'j_stall_gap',x:340,label:'좌판 사이 골목',get text(){
+      {id:'j_stall_gap',x:340,label:'좌판 사이 골목',get pic(){return Rg.examinePics.beans();},get text(){
         if(G.boss.dead)return ['기둥 밑에 모여 있던 콩알이 말끔히 치워졌다.','밤마다 여기 콩 자루를 기대 두던 게 누구였는지\n이젠 알 것 같다.'];
         return [G.f.night?'차일을 걷고 판을 접으니 골목이 휑하다.\n좌판 기둥 밑 콩알만 그대로 모여 있다.':'좌판 기둥 밑에 콩알이 소복이 모여 있다.\n장터 바닥에 콩이 왜 이렇게 모여 있지?',
           '여긴 콩 파는 좌판도 아닌데.\n누가 여기 콩 자루를 기대 뒀다 가져갔나?',
           '기둥 둘레 눈밭에 큰 발자국이 찍혀 있다.\n내 발 셋을 이어 놓은 만큼 크다.'];
       }},
+      // 결정 D-972: 독 소리는 은은하게 공기 중으로 퍼진다 (design/data/music/sfx.json onggi_ring)
       // 결정 D-784: 작은 창에서 아이 손끝이 독을 퉁기고, 닿는 순간 맑은 울림이 둘레로 번진다 (art.js onggiPic, 소리 onggi_ring)
       {id:'j_onggi',x:575,label:'옹기전 독',peek:false,get text(){
         if(typeof peekPicture==='function'&&Rg.onggiPic)peekPicture(Rg.onggiPic().draw,{animate:true});
@@ -429,25 +511,25 @@ Rg.expEncounters={
     ],
     inn:[
       // 결정 D-791: '마루 아래 신발'은 숙소 아궁이 불 지피기(field.js j_inn_fire)로 바꿨다 (사용자 피드백 2026-11-05 "뭘 위해서 있는건지 모르겠음")
-      {id:'j_inn_pillar',x:1210,label:'기둥의 키 자국',text:'기둥에 작은 금이 층층이 그어져 있다.\n짐 높이를 잰 걸까, 해마다 온 아이들 키일까?'},
+      {id:'j_inn_pillar',x:1210,label:'기둥의 키 자국',get pic(){return Rg.examinePics.pillar();},text:'기둥에 작은 금이 층층이 그어져 있다.\n짐 높이를 잰 걸까, 해마다 온 아이들 키일까?'},
       // 결정 D-794: '처마 끝 고드름' 조사를 뺐다 (사용자 피드백 2026-11-05 "필요없다")
       {id:'j_inn_stable',x:2110,label:'마구간 나귀',get text(){return G.f.night?'나귀가 선 채로 졸다가 귀만 쫑긋한다.\n여물통에 짚이 반쯤 남았다.':'짐을 부린 나귀가 여물을 씹는다.\n숙소에 묵는 보부상들은 짐을 나귀에 실어 온다.';}}
     ],
     pine:[
-      {id:'j_pine_scent1',x:1730,label:'부러진 솔가지',get text(){
+      {id:'j_pine_scent1',x:1730,label:'부러진 솔가지',get pic(){return Rg.examinePics.branch();},get text(){
         if(!G.f.jxBoarStarted)return '눈 아래 가지 하나가 부러져 있다.\n진한 송진 냄새. 코끝이 얼얼하다.';
         G.f.jxBoarScent1=true;return '솔가지에 쌓인 눈을 손바닥으로 털었다.\n알밤이가 코를 들고 마른 솔잎 쪽으로 간다.';
       }},
-      {id:'j_pine_scent2',x:1870,label:'눈 아래 마른 솔잎',get text(){
+      {id:'j_pine_scent2',x:1870,label:'눈 아래 마른 솔잎',get pic(){return Rg.examinePics.needles();},get text(){
         if(!G.f.jxBoarScent1)return '큰 바위 밑에 마른 솔잎이 모였다.\n바람은 여기를 비켜 가는 모양이다.';
         G.f.jxBoarScent2=true;return '마른 솔잎 아래에서 따뜻한 풀 냄새가 났다.\n알밤이가 오른쪽 잠자리를 알아보고 뛰어간다.';
       }},
       {id:'j_pine_scale',x:2280,y:128,label:'큰 바위의 솔방울 비늘',text:'솔방울 비늘이 바위 틈에 차곡차곡 끼었다.\n작은 발자국 아래에는 훨씬 오래된 붉은 자국이 있다.'}
     ],
     warehouse:[
-      {id:'j_warehouse_rope',x:400,label:'접어 둔 좌판 끈',text:'끈 끝을 한데 묶어 바구니에 담았다.\n아침엔 이걸 풀어 다시 장을 펼치겠지.'},
+      {id:'j_warehouse_rope',x:400,label:'접어 둔 좌판 끈',text:'장꾼들이 좌판 끈 끝을 한데 묶어 바구니에 담아 두었다.\n아침엔 이걸 풀어 다시 장을 펼치겠지.'},
       {id:'j_warehouse_fire',x:1780,label:'짐꾼 화톳불 자리',text:'짐꾼들이 짐을 부리며 쬐던 화톳불 자리다.\n재 속에 군밤 껍질이 묻혀 아직 따뜻하다.'},
-      {id:'j_warehouse_scratches',x:1230,label:'창고 문 앞 큰 발자국',get text(){return G.boss.dead?(Rg.arcs()&&!G.f.jangteoArcsYeotReturned?'창고 문 옆에 돌아온 물건들이 놓였다.\n그 사이에 날이 반질한 엿가위 하나. 장터 엿장수 거겠지?':'창고 문 옆에 돌아온 물건들이 놓였다.\n아침에 찾아갈 자리가 저마다 비어 있다.'):'눈 위에 큰 발자국이 찍혀 창고 문 앞만 빙빙 돌았다.\n발자국 곁으로 빗자루로 쓴 듯한 자국이 끌려 있다.';}},
+      {id:'j_warehouse_scratches',x:1230,label:'창고 문 앞 큰 발자국',get pic(){return Rg.examinePics.storeDoor();},get text(){return G.boss.dead?(Rg.arcs()&&!G.f.jangteoArcsYeotReturned?'창고 문 옆에 돌아온 물건들이 놓였다.\n그 사이에 날이 반질한 엿가위 하나. 장터 엿장수 거겠지?':'창고 문 옆에 돌아온 물건들이 놓였다.\n아침에 찾아갈 자리가 저마다 비어 있다.'):'눈 위에 큰 발자국이 찍혀 창고 문 앞만 빙빙 돌았다.\n발자국 곁으로 빗자루로 쓴 듯한 자국이 끌려 있다.';}},
       {id:'j_warehouse_mended',x:2470,y:128,label:'기운 멍석',get text(){return G.boss.dead?'바느질한 모서리에 눈 한 톨 안 묻었다.\n누가 멍석을 얌전히 접어 놓고 갔다.':'멍석 한 귀를 다른 색 짚으로 기웠다.\n헌것도 함부로 버리지 않는 장터구나.';}}
     ]
   }
