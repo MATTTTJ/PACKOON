@@ -85,6 +85,62 @@ Rg.ambient=()=>{for(const l of snow){l.y+=l.s;l.p+=0.02;l.x+=Math.sin(l.p)*0.3-0
 Rg.drawFront=()=>{for(const l of snow)R(l.x,l.y,Math.sin(l.p)>0.3?2:1,Math.sin(l.p)>0.3?2:1,'#ffffff');
   if(night()){ctx.fillStyle='rgba(10,14,40,.18)';ctx.fillRect(0,0,W,H);}};
 
+/* ---------- 결정 D-864: 처마 고드름 (사용자 피드백 2026-11-06 "고드름에 부딪히면 고드름 떨어지거나 깨지면서 주인공과 상호작용. 전투처럼 체력에 손해보지는 않는다") ----------
+   어귀·거리·숙소의 낮은 처마(기둥 위 판, y>=130) 앞쪽 끝에 고드름이 줄지어 달린다(art.js drawPlatforms가 Rg.drawIcicles로 그린다).
+   처마 밑을 지나거나 뛰어올라 머리가 고드름 끝에 닿으면 고드름이 똑 떨어져 바닥에서 깨진다. 소리(ice_tinkle)와 함께
+   아이가 움찔 웅크렸다 펴고(짧은 깡충), 처음 한 번은 속말을 한다. 체력은 줄지 않는다(hurt를 부르지 않는다).
+   깨진 고드름은 밤낮이 바뀌면(숙소에서 쉬면) 다시 언다. */
+const ICE_ZONES=['entrance','street','inn'];
+const icicleBroken=new Set(),icicleFall=[];let icicleNight=null,icicleSaid=false,icicleFlinch=0;
+function icicleList(p){   // 처마 판 하나에 달린 고드름: 자리마다 같은 길이 (판 좌표로 정한다)
+  const out=[];let s=((p.x*73856093)^(p.y*19349663))>>>0;const rnd=()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296;
+  for(let x=p.x+6,i=0;x<p.x+p.w-6;x+=8+Math.round(rnd()*7),i++)out.push({key:G.zone+':'+p.x+':'+i,x,top:p.y+6,len:4+Math.round(rnd()*6)});
+  return out;
+}
+const icicleEaves=()=>!CLASSIC&&ICE_ZONES.includes(G.zone)?fieldPlatforms().filter(p=>p.y>=130):[];
+Rg.icicles={list:p=>icicleList(p),broken:()=>icicleBroken.size,falling:()=>icicleFall.length};   // 검사용으로 들여다보는 창
+Rg.drawIcicles=(p,x)=>{   // art.js에서 처마 판을 그린 바로 뒤에 부른다. x는 화면 좌표
+  if(CLASSIC||!ICE_ZONES.includes(G.zone)||p.y<130)return;
+  const body=night()?'#8fb0c4':'#a8c6d6',hi=night()?'#c9dbe4':'#e1edf0',dk=night()?'#5f7f96':'#7fa4bb';
+  for(const c of icicleList(p)){if(icicleBroken.has(c.key))continue;const sx=Math.round(x+c.x-p.x);
+    R(sx-1,c.top,3,Math.max(2,c.len-3),body);R(sx,c.top,1,c.len,hi);R(sx+1,c.top+1,1,Math.max(1,c.len-4),dk);}
+};
+function heroTopY(){   // 머리끝 높이. 변신마다 키가 다르고, 구르는 동안은 낮다
+  if(typeof rolling!=='undefined'&&rolling)return G.py-10;
+  return G.py-({squirrel:10,owl:16,goat:22,gorani:24}[G.form]??22);
+}
+function icicleStep(){
+  if(icicleNight!==night()){icicleNight=night();icicleBroken.clear();}
+  if(icicleFlinch>0)icicleFlinch--;
+  for(const f of icicleFall){
+    if(f.y<f.ground){f.vy+=0.35;f.y=Math.min(f.ground,f.y+f.vy);if(f.y>=f.ground){Sound.playSfx?.('ice_tinkle');
+      f.bits=[-1.4,-0.6,0.3,1.1,1.7].map((vx,i)=>({x:f.x,y:f.ground-1,vx,vy:-1.2-(i%3)*0.5}));}}
+    else{f.t++;for(const b of f.bits||[]){b.x+=b.vx;b.vy+=0.25;b.y=Math.min(f.ground,b.y+b.vy);}}
+  }
+  for(let i=icicleFall.length-1;i>=0;i--)if(icicleFall[i].t>26)icicleFall.splice(i,1);
+  if(paused())return;
+  const top=heroTopY();
+  for(const p of icicleEaves()){if(G.px<p.x-6||G.px>p.x+p.w+6)continue;
+    for(const c of icicleList(p)){
+      if(icicleBroken.has(c.key)||Math.abs(c.x-G.px)>5)continue;
+      const tip=c.top+c.len;if(!(top<=tip&&G.py>tip))continue;   // 머리가 고드름 끝에 닿았다(판 위에 선 동안은 닿지 않는다)
+      icicleBroken.add(c.key);icicleFall.push({x:c.x,y:c.top,len:c.len,vy:G.vy<0?-0.6:0,ground:fieldGround(),t:0});
+      Sound.playSfx?.('ice_tinkle');
+      if(G.vy<0)G.vy=Math.max(G.vy,-0.4);   // 뛰어오르다 박으면 거기서 멈칫한다
+      else if(G.onGround&&icicleFlinch<=0){G.vy=-1.4;G.onGround=false;}   // 걷다 닿으면 움찔 깡충
+      if(icicleFlinch<=0&&!icicleSaid){icicleSaid=true;think('아야! 처마 고드름에 정수리를 박았다.\n똑 떨어져서 깨졌네. …차가워.');}
+      icicleFlinch=30;
+    }
+  }
+}
+function drawIcicleFall(){
+  for(const f of icicleFall){const sx=Math.round(f.x-cam);
+    if(!f.bits){R(sx-1,Math.round(f.y),3,Math.max(2,f.len-3),'#a8c6d6');R(sx,Math.round(f.y),1,f.len,'#e1edf0');continue;}
+    const a=Math.max(0,1-f.t/26);for(const b of f.bits)R(Math.round(b.x-cam),Math.round(b.y),1,1,'rgba(225,237,240,'+a.toFixed(2)+')');
+    R(sx-2,f.ground-1,5,1,'rgba(225,237,240,'+(a*0.8).toFixed(2)+')');   // 바닥에 흩어진 얼음 가루
+  }
+}
+
 /* ---------- 진행 ---------- */
 Rg.maxX=()=>2330;
 Rg.step=()=>{
@@ -101,7 +157,7 @@ Rg.faint=()=>{G.px=Math.max(60,G.px-80);think('아이코, 미끄러졌다. 살�
 Rg.bossDie=calm=>{
   G.boss.dead=true;addItem('nunhongsi',1);
   if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
-  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔고, 발자국은 밤새 내린 눈이 덮었다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
+  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔다. 발자국은 남았어도 몸이 보이지 않으니 아무도 임자를 못 봤던 것이다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
   think('눈홍시다! 시루에 찌면 홍시 약떡이 되겠다.');refreshGoal();
 };
 Rg.STORE_X=STORE_X;
@@ -246,7 +302,7 @@ if(!CLASSIC){
   const originalState=Rg.newState;
   Rg.newState=()=>{const s=originalState();s.pickups=[];s.boss.x=Rg.STORE_X;return s;};
   const peg=(x,y)=>{R(x-1,y-17,2,17,'#6b4934');R(x-9,y-19,18,7,'#ead4a6');R(x-6,y-17,11,1,'#784b36');};
-  const glint=(x,y)=>pawStamp(x,y,'#a85344');
+  const glint=(x,y,mini)=>pawStamp(x,y,'#a85344',false,mini);
   // 결정 D-319: 뒷산 돌계단 들머리의 작은 말뚝 (계단 그림은 art.js 거리·솔숲 배경)
   const stairPost=(x,y)=>{R(x-1,y-15,3,15,'#6b4934');R(x-6,y-18,13,5,'#ead4a6');R(x-4,y-16,9,1,'#784b36');R(x+3,y-17,3,3,'#784b36');};
   const shutter=(x,y)=>{R(x-17,y-35,34,35,'#705346');for(let i=0;i<5;i++)R(x-15+i*6,y-33,2,30,'#987459');R(x-18,y-22,36,3,'#b64e41');};
@@ -291,9 +347,10 @@ if(!CLASSIC){
     },
     drawPickup:Rg.drawPickup,onHit:Rg.onHit,ambient:Rg.ambient,
     weather:()=>{if(Rg.springRevisit())Vfx.setWeather('');else Rg.weather();},
-    weatherFront(){Rg.expArt.drawFront?.(id);},
+    weatherFront(){drawIcicleFall();Rg.expArt.drawFront?.(id);},   // 결정 D-864: 떨어져 깨지는 고드름
     faint(){G.px=Math.max(60,G.px-80);G.py=GROUND;G.vy=0;think('눈을 털고 다시 걷자.');},
     step(){
+      icicleStep();   // 결정 D-864: 처마 고드름
       const legacy=G.pickups.filter(a=>a.item==='solbang'&&!a.zone);
       if(legacy.length){
         const pine=G.pickups.filter(a=>a.zone==='pine');
@@ -366,7 +423,7 @@ if(!CLASSIC){
       exits:{right:{to:'street',toX:60}},
       doors:[],   // 결정 D-316: 지붕길 문(→거리 지붕)은 뺐다
       wanderers:E.wanderers.entrance,examines:E.examines.entrance,
-      stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint,base:'none',face:18}],   // D-116·D-778: 깃대 밑동을 감싼 나무판 앞면에 찍는다(판은 art.js flag)
+      stamps:[{id:'flag',x:720,note:'stamp:jangteo:flag',draw:glint,base:'none',face:17,mini:true}],   // D-116·D-778: 깃대 밑동을 감싼 나무판 앞면에 찍는다(판은 art.js flag). D-861: 작은 손바닥
     },
     street:{...common('street'),name:TABLES.ZONES.jangteo.street,w:2800,npcs:['morak','yeotbang','nal'],
       // 결정 D-315·D-316: 공중에 뜬 긴 지붕(610·2550)과 떡집 높은 마루(1250, y110)는 뺐다. 처마 계단 둘만 남는다.
@@ -402,7 +459,8 @@ if(!CLASSIC){
       // 결정 D-44: 뒷산에서 장터로는 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
       // 결정 D-319: 올라온 돌계단으로 내려가 거리의 그 돌계단 아래(2180)로 나온다. 지붕길 문(→거리 지붕)은 뺐다(D-316).
       doors:[{x:70,to:'street',toX:2180,label:'돌계단 따라 장터로 내려가기',descend:true,draw:stairPost}],
-      exits:{left:{to:'street',toX:2180}},
+      // 결정 D-863: 솔숲 왼쪽 끝으로 걸어가 장터로 넘어가는 출구는 뺐다. 내려가는 길은 '돌계단 따라 장터로 내려가기' 하나 (사용자 피드백 2026-11-06)
+      exits:{},
       get wanderers(){return night()?[...E.wanderers.pine,...nightLanterns('pine')]:[];},examines:E.examines.pine,
       stamps:[{id:'rock',x:2410,y:96,note:'stamp:jangteo:rock',draw:glint}],
       vistas:[{id:'lantern_river',x:2570,y:96,from:0,to:420,sound:'wind',draw:peg,
