@@ -26,10 +26,13 @@ Rg.strangers={
     trades:[{give:{acorn:2},get:{eoksae:1}}],swapPool:['eoksae','memil'],
     talk(form){
       if(form==='owl')return strangerSay([['너구리','(꾸벅이가 가시를 세우고 동그랗게 몸을 만다.)']]);
-      if(form==='deer'&&strangerOnce('dol_kkubeogi_deer'))return strangerSay([
-        ['꾸벅이','고라니구나… 너는 안 찌를게…\n둥지 짓다 남은 거 가져가…'],receiveItem('eoksae',1),
-        ['꾸벅이','근데 그 족제비 있잖아…\n너구리 꼬마보다 하루 먼저 왔더라…'],
-        ['꾸벅이','쿨…']],()=>{diary('dol_kkubeogi_deer','고라니 모습으로 가니 꾸벅이가 경계를 풀었다. 꾸벅이가 날쌘이 나보다 하루 먼저 마을에 왔다고 했다.');});
+      // 결정 D-1006: 고라니 변신이 수달 변신으로 바뀌었다 (D-1073, 영산 갈래). 꾸벅이가 경계를 푸는 손님도 수달로.
+      //   고슴도치는 물가 짐승을 무서워하지 않는다. 젖은 털 냄새에 잠이 덜 깬 채 말을 흘린다.
+      if(form==='otter'&&strangerOnce('dol_kkubeogi_otter'))return strangerSay([
+        ['꾸벅이','물 냄새… 수달이구나… 너는 안 찌를게…\n둥지 짓다 남은 거 가져가…'],receiveItem('eoksae',1),
+        // 너구리 꼬마를 만난 적이 있어야 '하루 먼저'를 안다
+        ...(G.f.kkuTalk?[['꾸벅이','근데 그 족제비 있잖아…\n너구리 꼬마보다 하루 먼저 왔더라…']]:[]),
+        ['꾸벅이','쿨…']],()=>{diary('dol_kkubeogi_otter','수달 모습으로 가니 꾸벅이가 경계를 풀었다.'+(G.f.kkuTalk?' 꾸벅이가 날쌘이 나보다 하루 먼저 마을에 왔다고 했다.':''));});
       return false;
     }},
   nal:{
