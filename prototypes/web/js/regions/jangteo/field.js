@@ -82,7 +82,7 @@ Rg.drawPickup=(a,x,bob)=>{
 /* 눈 */
 const snow=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H,s:0.25+Math.random()*0.45,p:Math.random()*6}));
 Rg.ambient=()=>{for(const l of snow){l.y+=l.s;l.p+=0.02;l.x+=Math.sin(l.p)*0.3-0.08;if(l.y>H){l.y=-3;l.x=Math.random()*W;}if(l.x<-3)l.x=W+2;}};
-Rg.drawFront=()=>{drawIcicleFall();for(const l of snow)R(l.x,l.y,Math.sin(l.p)>0.3?2:1,Math.sin(l.p)>0.3?2:1,'#ffffff');
+Rg.drawFront=()=>{for(const l of snow)R(l.x,l.y,Math.sin(l.p)>0.3?2:1,Math.sin(l.p)>0.3?2:1,'#ffffff');
   if(night()){ctx.fillStyle='rgba(10,14,40,.18)';ctx.fillRect(0,0,W,H);}};
 
 /* ---------- 결정 D-864: 처마 고드름 (사용자 피드백 2026-11-06 "고드름에 부딪히면 고드름 떨어지거나 깨지면서 주인공과 상호작용. 전투처럼 체력에 손해보지는 않는다") ----------
@@ -98,6 +98,7 @@ function icicleList(p){   // 처마 판 하나에 달린 고드름: 자리마다
   return out;
 }
 const icicleEaves=()=>!CLASSIC&&ICE_ZONES.includes(G.zone)?fieldPlatforms().filter(p=>p.y>=130):[];
+Rg.icicles={list:p=>icicleList(p),broken:()=>icicleBroken.size,falling:()=>icicleFall.length};   // 검사용으로 들여다보는 창
 Rg.drawIcicles=(p,x)=>{   // art.js에서 처마 판을 그린 바로 뒤에 부른다. x는 화면 좌표
   if(CLASSIC||!ICE_ZONES.includes(G.zone)||p.y<130)return;
   const body=night()?'#8fb0c4':'#a8c6d6',hi=night()?'#c9dbe4':'#e1edf0',dk=night()?'#5f7f96':'#7fa4bb';
@@ -148,7 +149,6 @@ Rg.step=()=>{
     G.pickups=Rg.newState().pickups;G.px=60;G.py=GROUND;G.vy=0;G.cam=0;
   }
   Rg.snowEncounter();   // 결정 D-684: 창고를 지키면 기척이 먼저 다가온다
-  icicleStep();   // 결정 D-864: 처마 고드름
   if(has('hongsi_tteok')&&!G.f.hongsiMade)Rg.sendMedicine();
 };
 Rg.onHit=()=>{};
@@ -344,9 +344,10 @@ if(!CLASSIC){
     },
     drawPickup:Rg.drawPickup,onHit:Rg.onHit,ambient:Rg.ambient,
     weather:()=>{if(Rg.springRevisit())Vfx.setWeather('');else Rg.weather();},
-    weatherFront(){Rg.expArt.drawFront?.(id);},
+    weatherFront(){drawIcicleFall();Rg.expArt.drawFront?.(id);},   // 결정 D-864: 떨어져 깨지는 고드름
     faint(){G.px=Math.max(60,G.px-80);G.py=GROUND;G.vy=0;think('눈을 털고 다시 걷자.');},
     step(){
+      icicleStep();   // 결정 D-864: 처마 고드름
       const legacy=G.pickups.filter(a=>a.item==='solbang'&&!a.zone);
       if(legacy.length){
         const pine=G.pickups.filter(a=>a.zone==='pine');
