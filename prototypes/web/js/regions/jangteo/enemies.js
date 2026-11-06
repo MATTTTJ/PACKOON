@@ -11,7 +11,8 @@
      - 얼굴: 각진 턱, 찌푸린 눈두덩 아래 가늘게 빛나는 서리빛 눈, 굳게 다문 입과 아래에서 솟은 엄니. 둥근 눈망울과 눈 속 흰 점은 쓰지 않는다.
      - 뿔: 이마에서 솟아 뒤로 휜 얼음 뿔 하나. 면이 깎인 얼음 결, 곁가지 얼음 송곳, 뿌리에 눈 더께. 정수리에 서리 결정이 돋는다.
    결정 D-681: 둔갑은 독수리·곰·멧돼지.
-     - 독수리(결정 D-761): 날개를 내리칠 때마다 판 바닥에서 소용돌이가 일어 하늘로 커지며 떠돈다(ndWind).
+     - 독수리(결정 D-761): 날개를 내리칠 때마다 판 바닥에서 소용돌이가 일어 위로 커지며 떠돈다(ndWind).
+       결정 D-878: 키는 판 높이의 2/3이고 좌우로 판을 오간다. 위쪽 칸과 옆으로 비켜 피한다.
      - 곰(결정 D-764): 앞발로 긁는다. 발톱 세 줄이 먼저 붉게 그어지고 굵고 빠르게 긁는다. 땅에 세 줄 자국이 남는다(ndClaw).
      - 멧돼지(결정 D-763): 몸은 판 위에서 사라지고, 판 안에는 발자국만 어지러운 길을 따라 찍히며 달려든다(ndRush).
    결정 D-762: 둔갑 공격이 끝나면 앞섶이 벌어지며 가슴에 푸른 빛이 돈다. 판(전투 칸)에서는 얼음이 갈라져 그 안의 심장이 드러난다.
@@ -605,7 +606,7 @@ function tickNundok(){const n=nd();if(n.flap>0)n.flap--;if(n.swap>0)n.swap--;if(
 function drawNundokFloor(c){
   const n=nd();
   for(const p of n.prints){const al=Math.min(1,(260-p.t)/60),sd=p.seed||0;
-    for(let i=0;i<4;i++){const a=sd+i*1.6,L=10+hash(i+sd)*9;brush(c,[[p.x+Math.cos(a)*7,p.y+Math.sin(a)*5],[p.x+Math.cos(a+0.2)*(7+L),p.y+Math.sin(a+0.2)*(5+L*0.6)]],1.2,FROST_DK,0.6*al);}   // 결정 D-879: 찍힌 자리 둘레로 언 땅이 갈라진다
+    blob(c,p.x+1,p.y+2,17,8,FROST,0.45*al);blob(c,p.x,p.y,13,6,'#c9d6de',0.5*al);   // 결정 D-879: 무게에 눌려 깊게 꺼진 눈
     hoof(c,p.x,p.y,p.a,0.85*al);
     if(p.t<RUSH.ring){const k=p.t/RUSH.ring;   // 쿵: 눈먼지 고리가 퍼지고 눈덩이가 튄다
       c.save();c.strokeStyle=SNOW;c.globalAlpha=0.85*(1-k);c.lineWidth=3*(1-k)+1;c.beginPath();c.ellipse(p.x,p.y,10+k*34,(10+k*34)*0.42,0,0,Math.PI*2);c.stroke();c.restore();
