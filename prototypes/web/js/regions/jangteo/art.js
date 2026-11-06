@@ -201,13 +201,15 @@ function flag(x,y,h=64){
   P(cx-1,cy+6,3,Math.max(2,bh-Math.round(bh*.42)-12),edge);   // 아래로 내린 쪽빛 줄
   P(x-6,y-4,16,4,'#807c78');P(x-7,y-5,18,2,tone().snow);P(x-4,y-8,10,4,'#6f6b66');
   /* 결정 D-778: 깃대 밑동을 두 쪽 나무판(지주)으로 감싸 짚 끈으로 묶었다. 높은 깃대가 바람에 흔들리지 않게 붙든다.
-     가는 깃대(3px)보다 손바닥 자국(9px)이 넓어 자국이 깃대 밖으로 삐져나왔다. 아빠 도장(face 18)은 이 판 앞면에 찍힌다 (사용자 피드백 2026-11-05) */
+     가는 깃대(3px)보다 손바닥 자국(9px)이 넓어 자국이 깃대 밖으로 삐져나왔다. 아빠 도장은 이 판 앞면에 찍힌다 (사용자 피드백 2026-11-05)
+     결정 D-861: 판과 도장을 작게 (사용자 피드백 2026-11-06 "깃대에 달린 나무판과 아빠 도장 좀 더 작게"). 판은 17×28에서 11×19로,
+     도장은 작은 손바닥(mini, 5×4)으로 face 17에 찍는다 (field.js stamps의 mini) */
   const pl=n()?'#5e4a3a':'#8c6a4c',pf=n()?'#6e5844':'#a98258',pd=n()?'#3e3028':'#5e4534',rope=n()?'#8a7a52':'#d2b46a';
-  P(x-7,y-36,17,28,pd);P(x-6,y-35,15,27,pl);P(x-5,y-35,13,26,pf);   // 판 둘레(어두운 테)와 앞면
-  P(x-6,y-37,15,2,pd);P(x-6,y-38,15,1,tone().snow);   // 판 윗머리와 눈
-  P(x+1,y-35,1,27,pd);   // 두 쪽 판이 맞닿은 금
-  for(const yy of [y-31,y-12]){P(x-7,yy,17,2,rope);P(x-7,yy+2,17,1,n()?'#5e5236':'#a8883a');}   // 짚 끈 두 줄 (도장 자리를 비켜 묶었다)
-  P(x-4,y-34,1,3,n()?'#7a6450':'#c49a6c');P(x+5,y-17,1,4,n()?'#7a6450':'#c49a6c');   // 나뭇결
+  P(x-4,y-27,11,19,pd);P(x-3,y-26,9,18,pl);P(x-2,y-26,7,17,pf);   // 판 둘레(어두운 테)와 앞면
+  P(x-3,y-28,9,2,pd);P(x-3,y-29,9,1,tone().snow);   // 판 윗머리와 눈
+  P(x+1,y-26,1,18,pd);   // 두 쪽 판이 맞닿은 금
+  for(const yy of [y-26,y-12]){P(x-4,yy,11,2,rope);P(x-4,yy+2,11,1,n()?'#5e5236':'#a8883a');}   // 짚 끈 두 줄 (도장 자리를 비켜 묶었다)
+  P(x-1,y-23,1,2,n()?'#7a6450':'#c49a6c');P(x+4,y-16,1,3,n()?'#7a6450':'#c49a6c');   // 나뭇결
 }
 /* 결정 D-311: 장터 어귀 집 사이에 되풀이되던 작은 붉은 깃발 대신, 장날 어귀에 실제로 놓였을 짐을 번갈아 둔다.
    지게에 얹은 짐, 장작더미, 옹기 독, 짚단. 길을 막지 않게 낮게 그린다. */
@@ -328,7 +330,7 @@ function drawPlatforms(id){
       }
       P(x,p.y,p.w,6,t.wood);P(x,p.y-1,p.w,2,t.snow);for(let j=5;j<p.w;j+=10)P(x+j,p.y+2,1,4,n()?'#827475':'#c3a079');
       if(p.y<130){P(x-3,p.y-5,p.w+6,4,t.tile);P(x,p.y-6,p.w,2,t.snow);}
-      else{P(x+4,p.y+6,3,GROUND-p.y-6,t.wood);P(x+p.w-7,p.y+6,3,GROUND-p.y-6,t.wood);}
+      else{P(x+4,p.y+6,3,GROUND-p.y-6,t.wood);P(x+p.w-7,p.y+6,3,GROUND-p.y-6,t.wood);Rg.drawIcicles?.(p,x);}   // 결정 D-864: 낮은 처마 끝 고드름 (field.js)
     }else if(id==='warehouse'){
       const top=p.y+5;
       for(let yy=top,r=0;yy<GROUND;yy+=13,r++){const off=r%2?6:0;for(let xx=x+2+off;xx<x+p.w-8;xx+=20){const w=Math.min(18,x+p.w-2-xx),h=Math.min(12,GROUND-yy);P(xx,yy,w,h,r%2?(n()?'#5d4a3c':'#8a6448'):(n()?'#6b5a48':'#a17a52'));P(xx+1,yy+1,w-2,1,n()?'#86705a':'#c79b6c');P(xx+Math.round(w/2),yy,1,h,n()?'#3d3028':'#6b4c36');}}
@@ -782,7 +784,8 @@ Rg.onggiPic=()=>{let t0=null;const st={};return {animate:true,draw(w,h,t){
 /* 결정 D-785: 쌀가루 묻은 발판 작은 창 (사용자 피드백 2026-11-05 "나오는 내용과 이미지가 최대한 매칭되게").
    글은 "아궁이 앞 발판에 쌀가루가 하얗게 묻었고 그 위에 큰 곰 발자국이 어지럽다". 그대로 그린다:
    위쪽은 아궁이 불빛과 김, 아래는 쌀가루가 하얗게 앉은 나무 발판. 큰 곰 발자국 여럿이 이리저리 찍혀 있고,
-   모락의 검은 발이 내려와 가루를 폭 날리며 새 발자국을 찍고 올라간다(3초마다 자리를 바꿔). 시루를 깨운 뒤엔 아이의 작은 발자국도 섞였다 */
+   시루를 깨운 뒤엔 아이의 작은 발자국도 섞였다.
+   결정 D-862: 발이 내려와 찍는 움직임은 뺐다. 발자국은 이미 찍혀 있는 것으로 둔다 (사용자 피드백 2026-11-06). 아궁이 김만 움직인다 */
 function bearPrint(x,y,f){
   // 가루에 눌린 곰 발자국: 가로로 넓은 발바닥 + 부채꼴 발가락 다섯 + 발톱 자국. f=-1 이면 반대쪽(아래)을 향해 찍혔다
   const d='#9c8b6e',dd='#7a6a50',s=f<0?-1:1;
@@ -790,9 +793,8 @@ function bearPrint(x,y,f){
   for(const [dx,dy] of [[-4,2],[-2,3],[0,4],[2,3],[4,2]]){const ty=s>0?y-dy:y+2+dy;R(x+dx,ty,1,2,d);R(x+dx,s>0?ty-2:ty+3,1,1,dd);}
 }
 function kidPrint(x,y){const d='#a8987a';R(x-1,y,3,2,d);R(x-2,y-2,1,1,d);R(x,y-3,1,1,d);R(x+2,y-2,1,1,d);}
-Rg.flourPic=()=>{let t0=null;return {animate:true,sound:'j_steam_flour',draw(w,h,t){
-  if(t0===null)t0=t;
-  const rm=Vfx.reducedMotion,P0=3,el=t-t0,k=rm?1.4:el%P0,cyc=rm?0:Math.floor(el/P0);
+Rg.flourPic=()=>{return {animate:true,sound:'j_steam_flour',draw(w,h,t){
+  const rm=Vfx.reducedMotion;
   // 아궁이 앞 흙바닥과 아궁이 (위쪽)
   R(0,0,w,h,'#b89a78');R(30,0,30,16,'#8c6651');R(34,2,22,3,'#b79b78');R(39,7,13,9,'#4b3a34');R(41,9,9,7,'#ecaa58');R(43,11,5,4,'#ffe0a0');
   if(!rm)for(let j=0;j<3;j++){const q=((t*0.6+j*0.33)%1);R(Math.round(44+Math.sin((t+j)*2)*3),Math.round(6-q*8),4-q*2,2,'rgba(255,255,255,'+(0.6-q*0.6).toFixed(2)+')');}   // 아궁이 김
@@ -804,15 +806,6 @@ Rg.flourPic=()=>{let t0=null;return {animate:true,sound:'j_steam_flour',draw(w,h
   const spots=[[10,26,1],[24,33,-1],[38,25,1],[52,34,-1]];
   for(const [x,y,f] of spots)bearPrint(x,y,f);
   if(isAwake('siru'))for(const [x,y] of [[17,24],[31,30],[45,25],[58,30]])kidPrint(x,y);   // 아이의 작은 발자국
-  // 모락의 발이 내려와 찍고 올라간다
-  const [sx,sy]=spots[cyc%spots.length],down=k<0.4?0:k<0.7?(k-0.4)/0.3:k<1.0?1:k<1.4?1-(k-1.0)/0.4:0;
-  if(down>0){
-    const fy=Math.round(sy-26+down*22);
-    R(sx-4,fy-16,9,12,'#1f1a18');R(sx-2,fy-15,2,10,'#3a302a');   // 검은 털 다리
-    R(sx-6,fy-5,13,5,'#1f1a18');R(sx-5,fy,11,2,'#1f1a18');R(sx-4,fy-4,3,1,'#3a302a');   // 둥근 발등
-    for(const dx of [-5,-3,-1,1,3])R(sx+dx+1,fy+2,1,2,'#e8dcc6');   // 발톱 다섯
-  }
-  if(!rm&&k>0.68&&k<1.2){const p=(k-0.68)/0.52;for(let i=0;i<5;i++)R(Math.round(sx-6+i*3+(i-2)*p*4),Math.round(sy+1-p*(3+i%3*2)),1,1,'rgba(255,255,255,'+(1-p).toFixed(2)+')');}   // 폭 날리는 쌀가루
 }};};
 /* 결정 D-786: 모락과 김 올리기 대화 그림 (사용자 피드백 2026-11-05 "시루가 쓰이면서 깨어 가는 과정을 애니메이션으로, 모락과의 대화 중 맞는 대목에서").
    0 아궁이 가마솥 위에 얹은 엄마 시루(금빛 테). 아직 차다.

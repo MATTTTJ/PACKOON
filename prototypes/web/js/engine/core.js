@@ -115,6 +115,13 @@ const fieldDef=()=>zoneDef()||REG;
 const fieldWidth=()=>zoneDef()?zoneDef().w:REG.world;
 const fieldGround=()=>zoneDef()?.ground??GROUND;
 const fieldPlatforms=()=>fieldDef().platforms||[];
+/* 결정 D-845: 구역의 비탈. slopes:[{x1,y1,x2,y2}] 는 왼쪽부터 이어지는 땅 높이 선이다 (x1<x2, 겹치지 않는다).
+   그 구간에서는 땅이 비탈 높이에 있고 아래는 산비탈 몸이라 들어갈 수 없다. 밖은 구역 바닥(ground)이다. */
+const zoneSlopes=(z=zoneDef())=>z?.slopes||[];
+const slopeAt=(x,z=zoneDef())=>zoneSlopes(z).find(s=>x>=s.x1&&x<=s.x2)||null;
+const slopeHeight=(s,x)=>s.y1+(s.y2-s.y1)*clamp((x-s.x1)/(s.x2-s.x1),0,1);
+/* 그 x 에서 발이 닿는 땅 높이 (비탈이면 비탈 위, 아니면 구역 바닥) */
+const surfaceY=(x,z=zoneDef())=>{const s=slopeAt(x,z);return s?slopeHeight(s,x):(z?.ground??GROUND);};
 /* 결정 D-48: 발판 무리는 오르락내리락한다 (사용자 피드백 2026-10-31 "난간이 너무 일정함").
    두 칸 계단(낮은 단 → 높은 단)을 되풀이하던 자리를, 올라갔다가 다시 내려오는 n칸 무리로 바꾼다.
    고정 시드라 열 때마다 같은 모양이다(저장·바닥 물건이 흔들리지 않는다). 한 번에 오르는 높이는 rise 안이라
