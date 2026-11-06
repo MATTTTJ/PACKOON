@@ -887,8 +887,11 @@ body.prologue #titleScreen{left:var(--stx,0px);top:var(--sty,0px);width:var(--st
 body.prologue #titleScreen .cover-card{margin:auto}
 body.prologue #titleScreen :is(.how-keys,.how-touch){display:none}
 /* 개발용 지역 고르기는 이름표 한 줄로 접어 둔다. 이름표에 마우스를 올리거나 Tab 으로 닿을 때만 단추가 펼쳐진다.
-   글 흐름 밖(절대 위치)으로 빼면 작은 화면에서 '길을 나서기' 단추를 덮어 눌림을 가로챈다 */
-body.prologue #titleScreen .devpick:not(:hover,:focus-within) .devpick-btns{height:0;overflow:hidden}
+   글 흐름 밖(절대 위치)으로 빼면 작은 화면에서 '길을 나서기' 단추를 덮어 눌림을 가로챈다.
+   펼친 단추는 이름표 아래로 겹쳐 띄워, 마우스를 올리고 뗄 때 글 카드 높이가 바뀌어 '길을 나서기'가 움직이지 않게 한다 */
+body.prologue #titleScreen .devpick{position:relative}
+body.prologue #titleScreen .devpick-btns{position:absolute;left:0;top:100%;padding-top:4px}
+body.prologue #titleScreen .devpick:not(:hover,:focus-within) .devpick-btns{display:none}   /* 이름표는 tabindex 가 있어 Tab 으로 닿으면 펼쳐진다 */
 @media (orientation:landscape) and (max-height:500px){
   body.prologue #titleScreen .cover-card{gap:6px}
   body.prologue #titleScreen .cover-card h2{font-size:20px}
