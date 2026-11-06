@@ -938,11 +938,14 @@ const stampCount=(region)=>Object.keys(G.f.stampsFound||{}).filter(k=>!region||k
 /* 결정 D-115: 아빠 손바닥 도장은 작다(가로 7·세로 6, 예전의 절반쯤). 손가락 넷 사이를 비워 손바닥으로 읽히게 하고,
    받침 앞면에 밝게 다듬은 자리(판) 위에 찍어 작아도 눈에 띈다. (x,y)는 손바닥 아래 끝 가운데. faint면 찾기 전의 흐린 자국이다. */
 const PAW=[[-1,-2,3,1],[-2,-4,5,2],[-3,-6,1,2],[-1,-7,1,2],[1,-7,1,2],[3,-6,1,2]];
-function pawStamp(x,y,c,faint=false){
+// 결정 D-861: 가는 깃대 판처럼 좁은 자리에 찍는 작은 손바닥 (도장 자리에 mini:true). 5×4, 발가락 셋
+const PAW_MINI=[[-1,-1,3,1],[-2,-2,5,1],[-2,-4,1,1],[0,-4,1,1],[2,-4,1,1]];
+function pawStamp(x,y,c,faint=false,mini=false){
   x=Math.round(x);y=Math.round(y);
   const plate=faint?'rgba(255,244,214,.22)':'rgba(255,244,214,.55)';
-  R(x-4,y-8,9,8,plate);R(x-3,y-9,7,1,plate);   // 손을 대고 누른 자리: 둘레보다 밝게 닳았다
-  for(const [px,py,w,h] of PAW)R(x+px,y+py,w,h,c);
+  if(mini)R(x-3,y-5,7,5,plate);
+  else{R(x-4,y-8,9,8,plate);R(x-3,y-9,7,1,plate);}   // 손을 대고 누른 자리: 둘레보다 밝게 닳았다
+  for(const [px,py,w,h] of mini?PAW_MINI:PAW)R(x+px,y+py,w,h,c);
 }
 /* 도장이 찍힌 받침. 좌표가 아니라 자리의 종류로 그린다(맵에서 도장 위치가 바뀌어도 받침이 따라간다).
    p.base가 있으면 그것을, 없으면 도장 id로 고른다. 받침 아래 끝이 (x,y)이고, 도장은 받침 앞면(STAMP_FACE만큼 위)에 찍힌다. */
@@ -964,7 +967,7 @@ function drawStampBase(kind,x,y){
   else if(kind==='stone'){R(x-7,y-5,14,5,'#9a958a');R(x-6,y-6,12,1,'#b8b3a6');R(x-7,y-1,14,1,'#6f6a60');R(x+4,y-4,2,2,'#7c776c');}
   else if(kind==='bark'){R(x-5,y-11,10,11,'#6e4a2c');R(x-4,y-11,1,11,'#59391f');R(x+3,y-10,1,9,'#59391f');R(x-1,y-10,2,2,'#4f331d');R(x-5,y-12,10,1,'#8a6440');}
 }
-function pawStamp_glint(x,y,seed){if(!Vfx.reducedMotion&&Math.floor((G.anim+seed)/18)%7===0)R(Math.round(x)+3,Math.round(y)-8,1,1,'#fff3c4');}
+function pawStamp_glint(x,y,seed,mini=false){if(!Vfx.reducedMotion&&Math.floor((G.anim+seed)/18)%7===0)R(Math.round(x)+(mini?2:3),Math.round(y)-(mini?5:8),1,1,'#fff3c4');}
 /* 결정 D-204: 도장을 찾았을 때 뜨는 작은 창은 손바닥 자국(묻은 것 포함, 위 -11~아래 +3)이 늘 다 들어가게 잡는다 (사용자 피드백 56).
    예전에는 땅에서 22px 위까지만 담아, 깃대·기둥처럼 높이 찍힌 도장(face 18)은 손가락 끝이 잘렸다.
    받침까지 한 창(28px)에 들어가면 받침과 함께, 아니면 손바닥을 가운데에 둔다. */
@@ -990,10 +993,10 @@ function drawZoneObjects(){
     if(k==='stamps'){const sx=p.x-cam,gy=p.y??fieldGround(),base=stampBase(p),py=gy-(p.face??STAMP_FACE[base]);
       // 결정 D-115: 받침을 먼저 그리고, 그 앞면에 작은 손바닥을 찍는다. 찾기 전에는 흐리고 이따금 반짝인다.
       drawStampBase(base,sx,gy);
-      if(!stampFound(p.id)){pawStamp(sx,py,'rgba(110,52,30,.55)',true);pawStamp_glint(sx,py,p.x);continue;}
-      if(p.draw)p.draw(sx,py);else pawStamp(sx,py,'#8a3424');
-      drawPawMark(R,Math.round(sx),Math.round(py),REG.id+':'+p.id);   // 결정 D-171: 그 자리에서 묻은 것 (notebook.js)
-      pawStamp_glint(sx,py,p.x+7);continue;}
+      if(!stampFound(p.id)){pawStamp(sx,py,'rgba(110,52,30,.55)',true,p.mini);pawStamp_glint(sx,py,p.x,p.mini);continue;}
+      if(p.draw)p.draw(sx,py,p.mini);else pawStamp(sx,py,'#8a3424',false,p.mini);
+      if(!p.mini)drawPawMark(R,Math.round(sx),Math.round(py),REG.id+':'+p.id);   // 결정 D-171: 그 자리에서 묻은 것 (notebook.js). 작은 손바닥(D-861)엔 덧그리지 않는다(수첩 도장 쪽엔 그대로)
+      pawStamp_glint(sx,py,p.x+7,p.mini);continue;}
     if(p.draw)p.draw(p.x-cam,p.y??fieldGround());
     if(k==='doors'&&!needMet(p)&&p.drawBlocked)p.drawBlocked(p.x-cam,p.y??fieldGround());
   }
