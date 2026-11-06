@@ -87,22 +87,24 @@ Rg.drawScenery=()=>{jangseung(96,true);jangseung(122,false);drawTree(670);drawTr
 /* 결정 D-208: 채집 전 겨우살이는 덩어리(슬라임처럼 보였다)가 아니라 가지에 붙어 자란 풀 덤불이다(사용자 피드백 47).
    가지 토막에서 누런 초록 줄기가 두 갈래씩 갈라지고, 끝마다 가는 잎이 짝지어 난다. 갈래 사이에 반투명한 흰 열매. 떠오르지 않고 바람에 잎끝만 흔들린다. */
 /* 결정 D-480: 겨우살이가 너무 컸다(사용자 피드백 2026-11-04). 덤불 지름을 약 20px에서 13px로 줄이고, 가지 토막도 짧게. 모양(갈래·잎 짝·흰 열매)은 그대로 */
+/* 결정 D-1011: 줍는 물건이 주인공 머리보다 컸다 (사용자 피드백 2026-11-06 31: 눈에 띄게 큰 물건을 고른 크기로). 겨우살이 덤불 지름 13 → 10, 가지 토막 14 → 10.
+   돌너머의 줍는 물건(메밀 이삭·겨우살이·석이)은 높이 8 안팎으로 맞춘다 */
 function drawMistletoe(x,y,a){
   const S='#7f8a36',L='#a3b04c',LD='#738232',BR='#eeedd2';
   const sw=Vfx.reducedMotion?0:Math.sin((G.anim+a.x)/38)*0.5;
-  R(x-7,y-2,14,2,'#5a4a3a');R(x-7,y-2,14,1,'#7a6450');R(x+5,y-4,2,2,'#5a4a3a');   // 붙어 자란 가지 토막
-  const cx=x,cy=y-6;R(cx,cy+1,1,3,S);   // 밑동: 가지 껍질을 뚫고 나온 짧은 줄기
+  R(x-5,y-2,10,2,'#5a4a3a');R(x-5,y-2,10,1,'#7a6450');R(x+3,y-4,2,2,'#5a4a3a');   // 붙어 자란 가지 토막
+  const cx=x,cy=y-5;R(cx,cy+1,1,3,S);   // 밑동: 가지 껍질을 뚫고 나온 짧은 줄기
   // 속은 겹친 잔가지로 어둡게 차 있다(테두리 빛이 사이로 새지 않게)
-  for(let j=-3;j<=2;j++){const half=Math.round(3.6*Math.sqrt(1-(j/3.4)**2));R(cx-half,cy+j,half*2+1,1,j<-1?'#6f7d30':'#5d6a28');}
+  for(let j=-2;j<=2;j++){const half=Math.round(2.8*Math.sqrt(1-(j/2.8)**2));R(cx-half,cy+j,half*2+1,1,j<-1?'#6f7d30':'#5d6a28');}
   // 줄기가 둥글게 사방으로 뻗는다. 끝마다 가는 잎 한 쌍.
   for(const deg of [-180,-150,-118,-90,-62,-30,0,155,25]){
-    const t=deg*Math.PI/180,len=deg>0&&deg<180?3:5,ex=Math.cos(t),ey=Math.sin(t);
+    const t=deg*Math.PI/180,len=deg>0&&deg<180?2:4,ex=Math.cos(t),ey=Math.sin(t);
     for(let i=1;i<=len;i++)R(Math.round(cx+ex*i+(i>2?sw:0)),Math.round(cy+ey*i),1,1,S);
     const tx=Math.round(cx+ex*len+sw),ty=Math.round(cy+ey*len);
     for(const k of [-1,1]){const lx=-ey*k+ex*.7,ly=ex*k+ey*.7;R(Math.round(tx+lx),Math.round(ty+ly),1,1,k<0?L:LD);}
   }
   // 갈래 사이 반투명한 흰 열매
-  for(const [dx,dy] of [[-1,-2],[2,-1],[0,-4],[-3,0]])R(cx+dx,cy+dy,1,1,BR);
+  for(const [dx,dy] of [[-1,-1],[1,-1],[0,-3],[-2,0]])R(cx+dx,cy+dy,1,1,BR);
 }
 /* 결정 D-393·D-486: 석이버섯은 바위 면에 붙은 납작한 잎 모양으로 그렸었다. D-641 로 땅에서 돋은 버섯 무더기로 바꿨다 */
 /* 결정 D-641: 필드의 석이는 땅에서 돋은 버섯 한 무더기로 그린다(사용자 피드백 2026-11-05 "그냥 버섯이 땅에서 자란 것처럼").
@@ -112,6 +114,11 @@ function seogiMushroom(cx,base,h,r){
   R(cx,base-h,2,h,STEM);R(cx+1,base-h+1,1,h-1,STEM_D);R(cx-1,base-1,4,1,STEM_D);
   for(let j=0;j<3;j++){const half=[r-2,r-1,r][j];R(cx+1-half,base-h-3+j,half*2,1,j===0?TOP2:j===2?RIM:TOP);}
   R(cx+2-r,base-h,r*2-2,1,GILL);R(cx+2-r,base-h-3,1,1,HI);R(cx,base-h-3,1,1,HI);
+}
+/* 결정 D-1011: 바위턱에서 줍는 석이는 작은 무더기(키 8 안팎). 땅에서 캐는 석이(채집 자리)는 그대로 큰 무더기 */
+function drawSeogiSmall(x,y){
+  R(x-6,y-1,12,1,'#55603f');R(x-5,y-2,10,1,'#6f7d5a');
+  seogiMushroom(x-4,y-2,3,3);seogiMushroom(x+2,y-2,4,3);seogiMushroom(x-1,y-2,5,4);
 }
 function drawSeogiClump(x,y,done=false){
   R(x-9,y-1,18,1,'#55603f');R(x-7,y-2,14,1,'#6f7d5a');R(x-5,y-3,3,1,'#86946a');R(x+5,y-3,2,1,'#86946a');   // 이끼 낀 흙
@@ -123,13 +130,14 @@ function drawSeogiClump(x,y,done=false){
 Rg.drawPickup=(a,x,bob)=>{
   // 결정 D-393: 메밀 이삭 한 줌. 붉은 줄기 셋을 짚으로 묶었고, 끝마다 세모난 검은 낟알이 송이로 달렸다
   if(a.item==='memil'){
-    R(x-2,a.y-6,1,6,'#a8483a');R(x,a.y-7,1,7,'#b8584a');R(x+2,a.y-6,1,6,'#a8483a');R(x-1,a.y-3,3,1,'#d9b860');
-    R(x-3,a.y-8+bob,2,2,'#3a3028');R(x-1,a.y-9+bob,2,2,'#2b2522');R(x+1,a.y-8+bob,2,2,'#3a3028');
-    R(x-3,a.y-8+bob,1,1,'#6a5a48');R(x,a.y-9+bob,1,1,'#6a5a48');R(x+2,a.y-8+bob,1,1,'#6a5a48');R(x+3,a.y-5,2,1,'#7a9a5a');}
+    // 결정 D-1011: 줄기를 두 칸 줄였다 (키 9 → 7)
+    R(x-2,a.y-4,1,4,'#a8483a');R(x,a.y-5,1,5,'#b8584a');R(x+2,a.y-4,1,4,'#a8483a');R(x-1,a.y-2,3,1,'#d9b860');
+    R(x-3,a.y-6+bob,2,2,'#3a3028');R(x-1,a.y-7+bob,2,2,'#2b2522');R(x+1,a.y-6+bob,2,2,'#3a3028');
+    R(x-3,a.y-6+bob,1,1,'#6a5a48');R(x,a.y-7+bob,1,1,'#6a5a48');R(x+2,a.y-6+bob,1,1,'#6a5a48');R(x+3,a.y-4,2,1,'#7a9a5a');}
   else if(a.item==='gyeousari')drawMistletoe(x,a.y,a);
   else if(a.item==='seoridarae'){R(x-4,a.y-8+bob,4,4,'#8ab86a');R(x,a.y-8+bob,4,4,'#7fa860');R(x-2,a.y-4+bob,4,4,'#6f9850');R(x-3,a.y-7+bob,1,1,'#f4fbff');R(x+1,a.y-7+bob,1,1,'#f4fbff');R(x-1,a.y-11,2,3,'#5a4a2a');}
   else if(a.item==='solbang')drawPineCone(x,a.y+bob,true);   // 결정 D-265·D-393
-  else if(!CLASSIC&&a.item==='seogi'){drawSeogiClump(x,a.y);R(x+5,a.y-16+bob,1,1,'#fff1bf');}   // 결정 D-641
+  else if(!CLASSIC&&a.item==='seogi'){drawSeogiSmall(x,a.y);R(x+4,a.y-11+bob,1,1,'#fff1bf');}   // 결정 D-641
 };
 /* 결정 D-266: 그늘에 녹지 않은 첫눈이 도톰하게 솟은 둔덕(파헤치는 채집 자리). (x,y)는 바닥 가운데. 옛 구성에도 쓰므로 field.js 에 둔다.
    d.prog 만큼 파이면 위가 깎이고, 다 파면 걷어 낸 눈이 양옆에 쌓이고 가운데 검은 흙이 드러난다.
@@ -206,7 +214,8 @@ function drawKkuCue(){
   const n=Rg.npcs.find(n=>n.id==='kkubeogi');if(!n)return;
   const x=n.x-cam;if(x<-30||x>W+30)return;
   const stir=Rg.kkuStirNow();
-  const f=G.px<n.x?-1:1;
+  // PA-229(공통 화면 갈래)의 시선 고정: 서 있는 인물은 주인공을 눈으로 따라오지 않는다. 엔진이 정한 방향(npcFacing)을 덧그림도 따른다
+  const f=typeof npcFacing==='function'?npcFacing(n):(G.px<n.x?-1:1);
   if(stir>0){
     // 원래 그림 위에 작은 코 움직임과 따뜻한 숨결만 겹친다.
     const twitch=Math.floor(stir*8)%2;
@@ -247,7 +256,8 @@ Rg.onPickup=a=>{if(a.item==='seoridarae')daraeGot('ledge');};
 function daraeGot(how){
   if(G.f.daraePicked)return;G.f.daraePicked=true;
   // 결정 D-130: 젊은 아빠의 수첩(적혀 있지 않다)과 지난가을의 아빠(열매를 받지 못하고 떠났다)를 나눠 적는다.
-  clue('h2','아빠의 수첩',!CLASSIC||Rg.arcs()?'아빠가 젊을 때 적은 수첩의 돌너머 쪽에는 서리다래가 적혀 있지 않다. 지난가을의 아빠는 서리다래를 기다리다, 글자를 읽은 그날 밤 떠났다(돌쇠 할배).':'아빠의 수첩에는 서리다래가 적혀 있지 않다. 아빠는 여기서 열매를 얻지 않고 곧장 떠났다.');
+  // 결정 D-1002: 단서 글이 지워진 '글자(되돌림)' 이야기를 아직 말하고 있었다(D-427로 바뀜). 할배가 들려준 대로 늙은 까치의 북쪽 소식으로 고친다
+  clue('h2','아빠의 수첩',!CLASSIC||Rg.arcs()?'아빠가 젊을 때 적은 수첩의 돌너머 쪽에는 서리다래가 적혀 있지 않다. 지난가을의 아빠는 서리다래를 기다리다, 늙은 까치가 북쪽 소식을 물어 온 그날 밤 떠났다(돌쇠 할배).':'아빠의 수첩에는 서리다래가 적혀 있지 않다. 아빠는 여기서 열매를 얻지 않고 곧장 떠났다.');
   diary('d_darae',!CLASSIC||Rg.arcs()?'서리다래를 수첩에 그렸다. 아빠가 젊을 때 적은 쪽에는 이 열매가 적혀 있지 않다. 지난가을의 아빠도 열매를 얻지 못하고 떠났다.':'서리다래를 붓으로 그렸다. 해머루 때는 아빠의 그림이 먼저 있었는데, 수첩 어디에도 서리다래는 적혀 있지 않다. 아빠는 이곳에서 열매를 얻지 않았다. 무언가를 알고 길을 바꾼 걸까.');
   // 결정 D-257: 받아 든 열매. 달랬으면 골렘이 내려놓은 것, 이겼으면 무너진 돌 사이에서 주운 것
   const first=how==='calm'?['너구리','(돌무더기가 내려놓은 서리다래다.\n서리가 하얗게 앉아 손끝이 시리다.)']
@@ -328,8 +338,10 @@ if(!CLASSIC){
   const platform=(x,y,w)=>({x,y,w});
   const bases={
     // 결정 D-48: 두 칸 계단만 stepRidge()로 오르락내리락. 다리·물건·변신 자리 발판은 그대로다.
-    gate:[...stepRidge(320,61,3,{low:164}),...stepRidge(1300,62,4,{low:164}),platform(1608,174,60),platform(1680,156,80),platform(2020,112,90),platform(2160,154,90)],
-    village:[...stepRidge(520,63,4,{low:164}),platform(1120,156,82),platform(1790,164,80),platform(1850,138,84),platform(1910,112,92),...stepRidge(2300,64,3,{low:164})],
+    // 결정 D-1008: 장승 사이로 지나던 두 발판(1608·1680)이 장승 몸과 금줄을 가로질렀다. 장승 뒤(오른쪽)에 낮은 받침 하나만 둔다. 아빠 도장이 그 받침에 찍힌다
+    //   장승 앞 마지막 돌계단(설계 1547)도 장승 갓 밑까지 뻗어 갓과 겹쳤다. 끝을 1585에서 자른다(겨우살이 턱으로 오르는 디딤은 남긴다)
+    gate:[...stepRidge(320,61,3,{low:164}),...stepRidge(1300,62,4,{low:164}).map(p=>p.x>1500&&p.x<1600&&p.x+p.w>1585?{...p,w:1585-p.x}:p),platform(1692,174,64),platform(2020,112,90),platform(2160,154,90)],
+    village:[...stepRidge(520,63,4,{low:164}),platform(1120,156,82),platform(1790,164,80),platform(1850,138,84),platform(1910,112,92),...stepRidge(2487,64,3,{low:164})],   // 결정 D-1008: 끝 돌계단(2300)이 성황당 장승과 끝 집 지붕을 가로질러 장승 너머로 옮겼다
     // 2190 턱은 디딤 없이 바닥에서 80px 위다. 산양 뛰기로만 오른다 (PA-47 선택 자리).
     field:[...stepRidge(260,65,3,{low:164}),...stepRidge(1180,66,4,{low:164}),platform(1900,164,86),platform(1960,138,90),platform(2020,112,88),platform(2190,112,76)],
     cliff:[...stepRidge(320,67,3,{low:164}),...stepRidge(790,68,4,{low:164}),...stepRidge(1600,69,3,{low:164}),platform(2220,166,90),platform(2280,138,90),platform(2350,112,130),platform(2500,138,96),platform(2560,112,294)],
@@ -514,7 +526,9 @@ if(!CLASSIC){
   // 산양 턱의 석이버섯, 다람쥐의 잊은 몫 (PA-47 선택 자리)
   Rg.zones.field.pickups.push({id:'dol_goat_seogi',x:2228,y:112,item:'seogi',got:false});
   Rg.zones.field.digs=[{id:'dol_cache_field',x:880,item:'memil',n:2,form:'squirrel',cache:true,done:false}];
-  Rg.zones.village.digs=[{id:'dol_cache_village',x:1420,item:'acorn',n:2,form:'squirrel',cache:true,done:false}];
+  // 결정 D-1007: 다람쥐가 묻어 둔 몫은 도토리만이 아니다 (사용자 피드백 2026-11-06 큰 장터 5). 돌담 마을엔 참나무가 없고 고갯길 솔숲이 가깝다.
+  //   늙은 까치도 담 틈에 잣을 숨긴다(D-271). 다람쥐도 가을에 솔숲에서 물어 온 잣을 돌담 밑에 묻었다. 밭의 몫은 이삭 메밀 그대로.
+  Rg.zones.village.digs=[{id:'dol_cache_village',x:1420,item:'jat',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.shrine.pickups=[{id:'dol_memory_seogi',x:1580,y:112,item:'seogi',got:false}];
   /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 고갯길·절벽길 억새, 높은 바위턱의 겨우살이, 마을 길에 흘린 메밀 이삭.
      결정 D-266: 그늘에 녹지 않은 첫눈 둔덕을 파면 눈에 덮였던 것이 나온다. 무엇이 왜 거기 있었는지는 자리마다 found 로 알린다.
@@ -527,13 +541,15 @@ if(!CLASSIC){
     ['gate','d',150,'eoksae'],['gate','p',1184,'gyeousari',{y:112}],['gate','d',1585,'solbang',mound(PINE)],
     ['village','d',1230,'memil',mound('돌담 밑에 쌓아 두고 잊은 메밀 단이 눈에 덮여 있었다. 이삭이 아직 붙어 있다.')],['village','p',2300,'memil'],
     ['field','d',455,'memil',mound('밭머리에 남겨 둔 메밀 이삭 단이 첫눈에 덮여 있었다.')],
-    ['cliff','d',600,'eoksae',mound('바람에 꺾인 억새가 바위 밑에 쓸려 와 쌓였고, 그 위로 눈이 덮였다.')],['cliff','p',1290,'seogi',{y:112}],['cliff','d',1700,'eoksae'],
+    ['cliff','d',600,'eoksae',mound('바람에 꺾인 억새가 바위 밑에 쓸려 와 쌓였고, 그 위로 눈이 덮였다.')],['cliff','p',756,'seogi',{y:112}],   // 결정 D-1009: 발판 없는 허공(1290)에 떠 있던 석이를 바위턱(725~788) 위로
+    ['cliff','d',1700,'eoksae'],
     ['shrine','d',690,'solbang',mound(PINE)],
     ['shrine','d',820,'gyeousari',mound('바람에 꺾여 떨어진 겨우살이 가지가 눈 속에 묻혀 있었다.')],
   ]);
   // 결정 D-665: 수리부엉이만 느끼는 숨은 물건 (사용자 피드백 2026-11-05). 수리부엉이로 곁을 지나면 드러난다. 좌표는 길을 줄인 뒤의 자리
   addZoneGather(Rg,'dol_owl_',[['cliff','p',920,'seokcheong',{hidden:'owl'}],['village','p',1460,'chadol',{hidden:'owl'}]]);
-  Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'해 떴다!\n엄마도 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:marker,layers:A.cliffLayers}];
+  // 결정 D-1009: 해돋이 자리는 골렘 뒤에 깔리는 높은 턱(112) 위다. 턱이 없을 땐 표지가 허공에 떠 보였다. 턱이 깔린 뒤에만 그린다
+  Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'해 떴다!\n엄마도 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:(x,y)=>{if(G.boss.dead)marker(x,y);},layers:A.cliffLayers}];
   // 결정 D-83: 밭 둔덕에서 먼 성황당 돌무더기가 꿈틀하는 것이 보인다. 목적지(성황당)와 골렘을 미리 보여 준다.
   // 결정 D-167: 꾸벅이 둥지(1510)와 붙어 있던 바라보기 자리를 메밀 그루터기 쪽 둔덕으로 옮긴다(사용자 피드백 27).
   Rg.zones.field.vistas=[{id:'shrine_stir',x:1000,from:0,to:180,sound:'wind',thought:'저 먼 돌무더기가… 움직였어?\n바람 탓인가.',
