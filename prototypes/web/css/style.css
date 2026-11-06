@@ -176,7 +176,12 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .trade-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}
 .trade-haggle{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .trade-log{margin-top:8px;font-family:var(--display);line-height:1.55;min-height:3.2em}
-.trade-log p{margin:2px 0}
+.trade-log p{margin:2px 0;white-space:pre-line}
+/* 결정 D-925: 바꾸는 법은 한 줄에 하나씩 세로로 (trade.js). 줄 안의 재료만 + 로 가로로 잇는다 */
+.trade-asks.list{flex-direction:column;align-items:flex-start;gap:3px}
+.trade-ask-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.trade-ask-row .dot{font-weight:700;color:var(--dim);width:.7em;text-align:center}
+.trade-asks .trade-left{padding-left:1.2em}
 @media (max-width:600px){.trade-wrap{grid-template-columns:1fr}}
 .mom-transcript summary{cursor:pointer;min-height:32px}
 .mom-transcript p{margin:4px 0}
@@ -931,5 +936,30 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
 @media (prefers-reduced-motion:reduce){.monologue.pop{animation:none}}
 @media (pointer:coarse) and (orientation:portrait){
   .monologue{left:50%;top:calc(var(--pady,0px) + 12px);transform:translateX(-50%);width:calc(100% - 16px);animation:none!important}
+  .monologue .text{font-size:14px}
+}
+
+/* 결정 D-920: 대화 창과 주인공 독백 창을 한 단계 키운다 (사용자 피드백 2026-11-06: "대화 칸 및 독백창 크기 살짝 더 키워도 될듯").
+   초상·글씨·안쪽 여백을 열에 하나쯤 늘린다. 휴대폰 세로·가로도 같은 비율로. 두 줄 대사 기준으로 그림을 가리는 높이는 크게 늘지 않는다. */
+.dialog{--fw:clamp(34px,3.8vw,48px);--px:clamp(10px,1.35vw,14px);--gp:clamp(7px,1.1vw,12px);padding:clamp(8px,.9vw,10px) var(--px) clamp(7px,.75vw,9px)}
+.dialog .text{font-size:clamp(14px,1.35vw,17px);line-height:1.5;max-width:70ch}
+.dialog .who{font-size:clamp(11px,1.1vw,13px)}
+.dialog .choices button{font-size:clamp(12px,1.1vw,14px);min-height:26px}
+.monologue{--fw:clamp(30px,3.2vw,40px);width:min(calc(var(--stw,100vw) * .72),38em);gap:9px;padding:7px 12px 7px 8px}
+.monologue .text{font-size:clamp(13px,1.25vw,16px);line-height:1.45}
+.monologue .who{font-size:clamp(10px,1vw,12px)}
+@media (pointer:coarse) and (orientation:portrait){
+  .dialog{--fw:50px;--px:14px;--gp:11px;padding:14px var(--px) max(12px, env(safe-area-inset-bottom, 0px))}
+  .dialog .text{font-size:16px}
+  .dialog .who{font-size:13px}
+  .dialog .choices button{font-size:16px;min-height:46px}
+  .monologue{--fw:36px;width:calc(100% - 16px);padding:8px 12px 8px 8px}
+  .monologue .text{font-size:15px}
+}
+@media (pointer:coarse) and (orientation:landscape){
+  .dialog{--fw:46px;--px:12px;--gp:9px;left:9%;right:9%}
+  .dialog .text{font-size:15px}
+  .dialog .who{font-size:12px}
+  .dialog .choices button{font-size:14px}
   .monologue .text{font-size:14px}
 }

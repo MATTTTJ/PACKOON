@@ -3955,7 +3955,10 @@ const TABLES={
   "mom_letter_fold_ms": 700,
   "think_base_ms": 1800,
   "think_char_ms": 75,
-  "think_far_px": 140
+  "think_far_px": 140,
+  "think_stop_base_ms": 700,
+  "think_stop_char_ms": 35,
+  "think_stop_max_ms": 2200
  },
  "PROGRESS": [
   {
