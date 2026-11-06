@@ -3596,6 +3596,8 @@ const TABLES={
   "gather_good_zone": 8,
   "gather_zone_min": 30,
   "gather_zone_max": 85,
+  "gather_zone_count": 2,
+  "gather_zone_gap": 25,
   "gather_stop_frames": 24,
   "gather_perfect_power": 2,
   "gather_yield": 1,

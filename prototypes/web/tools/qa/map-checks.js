@@ -209,6 +209,13 @@ async function runMap({browser:b,outDir}){
     const fallback=await b.eval("({unlocked:!!G.f.mapUnlocked,toast:document.querySelector('#heroMono .text')?.textContent,done:!!G.f.wanderersDone?.['galchamgol:old_magpie']})");
     check(fallback.unlocked&&!fallback.done&&fallback.toast==='돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도를 펴면 데려다줄 것 같다.','map-fallback','늙은 까치를 만나지 않고 돌너머로 들어간 시작에서 지정 지도 안내가 나오지 않았다.',fallback);
     records.push({stage:'dolneomeo-fallback',...fallback});
+    // 결정 D-816: 지역 고르기로 큰 장터·영산부터 시작해도 그 지역 까치가 지도를 맡는다 (사용자 피드백 2026-11-06 "3스테이지에 지도 누르면 같이 다닐 동무가 없다")
+    for(const [id,line] of [['jangteo','장터 처마 위에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.'],['yeongsan','눈 덮인 소나무에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.']]){
+      await ready(b);await b.eval(`G=newGame(${j(id)});resetScreens()`);await b.click('#btnStart');
+      const got=await b.eval("({region:G.region,unlocked:!!G.f.mapUnlocked,toast:document.querySelector('#heroMono .text')?.textContent})");
+      check(got.region===id&&got.unlocked&&got.toast===line,'map-start-'+id,id+' 에서 바로 시작했을 때 까치가 지도를 맡지 않았다(지도가 막힘).',got);
+      records.push({stage:'start-'+id,...got});
+    }
     await ready(b,true);await b.key('m');
     check(await b.eval("$('map').hidden&&!$('btnMap').getClientRects().length"),'map-classic','classic에서 지도 또는 지도 HUD 버튼이 열렸다.');
   }catch(error){
