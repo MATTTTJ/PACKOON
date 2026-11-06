@@ -607,13 +607,15 @@
       ]
     },
     {
-      "id": "onggi_ring", "name": "옹기 독 손끝으로 퉁김 (결정 D-784)", "category": "작은 연출", "status": "제안", "duration": 2.1, "gain": 0.78,
+      "id": "onggi_ring", "name": "옹기 독 손끝으로 퉁김 (결정 D-784·D-972: 은은하게 공기 중으로 퍼진다)", "category": "작은 연출", "status": "제안", "duration": 3.4, "gain": 0.7,
       "layers": [
-        {"instrument":"stone","note":"C6","start":0,"duration":0.03,"gain":0.13,"pan":0.1,"patch":{"fixedDuration":0.03,"attack":0.001,"decay":0.016,"sustain":0,"release":0.02,"tail":0.04},"seed":9160},
-        {"instrument":"windchime","note":"E5","start":0.004,"duration":1.6,"gain":0.2,"pan":0,"patch":{"fixedDuration":1.6,"attack":0.002,"decay":1.15,"sustain":0,"release":0.35,"tail":0.5,"partials":[[1,1,1],[2.34,0.34,0.75],[4.06,0.1,1.5]],"vibratoHz":4.5,"vibratoCents":3,"vibratoDelay":0.15},"seed":9161},
-        {"instrument":"gayageum_harmonic","note":"B5","start":0.006,"duration":0.9,"gain":0.06,"pan":0,"patch":{"fixedDuration":0.9,"attack":0.002,"decay":0.6,"sustain":0,"release":0.2,"tail":0.2},"seed":9162},
-        {"instrument":"windchime","note":"E5","start":0.24,"duration":1.2,"gain":0.075,"pan":-0.55,"patch":{"fixedDuration":1.2,"attack":0.01,"decay":0.9,"sustain":0,"release":0.3,"tail":0.4,"partials":[[1,1,1],[2.34,0.25,0.75]]},"seed":9163},
-        {"instrument":"windchime","note":"E5","start":0.46,"duration":1.1,"gain":0.045,"pan":0.55,"patch":{"fixedDuration":1.1,"attack":0.01,"decay":0.85,"sustain":0,"release":0.3,"tail":0.4,"partials":[[1,1,1],[2.34,0.2,0.75]]},"seed":9164}
+        {"instrument":"stone","note":"C6","start":0,"duration":0.03,"gain":0.045,"pan":0.1,"patch":{"fixedDuration":0.03,"attack":0.004,"decay":0.016,"sustain":0,"release":0.02,"tail":0.04},"seed":9160},
+        {"instrument":"windchime","note":"E5","start":0.01,"duration":2.6,"gain":0.13,"pan":0,"patch":{"fixedDuration":2.6,"attack":0.012,"decay":2.1,"sustain":0,"release":0.5,"tail":0.7,"partials":[[1,1,1],[2.0,0.1,1.3],[3.01,0.03,1.8]],"vibratoHz":3.2,"vibratoCents":4,"vibratoDelay":0.3},"seed":9161},
+        {"instrument":"windchime","note":"E4","start":0.03,"duration":2.9,"gain":0.06,"pan":0,"patch":{"fixedDuration":2.9,"attack":0.18,"decay":2.4,"sustain":0,"release":0.6,"tail":0.8,"partials":[[1,1,1],[2.0,0.15,1.2]],"vibratoHz":2.4,"vibratoCents":5,"vibratoDelay":0.4},"seed":9165},
+        {"instrument":"wind","note":"C4","start":0.08,"duration":2.4,"gain":0.035,"pan":0,"patch":{"kind":"noise","gain":0.65,"attack":0.5,"decay":1.2,"sustain":0.2,"release":0.7,"tail":0.4,"noise":1,"noiseCutoff":900,"partials":[],"fixedDuration":2.4},"seed":9166},
+        {"instrument":"windchime","note":"E5","start":0.42,"duration":2.0,"gain":0.05,"pan":-0.7,"patch":{"fixedDuration":2.0,"attack":0.05,"decay":1.6,"sustain":0,"release":0.4,"tail":0.6,"partials":[[1,1,1],[2.0,0.08,1.3]]},"seed":9163},
+        {"instrument":"windchime","note":"E5","start":0.86,"duration":1.9,"gain":0.032,"pan":0.7,"patch":{"fixedDuration":1.9,"attack":0.08,"decay":1.5,"sustain":0,"release":0.4,"tail":0.6,"partials":[[1,1,1],[2.0,0.06,1.3]]},"seed":9164},
+        {"instrument":"windchime","note":"E5","start":1.35,"duration":1.8,"gain":0.018,"pan":-0.35,"patch":{"fixedDuration":1.8,"attack":0.1,"decay":1.4,"sustain":0,"release":0.4,"tail":0.6,"partials":[[1,1,1]]},"seed":9167}
       ]
     },
     {
