@@ -16,7 +16,7 @@ const Vfx=(()=>{
        눈 아닌 바닥에서 구르면 흙먼지와 흙덩이, 단풍골·장터는 잎 부스러기도 튄다. 걷기는 예전처럼 출발·멈춤 먼지만.
      발자국은 따로 모아 두고(최대 snow_print_max) snow_print_frames 동안 서서히 사라진다. 서리는 옅고 짧다. */
   const prints=[];
-  const STEP_FRAMES={'':6,squirrel:5,goat:8,owl:8,deer:6};
+  const STEP_FRAMES={'':6,squirrel:5,goat:8,owl:8,otter:5};   // 결정 D-1073: 고라니 대신 수달
   let stepIdx=-1;
   function surface(){const s=fieldCall('surface');return s==='snow'||s==='frost'?s:'';}
   function addPrint(x,y,shape,life){
@@ -32,7 +32,7 @@ const Vfx=(()=>{
     const s=surface();if(!s)return;
     const form=G.form||'',idx=Math.floor(G.anim/(STEP_FRAMES[form]||6));
     if(idx===stepIdx)return;stepIdx=idx;
-    const snow=s==='snow',long=form==='goat'||form==='deer',x=G.px-G.face*(idx%2?(long?6:3):(long?-4:-1));
+    const snow=s==='snow',long=form==='goat'||form==='otter',x=G.px-G.face*(idx%2?(long?6:3):(long?-4:-1));
     if(G.py>=fieldGround()-.5)addPrint(x,G.py,form,snow?TABLES.TUNING.snow_print_frames:Math.round(TABLES.TUNING.snow_print_frames/3));
     if(motion.matches)return;
     const n=snow?(form==='squirrel'?2:long?4:3):1;
@@ -73,7 +73,7 @@ const Vfx=(()=>{
       const c='#8b9eac',P=(a,b,w,h)=>R(x+a,y+b,w,h,c);
       if(p.shape==='squirrel'){P(-1,-1,1,1);P(1,-1,1,1);}
       else if(p.shape==='goat'){P(-1,-1,1,1);P(1,-1,1,1);P(-1,0,1,1);P(1,0,1,1);}
-      else if(p.shape==='deer'){P(-1,-1,1,2);P(1,-1,1,2);}
+      else if(p.shape==='otter'){P(-2,-1,2,1);P(1,-1,2,1);P(-1,-2,3,1);}   // 결정 D-1073: 물갈퀴 발자국
       else if(p.shape==='owl'){P(0,-1,1,1);P(-1,-2,1,1);P(1,-2,1,1);P(0,-3,1,1);}
       else if(p.shape==='roll'){P(-2,-1,5,1);}
       else{P(-1,-1,3,1);P(-1,-2,1,1);P(1,-2,1,1);}

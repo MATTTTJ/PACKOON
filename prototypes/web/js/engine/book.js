@@ -58,13 +58,16 @@ function renderChildRecord(body,tab){
   if(tab==='todo')renderTodo(body);
   else if(tab==='clues'){
     if(!G.clues.length)note('아빠의 흔적을 아직 찾지 못했다. '+REG.name+' 동물들에게 말을 걸어 보자.');
-    G.clues.forEach(c=>entry(c.who,c.text));
+    // 결정 D-1078: 이름에는 그 이름으로 불리며 겪은 일이 쌓인다. 먹힌 이름을 지어 준 이에게서 들은 단서는 흐려진다(되찾으면 돌아온다)
+    const dim=new Set((G.nicknames||[]).filter(n=>n.lost&&n.by).flatMap(n=>[n.by,npcName(n.by)]).filter(Boolean));
+    G.clues.forEach(c=>{const e=entry(c.who,c.text);if(dim.has(c.who))e.classList.add('lost');});
   }else if(tab==='nicknames'){
     // 결정 D-423: 맨 위는 엄마가 지어 준 이름. 아이가 길에서 한 번도 말하지 않은 이름이라 엔딩에서 새 이름을 받을 때까지 비어 있다
     entry('엄마가 지어 준 이름',G.f.newName||'(아직 적지 않았다)').classList.add('own-name');
     const list=G.nicknames||[];if(!list.length)note('길에서 누군가 나를 새롭게 불러 주면 적어 두자.');
     // 먹힌 이름은 글자만 비고, 지어 준 이와 받은 곳은 흐리게 남는다
-    list.forEach(n=>{const e=entry((REGIONS[n.region]?.name||'길 위에서')+(n.by?' · '+(npcName(n.by)||n.by):''),n.lost?'　':n.text);if(n.lost)e.classList.add('lost');});
+    // 결정 D-1078: 먹힌 이름 칸에는 그 길의 기억이 흐려졌다는 한 줄이 남는다
+    list.forEach(n=>{const e=entry((REGIONS[n.region]?.name||'길 위에서')+(n.by?' · '+(npcName(n.by)||n.by):''),n.lost?'(그 길에서 있었던 일이 잘 떠오르지 않는다.)':n.text);if(n.lost)e.classList.add('lost');});
     // 결정 D-703: 엄마의 쪽지는 이름 장 아래. 받는 이 자리(번진 이름)가 이 장 맨 위 '엄마가 지어 준 이름'과 짝을 이룬다
     body.appendChild(el('div','sub mom-note-head','엄마의 쪽지'));renderMomNote(body);
   }else if(tab==='mom')renderMomNote(body);

@@ -201,7 +201,7 @@ async function runMobileLayout(browser, outDir, findings, evidence, steps) {
     const bosses = (w === 390 || w === 412) ? ['golem'] : LAYOUT_BOSSES;
     for (const kind of bosses) {
       // 도구 둘, 변신 넷(가장 많을 때)으로 전투를 연다
-      await browser.eval(`G.tool='sickle';G.f.battleTools=['pickaxe'];G.forms=['squirrel','goat','owl','deer'];refreshFormUi();startBattle('${kind}',()=>{})`);
+      await browser.eval(`G.tool='sickle';G.f.battleTools=['pickaxe'];G.forms=['squirrel','goat','owl','otter'];refreshFormUi();startBattle('${kind}',()=>{})`);
       await browser.until("B&&B.st!=='intro'", { timeout: 9000, label: kind + ' 전투 시작' }).catch(() => {});
       await browser.wait(300);
       const battle = await browser.eval(`(${measureLayout.toString()})()`);

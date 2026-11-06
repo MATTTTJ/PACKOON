@@ -63,12 +63,12 @@ function mapSeenText(seen){
    처음 맡을 때 아이가 까치를 본 속말 한 줄을 남긴다 (D-706). 시작(startGame)과 끝 화면의 다음 지역 단추가 부른다. */
 const MAP_MAGPIE_LINES={
   dolneomeo:'돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도를 펴면 데려다줄 것 같다.',
-  jangteo:'장터 처마 위에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.',
-  yeongsan:'눈 덮인 소나무에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.'
+  jangteo:'장터 처마 위에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.'
 };
 function ensureMapCompanions(){
   if(CLASSIC||!G||G.f.mapUnlocked||(REG?.order||0)<2)return false;
-  G.f.mapUnlocked=true;think(MAP_MAGPIE_LINES[G.region]||'나뭇가지에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.');return true;
+  // 결정 D-1079: 영산은 주인공 독백으로 연다. 지도는 조용히 열린다(REG.quietMapUnlock)
+  G.f.mapUnlocked=true;if(!REG.quietMapUnlock)think(MAP_MAGPIE_LINES[G.region]||'나뭇가지에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.');return true;
 }
 // 결정 D-18: M 지도와 까치 떼 이동 (design/data/decisions.csv)
 function openMap(){

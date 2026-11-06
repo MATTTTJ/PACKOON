@@ -175,7 +175,7 @@ const Sound=(()=>{
   /* 잎사귀 풀피리 (변신, forms.js): 짧게 떨며 오르는 소리를 바로 합성한다. 변신마다 높이만 다르다. */
   function leaf(form){
     if(!ready())return;
-    const base={'':523,squirrel:784,goat:587,owl:440,deer:659}[form||'']||523,t=ctx.currentTime;
+    const base={'':523,squirrel:784,goat:587,owl:440,otter:659}[form||'']||523,t=ctx.currentTime;
     const osc=ctx.createOscillator(),vib=ctx.createOscillator(),depth=ctx.createGain(),gain=ctx.createGain();
     osc.type='triangle';osc.frequency.setValueAtTime(base*.94,t);osc.frequency.linearRampToValueAtTime(base,t+.06);osc.frequency.linearRampToValueAtTime(base*1.06,t+.32);
     vib.frequency.value=7;depth.gain.value=base*.012;vib.connect(depth);depth.connect(osc.frequency);
