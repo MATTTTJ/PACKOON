@@ -30,9 +30,10 @@ function spark(x,y){for(let i=0;i<8;i++)sparks.push({x,y,vx:(Math.random()-.5)*2
 function dropSurfaceAt(x,sourceY,sourceX,zoneId=G.zone){
   const z=usesZones(REG)?REG.zones[zoneId]:REG;
   if(!z)return null;
-  const width=z.w??REG.world,ground=z.ground??GROUND;
+  const width=z.w??REG.world;
   const max=typeof z.maxX==='function'?z.maxX():width-16;
-  x=Math.round(clamp(x,16,Math.min(width-16,max)));
+  x=Math.round(clamp(x,edgeMargin(z,'left'),Math.min(width-edgeMargin(z,'right'),max)));
+  const ground=surfaceY(x,z);   // 결정 D-845: 비탈 위에 떨어지면 비탈 높이에 놓인다
   const surfaces=(z.platforms||[]).filter(p=>x>=p.x+8&&x<=p.x+p.w-8&&p.y>=sourceY-.01);
   const y=surfaces.reduce((v,p)=>Math.min(v,p.y),ground);
   return {x,y};
@@ -172,11 +173,12 @@ function step(){
   G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed*formMoveMul());if(ax)G.face=ax>0?1:-1;
   stepRoll(ax);   // 결정 D-94: 구르는 중이면 G.vx를 구르기 빠르기로 (roll.js)
   const climbing=stepClimb(ax);
+  if(!climbing)slopeSlip();   // 결정 D-846: 언 비탈에서 미끄러짐
   if(!climbing){
   if(jumpQ&&!G.onGround&&owlFlap())jumpQ=false;   // 결정 D-720: 수리부엉이 날갯짓 (forms.js)
   if(jumpQ&&G.onGround){Sound.jump();G.vy=TABLES.TUNING.field_jump_velocity*formJumpMul();G.onGround=false;}jumpQ=false;
   // ↓+점프: 땅이 아닌 발판 위에서만 아래로 빠진다. 지나는 동안 그 높이의 발판만 무시한다.
-  if(dropQ&&G.onGround&&G.py<fieldGround()-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;
+  if(dropQ&&G.onGround&&G.py<surfaceY(G.px)-0.5){G.dropY=G.py;G.dropT=TABLES.TUNING.field_drop_frames;G.py+=1;G.vy=1;G.onGround=false;
     // 결정 D-114: 발판 가장자리를 붙잡고 등을 보이며 잠깐 미끄러져 내려간 뒤 떨어진다. 공처럼 구르던 중이면 공 모양 그대로 빠진다.
     // 결정 D-400: 매달려 미끄러지는 것은 앞발로 턱을 붙잡는 너구리·다람쥐뿐이다. 산양·고라니는 앞을 본 채 뛰어내리고, 수리부엉이는 날개를 편다.
     const clings=!rolling&&formClings(G.form);G.dropBack=clings;G.dropHang=clings?dropHangFrames(G.dropY):0;}dropQ=false;
@@ -189,10 +191,12 @@ function step(){
   const prevY=G.py;
   if(!climbing){G.px+=G.vx;G.py+=G.vy;}
   if(zoneEdge())return;
-  G.px=clamp(G.px,16,fieldDef().maxX?fieldCall('maxX'):fieldWidth()-16);
+  G.px=clamp(G.px,edgeMargin(fieldDef(),'left'),fieldDef().maxX?fieldCall('maxX'):fieldWidth()-edgeMargin(fieldDef(),'right'));
   if(!climbing){
   G.onGround=false;
-  if(G.py>=fieldGround()){G.py=fieldGround();G.vy=0;G.onGround=true;}
+  // 결정 D-845: 비탈 위에서는 땅 높이가 비탈을 따른다. 내리막을 걸을 때 발이 뜨지 않게 조금 붙여 준다
+  const gy=surfaceY(G.px),stick=wasGrounded&&G.vy>=0&&slopeAt(G.px)&&G.dropT<=0&&gy-G.py<=2+Math.abs(G.vx)*1.2;
+  if(G.py>=gy||stick){G.py=gy;G.vy=0;G.onGround=true;}
   else if(G.vy>=0){for(const p of [...fieldPlatforms(),...formLedges()]){if(G.dropT>0&&Math.abs(p.y-G.dropY)<1)continue;if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
   }
   if(G.onGround||climbing){G.dropBack=false;G.dropHang=0;}
@@ -207,14 +211,76 @@ function step(){
   for(const s of zoneObjects('stamps'))if(s.auto&&pointNear(s))findStamp(s);
   for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.vy+=0.15;if(--s.t<=0)sparks.splice(i,1);}
   if(shakeT>0)shakeT--;
-  const target=G.px-W*0.42+(fieldCall('camLead')||0);G.cam+=(target-G.cam)*0.12;   // camLead: 구역이 화면을 앞서 보여 줄 때 (결정 D-547)G.cam=clamp(G.cam,0,Math.max(0,fieldWidth()-W));
+  const target=G.px-W*0.42+(fieldCall('camLead')||0);G.cam+=(target-G.cam)*0.12;   // camLead: 구역이 화면을 앞서 보여 줄 때 (결정 D-547)
+  // 결정 D-847: 화면은 구역 끝을 넘지 않는다 (사용자 피드백 2026-11-06 17: 맵 끝 뒤로 땅이 이어져 보였다. 주석 속에 묻혀 꺼져 있던 고정을 되살린다)
+  G.cam=clamp(G.cam,0,Math.max(0,fieldWidth()-W));
 }
+
+/* 결정 D-847: 나가는 길이 없는 구역 끝(막다른 끝)에는 덤불·바위 무더기가 서서 길을 막는다. 주인공은 그 앞까지만 걷는다.
+   구역이 edges:{left:false} 처럼 끄면 예전처럼 화면 끝까지 걷는다. 옛 구성(구역 없음)은 그대로 16px. */
+function deadEnd(z,side){return !!z&&z!==REG&&usesZones(REG)&&!z.exits?.[side]&&z.edges?.[side]!==false;}
+function edgeMargin(z,side){return deadEnd(z,side)?TABLES.TUNING.field_edge_margin:16;}
+
+/* 결정 D-846: 가파른 언 비탈(기울기 field_slope_slip_grade 이상)에 선 동안, 산양이 아니면 발이 미끄럽다.
+   - 오르막으로 걸으면 발이 헛돌아 field_slope_climb_speed 로만 오르고, field_slope_slipback_every 프레임마다
+     field_slope_slipback_frames 동안 주르륵 밀려 내려간다. 그래도 조금씩은 올라가 막히지 않는다.
+   - 가만히 있거나 내려가면 field_slope_slip_speed 만큼 아래로 밀린다. 뛰어 오르면 공중에서는 미끄럽지 않아 더 빨리 오른다.
+   빠른 모습(고라니·구르기)도 똑같이 헛돈다. 산양만 제 빠르기로 오른다. 비탈에 grip:true 를 주면 미끄럽지 않다.
+   미끄러지기 시작하면 구역의 slip() 을 부른다(처음 한 번 속말 등). */
+let slipFrames=0;
+function slopeSlip(){
+  const T=TABLES.TUNING,s=G.onGround?slopeAt(G.px):null,grade=s?(s.y2-s.y1)/(s.x2-s.x1):0;
+  if(!s||s.grip||Math.abs(grade)<T.field_slope_slip_grade||G.form==='goat'){slipFrames=0;return;}
+  const down=grade>0?1:-1,up=-down,climbing=Math.sign(G.vx)===up;
+  if(++slipFrames===1)fieldCall('slip');
+  const sliding=!climbing||slipFrames%T.field_slope_slipback_every<T.field_slope_slipback_frames;
+  G.vx=sliding?(climbing?0:G.vx)+down*T.field_slope_slip_speed:up*Math.min(Math.abs(G.vx),T.field_slope_climb_speed);
+  if(!Vfx.reducedMotion&&(sliding?slipFrames%4===1:slipFrames%10===1))sparks.push({x:G.px-up*2,y:G.py-1,vx:down*(.4+Math.random()*.5),vy:-.5-Math.random()*.6,t:16,c:'#e8eef0'});   // 발밑에서 튀는 서리 부스러기
+}
+const slopeSlipping=()=>slipFrames>0;
+const EDGE_LOOK={   // 지역마다 끝을 막는 것: 단풍 덤불, 서리 앉은 바위, 눈 쌓인 바위
+  galchamgol:{kind:'bush',dark:'#4e3322',mid:'#86492a',light:'#c97a3c',top:'#e3a04e'},
+  dolneomeo:{kind:'rock',dark:'#465254',mid:'#6c7878',light:'#94a09c',top:'#e4ebe6'},
+  jangteo:{kind:'rock',dark:'#4c4a47',mid:'#706b64',light:'#958f85',top:'#f4f6f4'},
+  yeongsan:{kind:'rock',dark:'#2d3846',mid:'#46566a',light:'#64788c',top:'#eef4f8'},
+};
+/* 끝 무더기 조각: [끝에서 안쪽으로 떨어진 거리, 땅에서 뜬 높이, 너비, 높이]. 큰 덩이가 바깥 끝에 붙고 위로 쌓인다 */
+const EDGE_PILE={
+  rock:[[0,0,27,25],[22,0,15,11],[3,23,21,17],[19,9,10,9],[7,38,14,12],[0,48,9,9]],
+  bush:[[0,0,30,30],[20,0,18,17],[2,26,24,20],[10,42,15,13],[24,13,10,10]],
+};
+function drawZoneEnds(){
+  const z=zoneDef();if(!z)return;const look=EDGE_LOOK[REG.id]||EDGE_LOOK.dolneomeo,m=TABLES.TUNING.field_edge_margin;
+  for(const side of ['left','right']){
+    if(!deadEnd(z,side))continue;
+    const wx=side==='left'?0:z.w,sx=Math.round(wx-cam);if(sx<-80||sx>W+80)continue;
+    const gy=Math.round(surfaceY(side==='left'?m:z.w-m));
+    EDGE_PILE[look.kind].forEach(([u,v,w,h],i)=>{
+      // 구역마다 조금씩 다른 크기 (고정 무늬라 볼 때마다 같다)
+      w+=Math.round(hash(wx+i*13)*4-2);h+=Math.round(hash(wx+i*29)*4-2);
+      const x=side==='left'?sx+u:sx-u-w,y=gy-v-h,inner=side==='left'?x+w-1:x;
+      if(look.kind==='bush'){
+        R(x+2,y,w-4,h,look.mid);R(x,y+2,w,h-3,look.mid);R(x+3,y-1,w-6,2,look.light);   // 둥근 덤불
+        for(let k=0;k<w*h/28;k++){const lx=x+1+Math.floor(hash(wx+i*7+k*3)*(w-3)),ly=y+1+Math.floor(hash(wx+i*5+k*11)*(h-3));R(lx,ly,2,1,hash(k+i)>.5?look.light:look.dark);}
+        if(hash(wx+i)>.3)R(x+Math.floor(w/2),y-2,2,2,look.top);
+        R(inner,y+3,1,h-4,look.dark);
+      }else{
+        R(x+1,y,w-2,h,look.mid);R(x,y+2,w,h-3,look.mid);   // 모서리가 둥근 바위
+        R(x+1,y,w-2,2,look.top);R(x+2,y+2,Math.max(2,w-8),1,look.light);   // 서리·눈 앉은 윗면
+        R(inner,y+2,1,h-3,look.dark);R(x+1,y+h-2,w-2,2,look.dark);   // 안쪽 그늘과 밑 그늘
+        if(w>14)R(x+Math.floor(w*.45),y+Math.floor(h*.5),Math.floor(w*.3),1,look.dark);   // 바위 결
+      }
+    });
+    R(side==='left'?sx:sx-m-8,gy,m+8,1,look.dark);   // 발치 그늘
+  }
+}
+
 
 /* 결정 D-188: 발판 가장자리를 붙잡고 미끄러지는 시간은 내려갈 높이에 맞춘다(사용자 피드백 38).
    낮은 받침대는 거의 바로 내려서고, 높은 발판일수록 길게 붙잡는다. 미끄러지는 거리는 내려갈 높이의
    field_drop_hang_ratio 만큼이고, 시간은 field_drop_hang_min_frames ~ field_drop_hang_frames 사이다. */
 function dropLandingY(x,y){
-  let land=fieldGround();
+  let land=surfaceY(x);
   for(const p of [...fieldPlatforms(),...formLedges()])if(p.y>y+1&&p.y<land&&x>p.x-3&&x<p.x+p.w+3)land=p.y;
   return land;
 }
@@ -404,7 +470,7 @@ function drawFieldTool(ox,oy,f,st,attackT,tool){
 function drawRaccoon(){
   if(!Vfx.reducedMotion&&G.hurtT>0&&Math.floor(G.hurtT/4)%2)return;
   const st=(G.onGround&&Math.abs(G.vx)>0.2)?Math.floor(G.anim/6)%2:0;
-  R(G.px-cam-7,fieldGround(),14,1,'rgba(40,24,14,.35)');
+  R(G.px-cam-7,Math.round(surfaceY(G.px)),14,1,'rgba(40,24,14,.35)');
   if(rolling){drawRollAt(G.px-cam,G.py,G.form||'',rollAngle);return;}
   // 결정 D-721: 너무 오래 굴러 어지러우면 그 자리에서 몸이 좌우로 휘청이고, 머리 위로 별 셋이 돈다. 바라보는 쪽도 이리저리 바뀐다
   if(rollDizzy>0){
@@ -470,6 +536,7 @@ function drawFieldScene(showPlayer=true){
   Vfx.draw('back');
   drawLogs();
   segmentedDraw(()=>fieldCall('drawScenery'));
+  drawZoneEnds();   // 결정 D-847
   Vfx.ground();   // 결정 D-174: 눈·서리에 남은 발자국과 구른 자국 (vfx.js)
   drawZoneObjects();
   drawDigs();
@@ -479,7 +546,7 @@ function drawFieldScene(showPlayer=true){
   fieldCall('drawActors');
   if(showPlayer){drawRaccoon();drawFormFx();}
   drawGatherCue();   // 채집 고리 (gather.js). 주인공 몸에 가리지 않게 주인공 다음에 그린다
-  if(!Vfx.reducedMotion)for(const s of sparks)R(s.x-cam,s.y,1,1,'#fff3b0');
+  if(!Vfx.reducedMotion)for(const s of sparks)R(s.x-cam,s.y,1,1,s.c||'#fff3b0');
   Vfx.front();
   if(showPlayer){drawListenMarks();drawFormHints();}   // 결정 D-173: 새 변신으로만 갈 수 있는 자리의 잎빛 (forms.js)
 }
@@ -879,11 +946,14 @@ const stampCount=(region)=>Object.keys(G.f.stampsFound||{}).filter(k=>!region||k
 /* 결정 D-115: 아빠 손바닥 도장은 작다(가로 7·세로 6, 예전의 절반쯤). 손가락 넷 사이를 비워 손바닥으로 읽히게 하고,
    받침 앞면에 밝게 다듬은 자리(판) 위에 찍어 작아도 눈에 띈다. (x,y)는 손바닥 아래 끝 가운데. faint면 찾기 전의 흐린 자국이다. */
 const PAW=[[-1,-2,3,1],[-2,-4,5,2],[-3,-6,1,2],[-1,-7,1,2],[1,-7,1,2],[3,-6,1,2]];
-function pawStamp(x,y,c,faint=false){
+// 결정 D-861: 가는 깃대 판처럼 좁은 자리에 찍는 작은 손바닥 (도장 자리에 mini:true). 5×4, 발가락 셋
+const PAW_MINI=[[-1,-1,3,1],[-2,-2,5,1],[-2,-4,1,1],[0,-4,1,1],[2,-4,1,1]];
+function pawStamp(x,y,c,faint=false,mini=false){
   x=Math.round(x);y=Math.round(y);
   const plate=faint?'rgba(255,244,214,.22)':'rgba(255,244,214,.55)';
-  R(x-4,y-8,9,8,plate);R(x-3,y-9,7,1,plate);   // 손을 대고 누른 자리: 둘레보다 밝게 닳았다
-  for(const [px,py,w,h] of PAW)R(x+px,y+py,w,h,c);
+  if(mini)R(x-3,y-5,7,5,plate);
+  else{R(x-4,y-8,9,8,plate);R(x-3,y-9,7,1,plate);}   // 손을 대고 누른 자리: 둘레보다 밝게 닳았다
+  for(const [px,py,w,h] of mini?PAW_MINI:PAW)R(x+px,y+py,w,h,c);
 }
 /* 도장이 찍힌 받침. 좌표가 아니라 자리의 종류로 그린다(맵에서 도장 위치가 바뀌어도 받침이 따라간다).
    p.base가 있으면 그것을, 없으면 도장 id로 고른다. 받침 아래 끝이 (x,y)이고, 도장은 받침 앞면(STAMP_FACE만큼 위)에 찍힌다. */
@@ -905,7 +975,7 @@ function drawStampBase(kind,x,y){
   else if(kind==='stone'){R(x-7,y-5,14,5,'#9a958a');R(x-6,y-6,12,1,'#b8b3a6');R(x-7,y-1,14,1,'#6f6a60');R(x+4,y-4,2,2,'#7c776c');}
   else if(kind==='bark'){R(x-5,y-11,10,11,'#6e4a2c');R(x-4,y-11,1,11,'#59391f');R(x+3,y-10,1,9,'#59391f');R(x-1,y-10,2,2,'#4f331d');R(x-5,y-12,10,1,'#8a6440');}
 }
-function pawStamp_glint(x,y,seed){if(!Vfx.reducedMotion&&Math.floor((G.anim+seed)/18)%7===0)R(Math.round(x)+3,Math.round(y)-8,1,1,'#fff3c4');}
+function pawStamp_glint(x,y,seed,mini=false){if(!Vfx.reducedMotion&&Math.floor((G.anim+seed)/18)%7===0)R(Math.round(x)+(mini?2:3),Math.round(y)-(mini?5:8),1,1,'#fff3c4');}
 /* 결정 D-204: 도장을 찾았을 때 뜨는 작은 창은 손바닥 자국(묻은 것 포함, 위 -11~아래 +3)이 늘 다 들어가게 잡는다 (사용자 피드백 56).
    예전에는 땅에서 22px 위까지만 담아, 깃대·기둥처럼 높이 찍힌 도장(face 18)은 손가락 끝이 잘렸다.
    받침까지 한 창(28px)에 들어가면 받침과 함께, 아니면 손바닥을 가운데에 둔다. */
@@ -931,10 +1001,10 @@ function drawZoneObjects(){
     if(k==='stamps'){const sx=p.x-cam,gy=p.y??fieldGround(),base=stampBase(p),py=gy-(p.face??STAMP_FACE[base]);
       // 결정 D-115: 받침을 먼저 그리고, 그 앞면에 작은 손바닥을 찍는다. 찾기 전에는 흐리고 이따금 반짝인다.
       drawStampBase(base,sx,gy);
-      if(!stampFound(p.id)){pawStamp(sx,py,'rgba(110,52,30,.55)',true);pawStamp_glint(sx,py,p.x);continue;}
-      if(p.draw)p.draw(sx,py);else pawStamp(sx,py,'#8a3424');
-      drawPawMark(R,Math.round(sx),Math.round(py),REG.id+':'+p.id);   // 결정 D-171: 그 자리에서 묻은 것 (notebook.js)
-      pawStamp_glint(sx,py,p.x+7);continue;}
+      if(!stampFound(p.id)){pawStamp(sx,py,'rgba(110,52,30,.55)',true,p.mini);pawStamp_glint(sx,py,p.x,p.mini);continue;}
+      if(p.draw)p.draw(sx,py,p.mini);else pawStamp(sx,py,'#8a3424',false,p.mini);
+      if(!p.mini)drawPawMark(R,Math.round(sx),Math.round(py),REG.id+':'+p.id);   // 결정 D-171: 그 자리에서 묻은 것 (notebook.js). 작은 손바닥(D-861)엔 덧그리지 않는다(수첩 도장 쪽엔 그대로)
+      pawStamp_glint(sx,py,p.x+7,p.mini);continue;}
     if(p.draw)p.draw(p.x-cam,p.y??fieldGround());
     if(k==='doors'&&!needMet(p)&&p.drawBlocked)p.drawBlocked(p.x-cam,p.y??fieldGround());
   }

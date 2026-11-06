@@ -279,8 +279,10 @@ function whipAngle(b,t,u){   // t 프레임, u 는 어깨(0)에서 주먹(1)까�
 function whipPoint(b,ang,r){const p=whipPivot(b.side),dx=Math.cos(ang)*r,dy=Math.sin(ang)*r;return [b.side<0?p.x+dx:p.x-dx,p.y+dy];}
 function whipLocal(side,x,y){const p=whipPivot(side),dx=side<0?x-p.x:p.x-x,dy=y-p.y;return {r:Math.hypot(dx,dy),a:Math.atan2(dy,dx)};}
 function whipArmPts(b,t,reachK=1,n=9){const sp=whipSpec(b.v),out=[];for(let i=0;i<=n;i++){const u=i/n;out.push(whipPoint(b,whipAngle(b,t,u),u*sp.reach*reachK));}return out;}
-function whipMarkPos(ra){const sp=whipSpec(ra.v),[x,y]=whipPoint(ra,sp.a1,sp.reach*(ra.v==='reach'?0.62:0.5));
-  return [clamp(x,BOX.x+26,BOX.x+BOX.w-26),clamp(y,BOX.y+22,BOX.y+BOX.h-18)];}
+/* 결정 D-876: 칠 자리는 판 안쪽(bMarkZone)에 든다. 처박힌 팔을 따라 안쪽에 드는 첫 자리를 고르고, 없으면 가장 가까운 안쪽 자리 */
+function whipMarkPos(ra){const sp=whipSpec(ra.v),k0=ra.v==='reach'?0.62:0.5,z=bMarkZone();
+  for(const d of [0,0.06,-0.06,0.12,-0.12,0.2,-0.2,0.28]){const [x,y]=whipPoint(ra,sp.a1,sp.reach*(k0+d));if(x>=z.x1&&x<=z.x2&&y>=z.y1&&y<=z.y2)return [x,y];}
+  const [x,y]=whipPoint(ra,sp.a1,sp.reach*k0),q=bFitMark(x,y);return [q.x,q.y];}
 const throwOf=s=>B.bullets.find(b=>b.k==='golemSnowball'&&b.side===s&&b.t>b.delay&&b.t<=b.delay+SB.wind+SB.follow);
 
 /* ---------- 골렘 그림 (상대 자리, 0.84배로 그려진다) ---------- */
@@ -604,7 +606,9 @@ function pickGolem(){
 const stompCount=()=>((B&&B.stompRound)||0)>=2?3:2;   // 세 번째 발 찧기부터 세 번 찧는다
 const clampIn=(x,y)=>[clamp(x,BOX.x+30,BOX.x+BOX.w-30),clamp(y,BOX.y+20,BOX.y+BOX.h-16)];
 /* 결정 D-255: 발 찧을 자리. aim 은 찧을 때마다 손 자리, march 는 한쪽 끝에서 반대쪽 끝으로 걸어오고, pincer 는 손 양옆을 찧은 뒤 가운데 */
-function stompTarget(b){
+/* 결정 D-876: 마지막 발바닥은 눈에 박혀 칠 자리가 되므로 판 안쪽(bMarkZone)에 찧는다 */
+function stompTarget(b){const [x,y]=stompSpot(b);if(!b.last)return [x,y];const q=bFitMark(x,y);return [q.x,q.y];}
+function stompSpot(b){
   const pat=b.pat||'aim',n=b.n,i=b.i;
   if(pat==='march'){const k=n>1?i/(n-1):0.5,x=b.dir<0?BOX.x+BOX.w-40-(BOX.w-80)*k:BOX.x+40+(BOX.w-80)*k;return clampIn(x,i%2?BOX.y+BOX.h*0.66:BOX.y+BOX.h*0.36);}
   if(pat==='pincer'&&i<n-1){const s=i%2?1:-1;return clampIn(B.px+s*78,B.py+(i?-18:18));}
