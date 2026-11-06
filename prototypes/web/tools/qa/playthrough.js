@@ -372,6 +372,9 @@ async function battleLoop(io,gifts,{sway=false,dodge=false}={}) {
     if(startHp===null)startHp=await read('G.hp');
     if(await read("!$('bResult').hidden")){await release();result=await read('B&&B.result');await click('#bResOk');await wait(80);continue;}
     if(!s.paused){
+      // 결정 D-876: 칠 자리는 모든 보스에서 판 안쪽 영역(bMarkZone)에 든다. 아래쪽 끝이나 모서리에 뜨면 도구 끝이 못 닿는다
+      const out=await read("B&&B.mark&&!bInMarkZone(B.mark)?{kind:B.kind,part:B.mark.part.id,x:Math.round(B.mark.x-BOX.x),y:Math.round(B.mark.y-BOX.y)}:null");
+      if(out){await release();throw new Error(`칠 자리가 판 안쪽 영역 밖에 떴다: ${out.kind} ${out.part} (판 안 ${out.x},${out.y})`);}
       if(await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)')){
         if(dodge)await hold(await read(DODGE_KEYS));
         else if(sway){

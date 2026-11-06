@@ -2818,6 +2818,12 @@ const TABLES={
      "text": "날쌘 아저씨가 볶은 깨를 소금이랑 같이 찧어 보라고 했다.",
      "section": "숨은 가공법",
      "when": "hint:sesame_salt"
+    },
+    {
+     "who": "me",
+     "text": "날쌘이 말없이 쪽지를 넣어 줬다. 깨 하나, 소금 하나, 절구에.",
+     "section": "숨은 가공법",
+     "when": "gift:g_gal_nal"
     }
    ]
   },
@@ -2837,6 +2843,12 @@ const TABLES={
      "text": "모락 아주머니 말로는 녹두에 참기름을 넣고 갈아야 빈대떡 부치기 좋다.",
      "section": "숨은 가공법",
      "when": "hint:mung_batter"
+    },
+    {
+     "who": "me",
+     "text": "날쌘이 쪽지를 쥐여 줬다. 녹두 하나, 참기름 하나, 맷돌에.",
+     "section": "숨은 가공법",
+     "when": "gift:g_jang_nal"
     }
    ]
   },
@@ -2850,6 +2862,12 @@ const TABLES={
      "text": "단풍골 가루에 장터 팥과 영산 열매를 포갰다. 세 계절이 한 떡이 됐다.",
      "section": "숨은 가공법",
      "when": "recipe:rainbow_tteok"
+    },
+    {
+     "who": "me",
+     "text": "모락 아주머니가 도토리 가루, 팥, 마가목 열매를 시루에 한 켜씩 앉히라고 가르쳐 주셨다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_jang_morak"
     }
    ]
   },
@@ -2869,6 +2887,12 @@ const TABLES={
      "text": "할머니가 칡뿌리는 겨우살이에 대추 하나 넣고 갈면 겨울 약이 된다고 했다.",
      "section": "숨은 가공법",
      "when": "hint:ssanghwa"
+    },
+    {
+     "who": "me",
+     "text": "날쌘이 보따리 끈에 쪽지를 끼워 두고 갔다. 칡뿌리, 겨우살이, 대추를 하나씩 맷돌에.",
+     "section": "숨은 가공법",
+     "when": "gift:g_yeong_nal"
     }
    ]
   },
@@ -3162,6 +3186,18 @@ const TABLES={
      "text": "결명자를 꿀에 개어 빚었다. 콩알만 한 환이 됐다.",
      "section": "숨은 가공법",
      "when": "recipe:gyeol_hwan"
+    },
+    {
+     "who": "me",
+     "text": "두꺼비 할머니가 손바닥을 펴 보라더니 결명자를 꿀에 개어 환으로 빚는 법을 일러 주셨다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_gal_toad"
+    },
+    {
+     "who": "me",
+     "text": "날쌘이 또 쪽지를 떨구고 갔다. 결명자 하나, 꿀 하나, 절구에.",
+     "section": "숨은 가공법",
+     "when": "gift:g_dol_nal"
     }
    ]
   },
@@ -3194,6 +3230,12 @@ const TABLES={
      "text": "솔방울을 찧어 석청에 재워 봤다. 송진 냄새가 단맛 속에 숨었다.",
      "section": "숨은 가공법",
      "when": "recipe:solbang_cheong"
+    },
+    {
+     "who": "me",
+     "text": "부엉 영감님이 장부 한 장을 찢어 주셨다. 솔방울 둘에 석청 하나, 절구에 찧어 잰다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_jang_bueong"
     }
    ]
   },
@@ -3232,6 +3274,12 @@ const TABLES={
      "text": "진흙에 돌가루와 억새를 넣고 찧었다. 손에 쩍쩍 붙는다.",
      "section": "숨은 가공법",
      "when": "recipe:heuk_banjuk"
+    },
+    {
+     "who": "me",
+     "text": "남생이 할머니가 진흙 덩이에 돌가루, 마른 억새를 같이 찧으면 둑 메우는 흙이 된다고 일러 주셨다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_dol_turtle"
     }
    ]
   },
@@ -3251,6 +3299,12 @@ const TABLES={
      "text": "구들돌을 숯불 김에 데워 억새꽃 솜에 쌌다. 한참 따뜻하다.",
      "section": "숨은 가공법",
      "when": "recipe:jjimjil_dol"
+    },
+    {
+     "who": "me",
+     "text": "검댕 아저씨가 받은 셈이라며 구들돌을 숯불에 달궈 억새꽃 솜에 싸서 찌는 법을 일러 줬다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_gal_geomdaeng"
     }
    ]
   },
@@ -3270,6 +3324,12 @@ const TABLES={
      "text": "이끼 낀 눈돌을 기름에 갈았다. 푸른 먹빛 물감이 됐다.",
      "section": "숨은 가공법",
      "when": "recipe:dol_mulgam"
+    },
+    {
+     "who": "me",
+     "text": "뿔영감님이 이끼 낀 눈돌을 참기름에 개어 갈면 장승 눈에 올리는 빛이 된다고 하셨다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_dol_ppuri"
     }
    ]
   },
@@ -3283,6 +3343,12 @@ const TABLES={
      "text": "옥돌을 맷돌에 갈아 봤다. 손등에 바르니 뽀얗다.",
      "section": "숨은 가공법",
      "when": "recipe:okgaru"
+    },
+    {
+     "who": "me",
+     "text": "돌쇠 할아버지가 내 손을 잡고 옥돌을 맷돌에 갈면 옥가루가 된다고 일러 주셨다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_dol_dolsoe"
     }
    ]
   },
@@ -3321,6 +3387,12 @@ const TABLES={
      "text": "쌀과 잣을 같이 갈았다. 죽이 곱게 쒀졌다.",
      "section": "숨은 가공법",
      "when": "recipe:jatjuk"
+    },
+    {
+     "who": "me",
+     "text": "꾸벅이가 졸면서 겨울잠 들기 전엔 쌀이랑 잣을 같이 갈아 죽을 먹는다고 중얼거렸다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_dol_kkubeogi"
     }
    ]
   },
@@ -3334,6 +3406,18 @@ const TABLES={
      "text": "송이를 찢어 쌀에 얹고 쪄 봤다. 시루 김에 송이 냄새가 가득하다.",
      "section": "숨은 가공법",
      "when": "recipe:songibap"
+    },
+    {
+     "who": "me",
+     "text": "여울이 빨래 아줌마한테 들었다며 쌀 두 줌에 송이 하나를 쪄 보라고 했다. 빨래 아줌마는 엄마다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_gal_otter"
+    },
+    {
+     "who": "me",
+     "text": "말뚝 행수님이 셈을 갚는다며 쌀 두 줌에 송이 하나를 얹어 찌는 상단 밥을 일러 주셨다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_jang_haengsu"
     }
    ]
   },
@@ -3353,6 +3437,18 @@ const TABLES={
      "text": "버섯 두 가지에 깨소금을 쳐서 쪘다. 검댕 아저씨네 저녁 맛이다.",
      "section": "숨은 가공법",
      "when": "recipe:beoseot_jjim"
+    },
+    {
+     "who": "me",
+     "text": "도담이 숯가마 쪽에선 버섯 두 가지에 깨소금을 쳐서 쪄 먹는다고 알려 줬다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_gal_dodam"
+    },
+    {
+     "who": "me",
+     "text": "종종이가 엄마가 쪄 주던 버섯찜 이야기를 혼잣말로 흘렸다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_jang_jongjong"
     }
    ]
   },
@@ -3372,6 +3468,18 @@ const TABLES={
      "text": "석이를 쌀가루에 섞어 쪘다. 거무스름한 잔치떡이 됐다.",
      "section": "숨은 가공법",
      "when": "recipe:seogibyeong"
+    },
+    {
+     "who": "me",
+     "text": "메밀댁이 말없이 시늉으로 쌀가루에 석이를 섞어 쪄 보였다. 석이병이다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_dol_badger"
+    },
+    {
+     "who": "me",
+     "text": "등잔발이 밤길에 들었다며 돌너머 메밀댁의 석이병 이야기를 해 줬다. 쌀가루에 석이를 섞어 찐다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_jang_deungjan"
     }
    ]
   },
@@ -3442,6 +3550,12 @@ const TABLES={
      "text": "고드름을 깨 넣고 마가목을 으깨 띄웠다. 이가 시리다.",
      "section": "숨은 가공법",
      "when": "recipe:hwachae"
+    },
+    {
+     "who": "me",
+     "text": "살금이가 고드름 조각에 마가목 두 알을 찧어 띄우면 시원하다고 중얼거렸다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_yeong_salgeumi"
     }
    ]
   },
@@ -3455,6 +3569,12 @@ const TABLES={
      "text": "얼음 비늘과 서리 수염을 같이 갈았다. 가루가 손끝에서 서늘하다.",
      "section": "숨은 가공법",
      "when": "recipe:bigeul_garu"
+    },
+    {
+     "who": "me",
+     "text": "옹달 할머니가 옛적엔 강철이 비늘과 서리 수염을 같이 갈아 산군 할아버지께 올렸다고 하셨다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_yeong_ongdal"
     }
    ]
   },
@@ -3474,6 +3594,12 @@ const TABLES={
      "text": "차돌을 찧으니 결대로 갈라졌다. 모난 데를 갈아 공깃돌 다섯 알.",
      "section": "숨은 가공법",
      "when": "recipe:gongi"
+    },
+    {
+     "who": "me",
+     "text": "삼촌은 어릴 때 아빠랑 차돌 두 개를 절구에 찧어 공깃돌을 만들었다고 혼잣말을 했다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_gal_musoe"
     }
    ]
   },
@@ -3493,6 +3619,12 @@ const TABLES={
      "text": "깨에 꿀을 버무려 찧었더니 강정이 굳었다. 얼레네 할머니 솜씨엔 아직 못 미친다.",
      "section": "숨은 가공법",
      "when": "recipe:gangjeong"
+    },
+    {
+     "who": "me",
+     "text": "엿방울이 장터 사람이면 다 안다며 깨를 꿀에 버무려 찧으면 깨강정이라고 했다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_jang_yeot"
     }
    ]
   },
@@ -3512,6 +3644,12 @@ const TABLES={
      "text": "콩을 찧어 덩이를 빚고 짚으로 묶었다. 할멈 말대로 매달아 띄우면 장이 된다.",
      "section": "숨은 가공법",
      "when": "recipe:meju"
+    },
+    {
+     "who": "me",
+     "text": "짠돌이 장국밥 할머니네 메주 빚는 법을 들은 대로 알려 줬다. 콩 둘을 찧어 짚으로 묶는다.",
+     "section": "숨은 가공법",
+     "when": "gift:g_jang_jjandol"
     }
    ]
   }
@@ -3669,6 +3807,8 @@ const TABLES={
   "battle_bare_cooldown": 16,
   "battle_bare_radius": 9,
   "battle_mark_radius": 13,
+  "battle_mark_margin": 28,
+  "battle_mark_spare": 6,
   "battle_iframes": 60,
   "battle_squirrel_speed": 3.3,
   "battle_squirrel_cooldown": 10,
@@ -4368,6 +4508,455 @@ const TABLES={
    }
   }
  },
+ "GIFT_RECIPES": [
+  {
+   "id": "g_gal_toad",
+   "region": "galchamgol",
+   "npc": "toad",
+   "out": "gyeol_hwan",
+   "way": "직접",
+   "lines": [
+    [
+     0,
+     "받기만 하면 쓰나. 손바닥 펴 보렴."
+    ],
+    [
+     0,
+     "결명자를 꿀에 개어 절구에 찧으면 콩알만 한 환이 된단다. 눈이 침침할 때 한 알씩 먹지."
+    ],
+    [
+     0,
+     "언제고 둘 다 손에 들어오거든 빚어 두렴. 연기를 많이 마시는 이한테 그만이란다."
+    ]
+   ]
+  },
+  {
+   "id": "g_gal_otter",
+   "region": "galchamgol",
+   "npc": "stream_otter",
+   "out": "songibap",
+   "way": "소문",
+   "lines": [
+    [
+     0,
+     "있잖아, 빨래 아줌마가 그랬어. 송이는 쌀이랑 같이 쪄야 향이 안 날아간대."
+    ],
+    [
+     0,
+     "쌀 두 줌에 송이 하나! 또박또박 외웠어. 너도 외울 수 있어?"
+    ]
+   ]
+  },
+  {
+   "id": "g_gal_musoe",
+   "region": "galchamgol",
+   "npc": "musoe",
+   "out": "gongi",
+   "way": "혼잣말",
+   "lines": [
+    [
+     0,
+     "…어릴 때 형이랑 냇가 차돌을 주워다 절구에 찧었다."
+    ],
+    [
+     0,
+     "두 개 찧으면 공깃돌이 다섯 개 나왔지. …형이 늘 이겼다."
+    ],
+    [
+     1,
+     "(삼촌이 혼잣말처럼 흘린 말이다. 차돌 두 개를 절구에 찧으면 공깃돌이 되나 보다.)"
+    ]
+   ]
+  },
+  {
+   "id": "g_gal_geomdaeng",
+   "region": "galchamgol",
+   "npc": "charcoal_badger",
+   "out": "jjimjil_dol",
+   "way": "직접",
+   "lines": [
+    [
+     0,
+     "받았으면 셈은 해야지. 하나 일러 주마."
+    ],
+    [
+     0,
+     "구들돌을 숯불에 달궈 억새꽃 솜에 싸서 찌면 찜질 돌이 된다. 밤새 안 식는다."
+    ],
+    [
+     0,
+     "…언 다리에 대면 좋다. 콜록."
+    ]
+   ]
+  },
+  {
+   "id": "g_gal_dodam",
+   "region": "galchamgol",
+   "npc": "dodam",
+   "out": "beoseot_jjim",
+   "way": "소문",
+   "lines": [
+    [
+     0,
+     "고마워! 대신 내가 들은 거 알려 줄게!"
+    ],
+    [
+     0,
+     "숯가마 쪽에선 싸리버섯이랑 꾀꼬리버섯에 깨소금 쳐서 쪄 먹는대! 지나가면 맨날 그 냄새 나거든!"
+    ]
+   ]
+  },
+  {
+   "id": "g_gal_nal",
+   "region": "galchamgol",
+   "npc": "nal",
+   "out": "sesame_salt",
+   "way": "쪽지",
+   "lines": [
+    [
+     0,
+     "…흥. 받은 건 받은 거고."
+    ],
+    [
+     1,
+     "(날쌘이 보따리에 쪽지 한 장을 툭 넣고 돌아섰다. 깨 하나, 소금 하나, 절구에.)"
+    ]
+   ]
+  },
+  {
+   "id": "g_dol_dolsoe",
+   "region": "dolneomeo",
+   "npc": "dolsoe",
+   "out": "okgaru",
+   "way": "직접",
+   "lines": [
+    [
+     0,
+     "이리 손 좀 다오."
+    ],
+    [
+     0,
+     "골렘 가슴께에 푸른 돌이 박혀 있다더구나. 옥돌이지. 맷돌에 한 바퀴 갈면 옥가루가 된다."
+    ],
+    [
+     0,
+     "갈린 가루가 손끝에 밀가루처럼 닿으면 다 된 게다. 기억해 두거라."
+    ]
+   ]
+  },
+  {
+   "id": "g_dol_kkubeogi",
+   "region": "dolneomeo",
+   "npc": "kkubeogi",
+   "out": "jatjuk",
+   "way": "혼잣말",
+   "lines": [
+    [
+     0,
+     "고마워어… 이제 자도 되겠다아…"
+    ],
+    [
+     0,
+     "겨울잠 들기 전엔… 쌀이랑 잣을… 맷돌에 같이 갈아서… 죽 한 그릇 먹고 자는 거야아…"
+    ],
+    [
+     1,
+     "(졸린 말 속에 잣죽 쑤는 법이 섞여 있었다. 쌀과 잣을 맷돌에 같이 가나 보다.)"
+    ]
+   ]
+  },
+  {
+   "id": "g_dol_turtle",
+   "region": "dolneomeo",
+   "npc": "dol_turtle",
+   "out": "heuk_banjuk",
+   "way": "직접",
+   "lines": [
+    [
+     0,
+     "고맙다, 아가. 하나 일러 주마."
+    ],
+    [
+     0,
+     "진흙 덩이에 돌가루, 마른 억새를 같이 찧으면 둑을 메우는 흙이 된단다."
+    ],
+    [
+     0,
+     "이제 내 손으론 못 찧는구나."
+    ]
+   ]
+  },
+  {
+   "id": "g_dol_badger",
+   "region": "dolneomeo",
+   "npc": "dol_badger",
+   "out": "seogibyeong",
+   "way": "직접",
+   "lines": [
+    [
+     0,
+     "…잠깐 봐라."
+    ],
+    [
+     1,
+     "(메밀댁이 말없이 가루를 뭉쳐 석이 한 쪽을 얹고 시루에 찌는 시늉을 한다.)"
+    ],
+    [
+     0,
+     "쌀가루에 석이 섞어 쪄라. 석이병이다."
+    ]
+   ]
+  },
+  {
+   "id": "g_dol_ppuri",
+   "region": "dolneomeo",
+   "npc": "ppuri",
+   "out": "dol_mulgam",
+   "way": "직접",
+   "lines": [
+    [
+     0,
+     "받았으면 갚는 법이다."
+    ],
+    [
+     0,
+     "이끼 낀 눈돌을 참기름에 개어 맷돌에 갈아라. 장승 눈에 올리는 빛이 그것이다."
+    ]
+   ]
+  },
+  {
+   "id": "g_dol_nal",
+   "region": "dolneomeo",
+   "npc": "nal",
+   "out": "gyeol_hwan",
+   "way": "쪽지",
+   "lines": [
+    [
+     0,
+     "…셈은 나중에 하자."
+    ],
+    [
+     1,
+     "(날쌘이 또 쪽지를 툭 떨구고 갔다. 결명자 하나, 꿀 하나, 절구에. 길에서 먹기 좋음.)"
+    ]
+   ]
+  },
+  {
+   "id": "g_jang_yeot",
+   "region": "jangteo",
+   "npc": "yeotbang",
+   "out": "gangjeong",
+   "way": "소문",
+   "lines": [
+    [
+     0,
+     "에헤, 받았으니 엿장수 비법 하나 풀어 볼까~?"
+    ],
+    [
+     0,
+     "비법은 무슨~ 장터 사람이면 다 아는 거야. 깨를 꿀에 버무려 절구에 꾹꾹 찧으면 깨강정이지~"
+    ],
+    [
+     0,
+     "내가 알려 줬다고는 하지 마~ 엿값 떨어지니까!"
+    ]
+   ]
+  },
+  {
+   "id": "g_jang_morak",
+   "region": "jangteo",
+   "npc": "morak",
+   "out": "rainbow_tteok",
+   "way": "직접",
+   "lines": [
+    [
+     0,
+     "이리 와 봐, 이리 와!"
+    ],
+    [
+     0,
+     "무지개떡은 켜켜이 따로 앉히는 거야! 도토리 가루, 팥, 마가목 열매를 시루에 한 켜씩! 한 켜씩!"
+    ],
+    [
+     0,
+     "마가목은 영산 가야 나니까, 거기 가거든 꼭 해 봐!"
+    ]
+   ]
+  },
+  {
+   "id": "g_jang_bueong",
+   "region": "jangteo",
+   "npc": "bueong",
+   "out": "solbang_cheong",
+   "way": "쪽지",
+   "lines": [
+    [
+     0,
+     "빈손으로 받을 수는 없지. 장부에 적힌 걸 하나 떼어 주마."
+    ],
+    [
+     1,
+     "(부엉 영감님이 장부 한 장을 찢어 건넨다.)"
+    ],
+    [
+     1,
+     "(상단 겨울 길 상비약. 솔방울 둘에 석청 하나, 절구에 찧어 잰다.)"
+    ],
+    [
+     0,
+     "기침 나는 길손에게 한 숟갈씩 팔던 것이지."
+    ]
+   ]
+  },
+  {
+   "id": "g_jang_deungjan",
+   "region": "jangteo",
+   "npc": "deungjan",
+   "out": "seogibyeong",
+   "way": "소문",
+   "lines": [
+    [
+     0,
+     "고마워! 밤길에 들은 얘기 하나 줄게!"
+    ],
+    [
+     0,
+     "돌너머 메밀댁은 쌀가루에 석이를 섞어 시루에 쪄 낸대! 석이병이라나!"
+    ],
+    [
+     0,
+     "짐꾼들이 그거 얻어먹으려고 줄을 선다지!"
+    ]
+   ]
+  },
+  {
+   "id": "g_jang_haengsu",
+   "region": "jangteo",
+   "npc": "haengsu",
+   "out": "songibap",
+   "way": "직접",
+   "lines": [
+    [
+     0,
+     "받은 셈은 갚아야지. 상단 밥 하나 일러 주마."
+    ],
+    [
+     0,
+     "쌀 두 줌에 송이 하나를 찢어 얹어 시루에 찐다. 송이밥이다. 먼 길엔 이만한 밥이 없지."
+    ]
+   ]
+  },
+  {
+   "id": "g_jang_jongjong",
+   "region": "jangteo",
+   "npc": "jongjong",
+   "out": "beoseot_jjim",
+   "way": "혼잣말",
+   "lines": [
+    [
+     0,
+     "고, 고마워요…"
+    ],
+    [
+     0,
+     "(작게) 엄마는 싸리버섯이랑 꾀꼬리버섯에 깨소금 쳐서 쪄 줬는데… 그거 먹으면 밤에도 안 졸았는데…"
+    ],
+    [
+     1,
+     "(종종이가 혼잣말로 흘린 말이다. 버섯 두 가지에 깨소금을 쳐서 시루에 찌나 보다.)"
+    ]
+   ]
+  },
+  {
+   "id": "g_jang_jjandol",
+   "region": "jangteo",
+   "npc": "jjandol",
+   "out": "meju",
+   "way": "소문",
+   "lines": [
+    [
+     0,
+     "…맨입으론 안 받는다. 들은 거나 하나 알려 주지."
+    ],
+    [
+     0,
+     "장국밥 할멈네는 콩 두 됫박을 절구에 찧고 짚으로 묶어 메주를 빚더라. 소금은 내 거 쓰고."
+    ]
+   ]
+  },
+  {
+   "id": "g_jang_nal",
+   "region": "jangteo",
+   "npc": "nal",
+   "out": "mung_batter",
+   "way": "쪽지",
+   "lines": [
+    [
+     0,
+     "…또 뭘 줘."
+    ],
+    [
+     1,
+     "(날쌘이 쪽지를 내 손에 쥐여 주고 고개를 돌렸다. 녹두 하나, 참기름 하나, 맷돌에. 떡집에서 사 감.)"
+    ]
+   ]
+  },
+  {
+   "id": "g_yeong_salgeumi",
+   "region": "yeongsan",
+   "npc": "salgeumi",
+   "out": "hwachae",
+   "way": "혼잣말",
+   "lines": [
+    [
+     0,
+     "(귀를 쫑긋 세웠다가 내린다.) 고, 고마워…"
+    ],
+    [
+     0,
+     "(귀를 늘어뜨리고 혼자 중얼거린다.) 고드름 조각에… 마가목 두 알… 찧어서 띄우면… 시원한데…"
+    ],
+    [
+     1,
+     "(살금이가 혼잣말로 흘린 말이다. 고드름 조각과 마가목 열매 두 알을 절구에 찧나 보다.)"
+    ]
+   ]
+  },
+  {
+   "id": "g_yeong_ongdal",
+   "region": "yeongsan",
+   "npc": "ongdal",
+   "out": "bigeul_garu",
+   "way": "소문",
+   "lines": [
+    [
+     0,
+     "받기만 하믄 쓰나. 들은 거 하나 일러 주지."
+    ],
+    [
+     0,
+     "강철이 비늘하고 서리 수염은 맷돌에 같이 갈아야 쓰는겨. 옛적엔 그 가루를 산군 할아버지께 올렸다더구먼."
+    ]
+   ]
+  },
+  {
+   "id": "g_yeong_nal",
+   "region": "yeongsan",
+   "npc": "nal",
+   "out": "ssanghwa",
+   "way": "쪽지",
+   "lines": [
+    [
+     0,
+     "…추운데 뭘 이런 걸."
+    ],
+    [
+     1,
+     "(날쌘이 보따리 끈에 쪽지를 끼우고 갔다. 칡뿌리, 겨우살이, 대추 하나씩, 맷돌에. 산 위는 춥다.)"
+    ]
+   ]
+  }
+ ],
  "SCENE_MUSIC": {
   "g_musoe_night": {
    "music": "father",
