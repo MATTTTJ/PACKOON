@@ -99,13 +99,15 @@ Rg.drawPickup=(a,x,bob)=>{
     R(x-3,a.y-8+bob,2,1,'#f4f7fa');R(x+1,a.y-8+bob,3,1,'#f4f7fa');}
   // 결정 D-265: 눈 위의 솔방울, 청설모가 떨군 잣송이(잣나무는 높은 산에 자란다)
   else if(a.item==='solbang')drawPineCone(x,a.y+bob,true);   // 결정 D-393
-  // 결정 D-393: 잣송이는 솔방울보다 훨씬 크고 달걀꼴이다. 두꺼운 비늘 끝이 젖혀지고 틈에 송진이 맺힌다
+  // 결정 D-393: 잣송이는 달걀꼴이고 두꺼운 비늘 끝이 젖혀지며 틈에 송진이 맺힌다.
+  // 결정 D-1065 (사용자 피드백 2026-11-06 31: 잣이 너무 크다): 솔방울(7×7)·마가목 송이와 비슷한 크기(7×9)로 줄였다. 줍는 물건은 주인공 머리보다 작다
   else if(a.item==='jat'){
-    for(const [dy,h] of [[-12,1],[-11,2],[-10,3],[-9,3],[-8,4],[-7,4],[-6,4],[-5,3],[-4,3],[-3,2],[-2,1]])R(x-h,a.y+dy+bob,h*2+1,1,'#6b4a2a');
-    for(let dy=-11;dy<=-3;dy++)for(let dx=-4;dx<=4;dx++)if((dx+dy*2+40)%4===0&&Math.abs(dx)<=4)R(x+dx,a.y+dy+bob,1,1,'#a8844e');
-    for(const [dx,dy] of [[-2,-8],[1,-6],[-1,-4],[2,-10]])R(x+dx,a.y+dy+bob,1,1,'#3e2a18');
-    R(x+1,a.y-9+bob,1,1,'#e8d8a0');R(x,a.y-1,1,1,'#4f3820');R(x-2,a.y-13+bob,5,1,'#f4f7fa');R(x+5,a.y-2,2,1,'#c79d5c');}
-  else if(a.item==='jip'){R(x-5,a.y-8,10,8,'#d9b860');R(x-5,a.y-8,10,1,'#f4f7fa');R(x-1,a.y-8,2,8,'#a8883a');}
+    for(const [dy,h] of [[-9,1],[-8,2],[-7,3],[-6,3],[-5,3],[-4,3],[-3,2],[-2,1]])R(x-h,a.y+dy+bob,h*2+1,1,'#6b4a2a');
+    for(const [dx,dy] of [[-1,-7],[1,-7],[-2,-5],[0,-5],[2,-5],[-1,-3],[1,-3]])R(x+dx,a.y+dy+bob,1,1,'#a8844e');
+    for(const [dx,dy] of [[0,-6],[-1,-4],[1,-4]])R(x+dx,a.y+dy+bob,1,1,'#3e2a18');
+    R(x+1,a.y-6+bob,1,1,'#e8d8a0');R(x-1,a.y-10+bob,3,1,'#f4f7fa');}
+  // 결정 D-1065: 짚단도 다른 줍는 물건과 비슷한 크기로 (8×7, 가운데를 새끼로 묶었다)
+  else if(a.item==='jip'){R(x-4,a.y-7,8,7,'#d9b860');R(x-4,a.y-7,8,1,'#f4f7fa');R(x-4,a.y-4,8,1,'#a8883a');for(const dx of [-3,-1,1,3])R(x+dx,a.y-1,1,1,'#b8983e');}
   else if(a.item==='legend_fruit'){const gl=Math.floor(G.anim/8)%2;R(x-4,a.y-9+bob,8,8,'#f0a0b8');R(x-2,a.y-8+bob,3,3,'#fde0ea');R(x-1,a.y-12,2,3,'#6b4423');if(gl){R(x-7,a.y-12,1,1,'#fff6d8');R(x+6,a.y-6,1,1,'#fff6d8');}}
 };
 Rg.drawDig=(d,x)=>{if(d.item!=='darae_vine')return false;
@@ -217,11 +219,26 @@ if(!CLASSIC){
     }
     a().back(id);
   }
+  /* 결정 D-1061 (사용자 피드백 2026-11-06 27: 더 어둡고 눈이 많이 내리게): 엔진 눈 입자는 드문드문이라, 영산 겨울에는
+     먼 눈발(작고 느림)과 가까운 눈발(크고 빠름) 두 켜를 더 뿌린다. 바람이 세졌다 잦아들어 비스듬함이 바뀐다.
+     자리는 시간으로 정해 입자를 따로 모으지 않는다. 그 아래에 밤빛을 한 겹 덮어 어둡게 한다. 동작 줄이기면 멈춘 눈 몇 점만 남긴다. */
+  function blizzard(){
+    ctx.fillStyle='rgba(6,10,26,.2)';ctx.fillRect(0,0,W,H);
+    const t=Vfx.reducedMotion?0:G.anim,gust=.65+.35*Math.sin(t*.004)+.2*Math.sin(t*.0113),n=Vfx.reducedMotion?40:160;
+    for(let i=0;i<n;i++){
+      const near=i%4===0,sp=near?1.25:.5+hash(i*.37)*.3,vx=-(near?.95:.45)*gust,span=W+20;
+      const x=(((hash(i*1.91)*W*1.5+t*vx*sp-cam*(near?.25:.08))%span)+span)%span-10;
+      const y=(((hash(i*3.77)*H+t*sp)%(H+10))+(H+10))%(H+10)-5,wob=Math.round(Math.sin(t*.03+i)*1.5);
+      if(near)R(Math.round(x+wob),Math.round(y),2,2,'rgba(238,243,248,.9)');
+      else R(Math.round(x+wob),Math.round(y),1,1,i%3?'rgba(200,212,226,.7)':'rgba(236,241,247,.85)');
+    }
+  }
   function front(){
     // 결정 D-429: 이름 잃은 마을은 영산의 다른 길보다 빛이 더 바랬다. 이름이 돌아오면(봄) 색도 돌아온다.
     if(G.zone==='shore'&&!Rg.namesBack()){
       ctx.save();ctx.globalCompositeOperation='saturation';ctx.globalAlpha=.45;ctx.fillStyle='#808080';ctx.fillRect(0,0,W,H);ctx.restore();
     }
+    if(!G.f.spring)blizzard();
     if(G.f.spring)a().willowSeeds();
     if(Vfx.reducedMotion){zoom=0;return;}
     if(!zoom)return;
@@ -289,6 +306,12 @@ if(!CLASSIC){
       {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 호숫가로':'얼음길로 호숫가에 돌아가기';},draw:sign},
     ]),
   };
+  /* 결정 D-1062 (사용자 피드백 2026-11-06 27: 더 험한 지형): 빈 눈밭에 바람이 쌓은 눈 둔덕(엔진 비탈 D-845)을 둔다.
+     좌표는 길을 줄인 뒤의 자리이고, 인물·물건·문·살펴보기가 없는 구간에만 둔다. 기울기는 미끄러지는 비탈(field_slope_slip_grade)보다 완만하다.
+     산막: 눈 굴 어귀 뒤 높은 능선 밑. 눈길: 옹달 할미 샘과 대추나무 사이(능선 발판 밑). */
+  const mound=pts=>pts.slice(1).map((p,i)=>({x1:pts[i][0],y1:pts[i][1],x2:p[0],y2:p[1]}));
+  Rg.zones.shelter.slopes=mound([[1600,GROUND],[1650,180],[1710,176],[1760,182],[1810,GROUND]]);
+  Rg.zones.snow.slopes=mound([[1110,GROUND],[1170,178],[1230,172],[1300,180],[1370,168],[1450,GROUND]]);
   Rg.zones.snow.step=()=>{
     stepCommon();
     if(G.f.seolpi)G.f.ySnowTrail=Math.max(G.f.ySnowTrail||180,Math.round(G.px));

@@ -3974,6 +3974,9 @@ const TABLES={
   "name_final_damage": 2,
   "name_final_open_bonus": 150,
   "y_lure_range": 90,
+  "think_stop_base_ms": 700,
+  "think_stop_char_ms": 35,
+  "think_stop_max_ms": 2200,
   "nundok_gloat_hits": 1,
   "nundok_gloat_frames": 45
  },
