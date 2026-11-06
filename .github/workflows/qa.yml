@@ -34,7 +34,7 @@ jobs:
             only: play-classic,speakers
           - key: rest
             title: 정적·저장·휴대폰·지도·바닥 물건
-            only: static,save,mobile,talk-esc,map,drops-floor,drops-persistence,drops-departure,drops-full
+            only: static,save,mobile,talk-esc,quest-order,map,drops-floor,drops-persistence,drops-departure,drops-full
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6

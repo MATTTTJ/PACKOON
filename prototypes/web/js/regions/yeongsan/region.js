@@ -249,7 +249,7 @@ function install(){
   };
   const oldGoal=Rg.goal;
   Rg.goal=()=>{
-    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return '얼음길 살피기';   // 결정 D-149
+    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return Rg.iceGoal();   // 결정 D-149·D-890
     return oldGoal();
   };
   // 완료 길손의 greeting을 가로채지 않고, 봄에만 별도 행동 자리를 곁에 둔다.

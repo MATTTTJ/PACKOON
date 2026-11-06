@@ -1,5 +1,5 @@
 'use strict';
-/* HUD: 체력, 손에 든 연장, 지금 할 일 (REG.goal() 이 중요한 일, 사연 심부름(SIDE_QUESTS)이 잔일을 준다) */
+/* HUD: 체력, 손에 든 연장, 지금 할 일 (REG.goal() 이 중요한 일, 사연 심부름(SIDE_QUESTS)이 잔일을 준다. 둘 다 목표로 보인다, D-890) */
 /* 결정 D-149: 할 일은 '중요'(이 지역 본 줄거리)와 '잔일'(인물 사연에서 맡은 심부름)으로 나눠 함께 보인다.
    결정 D-200: 아래 칸 이름은 '보통' 대신 소일거리라는 뜻의 '잔일' (사용자 피드백 36).
    문구는 짧은 명사형(~하기)으로 핵심만 쓰고 장소는 붙이지 않는다(사용자 피드백 2026-11-01). 수첩 '해야 할 일' 탭(D-150)도 같은 목록을 쓴다.
@@ -13,11 +13,26 @@ function activeSideQuests(){
   const list=SIDE_QUESTS.filter(sideOn);
   return [...list.filter(q=>q.region===G.region),...list.filter(q=>q.region!==G.region)];
 }
-function mainGoalText(){return regionCompleted(REG.id)?REG.cover.end.kicker:floorPickupGoal(REG.goal());}
+/* 결정 D-890: 할 일은 행동이 아니라 목표로 보인다 (사용자 피드백 2026-11-06 "맷돌에 쌀 갈기가 아니라 떡 재료 구하기처럼").
+   REG.goal() 은 goalLine(목표, 길잡이)로 '목표|길잡이' 한 줄을 돌려준다. 화면의 할 일 칸에는 목표만,
+   수첩 '해야 할 일'에는 목표 밑에 지금 단계의 길잡이(누구에게·무엇을·어디서)를 적는다 (book.js).
+   잔일은 이름(title)이 목표, text(F)가 길잡이다. 길잡이는 아이가 수첩에 적은 말이라, 아이가 들었거나 본 것만 쓴다. */
+function goalLine(goal,guide){return guide?goal+'|'+guide:goal;}
+function splitGoal(line){const s=line||'',i=s.indexOf('|');return i<0?{goal:s,guide:''}:{goal:s.slice(0,i),guide:s.slice(i+1)};}
+function mainGoalParts(){
+  if(regionCompleted(REG.id))return {goal:REG.cover.end.kicker,guide:''};
+  const p=splitGoal(REG.goal()),step=p.guide||p.goal,floor=floorPickupGoal(step);
+  if(floor===step)return p;
+  // 바닥에 놓인 진행 물건(떨어뜨린 것·떨어진 열매)은 길잡이 앞에 먼저 알린다. 할 일 칸은 목표 그대로 둔다 (D-890이 '바닥의 ○○ 줍기' 칸 바꾸기를 대신함).
+  const name=floor.replace(/^바닥의 | 줍기$/g,'');
+  if(new RegExp(name+'[^.]{0,12}(줍|주워)').test(p.guide))return p;   // 길잡이가 이미 그 물건을 주우라고 한다
+  return {goal:p.goal,guide:'바닥에 떨어진 '+name+'부터 주워 담자. '+p.guide,floor:true};
+}
+function mainGoalText(){return mainGoalParts().goal;}
 const HUD_SIDE_MAX=2;
 let lastGoal='';
 function refreshGoal(){
-  const g=mainGoalText(),subs=g&&!G.ended?activeSideQuests().map(q=>q.text(G.f)):[];
+  const g=mainGoalText(),subs=g&&!G.ended?activeSideQuests().map(q=>q.title):[];
   const key=g+'|'+subs.join('|');if(key===lastGoal)return;lastGoal=key;
   const e=$('goal');e.hidden=!g;e.innerHTML='';
   const row=(cls,label,text)=>{const r=el('div','goal-row '+cls);r.appendChild(el('b',null,label));r.appendChild(document.createTextNode(text));e.appendChild(r);};

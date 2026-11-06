@@ -28,7 +28,7 @@ node prototypes/web/tools/qa/run.js --only play-expanded
 node prototypes/web/tools/qa/run.js --only save,mobile
 ```
 
-`--quick`은 브라우저를 열지 않는다. `--only` 이름은 `syntax`, `data`, `versions`, `csv`, `dialogue`, `play-expanded`, `play-classic`, `speakers`, `edges`, `save`, `mobile`, `talk-esc`, `map`, `drops-floor`, `drops-persistence`, `drops-departure`, `drops-full`이다. `static`과 `runtime`은 각각의 묶음이며 쉼표로 여러 검사를 고를 수 있다. `speakers`는 두 모드를, `edges`는 확장판 연속 플레이를 먼저 실행한다.
+`--quick`은 브라우저를 열지 않는다. `--only` 이름은 `syntax`, `data`, `versions`, `csv`, `dialogue`, `play-expanded`, `play-classic`, `speakers`, `edges`, `save`, `mobile`, `talk-esc`, `quest-order`, `map`, `drops-floor`, `drops-persistence`, `drops-departure`, `drops-full`이다. `static`과 `runtime`은 각각의 묶음이며 쉼표로 여러 검사를 고를 수 있다. `speakers`는 두 모드를, `edges`는 확장판 연속 플레이를 먼저 실행한다.
 
 | 검사 | 확인하는 것 |
 |---|---|
@@ -285,7 +285,7 @@ if(!CLASSIC){
 | `newState()` | 처음 상태: `inv`(보따리에 더해짐), `pickups`(줍는 것 `{x, y, item}`), `digs`(흙더미 `{x, item}`), `f`(진행 표시, 앞 지역 것과 합쳐지니 이름이 겹치지 않게), `rel`(NPC id별 호감 축, 이미 만난 NPC는 앞 값을 이어 씀), 그 밖에 지역 전용 상태(새 지역 것으로 바뀜) |
 | `onStart()`, `endStats()` | 시작할 때 할 일, 끝 화면의 숫자 `[[이름, 값]]` |
 | `npcs` | `[{id, name, x, talk(), draw(x, y, 방향), props(npc)?}]` |
-| `goal()` | 지금 할 일 글 |
+| `goal()` | 지금 할 일. `goalLine(목표, 길잡이)`로 돌려준다. 화면엔 목표("떡 재료 구하기")만, 수첩 '해야 할 일'엔 지금 단계의 길잡이도 적는다 (결정 D-890) |
 | `maxX()` | 지금 갈 수 있는 오른쪽 끝 |
 | `step()` | 매 프레임 지역 진행 (몹, 장애물, 전투 시작 조건 등) |
 | `onHit(x1, x2, 피해, 방향)` | 휘두르기가 흙더미 말고 다른 것에 닿았을 때 |
