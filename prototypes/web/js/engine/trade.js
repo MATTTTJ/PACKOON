@@ -69,22 +69,42 @@ const Trade=(()=>{
     const head=jo(ITEMS[g.item].n,'은','는')+' '+rank(need)+'이다. ';
     // 1) 단계: 하나로도, 한 단계 아래 둘로도 닿지 않으면 단계만 말한다
     if(best<need-(need>0?1:0))return {ok:false,why:head+josa(kinds,'으로는','로는')+' 안 된다.'};
-    if(best<need){
-      const low=kinds.filter(id=>step(S.npc,id)<need-1);
-      if(low.length)return {ok:false,why:head+josa(low,'은','는')+' 값이 모자라다. '+jo(rank(need-1),'이라면','라면')+' 둘이어야 한다.'};
-      // 2) 수량: 한 단계 아래 물건은 둘
-      if(ids.length!==2)return {ok:false,why:jo(rank(need-1),'으로는','로는')+' 둘이어야 한다. 지금 '+ids.length+'개다.'};
-      return {ok:true};
-    }
-    // 2) 수량: 같은 단계 이상이면 하나로 충분하다
-    if(ids.length===1)return {ok:true};
-    if(ids.length===2&&need>0&&ids.every(id=>step(S.npc,id)>=need-1))return {ok:true};
-    return {ok:false,why:rank(need)+' 하나면 된다. 나머지는 빼자.'};
+    const low=need>0?kinds.filter(id=>step(S.npc,id)<need-1):[];
+    if(low.length)return {ok:false,why:head+josa(low,'은','는')+' 값이 모자라다. '+jo(rank(need-1),'이라면','라면')+' 둘이어야 한다.'};
+    /* 결정 D-905 (사용자 피드백 2026-11-06 "도토리 3개 올리면 메밀 3개로 바로 교환"): 한 번 몫의 몇 배를 얹어도 한 번에 바꾼다.
+       같은 단계 이상 물건은 하나가 한 몫, 한 단계 아래 물건은 둘이 한 몫이다. 몫은 상대가 남긴 횟수(stock.csv 횟수)까지만 친다.
+       몫을 채우지 못하고 남는 물건(한 단계 아래 하나, 횟수를 넘은 몫)은 받지 않고 보따리에 그대로 둔다.
+       횟수를 넘으면 값이 낮은 물건부터 쓰고 좋은 물건을 돌려준다. */
+    const hi=ids.filter(id=>step(S.npc,id)>=need).sort((a,b)=>step(S.npc,a)-step(S.npc,b)),lo=ids.filter(id=>step(S.npc,id)<need);
+    if(!hi.length&&lo.length<2)return {ok:false,why:jo(rank(need-1),'으로는','로는')+' 둘이어야 한다. 지금 '+lo.length+'개다.'};
+    const cap=stockLeft(g.row),use={};let k=0;
+    for(let i=0;i+1<lo.length&&k<cap;i+=2,k++){use[lo[i]]=(use[lo[i]]||0)+1;use[lo[i+1]]=(use[lo[i+1]]||0)+1;}
+    for(const id of hi){if(k>=cap)break;use[id]=(use[id]||0)+1;k++;}
+    return {ok:true,k,use,back:leftOver(offer,use)};
   }
+  const leftOver=(offer,use)=>Object.fromEntries(Object.entries(offer).map(([id,n])=>[id,n-(use[id]||0)]).filter(([,n])=>n>0));
+  /* 결정 D-905: 몇 번이고 하는 교환(손님 교환, 지역이 multi 로 연 부탁)은 원하는 묶음의 몇 배든 한 번에 바꾼다.
+     cap 은 남은 횟수. 묶음을 채우지 못한 나머지는 보따리에 그대로 둔다. 한 번만 하는 부탁(이야기 교환)은 묶음과 똑같아야 한다. */
+  function multiMatch(g,offer,cap){
+    const keys=Object.keys(offer).filter(id=>offer[id]>0);
+    for(let i=0;i<g.asks.length;i++){
+      const a=g.asks[i];
+      if(Object.keys(a).length!==keys.length||!keys.every(id=>a[id]))continue;
+      const k=Math.min(cap,...keys.map(id=>Math.floor(offer[id]/a[id])));
+      if(k<1)continue;
+      const use=Object.fromEntries(keys.map(id=>[id,a[id]*k]));
+      return {ok:true,alt:i,k,use,back:leftOver(offer,use)};
+    }
+    return null;
+  }
+  const guestLeft=()=>Math.max(0,TABLES.TUNING.stranger_trade_limit-strangerUsed(S.guest.npc.id));
   function storyMatch(g,offer){
     const keys=Object.keys(offer).filter(id=>offer[id]>0);
     const i=g.asks.findIndex(a=>Object.keys(a).length===keys.length&&keys.every(id=>a[id]===offer[id]));
-    if(i>=0)return {ok:true,alt:i};
+    if(i>=0&&g.kind==='story'&&!g.multi)return {ok:true,alt:i,k:1};
+    const multi=g.kind==='guest'?multiMatch(g,offer,guestLeft()):g.multi?multiMatch(g,offer,typeof g.multi==='function'?g.multi():Infinity):null;
+    if(multi)return multi;
+    if(i>=0)return {ok:true,alt:i,k:1};
     // 결정 D-124: 물건이 맞는지 먼저, 그다음 수를 본다
     const same=g.asks.find(a=>Object.keys(a).length===keys.length&&keys.every(id=>a[id]));
     if(same)return {ok:false,why:'물건은 맞다. 수를 맞추자: '+askText(same)+'.'};
@@ -215,6 +235,7 @@ const Trade=(()=>{
     }
     const go=el('button','btn primary','제안하기');go.type='button';go.id='tradePropose';go.disabled=!offered.length||!S.sel;go.onclick=propose;row.appendChild(go);
     tray.appendChild(row);
+    const pv=previewText(S.goods.find(g=>g.id===S.sel));if(pv){const p=el('p','small trade-preview',pv);tray.appendChild(p);}   // 결정 D-905
     const log=el('div','trade-log');log.setAttribute('role','status');log.setAttribute('aria-live','polite');
     for(const l of S.log.slice(-3)){const p=el('p');if(l.who)p.appendChild(el('b',null,l.who+' '));p.appendChild(document.createTextNode(l.line));log.appendChild(p);}
     tray.appendChild(log);body.appendChild(tray);
@@ -239,18 +260,31 @@ const Trade=(()=>{
     const st=stateOf(g);if(st.k==='done'||st.k==='lock'){S.log.push({who:'',line:st.why});render();return;}
     const m=asked(g)?storyMatch(g,S.offer):commonMatch(g,S.offer);
     if(!m.ok){S.log.push({who:'',line:'('+jo(S.name,'이','가')+' 고개를 젓는다.) '+m.why});render();return;}
-    if(g.kind==='story'){close();g.accept(m.alt);return;}
+    // 결정 D-905: 여러 몫을 한 번에. 부탁은 지역 코드가 몫 수(k)를 받아 대사와 물건을 맞춘다 (multi 가 없는 부탁은 늘 1)
+    if(g.kind==='story'){close();g.accept(m.alt,m.k||1);return;}
     if(g.kind==='guest'){
-      if(g.accept())S.log.push({who:'',line:'('+S.name+'에게서 '+ITEMS[g.item].n+' '+g.n+'개를 받았다.)'});
+      let got=0;for(let i=0;i<(m.k||1);i++){if(!g.accept())break;got++;}
+      if(got)S.log.push({who:'',line:'('+S.name+'에게서 '+ITEMS[g.item].n+' '+g.n*got+'개를 받았다.'+backText(got<(m.k||1)?null:m.back)+')'});
       S.offer={};S.goods=guestGoods();const cur=S.goods.find(x=>x.id===S.sel);if(!cur||stateOf(cur).k!=='open')S.sel=(S.goods.find(x=>stateOf(x).k==='open')||S.goods[0])?.id||null;render();return;
     }
-    for(const [id,n] of Object.entries(S.offer))takeItem(id,n);
-    const bonus=!!G.f.haggleBonus?.[key(S.npc)],n=g.n+(bonus?1:0);
+    for(const [id,n] of Object.entries(m.use))takeItem(id,n);
+    const bonus=!!G.f.haggleBonus?.[key(S.npc)],n=g.n*m.k+(bonus?1:0);   // 흥정 덤은 한 번 바꿀 때 하나다
     if(bonus)delete G.f.haggleBonus[key(S.npc)];
-    addItem(g.item,n);(G.f.stockUsed=G.f.stockUsed||{})[g.row.id]=(G.f.stockUsed[g.row.id]||0)+1;
+    addItem(g.item,n);(G.f.stockUsed=G.f.stockUsed||{})[g.row.id]=(G.f.stockUsed[g.row.id]||0)+m.k;
     learn('trade:'+g.row.id);Sound.exchange();
-    S.log.push({who:'',line:'('+S.name+'에게서 '+ITEMS[g.item].n+' '+n+'개를 받았다.'+(bonus?' 덤이 하나 붙었다.':'')+')'});
+    S.log.push({who:'',line:'('+S.name+'에게서 '+ITEMS[g.item].n+' '+n+'개를 받았다.'+(bonus?' 덤이 하나 붙었다.':'')+backText(m.back)+')'});
     S.offer={};S.goods=goodsOf(S.npc);const cur=S.goods.find(x=>x.id===S.sel);if(!cur||stateOf(cur).k!=='open')S.sel=(S.goods.find(x=>stateOf(x).k==='open')||S.goods[0])?.id||null;render();
+  }
+  // 몫이 안 되어 남는 물건 (세는 말이 늘 '개'라 조사는 '는')
+  const backText=back=>{const list=Object.entries(back||{}).map(([id,n])=>ITEMS[id].n+' '+n+'개');return list.length?' 몫이 안 되는 '+list.join(', ')+'는 도로 챙겼다.':'';};
+  // 결정 D-905: 얹은 물건으로 무엇을 몇 개 받는지 제안 전에 미리 보인다
+  function previewText(g){
+    if(!g||!Object.keys(S.offer).length)return '';
+    const st=stateOf(g);if(st.k==='done'||st.k==='lock')return '';
+    const m=asked(g)?storyMatch(g,S.offer):commonMatch(g,S.offer);
+    if(!m.ok||(g.kind==='story'&&!g.multi))return '';
+    const n=(g.n||1)*m.k+(g.kind==='common'&&G.f.haggleBonus?.[key(S.npc)]?1:0);
+    return '이대로면 '+ITEMS[g.item].n+' '+n+'개를 받는다.'+(m.k>1?' ('+m.k+'번 몫)':'')+backText(m.back).replace('도로 챙겼다','그대로 남는다');
   }
   $('tradeClose').onclick=()=>closePanels();
   /* 흔한 물건이 남은 상대와 이야기할 때는 대화창에 '보따리 펼치기'를 늘 둔다. 부탁을 마친 뒤에도 바꿀 수 있게.

@@ -93,8 +93,24 @@ function checkCraft(root) {
       findings.push({rule: 'craft-multiple', severity: '높음', file: 'design/data/heirlooms.csv', message: `${tool}: ${ITEMS[list[i].out]?.n} 재료가 ${ITEMS[list[j].out]?.n} 재료의 ${t}배라 배수 맞추기에 먹힌다`});
   }
   // 귀띔(hintLine)으로 알려 주는 숨은 가공법이 실제 가공법인지
-  for (const m of all.matchAll(/hintLine\(\s*['"]([a-z_]+)['"]/g))
+  const hinted = new Set();
+  for (const m of all.matchAll(/hintLine\(\s*['"]([a-z_]+)['"]/g)) {
+    hinted.add(m[1]);
     if (!recipes.some(r => r.out === m[1])) findings.push({rule: 'craft-hint', severity: '높음', file: 'prototypes/web/js', message: `귀띔하는 가공품 ${m[1]}의 가공법이 없다`});
+  }
+  /* 결정 D-906: 선물 답례로 배우는 가공법 (gift_recipes.csv → TABLES.GIFT_RECIPES).
+     그 인물이 그 지역에 있는지(npcs.csv 지역 또는 전체), 배우는 키를 가공대가 알아보는지(bag.js recipeKnown 의 gift:), 그리고
+     귀띔도 선물도 없이 직접 찾아야만 하는 숨은 가공법이 몇인지 본다 (그건 막힘이 아니라 검토용이다). */
+  const npcRegion = Object.fromEntries(readCsv(root, 'npcs.csv').map(r => [r.id, r['지역']]));
+  const gifts = sandbox.TABLES.GIFT_RECIPES || [];
+  for (const g of gifts) {
+    if (npcRegion[g.npc] !== g.region && npcRegion[g.npc] !== '전체')
+      findings.push({rule: 'craft-gift', severity: '높음', file: 'design/data/gift_recipes.csv', message: `${g.id}: ${g.npc}는 ${g.region}에 없는 인물이다 (npcs.csv 지역 ${npcRegion[g.npc]})`});
+  }
+  if (gifts.length && !/knows\(\s*['"]gift:['"]\s*\+/.test(src.find(s => s.file.endsWith('engine/bag.js'))?.text || ''))
+    findings.push({rule: 'craft-gift', severity: '높음', file: 'prototypes/web/js/engine/bag.js', message: '선물 답례로 배운 가공법(gift:)을 가공대가 알아보지 못한다'});
+  for (const r of recipes) if (r.hidden && !hinted.has(r.out) && !gifts.some(g => g.out === r.out))
+    warn.push({rule: 'craft-teach', severity: '검토', file: 'design/data/gift_recipes.csv', message: `숨은 가공법 ${ITEMS[r.out]?.n || r.out}는 일러 주는 인물(귀띔·선물 답례)이 없어 직접 찾아야만 한다`});
   return {recipes: recipes.length, findings, warnings: warn};
 }
 

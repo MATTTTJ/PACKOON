@@ -163,6 +163,22 @@ for(const r of t('tastes')){
 }
 for(const id of npcIds){const n=Object.keys(TASTES[id]||{}).length;if(n<2||n>3)fail('tastes.csv: NPC마다 맛 반응이 2~3개 필요하다 '+id);}
 for(const id of bossIds)if(Object.keys(TASTES[id]||{}).length<2)fail('tastes.csv: 전투 상대마다 맛 반응이 2개 이상 필요하다 '+id);
+/* 결정 D-906: 선물(좋아하는 것 건네기)의 답례로 배우는 숨은 가공법 (design/data/gift_recipes.csv).
+   대사는 ' / '로 줄을 나누고, '너구리:'로 시작하는 줄은 아이의 말·지문이다. 수첩 칸은 그 가공법 쪽에 아이가 적는 줄(키 gift:<id>)이다. */
+const GIFT_RECIPES=[];
+for(const r of t('gift_recipes')){
+  const where='gift_recipes.csv '+r.id,out=idOf(r['가공품'],where);
+  if(!regionIds.has(r['지역'])||!npcIds.has(r.NPC))fail(where+': 지역·NPC id를 확인한다');
+  if(!Object.values(RECIPES).flat().some(x=>x.out===out&&x.hidden))fail(where+': 숨은 가공법의 결과물이 아니다 '+r['가공품']);
+  if(!['직접','소문','혼잣말','쪽지'].includes(r['방식']))fail(where+': 방식은 직접·소문·혼잣말·쪽지 중 하나다');
+  if(!Object.values(TASTES[r.NPC]||{}).some(x=>['아주 좋아함','좋아함'].includes(x.kind)))fail(where+': 좋아하는 것이 없어 선물을 받을 수 없는 인물이다');
+  if(GIFT_RECIPES.some(g=>g.region===r['지역']&&g.npc===r.NPC&&g.out===out))fail(where+': 같은 지역·인물·가공품이 겹친다');
+  const lines=r['대사'].split(' / ').map(s=>s.trim()).filter(Boolean).map(s=>s.startsWith('너구리:')?[1,s.slice(4).trim()]:[0,s]);
+  if(!lines.length||lines.some(([,s])=>!s))fail(where+': 대사가 비었다');
+  if(!r['수첩'].trim()||!byId[out])fail(where+': 수첩 줄이 비었거나 notebook.csv 에 '+out+' 쪽이 없다');
+  byId[out].lines.push({who:'me',text:r['수첩'].trim(),section:'숨은 가공법',when:'gift:'+r.id});
+  GIFT_RECIPES.push({id:r.id,region:r['지역'],npc:r.NPC,out,way:r['방식'],lines});
+}
 /* 새 선택 교환은 현재 지역 코드에 연결하지 않고 목록·수량만 검증한다. */
 for(const r of t('trades').filter(r=>r.id.startsWith('t_craft_'))){
   if(!regionIds.has(r['지역'])||!npcIds.has(r.NPC))fail('trades.csv '+r.id+': 지역·NPC id를 확인한다');
@@ -342,7 +358,7 @@ const POPUP_SOUNDS={};
   }
 }
 requireValue(TUNING.roll_hold_ms>=80&&TUNING.roll_hold_ms<=400&&TUNING.roll_speed>1&&TUNING.roll_squirrel_speed>1&&TUNING.roll_accel_frames>=1&&TUNING.roll_step_frames>=1,'tuning.csv: 구르기 문턱은 80~400ms, 빠르기는 걷기보다 커야 한다');
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,STAMP_MARKS,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,SCENE_MUSIC,MUSIC_LAYERS,POPUP_SOUNDS},null,1)+";\n";
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,STAMP_MARKS,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,GIFT_RECIPES,SCENE_MUSIC,MUSIC_LAYERS,POPUP_SOUNDS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

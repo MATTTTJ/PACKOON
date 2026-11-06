@@ -1177,13 +1177,14 @@ function nalMarketGive(){
   talk([...(first?[['날쌘','마른 솔방울 셋이라. 눈 온 뒤론 이게 금값이야.\n젖은 장작에도 불을 붙이거든.'],['날쌘','마침 밤에 불 피울 데가 있어.\n한 줌씩 남은 거 묶어 줄게.']]:[]),['너구리','(꿀, 참기름, 팥을 하나씩 얻었다.)'],['날쌘','쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.']]);
 }
 // 결정 D-78: 쌀가루에 약과를 얹으면 날쌘이 제 몫으로 먹고 팥 한 되를 더 준다(날쌘은 약과를 좋아한다, tastes.csv).
-function nalTrade(id,yak=false){
-  const F=G.f;if(!has(id))return;
-  takeItem(id,1);F.nalJDone=true;ledgerDone('nal_jangteo');
-  const extra=yak&&has('yakgwa');if(extra)takeItem('yakgwa',1);
-  const n=(id==='memil_powder'?2:1)+(F.nalJBluff?1:0)+(extra?1:0);addItem('pat',n);
+// 결정 D-905: 팥 바꾸기는 몇 번이고 하는 교환이라, 가루를 여러 몫 얹으면 한 번에 바꾼다 (k 는 몫 수, engine/trade.js multi)
+function nalTrade(id,yak=false,k=1){
+  const F=G.f;k=Math.max(1,k|0);if(!has(id,k))return;
+  takeItem(id,k);F.nalJDone=true;ledgerDone('nal_jangteo');
+  const extra=yak&&has('yakgwa',k);if(extra)takeItem('yakgwa',k);
+  const n=((id==='memil_powder'?2:1)+(F.nalJBluff?1:0)+(extra?1:0))*k;addItem('pat',n);
   if(id==='memil_powder')learn('nal:jangteo-memil');
-  const lead=extra?[['날쌘','약과? …제법 빚었네.\n이건 팔 거 아니고, 내가 먹을게. 한 되 더 얹지.']]:[];
+  const lead=extra?[['날쌘',k>1?'약과가 '+(KO_COUNT[k]||k)+' 개? …제법 빚었네.\n이건 팔 거 아니고, 내가 먹을게. 하나에 한 되씩 더 얹지.':'약과? …제법 빚었네.\n이건 팔 거 아니고, 내가 먹을게. 한 되 더 얹지.']]:[];
   const got=['너구리','(팥 '+(KO_COUNT[n]||n)+' 되를 얻었다.)'];
   talk(id==='memil_powder'?[...lead,['날쌘','돌너머 메밀가루네. 장터에선 귀하니까\n팥 '+n+'되 쳐줄게. 잘 받은 줄 알아.'],got]:[...lead,['날쌘','자, 팥 '+n+'되. 거래 끝.'],got]);
 }
@@ -1469,8 +1470,8 @@ Rg.trade={
   ],
   nal:()=>[
     ...(G.ledger.nal_jangteo?[
-      {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1},{ssal_powder:1,yakgwa:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:i=>nalTrade('ssal_powder',i===1)},
-      {id:'t_nal_jangteo_memil',item:'pat',n:2+(G.f.nalJBluff?1:0),asks:[{memil_powder:1}],done:()=>G.f.nalJDone&&CLASSIC,accept:()=>nalTrade('memil_powder')}
+      {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1},{ssal_powder:1,yakgwa:1}],multi:true,done:()=>G.f.nalJDone&&CLASSIC,accept:(i,k)=>nalTrade('ssal_powder',i===1,k)},
+      {id:'t_nal_jangteo_memil',item:'pat',n:2+(G.f.nalJBluff?1:0),asks:[{memil_powder:1}],multi:true,done:()=>G.f.nalJDone&&CLASSIC,accept:(i,k)=>nalTrade('memil_powder',false,k)}
     ]:[]),
     // 결정 D-147: 떡 재료 묶음은 처음부터 날쌘 지게에 있다. 엿방울 몫을 아직 모르면 까닭은 말하지 않고 남겨 두기만 한다.
     ...(!CLASSIC?[{id:'t_craft_market',item:'honey',label:'꿀 · 참기름 · 팥',asks:[{solbang:3}],
