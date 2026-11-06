@@ -878,7 +878,7 @@ const TABLES={
    },
    {
     "id": "core",
-    "name": "심장",
+    "name": "눈홍시",
     "hp": 4,
     "mat": "dokkaebibul",
     "core": true,
@@ -3955,7 +3955,9 @@ const TABLES={
   "mom_letter_fold_ms": 700,
   "think_base_ms": 1800,
   "think_char_ms": 75,
-  "think_far_px": 140
+  "think_far_px": 140,
+  "nundok_gloat_hits": 1,
+  "nundok_gloat_frames": 45
  },
  "PROGRESS": [
   {
