@@ -7,6 +7,7 @@ let dlgScene=null,dlgQ=[],dlgEnd=null,dlgMusic=null,dlgPlan=null,dlgNextScene=nu
 const dlgHeld=()=>performance.now()-dlgGone.at<TABLES.TUNING.music_dialog_hold_ms;
 function dlgClosed(){dlgGone={at:performance.now(),music:dlgMusic,longing:dlgLonging};dlgMusic=null;dlgLonging=false;}
 /* 결정 D-331: 대화창 닫기는 여기 하나로. 창·장면 그림·남은 줄·음악 기록을 함께 정리한다 (교환 단추·되감기도 이걸 쓴다) */
+// 결정 D-920: 대화 창 크기(초상·글씨·여백)는 css/style.css 끝의 D-920 덩어리가 정한다. 독백 창(field.js think)도 같이 키웠다
 function dlgDismiss(){$('dlg').hidden=true;dlgPic(null);dlgQ=[];dlgEnd=null;dlgClosed();dlgPlan=null;dlgScene=null;}
 // 세 번째 인자는 지역의 전용 이야기 장면용이다. 기존 호출·선택지·종료 순서는 유지한다.
 /* 결정 D-72: 장면별 곡(design/data/scene_music.csv). options.scene 또는 바로 앞의 sceneNext(id)로 장면을 고르면
