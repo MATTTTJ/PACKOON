@@ -188,8 +188,10 @@ fieldTaste.addEventListener('keydown',e=>{
 });
 let fieldTasteWho=null;
 function renderFieldTaste(){
-  const n=REG?.npcs.find(n=>n.name===$('dlgWho').textContent);
-  const who=G&&open('dlg')&&!B&&!tradeClosedNow(n?.id)?n?.id:null;   // 결정 D-197 (disguise.js)
+  // 결정 D-906: 떠돌이(구역 인물·확장 만남)도 이름으로 찾아 건넬 수 있다. 큰 장터 떠돌이의 j_ 붙은 id는 tastes.csv 의 인물 id로 읽는다
+  const name=$('dlgWho').textContent,n=REG?.npcs.find(n=>n.name===name)||(REG&&name?portraitCandidates(REG).find(n=>n.name===name):null);
+  const tid=n&&(TABLES.TASTES[n.id]||!TABLES.TASTES[n.id.replace(/^j_/,'')]?n.id:n.id.replace(/^j_/,''));
+  const who=G&&open('dlg')&&!B&&!tradeClosedNow(n?.id)?tid:null;   // 결정 D-197 (disguise.js)
   if(who!==fieldTasteWho){fieldTaste.innerHTML='';fieldTasteWho=who;}
   const items=who?Object.keys(TABLES.TASTES[who]||{}).filter(id=>has(id)):[];
   fieldTaste.hidden=!who||!items.length;if(fieldTaste.hidden||fieldTaste.children.length)return;
@@ -201,8 +203,41 @@ function renderFieldTaste(){
     if(fieldTasteWho!==who||!open('dlg'))return;
     const result=giftTaste(who,id);if(!result){b.disabled=true;return;}
     response.textContent=result.line+(result.given?'':' (물건은 그대로다.)');if(result.given||!has(id))b.disabled=true;
+    if(result.given)giftLesson(who,result.line);   // 결정 D-906
   };choices.appendChild(b);});
 }
+/* 결정 D-906 (사용자 피드백 2026-11-06 "선물 시 보상으로 조합법을 배우도록. 성격에 따라 직접 알려 주거나 소문을 알려 주거나"):
+   좋아하는 것을 건네면 그 인물이 답례로 숨은 가공법 하나를 일러 준다. 누가 무엇을 어떻게 일러 주는지는 gift_recipes.csv 에 있다
+   (방식: 직접 가르침 · 들은 소문 · 혼잣말로 흘림 · 쪽지). 이 지역의 그 인물 줄 가운데 아직 모르는 가공법 하나만, 선물 한 번에 하나다.
+   배운 것(gift:<id>)은 건넨 순간 수첩에 적고(대화가 끊겨도 잃지 않게), 대사는 이어서 보인다.
+   대화의 마지막 줄에서 건네면 반응과 함께 바로 잇는다. 대화 중간이면 그 대화가 다 끝난 뒤에 잇는다 (결정 D-702: 대화를 중간에 끊지 않는다). */
+function giftLessonFor(who){
+  const knownOut=out=>Object.values(RECIPES).flat().some(r=>r.out===out&&recipeKnown(r));
+  return (TABLES.GIFT_RECIPES||[]).find(g=>g.region===G.region&&g.npc===who&&!knows('gift:'+g.id)&&!knownOut(g.out))||null;
+}
+// 말하는 이름은 선물을 건넨 대화의 이름 그대로 쓴다 (떠돌이는 지역 인물 목록에 없다)
+function giftLessonLines(g,name){
+  const item=ITEMS[g.out].n;
+  const lines=g.lines.map(([kid,text])=>[kid?'너구리':name,text]);
+  lines.push(['너구리',g.way==='쪽지'?'(쪽지를 수첩 사이에 끼워 두었다. '+item+' 만드는 법이다.)':'(수첩에 '+item+' 만드는 법을 적었다.)']);
+  return lines;
+}
+function giftLesson(who,reaction){
+  const g=giftLessonFor(who);if(!g)return;
+  learn('gift:'+g.id,true);
+  const name=$('dlgWho').textContent,last=!dlgQ.length&&!dlgEnd&&!$('dlgChoices').children.length;
+  if(last){dlgDismiss();talk([[name,reaction],...giftLessonLines(g,name)]);return;}
+  (G.f.giftLessonQ||(G.f.giftLessonQ=[])).push({id:g.id,name});
+}
+// 대화 중간에 건넨 선물의 답례: 대화와 창이 모두 닫히고 잠깐 조용하면 잇는다
+let giftLessonIdle=0;
+setInterval(()=>{
+  if(!G||!G.f?.giftLessonQ?.length)return;
+  if(!G.started||G.ended||paused()){giftLessonIdle=0;return;}
+  if(++giftLessonIdle<2)return;giftLessonIdle=0;
+  const q=G.f.giftLessonQ.shift(),g=(TABLES.GIFT_RECIPES||[]).find(x=>x.id===q?.id);
+  if(g&&g.region===G.region)talk(giftLessonLines(g,q.name));
+},250);
 new MutationObserver(renderFieldTaste).observe($('dlgWho'),{childList:true,characterData:true,subtree:true});
 new MutationObserver(renderFieldTaste).observe($('dlg'),{attributes:true,attributeFilter:['hidden']});
 

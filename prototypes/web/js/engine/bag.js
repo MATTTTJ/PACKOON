@@ -16,7 +16,7 @@ const RECIPES={};
 function defineRecipes(map){for(const k in map)RECIPES[k]=(RECIPES[k]||[]).concat(map[k]);}
 const isAwake=t=>G.awake.includes(t);
 const availableRecipes=t=>(RECIPES[t]||[]).filter(r=>!r.know||knows(r.know));
-const recipeKnown=r=>!r.hidden||knows(r.discover)||knows('hint:'+r.out);   // 결정 D-461: 귀띔으로 들은 숨은 가공법도 안다 (결정 D-460: 새 가공법은 모두 숨은 선택 가공법)
+const recipeKnown=r=>!r.hidden||knows(r.discover)||knows('hint:'+r.out)||(TABLES.GIFT_RECIPES||[]).some(g=>g.out===r.out&&knows('gift:'+g.id));   // 결정 D-906: 선물 답례로 배운 것도   // 결정 D-461: 귀띔으로 들은 숨은 가공법도 안다 (결정 D-460: 새 가공법은 모두 숨은 선택 가공법)
 const knownRecipes=t=>availableRecipes(t).filter(recipeKnown);
 function awaken(t){if(!isAwake(t))G.awake.push(t);}
 const pouch={tool:'jeolgu',items:[]};
