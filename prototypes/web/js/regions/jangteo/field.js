@@ -194,7 +194,7 @@ function nundokSprite(x,a){
   ctx.restore();
 }
 /* 결정 D-766: 몸을 감춘 동안. 큰 발자국이 찍혀 남고(옷자락이 끌린 자국이 곁에 남는다), 보이지 않는 큰 몸에 눈발이
-   세차게 휘감기고 미끄러져 떨어진다. 옆으로는 눈바람이 날린다. 수리부엉이 눈이면 서리 빛 속에 모습이 드러난다 */
+   세차게 엉기고 미끄러져 떨어진다. 눈보라는 위에서 비스듬히 내리친다(결정 D-877). 수리부엉이 눈이면 서리 빛 속에 모습이 드러난다 */
 Rg.drawSnowPresence=()=>{
   const e=snowEnc;if(!e)return;const x=e.x-cam;
   for(const s of e.steps){const sx=s.x-cam,o=s.foot?0:3;ctx.save();ctx.globalAlpha=0.85;
@@ -207,12 +207,15 @@ Rg.drawSnowPresence=()=>{
     ctx.save();
     {const fl=0.1+0.05*Math.sin(t*0.08);ctx.globalAlpha=fl;ctx.fillStyle='#e6eef6';   // 큰 몸 꼴로 어리는 눈 안개 (어깨가 넓고 머리가 낮다)
       ctx.beginPath();ctx.ellipse(x,GROUND-50,32,50,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x,GROUND-88,52,9,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x,GROUND-104,16,14,0,0,Math.PI*2);ctx.fill();}
-    for(let i=0;i<80;i++){const q=t*0.09*(i%2?1:-0.8)+i*0.55,rx=26+(i%5)*7,ry=44+(i%3)*10,sz=i%4?2:3;   // 보이지 않는 몸을 휘감는 눈발
-      ctx.globalAlpha=0.65+0.35*hash(i);R(x+Math.cos(q)*rx,GROUND-60+Math.sin(q*1.15)*ry,sz,sz,i%2?'#ffffff':'#d6e2ee');}
+    // 결정 D-877: 눈보라는 위에서 아래로 비스듬히 내리친다 (사용자 지시 2026-11-06 "눈폭풍 이펙트는 아래로 사선"). 옛: 몸 둘레를 빙빙 돌았다.
+    //   보이지 않는 몸에 부딪히는 눈발은 몸 꼴 안에서 짙게 엉긴다
+    for(let i=0;i<80;i++){const k=((t*0.02*(0.8+hash(i*1.7)*0.5)+hash(i*4.3))%1),px=x-30+hash(i*2.1)*110-k*70,py=GROUND-150+k*150,sz=i%4?2:3;
+      const dx=(px-x)/34,dy=(py-(GROUND-55))/55,hb=Math.hypot((px-x)/16,(py-(GROUND-104))/14),on=dx*dx+dy*dy<1||hb<1||(Math.abs(px-x)<52&&Math.abs(py-(GROUND-88))<9);
+      ctx.globalAlpha=(on?0.95:0.4)*Math.sin(k*Math.PI);R(px,py,sz,sz,i%2?'#ffffff':'#d6e2ee');}
     for(let i=0;i<24;i++){const k=((t*0.025+hash(i*3.7))%1),px=x-52+hash(i*5.1)*104,top=GROUND-92+Math.abs(px-x)*0.1;   // 어깨에서 미끄러져 떨어지는 눈
       ctx.globalAlpha=0.9*(1-k);R(px,top+k*86,3,3,'#ffffff');}
-    for(let i=0;i<30;i++){const k=((t*0.035+hash(i*9.1))%1),sx=x+110-k*240,sy=GROUND-130+hash(i*2.9)*126;   // 옆으로 날리는 눈바람
-      ctx.globalAlpha=0.75*Math.sin(k*Math.PI);R(sx,sy,10+Math.floor(hash(i)*10),i%3?1:2,'#f4f6f8');}
+    for(let i=0;i<30;i++){const k=((t*0.03+hash(i*9.1))%1),sx=x-60+hash(i*2.9)*220-k*110,sy=GROUND-170+k*165,n=3+Math.floor(hash(i)*3);   // 결정 D-877: 비스듬히 내리치는 눈바람 줄기
+      ctx.globalAlpha=0.75*Math.sin(k*Math.PI);for(let j=0;j<n;j++)R(sx-j*3,sy+j*4,2,i%3?1:2,'#f4f6f8');}
     for(let i=0;i<8;i++){const q=t*0.15+i*0.8;ctx.globalAlpha=0.7;R(x-30+i*8+Math.cos(q)*3,GROUND-4-Math.abs(Math.sin(q))*7,4,3,'#f4f6f8');}   // 발치에서 이는 눈
     if(Math.floor(t/40)%2===0){const k=(t%40)/40;ctx.globalAlpha=0.6*(1-k);R(x-10-k*10,GROUND-96-k*8,6+k*8,4,'#f4f6f8');}   // 찬 입김
     ctx.restore();

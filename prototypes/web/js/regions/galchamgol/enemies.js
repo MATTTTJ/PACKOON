@@ -617,19 +617,20 @@ function heldBy(b){return !!(B.kHold&&B.kHold.b===b&&B.mark);}
 /* 결정 D-224: 줄기·뿌리를 끊고 캐는 도구는 플레이어가 든 전투 도구다(battleTool). 줄기는 낫, 뿌리는 곡괭이가 잘 먹고
    (boss_parts.csv 잘먹는도구), 안 먹는 도구로 치면 재료 확률이 battle_tool_bad_mult 배로 준다. */
 /* 빈틈 자리: 줄기·뿌리는 남은 덩굴 위, 칡꽃은 꽃가루 잔향을 피한 자리 */
+/* 결정 D-876: 칠 자리는 판 안쪽(bMarkZone)에만. 줄기는 그 안에 드는 마디를, 마지막 뿌리는 그 안에 찍고, 꽃은 그 안에서 솟는다 */
 function kudzuMark(p){
-  B.kHold=null;
+  B.kHold=null;const z=bMarkZone();
   if(p.id==='arm'){const b=B.bullets.find(q=>q.k==='kudzuWhip'&&q.last&&q.ox!=null&&!q.cut);
     if(b){let best=null;B.kHold={b};
       for(let i=0;i<=12;i++){const sv=b.L*(0.25+0.65*i/12),[x,y]=whipPt(b,sv,true);
-        if(x<BOX.x+18||x>BOX.x+BOX.w-18||y<BOX.y+18||y>BOX.y+BOX.h-26)continue;
+        if(x<z.x1||x>z.x2||y<z.y1||y>z.y2)continue;
         const d=Math.hypot(x-B.px,y-B.py);if(!best||d>best.d)best={x,y,d};}
       if(best)return {x:best.x,y:best.y};
-      const [x,y]=whipPt(b,b.L*0.6,true);return {x:clamp(x,BOX.x+18,BOX.x+BOX.w-18),y:clamp(y,BOX.y+18,BOX.y+BOX.h-26)};}}
+      const [x,y]=whipPt(b,b.L*0.6,true);return bFitMark(x,y);}}
   if(p.id==='root'){const b=B.bullets.find(q=>q.k==='kudzuSlam'&&q.last&&q.x!=null);
-    if(b){B.kHold={b};return {x:b.x,y:clamp(b.y-10,BOX.y+18,BOX.y+BOX.h-18)};}}
-  if(p.core){const puffs=B.bullets.filter(q=>q.k==='kudzuScent'&&q.x!=null);let x,y;
-    for(let n=0;n<24;n++){x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+50+Math.random()*(BOX.h-86);   // 솟는 꽃이 칸 안에 들게
+    if(b){B.kHold={b};return bFitMark(b.x,b.y-10);}}
+  if(p.core){const puffs=B.bullets.filter(q=>q.k==='kudzuScent'&&q.x!=null),y1=Math.max(z.y1,BOX.y+50);let x,y;
+    for(let n=0;n<24;n++){x=z.x1+Math.random()*(z.x2-z.x1);y=y1+Math.random()*Math.max(0,z.y2-y1);   // 솟는 꽃이 칸 안에 들게
       if(Math.hypot(x-B.px,y-B.py)>=70&&puffs.every(q=>Math.hypot(x-q.x,y-q.y)>SCENT.radius+20))break;}
     return {x,y};}
   return null;
@@ -788,7 +789,7 @@ defineBullets({
     }},
   kudzuSlam:{
     step(b){const held=b.last&&!b.dug&&heldBy(b);b.t++;
-      if(b.x==null&&b.t>b.delay){b.x=B.px;b.y=B.py;}
+      if(b.x==null&&b.t>b.delay){b.x=B.px;b.y=B.py;if(b.last){const q=bFitMark(b.x,b.y-10);b.x=q.x;b.y=q.y+10;}}   // 결정 D-876: 박혀 남는 마지막 뿌리는 칠 자리가 판 안쪽에 들게 찍는다
       const f=slamAt(b);
       if(b.t===f.hit){Sound.playSfx('battle_hit');bSplash(b.x,b.y,KSOIL);if(Math.hypot(B.px-b.x,B.py-b.y)<SLAM.radius)bHitMe();
         (B.kHoles||(B.kHoles=[])).push({x:b.x,y:b.y+4,t:T().kudzu_hole_frames,max:T().kudzu_hole_frames,seed:Math.random()*6});if(B.kHoles.length>6)B.kHoles.shift();}

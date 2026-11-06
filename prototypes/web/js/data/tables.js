@@ -3661,6 +3661,8 @@ const TABLES={
   "battle_bare_cooldown": 16,
   "battle_bare_radius": 9,
   "battle_mark_radius": 13,
+  "battle_mark_margin": 28,
+  "battle_mark_spare": 6,
   "battle_iframes": 60,
   "battle_squirrel_speed": 3.3,
   "battle_squirrel_cooldown": 10,
