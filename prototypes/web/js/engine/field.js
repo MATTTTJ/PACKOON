@@ -652,7 +652,7 @@ function updateOverlay(){
   const floor=paused()||pickupPose||rolling?null:nearFloorItems()[0];
   if(floor){pr.hidden=false;pr.textContent=TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
-  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?'잊은 몫 캐기':gatherCfg(dg)?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';
+  else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?(dg.form==='otter'?'얼음 구멍에 잠수하기':'잊은 몫 캐기'):gatherCfg(dg)?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';
     // 결정 D-500·D-145: 안내 말풍선은 채집 원과 진행 점 위에 띄운다
     const ringTop=!dg.cache&&gatherCfg(dg)?gatherRingTop(dg):GROUND-14;
     pr.style.top=(Math.min(GROUND-14,ringTop)/H*100)+'%';}
