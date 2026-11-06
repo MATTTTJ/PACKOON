@@ -1099,7 +1099,7 @@ Rg.expansionContent=()=>({
     examines:[
       examine('wish_cloth',380,'소원 천 살펴보기','cloth','새 천 밑에 색 바랜 천이 겹쳐 달렸다.\n같은 가지에 몇 번의 겨울이 묶였을까?'),
       examine('grain_dish',950,'작은 제기 살펴보기','bowl','돌그릇 안에 메밀가루가 조금 남았다.\n바람이 들어도 깊은 그릇이라 안 날아간다.'),
-      {...examine('small_tower',2080,'낮은 돌탑 살펴보기','stone',''),get text(){return G.boss.dead?'큰 돌들이 내려앉아 낮은 탑을 받쳤다.\n작은 돌 하나도 굴러떨어지지 않았다.':'바람이 세도 이 낮은 탑은 흔들리지 않는다.\n밑돌 틈마다 작은 돌을 받쳐 뒀네.';}}
+      {...examine('small_tower',2250,'낮은 돌탑 살펴보기','stone','',Rg.shrineSummitY?.()??GROUND),get text(){return G.boss.dead?'큰 돌들이 내려앉아 낮은 탑을 받쳤다.\n작은 돌 하나도 굴러떨어지지 않았다.':'바람이 세도 이 낮은 탑은 흔들리지 않는다.\n밑돌 틈마다 작은 돌을 받쳐 뒀네.';}}
     ],
     wanderers:[{id:'dol_turtle',name:'남생이 할미',hint:'돌 그늘 쪽에서 느릿느릿 돌을 긁는 소리가 난다.',x:560,draw:drawGuest('turtle'),talk:talkTurtleArc,
       greeting:'샘부터 찾으라 했지?\n…네가 맨 천은 아직 잘 매여 있다.'}],stamps:[]
