@@ -313,8 +313,11 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .b-part.broken .nm{text-decoration:line-through;opacity:.5}
 .b-part .tag{font-size:.82em;color:var(--dan)}
 /* 결정 D-224: 부위 옆 잘 먹는 도구, 전투 도구 단추 */
-.b-fit{display:inline-flex;opacity:.35}
-.b-fit.on{opacity:1}
+/* 결정 D-944: 왼쪽 부위 줄의 도구 그림은 지금 든 도구와 같으면 밝은 금빛 바탕에 또렷하게, 다르면 잿빛으로 흐리게 (사용자 지시 2026-11-06) */
+.b-fit{display:inline-flex;align-items:center;gap:2px;padding:1px 3px;border-radius:3px;opacity:.38;filter:grayscale(1) brightness(.85);font-size:.82em;transition:opacity .15s,filter .15s,background-color .15s}
+.b-fit.on{opacity:1;filter:none;background:rgba(244,207,99,.75);box-shadow:0 0 0 1.5px #c98a12;font-weight:700}
+.b-fit .b-fit-name{display:none}
+.b-fit.on .b-fit-name{display:inline}
 .b-fit canvas,.b-tool canvas{width:16px;height:16px;image-rendering:pixelated}
 .b-tool{display:inline-flex;align-items:center;gap:4px}
 .b-tool:disabled{opacity:1;cursor:default}
