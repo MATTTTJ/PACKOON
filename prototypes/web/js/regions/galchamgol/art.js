@@ -50,6 +50,7 @@ if(!CLASSIC){
     '#d2b2a5':'#b9cfc2','#e0bc9c':'#c5d8c8','#edc9a0':'#d5dfc4','#f5d9ac':'#e1e5ca','#f3cea0':'#d6dfba','#edb886':'#c2d1a7',
     '#805f78':'#849e98','#9d6a7b':'#98b1a5','#bb7b7e':'#b4c4ad','#d8927e':'#c9d2b5','#edaa83':'#dce1bf','#f5c598':'#e7e6c9',
     '#bd8e83':'#91aa90','#aa7964':'#728c71','#877377':'#7c9586','#7c766e':'#6a8673',
+    '#c4825f':'#8fa483','#ba725c':'#80977a','#cc8f63':'#9fb28a','#9b6e58':'#6f8a6c','#a0755a':'#76906d','#916656':'#66806a','#8c6656':'#6f7a68','#7d6058':'#5f6d5f',   // 결정 D-980: 먼 숲
     '#c85c36':'#668b50','#d37b3e':'#7f9b5c','#bc6139':'#66874e','#df9748':'#9ab16b','#966245':'#54754b','#9f7047':'#648552','#815139':'#496743',
     '#c57a38':'#779855','#ab5735':'#66874e','#b96738':'#779855','#bd7944':'#6f8d54','#d28c4b':'#8fa665',
     '#67452f':'#6c6243','#ab7842':'#8c9a5f','#7b5132':'#72804d','#4c5140':'#4c5b40','#8d9060':'#8b9d67',
@@ -78,24 +79,27 @@ if(!CLASSIC){
       px(x,h,2,H-h,color);
     }
   }
-  function tree(x,y,scale=1,color=C.ember,dark=false,shape=0){
+  // 결정 D-980: far 면 먼 숲 나무다. 줄기·가지·잎 빛을 능선 안개 쪽으로 바래게 칠해 앞의 집·인물·물건과 겹쳐도 묻히지 않는다.
+  function tree(x,y,scale=1,color=C.ember,dark=false,shape=0,far=false){
     x=Math.round(x);y=Math.round(y);
     const q=(a,b,w,h,c)=>px(x+a*scale,y+b*scale,w*scale,h*scale,c);
-    q(-3,-53,6,53,dark?'#46362f':C.bark);q(-13,-43,12,3,C.bark);q(1,-34,15,3,C.bark);
+    const bark=far?(dark?'#7d6058':'#8c6656'):C.bark;
+    q(-3,-53,6,53,far?bark:dark?'#46362f':C.bark);q(-13,-43,12,3,bark);q(1,-34,15,3,bark);
     if(shape===1){
       // A windward oak has a low crown, a long left fork and an open right shoulder.
       q(-27,-63,27,15,color);q(-36,-55,38,15,color);q(-22,-44,38,12,color);
       q(0,-72,23,14,color);q(8,-61,24,15,color);q(-19,-65,18,5,color);
-      q(2,-46,18,3,C.bark);q(-27,-57,14,3,dark?'#76503d':'#e99849');
+      q(2,-46,18,3,bark);q(-27,-57,14,3,far?color:dark?'#76503d':'#e99849');
     }else if(shape===2){
       // A taller, sparsely leafed tree leaves its fork visible between two leaf clusters.
       q(-10,-77,19,15,color);q(-20,-68,32,13,color);q(-28,-55,24,12,color);
-      q(9,-60,22,16,color);q(-12,-39,31,11,color);q(-14,-55,15,3,C.bark);
-      q(-5,-73,11,3,dark?'#76503d':'#e99849');q(-20,-43,12,3,color);
+      q(9,-60,22,16,color);q(-12,-39,31,11,color);q(-14,-55,15,3,bark);
+      q(-5,-73,11,3,far?color:dark?'#76503d':'#e99849');q(-20,-43,12,3,color);
     }else{
       q(-23,-72,43,15,color);q(-31,-62,59,18,color);q(-25,-44,47,12,color);
-      q(-13,-78,23,8,color);q(-20,-69,17,4,dark?'#76503d':'#e99849');
+      q(-13,-78,23,8,color);q(-20,-69,17,4,far?color:dark?'#76503d':'#e99849');
     }
+    if(far)return;   // 먼 나무는 짙은 가지 그늘과 밝은 잎 반짝임을 그리지 않는다
     q(9,-55,18,3,dark?'#684334':'#ac4b32');q(-29,-53,13,2,dark?'#684334':'#ac4b32');
     q(-17,-74,3,2,'#edb660');q(7,-66,4,2,'#edb660');q(-22,-47,3,2,'#edb660');
   }
@@ -103,8 +107,10 @@ if(!CLASSIC){
     const s=90,start=Math.floor(RC()*par/s)*s;
     for(let u=start-s;u<start+W+s*2;u+=s){
       const a=hash(u+11),x=u-RC()*par;
-      tree(x,177+Math.floor(a*11),.65+a*.25,
-        dark?['#966245','#9f7047','#815139'][Math.floor(a*3)]:['#d37b3e','#bc6139','#df9748'][Math.floor(a*3)],dark,Math.floor(hash(u+73)*3));
+      // 결정 D-980: 먼 숲은 능선 기슭(166~172)에 서고 작고 바랬다 (사용자 피드백 2026-11-06 29: 나무와 물건·인물이 겹쳐 안 보인다).
+      //   예전엔 길 바로 뒤(177~188)에 진한 단풍빛으로 서서, 집·인물·다람쥐·바구니가 그 줄기와 잎에 묻혔다.
+      tree(x,166+Math.floor(a*7),.55+a*.2,
+        dark?['#9b6e58','#a0755a','#916656'][Math.floor(a*3)]:['#c4825f','#ba725c','#cc8f63'][Math.floor(a*3)],dark,Math.floor(hash(u+73)*3),true);
     }
   }
   function ground(marsh=false){
@@ -491,8 +497,18 @@ if(!CLASSIC){
   }
   // 칡잎: 세 갈래 잎과 잎자루 (몸통 감은 칡과 입구 덩굴이 같이 쓴다)
   function kudzuLeaf(lx,ly){px(lx,ly,4,3,'#6f8f3e');px(lx+4,ly+1,3,3,'#7f9f46');px(lx+1,ly-2,3,2,'#8aab4d');px(lx+2,ly+3,1,2,'#3a5a2b');}
+  // 결정 D-981: 다람쥐만 오르는 높은 참나무 (숲 climbs). 예전엔 막대 하나라 나무로 안 보였다. 굵은 줄기와 단풍 든 잎 그늘이 가지(발판)를 받친다.
+  function highOak(x,bottom,top){
+    x=Math.round(x);const bark='#6a4630',dk='#4a301f',lt='#8e6440';
+    px(x-6,top-6,12,bottom-top+6,bark);px(x-6,top-6,2,bottom-top+6,lt);px(x+4,top,2,bottom-top,dk);
+    for(let y=top+4;y<bottom-3;y+=9){px(x-3+(y%18?2:0),y,2,4,dk);}   // 껍질 골
+    px(x-10,bottom-4,20,4,bark);px(x-13,bottom-2,6,2,dk);px(x+8,bottom-2,7,2,dk);   // 퍼진 밑동
+    const leaf=[['#b9622f',-26,-34,30,14],['#d0813a',-14,-42,36,14],['#c56a34',6,-36,34,14],['#e09a46',-6,-48,22,8],['#a9552b',-22,-24,20,8],['#b9622f',40,-20,24,10],['#d0813a',52,-14,16,8]];
+    for(const [c,a,b,w,h] of leaf)px(x+a,top+b,w,h,c);
+    px(x+2,top-22,3,16,bark);px(x-12,top-18,10,3,bark);px(x+46,top-8,3,8,bark);   // 잎 그늘 속 가지
+  }
   Rg.expArt={
-    back:zoneBack,scenery,front:()=>{},
+    back:zoneBack,scenery,front:()=>{},highOak,
     vistaStream:[{speed:.06,draw:vistaStreamSky},{speed:.22,draw:vistaStreamVillage},{speed:.52,draw:vistaStreamWater},{speed:0,draw:vistaStreamFrame}],
     vistaHill:[{speed:.06,draw:vistaHillSky},{speed:.24,draw:vistaHillValley},{speed:.48,draw:vistaHillNear},{speed:0,draw:vistaHillFrame}],
     magpie(x,y,f=1){
