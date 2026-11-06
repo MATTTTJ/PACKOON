@@ -159,7 +159,7 @@ function step(){
   Vfx.update();
   const mg=openMinigame();if(mg){mg.step();return;}
   fieldCall('ambient');   // 현재 구역의 날씨·진행만 갱신한다
-  if(paused())return;
+  if(paused()){settleHero();return;}
   mapNoteSeen();          // D-146: 길 지도에 적을, 지금 화면에 보이는 인물·채집물
   if(document.hidden)return;
   stepFloorItems();
@@ -171,10 +171,14 @@ function step(){
   owlSenseTick();      // 결정 D-665: 수리부엉이가 숨은 물건 곁을 지나면 드러난다 (forms.js)
   G.anim++;
   let ax=0;if(isLeft())ax-=1;if(isRight())ax+=1;
+  // 결정 D-921: 사건 속말(thinkHold)이 뜬 동안은 걷기·뛰기·구르기·휘두르기를 받지 않는다. 떨어지는 중이면 그대로 내려서고, 땅에 선 뒤부터 센다
+  const held=thinkHold>0;
+  if(held){ax=0;jumpQ=atkQ=dropQ=false;rollHold=null;if(rolling)endRoll();}
   G.vx=ax*(G.attackT>0&&G.onGround?TABLES.TUNING.field_swing_speed:TABLES.TUNING.field_move_speed*formMoveMul());if(ax)G.face=ax>0?1:-1;
   stepRoll(ax);   // 결정 D-94: 구르는 중이면 G.vx를 구르기 빠르기로 (roll.js)
+  if(held)G.vx=0;
   const climbing=stepClimb(ax);
-  if(!climbing)slopeSlip();   // 결정 D-846: 언 비탈에서 미끄러짐
+  if(!climbing&&!held)slopeSlip();   // 결정 D-846: 언 비탈에서 미끄러짐 (D-921: 속말로 멈춰 선 동안은 밀리지 않는다)
   if(!climbing){
   if(jumpQ&&!G.onGround&&owlFlap())jumpQ=false;   // 결정 D-720: 수리부엉이 날갯짓 (forms.js)
   if(jumpQ&&G.onGround){Sound.jump();G.vy=TABLES.TUNING.field_jump_velocity*formJumpMul();G.onGround=false;}jumpQ=false;
@@ -201,6 +205,7 @@ function step(){
   else if(G.vy>=0){for(const p of [...fieldPlatforms(),...formLedges()]){if(G.dropT>0&&Math.abs(p.y-G.dropY)<1)continue;if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
   }
   if(G.onGround||climbing){G.dropBack=false;G.dropHang=0;}
+  if(held&&(G.onGround||climbing))thinkHold--;   // 결정 D-921
   Vfx.feet();Vfx.steps();   // 결정 D-174: 눈·서리 바닥의 발걸음·발자국 (vfx.js)
   if(!wasGrounded&&G.onGround)Sound.land();
   if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
@@ -395,7 +400,25 @@ function drawNpcGhosts(){
     ctx.save();ctx.globalAlpha=clamp(1-k,0,1);g.n.draw(x,g.y-bob,g.dir);ctx.restore();
   }
 }
-function drawNpcs(){drawNpcGhosts();for(const n of fieldNpcs()){const x=n.x-cam;if(x<-60||x>W+60)continue;const f=G.px<n.x?-1:1;
+/* 결정 D-923: 인물의 시선 (사용자 피드백 2026-11-06 6: "낮의 부엉이처럼 움직임이 없는 npc는 주인공이 지나간다고 시선이 따라오면 안 된다").
+   예전엔 모든 인물이 늘 주인공 쪽을 보았다. 이제는
+   - 서 있는 인물은 제 방향(n.face, 없으면 왼쪽 = 주인공이 대개 들어오는 쪽)을 그대로 본다. 주인공이 지나가도 돌아서지 않는다.
+   - 말을 걸면(그 인물과의 대화가 열린 동안) 주인공 쪽으로 돌아서고, 대화가 끝난 뒤에도 그 방향을 그대로 둔다.
+   - 걸어 다니는 인물(자리 x 가 바뀌는 인물)은 가는 쪽을 본다.
+   지역이 인물 그림 위에 덧그릴 때도 npcFacing(n) 으로 같은 방향을 쓴다. */
+const npcFaceMemo=new Map();
+let npcTalkId=null;
+function npcFacing(n){
+  if(!n||!G)return -1;
+  const key=G.region+':'+(G.zone||'')+':'+(n.id||n.name||''),x=n.x;
+  let m=npcFaceMemo.get(key);
+  if(!m){m={x,f:n.face===1||n.face===-1?n.face:-1};npcFaceMemo.set(key,m);}
+  if(Number.isFinite(x)&&Number.isFinite(m.x)&&Math.abs(x-m.x)>0.3)m.f=x>m.x?1:-1;   // 걷는 쪽
+  m.x=x;
+  if(npcTalkId!=null&&npcTalkId===n.id&&open('dlg'))m.f=G.px<x?-1:1;            // 말을 건 동안은 주인공 쪽
+  return m.f;
+}
+function drawNpcs(){drawNpcGhosts();if(npcTalkId!=null&&!open('dlg'))npcTalkId=null;for(const n of fieldNpcs()){const x=n.x-cam;if(x<-60||x>W+60)continue;const f=npcFacing(n);
   const a=npcMoveAlpha(n.id);if(a<=0)continue;
   if(a<1){ctx.save();ctx.globalAlpha=a;}
   if(n.props)n.props(n);
@@ -612,7 +635,7 @@ function updateHints(){
     const key=G.region+':'+p.id,seen=G.f.hintsSeen||(G.f.hintsSeen={});
     if(seen[key]||hintSettled(p))continue;
     if(Math.abs(p.x-G.px)>(p.hintRange||TABLES.TUNING.hint_range))continue;
-    seen[key]=true;think(typeof p.hint==='function'?p.hint():p.hint);hintThought={p,text:thoughtText()};return;   // 결정 D-706
+    seen[key]=true;think(typeof p.hint==='function'?p.hint():p.hint,{light:true});hintThought={p,text:thoughtText()};return;   // 결정 D-706
   }
 }
 /* 결정 D-706: 주인공의 짧은 속말. 사용자 규칙(2026-11-05): 검은 띠(toast)를 따로 띄워 설명하는 일은 게임 어디에도 없어야 하고,
@@ -626,9 +649,34 @@ heroThought.innerHTML='<div class="face"></div><div class="mono-body"><div class
 $('shell').appendChild(heroThought);
 let thoughtT=0,thoughtAt=null;
 const thoughtText=()=>heroThought.querySelector('.text').textContent;   // 독백 창의 글(이름표 빼고). D-831 기척 거두기가 쓴다
-function think(text){
+/* 결정 D-921: 사건 때문에 뜨는 속말은 주인공을 멈춰 세운다 (사용자 피드백 2026-11-06: "보스, npc, 환경 이벤트 등에 걸려서 설명이 나오거나
+   독백할 때는 반드시 멈춘 상태로. 그렇다고 공중에서 멈추면 안 된다").
+   - 가르는 법: think() 는 기본이 '사건 속말'이다. 지역 이야기·보스·문턱·환경(고드름·미끄러짐·밀려남)·지도·도장·수리부엉이 감지가 부르는 속말이 여기에 든다.
+     플레이어가 그냥 지나가거나 제 손으로 한 일에 붙는 가벼운 속말만 think(글,{light:true}) 로 부른다: 인물 기척(지나가다 듣는 소리),
+     변신으로 문턱 넘기 안내, 채집 시작 안내, 못 구르는 모습의 혼잣말(roll.js 는 글이 rollSpec().say 와 같으면 가볍게 본다).
+   - 멈춤: 뜨는 순간부터 좌우·점프·구르기·휘두르기 입력을 받지 않는다. 떨어지는 중이면 그대로 땅(발판)에 내려선 다음부터
+     think_stop_base_ms + 글자 수 × think_stop_char_ms (think_stop_max_ms 까지) 만큼 서 있는다. 속말 창은 그 뒤에도 원래 시간만큼 남는다.
+   - 대화 창이나 패널이 열려 필드가 멈춘 동안에도 공중에 뜬 주인공은 내려선다(settleHero). 그래서 공중에 굳은 채 설명을 듣지 않는다. */
+let thinkHold=0;
+function thinkStopFrames(t){const T=TABLES.TUNING;return Math.round(Math.min(T.think_stop_max_ms,T.think_stop_base_ms+T.think_stop_char_ms*[...t].length)*60/1000);}
+function settleHero(){
+  if(!G||!G.started||G.ended||B||inkOn||mapTravel||vistaMode||zoneMotion||document.hidden)return;
+  if(G.onGround||formClimb||!(open('dlg')||open('bag')||open('trade')||open('notebook')||openMinigame()))return;
+  const prevY=G.py;G.vx=0;G.dropHang=0;
+  G.vy=Math.min(TABLES.TUNING.field_fall_speed,G.vy+TABLES.TUNING.field_gravity);
+  G.py+=G.vy;
+  const gy=surfaceY(G.px);
+  if(G.py>=gy){G.py=gy;G.vy=0;G.onGround=true;}
+  else if(G.vy>=0){for(const p of [...fieldPlatforms(),...formLedges()]){if(G.dropT>0&&Math.abs(p.y-G.dropY)<1)continue;if(G.px>p.x-3&&G.px<p.x+p.w+3&&prevY<=p.y+0.01&&G.py>=p.y){G.py=p.y;G.vy=0;G.onGround=true;}}}
+  if(G.dropT>0)G.dropT--;
+  if(G.onGround){G.dropBack=false;Sound.land();}
+}
+function think(text,opts={}){
   if(!text)return;
   const t=String(text).replace(/\s*\n\s*/g,' ');
+  // 결정 D-921: 가벼운 속말이 아니면 멈춰 세운다
+  const light=opts.light||(typeof rollSpec==='function'&&G&&text===rollSpec().say);
+  if(!light&&G&&G.started&&!G.ended&&!B)thinkHold=Math.max(thinkHold,thinkStopFrames(t));
   heroThought.querySelector('.text').textContent=t;
   const face=heroThought.querySelector('.face');face.innerHTML='';face.appendChild(portrait('너구리'));
   thoughtT=Math.round((TABLES.TUNING.think_base_ms+TABLES.TUNING.think_char_ms*[...t].length)*60/1000);
@@ -687,7 +735,7 @@ const exitSpec=e=>typeof e==='string'?{to:e}:e;
 function resetFieldModes(){
   resetMap();
   cancelPickup();
-  endVista();zoneMotion=null;zoneFade=0;blockedEdge=null;sparks.length=0;shakeT=0;releaseInputs();suppressedKeys.clear();Vfx.clear();
+  endVista();zoneMotion=null;zoneFade=0;blockedEdge=null;thinkHold=0;sparks.length=0;shakeT=0;releaseInputs();suppressedKeys.clear();Vfx.clear();
 }
 function changeZone(to,arrival={}){
   if(!usesZones(REG)||!REG.zones[to]||paused())return false;
@@ -860,7 +908,7 @@ function zoneEdge(){
     if(blockedEdge!==side)think(p.reason||'여긴 아직 못 지나가겠다.');   // 결정 D-706
     blockedEdge=side;return false;
   }
-  if(!needMet(p))think(p.formLabel||formTo(p.formPass)+' 지나간다');
+  if(!needMet(p))think(p.formLabel||formTo(p.formPass)+' 지나간다',{light:true});   // 결정 D-921: 제 손으로 넘는 안내는 가벼운 속말
   const dest=REG.zones[p.to];if(!dest)return false;
   const direction=side==='right'?1:-1;
   return changeZone(p.to,{x:direction>0?16:dest.w-16,y:p.toY,edgeDirection:direction});
@@ -907,7 +955,8 @@ function interactWith(p,kind){
   if(isHomeReplyPoint(p,kind)&&deliverHomeReply())return;
   // 변신한 채로는 등록된 인물만 아이를 몰라보고 손님으로 대한다 (forms.js). 그 밖은 기존 대화
   if((kind==='npc'||kind==='wanderers')&&strangerApplies(p)){strangerTalk(p);return;}
-  if(kind==='npc'){learn('met:'+p.id);if(p.peek)peekAt(p.x,p.y??fieldGround());p.talk();}
+  if(kind==='npc'||kind==='wanderers')npcTalkId=p.id;   // 결정 D-923: 말을 건 인물만 주인공 쪽으로 돌아선다
+  if(kind==='npc'){learn('met:'+p.id);if(p.peek&&!peekFor(p))peekAt(p.x,p.y??fieldGround());p.talk();}   // 결정 D-924: pic 이 있으면 장면 그림
   else if(kind==='doors'){
     if(!pathOpen(p)){const say=typeof p.blockedSay==='function'?p.blockedSay():p.blockedSay;
       if(say)talk([['너구리',say]]);else think(p.reason||'여긴 아직 못 지나가겠다.');return;}
@@ -920,7 +969,7 @@ function interactWith(p,kind){
     const texts=Array.isArray(p.text)?p.text:[p.text];
     const visits=G.f.examineVisits||(G.f.examineVisits={}),key=expansionKey(p.id),i=Math.min(visits[key]||0,texts.length-1);
     visits[key]=Math.min(i+1,texts.length-1);
-    if(p.peek!==false)peekAt(p.x,p.y??fieldGround(),{hold:true,sound:p.sound||p.id});   // 결정 D-151: 조사 그림은 대화창이 닫힐 때까지. D-483: 그 자리 소리
+    if(p.peek!==false&&!peekFor(p,{sound:p.sound||p.id}))peekAt(p.x,p.y??fieldGround(),{hold:true,sound:p.sound||p.id});   // 결정 D-151: 조사 그림은 대화창이 닫힐 때까지. D-483: 그 자리 소리. D-924: pic 이 있으면 장면 그림
     talk([[p.who||'너구리',texts[i]]]);
   }else if(kind==='wanderers'){
     learn('met:'+p.id,true);
@@ -980,7 +1029,18 @@ function pawStamp_glint(x,y,seed,mini=false){if(!Vfx.reducedMotion&&Math.floor((
 /* 결정 D-204: 도장을 찾았을 때 뜨는 작은 창은 손바닥 자국(묻은 것 포함, 위 -11~아래 +3)이 늘 다 들어가게 잡는다 (사용자 피드백 56).
    예전에는 땅에서 22px 위까지만 담아, 깃대·기둥처럼 높이 찍힌 도장(face 18)은 손가락 끝이 잘렸다.
    받침까지 한 창(28px)에 들어가면 받침과 함께, 아니면 손바닥을 가운데에 둔다. */
+/* 결정 D-924: 살펴보기 작은 창은 그 대상이 장면 그림 pic 을 주면 그 그림을 띄운다 (사용자 피드백 2026-11-06 34:
+   "애니메이션이랑 말하는 내용이랑 맞는 게 하나도 없다. 미니 애니메이션은 플레이어가 내용을 좀 더 자세히 보게 하는 장치").
+   pic 은 64×44 칸에 그리는 함수 draw(w,h,초) 또는 {draw, animate, sound} 이고, 상태에 따라 바꾸려면 getter 로 둔다(get pic(){…}).
+   pic 이 없으면 예전처럼 필드 그 자리를 잘라 키운다(peekAt). 살펴보기(examines)·고정물(npc 의 peek:true)·도장이 같이 쓴다. */
+function peekFor(p,opts={}){
+  const pic=p.pic;
+  if(typeof pic==='function'){peekPicture(pic,{sound:opts.sound});return true;}
+  if(pic&&typeof pic.draw==='function'){peekPicture(pic.draw,{...pic,sound:pic.sound||opts.sound});return true;}
+  return false;
+}
 function peekStamp(s){
+  if(peekFor(s))return;   // 결정 D-924
   const gy=s.y??fieldGround(),py=gy-(s.face??STAMP_FACE[stampBase(s)]),top=py-11,bottom=Math.max(py+3,gy),ch=28;
   const mid=bottom-top<=ch-4?(top+bottom)/2:py-4;
   peekAt(s.x,Math.round(mid+ch/2),{w:40,h:ch,below:0});
@@ -996,7 +1056,7 @@ function findStamp(s){
 }
 function drawZoneObjects(){
   for(const p of zoneObjects('wanderers'))if(p.draw){const a=npcMoveAlpha(p.id);if(a<=0)continue;   // D-126
-    if(a<1){ctx.save();ctx.globalAlpha=a;}p.draw(p.x-cam,p.y??fieldGround(),G.px<p.x?-1:1);if(a<1)ctx.restore();}
+    if(a<1){ctx.save();ctx.globalAlpha=a;}p.draw(p.x-cam,p.y??fieldGround(),npcFacing(p));if(a<1)ctx.restore();}   // 결정 D-923
   for(const k of ['doors','examines','vistas','stamps'])for(const p of zoneObjects(k)){
     // 결정 D-81: 아빠 도장 자리에는 찾기 전에도 흐린 손바닥 흔적이 남아 있다. 찾으면 또렷해진다 (design/data/decisions.csv)
     if(k==='stamps'){const sx=p.x-cam,gy=p.y??fieldGround(),base=stampBase(p),py=gy-(p.face??STAMP_FACE[base]);
