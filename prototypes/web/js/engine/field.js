@@ -76,10 +76,11 @@ function floorPickupGoal(original){
   if(!G.started||G.ended)return original;
   const rows=[...G.pickups,...Object.values(G.floorItems?.[G.region]||{}).flat()].filter(a=>!a.got);
   // 결정 D-149: 할 일 문구는 짧은 명사형(~하기)이다. 바닥에 떨어진 그 물건이 있으면 '바닥의 ○○ 줍기'로 바꿔 알린다.
-  const a=rows.find(a=>((/줍기|따기|베기|캐기/.test(original)&&original.includes(ITEMS[a.item]?.n))||
-    (a.item==='root'&&!has('root')&&/칡뿌리 캐기/.test(original))||
+  // 결정 D-890: 할 일 길잡이는 문장(~줍자, ~따자)이라 줍는 말과 건네는 말을 어간으로 본다
+  const a=rows.find(a=>((/줍|주워|따기|따자|베기|베자|캐기|캐자/.test(original)&&original.includes(ITEMS[a.item]?.n))||
+    (a.item==='root'&&!has('root')&&/칡뿌리를? 캐/.test(original))||
     (a.item==='meoru'&&G.region==='galchamgol'&&G.boss.dead&&!has('meoru')&&!G.diary.some(d=>d.id==='end')))&&
-    !/건네기|넣어|빻기|갈기|갈아|찌기|드리기|맡기기/.test(original));
+    !/건네|넣|빻|갈기|갈아|갈자|찌기|찌자|드리|맡기/.test(original));
   if(!a)return original;
   return '바닥의 '+ITEMS[a.item].n+' 줍기';
 }

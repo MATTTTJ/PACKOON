@@ -579,15 +579,17 @@ if(!CLASSIC){
       if(!G.started||G.ended)return oldGoal();
       // 결정 D-67: 앞선 진행부터 본다. 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
       // 결정 D-218: '까치 할머니'라는 말은 쓰지 않는다. 약 나르는 까치는 늘 '늙은 까치'다.
-      if(has('darae_yak'))return '늙은 까치에게 약즙 맡기기';
-      if(G.boss.dead&&!G.f.daraePicked)return '서리다래 따기';
+      // 결정 D-890: 글은 story.js 의 Rg.goalSteps(목표·길잡이)를 같이 쓴다. 늙은 까치는 어르신으로 부른다.
+      const S=Rg.goalSteps;
+      if(has('darae_yak'))return S.send();
+      if(G.boss.dead&&!G.f.daraePicked)return S.pick();
       // 결정 D-130: 아이가 아는 이름과 본 것으로만 부른다.
-      if(G.f.ppuriPassed&&!G.boss.dead)return '움직이는 돌무더기와 맞서기';
+      if(G.f.ppuriPassed&&!G.boss.dead)return S.fight();
       // 결정 D-447: 할 일 줄에는 아이가 아직 만나거나 들은 적 없는 이름을 쓰지 않는다 (사용자 피드백 2026-11-04).
       //   도착 때 일기("서리다래가 어디 열리는지 마을에 물어보자")대로 묻고, 뿔영감이 "고슴도치 녀석"이라 한 뒤로는 고슴도치, 만난 뒤에야 꾸벅이.
-      if(!G.f.ppuriMet&&!G.f.kkuTalk)return '마을에 서리다래 물어보기';
-      if(!G.f.kkuTalk)return '고슴도치에게 서리다래 묻기';
-      if(!G.f.ppuriPassed&&has('memil_powder'))return '뿔영감에게 메밀가루 건네기';
+      if(!G.f.ppuriMet&&!G.f.kkuTalk)return S.askVillage();
+      if(!G.f.kkuTalk)return S.askHedgehog();
+      if(!G.f.ppuriPassed&&has('memil_powder'))return S.powderGive();
       return oldGoal();
     };
   };

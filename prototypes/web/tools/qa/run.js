@@ -7,7 +7,7 @@ const {execFileSync}=require('node:child_process');
 const {createHash}=require('node:crypto');
 const {launchBrowser,startServer}=require('./browser');
 const root=path.resolve(__dirname,'../../../..');
-const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','talk-esc','map','drops-floor','drops-persistence','drops-departure','drops-full'];
+const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','talk-esc','quest-order','map','trade','drops-floor','drops-persistence','drops-departure','drops-full'];
 const staticNames=names.slice(0,5);
 const args=process.argv.slice(2);
 let quick=false,only=null;
@@ -160,9 +160,17 @@ const watchdog=setTimeout(async()=>{
     if(selected.has('save'))add(await withBrowser('save',(browser,directory)=>runSave({browser,outDir:directory,rules})));
     if(selected.has('mobile'))add(await withBrowser('mobile',(browser,directory)=>runMobile({browser,outDir:directory,rules})));
     if(selected.has('talk-esc'))add(await withBrowser('talk-esc',(browser,directory)=>runTalkEsc({browser,outDir:directory,rules})));   // 결정 D-702
+    if(selected.has('quest-order')){   // 결정 D-892: 미리 해 둔 일을 할 일이 다시 시키지 않는지
+      const {runQuestOrder}=require('./quest-checks');
+      add(await withBrowser('quest-order',(browser,directory)=>runQuestOrder({browser,outDir:directory})));
+    }
     if(selected.has('map')){
       const {runMap}=require('./map-checks');
       add(await withBrowser('map',(browser,directory)=>runMap({browser,outDir:directory})));
+    }
+    if(selected.has('trade')){   // 결정 D-905·D-906
+      const {runTrade}=require('./trade-checks');
+      add(await withBrowser('trade',(browser,directory)=>runTrade({browser,outDir:directory})));
     }
     const {runDropCheck}=require('./drop-checks');
     for(const name of names.filter(n=>n.startsWith('drops-')))if(selected.has(name))

@@ -92,8 +92,8 @@ function talkDolsoeArc(){
       ['돌쇠 할배','손으로 돌 읽는 걸 가르치려 들면\n도망만 간다.'],
       ['돌쇠 할배','내 눈이 더 흐려지기 전에\n한 번은 가르쳐야 하는데.']
     ],'돌쇠 할배는 눈이 더 흐려지기 전에 손주 꼬마 두더지에게 손으로 돌 읽는 법을 가르치고 싶어 한다. 꼬마는 도망만 다닌다.')});
-    // 결정 D-135: 꼬마의 속마음(dolsoe5)은 꼬마에게 말을 걸어 듣는다. 할배 자리에서 꼬마가 말하지 않는다.
-    else if(!F.dolneomeo_arc_dolsoe5&&F.stackDone)c.push({t:'꼬마한테 물어볼게요',go:()=>talk([['돌쇠 할배','그래 주련.\n돌담 뒤에 숨어 있을 게다.']])});
+    // 결정 D-135: 꼬마의 속마음(dolsoe5)은 꼬마에게 말을 걸어 듣는다. 할배 자리에서 꼬마가 말하지 않는다. 결정 D-891: 돌 쌓기를 마쳤는지는 따지지 않는다.
+    else if(!F.dolneomeo_arc_dolsoe5)c.push({t:'꼬마한테 물어볼게요',go:()=>talk([['돌쇠 할배','그래 주련.\n돌담 뒤에 숨어 있을 게다.']])});
     // 결정 D-580: 꼬마가 배우는 막과 맞히는 막을 묶었다 (dolsoe6·dolsoe7).
     else if(F.dolneomeo_arc_dolsoe5&&!F.dolneomeo_arc_dolsoe7&&G.boss.dead)c.push({t:'꼬마가 할배를 찾아요',go:()=>arcAll(['dolneomeo_arc_dolsoe7','dolneomeo_arc_dolsoe6'],[
       ['꼬마 두더지','…가르쳐 줘, 할배.'],
@@ -504,40 +504,67 @@ Rg.npcs=[
 ];
 
 /* ---------- 지금 할 일 ---------- */
+/* 결정 D-890: 목표(화면)와 길잡이(수첩)를 함께 돌려준다 (goalLine). 길잡이는 아이가 들은 말과 본 것만 쓴다.
+   field.js 의 확장판 덮어쓰기도 같은 글(Rg.goalSteps)을 쓴다. 옛 구성은 구역 이름을 빼고 말한다. */
+const where=(expanded,classic='')=>CLASSIC?classic:expanded;
+const PATH_GOAL='돌산 길 열기',FIND_GOAL='서리다래 있는 곳 알아보기';
+const goalSteps=Rg.goalSteps={
+  send:()=>goalLine('엄마께 약즙 보내기','서리다래 약즙을 만들었다. 마을의 늙은 까치 어르신께 맡기면 엄마께 날라다 주신다.'),
+  pick:()=>goalLine('서리다래 얻기','돌무더기가 품고 있던 서리다래가 드러났다. '+where('성황당에서 ')+'서리다래를 주워 담자.'),
+  juice:()=>goalLine('엄마 약 만들기','서리다래를 얻었다. 보따리를 열고 맷돌에 갈아 약즙을 내자.'),
+  // 결정 D-130: 할 일 줄은 아이가 본 대로 '움직이는 돌무더기'라 부른다. 이름은 만나기 전엔 모른다.
+  fight:()=>goalLine('서리다래 얻기',(G.f.kkuDone?'서리다래는 성황당 돌무더기가 가슴에 품고 있단다. ':'')+'장승제를 올려 돌산 길이 열렸다. 돌산을 올라 움직이는 돌무더기와 맞서자.'),
+  // 결정 D-447: 뿔영감이 "고슴도치 녀석"이라 하기 전엔 마을에 묻는다. 꾸벅이 이름은 만난 뒤에만
+  askVillage:()=>goalLine(FIND_GOAL,'엄마 약에 쓸 서리다래가 어디 열리는지 모른다. 돌너머 마을 이웃들에게 물어보자.'),
+  askHedgehog:()=>goalLine(FIND_GOAL,'뿔영감님이 산 열매라면 고슴도치 녀석이 안다고 했다. 둥지에서 졸고 있단다. '+where('메밀밭 쪽 ')+'둥지를 찾아가 보자.'),
+  wake:()=>goalLine(FIND_GOAL,'꾸벅이는 꾸벅꾸벅 졸다가 가끔 고개를 든다. 고개를 들 때를 기다렸다가 말을 걸자.'),
+  eoksae:()=>goalLine(FIND_GOAL,has('eoksae',3)?'마른 억새 세 단이 모였다. 꾸벅이가 고개를 들 때 건네자.'
+    :'꾸벅이가 겨울잠 둥지에 깔 마른 억새 세 단을 베어다 주면 서리다래 자리를 알려 준댔다. 마른 억새를 베자. ('+(G.inv.eoksae||0)+'/3)'),
+  ppuri:()=>goalLine(PATH_GOAL,'서리다래는 성황당 돌무더기가 가슴에 품고 있단다. 그런데 장승지기 뿔영감님이 돌산 길을 막았다고 한다. '+where('장승 고갯길의 ')+'뿔영감님을 찾아뵙자.'),
+  // 뿔영감: "장승제엔 메밀전을 올린다. 메밀가루 하나를 가져와라."
+  powderGive:()=>goalLine(PATH_GOAL,'메밀가루가 생겼다. '+where('장승 고갯길의 ')+'뿔영감님께 건네고 장승제를 올리자.'),
+  tea:()=>goalLine(PATH_GOAL,'결명자를 구했다. 꾸벅이 말대로 돌쇠 할배께 결명자 차를 달여 드리자.'),
+  // 꾸벅이: "가루는 돌쇠 할배가 알아. 눈이 침침하셔서 결명자 차를 좋아하셔"
+  findTea:()=>goalLine(PATH_GOAL,'장승제 메밀전에 쓸 메밀가루가 있어야 한다. 꾸벅이 말로는 가루는 돌쇠 할배가 아시고, 할배는 결명자 차를 좋아하신다. 결명자 구할 데를 찾아보자.'),
+  nal:()=>goalLine(PATH_GOAL,(has('kflower')||has('gyeousari',2))?'날쌘 아저씨가 칡꽃 하나나 겨우살이 둘을 받고 결명자를 준단다. 날쌘 아저씨께 건네자.'
+    :'날쌘 아저씨가 겨우살이 둘이면 결명자를 준단다. 나무에 붙은 겨우살이 둘을 따자. ('+(G.inv.gyeousari||0)+'/2)'),
+  dolsoe:()=>goalLine(PATH_GOAL,G.f.dolsoeTea?'돌쇠 할배가 우리 집안 맷돌을 알아보셨다. 할배 곁에서 맷돌에 손을 얹어 보자.':'결명자를 구했으니 돌쇠 할배를 찾아뵙자.'),
+  memil:()=>{const m=G.inv.memil||0;return goalLine(PATH_GOAL,m<3?'맷돌이 깨어났다. 메밀 세 알을 갈면 메밀가루가 된다. '+where('메밀밭에서 ')+'메밀을 줍자. ('+m+'/3)'
+    :'메밀 세 알이 모였다. 보따리를 열고 맷돌에 갈아 메밀가루를 내자.');},
+};
 Rg.goal=()=>{
-  const F=G.f;
+  const F=G.f,S=goalSteps;
   if(!G.started)return '';
   if(G.ended)return '돌너머 마을 체험판 완료';
-  // 결정 D-67: 앞선 진행부터 거꾸로 본다. 결정 D-149: 짧은 명사형으로 핵심만, 장소는 붙이지 않는다.
-  if(G.boss.dead)return !F.daraePicked?'서리다래 따기':'맷돌에 서리다래 갈아 약즙 만들기';
-  // 결정 D-130: 할 일 줄은 아이가 본 대로 '움직이는 돌무더기'라 부른다. 이름은 만나기 전엔 모른다.
-  if(F.ppuriPassed)return '움직이는 돌무더기와 맞서기';
-  // 결정 D-447: 뿔영감이 "고슴도치 녀석"이라 하기 전엔 마을에 묻는다. 꾸벅이 이름은 만난 뒤에만
-  if(!F.kkuTalk)return F.ppuriMet?'고슴도치에게 서리다래 묻기':'마을에 서리다래 물어보기';
-  if(!F.kkuAwake)return '꾸벅이가 고개 들 때 말 걸기';
-  if(!F.kkuDone)return has('eoksae',3)?'꾸벅이에게 억새 건네기':'마른 억새 베기 ('+(G.inv.eoksae||0)+'/3)';
-  if(!F.ppuriMet)return '장승지기 뿔영감 찾아가기';
-  if(!F.ppuriPassed){
-    if(has('memil_powder'))return '뿔영감에게 메밀가루 건네기';
-    if(!isAwake('maetdol')){
-      if(has('gyeolmyeongja'))return '돌쇠 할배께 결명자 차 드리기';
-      if(!F.nalDDone)return !F.nalDTalk?'결명자 구할 데 찾기':(has('kflower')||has('gyeousari',2))?'날쌘에게 결명자 구하기':'겨우살이 2개 따기';
-      return '돌쇠 할배 찾아가기';
-    }
-    const m=G.inv.memil||0;
-    if(m<3)return '메밀 줍기 ('+m+'/3)';
-    return '맷돌에 메밀 3개 갈기';
+  // 결정 D-67: 앞선 진행부터 거꾸로 본다.
+  if(G.boss.dead)return !F.daraePicked?S.pick():S.juice();
+  if(F.ppuriPassed)return S.fight();
+  if(!F.kkuTalk)return F.ppuriMet?S.askHedgehog():S.askVillage();
+  if(!F.kkuAwake)return S.wake();
+  if(!F.kkuDone)return S.eoksae();
+  if(!F.ppuriMet)return S.ppuri();
+  if(has('memil_powder'))return S.powderGive();
+  if(!isAwake('maetdol')){
+    if(has('gyeolmyeongja'))return S.tea();
+    if(!F.nalDDone)return !F.nalDTalk?S.findTea():S.nal();
+    return S.dolsoe();
   }
-  return '움직이는 돌무더기와 맞서기';
+  return S.memil();
 };
-/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다. */
+/* 결정 D-149: 보통 일(사연에서 맡은 심부름). 아이가 하겠다고 한 뒤부터 마칠 때까지만 보인다.
+   결정 D-890: 이름(title)이 목표이고, text 는 수첩에 적는 지금 단계의 길잡이다. */
 defineSideQuests(Rg.id,[
-  {id:'dol_memil_sack',title:'메밀댁 햇메밀 자루 나르기',start:F=>F.dolneomeo_badger1,done:F=>F.dolneomeo_badger_sent,text:()=>'돌쇠 할배께 햇메밀 자루 갖다드리기'},
-  {id:'dol_mole',title:'꼬마 두더지 속마음 듣기',start:F=>F.dolneomeo_arc_dolsoe4,done:F=>F.dolneomeo_arc_dolsoe5,text:()=>'꼬마 두더지 속마음 듣기'},
+  {id:'dol_memil_sack',title:'메밀댁 햇메밀 자루 나르기',start:F=>F.dolneomeo_badger1,done:F=>F.dolneomeo_badger_sent,
+    text:()=>'메밀댁 아주머니가 맡긴 햇메밀 자루가 보따리에 있다. 돌쇠 할배 댁 마당에서 할배께 전해 드리자.'},
+  {id:'dol_mole',title:'꼬마 두더지 속마음 듣기',start:F=>F.dolneomeo_arc_dolsoe4,done:F=>F.dolneomeo_arc_dolsoe5,
+    text:()=>'돌쇠 할배는 손주 꼬마 두더지에게 손으로 돌 읽는 법을 가르치고 싶어 하신다. 꼬마는 도망만 다닌다. 돌담 뒤 꼬마에게 왜 그러는지 물어보자.'},
   // 결정 D-580: 그림은 그리는 자리에서 바로 단다. 장승 눈은 이야기를 들은 자리에서 바로 칠해 보통 일로 남지 않는다.
-  {id:'dol_kku_drawing',title:'꾸벅이에게 그림 남겨 주기',start:F=>F.dolneomeo_arc_kku5,done:F=>F.dolneomeo_arc_kku7,text:()=>'꾸벅이에게 그림 그려 주기'},
+  {id:'dol_kku_drawing',title:'꾸벅이에게 그림 남겨 주기',start:F=>F.dolneomeo_arc_kku5,done:F=>F.dolneomeo_arc_kku7,
+    text:()=>G.boss.dead?'꾸벅이가 봄에 깨도 꼬마 두더지를 알아보게 그림을 그려 주기로 했다. 메밀밭 둥지의 꾸벅이에게 가자.'
+      :'꾸벅이가 봄에 깨면 꼬마 두더지를 못 알아볼까 봐 걱정한다. 그림을 그려 주기로 했다. 엄마 약 서리다래부터 구하고 그려 주자.'},
   // 메밀댁이 맡긴 꽃수 보자기는 집에 돌아가 엄마 무릎에 올릴 때(영산을 마칠 때) 끝난다.
-  {id:'dol_flower_bojagi',title:'꽃수 보자기 주인에게 돌려주기',start:F=>F.dolneomeo_badger4,done:()=>regionCompleted('yeongsan'),text:()=>'꽃수 보자기 주인에게 돌려주기'},
+  {id:'dol_flower_bojagi',title:'꽃수 보자기 주인에게 돌려주기',start:F=>F.dolneomeo_badger4,done:()=>regionCompleted('yeongsan'),
+    text:()=>'오래전 아기를 안고 고개를 넘던 젊은 너구리가 두고 간 보자기다. 매듭도 꽃수도 엄마 것과 같다. 길을 마치고 집에 가면 엄마께 여쭤 보자.'},
 ]);
 /* ---------- 교환 화면의 부탁 (engine/trade.js) ----------
    결정 D-39: 원하는 것을 들은 뒤에만 보인다(장부에 적혔거나, 냄새를 맡고 먼저 말을 꺼낸 뒤). 받은 뒤의 이야기는 위의 대화 함수가 이어 간다.
@@ -1004,7 +1031,7 @@ function hareTower(){
     diary('dol_hare_tower','짐꾼 아저씨가 짐 괴던 돌로 내 소원 돌탑 밑동을 받쳐 주었다.');
   });
 }
-// 결정 D-135: 꼬마의 속마음은 꼬마에게 듣는다(할배 dolsoe4를 본 뒤·돌 쌓기 뒤).
+// 결정 D-135: 꼬마의 속마음은 꼬마에게 듣는다(할배 dolsoe4를 본 뒤. D-891).
 function moleAsk5(){
   // 결정 D-580: 해야 할 말만 (할배 손이 무서운 까닭, 엄마와 적는 일, 대신 기억하기).
   arcScene('dolneomeo_arc_dolsoe5',[
@@ -1020,8 +1047,8 @@ function returningHare(e){
   const p=nearInteraction();
   const mail=p?.id==='dol_magpie'&&has('darae_yak')&&!G.f.yakMade;
   const returning=p?.id==='dol_hare'&&G.f.dolWishTower&&G.f.dolneomeo_pack_help&&!G.f.dolHareTower;   // 결정 D-164
-  // 결정 D-135: 할배에게 꼬마 얘기를 들은 뒤(dolsoe4·돌 쌓기 뒤), 이미 인사한 꼬마에게 말을 걸면 속마음 막이 열린다.
-  const moleAsk=p?.id==='dol_mole'&&Rg.arcs()&&!!G.f.wanderersDone?.['dolneomeo:dol_mole']&&G.f.dolneomeo_arc_dolsoe4&&G.f.stackDone&&!G.f.dolneomeo_arc_dolsoe5;
+  // 결정 D-135·D-891: 할배에게 꼬마 얘기를 들은 뒤(dolsoe4. 돌 쌓기를 기다리지 않는다), 이미 인사한 꼬마에게 말을 걸면 속마음 막이 열린다.
+  const moleAsk=p?.id==='dol_mole'&&Rg.arcs()&&!!G.f.wanderersDone?.['dolneomeo:dol_mole']&&G.f.dolneomeo_arc_dolsoe4&&!G.f.dolneomeo_arc_dolsoe5;
   if(!mail&&!returning&&!moleAsk)return;
   e.preventDefault();e.stopImmediatePropagation();if(e.type==='keydown')suppressedKeys.add(e.key.toLowerCase());
   if(returning){hareTower();return;}

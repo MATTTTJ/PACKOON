@@ -37,12 +37,14 @@ function renderMomNote(body){
 function renderTodo(body){
   const item=(box,cls,text,sub)=>{const d=el('div','todo-item '+cls);d.appendChild(document.createTextNode(text));if(sub)d.appendChild(el('small',null,sub));box.appendChild(d);};
   const head=(cls,text)=>body.appendChild(el('div','todo-head '+cls,text));
+  // 결정 D-890: 목표 밑에 지금 단계의 길잡이를 적는다. 길을 잃었을 때 여기서 누구에게 가서 무엇을 할지 본다.
+  const guide=(text)=>{if(text)body.lastChild.appendChild(el('p','todo-guide',text));};
   head('main','중요');
-  const g=mainGoalText();item(body,'main',g||REG.cover.ready,REG.name);
+  const g=mainGoalParts();item(body,'main',g.goal||REG.cover.ready,REG.name);guide(g.guide);
   head('sub','잔일');
   const subs=activeSideQuests();
   if(!subs.length)body.appendChild(el('p','empty-note','맡은 부탁이 아직 없다. 길에서 만난 이들의 이야기를 들어 보자.'));
-  subs.forEach(q=>item(body,'sub',q.text(G.f),REGIONS[q.region]?.name));
+  subs.forEach(q=>{item(body,'sub',q.title,REGIONS[q.region]?.name);const t=q.text(G.f);guide(t!==q.title?t:'');});
   const done=[...regionList().filter(r=>r.id!==G.region&&regionCompleted(r.id)).map(r=>({cls:'main',text:r.cover.end.head,sub:r.name+' · 중요'})),
     ...SIDE_QUESTS.filter(sideDone).map(q=>({cls:'sub',text:q.title,sub:(REGIONS[q.region]?.name||'')+' · 잔일'}))];
   if(!done.length)return;
