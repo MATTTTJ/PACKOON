@@ -307,11 +307,21 @@ function snowGround(id){
   // 반복 발자국으로 본길과 생활 흔적을 잇는다.
   for(let wx=Math.floor(cam/36)*36;wx<cam+W+36;wx+=36){P(wx-cam,195,3,1,n()?'#8693a0':'#b3b7ad');P(wx-cam+8,197,3,1,n()?'#8693a0':'#b3b7ad');}
 }
+/* 결정 D-971: 솔숲의 배경 소나무가 흔들 소나무·다람쥐 몫·살펴보기·길손과 겹쳐 무엇을 만질 수 있는지 안 보였다 (사용자 피드백 2026-11-06 29).
+   그 자리 둘레에는 배경 소나무를 세우지 않는다. 자리 목록은 지금 구역의 것을 그릴 때마다 읽는다(진행에 따라 길손 자리가 바뀐다). */
+function busySpots(){
+  const z=typeof zoneDef==='function'?zoneDef():null,xs=[];if(!z)return xs;
+  try{for(const d of fieldItems('digs'))xs.push(d.x);}catch(_){}
+  for(const k of ['examines','stamps','doors','vistas'])for(const p of (z[k]||[]))xs.push(p.x);
+  try{for(const w of z.wanderers||[])xs.push(w.x);}catch(_){}
+  return xs;
+}
+const nearBusy=(wx,r,xs)=>xs.some(x=>Math.abs(x-wx)<r);
 function drawBack(id){
   sky(RC());steppedRidge(Math.round(RC()*.08),116,22,tone().mount,1);steppedRidge(Math.round(RC()*.19),137,15,n()?'#34445a':'#b2c1c9',4);
   farAir(RC());
   distantTown(Math.round(RC()*.32),173,1);
-  if(id==='pine'){for(let wx=Math.floor(cam/112)*112-112;wx<cam+W+112;wx+=112)pine(wx-cam,GROUND,62+Math.round(hash(wx)*25));}
+  if(id==='pine'){const busy=busySpots();for(let wx=Math.floor(cam/112)*112-112;wx<cam+W+112;wx+=112)if(!nearBusy(wx,30,busy))pine(wx-cam,GROUND,62+Math.round(hash(wx)*25));}
   snowGround(id);
 }
 function drawPlatforms(id){
@@ -405,7 +415,8 @@ function drawScenery(id){
     const vx=1770-cam;P(vx-8,44,196,7,t.wood);tileRoof(vx-13,27,206,17);P(vx+1,51,5,77,t.wood);P(vx+174,51,5,77,t.wood);P(vx-2,128,184,8,'#8d6b51');P(vx-2,126,184,2,'#cbb28c');
     for(let j=0;j<7;j++){const xx=vx+9+j*25;P(xx,49,2,6+j%3*4,'#b6d0dd');P(xx,49,1,4+j%3*4,'#f1f6ed');}lantern(vx+170,62);
   }else if(id==='pine'){
-    for(let wx=120;wx<2800;wx+=145){const x=wx-cam;if(x<-80||x>W+80)continue;pine(x,GROUND,72+Math.round(hash(wx)*32));if(wx%2===0)bundle(x+39,GROUND,wx);}
+    const busy=busySpots();   // 결정 D-971
+    for(let wx=120;wx<2800;wx+=145){const x=wx-cam;if(x<-80||x>W+80)continue;if(nearBusy(wx,40,busy))continue;pine(x,GROUND,72+Math.round(hash(wx)*32));if(wx%2===0)bundle(x+39,GROUND,wx);}
     const x=2410-cam;P(x-20,96,340,96,n()?'#53616f':'#929eaa');P(x-25,102,345,90,n()?'#53616f':'#929eaa');P(x-19,94,339,3,t.snow);P(x-11,109,4,57,n()?'#3a4b5d':'#798d9a');
     for(let j=0;j<5;j++)P(x+21+j*3,118+j*3,2,1,'#817a73');P(x-4,91,9,3,'#9b8770');
   }else if(id==='warehouse'){
