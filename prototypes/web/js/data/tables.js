@@ -3806,7 +3806,8 @@ const TABLES={
   "mom_letter_open_ms": 900,
   "mom_letter_fold_ms": 700,
   "think_base_ms": 1800,
-  "think_char_ms": 75
+  "think_char_ms": 75,
+  "think_far_px": 140
  },
  "PROGRESS": [
   {

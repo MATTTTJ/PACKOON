@@ -224,6 +224,16 @@ function fillCover(){
 /* 결정 D-705: 프롤로그 화면이 떠 있는 동안 body.prologue 를 단다 (style.css 가 게임 UI 를 숨긴다) */
 function syncPrologue(){document.body.classList.toggle('prologue',!$('titleScreen').hidden&&!!G&&!G.started&&!G.ended);}
 new MutationObserver(syncPrologue).observe($('titleScreen'),{attributes:true,attributeFilter:['hidden']});
+/* 결정 D-801·D-803: 셸 안에서 게임 화면(stage)이 놓인 자리를 CSS 변수로 둔다. 프롤로그 덮개와 주인공 독백 창이 그림 크기에 맞춘다.
+   휴대폰 가로는 셸이 그림보다 넓고, 세로는 그림 아래에 조작판이 있어서 셸 크기로는 맞지 않는다. 화면을 돌리거나 전투로 바뀌면 다시 잰다. */
+function syncStageBox(){
+  const s=$('stage').getBoundingClientRect(),h=$('shell').getBoundingClientRect(),st=document.body.style,b=$('stage').clientLeft||0;
+  st.setProperty('--stx',(s.left-h.left+b)+'px');st.setProperty('--sty',(s.top-h.top+b)+'px');
+  st.setProperty('--stw',(s.width-2*b)+'px');st.setProperty('--sth',(s.height-2*b)+'px');
+  const p=document.querySelector('#pad .pad-top')?.getBoundingClientRect();st.setProperty('--pady',(p?.height?p.bottom-h.top:s.bottom-h.top)+'px');   // 휴대폰 세로: 독백 창은 보따리·수첩·지도 줄 바로 아래 빈자리
+}
+if(typeof ResizeObserver!=='undefined'){const ro=new ResizeObserver(syncStageBox);ro.observe($('stage'));ro.observe($('shell'));}
+addEventListener('resize',syncStageBox);syncStageBox();
 function startGame(){
   G.started=true;$('titleScreen').hidden=true;syncPrologue();
   REG.onStart();

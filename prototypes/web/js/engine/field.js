@@ -539,22 +539,29 @@ function updateHints(){
   }
 }
 /* 결정 D-706: 주인공의 짧은 속말. 사용자 규칙(2026-11-05): 검은 띠(toast)를 따로 띄워 설명하는 일은 게임 어디에도 없어야 하고,
-   필요할 때만 주인공이 "이렇게 하면 되겠다" 정도로 혼잣말한다. 그래서 길 안내·막힘·사건의 한 줄은 주인공 머리 위 한지 말풍선으로 띄운다.
-   대화·패널·전투·경치 보기 동안은 숨고 시간도 멈춘다. 보이는 시간은 tuning.csv think_base_ms + 글자 수 × think_char_ms.
-   toast 는 저장·소리·물건을 얻었다 같은 짧은 알림에만 남긴다. */
-const heroThought=el('div','hero-thought');heroThought.hidden=true;heroThought.setAttribute('role','status');$('stage').appendChild(heroThought);
-let thoughtT=0;
+   필요할 때만 주인공이 "이렇게 하면 되겠다" 정도로 혼잣말한다. toast 는 저장·소리·물건을 얻었다 같은 짧은 알림에만 남긴다.
+   결정 D-803: 머리 위 말풍선은 주인공이 멀리 걸어가도 남아 있었다 (사용자 피드백 2026-11-06). 말풍선 대신 대화 창처럼 아래쪽에
+   독백 창을 띄운다. 주인공 얼굴과 이름표가 있고, 누를 수 없는 창이라 조작을 막지 않는다. 보이는 시간(tuning.csv think_base_ms +
+   글자 수 × think_char_ms)이 지나거나, 속말이 뜬 자리에서 think_far_px 넘게 멀어지거나, 구역이 바뀌면 닫힌다.
+   대화·패널·전투·경치 보기 동안은 숨고 시간도 멈춘다. */
+const heroThought=el('div','monologue');heroThought.id='heroMono';heroThought.hidden=true;heroThought.setAttribute('role','status');
+heroThought.innerHTML='<div class="face"></div><div class="mono-body"><div class="who">너구리</div><div class="text"></div></div>';
+$('shell').appendChild(heroThought);
+let thoughtT=0,thoughtAt=null;
 function think(text){
   if(!text)return;
   const t=String(text).replace(/\s*\n\s*/g,' ');
-  heroThought.textContent=t;
+  heroThought.querySelector('.text').textContent=t;
+  const face=heroThought.querySelector('.face');face.innerHTML='';face.appendChild(portrait('너구리'));
   thoughtT=Math.round((TABLES.TUNING.think_base_ms+TABLES.TUNING.think_char_ms*[...t].length)*60/1000);
+  thoughtAt=G?{x:G.px,region:G.region,zone:G.zone}:null;
   heroThought.classList.remove('pop');void heroThought.offsetWidth;heroThought.classList.add('pop');placeThought();
 }
 function placeThought(){
+  // 결정 D-803: 멀어지거나 구역·지역이 바뀌면 그 자리의 속말은 끝난다
+  if(thoughtT>0&&thoughtAt&&G&&(thoughtAt.region!==G.region||thoughtAt.zone!==G.zone||Math.abs(G.px-thoughtAt.x)>TABLES.TUNING.think_far_px))thoughtT=0;
   if(thoughtT<=0||!G||!G.started||G.ended||B||inkOn||vistaMode||zoneFade>0||zoneMotion||mapTravel||open('dlg')||open('map')||open('bag')||open('trade')||open('notebook')||openMinigame()){heroThought.hidden=true;return;}
   heroThought.hidden=false;
-  heroThought.style.left=(clamp(G.px-cam,70,W-70)/W*100)+'%';heroThought.style.top=(Math.max(34,G.py-($('prompt').hidden?36:54))/H*100)+'%';   // 말걸기 안내가 떠 있으면 그 위로
 }
 // 결정 D-717: 채집 자리는 높이(발 높이 차이)도 가까워야 뜬다. 난간·발판 위에 올라가 있으면 바로 아래 흙더미의 원이 뜨지 않는다 (사용자 피드백 2026-11-05)
 function nearDig(){if(paused()||(typeof rolling!=="undefined"&&rolling))return null;const T=TABLES.TUNING;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*T.field_dig_ahead))<T.field_dig_distance&&Math.abs((d.y??fieldGround())-G.py)<=T.field_dig_height)return d;}return null;}
