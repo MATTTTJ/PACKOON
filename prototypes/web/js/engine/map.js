@@ -57,10 +57,24 @@ function mapSeenText(seen){
   if(seen.items.length)parts.push('채집물 '+seen.items.map(i=>ITEMS[i.id].n+(i.spent?'(다 거둠)':'')).join('·'));
   return parts.join(' · ');
 }
+/* 결정 D-816: 지도 이동은 이야기상 정말 못 할 때(늙은 까치를 만나기 전의 단풍골, 대화·전투·연출 중)만 막는다 (사용자 피드백 2026-11-06
+   "3스테이지에 지도 누르면 같이 다닐 동무가 없다고 뜨냐. 지도로 이동 안되는경우는 없어야한다").
+   두 번째 지역부터는 어느 길로 들어왔든(늙은 까치를 지나쳤든, 지역 고르기로 바로 시작했든, 끝 화면의 다음 지역 단추든) 그 지역 까치 둘이 맡는다.
+   처음 맡을 때 아이가 까치를 본 속말 한 줄을 남긴다 (D-706). 시작(startGame)과 끝 화면의 다음 지역 단추가 부른다. */
+const MAP_MAGPIE_LINES={
+  dolneomeo:'돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도를 펴면 데려다줄 것 같다.',
+  jangteo:'장터 처마 위에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.',
+  yeongsan:'눈 덮인 소나무에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.'
+};
+function ensureMapCompanions(){
+  if(CLASSIC||!G||G.f.mapUnlocked||(REG?.order||0)<2)return false;
+  G.f.mapUnlocked=true;think(MAP_MAGPIE_LINES[G.region]||'나뭇가지에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.');return true;
+}
 // 결정 D-18: M 지도와 까치 떼 이동 (design/data/decisions.csv)
 function openMap(){
   if(CLASSIC)return false;
   if(mapTravel||mapBlocked()){mapNotice('지금은 까치를 부를 수 없다');return false;}
+  if(!G.f.mapUnlocked)ensureMapCompanions();   // 다른 길(저장·개발용 이동)로 들어와 아직 못 맡았으면 여기서 맡는다 (D-816)
   if(!G.f.mapUnlocked){mapNotice('아직 길을 함께 다닐 동무가 없다');return false;}
   if(G.ended&&!REG.next&&!G.f.newName){mapNotice('새 이름부터 정하자');$('newName')?.focus();return false;}
   if(!G.started)return false;

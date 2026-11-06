@@ -630,6 +630,23 @@
         {"instrument":"wind","note":"C4","start":0,"duration":0.7,"gain":0.16,"pan":0,"patch":{"fixedDuration":0.7,"kind":"noise","attack":0.003,"decay":0.245,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":700,"partials":[]},"seed":9120},
         {"instrument":"wind","note":"C4","start":0.2,"duration":0.6,"gain":0.1,"pan":0.2,"patch":{"fixedDuration":0.6,"kind":"noise","attack":0.003,"decay":0.21,"sustain":0.12,"release":0.035,"tail":0.045,"noise":0.95,"noiseCutoff":1200,"partials":[]},"seed":9121}
       ]
+    },
+    {
+      "id": "nd_stomp", "name": "멧돼지 발굽 쿵 (결정 D-879)", "category": "전투", "status": "제안", "duration": 0.46, "gain": 0.9,
+      "layers": [
+        {"instrument":"buk","note":"D2","start":0,"duration":0.22,"gain":0.4,"pan":0,"patch":{"fixedDuration":0.22,"attack":0.002,"decay":0.14,"sustain":0,"release":0.05,"tail":0.08},"seed":9140},
+        {"instrument":"moduk_low","note":"A2","start":0.003,"duration":0.1,"gain":0.12,"pan":0,"patch":{"fixedDuration":0.1,"attack":0.001,"decay":0.06,"sustain":0,"release":0.04,"tail":0.06},"seed":9141},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.14,"gain":0.08,"pan":0,"patch":{"fixedDuration":0.14,"kind":"noise","attack":0.003,"decay":0.09,"sustain":0.1,"release":0.04,"tail":0.05,"noise":1,"noiseCutoff":420,"partials":[]},"seed":9142}
+      ]
+    },
+    {
+      "id": "nd_berg", "name": "빙산 솟음 (결정 D-880)", "category": "전투", "status": "제안", "duration": 0.62, "gain": 0.85,
+      "layers": [
+        {"instrument":"buk","note":"A1","start":0,"duration":0.26,"gain":0.3,"pan":0,"patch":{"fixedDuration":0.26,"attack":0.002,"decay":0.16,"sustain":0,"release":0.05,"tail":0.08},"seed":9150},
+        {"instrument":"stone","note":"E5","start":0.01,"duration":0.05,"gain":0.09,"pan":0,"patch":{"fixedDuration":0.05,"attack":0.002,"decay":0.03,"sustain":0,"release":0.04,"tail":0.06},"seed":9151},
+        {"instrument":"windchime","note":"B6","start":0.04,"duration":0.26,"gain":0.07,"pan":0.1,"patch":{"fixedDuration":0.26,"attack":0.002,"decay":0.15,"sustain":0,"release":0.05,"tail":0.08},"seed":9152},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.3,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.3,"kind":"noise","attack":0.004,"decay":0.15,"sustain":0.1,"release":0.05,"tail":0.06,"noise":1,"noiseCutoff":1600,"partials":[]},"seed":9153}
+      ]
     }
   ]
 }
