@@ -796,6 +796,14 @@ const TABLES={
    "region": "jangteo",
    "d": "장국밥 가마솥 바닥에서 긁어 말린 누룽지. 고소하고 바삭하다. 먹으면 기운이 조금 난다.",
    "u": "조각"
+  },
+  "magpie_feather": {
+   "n": "까치 어르신의 깃",
+   "r": 3,
+   "kind": "귀한 것",
+   "region": "yeongsan",
+   "d": "늙은 까치가 마지막 남쪽 길에 앞서 뽑아 준 꽁지깃. 누가 부를 때 쥐면 어르신이 \"아가\" 하던 소리가 귓가에 난다. 강철이 앞에서 전투마다 한 번, 돌아본 이름을 지켜 준다 (결정 D-1074).",
+   "u": "개"
   }
  },
  "BOSS_PARTS": {
@@ -3882,8 +3890,6 @@ const TABLES={
   "form_owl_flap_velocity": 3.6,
   "form_owl_flaps": 1,
   "form_owl_sense_range": 56,
-  "form_deer_speed": 1.45,
-  "form_deer_listen_range": 360,
   "form_fx_frames": 24,
   "form_intro_ms": 5000,
   "form_gait_frames": 4,
@@ -3955,7 +3961,19 @@ const TABLES={
   "mom_letter_fold_ms": 700,
   "think_base_ms": 1800,
   "think_char_ms": 75,
-  "think_far_px": 140
+  "think_far_px": 140,
+  "form_otter_speed": 0.95,
+  "form_otter_slide_speed": 1.5,
+  "battle_otter_speed": 3.1,
+  "battle_otter_cooldown": 16,
+  "battle_otter_radius": 8,
+  "name_call_interval_frames": 54,
+  "name_call_move_px": 4,
+  "name_final_hp_ratio": 0.4,
+  "name_final_lock_frames": 150,
+  "name_final_damage": 2,
+  "name_final_open_bonus": 150,
+  "y_lure_range": 90
  },
  "PROGRESS": [
   {

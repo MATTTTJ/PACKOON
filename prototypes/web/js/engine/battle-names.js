@@ -12,7 +12,15 @@
      첫 이름을 먹힌 뒤 처음 열리는 빈틈에 단추가 잠깐 깜박인다. 설명 글은 없다.
    결정 D-435: 몸통을 치면 삼킨 이름이 하나씩 돌아온다(물러났다 다시 온 첫 몸통 치기는 name_return_retry_bonus 개).
      몸통을 부수거나, 이기거나, 달래면 삼킨 이름이 모두 돌아온다(G.f.nameRestored). 물러나면 뱃속에 남는다(G.f.gangcheolSwallowed).
-     달래면 입을 벌려 이름을 토해 낸다. '용'이라 불러 주면 하늘로 오르고, 불씨·떡이면 남쪽 바다로 떠난다. */
+     달래면 입을 벌려 이름을 토해 낸다. '용'이라 불러 주면 하늘로 오르고, 불씨·떡이면 남쪽 바다로 떠난다.
+   결정 D-1070 (사용자 지시 2026-11-06, design/proposals/name-story-v2.md §6.1): 이름 부르기는 피할 수 있다.
+     강철이는 한 이름을 지어 준 이의 목소리로 세 번까지만 부른다(삼척 창귀 전승 "세 번은 못 들은 척, 네 번째가 사람").
+     세 번 부르는 동안 손을 움직이거나 휘두르면(돌아보면) 그 이름을 삼킨다. 세 번을 참으면 그 이름은 이번 전투에서 다시 불리지 않는다.
+   결정 D-1071 (§6.2): 별명을 다 먹었거나 강철이의 부위가 name_final_hp_ratio 밑으로 깎이면 한 번, 아빠 목소리로 아이 본이름을 부른다.
+     이름은 화면에 내지 않는다(빈칸). 몸에 붙지 않은 이름이라 먹히지 않지만, 돌아보면 얼어붙어 크게 다친다. 참으면 빈틈이 길게 열린다.
+   결정 D-1074 (§6.3): 까치 어르신의 깃이 있으면 전투마다 한 번, 돌아본 순간 "아가!" 소리가 겹쳐 그 이름을 지킨다. */
+// 결정 D-1073: 넷째 변신 수달의 전투 손 설명 (battle.js 표에 더한다. 고라니 줄은 쓰이지 않는다)
+if(typeof BATTLE_FORM_TRAITS!=='undefined'){BATTLE_FORM_TRAITS.otter='빠름 · 미끄러움';BATTLE_FORM_HINTS.otter='수달 · 미끄러지듯 빠르게 움직이고, 좁게 닿는다';}
 
 /* 이름마다 두 목소리. call: 강철이가 그 이름을 지어 준 이의 목소리로 부르는 말. own: 아이가 스스로 댈 때 지어 준 이가 겹쳐 하는 말.
    표에 없는 이름(나중에 더한 별명)은 이름만 부른다 */
@@ -36,7 +44,7 @@ function nameBattleOn(){return !!(B&&B.names);}
 function nameBattleStart(){
   if(!B||!B.E.names)return;
   const swallowed=(G.f.gangcheolSwallowed||[]).filter(id=>(G.nicknames||[]).some(n=>n.id===id&&n.lost));
-  B.names={eaten:swallowed,pinned:[],used:[],turns:0,lock:0,jerk:null,fly:null,echo:null,boost:false,queued:false,
+  B.names={eaten:swallowed,pinned:[],used:[],turns:0,lock:0,jerk:null,fly:null,echo:null,boost:false,queued:false,call:null,kept:[],finalDone:false,featherUsed:false,bigOpen:false,
     flash:false,firstEat:false,retry:!!G.f.gangcheolRetry&&swallowed.length>0,spit:null,fade:0};
 }
 /* 지금 잃은 이름 수. 앞 전투에서 먹히고 아직 못 되찾은 것도 센다 */
@@ -55,32 +63,99 @@ function nameCallTurn(p){
   return true;
 }
 function nameMouthAt(){const m=B.E.names.mouth&&B.E.names.mouth();return m||{x:LW/2-50,y:EY};}
-/* 부름: 남은 이름 가운데 가장 최근에 받은 것(못 박힌 이름은 불려도 돌아보지 않는다) */
+/* 강철이가 얼마나 남았나 (부위 칸의 합) */
+function gangLeft(){let h=0,m=0;for(const p of B.parts){h+=Math.max(0,p.hp);m+=p.max;}return m?h/m:1;}
+/* 결정 D-1071: 마지막 부름(아빠 목소리, 본이름)이 올 때인가 */
+function nameFinalDue(){return !B.names.finalDone&&(!namesHeld().length||gangLeft()<=nameTune().name_final_hp_ratio);}
+/* 부름: 남은 이름 가운데 가장 최근에 받은 것(스스로 댔거나 세 번을 참은 이름은 다시 부르지 않는다).
+   결정 D-1070: 바로 삼키지 않는다. N.call 을 열고 nameStep 이 세 번 부르며 손이 움직이는지 본다. */
 function nameCallFire(){
-  const t=nameTune(),N=B.names,held=namesHeld(),free=held.filter(n=>!N.pinned.includes(n.id));
+  const t=nameTune(),N=B.names,held=namesHeld(),free=held.filter(n=>!N.pinned.includes(n.id)&&!N.kept.includes(n.id));
   B.st='ncall';B.t=t.gangcheol_namecall_after_frames;
+  if(nameFinalDue()){
+    N.finalDone=true;
+    N.call={final:true,n:{id:'',text:'',by:'아빠'},k:0,t:0,moved:0,lx:B.px,ly:B.py};B.t=99999;return;
+  }
   if(!held.length){
     B.msg='(…아무 이름도 불리지 않았다.)';
     // 빈 이름 칸 장면(큰 장터 D-136)을 겪었다면 장부가 스친다. 까닭은 말하지 않는다
     if(G.f.jangteoArcsKid2||G.f.jangteoArcsKid3)bLater('(…부엉 영감님 장부의 빈 칸이 떠오른다.)',T_LATER);
     return;
   }
-  const n=(free.length?free:held)[(free.length?free:held).length-1];
-  N.echo={by:n.by,text:'',t:110,max:110,cold:true};
-  B.msg='"'+nameVoice(n,'call')+'"';
-  if(!free.length){bLater('(…돌아보지 않았다.)',40);return;}   // 결정 D-434: 스스로 댄 이름은 불려도 버틴다
-  // 손이 소리 난 쪽(입)으로 홱 돌아가고 잠깐 움직이지 않는다
+  if(!free.length){B.msg='(…이번엔 아무도 돌아보게 하지 못했다.)';return;}   // 결정 D-434: 스스로 댄 이름·참아 낸 이름뿐
+  N.call={final:false,n:free[free.length-1],k:0,t:0,moved:0,lx:B.px,ly:B.py};B.t=99999;
+}
+/* 세 번의 부름 글. 별명은 지어 준 이의 말투로, 본이름은 화면에 내지 않는다(빈칸) */
+function nameCallLine(c){
+  if(c.final)return ['"……, 이리 온."','"……."','"……? 아빠다."'][c.k-1];
+  const n=c.n;return ['"'+nameVoice(n,'call')+'"','"'+n.text+'."','"…'+n.text+'?"'][c.k-1];
+}
+/* 부름 하나를 끝낸다. how: kept(세 번 참음)·feather(깃이 지킴)·eaten(삼킴)·frozen(본이름에 돌아봄) */
+function nameCallEnd(how){
+  const t=nameTune(),N=B.names,c=N.call;N.call=null;
+  B.t=t.gangcheol_namecall_after_frames;
+  if(c.final){
+    if(how==='frozen'){
+      // 결정 D-1071: 몸에 붙지 않은 이름이라 먹히지는 않는다. 아빠 목소리에 몸이 얼어붙어 한 차례 내내 움직이지 못하고 크게 다친다
+      N.lock=t.name_final_lock_frames;
+      for(let i=0;i<t.name_final_damage&&B.st!=='end';i++){B.inv=0;bHitMe();}
+      bLater('(…아빠 이름을 먹을 때, 아빠가 기억하던 것까지 먹었구나.)',T_LATER);
+      Sound.playSfx('battle_part_break');
+    }else{
+      // 참았다(깃이 지킨 것도 같다). 강철이가 크게 흔들리고 빈틈이 길게 열린다
+      N.bigOpen=true;B.quakeT=Math.max(B.quakeT||0,24);
+      bLater('(아빠는 집 밖에선 그 이름을 안 불렀어.)',40);
+      bLater('강철이가 크게 흔들린다. 입 속에 무언가 비친다.',T_LATER);
+      Sound.playSfx('battle_soothe');
+    }
+    renderBHud();return;
+  }
+  const n=c.n;
+  if(how==='kept'||how==='feather'){
+    if(!N.kept.includes(n.id))N.kept.push(n.id);
+    bLater(how==='feather'?'(…돌아보지 않았다. '+n.text+', 지켰다.)':'(…세 번. 참았다.)',30);
+    Sound.playSfx('battle_soothe');renderBHud();return;
+  }
+  // 삼킨다: 손이 소리 난 쪽(입)으로 홱 돌아가고 잠깐 움직이지 않는다
   const m=nameMouthAt(),dx=m.x-B.px,dy=m.y-B.py,d=Math.hypot(dx,dy)||1;
   N.jerk={vx:dx/d*5,vy:dy/d*5,t:7};N.lock=t.gangcheol_namecall_lock_frames;
   N.fly={text:n.text,x:B.px,y:B.py-18,t:0,max:46};
   loseName(n.id);if(!N.eaten.includes(n.id))N.eaten.push(n.id);
   G.f.gangcheolSwallowed=[...N.eaten];
   if(!N.firstEat){N.firstEat=true;N.flash=true;}
-  bLater('(…누가 나를 뭐라고 불렀더라.)',T_LATER);
+  // 결정 D-1078: 이름에 쌓인 기억도 함께 나간다 (수첩 그 길의 기록이 흐려진다, book.js)
+  bLater('(…'+n.text+'? 누가 나를 그렇게 불렀더라.)',T_LATER);
   Sound.playSfx('battle_part_break');renderBHud();
+}
+/* 결정 D-1070: 부르는 중. 첫 부름 뒤로 손이 움직이거나 휘두르면 돌아본 것이다 */
+function nameCallStep(){
+  const t=nameTune(),N=B.names,c=N.call;if(!c)return;
+  if(c.k>=1){
+    c.moved+=Math.hypot(B.px-c.lx,B.py-c.ly);
+    if(B.swing>0)c.moved+=t.name_call_move_px+1;
+  }
+  c.lx=B.px;c.ly=B.py;
+  if(c.k>=1&&c.moved>t.name_call_move_px){
+    if(has('magpie_feather')&&!N.featherUsed){
+      N.featherUsed=true;
+      N.echo={by:'늙은 까치',text:'"아가!"',t:120,max:120,warm:true};B.msg='(깃이 떨린다. 귓가에서 "아가!" 하는 소리가 겹친다.)';
+      nameCallEnd(c.final?'kept':'feather');return;
+    }
+    nameCallEnd(c.final?'frozen':'eaten');return;
+  }
+  if(--c.t>0)return;
+  if(c.k>=3){nameCallEnd('kept');return;}
+  c.k++;c.t=t.name_call_interval_frames;
+  N.echo={by:c.n.by,text:'',t:t.name_call_interval_frames,max:t.name_call_interval_frames,cold:true};
+  B.msg=nameCallLine(c)+' ('+c.k+')';
+  if(c.k===1&&c.final)bLater('(…내 이름이다. 아빠 목소리로.)',12);
+  else if(c.k===1&&!N.taboo&&knows('lore:three_calls')){N.taboo=true;bLater('(세 번은… 못 들은 척.)',12);}
+  Sound.playSfx('battle_warn');
 }
 function nameStep(){
   if(!nameBattleOn())return;const N=B.names;
+  if(N.call&&B.st==='ncall')nameCallStep();
+  if(N.bigOpen&&B.st==='open'&&B.mark){N.bigOpen=false;B.mark.t+=nameTune().name_final_open_bonus;B.mark.max+=nameTune().name_final_open_bonus;}
   if(N.lock>0)N.lock--;
   if(N.jerk&&N.jerk.t-->0){B.px=clamp(B.px+N.jerk.vx,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+N.jerk.vy,BOX.y+8,BOX.y+BOX.h-8);}
   if(N.fly&&++N.fly.t>=N.fly.max)N.fly=null;
@@ -176,7 +251,7 @@ function namePortrait(by){
 function drawNameFrost(c){
   if(!nameBattleOn())return;
   const tell=B.st==='ntell',call=B.st==='ncall';if(!tell&&!call)return;
-  const t=nameTune(),k=tell?1-B.t/t.gangcheol_namecall_tell_frames:Math.max(0,B.t/t.gangcheol_namecall_after_frames);
+  const t=nameTune(),k=tell?1-B.t/t.gangcheol_namecall_tell_frames:B.names.call?1:Math.max(0,Math.min(1,B.t/t.gangcheol_namecall_after_frames));
   const X=BOX.x,Y=BOX.y,W=BOX.w,H=BOX.h,d=6+k*26;
   c.save();c.globalAlpha=0.25+0.55*k;c.fillStyle='#f4f8fb';
   c.fillRect(X,Y,W,d);c.fillRect(X,Y+H-d,W,d);c.fillRect(X,Y,d,H);c.fillRect(X+W-d,Y,d,H);

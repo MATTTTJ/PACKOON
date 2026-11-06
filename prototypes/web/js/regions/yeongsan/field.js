@@ -244,7 +244,7 @@ if(!CLASSIC){
   }
   const content=(id,kind)=>{
     const list=Rg.expContent?.[kind]?.[id]||[];
-    return id==='shore'&&kind==='wanderers'&&Rg.replyCourierHere?.()?list.filter(n=>n.id!=='y_magpie_knot'):list;
+    return id==='shore'&&kind==='wanderers'&&Rg.replyCourierHere?.()?list.filter(n=>n.id!=='y_magpie_farewell'):list;
   };
   function zone(id,npcs,exits,doors=[]){return {
     w:2600,startX:70,ground:GROUND,npcs,platforms:platforms(id),exits,doors,
@@ -294,9 +294,11 @@ if(!CLASSIC){
     if(G.f.seolpi)G.f.ySnowTrail=Math.max(G.f.ySnowTrail||180,Math.round(G.px));
   };
   Rg.zones.slope.step=()=>{stepCommon();stepSalg();};
-  // PA-47 선택 자리: 고라니만 듣는 눈 속 짚단, 다람쥐의 잊은 몫
-  Rg.zones.slope.pickups=[{id:'y_deer_jip',x:1640,y:GROUND,item:'jip',form:'deer',listen:true,got:false}];
-  Rg.zones.shelter.digs=[{id:'y_cache_shelter',x:720,item:'acorn',n:2,form:'squirrel',cache:true,done:false}];
+  // PA-47 선택 자리: 다람쥐의 잊은 몫(결정 D-1021: 다른 다람쥐가 묻은 것이고 도토리만이 아니다. 산막 둘레 잣나무 밑엔 잣)
+  // 결정 D-1073: 고라니만 듣던 눈 속 짚단 대신 수달만 잠수하는 얼음 구멍 둘(비탈). 얼음 밑에 가라앉은 것을 건진다
+  Rg.zones.slope.digs=[{id:'y_dive_fish',x:1100,item:'bingeo',n:2,form:'otter',cache:true,done:false,line:'얼음 구멍에 쏙 들어갔다 나왔다. 빙어 두 마리를 물고 나왔다!'},
+    {id:'y_dive_jip',x:1640,item:'jip',n:1,form:'otter',cache:true,done:false,line:'얼음 밑에 짚단이 걸려 있었다. 가을에 누가 떨어뜨렸나 보다.'}];
+  Rg.zones.shelter.digs=[{id:'y_cache_shelter',x:720,item:'jat',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.snow.digs=[{id:'y_cache_snow',x:1260,item:'solbang',n:2,form:'squirrel',cache:true,done:false}];
   /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 눈 덮인 마가목 열매(줍는 자리마다 마가목이 선다), 덤불의 다래 덩굴,
      소나무 밑 솔방울, 높은 바위턱의 잣송이. 살금이 둘레(비탈 900~1350)는 비워 둔다. 좌표는 길을 줄인 뒤의 자리. */

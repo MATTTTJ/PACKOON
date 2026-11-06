@@ -135,7 +135,7 @@ async function runMap({browser:b,outDir}){
         G.ended=true;rememberRegion(G);
       }
       Object.assign(G.f,{mapUnlocked:true,momNoteSeen:true,momNoteRestored:true,momNoteFade:0,dodamDone:true,musoeDone:true,nalDone:true,toadMet:true,kkuDone:true,ppuriPassed:true,stackDone:true,yakMade:true,bueongDone:true,steamDone:true,yeotDone:true,hongsiMade:true,fruitGot:true,nameGiven:true,yakDone:true,spring:true,yStampPrompted:{}});
-      G.forms=['squirrel','goat','owl','deer'];G.f.leafGiven=true; // 진행값과 맞는 변신 (PA-47). 없으면 도착 때 변신이 열리는 장면이 뜬다.
+      G.forms=['squirrel','goat','owl','otter'];G.f.leafGiven=true; // 진행값과 맞는 변신 (PA-47). 없으면 도착 때 변신이 열리는 장면이 뜬다.
       G.started=true;resetScreens();G.ended=true;showEnd();rememberRegion(G);
       // 결정 D-55: 가까이 가면 뜨는 기척(hintsSeen)은 도착 자리에 따라 생기는 연출 기록이라 공유 진행 비교에서 뺀다.
       const stable={inv:structuredClone(G.inv),awake:structuredClone(G.awake),f:(({hintsSeen,...f})=>structuredClone(f))(G.f),learned:structuredClone(G.learned),diary:structuredClone(G.diary)};

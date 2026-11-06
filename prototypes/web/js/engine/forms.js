@@ -1,25 +1,27 @@
 'use strict';
 /* 유씨 집안 잎사귀 변신 (PA-47, design/proposals/leaf-transform.md).
-   상태: G.forms(열린 변신 id, squirrel·goat·owl·deer 순서), G.form(지금 모습, ''=너구리).
+   상태: G.forms(열린 변신 id, squirrel·goat·owl·otter 순서), G.form(지금 모습, ''=너구리).
    - unlockForm(id), setForm(id), hasForm(id), formName(id)
-   - 숫자 0(너구리)·1 다람쥐·2 산양·3 수리부엉이·4 고라니. 같은 키를 다시 누르면 너구리로 돌아온다.
+   - 숫자 0(너구리)·1 다람쥐·2 산양·3 수리부엉이·4 수달. (결정 D-1073: 영산의 변신을 고라니에서 수달로 바꿨다) 같은 키를 다시 누르면 너구리로 돌아온다.
    - 대화·미니게임·지도·경치·가방·책 중에는 바뀌지 않는다. 전투에서 지면 너구리로 돌아온다. 구역·마을을 옮겨도 그대로다(결정 D-722).
    필드 능력 수치와 손님 교환 횟수는 tuning.csv 의 form_*·stranger_* 줄이다. 전투는 battle.js 가 battle_<id>_* 줄을 읽는다.
 
    구역 오브젝트 (zone 또는 classic REG 에 둔다)
    - climbs:[{x, top, bottom?, ledge?, draw?(x,y,top)}]: 다람쥐가 ↑를 누르는 동안 오르는 줄기·들보. top 높이에 발판을 두거나
      ledge:true 면 줄기 꼭대기가 다람쥐에게만 작은 디딤이 된다.
-   - 문·가장자리 출구의 formPass:'squirrel'|'goat'|'owl'|'deer' (+ formLabel, formNeed()): 원래 need() 가 거짓이어도 그 변신이면 지난다.
+   - 문·가장자리 출구의 formPass:'squirrel'|'goat'|'owl'|'otter' 또는 그 배열 (+ formLabel, formNeed()): 원래 need() 가 거짓이어도 그 변신이면 지난다.
      formNeed 는 몸이 아니라 약속으로 남는 조건(예: 뿔영감의 허락)을 따로 적을 때 쓴다.
    - digs/pickups 의 form:'<id>': 그 변신일 때만 보이고 캔다·줍는다. cache:true 인 흙더미는 채집 놀이 없이 n 개(기본 2)를 바로 얻는다.
-   - listen:true: 고라니일 때 form_deer_listen_range 안에 있으면 화면에 소리 표시를 띄운다 (pickups·digs·examines·stamps·wanderers).
+   - 결정 D-1073: form:'otter' 인 cache 자리는 얼음 구멍이다. 수달만 잠수해 건지고, 다른 모습에는 얼음 구멍만 보인다(drawCacheHint).
+   - 수달은 눈·서리 바닥에서 배를 깔고 미끄러져 빠르다(form_otter_slide_speed).
 
    낯선 손님 (변신한 채 말 걸기): REG.strangers[npc.id] 가 있을 때만 strangerTalk(npc) 로 간다. 없으면 기존 npc.talk().
    REG.strangers={npcId:{line, kin, kinLine, fear:[...], fearLine, timid, timidGift:{item,n,line}, trades:[{give:{},get:{}}],
      swapPool:[...], price, talk?(form,npc)}}. REG.strangerCreditAtNight 가 참이면 수리부엉이 외상은 G.f.night 일 때만 연다.
    지역 파일은 REG.formCheck() 를 두면 필드가 돌 때마다 한 번 불린다 (이야기 표시가 참이 되면 unlockForm 하기 등). */
-const FORM_IDS=['squirrel','goat','owl','deer'];
-const FORM_NAMES={'':'너구리',squirrel:'다람쥐',goat:'산양',owl:'수리부엉이',deer:'고라니'};
+// 결정 D-1073: 넷째 변신은 수달이다(고라니는 뺐다). 옛 저장의 deer 는 save.js 가 otter 로 옮긴다
+const FORM_IDS=['squirrel','goat','owl','otter'];
+const FORM_NAMES={'':'너구리',squirrel:'다람쥐',goat:'산양',owl:'수리부엉이',otter:'수달'};
 const formName=id=>FORM_NAMES[id||'']??'';
 const hasForm=id=>!id||(!!G&&Array.isArray(G.forms)&&G.forms.includes(id));
 const formTo=id=>jo(formName(id),'으로','로');
@@ -80,15 +82,18 @@ const ROLL_FORMS={
   squirrel:{roll:true,speed:'roll_squirrel_speed',r:6},
   goat:{roll:false,say:'뿔이 걸려서 몸이 안 말려. 산양으론 못 구르겠어.'},
   owl:{roll:false,say:'날개를 접어도 공처럼은 안 되네.'},
-  deer:{roll:false,say:'다리가 길어서 몸을 둥글게 말 수가 없어.'}
+  otter:{roll:false,say:'몸이 길어서 공처럼은 안 말려. 배로 미끄러지는 게 낫지.'}
 };
 let formClimb=null,formGlide=false,formFx=null;
 /* 결정 D-175: 걷는 동안의 네 박자 걸음(-1이면 서 있다). 필드 주인공을 그릴 때만 field.js drawRaccoon 이 정하고, 그린 뒤 -1로 되돌린다 */
 let formGait=-1;
 /* 결정 D-262: 네발 변신이 공중에 있을 때의 다리 (0 땅, 1 뛰어오름: 네 다리를 접는다, 2 내려옴: 앞다리를 앞아래로 뻗고 뒷다리는 뒤로).
-   formGait 처럼 field.js drawRaccoon·drawCrawl 이 그리기 직전에 정하고 그린 뒤 0으로 되돌린다. 산양·고라니가 쓴다. */
+   formGait 처럼 field.js drawRaccoon·drawCrawl 이 그리기 직전에 정하고 그린 뒤 0으로 되돌린다. 산양·수달이 쓴다. */
 let formAir=0;
-const formMoveMul=()=>G.form==='squirrel'?TABLES.TUNING.form_squirrel_speed:G.form==='deer'?TABLES.TUNING.form_deer_speed:1;
+/* 결정 D-1020: 수달은 눈·서리 바닥에선 배를 깔고 미끄러져 빠르고, 맨땅에선 짧은 다리라 조금 느리다 */
+let otterSlideDraw=null;   // 그림만 미끄럼 모습으로 그릴 때 (변신 카드)
+const otterSliding=()=>!!G&&G.form==='otter'&&G.onGround&&['snow','frost'].includes(typeof fieldCall==='function'?fieldCall('surface'):'');
+const formMoveMul=()=>G.form==='squirrel'?TABLES.TUNING.form_squirrel_speed:G.form==='otter'?(otterSliding()?TABLES.TUNING.form_otter_slide_speed:TABLES.TUNING.form_otter_speed):1;
 const formJumpMul=()=>G.form==='goat'?TABLES.TUNING.form_goat_jump:1;
 const upHeld=()=>!!(keys['arrowup']||keys['w']||touch.up);
 const jumpHeld=()=>!!(keys['c']||keys[' ']||keys['arrowup']||keys['w']||touch.jump);
@@ -160,23 +165,50 @@ function formFallCap(){
   if(owlFlapT>0)return;
   if(formGlide)G.vy=Math.min(G.vy,TABLES.TUNING.form_owl_glide_fall);
 }
-/* 다람쥐 잊은 몫: 채집 놀이 없이 바로 나온다 */
+/* 다람쥐 잊은 몫: 채집 놀이 없이 바로 나온다.
+   결정 D-1021 (사용자 피드백 2026-11-06 큰 장터 5): 내가 가 본 적 없는 자리라 내가 묻은 것이 아니다. 다른 다람쥐가 묻고 잊은 몫이다.
+   흙더미 둘레에 남의 작은 발자국이 찍혀 있고, 아이는 다 가져가지 않고 한 알을 도로 묻어 둔다(n-1개, 하나뿐이면 그 하나).
+   안에 든 것은 지역마다 다르다(도토리만이 아니다. 지역 파일의 digs item). d.line 이 있으면 그 혼잣말을 쓴다.
+   결정 D-1073: form:'otter' 인 자리는 수달이 잠수해 건지는 얼음 구멍이다. */
 function openCache(d){
-  d.done=true;Sound.gather(true);Vfx.gather(d.x,(d.y??fieldGround())-4);learn('rule:squirrel_cache');
-  spawnDrops(d.item,d.n||2,{x:d.x,y:d.y??fieldGround(),zone:d.zone});
-  think('묻어 두고 잊은 몫을 찾았다!');
+  d.done=true;Sound.gather(true);Vfx.gather(d.x,(d.y??fieldGround())-4);
+  const n=d.n||2,name=ITEMS[d.item]?.n||'무언가';
+  if(d.form==='otter'){
+    learn('rule:otter_dive');
+    spawnDrops(d.item,n,{x:d.x,y:d.y??fieldGround(),zone:d.zone});
+    think(d.line||'얼음 구멍에 쏙 들어갔다 나왔다. '+jo(name,'을','를')+' 건졌다!');
+    return;
+  }
+  learn('rule:squirrel_cache');
+  const take=Math.max(1,n-1);d.left=n-take;
+  spawnDrops(d.item,take,{x:d.x,y:d.y??fieldGround(),zone:d.zone});
+  think(d.line||(d.left?'다른 다람쥐가 묻어 두고 잊은 '+name+'다. 다 가져가면 서운하겠지. 하나는 도로 묻어 두자.':'다른 다람쥐가 묻어 두고 잊은 '+name+'다. 고맙게 얻어 가자.'));
+}
+/* 남의 다람쥐 발자국(작은 발 무리)이 흙더미 양옆으로 이어진다 */
+function cachePrints(x,y,col){for(const [dx,k] of [[-14,0],[-10,1],[9,0],[13,1]]){R(x+dx,y-1-k,1,1,col);R(x+dx+2,y-1-k,1,1,col);R(x+dx+1,y-2-k,1,1,col);}}
+/* 얼음 구멍 (수달만 잠수한다). 둥근 검은 물과 얼음 테두리, 이따금 물결 */
+function drawIceHole(d,x,live){
+  const y=d.y??fieldGround();x=Math.round(x);
+  R(x-8,y-1,16,2,'#d6e6ef');R(x-6,y-2,12,1,'#eef5f8');
+  R(x-6,y-1,12,1,live?'#1f3442':'#3a5466');R(x-4,y,8,1,live?'#16262f':'#2b4352');
+  if(live&&!Vfx.reducedMotion&&Math.floor(G.anim/18)%3===0)R(x-2,y-1,4,1,'#8fb0c2');
 }
 function drawCache(d,x){
   const y=d.y??fieldGround();
-  if(d.done){R(x-4,y-1,8,1,'#3e2615');return;}
+  if(d.form==='otter'){drawIceHole(d,x,!d.done);return;}
+  if(d.done){R(x-4,y-1,8,1,'#3e2615');if(d.left)R(x-1,y-2,3,1,'#6b4423');return;}   // 도로 묻어 둔 한 알 자리
+  cachePrints(x,y,'#5a3a22');
   R(x-6,y-2,12,2,'#6b4423');R(x-4,y-4,8,2,'#7a4b2a');R(x-1,y-6,3,2,'#c9894a');R(x-1,y-7,3,1,'#6b4423');
   R(x-6,y-6,1,3,'#4a2e1a');R(x-4,y-7,1,3,'#4a2e1a');R(x+4,y-6,1,3,'#4a2e1a');   // 긁은 자국
 }
-/* 결정 D-80: 다람쥐가 아닌 모습에서 보이는 다람쥐 몫 자리. 흙을 판 흔적 없이 발톱 긁은 줄 셋만 남는다. */
+/* 결정 D-80: 다람쥐가 아닌 모습에서 보이는 다람쥐 몫 자리. 흙을 판 흔적 없이 발톱 긁은 줄 셋만 남는다.
+   결정 D-1021: 그 곁에 남의 작은 발자국. 결정 D-1073: 수달 자리는 다른 모습에도 얼음 구멍으로 보인다. */
 function drawCacheHint(d,x){
+  if(d.form==='otter'){drawIceHole(d,x,true);return;}
   const y=d.y??fieldGround();x=Math.round(x);
   R(x-7,y-2,14,2,'rgba(110,70,40,.55)');   // 살짝 헤집은 흙
   for(const [dx,h] of [[-5,6],[-1,7],[3,6]]){R(x+dx,y-h,2,h-1,'#4a2e1a');R(x+dx,y-h,1,1,'#7a4b2a');}   // 발톱 긁은 줄 셋
+  cachePrints(x,y,'rgba(90,58,34,.7)');
 }
 function drawClimbs(){
   for(const c of zoneObjects('climbs')){
@@ -187,25 +219,12 @@ function drawClimbs(){
     R(x-5,c.top-1,10,2,'#7a5232');
   }
 }
-/* 고라니: 들은 쪽을 화면 가장자리에 작게 표시한다 */
-function listenTargets(){
-  const out=[...fieldItems('pickups').filter(a=>a.listen&&!a.got),...fieldItems('digs').filter(d=>d.listen&&!d.done)];
-  for(const k of ['examines','stamps','wanderers'])for(const p of zoneObjects(k))if(p.listen&&!(k==='stamps'&&stampFound(p.id)))out.push(p);
-  return out.filter(p=>Math.abs(p.x-G.px)<TABLES.TUNING.form_deer_listen_range);
-}
+/* 결정 D-1073: 수달이 배로 미끄러질 때 뒤로 눈 가루가 흩날린다 (고라니의 소리 듣기 표시를 대신한다. field.js 가 이 이름으로 부른다) */
 function drawListenMarks(){
-  if(G.form!=='deer'||!G.started||G.ended)return;
-  const pulse=Vfx.reducedMotion?1:Math.floor(G.anim/10)%3;
-  for(const p of listenTargets()){
-    const sx=p.x-cam,y=Math.round(clamp((p.y??fieldGround())-14,24,fieldGround()-8));
-    const col='rgba(255,246,214,.9)';
-    if(sx>=8&&sx<=W-8){
-      for(let i=0;i<=pulse;i++){R(sx-4-i*3,y-2-i,1,4+i*2,col);R(sx+4+i*3,y-2-i,1,4+i*2,col);}
-    }else{
-      const d=sx<8?-1:1,ex=d<0?4:W-6;
-      for(let i=0;i<3;i++){const a=i<=pulse?col:'rgba(255,246,214,.35)',xx=ex-d*i*4;R(xx,y-2,1,1,a);R(xx+d,y-1,1,3,a);R(xx,y+2,1,1,a);}
-    }
-  }
+  if(G.form!=='otter'||!G.started||G.ended||Vfx.reducedMotion)return;
+  if(!otterSliding()||Math.abs(G.vx)<.6)return;
+  const x=Math.round(G.px-cam),y=Math.round(G.py);
+  for(let i=1;i<5;i++)R(x-G.face*(6+i*3),y-1-(i+G.anim)%2,2,1,'rgba(246,250,252,'+(0.8-i*.15).toFixed(2)+')');
 }
 
 /* ---------- 그림 ---------- */
@@ -269,26 +288,32 @@ function drawFormAt(ox,oy,f,st,form,attackT=0,glide=false){
     M(ox,oy,f,-4,-18,1,1,STRAP);M(ox,oy,f,-3,-17,1,1,STRAP);M(ox,oy,f,-2,-16,1,1,STRAP);M(ox,oy,f,-1,-15,1,1,STRAP);
     drawStrapLeaf(ox,oy,f,0,-15);drawSwipe(ox,oy-12,f,attackT,9);return;
   }
-  if(form==='deer'){
-    const C='#b88a55',L='#e3c9a0',D='#8a6440',Tu='#f4efe2';
-    if(formAir===1)for(const [lx,col] of [[-5,D],[-2,C],[4,D],[7,C]]){const k=lx>0?1:-1;M(ox,oy,f,lx,-11,2,5,col);M(ox,oy,f,lx+k,-7,2,3,col);M(ox,oy,f,lx+k*2,-5,2,1,'#3a2a1f');}   // 결정 D-262: 뛰어오를 때 다리를 접는다
-    else if(formAir===2)for(const [lx,col] of [[-5,D],[-2,C],[4,D],[7,C]]){   // 결정 D-262: 내려올 때 앞다리를 앞아래로 뻗고 뒷다리는 뒤로 길게
-      if(lx>0){M(ox,oy,f,lx,-11,2,5,col);M(ox,oy,f,lx+1,-6,2,5,col);M(ox,oy,f,lx+1,-1,2,1,'#3a2a1f');}
-      else{M(ox,oy,f,lx,-11,2,4,col);M(ox,oy,f,lx-1,-8,2,3,col);M(ox,oy,f,lx-2,-5,2,3,col);M(ox,oy,f,lx-3,-3,2,1,'#3a2a1f');}
+  if(form==='otter'){
+    /* 결정 D-1073: 수달. 낮고 긴 몸, 납작한 머리, 작고 둥근 귀, 굵다 끝이 가는 꼬리, 짧은 다리. 짙은 갈색에 옅은 목.
+       눈·서리 위를 빠르게 갈 때는 다리를 접고 배를 깔아 미끄러진다(머리를 앞으로 낮게). */
+    const C='#6b4a32',D='#4a3222',L='#cdb79a',N='#2a1d14';
+    const slide=(otterSlideDraw??(otterSliding()&&Math.abs(G.vx)>.6))&&!formAir;
+    if(slide){
+      M(ox,oy,f,-16,-4,6,2,D);M(ox,oy,f,-19,-3,4,1,D);                       // 꼬리 끝까지 바닥에 끈다
+      M(ox,oy,f,-11,-7,20,5,C);M(ox,oy,f,-9,-3,16,2,L);                     // 배를 깐 긴 몸
+      M(ox,oy,f,8,-8,7,5,C);M(ox,oy,f,9,-4,6,1,L);M(ox,oy,f,14,-6,2,2,N);   // 낮게 내민 머리·코
+      M(ox,oy,f,11,-8,1,1,K);M(ox,oy,f,9,-9,2,1,D);M(ox,oy,f,13,-5,3,1,'#e9e1d4');
+      M(ox,oy,f,-3,-11,7,4,BUNDLE);M(ox,oy,f,-1,-10,1,1,'#8a3b2a');
+      M(ox,oy,f,2,-8,1,4,STRAP);drawStrapLeaf(ox,oy,f,2,-6);return;
     }
-    else{M(ox,oy,f,-5+st,-11,2,11,D);M(ox,oy,f,-2,-11,2,11,C);M(ox,oy,f,4-st,-11,2,11,D);M(ox,oy,f,7,-11,2,11,C);
-    for(const lx of [-5+st,-2,4-st,7])M(ox,oy,f,lx,-1,2,1,'#3a2a1f');}
-    M(ox,oy,f,-8,-18,2,2,L);
-    M(ox,oy,f,-7,-18,16,7,C);M(ox,oy,f,-5,-12,12,1,L);
-    M(ox,oy,f,-3,-22,6,4,BUNDLE);M(ox,oy,f,-2,-21,1,1,'#8a3b2a');
-    M(ox,oy,f,7,-24,3,8,C);M(ox,oy,f,8,-27,6,4,C);M(ox,oy,f,13,-26,2,3,C);M(ox,oy,f,14,-26,1,1,K);
-    M(ox,oy,f,10,-26,1,1,K);M(ox,oy,f,12,-23,1,2,Tu);
-    M(ox,oy,f,5,-29,4,3,C);M(ox,oy,f,4,-30,3,2,C);M(ox,oy,f,5,-29,2,1,L);
-    M(ox,oy,f,4,-19,1,8,STRAP);drawStrapLeaf(ox,oy,f,4,-16);drawSwipe(ox,oy-12,f,attackT,10);return;
+    const legs=formAir===1?[[-7,-6],[-3,-6],[4,-6],[7,-6]]:[[-7+st,-4],[-4,-4],[4-st,-4],[7,-4]];
+    for(const [lx,ly] of legs){M(ox,oy,f,lx,ly,2,ly===-4?4:3,D);if(ly===-4)M(ox,oy,f,lx-1,-1,3,1,N);}
+    M(ox,oy,f,-17,-6,5,2,D);M(ox,oy,f,-14,-8,5,3,C);M(ox,oy,f,-20,-5,4,1,D);   // 굵다 끝이 가는 꼬리
+    M(ox,oy,f,-10,-12,20,8,C);M(ox,oy,f,-8,-5,16,1,D);M(ox,oy,f,2,-7,8,2,L);    // 낮고 긴 몸, 옅은 목·가슴
+    M(ox,oy,f,8,-15,8,7,C);M(ox,oy,f,15,-12,2,3,C);M(ox,oy,f,16,-12,1,1,N);    // 납작한 머리와 주둥이
+    M(ox,oy,f,10,-10,6,2,L);M(ox,oy,f,12,-13,1,1,K);M(ox,oy,f,9,-16,2,1,D);     // 볼·눈·작고 둥근 귀
+    M(ox,oy,f,16,-11,3,1,'#e9e1d4');M(ox,oy,f,16,-9,3,1,'#e9e1d4');             // 수염
+    M(ox,oy,f,-4,-16,7,4,BUNDLE);M(ox,oy,f,-3,-15,1,1,'#8a3b2a');
+    M(ox,oy,f,4,-13,1,6,STRAP);drawStrapLeaf(ox,oy,f,4,-10);drawSwipe(ox,oy-8,f,attackT,9);return;
   }
 }
 /* 결정 D-400 (사용자 피드백 2026-11-03): 오르내릴 때 등을 보이는 것은 두 발로도 다닐 수 있는 동물뿐이다.
-   너구리·다람쥐·수리부엉이는 등을 보이고, 산양·고라니처럼 네 발로만 다니는 짐승은 앞을 본 채 머리를 숙여 디딘다(drawTiltedForm).
+   너구리·다람쥐·수리부엉이는 등을 보이고, 산양·수달처럼 네 발로만 다니는 짐승은 앞을 본 채 머리를 숙여 디딘다(drawTiltedForm).
    결정 D-401: 수리부엉이는 땅에서 두 발로 걷는 새라 기어 내려가는 문에서는 등을 보인다. 발판에서 빠질 때는 날개를 펴고 내려앉는다(D-262 그대로).
    발판 턱을 붙잡고 미끄러지는 것(G.dropBack)은 앞발로 붙잡을 수 있는 너구리·다람쥐만 한다. */
 const FORM_UPRIGHT={'':true,squirrel:true,owl:true};
@@ -367,9 +392,12 @@ function drawFormPaw(c,form){
     for(let i=-2;i<=2;i++){c.save();c.translate(0,4);c.rotate(i*.32);blob(c,0,-9,2.6,8.5,i%2?'#8a6a45':'#6f5436');brush(c,[[0,-14],[0,-4]],.9,'#d8c09a',.8);c.restore();}
     blob(c,0,4,6.5,5,'#d8c09a');for(let i=-1;i<=1;i++)brush(c,[[i*3,2],[i*3,6]],.8,'#6f5436');
     for(let i=-1;i<=1;i++){brush(c,[[i*3.5,7],[i*4.5,10.5]],2,'#c9a040');brush(c,[[i*4.5,10.5],[i*5.5,12.5],[i*5.8+(i||.4),11.5]],1.1,INK);}
-  }else if(form==='deer'){   // 갈라진 고라니 발굽 (다리는 그리지 않는다)
-    blob(c,-3,-1,3.2,5.4,'#3a2a1f');blob(c,3,-1,3.2,5.4,'#3a2a1f');
-    brush(c,[[0,-6],[0,4]],1.2,'#efe3c8');
+  }else if(form==='otter'){   // 결정 D-1073: 물갈퀴 달린 수달 앞발. 짧고 둥근 발가락 다섯을 막이 잇는다
+    blob(c,0,2,7,6,'#5a3e2a');
+    for(let i=0;i<5;i++){const a=-0.9+i*0.45;blob(c,Math.sin(a)*7,-3+Math.abs(Math.sin(a))*3,1.8,2.6,'#4a3222');}
+    c.save();c.globalAlpha=.55;blob(c,0,-2,7,3.4,'#8a6a50');c.restore();   // 발가락 사이 물갈퀴
+    blob(c,0,3,3.2,2.4,'#cdb79a');
+    c.strokeStyle=INK;c.lineWidth=1.1;c.beginPath();c.ellipse(0,2,7,6,0,0,Math.PI*2);c.stroke();
   }
   c.restore();
 }
@@ -409,7 +437,7 @@ function strangerTalk(npc,opts={}){
   }
   if(e.kin===form&&e.kinLine)lines.push([who,e.kinLine]);
   const gifts=G.f.strangerGifts||(G.f.strangerGifts={}),gift=e.timidGift;
-  if(form==='deer'&&e.timid&&gift&&ITEMS[gift.item]&&!gifts[strangerKey(npc.id)]){
+  if(form==='otter'&&e.timid&&gift&&ITEMS[gift.item]&&!gifts[strangerKey(npc.id)]){   // 결정 D-1073: 겁 많은 이가 마음을 여는 모습은 고라니에서 수달로
     gifts[strangerKey(npc.id)]=true;if(gift.line)lines.push([who,gift.line]);
     addItem(gift.item,Number.isSafeInteger(gift.n)&&gift.n>0?gift.n:1);
   }
@@ -524,7 +552,7 @@ const FORM_INTRO={
   squirrel:{line:'줄기를 타고 높은 데까지 오른다'},
   goat:{line:'디딜 데를 보고 훌쩍 높이 뛴다'},
   owl:{line:'남들 눈엔 안 보이는 것을 느끼고, 천천히 내려앉는다'},   // 결정 D-665
-  deer:{line:'날쌔게 달리고, 숨은 소리를 먼저 듣는다'}
+  otter:{line:'눈 위를 배로 미끄러지고, 얼음 구멍에 잠수한다'}   // 결정 D-1073
 };
 const formIntroBox=el('div','form-intro');formIntroBox.hidden=true;formIntroBox.setAttribute('role','status');
 const formIntroCv=document.createElement('canvas');formIntroCv.width=96*3;formIntroCv.height=64*3;
@@ -572,11 +600,17 @@ function drawFormDemo(id,t){
       if(c<3.2){const s=Math.round((c-2.2)*6)%3+2;R(gx,gy-4-s,1,2*s+1,'#fbf2c8');R(gx-s,gy-4,2*s+1,1,'#fbf2c8');}}   // 반짝
     return;
   }
-  if(id==='deer'){   // 날쌔게 달리다 덤불 속 소리를 먼저 듣는다
-    R(78,42,16,14,'#6f8a4a');R(75,48,5,8,'#5f7a3e');R(82,39,8,4,'#86a35a');
-    const run=(t*52)%130-16,x=Math.round(Math.min(run,62));
-    drawFormAt(x,DG,1,run<62?Math.floor(t*12)%2:0,'deer');
-    if(run>30){const pulse=Math.floor(t*6)%3,col='rgba(90,60,30,.85)';for(let i=0;i<=pulse;i++)R(74-i*3,44-i,1,4+i*2,col);}
+  if(id==='otter'){   // 결정 D-1073: 눈 비탈을 배로 미끄러져 내려와 얼음 구멍에 쏙 들어갔다 빙어를 물고 나온다
+    R(0,DG,DEMO_W,DEMO_H-DG,'#e8f0f4');R(0,DG,DEMO_W,1,'#c9d8e0');
+    for(let x=0;x<44;x++){const h=Math.round((44-x)*0.5);R(x,DG-h,1,h,'#eef4f7');}   // 눈 비탈
+    R(70,DG,14,2,'#1f3442');R(68,DG-1,18,1,'#d6e6ef');                                 // 얼음 구멍
+    const c=t%3.4;
+    try{
+      if(c<1.4){const k=c/1.4,x=Math.round(4+k*60),y=Math.round(DG-Math.max(0,(44-x)*0.5));
+        otterSlideDraw=true;formAir=0;drawFormAt(x,y,1,0,'otter');}
+      else if(c<2.3){const k=(c-1.4)/.9;R(74,DG-2-Math.round(Math.sin(k*Math.PI)*3),6,2,'#8fb0c2');}   // 들어간 자리 물결
+      else{otterSlideDraw=false;drawFormAt(77,DG,1,0,'otter');R(84,DG-9,4,2,'#c9d6dc');R(83,DG-9,1,1,'#2b2b33');}   // 빙어를 물고 나온다
+    }finally{otterSlideDraw=null;}
     return;
   }
 }
@@ -611,9 +645,9 @@ function formIntroTick(){
 /* 그 변신으로만 갈 수 있거나 그 변신에게만 보이는 자리 (지금 구역) */
 function formHintSpots(id){
   const out=[],gy=fieldGround();
-  for(const p of zoneObjects('doors'))if(p.formPass===id&&!needMet(p))out.push({x:p.x,y:(p.y??gy)-24});
+  for(const p of zoneObjects('doors'))if([].concat(p.formPass).includes(id)&&!needMet(p))out.push({x:p.x,y:(p.y??gy)-24});
   const z=zoneDef();
-  if(z)for(const side of ['left','right']){const p=exitSpec(z.exits?.[side]);if(p&&p.formPass===id&&!needMet(p))out.push({x:side==='left'?16:z.w-16,y:gy-24});}
+  if(z)for(const side of ['left','right']){const p=exitSpec(z.exits?.[side]);if(p&&[].concat(p.formPass).includes(id)&&!needMet(p))out.push({x:side==='left'?16:z.w-16,y:gy-24});}
   if(id==='squirrel')for(const c of zoneObjects('climbs'))out.push({x:c.x,y:c.top+6});
   for(const d of fieldItems('digs'))if(d.form===id&&!d.done)out.push({x:d.x,y:(d.y??gy)-12});
   for(const a of fieldItems('pickups'))if(a.form===id&&!a.got)out.push({x:a.x,y:(a.y??gy)-12});

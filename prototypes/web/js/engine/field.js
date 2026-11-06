@@ -681,7 +681,7 @@ function encounterReady(){return !!G&&G.onGround&&!formClimb&&!(G.dropT>0)&&$('d
 const pointNear=p=>Math.abs(p.x-G.px)<(p.distance??TABLES.TUNING.field_talk_distance)&&Math.abs((p.y??fieldGround())-G.py)<TABLES.TUNING.field_interact_y;
 /* 원래 조건(need) 또는 몸으로 넘는 변신(formPass). formNeed 는 변신으로도 남는 약속 조건이다 (forms.js) */
 const needMet=p=>!p.need||p.need();
-const formPasses=p=>!!(p.formPass&&G?.form===p.formPass&&(!p.formNeed||p.formNeed()));
+const formPasses=p=>!!(p.formPass&&[].concat(p.formPass).includes(G?.form)&&(!p.formNeed||p.formNeed()));   // 결정 D-1073: formPass 는 변신 하나 또는 배열
 const pathOpen=p=>needMet(p)||formPasses(p);
 const exitSpec=e=>typeof e==='string'?{to:e}:e;
 function resetFieldModes(){
@@ -915,7 +915,7 @@ function interactWith(p,kind){
     if(startDoorFade(p))return;
     changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});
   }else if(kind==='vistas')startVista(p);
-  else if(kind==='stamps')findStamp(p);
+  else if(kind==='stamps'){if(!findStamp(p))p.revisit?.();}   // 결정 D-1023: 찾은 도장을 다시 누르면 지역이 그 이야기를 다시 연다
   else if(kind==='examines'){
     const texts=Array.isArray(p.text)?p.text:[p.text];
     const visits=G.f.examineVisits||(G.f.examineVisits={}),key=expansionKey(p.id),i=Math.min(visits[key]||0,texts.length-1);
@@ -992,7 +992,8 @@ function findStamp(s){
   G.f.stampCount=stampCount();G.f.stampsByRegion=G.f.stampsByRegion||{};G.f.stampsByRegion[REG.id]=stampCount(REG.id);
   learn(s.note,true);Vfx.burst(s.x,s.y??fieldGround());Sound.playSfx('stamp_found');
   peekStamp(s);
-  think('아빠 손바닥 도장이다! 수첩에 그날 이야기가 있을 거야.');return true;   // 결정 D-706
+  // 결정 D-1023: 지역이 찾은 순간의 이야기를 대화로 바로 이으면(REG.onStampFound) 속말을 따로 띄우지 않는다(대화 뒤에 다시 뜨지 않게)
+  if(!REG.onStampFound?.(s))think('아빠 손바닥 도장이다! 수첩에 그날 이야기가 있을 거야.');return true;   // 결정 D-706
 }
 function drawZoneObjects(){
   for(const p of zoneObjects('wanderers'))if(p.draw){const a=npcMoveAlpha(p.id);if(a<=0)continue;   // D-126

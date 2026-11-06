@@ -263,12 +263,12 @@ requireValue(TUNING.map_flight_ms>0&&TUNING.map_landing_margin>0,'tuning.csv: �
 requireValue(TUNING.drop_min_spacing>=16&&TUNING.drop_spread>=TUNING.drop_min_spacing,'tuning.csv: 바닥 아이템 간격은 16px 이상이며 퍼짐 폭 안에 있어야 한다');
 requireValue(TUNING.pickup_range>0&&TUNING.pickup_range_y>0,'tuning.csv: 줍기 범위는 0보다 커야 한다');
 requireValue(TUNING.pickup_pull_frames<=TUNING.pickup_motion_frames,'tuning.csv: 빨려 드는 시간은 줍기 동작보다 길 수 없다');
-for(const form of ['bare','squirrel','goat','owl','deer']){
+for(const form of ['bare','squirrel','goat','owl','deer','otter']){   // 결정 D-1073: 수달 (고라니 줄은 battle.js 가 아직 읽는다)
   requireValue(TUNING['battle_'+form+'_speed']>0&&TUNING['battle_'+form+'_cooldown']>0&&TUNING['battle_'+form+'_radius']>3,'tuning.csv: 전투 변신 속도·대기·되치기 반경을 확인한다');
 }
 requireValue(TUNING.battle_squirrel_speed>TUNING.battle_bare_speed&&TUNING.battle_squirrel_cooldown<TUNING.battle_bare_cooldown&&TUNING.battle_squirrel_radius<TUNING.battle_bare_radius&&TUNING.battle_owl_radius>TUNING.battle_bare_radius&&TUNING.battle_owl_cooldown>TUNING.battle_bare_cooldown,'tuning.csv: 다람쥐는 빠르고 좁게, 수리부엉이는 넓고 느리게 유지한다');
 requireValue(TUNING.battle_goat_damage_taken>0&&TUNING.battle_goat_damage_taken<1&&TUNING.battle_owl_tell_lead>=0&&TUNING.battle_deer_iframes>=TUNING.battle_iframes,'tuning.csv: 산양 피해 배수는 0~1 사이, 고라니 무적 시간은 기본 이상이어야 한다');
-requireValue(TUNING.form_squirrel_speed>0&&TUNING.form_deer_speed>0&&TUNING.form_goat_jump>=1&&TUNING.form_owl_glide_fall>0&&TUNING.form_owl_glide_fall<TUNING.field_fall_speed&&TUNING.form_climb_speed>0&&TUNING.form_climb_reach>0&&TUNING.form_deer_listen_range>0&&Number.isInteger(TUNING.stranger_trade_limit)&&TUNING.stranger_trade_limit>0,'tuning.csv: 필드 변신 배수·활공·오르기·손님 교환 수를 확인한다');
+requireValue(TUNING.form_squirrel_speed>0&&TUNING.form_otter_speed>0&&TUNING.form_otter_slide_speed>TUNING.form_otter_speed&&TUNING.form_goat_jump>=1&&TUNING.form_owl_glide_fall>0&&TUNING.form_owl_glide_fall<TUNING.field_fall_speed&&TUNING.form_climb_speed>0&&TUNING.form_climb_reach>0&&Number.isInteger(TUNING.stranger_trade_limit)&&TUNING.stranger_trade_limit>0,'tuning.csv: 필드 변신 배수·활공·오르기·손님 교환 수를 확인한다');
 requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_tool_good_damage>0&&TUNING.battle_tool_bad_mult>0&&TUNING.battle_tool_bad_mult<1&&TUNING.battle_hand_scale>0.5&&TUNING.battle_hand_scale<=2,'tuning.csv: 전투 기본 피해·날 세운 피해·잘 먹는 도구 덤·안 먹는 도구 배수(0~1)·손 그림 크기를 확인한다');
 requireValue(TUNING.kudzu_stem_cut_chance>0&&TUNING.kudzu_stem_cut_chance<=1&&TUNING.kudzu_root_dig_chance>0&&TUNING.kudzu_root_dig_chance<=1,'tuning.csv: 칡줄기 끊기·칡뿌리 캐기 확률은 0보다 크고 1 이하여야 한다');
 requireValue(TUNING.kudzu_scent_damage>0&&TUNING.kudzu_scent_damage<1&&TUNING.kudzu_scent_slow>0&&TUNING.kudzu_scent_slow<1&&TUNING.kudzu_scent_slow_frames>0&&TUNING.kudzu_scent_linger>0,'tuning.csv: 칡꽃 꽃가루 피해는 0~1칸, 느려짐 배수는 0~1, 시간은 0보다 커야 한다');
