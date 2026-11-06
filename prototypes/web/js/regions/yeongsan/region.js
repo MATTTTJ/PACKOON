@@ -204,19 +204,19 @@ function traceStamp(s,fresh=false){
     })},{t:'무늬는 찾았으니 나중에 볼게',go:null}
   ]]]);
 }
-/* 결정 D-1022: 산막 기둥의 이름들. 지나간 보부상들이 칼끝으로 새긴 이름 사이에 한 자리만 매끈하다(아빠 이름, 이름의 규칙 3).
+/* 결정 D-1022: 짐 부리는 기둥의 이름들. 지나간 보부상들이 칼끝으로 새긴 이름 사이에 한 자리만 매끈하다(아빠 이름, 이름의 규칙 3).
    그 밑 짐 걸이에 엄마에게 배운 보따리 매듭이 남아 아빠가 여기 묵었다는 걸 안다. 봄엔 글씨가 돌아온다(규칙 6). */
 function namesPost(){
   const F=G.f,pic=Rg.pics,withPic=(l,p)=>Object.assign(l,{pic:p});
   if(Rg.namesBack()){talk([withPic(['너구리','(매끈하던 자리에 글씨가 돌아왔다.\n아빠 이름이다. 날쌘 아저씨 이름 바로 곁.)'],pic.namesPostBack)]);return;}
   if(F.yNamesPost){talk([withPic(['너구리','(빼곡한 이름 사이에 한 자리만 매끈하다.\n그 밑 짐 걸이엔 엄마 매듭.)'],pic.namesPost)]);return;}
-  talk([withPic(['너구리','(산막 기둥에 칼끝으로 새긴 이름이 빼곡하다.\n지나간 보부상들이 하나씩 남긴 거다.)'],pic.namesPost),
+  talk([withPic(['너구리','(산막 옆 짐 부리는 기둥에 칼끝으로 새긴 이름이\n빼곡하다. 여기 묵어 간 보부상들이 남긴 거다.)'],pic.namesPost),
     ['너구리','(날쌘 아저씨 이름도 있다. 그 곁에…\n한 자리만 매끈하다.)'],
     ['너구리','(내 짐표 앞면처럼.)'],
     ['너구리','(그 밑 짐 걸이에 끈이 묶여 있다.\n두 번 감고, 한 번 당긴 매듭.)'],
     ['너구리','(엄마가 가르쳐 준 보따리 매듭이다.\n…아빠가 여기 묵었구나.)']],()=>Rg.playActivity('namesPost',()=>{
       F.yNamesPost=true;learn('y:names_post');
-      diary('y_names_post','산막 기둥에 지나간 보부상들이 새긴 이름이 빼곡했다. 날쌘 아저씨 이름 곁에 한 자리만 매끈했다. 내 짐표 앞면처럼. 그 밑 짐 걸이에 엄마가 가르쳐 준 매듭이 묶여 있었다. 아빠가 여기 묵었다.');
+      diary('y_names_post','산막 옆 짐 부리는 기둥에 지나간 보부상들이 새긴 이름이 빼곡했다. 날쌘 아저씨 이름 곁에 한 자리만 매끈했다. 내 짐표 앞면처럼. 그 밑 짐 걸이에 엄마가 가르쳐 준 매듭이 묶여 있었다. 아빠가 여기 묵었다.');
     }));
 }
 /* 결정 D-1075 (design/proposals/name-story-v2.md §5.4): 호수 쪽에서 엄마 목소리로 아기 곰을 부른다. 문간의 진짜 엄마는 꿈쩍 않는다.
@@ -329,8 +329,8 @@ function install(){
     return oldGoal();
   };
   // 결정 D-1075·D-1074: 곰 굴의 봄 자리와 '까치에게 집으로 보낼 것 묻기'는 뺐다 (사용자 피드백 2026-11-06 영산 23·38).
-  // 결정 D-1022 (영산 18·28): 산막의 매듭 살펴보기를 날쌘과 떨어진 산막 안쪽 기둥으로 옮기고 '기둥의 이름들'로 바꿨다
-  Rg.zones.shelter.npcs.push({id:'y_names_post',name:'산막 기둥',x:620,prompt:'산막 기둥 살펴보기',talk:namesPost,draw:(x,y)=>Rg.drawNamesPost(x,y)});
+  // 결정 D-1022 (영산 18·28): 산막의 매듭 살펴보기를 날쌘(산막 문간)과 떨어진 산막 옆 짐 부리는 기둥으로 옮기고 '기둥의 이름들'로 바꿨다
+  Rg.zones.shelter.npcs.push({id:'y_names_post',name:'짐 부리는 기둥',x:620,prompt:'짐 부리는 기둥 살펴보기',talk:namesPost,draw:(x,y)=>Rg.drawNamesPost(x,y)});
   // 결정 D-1023: 도장을 찾는 순간 그 이야기 대화를 바로 연다(engine/field.js findStamp 의 REG.onStampFound). 찾은 도장을 다시 누르면 다시 열린다
   Rg.onStampFound=s=>{if(!['hut_post','snow_sign','shore_rock'].includes(s.id))return false;
     if(typeof thoughtT!=='undefined')thoughtT=0;traceStamp(s,true);return true;};

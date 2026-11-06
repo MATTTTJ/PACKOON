@@ -69,7 +69,7 @@ function onPress(k){
   if(open('bag')&&(k==='q'||k==='r')){cycleBagKind(k==='q'?-1:1);return;}
   if(open('bag')||open('notebook')||open('trade'))return;
   if(pickupPose)return;
-  // 0 너구리 · 1 다람쥐 · 2 산양 · 3 수리부엉이 · 4 고라니 (forms.js)
+  // 0 너구리 · 1 다람쥐 · 2 산양 · 3 수리부엉이 · 4 수달 (forms.js, 결정 D-1073)
   if(formKey(k))return;
   // C(또는 Space·↑·W)는 점프, 아래를 누른 채면 발판 아래로 내려간다.
   // 결정 D-94: 움직이는 중의 Space는 짧게면 점프, 꾹 누르면 구르기 (roll.js). C·W·↑는 늘 바로 점프.

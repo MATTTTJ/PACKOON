@@ -32,10 +32,10 @@ function talkNal(){
       ['날쌘','다래 덩굴 둘이랑 짚 한 단.\n그것만 가져와.']],nalMenu);return;}
   nalMenu();
 }
-/* 결정 D-1022: 산막 기둥의 매끈한 자리를 물으면 날쌘도 거기 누가 새겼는지 떠올리지 못한다(이름의 규칙 3). 같이 새겼다는 것만 기억한다 */
+/* 결정 D-1022: 짐 부리는 기둥의 매끈한 자리를 물으면 날쌘도 거기 누가 새겼는지 떠올리지 못한다(이름의 규칙 3). 같이 새겼다는 것만 기억한다 */
 function nalPostAsk(){
   G.f.yNalPost=true;
-  talk([['너구리','산막 기둥에 아저씨 이름 옆자리요.\n거기만 매끈해요.'],
+  talk([['너구리','짐 부리는 기둥에 아저씨 이름 옆자리요.\n거기만 매끈해요.'],
     ['날쌘','기둥? …아, 거기.'],
     ['날쌘','누가 새겼어. 분명 나랑 같이 새겼는데.\n이름이… 안 떠올라.'],
     ['날쌘','(날쌘이 제 머리를 툭 친다.)\n…늙었나. 별꼴이야.'],
@@ -52,7 +52,7 @@ function nalAskChoices(){
   return c;
 }
 /* 사연을 켜든 끄든 묻는 것 */
-function nalPostChoice(){return G.f.yNamesPost&&!G.f.yNalPost&&!Rg.namesBack()?[{t:'산막 기둥의 매끈한 자리를 묻는다',go:nalPostAsk}]:[];}
+function nalPostChoice(){return G.f.yNamesPost&&!G.f.yNalPost&&!Rg.namesBack()?[{t:'짐 부리는 기둥의 매끈한 자리를 묻는다',go:nalPostAsk}]:[];}
 function nalMenu(){
   const F=G.f;
   if(!CLASSIC&&F.nalYDone){
@@ -1165,7 +1165,7 @@ function talkMagpie(){
 
 const examine=(id,x,label,text,p)=>({id,x,label,text,...(p?{pic:p}:{})});
 /* 결정 D-1022 (사용자 피드백 2026-11-06 영산 25·28): 이야기에 닿지 않던 살펴보기(눈 터널, 눈 위의 선, 낮게 흐르는 연기, 닳은 문설주,
-   산막의 매듭, 얼음 구멍 가장자리)는 뺐다. 산막 기둥의 이름들(region.js)·언 물길을 더했다. 모든 살펴보기에 말하는 것을 그린 그림(pic)을 단다. */
+   산막의 매듭, 얼음 구멍 가장자리)는 뺐다. 짐 부리는 기둥의 이름들(region.js)·언 물길을 더했다. 모든 살펴보기에 말하는 것을 그린 그림(pic)을 단다. */
 const examines={
   shelter:[],
   snow:[
