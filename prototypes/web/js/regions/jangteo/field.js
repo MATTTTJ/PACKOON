@@ -77,7 +77,29 @@ Rg.drawPickup=(a,x,bob)=>{
   if(a.item==='kong'){R(x-6,a.y-2,5,2,'#b89a5a');R(x-6,a.y-2,5,1,'#cdb070');R(x-5,a.y-1,3,1,'#8a7040');
     for(const [dx,dy] of [[0,-3],[2,-2],[-1,-2]]){R(x+dx,a.y+dy+bob,2,2,'#e2cf8a');R(x+dx,a.y+dy+bob,1,1,'#f4e6b0');R(x+dx+1,a.y+dy+1+bob,1,1,'#6a5a3a');}return;}
   if(a.item==='jip'){R(x-5,a.y-3+bob,10,2,'#d9b860');R(x-4,a.y-5+bob,8,2,'#c9a850');R(x-1,a.y-6+bob,2,6,'#a8883a');return;}
-  drawPineCone(x,a.y+bob,true);};   // 결정 D-393
+  // 결정 D-966: 줍는 재료는 주인공 머리보다 작게, 서로 비슷한 크기로 (사용자 피드백 2026-11-06 큰 장터 10·31). 솔방울은 공통 그림(9px)보다 작은 7px.
+  // 예전엔 콩·짚 말고는 모두 솔방울 그림으로 그려져, 수리부엉이가 찾는 녹두·송이도 솔방울처럼 보였다.
+  const k=jangteoPickupArt[a.item];if(k){k(x,a.y+bob);return;}
+  drawSmallCone(x,a.y+bob,true);};   // 결정 D-393·D-966
+/* 결정 D-966: 장터 솔방울. 공통 그림보다 한 칸씩 작게 (가로 5, 세로 7). 비늘 결과 송진 반짝임은 남긴다 */
+function drawSmallCone(x,y,snow){
+  for(const [dy,h] of [[-7,1],[-6,2],[-5,2],[-4,2],[-3,1],[-2,1]])R(x-h,y+dy,h*2+1,1,'#6b4423');
+  for(const [dy,xs] of [[-6,[-1,1]],[-5,[0]],[-4,[-1,1]],[-3,[0]]])for(const dx of xs)R(x+dx,y+dy,1,1,'#a8703a');
+  R(x,y-1,1,1,'#4a2e18');R(x-1,y-5,1,1,'#3e2614');R(x+1,y-4,1,1,'#3e2614');
+  if(snow){R(x-1,y-8,3,1,'#f4f7fa');}
+}
+const jangteoPickupArt={
+  // 자루에서 샌 팥 몇 알
+  pat:(x,y)=>{for(const [dx,dy] of [[-3,-2],[0,-3],[2,-2],[-1,-1]]){R(x+dx,y+dy,2,2,'#8a2a22');R(x+dx,y+dy,1,1,'#c0584a');}},
+  // 흘린 날밤 둘: 반들한 갈색, 뾰족한 끝, 밑동은 옅다
+  bam:(x,y)=>{for(const dx of [-4,1]){R(x+dx,y-4,4,4,'#6a3a1c');R(x+dx+1,y-5,2,1,'#6a3a1c');R(x+dx+1,y-6,1,1,'#3a2212');R(x+dx,y-1,4,1,'#c9a06a');R(x+dx+1,y-4,1,2,'#9a5a2c');}},
+  // 녹두 한 줌: 작은 초록 알
+  mung:(x,y)=>{for(const [dx,dy] of [[-3,-2],[-1,-3],[1,-2],[3,-2],[0,-1]]){R(x+dx,y+dy,2,1,'#5f8a3a');R(x+dx,y+dy-1,1,1,'#8ab85a');}},
+  // 솔가리 밑 송이: 굵은 흰 대에 갈색 갓
+  songi:(x,y)=>{R(x-1,y-5,3,5,'#efe6d2');R(x-3,y-7,7,2,'#7a5232');R(x-2,y-8,5,1,'#9a6a42');R(x-4,y-1,9,1,'#8a6a3a');},
+  // 잣 두 알
+  jat:(x,y)=>{for(const dx of [-3,1]){R(x+dx,y-3,3,3,'#4f3820');R(x+dx,y-3,2,2,'#c79d5c');R(x+dx,y-3,1,1,'#f1dcae');}},
+};
 
 /* 눈 */
 const snow=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H,s:0.25+Math.random()*0.45,p:Math.random()*6}));
@@ -91,7 +113,7 @@ Rg.drawFront=()=>{for(const l of snow)R(l.x,l.y,Math.sin(l.p)>0.3?2:1,Math.sin(l
    아이가 움찔 웅크렸다 펴고(짧은 깡충), 처음 한 번은 속말을 한다. 체력은 줄지 않는다(hurt를 부르지 않는다).
    깨진 고드름은 밤낮이 바뀌면(숙소에서 쉬면) 다시 언다. */
 const ICE_ZONES=['entrance','street','inn'];
-const icicleBroken=new Set(),icicleFall=[];let icicleNight=null,icicleSaid=false,icicleFlinch=0;
+const icicleBroken=new Set(),icicleFall=[];let icicleNight=null,icicleFlinch=0;
 function icicleList(p){   // 처마 판 하나에 달린 고드름: 자리마다 같은 길이 (판 좌표로 정한다)
   const out=[];let s=((p.x*73856093)^(p.y*19349663))>>>0;const rnd=()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296;
   for(let x=p.x+6,i=0;x<p.x+p.w-6;x+=8+Math.round(rnd()*7),i++)out.push({key:G.zone+':'+p.x+':'+i,x,top:p.y+6,len:4+Math.round(rnd()*6)});
@@ -107,7 +129,24 @@ Rg.drawIcicles=(p,x)=>{   // art.js에서 처마 판을 그린 바로 뒤에 부
 };
 function heroTopY(){   // 머리끝 높이. 변신마다 키가 다르고, 구르는 동안은 낮다
   if(typeof rolling!=='undefined'&&rolling)return G.py-10;
-  return G.py-({squirrel:10,owl:16,goat:22,gorani:24}[G.form]??22);
+  return G.py-({squirrel:10,owl:16,goat:22,deer:24,otter:12}[G.form]??22);
+}
+/* 결정 D-961: 고드름 달린 처마 위를 걸으면 무게로 발밑 처마 끝 고드름이 떨어진다 (사용자 피드백 2026-11-06 큰 장터 2).
+   처마에 내려앉는 순간 발 근처 하나, 그 위를 걷는 동안 몇 걸음마다 하나. 다람쥐는 가벼워 떨어뜨리지 않는다.
+   떨어진 고드름은 처마 밑 바닥에서 깨진다. 아이는 처마 위라 맞지 않는다. 속말은 없다(D-960). */
+let eaveWalk=0,eaveOn=null;
+function dropIcicleNear(p,x,range){
+  let best=null,bd=range;
+  for(const c of icicleList(p)){if(icicleBroken.has(c.key))continue;const d=Math.abs(c.x-x);if(d<=bd){bd=d;best=c;}}
+  if(!best)return false;
+  icicleBroken.add(best.key);icicleFall.push({x:best.x,y:best.top,len:best.len,vy:0.4,ground:fieldGround(),t:0});
+  Sound.playSfx?.('ice_tinkle');return true;
+}
+function eaveWeightStep(){
+  const on=G.onGround&&G.form!=='squirrel'?icicleEaves().find(p=>Math.abs(G.py-p.y)<2&&G.px>=p.x-2&&G.px<=p.x+p.w+2):null;
+  if(on&&on!==eaveOn){dropIcicleNear(on,G.px,10);eaveWalk=0;}   // 내려앉는 쿵
+  else if(on&&Math.abs(G.vx||0)>0.3&&++eaveWalk>=22){eaveWalk=0;dropIcicleNear(on,G.px,14);}   // 걸음마다 처마가 삐걱
+  eaveOn=on;
 }
 function icicleStep(){
   if(icicleNight!==night()){icicleNight=night();icicleBroken.clear();}
@@ -119,6 +158,7 @@ function icicleStep(){
   }
   for(let i=icicleFall.length-1;i>=0;i--)if(icicleFall[i].t>26)icicleFall.splice(i,1);
   if(paused())return;
+  eaveWeightStep();
   const top=heroTopY();
   for(const p of icicleEaves()){if(G.px<p.x-6||G.px>p.x+p.w+6)continue;
     for(const c of icicleList(p)){
@@ -128,7 +168,8 @@ function icicleStep(){
       Sound.playSfx?.('ice_tinkle');
       if(G.vy<0)G.vy=Math.max(G.vy,-0.4);   // 뛰어오르다 박으면 거기서 멈칫한다
       else if(G.onGround&&icicleFlinch<=0){G.vy=-1.4;G.onGround=false;}   // 걷다 닿으면 움찔 깡충
-      if(icicleFlinch<=0&&!icicleSaid){icicleSaid=true;think('아야! 처마 고드름에 정수리를 박았다.\n똑 떨어져서 깨졌네. …차가워.');}
+      // 결정 D-960: 속말은 한 게임에 처음 한 번만(저장에 남긴다). 그 뒤엔 떨어지고 깨지는 모습과 소리만 (사용자 피드백 2026-11-06 큰 장터 1)
+      if(icicleFlinch<=0&&!G.f.jxIcicleSaid){G.f.jxIcicleSaid=true;think('아야! 처마 고드름에 정수리를 박았다.\n똑 떨어져서 깨졌네. …차가워.');}
       icicleFlinch=30;
     }
   }
@@ -437,7 +478,8 @@ if(!CLASSIC){
     inn:{...common('inn'),name:TABLES.ZONES.jangteo.inn,w:2600,npcs:['bueong','maru'],
       platforms:[...stairs(1160),{x:1340,y:96,w:100},...stairs(1590,128),{x:1770,y:128,w:200},...stairs(2220)],
       pickups:cones('inn',[[445,192]]),
-      digs:[{id:'j_cache_inn',x:560,item:'solbang',n:2,form:'squirrel',cache:true,done:false}],
+      // 결정 D-963: 다람쥐가 묻고 잊은 몫은 그 땅에 맞는 것으로 (사용자 피드백 2026-11-06 큰 장터 5). 숙소 마당 짚더미 밑엔 군밤 장수가 흘린 날밤
+      digs:[{id:'j_cache_inn',x:560,item:'bam',n:2,form:'squirrel',cache:true,done:false}],
       exits:{left:{to:'street',toX:2720},right:{to:'warehouse',toX:60,need:needWarehouse,reason:warehouseReason,drawBlocked:gate}},
       doors:[],   // 결정 D-316·D-317: 숙소 문·마당 문(같은 구역 안 건너뛰기), 밤 골목 지름길, 창고문(창고 마당 엉뚱한 자리로)은 뺐다. 창고는 오른쪽 끝 쪽문으로
       get wanderers(){return [...E.wanderers.inn,innFire,...nightLanterns('inn')];},examines:E.examines.inn,
@@ -450,7 +492,7 @@ if(!CLASSIC){
       // 840 헛간 지붕은 720 처마에서 수리부엉이가 날개를 펴야 닿는다 (PA-47 선택 자리)
       platforms:[...stairs(420),...stairs(1100,96,[1]),...stairs(2180,96,[0]),{x:2390,y:96,w:340},{x:842,y:124,w:56}],
       // 결정 D-82: 솔숲의 소나무 흔들기 세 곳 (채집 고리 D-41)
-      digs:[{id:'j_cache_pine',x:1700,item:'kong',n:2,form:'squirrel',cache:true,done:false},
+      digs:[{id:'j_cache_pine',x:1700,item:'jat',n:2,form:'squirrel',cache:true,done:false},   // 결정 D-963: 솔숲 다람쥐가 묻은 잣
         {id:'j_pine_shake_1',x:960,item:'solbang',done:false},{id:'j_pine_shake_2',x:1620,item:'solbang',done:false},{id:'j_pine_shake_3',x:2080,item:'solbang',done:false}],
       // 결정 D-207: 솔방울이 같은 간격으로 늘어서지 않게 떨어진 자리를 들쭉날쭉하게 (사용자 피드백 58). 높은 칸의 것은 그 칸 안에서만 옮긴다.
       // 결정 D-391: 열넷은 너무 많았다. 소나무 밑과 바위턱에 여덟만 (엿방울 몫 다섯과 갈래 셋에 넉넉하고, 모자라면 쉬는 사이 다시 떨어진다 D-79)
@@ -499,10 +541,12 @@ if(!CLASSIC){
     ['warehouse','p',470,'kong'],['warehouse','p',1150,'kong'],
   ]);
   /* 결정 D-665: 수리부엉이만 느끼는 숨은 물건 (사용자 피드백 2026-11-05). 수리부엉이로 곁을 지나면 "무언가 느껴진다"며 드러난다.
-     장꾼이 흘리고 잊은 녹두, 장꾼 아이가 떨군 약과, 숙소 처마 밑에 숨겨 둔 꿀, 솔숲 솔가리 밑 송이. 좌표는 길을 줄인 뒤의 자리 */
+     장꾼이 흘리고 잊은 녹두, 장꾼 아이가 떨군 약과, 숙소 처마 밑에 숨겨 둔 꿀, 솔숲 솔가리 밑 송이. 좌표는 길을 줄인 뒤의 자리
+     결정 D-965: 꿀·약과는 완제품이라 길바닥에서 보이면 어색하다 (사용자 피드백 2026-11-06 큰 장터 9). 거리는 자루에서 샌 팥, 숙소는 군밤 장수가 흘린 날밤으로.
+     꿀은 날쌘의 떡 재료 묶음·등잔발 사례·엿방울 낯선 손님 교환으로 얻고, 약과는 시루 가공·모락 맷돌 때우기로 얻는다 */
   addZoneGather(Rg,'j_owl_',[
-    ['entrance','p',700,'mung',{hidden:'owl'}],['street','p',1040,'yakgwa',{hidden:'owl'}],
-    ['inn','p',1350,'honey',{hidden:'owl'}],['pine','p',1390,'songi',{hidden:'owl'}],
+    ['entrance','p',700,'mung',{hidden:'owl'}],['street','p',1040,'pat',{hidden:'owl'}],
+    ['inn','p',1350,'bam',{hidden:'owl'}],['pine','p',1390,'songi',{hidden:'owl'}],
   ]);
   // 길손의 조사에는 배경과 구별되는 작고 일정한 표지를 쓴다. 숨은 도장은 표지를 붙이지 않는다.
   for(const z of Object.values(Rg.zones))for(const p of z.examines)p.draw=p.draw||((x,y)=>{R(x-2,y-6,5,4,'#caa970');R(x,y-10,1,2,'#f6ead0');});
