@@ -4,7 +4,7 @@
 const Rg=REGIONS.dolneomeo;
 const GATE_X=1590;     // 뿔영감이 지키는 돌산 길목 (장승과 금줄)
 const GOLEM_AT=1860;   // 이보다 오른쪽으로 가면 돌 골렘과 전투
-const GOLEM_SIGHT=2190;   // 확장판 성황당에서 골렘을 처음 보고 한마디 하는 자리(설계 좌표, 결정 D-645)
+const GOLEM_SIGHT=2150;   // 확장판 성황당에서 골렘을 처음 보고 한마디 하는 자리(설계 좌표, 결정 D-645). 결정 D-845: 비탈 꼭대기에 막 올라선 자리
 // 결정 D-87: 뿔영감이 돌산 길을 열어 준 뒤, 성황당 끝 돌 골렘 쪽으로 다가갈수록 긴장이 오른다. 골렘이 잠들면 0.
 // 결정 D-116: 확장판 구역의 설계 좌표를 줄인 좌표로 (Rg.trimCuts, engine/core.js trimX). 옛 구성은 그대로다.
 const Z=(zone,x)=>CLASSIC?x:trimX(x,Rg.trimCuts?.[zone]);
@@ -166,6 +166,7 @@ Rg.drawDig=(d,x)=>{
 /* 성황당 돌무더기: 골렘이 잠들어 있을 때. 쓰러뜨리거나 달래면 작은 돌무더기로 돌아간다.
    결정 D-182: 눈을 뒤집어쓴 설인 같은 돌 골렘이 웅크려 잔다. 구들돌 발, 흰 차돌 팔, 어깨와 머리에 쌓인 눈, 아래로 늘어진 눈 털 */
 function drawCairn(){const b=G.boss;const x=b.x-cam;if(x<-60||x>W+60)return;
+  const GROUND=Math.round(surfaceY(b.x,usesZones(Rg)?Rg.zones.shrine:Rg));   // 결정 D-845: 확장판 골렘은 비탈 꼭대기 마당에 앉아 있다
   if(b.dead){R(x-14,GROUND-8,28,8,'#8a8680');R(x-10,GROUND-14,20,6,'#9a9690');R(x-6,GROUND-19,12,5,'#8a8680');
     R(x-12,GROUND-9,10,2,'#f3f5f4');R(x-6,GROUND-20,10,2,'#f3f5f4');
     if(G.f.golemCalm){R(x-3,GROUND-24,7,5,'#9a9690');R(x-1,GROUND-22,1,1,'#b4432a');}return;}
@@ -333,8 +334,16 @@ if(!CLASSIC){
     field:[...stepRidge(260,65,3,{low:164}),...stepRidge(1180,66,4,{low:164}),platform(1900,164,86),platform(1960,138,90),platform(2020,112,88),platform(2190,112,76)],
     cliff:[...stepRidge(320,67,3,{low:164}),...stepRidge(790,68,4,{low:164}),...stepRidge(1600,69,3,{low:164}),platform(2220,166,90),platform(2280,138,90),platform(2350,112,130),platform(2500,138,96),platform(2560,112,294)],
     // 결정 D-266: 높은 바위(석이버섯)로는 굴러 내려와 박힌 바윗돌 둘을 딛고 오른다(26·26·28px, 점프 약 45px). 눈 계단(D-165)은 걷어 냈다.
-    shrine:[...stepRidge(280,70,3,{low:164}),{...platform(1428,166,40),boulder:true},{...platform(1476,140,36),boulder:true},platform(1520,112,110),platform(1630,140,80),...stepRidge(1950,71,4,{low:164}),...stepRidge(2560,72,3,{low:164})],
+    // 결정 D-845: 성황당 뒤쪽 돌계단 발판 두 무리(1950·2560)는 걷어 내고, 그 자리를 꼭대기로 오르는 언 비탈(SHRINE_SLOPES)로 바꾼다.
+    shrine:[...stepRidge(280,70,3,{low:164}),{...platform(1428,166,40),boulder:true},{...platform(1476,140,36),boulder:true},platform(1520,112,110),platform(1630,140,80)],
   };
+  /* 결정 D-845 (사용자 피드백 2026-11-06 11·12): 장승제 뒤 골렘을 만나는 성황당 뒤쪽은 가파른 언 비탈이다. 비탈 넷 사이에 숨 고를 바위턱이 있고,
+     골렘은 산꼭대기 평평한 마당에 앉아 있다. 꼭대기 마당이 구역의 끝이라 골렘 뒤로 남는 빈 땅이 없다 (끝은 바위 무더기, D-847).
+     좌표는 길을 줄인 뒤의 자리(골렘 1850, 전투 1760). 산양은 미끄러지지 않고, 다른 모습은 비탈에서 미끄러진다 (D-846). */
+  const SUMMIT_Y=88;
+  const SHRINE_SLOPES=[[1330,GROUND,1380,164],[1380,164,1404,164],[1404,164,1458,134],[1458,134,1480,134],[1480,134,1530,108],[1530,108,1550,108],[1550,108,1590,SUMMIT_Y],[1590,SUMMIT_Y,1950,SUMMIT_Y]]
+    .map(([x1,y1,x2,y2])=>({x1,y1,x2,y2}));
+  Rg.shrineSummitY=()=>SUMMIT_Y;
   /* 결정 D-266: 눈 둔덕을 밟아 다져 계단을 만들던 일(D-165)은 현실성이 없어 뺐다(사용자 피드백 2026-11-02).
      성황당 솔숲 그늘의 눈 둔덕은 이제 파헤치는 채집 자리다(아래 addZoneGather 의 snow_mound). 옛 저장의 dolSnowSteps 표시는 쓰지 않는다. */
   // 구역에 들어설 때마다 자른 좌표의 bases로 발판을 다시 깐다 (D-109·D-110).
@@ -391,6 +400,23 @@ if(!CLASSIC){
       for(let k=13;k<p.w;k+=23)R(x+k,p.y+2,1,5,'#4b595b');
     }
   }
+  /* 결정 D-845: 성황당 뒤 언 비탈과 꼭대기 마당. 비탈 아래는 돌산 몸이다. 가파른 비탈 낯에는 얼음 결이 비쳐 미끄러운 데를 알린다(D-846).
+     줄인 좌표로 그리므로 RC()를 쓴다 (나눠 그리기 안에서도 같은 자리). */
+  function drawShrineHill(){
+    const z=Rg.zones.shrine,first=SHRINE_SLOPES[0].x1,T=TABLES.TUNING;
+    for(let sx=0;sx<W;sx+=2){
+      const wx=sx+RC();if(wx<first-1||wx>z.w)continue;
+      const y=Math.round(surfaceY(wx,z)),s=slopeAt(wx,z),steep=s&&Math.abs((s.y2-s.y1)/(s.x2-s.x1))>=T.field_slope_slip_grade;
+      R(sx,y,2,H-y,'#66706f');R(sx,y+16,2,H-y-16,'#5c6869');
+      if(hash(Math.floor(wx/22))>.62){const d=y+8+Math.floor(hash(Math.floor(wx/22)+3)*20);R(sx,d,2,3+Math.floor(hash(wx>>3)*2),'#c9d5d3');}   // 비탈 낯에 남은 눈 자국
+      for(let k=y+9;k<H;k+=11)if(hash(Math.floor(wx/6)+k)>.45)R(sx,k+Math.floor(hash(wx+k)*3),2,1,'#4a5657');   // 돌 켜
+      R(sx,y,2,2,steep?'#d6e6ea':'#e2e9e4');R(sx,y+2,2,1,'#a5b4b1');
+      if(steep&&Math.floor((wx+y)/7)%3===0)R(sx,y+4+Math.floor(hash(wx)*5),2,1,'#b9d0d6');   // 얼음 결
+    }
+    // 바위턱 끝의 디딤돌과 꼭대기 마당 들머리의 작은 돌탑
+    for(const s of SHRINE_SLOPES){if(s.y1!==s.y2||s.x2-s.x1>60)continue;const x=Math.round(s.x2-RC());if(x<-20||x>W+20)continue;R(x-6,s.y1-3,9,3,'#7b8786');R(x-5,s.y1-4,7,1,'#e2e9e4');}
+    const cx=Math.round(1606-RC());if(cx>-20&&cx<W+20){R(cx-6,SUMMIT_Y-5,12,5,'#7b8786');R(cx-4,SUMMIT_Y-9,8,4,'#8d9897');R(cx-2,SUMMIT_Y-12,5,3,'#7b8786');R(cx-6,SUMMIT_Y-6,12,1,'#e2e9e4');}
+  }
   function front(id){
     A.drawFront(id);
     if(depthFx?.image){
@@ -413,13 +439,13 @@ if(!CLASSIC){
     }
   }
   function zone(id,w,npcs){return {w,startX:80,ground:GROUND,platforms:bases[id],npcs,
-    camLead:()=>id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed?70*clamp((G.px-Z('shrine',2120))/160,0,1):0,   // 결정 D-645: 골렘에 다가가는 동안 화면이 골렘 쪽을 앞서 보여 준다
+    camLead:()=>id==='shrine'&&!G.boss.dead&&G.f.ppuriPassed?70*clamp((G.px-Z('shrine',1900))/160,0,1):0,   // 결정 D-845: 비탈 밑(설계 1900)부터 앞서 보여 꼭대기에서 골렘이 보인다   // 결정 D-645: 골렘에 다가가는 동안 화면이 골렘 쪽을 앞서 보여 준다
     // 옛 저장의 옛 다리 기억(D-116) 표시는 지운다 (결정 D-165)
     weather:()=>Vfx.setWeather(Rg.springRevisit()?'':'frost'),surface:()=>Rg.springRevisit()?'':'frost',ambient:()=>{if(!open('dlg'))ppuriScene=null;placeOld(G);if(G.f.dolMemory)delete G.f.dolMemory;Rg.ambient();applySteps();},
-    drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);drawStonePlatforms(id);},
+    drawBack:()=>A.drawBack(id),drawScenery:()=>{A.drawScenery(id);if(id==='shrine')drawShrineHill();drawStonePlatforms(id);},
     drawActors:()=>{if(id==='shrine')drawCairn();if(id==='field')drawKkuCue();},
     weatherFront:()=>front(id),drawPickup:Rg.drawPickup,drawDig:Rg.drawDig,onPickup:a=>Rg.onPickup(a),
-    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?Z('shrine',2240):80;G.py=GROUND;G.vy=0;applySteps();think('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
+    step:()=>commonStep(id),onHit:()=>{},faint:()=>{G.px=id==='shrine'?Z('shrine',2240):80;G.py=surfaceY(G.px,Rg.zones[id]);G.vy=0;applySteps();think('돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.');},
   };}
   Rg.startZone='gate';
   // 결정 D-109: 빈 걷기 구간 줄이기 (engine/core.js trimRegion). [시작, 지울 길이] — 설계 좌표.
@@ -443,7 +469,7 @@ if(!CLASSIC){
       bases[id]=tidyPlatforms(list,platformAnchors(Rg,id,Rg.zones[id]));
     }
   };
-  Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2800,[])};
+  Rg.zones={gate:zone('gate',2400,['ppuri']),village:zone('village',2800,['dolsoe','nal']),field:zone('field',2600,['kkubeogi']),cliff:zone('cliff',3000,[]),shrine:zone('shrine',2610,[])};   // 결정 D-845: 성황당은 꼭대기 마당 끝(줄인 좌표 1950)에서 끝난다
   // 대화가 이어지는 동안은 화자의 자리를 지키고, 끝나면 진행값으로 위치를 정한다.
   let ppuriScene=null;
   const ppuriVillage=()=>ppuriScene?.owner===G&&open('dlg')?
@@ -455,6 +481,9 @@ if(!CLASSIC){
   Rg.zones.field.exits={left:{to:'village',toX:2720}};
   Rg.zones.cliff.exits={right:{to:'shrine',toX:80}};
   Rg.zones.shrine.exits={left:{to:'cliff',toX:2920}};
+  Rg.zones.shrine.slopes=SHRINE_SLOPES;   // 결정 D-845
+  // 결정 D-846: 처음 미끄러질 때 한 번. 뿔영감이 비탈 돌에서 미끄러지지 않던 것을 본 아이가 떠올린다 (산양 변신은 장승제 때 열린다)
+  Rg.zones.shrine.slip=()=>{if(G.f.dolSlopeSlip)return;G.f.dolSlopeSlip=true;think(hasForm('goat')?'언 비탈이라 발이 자꾸 미끄러진다.\n뿔영감 발굽이라면 안 미끄러질 텐데.':'언 비탈이라 발이 자꾸 미끄러진다.\n뛰어서 바위턱마다 숨을 고르자.');};
   Rg.zones.gate.doors=[
     // 장승 둘은 고갯길 경치(art.js scenery)가 그린다. 들어설 때 비켜 선다 (결정 D-166)
     {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:()=>{}},   // 결정 D-264: 장승 사이 금줄은 고갯길 경치(art.js)가 그린다. 틀을 따로 세우지 않는다

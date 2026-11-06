@@ -163,7 +163,8 @@ function scenery(zone,fixtures={}){const sx=x=>Math.round(tx(x)-cam);const visib
   }else if(zone==='shrine'){
     for(let x=60;x<3100;x+=61){if(!visible(x))continue;cairn(sx(x),GROUND,15+Math.floor(hash(x)*24),Math.floor(x/61));}
     for(const x of [240,880,1510,2510])if(visible(x))pine(sx(x),GROUND,1.16+hash(x+11)*.61);
-    const cx=sx(fixtures.shrineX??2400);px(cx-27,GROUND-7,54,7,'#6e7b77');px(cx-22,GROUND-17,44,10,'#8a9790');px(cx-17,GROUND-19,34,2,P.frost);px(cx-18,GROUND-41,3,24,'#726653');px(cx+15,GROUND-41,3,24,'#726653');px(cx-25,GROUND-43,50,4,'#4c605c');px(cx-29,GROUND-45,58,2,P.frost);px(cx-20,GROUND-47,40,2,'#75867b');px(cx-12,GROUND-49,24,2,'#a4b0a0');
+    const SG=Rg.shrineSummitY?.()??GROUND;   // 결정 D-845: 성황당 돌집은 꼭대기 마당에 선다
+    const cx=sx(fixtures.shrineX??2400);px(cx-27,SG-7,54,7,'#6e7b77');px(cx-22,SG-17,44,10,'#8a9790');px(cx-17,SG-19,34,2,P.frost);px(cx-18,SG-41,3,24,'#726653');px(cx+15,SG-41,3,24,'#726653');px(cx-25,SG-43,50,4,'#4c605c');px(cx-29,SG-45,58,2,P.frost);px(cx-20,SG-47,40,2,'#75867b');px(cx-12,SG-49,24,2,'#a4b0a0');
   }
 }
 function front(zone){
