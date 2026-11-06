@@ -145,7 +145,8 @@ function tableParts(boss,extra){return TABLES.BOSS_PARTS[boss].map(p=>Object.ass
 function blayout(){
   const hand=B&&B.E.possession?{u:(B.px-BOX.x)/BOX.w,v:(B.py-BOX.y)/BOX.h}:null;
   const r=$('battle').getBoundingClientRect();const tall=r.height>0&&r.width/r.height<1.25;
-  if(tall){LW=600;LH=600;BOX={x:150,y:330,w:300,h:190};EY=168;}else{LW=800;LH=450;BOX={x:250,y:262,w:300,h:160};EY=112;}
+  // 결정 D-875: 전투 판을 조금 줄였다 (사용자 지시 2026-11-06 "보스 전투창 좀 더 작게"). 옛 판 300×160(세로 화면 300×190)
+  if(tall){LW=600;LH=600;BOX={x:162,y:336,w:276,h:174};EY=168;}else{LW=800;LH=450;BOX={x:262,y:266,w:276,h:148};EY=112;}
   bcv.width=LW*BDPR;bcv.height=LH*BDPR;
   paper=document.createElement('canvas');paper.width=LW;paper.height=LH;const p=paper.getContext('2d');
   p.fillStyle='#efe3c8';p.fillRect(0,0,LW,LH);
@@ -274,11 +275,27 @@ function warmSafe(x,y,padding=0){
 function finishWarmAttack(){
   const w=B.warm;w.current=w.next; // 직전의 길도 다음 예고까지 남긴다.
 }
+/* 결정 D-876: 칠 자리(빈틈 표식)는 판 가장자리에서 battle_mark_margin 만큼 안쪽에만 뜬다 (사용자 지시 2026-11-06
+   "너무 아래에 공격지점 생기면 무기 공격지점이랑 안 맞아서 못 친다. 모서리쪽은 만들지 말라. 모든 보스 공통").
+   손(몸)은 판 안에서만 움직이고 도구 끝(bAim)은 손보다 battle_aim_up 만큼 위에 있다. 그래서 아래쪽 끝은
+   손을 판 바닥까지 내렸을 때 도구 끝이 닿는 높이에서 battle_mark_spare 만큼 더 위다. 오른쪽도 같은 셈을 한다.
+   보스마다 정한 자리(markPosition·openMark)도 openMark 끝에서 이 안으로 들인다. 보스 파일은 bFitMark 로 미리 맞춰 그림과 자리를 같게 둔다. */
+function bMarkZone(){
+  const t=TABLES.TUNING,k=t.battle_hand_scale,m=t.battle_mark_margin,s=t.battle_mark_spare;
+  const tipLow=BOX.y+BOX.h-8-t.battle_aim_up*k,tipRight=BOX.x+BOX.w-8-t.battle_aim_left*k;
+  return {x1:BOX.x+m,x2:Math.min(BOX.x+BOX.w-m,tipRight-s),y1:BOX.y+m,y2:Math.min(BOX.y+BOX.h-m,tipLow-s)};
+}
+function bFitMark(x,y){const z=bMarkZone();return {x:clamp(x,z.x1,z.x2),y:clamp(y,z.y1,z.y2)};}
+function bInMarkZone(m){const z=bMarkZone();return m.x>=z.x1-0.5&&m.x<=z.x2+0.5&&m.y>=z.y1-0.5&&m.y<=z.y2+0.5;}
 function openMark(){
+  openMarkAt();
+  if(B.mark){const q=bFitMark(B.mark.x,B.mark.y);B.mark.x=q.x;B.mark.y=q.y;}   // 결정 D-876
+}
+function openMarkAt(){
   const p=B.cur;
   if(B.E.openMark&&B.E.openMark(p))return;   // 결정 D-183: 표식 자리와 글을 상대가 직접 정한다
   if(p.core&&coreHidden()){B.mark=null;B.msg=B.E.coreHidden;return;}
-  const aim=bAim();let x,y,n=0;do{x=BOX.x+30+Math.random()*(BOX.w-60);y=BOX.y+26+Math.random()*(BOX.h-52);n++;}while(Math.hypot(x-aim.x,y-aim.y)<70&&n<12);
+  const aim=bAim(),z=bMarkZone();let x,y,n=0;do{x=z.x1+Math.random()*(z.x2-z.x1);y=z.y1+Math.random()*(z.y2-z.y1);n++;}while(Math.hypot(x-aim.x,y-aim.y)<70&&n<12);
   if(B.E.markPosition){const pos=B.E.markPosition(p);if(pos){x=pos.x;y=pos.y;}}
   const life=B.E.markLife||(B.warm?180:B.E.settle||B.E.calmAction?150:120);
   B.mark={x,y,t:life,max:life,part:p};B.msg=p.name+'에 빈틈.';   // 결정 D-227: 누를 키를 알려 주는 글은 쓰지 않는다
