@@ -245,6 +245,12 @@ function lureScene(){
       {t:'아기 곰 귀를 막아 준다',go:()=>block(true)},
       {t:'앞을 막고 같이 센다',go:()=>block(false)}]]]);
 }
+// 결정 D-1075: '호수 쪽 목소리'는 모습이 없다. 대화 초상은 얼음 호수 위로 번지는 김과 그 너머 검은 똬리 그림자만 그린다(D-328 Rg.portraits)
+Rg.portraits={...Rg.portraits,'호수 쪽 목소리':(x,y)=>{
+  R(x-14,y-22,28,22,'#3a4a62');R(x-14,y-6,28,6,'#b9d3e1');R(x-14,y-6,28,1,'#e6f1f6');
+  R(x-6,y-12,14,5,'#1a1d24');R(x+4,y-15,5,4,'#1a1d24');R(x+6,y-14,1,1,'#c9e4f0');   // 똬리 그림자와 희미한 눈
+  for(let i=0;i<3;i++)R(x-12+i*3,y-19+i*3,10-i*2,1,'rgba(230,240,246,.7)');            // 건너오는 부름의 김
+}};
 function talkCub(){
   const F=G.f;
   if(!F.yLureDone&&!F.spring){lureScene();return;}
