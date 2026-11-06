@@ -43,7 +43,7 @@ const Trade=(()=>{
     if(asked(g)?g.done?.():stockLeft(g.row)<=0)return {k:'done',why:'다 바꿨다.'};
     const lock=g.locked?.();if(lock)return {k:'lock',why:lock};
     if(asked(g)){
-      if(!g.asks.some(a=>Object.entries(a).every(([id,n])=>has(id,n))))return {k:'short',why:'지금 보따리로는 못 바꾼다. 필요한 것: '+g.asks.map(askText).join(', 또는 ')+'.'};
+      if(!g.asks.some(a=>Object.entries(a).every(([id,n])=>has(id,n))))return {k:'short',why:'지금 보따리로는 못 바꾼다. 필요한 것:'+asksList(g)};
     }else{
       const need=ITEMS[g.item].r,ok=id=>!offerBlock(g,id,{});
       const units=Object.keys(G.inv).filter(id=>G.inv[id]>0&&ITEMS[id]&&ok(id));
@@ -55,8 +55,11 @@ const Trade=(()=>{
   }
   const npcOf=g=>g.row?.npc||S?.npc;
   const asked=g=>g.kind!=='common';   // 부탁·손님 교환: 원하는 물건이 정해져 있다
-  const priceText=g=>{const r=ITEMS[g.item].r;return r?rank(r)+' 하나, 또는 '+rank(r-1)+' 둘':rank(0)+' 하나';};
+  const priceText=g=>{const r=ITEMS[g.item].r;return r?rank(r)+' 하나나 '+rank(r-1)+' 둘':rank(0)+' 하나';};
   const askText=a=>Object.entries(a).map(([id,n])=>ITEMS[id].n+' '+n).join(' + ');
+  // 결정 D-925: 글로 말할 때도 바꾸는 법을 '또는'으로 잇지 않고 한 줄에 하나씩 (교환 기록은 줄바꿈을 그대로 보인다)
+  const asksList=g=>g.asks.length>1?'\n'+g.asks.map(a=>'· '+askText(a)).join('\n'):' '+askText(g.asks[0])+'.';
+  const priceRows=g=>{const r=ITEMS[g.item].r;return r?[rank(r)+' 하나',rank(r-1)+' 둘']:[rank(0)+' 하나'];};
   /* 결정 D-124: 값은 레어도 단계가 먼저, 수량이 나중이다. 단계가 모자라면 몇 개를 얹었든 단계 이야기만 한다. */
   function commonMatch(g,offer){
     const ids=Object.entries(offer).flatMap(([id,n])=>Array(n).fill(id)),need=ITEMS[g.item].r;
@@ -108,7 +111,7 @@ const Trade=(()=>{
     // 결정 D-124: 물건이 맞는지 먼저, 그다음 수를 본다
     const same=g.asks.find(a=>Object.keys(a).length===keys.length&&keys.every(id=>a[id]));
     if(same)return {ok:false,why:'물건은 맞다. 수를 맞추자: '+askText(same)+'.'};
-    return {ok:false,why:'원하는 건 '+g.asks.map(askText).join(', 또는 ')+'이다.'};
+    return {ok:false,why:'원하는 것:'+asksList(g)};
   }
   // 이 물건을 지금 고른 교환에 얹을 수 있는가. 못 얹으면 까닭을 돌려준다.
   function blocked(id){
@@ -182,14 +185,20 @@ const Trade=(()=>{
       b.appendChild(head);
       const asks=el('span','trade-asks');
       if(st.k==='lock')asks.appendChild(el('span','small',lock));
-      else if(asked(g))g.asks.forEach((a,i)=>{
-        if(i)asks.appendChild(el('span','small','또는'));
-        Object.entries(a).forEach(([id,n],k)=>{if(k)asks.appendChild(el('span','plus','+'));asks.appendChild(st.k==='short'?askPicture(id,n):picture(id,n));});
-      });
-      else{asks.appendChild(el('span','small',priceText(g)));asks.appendChild(el('span','small','· 남은 '+stockLeft(g.row)+'번'));}
+      /* 결정 D-925: 바꾸는 법이 여럿이면 '또는'으로 가로로 잇지 않고 한 줄에 한 가지씩 세로로 적는다 (사용자 피드백 2026-11-06 20:
+         "또는으로 연결하지 말고 세로로 깔끔하게 리스트화처럼"). 한 줄 안의 재료는 + 로 잇는다. 줄 앞에는 작은 점 하나. */
+      else if(asked(g)){asks.classList.add('list');g.asks.forEach(a=>{
+        const row=el('span','trade-ask-row');row.appendChild(el('span','dot','·'));
+        Object.entries(a).forEach(([id,n],k)=>{if(k)row.appendChild(el('span','plus','+'));row.appendChild(st.k==='short'?askPicture(id,n):picture(id,n));});
+        asks.appendChild(row);
+      });}
+      else{   // 결정 D-925: 흔한 물건의 값(같은 단계 하나 / 한 단계 아래 둘)도 한 줄에 하나씩
+        asks.classList.add('list');
+        for(const t of priceRows(g)){const row=el('span','trade-ask-row');row.appendChild(el('span','dot','·'));row.appendChild(el('span','small',t));asks.appendChild(row);}
+        asks.appendChild(el('span','small trade-left','남은 '+stockLeft(g.row)+'번'));}
       if(g.kind==='guest'&&st.k!=='lock')asks.appendChild(el('span','small','· 남은 '+Math.max(0,TABLES.TUNING.stranger_trade_limit-strangerUsed(S.guest.npc.id))+'번'));
       b.appendChild(asks);
-      b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(asked(g)?'원하는 것: '+g.asks.map(askText).join(', 또는 '):priceText(g))));
+      b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(asked(g)?'원하는 것: '+g.asks.map(askText).join('; '):priceText(g))));
       b.onclick=()=>{if(S.sel!==g.id){S.sel=g.id;S.offer={};}render();};
       theirs.appendChild(b);
     }

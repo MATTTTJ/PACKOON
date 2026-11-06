@@ -55,9 +55,11 @@ function gatherHit(d){
   const cfg=gatherCfg(d),MG=TABLES.MINIGAMES;if(!cfg||d.done)return;
   const grade=gatherCue.grade,just=grade==='perfect';gatherCue.grade=null;if(!grade)d.flaw=true;
   if(!G.f.gatherHinted)G.f.gatherHinted={};
-  // 결정 D-716: 채집 설명은 짧게. 자리마다 한 줄(cfg.hint)이고, 바늘·금빛 칸 규칙은 처음 캘 때 한 번만 덧붙인다 (사용자 피드백 2026-11-05 "설명이 너무 길다")
-  if(!G.f.gatherHinted[gatherKey(d)]){const first=!G.f.gatherRuleSaid;G.f.gatherHinted[gatherKey(d)]=true;G.f.gatherRuleSaid=true;
-    think(first?cfg.hint+' 도는 바늘이 금빛 칸에 닿을 때 치면 더 나오겠다.':cfg.hint);}
+  /* 결정 D-922: 채집 설명(바늘이 금빛 칸에 닿을 때 치기)은 한 게임에 단 한 번, 처음 캘 때만 띄운다 (사용자 피드백 2026-11-06:
+     "채집에 대한 설명 게임 당 시작할 때 단 한 번만"). 자리마다 띄우던 한 줄(cfg.hint)은 그 첫 번에만 붙인다. G.f 는 지역을 넘어도 이어지고
+     저장에 남아, 다음 지역·이어 하기에서도 다시 뜨지 않는다. 채집하면서 손으로 익힌 것이라 가벼운 속말로 띄운다(D-921, 멈춰 세우지 않음). */
+  G.f.gatherHinted[gatherKey(d)]=true;
+  if(!G.f.gatherRuleSaid){G.f.gatherRuleSaid=true;think(cfg.hint+' 도는 바늘이 금빛 칸에 닿을 때 치면 더 나오겠다.',{light:true});}
   d.prog=(d.prog||0)+(just?MG.gather_perfect_power:1);if(just)d.perfects=(d.perfects||0)+1;
   // 결정 D-482: 채집 자리마다 칠 때 소리를 따로 줄 수 있다(cfg.hitSound). 눈 둔덕은 쇠 날이 언 눈을 때리는 '팡'
   if(cfg.hitSound)Sound.hit(cfg.hitSound);else Sound.gather(true);
@@ -83,7 +85,7 @@ function finishGather(d){
   // 결정 D-266: 무엇이 왜 묻혀 있었는지 자리가 알려 준다(눈 둔덕). 칸을 맞춘 알림은 그 뒤에 띄운다.
   if(d.found)setTimeout(()=>think(d.found),250);
   if(rare)setTimeout(()=>toast(ITEMS[id].n+' ×'+n+' · '+ITEMS[rare].n+'도 나왔다'),d.found?1700:700);
-  else if(extra)setTimeout(()=>toast('금빛 칸에 맞춰 더 캐냈다. '+ITEMS[id].n+' ×'+n),d.found?1700:700);
+  else if(extra)setTimeout(()=>toast('더 캐냈다 · '+ITEMS[id].n+' ×'+n),d.found?1700:700);   // 결정 D-922: 칸 규칙은 다시 말하지 않는다
   if(REG.gatherDiary)diary(REG.gatherDiary[0],REG.gatherDiary[1]);
   if(gatherCue.d===d)gatherCue.d=null;
 }

@@ -85,6 +85,32 @@ const Rg=REGIONS.yeongsan, A={};
 const pink=()=>!!G.f.spring;
 const C={night:'#151e38',blue:'#273858',snow:'#e1e9ef',ice:'#9bbbd0',bark:'#54473e',rose:'#edb8cc'};
 const px=(x,y,w,h,c)=>R(Math.round(x),Math.round(y),Math.round(w),Math.round(h),c);
+/* 두 색 사이 (#rrggbb, 0~1) */
+function mix(a,b,t){
+  const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),A=p(a),B=p(b);
+  return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');
+}
+/* 번진 빛 한 점 (구름 뒤 달, 안개 뒤 해) */
+function glow(x,y,r,rgb,a){
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba('+rgb+','+a+')');g.addColorStop(1,'rgba('+rgb+',0)');
+  ctx.fillStyle=g;ctx.fillRect(Math.floor(x-r),Math.floor(y-r),Math.ceil(r*2),Math.ceil(r*2));
+}
+/* 값 잡음: 정수 자리의 hash 를 잇는다(곧은 선이라 능선이 모나게 꺾인다) */
+function vnoise(u,seed){const i=Math.floor(u),f=u-i,a=hash(i*1.31+seed),b=hash((i+1)*1.31+seed);return a+(b-a)*f;}
+/* 결정 D-1062: 험한 산줄기. 둥근 사인 능선 대신, 사이가 고르지 않은 봉우리들이 곧은 비탈로 이어져 모나게 꺾인다.
+   가끔 우뚝 솟은 큰 봉우리가 있고, 잔 바위 굴곡이 겹친다. 눈은 높이에 따라 쌓인다: 눈 선보다 높을수록 두껍게 덮이고 경계는 들쭉날쭉하다.
+   먼 줄기일수록 눈안개에 묻혀 밝고 흐리다. */
+function crags(camera,base,height,col,snowCol,seed,scale=1){
+  const gap=46*scale,nx=i=>i*gap+(hash(i*2.3+seed)-.5)*gap*.7,
+    nh=i=>{const r=hash(i*3.7+seed);return height*(r>.82?.85+.15*hash(i+seed):.12+.62*Math.pow(r,1.4));};
+  for(let x=-2;x<W+2;x+=2){
+    const u=x+camera;let i=Math.floor(u/gap);while(nx(i)>u)i--;while(nx(i+1)<u)i++;
+    const f=(u-nx(i))/Math.max(1,nx(i+1)-nx(i)),h=nh(i)+(nh(i+1)-nh(i))*f+(vnoise(u/7,seed)-.5)*4*scale,y=Math.round(base-h);
+    px(x,y,2,H-y,col);
+    const over=h-height*.4;
+    if(over>0){const d=Math.round(over*.8*(.5+.5*vnoise(u/5,seed+9)));if(d>0)px(x,y,2,d,snowCol);}
+  }
+}
 function mountains(camera,base,height,col,seed){
   for(let x=-2;x<W+2;x+=2){
     const u=x+camera+seed,y=base-Math.abs(Math.sin(u*.009))*height-Math.abs(Math.sin(u*.0037))*height*.42;
@@ -92,10 +118,12 @@ function mountains(camera,base,height,col,seed){
   }
 }
 function pine(x,y,size=1,snow=true,shape=0){
-  const s=size,lean=(shape%3-1)*2;px(x-2*s,y-43*s,4*s,43*s,'#384a4d');
+  // 결정 D-1064: 앞의 나무는 뒤 산줄기보다 확실히 어둡게 (사용자 피드백 2026-11-06 29: 배경과 겹쳐 안 보인다)
+  const s=size,lean=(shape%3-1)*2;px(x-2*s,y-43*s,4*s,43*s,'#262a2c');
   for(let i=0;i<4;i++){
     const w=(7+i*(shape%2?4:5))*s,cy=y-(50+shape%3*3)*s+i*11*s,bx=x+lean*(3-i);
-    px(bx-w,cy,w*2,6*s,'#3b5361');px(bx-w+3*s,cy-3*s,w*2-6*s,3*s,snow?'#cadce8':'#7b9a85');
+    px(bx-w,cy,w*2,6*s,snow?'#17262b':'#2e4a3a');px(bx-w+1,cy+5*s,w*2-2,1,snow?'#0f1a1e':'#22382c');
+    px(bx-w+3*s,cy-3*s,w*2-6*s,3*s,snow?'#d4e0e8':'#6d8f78');
   }
 }
 function rowan(x,y,seed=0){
@@ -106,9 +134,15 @@ function rowan(x,y,seed=0){
     px(bx,by-2,7,2,pink()?'#89a386':C.snow);px(bx+1,by+1,3,3,'#ce6058');px(bx+4,by+3,3,3,'#b84c4b');
   }
 }
+/* 결정 D-1062: 바위는 모서리가 꺾인 덩이. 윗면에만 눈이 얹히고 그늘진 쪽은 어둡다 */
 function rock(x,y,w=28,h=18){
-  px(x-w/2,y-h,w,h,'#637787');px(x-w/2+3,y-h-3,w-6,4,pink()?'#a5b7a8':'#eef3f5');
-  px(x-w/2+5,y-h+7,7,2,'#8a9da7');px(x+w/2-9,y-5,5,2,'#526b80');
+  const L=Math.round(x-w/2),sp=pink();
+  for(let i=0;i<w;i+=2){
+    const f=i/w,top=Math.round(h*(1-Math.abs(f-.45)*1.3)*(.82+.18*hash(Math.round(x)+i))),yy=y-Math.max(3,top);
+    px(L+i,yy,2,y-yy,f<.5?'#4a5560':'#38424c');
+    px(L+i,yy,2,1+(f<.6?2:1),sp?'#9fae9a':'#e6edf1');
+  }
+  px(L+Math.round(w*.3),y-Math.round(h*.45),Math.max(3,Math.round(w*.18)),1,'#2b333b');   // 갈라진 금
 }
 function hut(x,y){
   px(x-42,y-38,84,38,'#665147');px(x-48,y-47,96,10,'#3e3d42');
@@ -183,8 +217,8 @@ function azaleaRidge(camera,base,seed=0,height=18){
 function mist(camera,y,bloom=false){
   for(let i=0;i<7;i++){
     const x=((i*79-camera*.23)%530+530)%530-65;
-    px(x,y+i%3*4,62+i%2*22,2,bloom?'#d7d5d0':'#899aaf');
-    px(x+11,y-2+i%3*4,41+i%2*16,2,bloom?'#e5dfd7':'#a0adbb');
+    px(x,y+i%3*4,62+i%2*22,2,bloom?'#d7d5d0':'#47525f');
+    px(x+11,y-2+i%3*4,41+i%2*16,2,bloom?'#e5dfd7':'#556170');
   }
 }
 function birds(camera,y,bloom=false){
@@ -194,73 +228,160 @@ function birds(camera,y,bloom=false){
     px(x,by,3,1,bloom?'#7c8586':'#667a96');px(x+2,by+1,3,1,bloom?'#7c8586':'#667a96');px(x+4,by,3,1,bloom?'#7c8586':'#667a96');
   }
 }
-function sky(camera=0,bloom=pink()){
-  for(let y=0;y<H;y+=4){
-    const band=Math.floor(y/40),cols=bloom?['#ecd5df','#efd8e2','#f2dce5','#f5dce5','#e6c9d7','#bbbac6']:['#17232c','#1c2845','#293a59','#3a4a67','#4b5f79','#8b9cae'];
-    px(0,y,W,4,cols[Math.min(band,5)]);
+/* 결정 D-1060 (사용자 피드백 2026-11-06 33: 배경의 달이 어색하다): 눈이 쏟아지는 밤이라 별은 눈구름에 가려 보이지 않고,
+   달은 짙은 구름 뒤에 번진 흐린 빛(달무리)으로만 남는다. 구름 덩이가 천천히 흘러 그 빛을 가렸다 드러냈다 한다.
+   네모난 초승달과 고른 별무리는 뺐다. 경치 보기의 높은 능선(clear)에서만 구름이 갈라져 별 몇 점이 보인다.
+   봄은 새벽 안개 뒤의 해를 번진 빛으로만 둔다(네모난 해를 뺐다). */
+function sky(camera=0,bloom=pink(),clear=false){
+  if(bloom){
+    for(let y=0;y<H;y+=3)px(0,y,W,3,mix('#e7d4dc','#d3cdd0',Math.min(1,y/H*1.3)));
+    glow(300-camera*.03,46,46,'255,244,226',.5);glow(300-camera*.03,46,12,'255,250,240',.6);
+    for(let i=0;i<9;i++)px(i*51-((camera*.05)%51),64+i%3*8,38,2,'#f3e6e8');
+    return;
   }
-  if(!bloom){
-    for(let i=0;i<100;i++){
-      const x=((Math.round(hash(i*13.7)*560-camera*.18)%560)+560)%560-60,y=Math.round(hash(i*7.13)*116);
-      px(x,y,i%19===0?2:1,1,i%11===0?'#fff0c8':'#aebfdc');
-      if(i%19===0)px(x,y-1,1,3,'#d2ddef');
+  for(let y=0;y<H;y+=3)px(0,y,W,3,mix('#07090f','#323a48',Math.min(1,y/H*1.35)));
+  const mx=292-camera*.03,my=30,t=Vfx.reducedMotion?0:(G?.anim||0);
+  if(clear){
+    for(let i=0;i<60;i++){
+      const x=((Math.round(hash(i*13.7)*560-camera*.18)%560)+560)%560-60,y=Math.round(hash(i*7.13)*90);
+      px(x,y,1,1,i%9===0?'#e9eef6':'#8592a8');
     }
-    px(320-Math.round(camera*.03),24,12,12,'#d9e0dd');px(317-Math.round(camera*.03),22,12,12,'#1c2845');
-  }else{
-    px(300-Math.round(camera*.03),29,21,14,'#fff3e4');px(304-Math.round(camera*.03),25,13,22,'#fff3e4');
-    for(let i=0;i<9;i++)px(i*51-((camera*.05)%51),64+i%3*8,38,2,'#f9e7ed');
+  }
+  glow(mx,my,64,'176,188,206',.2);glow(mx,my,22,'210,218,230',.36);   // 구름 뒤 달무리
+  // 구름 세 켜: 위는 짙고 아래는 눈빛에 잿빛. 달 가까운 아랫자락만 희게 비친다
+  const layers=[[10,26,.05,'#0c1018','#1a2029'],[36,24,.09,'#141922','#252c37'],[64,20,.14,'#1b212b','#2b333f']];
+  for(const [base,thick,sp,col,rim] of layers){
+    for(let x=0;x<W;x+=2){
+      const u=x+camera*sp*1.4+t*sp*.25,th=Math.round(thick*clamp(vnoise(u/70,base)*1.6-.45,0,1)*(.8+.2*vnoise(u/9,base+3)));
+      if(th<2)continue;
+      const y0=Math.round(base-th*.55);px(x,y0,2,th,col);
+      const near=Math.max(0,1-Math.hypot(x-mx,base-my)/90);
+      px(x,y0+th-1,2,1,near>.05?mix(rim,'#8c97a8',near):rim);
+    }
   }
 }
 function ground(zone){
-  const lake=zone==='shore'||zone==='island';
+  const lake=zone==='shore'||zone==='island',sp=pink();
   if(lake){
-    px(0,157,W,GROUND-157,pink()?'#739cae':'#abc5d6');
-    for(let i=0;i<18;i++)px(i*29-(RC()*.1)%29,163+i%4*6,17,1,pink()?'#bfd9dc':'#d6e8ed');
+    px(0,157,W,GROUND-157,sp?'#739cae':'#5d6f80');
+    for(let i=0;i<18;i++)px(i*29-(RC()*.1)%29,163+i%4*6,17,1,sp?'#bfd9dc':'#7f93a4');
   }
   // 횡스크롤 바닥은 마른 해안이나 섬의 흙이다. 물길은 그 너머와 둑 아래에 둔다.
-  px(0,GROUND,W,H-GROUND,pink()?'#8a9085':'#b8c7d6');
-  px(0,GROUND,W,3,pink()?'#adbc99':'#f0f5f5');
-  if(lake){px(0,GROUND+17,W,H-GROUND-17,pink()?'#739cae':'#abc5d6');px(0,GROUND+16,W,1,pink()?'#647f7b':'#8ca3b6');}
+  // 결정 D-1061: 눈 덮인 바닥도 밤빛에 맞춰 어둡게. 윗면만 희다
+  px(0,GROUND,W,H-GROUND,sp?'#8a9085':'#93a2b3');
+  px(0,GROUND,W,2,sp?'#adbc99':'#dfe7ee');px(0,GROUND+2,W,1,sp?'#9aa98a':'#b6c3d0');
+  if(lake){px(0,GROUND+17,W,H-GROUND-17,sp?'#739cae':'#7d93a6');px(0,GROUND+16,W,1,sp?'#647f7b':'#5f7488');}
   for(let i=0;i<60;i++){
     const wx=Math.floor(cam/7)*7+i*7,x=wx-cam,r=hash(wx+8);
     if(lake){
-      px(x,GROUND+20+Math.floor(r*6),pink()?8:17,1,pink()?'#b2ced8':'#d6e8ed');
-      if(r>.6){px(x,GROUND+5,4,2,pink()?'#607969':'#8c9eac');px(x+2,GROUND-4,1,5,pink()?'#8d9d74':'#b4a78a');}
+      px(x,GROUND+20+Math.floor(r*6),sp?8:17,1,sp?'#b2ced8':'#a8bccb');
+      if(r>.6){px(x,GROUND+5,4,2,sp?'#607969':'#6d7f8e');px(x+2,GROUND-4,1,5,sp?'#8d9d74':'#8d8574');}
     }
-    else if(r>.65)px(x,GROUND+5+Math.floor(r*20),3,1,pink()?'#65796a':'#93abc1');
+    else if(r>.65)px(x,GROUND+5+Math.floor(r*20),3,1,sp?'#65796a':'#7b8ca0');
   }
 }
 A.back=zone=>{
   sky(Math.round(RC()*.1));
-  mountains(Math.round(RC()*.07),118,36,pink()?'#c9a6bd':'#384b68',34);
-  mountains(Math.round(RC()*.17),151,38,pink()?'#ad99b4':'#506783',109);
-  mountains(Math.round(RC()*.28),179,22,pink()?'#8797a3':'#748fa5',384);
-  mist(RC(),142,pink());birds(RC(),49,pink());
-  if(pink())azaleaRidge(Math.round(RC()*.28),179,384,22);
+  if(pink()){
+    mountains(Math.round(RC()*.07),118,36,'#c9a6bd',34);
+    mountains(Math.round(RC()*.17),151,38,'#ad99b4',109);
+    mountains(Math.round(RC()*.28),179,22,'#8797a3',384);
+    mist(RC(),142,true);birds(RC(),49,true);
+    azaleaRidge(Math.round(RC()*.28),179,384,22);
+  }else{
+    // 결정 D-1062: 먼 줄기는 눈안개에 묻혀 밝고 흐리게, 가까운 줄기일수록 어둡고 날카롭게
+    crags(Math.round(RC()*.06),116,70,'#353e4c','#68727f',34,1.4);
+    mist(RC(),118,false);
+    crags(Math.round(RC()*.15),150,66,'#252d36','#8691a0',109,1);
+    mist(RC(),150,false);
+    crags(Math.round(RC()*.3),186,46,'#181d24','#a9b4c0',384,.7);
+  }
   ground(zone);
 };
+/* 결정 D-1062 (사용자 피드백 2026-11-06 27): 바위턱 발판은 공중에 뜬 판자가 아니라 산비탈에서 튀어나온 바위턱이다.
+   엔진이 깐 통나무 판(drawLogs) 위에 눈 얹힌 바위 윗면을 덮어 그리고, 산막·눈길·비탈에서는 그 아래로 어두운 바위 몸을 땅까지 잇는다.
+   바위 몸은 뒤쪽이라 앞의 나무·인물보다 어둡게 둔다. 호숫가 마을의 집은 그 바위벽 앞에 앉는다. 신목 섬은 윗면 바위만 그린다. 발 디딜 판정은 그대로다. */
+function ledges(zone){
+  const tall=zone!=='island',sp=pink();   // 호숫가도 마을 뒤 바위벽으로 잇는다. 섬은 신목과 강철이가 가려지지 않게 윗면만
+  for(const p of fieldPlatforms()){
+    const x=Math.round(p.x-RC()),w=Math.round(p.w);if(x>W+40||x+w<-40)continue;   // 발판은 줄인 좌표라 RC()로 잰다
+    if(tall){
+      // 바위 몸은 땅으로 갈수록 넓어지는 산자락 꼴이다(좁은 턱 밑이 기둥처럼 보이지 않게)
+      const top=p.y+6,spread=Math.round((GROUND-top)*.32);
+      for(let i=-spread;i<w+spread;i+=2){
+        const out=i<0?-i:i>=w?i-w+2:0,yy=top+Math.round(out/.32+hash(p.x+i*.9)*5);
+        if(yy>=GROUND||x+i<-2||x+i>W)continue;
+        px(x+i,yy,2,GROUND-yy,sp?(out?'#5a5551':'#625c58'):(out?'#1b2229':'#1f262e'));
+        for(let k=yy+7;k<GROUND;k+=9)if(hash(Math.floor((p.x+i)/10)+k)>.4)px(x+i,k,2,1,sp?'#4c4744':'#151a20');   // 바위 켜
+        if(out&&hash(Math.floor((p.x+i)/8)+p.y)>.55)px(x+i,yy,2,1,sp?'#7d8a70':'#9aa7b4');               // 비탈에 얹힌 눈
+        else if(hash(Math.floor((p.x+i)/14)+p.y)>.8)px(x+i,yy+12+Math.round(hash(p.x+i*7)*30),2,2,sp?'#7d8a70':'#8b97a5');   // 결에 낀 눈
+      }
+    }
+    for(let i=0;i<w;i+=2){   // 윗면 바위: 아랫면이 들쭉날쭉하다
+      const d=4+Math.round(hash(p.x*.7+i*1.3)*5);
+      px(x+i,p.y,2,d,sp?'#77706a':'#38414b');px(x+i,p.y+d-1,2,1,sp?'#57514c':'#262d35');
+    }
+    px(x-1,p.y-2,w+2,2,sp?'#a9b796':'#e3eaef');px(x,p.y,w,1,sp?'#8d9b7c':'#b9c6d1');   // 얹힌 눈
+    for(let i=4;i<w-4;i+=11)if(hash(p.x+i)>.5)px(x+i,p.y+1,1+Math.round(hash(i+p.y)*2),2,sp?'#8d9b7c':'#cfd9e1');
+  }
+}
+/* 결정 D-1062: 구역 비탈(엔진 D-845 slopes)로 솟은 눈 둔덕. 발이 닿는 높이(surfaceY)까지 눈을 채운다 */
+function mounds(){
+  if(!zoneSlopes().length)return;
+  const sp=pink();
+  for(let sx=0;sx<W;sx+=2){
+    const wx=sx+RC();if(!slopeAt(wx))continue;   // 비탈도 줄인 좌표
+    const y=Math.round(surfaceY(wx));if(y>=GROUND)continue;
+    px(sx,y,2,GROUND-y+3,sp?'#8a9085':'#93a2b3');px(sx,y,2,2,sp?'#adbc99':'#dfe7ee');px(sx,y+2,2,1,sp?'#9aa98a':'#b6c3d0');
+    if(hash(Math.floor(wx/9))>.7)px(sx,y+5+Math.round(hash(wx)*8),2,1,sp?'#65796a':'#7b8ca0');
+  }
+}
+/* 결정 D-1063: 깊은 눈길의 눈더미. 네모 눈덩이 대신 바람에 쌓인 둥근 둔덕이고, 바람받이 쪽이 그늘진다.
+   설피로 지난 자리(ySnowTrail)는 낮게 다져지고 파란 설피 자국이 남는다. */
+function drift(x,wx){
+  const opened=(G.f.ySnowTrail||0)>wx,h0=opened?7:15+Math.round(hash(wx+3)*8),w=96;
+  for(let i=0;i<w;i+=2){
+    const f=i/w,h=Math.round(h0*Math.pow(Math.sin(Math.PI*Math.pow(f,.8)),.9)*(.9+.1*vnoise((wx+i)/6,3)));if(h<1)continue;
+    px(x+i,GROUND-h,2,h,f>.6?'#7f8ea0':'#93a2b3');px(x+i,GROUND-h,2,1,'#d5dee6');   // 바람받이 반대쪽이 그늘진다
+  }
+  if(opened)for(let i=0;i<5;i++)px(x+12+i*15,GROUND-2,6,2,'#5f7891');
+}
+/* 결정 D-1063: 얼어붙은 비탈 뒤의 언 바위벽. 비스듬한 바위 판에 얼음이 덮여 번들거리고, 윗턱에서 고드름이 늘어진다.
+   (예전의 하늘색 얼음 기둥은 무엇인지 알기 어려웠다) */
+function iceFace(x,wx){
+  const w=70+Math.round(hash(wx)*30),h0=56+Math.round(hash(wx+5)*30),sp=pink(),peak=.25+hash(wx+9)*.3;
+  for(let i=0;i<w;i+=2){
+    const f=i/w,k=f<peak?Math.pow(f/peak,.5):1-Math.pow((f-peak)/(1-peak),1.8),
+      step=Math.floor(hash(Math.floor((wx+i)/10))*3)*3,top=Math.round(GROUND-h0*Math.max(0,k)+step);
+    if(top>=GROUND-1)continue;
+    px(x+i,top,2,GROUND-top,sp?(f<peak?'#6a6964':'#5d5c58'):(f<peak?'#2e3843':'#232b34'));
+    px(x+i,top,2,1,sp?'#93a588':'#d8e3ea');
+    if(!sp&&f>peak){const g=top+3;px(x+i,g,2,Math.max(1,Math.round((GROUND-top)*.4)),'#33495b');}   // 내리받이 낯을 덮은 얼음
+  }
+}
 A.scenery=zone=>{
-  for(let wx=120;wx<2600;wx+=230){
-    const x=wx+Math.round(hash(wx)*34)-17-cam,size=.72+hash(wx+7)*.48,shape=Math.floor(hash(wx+11)*5);if(x<-100||x>W+100)continue;
+  // 아래 늘어놓기는 설계 좌표(wx, cam)로 그린다. 비탈 높이는 줄인 좌표라 그 구간의 밀림(cam-RC())을 빼고 잰다
+  const sp=pink(),winter=!sp,shift=cam-RC(),sy=w=>Math.round(surfaceY(w-shift)),onSlope=w=>!!slopeAt(w-shift);
+  ledges(zone);mounds();
+  // 결정 D-1064 (사용자 피드백 2026-11-06 29): 어두운 바위턱 몸 앞에는 어두운 솔을 세우지 않는다(겹쳐서 안 보였다)
+  const rocky=(w,pad=0)=>zone!=='island'&&fieldPlatforms().some(p=>{const s=(GROUND-p.y-6)*.32;return w-shift>p.x-s-pad&&w-shift<p.x+p.w+s+pad;});
+  for(let wx=140;wx<2600;wx+=230){
+    const x=wx+Math.round(hash(wx)*34)-17-cam,size=.8+hash(wx+7)*.5,shape=Math.floor(hash(wx+11)*5);if(x<-110||x>W+110)continue;
     if(zone==='shelter'){
-      if(wx%460<200){pine(x,GROUND,size,!pink(),shape);rock(x+56,GROUND,28+shape*3,12+shape*2);}
-      else{rowan(x,GROUND,wx);px(x+40,GROUND-6,28,6,'#8d7761');px(x+42,GROUND-9,24,3,'#dae4e9');}
+      // 결정 D-1063: 산막 둘레와 눈 굴 어귀는 비워 두고, 솔과 모난 바위만 둔다(마가목과 장작더미를 번갈아 늘어놓던 것은 뺐다)
+      if(Math.abs(wx-260)<120||Math.abs(wx-tx(1500))<80)continue;
+      if(!rocky(wx,24))pine(x,sy(wx),size,winter,shape);if(wx%460<230&&!rocky(wx+46))rock(x+46,sy(wx+46),30+shape*4,14+shape*3);
     }else if(zone==='snow'){
-      pine(x,GROUND,size,!pink(),shape);
-      if(!pink()){
-        const opened=(G.f.ySnowTrail||0)>wx;px(x+48,GROUND-(opened?10:29),75,opened?10:29,'#dbe7ee');
-        px(x+51,GROUND-(opened?10:29),69,3,'#eff5f6');
-        if(opened)for(let i=0;i<4;i++)px(x+53+i*17,GROUND-3,6,2,'#92adc4');
-      }else{px(x+48,GROUND-3,63,3,'#859b88');azalea(x+78,GROUND,.55,wx);}
+      if(!rocky(wx,24))pine(x,sy(wx),size,winter,shape);
+      if(winter){if(!onSlope(wx+50)&&!onSlope(wx+146)&&!rocky(wx+98,-20))drift(x+50,wx);}else{px(x+48,GROUND-3,63,3,'#859b88');azalea(x+78,GROUND,.55,wx);}
     }else if(zone==='slope'){
-      rock(x,GROUND,68,32);px(x+29,GROUND-65,22,65,pink()?'#9ba99c':'#a5c4d7');
-      px(x+31,GROUND-66,18,3,'#e1edf1');
-      if(G.f.shortcut)for(let i=0;i<4;i++)px(x+30+i*4,GROUND-10-i*12,8,3,'#6f6b5b');
-      rowan(x+93,GROUND,wx);
+      if(!rocky(wx+46))iceFace(x+18,wx);
+      if(wx%460<230&&!rocky(wx+96,16))rowan(x+96,GROUND,wx);
     }else{
       // 결정 D-429: 호숫가 서쪽(마을 어귀~집들)에는 바위·솔을 두지 않는다. 마을 그림은 A.village가 그린다
-      if(wx>2040){rock(x,GROUND,34+shape*4,12+shape*2);if(wx%460<200)pine(x+28,GROUND,size*.8,!pink(),shape);}
-      else if(wx>=650){px(x,GROUND-3,44,3,pink()?'#9ebfc9':'#e4f0f4');if(!pink()){px(x+10,GROUND+3,2,14,'#8daabc');px(x+10,GROUND+16,13,1,'#8daabc');}}
+      // 결정 D-1063: 물가에 꽂혀 무엇인지 모르던 말뚝은 뺐다. 얼음 낀 물가만 남긴다
+      if(wx>2040){rock(x,GROUND,34+shape*4,12+shape*2);if(wx%460<200)pine(x+28,GROUND,size*.8,winter,shape);}
+      else if(wx>=650&&winter)px(x,GROUND-2,44,2,'#c9d6df');
     }
   }
   if(zone==='shelter'){
@@ -268,24 +389,18 @@ A.scenery=zone=>{
     // 높은 대피소 별채는 오래된 문설주만 남았다. 도장을 찾는 위치와 맞춘다.
     const post=tx(1040)-cam;px(post-19,108-38,5,38,'#7b6a59');px(post+15,108-38,5,38,'#7b6a59');
     px(post-23,108-42,47,5,'#d9e4eb');px(post-18,108-35,4,11,'#b7a68f');
-    px(tx(1630)-cam,GROUND-17,80,17,'#667a86');px(tx(1627)-cam,GROUND-20,86,4,'#e0eaf0');
-    px(tx(1653)-cam,GROUND-12,33,12,'#333e50');px(tx(1657)-cam,GROUND-10,25,2,'#a3b6c8');
-    px(tx(2091)-cam,GROUND-14,18,14,'#7c7a70');px(tx(2088)-cam,GROUND-17,24,4,'#dbe7ed');
-    for(let i=0;i<4;i++)px(tx(2096)-cam+i*3,GROUND-24-i*8,8+i*2,2,'#a5b2bf');
+    // 결정 D-1063: 눈 굴 어귀. 눈 언덕에 뚫린 어두운 굴 입구다(문 자리). 무엇인지 모를 네모 헛간과 연기 나는 돌무지는 뺐다
+    const cx=tx(1500)-cam;
+    if(cx>-60&&cx<W+60){
+      for(let i=-36;i<36;i+=2){const h=Math.round(34*Math.pow(Math.cos(i/36*Math.PI/2),.8));px(cx+i,GROUND-h,2,h,i>8?'#a7b5c3':'#c3cfda');px(cx+i,GROUND-h,2,1,'#e8eef3');}
+      for(let i=-10;i<10;i+=2){const h=Math.round(18*Math.sqrt(1-Math.pow(i/10,2)));px(cx+i+4,GROUND-h,2,h,'#10151c');}
+      px(cx-4,GROUND-3,16,3,'#2a3646');
+    }
   }
   if(zone==='snow'){
+    // 결정 D-1063: 눈 터널·눈 위의 선(까마귀가 그린 골짜기)·붉은 천 장대는 뺐다 (사용자 피드백 2026-11-06 25·28)
     sign(tx(1780)-cam,108);rock(tx(2000)-cam,GROUND,99,30);
-    px(tx(1079)-cam,GROUND-1,42,1,'#8ca6bd');px(tx(1087)-cam,GROUND-3,2,3,'#8ca6bd');px(tx(1102)-cam,GROUND-5,2,5,'#8ca6bd');
-    px(tx(1107)-cam,GROUND-4,7,1,'#52677e');px(tx(1111)-cam,GROUND-6,3,3,'#52677e');
-    if(G.f.yCrowMap)for(let i=0;i<8;i++)px(tx(1080)-cam+i*5,GROUND-2-Math.round(Math.sin(i*.7)*3),6,1,'#667e98');
     sign(tx(2100)-cam,GROUND);for(let i=0;i<5;i++)px(tx(2098)-cam,GROUND-5-i*5,6,1,'#5a5d64');
-    // 가지가 눈 지붕을 받친다. 설피를 얻으면 파란 다짐길이 안쪽까지 이어진다.
-    px(tx(220)-cam,GROUND-28,60,5,'#e6eef2');px(tx(225)-cam,GROUND-35,50,7,'#eff5f5');
-    px(tx(220)-cam,GROUND-23,7,23,'#c4d5e2');px(tx(274)-cam,GROUND-23,7,23,'#c4d5e2');
-    px(tx(226)-cam,GROUND-24,49,3,'#7d7365');
-    if(G.f.seolpi){px(tx(227)-cam,GROUND-2,47,2,'#8ca8be');for(let i=0;i<5;i++)px(tx(232)-cam+i*8,GROUND-3,4,1,'#627f9a');}
-    // 어귀에서 보였던 두 봉우리 사이의 길. 붉은 천은 멀리서도 같은 자리다.
-    px(tx(1996)-cam,GROUND-64,4,34,'#776354');px(tx(2000)-cam,GROUND-63,15,8,'#c38178');
   }
   if(zone==='slope'){   // tx: 줄인 비탈 좌표 (D-116)
     rowan(tx(250)-cam,GROUND);
@@ -296,6 +411,8 @@ A.scenery=zone=>{
     if(G.f.yOtterWait){px(tx(1155)-cam,GROUND+3,8,1,'#b5cdd4');px(tx(1161)-cam,GROUND+2,2,3,'#b5cdd4');}
     const rx=tx(2100)-cam;rock(rx,GROUND,52,11);px(rx-25,GROUND-10,54,3,'#d6dedb');
     for(let i=0;i<4;i++)px(rx-19+i*11,GROUND-11,3,2,'#66766f');
+    // 살금이가 알려 준 발 디딜 돌턱: 호숫가로 내려가는 바위턱 문 앞에 눈을 턴 돌이 계단처럼 드러난다 (결정 D-1063)
+    if(G.f.shortcut){const dx=tx(2320)-cam;for(let i=0;i<5;i++){px(dx-42+i*9,GROUND-4-i*7,8,3,'#5d5a50');px(dx-42+i*9,GROUND-5-i*7,8,1,'#cfd8de');}}
   }
   if(zone==='shore'){
     const x=2320-cam;px(x-50,GROUND-2,100,5,'#9d8c73');
@@ -441,7 +558,7 @@ A.drawLostKid=(x,y,f)=>{
 };
 A.ridgeLayers=[
   {speed:.015,draw:c=>{
-    sky(c,false);
+    sky(c,false,true);   // 결정 D-1060: 높은 능선에서만 구름이 갈라져 별이 보인다
     // 별무리는 능선을 따라 길게 놓인다. 입자 대신 고정 도트로 침묵을 지킨다.
     for(let i=0;i<210;i++){
       const x=((Math.round(hash(i*11.73)*480)-c)%480+480)%480-40,y=Math.round(24+x*.15+(hash(i*5.39)-.5)*35);
@@ -503,24 +620,72 @@ A.springLayers=[
     for(let i=0;i<8;i++){px(8+i*10,212-i%3*3,2,6,'#789780');px(7+i*10,211-i%3*3,4,2,'#b9ce86');}
   }},
 ];
+/* 결정 D-1066: 아기 곰은 곰 아주머니(drawBearMom)와 같은 털빛의 작은 새끼다. 앞을 보고 앉았다 */
 A.drawBear=(x,y,f=1)=>{
-  M(x,y,f,-12,-11,24,11,'#8e7564');M(x,y,f,-10,-22,18,14,'#967e6d');
-  M(x,y,f,-10,-25,5,5,'#8e7564');M(x,y,f,3,-25,5,5,'#8e7564');
-  M(x,y,f,-8,-24,2,2,'#b99b85');M(x,y,f,4,-24,2,2,'#b99b85');
-  M(x,y,f,-8,-17,3,1,'#392f2c');M(x,y,f,2,-17,3,1,'#392f2c');
-  M(x,y,f,-5,-13,9,5,'#c3aa8e');M(x,y,f,-1,-14,3,2,'#392f2c');M(x,y,f,-9,-6,20,5,'#b6a385');
+  const Br='#6b4a36',Dk='#4a3224',Lt='#8e6c52',Mz='#b89a7a',K='#1a120c';
+  M(x,y,f,-8,-11,16,11,Br);M(x,y,f,-4,-9,8,7,Lt);                                    // 몸·가슴
+  M(x,y,f,-6,-21,13,11,Br);M(x,y,f,-7,-24,4,4,Br);M(x,y,f,4,-24,4,4,Br);M(x,y,f,-6,-23,2,2,Mz);M(x,y,f,5,-23,2,2,Mz);   // 머리·귀
+  M(x,y,f,-3,-17,1,2,K);M(x,y,f,3,-17,1,2,K);M(x,y,f,-3,-17,1,1,'#f2e8dc');           // 눈
+  M(x,y,f,-2,-15,5,4,Mz);M(x,y,f,0,-15,2,1,K);M(x,y,f,0,-12,1,1,'#5a3a2a');            // 주둥이
+  M(x,y,f,-8,-2,5,2,Dk);M(x,y,f,3,-2,5,2,Dk);M(x,y,f,-9,-8,3,6,Dk);M(x,y,f,6,-8,3,6,Dk);   // 발·팔
+};
+/* 결정 D-1066: 곰 아주머니. 이름을 먹혀 넋이 빠진 채 제 집 문간에 앉아 있다. 겨울엔 등을 굽히고 고개를 떨궜고, 팔은 늘어졌고, 눈에 빛이 없다.
+   봄(이름이 돌아온 뒤, Rg.namesBack)엔 허리를 펴고 고개를 들어 팔을 벌린다. 머릿수건을 썼다. 아기 곰보다 한참 크다 */
+A.drawBearMom=(x,y,f=1)=>{
+  const back=Rg.namesBack?Rg.namesBack():!!G.f.spring,t=Vfx.reducedMotion?0:G.anim;
+  const Br='#6b4a36',Dk='#4a3224',Lt='#8e6c52',Mz='#b89a7a',K='#1a120c',Sc=back?'#8a5a6a':'#6e6064';
+  const breathe=back?0:Math.round(Math.sin(t*.03));
+  M(x,y,f,-14,-20,26,20,Br);M(x,y,f,-6,-17,12,13,Lt);M(x,y,f,-15,-6,6,6,Dk);         // 앉은 몸·배·궁둥이
+  M(x,y,f,-12,-3,10,3,Dk);M(x,y,f,4,-3,10,3,Dk);                                       // 뒷발
+  if(back){
+    M(x,y,f,1,-32,14,12,Br);M(x,y,f,2,-36,4,4,Br);M(x,y,f,11,-36,4,4,Br);M(x,y,f,3,-35,2,2,Mz);M(x,y,f,12,-35,2,2,Mz);
+    M(x,y,f,1,-34,14,3,Sc);M(x,y,f,0,-32,2,5,Sc);                                      // 머릿수건
+    M(x,y,f,10,-29,2,2,K);M(x,y,f,10,-29,1,1,'#ffffff');M(x,y,f,12,-25,5,5,Mz);M(x,y,f,15,-25,2,2,K);M(x,y,f,13,-21,3,1,'#5a3a2a');
+    M(x,y,f,8,-20,4,10,Dk);M(x,y,f,11,-24,4,4,Dk);M(x,y,f,-10,-20,4,10,Dk);M(x,y,f,-13,-24,4,4,Dk);   // 벌린 두 팔
+  }else{
+    const dy=4+breathe;                                                                  // 고개를 떨궜다
+    M(x,y,f,3,-30+dy,14,12,Br);M(x,y,f,4,-34+dy,4,4,Br);M(x,y,f,13,-34+dy,4,4,Br);
+    M(x,y,f,3,-32+dy,14,3,Sc);M(x,y,f,2,-30+dy,2,5,Sc);
+    M(x,y,f,11,-25+dy,3,1,K);                                                           // 빛 없는 눈
+    M(x,y,f,14,-22+dy,5,5,Mz);M(x,y,f,17,-21+dy,2,1,K);
+    M(x,y,f,6,-15,4,13,Dk);M(x,y,f,-10,-15,4,13,Dk);                                    // 늘어진 팔
+  }
 };
 A.drawCrow=(x,y,f=1)=>{
   M(x,y,f,-9,-15,15,12,'#344052');M(x,y,f,-4,-26,12,12,'#2c3547');M(x,y,f,6,-21,8,3,'#6f7882');
   M(x,y,f,4,-23,1,1,'#d5dadd');M(x,y,f,-8,-11,8,4,'#4e5a6d');M(x,y,f,-14,-8,7,4,'#293345');
   M(x,y,f,-3,-4,1,4,'#677385');M(x,y,f,2,-4,1,4,'#677385');M(x,y,f,-5,-1,4,1,'#677385');M(x,y,f,1,-1,4,1,'#677385');
 };
+/* 결정 D-1066 (사용자 피드백 2026-11-06 35: 수달이 개처럼 보인다): 낮고 긴 몸을 바닥에 붙여 엎드렸다.
+   납작한 머리, 작고 둥근 귀, 수염 난 넓은 주둥이, 옅은 목, 굵다가 끝으로 가늘어지는 꼬리, 짧은 다리와 물갈퀴 발.
+   짙은 갈색 털이 물에 젖어 등만 번들거린다. 앞발로 얼음 구멍에 드리운 낚싯줄을 쥐고 있다(서서 막대를 든 모습은 뺐다). */
 A.drawOtter=(x,y,f=1)=>{
-  M(x,y,f,-10,-17,19,15,'#8c796b');M(x,y,f,-10,-28,20,13,'#9e8775');M(x,y,f,-12,-28,5,5,'#8c796b');M(x,y,f,7,-28,5,5,'#8c796b');
-  M(x,y,f,-8,-18,16,6,'#cbb6a0');M(x,y,f,-5,-23,2,2,'#2d3037');M(x,y,f,4,-23,2,2,'#2d3037');M(x,y,f,-1,-20,3,2,'#2d3037');
-  M(x,y,f,-15,-6,8,4,'#7a6b61');M(x,y,f,-11,-7,5,7,'#7a6b61');M(x,y,f,6,-5,4,5,'#7a6b61');
-  M(x,y,f,9,-14,5,3,'#b5a08c');M(x,y,f,12,-32,2,25,'#b59b75');M(x,y,f,14,-32,14,1,'#d3d9dc');
-  M(x,y,f,27,-31,1,34,'#d3d9dc');M(x,y,f,25,2,3,1,'#d3d9dc');
+  const Br='#5b4130',Dk='#3e2b1f',Sh='#7d5d45',Pl='#c9b59a',K='#140e0a',t=Vfx.reducedMotion?0:G.anim,tw=Math.round(Math.sin(t*.05));
+  M(x,y,f,-30,-3+tw,5,2,Dk);M(x,y,f,-26,-4,5,3,Dk);M(x,y,f,-22,-5,6,4,Br);M(x,y,f,-17,-7,4,6,Br);   // 꼬리: 굵다가 끝이 가늘다
+  M(x,y,f,-15,-10,23,9,Br);M(x,y,f,-14,-11,20,1,Sh);M(x,y,f,-12,-10,14,1,Sh);           // 길고 낮은 몸, 젖은 등
+  M(x,y,f,-12,-3,17,2,'#4c3627');                                                        // 배 그늘
+  M(x,y,f,5,-15,11,7,Br);M(x,y,f,5,-16,9,1,Sh);                                          // 납작한 머리
+  M(x,y,f,6,-17,2,2,Dk);                                                                 // 작고 둥근 귀
+  M(x,y,f,6,-9,8,3,Pl);M(x,y,f,8,-11,6,2,Pl);                                            // 옅은 목
+  M(x,y,f,13,-13,5,4,Pl);M(x,y,f,17,-13,2,2,K);                                          // 넓은 주둥이와 코
+  M(x,y,f,11,-14,1,1,K);                                                                 // 눈
+  M(x,y,f,17,-11,4,1,'#e8e0d4');M(x,y,f,17,-10,3,1,'#d8cfc2');M(x,y,f,12,-11,1,1,'#e8e0d4');   // 수염
+  M(x,y,f,6,-2,4,2,Dk);M(x,y,f,5,-1,6,1,Dk);M(x,y,f,-13,-2,4,2,Dk);M(x,y,f,-14,-1,6,1,Dk);   // 짧은 다리·물갈퀴 발
+  M(x,y,f,10,-4,2,2,Dk);M(x,y,f,12,-3,7,1,'#9fb3bf');M(x,y,f,19,-3,1,6,'#9fb3bf');      // 앞발에 쥔 낚싯줄이 구멍으로
+};
+/* 결정 D-1066 (사용자 피드백 2026-11-06 26): 잣까마귀. 단풍골 까마귀 영감(까만 큰 새)과 다른, 주인공보다 작은 산새다.
+   초콜릿빛 갈색 몸에 흰 점이 촘촘하고, 머리꼭지와 날개는 짙고, 꽁지 밑이 희다. 길고 뾰족한 검은 부리로 잣을 쪼아 묻는다.
+   가끔 고개를 숙여 눈을 쫀다 */
+A.drawNutcracker=(x,y,f=1)=>{
+  const Br='#4e3828',Cap='#2a1f18',Wg='#231b16',Wt='#efe9e0',K='#14100d',t=Vfx.reducedMotion?0:G.anim;
+  const peck=Math.floor(t/36)%6===0?2:0;
+  M(x,y,f,-6,-10,11,8,Br);M(x,y,f,-11,-9,6,3,Wg);M(x,y,f,-10,-7,4,1,Wt);               // 몸·꽁지·흰 꽁지 밑
+  M(x,y,f,-5,-10,7,4,Wg);M(x,y,f,-4,-7,1,1,Wt);M(x,y,f,-1,-7,1,1,Wt);                   // 날개와 끝의 흰 점
+  M(x,y,f,2,-15+peck,6,6,Br);M(x,y,f,2,-16+peck,6,2,Cap);                               // 머리·짙은 머리꼭지
+  M(x,y,f,8,-13+peck,4,2,K);M(x,y,f,11,-12+peck,2,1,K);                                // 길고 뾰족한 부리
+  M(x,y,f,5,-14+peck,1,1,K);M(x,y,f,6,-14+peck,1,1,'#cfc6b8');                          // 눈
+  for(const [dx,dy] of [[-4,-5],[-2,-4],[0,-6],[2,-4],[3,-8],[1,-9],[4,-11],[3,-13],[6,-12],[-3,-3]])M(x,y,f,dx,dy+(dy<-9?peck:0),1,1,Wt);   // 흰 점
+  M(x,y,f,-1,-2,1,2,K);M(x,y,f,2,-2,1,2,K);M(x,y,f,-2,0,3,1,K);M(x,y,f,1,0,3,1,K);     // 다리
 };
 A.drawMagpie=(x,y,f=1)=>{
   A.drawCrow(x,y,f);M(x,y,f,-5,-14,8,6,'#e1e5e3');M(x,y,f,-13,-7,7,3,'#638291');M(x,y,f,-20,-5,9,2,'#344052');
@@ -533,8 +698,16 @@ A.willowSeeds=()=>{
     px(x,y,1,2,'#f8f2df');if(i%3===0)px(x-1,y,3,1,'#eae6d2');
   }
 };
-A.blockedSnow=(x,y)=>{for(let i=0;i<5;i++){px(x-24+i*10,y-23-i%2*8,12,23+i%2*8,'#d8e7ef');px(x-23+i*10,y-25-i%2*8,10,3,'#f3f7f6');}};
-A.blockedIce=(x,y)=>{px(x-24,y-44,48,44,'#8badc5');px(x-22,y-46,44,4,'#dfeef3');for(let i=0;i<4;i++)px(x-14+i*9,y-37+i*6,2,12,'#c4dce6');};
+/* 결정 D-1063: 막힌 길 그림. 네모 눈덩이·하늘색 얼음 상자 대신, 허리까지 찬 눈더미와 얼음이 덮인 가파른 바위 턱 */
+A.blockedSnow=(x,y)=>{
+  for(let i=-30;i<30;i+=2){const h=Math.round(34*Math.pow(Math.cos(i/30*Math.PI/2),.6)*(.9+.1*hash(i+x)));px(x+i,y-h,2,h,i>6?'#8f9eaf':'#b4c2cf');px(x+i,y-h,2,1,'#e6edf2');}
+  for(let i=0;i<3;i++)px(x-14+i*11,y-20+i*3,6,1,'#7d8c9d');   // 바람 자국
+};
+A.blockedIce=(x,y)=>{
+  // 얼음이 덮여 오른쪽 아래로 쏟아지는 가파른 비탈 끝
+  for(let i=-28;i<28;i+=2){const top=Math.round(y-48+(i+28)*.75+hash(i+x)*3);if(top>=y)continue;px(x+i,top,2,y-top,'#2c3a47');px(x+i,top,2,2,'#cfdfe8');px(x+i,top+2,2,Math.round((y-top)*.5),'#3a5266');}
+  for(let i=0;i<4;i++)px(x-20+i*11,y-40+i*9,6,1,'#88a8bf');   // 번들거리는 얼음 결
+};
 A.stamp=(x,y)=>pawStamp(x,y,'#b98075');
 A.door=(x,y)=>{sign(x,y);px(x-8,y-32,12,1,'#eee7d4');px(x+2,y-34,3,5,'#eee7d4');};
 Rg.expArt=A;

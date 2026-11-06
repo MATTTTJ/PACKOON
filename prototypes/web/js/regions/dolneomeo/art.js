@@ -123,25 +123,34 @@ function backdrop(zone){bands(['#bfcdd3','#cbd8d9','#dce1da','#a4b7bd'],[54,49,5
   for(let i=0;i<5;i++){const x=mod(58+i*18-RC()*.055+(Vfx.reducedMotion?0:G.anim*.035),490)-40,y=52+Math.abs(i-2)*4;px(x,y,2,1,'#7a959c');px(x-3,y-1-wing,3,1,'#7a959c');px(x+2,y-1-wing,3,1,'#7a959c');}
   // 절벽 위 경치가 고갯길과 마을에서 먼저 보인다.
   const distant=Math.round(312-mod(RC()*.09,100));px(distant,93,23,5,'#a4b0b1');px(distant+5,88,14,5,'#aab7b6');px(distant+11,83,3,5,'#e7ece4');
-  if(zone==='field'){for(let i=0;i<8;i++){const x=mod(i*64-RC()*.46,512)-52;pine(x,188,.55+(i%3)*.13);}}
-  if(zone==='shrine'){for(let i=0;i<11;i++){const x=mod(i*47-RC()*.4,517)-45;cairn(x,184,15+i%4*5,i+4);}}
+  // 결정 D-1008: 밭 뒤 소나무 줄은 먼 경치다. 예전엔 땅(188)에 붙은 진한 색이라 억새 덤불·메밀댁 바로 뒤의 앞 나무처럼 겹쳐 보였다. 더 높이, 옅은 안개 빛으로
+  if(zone==='field'){for(let i=0;i<8;i++){const x=mod(i*64-RC()*.46,512)-52;pine(x,174,.42+(i%3)*.1,FAR_PINE);}}
+  // 결정 D-1008: 성황당 뒤 돌무더기 줄도 먼 경치다. 땅(184)에 붙은 진한 색이라 남생이 할미·소원 천 바로 뒤의 앞 돌무더기처럼 겹쳐 보였다. 더 높이, 옅게
+  if(zone==='shrine'){ctx.save();ctx.globalAlpha=.45;for(let i=0;i<11;i++){const x=mod(i*47-RC()*.4,517)-45;cairn(x,176,10+i%4*4,i+4);}ctx.restore();}
   frostGround();
 }
+const FAR_PINE={ink:'#7f979e',deep:'#869ea6',light:'#b4c5c8',frost:'#d9e4e4',moss:'#91a59c'};   // 결정 D-1008: 먼 소나무 빛
 function wall(x,y,width){for(let j=0;j<width;j+=17){stone(x+j,y,16,7,j,true);stone(x+j+6,y-7,15,6,j+1,true);}}
 function house(x,y,wide=false,variant=0){const w=(wide?80:59)+[0,-7,6][variant%3],h=34+(variant%3)*4,roof=5+variant%3;px(x,y-h,w,h,'#9a9e8d');px(x+5,y-h+4,w-10,h-7,'#bec0a9');px(x-6,y-h-3,w+12,6,'#505e5d');px(x-11,y-h-5,w+22,3,'#e0e6d9');for(let j=0;j<roof;j++){px(x-5+j*3,y-h-7-j,w+10-j*6,2,j%2?'#7e8677':'#6c776d');}px(x+7,y-25,13,14,'#57645a');px(x+8,y-24,11,1,'#d9c794');px(x+13,y-23,1,11,'#aab190');px(x+8,y-18,11,1,'#aab190');px(x+w-24,y-24,16,24,'#586057');px(x+w-22,y-22,12,22,'#6c6c5d');px(x+w-20,y-18,1,14,'#9b9b7e');px(x+6,y-h-12,3,13,'#66736e');if(variant%2){px(x+w+3,y-17,2,17,'#6e715c');px(x+w-1,y-19,11,3,'#a3a17e');}}
 function smoke(x,y,seed){const t=Vfx.reducedMotion?0:Math.floor(G.anim/18);for(let i=0;i<4;i++){const rise=(t+i*7)%29,sway=Math.round(Math.sin((rise+seed)*.15)*3);px(x+sway,y-rise,7+i%2*3,2,'#c7d3cd');px(x+sway+2,y-rise-2,4,2,'#c7d3cd');}}
 function hearth(x,y,warm=true){stone(x-16,y,32,5,1,false);px(x-12,y-7,24,5,'#555f59');px(x-9,y-7,18,2,'#76796a');px(x-7,y-6,14,3,'#444b45');if(warm){px(x-5,y-5,3,1,'#ba8d62');px(x+2,y-4,2,1,'#b17c55');}px(x-14,y-9,5,3,'#929788');px(x+9,y-9,5,3,'#929788');}
 function scenery(zone,fixtures={}){const sx=x=>Math.round(tx(x)-cam);const visible=(x,margin=80)=>{const t=tx(x);return t>cam-margin&&t<cam+W+margin;};   // tx: 줄인 구역 좌표 (D-109)
+  /* 결정 D-1008: 나무·돌무더기·큰 바위 같은 서 있는 장식이 살펴보기·인물·채집 자리와 겹쳐 잘 안 보였다 (사용자 피드백 2026-11-06 29).
+     그 자리 둘레(margin)에 걸리는 장식은 그리지 않는다. 줍는 물건은 주우면 사라져 장식이 갑자기 나타나므로 셈에 넣지 않는다. */
+  const anchors=[];try{for(const k of ['examines','stamps','doors','wanderers'])for(const p of zoneObjects(k))if((p.y??GROUND)>GROUND-20)anchors.push(p.x);for(const n of fieldNpcs())anchors.push(n.x);for(const d of fieldItems('digs'))anchors.push(d.x);}catch(_){}
+  const clear=(x,margin)=>{const t=tx(x);return !anchors.some(a=>Math.abs(a-t)<margin);};
   // 낮은 돌담은 뒤쪽 장식이다. 실제 발판의 흰 윗면은 지역 필드에서 따로 그린다.
   for(let x=80;x<3100;x+=122){if(!visible(x))continue;const y=GROUND-2;stone(sx(x),y,15+(x%3)*3,7,Math.floor(x/122));if(x%244===80){px(sx(x+23),y-5,1,5,'#b8bea1');px(sx(x+21),y-8,5,2,'#c8cbb5');}}
   if(zone==='gate'){
     const gx=fixtures.gateX??1650;gatePair(sx(gx),GROUND,Rg.depthOpen?.('dol_depth_gate')||0);
     const pole=sx(gx);if(!G.f.ppuriPassed)keumjul(pole,GROUND-36,19);   // 결정 D-264: 장승 둘 사이에 금줄만
-    for(const x of [180,820,1300,1930,2380])if(visible(x))pine(sx(x),GROUND,.92+hash(x)*.43);
+    // 결정 D-1008: 억새 덤불(150) 앞을 가리던 소나무(180)와 눈 둔덕(1585) 곁 소나무(1930)를 옆으로 옮겼다
+    for(const x of [225,820,1300,1985,2380])if(visible(x)&&clear(x,22))pine(sx(x),GROUND,.92+hash(x)*.43);
     if(visible(1020))wall(sx(980),GROUND-3,75);
     if(visible(940)){const x=sx(925);stone(x-12,GROUND,24,9,0);px(x-5,GROUND-16,12,6,'#a89c79');px(x-6,GROUND-12,14,1,'#d0c29c');px(x-3,GROUND-16,1,10,'#685f47');}
   }else if(zone==='village'){
-    for(const [i,x] of [220,1020,1640,2240].entries())if(visible(x,110)){house(sx(x),GROUND-2,x===1020,i);smoke(sx(x+7),GROUND-55-i%3*4,i*9);}
+    // 결정 D-1008: 끝 집(2240)이 공동 화로(2290) 앞을 가렸다. 집을 왼쪽으로 비켜 세운다
+    for(const [i,x] of [220,1020,1640,2170].entries())if(visible(x,110)){house(sx(x),GROUND-2,x===1020,i);smoke(sx(x+7),GROUND-55-i%3*4,i*9);}
     for(const x of [430,1320,2020,2590])if(visible(x))wall(sx(x),GROUND-2,83);
     const mx=sx(fixtures.millX??1160);stone(mx-29,GROUND,58,36);px(mx-25,GROUND-40,50,5,'#a6b0a7');px(mx-23,GROUND-41,46,1,P.frost);px(mx-2,GROUND-48,4,8,'#746f57');px(mx-4,GROUND-50,8,3,'#746f57');px(mx+17,GROUND-46,2,6,'#5a5f50');
     const ax=sx(fixtures.workshopX??1080);px(ax-25,GROUND-5,48,5,'#5e665c');px(ax-17,GROUND-14,31,9,'#85918a');px(ax-15,GROUND-15,27,2,'#c4cdc1');px(ax+1,GROUND-24,2,9,'#645b47');px(ax-2,GROUND-26,8,3,'#a5b3ab');   // 결정 D-735: 할배의 정. 꼬마가 감춘 동안엔 없고, 돌려드린 뒤엔 받침돌 모서리 홈에 꽂혀 있다
@@ -152,17 +161,20 @@ function scenery(zone,fixtures={}){const sx=x=>Math.round(tx(x)-cam);const visib
     if(visible(2290))hearth(sx(2290),GROUND);
   }else if(zone==='field'){
     for(let x=100;x<3000;x+=9){if(!visible(x,3))continue;const h=3+Math.floor(hash(x)*4);px(sx(x),GROUND-h,1,h,'#a09c7d');if(hash(x+1)>.8)px(sx(x)-1,GROUND-h,3,1,'#d9d9c1');}
-    for(const x of [410,1260,2190])if(visible(x))pine(sx(x),GROUND,1.08+hash(x+3)*.55);
+    // 결정 D-1008: 메밀 그루터기 살펴보기(390)를 가리던 소나무를 둔덕 너머(520)로, 산양 턱(2190) 밑 소나무를 밭 끝(2400)으로
+    for(const x of [520,1260,2400])if(visible(x)&&clear(x,24))pine(sx(x),GROUND,1.08+hash(x+3)*.55);
     const nx=sx(fixtures.nestX??1510);px(nx-22,GROUND-5,44,5,'#8d876a');px(nx-19,GROUND-8,38,3,'#bab18b');px(nx-15,GROUND-11,30,3,'#d8cfaa');
     for(const x of [720,1730,2570])if(visible(x))wall(sx(x),GROUND-2,62);
   }else if(zone==='cliff'){
-    for(let x=60;x<3100;x+=124){if(!visible(x))continue;const h=20+Math.floor(hash(x)*19);stone(sx(x),GROUND,35,h,Math.floor(x/124));px(sx(x)+4,GROUND-h+3,19,1,P.frost);}
-    for(const x of [210,1120,2010,2680])if(visible(x))pine(sx(x),GROUND,.84+hash(x+9)*.58);
-    const dx=sx(fixtures.daraeX??2780);px(dx-2,96,2,19,'#5f6950');px(dx-16,103,18,2,'#5f6950');px(dx,109,19,2,'#5f6950');px(dx-18,100,4,2,'#8a9d6b');px(dx+15,106,5,2,'#8a9d6b');
+    for(let x=60;x<3100;x+=124){if(!visible(x)||!clear(x,24))continue;const h=20+Math.floor(hash(x)*19);stone(sx(x),GROUND,35,h,Math.floor(x/124));px(sx(x)+4,GROUND-h+3,19,1,P.frost);}
+    // 결정 D-1008: 길을 줄이면서 잘린 자리(210·1120·2010)의 소나무는 원래 안 보였다. 끝의 소나무(2680)는 골렘 뒤 바위턱·해돋이 자리 밑을 가려 뺐다. 들어선 길목에 하나만 둔다
+    for(const x of [1240])if(visible(x)&&clear(x,24))pine(sx(x),GROUND,.84+hash(x+9)*.58);
+    // 결정 D-1009: 다래 덩굴은 골렘 뒤에 깔리는 높은 턱에 걸려 있다. 턱이 없을 때(골렘 전) 허공에 뜨지 않게 그때만 그린다
+    if(G.boss.dead){const dx=sx(fixtures.daraeX??2780);px(dx-2,96,2,19,'#5f6950');px(dx-16,103,18,2,'#5f6950');px(dx,109,19,2,'#5f6950');px(dx-18,100,4,2,'#8a9d6b');px(dx+15,106,5,2,'#8a9d6b');}
     if(visible(1440)){const x=sx(1460),done=G.f.dolneomeo_frog_warm;hearth(x+15,GROUND);stone(x+(done?-21:-3),GROUND,23,4,0,false);px(x+(done?-18:0),GROUND-4,15,1,'#bea882');px(x-48,GROUND-29,8,29,'#5e716e');px(x-48,GROUND-31,12,3,'#a1b2a5');px(x-42,GROUND-25,1,11,'#c5d7d3');px(x-43,GROUND-15,3,2,'#d9e4de');px(x-45,GROUND-1,8,1,'#8baaaa');}
   }else if(zone==='shrine'){
-    for(let x=60;x<3100;x+=61){if(!visible(x))continue;cairn(sx(x),GROUND,15+Math.floor(hash(x)*24),Math.floor(x/61));}
-    for(const x of [240,880,1510,2510])if(visible(x))pine(sx(x),GROUND,1.16+hash(x+11)*.61);
+    for(let x=60;x<3100;x+=61){if(!visible(x)||!clear(x,16))continue;cairn(sx(x),GROUND,15+Math.floor(hash(x)*24),Math.floor(x/61));}
+    for(const x of [240,880,1510,2510])if(visible(x)&&clear(x,24))pine(sx(x),GROUND,1.16+hash(x+11)*.61);
     const SG=Rg.shrineSummitY?.()??GROUND;   // 결정 D-845: 성황당 돌집은 꼭대기 마당에 선다
     const cx=sx(fixtures.shrineX??2400);px(cx-27,SG-7,54,7,'#6e7b77');px(cx-22,SG-17,44,10,'#8a9790');px(cx-17,SG-19,34,2,P.frost);px(cx-18,SG-41,3,24,'#726653');px(cx+15,SG-41,3,24,'#726653');px(cx-25,SG-43,50,4,'#4c605c');px(cx-29,SG-45,58,2,P.frost);px(cx-20,SG-47,40,2,'#75867b');px(cx-12,SG-49,24,2,'#a4b0a0');
   }
@@ -253,8 +265,9 @@ function wishStackPaint(w,h,s){
    산양·고라니는 발굽으로 쥘 수 없어 돌을 입에 물고 내려놓는다. (l: 돌 왼쪽, top: 돌 윗면, sw: 돌 너비) */
 function carryHand(form,l,top,sw){
   const cx=l+Math.floor(sw/2),half=Math.min(4,Math.ceil(sw/2)+1),pl=cx-half,pw=half*2+1;
-  if(form==='goat'||form==='deer'){
-    const C=form==='goat'?'#ebe5d9':'#b88a55',S=form==='goat'?'#b9b0a0':'#8a6440',D='#3a2f28';
+  // 결정 D-1006: 수달도 입에 문다 (짙은 갈색 목, 옅은 주둥이)
+  if(form==='goat'||form==='deer'||form==='otter'){
+    const C={goat:'#ebe5d9',deer:'#b88a55',otter:'#6a4a30'}[form],S={goat:'#b9b0a0',deer:'#8a6440',otter:'#4e3522'}[form],D='#3a2f28';
     px(cx-2,0,5,top-6,C);px(cx+2,0,1,top-6,S);            // 목
     px(cx-3,top-7,7,6,C);px(cx-3,top-7,1,6,S);            // 주둥이
     px(cx-1,top-6,1,1,D);px(cx+2,top-6,1,1,D);            // 콧구멍
@@ -284,7 +297,7 @@ function carryHand(form,l,top,sw){
 /* 결정 D-734: 맷돌 배우기의 가장 중요한 장면(왼쪽으로 한 바퀴)에 맷돌 돌리는 그림 (사용자 피드백 2026-11-05 돌너머 4).
    옆에서 조금 위로 본 맷돌. 아이 손이 어처구니를 쥐고 왼쪽으로 한 바퀴 돌린다. 윗돌 옆의 자개 발자국이 따라 돈다.
    한 바퀴를 다 돌면 잠깐 멈추고, 돌이 낮게 우는 결이 둘레에 번진다. 3.2초마다 되풀이. 손은 지금 모습을 따른다. */
-const MILL_HAND={'':['#3d332b','#7a6656'],squirrel:['#8a4a22','#d9b08a'],owl:['#6f5436','#c9a040'],goat:['#ebe5d9','#2e2621'],deer:['#b88a55','#3a2a1f']};
+const MILL_HAND={'':['#3d332b','#7a6656'],squirrel:['#8a4a22','#d9b08a'],owl:['#6f5436','#c9a040'],goat:['#ebe5d9','#2e2621'],deer:['#b88a55','#3a2a1f'],otter:['#5e4029','#a88a66']};
 function maetdolTurnPic(){
   return {sound:'pic_maetdol_turn',draw(w,h,t){
     px(0,0,w,h,'#dcd8c8');px(0,36,w,8,'#a39b8a');px(0,36,w,1,'#857d6e');
