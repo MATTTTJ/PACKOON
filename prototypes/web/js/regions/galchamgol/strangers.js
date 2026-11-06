@@ -14,8 +14,9 @@ Rg.strangers={
     trades:[{give:{rice:1},get:{acorn:3}}],swapPool:['acorn','powder'],
     talk(form){
       if(form==='owl')return strangerSay([['너구리','(도담이 꼬리를 말고 나무 구멍으로 쏙 숨는다.)']]);
-      if(form==='deer'&&strangerOnce('gal_dodam_deer'))return strangerSay([
-        ['도담','고라니 손님은 하나도 안 무서워.\n이거 하나 먹어 봐.'],receiveItem('acorn',1)]);
+      // 결정 D-987: 영산 변신이 고라니에서 수달로 바뀌었다 (D-1073). 물에서 온 손님이라 도담이 신기해한다.
+      if(form==='otter'&&strangerOnce('gal_dodam_otter'))return strangerSay([
+        ['도담','수달 손님이다! 숲까지 올라온 수달은 처음 봐!\n이거 하나 먹어 봐. 물에선 도토리 없지?'],receiveItem('acorn',1)]);
       return false;
     }},
   toad:{

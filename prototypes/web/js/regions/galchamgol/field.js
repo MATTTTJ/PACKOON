@@ -322,7 +322,8 @@ if(!CLASSIC){
       // 결정 D-410: 구역 사이는 이어진 길로만 오간다 (사용자 피드백 2026-11-03: 순간이동 기믹 빼기). 함지박 타기·물 건너 당산나무 문을 뺐다.
       exits:{right:{to:'forge',toX:70}},
       // 다람쥐의 잊은 몫 (PA-47, 다람쥐 모습에만 보인다)
-      digs:[{id:'gal_cache_village',x:880,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
+      // 결정 D-988: 다람쥐 몫이 도토리만이 아니다 (사용자 피드백 2026-11-06 큰 장터 5). 집 둘레 밤나무 밑이라 다른 다람쥐가 밤을 묻어 뒀다.
+      digs:[{id:'gal_cache_village',x:880,item:'bam',n:2,form:'squirrel',cache:true,done:false}],
       vistas:[{id:'stream',x:930,from:0,to:140,draw:A.streamDoor,sound:'water',
         thought:'낙엽이 앞서 가네.\n당산나무까지 가는 걸까?',
         diary:'물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.',layers:A.vistaStream}],
@@ -345,7 +346,7 @@ if(!CLASSIC){
       doors:[forestTreeDoor=path(2420,'hill',180,'금줄 따라 당산나무 언덕으로',{need:cutPath,
           reason:'칡덩굴이 금줄 길을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 금줄 길',blockedSay:vineSay,draw:A.ropeGate,drawBlocked:A.ropeGate})],   // 결정 D-190
       // 다람쥐만 오르는 높은 참나무 가지와 잊은 몫 (PA-47 선택 자리)
-      climbs:[{x:752,top:96}],
+      climbs:[{x:752,top:96,draw:(x,bottom,top)=>A.highOak(x,bottom,top)}],   // 결정 D-981
       digs:[{id:'gal_cache_forest',x:1900,item:'acorn',n:2,form:'squirrel',cache:true,done:false}],
       stamps:[{id:'knot',x:2250,y:112,note:'stamp:galchamgol:knot',label:'높은 가지 옹이 살피기'}],
       // 결정 D-154: 숯가마는 검댕(story.js, x 430)의 왼쪽에 서 있는 배경이다. 사연이 켜진 판에서 검댕과 함께 나온다.
