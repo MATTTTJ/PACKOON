@@ -274,6 +274,8 @@ Rg.drawSnowPresence=()=>{
       ctx.globalAlpha=(on?0.95:0.5)*Math.min(1,(r-18)/20);R(px,py,sz,sz,i%2?'#ffffff':'#d6e2ee');}
     for(let i=0;i<24;i++){const k=((t*0.025+hash(i*3.7))%1),px=x-52+hash(i*5.1)*104,top=GROUND-92+Math.abs(px-x)*0.1;   // 어깨에서 미끄러져 떨어지는 눈
       ctx.globalAlpha=0.9*(1-k);R(px,top+k*86,3,3,'#ffffff');}
+    for(let k=0;k<3;k++){const r=44+k*30,a0=hash(k*3.3)*6+t*0.055*Math.sqrt(114/r);ctx.globalAlpha=0.32;   // 휘감는 바람 띠
+      for(let j=0;j<22;j++){const a=a0-j*0.06,ex=Math.cos(a)*r,ey=Math.sin(a)*r*0.5,px=x+ex*ct-ey*st,py=cy+ex*st+ey*ct;if(py<GROUND-1)R(px,py,2,2,'#ffffff');}}
     for(let i=0;i<26;i++){const r=40+hash(i*2.9)*80,a0=hash(i*9.1)*Math.PI*2+t*0.055*Math.sqrt(114/r),n=4+Math.floor(hash(i)*3);   // 결정 D-941: 도는 방향으로 그어지는 눈바람 줄기
       ctx.globalAlpha=0.7;for(let j=0;j<n;j++){const a=a0-j*0.07,ex=Math.cos(a)*r,ey=Math.sin(a)*r*0.5,px=x+ex*ct-ey*st,py=cy+ex*st+ey*ct;if(py<GROUND-1)R(px,py,2,i%3?1:2,'#f4f6f8');}}
     for(let i=0;i<8;i++){const q=t*0.15+i*0.8;ctx.globalAlpha=0.7;R(x-30+i*8+Math.cos(q)*3,GROUND-4-Math.abs(Math.sin(q))*7,4,3,'#f4f6f8');}   // 발치에서 이는 눈

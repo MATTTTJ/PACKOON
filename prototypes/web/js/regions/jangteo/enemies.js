@@ -86,19 +86,27 @@ function hongsiInIce(c,x,y,s=1,crack=0,alpha=1){
 /* 결정 D-941: 숨은 눈도깨비 둘레로 눈폭풍이 휘몰아친다 (사용자 지시 2026-11-06 "눈도깨비를 중심으로 감싸고 돌아야 한다. 사선 방향으로").
    눈발은 (cx,cy)를 가운데 두고 비스듬히 기운 타원을 따라 돌며 안쪽으로 빨려 든다. 가까울수록 빠르다.
    긴 눈줄기는 도는 방향으로 그어진다. 예전(D-877)엔 판 전체에 위에서 아래로 비스듬히 내리쳤다. */
-const STORM={tilt:-0.5,squash:0.5,spin:0.9,inflow:0.35,rMin:26};
+const STORM={tilt:-0.5,squash:0.5,spin:0.9,inflow:0.35,rMin:26,bias:1.7,bands:4};
 function stormSwirl(c,cx,cy,rMax,n,streaks,alpha=1){
   const t=still()?0:B.time,ct=Math.cos(STORM.tilt),st=Math.sin(STORM.tilt);
   const at=(r,a)=>{const ex=Math.cos(a)*r,ey=Math.sin(a)*r*STORM.squash;return [cx+ex*ct-ey*st,cy+ex*st+ey*ct];};
-  const span=rMax-STORM.rMin;
+  const span=rMax-STORM.rMin,ang=(r,seed)=>seed+t*STORM.spin*0.06*Math.sqrt(rMax/r);
+  // 휘감는 바람 띠: 몸 둘레의 기운 타원 위를 도는 옅은 긴 호. 흐름이 보이게 한다
+  c.save();c.lineCap='round';
+  for(let k=0;k<STORM.bands;k++){const r=rMax*(0.22+k*0.17),a0=ang(r,k*1.7),len=1.1+hash(k*3.3)*0.6;
+    for(const [w,al] of [[9,0.12],[2.2,0.4]]){c.globalAlpha=al*alpha;c.strokeStyle=SNOW;c.lineWidth=w;c.beginPath();
+      for(let j=0;j<=16;j++){const [x,y]=at(r,a0-len*j/16);if(j)c.lineTo(x,y);else c.moveTo(x,y);}c.stroke();}}
+  c.restore();
+  // 눈발: 가운데로 몰리게(bias) 놓고, 돌면서 안쪽으로 빨려 든다
   for(let i=0;i<n;i++){
-    const r=STORM.rMin+((hash(i*2.3)*span-t*STORM.inflow*(0.6+hash(i))%span)+span)%span,a=hash(i*7.1)*Math.PI*2+t*STORM.spin*0.06*Math.sqrt(rMax/r);
+    const u=Math.pow(hash(i*2.3),STORM.bias),r=STORM.rMin+((u*span-t*STORM.inflow*(0.6+hash(i))%span)+span)%span,a=ang(r,hash(i*7.1)*Math.PI*2);
     const [x,y]=at(r,a),sz=1.3+hash(i*4.7)*2.3,fade=Math.min(1,(r-STORM.rMin)/30);
     blob(c,x,y,sz,sz*0.8,SNOW,0.85*alpha*fade);}
+  // 눈줄기: 도는 방향으로 길게 그어진 호
   for(let i=0;i<streaks;i++){
-    const r=STORM.rMin+20+hash(i*5.1)*(span-20),a=hash(i*8.3)*Math.PI*2+t*STORM.spin*0.06*Math.sqrt(rMax/r),len=0.18+hash(i*3)*0.2;
-    const pts=[0,0.5,1].map(q=>at(r*(1+q*0.04),a-len*q));
-    brush(c,pts,1.5,SNOW,0.55*alpha);}
+    const r=STORM.rMin+20+Math.pow(hash(i*5.1),1.3)*(span-20),a=ang(r,hash(i*8.3)*Math.PI*2),len=0.3+hash(i*3)*0.3;
+    const pts=[0,0.25,0.5,0.75,1].map(q=>at(r*(1+q*0.05),a-len*q));
+    brush(c,pts,1.6,SNOW,0.65*alpha);}
 }
 
 /* 결정 D-760: 설산에서 온 얼음 뿔. 이마(x,y)에서 솟아 lean 쪽으로 휜다. r 은 얼굴 반지름 */
