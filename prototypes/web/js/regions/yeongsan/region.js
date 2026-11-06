@@ -346,7 +346,7 @@ function install(){
   // 봄이 오면 아빠는 섬으로 건너와 산군 곁에 선다. 이름·약·귀향 장면이 모두 섬에서 열리기 때문이다.
   {
     const isl=Rg.zones.island,sh=Rg.zones.shore;
-    const islList=isl.npcs,shGet=Object.getOwnPropertyDescriptor(sh,'npcs').get;
+    const islList=isl.npcs,shDesc=Object.getOwnPropertyDescriptor(sh,'npcs'),shList=sh.npcs,shGet=()=>shDesc.get?shDesc.get():shList;
     Object.defineProperty(isl,'npcs',{configurable:true,get:()=>G?.f?.spring?[...islList,'dad']:islList});
     Object.defineProperty(sh,'npcs',{configurable:true,get:()=>{const l=shGet();return G?.f?.spring?l.filter(n=>n!=='dad'):l;}});
     // 수달과 살금이는 배와 함께 오간다. 섬 선착장에서도 보인다.

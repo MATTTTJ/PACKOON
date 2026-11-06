@@ -1169,7 +1169,7 @@ const examine=(id,x,label,text,p)=>({id,x,label,text,...(p?{pic:p}:{})});
 const examines={
   shelter:[],
   snow:[
-    examine('y_snow_stream',1100,'언 물길 살펴보기','옹달샘 쪽에서 내려온 물길이 얼어 있다.\n호수 쪽으로 가다가 뚝 멈췄다.',Rg.pics.frozenStream),
+    examine('y_snow_stream',880,'언 물길 살펴보기','옹달샘 쪽에서 내려온 물길이 얼어 있다.\n호수 쪽으로 가다가 뚝 멈췄다.',Rg.pics.frozenStream),
     examine('y_snow_sign',2100,'낡은 이정표 살펴보기','기둥에 가로줄이 여럿 새겨져 있다.\n해마다 눈이 어디까지 왔는지 재 둔 걸까?',Rg.pics.snowSign)
   ],
   slope:[
