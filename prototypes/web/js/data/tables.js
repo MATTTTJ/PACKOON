@@ -459,7 +459,7 @@ const TABLES={
    "r": 1,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "산막에서 말린 붉은 대추. 맷돌에서 지역 재료와 함께 간다. 교환으로만 얻는다.",
+   "d": "길손 움막에서 말린 붉은 대추. 맷돌에서 지역 재료와 함께 간다. 교환으로만 얻는다.",
    "u": "알"
   },
   "acorn_jelly": {
@@ -2562,7 +2562,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "마가목 열매를 좋아한다. 얼어붙은 비탈의 지름길을 안다.",
+     "text": "마가목 열매를 좋아한다. 얼어붙은 비탈 끝 바위턱의 눈에 묻힌 디딤돌로 호숫가에 내려가는 길을 안다.",
      "section": "관찰",
      "when": "salgeumi:shortcut"
     },
@@ -4249,7 +4249,7 @@ const TABLES={
    "warehouse": "창고 뒷길"
   },
   "yeongsan": {
-   "shelter": "산막",
+   "shelter": "영산 어귀",
    "snow": "깊은 눈길",
    "slope": "얼어붙은 비탈",
    "shore": "호숫가",
@@ -5500,31 +5500,6 @@ const TABLES={
   "pic_siru_steam": {
    "sfx": "steamer",
    "repeat": 1800
-  },
-  "y_hut_bindings": {
-   "sfx": "cloth_flutter"
-  },
-  "y_hut_post": {
-   "sfx": "wood_tap"
-  },
-  "y_hut_smoke": {
-   "sfx": "fire_crackle",
-   "repeat": 1500
-  },
-  "y_snow_tunnel": {
-   "sfx": "wind_gust"
-  },
-  "y_snow_map": {
-   "sfx": "footstep_snow"
-  },
-  "y_snow_sign": {
-   "sfx": "wood_tap"
-  },
-  "y_slope_rowan": {
-   "sfx": "leaf_rustle"
-  },
-  "y_slope_hole": {
-   "sfx": "ice_tinkle"
   },
   "y_slope_hoof": {
    "sfx": "footstep_snow"

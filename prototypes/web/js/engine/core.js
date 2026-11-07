@@ -171,8 +171,9 @@ function untrimX(t,cuts){if(!cuts||!Number.isFinite(t))return t;let s=0;for(cons
    결정 D-206: 5는 돌너머 성황당(남생이 할미 구역)을 더 줄인 판이다.
    결정 D-520: 6은 단풍골 마을 개울 뒤 빈 길을 반으로 줄인 판이다.
    결정 D-640: 7은 돌너머 돌쇠 할배~날쌘 사이 길을 2/3로 줄인 판이다.
+   결정 D-1229: 8은 영산 얼어붙은 비탈의 들어선 자리~수달 길을 반으로 줄인 판이다 (영산은 Rg.trimCutsV3~V7 에 옛 자르기를 둔다).
    지역이 Rg.trimCutsV1·V2·V3·V4·V5(그 판의 자르기)를 두면, 그 판으로 저장한 상태는 그 차이만큼만 옮긴다. */
-const TRIM_VER=7;
+const TRIM_VER=8;
 /* 결정 D-128: 자른 구역의 배경은 남은 구간마다 나눠 그린다(engine/field.js segmentedDraw).
    그리는 동안 TRIM_SEG는 그 구간이 당겨진 만큼이고, cam은 그만큼 옮겨진다. 그래서 설계 좌표로 쓴 그림(u-cam)이 제자리에 온다.
    이미 옮긴 좌표(발판·도장·물건)나 원경 원근(cam*k)은 RC()(실제 카메라)를 쓴다. */
