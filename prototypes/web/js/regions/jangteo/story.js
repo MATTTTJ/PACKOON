@@ -1568,7 +1568,7 @@ Rg.trade={
   ],
   nal:()=>[
     ...(G.ledger.nal_jangteo?[
-      {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1},{ssal_powder:1,yakgwa:1}],multi:true,done:()=>G.f.nalJDone&&CLASSIC,accept:(i,k)=>nalTrade('ssal_powder',i===1,k)},
+      {id:'t_nal_jangteo_ssal',item:'pat',n:1+(G.f.nalJBluff?1:0),asks:[{ssal_powder:1},{ssal_powder:1,yakgwa:1}],extra:[null,{pat:1}],multi:true,done:()=>G.f.nalJDone&&CLASSIC,accept:(i,k)=>nalTrade('ssal_powder',i===1,k)},
       {id:'t_nal_jangteo_memil',item:'pat',n:2+(G.f.nalJBluff?1:0),asks:[{memil_powder:1}],multi:true,done:()=>G.f.nalJDone&&CLASSIC,accept:(i,k)=>nalTrade('memil_powder',false,k)}
     ]:[]),
     // 결정 D-147: 떡 재료 묶음은 처음부터 날쌘 지게에 있다. 엿방울 몫을 아직 모르면 까닭은 말하지 않고 남겨 두기만 한다.

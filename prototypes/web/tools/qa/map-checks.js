@@ -5,6 +5,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {measureScene}=require('./runtime-checks');
 const {runZoneEnds}=require('./end-checks');   // 결정 D-847
+const {runSpacing}=require('./spacing-checks');   // 결정 D-1103
 const regions=['galchamgol','dolneomeo','jangteo','yeongsan'];
 const j=JSON.stringify;
 async function ready(b,classic=false){
@@ -223,6 +224,7 @@ async function runMap({browser:b,outDir}){
     await ready(b,true);await b.key('m');
     check(await b.eval("$('map').hidden&&!$('btnMap').getClientRects().length"),'map-classic','classic에서 지도 또는 지도 HUD 버튼이 열렸다.');
     await runZoneEnds(b,check,records,picture);   // 결정 D-847: 구역 끝 너머 빈 화면 없음, 막다른 끝 멈춤, 성황당 비탈 오르기
+    await runSpacing(b,check,records);   // 결정 D-1103: 채집물 사이·채집물과 상호작용 자리 사이 최소 간격
   }catch(error){
     findings.push({rule:'map-execution',severity:'높음',message:error.stack||error.message,scene:b.scene});
     await picture('map-failure').catch(()=>{});

@@ -59,7 +59,7 @@ Rg.namesBack=()=>!!(typeof G!=='undefined'&&G&&G.f&&(G.f.nameRestored||G.f.sprin
 /* PA-43: 옛 배치와 저장은 classic 쪽에 남긴다. 공급은 기존 마가목 넷에 하나를 더한다. */
 if(!CLASSIC){
   // 결정 D-207: 다래 덩굴 셋과 짚단이 30px 간격으로 붙어 있던 것을 들쭉날쭉 떨어뜨린다(사용자 피드백 58). 셋째 덩굴은 다람쥐 숨긴 몫(640)과 붙지 않게.
-  const SHELTER_VINES=[296,348,706],SHELTER_STRAW=404;
+  const SHELTER_VINES=[302,352,706],SHELTER_STRAW=404;   // 결정 D-1103: 날쌘(260)과 간격, 덩굴끼리 gather_min_gap
   const oldState=Rg.newState;
   Rg.newState=()=>{
     const s=oldState();
@@ -156,13 +156,7 @@ function prepareBoat(part){
 }
 function sail(to){
   const returning=G.zone==='island';
-  if(!G.f.spring){
-    if(!G.f.dadDone){talk([['너구리','아빠가 기다리고 있어. 먼저 아빠에게 가자.']]);return;}
-    if(!ready()){
-      talk([['너구리','아직 길을 모르겠어. 선착장 앞 막대에서 얼음을 먼저 두드려 보자.']]);return;
-    }
-    changeZone(to,{x:to==='island'?200:2320});return;
-  }
+  if(!G.f.spring)return;   // 결정 D-1127: 겨울엔 얼음길을 걸어서 건넌다 (이 자리는 봄에만 보인다)
   if(!returning&&!boatReady()){
     talk([['낚시하는 수달','배는 둑에 올려 뒀어. 노, 고리, 배 밑 차례로 같이 보자.'],['살금이','마른 돌길로 걸어와. 나는 선착장에서 기다릴게.']]);return;
   }
@@ -188,7 +182,8 @@ function traceStamp(s,fresh=false){
   if(traced[s.id]){talk([['너구리','손끝으로 따라가 본 무늬다. 수첩의 그날 이야기를 다시 읽어 보자.'],...record()]);return;}
   const details={
     hut_post:{act:'hutPrint',intro:'문설주에 아빠 손바닥 도장이 있어. 문을 잡던 손이 여기에 닿았겠지.',look:'바깥쪽은 매끈하고 무늬 안쪽은 거칠다.\n눈을 털고 내 손으로 따라가 볼까?',after:'보따리 가득 채워 올 줄 알았구나. 난 엄마 약 하나면 돼.'},
-    snow_sign:{act:'snowPrint',intro:'기둥 뒤에 무늬를 팠네. 눈이 덮여도 이 홈은 없어지지 않았어.',look:'젊은 아빠도 여기서 아래를 봤겠지.\n무늬를 짚으면서 아빠가 보던 쪽으로 서 보자.',after:'여기서 내려갈 길을 그려 봤구나. 나도 저 불빛 따라 내려갈래.'},
+    // 결정 D-1123: 팻말 대신 보부상들이 지게를 받쳐 두고 쉬던 쉼바위. 윗면엔 지게 다리 홈, 옆면에 도장
+    snow_sign:{act:'snowPrint',intro:'쉼바위 옆면에 무늬를 팠네. 윗면엔 지게 다리 받치던 홈도 있어.',look:'젊은 아빠도 여기 지게를 받쳐 두고 아래를 봤겠지.\n무늬를 짚으면서 아빠가 보던 쪽으로 서 보자.',after:'여기서 쉬면서 내려갈 길을 그려 봤구나. 나도 저 불빛 따라 내려갈래.'},
     shore_rock:{act:'shorePrint',intro:'바위의 오래된 무늬와 눈에 찍힌 새 발자국이 나란히 있어.',look:'무늬가 얼마나 닮았는지 손끝으로 짚어 보자.\n미끄럽지 않은 바위 쪽에서부터.',after:'젊었을 땐 빈손으로 혼자 내려갔구나. 이번엔 같이 돌아가야지.'}
   }[s.id];
   if(!details)return;
@@ -335,10 +330,14 @@ function install(){
   shore.npcs.push(...[1350,1900,2240].map((winterX,j)=>({...fixture('y_ice_station_'+j,'얼음길 막대 '+(j+1),winterX,()=>G.f.spring?prepareBoat(['oar','rope','launch'][j]):survey(j+1)),
     get x(){return G.f.spring?[2180,2210,2240][j]:winterX;},
     get prompt(){return G.f.spring?['둑에 둔 노 손보기','배 묶는 고리 손보기','작은 배 물에 띄우기'][j]:'얼음길 막대 '+(j+1)+' 살피기';}})));
-  shore.npcs.push(fixture('y_lake_depart','호수 건너기',2320,()=>sail('island')));
-  island.npcs.push(fixture('y_lake_return','호숫가로 돌아가기',160,()=>sail('shore')));
+  // 결정 D-1127 (사용자 지시 2026-11-07 4스테이지 14): 겨울엔 '호수 건너기' 단추가 섬으로 순간이동시켰다. 얼음길은 걸어서 건너면 된다.
+  //   겨울에는 이 두 자리를 감추고(화면 밖), 표시한 얼음길을 따라 오른쪽 끝(섬은 왼쪽 끝)으로 걸어 나가 건넌다(exits).
+  //   봄에는 얼음길이 물에 잠기니 배 띄우기 자리로 쓴다(sail → voyage).
+  const winterHide=x=>()=>G?.f?.spring?x:-9999;
+  shore.npcs.push({...fixture('y_lake_depart','호수 건너기',2320,()=>sail('island')),get x(){return winterHide(2320)();}});
+  island.npcs.push({...fixture('y_lake_return','호숫가로 돌아가기',160,()=>sail('shore')),get x(){return winterHide(160)();}});
   shore.exits.right.need=()=>!G.f.spring&&!!G.f.dadDone&&ready();
-  shore.exits.right.reason='선착장 앞 막대에서 얼음길을 살피자. 두드린 얼음만 밟고 건넌다.';
+  Object.defineProperty(shore.exits.right,'reason',{configurable:true,get:()=>!G.f.dadDone?'호숫가 끝에 누가 앉아 있다. 먼저 가 보자.':'선착장 앞 막대에서 얼음길을 살피자. 두드린 얼음만 밟고 건넌다.'});
   const oldDraw=shore.drawActors;
   shore.drawActors=()=>{
     oldDraw?.();

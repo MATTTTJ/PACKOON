@@ -1299,7 +1299,7 @@ Rg.trade={
     // 결정 D-147: 소금·깨는 처음부터 날쌘 지게에 있다. 칡 줄기가 없으면 값이 모자랄 뿐이다.
     ...(!CLASSIC?[{id:'t_craft_salt',item:'salt',label:'소금 2 · 깨 1',asks:[{vine:1}],done:()=>G.f.craftTrade_salt,accept:nalSaltGive}]:[])
   ],
-  toad:()=>G.f.toadMet?[{id:'t_toad',item:'meoru',icon:'magamok_tea',label:'엄마의 병을 늦추는 약',asks:[{meoru:1},{meoru:1,acorn_jelly:1}],done:()=>G.diary.some(d=>d.id==='end'),accept:toadGive}]:[]
+  toad:()=>G.f.toadMet?[{id:'t_toad',item:'meoru',icon:'magamok_tea',label:'엄마의 병을 늦추는 약',asks:[{meoru:1},{meoru:1,acorn_jelly:1}],extra:[null,{kkoe:1}],done:()=>G.diary.some(d=>d.id==='end'),accept:toadGive}]:[]
 };
 Rg.onHaggle=(npc,way)=>{
   if(npc!=='nal'||way!=='허세'||G.f.nalDone)return false;

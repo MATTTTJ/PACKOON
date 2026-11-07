@@ -30,7 +30,8 @@ function talkNal(){
   if(!F.nalYTalk){F.nalYTalk=true;ledger('nal_yeongsan','날쌘','다래 덩굴 2 + 짚 1','설피');
     // 결정 D-161: 같은 길을 걸어 본 보부상으로 고갯길 고생을 먼저 알아준다.
     talk([['날쌘','…여기까지 왔네.'],['날쌘','이 고갯길, 나도 넘을 때마다\n숨이 턱까지 차.'],['날쌘','눈이 허리까지 쌓였어. 그 발로는 어림없어.\n설피를 엮어 주지.'],
-      ['날쌘','다래 덩굴 둘이랑 짚 한 단.\n그것만 가져와.']],nalMenu);return;}
+      // 결정 D-1121 (사용자 지시 2026-11-07 4스테이지 2): 무슨 덩굴인지 모르겠다는 지적. 아이템 이름(다래 덩굴) 그대로, 단풍골 칡과 헷갈리지 않게
+      ['날쌘','다래 덩굴 둘이랑 짚 한 단.\n칡 말고 다래. 그것만 가져와.']],nalMenu);return;}
   nalMenu();
 }
 /* 결정 D-1022: 짐 부리는 기둥의 매끈한 자리를 물으면 날쌘도 거기 누가 새겼는지 떠올리지 못한다(이름의 규칙 3). 같이 새겼다는 것만 기억한다 */
@@ -72,18 +73,18 @@ function nalMenu(){
   }
   const c=[{t:'보따리를 펼친다',go:()=>Trade.open('nal')},...nalPostChoice(),{t:'그만두기',go:null}];
   if(arcs()){
-    talk([['날쌘',vineOK()&&bindOK()?'다 모았네. 이리 줘.':!vineOK()?'덩굴 둘. 재료 없이 엮는 재주는\n나도 없어.':'짚 하나면 돼.\n…그것도 없으면 내 꼬리털이라도 뽑게?',c]]);return;
+    talk([['날쌘',vineOK()&&bindOK()?'다 모았네. 이리 줘.':!vineOK()?'다래 덩굴 둘. 재료 없이 엮는 재주는\n나도 없어.':'짚 하나면 돼.\n…그것도 없으면 내 꼬리털이라도 뽑게?',c]]);return;
   }
-  talk([['날쌘',vineOK()&&bindOK()?'재료는 다 모았네. 이리 줘 봐.':!vineOK()?'덩굴 둘. 재료 없이 엮는 재주는\n나도 없어.':'짚 하나만 가져와.\n…그것도 없으면 내 꼬리털이라도 뽑게?',c]]);
+  talk([['날쌘',vineOK()&&bindOK()?'재료는 다 모았네. 이리 줘 봐.':!vineOK()?'다래 덩굴 둘. 재료 없이 엮는 재주는\n나도 없어.':'짚 하나만 가져와.\n…그것도 없으면 내 꼬리털이라도 뽑게?',c]]);
 }
 /* trades.csv t_craft_jujube: 설피를 받은 뒤 남은 덩굴 하나로 대추 둘. */
 function craftJujube(){
   if(CLASSIC||!G.f.seolpi||G.f.yCraftJujube)return;
   ledger('t_craft_jujube','날쌘','다래 덩굴 1','대추 2');
   if(!has('darae_vine')){
-    talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n덩굴 하나에 대추 둘로 바꿀까 했지.']]);return;
+    talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n다래 덩굴 하나에 대추 둘로 바꿀까 했지.']]);return;
   }
-  talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n덩굴 하나랑 바꿀까 했지.'],['날쌘','마침 덩굴이 있네.\n하나에 대추 둘, 어때?',[
+  talk([['날쌘','말린 대추야. 산막 장작 묶을 끈이 모자라서\n다래 덩굴 하나랑 바꿀까 했지.'],['날쌘','마침 다래 덩굴이 있네.\n하나에 대추 둘, 어때?',[
     {t:'보따리를 펼친다',go:()=>Trade.open('nal')},{t:'지금은 놔둘게요',go:null}]]]);
 }
 // 결정 D-78: 약과를 얹으면 대추 하나 더. 영산의 날쌘은 "제값"이라 받은 만큼 더 준다.
@@ -94,7 +95,7 @@ function jujubeGive(i=0){
   const yak=i===1&&has('yakgwa');
   takeItem('darae_vine',1);if(yak)takeItem('yakgwa',1);addItem('jujube',yak?3:2);G.f.yCraftJujube=true;ledgerDone('t_craft_jujube');
   // 결정 D-235: 받은 것을 한 줄로 알린다 (대추는 알로 센다)
-  talk([...(first?[['날쌘','덩굴이네. 산막 장작 묶을 끈이\n모자라던 참이야.']]:[]),...(yak?[['날쌘','약과까지 얹어? …그럼 대추도 하나 더.\n받은 만큼은 줘야 제값이지.']]:[]),['너구리',yak?'(대추 세 알을 얻었다.)':'(대추 두 알을 얻었다.)'],['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
+  talk([...(first?[['날쌘','다래 덩굴이네. 산막 장작 묶을 끈이\n모자라던 참이야.']]:[]),...(yak?[['날쌘','약과까지 얹어? …그럼 대추도 하나 더.\n받은 만큼은 줘야 제값이지.']]:[]),['너구리',yak?'(대추 세 알을 얻었다.)':'(대추 두 알을 얻었다.)'],['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
 }
 // 결정 D-77: 보스가 물러난 뒤 남은 얼음 비늘은 산에 두면 또 얼어붙는다. 산지기 살금이가 깊은 물에 돌려보낸다.
 // 결정 D-1080: 어둑차사로 바뀌어 살금이는 "그놈 곁에서 나온 것"으로만 부른다(물건 이름·출처는 items.csv)
@@ -107,7 +108,7 @@ const SEOLPI_ASKS=[{darae_vine:2,jip:1},{darae_vine:2,eoksae:2}];   // 결정 D-
 function nalTrade(i=0){
   const F=G.f,ask=SEOLPI_ASKS[i];
   if(F.nalYDone||!ask||Object.entries(ask).some(([id,n])=>!has(id,n)))return;
-  const vine='덩굴 둘',bind=ask.jip?'짚 하나':'억새 둘';
+  const vine='다래 덩굴 둘',bind=ask.jip?'짚 하나':'억새 둘';
   for(const [id,n] of Object.entries(ask))takeItem(id,n);
   F.nalYDone=true;F.seolpi=true;ledgerDone('nal_yeongsan');
   if(arcs()){
@@ -504,9 +505,12 @@ function ongdalArcMeet(){
     ['옹달 할미','아랫마을 사람들도 물 길으러 오다 발을 끊었어.\n내려가 봤더니 호수 섬에 갓 쓴 시커먼 게 앉았더구먼.'],
     ...(knows('dolneomeo:turtle-spring')?[['너구리','(남생이 할머니가 그랬지. 뭐가 지나간 자리엔\n샘이 먼저 언다고.)']]:[]),
     ['옹달 할미','첫눈 뒤로 발을 끊은 애가 하나 있어.\n비탈에 사는 겁 많은 고라니. 내 다리론 비탈을 못 가.'],
-    ['옹달 할미','(할미가 솥 물을 표주박에 따라 마개를 막는다.)\n지게 멘 걸 보니 장사꾼이구먼. 이거 좀 날라 줘.'],
-    ['너구리','값은요?'],
-    ['옹달 할미','…허. 장사꾼 맞네.\n갔다 오면 국물 한 그릇.']],
+    // 결정 D-1122 (사용자 지시 2026-11-07 4스테이지 5): 아이가 어른에게 "값은요?" 하던 줄은 버릇없다. 아이는 선뜻 맡고,
+    //   값은 할미가 먼저 정한다(보부상한테 공짜 심부름은 안 시킨다). 아이는 지게를 메지 않았으니(D-424) 할미는 목화송이 모자를 보고 보부상인 줄 안다
+    ['옹달 할미','(할미가 솥 물을 표주박에 따라 마개를 막는다.)\n목화송이 모자를 보니 보부상이구먼. 이거 좀 날라 줄텨?'],
+    ['너구리','네, 갖다드릴게요.\n비탈에 사는 고라니 맞죠?'],
+    ['옹달 할미','그려. 보부상한테 공짜 심부름은 안 시켜.\n갔다 오면 국물 한 그릇 줄 거여.'],
+    ['너구리','고맙습니다. 식기 전에 다녀올게요.']],
     '눈길 옹달샘이 얼어 오소리 할미가 금 간 솥에 눈을 녹여 산짐승에게 물을 주고 있었다. 비탈의 겁 많은 고라니 몫으로 표주박 물을 맡았다. 값은 국물 한 그릇.',
     ()=>{learn('met:ongdal',true);learn('ongdal:pot');think('표주박 물을 비탈의 고라니한테 가져다주자.');});
 }
@@ -1092,7 +1096,7 @@ Rg.goal=()=>{
   if(mapVisited(Rg.id,'shore'))return Q('아빠 찾기','호숫가 끝 얼음 가에 너구리 하나가 앉아 있다. 다가가 보자.');
   if(!F.nalYTalk)return Q('아빠 찾기','아빠는 북쪽 영산으로 갔다. 눈 덮인 산에 산막 불빛이 보인다. 불빛을 따라가 보자.');
   if(!F.seolpi){
-    // 날쌘: "다래 덩굴 둘이랑 짚 한 단. 그것만 가져와." (결정 D-1024)
+    // 날쌘: "다래 덩굴 둘이랑 짚 한 단. 칡 말고 다래. 그것만 가져와." (결정 D-1024·D-1121)
     const why='눈이 허리까지 쌓여 설피가 있어야 한다. 날쌘 아저씨가 다래 덩굴 둘이랑 짚 한 단이면 엮어 주신단다.';
     if(vineOK()&&bindOK())return Q('설피 마련하기','설피 재료가 모였다. 산막의 날쌘 아저씨께 건네자.');
     if(!vineOK())return Q('설피 마련하기',why+' 눈 밑에 묻힌 다래 덩굴을 베자. ('+(G.inv.darae_vine||0)+'/2)');
@@ -1126,7 +1130,7 @@ Rg.trade={
   nal:()=>[
     ...(G.ledger.nal_yeongsan?[{id:'t_nal_yeongsan',item:'seolpi',n:1,asks:SEOLPI_ASKS,done:()=>G.f.nalYDone,accept:nalTrade}]:[]),
     // 결정 D-147: 대추 꾸러미는 처음부터 날쌘 지게에 매달려 있다. 설피를 받기 전에는 덩굴 둘이 설피 몫이다(첫 만남에 들은 값).
-    ...(!CLASSIC?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],done:()=>G.f.yCraftJujube,
+    ...(!CLASSIC?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],extra:[null,{jujube:1}],done:()=>G.f.yCraftJujube,
       locked:()=>!G.f.seolpi&&has('darae_vine')&&!has('darae_vine',3)?'다래 덩굴 둘은 설피 엮을 몫이다. 하나가 더 있어야 한다.':null,accept:jujubeGive}]:[])
   ],
   salgeumi:()=>[
@@ -1318,7 +1322,7 @@ Rg.expContent={
     _shore:[{id:'y_magpie_farewell',name:'늙은 까치',x:500,draw:draw('drawMagpie'),talk:talkMagpie,greeting:'…'}]
   },
   examines,
-  // D-116: 이정표 기둥과 호숫가 큰 바위에는 받침을 따로 그리지 않고 그 위에 찍는다
+  // D-116: 쉼바위(결정 D-1123, 예전 이정표 기둥)와 호숫가 큰 바위에는 받침을 따로 그리지 않고 그 위에 찍는다
   stamps:{shelter:[stamp('hut_post',1040,108)],snow:[{...stamp('snow_sign',1780,108),base:'none',face:10}],shore:[{...stamp('shore_rock',2130,192),base:'none',face:12}]}
 };
 

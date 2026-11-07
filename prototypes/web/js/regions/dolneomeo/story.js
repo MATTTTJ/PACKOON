@@ -612,7 +612,7 @@ Rg.trade={
     // 결정 D-77: 골렘이 잠든 뒤, 돌쇠 할배는 성황당 돌무더기의 눈돌을 제자리에 넣어 주려 한다.
     ...(G.f.dolsoeTea&&G.boss.dead?[{id:'t_dolsoe_eye',item:'stonedust',n:2,label:'돌무더기 눈돌 제자리 찾기 · 돌가루 2',asks:[{mossy_eye:1}],done:()=>G.f.dolsoeEye,accept:dolsoeEyeGive}]:[])
   ],
-  ppuri:()=>G.ledger.ppuri?[{id:'t_ppuri',item:'memil_powder',icon:'geumjul',label:'돌산 길 열기',asks:[{memil_powder:1},{memil_powder:1,memil_jelly:1}],done:()=>G.f.ppuriPassed,accept:ppuriGive}]:[]
+  ppuri:()=>G.ledger.ppuri?[{id:'t_ppuri',item:'memil_powder',icon:'geumjul',label:'돌산 길 열기',asks:[{memil_powder:1},{memil_powder:1,memil_jelly:1}],extra:[null,{seogi:1}],done:()=>G.f.ppuriPassed,accept:ppuriGive}]:[]
 };
 Rg.onHaggle=(npc,way)=>{
   if(npc!=='nal'||way!=='허세'||G.f.nalDDone)return false;

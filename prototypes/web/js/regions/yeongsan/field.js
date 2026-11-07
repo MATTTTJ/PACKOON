@@ -138,7 +138,8 @@ function stepSalg(){
   s.tick++;
   const d=Math.abs(s.x-G.px),moving=Math.abs(G.vx)>MG.salg_moving;
   if(s.startle>0){s.startle--;if(!s.startle){s.phase='graze';s.timer=MG.salg_return_graze;s.risk=0;}return;}
-  if(s.x>s.home)s.x=Math.max(s.home,s.x-MG.salg_return_speed);
+  // 결정 D-1124 (사용자 지시 2026-11-07 4스테이지 8): 놀라 물러난 뒤 제자리로 걸어 돌아오던 것을 뺐다.
+  //   가만히 서 있으면 살금이가 이쪽으로 밀려오는 것처럼 보였다. 물러난 자리에서 다시 풀을 뜯고, 아이가 조심히 다가가야 한다.
   if(d>=MG.salg_active_distance)return;
   if(!s.greeted){s.greeted=true;Rg.salgSay('start');}
   if(!s.arrived&&d<MG.salg_arrival_distance){s.arrived=true;Rg.salgSay('good');}
@@ -203,6 +204,13 @@ if(!CLASSIC){
   const snowReason='눈이 허리까지 찬다. 산막의 날쌘에게 설피를 엮어 달라고 하자.';
   const iceReason='발 디딜 틈이 안 보인다. 이 산 짐승들은 어디로 다닐까?';
   const sign=(x,y)=>a().door(x,y);
+  // 결정 D-1125: 호숫가에서 비탈로 오르는 바위턱 오솔길. 디딤돌 셋과 위 바위에 매어 늘어뜨린 밧줄
+  const climbRope=(x,y)=>{
+    x=Math.round(x);
+    for(let i=0;i<3;i++){R(x-14+i*9,y-6-i*9,14,6+i*9,'#4a5560');R(x-14+i*9,y-7-i*9,14,2,'#e6edf1');}
+    R(x+8,y-38,16,12,'#38424c');R(x+8,y-39,16,2,'#f4f7fa');
+    R(x+12,y-36,2,2,'#7a6450');for(let k=0;k<30;k++)R(x+12-Math.round(Math.sin(k/9)*2),y-34+k,1,1,'#b89a68');
+  };
   const stepCommon=()=>{
     Rg.arcsEnabled();
     if(has('doerim_yak')&&!G.f.yakDone){G.f.yakDone=true;Rg.offerReturnPrep();}
@@ -225,11 +233,15 @@ if(!CLASSIC){
      자리는 시간으로 정해 입자를 따로 모으지 않는다. 그 아래에 밤빛을 한 겹 덮어 어둡게 한다. 동작 줄이기면 멈춘 눈 몇 점만 남긴다. */
   function blizzard(){
     ctx.fillStyle='rgba(6,10,26,.2)';ctx.fillRect(0,0,W,H);
-    const t=Vfx.reducedMotion?0:G.anim,gust=.65+.35*Math.sin(t*.004)+.2*Math.sin(t*.0113),n=Vfx.reducedMotion?40:160;
+    // 결정 D-1120: 눈발이 방향을 자꾸 뒤집어 어지럽던 것을 고쳤다 (사용자 지시 2026-11-07 4스테이지 1).
+    //   전에는 자리를 '시간 × 지금 바람 세기'로 셌다. 오래 머물수록 바람이 조금만 바뀌어도 눈송이가 크게 앞뒤로 튀었다.
+    //   이제 바람 세기를 시간으로 쌓은 값(drift)으로 옮긴다. 눈은 늘 왼쪽으로 비스듬히 흐르고, 세기만 천천히 조금 바뀐다(0.45~0.95).
+    const t=Vfx.reducedMotion?0:G.anim,n=Vfx.reducedMotion?40:160;
+    const drift=.7*t-(.18/.0025)*Math.cos(t*.0025)-(.07/.0071)*Math.cos(t*.0071);
     for(let i=0;i<n;i++){
-      const near=i%4===0,sp=near?1.25:.5+hash(i*.37)*.3,vx=-(near?.95:.45)*gust,span=W+20;
-      const x=(((hash(i*1.91)*W*1.5+t*vx*sp-cam*(near?.25:.08))%span)+span)%span-10;
-      const y=(((hash(i*3.77)*H+t*sp)%(H+10))+(H+10))%(H+10)-5,wob=Math.round(Math.sin(t*.03+i)*1.5);
+      const near=i%4===0,sp=near?1.25:.5+hash(i*.37)*.3,vx=-(near?.95:.45),span=W+20;
+      const x=(((hash(i*1.91)*W*1.5+drift*vx*sp-cam*(near?.25:.08))%span)+span)%span-10;
+      const y=(((hash(i*3.77)*H+t*sp)%(H+10))+(H+10))%(H+10)-5,wob=Math.round(Math.sin(t*.02+i));
       if(near)R(Math.round(x+wob),Math.round(y),2,2,'rgba(238,243,248,.9)');
       else R(Math.round(x+wob),Math.round(y),1,1,i%3?'rgba(200,212,226,.7)':'rgba(236,241,247,.85)');
     }
@@ -303,6 +315,9 @@ if(!CLASSIC){
     shore:zone('shore',['dad'],{left:'slope'},[
       {x:2320,to:'island',toX:160,get label(){return G.f.spring?'작은 배로 신목 섬에':'언 호수를 걸어 신목 섬에';},
         need:()=>!!G.f.dadDone,reason:'아빠가 기다리고 있다. 먼저 호숫가에서 말을 걸어 보자.',draw:sign},
+      // 결정 D-1125 (사용자 지시 2026-11-07 4스테이지 9): 호숫가에서 비탈로 되돌아갈 단추가 없었다(왼쪽 끝으로 걸어 나가야만 했다).
+      //   내려온 자리 왼쪽(마을 장승 앞)에 바위턱 오솔길과 매어 둔 밧줄을 두고, 문으로 언제든 비탈(내려온 바위턱 앞)로 오른다.
+      {x:55,to:'slope',toX:2320,label:'밧줄 잡고 바위턱 올라 비탈로',draw:(x,y)=>climbRope(x,y)},
     ]),
     island:zone('island',['durumi'],{},[   // 결정 D-1081: 산군 대신 두루미
       {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 호숫가로':'얼음길로 호숫가에 돌아가기';},draw:sign},
@@ -323,7 +338,7 @@ if(!CLASSIC){
   // 결정 D-1073: 고라니만 듣던 눈 속 짚단 대신 수달만 잠수하는 얼음 구멍 둘(비탈). 얼음 밑에 가라앉은 것을 건진다
   Rg.zones.slope.digs=[{id:'y_dive_fish',x:1100,item:'bingeo',n:2,form:'otter',cache:true,done:false,line:'얼음 구멍에 쏙 들어갔다 나왔다. 빙어 두 마리를 물고 나왔다!'},
     {id:'y_dive_jip',x:1640,item:'jip',n:1,form:'otter',cache:true,done:false,line:'얼음 밑에 짚단이 걸려 있었다. 가을에 누가 떨어뜨렸나 보다.'}];
-  Rg.zones.shelter.digs=[{id:'y_cache_shelter',x:720,item:'jat',n:2,form:'squirrel',cache:true,done:false}];
+  Rg.zones.shelter.digs=[{id:'y_cache_shelter',x:655,item:'jat',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.snow.digs=[{id:'y_cache_snow',x:1260,item:'solbang',n:2,form:'squirrel',cache:true,done:false}];
   /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 눈 덮인 마가목 열매(줍는 자리마다 마가목이 선다), 덤불의 다래 덩굴,
      소나무 밑 솔방울, 높은 바위턱의 잣송이. 살금이 둘레(비탈 900~1350)는 비워 둔다. 좌표는 길을 줄인 뒤의 자리. */
@@ -331,7 +346,7 @@ if(!CLASSIC){
      눈길은 마가목·잣송이·솔방울, 비탈은 덤불과 마가목, 호숫가는 덤불과 바위턱 잣송이. 마가목은 비탈의 마가목 나무(구역에 이미 있는 다섯)에서 주로 딴다. */
   addZoneGather(Rg,'y_g_',[
     ['shelter','d',1110,'darae_vine'],['shelter','p',1560,'solbang'],
-    ['snow','p',455,'magamok'],['snow','p',960,'solbang'],['snow','p',1420,'jat',{y:108}],
+    ['snow','p',420,'magamok'],['snow','p',960,'solbang'],['snow','p',1430,'jat',{y:108}],   // 결정 D-1103: 언 물길(480)·도장(1380)과 간격
     ['slope','d',1560,'darae_vine'],['slope','p',1800,'magamok'],
     // 결정 D-429: 호숫가 덤불은 마을 집 앞(1440)에서 끝 바위 쪽 마른 둑(2040)으로 옮겼다
     ['shore','d',2040,'darae_vine'],['shore','p',1610,'jat',{y:108}],
@@ -354,8 +369,16 @@ if(!CLASSIC){
   Rg.zones.shore.maxX=()=>G.f.spring?2340:2584;
   Rg.zones.island.exits.left={to:'shore',toX:2584,need:()=>!G.f.spring,
     reason:'얼음길이 물에 잠겼다. 오른쪽 선착장에서 배를 타자.'};
+  // 결정 D-1126 (사용자 지시 2026-11-07 4스테이지 13): 아빠를 만날 때는 무엇으로 변해 있었든 본모습(너구리)으로 돌아온다.
+  //   아빠 곁(y_dad_revert_range 안)에 들어서면 저절로 풀린다. 말을 걸 때 '낯선 손님' 대접도 생기지 않는다.
+  const dadRevert=()=>{
+    if(!G.form||paused())return;
+    const d=fieldNpcs().find(n=>n.id==='dad');
+    if(d&&Math.abs(d.x-G.px)<TABLES.TUNING.y_dad_revert_range)setForm('',{force:true});
+  };
+  Rg.zones.shore.step=()=>{stepCommon();dadRevert();};
   Rg.zones.island.step=()=>{
-    stepCommon();
+    stepCommon();dadRevert();
     Rg.craneTick?.();   // 결정 D-1085: 두루미 곁 세 번째 부름 버티기 (story.js)
     if(!G.boss.dead&&G.f.sangunMet&&G.px>isl(BOSS_AT)&&encounterReady())Rg.startGangcheol();
   };
