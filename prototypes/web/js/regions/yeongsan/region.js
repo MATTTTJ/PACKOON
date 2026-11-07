@@ -69,7 +69,7 @@ if(!CLASSIC){
     // 결정 D-1184: 산막은 보부상들이 묵어 가는 곳이라 깔고 자던 짚단이 둘 있다. 하나는 날쌘의 설피에,
     //   하나는 호숫가 빈 지게 할아버지의 짚신에 쓴다(짚이 떨어져 빈손으로 꼬는 시늉만 하던 손, D-1167). 수달 잠수 짚단은 덤.
     s.pickups=[{id:'shelter_straw',zone:'shelter',x:SHELTER_STRAW,y:GROUND,item:'jip',got:false},
-      {id:'shelter_straw_2',zone:'shelter',x:470,y:GROUND,item:'jip',got:false},
+      {id:'shelter_straw_2',zone:'shelter',x:560,y:GROUND,item:'jip',got:false},
       ...[['slope',420,GROUND],['slope',900,150],['shore',880,GROUND],['slope',1265,150],['island',2140,108]].map(([zone,x,y],i)=>
         ({id:'slope_rowan_'+i,zone,x,y,item:'magamok',got:false}))];
     s.digs=s.digs.map((d,i)=>({...d,id:'shelter_vine_'+i,zone:'shelter',x:SHELTER_VINES[i]}));
