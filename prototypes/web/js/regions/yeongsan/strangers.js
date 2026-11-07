@@ -1,6 +1,6 @@
 'use strict';
 /* 영산 낯선 손님 (leaf-transform.md 6). 형식은 galchamgol/strangers.js 머리말을 따른다.
-   아빠와 산군 할아버지는 알아보므로 여기 없다 (story.js talkDad·talkSangun).
+   아빠는 알아보므로 여기 없다 (story.js talkDad). 두루미(결정 D-1081)는 고개를 돌리지 않아 발소리로만 묻는다 (engine/disguise.js).
    결정 D-1073: 영산의 변신은 수달이다. 낚시하는 수달에게 배운다(story.js otterLearn). 살금이는 변신을 가르치지 않는다. */
 (()=>{
 const Rg=REGIONS.yeongsan;

@@ -71,23 +71,29 @@ function drawLake(){const x=LAKE_X-cam;if(x>W+10)return;
   }
   else{R(tx-30,GROUND-112,24,1,'#ffffff');R(tx+6,GROUND-120,30,1,'#ffffff');}
 }
-/* 강철이: 신목이 있는 섬을 휘감고 겨울을 놓지 않는다 (필드에서는 잠든 듯 똬리) */
-function drawCoil(){if(G.boss.dead)return;const x=G.boss.x-RC();   // 강철이 자리는 이미 옮긴 좌표 (D-128)
- if(x<-120||x>W+120)return;const b=Math.floor(G.anim/20)%2;
-  for(let i=0;i<7;i++){const a=i/7*Math.PI*2;R(x+Math.cos(a)*70+40,GROUND-18-Math.sin(a)*10-b,22,10,'#7a8ca8');R(x+Math.cos(a)*70+42,GROUND-18-Math.sin(a)*10-b,18,2,'#b8c8dc');}
-  for(let i=0;i<7;i++){const a=i/7*Math.PI*2;if(Math.sin(a)<-0.2)continue;R(x+Math.cos(a)*70+48,GROUND-24-Math.sin(a)*10-b,3,6,'#3e4a62');R(x+Math.cos(a)*70+49,GROUND-27-Math.sin(a)*10-b,1,3,'#3e4a62');}   // 등지느러미
-  // 결정 D-746: 잠든 이무기 머리. 길게 뻗은 주둥이, 눈을 내리누른 눈두덩 밑으로 감긴 눈, 뒤로 휜 자라다 만 뿔, 늘어진 수염
-  // (예전의 네모난 머리와 하얀 네모 눈은 귀여워 보였다. 사용자 피드백 2026-11-05)
-  const K='#3e4a62',HD='#5a6a86';
-  R(x-22,GROUND-44-b,3,7,K);R(x-19,GROUND-48-b,3,5,K);R(x-17,GROUND-50-b,2,3,K);R(x-28,GROUND-42-b,3,5,K);R(x-26,GROUND-45-b,2,3,K);   // 뿔
-  R(x-14,GROUND-34-b,8,4,K);R(x-12,GROUND-38-b,6,4,K);R(x-10,GROUND-41-b,4,3,K);   // 목덜미 갈기
-  R(x-34,GROUND-38-b,24,13,HD);R(x-52,GROUND-33-b,20,8,HD);R(x-54,GROUND-31-b,3,5,HD);   // 머리뼈와 주둥이
-  R(x-50,GROUND-26-b,36,3,'#4a5874');R(x-34,GROUND-38-b,24,2,'#6a7c98');   // 아래턱과 정수리 빛
-  R(x-36,GROUND-37-b,12,3,K);R(x-38,GROUND-36-b,3,2,K);   // 눈두덩
-  R(x-35,GROUND-33-b,8,1,'#e8f2fa');R(x-34,GROUND-32-b,6,1,'#9fb4cc');   // 감긴 눈 (얇게 빛이 샌다)
-  R(x-51,GROUND-31-b,2,1,'#232a3a');R(x-46,GROUND-26-b,1,2,'#e8f2fa');R(x-40,GROUND-26-b,1,2,'#e8f2fa');   // 콧구멍과 송곳니
-  for(const [dx,dy,w] of [[-58,-29,5],[-64,-27,5],[-69,-24,4],[-72,-21,3],[-58,-24,4],[-63,-21,4],[-66,-18,3]])R(x+dx,GROUND+dy-b,w,1,'#b8c8dc');   // 수염
-  if(b)R(x-58,GROUND-34,4,2,'#e8f2fa');   // 잠든 숨에 서리김
+/* 결정 D-1182: 필드의 보스 자리는 이무기 똬리 대신 어둑차사(name-story-v3 §3.1).
+   갓 쓴 키 큰 그림자가 섬 기슭에 서 있다. 갓 아래는 비어 있고, 도포 자락은 먹물처럼 바닥에 번진다.
+   붉은색은 손에 늘어뜨린 적패지에만 쓴다. 이름(drawCoil)은 다른 파일이 부르니 그대로 둔다. */
+function drawCoil(){if(G.boss.dead)return;const x=G.boss.x-RC();   // 보스 자리는 이미 옮긴 좌표 (D-128)
+  if(x<-120||x>W+120)return;const b=Math.floor(G.anim/24)%2,sw=Math.round(Math.sin(G.anim/40)*2);
+  const INK='#0d0b10',INK2='#1b1820',INK3='#2a2630';
+  // 바닥에 번진 어둠 (어둑시니: 숨 쉬듯 부풀었다 준다)
+  R(x-40-b*2,GROUND-3,80+b*4,3,INK2);R(x-28-b,GROUND-5,56+b*2,2,INK2);R(x-52-b*3,GROUND-1,104+b*6,1,INK3);
+  // 도포: 아래로 넓게 퍼지고 자락 끝이 까마귀 깃으로 풀린다
+  for(let i=0;i<14;i++){const yy=GROUND-6-i*5,w=34-i*1.2;R(Math.round(x-w/2),yy,Math.round(w),5,i%3?INK:INK2);}
+  for(const [dx,h] of [[-19,7],[-14,9],[-8,6],[-2,8],[4,7],[10,9],[15,6]])R(x+dx,GROUND-6,2,h>7?3:2,INK3),R(x+dx+1,GROUND-4+((dx+b)%2),1,3,INK);
+  // 소매: 양옆으로 늘어진 깃 끝, 길고 흰 손
+  R(x-22,GROUND-58+sw,7,24,INK);R(x+15,GROUND-58-sw,7,24,INK);
+  for(let k=0;k<4;k++){R(x-24+k,GROUND-34+sw+k*2,2,3,INK2);R(x+20+k,GROUND-34-sw+k*2,2,3,INK2);}
+  R(x-21,GROUND-33+sw,2,7,'#d8d4cc');R(x-19,GROUND-31+sw,1,6,'#d8d4cc');R(x+18,GROUND-33-sw,2,6,'#d8d4cc');
+  // 적패지: 오른손에서 바닥까지 늘어진 붉은 천, 읽히지 않는 붓 자국
+  R(x+18,GROUND-27-sw,4,25+sw,'#8e2018');R(x+18,GROUND-27-sw,1,25+sw,'#b8392a');
+  for(let k=0;k<4;k++)R(x+19,GROUND-24-sw+k*6,2,1,'#3a0a06');
+  R(x+16+sw,GROUND-3,9,2,'#8e2018');
+  // 갓: 넓은 챙과 높은 대우, 갓끈. 그 아래는 얼굴 없이 어둠뿐, 이따금 부리 같은 그림자
+  R(x-9,GROUND-84,18,4,INK);R(x-24,GROUND-77,48,3,INK);R(x-26,GROUND-76,52,1,INK3);R(x-7,GROUND-80,14,3,INK2);
+  R(x-9,GROUND-74,18,10,INK);R(x-5,GROUND-73,1,10,INK3);R(x+4,GROUND-73,1,10,INK3);   // 갓끈
+  if(b)R(x-1,GROUND-68,4,2,INK3),R(x+2,GROUND-67,2,1,INK3);
 }
 Rg.drawBack=()=>{drawSky();drawGround();};
 Rg.drawScenery=()=>{[1000,1140,1280,1360].forEach(drawRowan);drawDrift();drawSlope();drawLake();drawCoil();};
@@ -164,17 +170,20 @@ Rg.maxX=()=>!G.f.seolpi?SNOW_X-6:!G.f.shortcut?SLOPE_X-12:!G.f.sangunMet?BOSS_AT
 Rg.step=()=>{
   Rg.arcsEnabled();
   stepSalg();
+  Rg.craneTick?.();   // 결정 D-1085: 두루미 곁 세 번째 부름 버티기 (story.js)
   if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT&&encounterReady())Rg.startGangcheol();   // 결정 D-719
   if(has('doerim_yak')&&!G.f.yakDone){G.f.yakDone=true;Rg.offerReturnPrep();}
 };
 Rg.onHit=()=>{};
 Rg.faint=()=>{G.px=Math.max(60,G.px-90);think('눈보라에 밀려났다…');};
-Rg.onPickup=a=>{if(a.item==='legend_fruit'&&!G.f.fruitGot){G.f.fruitGot=true;Rg.fruitFound();}};
+Rg.onPickup=a=>{if(a.item==='legend_fruit'&&!G.f.fruitGot){G.f.fruitGot=true;Rg.fruitFound();}
+  // 결정 D-1186: 옛 구성의 아빠 곁 짚신
+  if(a.item==='jipsin'&&CLASSIC&&!G.f.yJipsin){G.f.yJipsin=true;think('아빠 곁에 새 짚신 한 켤레. 넋이 빠져도\n손은 길 떠날 신을 삼았구나.');}};
 /* 이기든 달래든 호수의 얼음이 풀리고 봄이 온다. 신목에 전설의 열매가 열린다 */
 Rg.bringSpring=()=>{
   G.boss.dead=true;G.f.spring=true;
   G.pickups.push({x:TREE_X,y:150,item:'legend_fruit',got:false});
-  diary('y_spring','강철이가 떠나자 호수의 얼음이 풀렸다. 느티나무에 새잎이 돋고 산자락에 진달래가 폈다. 신목 가지에 무언가 열렸다.');
+  diary('y_spring','붉은 천이 풀리고 신목이 제 이름을 되찾자 호수의 얼음이 풀렸다. 느티나무에 새잎이 돋고 산자락에 진달래가 폈다. 신목 가지에 무언가 열렸다.');
   think('봄이 왔다! 신목에 열매가 열렸어!');refreshGoal();
 };
 Rg.SLOPE_X=SLOPE_X;Rg.TREE_X=TREE_X;
@@ -251,6 +260,7 @@ if(!CLASSIC){
       ctx.save();ctx.globalCompositeOperation='saturation';ctx.globalAlpha=.45;ctx.fillStyle='#808080';ctx.fillRect(0,0,W,H);ctx.restore();
     }
     if(!G.f.spring)blizzard();
+    Rg.craneHoldDraw?.();   // 결정 D-1085: 셋째 부름의 붉은 붓 획 (story.js)
     if(G.f.spring)a().willowSeeds();
     if(Vfx.reducedMotion){zoom=0;return;}
     if(!zoom)return;
@@ -317,7 +327,7 @@ if(!CLASSIC){
       //   내려온 자리 왼쪽(마을 장승 앞)에 바위턱 오솔길과 매어 둔 밧줄을 두고, 문으로 언제든 비탈(내려온 바위턱 앞)로 오른다.
       {x:55,to:'slope',toX:2320,label:'밧줄 잡고 바위턱 올라 비탈로',draw:(x,y)=>climbRope(x,y)},
     ]),
-    island:zone('island',['sangun'],{},[
+    island:zone('island',['durumi'],{},[   // 결정 D-1081: 산군 대신 두루미
       {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 호숫가로':'얼음길로 호숫가에 돌아가기';},draw:sign},
     ]),
   };
@@ -377,6 +387,7 @@ if(!CLASSIC){
   Rg.zones.shore.step=()=>{stepCommon();dadRevert();};
   Rg.zones.island.step=()=>{
     stepCommon();dadRevert();
+    Rg.craneTick?.();   // 결정 D-1085: 두루미 곁 세 번째 부름 버티기 (story.js)
     if(!G.boss.dead&&G.f.sangunMet&&G.px>isl(BOSS_AT)&&encounterReady())Rg.startGangcheol();
   };
   Rg.zones.island.maxX=()=>G.f.sangunMet?2584:BOSS_AT-30;   // trimRegion이 이 값도 섬 좌표로 옮긴다

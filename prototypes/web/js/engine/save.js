@@ -95,7 +95,7 @@ function migrateNameStory(g){
   if(Array.isArray(g.forms)&&g.forms.includes('deer'))g.forms=[...new Set(g.forms.map(id=>id==='deer'?'otter':id))];
   if(g.form==='deer')g.form='otter';
   for(const k of ['formHintIds','formIntroQ'])if(Array.isArray(g.f[k]))g.f[k]=g.f[k].map(id=>id==='deer'?'otter':id);
-  // 결정 D-1072: 예전 판에서 아빠가 이미 돌아본(dadBack) 저장은 이름을 네 번 부른 것으로 친다
+  // 결정 D-1072: 예전 판에서 아빠가 이미 돌아본(dadBack) 저장은 이름을 불러 데려온 것으로 친다 (횟수는 D-1084로 세 번)
   if(g.f.dadBack&&g.f.dadCalled===undefined)g.f.dadCalled=true;
 }
 function readSave(){

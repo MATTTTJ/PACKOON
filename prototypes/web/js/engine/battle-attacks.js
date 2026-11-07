@@ -66,39 +66,3 @@ defineBullets({
       for(let y=BOX.y+6;y<BOX.y+BOX.h;y+=12)brush(c,[[edge-5,y],[edge+5,y+4]],2,'#f7f4ed',0.6);
     }},
 });
-
-/* 강철이 선택 기능. 예고부터 끝까지 같은 온기 길을 비워 둔다. */
-function winterAttack(kind){return {dur:220,tick(t){
-  if(t===0&&B.E.warmPath)B.bullets.push({k:'gangcheolWinter',kind,t:0,life:220});
-}};}
-defineAttacks({
-  gangcheolFrost:winterAttack('mouth'),gangcheolCoil:winterAttack('body'),
-  gangcheolIcicles:winterAttack('tail'),gangcheolBlizzard:winterAttack('core'),
-});
-/* 그린 먹과 피격 판정에 같은 범위를 쓴다. 온기 길은 이 범위보다 우선한다.
-   결정 D-246: 방향 dir(B.warm.dir, 같은 부위는 차례마다 바뀐다)
-   입: 0 위에서 내려오는 서리 띠 · 1 왼쪽에서 오른쪽으로 가는 서리 띠
-   몸통: 0 양옆에서 조여 듦 · 1 위아래에서 조여 듦
-   꼬리: 0 위에서 떨어지는 고드름 줄 · 1 오른쪽에서 날아드는 고드름 줄
-   머리: 0 시계 방향 · 1 반대 방향으로 도는 눈보라 띠 */
-function winterThreat(kind,t,x,y,dir=B.warm?B.warm.dir:0){
-  if(t<=30)return false;
-  const u=(x-BOX.x)/BOX.w,v=(y-BOX.y)/BOX.h;
-  if(kind==='mouth')return dir?Math.abs(u-((t-30)%100)/80)<0.18*BOX.h/BOX.w*1.2:Math.abs(v-((t-30)%100)/80)<0.18;
-  if(kind==='body'){if(dir){const depth=Math.min(0.4,(t-30)/200);return v<depth||v>1-depth;}
-    const depth=Math.min(0.46,(t-30)/180);return u<depth||u>1-depth;}
-  if(kind==='tail'){
-    const fall=((t-30)%80)/65;
-    if(dir)return Math.abs((1-u)-fall)<0.1&&Math.abs(v*5-Math.round(v*5))<0.2;
-    return Math.abs(v-fall)<0.14&&Math.abs(u*8-Math.round(u*8))<0.2;
-  }
-  // 머리를 드러낸 뒤에도 눈보라는 남는다. 읽을 수 있는 두 띠가 회전한다.
-  const a=(t-30)*0.025*(dir?-1:1),dx=(u-0.5)*BOX.w,dy=(v-0.5)*BOX.h;
-  return Math.abs(dx*Math.cos(a)+dy*Math.sin(a))<28;
-}
-defineBullets({gangcheolWinter:{
-  step(b){b.t++;if(b.t>=b.life){b.dead=1;return;}
-    if(!warmSafe(B.px,B.py)&&winterThreat(b.kind,b.t,B.px,B.py))bHitMe();
-  },
-  draw(c,b){drawWinterThreat(c,b.kind,b.t);},
-}});

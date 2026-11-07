@@ -163,7 +163,7 @@ function measureLayout() {
   return out;
 }
 const LAYOUT_SIZES = [[360, 780], [390, 844], [412, 915], [844, 390], [740, 360]];
-const LAYOUT_BOSSES = ['kudzu', 'golem', 'dokkaebi', 'gangcheol'];
+const LAYOUT_BOSSES = ['kudzu', 'golem', 'dokkaebi', 'gangcheol'];   // gangcheol 은 어둑차사 (보스 id 그대로, 결정 D-1080)
 const overlap = (a, b, slack = 1) => a.x + slack < b.x + b.w && b.x + slack < a.x + a.w && a.y + slack < b.y + b.h && b.y + slack < a.y + a.h;
 function judgeLayout(scene, m, findings) {
   const [vw, vh] = m.viewport, at = { scene, viewport: vw + '×' + vh };
