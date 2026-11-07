@@ -113,7 +113,12 @@ Rg.drawPickup=(a,x,bob)=>{
     for(const [dx,dy] of [[0,-6],[-1,-4],[1,-4]])R(x+dx,a.y+dy+bob,1,1,'#3e2a18');
     R(x+1,a.y-6+bob,1,1,'#e8d8a0');R(x-1,a.y-10+bob,3,1,'#f4f7fa');}
   // 결정 D-1065: 짚단도 다른 줍는 물건과 비슷한 크기로 (8×7, 가운데를 새끼로 묶었다)
-  else if(a.item==='jip'){R(x-4,a.y-7,8,7,'#d9b860');R(x-4,a.y-7,8,1,'#f4f7fa');R(x-4,a.y-4,8,1,'#a8883a');for(const dx of [-3,-1,1,3])R(x+dx,a.y-1,1,1,'#b8983e');}
+  // 결정 D-1221 (사용자 지시 2026-11-07 4스테이지 18): 눕힌 네모 대신 위로 길게 세운 짚단(7×13). 허리를 새끼로 묶고, 위는 이삭 끝이 벌어졌다
+  else if(a.item==='jip'){
+    R(x-3,a.y-13,1,3,'#d9b860');R(x-1,a.y-14,1,4,'#e6c870');R(x+1,a.y-14,1,4,'#d9b860');R(x+3,a.y-13,1,3,'#e6c870');   // 벌어진 이삭 끝
+    R(x-2,a.y-10,5,10,'#d9b860');R(x-1,a.y-10,1,10,'#e6c870');R(x+2,a.y-10,1,10,'#b8983e');   // 줄기 다발
+    R(x-3,a.y-6,7,2,'#8a6a2e');   // 허리 새끼
+    R(x-3,a.y-1,7,1,'#b8983e');R(x-2,a.y-14,1,1,'#f4f7fa');R(x+2,a.y-14,1,1,'#f4f7fa');}   // 밑동, 끝에 앉은 눈
   else if(a.item==='legend_fruit'){const gl=Math.floor(G.anim/8)%2;R(x-4,a.y-9+bob,8,8,'#f0a0b8');R(x-2,a.y-8+bob,3,3,'#fde0ea');R(x-1,a.y-12,2,3,'#6b4423');if(gl){R(x-7,a.y-12,1,1,'#fff6d8');R(x+6,a.y-6,1,1,'#fff6d8');}}
 };
 Rg.drawDig=(d,x)=>{if(d.item!=='darae_vine')return false;
@@ -197,7 +202,10 @@ if(!CLASSIC){
   // 결정 D-116: 비탈 앞 빈 눈밭(500~830)과 빈 능선 발판 무리(1720~2030), 섬 선착장과 신목 사이(1560~1820)를 지운다.
   Rg.trimCutsV2={shelter:[[1960,480]],snow:[[300,400],[2230,330]],slope:[[500,330],[1720,310]],island:[[300,1200],[1560,260]]};   // 둘째 판(D-116) — 옛 저장을 옮길 때 쓴다
   // 결정 D-128: 걷기만 하는 길을 콘텐츠 사이 230px 안팎으로. 산막 짚과 곰 자장가 사이, 비탈 호숫가 문 뒤 출구 앞, 호숫가 떠날 자리 뒤 출구 앞.
-  Rg.trimCuts={shelter:[[450,80],[1960,480]],snow:[[300,400],[2230,330]],slope:[[500,330],[1720,310],[2430,50]],shore:[[2430,50]],island:[[300,1200],[1560,260]]};
+  Rg.trimCutsV3=Rg.trimCutsV4=Rg.trimCutsV5=Rg.trimCutsV6=Rg.trimCutsV7={shelter:[[450,80],[1960,480]],snow:[[300,400],[2230,330]],slope:[[500,330],[1720,310],[2430,50]],shore:[[2430,50]],island:[[300,1200],[1560,260]]};   // 셋째 판(D-128) — 옛 저장을 옮길 때 쓴다
+  // 결정 D-1229 (사용자 지시 2026-11-07 4스테이지 26): 얼어붙은 비탈에 들어서서 낚시하는 수달(1250)까지 가는 길을 반으로 (850px → 450px).
+  //   비탈 앞 눈밭 자르기(500~830)를 들어선 자리 바로 뒤(100~830)까지 넓힌다. 그 사이의 마가목 밑 살펴보기는 뺐고(D-1224) 마가목 하나는 1000으로 옮겼다.
+  Rg.trimCuts={...Rg.trimCutsV7,slope:[[100,730],[1720,310],[2430,50]]};
   const isl=x=>trimX(x,Rg.trimCuts.island);
   const slp=x=>trimX(x,Rg.trimCuts.slope);
   // 강철이는 섬에, 살금이(자리·돌아갈 자리)는 비탈에 있다 (D-116)
@@ -205,13 +213,17 @@ if(!CLASSIC){
   Rg.trimMigrateHook=(g,_,conv)=>{
     if(g.boss)g.boss.x=conv?conv('island',g.boss.x):isl(g.boss.x);
     if(g.salg&&conv){g.salg.x=conv('slope',g.salg.x);g.salg.home=conv('slope',g.salg.home);}
+    // 결정 D-1229: 잘린 눈밭에 있던 마가목은 잘린 자리 끝에 모이지 않고 새 자리(설계 1000)로 간다
+    const rowan=(g.pickups||[]).find(p=>p.id==='slope_rowan_0'&&!p.got);if(rowan)rowan.x=slp(1000);
   };
   const a=()=>Rg.expArt;
   const snowGate=()=>!!G.f.seolpi;
   const ledgeGate=()=>!!G.f.shortcut;
-  const snowReason='눈이 허리까지 찬다. 산막의 날쌘에게 설피를 엮어 달라고 하자.';
-  const iceReason='발 디딜 틈이 안 보인다. 이 산 짐승들은 어디로 다닐까?';
-  const sign=(x,y)=>a().door(x,y);
+  const snowReason='눈이 허리까지 찬다. 길손 움막의 날쌘에게 설피를 엮어 달라고 하자.';   // 결정 D-1223: 산막 → 길손 움막
+  // 결정 D-1226 (사용자 지시 2026-11-07 4스테이지 28): 살금이를 돕기 전에는 호숫가로 가는 길을 못 찾는다. 수리부엉이·수달로 넘던 길도 뺐다.
+  //   살금이가 비탈 끝 바위턱의 눈 밑 디딤돌을 알려 줘야(G.f.shortcut) 열린다.
+  const iceReason='얼음 비탈뿐이라 호숫가로 내려갈 길을 못 찾겠다. 이 산 짐승들은 어디로 다닐까?';
+  // 결정 D-1225 (사용자 지시 2026-11-07 4스테이지 21): 문·경치 자리에 꽂던 팻말(뜻 없는 표지판)은 뺐다. 눈 굴·돌턱·밧줄 같은 자리 그림이 길을 보인다
   // 결정 D-1125: 호숫가에서 비탈로 오르는 바위턱 오솔길. 디딤돌 셋과 위 바위에 매어 늘어뜨린 밧줄
   const climbRope=(x,y)=>{
     x=Math.round(x);
@@ -312,23 +324,23 @@ if(!CLASSIC){
   // 결정 D-429: 산막·눈길에서 호숫가로 곧장 옮겨 주던 능선 문 둘(과 호숫가 쪽 짝 문)은 뺐다 (사용자 지시 2026-11-03: 순간이동 기믹 빼기).
   // 호숫가는 산막 → 눈길 → 비탈 → 호숫가로 걸어서 닿고, 같은 길로 돌아 나온다. 길 막힘 순서(설피·지름길·강철이)는 그대로다.
   Rg.zones={
-    // 깊은 눈길은 몸의 문제라 산양이 지난다. 얼어붙은 비탈은 수리부엉이가 날개를 펴고 내려간다 (PA-47).
+    // 깊은 눈길은 몸의 문제라 산양이 지난다 (PA-47). 얼어붙은 비탈은 길을 아는 살금이만 열어 준다 (D-1226).
     shelter:zone('shelter',['nal'],{right:{to:'snow',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'}},[
-      {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,draw:sign,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'},
+      {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'},
     ]),
     snow:zone('snow',['ongdal'],{left:'shelter',right:'slope'}),
-    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y),formPass:'owl',formLabel:'수리부엉이로 날개 펴고 비탈 내려가기'}},[
-      {x:2320,to:'shore',toX:170,label:'바위턱을 디뎌 호숫가로',need:ledgeGate,reason:iceReason,draw:sign,drawBlocked:(x,y)=>a().blockedIce(x,y),formPass:'owl',formLabel:'수리부엉이로 날개 펴고 비탈 내려가기'},
+    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y)}},[
+      {x:2320,to:'shore',toX:170,label:'바위턱을 디뎌 호숫가로',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y)},
     ]),
     shore:zone('shore',['dad'],{left:'slope'},[
       {x:2320,to:'island',toX:160,get label(){return G.f.spring?'작은 배로 신목 섬에':'언 호수를 걸어 신목 섬에';},
-        need:()=>!!G.f.dadDone,reason:'아빠가 기다리고 있다. 먼저 호숫가에서 말을 걸어 보자.',draw:sign},
+        need:()=>!!G.f.dadDone,reason:'아빠가 기다리고 있다. 먼저 호숫가에서 말을 걸어 보자.'},
       // 결정 D-1125 (사용자 지시 2026-11-07 4스테이지 9): 호숫가에서 비탈로 되돌아갈 단추가 없었다(왼쪽 끝으로 걸어 나가야만 했다).
       //   내려온 자리 왼쪽(마을 장승 앞)에 바위턱 오솔길과 매어 둔 밧줄을 두고, 문으로 언제든 비탈(내려온 바위턱 앞)로 오른다.
       {x:55,to:'slope',toX:2320,label:'밧줄 잡고 바위턱 올라 비탈로',draw:(x,y)=>climbRope(x,y)},
     ]),
     island:zone('island',['durumi'],{},[   // 결정 D-1081: 산군 대신 두루미
-      {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 호숫가로':'얼음길로 호숫가에 돌아가기';},draw:sign},
+      {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 호숫가로':'얼음길로 호숫가에 돌아가기';}},
     ]),
   };
   /* 결정 D-1062 (사용자 피드백 2026-11-06 27: 더 험한 지형): 빈 눈밭에 바람이 쌓은 눈 둔덕(엔진 비탈 D-845)을 둔다.
@@ -354,8 +366,10 @@ if(!CLASSIC){
      눈길은 마가목·잣송이·솔방울, 비탈은 덤불과 마가목, 호숫가는 덤불과 바위턱 잣송이. 마가목은 비탈의 마가목 나무(구역에 이미 있는 다섯)에서 주로 딴다. */
   addZoneGather(Rg,'y_g_',[
     ['shelter','d',1110,'darae_vine'],['shelter','p',1560,'solbang'],
-    ['snow','p',420,'magamok'],['snow','p',960,'solbang'],['snow','p',1430,'jat',{y:108}],   // 결정 D-1103: 언 물길(480)·도장(1380)과 간격
-    ['slope','d',1560,'darae_vine'],['slope','p',1800,'magamok'],
+    ['snow','p',420,'magamok'],['snow','p',960,'solbang'],['snow','p',1430,'jat',{y:108}],   // 결정 D-1103: 도장(1380)과 간격
+    // 결정 D-1230 (사용자 지시 2026-11-07 4스테이지 24): 언 물길(480, D-1224로 뺐다) 뒤로 오르는 눈 언덕 꼭대기 턱(625~707, 높이 110)에 잣송이 하나
+    ['snow','p',666,'jat',{y:110}],
+    ['slope','d',1160,'darae_vine'],['slope','p',1400,'magamok'],   // 결정 D-1229: 비탈을 400 더 줄여 같은 설계 자리(2200·2490)를 줄인 좌표로 옮겼다
     // 결정 D-429: 호숫가 덤불은 마을 집 앞(1440)에서 끝 바위 쪽 마른 둑(2040)으로 옮겼다
     ['shore','d',2040,'darae_vine'],['shore','p',1610,'jat',{y:108}],
   ]);
@@ -401,10 +415,10 @@ if(!CLASSIC){
     const fruit=G.pickups[G.pickups.length-1];fruit.id='island_legend_fruit';fruit.zone='island';fruit.x=isl(fruit.x);
     diary('y_boat','얼음이 녹자 걸어서 건너온 얼음길이 물에 잠겼다. 호숫가로 돌아가려면 이제 배가 있어야 한다.');
   };
-  Rg.zones.snow.vistas=[{id:'snow_ridge',x:1600,y:108,from:0,to:640,sound:'wind',draw:sign,
+  Rg.zones.snow.vistas=[{id:'snow_ridge',x:1600,y:108,from:0,to:640,sound:'wind',
     thought:'와, 저기서 여기까지 왔네.\n엄마도 저 불빛 너머에 있겠지.',diary:'눈길 능선에서 지나온 고을의 불빛을 보았다. 산 안쪽으로 이어지는 바위턱도 보인다.',
     get layers(){return a().ridgeLayers;}}];
-  Rg.zones.island.vistas=[{id:'spring_tree',x:2430,from:0,to:640,sound:'water',draw:sign,
+  Rg.zones.island.vistas=[{id:'spring_tree',x:2430,from:0,to:640,sound:'water',
     get thought(){return G.f.spring?'새잎이다. 물도 흐르네.\n엄마랑 같이 보고 싶다.':'나뭇가지 끝이 통통하네.\n저 안에 잎이 있나?';},
     diary:'금줄 두른 늙은 느티나무 곁에서 호수를 보았다. 겨울눈 안에 새잎이 숨어 있었다.',
     get layers(){return G.f.spring?a().springLayers:a().winterLayers||a().ridgeLayers;}}];
