@@ -97,12 +97,12 @@ function jujubeGive(i=0){
   // 결정 D-235: 받은 것을 한 줄로 알린다 (대추는 알로 센다)
   talk([...(first?[['날쌘','다래 덩굴이네. 산막 장작 묶을 끈이\n모자라던 참이야.']]:[]),...(yak?[['날쌘','약과까지 얹어? …그럼 대추도 하나 더.\n받은 만큼은 줘야 제값이지.']]:[]),['너구리',yak?'(대추 세 알을 얻었다.)':'(대추 두 알을 얻었다.)'],['날쌘','잘 말렸지? 네 아빠는 이걸\n마가목이랑 같이 갈더라.']]);
 }
-// 결정 D-77: 보스가 물러난 뒤 남은 얼음 비늘은 산에 두면 또 얼어붙는다. 산지기 살금이가 깊은 물에 돌려보낸다.
-// 결정 D-1080: 어둑차사로 바뀌어 살금이는 "그놈 곁에서 나온 것"으로만 부른다(물건 이름·출처는 items.csv)
+// 결정 D-77, 결정 D-1181: 어둑차사가 물러난 뒤 남은 언 까마귀 깃은 볕에도 녹지 않아 산짐승들이 꺼린다.
+//   살금이는 그놈이 북쪽 길로 걸어가는 걸 비탈에서 봤다. 산지기라 제 것은 제자리로, 그 길 끝에 두고 온다.
 function salgScaleGive(){
   if(G.f.salgScale||!has('ice_scale'))return;
   takeItem('ice_scale',1);G.f.salgScale=true;rel('salgeumi',1);
-  talk([['살금이','그, 그거… 그놈 곁에서 나온 거지?\n산에 두면 녹지 않고 또 얼어붙어.'],['살금이','내가 호수 깊은 물에 돌려보낼게.\n대신 말려 둔 마가목 열매… 가져가.'],receiveItem('magamok',2)]);
+  talk([['살금이','그, 그거… 그놈 곁에서 나온 깃이지?\n볕에 둬도 안 녹아. 다들 무서워해.'],['살금이','그놈 걸어간 북쪽 길 끝에 두고 올게.\n그놈 거니까, 그놈이 가져가라고.'],['살금이','…대신 말려 둔 마가목 열매, 가져가.'],receiveItem('magamok',2)]);
 }
 const SEOLPI_ASKS=[{darae_vine:2,jip:1},{darae_vine:2,eoksae:2}];   // 결정 D-1024: 대신 받는 조합은 둘까지
 function nalTrade(i=0){
@@ -922,7 +922,7 @@ Rg.startGangcheol=()=>{
         diary('y_dad_pull','어둑차사 앞에서 물러날 때 누가 내 뒷덜미를 끌어냈다. 아빠였다. 나를 알아본 건 아니었다. 아빠는 나를 내려놓고 제 발자국을 되짚어 호숫가로 돌아갔다.');
         talk([['너구리','(뒷덜미가 확 당겨졌다.\n누가 나를 얼음 가로 끌어낸다.)'],
           ['너구리','…아빠?'],
-          ['아빠','(아빠다. 나를 내려놓더니, 나를 보지도 않고\n제 발자국을 되짚어 돌아간다.)'],
+          ['너구리','(아빠다. 나를 내려놓더니, 나를 보지도 않고\n제 발자국을 되짚어 돌아간다.)'],   // 결정 D-1183: 아빠는 섬 구역 인물이 아니라 말 없이 지나가니 아이의 지문으로
           ['너구리','(알아본 건 아니었다.\n그래도 손은 왔다.)']],hint);
       }else hint();
     }
@@ -1135,7 +1135,7 @@ Rg.trade={
   ],
   salgeumi:()=>[
     ...(G.ledger.salgeumi?[{id:'t_salgeumi',item:'magamok',info:true,label:'호숫가 지름길에 대한 정보',asks:SALG_ASKS,done:()=>G.f.salgDone,accept:salgGive}]:[]),
-    ...(G.f.salgDone&&G.boss.dead?[{id:'t_salgeumi_scale',item:'magamok',n:2,label:'얼음 비늘 물에 돌려보내기 · 마가목 열매 2',asks:[{ice_scale:1}],done:()=>G.f.salgScale,accept:salgScaleGive}]:[])
+    ...(G.f.salgDone&&G.boss.dead?[{id:'t_salgeumi_scale',item:'magamok',n:2,label:'언 까마귀 깃 북쪽 길에 두기 · 마가목 열매 2',asks:[{ice_scale:1}],done:()=>G.f.salgScale,accept:salgScaleGive}]:[])
   ]
 };
 })();

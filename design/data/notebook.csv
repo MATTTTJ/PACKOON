@@ -131,7 +131,7 @@ gangcheol,yeongsan,어둑차사,동물,나,calm:gangcheol,달래서 끝냈을 �
 darae_vine,yeongsan,다래 덩굴,물건,나,got:darae_vine,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 magamok,yeongsan,마가목 열매,물건,나,got:magamok,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 magamok,yeongsan,마가목 열매,물건,아빠,,처음부터,영산 비탈에 많다. 고라니가 좋아한다.,제안,,아빠 수첩
-broken_orb,yeongsan,깨진 여의주,물건,나,got:broken_orb,처음 얻을 때,(items.csv 의 설명),제안,,관찰
+broken_orb,yeongsan,검은 갓,물건,나,got:broken_orb,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 legend_fruit,yeongsan,전설의 열매,물건,나,got:legend_fruit,처음 얻을 때,(items.csv 의 설명),제안,,관찰
 legend_fruit,yeongsan,전설의 열매,물건,아빠,,처음부터,영산 신목의 열매. 봄에만 열린다.,제안,,아빠 수첩
 legend_fruit,yeongsan,전설의 열매,물건,아빠,got:legend_fruit,처음 얻을 때,(나중에 덧쓴 글씨) 여기다.,제안,,아빠 수첩
@@ -194,7 +194,7 @@ yaksik,jangteo,약식,물건,나,got:yaksik,처음 얻을 때,(items.csv 의 설
 chik_sil,galchamgol,칡 실,물건,나,got:chik_sil,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
 darae_cha,yeongsan,다래 줄기차,물건,나,got:darae_cha,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
 hwachae,yeongsan,마가목 화채,물건,나,got:hwachae,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
-bigeul_garu,yeongsan,비늘 가루,물건,나,got:bigeul_garu,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
+bigeul_garu,yeongsan,서리 깃 가루,물건,나,got:bigeul_garu,처음 얻을 때,(items.csv 의 설명),제안,PA-176 가공법,관찰
 sesame_salt,galchamgol,깨소금,물건,나,hint:sesame_salt,누가 지나가며 일러 줬을 때,날쌘 아저씨가 볶은 깨를 소금이랑 같이 찧어 보라고 했다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
 ssanghwa,yeongsan,쌍화 약재,물건,나,hint:ssanghwa,누가 지나가며 일러 줬을 때,할머니가 칡뿌리는 겨우살이에 대추 하나 넣고 갈면 겨울 약이 된다고 했다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
 chik_sil,galchamgol,칡 실,물건,나,hint:chik_sil,누가 지나가며 일러 줬을 때,아빠 낫 자루에 감긴 끈은 칡 실이다. 칡 줄기를 쪄서 뽑는다고 삼촌이 그랬다.,제안,PA-176 가공법 · 결정 D-461,숨은 가공법
@@ -232,7 +232,7 @@ yaksik,jangteo,약식,물건,나,recipe:yaksik,숨은 가공법을 직접 만들
 chik_sil,galchamgol,칡 실,물건,나,recipe:chik_sil,숨은 가공법을 직접 만들었을 때,칡 줄기를 쪄서 껍질을 벗기니 실이 나왔다. 아빠 낫 자루의 그 끈이다.,제안,PA-176 가공법,숨은 가공법
 darae_cha,yeongsan,다래 줄기차,물건,나,recipe:darae_cha,숨은 가공법을 직접 만들었을 때,다래 덩굴을 찧어 대추와 달였다. 속이 풀린다.,제안,PA-176 가공법,숨은 가공법
 hwachae,yeongsan,마가목 화채,물건,나,recipe:hwachae,숨은 가공법을 직접 만들었을 때,고드름을 깨 넣고 마가목을 으깨 띄웠다. 이가 시리다.,제안,PA-176 가공법,숨은 가공법
-bigeul_garu,yeongsan,비늘 가루,물건,나,recipe:bigeul_garu,숨은 가공법을 직접 만들었을 때,얼음 비늘과 서리 수염을 같이 갈았다. 가루가 손끝에서 서늘하다.,제안,PA-176 가공법,숨은 가공법
+bigeul_garu,yeongsan,서리 깃 가루,물건,나,recipe:bigeul_garu,숨은 가공법을 직접 만들었을 때,언 까마귀 깃과 고드름 조각을 같이 갈았다. 가루가 손끝에서 서늘하다.,제안,PA-176 가공법,숨은 가공법
 meju,jangteo,메주,물건,나,got:meju,처음 얻을 때,(items.csv 의 설명),제안,결정 D-790,관찰
 meju,jangteo,메주,물건,나,hint:meju,누가 지나가며 일러 줬을 때,뭉근 할멈 말로는 콩 두 됫박을 절구에 찧어 덩이를 빚고 짚으로 묶으면 메주가 된다.,제안,결정 D-790,숨은 가공법
 meju,jangteo,메주,물건,나,recipe:meju,숨은 가공법을 직접 만들었을 때,콩을 찧어 덩이를 빚고 짚으로 묶었다. 할멈 말대로 매달아 띄우면 장이 된다.,제안,결정 D-790,숨은 가공법

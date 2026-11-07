@@ -63,7 +63,10 @@ if(!CLASSIC){
   const oldState=Rg.newState;
   Rg.newState=()=>{
     const s=oldState();
+    // 결정 D-1184: 산막은 보부상들이 묵어 가는 곳이라 깔고 자던 짚단이 둘 있다. 하나는 날쌘의 설피에,
+    //   하나는 호숫가 빈 지게 할아버지의 짚신에 쓴다(짚이 떨어져 빈손으로 꼬는 시늉만 하던 손, D-1167). 수달 잠수 짚단은 덤.
     s.pickups=[{id:'shelter_straw',zone:'shelter',x:SHELTER_STRAW,y:GROUND,item:'jip',got:false},
+      {id:'shelter_straw_2',zone:'shelter',x:470,y:GROUND,item:'jip',got:false},
       ...[['slope',420,GROUND],['slope',900,150],['shore',880,GROUND],['slope',1265,150],['island',2140,108]].map(([zone,x,y],i)=>
         ({id:'slope_rowan_'+i,zone,x,y,item:'magamok',got:false}))];
     s.digs=s.digs.map((d,i)=>({...d,id:'shelter_vine_'+i,zone:'shelter',x:SHELTER_VINES[i]}));
@@ -114,6 +117,17 @@ Rg.playActivity=(id,callback)=>{
   if(ACTIVITIES.has(id)){Sound.gather(true);const log=G.f.yActivities||(G.f.yActivities={});log[id]=(log[id]||0)+1;}
   callback?.();
 };
+
+// 결정 D-1180: 옛 구성(classic)도 두루미 사건에서 '섬 쪽 목소리'가 말하니 초상은 아래 classic 끝내기 전에 올린다.
+// 결정 D-1075: '호수 쪽 목소리'는 모습이 없다. 대화 초상은 얼음 호수 위로 번지는 김과 그 너머 그림자만 그린다(D-328 Rg.portraits)
+// 결정 D-1080·D-1085: 똬리 대신 넓은 갓 그림자와 붉은 천 자락(어둑차사). 두루미 사건의 '섬 쪽 목소리'도 같은 초상
+const voicePortrait=(x,y)=>{
+  R(x-14,y-22,28,22,'#3a4a62');R(x-14,y-6,28,6,'#b9d3e1');R(x-14,y-6,28,1,'#e6f1f6');
+  R(x-9,y-17,18,2,'#15171e');R(x-4,y-20,8,3,'#15171e');R(x-5,y-15,10,9,'#1a1d24');      // 넓은 갓과 그 아래 어둠(얼굴이 없다)
+  R(x+5,y-12,6,1,'#a3261e');R(x+8,y-11,5,1,'#a3261e');R(x+11,y-10,3,1,'#c9372b');        // 붉은 천 자락
+  for(let i=0;i<3;i++)R(x-12+i*3,y-19+i*3,10-i*2,1,'rgba(230,240,246,.7)');            // 건너오는 부름의 김
+};
+Rg.portraits={...Rg.portraits,'호수 쪽 목소리':voicePortrait,'섬 쪽 목소리':voicePortrait};
 
 /* 3개 관찰 지점은 본길에 놓인다. 샛길의 도장·선물과는 독립이다.
    마지막 선택을 미룬 채 봄 호수로 돌아와도 전 재료와 아빠에게 닿는다. */
@@ -243,15 +257,6 @@ function lureScene(){
       {t:'아기 곰 귀를 막아 준다',go:()=>block(true)},
       {t:'앞을 막고 같이 센다',go:()=>block(false)}]]]);
 }
-// 결정 D-1075: '호수 쪽 목소리'는 모습이 없다. 대화 초상은 얼음 호수 위로 번지는 김과 그 너머 그림자만 그린다(D-328 Rg.portraits)
-// 결정 D-1080·D-1085: 똬리 대신 넓은 갓 그림자와 붉은 천 자락(어둑차사). 두루미 사건의 '섬 쪽 목소리'도 같은 초상
-const voicePortrait=(x,y)=>{
-  R(x-14,y-22,28,22,'#3a4a62');R(x-14,y-6,28,6,'#b9d3e1');R(x-14,y-6,28,1,'#e6f1f6');
-  R(x-9,y-17,18,2,'#15171e');R(x-4,y-20,8,3,'#15171e');R(x-5,y-15,10,9,'#1a1d24');      // 넓은 갓과 그 아래 어둠(얼굴이 없다)
-  R(x+5,y-12,6,1,'#a3261e');R(x+8,y-11,5,1,'#a3261e');R(x+11,y-10,3,1,'#c9372b');        // 붉은 천 자락
-  for(let i=0;i<3;i++)R(x-12+i*3,y-19+i*3,10-i*2,1,'rgba(230,240,246,.7)');            // 건너오는 부름의 김
-};
-Rg.portraits={...Rg.portraits,'호수 쪽 목소리':voicePortrait,'섬 쪽 목소리':voicePortrait};
 function jipsinGive(){
   if(G.f.yJipsin||!has('jip')||!ITEMS.jipsin)return;
   takeItem('jip',1);G.f.yJipsin=true;
