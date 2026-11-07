@@ -13,7 +13,6 @@
          tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래), drawOver?(c):상자 밖까지 날아가는 탄(상자 위에 잘리지 않게, 결정 D-182),
          finale?:{start(), step()→끝나면 true}(dodge 를 다 버틴 뒤 입력을 막는 마무리 연출. 그 뒤 'win'),
          possession?:{order:빙의 순서, attacks:부위별 시험판 공격, travel:불 이동 시간, wait:도착 뒤 대피 시간}, partPose?(id):그려진 부위 좌표,
-         warmPath?:{width,wideWidth,attacks:부위별 공격},
          headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표, openMark?(p):공격 뒤 표식을 직접 정했으면 true,
          draw(c):수묵 그림, onWin(B)?:이겼을 때 보상, onCalm(B)?:달랬을 때 보상 (B.loot 에 넣고 B.bonus 에 글)} */
 const bcv=$('bcv');const bctx=bcv.getContext('2d');
@@ -171,7 +170,7 @@ function inkTransition(text,sx,cb){
   setTimeout(()=>{cb();k.className='ink off';setTimeout(()=>{k.hidden=true;k.className='ink';inkOn=false;},460);},1050);
 }
 /* 결정 D-243: 진정은 선물로만 한다 (사용자 피드백 2026-11-02, D-11 을 바꿈). 공격 뒤 행동으로 달래는 장치
-   (골렘의 기울어진 소원 돌, 도깨비의 장터 물건 돌려놓기, 강철이의 샘 얼음 걷기)를 엔진에서 뺐다. 상대에 calmAction 이 남아 있어도 진정은 오르지 않는다.
+   (골렘의 기울어진 소원 돌, 도깨비의 장터 물건 돌려놓기, 옛 강철이의 샘 얼음 걷기)를 엔진에서 뺐다. 상대에 calmAction 이 남아 있어도 진정은 오르지 않는다.
    calmAction 은 '공격 탄이 다 사라진 뒤에 빈틈을 연다'(settle) 뜻으로만 읽는다. 새로 쓸 때는 settle:true 를 쓴다. */
 /* onEnd(결과, {hits}) 결과는 'win' | 'calm' | 'lose' | 'flee' */
 function startBattle(kind,onEnd){
@@ -186,10 +185,9 @@ function startBattle(kind,onEnd){
   blayout();B.px=BOX.x+BOX.w/2;B.py=BOX.y+BOX.h*0.65;
   if(E.showHands){B.handShown=false;B.handShow=0;}
   if(E.possession){B.round=0;B.possession={from:'core',to:'core'};}
-  if(E.warmPath)B.warm={current:{u:0.25,v:0.7},next:null,points:[],round:0,fire:0,dir:0};
   // 결정 D-224: 만나기 직전 손에 든 도구를 들고 들어간다. 든 것이 전투 도구가 아니면 가진 첫 도구
   if(!E.dodge){const own=ownedBattleTools();B.tool=own.includes(G.tool)?G.tool:own[0]||null;B.toolSwap=0;}
-  nameBattleStart();$('bNames').hidden=!B.names;   // 결정 D-432~D-435: 강철이 전투의 이름 (battle-names.js)
+  nameBattleStart();$('bNames').hidden=!B.names;   // 결정 D-432~D-435·D-1140: 마지막 보스 어둑차사 전투의 이름 (battle-names.js)
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
   // 결정 D-227: 전투 중 튜토리얼 같은 안내 글을 띄우지 않는다. 할 일 줄에는 상대 이름만 (피하기 시험은 그 시험의 글)
@@ -231,7 +229,7 @@ function bLiving(){return B.parts.filter(p=>!p.broken);}
 function coreHidden(){const c=B.parts.find(p=>p.core);if(!c||c.broken)return false;
   if(B.E.coreNeeds)return !B.parts.find(p=>p.id===B.E.coreNeeds).broken;
   return B.parts.filter(p=>!p.core).every(p=>!p.broken);}
-/* 상자 비율 좌표({u,v})를 화면 좌표로. 비율이라 화면 회전에도 자리를 유지한다 (온기 길·불씨가 쓴다).
+/* 상자 비율 좌표({u,v})를 화면 좌표로. 비율이라 화면 회전에도 자리를 유지한다.
    결정 D-341: 쓰는 보스가 없던 엄폐물(cover) 기능은 지웠다. */
 function coverPoint(r){return {x:BOX.x+r.u*BOX.w,y:BOX.y+r.v*BOX.h};}
 /* 수리부엉이 깃: 부위 공격 예고(tell)를 battle_owl_tell_lead 만큼 먼저 보여 준다 */
@@ -252,35 +250,9 @@ function chooseAttackBase(){
   const L=bLiving();let o=L.filter(p=>p!==B.last);if(!o.length)o=L;
   const first=!B.last&&B.E.firstPart?L.find(q=>q.id===B.E.firstPart):null;
   const p=first||o[Math.floor(Math.random()*o.length)];
-  if(nameCallTurn(p))return;   // 결정 D-432: 입 차례 가운데 몇 번은 피할 수 없는 이름 부르기
   B.cur=p;B.last=p;B.st='tell';B.t=first?72:42;B.msg=p.tell;B.hitThis=false;
-  if(B.E.warmPath){prepareWarmPath();B.t=80;}
 }
-/* 온기 길은 비율 좌표로 보관한다. 판정과 그림이 같은 꺾은선을 쓴다. */
-function prepareWarmPath(){
-  const w=B.warm;w.round++;
-  // 결정 D-246: 같은 부위의 공격이 다음 차례에는 다른 방향에서 온다 (battle-attacks.js winterThreat 가 w.dir 로 읽는다)
-  w.dirs=w.dirs||{};const k=B.cur.id;w.dir=w.dirs[k]=(w.dirs[k]??(Math.random()<0.5?1:0))^1;
-  const tell=B.E.warmPath.tells&&B.E.warmPath.tells[k];if(tell)B.msg=tell[w.dir];
-  w.next={u:w.current.u<0.5?0.77:0.23,v:Math.floor((w.round-1)/2)%2?0.76:0.24};
-  // 같은 두 샘을 왕복하며 한곳에 머물 수 없도록 높이도 두 차례마다 바꾼다.
-  const bend=B.cur.id==='body'?w.current.u:B.cur.id==='tail'?w.next.u:0.5;
-  w.points=[w.current,{u:part('body').broken?0.5:bend,v:(w.current.v+w.next.v)/2},w.next];
-  w.width=part('body').broken?B.E.warmPath.wideWidth:B.E.warmPath.width;
-}
-function warmSafe(x,y,padding=0){
-  const w=B.warm;if(!w)return false;
-  if([w.current,w.next].some(r=>r&&Math.hypot(x-coverPoint(r).x,y-coverPoint(r).y)<=38+padding))return true;
-  for(let i=1;i<w.points.length;i++){
-    const a=coverPoint(w.points[i-1]),z=coverPoint(w.points[i]),dx=z.x-a.x,dy=z.y-a.y;
-    const q=clamp(((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy||1),0,1);
-    if(Math.hypot(x-a.x-q*dx,y-a.y-q*dy)<=w.width/2+padding)return true;
-  }
-  return false;
-}
-function finishWarmAttack(){
-  const w=B.warm;w.current=w.next; // 직전의 길도 다음 예고까지 남긴다.
-}
+/* 결정 D-1143: 강철이 전투만 쓰던 온기 길(warmPath: 안전한 길, 겨울 공격, 불씨로 넓히기)은 어둑차사로 바꾸며 지웠다. */
 /* 결정 D-876: 칠 자리(빈틈 표식)는 판 가장자리에서 battle_mark_margin 만큼 안쪽에만 뜬다 (사용자 지시 2026-11-06
    "너무 아래에 공격지점 생기면 무기 공격지점이랑 안 맞아서 못 친다. 모서리쪽은 만들지 말라. 모든 보스 공통").
    손(몸)은 판 안에서만 움직이고 도구 끝(bAim)은 손보다 battle_aim_up 만큼 위에 있다. 그래서 아래쪽 끝은
@@ -303,10 +275,10 @@ function openMarkAt(){
   if(p.core&&coreHidden()){B.mark=null;B.msg=B.E.coreHidden;return;}
   const aim=bAim(),z=bMarkZone();let x,y,n=0;do{x=z.x1+Math.random()*(z.x2-z.x1);y=z.y1+Math.random()*(z.y2-z.y1);n++;}while(Math.hypot(x-aim.x,y-aim.y)<70&&n<12);
   if(B.E.markPosition){const pos=B.E.markPosition(p);if(pos){x=pos.x;y=pos.y;}}
-  const life=B.E.markLife||(B.warm?180:B.E.settle||B.E.calmAction?150:120);
+  const life=B.E.markLife||(B.E.settle||B.E.calmAction?150:120);
   B.mark={x,y,t:life,max:life,part:p};B.msg=p.name+'에 빈틈.';   // 결정 D-227: 누를 키를 알려 주는 글은 쓰지 않는다
 }
-function bAttackDef(p){const mode=B.E.possession||B.E.warmPath;return ATTACKS[(mode&&mode.attacks&&mode.attacks[p.id])||p.atk];}
+function bAttackDef(p){const mode=B.E.possession;return ATTACKS[(mode&&mode.attacks&&mode.attacks[p.id])||p.atk];}
 function attackTick(p){bAttackDef(p).tick(B.atkT,BOX.x,BOX.y,BOX.w,BOX.h);}
 /* 하트는 정수다. 산양 발굽은 맞을 때마다 battle_goat_damage_taken 만큼 쌓고 1이 찰 때만 한 칸 준다 (0.5면 두 번에 한 칸).
    고라니는 맞은 뒤 무적 시간이 battle_deer_iframes 로 길다.
@@ -337,7 +309,7 @@ function bStrike(){
     const boosted=nameHitText(p);
     if(p.hp<=0)breakPart(p);else B.msg=boosted||toolHitText(p);
     if(B.E.onMarkHit&&B.st!=='end')B.E.onMarkHit(p,m);
-    if(B.st!=='end')nameOnPartHit(p);   // 결정 D-435: 몸통을 치면 삼킨 이름이 돌아온다
+    if(B.st!=='end')nameOnPartHit(p,m);   // 결정 D-1140·D-1141: 부름 사이 적패지를 치면 부름이 끊기고, 소매를 부수면 이름이 돌아온다
   }   // 결정 D-227: 헛친 때 안내 글을 띄우지 않는다
   strikeFeedback(aim,hits0);
 }
@@ -373,7 +345,6 @@ function toolHitText(p,tool=battleTool()){
 function breakPart(p){
   p.broken=true;
   if(!p.core)Sound.playSfx('battle_part_break');
-  if(B.warm&&p.id==='body')B.warm.width=B.E.warmPath.wideWidth;
   if(p.mat&&!p.core)B.loot.push(p.mat);
   if(p.core){if(p.mat)B.loot.push(p.mat);bEnd('win');return;}
   B.msg=B.E.npc?jo(p.name,'의','의')+' 기세를 꺾었다!':jo(p.name,'이','가')+' 부러졌다! '+(p.mat?ITEMS[p.mat].n+' 획득.':'');
@@ -408,7 +379,6 @@ function bStep(){
   for(const k of B.cracks)k.t--;B.cracks=B.cracks.filter(k=>k.t>0);
   for(const q of B.pops){q.t--;q.y-=0.45;}B.pops=B.pops.filter(q=>q.t>0);
   if(B.slowT>0)B.slowT--;
-  if(B.warm&&B.warm.fire>0)B.warm.fire--;
   nameStep();
   if(B.st!=='end'&&B.st!=='giftPlace'&&B.st!=='finale'&&!nameLocked()){
     let dx=0,dy=0;
@@ -433,8 +403,8 @@ function bStep(){
     // 결정 D-432: 이름 부르기 예고(ntell) → 부름(ncall) → 입에 빈틈
     case 'ntell':if(--B.t<=0)nameCallFire();break;
     case 'ncall':if(--B.t<=0&&!B.later.length){B.st='open';B.opens=(B.opens||0)+1;openMark();}break;
-    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.possession||B.E.warmPath||B.E.settle||B.E.calmAction)B.st='settle';else{B.st='open';B.opens=(B.opens||0)+1;openMark();}}break;
-    case 'settle':if(!B.bullets.length){if(B.warm)finishWarmAttack();B.st='open';B.opens=(B.opens||0)+1;openMark();}break;
+    case 'atk':attackTick(B.cur);if(++B.atkT>=B.atkDur){if(B.E.dodge)B.st='clear';else if(B.E.possession||B.E.settle||B.E.calmAction)B.st='settle';else{B.st='open';B.opens=(B.opens||0)+1;openMark();}}break;
+    case 'settle':if(!B.bullets.length){B.st='open';B.opens=(B.opens||0)+1;openMark();}break;
     case 'giftPlace':if(--B.t<=0){B.giftPlace=null;bEnd('calm');}break;
     case 'clear':if(!B.bullets.length){B.survived++;B.msg=(B.hitThis?'아야… 그래도 버텼다. ':'잘 피했다! ')+'('+B.survived+'/'+B.E.dodge+')';renderBHud();if(B.survived>=B.E.dodge){if(B.E.finale){B.st='finale';B.E.finale.start();}else bEnd('win');}else{B.st='idle';B.t=40;}}break;
     case 'finale':if(B.E.finale.step())bEnd('win');break;
@@ -544,7 +514,6 @@ function giveGift(id){
   if(!lore)takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();B.lastGift=id;
   B.calm=Math.min(100,B.calm+v);
   B.msg=taste?taste.line:((B.E.likeTexts&&B.E.likeTexts[id])||B.E.likeText);
-  if(B.warm&&id==='dokkaebibul')B.warm.fire=180;
   closeGift();renderBHud();
   if(B.calm>=100){
     if(B.E.placeGift===id){B.giftPlace={x:B.px,y:B.py};B.st='giftPlace';B.t=60;B.mark=null;B.bullets=[];B.msg='아빠의 소원 돌을 손으로 꼭대기에 얹는다.';}
@@ -763,7 +732,6 @@ function bDraw(){
   if(B.E.drawFloor)B.E.drawFloor(c);
   if(B.E.possession)drawPossessedAttack(c);
   for(const b of B.bullets)BULLETS[b.k].draw(c,b);
-  if(B.warm)drawWarmPath(c);
   // 결정 D-228: 칠 수 있는 곳은 금빛으로만 강조한다(빨강·먹은 피할 것). 도구 날(bAim)이 닿으면 더 밝게 빛난다.
   //   작은 도구 그림은 그 부위에 잘 먹는 도구다.
   if(B.mark){const m=B.mark;
