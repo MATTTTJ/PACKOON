@@ -21,7 +21,10 @@ const Rg=defineRegion('yeongsan',{
   newState:()=>({
     pickups:[[985,160],[1128,150],[1265,158],[1340,GROUND]].map(([x,y])=>({x,y,item:'magamok',got:false})).concat([{x:330,y:GROUND,item:'jip',got:false}])   // 산막 처마 밑 짚단
       // 결정 D-265: 옛 구성에만 소나무 밑 솔방울 둘을 더한다(확장판은 구역 선언의 것을 쓴다)
-      .concat(CLASSIC?[190,742].map((x,i)=>({id:'y_cl_'+i,x,y:GROUND,item:'solbang',got:false})):[]),
+      .concat(CLASSIC?[190,742].map((x,i)=>({id:'y_cl_'+i,x,y:GROUND,item:'solbang',got:false})):[])
+      // 결정 D-1186: 옛 구성에는 호숫가 마을(빈 지게 할아버지)이 없다. 넋 빠진 아빠 곁에, 아빠 손이 버릇처럼 삼아 둔
+      //   짚신 한 켤레가 놓여 있다(보부상은 제 짚신을 제가 삼는다). 어둑차사 진정 선물(사잣밥)이 옛 구성에서도 열린다.
+      .concat(CLASSIC?[{id:'y_cl_jipsin',x:1690,y:GROUND,item:'jipsin',got:false}]:[]),
     // 결정 D-265: 120px 고른 간격이던 덤불을 들쭉날쭉하게. 확장판은 이 순서대로 산막 자리(SHELTER_VINES)로 옮긴다
     digs:[{x:404,item:'darae_vine',done:false},{x:551,item:'darae_vine',done:false},{x:612,item:'darae_vine',done:false}],
     boss:{x:2120,dead:false},

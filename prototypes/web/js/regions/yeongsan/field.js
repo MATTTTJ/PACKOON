@@ -176,7 +176,9 @@ Rg.step=()=>{
 };
 Rg.onHit=()=>{};
 Rg.faint=()=>{G.px=Math.max(60,G.px-90);think('눈보라에 밀려났다…');};
-Rg.onPickup=a=>{if(a.item==='legend_fruit'&&!G.f.fruitGot){G.f.fruitGot=true;Rg.fruitFound();}};
+Rg.onPickup=a=>{if(a.item==='legend_fruit'&&!G.f.fruitGot){G.f.fruitGot=true;Rg.fruitFound();}
+  // 결정 D-1186: 옛 구성의 아빠 곁 짚신
+  if(a.item==='jipsin'&&CLASSIC&&!G.f.yJipsin){G.f.yJipsin=true;think('아빠 곁에 새 짚신 한 켤레. 넋이 빠져도\n손은 길 떠날 신을 삼았구나.');}};
 /* 이기든 달래든 호수의 얼음이 풀리고 봄이 온다. 신목에 전설의 열매가 열린다 */
 Rg.bringSpring=()=>{
   G.boss.dead=true;G.f.spring=true;

@@ -326,6 +326,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await stage('영산 · 설피',async()=>{await pickup('jip');await gather('darae_vine',2);for(let i=0;i<3&&!await read('G.f.seolpi');i++)await npc('nal');if(!await read('G.f.seolpi'))throw new Error('설피를 받지 못했다');});
     await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('넋 빠진 아빠에게서 장부 한 장을 받지 못했다');if(mode==='expanded')await npc('y_ice_station_2');});
     // 결정 D-1184: 확장판은 산막의 둘째 짚단을 빈 지게 할아버지 곁에 놓아 짚신(어둑차사 진정 선물)을 받는다.
+    if(mode!=='expanded')await stage('영산 · 짚신',async()=>{await pickup('jipsin');});   // 결정 D-1186: 옛 구성은 아빠 곁 짚신
     if(mode==='expanded')await stage('영산 · 짚신',async()=>{await pickup('jip');await zone('shore');
       const w=await read("(()=>{const w=zoneObjects('wanderers').find(w=>w.id==='y_lost_jige');return w&&{x:w.x,y:w.y??192};})()");
       if(!w)throw new Error('빈 지게 할아버지가 호숫가에 없다');await jumpTo(w.x,w.y);await key('e');await settle(/짚 한 단/);
@@ -381,6 +382,8 @@ async function battleLoop(io,gifts,{sway=false,dodge=false}={}) {
       // 결정 D-876: 칠 자리는 모든 보스에서 판 안쪽 영역(bMarkZone)에 든다. 아래쪽 끝이나 모서리에 뜨면 도구 끝이 못 닿는다
       const out=await read("B&&B.mark&&!bInMarkZone(B.mark)?{kind:B.kind,part:B.mark.part.id,x:Math.round(B.mark.x-BOX.x),y:Math.round(B.mark.y-BOX.y)}:null");
       if(out){await release();throw new Error(`칠 자리가 판 안쪽 영역 밖에 떴다: ${out.kind} ${out.part} (판 안 ${out.x},${out.y})`);}
+      // 결정 D-1185: 어둑차사의 세 번째 부름(삼혼 부르기) 동안은 손을 떼고 멈춘다. 플레이어가 배우는 그대로다(두루미 사건)
+      if(await read("!!(B&&B.st==='ncall'&&B.names&&B.names.call&&B.names.call.k>=3)")){await release();await wait(40);continue;}
       if(await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)')){
         if(dodge)await hold(await read(DODGE_KEYS));
         else if(sway){

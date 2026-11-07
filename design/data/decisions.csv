@@ -649,3 +649,5 @@ D-1181,이야기,보스 부위 물건 언 까마귀 깃을 살금이가 받아 '
 D-1182,그림,"영산 필드의 보스 자리 그림을 이무기 똬리에서 갓 쓴 키 큰 그림자(어둑차사)로 바꾼다. 바닥에 번지는 어둠, 깃으로 풀린 도포 자락, 흰 손, 붉은 적패지",채택,사용자 지시(2026-11-07),있음,design/proposals/name-story-v3.md,prototypes/web/js/regions/yeongsan/field.js 의 결정 표시를 찾아 되돌린다
 D-1183,연출,진 뒤 아빠가 뒷덜미를 끌어내는 장면에서 아빠의 몸짓 줄은 아이의 지문으로 쓴다(아빠는 섬 구역 인물이 아니고 말없이 지나간다),채택,사용자 지시(2026-11-07),있음,design/proposals/name-story-v3.md,prototypes/web/js/regions/yeongsan/story.js 의 결정 표시를 찾아 되돌린다
 D-1184,이야기,"영산 산막에 짚단을 하나 더 둔다. 하나는 설피에, 하나는 빈 지게 할아버지의 짚신에 쓴다. 자동 플레이는 짚신을 받아 어둑차사를 달랜다",채택,사용자 지시(2026-11-07),있음,design/proposals/name-story-v3.md,prototypes/web/js/regions/yeongsan/region.js · prototypes/web/tools/qa/playthrough.js 의 결정 표시를 찾아 되돌린다
+D-1185,검사,자동 플레이는 어둑차사의 세 번째 부름 동안 손을 떼고 멈춘다(플레이어가 두루미 사건에서 배우는 그대로),채택,사용자 지시(2026-11-07),있음,design/proposals/name-story-v3.md,prototypes/web/tools/qa/playthrough.js 의 결정 표시를 찾아 되돌린다
+D-1186,이야기,"옛 구성(classic)에는 호숫가 마을이 없어, 넋 빠진 아빠 곁에 아빠 손이 버릇처럼 삼아 둔 짚신 한 켤레를 줍는다. 어둑차사 진정 선물이 옛 구성에서도 열린다",채택,사용자 지시(2026-11-07),있음,design/proposals/name-story-v3.md,prototypes/web/js/regions/yeongsan/region.js · field.js 의 결정 표시를 찾아 되돌린다
