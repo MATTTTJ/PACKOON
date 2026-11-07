@@ -6,6 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const {spawnSync} = require('node:child_process');
 const {checkCraft} = require('./craft-checks');
+const {checkAsks} = require('./ask-checks');   // 결정 D-1102
 
 const slash = value => value.split(path.sep).join('/');
 const location = (source, offset) => source.slice(0, offset).split('\n').length;
@@ -264,7 +265,11 @@ async function runStatic({root, rules, only} = {}) {
     let craft = {recipes: 0, findings: []};
     try { craft = checkCraft(root); } catch (error) { findings.push(finding('craft', 'prototypes/web/tools/qa/craft-checks.js', 1, '가공법 점검 실패: ' + error.message)); }
     findings.push(...craft.findings.map(f => finding(f.rule, f.file, 1, f.message)));
-    results.push(result('data', 'CSV와 tables.js 일치 · 결정 ' + decisions.rows + '개, 코드 표시 ' + decisions.tags + '곳 · 가공법 ' + craft.recipes + '개 점검', findings, {output: (check.stdout + check.stderr).trim()}));
+    // 결정 D-1102: 덤 없는 상위 조합 금지 (교환 대체끼리, 같은 상대의 같은 물건 교환끼리, 손님 교환끼리)
+    let asks = {goods: 0, findings: []};
+    try { asks = checkAsks(root); } catch (error) { findings.push(finding('trade-superset', 'prototypes/web/tools/qa/ask-checks.js', 1, '교환 조합 점검 실패: ' + error.message)); }
+    findings.push(...asks.findings.map(f => finding(f.rule, f.file, f.line, f.message)));
+    results.push(result('data', 'CSV와 tables.js 일치 · 결정 ' + decisions.rows + '개, 코드 표시 ' + decisions.tags + '곳 · 가공법 ' + craft.recipes + '개 점검 · 교환 ' + asks.goods + '개 덤 점검', findings, {output: (check.stdout + check.stderr).trim()}));
   }
   if (wants('versions')) {
     const file = 'prototypes/web/index.html', source = fs.readFileSync(path.join(root, file), 'utf8'), findings = [];

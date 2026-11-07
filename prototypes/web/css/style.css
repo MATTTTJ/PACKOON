@@ -966,3 +966,16 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
   .dialog .choices button{font-size:14px}
   .monologue .text{font-size:14px}
 }
+/* 결정 D-1101: 교환 창 물건 정보 창 (마우스를 올리거나 휴대폰에서 누르면 뜬다). 교환 창 위 맨 앞 겹, 고정 위치 */
+.trade-tip{position:fixed;z-index:60;max-width:min(260px,80vw);padding:7px 9px;background:#fff8e6;border:1px solid #8a6a44;border-radius:5px;box-shadow:0 3px 10px rgba(40,24,10,.28);color:var(--meok);font-size:13px;line-height:1.45;pointer-events:none}
+.trade-tip p{margin:3px 0 0}
+.trade-tip-head{display:flex;align-items:center;gap:5px}
+.trade-tip-head canvas{width:22px;height:22px;image-rendering:pixelated}
+.trade-tip-head canvas.rarity-mark{width:13px;height:13px}
+.trade-tip-count{color:#6b4f2c;font-weight:600}
+.trade-tip-why{color:#a2462c}
+.trade-good-icon{display:inline-flex}
+/* 결정 D-1102: 재료를 더 얹는 조합의 덤. 줄 끝에 붉은 '덤' 딱지와 더 받는 물건 그림 */
+.trade-extra{display:inline-flex;align-items:center;gap:3px;margin-left:4px;padding:1px 4px 1px 2px;border:1px dashed var(--dan);border-radius:4px;background:#fbefe0}
+.trade-extra-tag{font-size:.78em;font-weight:700;color:#fff;background:var(--dan);border-radius:3px;padding:0 4px;line-height:1.5}
+.trade-good:not([aria-pressed="true"]):not(:hover):not(:focus-visible) .trade-extra .trade-ask{opacity:.8}

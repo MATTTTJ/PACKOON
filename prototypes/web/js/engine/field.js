@@ -690,6 +690,18 @@ function placeThought(){
   heroThought.hidden=false;
 }
 // 결정 D-717: 채집 자리는 높이(발 높이 차이)도 가까워야 뜬다. 난간·발판 위에 올라가 있으면 바로 아래 흙더미의 원이 뜨지 않는다 (사용자 피드백 2026-11-05)
+/* 결정 D-1103: 채집물 사이 최소 간격 (사용자 피드백 2026-11-07). 개발자 모드에서 구역에 들어설 때 너무 붙은 자리를 콘솔에 알린다.
+   자동 검사 map 의 tools/qa/spacing-checks.js 와 같은 기준이다: 채집물끼리 gather_min_gap, 채집물과 말 걸기·조사 자리 gather_interact_gap. */
+function gatherSpacingWarn(){
+  if(typeof Dev==='undefined'||!Dev.on||CLASSIC)return;
+  const T=TABLES.TUNING,yOf=a=>a.y??fieldGround(),near=(a,b,gap)=>Math.abs(yOf(a)-yOf(b))<T.field_interact_y&&Math.abs(a.x-b.x)<gap;
+  const gs=[...fieldItems('digs'),...fieldItems('pickups')];
+  const others=[...fieldNpcs(),...['wanderers','doors','examines','vistas','stamps'].flatMap(k=>zoneObjects(k))];
+  gs.forEach((a,i)=>{
+    for(const b of gs.slice(i+1))if(near(a,b,T.gather_min_gap))console.warn('채집물 간격',G.zone,a.id||a.item,a.x,b.id||b.item,b.x);
+    for(const b of others)if(near(a,b,T.gather_interact_gap))console.warn('채집물과 상호작용 간격',G.zone,a.id||a.item,a.x,b.id||b.label,b.x);
+  });
+}
 function nearDig(){if(paused()||(typeof rolling!=="undefined"&&rolling))return null;const T=TABLES.TUNING;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*T.field_dig_ahead))<T.field_dig_distance&&Math.abs((d.y??fieldGround())-G.py)<=T.field_dig_height)return d;}return null;}
 function updateOverlay(){
   placeThought();
@@ -750,7 +762,7 @@ function changeZone(to,arrival={}){
   const z=REG.zones[to];
   formClimb=null;   // 결정 D-722: 구역을 옮겨도 변신은 그대로다 (사용자 피드백 2026-11-05 "굳이 너구리로 풀릴 필요 없다"). 줄기를 잡던 것만 놓는다
   G.zone=to;G.px=clamp(arrival.x??z.startX??70,16,z.w-16);G.py=arrival.y??z.ground??GROUND;
-  markZoneVisited();
+  markZoneVisited();gatherSpacingWarn();
   if(!edge)G.vx=0;
   G.vy=G.attackT=0;G.onGround=G.py===(z.ground??GROUND);
   G.cam=clamp(G.px-W*.42,0,Math.max(0,z.w-W));

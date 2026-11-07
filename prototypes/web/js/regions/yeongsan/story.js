@@ -1025,7 +1025,7 @@ Rg.trade={
   nal:()=>[
     ...(G.ledger.nal_yeongsan?[{id:'t_nal_yeongsan',item:'seolpi',n:1,asks:SEOLPI_ASKS,done:()=>G.f.nalYDone,accept:nalTrade}]:[]),
     // 결정 D-147: 대추 꾸러미는 처음부터 날쌘 지게에 매달려 있다. 설피를 받기 전에는 덩굴 둘이 설피 몫이다(첫 만남에 들은 값).
-    ...(!CLASSIC?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],done:()=>G.f.yCraftJujube,
+    ...(!CLASSIC?[{id:'t_craft_jujube',item:'jujube',n:2,asks:[{darae_vine:1},{darae_vine:1,yakgwa:1}],extra:[null,{jujube:1}],done:()=>G.f.yCraftJujube,
       locked:()=>!G.f.seolpi&&has('darae_vine')&&!has('darae_vine',3)?'다래 덩굴 둘은 설피 엮을 몫이다. 하나가 더 있어야 한다.':null,accept:jujubeGive}]:[])
   ],
   salgeumi:()=>[

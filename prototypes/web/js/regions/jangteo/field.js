@@ -475,7 +475,7 @@ if(!CLASSIC){
     street:{...common('street'),name:TABLES.ZONES.jangteo.street,w:2800,npcs:['morak','yeotbang','nal'],
       // 결정 D-315·D-316: 공중에 뜬 긴 지붕(610·2550)과 떡집 높은 마루(1250, y110)는 뺐다. 처마 계단 둘만 남는다.
       platforms:[...stairs(430),...stairs(2370)],
-      pickups:cones('street',[[850,192]]),
+      pickups:cones('street',[[830,192]]),   // 결정 D-1103: 콩 할아버지 길손(880)과 간격
       exits:{left:{to:'entrance',toX:2530},right:{to:'inn',toX:60}},
       // 결정 D-316·D-319: 문은 뒷산 돌계단 하나. 솔숲에서 내려오면 같은 돌계단 아래로 나온다.
       doors:[{x:2180,to:'pine',toX:70,label:'뒷산 돌계단 오르기',ascend:true,draw:stairPost}],
@@ -498,12 +498,12 @@ if(!CLASSIC){
       // 840 헛간 지붕은 720 처마에서 수리부엉이가 날개를 펴야 닿는다 (PA-47 선택 자리)
       platforms:[...stairs(420),...stairs(1100,96,[1]),...stairs(2180,96,[0]),{x:2390,y:96,w:340},{x:842,y:124,w:56}],
       // 결정 D-82: 솔숲의 소나무 흔들기 세 곳 (채집 고리 D-41)
-      digs:[{id:'j_cache_pine',x:1700,item:'jat',n:2,form:'squirrel',cache:true,done:false},   // 결정 D-963: 솔숲 다람쥐가 묻은 잣
+      digs:[{id:'j_cache_pine',x:1680,item:'jat',n:2,form:'squirrel',cache:true,done:false},   // 결정 D-963: 솔숲 다람쥐가 묻은 잣
         {id:'j_pine_shake_1',x:960,item:'solbang',done:false},{id:'j_pine_shake_2',x:1620,item:'solbang',done:false},{id:'j_pine_shake_3',x:2080,item:'solbang',done:false}],
       // 결정 D-207: 솔방울이 같은 간격으로 늘어서지 않게 떨어진 자리를 들쭉날쭉하게 (사용자 피드백 58). 높은 칸의 것은 그 칸 안에서만 옮긴다.
       // 결정 D-391: 열넷은 너무 많았다. 소나무 밑과 바위턱에 여덟만 (엿방울 몫 다섯과 갈래 셋에 넉넉하고, 모자라면 쉬는 사이 다시 떨어진다 D-79)
-      pickups:[...cones('pine',[[232,192],[612,96],[700,192],[1040,192],[1270,128],[1500,192],[2250,160],[2600,96]]),
-        {id:'j_owl_roof_cone_1',x:853,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:884,y:124,item:'solbang',got:false}],
+      pickups:[...cones('pine',[[232,192],[612,96],[700,192],[1040,192],[1270,128],[1500,192],[2250,160],[2620,96]]),   // 결정 D-1103: 등불 강 경치(2570)와 간격
+        {id:'j_owl_roof_cone_1',x:846,y:124,item:'solbang',got:false},{id:'j_owl_roof_cone_2',x:894,y:124,item:'solbang',got:false}],   // 결정 D-1103: 지붕 양 끝으로
       // 결정 D-44: 뒷산에서 장터로는 등을 보이며 기어 내려간다 (engine/field.js startCrawl)
       // 결정 D-319: 올라온 돌계단으로 내려가 거리의 그 돌계단 아래(2180)로 나온다. 지붕길 문(→거리 지붕)은 뺐다(D-316).
       doors:[{x:70,to:'street',toX:2180,label:'돌계단 따라 장터로 내려가기',descend:true,draw:stairPost}],
@@ -543,7 +543,7 @@ if(!CLASSIC){
      마구간 여물통 곁에 흘린 짚, 창고 마당 짐짝 틈으로 샌 콩. 장꾼이 팔 물건은 줍지 않는다. 좌표는 길을 줄인 뒤의 자리.
      결정 D-391: 짚 하나, 콩 둘로 줄인다. */
   addZoneGather(Rg,'j_g2_',[
-    ['inn','p',2042,'jip'],
+    ['inn','p',2000,'jip'],   // 결정 D-1103: 마구간 살펴보기(2060)와 간격
     ['warehouse','p',470,'kong'],['warehouse','p',1150,'kong'],
   ]);
   /* 결정 D-665: 수리부엉이만 느끼는 숨은 물건 (사용자 피드백 2026-11-05). 수리부엉이로 곁을 지나면 "무언가 느껴진다"며 드러난다.

@@ -55,11 +55,14 @@ function gatherHit(d){
   const cfg=gatherCfg(d),MG=TABLES.MINIGAMES;if(!cfg||d.done)return;
   const grade=gatherCue.grade,just=grade==='perfect';gatherCue.grade=null;if(!grade)d.flaw=true;
   if(!G.f.gatherHinted)G.f.gatherHinted={};
+  const firstEver=!Object.keys(G.f.gatherHinted).length;   // 결정 D-1100: 예전에 한 번이라도 캔 저장은 처음이 아니다
   /* 결정 D-922: 채집 설명(바늘이 금빛 칸에 닿을 때 치기)은 한 게임에 단 한 번, 처음 캘 때만 띄운다 (사용자 피드백 2026-11-06:
      "채집에 대한 설명 게임 당 시작할 때 단 한 번만"). 자리마다 띄우던 한 줄(cfg.hint)은 그 첫 번에만 붙인다. G.f 는 지역을 넘어도 이어지고
      저장에 남아, 다음 지역·이어 하기에서도 다시 뜨지 않는다. 채집하면서 손으로 익힌 것이라 가벼운 속말로 띄운다(D-921, 멈춰 세우지 않음). */
   G.f.gatherHinted[gatherKey(d)]=true;
-  if(!G.f.gatherRuleSaid){G.f.gatherRuleSaid=true;think(cfg.hint+' 도는 바늘이 금빛 칸에 닿을 때 치면 더 나오겠다.',{light:true});}
+  /* 결정 D-1100: 그 한 번은 1스테이지 단풍골의 첫 채집뿐이다 (사용자 피드백 2026-11-07 "게임 시작 시, 1스테이지에서 처음 채집할 때만 튜토리얼처럼").
+     D-922 이전 저장(이 표시가 없던 저장, 이미 캔 자리가 있음)을 이어 하거나 뒤 지역에서 시작해 뒤 지역에서 처음 캐면 설명 없이 표시만 남긴다. */
+  if(!G.f.gatherRuleSaid){G.f.gatherRuleSaid=true;if(firstEver&&G.region==='galchamgol')think(cfg.hint+' 도는 바늘이 금빛 칸에 닿을 때 치면 더 나오겠다.',{light:true});}
   d.prog=(d.prog||0)+(just?MG.gather_perfect_power:1);if(just)d.perfects=(d.perfects||0)+1;
   // 결정 D-482: 채집 자리마다 칠 때 소리를 따로 줄 수 있다(cfg.hitSound). 눈 둔덕은 쇠 날이 언 눈을 때리는 '팡'
   if(cfg.hitSound)Sound.hit(cfg.hitSound);else Sound.gather(true);

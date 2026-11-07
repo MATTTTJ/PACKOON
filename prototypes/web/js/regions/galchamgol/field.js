@@ -271,8 +271,9 @@ if(!CLASSIC){
   Rg.trimCuts={village:[[1310,250],[1580,200],[1800,590],[2410,70]],forge:[[1110,330],[1670,30],[2150,350]],forest:[[830,280],[1230,130],[1472,50],[2530,150]]};
   const A=Rg.expArt;
   const oldState=Rg.newState,oldStep=Rg.step,oldHit=Rg.onHit;
-  const acorns=[['village',280,GROUND],['village',530,160],['village',1260,GROUND],
-    ['forge',330,GROUND],['forge',2050,122],['forest',350,GROUND],['forest',1120,GROUND],['forest',2250,112]];
+  // 결정 D-1103: 채집물 사이·말 걸기 자리와 최소 간격 (tuning gather_min_gap·gather_interact_gap). 감나무 일(300)·여울(1290)·숲 첫 도토리 무리·금줄 매듭 도장(1790) 곁에서 비켜 둔다
+  const acorns=[['village',230,GROUND],['village',530,160],['village',1150,GROUND],
+    ['forge',330,GROUND],['forge',2050,122],['forest',330,GROUND],['forest',1120,GROUND],['forest',2300,112]];
   // 결정 D-521: 늪가 약방 구역을 뺐다. 늪에 있던 꾀꼬리버섯 흙더미는 숲 안쪽 높은 발판 아래로 옮긴다.
   const digs=[['village',600],['forest',1370],['forge',1700],['forest',2300]];
   const placeRoot=()=>{
@@ -338,10 +339,10 @@ if(!CLASSIC){
       {x:744,y:96,w:64}]),
       npcs:['dodam'],exits:{left:{to:'forge',toX:2480}},   // 결정 D-521: 늪가 약방으로 가던 오른쪽 길은 뺐다
       // 결정 D-207: 도토리가 같은 간격으로 늘어서지 않게 (사용자 피드백 58). 가지 위 둘은 가지(744~808) 안에서만 옮긴다.
-      pickups:[{id:'gal_extra_acorn_1',x:396,y:GROUND,item:'acorn',got:false},
-        {id:'gal_extra_acorn_2',x:471,y:GROUND,item:'acorn',got:false},
+      pickups:[{id:'gal_extra_acorn_1',x:380,y:GROUND,item:'acorn',got:false},   // 결정 D-1103: 검댕(430) 양옆으로 비켜 둔다
+        {id:'gal_extra_acorn_2',x:480,y:GROUND,item:'acorn',got:false},
         {id:'gal_extra_acorn_3',x:1750,y:152,item:'acorn',got:false},
-        {id:'gal_branch_acorn_1',x:761,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:792,y:96,item:'acorn',got:false}],
+        {id:'gal_branch_acorn_1',x:752,y:96,item:'acorn',got:false},{id:'gal_branch_acorn_2',x:800,y:96,item:'acorn',got:false}],   // 결정 D-1103: 가지 양 끝으로
       // 결정 D-411: 당산나무 언덕으로는 금줄 친 길로 걸어 오른다 (나무 속을 오르는 길은 뺐다). 덩굴은 금줄에 걸려 늘어진다(drawBarrier).
       doors:[forestTreeDoor=path(2420,'hill',180,'금줄 따라 당산나무 언덕으로',{need:cutPath,
           reason:'칡덩굴이 금줄 길을 덮었다. 무쇠 삼촌의 낫으로 걷어야 한다.',blockedLabel:'칡덩굴에 막힌 금줄 길',blockedSay:vineSay,draw:A.ropeGate,drawBlocked:A.ropeGate})],   // 결정 D-190
@@ -363,7 +364,7 @@ if(!CLASSIC){
       exits:{left:{to:'forest',toX:2360}},
       doors:[path(180,'forest',2420,'금줄 따라 숲으로 내려가기',{draw:A.ropeGate})],
       pickups:[{id:'gal_extra_acorn_4',x:630,y:160,item:'acorn',got:false},
-        {id:'gal_cut_vine',x:340,y:GROUND,item:'vine',got:false}],
+        {id:'gal_cut_vine',x:350,y:GROUND,item:'vine',got:false}],   // 결정 D-1103: 두꺼비 할멈(300)과 간격
       stamps:[{id:'roots',x:2140-HILL_SHIFT,note:'stamp:galchamgol:roots',label:'당산나무 뿌리의 손바닥 자국 살피기'}],
       vistas:[{id:'home',x:2380-HILL_SHIFT,y:126,from:0,to:160,draw:A.marker,sound:'wind',
         thought:'우리 집 지붕이다.\n엄마, 나 여기까지 왔어.',
@@ -388,7 +389,7 @@ if(!CLASSIC){
     ['hill','p',410,'acorn'],
   ]);
   // 결정 D-665: 수리부엉이만 느끼는 숨은 물건 (사용자 피드백 2026-11-05). 수리부엉이로 곁을 지나면 드러난다. 좌표는 길을 줄인 뒤의 자리
-  addZoneGather(Rg,'gal_owl_',[['forest','p',1000,'kkoe',{hidden:'owl'}],['hill','p',1000,'songi',{hidden:'owl'}]]);
+  addZoneGather(Rg,'gal_owl_',[['forest','p',1020,'kkoe',{hidden:'owl'}],['hill','p',1000,'songi',{hidden:'owl'}]]);
 
 }
 })();

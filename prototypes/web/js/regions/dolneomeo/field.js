@@ -307,8 +307,8 @@ if(!CLASSIC){
   const originalNewState=Rg.newState,originalStart=Rg.onStart;
   // 결정 D-207: 채집물은 같은 간격으로 늘어서지 않게 사이를 들쭉날쭉하게 둔다(사용자 피드백 58). 메밀댁(760)·꾸벅이 둥지 문턱(1590)과 겹치지 않게.
   const pickupMap=[
-    ['field',602,192],['field',661,192],['field',702,192],
-    ['field',1768,192],['field',1821,192],['field',1866,192],
+    ['field',602,192],['field',661,192],['field',712,192],
+    ['field',1768,192],['field',1821,192],['field',1872,192],   // 결정 D-1103: 채집물 사이 최소 간격(gather_min_gap)
     ['village',1920,112],['field',2040,112],
   ];
   const digMap=[['field',1316],['field',1437],['field',1668],['field',2310]];
@@ -528,7 +528,7 @@ if(!CLASSIC){
   Rg.zones.field.digs=[{id:'dol_cache_field',x:880,item:'memil',n:2,form:'squirrel',cache:true,done:false}];
   // 결정 D-1007: 다람쥐가 묻어 둔 몫은 도토리만이 아니다 (사용자 피드백 2026-11-06 큰 장터 5). 돌담 마을엔 참나무가 없고 고갯길 솔숲이 가깝다.
   //   늙은 까치도 담 틈에 잣을 숨긴다(D-271). 다람쥐도 가을에 솔숲에서 물어 온 잣을 돌담 밑에 묻었다. 밭의 몫은 이삭 메밀 그대로.
-  Rg.zones.village.digs=[{id:'dol_cache_village',x:1420,item:'jat',n:2,form:'squirrel',cache:true,done:false}];
+  Rg.zones.village.digs=[{id:'dol_cache_village',x:1390,item:'jat',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.shrine.pickups=[{id:'dol_memory_seogi',x:1580,y:112,item:'seogi',got:false}];
   /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 고갯길·절벽길 억새, 높은 바위턱의 겨우살이, 마을 길에 흘린 메밀 이삭.
      결정 D-266: 그늘에 녹지 않은 첫눈 둔덕을 파면 눈에 덮였던 것이 나온다. 무엇이 왜 거기 있었는지는 자리마다 found 로 알린다.
