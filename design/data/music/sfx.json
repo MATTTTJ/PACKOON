@@ -649,6 +649,30 @@
         {"instrument":"windchime","note":"B6","start":0.04,"duration":0.26,"gain":0.07,"pan":0.1,"patch":{"fixedDuration":0.26,"attack":0.002,"decay":0.15,"sustain":0,"release":0.05,"tail":0.08},"seed":9152},
         {"instrument":"wind","note":"C4","start":0,"duration":0.3,"gain":0.1,"pan":0,"patch":{"fixedDuration":0.3,"kind":"noise","attack":0.004,"decay":0.15,"sustain":0.1,"release":0.05,"tail":0.06,"noise":1,"noiseCutoff":1600,"partials":[]},"seed":9153}
       ]
+    },
+    {
+      "id": "chasa_call", "name": "어둑차사 부름 (결정 D-1150)", "category": "전투", "status": "제안", "duration": 1.1, "gain": 0.9,
+      "layers": [
+        {"instrument":"jing","note":"G1","start":0,"duration":0.9,"gain":0.22,"pan":0,"patch":{"attack":0.03,"release":0.4,"fixedDuration":0.9},"seed":9201},
+        {"instrument":"daegeum","note":"D3","start":0.05,"duration":0.7,"gain":0.12,"pan":-0.1,"patch":{"attack":0.12,"decay":0.2,"sustain":0.5,"release":0.3,"fixedDuration":0.7},"seed":9202},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.9,"gain":0.1,"pan":0.1,"patch":{"kind":"noise","attack":0.2,"decay":0.3,"sustain":0.3,"release":0.3,"tail":0.1,"noise":1,"noiseCutoff":900,"partials":[],"fixedDuration":0.9},"seed":9203}
+      ]
+    },
+    {
+      "id": "chasa_write", "name": "붉은 붓 획 (결정 D-1150)", "category": "전투", "status": "제안", "duration": 0.5, "gain": 0.8,
+      "layers": [
+        {"instrument":"wind","note":"C4","start":0,"duration":0.32,"gain":0.2,"pan":0,"patch":{"kind":"noise","attack":0.01,"decay":0.16,"sustain":0.2,"release":0.08,"tail":0.05,"noise":1,"noiseCutoff":2600,"partials":[],"fixedDuration":0.32},"seed":9211},
+        {"instrument":"buk","note":"A1","start":0.02,"duration":0.2,"gain":0.18,"pan":0,"patch":{"attack":0.002,"decay":0.12,"sustain":0,"release":0.04,"tail":0.06,"fixedDuration":0.2},"seed":9212},
+        {"instrument":"stone","note":"C6","start":0.28,"duration":0.03,"gain":0.05,"pan":0,"patch":{"fixedDuration":0.03,"attack":0.002,"decay":0.018,"sustain":0,"release":0.05,"tail":0.06},"seed":9213}
+      ]
+    },
+    {
+      "id": "crow_caw", "name": "까마귀 (결정 D-1150)", "category": "전투", "status": "제안", "duration": 0.5, "gain": 0.7,
+      "layers": [
+        {"instrument":"piri","note":"E4","start":0,"duration":0.12,"gain":0.16,"pan":0.15,"patch":{"attack":0.004,"decay":0.06,"sustain":0.3,"release":0.04,"fixedDuration":0.12},"seed":9221},
+        {"instrument":"piri","note":"D4","start":0.17,"duration":0.14,"gain":0.14,"pan":0.15,"patch":{"attack":0.004,"decay":0.07,"sustain":0.3,"release":0.05,"fixedDuration":0.14},"seed":9222},
+        {"instrument":"wind","note":"C4","start":0,"duration":0.3,"gain":0.06,"pan":0,"patch":{"kind":"noise","attack":0.01,"decay":0.1,"sustain":0.1,"release":0.05,"tail":0.05,"noise":1,"noiseCutoff":3000,"partials":[],"fixedDuration":0.3},"seed":9223}
+      ]
     }
   ]
 }

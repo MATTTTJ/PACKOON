@@ -324,7 +324,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await next();
     await stage('영산 · 설피',async()=>{await pickup('jip');await gather('darae_vine',2);for(let i=0;i<3&&!await read('G.f.seolpi');i++)await npc('nal');if(!await read('G.f.seolpi'))throw new Error('설피를 받지 못했다');});
     await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('넋 빠진 아빠에게서 장부 한 장을 받지 못했다');if(mode==='expanded')await npc('y_ice_station_2');});
-    await stage('영산 · 봄과 열매',async()=>{await npc('sangun');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['dokkaebibul'],toSteel,'강철이');await pickup('legend_fruit');await npc('sangun');});
+    await stage('영산 · 봄과 열매',async()=>{await npc('sangun');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['jipsin','rice'],toSteel,'어둑차사',{dodge:true});await pickup('legend_fruit');await npc('sangun');});
     const final=await settle();if(!final.ended||final.region!=='yeongsan'||!final.flags.yakDone)throw new Error('마지막 귀향과 엔딩에 도착하지 못했다');
     // 결정 D-73: 엔딩은 한 줄씩 넘긴다. 이름 칸이 나올 때까지 '다음'을 누르고, 이름을 부른 뒤에도 끝까지 넘긴다.
     log('엔딩 넘김',{toName:await b.endingToName()});

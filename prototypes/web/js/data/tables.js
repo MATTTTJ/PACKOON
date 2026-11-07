@@ -363,35 +363,35 @@ const TABLES={
    "d": "날쌘이 말없이 얹어 준 토시. 손이 시리지 않다."
   },
   "frost_whisker": {
-   "n": "서리 수염",
+   "n": "붉은 천 조각",
    "r": 2,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "강철이의 입가에 늘어졌던 수염. 녹지 않는 서리가 맺혀 있다.",
-   "u": "가닥"
+   "d": "어둑차사의 적패지에서 찢겨 나온 붉은 무명. 붓 자국이 빼곡한데 한 글자도 읽히지 않는다.",
+   "u": "조각"
   },
   "ice_scale": {
-   "n": "얼음 비늘",
+   "n": "언 까마귀 깃",
    "r": 1,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "강철이의 몸통에서 떨어진 비늘. 햇빛에 비추면 무지개가 든다.",
-   "u": "장"
+   "d": "어둑차사의 소매에서 뜯긴 까마귀 깃. 얼음이 덮여 볕에 두어도 녹지 않는다.",
+   "u": "개"
   },
   "icicle": {
    "n": "고드름 조각",
    "r": 1,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "강철이의 꼬리에서 부러진 고드름.",
+   "d": "어둑차사의 도포 자락 끝에 얼어붙어 있던 고드름. 먹물 빛이 비친다.",
    "u": "조각"
   },
   "broken_orb": {
-   "n": "깨진 여의주",
+   "n": "검은 갓",
    "r": 3,
    "kind": "귀한 것",
    "region": "yeongsan",
-   "d": "용이 되지 못한 이무기의 여의주. 금이 갔는데도 따뜻하다."
+   "d": "어둑차사가 쓰고 있던 넓은 검은 갓. 안쪽이 텅 비어 있고, 들면 겨울밤처럼 차다."
   },
   "dad_ledger": {
    "n": "아빠의 장부 한 장",
@@ -774,11 +774,11 @@ const TABLES={
    "u": "그릇"
   },
   "bigeul_garu": {
-   "n": "비늘 가루",
-   "r": 2,
+   "n": "서리 깃 가루",
+   "r": 1,
    "kind": "재료",
    "region": "yeongsan",
-   "d": "얼음 비늘과 서리 수염을 함께 갈았다. 가루가 손끝에서 서늘하다. 열 내리는 데 좋을 것 같다.",
+   "d": "언 까마귀 깃과 고드름 조각을 함께 갈았다. 가루가 손끝에서 서늘하다. 열 내리는 데 좋을 것 같다.",
    "u": "줌"
   },
   "meju": {
@@ -804,6 +804,14 @@ const TABLES={
    "region": "yeongsan",
    "d": "늙은 까치가 마지막 남쪽 길에 앞서 뽑아 준 꽁지깃. 누가 부를 때 쥐면 어르신이 \"아가\" 하던 소리가 귓가에 난다. 강철이 앞에서 전투마다 한 번, 돌아본 이름을 지켜 준다 (결정 D-1074).",
    "u": "개"
+  },
+  "jipsin": {
+   "n": "짚신",
+   "r": 1,
+   "kind": "재료",
+   "region": "yeongsan",
+   "d": "넋이 빠진 할아버지가 손버릇처럼 삼은 짚신 한 켤레. 먼 길 떠나는 이가 신으라고 초상집 문간에 놓던 그 신이다.",
+   "u": "켤레"
   }
  },
  "BOSS_PARTS": {
@@ -896,28 +904,28 @@ const TABLES={
   "gangcheol": [
    {
     "id": "mouth",
-    "name": "입",
+    "name": "적패지",
     "hp": 3,
     "mat": "frost_whisker",
     "tool": "sickle"
    },
    {
     "id": "body",
-    "name": "몸통",
+    "name": "소매",
     "hp": 4,
     "mat": "ice_scale",
-    "tool": "pick"
+    "tool": "sickle"
    },
    {
     "id": "tail",
-    "name": "꼬리",
+    "name": "도포 자락",
     "hp": 3,
     "mat": "icicle",
     "tool": "pick"
    },
    {
     "id": "core",
-    "name": "머리",
+    "name": "갓",
     "hp": 5,
     "mat": "broken_orb",
     "core": true,
@@ -939,8 +947,8 @@ const TABLES={
    "seogi": 40
   },
   "gangcheol": {
-   "dokkaebibul": 100,
-   "patsirutteok": 60
+   "jipsin": 100,
+   "rice": 50
   },
   "dokkaebi": {
    "memiltteok": 100,
@@ -1202,8 +1210,8 @@ const TABLES={
    },
    {
     "need": {
-     "frost_whisker": 1,
-     "ice_scale": 1
+     "ice_scale": 1,
+     "icicle": 1
     },
     "out": "bigeul_garu",
     "n": 1,
@@ -1633,20 +1641,24 @@ const TABLES={
   },
   "gangcheol": {
    "jujube": {
-    "kind": "아주 좋아함",
-    "line": "달인 대추의 따뜻한 김에 강철이의 긴 몸이 풀린다.",
-    "effect": "calm:60"
+    "kind": "그저 그럼",
+    "line": "대추 단내에도 갓 아래 어둠은 꿈쩍하지 않는다.",
+    "effect": "none"
    },
    "yakgwa": {
-    "kind": "좋아함",
-    "line": "꿀 바른 약과의 단내에 강철이가 언 숨을 길게 내쉰다.",
-    "effect": "calm:40"
+    "kind": "그저 그럼",
+    "line": "약과를 내밀어도 길고 흰 손이 받지 않는다.",
+    "effect": "none"
    },
-   "lore:yong": {
+   "jipsin": {
     "kind": "아주 좋아함",
-    "line": "\"…용이다!\" 강철이가 긴 목을 들어, 하늘을 오래 올려다본다.",
-    "effect": "calm:100",
-    "lore": "용이라 불러 준다"
+    "line": "짚신 한 켤레를 갓 아래 어둠 앞에 놓았다. 길고 흰 손이 오래도록 신을 쓰다듬는다.",
+    "effect": "calm:100"
+   },
+   "rice": {
+    "kind": "좋아함",
+    "line": "주먹밥을 놓았다. 고개를 숙이듯 갓이 기울고, 붉은 천이 잠잠해진다.",
+    "effect": "calm:50"
    }
   },
   "jjandol": {
@@ -3580,7 +3592,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "옹달 할머니가 옛적엔 강철이 비늘과 서리 수염을 같이 갈아 산군 할아버지께 올렸다고 하셨다.",
+     "text": "옹달 할머니가 언 까마귀 깃과 고드름 조각을 맷돌에 같이 갈면 열 내리는 가루가 된다고 하셨다.",
      "section": "숨은 가공법",
      "when": "gift:g_yeong_ongdal"
     }
@@ -3969,7 +3981,7 @@ const TABLES={
   "battle_otter_radius": 8,
   "name_call_interval_frames": 54,
   "name_call_move_px": 4,
-  "name_final_hp_ratio": 0.4,
+  "name_final_hp_ratio": 0.35,
   "name_final_lock_frames": 150,
   "name_final_damage": 2,
   "name_final_open_bonus": 150,
@@ -3978,7 +3990,44 @@ const TABLES={
   "think_stop_char_ms": 35,
   "think_stop_max_ms": 2200,
   "nundok_gloat_hits": 1,
-  "nundok_gloat_frames": 45
+  "nundok_gloat_frames": 45,
+  "name_call_third_frames": 60,
+  "name_call_pull": 0.35,
+  "name_call_move_px_torn": 14,
+  "chasa_rope_count": 3,
+  "chasa_rope_gap": 40,
+  "chasa_rope_lash": 22,
+  "chasa_rope_hold": 34,
+  "chasa_rope_back": 16,
+  "chasa_rope_amp": 8,
+  "chasa_rope_hit": 6,
+  "chasa_rope_slow_frames": 90,
+  "chasa_rope_slow": 0.5,
+  "chasa_crow_slots": 6,
+  "chasa_crow_waves": 3,
+  "chasa_crow_wave_gap": 46,
+  "chasa_crow_speed": 2.4,
+  "chasa_crow_slope": 0.55,
+  "chasa_crow_hit": 7,
+  "chasa_shadow_frames": 300,
+  "chasa_shadow_start": 0.14,
+  "chasa_shadow_max": 0.6,
+  "chasa_shadow_grow": 0.0026,
+  "chasa_shadow_creep": 0.0006,
+  "chasa_shadow_shrink": 0.004,
+  "chasa_shadow_far": 0.8,
+  "chasa_fire_grow_mul": 0.6,
+  "chasa_fire_shrink_mul": 1.8,
+  "chasa_finger_every": 54,
+  "chasa_finger_tell": 24,
+  "chasa_finger_hit": 9,
+  "chasa_ledger_tell": 90,
+  "chasa_ledger_frames": 420,
+  "chasa_ledger_stroke_every": 34,
+  "chasa_ledger_stroke_tell": 30,
+  "chasa_ledger_light": 38,
+  "chasa_seal_life": 180,
+  "chasa_seal_bonus": 2
  },
  "PROGRESS": [
   {
@@ -4959,7 +5008,7 @@ const TABLES={
     ],
     [
      0,
-     "강철이 비늘하고 서리 수염은 맷돌에 같이 갈아야 쓰는겨. 옛적엔 그 가루를 산군 할아버지께 올렸다더구먼."
+     "언 까마귀 깃하고 고드름 조각은 맷돌에 같이 갈아야 쓰는겨. 옛날 산사람들은 그 가루를 열 오른 이마에 얹었구먼."
     ]
    ]
   },
