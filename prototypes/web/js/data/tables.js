@@ -1578,20 +1578,15 @@ const TABLES={
     "effect": "none"
    }
   },
-  "sangun": {
-   "magamok_tea": {
+  "durumi": {
+   "bingeo": {
     "kind": "아주 좋아함",
-    "line": "네가 지나온 산의 향이구나. 잘 받으마.",
+    "line": "…빙어로구나. 고개를 못 돌리니 물고기 볼 틈이 없었다. 고맙다.",
     "effect": "none"
    },
-   "ssanghwa": {
+   "kong": {
     "kind": "좋아함",
-    "line": "여러 향이 한데 머무는구나. 잠시 쉬어라.",
-    "effect": "none"
-   },
-   "bigeul_garu": {
-    "kind": "좋아함",
-    "line": "그놈 비늘을 갈았구나. 서늘한 약이다.",
+    "line": "낟알이로구나. 남쪽 논에서 겨울 날 적엔 이걸 주워 먹었지.",
     "effect": "none"
    }
   },
@@ -2586,7 +2581,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "짐표 앞면에 아빠 이름이 돌아왔다. 이번엔 부르니 돌아보았다. \"…모자, 잘 맞네.\"",
+     "text": "짐표 앞면에 아빠 이름이 돌아왔다. 세 번 부르니 세 번째에 돌아보았다. \"…모자, 잘 맞네.\"",
      "section": "관찰",
      "when": "dad:back"
     },
@@ -2629,26 +2624,32 @@ const TABLES={
    ]
   },
   {
-   "id": "sangun",
+   "id": "durumi",
    "region": "yeongsan",
    "kind": "animal",
    "lines": [
     {
      "who": "dad",
-     "text": "영산의 주인, 산군 할아버지. 셈이 맞지 않으면 아무것도 내주지 않는다.",
+     "text": "신목 섬 앞 얼음 끝의 늙은 두루미. 열매는 잃은 것만 돌려준다 했다. 나는 잃은 게 없어 빈손으로 내려간다.",
      "section": "아빠 수첩"
     },
     {
      "who": "me",
-     "text": "엄마의 오래된 거래 상대. 악하지 않다. 셈이 맞아야 할 뿐이다.",
+     "text": "첫눈 뒤로 고개를 한 번도 돌리지 않아 제 이름을 지킨 늙은 두루미. 셋째 부름에 돌아보면 이름이 붉은 천에 적힌단다.",
      "section": "관찰",
-     "when": "sangun:story"
+     "when": "durumi:call"
     },
     {
      "who": "me",
-     "text": "내 이름으로 셈을 맞췄다.",
+     "text": "신목지기. 엄마가 내 명다리를 맨 걸 지켜봤다. 아빠가 내 대신 대답해 이름을 잃는 것도 밤마다 봤다. 돕지 못한 걸 부끄러워한다.",
      "section": "관찰",
-     "when": "sangun:name"
+     "when": "durumi:story"
+    },
+    {
+     "who": "me",
+     "text": "내 명다리를 풀어 나무에 건넸다. 셈이 맞았다.",
+     "section": "관찰",
+     "when": "durumi:name"
     }
    ]
   },
@@ -2659,42 +2660,36 @@ const TABLES={
    "lines": [
     {
      "who": "dad",
-     "text": "영산 호수의 이무기 이야기. 지나는 곳마다 추위를 몬다. 따뜻한 것을 그리워한다더라.",
+     "text": "북쪽 산 사람들 옛말. 밤에 누가 이름을 부르거든 돌아보지 말 것. 세 번째 부름엔 넋이 따라간다.",
      "section": "아빠 수첩"
     },
     {
      "who": "me",
-     "text": "호수를 휘감은 이무기. 입은 서리를 뿜고, 몸통은 조여 오고, 꼬리는 고드름을 뿌린다.",
+     "text": "갓 쓴 어둠. 이름을 세 번 부르고, 마주 보면 커지고, 붉은 오랏줄을 던지고, 소매에서 까마귀가 쏟아진다. 정체는 아무도 모른다.",
      "section": "관찰",
      "when": "fight:gangcheol"
     },
     {
      "who": "me",
-     "text": "몸통을 풀어야 머리가 드러난다.",
+     "text": "갓이 떨어지면 그 아래가 비어 있다.",
      "section": "관찰",
      "when": "core:gangcheol"
     },
     {
      "who": "me",
-     "text": "도깨비불씨의 온기에 눈을 감았다. 아빠 수첩에 적힌 대로다.",
+     "text": "짚신을 내려다보다 갓을 숙였다. 맨발로 먼 길을 왔나 보다. 옹달 할머니가 말한 사잣밥이다.",
      "section": "관찰",
-     "when": "like:gangcheol:dokkaebibul"
+     "when": "like:gangcheol:jipsin"
     },
     {
      "who": "me",
-     "text": "붉은 팥 냄새에 움찔 물러났다. 좋아서가 아니라 꺼려서다. 팥은 잡귀를 쫓는다더니.",
+     "text": "밥 냄새에 소매가 멈췄다. 초상집 문간의 밥 한 그릇이 생각났다.",
      "section": "관찰",
-     "when": "like:gangcheol:patsirutteok"
+     "when": "like:gangcheol:rice"
     },
     {
      "who": "me",
-     "text": "하늘로 오르다 누가 \"강철이다!\" 하고 부르는 바람에 떨어졌단다. 그때 누가 \"용이다\" 불러 줬으면 달랐을까.",
-     "section": "관찰",
-     "when": "lore:yong"
-    },
-    {
-     "who": "me",
-     "text": "달래면 남쪽 바다로 떠나며 서리 수염을 남긴다.",
+     "text": "달래면 짚신을 신고 갓을 숙인 뒤 북쪽 길로 걸어 사라진다. 붉은 천은 두고 간다.",
      "section": "관찰",
      "when": "calm:gangcheol"
     }
@@ -3974,6 +3969,8 @@ const TABLES={
   "name_final_damage": 2,
   "name_final_open_bonus": 150,
   "y_lure_range": 90,
+  "y_crane_range": 40,
+  "y_crane_hold_frames": 150,
   "think_stop_base_ms": 700,
   "think_stop_char_ms": 35,
   "think_stop_max_ms": 2200,

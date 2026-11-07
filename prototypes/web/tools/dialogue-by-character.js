@@ -10,7 +10,7 @@ const out=path.resolve(root,process.argv[2]||'qa-out/dialogue-by-character.md');
 const order=['galchamgol','dolneomeo','jangteo','yeongsan'];
 const regionName={galchamgol:'단풍골',dolneomeo:'돌너머',jangteo:'큰 장터',yeongsan:'영산',engine:'공통'};
 const npcs=parseCsv(fs.readFileSync(path.join(root,'design/data/npcs.csv'),'utf8').replace(/^﻿/,''));
-const nameAt=npcs.shift().cells.indexOf('이름'),known=npcs.map(r=>r.cells[nameAt]).concat(['아빠','엄마','늙은 까치','산군 할아버지']);
+const nameAt=npcs.shift().cells.indexOf('이름'),known=npcs.map(r=>r.cells[nameAt]).concat(['아빠','엄마','늙은 까치']);
 const dir=path.join(root,'prototypes/web/js');
 const files=[];
 for(const sub of ['engine',...fs.readdirSync(path.join(dir,'regions')).map(r=>'regions/'+r)])

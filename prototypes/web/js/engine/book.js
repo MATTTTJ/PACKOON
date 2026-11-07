@@ -7,7 +7,7 @@ function childNoteSection(line){return line.when?.startsWith('habit:')?'익힌 �
 function momNotePaper(){
   const stage=G.f.momNoteRestored?0:(G.f.momNoteFade||0),paper=el('div','mom-note');
   // 결정 D-38: 받는 이의 이름은 번져서 읽히지 않는다. 아이의 이름은 엔딩에서야 나온다. 엔딩 뒤에는 새 이름이 또렷하게 보인다.
-  // 결정 D-132: 산군에게 이름을 내놓은 뒤부터 엔딩 전까지는 번진 자국도 없이 이름 자리가 빈다.
+  // 결정 D-132: 신목에 이름을 내놓은 뒤부터 엔딩 전까지는 번진 자국도 없이 이름 자리가 빈다.
   const named=!!(G.f.momNoteRestored&&G.f.newName),blank=!named&&!!G.f.nameGiven;
   const recipient=named?G.f.newName:blank?'　　　':'아무개',lines=[recipient+'에게',...MOM_NOTE];
   const spoken=[(named?recipient:blank?'(빈자리)':'(번진 이름)')+'에게',...MOM_NOTE];

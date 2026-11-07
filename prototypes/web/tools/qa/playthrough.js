@@ -12,7 +12,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   const read = async expression => b.eval(expression);
   const wait = async ms => b.wait(ms);
   const log = (action, detail) => trace.push({seconds:+((Date.now()-started)/1000).toFixed(2), scene, action, detail});
-  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,note:!$('notebook').hidden,who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade})`);
+  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,note:!$('notebook').hidden,who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade,still:!!REG.holdStill?.()})`);
   async function check() {
     if(Date.now()-started>maxRun)throw new Error('연속 플레이 제한 540초를 넘었다');
     const s=await snapshot();
@@ -47,7 +47,8 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       }
       if(s.mg){await minigame(s.mg);continue;}
       if(s.battle)return s;
-      if(s.ink||s.motion||s.fade){await wait(100);continue;}
+      // 결정 D-1163: 이야기가 손을 떼고 버티라는 동안(REG.holdStill, 영산 두루미 사건)은 아무것도 누르지 않고 기다린다
+      if(s.ink||s.motion||s.fade||s.still){await wait(100);continue;}
       return s;
     }
     throw new Error('대화/미니게임이 200회 입력 뒤에도 닫히지 않는다'+(s.dlg?'. 마지막 줄: '+s.who+': '+s.text:s.mg?'. 미니게임: '+s.mg:''));
@@ -90,7 +91,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
           return;
         }
         // 쪽지·수첩 창이 걷는 도중에 열려도 닫고 다시 걷는다 (새 게임 첫 프레임의 엄마 쪽지가 늦게 열리는 경우)
-        if(s.dlg||s.note||s.mg||s.ink||s.motion||s.fade){if(held){await key(held,'up');held=null;}await settle();continue;}
+        if(s.dlg||s.note||s.mg||s.ink||s.motion||s.fade||s.still){if(held){await key(held,'up');held=null;}await settle();continue;}
         const d=x-s.x;if(Math.abs(d)<=5)return;
         const desiredRate=Math.abs(d)<50||sneak||slow?1:6;
         if(desiredRate!==rate){rate=desiredRate;await read('window.__qaClockRate='+rate);}
@@ -324,7 +325,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await next();
     await stage('영산 · 설피',async()=>{await pickup('jip');await gather('darae_vine',2);for(let i=0;i<3&&!await read('G.f.seolpi');i++)await npc('nal');if(!await read('G.f.seolpi'))throw new Error('설피를 받지 못했다');});
     await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('넋 빠진 아빠에게서 장부 한 장을 받지 못했다');if(mode==='expanded')await npc('y_ice_station_2');});
-    await stage('영산 · 봄과 열매',async()=>{await npc('sangun');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['dokkaebibul'],toSteel,'강철이');await pickup('legend_fruit');await npc('sangun');});
+    await stage('영산 · 봄과 열매',async()=>{await npc('durumi');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['dokkaebibul'],toSteel,'강철이');await pickup('legend_fruit');await npc('durumi');});
     const final=await settle();if(!final.ended||final.region!=='yeongsan'||!final.flags.yakDone)throw new Error('마지막 귀향과 엔딩에 도착하지 못했다');
     // 결정 D-73: 엔딩은 한 줄씩 넘긴다. 이름 칸이 나올 때까지 '다음'을 누르고, 이름을 부른 뒤에도 끝까지 넘긴다.
     log('엔딩 넘김',{toName:await b.endingToName()});

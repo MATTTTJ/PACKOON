@@ -28,10 +28,10 @@ const Rg=defineRegion('yeongsan',{
     salg:{x:1480,home:1480,startle:0},   // 살금이: 귀를 세울 때 움직이면 달아난다
     f:{nalYTalk:false,nalYDone:false,seolpi:false,salgMet:false,salgDone:false,shortcut:false,
       dadMet:false,dadDone:false,sangunMet:false,spring:false,fruitGot:false,nameGiven:false,yakDone:false,newName:''},
-    rel:{salgeumi:{t:'호감',v:0},sangun:{t:'외경',v:0},nal:{t:'경멸',v:0}},
+    rel:{salgeumi:{t:'호감',v:0},durumi:{t:'외경',v:0},nal:{t:'경멸',v:0}},   // 결정 D-1081: 산군 대신 두루미
   }),
   weather:()=>Vfx.setWeather(G.f.spring?'':'snow'),surface:()=>G.f.spring?'':'snow',   // 결정 D-174: 눈 쌓인 바닥 (발걸음 효과)
-  weatherFront(){if(!G.f.spring)R(0,0,W,H,'rgba(20,28,70,.12)');},
+  weatherFront(){if(!G.f.spring)R(0,0,W,H,'rgba(20,28,70,.12)');Rg.craneHoldDraw?.();},   // 결정 D-1085: 옛 구성에서도 셋째 부름의 붓 획
   // 결정 D-1079 (사용자 피드백 2026-11-06 영산 17): 영산은 까치 줄 대신 주인공 독백으로 연다. 지도는 조용히 열린다(engine/map.js quietMapUnlock)
   quietMapUnlock:true,
   onStart(){
@@ -53,7 +53,7 @@ Rg.arcsEnabled=arcsEnabled;
 /* 결정 D-429: 호숫가 구역은 이름 잃은 마을이다 (사용자 지시 2026-11-03, design/proposals/name-story.md §6). 호숫가 구역 설계 좌표.
    장승 둘 사이가 비탈에서 내려오는 어귀, 초가 다섯, 우물, 빨랫줄. 아빠는 호숫가 끝 큰 바위 곁 얼음 가에 앉아 있다. */
 Rg.VILLAGE={jangseung:[125,205],houses:[360,640,790,1410,1760],well:470,line:[1805,1885],loom:700,jige:790,kid:1440,dad:2185,bear:1730,cub:1700};   // 결정 D-1075: 곰 아주머니 문간(오른쪽 끝 집)과 아기 곰
-/* 강철이가 삼킨 이름이 돌아왔는가. 강철이가 떠나 봄이 오면 이름도 돌아온다 (이름의 규칙 6, D-420) */
+/* 어둑차사가 삼킨 이름이 돌아왔는가. 그것이 물러나 봄이 오면 이름도 돌아온다 (이름의 규칙 6, D-420) */
 Rg.namesBack=()=>!!(typeof G!=='undefined'&&G&&G.f&&(G.f.nameRestored||G.f.spring));
 
 /* PA-43: 옛 배치와 저장은 classic 쪽에 남긴다. 공급은 기존 마가목 넷에 하나를 더한다. */
@@ -220,24 +220,25 @@ function namesPost(){
     }));
 }
 /* 결정 D-1075 (design/proposals/name-story-v2.md §5.4): 호수 쪽에서 엄마 목소리로 아기 곰을 부른다. 문간의 진짜 엄마는 꿈쩍 않는다.
-   강철이는 곰 아주머니 이름을 먹으며 그 기억(아기 이름, 부르던 목소리)도 먹었다(이름의 규칙 2). 아이는 날쌘에게 들은 금기대로 세 번을 함께 버틴다. */
+   어둑차사는 곰 아주머니 이름을 먹으며 그 기억(아기 이름, 부르던 목소리)도 먹었다(이름의 규칙 2).
+   결정 D-1083·D-1084 (name-story-v3 §6): 첫째·둘째 부름에 아기 곰이 일어선다. 데려가는 세 번째 부름 때 아이가 귀를 막아 주거나 앞을 막고 같이 버틴다. */
 function lureScene(){
   const F=G.f;if(F.yLureDone)return;F.yLureDone=true;
   const tosi=has('fur_tosi');
-  const rest=[['호수 쪽 목소리','"…곰실아."'],
-    ['아기 곰','(아기 곰이 몸을 떤다.)'],
-    ['호수 쪽 목소리','"곰실아?"'],
-    ['너구리','…셋.'],
-    ['너구리','(바람 소리만 남았다. 네 번째는 오지 않았다.)'],
+  const rest=ears=>[['호수 쪽 목소리','"…곰실아."'],
+    ['아기 곰','(아기 곰이 몸을 떤다.\n발이 얼음 쪽으로 움찔한다.)'],
+    ['호수 쪽 목소리','"곰실아아."'],
+    ['너구리',ears?'(귀를 꼭 덮은 채 아기 곰을 끌어안았다.\n…세 번째다. 돌아보지 마.)':'(아기 곰 손을 꽉 쥐었다.\n…세 번째다. 돌아보지 마.)'],
+    ['너구리','(바람 소리만 남았다.\n세 번째가 지나갔다.)'],
     ['아기 곰','…엄마 목소리였는데.'],
     ['너구리','네 엄마는 저기 계셔.\n목소리는 저기서 안 났어.'],
     ['아기 곰','(아기 곰이 문간의 엄마를 본다. 엄마는 돌아보지 않는다.)\n…엄마는 요즘 나를 안 불러.'],
     ['너구리','(그놈은 아주머니 목소리를 안다.\n아주머니 이름을 먹었으니까.)'],
     ['너구리','(아빠도… 이렇게 돌아봤을까.)']];
   const finish=()=>Rg.playActivity('lure',()=>{learn('lore:lure');learn('lore:three_calls');
-    diary('y_lure','호숫가 마을에서 호수 쪽 목소리가 아기 곰을 엄마 목소리로 불렀다. 진짜 엄마는 문간에 앉아 꿈쩍도 안 했다. 아기 곰을 붙잡고 세 번을 함께 버텼다. 네 번째는 오지 않았다. 그놈은 먹은 이름의 목소리로 부른다.');});
+    diary('y_lure','호숫가 마을에서 호수 쪽 목소리가 아기 곰을 엄마 목소리로 불렀다. 진짜 엄마는 문간에 앉아 꿈쩍도 안 했다. 아기 곰을 붙잡고 세 번째 부름까지 함께 버텼다. 세 번째가 지나가자 바람 소리만 남았다. 그것은 먹은 이름의 목소리로 부른다.');});
   const block=ears=>talk([ears?['너구리',tosi?'(날쌘 아저씨가 준 털토시를\n아기 곰 귀에 씌웠다.)':'(두 손으로 아기 곰 귀를 덮었다.)']:
-      ['너구리','(아기 곰 앞을 막아서 손을 잡았다.)\n세 번만 참자. 세 번은 못 들은 척하는 거래.'],...rest],finish);
+      ['너구리','(아기 곰 앞을 막아서 손을 잡았다.)\n돌아보지 마. 세 번째가 데려가는 거래.'],...rest(ears)],finish);
   talk([['너구리','(곰 아주머니 문간에 아기 곰이 쪼그려 앉아 있다.\n아주머니는 돌아보지 않는다.)'],
     Object.assign(['호수 쪽 목소리','(호수 쪽에서 누가 부른다.)\n"곰실아… 곰실아, 이리 온."'],{pic:Rg.pics.lure}),
     ['아기 곰','엄마다!\n(아기 곰이 벌떡 일어나 얼음 쪽으로 걸어간다.)'],
@@ -245,17 +246,30 @@ function lureScene(){
       {t:'아기 곰 귀를 막아 준다',go:()=>block(true)},
       {t:'앞을 막고 같이 센다',go:()=>block(false)}]]]);
 }
-// 결정 D-1075: '호수 쪽 목소리'는 모습이 없다. 대화 초상은 얼음 호수 위로 번지는 김과 그 너머 검은 똬리 그림자만 그린다(D-328 Rg.portraits)
-Rg.portraits={...Rg.portraits,'호수 쪽 목소리':(x,y)=>{
+// 결정 D-1075: '호수 쪽 목소리'는 모습이 없다. 대화 초상은 얼음 호수 위로 번지는 김과 그 너머 그림자만 그린다(D-328 Rg.portraits)
+// 결정 D-1080·D-1085: 똬리 대신 넓은 갓 그림자와 붉은 천 자락(어둑차사). 두루미 사건의 '섬 쪽 목소리'도 같은 초상
+const voicePortrait=(x,y)=>{
   R(x-14,y-22,28,22,'#3a4a62');R(x-14,y-6,28,6,'#b9d3e1');R(x-14,y-6,28,1,'#e6f1f6');
-  R(x-6,y-12,14,5,'#1a1d24');R(x+4,y-15,5,4,'#1a1d24');R(x+6,y-14,1,1,'#c9e4f0');   // 똬리 그림자와 희미한 눈
+  R(x-9,y-17,18,2,'#15171e');R(x-4,y-20,8,3,'#15171e');R(x-5,y-15,10,9,'#1a1d24');      // 넓은 갓과 그 아래 어둠(얼굴이 없다)
+  R(x+5,y-12,6,1,'#a3261e');R(x+8,y-11,5,1,'#a3261e');R(x+11,y-10,3,1,'#c9372b');        // 붉은 천 자락
   for(let i=0;i<3;i++)R(x-12+i*3,y-19+i*3,10-i*2,1,'rgba(230,240,246,.7)');            // 건너오는 부름의 김
-}};
+};
+Rg.portraits={...Rg.portraits,'호수 쪽 목소리':voicePortrait,'섬 쪽 목소리':voicePortrait};
+function jipsinGive(){
+  if(G.f.yJipsin||!has('jip')||!ITEMS.jipsin)return;
+  takeItem('jip',1);G.f.yJipsin=true;
+  diary('y_jipsin','호숫가 마을의 빈 지게 할아버지 곁에 짚 한 단을 놓았다. 할아버지는 돌아보지도 않고 짚신 한 켤레를 삼아 내 쪽으로 밀어 주었다. 이름을 잃어도 손은 안 잊었다.');
+  talk([['너구리','(짚 한 단을 할아버지 무릎 곁에 놓았다.)'],
+    ['빈 지게 할아버지','(손이 짚을 집는다. 말없이, 빠르게 꼰다.\n짚신 한 켤레가 금세 삼아진다.)'],
+    ['빈 지게 할아버지','(다 삼은 짚신을 내 쪽으로 밀어 준다.\n돌아보지는 않는다.)'],
+    receiveItem('jipsin',1),
+    ['너구리','(…손은 안 잊었구나.)']]);
+}
 function talkCub(){
   const F=G.f;
   if(!F.yLureDone&&!F.spring){lureScene();return;}
-  if(!Rg.namesBack()){talk([['아기 곰','…세 번은 참았어.\n진짜 엄마는 네 번 부를 거지?']]);return;}
-  if(F.wanderersDone?.[expansionKey('y_lost_bear')]){talk([['아기 곰','엄마가 네 번 불렀어! 히히.']]);return;}
+  if(!Rg.namesBack()){talk([['아기 곰','…세 번째는 참았어.\n진짜 엄마는 언제 날 불러?']]);return;}
+  if(F.wanderersDone?.[expansionKey('y_lost_bear')]){talk([['아기 곰','엄마가 세 번 불렀어! 히히.']]);return;}
   talk([['아기 곰','엄마가 나 봐! 엄마한테 가 봐.\n(아기 곰이 문간 쪽으로 손짓한다.)']]);
 }
 function install(){
@@ -269,7 +283,7 @@ function install(){
     const lost=(id,x,winterName,springName,draw,winter,spring,thanks,after)=>({id,x,draw,speakers:[winterName,springName],   // 초상은 겨울·봄 이름 모두로 찾는다
       get name(){return back()?springName:winterName;},
       talk:()=>{
-        if(!back()){talk(winter);return;}
+        if(!back()){talk(typeof winter==='function'?winter():winter);return;}
         if(G.f.wanderersDone?.[expansionKey(id)]){talk(after);return;}
         talkGive([...spring,...(typeof thanks==='function'?thanks():thanks)],()=>finishWanderer(id));   // 결정 D-352: 사례는 끝까지 들으면 받는다
       }});
@@ -282,8 +296,12 @@ function install(){
           ['순덕 아주머니','…손은 안 잊었구나.']],
         [['순덕 아주머니','수달이 그러는데, 네가 섬에 건너갔다며.\n실 자으려고 모아 둔 솜이야. 가져가.'],gotLine('eoksae_som',2)],
         [['순덕 아주머니','(물레가 돈다. 이번엔 실이 감긴다.)']]),
+      // 결정 D-1167 (name-story-v3 §3.6): 이름을 잃은 뒤로도 손이 버릇처럼 짚신을 삼는다. 짚이 떨어져 빈손으로 시늉만 한다.
+      //   짚 한 단을 곁에 놓으면 말없이 한 켤레를 밀어 준다(교환 창 없이 놓고 받는다). 어둑차사 진정 선물(사잣밥)의 짚신이다.
       lost('y_lost_jige',V.jige,'빈 지게 할아버지','갑돌 할아버지',(x,y,f)=>Rg.expArt.drawLostJige(x,y,f),
-        [['빈 지게 할아버지','…어디 가던 길이더라.'],['너구리','(지게를 지고 문간을 나섰다가, 도로 들어간다.)']],
+        ()=>[['빈 지게 할아버지','…어디 가던 길이더라.'],['너구리','(지게를 지고 문간을 나섰다가, 도로 들어간다.)'],
+          ['너구리',G.f.yJipsin?'(할아버지 손이 또 빈손으로 짚을 꼬는 시늉을 한다.)':'(문간에 앉아 빈손으로 짚을 꼬는 시늉을 한다.\n짚신 삼던 손이다. 짚은 다 떨어졌다.)',
+            ...(!G.f.yJipsin&&has('jip')&&ITEMS.jipsin?[[{t:'짚 한 단을 곁에 놓아 드린다',go:jipsinGive},{t:'그냥 둔다',go:null}]]:[])]],
         [['갑돌 할아버지','(지게에 장작을 얹다 말고 나를 본다.)\n…장에 가던 길이었지. 이제 생각났다.'],
           ['갑돌 할아버지','수달 녀석이 그러더구나.\n꼬마 보부상이 섬에 건너갔다고.']],
         [['갑돌 할아버지','보부상이면 짐은 받아야지.\n불쏘시개다. 겨울 산엔 이만한 게 없어.'],gotLine('solbang',3)],
@@ -294,15 +312,17 @@ function install(){
         [['봉순이','수달 아저씨가 그러는데 너 덕분이래.\n이거 줄게. 내가 제일 아끼는 거.'],gotLine('gongi',1)],
         [['봉순이','봉순아! 봉순아!\n…헤헤, 내가 나 불렀어.']]),
       // 결정 D-1075 (사용자 피드백 2026-11-06 영산 22·23): 곰 굴 대신 이름 잃은 곰 아주머니와 아기 곰.
-      //   봄엔 진짜 엄마가 아기 곰을 부른다. 아기 곰은 겨울에 배운 대로 세 번을 참고, 네 번째에 돌아본다(이름의 규칙 8).
+      //   봄엔 진짜 엄마가 아기 곰을 부른다. 결정 D-1084 (name-story-v3 §6): 아기 곰은 겨울에 배운 대로 둘째까지 참다가,
+      //   엄마의 세 번째 부름에 돌아본다. 그것의 세 번은 데려가고, 식구의 세 번은 데려온다(이름의 규칙 9).
       lost('y_lost_bear',V.bear,'문간 곰 아주머니','말순 아주머니',(x,y,f)=>(Rg.expArt.drawBearMom||Rg.expArt.drawBear)(x,y,-1),
         [['너구리','아주머니?'],['문간 곰 아주머니','(돌아보지 않는다. 빈 바구니에\n도토리를 넣는 시늉만 되풀이한다.)']],
         [['말순 아주머니','(아주머니가 문간에서 벌떡 일어난다.)\n곰실아!'],
           ['아기 곰','(아기 곰이 귀를 쫑긋 세우더니… 꾹 참는다.)'],
           ['말순 아주머니','곰실아! …곰실아?'],
-          ['너구리','(…셋.)'],
+          ['너구리','(…둘.)'],
           ['말순 아주머니','곰실아아! 엄마 여기 있잖아!'],
-          ['아기 곰','(아기 곰이 돌아보며 달려간다.)\n엄마는 네 번 불렀어!'],
+          ['아기 곰','(세 번째에, 아기 곰이 돌아보며 달려간다.)\n엄마는 세 번 불렀어!'],
+          ['너구리','(그것의 세 번은 데려가고,\n엄마의 세 번은 데려온다.)'],
           ['말순 아주머니','(아주머니가 아기 곰을 꼭 끌어안는다.)\n…겨울 내내 엄마가 어디 가 있었나 몰라.']],
         ()=>[...(G.f.yLureDone?[['아기 곰','엄마, 얘가 나 붙잡아 줬어.\n호수 쪽 목소리 따라가려고 할 때.']]:[]),
           ['말순 아주머니','…그랬구나. 굴에 넣어 두려던 겨울 도토리야.\n굴은 다음 겨울에나 가지 뭐.'],gotLine('acorn',3)],
@@ -349,7 +369,7 @@ function install(){
   {const sl=Rg.zones.slope,lab=()=>G?.form==='otter'?'수달로 배 깔고 비탈 미끄러져 내려가기':'수리부엉이로 날개 펴고 비탈 내려가기';
     for(const p of [sl.exits.right,...(sl.doors||[]).filter(d=>d.to==='shore')]){if(!p||typeof p!=='object')continue;
       p.formPass=['owl','otter'];Object.defineProperty(p,'formLabel',{configurable:true,get:lab});}}
-  // 봄이 오면 아빠는 섬으로 건너와 산군 곁에 선다. 이름·약·귀향 장면이 모두 섬에서 열리기 때문이다.
+  // 봄이 오면 아빠는 섬으로 건너와 두루미 곁에 선다. 이름·약·귀향 장면이 모두 섬에서 열리기 때문이다.
   {
     const isl=Rg.zones.island,sh=Rg.zones.shore;
     const islList=isl.npcs,shDesc=Object.getOwnPropertyDescriptor(sh,'npcs'),shList=sh.npcs,shGet=()=>shDesc.get?shDesc.get():shList;

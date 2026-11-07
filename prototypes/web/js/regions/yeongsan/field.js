@@ -163,6 +163,7 @@ Rg.maxX=()=>!G.f.seolpi?SNOW_X-6:!G.f.shortcut?SLOPE_X-12:!G.f.sangunMet?BOSS_AT
 Rg.step=()=>{
   Rg.arcsEnabled();
   stepSalg();
+  Rg.craneTick?.();   // 결정 D-1085: 두루미 곁 세 번째 부름 버티기 (story.js)
   if(!G.boss.dead&&G.f.sangunMet&&G.px>BOSS_AT&&encounterReady())Rg.startGangcheol();   // 결정 D-719
   if(has('doerim_yak')&&!G.f.yakDone){G.f.yakDone=true;Rg.offerReturnPrep();}
 };
@@ -173,7 +174,7 @@ Rg.onPickup=a=>{if(a.item==='legend_fruit'&&!G.f.fruitGot){G.f.fruitGot=true;Rg.
 Rg.bringSpring=()=>{
   G.boss.dead=true;G.f.spring=true;
   G.pickups.push({x:TREE_X,y:150,item:'legend_fruit',got:false});
-  diary('y_spring','강철이가 떠나자 호수의 얼음이 풀렸다. 느티나무에 새잎이 돋고 산자락에 진달래가 폈다. 신목 가지에 무언가 열렸다.');
+  diary('y_spring','붉은 천이 풀리고 신목이 제 이름을 되찾자 호수의 얼음이 풀렸다. 느티나무에 새잎이 돋고 산자락에 진달래가 폈다. 신목 가지에 무언가 열렸다.');
   think('봄이 왔다! 신목에 열매가 열렸어!');refreshGoal();
 };
 Rg.SLOPE_X=SLOPE_X;Rg.TREE_X=TREE_X;
@@ -239,6 +240,7 @@ if(!CLASSIC){
       ctx.save();ctx.globalCompositeOperation='saturation';ctx.globalAlpha=.45;ctx.fillStyle='#808080';ctx.fillRect(0,0,W,H);ctx.restore();
     }
     if(!G.f.spring)blizzard();
+    Rg.craneHoldDraw?.();   // 결정 D-1085: 셋째 부름의 붉은 붓 획 (story.js)
     if(G.f.spring)a().willowSeeds();
     if(Vfx.reducedMotion){zoom=0;return;}
     if(!zoom)return;
@@ -302,7 +304,7 @@ if(!CLASSIC){
       {x:2320,to:'island',toX:160,get label(){return G.f.spring?'작은 배로 신목 섬에':'언 호수를 걸어 신목 섬에';},
         need:()=>!!G.f.dadDone,reason:'아빠가 기다리고 있다. 먼저 호숫가에서 말을 걸어 보자.',draw:sign},
     ]),
-    island:zone('island',['sangun'],{},[
+    island:zone('island',['durumi'],{},[   // 결정 D-1081: 산군 대신 두루미
       {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 호숫가로':'얼음길로 호숫가에 돌아가기';},draw:sign},
     ]),
   };
@@ -354,6 +356,7 @@ if(!CLASSIC){
     reason:'얼음길이 물에 잠겼다. 오른쪽 선착장에서 배를 타자.'};
   Rg.zones.island.step=()=>{
     stepCommon();
+    Rg.craneTick?.();   // 결정 D-1085: 두루미 곁 세 번째 부름 버티기 (story.js)
     if(!G.boss.dead&&G.f.sangunMet&&G.px>isl(BOSS_AT)&&encounterReady())Rg.startGangcheol();
   };
   Rg.zones.island.maxX=()=>G.f.sangunMet?2584:BOSS_AT-30;   // trimRegion이 이 값도 섬 좌표로 옮긴다
