@@ -17,6 +17,8 @@ grep -v '^#' "$ROOT/tools/audio/ace/v5-spec.tsv" | while IFS=$'\t' read -r id bp
   [ "$want" != "  " ] && [[ "$want" != *" $id "* ]] && continue
   if [ "$bars" != "0" ]; then dur=$(node -e "console.log(((${bars}+2)*${beats}*60/${bpm}).toFixed(2))"); loopcap=", loopable"
   else dur=$(node -e "console.log(Math.max(10,${len}).toFixed(2))"); loopcap=""; fi
+  # 결정 D-1240: 캡션이 !로 시작하면 "catchy memorable hook melody"를 붙이지 않는다 (영산 겨울: 숨소리만 들리는 고요)
+  common="$COMMON"; case "$cap" in '!'*) common="Korean traditional gugak, instrumental, no vocals"; cap="${cap#!}";; esac
   scale="pentatonic scale C D E G A"; key="C major"
   [ "$allowed" = "0,3,5,7,10" ] && { scale="minor pentatonic scale C Eb F G Bb"; key="C minor"; }
   IFS=';' read -ra VS <<< "$variants"
@@ -28,7 +30,7 @@ grep -v '^#' "$ROOT/tools/audio/ace/v5-spec.tsv" | while IFS=$'\t' read -r id bp
       [ -n "$(ls "$OUT/gen/$id/$vname"/*_s${seed}.wav 2>/dev/null)" ] && continue
       tmp="$OUT/gen/$id/$vname/tmp"; mkdir -p "$tmp"
       bash "$ENGINE" --quality standard --seed "$seed" --batch 1 --format wav --output-dir "$tmp" \
-        generate --caption "$COMMON$loopcap, $cap${vcap:+, $vcap}, $scale" --instrumental --bpm "${bpm%.*}" --key "$key" --time-sig "$ts" --duration "$dur" 2>&1 | tail -1 | cut -c1-120
+        generate --caption "$common$loopcap, $cap${vcap:+, $vcap}, $scale" --instrumental --bpm "${bpm%.*}" --key "$key" --time-sig "$ts" --duration "$dur" 2>&1 | tail -1 | cut -c1-120
       f=$(ls -t "$tmp"/*.wav 2>/dev/null | head -1); [ -n "$f" ] && mv "$f" "$OUT/gen/$id/$vname/${id}_${vname}_s${seed}.wav"
       rm -rf "$tmp"
     done

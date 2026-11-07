@@ -25,11 +25,25 @@ Rg.art={
      봄이 오면(어둑차사가 물러나면) 솥을 엎어 말린다. */
   badger(ox,oy,f){const Gy='#857d70',Dk='#4a443d',Wt='#eee6d6',K='#17120e',Sc='#7a4a6a';
     // 결정 D-154: 옆에 걸어 둔 솥은 Rg.props.ongdalPot이 제자리에 그린다(할미가 고개를 돌려도 움직이지 않는다).
-    M(ox,oy,f,-9,-11,15,8,Gy);M(ox,oy,f,-9,-5,15,2,Dk);M(ox,oy,f,-10,-10,2,5,Dk);
+    // 결정 D-1243 (사용자 지시 2026-11-07 4스테이지 25): 할미도 움직인다. 숨 쉴 때 등이 오르내리고, 이따금 솥 쪽으로 고개를 끄덕이고,
+    //   찬 공기에 입김이 난다. 솥을 보고 있을 때(왼쪽, 말을 걸기 전)는 국자로 솥의 눈 녹은 물을 천천히 젓는다. 봄엔 솥을 엎어 둬 젓지 않는다.
+    //   그림을 줄이기 설정에서는 멈춘 모습(국자를 솥에 담근 채)으로 둔다.
+    const field=ctx.canvas===cv,t=field&&!Vfx.reducedMotion&&typeof G!=='undefined'&&G?G.anim:0;
+    const bk=t%150<75?0:1,nod=Math.floor(t/110)%5===4?1:0,hy=oy+nod;
+    const stir=field&&f<0&&!(G&&G.boss&&G.boss.dead);
+    M(ox,oy,f,-9,-11-bk,15,8+bk,Gy);M(ox,oy,f,-9,-5,15,2,Dk);M(ox,oy,f,-10,-10-bk,2,5+bk,Dk);
     M(ox,oy,f,-8,-3,3,3,K);M(ox,oy,f,-3,-3,3,3,K);M(ox,oy,f,1,-3,3,3,K);
-    M(ox,oy,f,4,-16,9,8,Wt);M(ox,oy,f,5,-16,2,8,K);M(ox,oy,f,9,-16,2,7,K);M(ox,oy,f,12,-11,2,2,K);M(ox,oy,f,10,-12,1,1,'#ffffff');
-    M(ox,oy,f,3,-18,10,3,Sc);M(ox,oy,f,2,-16,2,3,Sc);
-    M(ox,oy,f,-3,-9,4,5,'#c9a45a');M(ox,oy,f,-2,-11,2,2,'#c9a45a');M(ox,oy,f,-2,-6,2,1,'#6a3a2a');},
+    M(ox,hy,f,4,-16,9,8,Wt);M(ox,hy,f,5,-16,2,8,K);M(ox,hy,f,9,-16,2,7,K);M(ox,hy,f,12,-11,2,2,K);M(ox,hy,f,10,-12,1,1,'#ffffff');
+    M(ox,hy,f,3,-18,10,3,Sc);M(ox,hy,f,2,-16,2,3,Sc);
+    M(ox,oy,f,-3,-9,4,5,'#c9a45a');M(ox,oy,f,-2,-11,2,2,'#c9a45a');M(ox,oy,f,-2,-6,2,1,'#6a3a2a');
+    if(stir){   // 앞발이 국자 자루를 쥐고, 국자 끝이 솥(왼쪽 x-25~-14) 안에서 작게 돈다
+      const a=t*.06,sx=Math.round(Math.cos(a)*2),sy=Math.round(Math.sin(a));
+      M(ox,oy,f,9,-8,4,2,Gy);M(ox,oy,f,12,-9,2,2,K);                                          // 앞발
+      for(let k=0;k<6;k++)M(ox,oy,f,13+k,-10+Math.round(k/3)+(k>3?sy:0),1,1,'#8c735d');      // 국자 자루
+      M(ox,oy,f,18+sx,-9+sy,3,2,'#6f5a46');M(ox,oy,f,19+sx,-9+sy,1,1,'#b7c7d0');            // 국자 끝(물에 잠겼다)
+    }
+    const p=t%170;   // 입김: 입가에서 앞쪽 위로 피어올라 옅어진다
+    if(field&&p<42)M(ox,hy,f,14+Math.round(p/9),-12-Math.round(p/7),2+(p>20?1:0),2,'rgba(236,240,244,'+(0.75-p/60).toFixed(2)+')');},
   /* 아빠: 모자는 아들이 쓰고 있어서 목도리만 둘렀다.
      결정 D-431·D-1087: 어둑차사의 부름에 아이 대신 대답하다 이름을 다 먹혀 넋이 빠졌다(이름이 돌아오기 전). 호수만 보고, 고개를 조금 떨궜고, 눈에 빛이 없다.
      버릇만 남았다: 보따리 매듭을 묶었다 풀고, 곁에 꽂은 겨울 막대에 금을 긋는다(가을부터 하루 하나, 깊은 금 하나는 첫눈 온 날). */
