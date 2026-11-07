@@ -5,7 +5,6 @@ handwork_steam_relation,손일 (미니게임 없음),김 올리기 호감,1,호�
 salg_graze,살금살금,기본 풀 뜯는 시간,108,프레임,기본 풀 뜯는 시간,제안
 salg_return_graze,살금살금,놀람 후 풀 뜯는 시간,114,프레임,놀람 후 풀 뜯는 시간,제안
 salg_moving,살금살금,움직임 판정 속도,0.2,px/프레임,움직임 판정 속도,제안
-salg_return_speed,살금살금,제자리로 돌아오는 속도,0.25,px/프레임,제자리로 돌아오는 속도,제안
 salg_active_distance,살금살금,반응 시작 거리,190,px,반응 시작 거리,제안
 salg_arrival_distance,살금살금,다가오기 성공 반응 거리,30,px,다가오기 성공 반응 거리,제안
 salg_grass_interval,살금살금,풀 뜯는 소리 간격,28,프레임,풀 뜯는 소리 간격,제안
