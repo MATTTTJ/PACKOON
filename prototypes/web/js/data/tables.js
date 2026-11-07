@@ -3978,7 +3978,11 @@ const TABLES={
   "think_stop_char_ms": 35,
   "think_stop_max_ms": 2200,
   "nundok_gloat_hits": 1,
-  "nundok_gloat_frames": 45
+  "nundok_gloat_frames": 45,
+  "gather_min_gap": 48,
+  "gather_interact_gap": 42,
+  "trade_tip_hold_ms": 350,
+  "trade_tip_show_ms": 2400
  },
  "PROGRESS": [
   {

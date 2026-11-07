@@ -2,7 +2,9 @@
 /* 보부상 교환: 서로 보따리를 펼쳐 놓고 바꾼다.
    결정 D-39: 상대가 내놓은 물건마다 원하는 것이 그림으로 붙어 있다. 내 보따리에서 골라 얹고 제안하면 상대가 받거나 거절한다.
      · 부탁: 이야기에 걸린 교환. 지역 코드가 REG.trade[npc]()로 넣는다.
-         {id, item(그림), n, label?(물건이 아닌 것: 정보·허락), asks:[{물건id:개수}, …대체], locked?()→이유, done?(), accept(대체번호)}
+         {id, item(그림), n, label?(물건이 아닌 것: 정보·허락), asks:[{물건id:개수}, …대체], extra?:[덤|null, …], locked?()→이유, done?(), accept(대체번호)}
+       결정 D-1102: 한 대체가 다른 대체에 재료를 더 얹은 꼴이면 그만한 덤을 extra[같은 번호]={물건id:개수}로 적는다. 창에 '덤'으로 보인다.
+         덤 없는 상위 조합은 자동 검사(qa data, ask-checks.js)가 막는다 (사용자 피드백 2026-11-07).
        정보·허락·나중에 생긴 부탁은 상대가 무엇을 원하는지 들은 뒤에만 넣는다(인과). 결정 D-147: 상대가 처음부터 지닌 물건
        (날쌘의 소금·깨, 참기름, 떡 재료, 대추)은 만나자마자 보인다. 사연을 듣기 전에 바꾸면 받는 대사가 그 사연을 먼저 꺼낸다.
        받은 뒤의 대사·물건 주고받기는 지역 코드가 이어 간다.
@@ -58,7 +60,7 @@ const Trade=(()=>{
   const priceText=g=>{const r=ITEMS[g.item].r;return r?rank(r)+' 하나나 '+rank(r-1)+' 둘':rank(0)+' 하나';};
   const askText=a=>Object.entries(a).map(([id,n])=>ITEMS[id].n+' '+n).join(' + ');
   // 결정 D-925: 글로 말할 때도 바꾸는 법을 '또는'으로 잇지 않고 한 줄에 하나씩 (교환 기록은 줄바꿈을 그대로 보인다)
-  const asksList=g=>g.asks.length>1?'\n'+g.asks.map(a=>'· '+askText(a)).join('\n'):' '+askText(g.asks[0])+'.';
+  const asksList=g=>g.asks.length>1?'\n'+g.asks.map((a,i)=>'· '+askText(a)+extraText(g.extra?.[i])).join('\n'):' '+askText(g.asks[0])+'.';
   const priceRows=g=>{const r=ITEMS[g.item].r;return r?[rank(r)+' 하나',rank(r-1)+' 둘']:[rank(0)+' 하나'];};
   /* 결정 D-124: 값은 레어도 단계가 먼저, 수량이 나중이다. 단계가 모자라면 몇 개를 얹었든 단계 이야기만 한다. */
   function commonMatch(g,offer){
@@ -148,13 +150,52 @@ const Trade=(()=>{
     S.goods=guestGoods();S.sel=(S.goods.find(g=>stateOf(g).k==='open')||S.goods[0])?.id||null;
     Sound.panel(true);render();$('trade').hidden=false;$('tradeBody').scrollTop=0;
   }
-  function close(){if(!$('trade').hidden){Sound.panel(false);$('trade').hidden=true;}S=null;}
-  function picture(id,n){const s=el('span','trade-ask');s.appendChild(icon(id));if(n>1)s.appendChild(el('b',null,'×'+n));s.title=ITEMS[id].n+(n>1?' '+n:'');return s;}
+  function close(){hideTip();if(!$('trade').hidden){Sound.panel(false);$('trade').hidden=true;}S=null;}
+  /* 결정 D-1101: 물건 그림에 마우스를 올리면 작은 정보 창이 뜬다 (사용자 피드백 2026-11-07 "그림만 봐서는 구분이 안 되는 경우가 있다").
+     이름·품·한 줄 설명(items.csv 설명)과 가진 수(원하는 물건 그림이면 필요한 수도). 휴대폰은 그림을 꾹 누르거나(보따리 칸) 한 번 누르면(원하는 물건 그림) 뜨고
+     잠시 뒤 사라진다. 창은 교환 창 밖 맨 위 겹에 고정 위치로 띄워, 창이 다시 그려져도(render) 그 자리에 남는다. */
+  const tip=el('div','trade-tip');tip.id='tradeTip';tip.hidden=true;tip.setAttribute('role','tooltip');document.body.appendChild(tip);
+  let tipEl=null,tipHide=0,tipPress=0;
+  function tipOn(node,id,need,why){node.dataset.tip=id;if(need)node.dataset.need=need;if(why)node.dataset.why=why;return node;}
+  function hideTip(){clearTimeout(tipHide);clearTimeout(tipPress);tip.hidden=true;tipEl=null;}
+  function showTip(node,ms){
+    const id=node?.dataset.tip,it=ITEMS[id];if(!it)return;
+    clearTimeout(tipHide);tipEl=node;tip.innerHTML='';
+    const head=el('div','trade-tip-head');head.appendChild(icon(id));head.appendChild(el('b',null,it.n));head.appendChild(rarityIcon(it.r));head.appendChild(el('span','small',rank(it.r)));
+    tip.appendChild(head);
+    if(it.d)tip.appendChild(el('p',null,it.d));
+    const have=G.inv[id]||0,need=+node.dataset.need||0;
+    tip.appendChild(el('p','trade-tip-count',need?'필요 '+need+'개 · 지금 '+have+'개':node.dataset.extra?'덤으로 더 받는다 · 지금 '+have+'개':'가진 것 '+have+'개'));
+    if(node.dataset.why)tip.appendChild(el('p','trade-tip-why',node.dataset.why));
+    tip.hidden=false;
+    const r=node.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+    let top=r.top-h-6;if(top<4)top=r.bottom+6;
+    tip.style.left=Math.round(clamp(r.left+r.width/2-w/2,4,innerWidth-w-4))+'px';tip.style.top=Math.round(clamp(top,4,innerHeight-h-4))+'px';
+    if(ms)tipHide=setTimeout(hideTip,ms);
+  }
+  const tipTarget=e=>e.target?.closest?.('[data-tip]');
+  $('trade').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const t=tipTarget(e);if(t&&t!==tipEl)showTip(t);});
+  $('trade').addEventListener('pointerout',e=>{if(e.pointerType!=='mouse'||!tipEl)return;const to=e.relatedTarget;if(!to||!tipEl.contains(to))hideTip();});
+  $('trade').addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const t=tipTarget(e);clearTimeout(tipPress);if(t)tipPress=setTimeout(()=>showTip(t,TABLES.TUNING.trade_tip_show_ms),TABLES.TUNING.trade_tip_hold_ms);});
+  $('trade').addEventListener('pointerup',e=>{
+    if(e.pointerType==='mouse')return;clearTimeout(tipPress);
+    const t=tipTarget(e);if(t&&t.classList.contains('trade-ask')&&!t.closest('.trade-chip'))showTip(t,TABLES.TUNING.trade_tip_show_ms);   // 원하는 물건 그림은 한 번 눌러도 뜬다
+  });
+  $('trade').addEventListener('pointercancel',()=>clearTimeout(tipPress));
+  $('tradeBody').addEventListener('scroll',hideTip,{passive:true});
+  /* 결정 D-1102: 덤 표시. 재료를 더 얹는 조합에는 무엇을 더 받는지 그 줄 끝에 '덤'으로 붙인다 */
+  function extraChip(extra){
+    const c=el('span','trade-extra');c.appendChild(el('span','trade-extra-tag','덤'));
+    for(const [id,n] of Object.entries(extra)){const p=picture(id,n);p.dataset.extra='1';c.appendChild(p);}
+    return c;
+  }
+  const extraText=extra=>extra?' (덤 '+Object.entries(extra).map(([id,n])=>ITEMS[id].n+' '+n).join(', ')+')':'';
+  function picture(id,n,need){const s=el('span','trade-ask');s.appendChild(icon(id));if(n>1)s.appendChild(el('b',null,'×'+n));tipOn(s,id,need);return s;}
   // 결정 D-147: 부탁의 원하는 물건 그림. 모자란 물건은 흐리게, 가진 수/필요한 수를 붙인다.
   function askPicture(id,n){
-    const have=G.inv[id]||0;if(have>=n)return picture(id,n);
+    const have=G.inv[id]||0;if(have>=n)return picture(id,n,n);
     const s=el('span','trade-ask missing');s.appendChild(icon(id));s.appendChild(el('b',null,have+'/'+n));
-    s.title=ITEMS[id].n+' '+n+'개 필요, 지금 '+have+'개';return s;
+    tipOn(s,id,n);return s;
   }
   // 결정 D-148: 품 표시 보기. 날쌘이 첫 만남에 말로 알려 준 것(잎·열매)을 화면의 실제 표시로 늘 보여 준다.
   function legend(){
@@ -178,7 +219,8 @@ const Trade=(()=>{
       const st=stateOf(g),lock=st.k==='open'?null:st.why,b=el('button','trade-good'+(st.k==='lock'?' off':''));b.type='button';b.dataset.good=g.id;b.dataset.state=st.k;
       b.setAttribute('aria-pressed',String(S.sel===g.id));
       // 결정 D-112: 물건이 아닌 정보(info:true)는 찢긴 수첩 쪽 아이콘으로 그리고, 이름은 "~에 대한 정보"로 적는다.
-      const head=el('span','trade-good-head');head.appendChild(icon(g.info?'torn_page':(g.icon||g.item)));
+      const head=el('span','trade-good-head'),hi=icon(g.info?'torn_page':(g.icon||g.item));
+      if(g.info||g.icon)head.appendChild(hi);else{const w=tipOn(el('span','trade-good-icon'),g.item);w.appendChild(hi);head.appendChild(w);}   // 결정 D-1101
       head.appendChild(el('b',null,(g.label||ITEMS[g.item].n)+(g.n>1?' ×'+g.n:'')));
       if(!g.label)head.appendChild(rarityIcon(ITEMS[g.item].r));
       head.appendChild(el('span','chip',g.info?'정보':g.kind==='story'?'부탁':g.kind==='guest'?'손님 교환':'흔한 물건'));
@@ -189,7 +231,8 @@ const Trade=(()=>{
          "또는으로 연결하지 말고 세로로 깔끔하게 리스트화처럼"). 한 줄 안의 재료는 + 로 잇는다. 줄 앞에는 작은 점 하나. */
       else if(asked(g)){asks.classList.add('list');g.asks.forEach(a=>{
         const row=el('span','trade-ask-row');row.appendChild(el('span','dot','·'));
-        Object.entries(a).forEach(([id,n],k)=>{if(k)row.appendChild(el('span','plus','+'));row.appendChild(st.k==='short'?askPicture(id,n):picture(id,n));});
+        Object.entries(a).forEach(([id,n],k)=>{if(k)row.appendChild(el('span','plus','+'));row.appendChild(st.k==='short'?askPicture(id,n):picture(id,n,n));});
+        const ex=g.extra?.[g.asks.indexOf(a)];if(ex)row.appendChild(extraChip(ex));   // 결정 D-1102
         asks.appendChild(row);
       });}
       else{   // 결정 D-925: 흔한 물건의 값(같은 단계 하나 / 한 단계 아래 둘)도 한 줄에 하나씩
@@ -198,7 +241,7 @@ const Trade=(()=>{
         asks.appendChild(el('span','small trade-left','남은 '+stockLeft(g.row)+'번'));}
       if(g.kind==='guest'&&st.k!=='lock')asks.appendChild(el('span','small','· 남은 '+Math.max(0,TABLES.TUNING.stranger_trade_limit-strangerUsed(S.guest.npc.id))+'번'));
       b.appendChild(asks);
-      b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(asked(g)?'원하는 것: '+g.asks.map(askText).join('; '):priceText(g))));
+      b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(asked(g)?'원하는 것: '+g.asks.map((a,i)=>askText(a)+extraText(g.extra?.[i])).join('; '):priceText(g))));
       b.onclick=()=>{if(S.sel!==g.id){S.sel=g.id;S.offer={};}render();};
       theirs.appendChild(b);
     }
@@ -212,7 +255,7 @@ const Trade=(()=>{
       const s=el('button','slot');s.type='button';s.dataset.item=id;
       s.appendChild(icon(id));s.appendChild(el('span','n',left));s.appendChild(rarityIcon(ITEMS[id].r));
       if(!S.guest&&liked(S.npc,id))s.appendChild(el('span','trade-like','좋아함'));
-      s.title=ITEMS[id].n+(why?' — '+why:'');s.setAttribute('aria-label',ITEMS[id].n+' '+left+'개'+(why?'. '+why:''));
+      tipOn(s,id,0,why);s.setAttribute('aria-label',ITEMS[id].n+' '+left+'개'+(why?'. '+why:''));   // 결정 D-1101: 정보 창이 이름과 못 얹는 까닭을 보인다
       s.disabled=!!why||left<=0;
       s.onclick=()=>{if(blocked(id)||G.inv[id]-(S.offer[id]||0)<=0)return;S.offer[id]=(S.offer[id]||0)+1;render();};
       grid.appendChild(s);
@@ -293,7 +336,8 @@ const Trade=(()=>{
     const m=asked(g)?storyMatch(g,S.offer):commonMatch(g,S.offer);
     if(!m.ok||(g.kind==='story'&&!g.multi))return '';
     const n=(g.n||1)*m.k+(g.kind==='common'&&G.f.haggleBonus?.[key(S.npc)]?1:0);
-    return '이대로면 '+ITEMS[g.item].n+' '+n+'개를 받는다.'+(m.k>1?' ('+m.k+'번 몫)':'')+backText(m.back).replace('도로 챙겼다','그대로 남는다');
+    const ex=g.extra?.[m.alt],exs=ex?' 덤으로 '+Object.entries(ex).map(([id,c])=>ITEMS[id].n+' '+c*m.k+'개').join(', ')+'도 받는다.':'';   // 결정 D-1102
+    return '이대로면 '+ITEMS[g.item].n+' '+n+'개를 받는다.'+(m.k>1?' ('+m.k+'번 몫)':'')+exs+backText(m.back).replace('도로 챙겼다','그대로 남는다');
   }
   $('tradeClose').onclick=()=>closePanels();
   /* 흔한 물건이 남은 상대와 이야기할 때는 대화창에 '보따리 펼치기'를 늘 둔다. 부탁을 마친 뒤에도 바꿀 수 있게.
