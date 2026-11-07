@@ -2750,30 +2750,46 @@ const TABLES={
    ]
   },
   {
-   "id": "dad_stamps_galchamgol",
+   "id": "gal_stamp_anvil",
    "region": "galchamgol",
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "부를 준다는 열매를 찾으러 낫날부터 벼렸다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "모루 밑에 아빠 손. 쇳가루랑 숯검댕이 손금마다 박혔다. 연장 고칠 대장간이 여기 있다는 표다. 삼촌이 이 모루를 들이던 해에 아빠가 찍어 줬대.",
+     "section": "관찰",
      "when": "stamp:galchamgol:anvil"
-    },
+    }
+   ],
+   "name": "모루 밑 아빠 손"
+  },
+  {
+   "id": "gal_stamp_knot",
+   "region": "galchamgol",
+   "kind": "stamp",
+   "lines": [
     {
-     "who": "dad",
-     "text": "높이 오르면 남보다 먼저 열매를 찾을 줄 알았다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "높은 가지 옹이에 아빠 손. 손끝에 단풍잎 한 조각이 같이 찍혔다. 여기 올라서니 금줄 길이 보였다. 숲에서 길을 놓치면 여기 오르라는 표다.",
+     "section": "관찰",
      "when": "stamp:galchamgol:knot"
-    },
+    }
+   ],
+   "name": "높은 가지 아빠 손"
+  },
+  {
+   "id": "gal_stamp_roots",
+   "region": "galchamgol",
+   "kind": "stamp",
+   "lines": [
     {
-     "who": "dad",
-     "text": "해를 머금은 머루. 맛은 좋다. 내가 찾는 부는 여기 없다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "당산나무 뿌리에 아빠 손. 가운데가 보랏빛이다. 머루 만진 손으로 짚었나 봐. 북쪽 길은 이 언덕 끝에서 떠난다. 나도 여기서 떠난다.",
+     "section": "관찰",
      "when": "stamp:galchamgol:roots"
     }
    ],
-   "name": "젊은 아빠의 그날"
+   "name": "당산나무 뿌리 아빠 손"
   },
   {
    "id": "jeolgu",
@@ -2917,13 +2933,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "장승 뒤에서 짚신을 고쳤다. 부를 준다는 열매가 북쪽에 있다니 고개 하나쯤은 더 넘을 수 있다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "장승 뒤 받침에 아빠 손. 짚 부스러기가 같이 눌렸다. 고갯길 앞이라 짚신을 고쳐 신고 넘으라는 표다. 내 짚신 끈도 여기서 다시 맸다.",
+     "section": "관찰",
      "when": "stamp:dolneomeo:jangseung"
     }
    ],
-   "name": "장승 뒤 도장"
+   "name": "장승 뒤 아빠 손"
   },
   {
    "id": "dolneomeo_mill_base",
@@ -2931,13 +2947,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "돌쇠 어른께 돌을 배웠다. 부자가 되면 돌가루 묻힐 일도 없겠지. 그래도 손에 밴 돌 냄새가 싫지는 않다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "맷돌 받침돌에 아빠 손. 흰 돌가루가 고루 뱄다. 곡식 빻을 맷돌이 있는 집이라는 표다. 돌쇠 할배가 돌을 가르쳐 준 그 손이다.",
+     "section": "관찰",
      "when": "stamp:dolneomeo:mill_base"
     }
    ],
-   "name": "맷돌 받침돌 도장"
+   "name": "맷돌 받침돌 아빠 손"
   },
   {
    "id": "dolneomeo_cliff_crack",
@@ -2945,13 +2961,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "구름 아래 마을이 좁쌀만 하다. 부자가 되어 돌아올 길을 잊을까 바위 틈에 발바닥을 찍어 둔다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "절벽 바위 틈에 아빠 손. 손가락만 길게 눌렸고 끝에 서리가 앉았다. 여기는 붙잡아도 안 미끄러진다는 표다. 나도 그 틈을 잡고 아래를 봤다. 다리가 후들거렸다.",
+     "section": "관찰",
      "when": "stamp:dolneomeo:cliff_crack"
     }
    ],
-   "name": "절벽 바위 틈 도장"
+   "name": "절벽 바위 틈 아빠 손"
   },
   {
    "id": "salt",
@@ -3064,13 +3080,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "부를 준다는 열매를 찾으러 북쪽으로 간다. 장터 깃발에 길을 물으니 바람만 대답했다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "깃대 판에 작은 아빠 손. 흙먼지가 한쪽으로 끌렸다. 장 서는 마당 한가운데라는 표다. 길 물을 데가 없으면 깃발부터 찾으라는 거겠지.",
+     "section": "관찰",
      "when": "stamp:jangteo:flag"
     }
    ],
-   "name": "젊은 아빠의 그날 · 장터 깃대"
+   "name": "장터 깃대 아빠 손"
   },
   {
    "id": "dad_stamp_jangteo_pillar",
@@ -3078,13 +3094,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "부자가 되어 돌아가겠다고 다짐하며 묵었다. 새벽길을 서두르다 젖은 발로 기둥을 짚었다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "숙소 기둥에 아빠 손. 물 자국이 흘러내렸다. 보부상이 묵어 갈 숙소라는 표다. 새벽에 젖은 손으로 짚고 나섰나 봐.",
+     "section": "관찰",
      "when": "stamp:jangteo:pillar"
     }
    ],
-   "name": "젊은 아빠의 그날 · 숙소 기둥"
+   "name": "숙소 기둥 아빠 손"
   },
   {
    "id": "dad_stamp_jangteo_rock",
@@ -3092,13 +3108,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "보배가 열린다는 산은 아직 멀다. 바위에서 내려다보니 장터 등불은 밤늦도록 꺼지지 않았다. 나도 저렇게 벌 테다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "솔숲 큰 바위에 아빠 손. 송진 방울이랑 솔잎이 붙었다. 바위에 오르니 장터 불빛이 다 보였다. 밤에 솔숲에서 길 잃으면 여기 오르라는 표다.",
+     "section": "관찰",
      "when": "stamp:jangteo:rock"
     }
    ],
-   "name": "젊은 아빠의 그날 · 솔숲 바위"
+   "name": "솔숲 바위 아빠 손"
   },
   {
    "id": "y_stamp_hut",
@@ -3106,13 +3122,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "부를 준다는 열매가 산 위에 있다기에 산막에서 짐을 고쳐 맸다. 빈 보따리를 무겁게 채워 돌아올 줄 알았다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "움막 문설주에 아빠 손. 둘레에 서리꽃이 폈다. 눈보라 치면 여기 들어와 묵으라는 표다. 아빠 손을 따라 그리니 내 손이 시렸다.",
+     "section": "관찰",
      "when": "stamp:yeongsan:hut_post"
     }
    ],
-   "name": "젊은 아빠의 그날 · 산막"
+   "name": "움막 문설주 아빠 손"
   },
   {
    "id": "y_stamp_snow",
@@ -3120,13 +3136,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "쉼바위에 지게를 받쳐 두고 눈을 털어 발바닥 무늬를 남겼다. 부자가 되어 내려올 때도 여기서 쉬어 가겠거니 했다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "쉼바위 옆에 아빠 손. 손끝이랑 손바닥 가에 눈이 묻었다. 지게를 받쳐 두고 숨 돌리라는 표다. 윗면 홈마다 지게 다리 자국이 닳아 있었다. 여럿이 쉬어 갔다.",
+     "section": "관찰",
      "when": "stamp:yeongsan:snow_sign"
     }
    ],
-   "name": "젊은 아빠의 그날 · 눈길"
+   "name": "쉼바위 아빠 손"
   },
   {
    "id": "y_stamp_shore",
@@ -3134,13 +3150,13 @@ const TABLES={
    "kind": "stamp",
    "lines": [
     {
-     "who": "dad",
-     "text": "부를 주는 열매가 아니었다. 되찾을 것이 없던 나는 빈손으로 돌아갔다. 그래도 신목이 있는 자리는 수첩에 적어 두었다.",
-     "section": "아빠 수첩",
+     "who": "me",
+     "text": "호숫가 바위에 아빠 손. 호수 바람과 얼음에 닳아 아주 옅다. 호수 건너 신목 섬이 보이는 자리라는 표다. 아빠가 찾던 데가 저기다.",
+     "section": "관찰",
      "when": "stamp:yeongsan:shore_rock"
     }
    ],
-   "name": "젊은 아빠의 그날 · 호숫가"
+   "name": "호숫가 바위 아빠 손"
   },
   {
    "id": "ongdal",

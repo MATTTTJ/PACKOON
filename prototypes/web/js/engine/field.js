@@ -1065,7 +1065,24 @@ function findStamp(s){
   learn(s.note,true);Vfx.burst(s.x,s.y??fieldGround());Sound.playSfx('stamp_found');
   peekStamp(s);
   // 결정 D-1023: 지역이 찾은 순간의 이야기를 대화로 바로 이으면(REG.onStampFound) 속말을 따로 띄우지 않는다(대화 뒤에 다시 뜨지 않게)
-  if(!REG.onStampFound?.(s))think('아빠 손바닥 도장이다! 수첩에 그날 이야기가 있을 거야.');return true;   // 결정 D-706
+  if(REG.onStampFound?.(s))return true;
+  // 결정 D-1202: 처음 찾은 도장이면 아이가 왜 아빠 손인지, 왜 거기 찍혔는지를 제가 아는 것으로 짚는다(dadStampIntro).
+  const intro=dadStampIntro();
+  if(intro.length)talk(intro);else think('아빠 손바닥 도장이다!\n여긴 무슨 표일까? 수첩에 그려 두자.');   // 결정 D-706
+  return true;
+}
+/* 결정 D-1200·D-1202 (사용자 지시 2026-11-07): 아빠 손바닥 도장은 뒤에 같은 길을 걸어올 보부상들을 위해
+   쓸 만한 자리(대장간, 묵을 데, 손 짚을 바위 틈, 갈림길…)마다 일부러 찍은 이정표다. 아이는 그 길을 따라 하나씩 찾는다.
+   아이가 아는 까닭: 손 모양은 아빠 수첩 첫 장의 손바닥과 같고(수첩 도장 쪽 맨 위에 그 손이 있다),
+   보부상이 뒤에 올 이를 위해 길표를 남긴다는 건 보부상 집 아이라 아빠에게 들어 안다.
+   어느 지역에서 처음 찾든 한 번만 짚는다. 단풍골 모루 밑은 무쇠 삼촌이 직접 말해 준다(galchamgol/story.js). */
+function dadStampIntro(){
+  if(knows('lore:dad_stamp'))return [];
+  learn('lore:dad_stamp',true);
+  return [['너구리','(손가락이 길게 벌어진 너구리 손바닥 자국.\n아빠 수첩 첫 장에 찍힌 손이랑 똑같다.)'],
+    ['너구리','(아빠가 그랬지. 보부상은 뒤에 올 사람 보라고\n쓸 만한 자리마다 길표를 남긴다고.)'],
+    ['너구리','(아빠는 손바닥으로 남겼구나.\n이 길을 따라가면 아빠 손이 또 있겠다.)'],
+    ['너구리','(찾는 대로 수첩에 그려 두자.)']];
 }
 function drawZoneObjects(){
   for(const p of zoneObjects('wanderers'))if(p.draw){const a=npcMoveAlpha(p.id);if(a<=0)continue;   // D-126

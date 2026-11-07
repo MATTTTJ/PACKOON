@@ -1,13 +1,13 @@
-﻿id,지역,도장키,자리,무늬,눌림,묻은것,아빠처지,상태,비고
-galchamgol_anvil,galchamgol,stamp:galchamgol:anvil,대장간 모루 밑,soot,진하게,쇳가루·숯검댕이 점점이,길 떠나는 첫날. 들떠서 꾹 눌렀다,제안,D-171
-galchamgol_knot,galchamgol,stamp:galchamgol:knot,참나무 숲 높은 가지 옹이,leaf,진하게,손가락 끝에 붙은 단풍잎 한 조각,남보다 먼저 오르려 손끝에 힘을 줬다,제안,D-171
-galchamgol_roots,galchamgol,stamp:galchamgol:roots,당산나무 뿌리,juice,보통,"손바닥 가운데 머루즙 보랏빛, 한 방울 흘러내림",머루를 맛보고 손을 닦지 않았다. 찾는 부는 여기 없다,제안,D-171
-dolneomeo_jangseung,dolneomeo,stamp:dolneomeo:jangseung,장승 뒤,straw,보통,짚신 고친 짚 부스러기,고개 하나쯤 더 넘을 수 있다고 다진 손,제안,D-171
-dolneomeo_mill_base,dolneomeo,stamp:dolneomeo:mill_base,맷돌 받침돌,dust,보통,손바닥에 고루 밴 흰 돌가루,돌쇠 어른께 돌을 배운 손. 돌가루가 싫지 않다,제안,D-171
-dolneomeo_cliff_crack,dolneomeo,stamp:dolneomeo:cliff_crack,절벽 바위 틈,grip,보통,"손가락 끝에 서리, 손가락만 길게 눌림",바위 틈을 붙잡고 아래를 내려다본 손,제안,D-171
-jangteo_flag,jangteo,stamp:jangteo:flag,장터 깃대 밑,wind,보통,한쪽으로 끌린 흙먼지 자국,길을 물어도 바람만 대답했다. 손이 미끄러졌다,제안,D-171
-jangteo_pillar,jangteo,stamp:jangteo:pillar,숙소 기둥,wet,보통,젖은 손바닥에서 흘러내린 물 자국,새벽길을 서두르다 젖은 손으로 짚었다,제안,D-171
-jangteo_rock,jangteo,stamp:jangteo:rock,솔숲 큰 바위,resin,진하게,송진 방울과 솔잎,장터 등불을 보며 나도 벌 테다 다짐한 손,제안,D-171
-yeongsan_hut_post,yeongsan,stamp:yeongsan:hut_post,산막 문설주,frost,보통,둘레에 핀 서리꽃,짐을 고쳐 매며 빈 보따리를 채울 줄 알았다,제안,D-171
-yeongsan_snow_sign,yeongsan,stamp:yeongsan:snow_sign,눈길 이정표,snow,보통,손가락 끝과 손바닥 가에 묻은 눈,이정표 눈을 털던 손. 내려올 길을 믿었다,제안,D-171
-yeongsan_shore_rock,yeongsan,stamp:yeongsan:shore_rock,호숫가 바위,ice,옅게,"얼음 알갱이, 손자국이 옅다",부를 주는 열매가 아니었다. 빈손이라 힘없이 짚었다,제안,D-171
+﻿id,지역,도장키,자리,무늬,눌림,묻은것,이정표,상태,비고
+galchamgol_anvil,galchamgol,stamp:galchamgol:anvil,대장간 모루 밑,soot,진하게,쇳가루·숯검댕이 점점이,연장을 고칠 대장간이 있다,제안,D-171 · D-1200 · 바람이 덜 닿는 자리라 또렷하게 남았다
+galchamgol_knot,galchamgol,stamp:galchamgol:knot,참나무 숲 높은 가지 옹이,leaf,진하게,손가락 끝에 붙은 단풍잎 한 조각,숲에서 길을 놓치면 여기 올라라. 금줄 길이 보인다,제안,D-171 · D-1200 · 바람이 덜 닿는 자리라 또렷하게 남았다
+galchamgol_roots,galchamgol,stamp:galchamgol:roots,당산나무 뿌리,juice,보통,"손바닥 가운데 머루즙 보랏빛, 한 방울 흘러내림",고을 끝 당산나무. 북쪽 길은 여기서 떠난다,제안,D-171 · D-1200
+dolneomeo_jangseung,dolneomeo,stamp:dolneomeo:jangseung,장승 뒤 받침,straw,보통,짚신 고친 짚 부스러기,고갯길 들머리. 짚신을 고쳐 신고 넘어라,제안,D-171 · D-1200
+dolneomeo_mill_base,dolneomeo,stamp:dolneomeo:mill_base,맷돌 받침돌,dust,보통,손바닥에 고루 밴 흰 돌가루,곡식을 빻을 맷돌이 있는 집,제안,D-171 · D-1200
+dolneomeo_cliff_crack,dolneomeo,stamp:dolneomeo:cliff_crack,절벽 바위 틈,grip,보통,"손가락 끝에 서리, 손가락만 길게 눌림",붙잡아도 안 미끄러지는 단단한 바위 틈,제안,D-171 · D-1200
+jangteo_flag,jangteo,stamp:jangteo:flag,장터 깃대 판,wind,보통,한쪽으로 끌린 흙먼지 자국,장 서는 마당 한가운데. 길을 물을 데,제안,D-171 · D-1200
+jangteo_pillar,jangteo,stamp:jangteo:pillar,숙소 기둥,wet,보통,젖은 손바닥에서 흘러내린 물 자국,보부상이 묵어 갈 숙소,제안,D-171 · D-1200
+jangteo_rock,jangteo,stamp:jangteo:rock,솔숲 큰 바위,resin,진하게,송진 방울과 솔잎,밤에 솔숲에서 길을 잃으면 여기 올라 장터 불빛을 보라,제안,D-171 · D-1200 · 바람이 덜 닿는 자리라 또렷하게 남았다
+yeongsan_hut_post,yeongsan,stamp:yeongsan:hut_post,움막 문설주,frost,보통,둘레에 핀 서리꽃,눈보라를 피해 묵어 갈 움막,제안,D-171 · D-1200
+yeongsan_snow_sign,yeongsan,stamp:yeongsan:snow_sign,눈길 쉼바위,snow,보통,손가락 끝과 손바닥 가에 묻은 눈,지게를 받쳐 두고 숨 돌릴 바위,제안,D-171 · D-1200
+yeongsan_shore_rock,yeongsan,stamp:yeongsan:shore_rock,호숫가 바위,ice,옅게,"얼음 알갱이, 손자국이 옅다",호수 건너 신목 섬이 보이는 자리,제안,D-171 · D-1200 · 호수 바람과 얼음에 닳아 옅다

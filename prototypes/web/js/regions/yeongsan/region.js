@@ -184,25 +184,26 @@ function voyage(to,firstReturn){
 }
 function traceStamp(s,fresh=false){
   const traced=G.f.yStampHands||(G.f.yStampHands={});
-  const record=()=>{const page=Object.values(NOTES).find(p=>p.lines.some(l=>l.when===s.note));return (page?.lines||[]).filter(l=>l.when===s.note).map(l=>['아빠의 옛 기록',l.text]);};
-  // 결정 D-1023: 따라가 본 도장도 다시 누르면 그날 이야기를 다시 읽는다
-  if(traced[s.id]){talk([['너구리','손끝으로 따라가 본 무늬다. 수첩의 그날 이야기를 다시 읽어 보자.'],...record()]);return;}
+  // 결정 D-1204 (사용자 지시 2026-11-07): 도장은 뒤에 올 보부상을 위한 아빠의 이정표다. 아빠의 옛 기록을 읽는 대신
+  //   아이가 무늬를 손끝으로 짚어 보고, 무슨 자리라는 표인지 알아채 수첩에 옮겨 그린다(수첩 줄은 notebook.csv 도장 쪽).
   const details={
-    hut_post:{act:'hutPrint',intro:'문설주에 아빠 손바닥 도장이 있어. 문을 잡던 손이 여기에 닿았겠지.',look:'바깥쪽은 매끈하고 무늬 안쪽은 거칠다.\n눈을 털고 내 손으로 따라가 볼까?',after:'보따리 가득 채워 올 줄 알았구나. 난 엄마 약 하나면 돼.'},
+    hut_post:{act:'hutPrint',intro:'움막 문설주에 아빠 손바닥 도장이 있어.\n둘레에 서리꽃이 폈네.',look:'눈보라 치면 여기 들어와 묵으라는 표구나.\n눈을 털고 내 손으로 따라가 볼까?',after:'아빠 손 덕에 눈길에서도 이 문을 찾겠다.\n수첩에 옮겨 그려 두자.'},
     // 결정 D-1123: 팻말 대신 보부상들이 지게를 받쳐 두고 쉬던 쉼바위. 윗면엔 지게 다리 홈, 옆면에 도장
-    snow_sign:{act:'snowPrint',intro:'쉼바위 옆면에 무늬를 팠네. 윗면엔 지게 다리 받치던 홈도 있어.',look:'젊은 아빠도 여기 지게를 받쳐 두고 아래를 봤겠지.\n무늬를 짚으면서 아빠가 보던 쪽으로 서 보자.',after:'여기서 쉬면서 내려갈 길을 그려 봤구나. 나도 저 불빛 따라 내려갈래.'},
-    shore_rock:{act:'shorePrint',intro:'바위의 오래된 무늬와 눈에 찍힌 새 발자국이 나란히 있어.',look:'무늬가 얼마나 닮았는지 손끝으로 짚어 보자.\n미끄럽지 않은 바위 쪽에서부터.',after:'젊었을 땐 빈손으로 혼자 내려갔구나. 이번엔 같이 돌아가야지.'}
+    snow_sign:{act:'snowPrint',intro:'쉼바위 옆면에 아빠 손이 있어.\n윗면엔 지게 다리 받치던 홈이 패였고.',look:'지게 받쳐 두고 숨 돌리라는 표구나.\n무늬를 짚으면서 아빠가 보던 쪽으로 서 보자.',after:'여기 서니 지나온 길이 다 보여.\n아빠도 여기서 숨을 돌렸겠지.'},
+    shore_rock:{act:'shorePrint',intro:'바위의 오래된 손 무늬와\n눈에 찍힌 새 발자국이 나란히 있어.',look:'무늬가 바람에 닳아 아주 옅다.\n미끄럽지 않은 바위 쪽에서부터 짚어 보자.',after:'호수 건너 신목 섬이 보이는 자리라는 표구나.\n아빠가 찾던 데가 저기야.'}
   }[s.id];
   if(!details)return;
+  // 결정 D-1023: 따라가 본 도장을 다시 누르면 그때 알아챈 것을 다시 떠올린다
+  if(traced[s.id]){talk([['너구리','손끝으로 따라가 보고 수첩에 옮겨 그린 무늬다.'],['너구리',details.after.split('\n')[0]]]);return;}
   // 결정 D-1023 (사용자 피드백 2026-11-06 영산 24·32): 찾은 순간의 알림을 먼저 이 대화의 첫 줄로 끝낸다. 대화가 끝난 뒤에 찾았다는 창이 다시 뜨지 않는다.
   //   "나중에"로 끊어도 그 도장을 다시 누르면 이 대화가 다시 열린다(s.revisit, engine/field.js interactWith).
-  const first=fresh?[['너구리','(아빠 손바닥 도장이다!\n수첩에 그날 이야기가 있을 거야.)']]:[];
+  //   결정 D-1202: 이 도장이 처음 찾은 도장이면 아빠 손인 걸 어떻게 아는지부터 짚는다(engine/field.js dadStampIntro).
+  const first=fresh?(()=>{const l=dadStampIntro();return l.length?l:[['너구리','(아빠 손바닥 도장이다!)']];})():[];
   talk([...first,['너구리',details.intro],['너구리',details.look,[
     {t:'손끝으로 무늬를 따라가 본다',go:()=>Rg.playActivity(details.act,()=>{
       traced[s.id]=true;
-      const lines=record();
-      diary('y_stamp_hands_'+s.id,'도장의 홈을 손끝으로 짚고 수첩의 그날 이야기를 읽었다. '+details.after);
-      talk([...lines,['너구리',details.after]]);
+      diary('y_stamp_hands_'+s.id,'아빠 도장의 홈을 손끝으로 짚어 보고 수첩에 옮겨 그렸다. '+details.after.replace('\n',' '));
+      talk([['너구리','(손끝으로 홈을 따라간다. 아빠 손가락 끝이\n내 손가락보다 한 마디 길다.)'],['너구리',details.after]]);
     })},{t:'무늬는 찾았으니 나중에 볼게',go:null}
   ]]]);
 }
