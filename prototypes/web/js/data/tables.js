@@ -3114,7 +3114,7 @@ const TABLES={
    "lines": [
     {
      "who": "dad",
-     "text": "이정표 위 눈을 털고 발바닥 무늬를 남겼다. 부자가 되어 내려올 때도 이 길로 오겠거니 했다.",
+     "text": "쉼바위에 지게를 받쳐 두고 눈을 털어 발바닥 무늬를 남겼다. 부자가 되어 내려올 때도 여기서 쉬어 가겠거니 했다.",
      "section": "아빠 수첩",
      "when": "stamp:yeongsan:snow_sign"
     }
@@ -3719,7 +3719,6 @@ const TABLES={
   "salg_graze": 108,
   "salg_return_graze": 114,
   "salg_moving": 0.2,
-  "salg_return_speed": 0.25,
   "salg_active_distance": 190,
   "salg_arrival_distance": 30,
   "salg_grass_interval": 28,
@@ -3974,6 +3973,7 @@ const TABLES={
   "name_final_damage": 2,
   "name_final_open_bonus": 150,
   "y_lure_range": 90,
+  "y_dad_revert_range": 60,
   "think_stop_base_ms": 700,
   "think_stop_char_ms": 35,
   "think_stop_max_ms": 2200,
