@@ -1,6 +1,7 @@
 'use strict';
-/* 아빠의 수첩: 젊은 아빠가 남긴 메모·도장 위에 아이가 이어 적는 한 권 (N·B 키, 화면의 수첩 버튼).
-   동물·물건·도장 쪽에는 아빠의 줄(흐린 옛 먹, 글만)과 아이의 줄(새 먹)이 한 쪽에 같이 놓인다.
+/* 아빠의 수첩: 젊은 아빠가 남긴 메모 위에 아이가 이어 적는 한 권 (N·B 키, 화면의 수첩 버튼).
+   동물·물건 쪽에는 아빠의 줄(흐린 옛 먹, 글만)과 아이의 줄(새 먹)이 한 쪽에 같이 놓인다.
+   결정 D-1201: 도장 쪽은 아이가 찾은 아빠 손바닥 도장을 보고 그린 그림과 느낀 줄만 있다(아빠 줄 없음).
    결정 D-61: 그림은 아이가 직접 보고 겪은 것만 아이 손으로 그린다(크레용 그림). 보기 전에는 빈 칸이다.
    해야 할 일·이름·숨은 가공법·장부는 아이가 이어 적은 장이다 (그리기는 book.js).
    아빠 단서는 '아빠 단서' 장, 엄마의 쪽지는 '이름' 장 아래에 있다 (결정 D-703, 예전엔 보따리 '중요' 탭). 일기·까치 답장 장은 없앴고 기록(G.diary)은 진행 판정에 그대로 쓴다.
@@ -72,7 +73,8 @@ function crayonCanvas(src,seed){
 }
 /* 결정 D-171: 아빠 손바닥 도장에는 그 자리에서 묻은 것이 함께 찍힌다 (사용자 피드백 23).
    무늬와 눌린 세기는 design/data/stamps.csv (TABLES.STAMP_MARKS, 키 '지역:도장id').
-   눌린 세기로 젊은 아빠의 마음이 은근히 비친다: 길 떠난 첫 도장은 진하게, 빈손으로 돌아선 호숫가는 옅게.
+   결정 D-1200: 눌린 세기는 아빠 마음이 아니라 자국이 얼마나 남았나다. 바람이 덜 닿는 모루 밑·옹이·송진 바위는 진하고,
+   호수 바람과 얼음에 닳은 호숫가 바위는 옅다.
    fill(x,y,w,h,색)으로 그리므로 필드(R)와 수첩 그림(캔버스)이 같은 무늬를 쓴다. (x,y)는 손바닥 아래 끝 가운데, s는 배율.
    손바닥 모양 PAW는 engine/field.js. */
 function pawMark(key){return TABLES.STAMP_MARKS?.[key]||null;}
@@ -99,8 +101,8 @@ function drawPawMark(fill,x,y,key,s=1,c='#8a3424'){
     case 'ice':P(-5,-3,1,1,'#cfe3ec');P(4,-5,1,1,'#cfe3ec');P(-4,-7,1,1,'#dbeaf0');P(2,-1,1,1,'#cfe3ec');break;   // 얼음 알갱이 (옅은 자국은 눌림이 맡는다)
   }
 }
-/* 도장 쪽: 찾은 아빠 도장(너구리 손바닥 자국)을 찾은 만큼, 묻은 것과 함께 찍어 그린다 (D-171).
-   결정 D-172: 손바닥은 필드 도장과 같은 모양(PAW)을 두 배로 그린다 */
+/* 도장 쪽: 아이가 찾은 아빠 도장(너구리 손바닥 자국)을 묻은 것까지 옮겨 그린다 (D-171). 결정 D-1201: 도장 하나에 쪽 하나.
+   결정 D-172: 손바닥은 필드 도장과 같은 모양(PAW)을 두 배로 그린다. 아이 그림이라 crayonCanvas 를 거친다 */
 function pawCanvas(keys){
   // 칸 하나는 무늬(손바닥 둘레 -7~+6, 위 -11~아래 +3, 두 배)까지 들어가는 크기
   const n=keys.length,CELL=28,c=document.createElement('canvas'),cols=Math.min(3,Math.max(1,n));c.width=cols*CELL;c.height=Math.ceil(n/3)*CELL;const g=c.getContext('2d');
@@ -152,13 +154,14 @@ function collectFreshDrawings(){
   noteFresh.forEach(id=>drawn[id]=true);
 }
 
-/* 탭: 앞의 셋은 아빠와 같이 쓰는 쪽, 나머지는 아이가 이어 적은 장. 탭 선택은 저장하지 않는다 */
+/* 탭: 앞의 둘(동물·물건)은 아빠와 같이 쓰는 쪽, 나머지는 아이가 이어 적은 장. 탭 선택은 저장하지 않는다 */
 // 결정 D-30: 수첩에서 일기·까치 답장을 뺐다 (design/data/decisions.csv)
 // 결정 D-703: 보따리 '중요' 탭을 없애고 아빠 단서는 수첩 '아빠 단서' 장으로, 엄마의 쪽지는 '이름' 장 아래로 돌아왔다
 // 결정 D-150: 아이가 적는 장 맨 앞에 '해야 할 일'(중요·잔일로 나눈 할 일, 끝낸 일)을 두고, '익힌 솜씨' 장은 없앤다.
 //   손버릇 줄은 그 가보의 물건 쪽에 아이 줄로 남는다(myTexts). 탭 이름이 같은 보따리 '중요' 탭과 헷갈리지 않게 '해야 할 일'로 부른다.
-const NOTE_TABS=[['animal','동물',1],['item','물건',1],...(CLASSIC?[]:[['stamp','도장',1]]),
-  ['todo','해야 할 일'],['clues','아빠 단서']   /* 결정 D-703 */,['nicknames','이름']   /* 결정 D-423 */,['recipes','숨은 가공법'],['ledger','물품 장부']];
+// 결정 D-1201: 도장 쪽은 아이가 그리고 적은 장이라 아이 장(아빠 단서 뒤)으로 옮겼다.
+const NOTE_TABS=[['animal','동물',1],['item','물건',1],
+  ['todo','해야 할 일'],['clues','아빠 단서']   /* 결정 D-703 */,...(CLASSIC?[]:[['stamp','도장']]),['nicknames','이름']   /* 결정 D-423 */,['recipes','숨은 가공법'],['ledger','물품 장부']];
 const PAGE_SECTION={animal:'관찰',item:'관찰',stamp:'관찰',recipes:'숨은 가공법'};
 let noteTab='animal';
 // 너구리의 책이 따로 있던 때의 이름(bookTab)도 같은 탭을 가리킨다. 없어진 관찰 탭은 동물 쪽으로 간다
@@ -267,9 +270,14 @@ function renderNotebook(){
   const {dad,mine}=noteTally();$('noteTally').textContent='아빠가 적은 쪽 '+dad+' · 내가 이어 적은 줄 '+mine;
   const body=$('noteBody');const sc=body.scrollTop;body.innerHTML='';
   if(noteTab==='stamp'){
+    // 결정 D-1202: 맨 위에 수첩 첫 장에 찍힌 아빠 손(수첩 주인의 도장). 아이는 길에서 이 손과 같은 자국을 알아본다.
+    const first=el('figure','stamp-first');const fc=document.createElement('canvas');fc.width=28;fc.height=28;
+    {const g=fc.getContext('2d');g.fillStyle='#7a2e22';for(const [px,py,w,h] of PAW)g.fillRect(14+px*2,22+py*2,w*2,h*2);}
+    first.appendChild(fc);first.appendChild(el('figcaption',null,'수첩 첫 장의 아빠 손'));body.appendChild(first);
     body.appendChild(el('p','small','찾은 아빠 도장 '+stampCount()+' / '+stampTotal()));
-    // 아빠가 젊어서 적어 둔 말. 열두 곳을 다 찾으면 영산 끝에서 아빠와 나란히 서는 장면이 더해진다 (yeongsan/story.js).
-    body.appendChild(el('p','note-line dad','아빠: 내 손바닥 도장은 네 고장에 열두 개. 다 찾는 이가 있다면 내 길을 다 걸은 셈이다.'));
+    // 아이가 도장의 뜻을 안 뒤(field.js dadStampIntro, 단풍골 모루 밑의 삼촌)에만 적는 줄
+    if(knows('lore:dad_stamp')){const p=el('p','note-line me');p.appendChild(el('span','who','나'));
+      p.appendChild(document.createTextNode('아빠는 뒤에 올 보부상 보라고 쓸 만한 자리마다 손바닥을 찍었다. 아빠 길을 따라가며 찾는 대로 그려 둔다.'));body.appendChild(p);}
   }
   if(PAGE_SECTION[noteTab])renderPages(body,PAGE_SECTION[noteTab],['animal','item','stamp'].includes(noteTab)?noteTab:null);
   else renderChildRecord(body,noteTab);

@@ -546,6 +546,8 @@ body.in-battle .pad-top .chipbtn{display:none}
 .note-line.dad .who{border:1px solid #b9a07a;color:#8a6a48}
 .note-line.me{color:var(--meok)}
 .note-line.me .who{background:var(--meok);color:var(--hanji)}
+.stamp-first{margin:0 0 6px;display:flex;align-items:center;gap:8px;color:#7a5a38;font-size:.85em}
+.stamp-first canvas{width:42px;height:42px;image-rendering:pixelated;background:#f3e8cf;border:1px solid #c9b48c;border-radius:3px;opacity:.85}
 /* 한 쪽에 두 손: 아빠 줄은 바랜 옛 먹(명조), 아이 줄은 아래에 새 먹(돋움)으로 들여 쓴다 */
 .note-tally{margin:0;padding:2px 14px 6px;font:13px/1.4 var(--ui);color:var(--dim)}
 #noteTabs{flex-wrap:wrap;align-items:center}
