@@ -25,11 +25,25 @@ Rg.art={
      봄이 오면(어둑차사가 물러나면) 솥을 엎어 말린다. */
   badger(ox,oy,f){const Gy='#857d70',Dk='#4a443d',Wt='#eee6d6',K='#17120e',Sc='#7a4a6a';
     // 결정 D-154: 옆에 걸어 둔 솥은 Rg.props.ongdalPot이 제자리에 그린다(할미가 고개를 돌려도 움직이지 않는다).
-    M(ox,oy,f,-9,-11,15,8,Gy);M(ox,oy,f,-9,-5,15,2,Dk);M(ox,oy,f,-10,-10,2,5,Dk);
+    // 결정 D-1243 (사용자 지시 2026-11-07 4스테이지 25): 할미도 움직인다. 숨 쉴 때 등이 오르내리고, 이따금 솥 쪽으로 고개를 끄덕이고,
+    //   찬 공기에 입김이 난다. 솥을 보고 있을 때(왼쪽, 말을 걸기 전)는 국자로 솥의 눈 녹은 물을 천천히 젓는다. 봄엔 솥을 엎어 둬 젓지 않는다.
+    //   그림을 줄이기 설정에서는 멈춘 모습(국자를 솥에 담근 채)으로 둔다.
+    const field=ctx.canvas===cv,t=field&&!Vfx.reducedMotion&&typeof G!=='undefined'&&G?G.anim:0;
+    const bk=t%150<75?0:1,nod=Math.floor(t/110)%5===4?1:0,hy=oy+nod;
+    const stir=field&&f<0&&!(G&&G.boss&&G.boss.dead);
+    M(ox,oy,f,-9,-11-bk,15,8+bk,Gy);M(ox,oy,f,-9,-5,15,2,Dk);M(ox,oy,f,-10,-10-bk,2,5+bk,Dk);
     M(ox,oy,f,-8,-3,3,3,K);M(ox,oy,f,-3,-3,3,3,K);M(ox,oy,f,1,-3,3,3,K);
-    M(ox,oy,f,4,-16,9,8,Wt);M(ox,oy,f,5,-16,2,8,K);M(ox,oy,f,9,-16,2,7,K);M(ox,oy,f,12,-11,2,2,K);M(ox,oy,f,10,-12,1,1,'#ffffff');
-    M(ox,oy,f,3,-18,10,3,Sc);M(ox,oy,f,2,-16,2,3,Sc);
-    M(ox,oy,f,-3,-9,4,5,'#c9a45a');M(ox,oy,f,-2,-11,2,2,'#c9a45a');M(ox,oy,f,-2,-6,2,1,'#6a3a2a');},
+    M(ox,hy,f,4,-16,9,8,Wt);M(ox,hy,f,5,-16,2,8,K);M(ox,hy,f,9,-16,2,7,K);M(ox,hy,f,12,-11,2,2,K);M(ox,hy,f,10,-12,1,1,'#ffffff');
+    M(ox,hy,f,3,-18,10,3,Sc);M(ox,hy,f,2,-16,2,3,Sc);
+    M(ox,oy,f,-3,-9,4,5,'#c9a45a');M(ox,oy,f,-2,-11,2,2,'#c9a45a');M(ox,oy,f,-2,-6,2,1,'#6a3a2a');
+    if(stir){   // 앞발이 국자 자루를 쥐고, 국자 끝이 솥(왼쪽 x-25~-14) 안에서 작게 돈다
+      const a=t*.06,sx=Math.round(Math.cos(a)*2),sy=Math.round(Math.sin(a));
+      M(ox,oy,f,9,-8,4,2,Gy);M(ox,oy,f,12,-9,2,2,K);                                          // 앞발
+      for(let k=0;k<6;k++)M(ox,oy,f,13+k,-10+Math.round(k/3)+(k>3?sy:0),1,1,'#8c735d');      // 국자 자루
+      M(ox,oy,f,18+sx,-9+sy,3,2,'#6f5a46');M(ox,oy,f,19+sx,-9+sy,1,1,'#b7c7d0');            // 국자 끝(물에 잠겼다)
+    }
+    const p=t%170;   // 입김: 입가에서 앞쪽 위로 피어올라 옅어진다
+    if(field&&p<42)M(ox,hy,f,14+Math.round(p/9),-12-Math.round(p/7),2+(p>20?1:0),2,'rgba(236,240,244,'+(0.75-p/60).toFixed(2)+')');},
   /* 아빠: 모자는 아들이 쓰고 있어서 목도리만 둘렀다.
      결정 D-431·D-1087: 어둑차사의 부름에 아이 대신 대답하다 이름을 다 먹혀 넋이 빠졌다(이름이 돌아오기 전). 호수만 보고, 고개를 조금 떨궜고, 눈에 빛이 없다.
      버릇만 남았다: 보따리 매듭을 묶었다 풀고, 곁에 꽂은 겨울 막대에 금을 긋는다(가을부터 하루 하나, 깊은 금 하나는 첫눈 온 날). */
@@ -162,10 +176,6 @@ function hut(x,y){
   px(x-32,y-65,8,17,'#5a4b43');px(x-34,y-67,12,3,'#e1e9ef');
   for(let i=0;i<3;i++)px(x-31+i*3,y-76-i*12,6+i*2,3,'#8a9bab');
   px(x+46,y-10,23,9,'#b6a073');px(x+47,y-12,21,2,'#e2e6e9');
-}
-function sign(x,y){
-  px(x-2,y-33,4,33,'#776354');px(x-19,y-36,37,9,'#b4aa94');px(x-22,y-39,41,3,'#e9eef1');
-  px(x-12,y-32,17,1,'#5c5a58');px(x+4,y-34,4,4,'#5c5a58');
 }
 /* 결정 D-1123 (사용자 지시 2026-11-07 4스테이지 7): 옹달 할미 오른쪽 능선의 아빠 도장은 팻말이 아니라 쉼바위에 있다.
    보부상들이 지게를 받쳐 두고 쉬어 가던 윗면 평평한 바위. 앞에 지게 받치던 작대기가 기대 있고, 윗면엔 눈이 얹혔다.
@@ -411,7 +421,7 @@ A.scenery=zone=>{
     }
   }
   if(zone==='shelter'){
-    hut(260-cam,GROUND);sign(Rg.zones?.shelter?.w?Rg.zones.shelter.w-400-cam:2200-cam,GROUND);   // 오른쪽 끝에서 400 (D-109로 너비가 줄어도 끝에 둔다)
+    hut(260-cam,GROUND);   // 결정 D-1225: 오른쪽 끝에 서 있던 뜻 없는 팻말은 뺐다 (사용자 지시 2026-11-07 4스테이지 21)
     // 높은 대피소 별채는 오래된 문설주만 남았다. 도장을 찾는 위치와 맞춘다.
     const post=tx(1040)-cam;px(post-19,108-38,5,38,'#7b6a59');px(post+15,108-38,5,38,'#7b6a59');
     px(post-23,108-42,47,5,'#d9e4eb');px(post-18,108-35,4,11,'#b7a68f');
@@ -426,7 +436,7 @@ A.scenery=zone=>{
   if(zone==='snow'){
     // 결정 D-1063: 눈 터널·눈 위의 선(까마귀가 그린 골짜기)·붉은 천 장대는 뺐다 (사용자 피드백 2026-11-06 25·28)
     restRock(tx(1780)-cam,108);rock(tx(2000)-cam,GROUND,99,30);   // 결정 D-1123: 도장 자리는 팻말 대신 쉼바위
-    sign(tx(2100)-cam,GROUND);for(let i=0;i<5;i++)px(tx(2098)-cam,GROUND-5-i*5,6,1,'#5a5d64');
+    // 결정 D-1225: 눈 높이를 잰 낡은 이정표(살펴보기)는 뺐다
   }
   if(zone==='slope'){   // tx: 줄인 비탈 좌표 (D-116)
     rowan(tx(250)-cam,GROUND);
@@ -739,6 +749,5 @@ A.blockedIce=(x,y)=>{
   for(let i=0;i<4;i++)px(x-20+i*11,y-40+i*9,6,1,'#88a8bf');   // 번들거리는 얼음 결
 };
 A.stamp=(x,y)=>pawStamp(x,y,'#b98075');
-A.door=(x,y)=>{sign(x,y);px(x-8,y-32,12,1,'#eee7d4');px(x+2,y-34,3,5,'#eee7d4');};
 Rg.expArt=A;
 })();

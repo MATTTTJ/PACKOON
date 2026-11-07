@@ -19,7 +19,7 @@ const Rg=defineRegion('yeongsan',{
       '그날 밤.']},
   },
   newState:()=>({
-    pickups:[[985,160],[1128,150],[1265,158],[1340,GROUND]].map(([x,y])=>({x,y,item:'magamok',got:false})).concat([{x:330,y:GROUND,item:'jip',got:false}])   // 산막 처마 밑 짚단
+    pickups:[[985,160],[1128,150],[1265,158],[1340,GROUND]].map(([x,y])=>({x,y,item:'magamok',got:false})).concat([{x:330,y:GROUND,item:'jip',got:false}])   // 움막 처마 밑 짚단
       // 결정 D-265: 옛 구성에만 소나무 밑 솔방울 둘을 더한다(확장판은 구역 선언의 것을 쓴다)
       .concat(CLASSIC?[190,742].map((x,i)=>({id:'y_cl_'+i,x,y:GROUND,item:'solbang',got:false})):[])
       // 결정 D-1186: 옛 구성에는 호숫가 마을(빈 지게 할아버지)이 없다. 넋 빠진 아빠 곁에, 아빠 손이 버릇처럼 삼아 둔
@@ -39,7 +39,7 @@ const Rg=defineRegion('yeongsan',{
   quietMapUnlock:true,
   onStart(){
     Rg.arcsEnabled();
-    diary('y_start','영산에 왔다. 눈이 허리까지 쌓였다. 산막에 불빛이 보인다.');
+    diary('y_start','영산에 왔다. 눈이 허리까지 쌓였다. 산 어귀 길손 움막에 불빛이 보인다.');
     // 결정 D-68: 첫 화면 안내는 '할 일' 한 줄만
     if(!CLASSIC&&!G.f.yOpening){G.f.yOpening=true;
       talk([['너구리','(북쪽 영산이다.\n아빠가 마지막 편지에 간다고 적은 산.)'],
@@ -66,11 +66,11 @@ if(!CLASSIC){
   const oldState=Rg.newState;
   Rg.newState=()=>{
     const s=oldState();
-    // 결정 D-1184: 산막은 보부상들이 묵어 가는 곳이라 깔고 자던 짚단이 둘 있다. 하나는 날쌘의 설피에,
+    // 결정 D-1184: 길손 움막(D-1223, 옛 산막)은 보부상들이 묵어 가는 곳이라 깔고 자던 짚단이 둘 있다. 하나는 날쌘의 설피에,
     //   하나는 호숫가 빈 지게 할아버지의 짚신에 쓴다(짚이 떨어져 빈손으로 꼬는 시늉만 하던 손, D-1167). 수달 잠수 짚단은 덤.
     s.pickups=[{id:'shelter_straw',zone:'shelter',x:SHELTER_STRAW,y:GROUND,item:'jip',got:false},
       {id:'shelter_straw_2',zone:'shelter',x:560,y:GROUND,item:'jip',got:false},
-      ...[['slope',420,GROUND],['slope',900,150],['shore',880,GROUND],['slope',1265,150],['island',2140,108]].map(([zone,x,y],i)=>
+      ...[['slope',1000,GROUND],['slope',900,150],['shore',880,GROUND],['slope',1265,150],['island',2140,108]].map(([zone,x,y],i)=>
         ({id:'slope_rowan_'+i,zone,x,y,item:'magamok',got:false}))];
     s.digs=s.digs.map((d,i)=>({...d,id:'shelter_vine_'+i,zone:'shelter',x:SHELTER_VINES[i]}));
     return s;
@@ -110,12 +110,12 @@ defineGather({
 /* 결정 D-421: 마지막 약은 아빠와 함께 엄마의 절구로 찧는다(story.js makeReturningMedicine). 가공법은 heirlooms.csv 절구 줄 */
 })();
 
-/* 영산의 함께 하는 일(곰 잠자리, 얼음 표시, 배 띄우기 등) */
+/* 영산의 함께 하는 일(아기 곰, 잣까마귀, 배 띄우기 등) */
 (()=>{
 const Rg=REGIONS.yeongsan;
 // 결정 D-88: 손일은 미니게임 없이 바로 마친다 (확정: 미니게임은 채집·전투·놀이에만, 대장 2026-10-30). 막혀 있던 판정 코드는 지웠다.
 // 다녀간 일은 G.f.yActivities에 센다(사연 조건).
-const ACTIVITIES=new Set(['lure','nutcracker','otter','farewell','namesPost','hutPrint','snowPrint','shorePrint','ice1','ice2','ice3','oar','rope','launch','sail']);   // 결정 D-1075·D-1076: 곰 굴·까마귀 대신 아기 곰·잣까마귀
+const ACTIVITIES=new Set(['lure','nutcracker','otter','farewell','namesPost','hutPrint','snowPrint','shorePrint','oar','rope','launch','sail']);   // 결정 D-1075·D-1076: 곰 굴·까마귀 대신 아기 곰·잣까마귀
 Rg.playActivity=(id,callback)=>{
   if(ACTIVITIES.has(id)){Sound.gather(true);const log=G.f.yActivities||(G.f.yActivities={});log[id]=(log[id]||0)+1;}
   callback?.();
@@ -135,30 +135,18 @@ Rg.portraits={...Rg.portraits,'호수 쪽 목소리':voicePortrait,'섬 쪽 목�
 /* 3개 관찰 지점은 본길에 놓인다. 샛길의 도장·선물과는 독립이다.
    마지막 선택을 미룬 채 봄 호수로 돌아와도 전 재료와 아빠에게 닿는다. */
 if(CLASSIC)return;
-// 결정 D-132: 바위 곁·검은 금 막대(1·2)는 둘러보기. 건너는 데는 아빠가 길을 이어 주는 선착장 앞 막대(3)만 있으면 된다.
-const ready=()=>!!G.f.yIce3;
+// 결정 D-1228 (사용자 지시 2026-11-07 4스테이지 30): 호숫가 얼음길 막대 셋(두드려 보고 가지 세우기)은 뺐다. 이 맵에 이정표가 왜 필요한지 안 읽혔다.
+//   섬으로는 아빠를 만난 뒤 아빠 발자국을 따라 걸어 건넌다(처음 건널 때 crossIce). 막대 자리는 봄의 배 손보기 자리로만 남는다.
 const boatReady=()=>!!G.f.yBoatOar&&!!G.f.yBoatRope&&!!G.f.yBoatLaunch;
-const mark=(x,y)=>{
-  R(x-2,y-27,4,27,'#8c735d');R(x-9,y-28,18,3,'#d9c18c');
-  for(let i=0;i<3;i++)R(x-15+i*13,y-1,8,2,'#bdcfd6');
-};
-const fixture=(id,name,x,talkFn)=>({id,name,x,prompt:name,talk:talkFn,draw:mark,peek:true});
-function survey(i){
-  if(i===3&&!G.f.dadDone){talk([['너구리',G.f.dadMet?'아빠한테 다시 가 보자.\n얼음길보다 아빠가 먼저야.':'호숫가 끝에 누가 앉아 있어.\n얼음길보다 저쪽이 먼저야.']]);return;}
-  if(G.f['yIce'+i]){talk([['너구리','여긴 두드려 봤어. 표시한 가지를 따라가면 돼.']]);return;}
-  // 결정 D-1022: 막대 자리 그림은 말하는 것(두드리는 가지·검은 금·아빠 발자국)을 그린다
-  const pic=Rg.pics,withPic=(l,p)=>Object.assign(l,{pic:p});
-  const lines={
-    1:[withPic(['너구리','(가늘고 긴 가지를 주웠다. 발은 마른 돌 위에 둔다.)'],pic.iceTap),['너구리','흰 얼음과 갈대 곁이 다르게 울린다. 색만 보고 밟으면 안 되겠네.']],
-    2:[withPic(['너구리','(얼음 밑의 검은 금이 호수 안쪽으로 이어진다.)'],pic.blackCrack),['너구리','금 밑으로 물이 흐른다. 저리로는 못 가.\n마른 둑 쪽으로 돌아가자.']],
-    // 결정 D-436: 넋이 빠진 아빠는 길을 일러 주지 못한다. 대신 버릇처럼 날마다 섬 기슭까지 오가며 다진 발자국이 남았다(싸우러 건너던 길)
-    3:[withPic(['너구리','(얼음 위에 발자국이 한 줄로 나 있다.\n호숫가 끝에서 섬 쪽으로 갔다가, 되돌아온 발자국.)'],pic.dadPrints),['너구리','(아빠 발자국이다. 날마다 같은 데로 다녔구나.\n…여기만 밟으면 꺼지지 않겠다.)']]
-  };
-  talk(lines[i],()=>Rg.playActivity('ice'+i,()=>{
-    G.f['yIce'+i]=true;
-    diary('y_ice_'+i,['','바위 곁에서 얼음을 두드렸다. 하얗게 보여도 갈대 곁에서는 물소리가 났다. 발 디딜 곳에 가지를 세웠다.','검은 금을 따라 흐르는 물을 봤다. 마른 둑 쪽을 택하고 돌아설 자리도 표시했다.','신목으로 이어지는 아빠 발자국을 찾았다. 날마다 섬 기슭까지 갔다가 되돌아온 자국이다. 그 자리에 가지를 세웠다. 봄엔 이 표시가 물길을 알려 주겠다.'][i]);
-    talk([['너구리',i===3?'아빠 발자국 따라 가지를 세웠어.\n여기만 밟고 가자. 아빠, 다녀올게.':'표시 하나 세웠다. 다음 돌까지는 여기서 보여.']],refreshGoal);
-  }));
+const fixture=(id,name,x,talkFn)=>({id,name,x,prompt:name,talk:talkFn,draw:()=>{},peek:true});
+/* 결정 D-1228: 처음 얼음길을 건너 섬에 닿으면, 아빠가 앉던 바위에서 섬 기슭까지 난 발자국을 따라왔다는 걸 말한다.
+   결정 D-436: 넋이 빠진 아빠는 길을 일러 주지 못한다. 대신 버릇처럼 날마다 섬 기슭까지 오가며 다진 발자국이 남았다 */
+function crossIce(){
+  const F=G.f;if(F.spring||F.yIceWalked||G.zone!=='island'||paused()||B||!G.started)return;
+  F.yIceWalked=true;
+  talk([Object.assign(['너구리','(얼음 위에 발자국 한 줄이 섬까지 나 있었다.\n아빠가 앉아 있던 바위에서 시작한 자국이다.)'],{pic:Rg.pics.dadPrints}),
+    ['너구리','(그 발자국만 골라 밟고 건넜다.\n아빠가 날마다 오간 데라 얼음이 단단했다.)']],
+    ()=>diary('y_ice_walk','아빠가 앉아 있던 바위에서 섬 기슭까지 발자국 한 줄이 나 있었다. 날마다 섬까지 갔다가 되돌아온 자국이다. 그 발자국만 밟고 얼음을 건넜다.'));
 }
 function prepareBoat(part){
   const key={oar:'yBoatOar',rope:'yBoatRope',launch:'yBoatLaunch'}[part];
@@ -169,7 +157,7 @@ function prepareBoat(part){
   // 결정 D-1022: 노·고리·배 띄우기를 그린 그림을 첫 줄에 단다
   talk([Object.assign(['낚시하는 수달',part==='oar'?'겨울엔 얼음 구멍만 봤지.\n이제 같이 호수에 나가자. 노는 여기 올려 뒀어.':part==='rope'?'물에 뜨면 이젠 이 끈이 배를 잡아 줘야지.\n나중에 풀기 쉬운 고리를 만들자.':'우린 겨울마다 배를 둑에 올려 둬. 이번엔 네가 뒤를 받쳐 줄래?'],{pic:Rg.pics[part]}),
     ['살금이','나, 나도 도울게. 물가 돌이라면 내가 잘 아니까.']],()=>Rg.playActivity(part,()=>{
-      G.f[key]=true;diary('y_boat_'+part,{oar:'둑에 올려 둔 노를 수달, 살금이와 함께 손봤다.',rope:'배 묶는 고리를 새로 맸다. 살금이가 말뚝 곁을 눌러 줬다.',launch:'수달, 살금이와 작은 배를 물에 띄웠다.'}[part]+' 겨울에 살핀 얼음길이 봄 물길로 바뀌었다.');
+      G.f[key]=true;diary('y_boat_'+part,{oar:'둑에 올려 둔 노를 수달, 살금이와 함께 손봤다.',rope:'배 묶는 고리를 새로 맸다. 살금이가 말뚝 곁을 눌러 줬다.',launch:'수달, 살금이와 작은 배를 물에 띄웠다.'}[part]+' 겨울에 걸어 건넌 얼음길이 봄 물길로 바뀌었다.');
       talk([['너구리',part==='launch'?'배가 떴다! 겨울에 못 본 호수도 보러 가자.':'됐다. 다음 자리도 같이 보자.']]);
     }));
 }
@@ -182,14 +170,14 @@ function sail(to){
   if(returning&&!G.f.yBoatReturn){
     talk([['낚시하는 수달','물이 풀리자마자 살금이랑 노를 챙겨 왔어.\n봄마다 내가 타던 배야.'],['살금이','너, 너도 타. 호숫가까지 데려다줄게.'],['낚시하는 수달','다음엔 네 손으로도 띄워 보자. 둑에 올릴 때 같이 들면 돼.']],()=>voyage(to,true));return;
   }
-  talk([['낚시하는 수달','이번엔 어느 길로 갈까?',[{t:'겨울에 표시한 길 따라 노를 젓는다',go:()=>voyage(to,false)},
+  talk([['낚시하는 수달','이번엔 어느 길로 갈까?',[{t:'겨울에 걸어 건넌 길 따라 노를 젓는다',go:()=>voyage(to,false)},
     {t:'앞서 건넌 물길로 바로 간다',go:()=>{if(G.f.yBoatSailed)changeZone(to,{x:to==='island'?200:2320});else voyage(to,false);}},
     {t:'아직 물가를 더 본다',go:null}]]]);
 }
 function voyage(to,firstReturn){
   Rg.playActivity(to==='island'?'sailOut':'sail',()=>{
     G.f.yBoatSailed=true;if(firstReturn)G.f.yBoatReturn=true;
-    diary('y_boat_sail','수달, 살금이와 노를 저었다. 겨울 얼음길에 세운 가지가 봄 호수에서도 길을 알려 줬다. 물길은 열렸고 둑에서 다시 배를 띄울 수 있다.');
+    diary('y_boat_sail','수달, 살금이와 노를 저었다. 겨울에 아빠 발자국을 따라 걸어 건넌 길을 이번엔 배로 건넜다. 물길은 열렸고 둑에서 다시 배를 띄울 수 있다.');
     changeZone(to,{x:to==='island'?200:2320});
     talk([['살금이','돌만 보던 길인데… 물 건너서 보니 다르네.'],['너구리','우리 발자국 있던 데로 배가 왔어.']]);
   });
@@ -219,19 +207,19 @@ function traceStamp(s,fresh=false){
     })},{t:'무늬는 찾았으니 나중에 볼게',go:null}
   ]]]);
 }
-/* 결정 D-1022: 짐 부리는 기둥의 이름들. 지나간 보부상들이 칼끝으로 새긴 이름 사이에 한 자리만 매끈하다(아빠 이름, 이름의 규칙 3).
+/* 결정 D-1022: 이름 새긴 기둥(결정 D-1222, 옛 '짐 부리는 기둥')의 이름들. 지나간 보부상들이 칼끝으로 새긴 이름 사이에 한 자리만 매끈하다(아빠 이름, 이름의 규칙 3).
    그 밑 짐 걸이에 엄마에게 배운 보따리 매듭이 남아 아빠가 여기 묵었다는 걸 안다. 봄엔 글씨가 돌아온다(규칙 6). */
 function namesPost(){
   const F=G.f,pic=Rg.pics,withPic=(l,p)=>Object.assign(l,{pic:p});
   if(Rg.namesBack()){talk([withPic(['너구리','(매끈하던 자리에 글씨가 돌아왔다.\n아빠 이름이다. 날쌘 아저씨 이름 바로 곁.)'],pic.namesPostBack)]);return;}
   if(F.yNamesPost){talk([withPic(['너구리','(빼곡한 이름 사이에 한 자리만 매끈하다.\n그 밑 짐 걸이엔 엄마 매듭.)'],pic.namesPost)]);return;}
-  talk([withPic(['너구리','(산막 옆 짐 부리는 기둥에 칼끝으로 새긴 이름이\n빼곡하다. 여기 묵어 간 보부상들이 남긴 거다.)'],pic.namesPost),
+  talk([withPic(['너구리','(움막 옆 기둥에 칼끝으로 새긴 이름이\n빼곡하다. 여기 묵어 간 보부상들이 남긴 거다.)'],pic.namesPost),
     ['너구리','(날쌘 아저씨 이름도 있다. 그 곁에…\n한 자리만 매끈하다.)'],
     ['너구리','(내 짐표 앞면처럼.)'],
     ['너구리','(그 밑 짐 걸이에 끈이 묶여 있다.\n두 번 감고, 한 번 당긴 매듭.)'],
     ['너구리','(엄마가 가르쳐 준 보따리 매듭이다.\n…아빠가 여기 묵었구나.)']],()=>Rg.playActivity('namesPost',()=>{
       F.yNamesPost=true;learn('y:names_post');
-      diary('y_names_post','산막 옆 짐 부리는 기둥에 지나간 보부상들이 새긴 이름이 빼곡했다. 날쌘 아저씨 이름 곁에 한 자리만 매끈했다. 내 짐표 앞면처럼. 그 밑 짐 걸이에 엄마가 가르쳐 준 매듭이 묶여 있었다. 아빠가 여기 묵었다.');
+      diary('y_names_post','길손 움막 옆 이름 새긴 기둥에 지나간 보부상들이 칼끝으로 새긴 이름이 빼곡했다. 날쌘 아저씨 이름 곁에 한 자리만 매끈했다. 내 짐표 앞면처럼. 그 밑 짐 걸이에 엄마가 가르쳐 준 매듭이 묶여 있었다. 아빠가 여기 묵었다.');
     }));
 }
 /* 결정 D-1075 (design/proposals/name-story-v2.md §5.4): 호수 쪽에서 엄마 목소리로 아기 곰을 부른다. 문간의 진짜 엄마는 꿈쩍 않는다.
@@ -338,17 +326,18 @@ function install(){
     const dad=Rg.npcs.find(n=>n.id==='dad');if(dad)dad.x=V.dad;
   }
   shore.doors=shore.doors.filter(d=>d.to!=='island');island.doors=island.doors.filter(d=>d.to!=='shore');
-  shore.npcs.push(...[1350,1900,2240].map((winterX,j)=>({...fixture('y_ice_station_'+j,'얼음길 막대 '+(j+1),winterX,()=>G.f.spring?prepareBoat(['oar','rope','launch'][j]):survey(j+1)),
-    get x(){return G.f.spring?[2180,2210,2240][j]:winterX;},
-    get prompt(){return G.f.spring?['둑에 둔 노 손보기','배 묶는 고리 손보기','작은 배 물에 띄우기'][j]:'얼음길 막대 '+(j+1)+' 살피기';}})));
+  // 결정 D-1228: 봄의 배 손보기 자리 셋 (id는 옛 저장 때문에 그대로). 겨울에는 아무것도 없다
+  shore.npcs.push(...[0,1,2].map(j=>({...fixture('y_ice_station_'+j,['둑에 둔 노 손보기','배 묶는 고리 손보기','작은 배 물에 띄우기'][j],-9999,()=>prepareBoat(['oar','rope','launch'][j])),
+    get x(){return G.f.spring?[2180,2210,2240][j]:-9999;}})));
   // 결정 D-1127 (사용자 지시 2026-11-07 4스테이지 14): 겨울엔 '호수 건너기' 단추가 섬으로 순간이동시켰다. 얼음길은 걸어서 건너면 된다.
   //   겨울에는 이 두 자리를 감추고(화면 밖), 표시한 얼음길을 따라 오른쪽 끝(섬은 왼쪽 끝)으로 걸어 나가 건넌다(exits).
   //   봄에는 얼음길이 물에 잠기니 배 띄우기 자리로 쓴다(sail → voyage).
   const winterHide=x=>()=>G?.f?.spring?x:-9999;
   shore.npcs.push({...fixture('y_lake_depart','호수 건너기',2320,()=>sail('island')),get x(){return winterHide(2320)();}});
   island.npcs.push({...fixture('y_lake_return','호숫가로 돌아가기',160,()=>sail('shore')),get x(){return winterHide(160)();}});
-  shore.exits.right.need=()=>!G.f.spring&&!!G.f.dadDone&&ready();
-  Object.defineProperty(shore.exits.right,'reason',{configurable:true,get:()=>!G.f.dadDone?'호숫가 끝에 누가 앉아 있다. 먼저 가 보자.':'선착장 앞 막대에서 얼음길을 살피자. 두드린 얼음만 밟고 건넌다.'});
+  shore.exits.right.need=()=>!G.f.spring&&!!G.f.dadDone;   // 결정 D-1228: 아빠를 만난 뒤면 건넌다
+  Object.defineProperty(shore.exits.right,'reason',{configurable:true,get:()=>'호숫가 끝에 누가 앉아 있다. 먼저 가 보자.'});
+  {const oldStep=island.step;island.step=()=>{oldStep?.();crossIce();};}
   const oldDraw=shore.drawActors;
   shore.drawActors=()=>{
     oldDraw?.();
@@ -359,14 +348,10 @@ function install(){
     const rx=2210-cam;for(let i=0;i<3;i++){R(rx-12+i*3,GROUND-9+i*2,24-i*6,1,'#d6bd88');R(rx-12+i*3,GROUND-7+i,1,4-i,'#b49a6d');}
     const bx=2240-cam;for(let i=0;i<3;i++){R(bx-20+i*8,GROUND-5-i*2,31,3,'#a18462');R(bx-21+i*8,GROUND-5-i*2,3,3,'#c7b48e');}
   };
-  const oldGoal=Rg.goal;
-  Rg.goal=()=>{
-    if(G.f.dadDone&&!G.f.sangunMet&&!ready())return Rg.iceGoal();   // 결정 D-149·D-890
-    return oldGoal();
-  };
   // 결정 D-1075·D-1074: 곰 굴의 봄 자리와 '까치에게 집으로 보낼 것 묻기'는 뺐다 (사용자 피드백 2026-11-06 영산 23·38).
-  // 결정 D-1022 (영산 18·28): 산막의 매듭 살펴보기를 날쌘(산막 문간)과 떨어진 산막 옆 짐 부리는 기둥으로 옮기고 '기둥의 이름들'로 바꿨다
-  Rg.zones.shelter.npcs.push({id:'y_names_post',name:'짐 부리는 기둥',x:620,prompt:'짐 부리는 기둥 살펴보기',talk:namesPost,draw:(x,y)=>Rg.drawNamesPost(x,y)});
+  // 결정 D-1022 (영산 18·28): 움막의 매듭 살펴보기를 날쌘(움막 문간)과 떨어진 움막 옆 기둥으로 옮기고 '기둥의 이름들'로 바꿨다
+  // 결정 D-1222 (사용자 지시 2026-11-07 4스테이지 20): '짐 부리는 기둥'은 무엇인지 안 읽혀 '이름 새긴 기둥'으로 부른다 (id 그대로)
+  Rg.zones.shelter.npcs.push({id:'y_names_post',name:'이름 새긴 기둥',x:620,prompt:'이름 새긴 기둥 살펴보기',talk:namesPost,draw:(x,y)=>Rg.drawNamesPost(x,y)});
   // 결정 D-1023: 도장을 찾는 순간 그 이야기 대화를 바로 연다(engine/field.js findStamp 의 REG.onStampFound). 찾은 도장을 다시 누르면 다시 열린다
   Rg.onStampFound=s=>{if(!['hut_post','snow_sign','shore_rock'].includes(s.id))return false;
     if(typeof thoughtT!=='undefined')thoughtT=0;traceStamp(s,true);return true;};
@@ -375,10 +360,8 @@ function install(){
   {const oldStep=shore.step;shore.step=()=>{oldStep?.();
     if(paused()||B||G.f.spring||G.f.yLureDone||!G.onGround||G.zone!=='shore')return;
     if(Math.abs(G.px-Rg.VILLAGE.cub)<TABLES.TUNING.y_lure_range)lureScene();};}
-  // 결정 D-1073: 얼어붙은 비탈은 수달도 배를 깔고 미끄러져 내려간다 (수리부엉이처럼 지름길 없이)
-  {const sl=Rg.zones.slope,lab=()=>G?.form==='otter'?'수달로 배 깔고 비탈 미끄러져 내려가기':'수리부엉이로 날개 펴고 비탈 내려가기';
-    for(const p of [sl.exits.right,...(sl.doors||[]).filter(d=>d.to==='shore')]){if(!p||typeof p!=='object')continue;
-      p.formPass=['owl','otter'];Object.defineProperty(p,'formLabel',{configurable:true,get:lab});}}
+  // 결정 D-1227 (사용자 지시 2026-11-07 4스테이지 27): 얼어붙은 비탈을 수달로 배 깔고(또 수리부엉이로) 내려가던 길은 뺐다.
+  //   호숫가 길은 살금이가 알려 준 디딤돌로만 열린다 (field.js iceReason, D-1226). 수달은 얼음 구멍 잠수로 쓴다.
   // 봄이 오면 아빠는 섬으로 건너와 두루미 곁에 선다. 이름·약·귀향 장면이 모두 섬에서 열리기 때문이다.
   {
     const isl=Rg.zones.island,sh=Rg.zones.shore;

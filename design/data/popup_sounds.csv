@@ -50,14 +50,6 @@ j_warehouse_fire,jangteo,짐꾼 화톳불 자리,fire_crackle,,제안
 j_warehouse_scratches,jangteo,창고 문 앞 큰 발자국,leaf_rustle,,제안
 pic_kite,jangteo,처마에 걸린 연 (연 꼬리 풀기 그림),cloth_flutter,1600,제안
 pic_siru_steam,jangteo,김이 오르며 깨어나는 시루 (모락과 김 올리기 그림),steamer,1800,제안
-y_hut_bindings,yeongsan,산막의 매듭 살펴보기,cloth_flutter,,제안
-y_hut_post,yeongsan,닳은 문설주 살펴보기,wood_tap,,제안
-y_hut_smoke,yeongsan,낮게 흐르는 연기 살펴보기,fire_crackle,1500,제안
-y_snow_tunnel,yeongsan,눈 터널 안 들여다보기,wind_gust,,제안
-y_snow_map,yeongsan,눈 위의 선 살펴보기,footstep_snow,,제안
-y_snow_sign,yeongsan,낡은 이정표 살펴보기,wood_tap,,제안
-y_slope_rowan,yeongsan,마가목 밑 살펴보기,leaf_rustle,,제안
-y_slope_hole,yeongsan,얼음 구멍 가장자리 살펴보기,ice_tinkle,,제안
 y_slope_hoof,yeongsan,가느다란 발 디딤 살펴보기,footstep_snow,,제안
 y_shore_boat,yeongsan,호숫가 작은 배 살펴보기,water_trickle,,제안
 y_shore_bowl,yeongsan,열매 놓였던 돌 살펴보기,stone_knock,,제안

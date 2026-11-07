@@ -275,15 +275,42 @@ $('btnNext').onclick=()=>{if(!REGIONS[REG.next])return;enterRegion(G,REGIONS[REG
 $('btnBookEnd').onclick=()=>{Sound.panel(true);noteTab='animal';renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;$('endScreen').hidden=true;
   $('noteClose').addEventListener('click',()=>{if(G.ended)$('endScreen').hidden=false;},{once:true});};
 
+/* 결정 D-1242 (사용자 지시 2026-11-07 4스테이지 19: 움직일 때 배경, 특히 집이 떨린다):
+   게임은 1초에 60번 움직이고(step) 화면은 모니터 주기마다 그린다. 같은 장면을 프레임마다 잘라 비교하면 집은 한 칸도 어긋나지 않았다.
+   떨림은 그리는 때와 움직이는 때가 어긋나서 생긴다.
+   - 60Hz 모니터: 프레임 사이 시간이 16.66~16.68ms로 조금씩 흔들려, 어떤 프레임은 한 번도 안 움직이고 다음 프레임에 두 번 움직였다(멈칫·껑충).
+     60Hz·120Hz 근처의 프레임 시간은 정확한 값으로 맞춰 프레임마다 같은 횟수만 움직이게 한다.
+   - 그 밖의 주기(144Hz 등)나 120Hz: 마지막 두 움직임 사이를 그 프레임 시각만큼 이어서(보간) 화면·주인공을 그린다. 한 프레임 안의 값만 바꿨다 되돌린다. */
+const STEP_MS=1000/60;
 let last=0,acc=0;
+const renderPrev={cam:0,px:0,py:0,zone:null,region:null};
 function loop(t){
-  if(!last)last=t;acc+=Math.min(100,t-last);last=t;
-  while(acc>=1000/60){step();bStep();acc-=1000/60;}
+  if(!last)last=t;let dt=Math.min(100,t-last);last=t;
+  let snapped60=false;
+  if(Math.abs(dt-STEP_MS)<1){dt=STEP_MS;snapped60=true;}else if(Math.abs(dt-STEP_MS/2)<.5)dt=STEP_MS/2;
+  acc+=dt;
+  while(acc>=STEP_MS){
+    if(G){renderPrev.cam=G.cam;renderPrev.px=G.px;renderPrev.py=G.py;renderPrev.zone=G.zone;renderPrev.region=G.region;}
+    step();bStep();acc-=STEP_MS;
+  }
   // 대화·선택지·전투·손일의 콜백이 바꾼 진행을 다음 화면에 함께 반영한다.
   // 전투 중에는 모바일 목표 칸의 전투 안내를 유지한다.
   if(!B&&!inkOn)refreshGoal();
   GameMusic.update();GameMusic.adapt();
-  if(B&&!$('battle').hidden)bDraw();else draw();requestAnimationFrame(loop);
+  if(B&&!$('battle').hidden)bDraw();
+  else{
+    const a=acc/STEP_MS,P=renderPrev;
+    // a=0(막 움직인 프레임)이면 바로 앞 상태를 그린다. 보간하는 동안은 늘 한 걸음 뒤를 그려야 앞뒤로 튀지 않는다.
+    const lerp=!snapped60&&G&&G.started&&a<1&&P.zone===G.zone&&P.region===G.region&&
+      Math.abs(G.cam-P.cam)<12&&Math.abs(G.px-P.px)<12&&Math.abs(G.py-P.py)<20;
+    if(!lerp)draw();
+    else{
+      const cam0=G.cam,px0=G.px,py0=G.py;
+      G.cam=P.cam+(cam0-P.cam)*a;G.px=P.px+(px0-P.px)*a;G.py=P.py+(py0-P.py)*a;
+      try{draw();}finally{G.cam=cam0;G.px=px0;G.py=py0;}
+    }
+  }
+  requestAnimationFrame(loop);
 }
 /* 주소 뒤 ?region=<id> 로 그 지역부터 시작할 수 있다 (앞 지역은 마친 것으로 친다). 없으면 첫 지역 */
 function boot(data){
