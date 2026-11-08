@@ -147,7 +147,7 @@ const TABLES={
    "r": 3,
    "kind": "귀한 것",
    "region": "dolneomeo",
-   "d": "첫서리 밤에 성황당 돌무더기가 가슴의 핵 안에 품어 맺은 다래. 엄마의 병을 늦추는 약 재료."
+   "d": "첫서리 밤에 성황당 돌무더기가 가슴의 핵 안에 품어 맺은 다래. 엄마 기운을 붙드는 약 재료."
   },
   "darae_yak": {
    "n": "서리다래 약즙",
@@ -1922,7 +1922,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "엄마의 병을 고치지는 못해도 늦출 수는 있다고 했다. 무언가 알면서 말을 아낀다.",
+     "text": "엄마를 낫게 하지는 못해도 기운은 붙들 수 있다고 했다. 아빠가 작년 가을 찾아왔다는데 무슨 얘기를 했는지는 아빠한테 들으란다.",
      "section": "관찰",
      "when": "met:toad"
     },
@@ -1934,7 +1934,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "내가 아기였던 겨울에 엄마가 두고 간 포대기 끈을 받았다. 할멈이 내내 간직하고 있었다.",
+     "text": "작년 여름 앓는 나를 업고 할멈 약방에 맡기고 혼자 북쪽 길로 갔던 엄마가 돌아와 나를 데려가며 잊고 간 포대기 끈을 받았다.",
      "section": "관찰",
      "when": "galchamgol:arc-toad-wrap"
     }
@@ -2730,24 +2730,6 @@ const TABLES={
    "region": "yeongsan",
    "kind": "item",
    "lines": []
-  },
-  {
-   "id": "legend_fruit",
-   "region": "yeongsan",
-   "kind": "item",
-   "lines": [
-    {
-     "who": "dad",
-     "text": "영산 신목의 열매. 봄에만 열린다.",
-     "section": "아빠 수첩"
-    },
-    {
-     "who": "dad",
-     "text": "(나중에 덧쓴 글씨) 여기다.",
-     "section": "아빠 수첩",
-     "when": "got:legend_fruit"
-    }
-   ]
   },
   {
    "id": "gal_stamp_anvil",
