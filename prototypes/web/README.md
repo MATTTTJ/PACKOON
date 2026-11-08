@@ -4,7 +4,7 @@
 
 - 플레이: https://mattttj.github.io/PACKOON/ (이 폴더로 넘어온다)
 - 내 컴퓨터에서: `index.html`을 더블클릭해 브라우저로 연다. 빌드나 서버가 필요 없다.
-- 저장: 화면 위 "저장" 버튼이나 아빠의 수첩 아래 "저장하기". 플레이 중 30초마다, 다음 지역으로 넘어갈 때도 저절로 저장된다 (대화·전투·미니게임 중에는 저장하지 않음). 저장은 그 기기의 브라우저에만 남는다. 시작 화면의 "이어서 하기"로 다시 시작하고, 수첩 아래 "처음부터 하기"는 한 번 더 눌러야 저장을 지운다 (`js/engine/save.js`).
+- 저장: 화면 위 "저장" 버튼이나 아빠의 수첩 아래 "저장하기". 플레이 중 30초마다, 다음 지역으로 넘어갈 때도 저절로 저장된다 (대화·전투·미니게임 중에는 저장하지 않음). 저장은 그 기기의 브라우저에만 남는다. 보스 바로 앞의 쉼터(화톳불)에 닿으면 그 자리를 따로 저장하고, 보스에게 지면 쉼터 불 앞에서 그때 상태로 다시 시작한다 (`js/engine/rest.js`, 결정 D-1301). 시작 화면의 "이어서 하기"로 다시 시작하고, 수첩 아래 "처음부터 하기"는 한 번 더 눌러야 저장을 지운다 (`js/engine/save.js`).
 - 지역 고르기: 시작 화면 아래 **개발용 · 이 지역부터 시작** 버튼을 누른다. 또는 주소 뒤에 `?region=<지역 id>`를 붙이면 그 지역부터 시작한다 (예: `index.html?region=dolneomeo`). 앞 지역은 그 지역의 `finish`대로 마친 것으로 친다. 확인용 바로가기라서 앞 지역의 단서 내용은 비어 있다.
 - 개발자 모드: 주소 뒤에 `?dev=1`을 붙이거나 게임 중 ` (백틱) 키. 왼쪽 위에 **개발** 표시가 뜨고, ` 키나 그 표시로 패널을 연다. 바로 가기(지역·구역·x, 인물 앞), 연습 전투(이겼던 보스도 다시. 결과 창을 닫으면 시작 직전 상태로 돌아옴), 장면 되감기(켠 뒤 연 대화·전투의 직전으로), 지나간 사연 다시 보기(그 장면과 뒤 장면의 진행값을 지우고 상대 앞으로), 아이템·변신 잎·연장·밤·체력, 진행값 보기·고치기. 켜 있는 동안 저장은 개발용 칸에만 하고, **끄기**를 누르면 원래 저장으로 돌아간다 (`js/engine/dev.js`, 결정 D-220~223).
 
@@ -28,7 +28,7 @@ node prototypes/web/tools/qa/run.js --only play-expanded
 node prototypes/web/tools/qa/run.js --only save,mobile
 ```
 
-`--quick`은 브라우저를 열지 않는다. `--only` 이름은 `syntax`, `data`, `versions`, `csv`, `dialogue`, `play-expanded`, `play-classic`, `speakers`, `edges`, `save`, `mobile`, `talk-esc`, `quest-order`, `map`, `trade`, `drops-floor`, `drops-persistence`, `drops-departure`, `drops-full`이다. `static`과 `runtime`은 각각의 묶음이며 쉼표로 여러 검사를 고를 수 있다. `speakers`는 두 모드를, `edges`는 확장판 연속 플레이를 먼저 실행한다.
+`--quick`은 브라우저를 열지 않는다. `--only` 이름은 `syntax`, `data`, `versions`, `csv`, `dialogue`, `play-expanded`, `play-classic`, `speakers`, `edges`, `save`, `mobile`, `talk-esc`, `quest-order`, `map`, `trade`, `drops-floor`, `drops-persistence`, `drops-departure`, `drops-full`, `rest`(보스 앞 쉼터, D-1301)이다. `static`과 `runtime`은 각각의 묶음이며 쉼표로 여러 검사를 고를 수 있다. `speakers`는 두 모드를, `edges`는 확장판 연속 플레이를 먼저 실행한다.
 
 | 검사 | 확인하는 것 |
 |---|---|
@@ -156,6 +156,7 @@ js/engine/              모든 지역이 같이 쓰는 것
   battle-ink.js         수묵 붓 도구
   battle.js             부위 공략 전투
   battle-attacks.js     부위 공격 목록 (sweep, spike, seed, slam, ember, shout)
+  rest.js               보스 앞 쉼터(화톳불): 다가가면 켜져 따로 저장하고, 보스에게 지면 그때로 돌아온다 (D-1301. 지역은 Rg.rest 로 자리를 알린다)
   game.js               시작·끝 화면, 게임 루프, 부팅 (맨 마지막에 읽는다)
 js/data/common.js       지역과 상관없는 것: 주먹밥, 연장, 가보 셋(결정 D-421), 아빠의 짐표 그림
 js/regions/<지역 id>/   지역 하나의 데이터와 전용 코드

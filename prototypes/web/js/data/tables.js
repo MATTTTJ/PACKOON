@@ -4072,7 +4072,10 @@ const TABLES={
   "chasa_robe_inside_dark": 0.97,
   "chasa_crow_bulge": 0.24,
   "chasa_crow_thick_min": 0.8,
-  "chasa_crow_thick_max": 1.2
+  "chasa_crow_thick_max": 1.2,
+  "rest_range": 22,
+  "rest_toast_gap_ms": 20000,
+  "rest_return_back": 16
  },
  "PROGRESS": [
   {

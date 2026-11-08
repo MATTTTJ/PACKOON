@@ -226,7 +226,7 @@ if(!CLASSIC){
   // 결정 D-1250: 막힘 말은 비탈 끝 낭떠러지 앞에서 한다. 디딤돌 문이 열린 뒤에는 그 문으로 이끈다
   const cliffBefore='얼음 낭떠러지다. 호숫가로 내려갈 길을 못 찾겠다.\n이 산 짐승들은 어디로 다닐까?';
   const cliffAfter='낭떠러지다. 살금이가 눈을 털어 둔 디딤돌로 내려가자.';
-  // 결정 D-1225 (사용자 지시 2026-11-07 4스테이지 21): 문·경치 자리에 꽂던 팻말(뜻 없는 표지판)은 뺐다. 눈 굴·돌턱·밧줄 같은 자리 그림이 길을 보인다
+  // 결정 D-1225 (사용자 지시 2026-11-07 4스테이지 21): 문·경치 자리에 꽂던 팻말(뜻 없는 표지판)은 뺐다. 돌턱·밧줄 같은 자리 그림이 길을 보인다
   // 결정 D-1125: 호숫가에서 비탈로 오르는 바위턱 오솔길. 디딤돌 셋과 위 바위에 매어 늘어뜨린 밧줄
   const climbRope=(x,y)=>{
     x=Math.round(x);
@@ -328,9 +328,8 @@ if(!CLASSIC){
   // 호숫가는 산막 → 눈길 → 비탈 → 호숫가로 걸어서 닿고, 같은 길로 돌아 나온다. 길 막힘 순서(설피·지름길·강철이)는 그대로다.
   Rg.zones={
     // 깊은 눈길은 몸의 문제라 산양이 지난다 (PA-47). 얼어붙은 비탈은 길을 아는 살금이만 열어 준다 (D-1226).
-    shelter:zone('shelter',['nal'],{right:{to:'snow',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'}},[
-      {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'},
-    ]),
+    // 결정 D-1300 (사용자 지시 2026-11-08 39): 영산 어귀 가운데(1500)의 '눈 굴 입구' 문과 굴 그림은 뺐다. 깊은 눈길로는 오른쪽 끝 길 하나로만 간다
+    shelter:zone('shelter',['nal'],{right:{to:'snow',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'}}),
     snow:zone('snow',['ongdal'],{left:'shelter',right:'slope'}),
     // 결정 D-1250 (사용자 지시 2026-11-08 32: 살금이 일 전에는 다음 맵으로 가는 길이 없다. 지름길이 열린 뒤에도 지름길로만 간다):
     //   비탈 오른쪽 끝은 얼음 낭떠러지라 걸어서는 끝내 못 나간다(가장자리 출구는 늘 닫힘. 지도 줄기를 잇는 자리로만 남긴다).
@@ -353,7 +352,7 @@ if(!CLASSIC){
   {const list=Rg.zones.slope.doors;Object.defineProperty(Rg.zones.slope,'doors',{configurable:true,enumerable:true,get(){return ledgeOpen()?list:[];}});}   // 결정 D-1250
   /* 결정 D-1062 (사용자 피드백 2026-11-06 27: 더 험한 지형): 빈 눈밭에 바람이 쌓은 눈 둔덕(엔진 비탈 D-845)을 둔다.
      좌표는 길을 줄인 뒤의 자리이고, 인물·물건·문·살펴보기가 없는 구간에만 둔다. 기울기는 미끄러지는 비탈(field_slope_slip_grade)보다 완만하다.
-     산막: 눈 굴 어귀 뒤 높은 능선 밑. 눈길: 옹달 할미 샘과 대추나무 사이(능선 발판 밑). */
+     산막: 어귀 가운데 높은 능선 밑. 눈길: 옹달 할미 샘과 대추나무 사이(능선 발판 밑). */
   const mound=pts=>pts.slice(1).map((p,i)=>({x1:pts[i][0],y1:pts[i][1],x2:p[0],y2:p[1]}));
   Rg.zones.shelter.slopes=mound([[1600,GROUND],[1650,180],[1710,176],[1760,182],[1810,GROUND]]);
   Rg.zones.snow.slopes=mound([[1110,GROUND],[1170,178],[1230,172],[1300,180],[1370,168],[1450,GROUND]]);

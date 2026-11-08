@@ -404,8 +404,8 @@ A.scenery=zone=>{
   for(let wx=140;wx<2600;wx+=230){
     const x=wx+Math.round(hash(wx)*34)-17-cam,size=.8+hash(wx+7)*.5,shape=Math.floor(hash(wx+11)*5);if(x<-110||x>W+110)continue;
     if(zone==='shelter'){
-      // 결정 D-1063: 산막 둘레와 눈 굴 어귀는 비워 두고, 솔과 모난 바위만 둔다(마가목과 장작더미를 번갈아 늘어놓던 것은 뺐다)
-      if(Math.abs(wx-260)<120||Math.abs(wx-tx(1500))<80)continue;
+      // 결정 D-1063: 산막 둘레는 비워 두고, 솔과 모난 바위만 둔다(마가목과 장작더미를 번갈아 늘어놓던 것은 뺐다). 결정 D-1300: 눈 굴 어귀는 뺐다
+      if(Math.abs(wx-260)<120)continue;
       if(!rocky(wx,24))pine(x,sy(wx),size,winter,shape);if(wx%460<230&&!rocky(wx+46))rock(x+46,sy(wx+46),30+shape*4,14+shape*3);
     }else if(zone==='snow'){
       if(!rocky(wx,24))pine(x,sy(wx),size,winter,shape);
@@ -425,13 +425,6 @@ A.scenery=zone=>{
     // 높은 대피소 별채는 오래된 문설주만 남았다. 도장을 찾는 위치와 맞춘다.
     const post=tx(1040)-cam;px(post-19,108-38,5,38,'#7b6a59');px(post+15,108-38,5,38,'#7b6a59');
     px(post-23,108-42,47,5,'#d9e4eb');px(post-18,108-35,4,11,'#b7a68f');
-    // 결정 D-1063: 눈 굴 어귀. 눈 언덕에 뚫린 어두운 굴 입구다(문 자리). 무엇인지 모를 네모 헛간과 연기 나는 돌무지는 뺐다
-    const cx=tx(1500)-cam;
-    if(cx>-60&&cx<W+60){
-      for(let i=-36;i<36;i+=2){const h=Math.round(34*Math.pow(Math.cos(i/36*Math.PI/2),.8));px(cx+i,GROUND-h,2,h,i>8?'#a7b5c3':'#c3cfda');px(cx+i,GROUND-h,2,1,'#e8eef3');}
-      for(let i=-10;i<10;i+=2){const h=Math.round(18*Math.sqrt(1-Math.pow(i/10,2)));px(cx+i+4,GROUND-h,2,h,'#10151c');}
-      px(cx-4,GROUND-3,16,3,'#2a3646');
-    }
   }
   if(zone==='snow'){
     // 결정 D-1063: 눈 터널·눈 위의 선(까마귀가 그린 골짜기)·붉은 천 장대는 뺐다 (사용자 피드백 2026-11-06 25·28)
