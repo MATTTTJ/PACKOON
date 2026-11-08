@@ -227,6 +227,7 @@ function renderBHud(){
 function bLiving(){return B.parts.filter(p=>!p.broken);}
 /* 핵심 부위는 다른 부위를 하나도 못 꺾었을 때 가려져 있다. 상대에 coreNeeds:'<부위 id>' 가 있으면 그 부위를 꺾어야 드러난다 */
 function coreHidden(){const c=B.parts.find(p=>p.core);if(!c||c.broken)return false;
+  if(B.E.coreRevealed)return !B.E.coreRevealed();   // 결정 D-1273: 상대가 핵심이 드러나는 때를 직접 정한다 (어둑차사: 깎은 몫)
   if(B.E.coreNeeds)return !B.parts.find(p=>p.id===B.E.coreNeeds).broken;
   return B.parts.filter(p=>!p.core).every(p=>!p.broken);}
 /* 상자 비율 좌표({u,v})를 화면 좌표로. 비율이라 화면 회전에도 자리를 유지한다.
@@ -350,7 +351,7 @@ function breakPart(p){
   B.msg=B.E.npc?jo(p.name,'의','의')+' 기세를 꺾었다!':jo(p.name,'이','가')+' 부러졌다! '+(p.mat?ITEMS[p.mat].n+' 획득.':'');
   // 결정 D-370: 부서진 부위는 그 공격을 더 못 한다(공격은 남은 부위에서만 고른다). 약해진 모습을 한 줄로 알리고, 그림도 부서진 모습으로 바뀐다
   if(p.weak)bLater(p.weak,T_LATER);
-  if(B.E.coreNeeds?p.id===B.E.coreNeeds:B.parts.filter(q=>!q.core).filter(q=>q.broken).length===1){learn('core:'+B.kind);bLater(B.E.coreShown,p.weak?T_LATER*2:T_LATER);}
+  if(!B.E.coreRevealed&&(B.E.coreNeeds?p.id===B.E.coreNeeds:B.parts.filter(q=>!q.core).filter(q=>q.broken).length===1)){learn('core:'+B.kind);bLater(B.E.coreShown,p.weak?T_LATER*2:T_LATER);}
 }
 /* 결정 D-370: 부서진 뒤의 글은 차례로 보인다. 남은 글이 있는 동안은 다음 공격을 시작하지 않는다(예고 글을 덮지 않게) */
 const T_LATER=72;
@@ -718,7 +719,7 @@ function bDraw(){
   c.restore();
   if(B.E.possession)drawPossession(c);
   // 글귀
-  c.fillStyle=INK;c.textAlign='center';c.textBaseline='alphabetic';c.font='17px "Gowun Batang", "Batang", serif';
+  c.fillStyle=(B.E.msgColor&&B.E.msgColor())||INK;c.textAlign='center';c.textBaseline='alphabetic';c.font='17px "Gowun Batang", "Batang", serif';   // 결정 D-1274: 배경이 어두워지면 글귀를 밝게
   const msg=B.msg||'';const maxW=LW-60;
   let msgW=c.measureText(msg).width,msgY=BOX.y-14;
   if(msgW>maxW){const mid=Math.floor(msg.length/2);let cut=msg.lastIndexOf(' ',mid);if(cut<6)cut=msg.indexOf(' ',mid);if(cut<0)cut=mid;
@@ -735,7 +736,7 @@ function bDraw(){
   // 결정 D-228: 칠 수 있는 곳은 금빛으로만 강조한다(빨강·먹은 피할 것). 도구 날(bAim)이 닿으면 더 밝게 빛난다.
   //   작은 도구 그림은 그 부위에 잘 먹는 도구다.
   if(B.mark){const m=B.mark;
-    drawStrikeSpot(c,m.x,m.y,battleMarkRadius(),m.t/m.max,bAimOn(m),m.part.tool);}   // 결정 D-501: 칠 자리는 battle_mark_radius 크기
+    if(!(B.E.drawMark&&B.E.drawMark(c,m)))drawStrikeSpot(c,m.x,m.y,battleMarkRadius(),m.t/m.max,bAimOn(m),m.part.tool);}   // 결정 D-1271: 상대가 칠 자리를 직접 그릴 수 있다 (어둑차사의 바닥 이름)   // 결정 D-501: 칠 자리는 battle_mark_radius 크기
   drawImpact(c);
   if(B.handShow>0)drawOpenHands(c);
   else if(B.st!=='giftPlace'){drawPaw(c,B.px,B.py);drawNameFade(c);drawAim(c);drawToolSwap(c);}

@@ -388,6 +388,10 @@ async function battleLoop(io,gifts,{sway=false,dodge=false}={}) {
       if(out){await release();throw new Error(`칠 자리가 판 안쪽 영역 밖에 떴다: ${out.kind} ${out.part} (판 안 ${out.x},${out.y})`);}
       // 결정 D-1185: 어둑차사의 세 번째 부름(삼혼 부르기) 동안은 손을 떼고 멈춘다. 플레이어가 배우는 그대로다(두루미 사건)
       if(await read("!!(B&&B.st==='ncall'&&B.names&&B.names.call&&B.names.call.k>=3)")){await release();await wait(40);continue;}
+      // 결정 D-1272: 붉은 오랏줄에 묶이면 손 곁 칠 곳으로 도구 날을 옮겨 빠르게 쳐서 끊는다(묶인 손은 조금만 움직인다)
+      const bind=await read("B&&B.ch&&B.ch.bind?{dx:B.ch.bind.sx-bAim().x,dy:B.ch.bind.sy-bAim().y}:null");
+      if(bind){const near=(d,lo,hi)=>d<-3?lo:d>3?hi:null;await hold([near(bind.dx,'ArrowLeft','ArrowRight'),near(bind.dy,'ArrowUp','ArrowDown')]);
+        await key('j');await wait(60);continue;}
       if(await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)')){
         if(dodge)await hold(await read(DODGE_KEYS));
         else if(sway){
