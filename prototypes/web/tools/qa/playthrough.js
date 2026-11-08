@@ -359,7 +359,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
    dodge: 기다리는 동안 칸 안의 공격 예고를 읽고 피한다. 예전에는 선물을 기다리는 내내 손을 세워 두어 엉킨 칡의 채찍·뿌리·꽃가루를
      다 맞고 가끔 졌다(자동 검사 연속 플레이가 칡에게 지던 문제). 띠 공격(ox·dx·L)은 띠 밖 옆쪽으로, 자리 공격(x·y)은 그 자리에서 멀어진다. */
 const DODGE_KEYS=`(()=>{if(!B)return [null,null];const h={x:B.px,y:B.py},half=0.21*BOX.h+12,R=44;let vx=0,vy=0,n=0;
-  for(const b of B.bullets){if(b.dead)continue;
+  for(const b of B.bullets){if(b.dead||b.k==='chasaSeam')continue;   // 도포 솔기는 피할 것이 아니라 칠 곳이다
     if(b.ox!=null&&b.dx!=null&&b.L!=null){if(b.t>(b.delay||0)+60)continue;
       const rx=h.x-b.ox,ry=h.y-b.oy,s=rx*b.dx+ry*b.dy,d=-rx*b.dy+ry*b.dx;
       if(s>-half&&s<b.L+half&&Math.abs(d)<half){const sg=d>=0?1:-1,w=1+(half-Math.abs(d))/half;vx+=-b.dy*sg*w;vy+=b.dx*sg*w;n++;}}
@@ -392,6 +392,10 @@ async function battleLoop(io,gifts,{sway=false,dodge=false}={}) {
       const bind=await read("B&&B.ch&&B.ch.bind?{dx:B.ch.bind.sx-bAim().x,dy:B.ch.bind.sy-bAim().y}:null");
       if(bind){const near=(d,lo,hi)=>d<-3?lo:d>3?hi:null;await hold([near(bind.dx,'ArrowLeft','ArrowRight'),near(bind.dy,'ArrowUp','ArrowDown')]);
         await key('j');await wait(60);continue;}
+      // 결정 D-1323: 도포 속에 갇혀 솔기에 빛이 갈라지면 그 칠 곳으로 도구 날을 옮겨 쳐서 찢고 나온다
+      const seam=await read("(()=>{const s=B&&B.bullets.find(q=>q.k==='chasaSeam'&&q.ph==='lit'&&q.lit>0.6);return s?{dx:s.x-bAim().x,dy:s.y-bAim().y}:null;})()");
+      if(seam){const near=(d,lo,hi)=>d<-3?lo:d>3?hi:null;await hold([near(seam.dx,'ArrowLeft','ArrowRight'),near(seam.dy,'ArrowUp','ArrowDown')]);
+        if(Math.hypot(seam.dx,seam.dy)<8)await key('j');await wait(40);continue;}
       if(await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)')){
         if(dodge)await hold(await read(DODGE_KEYS));
         else if(sway){

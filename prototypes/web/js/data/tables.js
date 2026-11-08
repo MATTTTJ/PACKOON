@@ -4060,7 +4060,19 @@ const TABLES={
   "name_echo_step": 4,
   "name_echo_ring_gap": 9,
   "name_echo_in": 5,
-  "name_echo_fade": 95
+  "name_echo_fade": 95,
+  "name_hollow_speed": 0.1,
+  "name_hollow_grip": 0.06,
+  "name_hollow_twist": 0.75,
+  "name_hollow_near": 26,
+  "chasa_robe_wrap_frames": 40,
+  "chasa_robe_tear_hits": 2,
+  "chasa_robe_tear_frames": 210,
+  "chasa_robe_squeeze_frames": 50,
+  "chasa_robe_inside_dark": 0.93,
+  "chasa_crow_bulge": 0.24,
+  "chasa_crow_thick_min": 0.8,
+  "chasa_crow_thick_max": 1.2
  },
  "PROGRESS": [
   {

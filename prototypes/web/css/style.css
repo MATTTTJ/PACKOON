@@ -562,6 +562,7 @@ body.in-battle .pad-top .chipbtn{display:none}
 /* 결정 D-423: 이름 장. 맨 위 엄마가 지어 준 이름, 먹힌 이름은 흐리게 */
 .entry.me.own-name{border-left-color:#b07d26}
 .entry.me.lost{opacity:.42}
+.entry.me.lost .ink-smear{display:block;width:7em;height:1.05em;margin-top:2px;border-radius:50%;background:radial-gradient(ellipse at 45% 55%,rgba(70,56,42,.32),rgba(70,56,42,.12) 55%,transparent 72%)}   /* 결정 D-1320: 지워진 이름 자리의 먹 번짐 */
 
 /* 마지막 지역 끝 화면: 엄마가 지어 준 새 이름 */
 .newname{display:flex;flex-direction:column;gap:6px;margin-top:4px}

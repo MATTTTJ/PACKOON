@@ -20,6 +20,12 @@
    결정 D-1275: 부름마다 나레이션과 메아리(nameEchoes). 온 방향에서 이름이 빠르게 떴다가 천천히 사라진다.
    결정 D-1142 (§3.4-5 명부 펼치기): 마지막 부름(아빠 목소리, 본이름)은 발악 끝에 한 번 온다. 이름은 화면에 내지 않는다(빈칸).
      몸에 붙지 않은 이름이라 먹히지 않지만, 셋째 부름에 돌아보면 얼어붙어 크게 다친다. 참으면 적패지 끝의 낙관이 드러나 빈틈이 길게 열린다.
+   결정 D-1320 (사용자 지시 2026-11-08 42): 이름 빼앗기가 이 전투의 중심이다. 전투 동안 판 왼쪽에 수첩 '이름' 장을 펼쳐 둔다(drawNameBook).
+     이름을 빼앗기면 그 줄의 먹 글씨가 한 자씩 떨어져 적패지로 날아가고 줄은 빈 종이가 된다. 되찾으면 글씨가 날아와 다시 적힌다.
+     예전의 부위 줄 아래 이름패 줄(HTML)과 손에서 입으로 날던 이름패(N.fly)는 이 수첩으로 바꿨다.
+   결정 D-1321: 가진 이름을 하나도 안 남기고 다 빼앗기면 '텅 빈 손'이다(nameHollow, 처음부터 이름이 없던 아이는 아니다).
+     손 빠르기가 name_hollow_speed(1/10)로 떨어지고, 입력이 늦게 먹으며(name_hollow_grip) 방향이 천천히 비틀린다(name_hollow_twist).
+     키보드와 터치 끌기 둘 다 같다. 손 둘레에 먹 그늘이 진다. 하나라도 되찾으면 바로 풀린다(바닥 이름은 손 곁에 뜬다, 영산 enemies.js).
    결정 D-1074 (v2 §6.3): 까치 어르신의 깃이 있으면 전투마다 한 번, 셋째 부름에 돌아본 순간 "아가!" 소리가 겹쳐 그 이름을 지킨다. */
 // 결정 D-1073: 넷째 변신 수달의 전투 손 설명 (battle.js 표에 더한다. 고라니 줄은 쓰이지 않는다)
 if(typeof BATTLE_FORM_TRAITS!=='undefined'){BATTLE_FORM_TRAITS.otter='빠름 · 미끄러움';BATTLE_FORM_HINTS.otter='수달 · 미끄러지듯 빠르게 움직이고, 좁게 닿는다';}
@@ -47,12 +53,27 @@ function nameBattleStart(){
   if(!B||!B.E.names)return;
   const swallowed=(G.f.gangcheolSwallowed||[]).filter(id=>(G.nicknames||[]).some(n=>n.id===id&&n.lost));
   B.names={eaten:swallowed,pinned:[],used:[],lock:0,jerk:null,fly:null,echo:null,boost:false,queued:false,call:null,kept:[],finalDone:false,featherUsed:false,bigOpen:false,
-    flash:false,firstEat:false,retry:!!G.f.gangcheolRetry&&swallowed.length>0,spit:null,fade:0,wantFinal:false,echoes:[]};
+    flash:false,firstEat:false,retry:!!G.f.gangcheolRetry&&swallowed.length>0,spit:null,fade:0,wantFinal:false,echoes:[],
+    ink:[],hollow:false,hv:null,drag:null};   // 결정 D-1320: ink 는 수첩 글씨가 떨어져 나가거나(out) 날아와 적히는(in) 움직임
 }
 /* 지금 잃은 이름 수. 앞 전투에서 먹히고 아직 못 되찾은 것도 센다 */
 function namesLostNow(){return (G.nicknames||[]).filter(n=>n.lost).length;}
 function namePowerMul(){if(!nameBattleOn())return 1;const t=nameTune();return Math.max(t.name_power_min,1-t.name_power_loss*namesLostNow());}
-function nameSpeedMul(){if(!nameBattleOn())return 1;const t=nameTune();return Math.max(t.name_speed_min,1-t.name_speed_loss*namesLostNow());}
+/* 결정 D-1321: 텅 빈 손. 가진 이름이 있었는데 하나도 안 남았다 */
+function nameHollow(){return nameBattleOn()&&(G.nicknames||[]).length>0&&!namesHeld().length;}
+// 텅 빈 손이면 이름당 감소(D-433) 대신 name_hollow_speed 하나만 쓴다 (겹쳐 곱하지 않는다)
+function nameSpeedMul(){if(!nameBattleOn())return 1;const t=nameTune();if(nameHollow())return t.name_hollow_speed;return Math.max(t.name_speed_min,1-t.name_speed_loss*namesLostNow());}
+/* 결정 D-1321: 텅 빈 손의 조종. ix·iy 는 이번 프레임에 들어온 이동(키 × 빠르기 + 터치 끌기).
+   바로 옮기지 않고 손의 흐름(hv)에 name_hollow_grip 만큼만 섞는다(늦게 먹고 미끄러진다). 방향은 천천히 비틀린다 */
+function nameHollowMove(ix,iy){
+  const t=nameTune(),N=B.names,th=t.name_hollow_twist*(Math.sin(B.time*0.031)*0.65+Math.sin(B.time*0.057+1.3)*0.35);
+  const c=Math.cos(th),s=Math.sin(th),rx=ix*c-iy*s,ry=ix*s+iy*c,k=t.name_hollow_grip;
+  N.hv=N.hv||{x:0,y:0};N.hv.x=N.hv.x*(1-k)+rx*k;N.hv.y=N.hv.y*(1-k)+ry*k;
+  B.px=clamp(B.px+N.hv.x,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+N.hv.y,BOX.y+8,BOX.y+BOX.h-8);
+}
+/* 터치 끌기: 텅 빈 손이면 끈 만큼을 모아 두었다가 nameHollowMove 가 흘려 쓴다. 옮겼으면 true */
+function nameHollowDrag(dx,dy){if(!nameHollow())return false;const N=B.names;N.drag=N.drag||{x:0,y:0};N.drag.x+=dx;N.drag.y+=dy;return true;}
+function nameTakeDrag(){const N=B.names,d=N&&N.drag;if(!d)return {x:0,y:0};N.drag=null;return d;}
 function nameLocked(){return nameBattleOn()&&B.names.lock>0;}
 /* 결정 D-1140: 이름 부르기 예고(ntell)를 건다. 어느 차례에 부를지는 상대의 pickAttack 이 정한다. final 이면 마지막 부름(아빠 목소리) */
 function nameCallBegin(p,final=false){
@@ -151,9 +172,9 @@ function nameCallEnd(how){
   nameTake(n,B.px,B.py-18);
 }
 /* 이름 하나가 명부에 적혀 먹힌다. 이름패가 얼며 적패지로 날아간다 (셋째 부름에 돌아봄, 결정 D-1272: 오랏줄에 오래 묶임) */
-function nameTake(n,x,y){
+function nameTake(n,x,y,via){
   const N=B.names;
-  N.fly={text:n.text,x,y,t:0,max:46};
+  bookInk(n,'out',x,y,via);   // 결정 D-1320: 수첩 그 줄의 글씨가 한 자씩 떨어져 적패지로 날아간다
   loseName(n.id);if(!N.eaten.includes(n.id))N.eaten.push(n.id);
   G.f.gangcheolSwallowed=[...N.eaten];
   if(!N.firstEat){N.firstEat=true;N.flash=true;}
@@ -214,6 +235,12 @@ function nameStep(){
   if(N.echo&&--N.echo.t<=0)N.echo=null;
   for(const e of N.echoes){e.t++;if(e.t>0&&!Vfx.reducedMotion){e.x+=e.vx;e.y+=e.vy;}}N.echoes=N.echoes.filter(e=>e.t<e.max);
   if(N.spit)N.spit.t++;
+  for(const q of N.ink)q.t++;N.ink=N.ink.filter(q=>q.t<q.max);
+  // 결정 D-1321: 텅 빈 손이 되는 순간과 풀리는 순간
+  const hollow=nameHollow();
+  if(hollow&&!N.hollow)bLater('(…아무도 나를 부르지 않는다. 손이 내 손 같지 않다.)',30);
+  if(!hollow&&N.hollow)N.hv=null;
+  N.hollow=hollow;
   const target=Math.min(nameTune().name_hand_fade_max,nameTune().name_hand_fade*namesLostNow());
   N.fade+=(target-N.fade)*0.08;
   if(N.queued&&B.st==='open'&&!B.paused){N.queued=false;openNameMenu();}
@@ -230,6 +257,7 @@ function nameReturn(k,x,y){
 function nameReturnIds(ids,x,y){
   if(!nameBattleOn())return 0;const N=B.names,back=ids.filter(id=>N.eaten.includes(id));if(!back.length)return 0;
   N.eaten=N.eaten.filter(id=>!back.includes(id));
+  for(const n of (G.nicknames||[]).filter(q=>back.includes(q.id)))bookInk(n,'in',x??B.px,y??B.py);   // 결정 D-1320
   restoreNames(back);G.f.gangcheolSwallowed=[...N.eaten];
   const texts=(G.nicknames||[]).filter(n=>back.includes(n.id)).map(n=>n.text);
   texts.forEach((s,i)=>B.pops.push({x:(x??B.px)+(i%2?18:-18),y:(y??B.py)-40-i*14,t:60,text:s,good:true}));
@@ -246,9 +274,10 @@ function nameOnPartHit(p,m){
 function nameBattleEnd(result){
   if(!nameBattleOn())return;const N=B.names;N.call=null;
   if(result==='win'||result==='calm'){
-    const lost=(G.nicknames||[]).filter(n=>n.lost).map(n=>n.text);
+    // 결정 D-1320: 삼킨 이름이 적패지에서 풀려 수첩 제 줄로 날아와 다시 적힌다 (예전의 이름패를 토해 내던 그림 대신)
+    const m=nameMouthAt();for(const n of (G.nicknames||[]).filter(q=>q.lost))bookInk(n,'in',m.x,m.y);
     restoreNames();N.eaten=[];G.f.gangcheolSwallowed=[];G.f.gangcheolRetry=false;G.f.nameRestored=true;
-    N.spit={texts:lost,t:0};N.fly=null;N.lock=0;
+    N.fly=null;N.lock=0;
   }else{
     G.f.gangcheolSwallowed=[...N.eaten];G.f.gangcheolRetry=N.eaten.length>0;
     // 결정 D-435: 첫 물러남(지거나 물러남)에는 넋 빠진 아빠가 아이를 얼음 가에서 끌어낸다. 장면은 영산 이야기가 이 표시를 읽어 잇는다
@@ -258,14 +287,9 @@ function nameBattleEnd(result){
 }
 function calmWinText(){return B.E.calmWin;}
 /* 부위 줄 아래 이름패 줄. 무엇인지 설명하지 않는다 */
+/* 결정 D-1320: 이름패 줄(HTML)은 뺐다. 이름은 판 왼쪽의 수첩 장(drawNameBook)에 보인다. '이름' 단추 상태만 맞춘다 */
 function renderNameTags(wrap){
   if(!nameBattleOn()||!(G.nicknames||[]).length)return;
-  const row=el('div','b-names');
-  for(const n of G.nicknames){
-    const tag=el('span','b-nametag'+(n.lost?' lost':'')+(B.names.pinned.includes(n.id)?' pinned':''),n.lost?'':n.text);
-    tag.title=n.lost?'':n.text;row.appendChild(tag);
-  }
-  wrap.appendChild(row);
   const btn=$('bNames');if(btn)btn.disabled=!B.names.pinned.length&&!namesHeld().length;
 }
 /* '이름' 단추: 빈틈에만. 빈틈이 아니면 다음 빈틈에 연다(선물과 같은 결, D-64) */
@@ -326,7 +350,12 @@ function drawNameFrost(c){
 }
 /* 손이 옅어진다: 잃은 이름만큼 종이빛을 손 위에 덮는다 */
 function drawNameFade(c){
-  if(!nameBattleOn()||B.names.fade<0.01||B.handShow>0)return;
+  if(!nameBattleOn()||B.handShow>0)return;
+  // 결정 D-1321: 텅 빈 손이면 손 둘레에 먹 그늘이 숨 쉬듯 진다
+  if(nameHollow()){const p=Vfx.reducedMotion?0.5:0.5+0.5*Math.sin(B.time*0.08),g=c.createRadialGradient(B.px,B.py,6,B.px,B.py,36);
+    g.addColorStop(0,'rgba(20,16,12,0)');g.addColorStop(0.55,'rgba(20,16,12,'+(0.3+0.14*p).toFixed(3)+')');g.addColorStop(1,'rgba(20,16,12,0)');
+    c.save();c.fillStyle=g;c.beginPath();c.arc(B.px,B.py,36,0,Math.PI*2);c.fill();c.restore();}
+  if(B.names.fade<0.01)return;
   const g=c.createRadialGradient(B.px,B.py,2,B.px,B.py,30);
   g.addColorStop(0,'rgba(239,227,200,'+B.names.fade.toFixed(3)+')');g.addColorStop(1,'rgba(239,227,200,0)');
   c.save();c.fillStyle=g;c.beginPath();c.arc(B.px,B.py,30,0,Math.PI*2);c.fill();c.restore();
@@ -355,8 +384,58 @@ function drawNameEchoes(c){
   for(let i=0;i<3;i++){const x=BOX.x+BOX.w/2+(i-1)*16,y=BOX.y+11;
     blob(c,x,y,4.4,3.6,i<cl.k?(cl.k===3?RED:INK):'#d8ccb4',i<cl.k?0.9:0.7);}
 }
+/* ---------- 결정 D-1320: 전투 속 수첩 '이름' 장 ----------
+   판 왼쪽에 아빠의 수첩 '이름' 장을 펼쳐 둔다(세로 화면은 왼쪽 가장자리 좁은 장). 이름마다 한 줄, 지금 가진 이름은 먹 글씨다.
+   빼앗기면 글씨가 한 자씩 떨어져 적패지로 날아가고 그 줄에는 옅은 먹 번짐만 남는다. 되찾으면 글씨가 날아와 한 자씩 다시 적힌다. */
+function bookRect(){const tall=LW<700,w=tall?Math.min(138,BOX.x-16):Math.min(196,BOX.x-46);return {x:tall?8:BOX.x-w-28,y:BOX.y-4,w,h:BOX.h+8};}
+function bookLine(i){const r=bookRect(),n=Math.max(1,(G.nicknames||[]).length),top=r.y+30,lh=Math.min(21,(r.h-36)/n);return {x:r.x+18,y:top+lh*(i+0.5),lh,size:Math.round(Math.max(10,Math.min(14,lh-5)))};}
+const bookFont=s=>'bold '+s+'px "Gowun Batang", "Batang", serif';
+function bookInk(n,dir,x,y,via){
+  if(!nameBattleOn())return;if((G.nicknames||[]).findIndex(q=>q.id===n.id)<0)return;
+  const chars=[...n.text];B.names.ink=B.names.ink.filter(q=>q.id!==n.id);
+  B.names.ink.push({id:n.id,dir,x,y,via:via||'',t:0,max:(dir==='out'?44:36)+chars.length*4});
+}
+/* 글자 하나가 (ax,ay)에서 (bx,by)로 위로 휘며 난다 */
+function inkPath(ax,ay,bx,by,e,lift){const mx=(ax+bx)/2,my=Math.min(ay,by)-lift;return [(1-e)*(1-e)*ax+2*(1-e)*e*mx+e*e*bx,(1-e)*(1-e)*ay+2*(1-e)*e*my+e*e*by];}
+function drawNameBook(c){
+  const list=G.nicknames||[];if(!list.length)return;
+  const N=B.names,r=bookRect(),hollow=nameHollow(),m=nameMouthAt(),ease=e=>e*e*(3-2*e);
+  c.save();
+  c.fillStyle='rgba(40,30,20,.28)';c.fillRect(r.x+3,r.y+4,r.w,r.h);   // 그림자
+  c.fillStyle=hollow?'#e9e2d2':'#f3e8cf';c.fillRect(r.x,r.y,r.w,r.h);
+  c.strokeStyle='rgba(29,24,20,.6)';c.lineWidth=1.2;c.strokeRect(r.x,r.y,r.w,r.h);
+  c.fillStyle='#d9c7a3';c.fillRect(r.x,r.y,9,r.h);   // 실로 맨 왼쪽 묶음
+  for(let i=0;i<4;i++){const y=r.y+r.h*(0.13+i*0.25);c.strokeStyle='rgba(122,85,32,.85)';c.lineWidth=1.2;c.beginPath();c.moveTo(r.x-2,y);c.lineTo(r.x+5,y);c.stroke();
+    c.fillStyle=INK;c.beginPath();c.arc(r.x+5,y,1.4,0,Math.PI*2);c.fill();}
+  c.font='13px "Gowun Batang", "Batang", serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle=INK;c.globalAlpha=hollow?0.35:0.8;
+  c.fillText('이름',r.x+r.w/2+4,r.y+14);c.globalAlpha=1;brush(c,[[r.x+22,r.y+23],[r.x+r.w/2+4,r.y+22],[r.x+r.w-12,r.y+23]],1.2,INK,hollow?0.2:0.45);
+  list.forEach((n,i)=>{
+    const L=bookLine(i),q=N.ink.find(k=>k.id===n.id);c.font=bookFont(L.size);c.textAlign='left';c.textBaseline='middle';
+    c.fillStyle='rgba(120,96,64,.2)';c.fillRect(r.x+14,L.y+L.lh/2-0.5,r.w-22,1);   // 줄
+    const chars=[...n.text],ws=chars.map(s=>c.measureText(s).width),total=ws.reduce((a,b)=>a+b,0),fit=Math.min(1,(r.w-30)/Math.max(1,total));
+    const xs=[];let x=L.x;for(const w of ws){xs.push(x);x+=w*fit;}
+    const smear=a=>{if(a<=0.01)return;blob(c,L.x+total*fit/2,L.y+1,total*fit/2+3,L.size*0.32,'#6b5a48',0.16*a);
+      for(let k=0;k<3;k++)blob(c,L.x+total*fit*hash(i*7+k*3.1),L.y+(hash(i+k*1.7)-0.5)*5,1.4,1.1,INK,0.22*a);};
+    const ch=(s,X,Y,a,size,col)=>{if(a<=0.01||s===' ')return;c.save();c.globalAlpha=a;c.font=bookFont(size);c.fillStyle=col||INK;
+      c.translate(X,Y);if(fit<1)c.scale(fit,1);c.fillText(s,0,0);c.restore();};
+    const pinned=N.pinned.includes(n.id);
+    if(q&&q.dir==='out'){   // 떨어져 나간다: 앞 글자부터 한 자씩 들려 적패지로
+      let gone=0;chars.forEach((s,k)=>{const e=clamp((q.t-k*4)/34,0,1);if(e<=0){ch(s,xs[k],L.y,1,L.size);return;}gone++;
+        const [fx,fy]=inkPath(xs[k],L.y,m.x,m.y,ease(e),70+k*6);ch(s,fx,fy+(Vfx.reducedMotion?0:Math.sin(e*9+k)*2),1-Math.pow(e,4),L.size*(1+0.6*Math.sin(Math.PI*e)-0.3*e),e>0.45?SCROLL_INK:INK);});   // 날며 크게 보였다가 적패지에 닿으며 작아진다
+      smear(gone/chars.length);
+    }else if(q&&q.dir==='in'){   // 날아와 다시 적힌다
+      chars.forEach((s,k)=>{const e=clamp((q.t-k*4)/26,0,1);if(e<=0)return;if(e>=1){ch(s,xs[k],L.y,1,L.size);return;}
+        const [fx,fy]=inkPath(q.x,q.y,xs[k],L.y,ease(e),50);ch(s,fx,fy,0.5+0.5*e,L.size*(1+0.5*Math.sin(Math.PI*e)),e<0.6?'#7a5520':INK);});
+      smear(1-clamp(q.t/(chars.length*4+26),0,1));
+    }else if(n.lost)smear(1);
+    else{chars.forEach((s,k)=>ch(s,xs[k],L.y,1,L.size));if(pinned){c.fillStyle='#7a5520';c.beginPath();c.arc(L.x-6,L.y,1.8,0,Math.PI*2);c.fill();}}
+  });
+  c.restore();
+}
+const SCROLL_INK='#7a1d16';
 function drawNames(c){
   if(!nameBattleOn())return;const N=B.names;
+  drawNameBook(c);   // 결정 D-1320
   drawNameFrost(c);drawNameEchoes(c);
   // 먹힌 이름패가 얼며 입으로 날아간다
   if(N.fly){const f=N.fly,e=f.t/f.max,m=nameMouthAt(),mx=(f.x+m.x)/2,my=Math.min(f.y,m.y)-40;

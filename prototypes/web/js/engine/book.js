@@ -66,8 +66,9 @@ function renderChildRecord(body,tab){
     entry('엄마가 지어 준 이름',G.f.newName||'(아직 적지 않았다)').classList.add('own-name');
     const list=G.nicknames||[];if(!list.length)note('길에서 누군가 나를 새롭게 불러 주면 적어 두자.');
     // 먹힌 이름은 글자만 비고, 지어 준 이와 받은 곳은 흐리게 남는다
-    // 결정 D-1078: 먹힌 이름 칸에는 그 길의 기억이 흐려졌다는 한 줄이 남는다
-    list.forEach(n=>{const e=entry((REGIONS[n.region]?.name||'길 위에서')+(n.by?' · '+(npcName(n.by)||n.by):''),n.lost?'(그 길에서 있었던 일이 잘 떠오르지 않는다.)':n.text);if(n.lost)e.classList.add('lost');});
+    // 결정 D-1320 (사용자 지시 2026-11-08 42, D-1078 의 한 줄을 바꿈): 먹힌 이름 칸은 글씨가 지워진 빈 줄이다. 옅은 먹 번짐만 남는다
+    list.forEach(n=>{const e=entry((REGIONS[n.region]?.name||'길 위에서')+(n.by?' · '+(npcName(n.by)||n.by):''),n.lost?'':n.text);
+      if(n.lost){e.classList.add('lost');e.appendChild(el('span','ink-smear'));e.title='글씨가 지워졌다';}});
     // 결정 D-703: 엄마의 쪽지는 이름 장 아래. 받는 이 자리(번진 이름)가 이 장 맨 위 '엄마가 지어 준 이름'과 짝을 이룬다
     body.appendChild(el('div','sub mom-note-head','엄마의 쪽지'));renderMomNote(body);
   }else if(tab==='mom')renderMomNote(body);
