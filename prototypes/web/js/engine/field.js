@@ -214,6 +214,7 @@ function step(){
   if(G.attackT>0){G.attackT--;if(G.attackT===TABLES.TUNING.field_swing_hit_at)doHit();}
   if(G.hurtT>0)G.hurtT--;
   fieldCall('step');
+  if(typeof restStep==='function')restStep();   // 결정 D-1301: 보스 앞 쉼터 (rest.js)
   for(const s of zoneObjects('stamps'))if(s.auto&&pointNear(s))findStamp(s);
   for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.vy+=0.15;if(--s.t<=0)sparks.splice(i,1);}
   if(shakeT>0)shakeT--;
@@ -563,6 +564,7 @@ function drawFieldScene(showPlayer=true){
   drawZoneEnds();   // 결정 D-847
   Vfx.ground();   // 결정 D-174: 눈·서리에 남은 발자국과 구른 자국 (vfx.js)
   drawZoneObjects();
+  if(typeof restDraw==='function')restDraw();   // 결정 D-1301
   drawDigs();
   drawPickups();
   drawFloorDrops();

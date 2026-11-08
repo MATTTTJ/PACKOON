@@ -481,8 +481,8 @@ function drawScenery(id){
     const sx=2280-cam;P(sx-3,122,6,5,'#b9aa89');P(sx-5,124,10,2,'#786e58');
   }else if(id==='warehouse'){
     // 결정 D-318: 짐꾼 화톳불 자리 (조사 '짐꾼 화톳불 자리'). 설계 1780은 줄인 뒤 880, 짐짝 더미와 창고 큰 문 사이 빈 마당
-    {const fx=1780-cam;for(let j=0;j<5;j++)P(fx-12+j*5,GROUND-4,5,4,'#6b6460');P(fx-9,GROUND-6,18,3,'#3a3430');P(fx-6,GROUND-8,4,2,n()?'#ff9a3a':'#c9604b');P(fx+1,GROUND-7,3,2,n()?'#ffcf70':'#8a4a2a');
-      if(n())P(fx-14,GROUND-20,28,18,'rgba(255,160,70,.10)');P(fx+14,GROUND-12,10,10,'#8a6448');P(fx+15,GROUND-13,8,2,'#a17a52');}   // 짐꾼이 걸터앉던 짐짝
+    // 결정 D-1304: 화톳불 돌 테와 불은 쉼터(engine/rest.js)가 그린다. 여기는 짐꾼이 걸터앉던 짐짝만
+    {const fx=1780-cam;P(fx+19,GROUND-12,10,10,'#8a6448');P(fx+20,GROUND-13,8,2,'#a17a52');}
     const x=tx(400)-cam;for(let j=0;j<3;j++){P(x-9+j*5,GROUND-8,3,7,'#aa8c59');P(x-10+j*5,GROUND-10,6,2,'#ccb17b');}P(x-10,GROUND-2,17,2,'#7e6846');
     const mx=tx(2470)-cam;P(mx-17,121,34,7,'#ac9667');P(mx-17,120,34,2,'#d4be86');for(let j=0;j<8;j++)P(mx-15+j*4,122,1,5,'#816e4e');P(mx-12,117,24,3,'#c4aa73');
   }
