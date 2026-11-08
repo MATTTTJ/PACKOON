@@ -8,8 +8,9 @@ defineItems({rice:{eat:2}});   // 게임 전용 칸
 defineRecipes(TABLES.RECIPES);
 /* 메밀떡은 시루가 깨어난 뒤에도 모락에게 따로 배워야 쓸 수 있다 (trades.csv t_morak) */
 RECIPES.siru.find(r=>r.out==='memiltteok').know='morak:memiltteok';
-/* 결정 D-421: 마지막 약(전설의 열매 → 되찾음 약)은 엄마의 절구로 아빠와 함께 찧는 영산 장면 전용이다. 장면이 yak:withDad 를 배우기 전에는 가공대에 보이지 않는다 */
-RECIPES.jeolgu.find(r=>r.out==='doerim_yak').know='yak:withDad';
+/* 결정 D-421: 마지막 약(되찾음 약)은 엄마의 절구로 아빠와 함께 찧는 영산 장면 전용이다. 장면이 yak:withDad 를 배우기 전에는 가공대에 보이지 않는다.
+   결정 D-1398 (사용자 지시 2026-11-08 47, name-story-v4 §4): 전설의 열매와 약 찧기를 뺀다. 표에서 가공법이 빠져도 깨지지 않게 있을 때만 숨긴다 */
+{const yak=RECIPES.jeolgu.find(r=>r.out==='doerim_yak');if(yak)yak.know='yak:withDad';}
 for(const e of TABLES.NOTES)defineNotes(e.region,[e]);
 defineTools({
   pick:{n:'곡괭이',d:'땅을 파서 뿌리와 버섯을 캔다. 싸울 때도 쓴다.'},
