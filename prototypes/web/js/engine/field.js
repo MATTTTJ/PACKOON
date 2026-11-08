@@ -933,6 +933,10 @@ function nearInteraction(){
   const points=[...fieldNpcs(),...zoneObjects('wanderers'),...zoneObjects('doors'),...zoneObjects('examines'),...zoneObjects('vistas'),...zoneObjects('stamps').filter(s=>!stampFound(s.id))];
   let best=null,dist=Infinity;
   for(const p of points)if(!npcMoving(p)&&pointNear(p)&&Math.abs(p.x-G.px)<dist){best=p;dist=Math.abs(p.x-G.px);}
+  // 결정 D-1340: 찾은 도장도 다시 살필 수 있다(짧게, revisitStamp). 곁에 인물·문·조사 자리가 함께 닿으면 그쪽이 먼저이고,
+  //   도장 바로 앞에 서야(다른 자리보다 field_stamp_revisit_margin 넘게 가까워야) 도장이 잡힌다(모루 곁 무쇠 삼촌처럼)
+  const margin=best?TABLES.TUNING.field_stamp_revisit_margin:0;
+  for(const p of zoneObjects('stamps'))if(stampFound(p.id)&&pointNear(p)&&Math.abs(p.x-G.px)+margin<dist){best=p;dist=Math.abs(p.x-G.px)+margin;}
   return best;
 }
 function interactionKind(p){
@@ -944,7 +948,7 @@ function interactionLabel(p){
   // 결정 D-32: 막힌 길 위에는 짧은 이름(blockedLabel)만. 까닭은 다가가 말을 걸면 아이 혼잣말(blockedSay)로 한다 (design/data/decisions.csv)
   if(k==='doors')return needMet(p)?(p.label||'들어가기'):formPasses(p)?(p.formLabel||formTo(p.formPass)+' 지나가기'):(p.blockedLabel||p.reason||'아직 닫힌 길');
   if(k==='vistas')return '바라보기';
-  if(k==='stamps')return p.label||'희미한 자국 살펴보기';
+  if(k==='stamps')return stampFound(p.id)?(p.revisitLabel||'아빠 도장 다시 보기'):(p.label||'희미한 자국 살펴보기');   // 결정 D-1340
   if(k==='examines')return p.label||'조사하기';
   return p.prompt||(p.name||'길손')+'에게 말 걸기';
 }
@@ -978,7 +982,7 @@ function interactWith(p,kind){
     if(startDoorFade(p))return;
     changeZone(p.to,{x:p.toX,y:p.toY,sound:p.sound||'door'});
   }else if(kind==='vistas')startVista(p);
-  else if(kind==='stamps'){if(!findStamp(p))p.revisit?.();}   // 결정 D-1023: 찾은 도장을 다시 누르면 지역이 그 이야기를 다시 연다
+  else if(kind==='stamps'){if(!findStamp(p)){if(p.revisit)p.revisit();else revisitStamp(p);}}   // 결정 D-1023: 지역이 이야기를 따로 두면 그걸 다시 연다. 결정 D-1340: 아니면 짧게 떠올린다
   else if(kind==='examines'){
     const texts=Array.isArray(p.text)?p.text:[p.text];
     const visits=G.f.examineVisits||(G.f.examineVisits={}),key=expansionKey(p.id),i=Math.min(visits[key]||0,texts.length-1);
@@ -1058,6 +1062,19 @@ function peekStamp(s){
   const gy=s.y??fieldGround(),py=gy-(s.face??STAMP_FACE[stampBase(s)]),top=py-11,bottom=Math.max(py+3,gy),ch=28;
   const mid=bottom-top<=ch-4?(top+bottom)/2:py-4;
   peekAt(s.x,Math.round(mid+ch/2),{w:40,h:ch,below:0});
+}
+/* 결정 D-1340 (사용자 지시 2026-11-08 45): 찾은 아빠 도장도 다시 살필 수 있다. 처음처럼 길게 잇지 않고,
+   작은 창으로 도장을 다시 보이고 수첩에 적어 둔 그 도장 글에서 두 마디(어디의 손인지, 무슨 표인지)만 속말로 떠올린다. */
+function stampRecall(s){
+  const line=(TABLES.NOTES||[]).flatMap(n=>n.lines||[]).find(l=>l.when===s.note);
+  const sent=String(line?.text||'').split(/(?<=[.!?])\s+/).map(t=>t.trim()).filter(Boolean);
+  const mean=sent.find((t,i)=>i>0&&/표/.test(t))||sent.find((t,i)=>i>0&&/길/.test(t));   // 무슨 표인지, 없으면 길 이야기
+  const pick=[sent[0],mean].filter(Boolean);
+  return pick.length?pick.join('\n'):'수첩에 그려 둔 아빠 손이다.';
+}
+function revisitStamp(s){
+  if(CLASSIC||!stampFound(s.id))return false;
+  peekStamp(s);think(stampRecall(s),{light:true});return true;
 }
 function findStamp(s){
   if(CLASSIC||stampFound(s.id))return false;

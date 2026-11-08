@@ -428,8 +428,9 @@ if(!CLASSIC){
     const fruit=G.pickups[G.pickups.length-1];fruit.id='island_legend_fruit';fruit.zone='island';fruit.x=isl(fruit.x);
     diary('y_boat','얼음이 녹자 걸어서 건너온 얼음길이 물에 잠겼다. 호숫가로 돌아가려면 이제 배가 있어야 한다.');
   };
-  Rg.zones.snow.vistas=[{id:'snow_ridge',x:1600,y:108,from:0,to:640,sound:'wind',
-    thought:'와, 저기서 여기까지 왔네.\n엄마도 저 불빛 너머에 있겠지.',diary:'눈길 능선에서 지나온 고을의 불빛을 보았다. 산 안쪽으로 이어지는 바위턱도 보인다.',
+  // 결정 D-1342: 능선 끝 너럭바위·돌탑·굽은 소나무를 그려 바라볼 까닭을 둔다 (art.js ridgeLookout)
+  Rg.zones.snow.vistas=[{id:'snow_ridge',x:1600,y:108,from:0,to:640,sound:'wind',draw:(x,y)=>a().ridgeLookout(x,y),
+    thought:'와, 저기서 여기까지 왔네.\n엄마도 저 불빛 너머에 있겠지.',diary:'눈길 능선 끝 너럭바위에 서서 지나온 고을의 불빛을 보았다. 바위 위엔 지나간 이들이 얹은 작은 돌탑이 있었다. 산 안쪽으로 이어지는 바위턱도 보인다.',
     get layers(){return a().ridgeLayers;}}];
   Rg.zones.island.vistas=[{id:'spring_tree',x:2430,from:0,to:640,sound:'water',
     get thought(){return G.f.spring?'새잎이다. 물도 흐르네.\n엄마랑 같이 보고 싶다.':'나뭇가지 끝이 통통하네.\n저 안에 잎이 있나?';},

@@ -4057,7 +4057,8 @@ const TABLES={
   "chasa_crow_thick_max": 1.2,
   "rest_range": 22,
   "rest_toast_gap_ms": 20000,
-  "rest_return_back": 16
+  "rest_return_back": 16,
+  "field_stamp_revisit_margin": 12
  },
  "PROGRESS": [
   {

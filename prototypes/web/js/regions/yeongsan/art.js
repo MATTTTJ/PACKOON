@@ -16,11 +16,48 @@ Rg.art={
     M(ox,oy,f,-11,-16-(warn&&s.timer>20?Math.floor(s.timer/4)%2*2:0),2,3,'#f4f0e8');
     if(field&&!G.f.salgDone&&Math.abs(s.x-G.px)<TABLES.MINIGAMES.salg_active_distance){
       if(!warn&&!alert){M(ox,oy,f,11,-16,3,1,'#9ab870');if(s.tick%28<14)M(ox,oy,f,12,-14,2,1,'#9ab870');}
-      if(warn||alert){const left=warn?s.timer/TABLES.MINIGAMES.salg_warning_frames:1-(s.risk||0)/TABLES.MINIGAMES.salg_risk_limit;
-        R(ox-13,oy-39,26,5,'#302c3e');R(ox-12,oy-38,Math.ceil(24*left),3,warn?'#e8c88a':s.risk?'#e6a082':'#b4d4cc');
-        // 귀가 서기 전에는 시간이, 선 뒤에는 발소리를 참을 여유가 줄어든다.
-        R(ox+11,oy-46,1,4,'#f4e8c8');R(ox+11,oy-41,1,1,'#f4e8c8');}
+      if(!(s.startle>0))Rg.art.salgEar(ox,oy,f,s,warn,alert);   // 놀라 물러나는 동안엔 귀 표시를 쉰다
     }},
+  /* 결정 D-1341 (사용자 지시 2026-11-08 46): 살금이 머리 위 막대는 무엇을 재는지 안 읽혔다. 살금이가 말하는 그대로 '귀'를 말풍선에 그린다.
+     - 풀 뜯는 동안: 말풍선 속 귀가 눕혀져 있다(안 듣는다. 움직여도 된다).
+     - 귀가 서는 중(예고): 귀가 아래부터 차츰 일어서고 말풍선 테가 누렇게 깜박인다. 다 서기 전에 멈춘다.
+     - 귀가 선 뒤: 귀가 꼿꼿하다. 아이가 움직이면 아이 발밑에 발소리 물결이 일고, 말풍선 속 귀로 소리 물결이 든다.
+       참을 여유가 줄수록 물결이 늘고 붉어지며 말풍선 테도 붉어지고, 끝 무렵엔 귀가 떤다. 다 차면 놀라 달아난다.
+     예전 막대와 같은 값(s.timer·s.risk)을 그림으로만 바꿨다. 글자 설명은 두지 않는다. */
+  salgEar(ox,oy,f,s,warn,alert){
+    // 말풍선은 이름표(머리 위 가운데, 발에서 34쯤) 위로 띄우고, 머리 쪽으로 점 꼬리를 내린다
+    const MG=TABLES.MINIGAMES,dir=Math.sign(G.px-s.x)||f,cx=Math.round(ox+f*8),by=oy-42;
+    const risk=alert?Math.min(1,(s.risk||0)/MG.salg_risk_limit):0;
+    const shake=alert&&risk>.6&&!Vfx.reducedMotion?(Math.floor(s.tick/2)%2?1:-1):0;
+    const blink=warn&&Math.floor(s.timer/6)%2;
+    const rim=warn?(blink?'#f2c45a':'#c98a2e'):alert?(risk>.6?'#d8452e':risk>0?'#e08a5a':'#5b6f8a'):'#4a4458';
+    // 말풍선: 둥근 네모와 살금이 머리를 가리키는 꼬리
+    const bx=cx-11,bt=by-15,bw=22,bh=17;
+    R(bx+1,bt-1,bw-2,1,rim);R(bx+1,bt+bh,bw-2,1,rim);R(bx-1,bt+1,1,bh-2,rim);R(bx+bw,bt+1,1,bh-2,rim);
+    R(bx,bt,1,1,rim);R(bx+bw-1,bt,1,1,rim);R(bx,bt+bh-1,1,1,rim);R(bx+bw-1,bt+bh-1,1,1,rim);
+    R(bx+1,bt,bw-2,bh,'#efe6d2');R(bx,bt+1,bw,bh-2,'#efe6d2');
+    R(cx-1,bt+bh+2,3,2,'#efe6d2');R(cx+f,bt+bh+5,2,2,'#efe6d2');   // 생각 말풍선 점 꼬리(머리 쪽으로)
+    const ex=cx-dir*4,eb=bt+bh-3,Br='#a8865a',In='#e6a090';
+    if(!warn&&!alert){   // 눕힌 귀: 끝이 뒤로 처진다. 곁에 풀잎
+      R(ex-5,eb-2,10,3,Br);R(ex-4,eb-1,7,1,In);R(ex+4,eb-3,3,1,Br);R(ex-6,eb-1,1,2,Br);
+      R(ex+dir*8,eb-4,1,4,'#7fa860');R(ex+dir*9,eb-6,1,3,'#7fa860');
+      return;}
+    const k=warn?1-s.timer/MG.salg_warning_frames:1,h=Math.max(3,Math.round(3+9*k));
+    const rows=[4,5,5,5,5,4,4,3,3,2,2,1];   // 아래(밑동)부터 위(끝)로
+    for(let i=0;i<h;i++){const w=rows[Math.min(rows.length-1,Math.round(i*(rows.length-1)/Math.max(1,h-1)))];
+      R(ex-Math.floor(w/2)+shake,eb-i,w,1,Br);if(w>=3&&i>0&&i<h-1)R(ex-Math.floor(w/2)+1+shake,eb-i,w-2,1,In);}
+    if(!alert)return;
+    // 귀로 드는 소리 물결: 참을 여유가 줄수록 겹이 늘고 붉어진다
+    const waves=risk>0?1+Math.round(risk*2):0,col=risk>.6?'#d8452e':risk>.3?'#e08a5a':'#7f97b0';
+    for(let j=0;j<waves;j++){const x=ex+dir*(4+j*3),half=2+j,yc=eb-6;
+      R(x,yc-half+1,1,half*2-1,col);R(x-dir,yc-half,1,1,col);R(x-dir,yc+half-1,1,1,col);}
+    // 아이 발밑 발소리: 귀가 선 뒤 소리가 닿는 거리 안에서 움직이면
+    if(Math.abs(G.vx)>MG.salg_moving&&Math.abs(s.x-G.px)<MG.salg_risk_distance){
+      const hx=Math.round(G.px-cam),hy=Math.round(G.py),p=Math.floor(s.tick/5)%2;
+      const fc=risk>.6?'#f08a6a':'#f6e2b8';
+      for(const sd of [-1,1])for(let j=0;j<2;j++){const x=hx+sd*(7+j*3+p);R(x,hy-4-j,1,4+j*2,fc);R(x-sd,hy-5-j,1,1,fc);R(x-sd,hy+j,1,1,fc);}
+    }
+  },
   /* 옹달 할미 (결정 D-120): 늙은 오소리. 흰 줄무늬 얼굴, 자주색 머릿수건. 곁에 금 간 솥과 작은 불, 허리춤에 표주박.
      봄이 오면(어둑차사가 물러나면) 솥을 엎어 말린다. */
   badger(ox,oy,f){const Gy='#857d70',Dk='#4a443d',Wt='#eee6d6',K='#17120e',Sc='#7a4a6a';
@@ -186,6 +223,23 @@ function restRock(x,y){
   px(x-6,y-21,12,1,'#2e3741');px(x-5,y-20,1,2,'#2e3741');px(x+5,y-20,1,2,'#2e3741');   // 지게 다리 받치던 홈
   for(let i=0;i<14;i++)px(x+20+Math.floor(i/3),y-14-i,2,1,'#7a6450');px(x+19,y-1,3,1,'#5a4a3a');   // 기대 둔 작대기
 }
+/* 결정 D-1342 (사용자 지시 2026-11-08 44): 깊은 눈길 능선의 바라보기 자리. 예전엔 빈 눈 위에 '바라보기'만 떴다.
+   능선 끝에 산사람들이 앉아 쉬며 내려다보던 너럭바위가 있고, 그 위에 지나간 이들이 하나씩 얹은 작은 돌탑,
+   바람에 지나온 쪽(왼쪽, 남쪽 고을)으로 굽은 키 작은 소나무가 섰다. 여기서 뒤돌아 지나온 길을 보게 되는 까닭이다. */
+function ridgeLookout(x,y){
+  x=Math.round(x);const sp=pink();
+  // 굽은 소나무: 밑동은 바위 뒤, 줄기가 왼쪽으로 기운다. 가지 셋에 눈이 얹혔다
+  for(let i=0;i<32;i++){const tx0=x-6-Math.round(i*i/56);px(tx0,y-2-i,3,1,'#5b4a3d');px(tx0,y-2-i,1,1,'#7d6857');}
+  for(const [bx,by,w] of [[-24,-34,16],[-19,-25,15],[-13,-16,12],[-8,-8,8]]){
+    px(x+bx-w+6,by+y,w,4,sp?'#2e4a3a':'#203a3a');px(x+bx-w+7,by+y+3,w-2,1,'#0f1a1e');px(x+bx-w+7,by+y-2,w-2,2,sp?'#6d8f78':'#eef3f6');}
+  // 너럭바위: 낮고 넓다. 윗면이 판판하고 눈이 얹혔다
+  px(x-8,y-7,34,7,'#4a5560');px(x+12,y-6,14,6,'#38424c');px(x-9,y-8,34,2,sp?'#9fae9a':'#e6edf1');
+  px(x-3,y-3,6,1,'#2b333b');px(x+16,y-2,4,1,'#2b333b');
+  // 작은 돌탑: 넓적한 돌에서 위로 작아진다. 맨 위 돌에만 눈
+  px(x+10,y-12,12,4,'#6d7680');px(x+11,y-16,10,4,'#868f99');px(x+12,y-20,8,4,'#6d7680');px(x+13,y-23,6,3,'#959ea7');px(x+14,y-26,4,3,'#7f8892');
+  px(x+10,y-13,12,1,'#a7b0b8');px(x+12,y-21,8,1,'#a7b0b8');px(x+14,y-27,4,1,sp?'#c9d6c4':'#f4f7fa');px(x+20,y-15,1,3,'#4f5860');px(x+18,y-22,1,2,'#4f5860');
+}
+A.ridgeLookout=ridgeLookout;
 function boat(x,y){
   px(x-26,y-7,52,5,'#665248');px(x-22,y-2,44,5,'#90715a');px(x-16,y+3,32,3,'#574b47');
   px(x-17,y-8,34,2,'#bd9c72');px(x+11,y-26,3,21,'#8c765b');px(x+6,y-28,14,3,'#b99a70');
