@@ -12,9 +12,12 @@
    결정 D-434: '이름' 단추. 빈틈에 남은 이름 하나를 스스로 대면 지어 준 이의 목소리가 겹친다.
      그 이름은 이번 전투에서 먹히지 않고(못 박힘), 다음 한 번 치기는 잘 먹는 도구만큼 깎는다. 이름마다 한 전투에 한 번.
      첫 이름을 먹힌 뒤 처음 열리는 빈틈에 단추가 잠깐 깜박인다. 설명 글은 없다.
-   결정 D-1141 (§3.4-4 까마귀 전령): 먹힌 이름은 쪽지 문 까마귀를 손으로 스치면 하나씩 돌아온다(물러났다 다시 온 첫 까마귀 떼는 name_return_retry_bonus 마리).
-     소매를 부수면 쪽지 문 까마귀들이 흩어져 먹힌 이름이 모두 돌아온다. 이기거나 달래면 모두 돌아온다(G.f.nameRestored).
+   결정 D-1141 (§3.4-4, 결정 D-1271로 바뀜): 먹힌 이름은 패턴을 피한 뒤 빈틈에 판 바닥에서 떠오른다. 치면 하나씩 돌아온다(nameReturnIds).
+     예전의 쪽지 문 까마귀는 뺐다(사용자 지시 2026-11-08 34·38: 까마귀 떼는 한 몸 같은 큰 떼로, 약점은 바닥의 이름으로).
+     소매를 부수면 먹힌 이름이 모두 돌아온다. 이기거나 달래면 모두 돌아온다(G.f.nameRestored).
      물러나면 명부에 남는다(G.f.gangcheolSwallowed, 옛 저장 키 그대로).
+   결정 D-1272: 붉은 오랏줄에 묶인 채 오래 버티면 이름 하나를 빼앗긴다(nameBindTarget·nameTake, 부름과 같은 결과).
+   결정 D-1275: 부름마다 나레이션과 메아리(nameEchoes). 온 방향에서 이름이 빠르게 떴다가 천천히 사라진다.
    결정 D-1142 (§3.4-5 명부 펼치기): 마지막 부름(아빠 목소리, 본이름)은 발악 끝에 한 번 온다. 이름은 화면에 내지 않는다(빈칸).
      몸에 붙지 않은 이름이라 먹히지 않지만, 셋째 부름에 돌아보면 얼어붙어 크게 다친다. 참으면 적패지 끝의 낙관이 드러나 빈틈이 길게 열린다.
    결정 D-1074 (v2 §6.3): 까치 어르신의 깃이 있으면 전투마다 한 번, 셋째 부름에 돌아본 순간 "아가!" 소리가 겹쳐 그 이름을 지킨다. */
@@ -44,7 +47,7 @@ function nameBattleStart(){
   if(!B||!B.E.names)return;
   const swallowed=(G.f.gangcheolSwallowed||[]).filter(id=>(G.nicknames||[]).some(n=>n.id===id&&n.lost));
   B.names={eaten:swallowed,pinned:[],used:[],lock:0,jerk:null,fly:null,echo:null,boost:false,queued:false,call:null,kept:[],finalDone:false,featherUsed:false,bigOpen:false,
-    flash:false,firstEat:false,retry:!!G.f.gangcheolRetry&&swallowed.length>0,spit:null,fade:0,wantFinal:false};
+    flash:false,firstEat:false,retry:!!G.f.gangcheolRetry&&swallowed.length>0,spit:null,fade:0,wantFinal:false,echoes:[]};
 }
 /* 지금 잃은 이름 수. 앞 전투에서 먹히고 아직 못 되찾은 것도 센다 */
 function namesLostNow(){return (G.nicknames||[]).filter(n=>n.lost).length;}
@@ -85,11 +88,35 @@ function nameCallLine(c){
   if(c.final)return ['"……, 이리 온."','"……."','"……? 아빠다."'][c.k-1];
   const n=c.n;return ['"'+nameVoice(n,'call')+'"','"'+n.text+'."','"…'+n.text+'?"'][c.k-1];
 }
+/* 결정 D-1275: 부름마다 나레이션 */
+function nameCallNarration(c){
+  if(c.final)return ['첫 번째 부름. 낯익은 목소리다.','두 번째 부름. 산이 그 목소리를 되받는다.','세 번째 부름. 붉은 붓이 먹을 찍는다.'][c.k-1];
+  return ['첫 번째 부름이 언 호수를 건너온다.','두 번째 부름. 산이 그 이름을 되받아 운다.','세 번째 부름. 붉은 붓이 먹을 찍는다.'][c.k-1];
+}
+/* 메아리 말: 처음엔 부른 이름 그대로, 멀어질수록 끝말만 남는다 (본이름은 빈칸) */
+function nameEchoWords(c){
+  if(c.final)return ['"……"','"……"','"…"'];
+  const s=c.n.text,parts=s.split(' '),last=parts[parts.length-1];
+  return [s,parts.length>1?'…'+last:s,'…'+last.slice(-1)];
+}
+/* 결정 D-1275: 메아리. 적패지(소리 난 곳)에서 먼저 부른 말이 뜨고, 고리처럼 바깥으로 번지며 온 방향에 이름이 뜬다.
+   먼 고리일수록 늦게 뜨고 작고 끝말만 남는다. 뜰 때는 빠르고(name_echo_in) 사라질 때는 느리다(name_echo_fade) */
+function nameEchoes(c){
+  const N=B.names,t=nameTune(),m=nameMouthAt(),words=nameEchoWords(c),n=t.name_echo_base+t.name_echo_step*(c.k-1);
+  N.echoes.push({text:nameCallLine(c),x:clamp(m.x,120,LW-120),y:Math.max(30,m.y-34),t:0,max:t.name_echo_fade+40,size:18,k:c.k,main:true,vx:0,vy:-0.12});
+  const turn=Math.random()*Math.PI*2;
+  for(let i=0;i<n;i++){
+    const ring=i%3,a=turn+i/n*Math.PI*2+(Math.random()-0.5)*0.5,r=[170,260,350][ring]+Math.random()*60;
+    const x=clamp(LW/2+Math.cos(a)*r,46,LW-46),y=clamp(LH*0.42+Math.sin(a)*r*0.62,22,LH-16);
+    N.echoes.push({text:words[ring],x,y,t:-(4+ring*t.name_echo_ring_gap+Math.floor(Math.random()*8)),max:t.name_echo_fade,size:16-ring*1.5,k:c.k,vx:Math.cos(a)*0.22,vy:Math.sin(a)*0.14});
+  }
+}
 /* 적패지가 부서졌으면 붓 획이 흐려진다 */
 function nameScrollTorn(){const p=B.parts.find(q=>q.id===B.E.names.scroll);return !!(p&&p.broken);}
 /* 부름 하나를 끝낸다. how: kept(셋째를 참음)·feather(깃이 지킴)·cut(적패지를 쳐 끊음)·eaten(적힘)·frozen(본이름에 돌아봄) */
 function nameCallEnd(how){
   const t=nameTune(),N=B.names,c=N.call;N.call=null;
+  N.echoes=N.echoes.filter(e=>e.t>=0);   // 결정 D-1275: 부름이 끝나면 아직 안 뜬 메아리는 거둔다 (이미 뜬 것은 천천히 사라진다)
   if(B.mark&&B.mark.cut)B.mark=null;
   B.t=t.gangcheol_namecall_after_frames;
   if(c.final){
@@ -103,7 +130,7 @@ function nameCallEnd(how){
       // 결정 D-1142: 참았다(깃이 지킨 것도 같다). 붓이 미끄러지고 적패지 끝의 낙관이 드러난다. 빈틈이 길게 열린다
       N.bigOpen=true;B.quakeT=Math.max(B.quakeT||0,24);
       bLater('(아빠는 집 밖에선 그 이름을 안 불렀어.)',40);
-      bLater('붓이 미끄러졌다. 풀린 적패지 끝에 붉은 낙관이 드러난다.',T_LATER);
+      bLater('붓이 미끄러졌다. 새잎 빛을 묶은 붉은 낙관 매듭이 느슨해진다.',T_LATER);   // 결정 D-1273: 낙관은 핵(신목 이름)을 묶은 매듭
       Sound.playSfx('battle_soothe');
     }
     renderBHud();return;
@@ -121,13 +148,24 @@ function nameCallEnd(how){
   // 적힌다: 손이 소리 난 쪽(적패지)으로 홱 돌아가고 잠깐 움직이지 않는다
   const m=nameMouthAt(),dx=m.x-B.px,dy=m.y-B.py,d=Math.hypot(dx,dy)||1;
   N.jerk={vx:dx/d*5,vy:dy/d*5,t:7};N.lock=t.gangcheol_namecall_lock_frames;
-  N.fly={text:n.text,x:B.px,y:B.py-18,t:0,max:46};
+  nameTake(n,B.px,B.py-18);
+}
+/* 이름 하나가 명부에 적혀 먹힌다. 이름패가 얼며 적패지로 날아간다 (셋째 부름에 돌아봄, 결정 D-1272: 오랏줄에 오래 묶임) */
+function nameTake(n,x,y){
+  const N=B.names;
+  N.fly={text:n.text,x,y,t:0,max:46};
   loseName(n.id);if(!N.eaten.includes(n.id))N.eaten.push(n.id);
   G.f.gangcheolSwallowed=[...N.eaten];
   if(!N.firstEat){N.firstEat=true;N.flash=true;}
   // 결정 D-1078: 이름에 쌓인 기억도 함께 나간다 (수첩 그 길의 기록이 흐려진다, book.js)
   bLater('(…'+n.text+'? 누가 나를 그렇게 불렀더라.)',T_LATER);
   Sound.playSfx('chasa_write');renderBHud();
+}
+/* 결정 D-1272: 오랏줄이 묶어 갈 이름. 부름과 같이 가장 최근에 받은 것(스스로 댄 이름·지켜 낸 이름은 빼고) */
+function nameBindTarget(){
+  if(!nameBattleOn())return null;const N=B.names;
+  const free=namesHeld().filter(n=>!N.pinned.includes(n.id)&&!N.kept.includes(n.id));
+  return free[free.length-1]||null;
 }
 /* 결정 D-1140: 부르는 중. 첫째·둘째에는 손이 조금씩 끌려가고, 셋째 동안 손이 움직이거나 휘두르면 돌아본 것이다 */
 function nameCallStep(){
@@ -155,9 +193,11 @@ function nameCallStep(){
   if(c.k>=3){nameCallEnd('kept');return;}
   c.k++;c.t=c.k===3?t.name_call_third_frames:t.name_call_interval_frames;
   N.echo={by:c.n.by,text:'',t:c.t,max:c.t,cold:true};
-  B.msg=nameCallLine(c)+' ('+c.k+')';
-  if(c.k===1&&c.final)bLater('(…내 이름이다. 아빠 목소리로.)',12);
-  else if(c.k===1&&!N.taboo&&knows('lore:three_calls')){N.taboo=true;bLater('(세 번째엔… 돌아보지 말자.)',12);}
+  // 결정 D-1275 (사용자 지시 2026-11-08 37): 부름마다 나레이션 한 줄로 몇 번째인지 가른다. 부른 말은 적패지에서 한 번,
+  //   이어서 판 곳곳 온 방향에서 메아리로 빠르게 떴다가 천천히 사라진다. 부름이 거듭될수록 메아리가 많고 짙다
+  B.msg=nameCallNarration(c);nameEchoes(c);
+  if(c.k===1&&c.final)bLater('(…내 이름이다. 아빠 목소리로.)',40);
+  else if(c.k===1&&!N.taboo&&knows('lore:three_calls')){N.taboo=true;bLater('(세 번째엔… 돌아보지 말자.)',40);}
   // 둘째 부름 뒤 셋째 사이: 적패지에 칠 자리가 뜬다. 치면 부름이 끊긴다 (마지막 부름은 끊지 못한다)
   if(c.k===2&&!c.final&&B.E.names.cutAt){const p=B.parts.find(q=>q.id===B.E.names.scroll);
     if(p&&!p.broken){const m=B.E.names.cutAt(),q=bFitMark(m.x,m.y);B.mark={x:q.x,y:q.y,t:c.t,max:c.t,part:p,cut:true};}}
@@ -172,6 +212,7 @@ function nameStep(){
   if(N.jerk&&N.jerk.t-->0){B.px=clamp(B.px+N.jerk.vx,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+N.jerk.vy,BOX.y+8,BOX.y+BOX.h-8);}
   if(N.fly&&++N.fly.t>=N.fly.max)N.fly=null;
   if(N.echo&&--N.echo.t<=0)N.echo=null;
+  for(const e of N.echoes){e.t++;if(e.t>0&&!Vfx.reducedMotion){e.x+=e.vx;e.y+=e.vy;}}N.echoes=N.echoes.filter(e=>e.t<e.max);
   if(N.spit)N.spit.t++;
   const target=Math.min(nameTune().name_hand_fade_max,nameTune().name_hand_fade*namesLostNow());
   N.fade+=(target-N.fade)*0.08;
@@ -180,10 +221,15 @@ function nameStep(){
   if(N.flash){if(B.st==='open')N.flashSeen=true;else if(N.flashSeen)N.flash=false;}
   const btn=$('bNames');if(btn)btn.classList.toggle('want',N.flash&&B.st==='open');
 }
-/* 결정 D-1141: 먹힌 이름을 k 개 돌려준다 (쪽지 문 까마귀, 소매를 부숨) */
+/* 결정 D-1141: 먹힌 이름을 k 개 돌려준다 (소매를 부숨) */
 function nameReturn(k,x,y){
   if(!nameBattleOn())return 0;const N=B.names;if(!N.eaten.length)return 0;
-  const back=N.eaten.splice(Math.max(0,N.eaten.length-k),k);
+  return nameReturnIds(N.eaten.slice(Math.max(0,N.eaten.length-k)),x,y);
+}
+/* 결정 D-1271: 바닥에 떠오른 내 이름을 쳐서 그 이름 하나를 되찾는다 */
+function nameReturnIds(ids,x,y){
+  if(!nameBattleOn())return 0;const N=B.names,back=ids.filter(id=>N.eaten.includes(id));if(!back.length)return 0;
+  N.eaten=N.eaten.filter(id=>!back.includes(id));
   restoreNames(back);G.f.gangcheolSwallowed=[...N.eaten];
   const texts=(G.nicknames||[]).filter(n=>back.includes(n.id)).map(n=>n.text);
   texts.forEach((s,i)=>B.pops.push({x:(x??B.px)+(i%2?18:-18),y:(y??B.py)-40-i*14,t:60,text:s,good:true}));
@@ -292,9 +338,26 @@ function drawNameTag(c,x,y,text,frost,alpha){
   c.beginPath();c.rect(x-w/2,y-9,w,18);c.fill();c.stroke();
   c.fillStyle=frost?'#7d8c96':INK;c.fillText(text,x,y+0.5);c.restore();
 }
+/* 결정 D-1275: 메아리. 부름이 거듭될수록 빛깔이 짙어진다(첫째 차가운 잿빛, 둘째 짙은 먹빛, 셋째 붉은 먹빛) */
+const ECHO_COLS=['#62737e','#3b4750','#7d2a1f'];
+function drawNameEchoes(c){
+  const N=B.names;if(!N.echoes.length)return;
+  c.save();c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';
+  for(const e of N.echoes){if(e.t<0)continue;
+    const inT=nameTune().name_echo_in,a=e.t<inT?e.t/inT:Math.pow(1-(e.t-inT)/(e.max-inT),1.4),base=e.main?0.95:[0.5,0.66,0.8][e.k-1];
+    const s=e.size*(1+0.12*e.t/e.max);
+    c.globalAlpha=a*base;c.font=(e.main||e.k===3?'bold ':'')+s.toFixed(1)+'px "Gowun Batang", "Batang", serif';
+    c.lineWidth=e.main?5:3.5;c.strokeStyle='rgba(255,250,240,.72)';c.strokeText(e.text,e.x,e.y);
+    c.fillStyle=ECHO_COLS[e.k-1];c.fillText(e.text,e.x,e.y);}
+  c.restore();
+  // 몇 번째 부름인지: 판 위 가운데 붓 점 셋
+  const cl=N.call;if(!cl||B.st!=='ncall')return;
+  for(let i=0;i<3;i++){const x=BOX.x+BOX.w/2+(i-1)*16,y=BOX.y+11;
+    blob(c,x,y,4.4,3.6,i<cl.k?(cl.k===3?RED:INK):'#d8ccb4',i<cl.k?0.9:0.7);}
+}
 function drawNames(c){
   if(!nameBattleOn())return;const N=B.names;
-  drawNameFrost(c);
+  drawNameFrost(c);drawNameEchoes(c);
   // 먹힌 이름패가 얼며 입으로 날아간다
   if(N.fly){const f=N.fly,e=f.t/f.max,m=nameMouthAt(),mx=(f.x+m.x)/2,my=Math.min(f.y,m.y)-40;
     const x=(1-e)*(1-e)*f.x+2*(1-e)*e*mx+e*e*m.x,y=(1-e)*(1-e)*f.y+2*(1-e)*e*my+e*e*m.y;
