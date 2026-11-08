@@ -356,6 +356,7 @@ function dadComesBack(next){
   F.dadBack=true;F.dadCalled=true;learn('dad:back');
   diary('y_dad_back','붉은 천이 풀려 삼킨 이름들이 흩어졌다. 짐표 앞면에 아빠 이름이 돌아왔다. 어른 이름은 함부로 부르는 게 아니라고 배웠지만, 소리 내어 불렀다. 한 번, 두 번. 세 번째에 아빠가 돌아보았다.');
   const memo=G.clues.some(c=>c.id==='j3');
+  sceneNext('y_dad_back');   // 결정 D-1401: 짐표 이름으로 아빠를 세 번 불러 데려온다. 아빠 곡
   talk([Object.assign(['너구리','(보따리 끈의 짐표가 따뜻하다.\n매끈하던 앞면에… 글씨가 있다.)'],{pic:Rg.pics.tagLetters}),
     ['너구리','(아빠 이름이다. 먹빛이 또렷하다.\n…나는 왜 이걸 잊고 있었지?)'],
     Object.assign(['너구리','(얼음 녹은 물가에 아빠가 올라와 앉아 있다.\n아직 호수만 본다. 매듭을 묶었다 푼다.)'],{pic:Rg.pics.dadCall}),
@@ -455,6 +456,7 @@ function dadArcMud(){
 // ③ 수첩의 손도장: 명패를 다시 건 뒤(D-1366). 아빠가 뒤에 올 보부상 보라고 길마다 찍은 손바닥 도장과 같은 손이다 (D-1200).
 function dadArcPalm(){
   const found=typeof stampCount==='function'?stampCount():0;
+  sceneNext('y_dad_palm');   // 결정 D-1401: 아빠와 손도장을 나란히 찍는다. 아빠 곡
   arcScene('yArcsDad3',[
     ['너구리','(아빠 무릎에 수첩을 펼쳤다. 아빠가 한 장씩 넘기다\n내 그림에서 손이 자꾸 멈춘다.)'],
     ['아빠','(맨 뒤 빈 쪽에 흙 묻은 손바닥을 꾹 찍는다.)'],

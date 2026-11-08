@@ -3931,6 +3931,8 @@ const TABLES={
   "wish_anim_done_frames": 50,
   "music_duck": 0.72,
   "music_dialog_hold_ms": 600,
+  "music_fade_return": 2,
+  "music_story_min_ms": 8000,
   "battle_aim_left": 1,
   "battle_aim_up": 19,
   "battle_hitstop": 4,
@@ -5085,6 +5087,14 @@ const TABLES={
   },
   "y_give_name": {
    "music": "theme",
+   "from": 0
+  },
+  "y_dad_back": {
+   "music": "father",
+   "from": 0
+  },
+  "y_dad_palm": {
+   "music": "father",
    "from": 0
   }
  },

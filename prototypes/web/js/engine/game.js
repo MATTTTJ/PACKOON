@@ -36,6 +36,12 @@ const GameMusic=(()=>{
      경치 효과음이 끝날 만큼 쉰 뒤 경치 곡을 들인다. 돌아올 때도 경치 곡을 내리고 잠깐 쉰 뒤 지역 곡을 반복 처음부터 들인다. */
   const SCENERY_GAP_IN=800,SCENERY_GAP_OUT=350,SCENERY_FADE=.4;
   let gapFor=null,gapUntil=0,gapKind=null;
+  /* 결정 D-1401 (사용자 지시 2026-11-09, Fable 분석): 곡은 장면이 바꾸고 대화는 바꾸지 않는다.
+     - 장면 곡(표의 장면·전투·회상·가공·미니게임)에서 지역 곡으로 돌아오면 떠날 때의 자리부터 잇는다(resume). 도입부를 되풀이하지 않는다.
+       돌아올 때는 music_fade_return 초로 겹친다. 경치는 D-46대로 반복 처음부터다.
+     - 장면 곡은 music_story_min_ms 동안은 지역 곡으로 돌아가지 않는다(짧은 대화에서 곡이 들어오자마자 나가지 않게, storyHold).
+     - 회상 장면(cine)은 대화처럼 낮추지 않는다(D-1260을 바꿨다. 자막뿐이라 겹칠 소리가 없다). */
+  let resume=null;const storyHold={id:null,at:0};
   const history=[],warnings=new Set();
   function valid(value,fallback){
     const id=typeof value==='function'?value(G,zoneDef()):value;
@@ -61,26 +67,29 @@ const GameMusic=(()=>{
     if(mg?.id==='rhythm')return {id:null,kind:'rhythm'};
     // 결정 D-233: 이어지는 대화 사이의 짧은 틈에는 앞 대화의 곡을 그대로 둔다
     const story=scene||(open('dlg')?dlgMusic:dlgHeld()?dlgGone.music:null);
-    if(story)return {id:valid(story,regionTrack()),kind:'story'};
+    if(story){const id=valid(story,regionTrack());if(storyHold.id!==id){storyHold.id=id;storyHold.at=performance.now();}return {id,kind:'story'};}
     if(vistaMode)return {id:valid(vistaMode.p.music,scenery[G.region]||'scenery_danpunggol'),kind:'scenery'};
     if(mg)return {id:valid(mg.music,'minigame'),kind:'minigame'};
     if(brewing||craftHands)return {id:'crafting',kind:'crafting'};
     if(!G.started)return {id:TitleScreen.isOpen()?'title':arrival?regionTrack():'theme',kind:'title'};
+    // 결정 D-1401: 장면 곡이 막 들어왔으면 대화가 끝나도 music_story_min_ms 를 채운 뒤 지역 곡으로 돌아간다
+    if(storyHold.id&&performance.now()-storyHold.at<TABLES.TUNING.music_story_min_ms)return {id:storyHold.id,kind:'story'};
+    storyHold.id=null;
     return {id:regionTrack(),kind:'region'};
   }
   function update(){
     if(!G||!REG)return;
     if(owner!==G||region!==G.region){
       const moved=owner===G&&region&&region!==G.region;
-      owner=G;region=G.region;scene=null;requested=undefined;pending=false;requestCount++;
+      owner=G;region=G.region;scene=null;requested=undefined;pending=false;requestCount++;resume=null;storyHold.id=null;
       travelTo=moved?regionTrack():null;arrival=!!moved;
       if(!moved)player.stop(.08);
     }
     const target=selection();
     // 대화·손맛·환경음을 살리되 BGM과 효과음의 사용자 음량은 각각 유지한다.
     // 결정 D-233: 대화가 닫힌 뒤 music_dialog_hold_ms 동안은 덕킹을 풀지 않는다(이어지는 대화 사이에서 커졌다 작아지지 않게)
-    // 결정 D-1260: 회상 장면(engine/cine.js) 동안도 대화처럼 음악을 낮춘다
-    const factor=open('dlg')||dlgHeld()||vistaMode||brewing||!!craftHands||open('cine')?TABLES.TUNING.music_duck:1;
+    // 결정 D-1401: 회상 장면(engine/cine.js)은 낮추지 않는다 (D-1260의 '대화처럼 낮춘다'를 바꿨다)
+    const factor=open('dlg')||dlgHeld()||vistaMode||brewing||!!craftHands?TABLES.TUNING.music_duck:1;
     if(factor!==duck){duck=factor;player.setDucking(duck,.18);}
     const travelling=player.getState().travel;
     // 도착 대화·패널·경치는 길 위 간주를 지우지 않는다. 전투와 장단은 먼저 들려주고 끝난 뒤 한 번 잇는다.
@@ -119,6 +128,11 @@ const GameMusic=(()=>{
       if(requested!==target.id){requestCount++;player.stop(.025);requested=target.id;}
       pending=true;return;
     }
+    // 결정 D-1401: 지역 곡을 떠나 장면 곡으로 갈 때 지금 자리를 적어 둔다 (경치는 D-46대로 따로 한다)
+    if(lastKind==='region'&&!['region','scenery'].includes(target.kind)){
+      const cur=player.getState(),last=history[history.length-1];
+      if(cur.playing&&!cur.loading&&last&&cur.id===last.id)resume={id:cur.id,t:cur.currentTime,f:cur.tempoFactor||1};
+    }
     requested=target.id;pending=false;const ticket=++requestCount;
     const row={id:target.id,kind:target.kind,region:G.region,zone:G.zone,audioTime:Sound.context.currentTime};
     history.push(row);if(history.length>80)history.shift();
@@ -133,7 +147,12 @@ const GameMusic=(()=>{
       // 경치에서 돌아오면 지역 곡을 반복 처음(박 처음)부터 다시 들인다. 템포 단계가 있으면 그 빠르기로 센다.
       const t=PackoonAudioData.score.tracks.find(t=>t.id===target.id);
       if(t?.loop)settings.fromSeconds=t.loop.start*t.meter[0]*4/t.meter[1]*60/(t.tempo*(settings.tempo||1));
+    }else if(target.kind==='region'&&resume&&resume.id===target.id&&lastKind!=='region'){
+      // 결정 D-1401: 장면 곡에서 돌아오면 떠날 때의 자리부터 잇는다. 템포 단계가 바뀌었으면 그 빠르기로 옮긴다
+      settings.fromSeconds=resume.t*resume.f/(settings.tempo||1);
+      settings.crossfade=TABLES.TUNING.music_fade_return;
     }else if(target.kind==='region'){
+      if(lastKind&&!['region','gap','travel','title'].includes(lastKind))settings.crossfade=TABLES.TUNING.music_fade_return;
       const now=player.getState(),tracks=PackoonAudioData.score.tracks;
       const before=tracks.find(t=>t.id===now.id),after=tracks.find(t=>t.id===target.id);
       if(before&&after?.loop&&now.id!==target.id&&history.length>1&&history[history.length-2].kind==='region'){
@@ -142,6 +161,7 @@ const GameMusic=(()=>{
         settings.fromSeconds=(after.loop.start*bar+beats%loopBeats)*60/after.tempo;
       }
     }
+    if(target.kind==='region')resume=null;
     player.play(target.id,settings).then(ok=>{
       if(!ok&&ticket===requestCount)pending=true;
     }).catch(error=>{console.error('음악 재생 실패:',error);});
@@ -192,7 +212,7 @@ const GameMusic=(()=>{
     }
   }
   function setScene(id){update();scene=id||null;update();}
-  function reset(){scene=null;dlgMusic=null;dlgGone.at=-1e9;requested=undefined;pending=false;travelTo=null;requestCount++;if(owner!==G||region===G.region)player.stop(.08);}
+  function reset(){scene=null;resume=null;storyHold.id=null;dlgMusic=null;dlgGone.at=-1e9;requested=undefined;pending=false;travelTo=null;requestCount++;if(owner!==G||region===G.region)player.stop(.08);}
   function getState(){return {...player.getState(),desired:selection(),duck,mood:{...mood},levels:applied,history:history.slice(),diagnostics:player.getDiagnostics()};}
   // Sound의 trusted 입력 처리와 resume Promise가 끝난 뒤 아직 잠긴 곡을 다시 요청한다.
   addEventListener('pointerdown',()=>setTimeout(update,0),true);
