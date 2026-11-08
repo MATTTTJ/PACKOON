@@ -361,7 +361,7 @@ function install(){
     if(paused()||B||G.f.spring||G.f.yLureDone||!G.onGround||G.zone!=='shore')return;
     if(Math.abs(G.px-Rg.VILLAGE.cub)<TABLES.TUNING.y_lure_range)lureScene();};}
   // 결정 D-1227 (사용자 지시 2026-11-07 4스테이지 27): 얼어붙은 비탈을 수달로 배 깔고(또 수리부엉이로) 내려가던 길은 뺐다.
-  //   호숫가 길은 살금이가 알려 준 디딤돌로만 열린다 (field.js iceReason, D-1226). 수달은 얼음 구멍 잠수로 쓴다.
+  //   호숫가 길은 살금이가 알려 준 디딤돌로만 열린다 (field.js ledgeOpen, D-1226·D-1250). 수달은 얼음 구멍 잠수로 쓴다.
   // 봄이 오면 아빠는 섬으로 건너와 두루미 곁에 선다. 이름·약·귀향 장면이 모두 섬에서 열리기 때문이다.
   {
     const isl=Rg.zones.island,sh=Rg.zones.shore;

@@ -76,6 +76,10 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
         await wait(100);
       }else if(id==='dolDepthTravel') {
         await wait(100);
+      }else if(id==='cine') {
+        // 결정 D-1260: 회상 장면(engine/cine.js)은 자막마다 E 로 넘긴다. 건너뛰지 않고 컷을 모두 지나간다.
+        const at=await read('Cine.state');log('회상 장면',at);
+        await key('e');await wait(520);
       }else throw new Error('처리 방법이 없는 미니게임: '+id);
     }
     throw new Error(`미니게임 ${id}에서 45초 진행하지 못했다`);
@@ -324,7 +328,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       }});
     await next();
     await stage('영산 · 설피',async()=>{await pickup('jip');await gather('darae_vine',2);for(let i=0;i<3&&!await read('G.f.seolpi');i++)await npc('nal');if(!await read('G.f.seolpi'))throw new Error('설피를 받지 못했다');});
-    await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('넋 빠진 아빠에게서 장부 한 장을 받지 못했다');if(mode==='expanded')await npc('y_ice_station_2');});
+    await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('넋 빠진 아빠에게서 장부 한 장을 받지 못했다');});
     // 결정 D-1184: 확장판은 길손 움막의 둘째 짚단을 빈 지게 할아버지 곁에 놓아 짚신(어둑차사 진정 선물)을 받는다.
     if(mode!=='expanded')await stage('영산 · 짚신',async()=>{await pickup('jipsin');});   // 결정 D-1186: 옛 구성은 아빠 곁 짚신
     if(mode==='expanded')await stage('영산 · 짚신',async()=>{await pickup('jip');await zone('shore');

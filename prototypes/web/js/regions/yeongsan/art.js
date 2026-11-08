@@ -448,9 +448,31 @@ A.scenery=zone=>{
     const rx=tx(2100)-cam;rock(rx,GROUND,52,11);px(rx-25,GROUND-10,54,3,'#d6dedb');
     for(let i=0;i<4;i++)px(rx-19+i*11,GROUND-11,3,2,'#66766f');
     // 살금이가 알려 준 발 디딜 돌턱: 호숫가로 내려가는 바위턱 문 앞에 눈을 턴 돌이 계단처럼 드러난다 (결정 D-1063)
-    if(G.f.shortcut){const dx=tx(2320)-cam;for(let i=0;i<5;i++){px(dx-42+i*9,GROUND-4-i*7,8,3,'#5d5a50');px(dx-42+i*9,GROUND-5-i*7,8,1,'#cfd8de');}}
+    // 결정 D-1250 (사용자 지시 2026-11-08 32): 비탈 오른쪽 끝은 얼음 낭떠러지다. 걸어서 넘을 길이 없다.
+    //   살금이가 알려 주기 전에는 바위턱에 눈만 덮여 있고, 알려 준 뒤에는 눈 털린 디딤돌이 낭떠러지 낯을 따라 아래로 드러난다.
+    const rim=tx(2538)-cam;
+    if(rim<W+20){
+      px(rim,GROUND-1,W-rim+20,H-GROUND+1,'#16212d');   // 아래가 텅 빈 낭떠러지
+      for(let i=0;i<4;i++)px(rim,GROUND+6+i*7,W-rim+20,1,i%2?'#1d2b3a':'#223446');   // 깊이를 보이는 안개 켜
+      px(rim+4,H-6,W-rim+16,2,'#8fa9bb');px(rim+10,H-4,W-rim+10,1,'#5f7a8e');   // 까마득히 아래 언 호숫가
+      for(let i=0;i<H-GROUND;i+=3){const j=Math.round(hash(i*1.7+3)*5);px(rim-3+j,GROUND+i,4,3,i%6?'#3a4b5b':'#2f3e4c');}   // 깎아지른 바위 낯
+      px(rim-16,GROUND-3,20,3,'#e8f0f5');px(rim+2,GROUND-2,5,2,'#dbe6ee');   // 처마처럼 걸린 눈
+      for(let k=0;k<4;k++)px(rim-12+k*4,GROUND,1,3+(k%2)*3,'#cfe2ee');   // 고드름
+      if(!Vfx.reducedMotion)for(let k=0;k<5;k++){const f=(G.anim*.6+k*37)%60;px(rim+6+Math.round(hash(k)*14),GROUND+Math.round(f*.5),1,1,'rgba(230,238,245,.7)');}   // 바람에 날려 떨어지는 눈
+      const dx=tx(2500)-cam;
+      if(Rg.ledgeOpen?.()){
+        // 눈 털린 디딤돌: 바위턱에서 낭떠러지 낯을 따라 아래로. 살금이 앞발 자국과 털어 낸 눈 무더기
+        for(let i=0;i<3;i++){px(dx-10+i*12,GROUND-2,9,3,'#5d5a50');px(dx-10+i*12,GROUND-3,9,1,'#cfd8de');}
+        for(let i=0;i<5;i++){const sx=rim-2+(i%2)*6,sy=GROUND+4+i*7;px(sx,sy,9,3,'#5d5a50');px(sx,sy-1,9,1,'#cfd8de');}
+        px(dx-22,GROUND-4,8,4,'#e8eef2');px(dx+28,GROUND-3,6,3,'#e8eef2');
+        for(let i=0;i<3;i++)px(dx-6+i*12,GROUND-6,2,1,'#8a7a6a');
+      }else{px(dx-18,GROUND-4,52,4,'#e8eef2');px(dx-12,GROUND-6,34,2,'#f4f7fa');}   // 눈에 묻힌 바위턱
+    }
   }
   if(zone==='shore'){
+    // 결정 D-1250: 왼쪽 끝은 비탈에서 내려온 바위 벽이다. 오르는 길은 디딤돌 바위턱(밧줄 문) 하나뿐이다
+    {const wx=-cam;if(wx>-40)for(let i=0;i<GROUND-96;i+=3){const j=Math.round(hash(i*1.3+11)*4);px(wx,96+i,14+j,3,i%6?'#3a4b5b':'#2f3e4c');px(wx+12+j,96+i,1,3,'#55697a');}
+      if(wx>-40){px(wx,94,18,3,'#e8f0f5');for(let k=0;k<3;k++)px(wx+3+k*5,97,1,3+k%2*2,'#cfe2ee');}}
     const x=2320-cam;px(x-50,GROUND-2,100,5,'#9d8c73');
     for(let i=0;i<7;i++)px(x-48+i*15,GROUND-2,2,5,'#635c53');
     boat(x+16,GROUND+20);rock(2130-cam,GROUND,61,23);

@@ -152,6 +152,7 @@ js/engine/              모든 지역이 같이 쓰는 것
   trade.js              보따리 펼치기 교환 화면: 부탁(지역 Rg.trade)·흔한 물건(stock.csv)·흥정(haggle.csv)
   book.js               수첩 뒤쪽에 아이가 이어 적은 장 그리기 (일기·단서·별명·답장·엄마 쪽지·장부)
   notebook.js           아빠의 수첩 패널 (아빠의 쪽 + 아이의 줄, 탭, 쪽 수·줄 수, learn)
+  cine.js               회상 장면 재생기: 무대를 덮는 240×135 움직이는 그림과 아래 자막, 다음·건너뛰기, 수첩 다시 보기 (D-1260. 영산 두루미 회상이 쓴다)
   battle-ink.js         수묵 붓 도구
   battle.js             부위 공략 전투
   battle-attacks.js     부위 공격 목록 (sweep, spike, seed, slam, ember, shout)
