@@ -5,6 +5,7 @@
      쉼터 칸(REST_KEY, 개발자 모드는 따로)에 따로 남기고, 보통 저장도 한다. 30초 자동 저장이 덮어써도 쉼터 칸은 남는다.
    - 보스에게 지면(lose) 결과 창을 닫은 뒤 쉼터 칸을 되살려 불 앞에 세운다(restAfterBattle). 물러나면(flee) 그 자리 그대로.
      되살린 뒤에도 남길 것: 쓰러진 횟수(faints), 알게 된 것(learned), 지역이 carry 로 적은 진행값.
+     보스가 빼앗은 이름은 모두 돌려놓는다(결정 D-1400).
    - 쉼터를 한 번도 켜지 않았거나(옛 저장) 칸이 다른 지역·다른 게임 것이면 예전처럼 그 자리에서 일어난다. */
 const REST_KEY='packoon-rest-v1',DEV_REST_KEY='packoon-rest-dev-v1';
 const restKey=()=>typeof Dev!=='undefined'&&Dev.on?DEV_REST_KEY:REST_KEY;
@@ -59,9 +60,14 @@ function restStep(){
 }
 /* 보스 전투 결과 뒤. lose 이고 쉼터 칸이 있으면 쉼터로 되돌린 뒤 hint, 아니면 place(예전 자리) 뒤 hint */
 function restAfterBattle(res,place,hint){
-  if(res!=='lose'||!restLit()||!readRest()){place?.();hint?.();return;}
-  inkTransition('쉼터',42,()=>{if(!restReturn())place?.();hint?.();});
+  if(res!=='lose'||!restLit()){place?.();hint?.();return;}
+  // 결정 D-1400: 쉼터를 켠 뒤 지면 칸을 못 읽어 그 자리에서 일어나도 빼앗긴 이름은 돌아온다
+  if(!readRest()){place?.();restNames();hint?.();return;}
+  inkTransition('쉼터',42,()=>{if(!restReturn()){place?.();restNames();}hint?.();});
 }
+/* 결정 D-1400 (사용자 지시 2026-11-09): 쉼터에서 다시 시작하면 보스가 빼앗은 이름이 도전 전처럼 모두 돌아온다.
+   쉼터 칸이 이름을 잃은 뒤에 적혔어도(물러난 뒤 다시 불을 지남, 옛 저장) 그렇다. 이름 규칙은 battle-names.js nameRestReset */
+function restNames(){if(typeof nameRestReset==='function')nameRestReset();}
 function restReturn(){
   const s=readRest(),r=REG?.rest;if(!s||!r)return false;
   const keep={faints:G.f.faints||0,restLit:{...(G.f.restLit||{})}};
@@ -70,6 +76,7 @@ function restReturn(){
   let g;try{g=repairSavedState(s.G);}catch(_){return false;}
   G=g;Object.assign(G.f,keep);
   for(const id of learned)if(!G.learned.includes(id))G.learned.push(id);
+  restNames();   // 결정 D-1400
   G.form='';G.hp=G.maxhp;G.hurtT=0;G.ended=false;G.started=true;   // 불 앞에서 깜박이지 않고 바로 보이게
   if(usesZones(REG)&&s.zone)G.zone=s.zone;
   resetScreens();

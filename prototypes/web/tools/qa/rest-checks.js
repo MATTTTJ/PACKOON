@@ -56,7 +56,15 @@ async function runRest({ browser, outDir }) {
         await lose('flee');
         const f = await browser.eval('({probe:G.f.__restProbe2,faints:G.f.faints})');
         if (f.probe !== 1) fail('rest-flee', `${where}: 물러났는데 진행이 쉼터 때로 되돌아갔다`);
-        checked.push({ where, lit, after: a, fled: f });
+        // 결정 D-1400: 이름을 잃은 채 쉼터 칸이 다시 적혀도(물러난 뒤 불을 다시 지남) 지고 돌아오면 이름이 모두 돌아온다
+        let again = null;
+        if (id === 'yeongsan') {
+          await browser.eval(`(()=>{dlgDismiss();thinkHold=0;for(const n of G.nicknames){n.lost=true;}G.f.gangcheolSwallowed=G.nicknames.map(n=>n.id);writeRest(REG.rest);return 1;})()`);
+          await lose('lose');
+          again = await browser.eval(`({lost:(G.nicknames||[]).filter(n=>n.lost).length,swallowed:(G.f.gangcheolSwallowed||[]).length})`);
+          if (again.lost || again.swallowed) fail('rest-names', `${where}: 이름 없이 적힌 쉼터로 돌아왔는데 빼앗긴 이름 ${again.lost}개가 돌아오지 않았다`);
+        }
+        checked.push({ where, lit, after: a, fled: f, again });
       } catch (error) {
         fail('rest-execution', `${where}: ${error.message}`);
         await browser.screenshot(path.join(outDir, `rest-${mode}-${id}-failure.png`)).catch(() => {});

@@ -285,6 +285,13 @@ function nameBattleEnd(result){
   }
   renderBHud();
 }
+/* 결정 D-1400 (사용자 지시 2026-11-09): 쉼터에서 다시 시작하면(rest.js restNames) 어둑차사가 빼앗은 이름이 도전 전처럼 모두 돌아온다.
+   이름을 잃는 길은 어둑차사뿐이라(nameTake) 잃은 이름을 모두 푼다. 물러나(flee) 그 자리에 있을 때는 예전대로 명부에 남는다(D-1141) */
+function nameRestReset(){
+  if(!G)return 0;const k=restoreNames();
+  if(G.f){G.f.gangcheolSwallowed=[];G.f.gangcheolRetry=false;}
+  return k;
+}
 function calmWinText(){return B.E.calmWin;}
 /* 부위 줄 아래 이름패 줄. 무엇인지 설명하지 않는다 */
 /* 결정 D-1320: 이름패 줄(HTML)은 뺐다. 이름은 판 왼쪽의 수첩 장(drawNameBook)에 보인다. '이름' 단추 상태만 맞춘다 */
