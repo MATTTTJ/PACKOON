@@ -79,7 +79,8 @@ const GameMusic=(()=>{
     const target=selection();
     // 대화·손맛·환경음을 살리되 BGM과 효과음의 사용자 음량은 각각 유지한다.
     // 결정 D-233: 대화가 닫힌 뒤 music_dialog_hold_ms 동안은 덕킹을 풀지 않는다(이어지는 대화 사이에서 커졌다 작아지지 않게)
-    const factor=open('dlg')||dlgHeld()||vistaMode||brewing||!!craftHands?TABLES.TUNING.music_duck:1;
+    // 결정 D-1260: 회상 장면(engine/cine.js) 동안도 대화처럼 음악을 낮춘다
+    const factor=open('dlg')||dlgHeld()||vistaMode||brewing||!!craftHands||open('cine')?TABLES.TUNING.music_duck:1;
     if(factor!==duck){duck=factor;player.setDucking(duck,.18);}
     const travelling=player.getState().travel;
     // 도착 대화·패널·경치는 길 위 간주를 지우지 않는다. 전투와 장단은 먼저 들려주고 끝난 뒤 한 번 잇는다.
