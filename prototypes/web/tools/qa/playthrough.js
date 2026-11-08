@@ -76,6 +76,10 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
         await wait(100);
       }else if(id==='dolDepthTravel') {
         await wait(100);
+      }else if(id==='cine') {
+        // 결정 D-1260: 회상 장면(engine/cine.js)은 자막마다 E 로 넘긴다. 건너뛰지 않고 컷을 모두 지나간다.
+        const at=await read('Cine.state');log('회상 장면',at);
+        await key('e');await wait(520);
       }else throw new Error('처리 방법이 없는 미니게임: '+id);
     }
     throw new Error(`미니게임 ${id}에서 45초 진행하지 못했다`);

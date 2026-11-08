@@ -250,6 +250,9 @@ function notePage(e,section){
   if(dad.length)write('dad-ink','아빠',dad.map(l=>l.text));
   if(mine.length)write('my-ink','나',mine);
   else if(dad.length){const gap=el('div','my-ink blank');gap.setAttribute('aria-hidden','true');card.appendChild(gap);}
+  // 결정 D-1264: 본 회상 장면은 그 인물 쪽에서 다시 본다 (engine/cine.js Cine.addReplay)
+  const rp=section==='관찰'&&typeof Cine!=='undefined'?Cine.replayFor(e.id):null;
+  if(rp){const b=el('button','note-replay',rp.label);b.type='button';b.onclick=ev=>{ev.stopPropagation();closePanels();rp.play();};card.appendChild(b);}
   return card;
 }
 // 결정 D-81: 도장 전체 수는 수첩 데이터에서 센다(도장 쪽의 stamp: 키). 지역별로도 센다.
