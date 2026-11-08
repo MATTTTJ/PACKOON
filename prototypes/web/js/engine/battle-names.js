@@ -387,8 +387,18 @@ function drawNameEchoes(c){
 /* ---------- 결정 D-1320: 전투 속 수첩 '이름' 장 ----------
    판 왼쪽에 아빠의 수첩 '이름' 장을 펼쳐 둔다(세로 화면은 왼쪽 가장자리 좁은 장). 이름마다 한 줄, 지금 가진 이름은 먹 글씨다.
    빼앗기면 글씨가 한 자씩 떨어져 적패지로 날아가고 그 줄에는 옅은 먹 번짐만 남는다. 되찾으면 글씨가 날아와 한 자씩 다시 적힌다. */
-function bookRect(){const tall=LW<700,w=tall?Math.min(138,BOX.x-16):Math.min(196,BOX.x-46);return {x:tall?8:BOX.x-w-28,y:BOX.y-4,w,h:BOX.h+8};}
-function bookLine(i){const r=bookRect(),n=Math.max(1,(G.nicknames||[]).length),top=r.y+30,lh=Math.min(21,(r.h-36)/n);return {x:r.x+18,y:top+lh*(i+0.5),lh,size:Math.round(Math.max(10,Math.min(14,lh-5)))};}
+/* 결정 D-1320: 부위 줄(HTML, #bParts)이 길게 내려오는 작은 화면에서는 수첩 장 위쪽을 그 아래로 내린다.
+   가로 휴대폰에서 방향 판(#dpad)이 판 왼쪽을 덮으면 수첩 장을 그 오른쪽으로 좁혀 둔다 (자리는 20프레임마다 잰다) */
+function bookPlace(){const N=B.names;if(N.placeAt==null||B.time-N.placeAt>20||B.time<N.placeAt){N.placeAt=B.time;
+    const c=bcv.getBoundingClientRect(),toX=x=>(x-c.left)*LW/c.width,toY=y=>(y-c.top)*LH/c.height,vis=e=>e&&e.getClientRects().length&&e.getBoundingClientRect().width>0;
+    let y=BOX.y-4,left=LW<700?8:16;
+    const p=document.getElementById('bParts');if(c.height>0&&vis(p))y=Math.max(y,toY(p.getBoundingClientRect().bottom)+6);
+    const d=document.getElementById('dpad');if(c.width>0&&vis(d)){const r=d.getBoundingClientRect();if(toY(r.bottom)>y&&toY(r.top)<BOX.y+BOX.h&&toX(r.left)<BOX.x)left=Math.max(left,toX(r.right)+6);}
+    N.place={y:Math.min(y,BOX.y+BOX.h-70),left};}
+  return N.place;}
+function bookRect(){const P=bookPlace(),tall=LW<700,max=tall?138:196,gap=tall?8:28,w=Math.max(70,Math.min(max,BOX.x-gap-P.left));
+  return {x:Math.max(P.left,BOX.x-w-gap),y:P.y,w,h:BOX.y+BOX.h+4-P.y};}
+function bookLine(i){const r=bookRect(),n=Math.max(1,(G.nicknames||[]).length),top=r.y+(r.h<120?24:30),lh=Math.min(21,(r.h-(r.h<120?28:36))/n);return {x:r.x+18,y:top+lh*(i+0.5),lh,size:Math.round(Math.max(10,Math.min(14,lh-5)))};}
 const bookFont=s=>'bold '+s+'px "Gowun Batang", "Batang", serif';
 function bookInk(n,dir,x,y,via){
   if(!nameBattleOn())return;if((G.nicknames||[]).findIndex(q=>q.id===n.id)<0)return;

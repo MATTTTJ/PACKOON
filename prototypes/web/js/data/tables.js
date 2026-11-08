@@ -4069,7 +4069,7 @@ const TABLES={
   "chasa_robe_tear_hits": 2,
   "chasa_robe_tear_frames": 210,
   "chasa_robe_squeeze_frames": 50,
-  "chasa_robe_inside_dark": 0.93,
+  "chasa_robe_inside_dark": 0.97,
   "chasa_crow_bulge": 0.24,
   "chasa_crow_thick_min": 0.8,
   "chasa_crow_thick_max": 1.2

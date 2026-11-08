@@ -730,8 +730,8 @@ function bDraw(){
   else c.fillText(msg,LW/2,BOX.y-14);
   // 결정 D-227: 공격 예고 동안 글귀 앞에 작은 위험 표시만 둔다
   if(B.st==='tell'&&!B.E.dodge)drawDangerSign(c,msg?LW/2-msgW/2-16:LW/2,msgY-6,1,B.t);
-  // 상자
-  c.save();c.fillStyle='rgba(255,252,242,.55)';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();
+  // 상자 (결정 D-1325: 판이 덮여 갇힌 동안은 종이빛도 그만큼 옅다)
+  c.save();c.globalAlpha=B.E.borderAlpha?B.E.borderAlpha():1;c.fillStyle='rgba(255,252,242,.55)';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();
   c.save();c.beginPath();c.rect(BOX.x,BOX.y,BOX.w,BOX.h);c.clip();
   if(B.E.drawFloor)B.E.drawFloor(c);
   if(B.E.possession)drawPossessedAttack(c);
@@ -750,8 +750,8 @@ function bDraw(){
   if(B.E.drawOver)B.E.drawOver(c);
   if(B.giftPlace)drawPlacedGift(c);
   drawBonk(c);
-  // 붓 테두리
-  const X=BOX.x,Y=BOX.y,Wd=BOX.w,Ht=BOX.h;
-  brush(c,[[X-3,Y+1],[X+Wd*0.5,Y-1],[X+Wd+3,Y+1]],4,INK);brush(c,[[X+Wd+1,Y-2],[X+Wd-1,Y+Ht*0.5],[X+Wd+1,Y+Ht+3]],4,INK);
-  brush(c,[[X+Wd+2,Y+Ht+1],[X+Wd*0.5,Y+Ht+2],[X-3,Y+Ht]],4,INK);brush(c,[[X-1,Y+Ht+2],[X+1,Y+Ht*0.5],[X-1,Y-3]],4,INK);
+  // 붓 테두리. 결정 D-1325: 상대가 판을 덮어 가두면(어둑차사 도포) borderAlpha 만큼 옅어진다
+  const X=BOX.x,Y=BOX.y,Wd=BOX.w,Ht=BOX.h,ba=B.E.borderAlpha?B.E.borderAlpha():1;
+  if(ba>0.01){brush(c,[[X-3,Y+1],[X+Wd*0.5,Y-1],[X+Wd+3,Y+1]],4,INK,ba);brush(c,[[X+Wd+1,Y-2],[X+Wd-1,Y+Ht*0.5],[X+Wd+1,Y+Ht+3]],4,INK,ba);
+  brush(c,[[X+Wd+2,Y+Ht+1],[X+Wd*0.5,Y+Ht+2],[X-3,Y+Ht]],4,INK,ba);brush(c,[[X-1,Y+Ht+2],[X+1,Y+Ht*0.5],[X-1,Y-3]],4,INK,ba);}
 }

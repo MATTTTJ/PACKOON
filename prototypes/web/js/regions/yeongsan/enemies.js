@@ -244,7 +244,7 @@ function drawRobeWrap(c){
   const e=w*w*(3-2*w),cx=LW/2,cy=EY,sx=S.seamX||LW/2,k1=clamp(e/0.5,0,1),k2=clamp((e-0.5)/0.5,0,1),L=(a,b,u)=>a+(b-a)*u,mv=!still();
   c.save();c.translate(LW/2,EY);c.scale(1/0.84,1/0.84);c.translate(-LW/2,-EY);   // 몸 그림의 0.84배를 풀어 화면 좌표로
   const sh=toScreen(cx,cy-36);
-  if(k2>0){c.fillStyle='#070504';c.globalAlpha=0.97*k2;c.fillRect(-40,-40,LW+80,LH+80);c.globalAlpha=1;}   // 다 덮이면 빈 데 없이 어둡다
+  if(k2>0){c.fillStyle='#070504';c.globalAlpha=k2;c.fillRect(-40,-40,LW+80,LH+80);c.globalAlpha=1;}   // 다 덮이면 빈 데 없이 어둡다
   for(const s of [-1,1]){
     const E0={x:cx+s*90,y:cy+150},E1={x:s<0?-70:LW+70,y:LH*0.72},E2={x:sx,y:LH+70};
     const C0={x:cx+s*80,y:cy+40},C1={x:cx+s*LW*0.46,y:-50},C2={x:sx,y:BOX.y-34};
@@ -259,6 +259,8 @@ function drawRobeWrap(c){
     c.save();c.strokeStyle='rgba(214,224,232,'+(0.28*edge).toFixed(3)+')';c.lineWidth=1.4;c.beginPath();hem.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke();c.restore();   // 자락 가장자리
     for(let i=2;i<hem.length;i+=2){const [x,y]=hem[i],[x0,y0]=hem[i-1],a=Math.atan2(y-y0,x-x0)-s*Math.PI/2;quill(c,x,y,12+hash(i+s)*6,3,a+(hash(i*2.3)-0.5)*0.5,INK,0.9*edge);}   // 깃으로 풀린 끝
   }
+  // 결정 D-1325: 다 닫혀 가면 두 자락의 결도 한 어둠에 묻힌다 (솔기와 이름만 비친다)
+  if(k2>0.6){c.fillStyle='#070504';c.globalAlpha=(k2-0.6)/0.4;c.fillRect(-40,-40,LW+80,LH+80);c.globalAlpha=1;}
   // 갇힌 어둠 속에 먹힌 동물 이름이 떴다 사라진다 (판 바깥 화면 곳곳)
   if(e>0.7){c.save();c.font='12px "Gowun Batang", "Batang", serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#b9c4cc';
     for(let i=0;i<9;i++){const fl=mv?Math.pow(Math.max(0,Math.sin(B.time*0.03+i*2.1)),4):0.3;if(fl<0.03)continue;
@@ -784,7 +786,7 @@ function tickChasa(){const S=ch(),t=T();if(S.flap>0)S.flap--;if(B.lastGift==='ji
 /* 판 바닥: 도포 속 어둠과 손 둘레 빛 */
 function drawChasaFloor(c){
   const S=ch(),X=BOX.x,Y=BOX.y,W=BOX.w,H=BOX.h;
-  if(S.night>0.01){c.save();c.fillStyle=NIGHT;c.globalAlpha=Math.max(0.84*S.night,T().chasa_robe_inside_dark*S.wrap);c.fillRect(X,Y,W,H);c.restore();
+  if(S.night>0.01){c.save();c.fillStyle=S.wrap>0.5?'#070504':NIGHT;c.globalAlpha=Math.max(0.84*S.night,T().chasa_robe_inside_dark*S.wrap);c.fillRect(X,Y,W,H);c.restore();   // 갇히면 판 밖과 같은 어둠
     // 먹힌 이름들이 바닥 어둠 속에서 떴다 사라진다
     c.save();c.font='10px "Gowun Batang", "Batang", serif';c.textAlign='center';c.fillStyle='#b9c6cf';
     // 칸 여섯(가로 셋 × 세로 둘)에 하나씩만 띄워 서로 겹치지 않고, 넋의 손이 있는 자리 곁은 비운다
@@ -845,8 +847,7 @@ function drawChasaOver(c){
   if(m&&m.core){const s=toScreen(LW/2,EY-40),pts=[];for(let i=0;i<=10;i++){const u=i/10,w=still()?0:Math.sin(u*9+B.time*0.08)*3*(1-u);pts.push([s.x+(m.x-s.x)*u+w,s.y+(m.y-6-s.y)*u]);}
     brush(c,pts,2.2,INK,0.55);}
   if(S.bind)drawBoundOver(c,S.bind);
-  // 결정 D-1323: 갇힌 동안 판 테두리가 어둠 속에 희미하게 비친다. 솔기를 찢는 순간 빛이 쏟아진다
-  if(S.wrap>0.5){c.save();c.strokeStyle='rgba(200,210,220,'+(0.2*(S.wrap-0.5)*2).toFixed(3)+')';c.setLineDash([4,6]);c.lineWidth=1;c.strokeRect(BOX.x+0.5,BOX.y+0.5,BOX.w-1,BOX.h-1);c.restore();}
+  // 결정 D-1323: 솔기를 찢는 순간 빛이 쏟아진다 (갇힌 동안 판 테두리는 비치지 않는다, D-1325)
   if(S.tornT>0){c.save();c.fillStyle='#fff4cf';c.globalAlpha=0.55*S.tornT/30;c.fillRect(0,0,LW,LH);c.restore();}
   for(const q of S.flights){const e=q.t/q.max,to=flightTarget(q),mx=(q.x+to.x)/2,my=Math.min(q.y,to.y)-60,ee=e*e*(3-2*e);
     const x=(1-ee)*(1-ee)*q.x+2*(1-ee)*ee*mx+ee*ee*to.x,y=(1-ee)*(1-ee)*q.y+2*(1-ee)*ee*my+ee*ee*to.y,a=q.to==='sky'?1-e:Math.min(1,(1-e)*3);
@@ -866,6 +867,7 @@ defineEnemies({
     settle:true,markLife:150,
     pickAttack:pickChasa,openMark:chasaOpen,onMarkHit:chasaHit,tickHazards:tickChasa,drawFloor:drawChasaFloor,drawOver:drawChasaOver,
     strike:chasaStrike,drawMark:drawChasaMark,coreRevealed:()=>ch().revealed,msgColor:()=>ch().night>0.4?'#efe6d6':null,
+    borderAlpha:()=>{const w=ch().wrap;return 1-clamp((w-0.55)/0.4,0,1);},   // 결정 D-1325: 도포에 갇히면 판 테두리가 어둠에 묻힌다
     // 결정 D-370·D-1145: weak 는 부서진 뒤 한 줄
     parts:tableParts('gangcheol',{
       mouth:{atk:'chasaRope',tell:'붉은 적패지가 오랏줄처럼 풀려 나온다.',weak:'적패지가 찢겼다. 오랏줄이 사라지고, 붓 자국이 흐려진다.'},
