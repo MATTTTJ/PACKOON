@@ -142,11 +142,12 @@ function drawChasaBody(c,fade){
   const handAt=s=>{const h=sleeve.broken?{x:cx+s*42+shk(sleeve),y:cy+34}:{x:cx+s*(86+open*26)+shk(sleeve),y:cy+(32-open*30)};
     if(R<=0.01)return h;const o={x:cx+s*(22+56*R),y:cy+6};return {x:h.x+(o.x-h.x)*R,y:h.y+(o.y-h.y)*R};};
   // 도포 자락 (몸): 어깨에서 바닥까지 넓게 퍼진다. 결정 D-1145: 부서지면 찢겨 짧아진다
-  {const o=shk(robe),col=partCol(robe),spread=(tell&&B.cur===robe?6:0)+R*52,hemY=robe.broken?cy+74:cy+124;
+  // 펼친 뒤엔 붉게 깜빡이지 않는다 (붉은색은 적패지·오랏줄에만, §3.1)
+  {const o=shk(robe),col=R>0.1?INK:partCol(robe),spread=(tell&&B.cur===robe?6:0)+R*52,hemY=robe.broken?cy+74:cy+124;
     const L=[[cx-30+o,cy-38],[cx-46+o-spread*0.4,cy+20],[cx-66+o-spread,hemY-4],[cx-74+o-spread,hemY]],Rt=[[cx+30+o,cy-38],[cx+46+o+spread*0.4,cy+20],[cx+66+o+spread,hemY-4],[cx+74+o+spread,hemY]];
     const hem=[];for(let i=0;i<=10;i++){const u=i/10,x=cx-74-spread+u*(148+spread*2)+o,j=robe.broken?(hash(i*2.3)*16-4):Math.sin(i*1.7+(still()?0:B.time*0.05))*3;hem.push([x,hemY+j]);}
     const outline=[...L,...hem.slice(1,-1),...Rt.slice().reverse()];
-    poly(c,outline,col===INK?'#191512':col,0.93*fade,S.night>0.05?'rgba(214,224,232,'+(0.4*S.night).toFixed(3)+')':null,1.4);   // 어둠이 내려앉으면 달빛 테두리
+    poly(c,outline,col===INK?'#191512':col,0.93*fade,S.night>0.05?'rgba(214,224,232,'+(0.2*S.night).toFixed(3)+')':null,1.2);   // 어둠이 내려앉으면 겉감 윤곽만 겨우 보인다
     for(let i=0;i<5;i++){const x=cx-34+i*17+o;brush(c,[[x,cy-20],[x+(i-2)*(4+R*10),cy+40],[x+(i-2)*(9+R*22),hemY-6]],1.4,'#4a423b',0.55*fade*(1-R*0.7));}   // 옷 주름
     // 자락 끝은 까마귀 깃처럼 풀려 있다
     for(let i=0;i<9;i++){const u=(i+0.5)/9,x=cx-70-spread+u*(140+spread*2)+o;quill(c,x,hemY-2,robe.broken?10:16,3,Math.PI/2+(hash(i)-0.5)*0.8,INK,0.85*fade);}
@@ -154,11 +155,15 @@ function drawChasaBody(c,fade){
     // 결정 D-1276 (사용자 지시 2026-11-08 36): 도포를 양쪽으로 펼치면 안은 아무것도 없는 어둠이다. 먹은 동물들의 이름만 떴다 사라진다
     if(R>0.02){const top=cy-30,w=y=>5+(10+50*R-5)*clamp((y-top)/(hemY-top),0,1);
       const left=[],right=[];for(let i=0;i<=8;i++){const y=top+(hemY-2-top)*i/8,ww=w(y)+Math.sin(i*1.3+(still()?0:B.time*0.04))*2*R;left.push([cx+o-ww,y]);right.push([cx+o+ww,y]);}
-      poly(c,[...left,...right.reverse()],NIGHT,0.97*fade*Math.min(1,R*1.6),'#3a332d',1.2);
+      // 바닥이 안 보이는 깊은 어둠: 가운데는 아주 짙은 먹, 가장자리로 갈수록 더 검다. 별빛 같은 것은 없다
+      const mid=(top+hemY)/2,g=c.createRadialGradient(cx+o,mid,4,cx+o,mid,Math.max(40,(hemY-top)*0.7));
+      g.addColorStop(0,'#1d1916');g.addColorStop(0.6,'#0b0908');g.addColorStop(1,'#020101');
+      poly(c,[...left,...right.reverse()],g,0.98*fade*Math.min(1,R*1.6));
+      // 이름은 자리 여섯에 하나씩만 뜬다. 줄마다 좌우로 번갈아 줄 간격이 글자보다 넓어 겹치지 않는다
       c.save();c.font='11px "Gowun Batang", "Batang", serif';c.textAlign='center';c.textBaseline='middle';
-      for(let i=0;i<10;i++){const y=top+14+i/9*(hemY-top-26),x=cx+o+((i%2?0.4:-0.4)+(hash(i*3.1)-0.5)*0.4)*w(y),   // 줄마다 좌우로 번갈아 겹치지 않게
-          fl=still()?0.5:Math.pow(Math.max(0,Math.sin(B.time*0.045+i*2.1)),3),nm=LEDGER_NAMES[(i+Math.floor(B.time/90))%LEDGER_NAMES.length].text;
-        c.globalAlpha=fl*R*fade*0.85;c.fillStyle='#cfd9e0';c.fillText(nm,x,y);}
+      for(let i=0;i<6;i++){const y=top+18+i/5*(hemY-top-34),x=cx+o+(i%2?0.38:-0.38)*w(y),
+          fl=still()?0.5:Math.pow(Math.max(0,Math.sin(B.time*0.04+i*2.3)),3),nm=LEDGER_NAMES[(i+Math.floor(B.time/150)*6)%LEDGER_NAMES.length].text;
+        c.globalAlpha=fl*R*fade*0.7;c.fillStyle='#b9c4cc';c.fillText(nm,x,y);}
       c.restore();}
     if(tell&&B.cur===robe&&!still())for(let i=0;i<6;i++)blob(c,cx-60+i*24,hemY+8+((B.time+i*7)%20),5,4,INK,0.5);}   // 자락에서 먹이 스민다
   // 소매 (까마귀 깃): 어깨에서 양옆으로 넓게 늘어진다. 결정 D-1145: 부서지면 깃이 다 뜯겨 넝마처럼 어깨에서 늘어진다
@@ -378,11 +383,17 @@ const HANDS=['bear','badger','rabbit','weasel','otter','bird'];
 function handSpawn(near){
   const t=T(),X=BOX.x,Y=BOX.y,W=BOX.w,H=BOX.h;let x,y,n=0;
   do{if(near){x=B.px+(Math.random()-0.5)*20;y=B.py+6+Math.random()*12;}else{x=X+12+Math.random()*(W-24);y=Y+H*0.3+Math.random()*(H*0.7-8);}
-    x=clamp(x,X+10,X+W-10);y=clamp(y,Y+24,Y+H-6);n++;}
-  while(n<8&&B.bullets.some(q=>q.k==='chasaHand'&&Math.hypot(q.x-x,q.y-y)<26));
+    x=clamp(x,X+10,X+W-10);y=clamp(y,Y+24,Y+H-14);n++;}
+  while(n<12&&B.bullets.some(q=>q.k==='chasaHand'&&Math.abs(q.x-x)<44&&Math.abs(q.y-y)<24));   // 이름표(손 아래 한 줄)끼리 안 겹치게
   const who=LEDGER_NAMES[Math.floor(Math.random()*LEDGER_NAMES.length)];
-  return {k:'chasaHand',x,y,t:0,kind:who.hand,name:who.text,tell:t.chasa_hand_tell+(has('dokkaebibul')?t.chasa_fire_tell_bonus:0),flip:Math.random()<0.5?-1:1};
+  // 높이를 섞어 곳곳에서 제각기 솟는다
+  return {k:'chasaHand',x,y,t:0,kind:who.hand,name:who.text,h:t.chasa_hand_height*(0.7+Math.random()*0.6),
+    tell:t.chasa_hand_tell+(has('dokkaebibul')?t.chasa_fire_tell_bonus:0),flip:Math.random()<0.5?-1:1};
 }
+/* 손 이름표는 손 바로 아래 한 줄. 먼저 솟은 손의 이름표와 겹치면 그 손이 가라앉은 뒤에 띄운다 */
+function handLabelFree(b){return !B.bullets.some(q=>q!==b&&q.k==='chasaHand'&&!q.dead&&q.t>b.t&&Math.abs(q.x-b.x)<42&&Math.abs(q.y-b.y)<14);}
+function handLabel(c,b,a){if(a<=0.01||!handLabelFree(b))return;
+  c.save();c.globalAlpha=a;c.font='10px "Gowun Batang", "Batang", serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#d6e0e6';c.fillText(b.name,b.x,b.y+10);c.restore();}
 function handPhase(b){const t=T(),r=b.tell+t.chasa_hand_rise,h=r+t.chasa_hand_hold,e=h+t.chasa_hand_sink;
   return {k:b.t<=b.tell?0:b.t<=r?(b.t-b.tell)/t.chasa_hand_rise:b.t<=h?1:Math.max(0,1-(b.t-h)/t.chasa_hand_sink),end:e,live:b.t>b.tell&&b.t<=h};}
 /* 넋의 손 하나: 바닥(x,y)에서 위로 top 까지 솟은 팔과 그 끝의 발 */
@@ -526,19 +537,18 @@ defineBullets({
         blob(c,x-Math.sin(a)*h,y+Math.cos(a)*h,3.2,2,'#efe3c8',0.65);blob(c,x-Math.sin(a)*h+Math.cos(a),y+Math.cos(a)*h+Math.sin(a),1.2,1.2,INK,0.9);}}},   // 흐린 눈빛
   chasaHand:{
     step(b){b.t++;const t=T(),ph=handPhase(b);if(b.t>ph.end){b.dead=1;return;}
-      if(!ph.live)return;const top=b.y-t.chasa_hand_height*ph.k;
+      if(!ph.live)return;const top=b.y-(b.h||t.chasa_hand_height)*ph.k;
       if((Math.abs(B.px-b.x)<t.chasa_hand_hit&&B.py>top-4&&B.py<b.y+6)||Math.hypot(B.px-b.x,B.py-b.y)<t.chasa_hand_hit+2)bHitMe();},
     draw(c,b){const t=T(),ph=handPhase(b),pulse=still()?0.5:(b.t%14)/14;
       if(b.t<=b.tell){const e=b.t/b.tell;   // 전조: 넋빛 물결이 동그랗게 인다
         c.save();c.strokeStyle='rgba(200,220,234,'+(0.35+0.5*e).toFixed(3)+')';c.lineWidth=1.4;
         for(let i=0;i<2;i++){const r=(pulse+i*0.5)%1;c.globalAlpha=1-r;c.beginPath();c.ellipse(b.x,b.y,5+r*12,2+r*4,0,0,Math.PI*2);c.stroke();}
         c.restore();blob(c,b.x,b.y,6*e+2,2.4*e+1,'#dfe9f0',0.35+0.4*e);
-        if(e>0.4){c.save();c.globalAlpha=(e-0.4)*0.9;c.font='10px "Gowun Batang", "Batang", serif';c.textAlign='center';c.fillStyle='#cfd9e0';c.fillText(b.name,b.x+b.flip*16,b.y-4);c.restore();}
-        return;}
-      const top=b.y-t.chasa_hand_height*ph.k;
+        handLabel(c,b,e>0.4?(e-0.4)*0.9:0);return;}
+      const top=b.y-(b.h||t.chasa_hand_height)*ph.k;
       blob(c,b.x,b.y,9,3,'#dfe9f0',0.4*ph.k);
       ghostHand(c,b.x,b.y,top,b.kind,ph.k,b.flip);
-      c.save();c.globalAlpha=0.7*ph.k;c.font='10px "Gowun Batang", "Batang", serif';c.textAlign='center';c.fillStyle='#d6e0e6';c.fillText(b.name,b.x+b.flip*16,b.y-6-8*ph.k);c.restore();}},
+      handLabel(c,b,0.75*ph.k);}},
   chasaDark:{
     step(b){b.t++;if(b.t>b.life)b.dead=1;},
     draw(c,b){const fade=Math.min(1,b.t/30,(b.life-b.t)/30),R=T().chasa_ledger_light;
@@ -657,8 +667,11 @@ function drawChasaFloor(c){
   if(S.night>0.01){c.save();c.fillStyle=NIGHT;c.globalAlpha=0.84*S.night;c.fillRect(X,Y,W,H);c.restore();
     // 먹힌 이름들이 바닥 어둠 속에서 떴다 사라진다
     c.save();c.font='10px "Gowun Batang", "Batang", serif';c.textAlign='center';c.fillStyle='#b9c6cf';
-    for(let i=0;i<7;i++){const fl=still()?0.3:Math.pow(Math.max(0,Math.sin(B.time*0.035+i*1.9)),4);c.globalAlpha=fl*0.4*S.night;
-      c.fillText(LEDGER_NAMES[(i*3+Math.floor(B.time/120))%LEDGER_NAMES.length].text,X+20+hash(i*4.7)*(W-40),Y+14+hash(i*2.3)*(H-24));}
+    // 칸 여섯(가로 셋 × 세로 둘)에 하나씩만 띄워 서로 겹치지 않고, 넋의 손이 있는 자리 곁은 비운다
+    for(let i=0;i<6;i++){const fl=still()?0.3:Math.pow(Math.max(0,Math.sin(B.time*0.035+i*1.9)),4);if(fl<0.02)continue;
+      const x=X+W*(i%3+0.5)/3+(hash(i*4.7)-0.5)*W*0.12,y=Y+H*(Math.floor(i/3)+0.5)/2+(hash(i*2.3)-0.5)*H*0.16;
+      if(B.bullets.some(q=>q.k==='chasaHand'&&Math.abs(q.x-x)<50&&q.y-(q.h||34)-8<y+8&&q.y+18>y-8))continue;
+      c.globalAlpha=fl*0.4*S.night;c.fillText(LEDGER_NAMES[(i+Math.floor(B.time/120)*6)%LEDGER_NAMES.length].text,x,y);}
     c.restore();
     const fire=has('dokkaebibul'),R=fire?34:24,g=c.createRadialGradient(B.px,B.py,2,B.px,B.py,R);
     g.addColorStop(0,(fire?'rgba(122,184,232,':'rgba(239,227,200,')+(0.45*S.night).toFixed(3)+')');g.addColorStop(1,'rgba(239,227,200,0)');
