@@ -986,13 +986,6 @@ const TABLES={
    },
    {
     "need": {
-     "legend_fruit": 1
-    },
-    "out": "doerim_yak",
-    "n": 1
-   },
-   {
-    "need": {
      "sesame": 1,
      "honey": 1
     },

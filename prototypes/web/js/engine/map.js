@@ -76,7 +76,7 @@ function openMap(){
   if(mapTravel||mapBlocked()){mapNotice('지금은 까치를 부를 수 없다');return false;}
   if(!G.f.mapUnlocked)ensureMapCompanions();   // 다른 길(저장·개발용 이동)로 들어와 아직 못 맡았으면 여기서 맡는다 (D-816)
   if(!G.f.mapUnlocked){mapNotice('아직 길을 함께 다닐 동무가 없다');return false;}
-  if(G.ended&&!REG.next&&!G.f.newName){mapNotice('새 이름부터 정하자');$('newName')?.focus();return false;}
+  if(G.ended&&!REG.next&&!G.f.newName){mapNotice('내 이름부터 적자');$('newName')?.focus();return false;}
   if(!G.started)return false;
   if(open('map'))return true;
   mapReturnFocus=document.activeElement;mapWasEnd=open('endScreen');

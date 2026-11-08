@@ -62,7 +62,7 @@ function renderChildRecord(body,tab){
     const dim=new Set((G.nicknames||[]).filter(n=>n.lost&&n.by).flatMap(n=>[n.by,npcName(n.by)]).filter(Boolean));
     G.clues.forEach(c=>{const e=entry(c.who,c.text);if(dim.has(c.who))e.classList.add('lost');});
   }else if(tab==='nicknames'){
-    // 결정 D-423: 맨 위는 엄마가 지어 준 이름. 아이가 길에서 한 번도 말하지 않은 이름이라 엔딩에서 새 이름을 받을 때까지 비어 있다
+    // 결정 D-423: 맨 위는 엄마가 지어 준 이름. 아이가 길에서 한 번도 말하지 않은 이름이라 엔딩에서 엄마가 다시 불러 줄 때까지 비어 있다 (D-1373)
     entry('엄마가 지어 준 이름',G.f.newName||'(아직 적지 않았다)').classList.add('own-name');
     const list=G.nicknames||[];if(!list.length)note('길에서 누군가 나를 새롭게 불러 주면 적어 두자.');
     // 먹힌 이름은 글자만 비고, 지어 준 이와 받은 곳은 흐리게 남는다

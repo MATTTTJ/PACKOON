@@ -44,8 +44,8 @@ function crowShape(c,x,y,a,k,f){
 /* 결정 D-1271: 적패지에 적힌 남의 이름. 빈틈마다 판 바닥에서 하나씩 떠오른다. 먼저 먹힌 내 이름, 그다음 이 순서.
    - 호숫가 마을 넷: 이름이 하나씩뿐이라 세 번째 부름에 통째로 넘어간 이들(region.js 결정 D-430). 치면 호숫가 쪽으로 날아간다.
      봄에 순덕 아주머니가 "호수 쪽에서 내 이름이 날아왔어"라고 한다.
-   - 명다리 아이들: 신목이 이름을 잃은 뒤 셋째 부름마다 풀려 날아간 천의 이름(두루미 이야기 CRANE_DAD). 치면 신목 가지로 돌아가 감긴다.
-     오래 살라고 천하게 지은 아명들이다(명다리를 거는 까닭과 같다).
+   - 명패 아이들 (결정 D-1361, name-story-v4 §2): 신목이 이름을 잃은 뒤 셋째 부름마다 끈째 끌려간 나무 패의 이름(두루미 회상 둘째 편). 치면 신목 가지로 돌아가 매달린다.
+     오래 살라고 천하게 지은 아명들이다(명패를 거는 까닭과 같다).
    - 다 돌려준 뒤엔 닳아 읽히지 않는 오래된 이름이 떠오른다. 임자를 아무도 몰라 하늘로 풀려 간다.
    hand 는 도포 속에서 솟는 그 임자의 넋의 손 (결정 D-1276). 돌려준 이름은 G.f.chasaFreed 에 남아 다시 싸워도 떠오르지 않는다. */
 const LEDGER_NAMES=[
@@ -66,7 +66,7 @@ function nextFloorName(){
   const freed=G.f.chasaFreed||[],f=LEDGER_NAMES.find(q=>!freed.includes(q.id));
   return f||{old:true,text:''};
 }
-/* 이름이 임자에게 날아간다: 내 이름은 손으로, 호숫가 이름은 왼쪽 호숫가로, 명다리 이름은 오른쪽 신목 가지로, 오래된 이름은 하늘로 */
+/* 이름이 임자에게 날아간다: 내 이름은 손으로, 호숫가 이름은 왼쪽 호숫가로, 명패 이름은 오른쪽 신목 가지로, 오래된 이름은 하늘로 */
 function freeFloorName(f,x,y){
   const S=ch();
   if(f.kid){nameReturnIds([f.id],x,y);Sound.playSfx('battle_soothe');return;}
@@ -326,10 +326,12 @@ function drawNightLake(c){
     brush(c,[a,[(a[0]+b[0])/2+8,(a[1]+b[1])/2-6],b],w,INK,0.34);
   const ry=gy*0.86;brush(c,[[sx-24,ry],[sx,ry+8],[sx+20,ry]],3,'#6b5540',0.65);
   for(let i=0;i<4;i++){const x=sx-16+i*11,y=ry+3+Math.sin(i/3*Math.PI)*5;c.save();c.fillStyle='rgba(250,246,236,.8)';c.fillRect(x-3,y,6,11);c.restore();brush(c,[[x-3,y],[x+3,y],[x+3,y+11],[x-3,y+11],[x-3,y]],1,INK,0.3);}
-  // 결정 D-1271: 돌려준 명다리 이름마다 가지에 흰 천이 하나씩 다시 감긴다
+  // 결정 D-1271·D-1361: 돌려준 명패 이름마다 가지에 나무 패가 하나씩 다시 매달린다
   const BR=[[sx-30,gy*0.21],[sx-52,gy*0.17],[sx-74,gy*0.12],[sx+12,gy*0.2],[sx-92,gy*0.19],[sx+24,gy*0.08]];
   for(let i=0;i<Math.min(S.strips,BR.length);i++){const [x,y]=BR[i],sw=still()?0:Math.sin(t*0.04+i)*1.5;
-    c.save();c.fillStyle='rgba(250,246,236,.88)';c.beginPath();c.moveTo(x-2.5,y);c.lineTo(x+2.5,y);c.lineTo(x+2.5+sw,y+12);c.lineTo(x-2.5+sw,y+12);c.closePath();c.fill();c.restore();
+    brush(c,[[x,y],[x+sw*.5,y+4]],1,'#6b5540',0.7);
+    c.save();c.fillStyle='rgba(214,186,138,.92)';c.fillRect(x-3+sw,y+4,6,8);c.restore();
+    brush(c,[[x-3+sw,y+4],[x+3+sw,y+4],[x+3+sw,y+12],[x-3+sw,y+12],[x-3+sw,y+4]],1,INK,0.35);
     brush(c,[[x-3,y],[x+3,y]],1.4,'#6b5540',0.7);}
   for(let i=0;i<9;i++){const x=LW*0.2+i*LW*0.011,h=40+hash(i*3.3)*36,sw=still()?0:Math.sin(t*0.02+i*0.7)*3;   // 눈 얹힌 갈대
     brush(c,[[x,gy+4],[x+sw*0.5,gy-h*0.5],[x+sw,gy-h]],1.6,INK,0.5);blob(c,x+sw,gy-h-3,3,4,SNOW,0.8);}
