@@ -328,14 +328,15 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
       }});
     await next();
     await stage('영산 · 설피',async()=>{await pickup('jip');await gather('darae_vine',2);for(let i=0;i<3&&!await read('G.f.seolpi');i++)await npc('nal');if(!await read('G.f.seolpi'))throw new Error('설피를 받지 못했다');});
-    await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('넋 빠진 아빠에게서 장부 한 장을 받지 못했다');});
+    await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('넋 빠진 아빠를 만나지 못했다');});
     // 결정 D-1184: 확장판은 길손 움막의 둘째 짚단을 빈 지게 할아버지 곁에 놓아 짚신(어둑차사 진정 선물)을 받는다.
     if(mode!=='expanded')await stage('영산 · 짚신',async()=>{await pickup('jipsin');});   // 결정 D-1186: 옛 구성은 아빠 곁 짚신
     if(mode==='expanded')await stage('영산 · 짚신',async()=>{await pickup('jip');await zone('shore');
       const w=await read("(()=>{const w=zoneObjects('wanderers').find(w=>w.id==='y_lost_jige');return w&&{x:w.x,y:w.y??192};})()");
       if(!w)throw new Error('빈 지게 할아버지가 호숫가에 없다');await jumpTo(w.x,w.y);await key('e');await settle(/짚 한 단/);
       if(!await read('(G.inv.jipsin||0)>0'))throw new Error('짚신을 받지 못했다');});
-    await stage('영산 · 봄과 열매',async()=>{await npc('durumi');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['jipsin','rice'],toSteel,'어둑차사',{dodge:true});await pickup('legend_fruit');await npc('durumi');});
+    // 결정 D-1366 (name-story-v4 §4): 열매 줍기와 이름 셈을 뺐다. 이기면 아빠를 불러 데려오고, 두루미 곁에서 명패를 다시 건다
+    await stage('영산 · 봄과 명패',async()=>{await npc('durumi');const toSteel=async()=>{await moveX(2050);};await toSteel();await mustWin(['jipsin','rice'],toSteel,'어둑차사',{dodge:true});await npc('durumi');if(!await read('G.f.yakDone'))await npc('durumi');});
     const final=await settle();if(!final.ended||final.region!=='yeongsan'||!final.flags.yakDone)throw new Error('마지막 귀향과 엔딩에 도착하지 못했다');
     // 결정 D-73: 엔딩은 한 줄씩 넘긴다. 이름 칸이 나올 때까지 '다음'을 누르고, 이름을 부른 뒤에도 끝까지 넘긴다.
     log('엔딩 넘김',{toName:await b.endingToName()});
