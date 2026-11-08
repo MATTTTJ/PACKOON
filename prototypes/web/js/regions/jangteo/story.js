@@ -1361,7 +1361,7 @@ function bueongGiveNow(){
 // 결정 D-1304 (사용자 지시 2026-11-08 43): 눈도깨비 앞 쉼터는 창고 마당의 짐꾼 화톳불 자리(설계 1780)다. 그믐 밤 창고를 지킬 때만 불을 지핀다.
 //   옛 구성은 부엉 영감(1190)과 창고(1500) 사이. 전투에서 본 눈홍시(ndHongsiSeen)는 쉼터로 되돌아가도 기억한다
 Rg.rest={zone:'warehouse',get x(){return CLASSIC?1360:trimX(1780,Rg.trimCuts?.warehouse);},need:()=>!!G.f.guard&&night(),carry:['ndHongsiSeen'],
-  line:'(짐꾼들 화톳불 재를 헤쳐 다시 불을 지폈다.\n여기서면 창고 문이 잘 보인다.)'};
+  line:'짐꾼들 화톳불 재를 헤쳐 다시 불을 지폈다. 여기서면 창고 문이 잘 보인다.'};
 Rg.startDokkaebi=()=>{
   // 표의 부수면 칸은 id 하나만 받는다. 곰 둔갑의 기본 콩 1개에 지역 결정분 1개를 보탠다.
   // 전투 결과 콜백은 후퇴·패배 때도 부위 전리품 지급이 끝난 뒤 한 번 실행된다.

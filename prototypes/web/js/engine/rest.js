@@ -70,7 +70,7 @@ function restReturn(){
   let g;try{g=repairSavedState(s.G);}catch(_){return false;}
   G=g;Object.assign(G.f,keep);
   for(const id of learned)if(!G.learned.includes(id))G.learned.push(id);
-  G.form='';G.hp=G.maxhp;G.hurtT=60;G.ended=false;G.started=true;
+  G.form='';G.hp=G.maxhp;G.hurtT=0;G.ended=false;G.started=true;   // 불 앞에서 깜박이지 않고 바로 보이게
   if(usesZones(REG)&&s.zone)G.zone=s.zone;
   resetScreens();
   G.px=s.x-TABLES.TUNING.rest_return_back;G.py=surfaceY(G.px);G.vx=G.vy=0;G.onGround=true;G.face=1;G.attackT=0;
@@ -83,8 +83,9 @@ function restDraw(){
   const r=restSpot();if(!r||r.draw===false)return;
   const x=Math.round(r.x-cam),y=Math.round(surfaceY(r.x));if(x<-40||x>W+40)return;
   const lit=restLit()&&!G.boss?.dead,t=G.anim;
-  if(lit){ctx.save();ctx.globalAlpha=0.16+0.04*Math.sin(t*0.21);ctx.fillStyle='#ffa047';
-    ctx.beginPath();ctx.ellipse(x,y-10,30,20,0,0,Math.PI*2);ctx.fill();ctx.restore();}
+  if(lit){const a=0.2+0.05*Math.sin(t*0.21),g=ctx.createRadialGradient(x,y-8,1,x,y-8,22);
+    g.addColorStop(0,'rgba(255,170,80,'+a.toFixed(3)+')');g.addColorStop(1,'rgba(255,170,80,0)');
+    ctx.save();ctx.fillStyle=g;ctx.fillRect(x-22,y-30,44,32);ctx.restore();}
   // 장작 둘 (엇갈림)
   for(let i=0;i<9;i++){R(x-9+i,y-3-Math.floor(i/3),2,2,lit?'#5a3a22':'#3a2e26');R(x+7-i,y-3-Math.floor(i/3),2,2,lit?'#6b4423':'#45362b');}
   R(x-6,y-2,12,2,lit?'#2a1d16':'#2a2522');

@@ -891,7 +891,7 @@ function makeReturningMedicine(){
 //   물러날 때 아빠가 아이를 끌어다 내려놓는 자리(설계 1960)와 같은 불가다. 두루미를 만난 뒤(sangunMet)에만 불을 피운다.
 //   쉼터로 되돌아가도 아빠 끌어내기 표시(nameDadPullDue·nameDadPulled)는 남긴다. 이름은 쉼터에서의 그대로 돌아온다
 Rg.rest={zone:'island',get x(){return CLASSIC?1975:trimX(1975,Rg.trimCuts?.island);},need:()=>!!G.f.sangunMet,carry:['nameDadPullDue','nameDadPulled'],
-  line:'(언 손으로 부시를 쳐서 겨우 불을 피웠다.\n여기서 숨 고르고 가자.)'};
+  line:'언 손으로 부시를 쳐서 겨우 불을 피웠다. 여기서 숨 고르고 가자.'};
 Rg.startGangcheol=()=>{
   G.px=CLASSIC?2000:trimX(2000,Rg.trimCuts?.island);   // 줄인 섬 좌표 (D-116)
   inkTransition('어둑차사',(G.boss.x-G.cam)/W*100,()=>startBattle('gangcheol',res=>{

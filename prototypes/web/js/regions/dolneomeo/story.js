@@ -478,7 +478,7 @@ function tellSeogi(){
 // 결정 D-1303 (사용자 지시 2026-11-08 43): 돌 골렘 앞 쉼터. 옛 구성은 뿔영감 고개(1560) 너머 골렘 앞(1860) 앞.
 //   확장판 성황당은 골렘을 처음 보는 비탈 꼭대기(설계 2150) 뒤, 작은 돌탑 조사(설계 2250) 앞인 설계 2200
 Rg.rest={zone:'shrine',get x(){return CLASSIC?1790:trimX(2200,Rg.trimCuts?.shrine);},need:()=>!!G.f.ppuriPassed,
-  line:'(바람 그늘에서 부시를 쳐 불을 피웠다.\n언 손부터 녹이고 가자.)'};
+  line:'바람 그늘에서 부시를 쳐 불을 피웠다. 언 손부터 녹이고 가자.'};
 Rg.startGolem=()=>{
   G.px=1845;
   inkTransition('돌 골렘',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
