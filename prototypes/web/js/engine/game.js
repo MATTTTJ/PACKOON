@@ -208,7 +208,7 @@ const GameMusic=(()=>{
 })();
 function fillCover(){
   const C=REG.cover;
-  $('regionTag').textContent=REG.name;$('regionSub').textContent='엄마의 약을 찾아 네 지역을 잇는 여행';
+  $('regionTag').textContent=REG.name;$('regionSub').textContent='아빠를 찾아 네 지역을 잇는 여행';
   cv.setAttribute('aria-label',REG.name+' 게임 화면');
   $('titleKicker').textContent=C.title.kicker;$('titleHead').textContent=C.title.head;
   const tb=$('titleBody');tb.innerHTML='';C.title.body.forEach(t=>tb.appendChild(el('p',null,t)));
