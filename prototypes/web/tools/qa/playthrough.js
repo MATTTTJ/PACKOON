@@ -394,8 +394,11 @@ async function battleLoop(io,gifts,{sway=false,dodge=false}={}) {
         await key('j');await wait(60);continue;}
       // 결정 D-1323: 도포 속에 갇혀 솔기에 빛이 갈라지면 그 칠 곳으로 도구 날을 옮겨 쳐서 찢고 나온다
       const seam=await read("(()=>{const s=B&&B.bullets.find(q=>q.k==='chasaSeam'&&q.ph==='lit'&&q.lit>0.6);return s?{dx:s.x-bAim().x,dy:s.y-bAim().y}:null;})()");
-      if(seam){const near=(d,lo,hi)=>d<-3?lo:d>3?hi:null;await hold([near(seam.dx,'ArrowLeft','ArrowRight'),near(seam.dy,'ArrowUp','ArrowDown')]);
-        if(Math.hypot(seam.dx,seam.dy)<8)await key('j');await wait(40);continue;}
+      if(seam){   // 빈틈 표식과 같이: 멀면 누르고 있고, 10px 안에서는 톡톡 눌러 맞춘 뒤 친다
+        const far=(d,lo,hi)=>d<-10?lo:d>10?hi:null,near=(d,lo,hi)=>d<-3?lo:d>3?hi:null;await hold([far(seam.dx,'ArrowLeft','ArrowRight'),far(seam.dy,'ArrowUp','ArrowDown')]);
+        if(!steer){for(const k of [near(seam.dx,'ArrowLeft','ArrowRight'),near(seam.dy,'ArrowUp','ArrowDown')].filter(Boolean)){await key(k,'down');await wait(12);await key(k,'up');}
+          if(Math.hypot(seam.dx,seam.dy)<9)await key('j');}
+        await wait(40);continue;}
       if(await read('('+json(gifts)+').some(id=>(G.inv[id]||0)>0)')){
         if(dodge)await hold(await read(DODGE_KEYS));
         else if(sway){
