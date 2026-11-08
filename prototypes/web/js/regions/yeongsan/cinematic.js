@@ -143,7 +143,8 @@ function quillT(c,x,y,len,wid,a){const ca=Math.cos(a),sa=Math.sin(a),nx=-sa,ny=c
 const P={
   winterDusk:{sky:['#28304c','#8c8496'],far:'#4e5670',near:'#3e465e',lake:['#9fb4c4','#dbe7ee'],isle:'snow',flakes:'#f2f4f8'},
   oldDay:{sky:['#a9b4bc','#e2ddcf'],far:'#8c96a0',near:'#7a8590',lake:['#9fb0b4','#c9d4d4'],isle:'thin',flakes:null},
-  autumn:{sky:['#3c3452','#d69a62'],far:'#5a4a5a',near:'#4a3c4c',lake:['#3e4f60','#5e6e78'],isle:'autumn',flakes:null,water:true},
+  // 결정 D-1265 (D-1258과 맞춤): 늦가을 첫얼음. 아빠는 첫얼음을 밟고 걸어서 섬에 건넜다. 옅은 잿빛 얼음판에 금과 검은 물 자리
+  autumn:{sky:['#3c3452','#d69a62'],far:'#5a4a5a',near:'#4a3c4c',lake:['#7f888f','#aeb5b8'],isle:'autumn',flakes:null,firstIce:true},
   night:{sky:['#090c18','#1e2840'],far:'#141a2a',near:'#10141f',lake:['#26323f','#3e4c5c'],isle:'snow',flakes:'#c9d4dc'},
 };
 const ISLE={x:150,top:60,base:78};
@@ -157,6 +158,14 @@ function wideBack(c,p,t,o={}){
   ridge(52,7,1.3,o.far||p.far,62);ridge(57,4,4.1,o.near||p.near,62);
   const lake=o.lake||p.lake;for(let y=60;y<H;y++)R(0,y,W,1,mix(lake[0],lake[1],(y-60)/(H-60)));
   if(p.water||o.water){for(let i=0;i<22;i++){const y=62+Math.floor(hash(i)*60),x=((hash(i+4)*W+t*(4+i%3))%W);R(Math.round(x),y,3+(i%3),1,o.glint||'rgba(240,190,130,.35)');}}
+  else if(p.firstIce){
+    // 얇은 첫얼음: 아직 다 덮지 못해 검은 물 자리가 군데군데 남았고, 가는 금이 많다. 저녁놀이 얼음에 옅게 비친다
+    for(let i=0;i<9;i++){const x=hash(i*7+1)*W,y=64+hash(i*3+2)*58,k=(y-60)/75,rw=(4+hash(i)*10)*(.5+k),rh=(1+hash(i+5)*2)*(.5+k);
+      if(Math.abs(y-110)<9&&x<130)continue;   // 아빠가 걸어온 줄에는 물 자리가 없다 (단단한 데를 골라 디뎠다)
+      blob(c,x,y,rw,rh,'#2a3440',.9);blob(c,x-rw*.3,y-rh*.3,rw*.5,rh*.4,'#3e4a56',.8);R(Math.round(x-rw*.6),Math.round(y+rh-1),Math.max(2,Math.round(rw*.8)),1,'rgba(230,236,240,.45)');}
+    for(let i=0;i<16;i++){const x=hash(i*5)*W,y=62+hash(i*11)*62,l=6+hash(i+1)*18;pline(x,y,x+l*(hash(i+9)-.3),y+3-hash(i+2)*6,1,'rgba(240,244,248,.4)');pline(x+l*.5,y+1,x+l*.5+4,y+4,1,'rgba(60,70,80,.35)');}
+    for(let i=0;i<10;i++)R(Math.round(hash(i+40)*W),Math.round(66+hash(i+41)*50),6+(i%4)*3,1,'rgba(232,170,110,.22)');
+  }
   else for(let i=0;i<7;i++){const x=hash(i*3)*W,y=82+hash(i*5)*40;pline(x,y,x+10+hash(i)*14,y+2-hash(i+1)*4,1,'rgba(255,255,255,.35)');}   // 얼음 금
   // 섬
   const isle=o.isle||p.isle;
@@ -332,6 +341,7 @@ const AUTUMN={id:'crane_autumn',who:CRANE,music:'theme',sub:'두루미가 본 �
      for(let i=0;i<6;i++){const u=((s.t*.12+hash(i))%1),x=Math.round(lerp(130,120+hash(i+1)*60,u)),y=Math.round(lerp(30,80,u));R(x+Math.round(Math.sin(s.t*2+i)*2),y,1,1,'#d8903c');}   // 지는 잎
      for(let x=0;x<W;x+=3){const h=10+hash(x)*10;pline(x,H,x+Math.sin(s.t*1.2+x)*2,H-h,1,x%2?'#b89048':'#8a6a34');}   // 물가 갈대
      const walk=prog(s,0,3.2),x=lerp(-8,dadNear[0],walk);
+     for(let px=2,i=0;px<x-6;px+=6,i++)R(px,dadNear[1]-1+(i%2),2,1,'rgba(56,62,70,.55)');   // 첫얼음 위에 찍힌 아빠 발자국
      if(s.li<2||s.lt<1)A(c,s.li===2?1-cl(s.lt):1,()=>{
        if(walk<.999)put(c,dadSide(Math.floor(s.t*3.5)%2),x,dadNear[1],1);
        else put(c,dadFront(0,s.li>=1&&!(s.li===1&&s.lt<.6)),x,dadNear[1],1);});
