@@ -871,7 +871,7 @@ Rg.hangMyeongpae=hangMyeongpae;
 /* ---------- 어둑차사 전투 (보스 id 는 옛 저장 때문에 gangcheol 그대로, 결정 D-1080) ---------- */
 // 결정 D-1305 (사용자 지시 2026-11-08 43): 어둑차사 앞 쉼터. 신목 섬의 두루미(설계 1920) 뒤, 어둑차사 앞(2030) 앞인 설계 1975.
 //   물러날 때 아빠가 아이를 끌어다 내려놓는 자리(설계 1960)와 같은 불가다. 두루미를 만난 뒤(sangunMet)에만 불을 피운다.
-//   쉼터로 되돌아가도 아빠 끌어내기 표시(nameDadPullDue·nameDadPulled)는 남긴다. 이름은 쉼터에서의 그대로 돌아온다
+//   쉼터로 되돌아가도 아빠 끌어내기 표시(nameDadPullDue·nameDadPulled)는 남긴다. 빼앗긴 이름은 도전 전처럼 모두 돌아온다(결정 D-1400)
 Rg.rest={zone:'island',get x(){return CLASSIC?1975:trimX(1975,Rg.trimCuts?.island);},need:()=>!!G.f.sangunMet,carry:['nameDadPullDue','nameDadPulled'],
   line:'언 손으로 부시를 쳐서 겨우 불을 피웠다. 여기서 숨 고르고 가자.'};
 Rg.startGangcheol=()=>{
