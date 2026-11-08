@@ -218,11 +218,14 @@ if(!CLASSIC){
   };
   const a=()=>Rg.expArt;
   const snowGate=()=>!!G.f.seolpi;
-  const ledgeGate=()=>!!G.f.shortcut;
+  // 결정 D-1250: 디딤돌 길은 살금이가 알려 줬거나(shortcut), 예전 판에서 이미 호숫가에 내려가 본 저장이면 열려 있다(옛 저장이 막히지 않게)
+  const ledgeOpen=Rg.ledgeOpen=()=>!!G?.f?.shortcut||!!G?.visitedZones?.yeongsan?.shore;
   const snowReason='눈이 허리까지 찬다. 길손 움막의 날쌘에게 설피를 엮어 달라고 하자.';   // 결정 D-1223: 산막 → 길손 움막
   // 결정 D-1226 (사용자 지시 2026-11-07 4스테이지 28): 살금이를 돕기 전에는 호숫가로 가는 길을 못 찾는다. 수리부엉이·수달로 넘던 길도 뺐다.
   //   살금이가 비탈 끝 바위턱의 눈 밑 디딤돌을 알려 줘야(G.f.shortcut) 열린다.
-  const iceReason='얼음 비탈뿐이라 호숫가로 내려갈 길을 못 찾겠다. 이 산 짐승들은 어디로 다닐까?';
+  // 결정 D-1250: 막힘 말은 비탈 끝 낭떠러지 앞에서 한다. 디딤돌 문이 열린 뒤에는 그 문으로 이끈다
+  const cliffBefore='얼음 낭떠러지다. 호숫가로 내려갈 길을 못 찾겠다.\n이 산 짐승들은 어디로 다닐까?';
+  const cliffAfter='낭떠러지다. 살금이가 눈을 털어 둔 디딤돌로 내려가자.';
   // 결정 D-1225 (사용자 지시 2026-11-07 4스테이지 21): 문·경치 자리에 꽂던 팻말(뜻 없는 표지판)은 뺐다. 눈 굴·돌턱·밧줄 같은 자리 그림이 길을 보인다
   // 결정 D-1125: 호숫가에서 비탈로 오르는 바위턱 오솔길. 디딤돌 셋과 위 바위에 매어 늘어뜨린 밧줄
   const climbRope=(x,y)=>{
@@ -329,20 +332,25 @@ if(!CLASSIC){
       {x:1500,to:'snow',toX:180,label:'눈 굴 입구로 들어가기',need:snowGate,reason:snowReason,drawBlocked:(x,y)=>a().blockedSnow(x,y),formPass:'goat',formLabel:'산양으로 눈 덮인 바위턱 디뎌 건너기'},
     ]),
     snow:zone('snow',['ongdal'],{left:'shelter',right:'slope'}),
-    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y)}},[
-      {x:2320,to:'shore',toX:170,label:'바위턱을 디뎌 호숫가로',need:ledgeGate,reason:iceReason,drawBlocked:(x,y)=>a().blockedIce(x,y)},
+    // 결정 D-1250 (사용자 지시 2026-11-08 32: 살금이 일 전에는 다음 맵으로 가는 길이 없다. 지름길이 열린 뒤에도 지름길로만 간다):
+    //   비탈 오른쪽 끝은 얼음 낭떠러지라 걸어서는 끝내 못 나간다(가장자리 출구는 늘 닫힘. 지도 줄기를 잇는 자리로만 남긴다).
+    //   호숫가로 내려가는 디딤돌 문은 살금이가 알려 준 뒤에야 생긴다(ledgeOpen). 그 전에는 문도 그림도 없다.
+    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:()=>false,get reason(){return ledgeOpen()?cliffAfter:cliffBefore;},drawBlocked:(x,y)=>a().cliffEnd(x,y)}},[
+      {x:2500,to:'shore',toX:170,label:'눈 털린 디딤돌 밟고 호숫가로 내려가기',need:ledgeOpen},
     ]),
-    shore:zone('shore',['dad'],{left:'slope'},[
+    // 결정 D-1250: 호숫가에서 비탈로 오르는 길도 같은 디딤돌 바위턱(밧줄 문) 하나뿐이다. 왼쪽 끝은 바위 벽이다.
+    shore:zone('shore',['dad'],{left:{to:'slope',need:()=>false,reason:'바위 벽이다. 내려온 디딤돌 바위턱으로 올라가자.'}},[
       {x:2320,to:'island',toX:160,get label(){return G.f.spring?'작은 배로 신목 섬에':'언 호수를 걸어 신목 섬에';},
         need:()=>!!G.f.dadDone,reason:'아빠가 기다리고 있다. 먼저 호숫가에서 말을 걸어 보자.'},
       // 결정 D-1125 (사용자 지시 2026-11-07 4스테이지 9): 호숫가에서 비탈로 되돌아갈 단추가 없었다(왼쪽 끝으로 걸어 나가야만 했다).
       //   내려온 자리 왼쪽(마을 장승 앞)에 바위턱 오솔길과 매어 둔 밧줄을 두고, 문으로 언제든 비탈(내려온 바위턱 앞)로 오른다.
-      {x:55,to:'slope',toX:2320,label:'밧줄 잡고 바위턱 올라 비탈로',draw:(x,y)=>climbRope(x,y)},
+      {x:55,to:'slope',toX:2500,label:'디딤돌 밟고 바위턱 올라 비탈로',draw:(x,y)=>climbRope(x,y)},
     ]),
     island:zone('island',['durumi'],{},[   // 결정 D-1081: 산군 대신 두루미
       {x:160,to:'shore',toX:2320,get label(){return G.f.spring?'배를 타고 호숫가로':'얼음길로 호숫가에 돌아가기';}},
     ]),
   };
+  {const list=Rg.zones.slope.doors;Object.defineProperty(Rg.zones.slope,'doors',{configurable:true,enumerable:true,get(){return ledgeOpen()?list:[];}});}   // 결정 D-1250
   /* 결정 D-1062 (사용자 피드백 2026-11-06 27: 더 험한 지형): 빈 눈밭에 바람이 쌓은 눈 둔덕(엔진 비탈 D-845)을 둔다.
      좌표는 길을 줄인 뒤의 자리이고, 인물·물건·문·살펴보기가 없는 구간에만 둔다. 기울기는 미끄러지는 비탈(field_slope_slip_grade)보다 완만하다.
      산막: 눈 굴 어귀 뒤 높은 능선 밑. 눈길: 옹달 할미 샘과 대추나무 사이(능선 발판 밑). */
@@ -353,7 +361,13 @@ if(!CLASSIC){
     stepCommon();
     if(G.f.seolpi)G.f.ySnowTrail=Math.max(G.f.ySnowTrail||180,Math.round(G.px));
   };
-  Rg.zones.slope.step=()=>{stepCommon();stepSalg();};
+  // 결정 D-1250: 낭떠러지 바위턱 끝(설계 2530)에서 더 못 간다. 밀면 한 번 속말을 한다
+  Rg.zones.slope.maxX=()=>2530;
+  let cliffPush=false;
+  Rg.zones.slope.step=()=>{stepCommon();stepSalg();
+    const at=G.px>=Rg.zones.slope.maxX()-1&&isRight();
+    if(at&&!cliffPush&&$('dlg').hidden)think(Rg.zones.slope.exits.right.reason);
+    cliffPush=at;};
   // PA-47 선택 자리: 다람쥐의 잊은 몫(결정 D-1021: 다른 다람쥐가 묻은 것이고 도토리만이 아니다. 산막 둘레 잣나무 밑엔 잣)
   // 결정 D-1073: 고라니만 듣던 눈 속 짚단 대신 수달만 잠수하는 얼음 구멍 둘(비탈). 얼음 밑에 가라앉은 것을 건진다
   Rg.zones.slope.digs=[{id:'y_dive_fish',x:1100,item:'bingeo',n:2,form:'otter',cache:true,done:false,line:'얼음 구멍에 쏙 들어갔다 나왔다. 빙어 두 마리를 물고 나왔다!'},
