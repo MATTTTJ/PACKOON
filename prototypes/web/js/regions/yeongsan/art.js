@@ -470,6 +470,9 @@ A.scenery=zone=>{
     }
   }
   if(zone==='shore'){
+    // 결정 D-1250: 왼쪽 끝은 비탈에서 내려온 바위 벽이다. 오르는 길은 디딤돌 바위턱(밧줄 문) 하나뿐이다
+    {const wx=-cam;if(wx>-40)for(let i=0;i<GROUND-96;i+=3){const j=Math.round(hash(i*1.3+11)*4);px(wx,96+i,14+j,3,i%6?'#3a4b5b':'#2f3e4c');px(wx+12+j,96+i,1,3,'#55697a');}
+      if(wx>-40){px(wx,94,18,3,'#e8f0f5');for(let k=0;k<3;k++)px(wx+3+k*5,97,1,3+k%2*2,'#cfe2ee');}}
     const x=2320-cam;px(x-50,GROUND-2,100,5,'#9d8c73');
     for(let i=0;i<7;i++)px(x-48+i*15,GROUND-2,2,5,'#635c53');
     boat(x+16,GROUND+20);rock(2130-cam,GROUND,61,23);

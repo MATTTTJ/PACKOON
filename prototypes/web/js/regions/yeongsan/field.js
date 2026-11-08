@@ -335,7 +335,7 @@ if(!CLASSIC){
     // 결정 D-1250 (사용자 지시 2026-11-08 32: 살금이 일 전에는 다음 맵으로 가는 길이 없다. 지름길이 열린 뒤에도 지름길로만 간다):
     //   비탈 오른쪽 끝은 얼음 낭떠러지라 걸어서는 끝내 못 나간다(가장자리 출구는 늘 닫힘. 지도 줄기를 잇는 자리로만 남긴다).
     //   호숫가로 내려가는 디딤돌 문은 살금이가 알려 준 뒤에야 생긴다(ledgeOpen). 그 전에는 문도 그림도 없다.
-    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:()=>false,get reason(){return ledgeOpen()?cliffAfter:cliffBefore;},drawBlocked:(x,y)=>a().cliffEnd(x,y)}},[
+    slope:zone('slope',['salgeumi'],{left:'snow',right:{to:'shore',need:()=>false,get reason(){return ledgeOpen()?cliffAfter:cliffBefore;}}},[   // 낭떠러지 그림은 art.js 비탈 풍경
       {x:2500,to:'shore',toX:170,label:'눈 털린 디딤돌 밟고 호숫가로 내려가기',need:ledgeOpen},
     ]),
     // 결정 D-1250: 호숫가에서 비탈로 오르는 길도 같은 디딤돌 바위턱(밧줄 문) 하나뿐이다. 왼쪽 끝은 바위 벽이다.
