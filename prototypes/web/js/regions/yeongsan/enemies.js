@@ -12,13 +12,17 @@
    결정 D-1273: 부위 셋의 몫을 chasa_core_reveal 만큼 깎으면 핵이 드러난다. 핵은 갓 아래 깊이 감춘 새잎 빛, 맨 먼저 먹은 신목의 이름이다.
      핵을 쳐서 갓(핵심 부위)을 다 깎으면 이긴다. 무엇인지 화면에 이름을 내지 않는다(신목 이름은 봄에도 화면에 내지 않는다).
    결정 D-370·D-1145: 부서진 부위는 그 공격을 더 고르지 않고, 부서진 모습으로 그린다.
+   결정 D-1322 (사용자 지시 2026-11-08 42): 이 전투의 중심은 이름 빼앗기다. 패턴마다 실패하면 하트보다 이름을 먼저 잃는다.
+     오랏줄에 오래 묶임·셋째 부름에 돌아봄(그대로), 까마귀 떼에 처음 닿으면 한 마리가 이름을 물어 감, 도포 속에서 못 빠져나오면 도포가 이름을 감싸 쥠.
+     이름을 다 잃은 텅 빈 손(battle-names.js nameHollow)이면 빈틈의 바닥 이름(내 별명)이 손 바로 곁에 떠오른다. 핵이 드러난 뒤에도 그렇다.
    붉은색은 적패지와 오랏줄에만 쓴다 (§3.1). 칠 수 있는 것은 금빛(D-228). 넋의 손만 옅은 푸른 흰빛이다(결정 D-1276). */
 (()=>{
 const T=()=>TABLES.TUNING;
 const still=()=>Vfx.reducedMotion;
 const PALE='#ebe5d8',PALE_DK='#b9b0a0',SCROLL='#a3261c',SCROLL_DK='#5e120c',STRAW='#c9a868',SNOW='#f6f4ef',FIRE='#7ab8e8',NIGHT='#0e0b09';
 function ch(){return B.ch||(B.ch={turn:0,despDone:false,dark:0,voices:[],seal:false,flap:0,
-  bind:null,robe:0,night:0,flock:0,flights:[],strips:0,revealed:false,ropeDir:-1});}
+  bind:null,robe:0,night:0,flock:0,flights:[],strips:0,revealed:false,ropeDir:-1,
+  wrap:0,squeeze:0,robeOut:false,robeFail:false,tornT:0,seamX:0,crowTook:false});}   // 결정 D-1323: 도포가 감싼 정도·조임·솔기
 function poly(c,pts,fill,alpha=1,stroke=null,lw=1.6){c.save();c.globalAlpha=alpha;c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();
   c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=lw;c.lineJoin='round';c.stroke();}c.restore();}
 /* 까마귀 깃 하나: (x,y)에서 a 방향으로 len */
@@ -104,26 +108,37 @@ function drawChasa(c){
    머리 곁 빈자리가 눈처럼 보이고, 그 안에 흐린 빛이 비친다. 가까이 보면 한 마리 한 마리가 날갯짓하는 까마귀다.
    떼는 펼친 소매에서 쏟아져 나와 모이고, 패턴이 끝나면 소매로 돌아간다. 몸 그림 뒤에 그린다 */
 /* 머리가 도는 길: 갓 위를 지나 어둑차사 둘레를 8자로 크게 감돈다 */
-function skyHead(t){const w=0.012;return {x:LW/2+LW*0.27*Math.sin(t*w),y:EY-34+62*Math.sin(t*w*2+0.6)};}
+/* 결정 D-1324 (사용자 지시 2026-11-08 40: 그냥 뭉쳐 있는 모양이라 배열과 수에 변화를 줘 꾸물꾸물하게): 감도는 8자의 폭과 높이가 천천히 바뀐다.
+   몸을 따라 부풂과 잘록함이 물결처럼 흐르고(chasa_crow_bulge), 까마귀가 몸 안에서 자리를 바꾸고, 몸이 두세 줄기로 갈라졌다 다시 합친다.
+   가장자리에서 몇 마리씩 떨어져 나갔다 돌아오고, 꼬리 쪽 몇십 마리가 멀리 날아갔다 돌아와 마리 수가 늘고 준다. */
+function skyHead(t){const w=0.012,ax=LW*0.27*(1+0.14*Math.sin(t*0.0041)),ay=52*(1+0.22*Math.sin(t*0.0063+1));return {x:LW/2+ax*Math.sin(t*w),y:EY-22+ay*Math.sin(t*w*2+0.6)};}
 function skyFrame(t,s){
   const lag=170,p=skyHead(t-s*lag),q=skyHead(t-s*lag-2),dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy)||1;
-  const breath=1+0.1*Math.sin(t*0.045+s*4),w=(s<0.06?14+s/0.06*30:44*(1-0.84*Math.pow((s-0.06)/0.94,1.15)))*breath;
+  const breath=(1+0.1*Math.sin(t*0.045+s*4))*(1+T().chasa_crow_bulge*1.4*Math.sin(t*0.042-s*9.5)),w=(s<0.06?14+s/0.06*30:44*(1-0.84*Math.pow((s-0.06)/0.94,1.15)))*breath;
   return {x:p.x,y:p.y,nx:-dy/d,ny:dx/d,a:Math.atan2(dy,dx),w};
 }
 function drawSkyFlock(c,fade,src){
   const S=ch();if(S.flock<0.02)return;
-  const t=still()?40:B.time,n=still()?90:T().chasa_crow_sky,e=S.flock*S.flock*(3-2*S.flock);
+  const t=still()?40:B.time,n=still()?90:T().chasa_crow_sky,e=S.flock*S.flock*(3-2*S.flock),mv=!still();
+  const sm=x=>x*x*(3-2*x),split=mv?sm(clamp(Math.sin(t*0.0115+0.8)*1.5-0.5,0,1)):0;   // 두세 줄기로 갈라지는 정도
+  const nVis=mv?Math.round(n*(0.9+0.1*Math.sin(t*0.021))):n;   // 이만큼 뒤의 까마귀는 멀리 날아갔다 돌아온다
   c.save();c.fillStyle=INK;
   for(const pass of [0,1]){
     c.globalAlpha=(pass?0.94:0.5)*fade*Math.min(1,e*1.4);c.beginPath();
     for(let j=pass;j<n;j+=2){
-      const s=Math.pow((j+0.5)/n,1.25),F=skyFrame(t,s);
+      const r=hash(j*5.17),lobe=j%3-1,s0=Math.pow((j+0.5)/n,1.25);
+      const s=clamp(s0+(mv?0.035*Math.sin(t*0.05-s0*14):0)+lobe*split*0.05,0,1),F=skyFrame(t,s);   // 몸을 따라 흐르는 촘촘함의 물결
       let o=hash(j*7.31)*2-1;o=Math.sign(o)*Math.pow(Math.abs(o),0.7);
+      if(mv)o=clamp(o+0.24*Math.sin(t*0.013*(0.6+r)+j*2.1),-1.15,1.15);   // 몸 안에서 자리를 바꾼다
       if(s<0.08&&o>0.1&&o<0.62)o=o<0.36?0.08:0.66;   // 눈 자리는 비운다
-      const jx=still()?0:Math.sin(t*0.07+j*1.7)*3.4,jy=still()?0:Math.cos(t*0.06+j*2.3)*2.8;
-      let x=F.x+F.nx*o*F.w+jx,y=F.y+F.ny*o*F.w+jy;
+      o=o*(1-split*0.45)+lobe*split*0.75;   // 갈라지면 가는 줄기 셋이 나란히 난다
+      const jx=mv?Math.sin(t*0.07+j*1.7)*3.4:0,jy=mv?Math.cos(t*0.06+j*2.3)*2.8:0;
+      let x=F.x+F.nx*o*F.w+jx,y=F.y+F.ny*o*F.w+jy,a=F.a+(hash(j*2.9)-0.5)*0.6;
+      if(mv&&r<0.16){const ex=Math.pow(Math.max(0,Math.sin(t*0.017*(0.7+r*4)+j)),3),sg=o>=0?1:-1;   // 가장자리에서 떨어져 나갔다 돌아온다
+        x+=F.nx*sg*ex*F.w*1.6+Math.cos(F.a)*ex*16;y+=F.ny*sg*ex*F.w*1.6+Math.sin(F.a)*ex*16;a+=sg*ex*0.9;}
+      if(mv&&j>=nVis-10){const k=clamp((j-nVis+10)/14,0,1),sg=hash(j*3.9)<0.5?-1:1,q=(sg<0?Math.PI:0)-sg*(0.2+hash(j*1.3)*0.5);x+=Math.cos(q)*k*LW*0.6;y+=Math.sin(q)*k*LH*0.25;a=q;}   // 옆으로 멀리 날아간다
       const from=j%2?src.R:src.L;x=from.x+(x-from.x)*e;y=from.y+(y-from.y)*e;
-      crowShape(c,x,y,F.a+(hash(j*2.9)-0.5)*0.6,1.05+hash(j)*0.45,still()?0.3:Math.sin(t*0.5+j*1.3));
+      crowShape(c,x,y,a,1.05+hash(j)*0.45,mv?Math.sin(t*0.5+j*1.3):0.3);
     }
     c.fill();}
   c.restore();
@@ -143,7 +158,7 @@ function drawChasaBody(c,fade){
     if(R<=0.01)return h;const o={x:cx+s*(22+56*R),y:cy+6};return {x:h.x+(o.x-h.x)*R,y:h.y+(o.y-h.y)*R};};
   // 도포 자락 (몸): 어깨에서 바닥까지 넓게 퍼진다. 결정 D-1145: 부서지면 찢겨 짧아진다
   // 펼친 뒤엔 붉게 깜빡이지 않는다 (붉은색은 적패지·오랏줄에만, §3.1)
-  {const o=shk(robe),col=R>0.1?INK:partCol(robe),spread=(tell&&B.cur===robe?6:0)+R*52,hemY=robe.broken?cy+74:cy+124;
+  {const o=shk(robe),col=R>0.1?INK:partCol(robe),spread=(tell&&B.cur===robe?6:0)+R*84,hemY=robe.broken?cy+74:cy+124;
     const L=[[cx-30+o,cy-38],[cx-46+o-spread*0.4,cy+20],[cx-66+o-spread,hemY-4],[cx-74+o-spread,hemY]],Rt=[[cx+30+o,cy-38],[cx+46+o+spread*0.4,cy+20],[cx+66+o+spread,hemY-4],[cx+74+o+spread,hemY]];
     const hem=[];for(let i=0;i<=10;i++){const u=i/10,x=cx-74-spread+u*(148+spread*2)+o,j=robe.broken?(hash(i*2.3)*16-4):Math.sin(i*1.7+(still()?0:B.time*0.05))*3;hem.push([x,hemY+j]);}
     const outline=[...L,...hem.slice(1,-1),...Rt.slice().reverse()];
@@ -218,6 +233,48 @@ function drawChasaBody(c,fade){
   // 짚신: 달래면 자락 아래로 짚신 두 짝이 보인다
   if(calm&&gotShoes()){for(const s of [-1,1]){blob(c,cx+s*14,cy+128,9,3.6,STRAW,0.95*fade);brush(c,[[cx+s*14-7,cy+127],[cx+s*14+7,cy+127]],1,'#8a6a38',0.9*fade);}}
   drawSkyFlock(c,fade,{L:handAt(-1),R:handAt(1)});   // 까마귀 떼는 몸 앞으로 지나간다
+  drawRobeWrap(c);   // 결정 D-1323: 크게 펼친 도포가 판을 덮어 감싼다
+}
+/* 결정 D-1323 (사용자 지시 2026-11-08 41: 도포를 엄청 크게 확 펼쳐 주인공이 도포 속에 감싸인 느낌. 안의 어두운 공간에 갇혀 패턴을 깨고 빠져나온다):
+   두 자락이 어깨에서 화면 양 끝까지 크게 펼쳐지고(앞 절반), 이어 위에서 판 위로 덮이며 솔기(seamX)에서 맞닿아 닫힌다(뒤 절반).
+   닫히면 전투 화면 전체가 도포 안의 어둠이다. 동물 이름만 떴다 사라지고 손 둘레만 희미하게 밝다(drawChasaFloor).
+   자락 끝은 까마귀 깃으로 풀려 있다. 찢고 나오면 자락이 양옆으로 젖혀지며 빛이 쏟아진다(tornT). */
+function drawRobeWrap(c){
+  const S=ch(),w=S.wrap;if(w<0.005)return;
+  const e=w*w*(3-2*w),cx=LW/2,cy=EY,sx=S.seamX||LW/2,k1=clamp(e/0.5,0,1),k2=clamp((e-0.5)/0.5,0,1),L=(a,b,u)=>a+(b-a)*u,mv=!still();
+  c.save();c.translate(LW/2,EY);c.scale(1/0.84,1/0.84);c.translate(-LW/2,-EY);   // 몸 그림의 0.84배를 풀어 화면 좌표로
+  const sh=toScreen(cx,cy-36);
+  if(k2>0){c.fillStyle='#070504';c.globalAlpha=k2;c.fillRect(-40,-40,LW+80,LH+80);c.globalAlpha=1;}   // 다 덮이면 빈 데 없이 어둡다
+  for(const s of [-1,1]){
+    const E0={x:cx+s*90,y:cy+150},E1={x:s<0?-70:LW+70,y:LH*0.72},E2={x:sx,y:LH+70};
+    const C0={x:cx+s*80,y:cy+40},C1={x:cx+s*LW*0.46,y:-50},C2={x:sx,y:BOX.y-34};
+    const Ex=k2>0?L(E1.x,E2.x,k2):L(E0.x,E1.x,k1),Ey=k2>0?L(E1.y,E2.y,k2):L(E0.y,E1.y,k1);
+    const Cx=k2>0?L(C1.x,C2.x,k2):L(C0.x,C1.x,k1),Cy=k2>0?L(C1.y,C2.y,k2):L(C0.y,C1.y,k1);
+    const hem=[];for(let i=0;i<=26;i++){const u=i/26,x0=sh.x+s*16,x=(1-u)*(1-u)*x0+2*(1-u)*u*Cx+u*u*Ex,y=(1-u)*(1-u)*sh.y+2*(1-u)*u*Cy+u*u*Ey,
+      wv=mv?Math.sin(u*11+B.time*0.13+s)*3*u:0;hem.push([x+wv*0.6,y+wv]);}
+    const out=s<0?-90:LW+90,pts=[[cx,-60],...hem,[hem[hem.length-1][0],LH+90],[out,LH+90],[out,-60]];
+    const g=c.createLinearGradient(sh.x,sh.y,Ex,Ey);g.addColorStop(0,'#1c1714');g.addColorStop(1,'#060403');
+    poly(c,pts,g,0.98);const edge=1-k2*k2;if(edge<0.02)continue;
+    for(let i=1;i<4;i++){const u=i/4;brush(c,[[sh.x+s*10,sh.y+6],[L(sh.x,Cx,u*0.8)+s*i*14,L(sh.y,Cy,u)+20],[L(sh.x,Ex,u)+s*i*26,L(sh.y,Ey,u)]],2,'#2e2620',0.5*edge);}   // 옷 주름
+    c.save();c.strokeStyle='rgba(214,224,232,'+(0.28*edge).toFixed(3)+')';c.lineWidth=1.4;c.beginPath();hem.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke();c.restore();   // 자락 가장자리
+    for(let i=2;i<hem.length;i+=2){const [x,y]=hem[i],[x0,y0]=hem[i-1],a=Math.atan2(y-y0,x-x0)-s*Math.PI/2;quill(c,x,y,12+hash(i+s)*6,3,a+(hash(i*2.3)-0.5)*0.5,INK,0.9*edge);}   // 깃으로 풀린 끝
+  }
+  // 결정 D-1325: 다 닫혀 가면 두 자락의 결도 한 어둠에 묻힌다 (솔기와 이름만 비친다)
+  if(k2>0.6){c.fillStyle='#070504';c.globalAlpha=(k2-0.6)/0.4;c.fillRect(-40,-40,LW+80,LH+80);c.globalAlpha=1;}
+  // 갇힌 어둠 속에 먹힌 동물 이름이 떴다 사라진다 (판 바깥 화면 곳곳)
+  if(e>0.7){c.save();c.font='12px "Gowun Batang", "Batang", serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#b9c4cc';
+    for(let i=0;i<9;i++){const fl=mv?Math.pow(Math.max(0,Math.sin(B.time*0.03+i*2.1)),4):0.3;if(fl<0.03)continue;
+      const x=LW*(0.08+0.84*hash(i*3.7+Math.floor(B.time/200))),y=LH*(0.08+0.5*hash(i*5.1+Math.floor(B.time/200)));
+      c.globalAlpha=fl*0.45*(e-0.7)/0.3;c.fillText(LEDGER_NAMES[(i+Math.floor(B.time/160))%LEDGER_NAMES.length].text,x,y);}
+    c.restore();}
+  // 솔기: 두 자락이 맞닿은 줄. 빛이 갈라지면 위아래로 밝은 틈이 난다 (판 안은 솔기 칼집이 따로 그린다)
+  const seam=B.bullets.find(q=>q.k==='chasaSeam');
+  if(k2>0.95){const lit=seam?seam.lit||0:0,y0=BOX.y-40;
+    c.save();c.strokeStyle=lit>0?'rgba(255,244,207,'+(0.35+0.6*lit).toFixed(3)+')':'rgba(120,110,100,.4)';c.lineWidth=lit>0?2+lit*2:1;c.beginPath();
+    for(let y=y0;y<=LH;y+=8)c.lineTo(sx+(hash(y*0.37)-0.5)*(lit>0?4:2),y);c.stroke();
+    if(lit>0){const g=c.createLinearGradient(sx-18,0,sx+18,0);g.addColorStop(0,'rgba(255,244,207,0)');g.addColorStop(0.5,'rgba(255,244,207,'+(0.22*lit).toFixed(3)+')');g.addColorStop(1,'rgba(255,244,207,0)');c.fillStyle=g;c.fillRect(sx-18,y0,36,LH-y0);}
+    c.restore();}
+  c.restore();
 }
 /* 새잎 하나: 핵(신목 이름)의 모습. 금빛(칠 수 있는 것, D-228)에 새잎 결 */
 function leafBud(c,x,y,k,a){
@@ -334,7 +391,15 @@ function ropeBind(b){
 }
 /* 묶인 채 치기: 칠 곳에 도구 날이 닿으면 한 단계씩 끊긴다 (상대가 치기를 먼저 처리한다, battle.js strike) */
 function chasaStrike(){
-  const S=ch(),bd=S.bind;if(!bd)return false;
+  const S=ch(),bd=S.bind;
+  // 결정 D-1323: 도포 솔기를 친다. 칠 때마다 틈이 벌어지고 chasa_robe_tear_hits 번이면 찢겨 빛이 쏟아진다
+  const seam=!bd&&B.bullets.find(q=>q.k==='chasaSeam'&&q.ph==='lit'&&q.lit>0.6);
+  if(seam){const a=bAim();if(Math.hypot(a.x-seam.x,a.y-seam.y)>battleHandProfile().radius+T().chasa_rope_spot_slack+4)return false;
+    seam.hits++;seam.flash=12;B.hitStop=3;if(!still())B.quakeT=5;
+    for(let i=0;i<6+seam.hits*4;i++){const q=Math.random()*Math.PI*2,s=1+Math.random()*2.8;B.fx.push({x:seam.x,y:seam.y,vx:Math.cos(q)*s,vy:Math.sin(q)*s,r:1+Math.random()*1.8,t:24,col:i%2?'#fff4cf':'#e9dfc8'});}
+    if(seam.hits>=T().chasa_robe_tear_hits){seam.ph='torn';seam.t=0;S.robeOut=true;S.tornT=30;B.msg='솔기가 찢어졌다! 빛이 쏟아져 들어온다.';Sound.playSfx('battle_part_break');return true;}
+    B.msg='탁! 솔기 틈이 벌어진다.';Sound.playSfx('battle_hit');return true;}
+  if(!bd)return false;
   const a=bAim();if(Math.hypot(a.x-bd.sx,a.y-bd.sy)>battleHandProfile().radius+T().chasa_rope_spot_slack)return false;
   bd.hits++;bd.flash=12;B.hitStop=3;if(!still())B.quakeT=5;
   for(let i=0;i<5+bd.hits*3;i++){const q=Math.random()*Math.PI*2,s=1+Math.random()*2.6;B.fx.push({x:bd.sx,y:bd.sy,vx:Math.cos(q)*s,vy:Math.sin(q)*s,r:1+Math.random()*1.6,t:22,col:i%3?SCROLL:'#e8b0a0'});}
@@ -358,7 +423,11 @@ function ropeRelease(how){
 function crowPlan(){
   const t=T(),passes=[];let prev=-1;
   for(let i=0;i<t.chasa_crow_waves;i++){let d;do d=Math.floor(Math.random()*4);while(d===prev);prev=d;
-    passes.push({dir:d,c:0.32+Math.random()*0.36,a:(d<2?0.2:0.18)+Math.random()*0.1,f:0.7+Math.random()*0.8,ph:Math.random()*Math.PI*2,delay:i*t.chasa_crow_gap});}
+    // 결정 D-1324: 떼마다 굵기와 마리 수가 다르다(굵은 떼일수록 많다)
+    const k=Math.random(),thick=t.chasa_crow_thick_min+k*(t.chasa_crow_thick_max-t.chasa_crow_thick_min);
+    passes.push({dir:d,c:0.32+Math.random()*0.36,a:(d<2?0.2:0.18)+Math.random()*0.1,f:0.7+Math.random()*0.8,ph:Math.random()*Math.PI*2,delay:i*t.chasa_crow_gap,
+      thick,n:Math.round(t.chasa_crow_count*(0.62+0.38*k))});}
+  ch().crowTook=false;   // 결정 D-1322: 이번 차례에 까마귀가 이름을 물어 갔나
   return {kind:'crows',passes};
 }
 function passLen(P){const m=T().chasa_crow_margin;return (P.dir<2?BOX.w:BOX.h)+2*m;}
@@ -369,7 +438,15 @@ function passPt(P,u){
 }
 function passU(P,x,y){const m=T().chasa_crow_margin,sg=P.dir%2?-1:1;
   if(P.dir<2)return sg>0?x-(BOX.x-m):BOX.x+BOX.w+m-x;return sg>0?y-(BOX.y-m):BOX.y+BOX.h+m-y;}
-function bandHalf(s){const t=T(),k=s<0.08?0.5+0.5*s/0.08:s>0.72?1-0.7*(s-0.72)/0.28:1;return t.chasa_crow_band*k*(1+0.08*Math.sin(B.time*0.06));}
+// 결정 D-1324: 굵기가 떼를 따라 물결치듯 부풀고 잘록해진다. 닿는 폭도 그림과 같이 바뀐다
+function bandHalf(s,P){const t=T(),k=s<0.08?0.5+0.5*s/0.08:s>0.72?1-0.7*(s-0.72)/0.28:1;
+  return t.chasa_crow_band*k*(P?P.thick:1)*(1+t.chasa_crow_bulge*Math.sin(B.time*0.09-s*10+(P?P.ph:0)));}
+/* 결정 D-1322: 떼에 닿았다. 이번 차례에 처음이면 까마귀 한 마리가 이름을 물고 날아간다(하트는 그대로). 그 뒤로는 다친다 */
+function crowHit(){
+  if(B.inv>0||B.st==='end')return;const S=ch(),n=S.crowTook?null:nameBindTarget();
+  if(n){S.crowTook=true;B.inv=T().battle_iframes;B.msg='까마귀 한 마리가 이름을 물고 날아오른다.';Sound.playSfx('crow_caw');nameTake(n,B.px,B.py-20,'crow');return;}
+  bHitMe();
+}
 function flockHead(b){return (b.t-T().chasa_crow_scout)*T().chasa_crow_speed;}
 /* 결정 D-1276 (사용자 지시 2026-11-08 36, 결정 D-1146을 바꿈): 도포 펼치기. 어둑차사가 도포를 양쪽으로 펼치면 안은 아무것도 없는 어둠이고
    먹은 동물들의 이름만 떴다 사라진다. 전투 칸 전체에 어둠이 내려앉는다(chasa_robe_dark).
@@ -455,8 +532,11 @@ defineAttacks({
   chasaCrows:{get dur(){const t=T();return t.chasa_crow_gap*(t.chasa_crow_waves-1)+t.chasa_crow_scout+Math.ceil((BOX.w+2*t.chasa_crow_margin+t.chasa_crow_body)/t.chasa_crow_speed)+4;},
     tick(t){const P=B.attackPlan;for(const p of P.passes)if(t===p.delay){B.bullets.push({k:'chasaFlock',P:p,t:0,cawed:false});ch().flap=30;}}},
   chasaRobe:{get dur(){return T().chasa_robe_frames;},
-    tick(t){const T_=T();if(t<12||t>=T_.chasa_robe_frames-50||(t-12)%T_.chasa_hand_every)return;
-      const i=(t-12)/T_.chasa_hand_every;B.bullets.push(handSpawn(i%3===1));}},
+    // 결정 D-1323: 도포가 판을 다 감싼 뒤(chasa_robe_wrap_frames) 넋의 손이 솟는다. 손이 그칠 무렵 솔기가 생긴다(손이 다 가라앉으면 빛이 갈라진다)
+    tick(t){const T_=T(),w0=T_.chasa_robe_wrap_frames;
+      if(t===T_.chasa_robe_frames-50)B.bullets.push({k:'chasaSeam',ph:'wait',x:ch().seamX,y:0,t:0,lit:0,hits:0,flash:0});
+      if(t<w0||t>=T_.chasa_robe_frames-50||(t-w0)%T_.chasa_hand_every)return;
+      const i=(t-w0)/T_.chasa_hand_every;B.bullets.push(handSpawn(i%3===1));}},
   chasaLedger:{get dur(){return T().chasa_ledger_frames;},
     tick(t){const T_=T();
       if(t===0)B.bullets.push({k:'chasaDark',t:0,life:T_.chasa_ledger_frames});
@@ -508,7 +588,7 @@ defineBullets({
       const u=passU(P,B.px,B.py);if(u>head||u<head-body)return;
       const s=(head-u)/body,[cx,cy]=passPt(P,u),[nx2,ny2]=passPt(P,u+3),ax=nx2-cx,ay=ny2-cy,al=Math.hypot(ax,ay)||1;
       const perp=Math.abs((B.px-cx)*(-ay/al)+(B.py-cy)*(ax/al));
-      if(perp<bandHalf(s)-1.5)bHitMe();},
+      if(perp<bandHalf(s,P)-1.5)crowHit();},
     draw(c,b){const t=T(),P=b.P,L=passLen(P),head=flockHead(b),body=t.chasa_crow_body,scoutU=(b.t)*t.chasa_crow_speed*2.6;
       // 깃 자국: 정찰 까마귀가 지나간 길. 떼의 꼬리가 지나가면 사라진다
       const tailU=head-body,trailEnd=Math.min(L,scoutU),fadeT=clamp(1-(tailU-L*0.6)/(L*0.5),0,1);
@@ -522,18 +602,20 @@ defineBullets({
         c.fill();c.restore();}
       if(head<=0)return;
       // 떼: 머리 쪽이 굵고 꼬리로 갈수록 가늘다. 한 길에 모아 칠한다
-      const n=still()?Math.round(t.chasa_crow_count*0.6):t.chasa_crow_count;
+      const n=still()?Math.round((P.n||t.chasa_crow_count)*0.6):(P.n||t.chasa_crow_count),mv=!still();
       c.save();c.fillStyle=INK;
       for(const pass of [0,1]){c.globalAlpha=pass?0.95:0.6;c.beginPath();
-        for(let j=pass;j<n;j+=2){const s=Math.pow((j+0.5)/n,1.15),u=head-s*body;if(u<-14||u>L+14)continue;
-          const [x,y]=passPt(P,u),[x2,y2]=passPt(P,u+3),a=Math.atan2(y2-y,x2-x),half=bandHalf(s);
+        for(let j=pass;j<n;j+=2){const r=hash(j*5.17+P.ph),s0=Math.pow((j+0.5)/n,1.15),s=mv?clamp(s0+0.03*Math.sin(B.time*0.11-s0*16+P.ph),0,1):s0,u=head-s*body;if(u<-14||u>L+14)continue;
+          const [x,y]=passPt(P,u),[x2,y2]=passPt(P,u+3),a=Math.atan2(y2-y,x2-x),half=bandHalf(s,P);
           let o=hash(j*7.31+b.P.ph)*2-1;o=Math.sign(o)*Math.pow(Math.abs(o),0.8);
+          if(mv)o=clamp(o+0.2*Math.sin(B.time*0.05*(0.6+r)+j*1.3),-1,1);   // 결정 D-1324: 떼 안에서 자리를 바꾼다
+          if(mv&&r<0.08)o+=(o>=0?1:-1)*Math.pow(Math.max(0,Math.sin(B.time*0.03*(1+r*5)+j)),3)*0.35;   // 가장자리 몇 마리가 비어져 나왔다 돌아온다
           if(s<0.07&&o>0.12&&o<0.6)o=o<0.36?0.08:0.64;   // 머리 곁 눈 자리
           const jx=still()?0:Math.sin(B.time*0.09+j*1.9)*2.2,jy=still()?0:Math.cos(B.time*0.08+j*2.7)*2.2;
           crowShape(c,x-Math.sin(a)*o*half+jx,y+Math.cos(a)*o*half+jy,a+(hash(j*3.3)-0.5)*0.45,0.82+hash(j)*0.3,still()?0.3:Math.sin(B.time*0.55+j*1.3));}
         c.fill();}
       c.restore();
-      const eu=head-0.04*body;if(eu>0&&eu<L){const [x,y]=passPt(P,eu),[x2,y2]=passPt(P,eu+3),a=Math.atan2(y2-y,x2-x),h=bandHalf(0.04)*0.34;
+      const eu=head-0.04*body;if(eu>0&&eu<L){const [x,y]=passPt(P,eu),[x2,y2]=passPt(P,eu+3),a=Math.atan2(y2-y,x2-x),h=bandHalf(0.04,P)*0.34;
         blob(c,x-Math.sin(a)*h,y+Math.cos(a)*h,3.2,2,'#efe3c8',0.65);blob(c,x-Math.sin(a)*h+Math.cos(a),y+Math.cos(a)*h+Math.sin(a),1.2,1.2,INK,0.9);}}},   // 흐린 눈빛
   chasaHand:{
     step(b){b.t++;const t=T(),ph=handPhase(b);if(b.t>ph.end){b.dead=1;return;}
@@ -549,6 +631,32 @@ defineBullets({
       blob(c,b.x,b.y,9,3,'#dfe9f0',0.4*ph.k);
       ghostHand(c,b.x,b.y,top,b.kind,ph.k,b.flip);
       handLabel(c,b,0.75*ph.k);}},
+  /* 결정 D-1323: 도포 솔기. 넋의 손이 다 가라앉으면(wait → lit) 솔기에 빛 한 줄이 갈라지고, 손 높이의 솔기 위에 금빛 칠 곳이 뜬다.
+     chasa_robe_tear_hits 번 치면 찢긴다(torn, chasaStrike). chasa_robe_tear_frames 안에 못 찢으면 도포가 조인다(squeeze):
+     손 둘레 빛이 좁아지다가 이름 하나를 감싸 쥐고 풀어 준다(이름이 없으면 한 칸 다친다). 그때는 빈틈이 열리지 않는다 */
+  chasaSeam:{
+    step(b){const t=T(),S=ch();if(b.flash>0)b.flash--;
+      if(b.ph==='wait'){if(!B.bullets.some(q=>q.k==='chasaHand'&&!q.dead)){b.ph='lit';b.t=0;const q=bFitMark(b.x,clamp(B.py-14,BOX.y+20,BOX.y+BOX.h-16));b.x=q.x;b.y=q.y;
+          B.msg='두 자락이 맞닿은 솔기에 빛 한 줄이 갈라진다.';Sound.playSfx('battle_soothe');}return;}
+      b.t++;
+      if(b.ph==='lit'){b.lit=Math.min(1,b.t/18);if(b.t>=t.chasa_robe_tear_frames){b.ph='squeeze';b.t=0;S.robeFail=true;B.msg='빛이 닫힌다. 도포가 조여 온다.';Sound.playSfx('chasa_write');}return;}
+      if(b.ph==='squeeze'){S.squeeze=Math.min(1,b.t/t.chasa_robe_squeeze_frames);b.lit=Math.max(0,b.lit-0.08);if(!still())B.quakeT=Math.max(B.quakeT||0,3);
+        if(b.t>=t.chasa_robe_squeeze_frames){S.squeeze=0;S.robeOut=true;b.dead=1;const n=nameBindTarget();
+          if(n){B.msg='도포가 이름 하나를 감싸 쥐고 풀린다.';nameTake(n,B.px,B.py-20);}else{B.inv=0;bHitMe();if(B.st!=='end')B.msg='도포가 조이다 풀렸다.';}}
+        return;}
+      if(b.ph==='torn'&&b.t>26)b.dead=1;},
+    draw(c,b){if(b.ph==='wait')return;const Y0=BOX.y,H=BOX.h,lit=b.ph==='torn'?1:b.lit,open=b.ph==='torn'?Math.min(1,b.t/14):b.hits*0.25;
+      // 판 안을 가로지르는 빛의 틈. 칠수록, 찢기면 넓게 벌어진다
+      const half=1.5+open*16+(b.ph==='torn'?b.t*3:0),a=b.ph==='torn'?Math.max(0,1-b.t/26):lit;
+      const g=c.createLinearGradient(b.x-half-10,0,b.x+half+10,0);g.addColorStop(0,'rgba(255,244,207,0)');g.addColorStop(0.5,'rgba(255,244,207,'+(0.85*a).toFixed(3)+')');g.addColorStop(1,'rgba(255,244,207,0)');
+      c.save();c.fillStyle=g;c.fillRect(b.x-half-10,Y0,half*2+20,H);c.strokeStyle='rgba(255,250,232,'+(0.9*a).toFixed(3)+')';c.lineWidth=1.4+open*2;c.beginPath();
+      for(let y=Y0;y<=Y0+H;y+=7)c.lineTo(b.x+(hash(y*0.37)-0.5)*3,y);c.stroke();c.restore();
+      if(b.ph!=='lit')return;
+      const life=1-b.t/T().chasa_robe_tear_frames,near=Math.hypot(bAim().x-b.x,bAim().y-b.y)<=battleHandProfile().radius+T().chasa_rope_spot_slack+4,p=0.5+0.5*Math.sin(B.time*0.3);
+      c.save();const gg=c.createRadialGradient(b.x,b.y,1,b.x,b.y,17);gg.addColorStop(0,GOLD_LT+(near?0.75:0.4+0.15*p)+')');gg.addColorStop(1,GOLD_LT+'0)');c.fillStyle=gg;c.beginPath();c.arc(b.x,b.y,17,0,Math.PI*2);c.fill();
+      c.strokeStyle=GOLD;c.lineWidth=near?2.8:2;c.beginPath();c.arc(b.x,b.y,11,-Math.PI/2,-Math.PI/2+Math.PI*2*life);c.stroke();
+      if(b.flash>0){c.strokeStyle='#fff4cf';c.globalAlpha=b.flash/12;c.lineWidth=2.4;c.beginPath();c.arc(b.x,b.y,10+(12-b.flash)*1.4,0,Math.PI*2);c.stroke();}
+      c.restore();}},
   chasaDark:{
     step(b){b.t++;if(b.t>b.life)b.dead=1;},
     draw(c,b){const fade=Math.min(1,b.t/30,(b.life-b.t)/30),R=T().chasa_ledger_light;
@@ -610,6 +718,8 @@ function pickChasa(){
   if(S.turn===f||(S.turn>f&&(S.turn-f)%e===0)||!living.length){nameCallBegin(core);return;}
   const o=living.filter(q=>q!==B.last),pool=o.length?o:living,p=pool[Math.floor(Math.random()*pool.length)];
   B.cur=p;B.last=p;B.st='tell';B.t=first?72:p.id==='tail'?62:50;B.msg=p.tell;B.hitThis=false;
+  // 결정 D-1323: 도포마다 솔기 자리를 새로 정한다
+  if(p.id==='tail'){S.robeOut=false;S.robeFail=false;S.squeeze=0;S.seamX=BOX.x+BOX.w*(0.3+Math.random()*0.4);}
   B.attackPlan=p.id==='mouth'?ropePlan():p.id==='body'?crowPlan():{kind:'robe'};
 }
 /* 부위 셋의 남은 몫 */
@@ -625,6 +735,13 @@ function chasaOpen(p){
   const S=ch(),N=B.names,core=part('core'),t=T();
   if(p===LEDGER){B.mark=null;nameCallBegin(core,true);return true;}
   if(core.broken){B.mark=null;return true;}
+  // 결정 D-1323: 도포가 조여 이름을 가져갔으면 이번엔 빈틈이 없다
+  if(p.id==='tail'&&S.robeFail){S.robeFail=false;B.mark=null;B.msg='(…도포 속에서 겨우 풀려났다.)';return true;}
+  // 결정 D-1322: 텅 빈 손이면 먹힌 내 별명이 손 바로 곁 바닥에서 떠오른다 (핵이 드러났어도)
+  if(nameHollow()&&N&&N.eaten.length){
+    const target=!p.core&&!p.broken&&p!==LEDGER?p:B.parts.find(q=>!q.core&&!q.broken)||core,f=nextFloorName(),a=bAim(),ang=Math.random()*Math.PI*2,d=t.name_hollow_near;
+    const q=bFitMark(a.x+Math.cos(ang)*d,a.y+Math.sin(ang)*d);
+    B.mark={x:q.x,y:q.y,t:t.chasa_floor_life,max:t.chasa_floor_life,part:target,floor:f};B.msg='손 바로 곁 바닥에서 낯익은 이름이 떠오른다.';return true;}
   if(N&&N.finalDone&&N.bigOpen&&!S.seal&&!coreHidden()){S.seal=true;B.mark=coreMark(t.chasa_seal_life,true);B.msg='새잎 빛을 묶은 낙관 매듭에 빈틈.';return true;}
   if(!coreHidden()){B.mark=coreMark(t.chasa_core_life,false);B.msg='갓 아래 새잎 빛이 드리운다.';return true;}
   const target=p.core||p.broken?(!part('mouth').broken?part('mouth'):B.parts.find(q=>!q.core&&!q.broken)):p;
@@ -647,8 +764,13 @@ function gotShoes(){return !!(B&&((B.ch&&B.ch.shoes)||B.lastGift==='jipsin'));}
 function tickChasa(){const S=ch(),t=T();if(S.flap>0)S.flap--;if(B.lastGift==='jipsin')S.shoes=true;
   for(const v of S.voices)v.t++;S.voices=S.voices.filter(v=>v.t<v.max);
   // 도포가 펼쳐지는 동안 어둠이 내려앉고, 까마귀 떼는 하늘로 솟는다. 끝나면 천천히 거둔다
-  const on=['tell','atk','settle'].includes(B.st),robeGoal=on&&B.cur&&B.cur.id==='tail'&&!B.cur.broken?1:0,flockGoal=on&&B.cur&&B.cur.id==='body'&&!B.cur.broken?1:0;
-  S.robe+=(robeGoal-S.robe)*(robeGoal?0.05:0.04);S.night=S.robe;
+  const on=['tell','atk','settle'].includes(B.st),robeGoal=on&&B.cur&&B.cur.id==='tail'&&!B.cur.broken&&!S.robeOut?1:0,flockGoal=on&&B.cur&&B.cur.id==='body'&&!B.cur.broken?1:0;
+  S.robe+=(robeGoal-S.robe)*(robeGoal?0.05:0.04);
+  // 결정 D-1323: 공격이 시작되면 자락이 chasa_robe_wrap_frames 동안 판을 덮어 닫힌다. 찢으면 빠르게, 풀려나면 천천히 걷힌다
+  const wrapOn=robeGoal&&(B.st==='atk'||B.st==='settle');
+  S.wrap=clamp(S.wrap+(wrapOn?1/t.chasa_robe_wrap_frames:-(S.tornT>0?0.09:0.035)),0,1);if(S.tornT>0)S.tornT--;
+  if(!wrapOn&&S.squeeze>0&&!B.bullets.some(q=>q.k==='chasaSeam'))S.squeeze=0;
+  S.night=Math.max(S.robe,S.wrap);
   S.flock+=(flockGoal-S.flock)*(flockGoal?0.035:0.03);
   if(S.dark>0)S.dark=Math.max(0,S.dark-0.004);
   // 묶임: 손은 묶인 자리 둘레만 느리게 움직인다. 오래 못 끊으면 이름을 묶어 간다
@@ -664,7 +786,7 @@ function tickChasa(){const S=ch(),t=T();if(S.flap>0)S.flap--;if(B.lastGift==='ji
 /* 판 바닥: 도포 속 어둠과 손 둘레 빛 */
 function drawChasaFloor(c){
   const S=ch(),X=BOX.x,Y=BOX.y,W=BOX.w,H=BOX.h;
-  if(S.night>0.01){c.save();c.fillStyle=NIGHT;c.globalAlpha=0.84*S.night;c.fillRect(X,Y,W,H);c.restore();
+  if(S.night>0.01){c.save();c.fillStyle=S.wrap>0.5?'#070504':NIGHT;c.globalAlpha=Math.max(0.84*S.night,T().chasa_robe_inside_dark*S.wrap);c.fillRect(X,Y,W,H);c.restore();   // 갇히면 판 밖과 같은 어둠
     // 먹힌 이름들이 바닥 어둠 속에서 떴다 사라진다
     c.save();c.font='10px "Gowun Batang", "Batang", serif';c.textAlign='center';c.fillStyle='#b9c6cf';
     // 칸 여섯(가로 셋 × 세로 둘)에 하나씩만 띄워 서로 겹치지 않고, 넋의 손이 있는 자리 곁은 비운다
@@ -673,9 +795,12 @@ function drawChasaFloor(c){
       if(B.bullets.some(q=>q.k==='chasaHand'&&Math.abs(q.x-x)<50&&q.y-(q.h||34)-8<y+8&&q.y+18>y-8))continue;
       c.globalAlpha=fl*0.4*S.night;c.fillText(LEDGER_NAMES[(i+Math.floor(B.time/120)*6)%LEDGER_NAMES.length].text,x,y);}
     c.restore();
-    const fire=has('dokkaebibul'),R=fire?34:24,g=c.createRadialGradient(B.px,B.py,2,B.px,B.py,R);
+    const fire=has('dokkaebibul'),R=(fire?34:24)*(1-0.65*S.squeeze),g=c.createRadialGradient(B.px,B.py,2,B.px,B.py,R);   // 결정 D-1323: 도포가 조이면 손 둘레 빛이 좁아진다
     g.addColorStop(0,(fire?'rgba(122,184,232,':'rgba(239,227,200,')+(0.45*S.night).toFixed(3)+')');g.addColorStop(1,'rgba(239,227,200,0)');
     c.save();c.fillStyle=g;c.beginPath();c.arc(B.px,B.py,R,0,Math.PI*2);c.fill();c.restore();
+    // 결정 D-1323: 도포가 조이면 먹빛 주름 자락이 사방에서 손 쪽으로 오므라든다
+    if(S.squeeze>0){const sq=S.squeeze,r0=150-110*sq;for(let i=0;i<10;i++){const a=i/10*Math.PI*2+(still()?0:B.time*0.01),x=B.px+Math.cos(a)*r0,y=B.py+Math.sin(a)*r0*0.75;
+      brush(c,[[x+Math.cos(a)*60,y+Math.sin(a)*45],[x+Math.cos(a+0.25)*24,y+Math.sin(a+0.25)*18],[x,y]],10+sq*8,'#050302',0.75*sq);}}
     if(fire&&!still()){const y=B.py+10;for(let i=0;i<3;i++)blob(c,B.px+(i-1)*5,y-((B.time+i*9)%14),2.4,3.2,FIRE,0.6*S.night);}}   // 품 안의 도깨비불씨
 }
 /* 결정 D-1271: 바닥 이름과 핵을 그린다 (battle.js drawMark). 칠 수 있는 것이라 금빛이다 */
@@ -722,6 +847,8 @@ function drawChasaOver(c){
   if(m&&m.core){const s=toScreen(LW/2,EY-40),pts=[];for(let i=0;i<=10;i++){const u=i/10,w=still()?0:Math.sin(u*9+B.time*0.08)*3*(1-u);pts.push([s.x+(m.x-s.x)*u+w,s.y+(m.y-6-s.y)*u]);}
     brush(c,pts,2.2,INK,0.55);}
   if(S.bind)drawBoundOver(c,S.bind);
+  // 결정 D-1323: 솔기를 찢는 순간 빛이 쏟아진다 (갇힌 동안 판 테두리는 비치지 않는다, D-1325)
+  if(S.tornT>0){c.save();c.fillStyle='#fff4cf';c.globalAlpha=0.55*S.tornT/30;c.fillRect(0,0,LW,LH);c.restore();}
   for(const q of S.flights){const e=q.t/q.max,to=flightTarget(q),mx=(q.x+to.x)/2,my=Math.min(q.y,to.y)-60,ee=e*e*(3-2*e);
     const x=(1-ee)*(1-ee)*q.x+2*(1-ee)*ee*mx+ee*ee*to.x,y=(1-ee)*(1-ee)*q.y+2*(1-ee)*ee*my+ee*ee*to.y,a=q.to==='sky'?1-e:Math.min(1,(1-e)*3);
     for(let i=0;i<3;i++)blob(c,x-(to.x-q.x)*0.02*i+(hash(i+q.t)-0.5)*6,y+(hash(i*2+q.t)-0.5)*6+i*2,1.4,1.4,'#f4de8c',a*0.6);
@@ -740,6 +867,7 @@ defineEnemies({
     settle:true,markLife:150,
     pickAttack:pickChasa,openMark:chasaOpen,onMarkHit:chasaHit,tickHazards:tickChasa,drawFloor:drawChasaFloor,drawOver:drawChasaOver,
     strike:chasaStrike,drawMark:drawChasaMark,coreRevealed:()=>ch().revealed,msgColor:()=>ch().night>0.4?'#efe6d6':null,
+    borderAlpha:()=>{const w=ch().wrap;return 1-clamp((w-0.55)/0.4,0,1);},   // 결정 D-1325: 도포에 갇히면 판 테두리가 어둠에 묻힌다
     // 결정 D-370·D-1145: weak 는 부서진 뒤 한 줄
     parts:tableParts('gangcheol',{
       mouth:{atk:'chasaRope',tell:'붉은 적패지가 오랏줄처럼 풀려 나온다.',weak:'적패지가 찢겼다. 오랏줄이 사라지고, 붓 자국이 흐려진다.'},

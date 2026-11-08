@@ -387,7 +387,9 @@ function bStep(){
     if(keys['arrowup']||keys['w']||touch.up)dy-=1;if(keys['arrowdown']||keys['s']||touch.down)dy+=1;
     if(dx&&dy){dx*=0.72;dy*=0.72;}
     const speed=battleHandProfile().speed*(B.slowT>0?B.slowK:1);   // 결정 D-178: 꽃가루에 맞으면 잠깐 느려진다
-    B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);
+    // 결정 D-1321: 이름을 다 빼앗긴 텅 빈 손은 키와 터치 끌기가 늦게 먹고 방향이 비틀린다 (battle-names.js)
+    if(nameHollow()){const d=nameTakeDrag();nameHollowMove(dx*speed+d.x,dy*speed+d.y);}
+    else{B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);}
   }
   B.parts.forEach(p=>{if(p.shake>0)p.shake--;});
   if(B.bonk>0)B.bonk--;
@@ -556,6 +558,7 @@ let bDrag=null;
 bcv.addEventListener('pointerdown',e=>{if(!B||B.paused||B.handShow>0||B.st==='end'||B.st==='giftPlace'||bDrag)return;e.preventDefault();const r=bcv.getBoundingClientRect();bDrag={pointerId:e.pointerId,x:e.clientX,y:e.clientY,sx:LW/r.width,sy:LH/r.height};try{bcv.setPointerCapture(e.pointerId);}catch(_){}});
 bcv.addEventListener('pointermove',e=>{if(!B||!bDrag||B.paused||B.handShow>0||nameLocked()||B.st==='end'||B.st==='giftPlace'||e.pointerId!==bDrag.pointerId)return;const dx=(e.clientX-bDrag.x)*bDrag.sx*1.25,dy=(e.clientY-bDrag.y)*bDrag.sy*1.25;bDrag.x=e.clientX;bDrag.y=e.clientY;
   const speed=battleHandProfile().speed/TABLES.TUNING.battle_bare_speed;
+  if(nameHollowDrag(dx*speed,dy*speed))return;   // 결정 D-1321: 텅 빈 손은 끈 만큼을 모았다가 흘려 쓴다
   B.px=clamp(B.px+dx*speed,BOX.x+8,BOX.x+BOX.w-8);B.py=clamp(B.py+dy*speed,BOX.y+8,BOX.y+BOX.h-8);});
 function endDrag(e){if(e&&bDrag&&e.pointerId!==bDrag.pointerId)return;bDrag=null;}bcv.addEventListener('pointerup',endDrag);bcv.addEventListener('pointercancel',endDrag);
 bcv.addEventListener('lostpointercapture',endDrag);
@@ -727,8 +730,8 @@ function bDraw(){
   else c.fillText(msg,LW/2,BOX.y-14);
   // 결정 D-227: 공격 예고 동안 글귀 앞에 작은 위험 표시만 둔다
   if(B.st==='tell'&&!B.E.dodge)drawDangerSign(c,msg?LW/2-msgW/2-16:LW/2,msgY-6,1,B.t);
-  // 상자
-  c.save();c.fillStyle='rgba(255,252,242,.55)';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();
+  // 상자 (결정 D-1325: 판이 덮여 갇힌 동안은 종이빛도 그만큼 옅다)
+  c.save();c.globalAlpha=B.E.borderAlpha?B.E.borderAlpha():1;c.fillStyle='rgba(255,252,242,.55)';c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);c.restore();
   c.save();c.beginPath();c.rect(BOX.x,BOX.y,BOX.w,BOX.h);c.clip();
   if(B.E.drawFloor)B.E.drawFloor(c);
   if(B.E.possession)drawPossessedAttack(c);
@@ -747,8 +750,8 @@ function bDraw(){
   if(B.E.drawOver)B.E.drawOver(c);
   if(B.giftPlace)drawPlacedGift(c);
   drawBonk(c);
-  // 붓 테두리
-  const X=BOX.x,Y=BOX.y,Wd=BOX.w,Ht=BOX.h;
-  brush(c,[[X-3,Y+1],[X+Wd*0.5,Y-1],[X+Wd+3,Y+1]],4,INK);brush(c,[[X+Wd+1,Y-2],[X+Wd-1,Y+Ht*0.5],[X+Wd+1,Y+Ht+3]],4,INK);
-  brush(c,[[X+Wd+2,Y+Ht+1],[X+Wd*0.5,Y+Ht+2],[X-3,Y+Ht]],4,INK);brush(c,[[X-1,Y+Ht+2],[X+1,Y+Ht*0.5],[X-1,Y-3]],4,INK);
+  // 붓 테두리. 결정 D-1325: 상대가 판을 덮어 가두면(어둑차사 도포) borderAlpha 만큼 옅어진다
+  const X=BOX.x,Y=BOX.y,Wd=BOX.w,Ht=BOX.h,ba=B.E.borderAlpha?B.E.borderAlpha():1;
+  if(ba>0.01){brush(c,[[X-3,Y+1],[X+Wd*0.5,Y-1],[X+Wd+3,Y+1]],4,INK,ba);brush(c,[[X+Wd+1,Y-2],[X+Wd-1,Y+Ht*0.5],[X+Wd+1,Y+Ht+3]],4,INK,ba);
+  brush(c,[[X+Wd+2,Y+Ht+1],[X+Wd*0.5,Y+Ht+2],[X-3,Y+Ht]],4,INK,ba);brush(c,[[X-1,Y+Ht+2],[X+1,Y+Ht*0.5],[X-1,Y-3]],4,INK,ba);}
 }
