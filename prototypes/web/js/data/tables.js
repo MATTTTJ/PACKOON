@@ -4060,7 +4060,10 @@ const TABLES={
   "name_echo_step": 4,
   "name_echo_ring_gap": 9,
   "name_echo_in": 5,
-  "name_echo_fade": 95
+  "name_echo_fade": 95,
+  "rest_range": 22,
+  "rest_toast_gap_ms": 20000,
+  "rest_return_back": 16
  },
  "PROGRESS": [
   {

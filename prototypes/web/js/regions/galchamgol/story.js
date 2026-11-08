@@ -675,17 +675,21 @@ function toadWrap(){
 }
 
 /* ---------- 엉킨 칡 전투 ---------- */
+// 결정 D-1302 (사용자 지시 2026-11-08 43): 엉킨 칡 앞 쉼터. 확장판은 언덕의 금줄 천 조사(810)를 지나 칡을 처음 보는 자리(960) 앞,
+//   옛 구성은 칡덩굴 장막(1660) 너머 칡 앞(1955) 앞. 둘 다 쉼터와 칡 사이에는 할 일·인물·문이 없다
+Rg.rest={zone:'hill',get x(){return CLASSIC?1870:890;},need:()=>CLASSIC?!!G.barrier?.cut:true,
+  line:'(부시를 쳐서 작은 불을 피웠다.\n손 좀 녹이고, 숨 고르고 가자.)'};
 Rg.startKudzu=()=>{
   G.px=1950-(Rg.hillShift||0);
   inkTransition('엉킨 칡',(G.boss.x-G.cam)/W*100,()=>startBattle('kudzu',res=>{
     if(res==='win'||res==='calm'){
       if(res==='calm')diary('calm','엉킨 칡을 부수지 않고 달랬다. 칡이 놓아준 자리에 보랏빛 꽃이 피어 있었다.');
       Rg.bossDie();
-    }else{
-      G.px=1900-(Rg.hillShift||0);G.f.faints+=res==='lose'?1:0;
+    }else restAfterBattle(res,()=>{G.px=1900-(Rg.hillShift||0);},()=>{   // 결정 D-1302: 지면 쉼터로 (rest.js)
+      G.f.faints+=res==='lose'?1:0;
       diary('hint','엉킨 칡에게 밀려났다. 서두르지 말고 칡이 틈을 보일 때를 노리자. 버섯 향을 좋아하는 것 같았다.');
       talk([['너구리','(…서두르지 말자. 버섯 향을 좋아하는 것 같았어.)']],()=>think('준비되면 다시 다가가자.'));
-    }
+    });
   }));
 };
 

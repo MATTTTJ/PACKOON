@@ -529,7 +529,8 @@ Rg.expEncounters={
     ],
     warehouse:[
       {id:'j_warehouse_rope',x:400,label:'접어 둔 좌판 끈',text:'장꾼들이 좌판 끈 끝을 한데 묶어 바구니에 담아 두었다.\n아침엔 이걸 풀어 다시 장을 펼치겠지.'},
-      {id:'j_warehouse_fire',x:1780,label:'짐꾼 화톳불 자리',text:'짐꾼들이 짐을 부리며 쬐던 화톳불 자리다.\n재 속에 군밤 껍질이 묻혀 아직 따뜻하다.'},
+      // 결정 D-1304: 이 자리가 눈도깨비 앞 쉼터다. 그믐 밤에 아이가 다시 불을 지핀다
+      {id:'j_warehouse_fire',x:1780,label:'짐꾼 화톳불 자리',get text(){return G.f.restLit?.jangteo&&!G.boss.dead?'내가 다시 지핀 짐꾼 화톳불이다.\n여기서면 창고 문이 잘 보인다.':'짐꾼들이 짐을 부리며 쬐던 화톳불 자리다.\n재 속에 군밤 껍질이 묻혀 아직 따뜻하다.';}},
       {id:'j_warehouse_scratches',x:1230,label:'창고 문 앞 큰 발자국',get pic(){return Rg.examinePics.storeDoor();},get text(){return G.boss.dead?(Rg.arcs()&&!G.f.jangteoArcsYeotReturned?'창고 문 옆에 돌아온 물건들이 놓였다.\n그 사이에 날이 반질한 엿가위 하나. 장터 엿장수 거겠지?':'창고 문 옆에 돌아온 물건들이 놓였다.\n아침에 찾아갈 자리가 저마다 비어 있다.'):'눈 위에 큰 발자국이 찍혀 창고 문 앞만 빙빙 돌았다.\n발자국 곁으로 빗자루로 쓴 듯한 자국이 끌려 있다.';}},
       {id:'j_warehouse_mended',x:2470,y:128,label:'기운 멍석',get text(){return G.boss.dead?'바느질한 모서리에 눈 한 톨 안 묻었다.\n누가 멍석을 얌전히 접어 놓고 갔다.':'멍석 한 귀를 다른 색 짚으로 기웠다.\n헌것도 함부로 버리지 않는 장터구나.';}}
     ]

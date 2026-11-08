@@ -580,8 +580,8 @@ if(!CLASSIC){
         if(res==='win'||res==='calm'){
           if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
           Rg.bossDie();
-        }else{G.px=Z('shrine',2240);G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
-          talk([['너구리','(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>think('숨 좀 고르자. 준비되면 다시 가 보자.'));}
+        }else restAfterBattle(res,()=>{G.px=Z('shrine',2240);},()=>{G.f.faints+=res==='lose'?1:0;diary('d_hint','돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');   // 결정 D-1303: 지면 쉼터로 (rest.js)
+          talk([['너구리','(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>think('숨 좀 고르자. 준비되면 다시 가 보자.'));});
       }));
     };
     Rg.sendMedicine=()=>{

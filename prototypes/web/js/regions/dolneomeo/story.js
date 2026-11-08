@@ -475,17 +475,21 @@ function tellSeogi(){
 }
 
 /* ---------- 돌 골렘 전투 ---------- */
+// 결정 D-1303 (사용자 지시 2026-11-08 43): 돌 골렘 앞 쉼터. 옛 구성은 뿔영감 고개(1560) 너머 골렘 앞(1860) 앞.
+//   확장판 성황당은 골렘을 처음 보는 비탈 꼭대기(설계 2150) 뒤, 작은 돌탑 조사(설계 2250) 앞인 설계 2200
+Rg.rest={zone:'shrine',get x(){return CLASSIC?1790:trimX(2200,Rg.trimCuts?.shrine);},need:()=>!!G.f.ppuriPassed,
+  line:'(바람 그늘에서 부시를 쳐 불을 피웠다.\n언 손부터 녹이고 가자.)'};
 Rg.startGolem=()=>{
   G.px=1845;
   inkTransition('돌 골렘',(G.boss.x-G.cam)/W*100,()=>startBattle('golem',res=>{
     if(res==='win'||res==='calm'){
       if(res==='calm'){G.f.golemCalm=true;diary('d_calm','성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.');}
       Rg.bossDie();
-    }else{
-      G.px=1790;G.f.faints+=res==='lose'?1:0;
+    }else restAfterBattle(res,()=>{G.px=1790;},()=>{   // 결정 D-1303: 지면 쉼터로 (rest.js)
+      G.f.faints+=res==='lose'?1:0;
       diary('d_hint','돌 골렘의 가슴 핵은 처음엔 눈 껍데기에 덮여 있다. 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.');
       talk([['너구리','(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)']],()=>think('준비되면 다시 다가가자.'));
-    }
+    });
   }));
 };
 
