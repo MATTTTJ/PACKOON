@@ -371,7 +371,7 @@ if(!CLASSIC){
   // 결정 D-1073: 고라니만 듣던 눈 속 짚단 대신 수달만 잠수하는 얼음 구멍 둘(비탈). 얼음 밑에 가라앉은 것을 건진다
   Rg.zones.slope.digs=[{id:'y_dive_fish',x:1100,item:'bingeo',n:2,form:'otter',cache:true,done:false,line:'얼음 구멍에 쏙 들어갔다 나왔다. 빙어 두 마리를 물고 나왔다!'},
     {id:'y_dive_jip',x:1640,item:'jip',n:1,form:'otter',cache:true,done:false,line:'얼음 밑에 짚단이 걸려 있었다. 가을에 누가 떨어뜨렸나 보다.'}];
-  Rg.zones.shelter.digs=[{id:'y_cache_shelter',x:655,item:'jat',n:2,form:'squirrel',cache:true,done:false}];
+  Rg.zones.shelter.digs=[{id:'y_cache_shelter',x:640,   /* 결정 D-1413: 이름 말뚝과 떨어지게 (655에서 옮김) */item:'jat',n:2,form:'squirrel',cache:true,done:false}];
   Rg.zones.snow.digs=[{id:'y_cache_snow',x:1260,item:'solbang',n:2,form:'squirrel',cache:true,done:false}];
   /* 결정 D-265: 길섶 채집물을 더한다 (사용자 피드백 2026-11-02). 눈 덮인 마가목 열매(줍는 자리마다 마가목이 선다), 덤불의 다래 덩굴,
      소나무 밑 솔방울, 높은 바위턱의 잣송이. 살금이 둘레(비탈 900~1350)는 비워 둔다. 좌표는 길을 줄인 뒤의 자리. */

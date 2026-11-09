@@ -3986,6 +3986,7 @@ const TABLES={
   "nundok_gloat_hits": 1,
   "nundok_gloat_frames": 45,
   "gather_min_gap": 48,
+  "gather_dig_interact_gap": 58,
   "gather_interact_gap": 42,
   "trade_tip_hold_ms": 350,
   "trade_tip_show_ms": 2400,

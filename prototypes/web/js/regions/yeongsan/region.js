@@ -62,7 +62,7 @@ Rg.namesBack=()=>!!(typeof G!=='undefined'&&G&&G.f&&(G.f.nameRestored||G.f.sprin
 /* PA-43: 옛 배치와 저장은 classic 쪽에 남긴다. 공급은 기존 마가목 넷에 하나를 더한다. */
 if(!CLASSIC){
   // 결정 D-207: 다래 덩굴 셋과 짚단이 30px 간격으로 붙어 있던 것을 들쭉날쭉 떨어뜨린다(사용자 피드백 58). 셋째 덩굴은 다람쥐 숨긴 몫(640)과 붙지 않게.
-  const SHELTER_VINES=[302,352,706],SHELTER_STRAW=404;   // 결정 D-1103: 날쌘(260)과 간격, 덩굴끼리 gather_min_gap
+  const SHELTER_VINES=[320,370,706],SHELTER_STRAW=420;   // 결정 D-1103: 날쌘(260)과 간격, 덩굴끼리 gather_min_gap. 결정 D-1413: 첫 덩굴을 날쌘에게서 gather_dig_interact_gap(58) 넘게 (302·352·404에서 옮김)
   const oldState=Rg.newState;
   Rg.newState=()=>{
     const s=oldState();
