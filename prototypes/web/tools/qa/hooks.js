@@ -18,7 +18,7 @@ function installInPage(rules) {
     : physicalKeys.has('arrowleft') || physicalKeys.has('a');
   const blockingScene = () => [
     open('dlg') && '대화', open('bag') && '보따리', open('notebook') && '수첩',
-    !!openMinigame() && '미니게임', !!B && '전투', inkOn && '먹 전환', !!vistaMode && '경치', G.ended && '지역 종료'
+    !!openMinigame() && '미니게임', typeof thinkWait !== 'undefined' && thinkWait === 2 && '발견 속말', !!B && '전투', inkOn && '먹 전환', !!vistaMode && '경치', G.ended && '지역 종료'
   ].filter(Boolean);
   let currentTalk = { stack: '', number: 0 };
   const origin = stack => {
