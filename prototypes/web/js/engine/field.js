@@ -590,7 +590,25 @@ function npcTagHeight(n){
     const d=c.getContext('2d').getImageData(0,0,96,96).data;for(let y=0;y<96;y++){let hit=false;for(let x=0;x<96;x++)if(d[(y*96+x)*4+3]>40){hit=true;break;}if(hit){h=90-y+4;break;}}}catch(_){}
   h=clamp(h,14,80);npcTagHeights.set(n,h);return h;
 }
-function npcTagText(n){return n.known||knows('met:'+n.id)?(n.tag||n.name):'?';}
+/* 결정 D-1428 (사용자 피드백 2026-11-09 단풍골 12): 이름표가 '?'로 남던 두 경우를 고친다.
+   ① 말 걸기(interactWith)를 거치지 않고 인물이 먼저 말을 거는 장면(언덕 어귀에서 부르는 두꺼비 할멈 등)은 met 이 적히지 않았다.
+      이제 대화 줄이 뜰 때 그 줄을 말한 지금 필드의 인물을 만난 것으로 적는다(meetSpeaker, dialog.js showLine). 대화창에 이름이 이미 보였다.
+   ② 지역마다 id 가 다른 같은 인물(늙은 까치: old_magpie·dol_magpie·j_magpie·y_magpie_farewell)은 앞 지역에서 만났어도 '?'였다.
+      이름이 같은 인물을 어느 지역에서든 만났으면 이름을 쓴다(metNames). */
+let metNameMemo={n:-1,g:null,set:new Set()};
+function metNames(){
+  const L=G?.learned||[];if(metNameMemo.n===L.length&&metNameMemo.g===G)return metNameMemo.set;
+  const ids=new Set(L.filter(k=>k.startsWith('met:')).map(k=>k.slice(4))),names=new Set();
+  if(ids.size)for(const r of regionList())for(const n of portraitCandidates(r))if(ids.has(n.id)&&n.name)names.add(n.name);
+  metNameMemo={n:L.length,g:G,set:names};return names;
+}
+function meetSpeaker(name){
+  if(!G||!G.started||G.ended||!name||name==='너구리'||/^[（(]/.test(name))return;
+  const wanderers=zoneObjects('wanderers');
+  for(const n of [...fieldNpcs(),...wanderers])
+    if(n&&n.name&&!n.prompt&&n.tag!==false&&(n.name===name||n.speakers?.includes(name))&&!knows('met:'+n.id))learn('met:'+n.id,wanderers.includes(n));
+}
+function npcTagText(n){return n.known||knows('met:'+n.id)||metNames().has(n.name)?(n.tag||n.name):'?';}
 function updateNpcTags(near){
   const shown=new Set();
   if(G&&G.started&&!G.ended&&!paused()&&!B){

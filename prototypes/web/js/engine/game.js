@@ -259,6 +259,7 @@ function startGame(){
   G.started=true;$('titleScreen').hidden=true;syncPrologue();
   REG.onStart();
   ensureMapCompanions();   // 결정 D-816
+  if(typeof noteReadMap==='function')noteReadMap();   // 결정 D-1403: 본 줄 기록은 시작할 때 만든다 (타이머가 대화 중에 진행값을 바꾸지 않게)
   lastGoal='';refreshHud();
 }
 /* 지역을 끝낼 때 지역 코드가 부른다. REG.next 가 있으면 다음 지역 버튼이 나온다 */

@@ -7,7 +7,7 @@ const {execFileSync}=require('node:child_process');
 const {createHash}=require('node:crypto');
 const {launchBrowser,startServer}=require('./browser');
 const root=path.resolve(__dirname,'../../../..');
-const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','talk-esc','quest-order','map','trade','drops-floor','drops-persistence','drops-departure','drops-full','rest'];
+const names=['syntax','data','versions','csv','dialogue','play-expanded','play-classic','speakers','edges','save','mobile','talk-esc','quest-order','map','trade','drops-floor','drops-persistence','drops-departure','drops-full','rest','tags'];
 const staticNames=names.slice(0,5);
 const args=process.argv.slice(2);
 let quick=false,only=null;
@@ -175,6 +175,10 @@ const watchdog=setTimeout(async()=>{
     if(selected.has('rest')){   // 결정 D-1301: 보스 앞 쉼터
       const {runRest}=require('./rest-checks');
       add(await withBrowser('rest',(browser,directory)=>runRest({browser,outDir:directory})));
+    }
+    if(selected.has('tags')){   // 결정 D-1428: 인물 이름표
+      const {runTags}=require('./tag-checks');
+      add(await withBrowser('tags',(browser,directory)=>runTags({browser,outDir:directory})));
     }
     const {runDropCheck}=require('./drop-checks');
     for(const name of names.filter(n=>n.startsWith('drops-')))if(selected.has(name))
