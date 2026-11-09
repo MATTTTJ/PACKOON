@@ -271,13 +271,13 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await read(`(()=>{if(window.__qaClockInstalled)return;window.__qaClockInstalled=true;window.__qaClockRate=1;let last=null,virtual=null;const raf=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=callback=>raf(now=>{if(last===null){last=now;virtual=now;}else{virtual+=(now-last)*window.__qaClockRate;last=now;}callback(virtual);});})()`);
     if(await read("!$('titleScene').hidden"))await click('#tsNew');
     await click('#btnStart');
-    // 엄마 쪽지는 새 게임 첫 필드 프레임에 펼쳐지고 독백 대화가 붙는다(notebook.js showMomNote, 결정 D-704). settle이 대화를 넘긴다.
-    await b.until('G.started&&G.f.momNoteSeen',{label:'새 게임 엄마 쪽지'});
+    // 결정 D-1402: 출발 쪽지 장면은 없다. 첫 필드 프레임에 표시(momNoteSeen)만 선다.
+    await b.until('G.started&&G.f.momNoteSeen',{label:'새 게임 시작'});
     await settle();
     if(await b.eval("!$('bag').hidden||!$('notebook').hidden"))throw new Error('시작 쪽지 창을 닫지 못했다');
     if(await read('G.f.arcs')!==(mode==='expanded'))throw new Error('사연 켬/끔 시작값이 모드와 다르다');
     await stage('단풍골 · 가루와 채집',async()=>{await gather('root',1);await pickup('acorn',6);await gather('ssari',1);if(await read('(G.inv.ssari||0)<2'))await gather('kkoe',1);await craft('jeolgu','powder',2);await npc('dodam');});
-    await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);if(!await read('G.f.nalDone&&(G.inv.coal||0)>=2'))throw new Error('허세 흥정 뒤 숯 두 개(덤)를 받지 못했다');await npc('musoe');await battle(['rice'],{sway:true});await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
+    await stage('단풍골 · 숯과 낫',async()=>{await npc('nal',/허세/);if(!await read('G.f.nalDone&&(G.inv.coal||0)>=(TABLES.TUNING.trade_haggle_on?2:1)'))throw new Error('날쌘에게 숯을 받지 못했다(흥정을 켜 두었으면 허세 덤까지 두 개, 결정 D-1404)');await npc('musoe');await battle(['rice'],{sway:true});await npc('musoe');if(!await read('G.f.musoeDone'))throw new Error('낫을 받지 못했다');});
     await stage('단풍골 · 당산나무와 약',async()=>{
       if(mode==='expanded')await zone('forest');await moveX((await read('G.barrier.x'))-28);
       for(let i=0;i<5&&!await read('G.barrier.cut');i++){await key('j');await wait(400);}

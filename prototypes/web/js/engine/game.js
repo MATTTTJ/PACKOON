@@ -288,7 +288,7 @@ function resetScreens(){
   GameMusic.reset();
   resetFieldModes();REG=REGIONS[G.region];prepareZones(G,REG);fillCover();closePanels();
   $('endScreen').hidden=true;$('titleScreen').hidden=G.started;syncPrologue();document.body.classList.remove('ending-scene');
-  lastGoal='';lastTool='';lastNear=null;refreshHud();refreshSaveUI();
+  lastGoal='';lastNear=null;refreshHud();refreshSaveUI();
 }
 $('btnStart').onclick=startOrConfirm;   // 처음부터(btnRestart)는 save.js
 /* 다음 지역으로: 보따리·연장·수첩·호감은 그대로 가지고 간다 */

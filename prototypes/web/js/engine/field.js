@@ -164,7 +164,7 @@ function step(){
   if(document.hidden)return;
   stepFloorItems();
   if(pickupPose){G.vx=0;jumpQ=atkQ=dropQ=false;stepPickup();return;}
-  if(REG.order===regionList()[0].order&&!G.f.momNoteSeen){showMomNote();return;}
+  if(!G.f.momNoteSeen)G.f.momNoteSeen=true;   // 결정 D-1402: 첫 출발 엄마 쪽지 장면을 뺐다. 표시만 남겨 옛 검사·저장과 맞춘다
   if(usesZones(REG)&&['inn','shelter'].includes(G.zone)&&deliverHomeReply())return;
   REG.formCheck?.();   // 지역이 이야기 진행에 맞춰 변신을 여는 자리 (forms.js)
   formIntroTick();     // 결정 D-173: 새 변신 알림 카드는 대화가 끝난 뒤에 (forms.js)

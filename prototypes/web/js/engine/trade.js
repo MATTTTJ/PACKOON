@@ -276,7 +276,9 @@ const Trade=(()=>{
     tray.appendChild(chips);
     const row=el('div','trade-actions');
     // 결정 D-125: 상대에게 지금 바꿀 수 있는 물건(열림·값 부족)이 하나도 없으면 흥정 줄을 숨긴다.
-    if(!S.guest&&TABLES.HAGGLE?.[S.npc]&&S.goods.some(g=>['open','short'].includes(stateOf(g).k))){
+    // 결정 D-1404 (사용자 지시 2026-11-09): 흥정 줄은 tuning.csv trade_haggle_on 이 1일 때만 보인다. 지금은 꺼 둔다(나중에 아이디어가 생기면 다시 켠다).
+    //   흥정 덤은 모두 덤일 뿐 진행에 쓰이지 않는다(날쌘 숯·결명자·팥 덤, haggleBonus).
+    if(TABLES.TUNING.trade_haggle_on&&!S.guest&&TABLES.HAGGLE?.[S.npc]&&S.goods.some(g=>['open','short'].includes(stateOf(g).k))){
       const hag=el('div','trade-haggle'),closed=!!G.f.haggleUsed?.[key(S.npc)];
       hag.appendChild(el('span','small',haggleState()));
       if(!closed)for(const way of WAYS){

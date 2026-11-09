@@ -40,12 +40,9 @@ async function fresh(browser, rules, mobile = false) {
   await browser.until('G.started && !G.ended', { timeout: 10000, label: '새 게임' });
   await readStartLetter(browser, mobile);
 }
-// 결정 D-704: 출발 쪽지는 화면 가운데에 펼쳐지고 아이의 독백 대화로 읽는다. 끝까지 넘기고 쪽지가 접혀 사라질 때까지 기다린다
+// 결정 D-1402: 출발 쪽지 장면을 뺐다. 새 게임 첫 필드 프레임에 표시만 서고 대화는 뜨지 않는다
 async function readStartLetter(browser, mobile = false, label = '') {
-  await browser.until("G.f.momNoteSeen && !document.querySelector('#dlg').hidden && !!document.querySelector('.mom-letter')", { timeout: 10000, label: label + '출발 쪽지 독백' });
-  const press = async () => { if (mobile) await tap(browser, '#dlg'); else await browser.key('e'); await browser.wait(120); };
-  await browser.advanceDialogue({ press });
-  await browser.until("!document.querySelector('.mom-letter')", { timeout: 5000, label: label + '출발 쪽지 접힘' });
+  await browser.until("G.f.momNoteSeen && !document.querySelector('.mom-letter')", { timeout: 10000, label: label + '출발 (쪽지 장면 없음)' });
 }
 
 async function runEdges({ outDir, evidence = [] }) {

@@ -24,7 +24,7 @@
       <canvas id="cv" width="400" height="225" aria-label="게임 화면"></canvas>
       <div class="hud">
         <div class="hud-left">
-          <div class="status"><div class="hearts" id="hearts"></div><div class="tool" id="toolLabel"></div><div class="form-now" id="formLabel" title="지금 모습 (0~4로 바꾸기)" hidden></div></div>
+          <div class="status"><div class="hearts" id="hearts"></div><div class="form-now" id="formLabel" title="지금 모습 (0~4로 바꾸기)" hidden></div></div>
           <div class="goal" id="goal" hidden></div>
         </div>
         <div class="hud-btns">
@@ -32,7 +32,7 @@
           <button class="chipbtn" id="btnNote" type="button">수첩 <kbd>N</kbd></button>
           <button class="chipbtn" id="btnMap" type="button">지도 <kbd>M</kbd></button>
           <button class="chipbtn" id="btnSound" type="button" aria-pressed="true">소리 켜짐 <kbd>V</kbd></button>
-          <button class="chipbtn" id="btnVolume" type="button" aria-pressed="false">음량 작게</button>
+          <label class="chipbtn vol-chip" id="btnVolume" title="음량: 왼쪽 끝은 소리 없음, 오른쪽 끝은 가장 크게">음량 <input id="volumeAll" type="range" min="0" max="1" step="0.05" aria-label="전체 음량"></label>
           <button class="chipbtn" id="btnSaveHud" type="button">저장</button>
         </div>
       </div>

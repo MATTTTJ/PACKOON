@@ -28,7 +28,7 @@ function showLine(){
   if(!L){const f=dlgEnd;dlgDismiss();if(f)f();return;}
   // 결정 D-600: 이름(#dlgWho)은 창 위 테두리의 꼬리표로 그린다(style.css). 이름이 빈 줄(지문)은 꼬리표도 숨는다
   $('dlg').hidden=false;$('dlgWho').textContent=L[0];fillDlgText($('dlgText'),L[1]);dlgShownAt=performance.now();
-  if(L.hint)learn(L.hint);   // 결정 D-461: 숨은 가공법 귀띔은 그 줄을 들은 순간 수첩에 적힌다 (arcs.js hintLine)
+  if(L.hint){const R=G.f.recipeFrom||(G.f.recipeFrom={}),out=L.hint.slice(5);if(!R[out]&&L[0])R[out]=L[0];learn(L.hint);}   // 결정 D-461: 숨은 가공법 귀띔은 그 줄을 들은 순간 수첩에 적힌다 (arcs.js hintLine). 결정 D-1406: 일러 준 이를 남긴다
   if('pic' in L)dlgPic(L.pic);
   const face=$('dlgFace');face.innerHTML='';face.appendChild(portrait(L[0]));
   const ch=$('dlgChoices');ch.innerHTML='';
