@@ -339,13 +339,19 @@ function has(id,n){return (G.inv[id]||0)>=(n||1);}
 // 결정 D-63: 귀한 것·도구와 아빠·엄마 물건은 맞바꾸기·흔한 물건 교환·선물로 내놓지 않는다.
 // 예외는 그 전투 상대가 좋아하는 물건뿐이다(사연 있는 돌, 도깨비불씨, 아빠가 맡긴 엿). "네 아빠 거잖아"(기획서 §5).
 function keepsake(id){const it=ITEMS[id];return !it||['귀한 것','도구'].includes(it.kind)||/^(dad|mom)_/.test(id);}
-function addItem(id,n){
-  if(n>0)Sound.item();
+// 결정 D-1420: later 면 물건만 넣고, 소리·그림·알림은 돌려준 함수를 부를 때 낸다 (dialog.js receiveItem)
+function addItem(id,n,later){
   G.inv[id]=(G.inv[id]||0)+n;
-  Vfx.item(id,n);
-  if(learn('got:'+id,true)&&NOTES[id])toast('수첩에 그렸다 · '+ITEMS[id].n);
-  else toast('+ '+ITEMS[id].n+(n>1?' ×'+n:''));
+  const drawn=learn('got:'+id,true)&&NOTES[id];
+  const fx=()=>{
+    if(n>0)Sound.item();
+    Vfx.item(id,n);
+    if(drawn)toast('수첩에 그렸다 · '+ITEMS[id].n);
+    else toast('+ '+ITEMS[id].n+(n>1?' ×'+n:''));
+  };
   refreshHud();
+  if(later)return fx;
+  fx();
 }
 function takeItem(id,n){G.inv[id]=(G.inv[id]||0)-n;if(G.inv[id]<=0)delete G.inv[id];refreshHud();}
 function diary(id,text){if(G.diary.some(d=>d.id===id))return;G.diary.push({id,text});}

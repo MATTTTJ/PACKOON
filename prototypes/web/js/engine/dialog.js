@@ -28,7 +28,9 @@ function showLine(){
   if(!L){const f=dlgEnd;dlgDismiss();if(f)f();return;}
   // 결정 D-600: 이름(#dlgWho)은 창 위 테두리의 꼬리표로 그린다(style.css). 이름이 빈 줄(지문)은 꼬리표도 숨는다
   $('dlg').hidden=false;$('dlgWho').textContent=L[0];fillDlgText($('dlgText'),L[1]);dlgShownAt=performance.now();
-  if(L.hint)learn(L.hint);   // 결정 D-461: 숨은 가공법 귀띔은 그 줄을 들은 순간 수첩에 적힌다 (arcs.js hintLine)
+  if(L.hint){const R=G.f.recipeFrom||(G.f.recipeFrom={}),out=L.hint.slice(5);if(!R[out]&&L[0])R[out]=L[0];learn(L.hint);}   // 결정 D-461: 숨은 가공법 귀띔은 그 줄을 들은 순간 수첩에 적힌다 (arcs.js hintLine). 결정 D-1406: 일러 준 이를 남긴다
+  if(typeof meetSpeaker==='function')meetSpeaker(L[0]);   // 결정 D-1428: 말한 인물은 이름표가 '?'에서 이름으로 (field.js)
+  if(typeof L.on==='function')L.on();   // 결정 D-1420: 그 줄이 뜨는 순간의 연출(받은 물건 효과, 인물 모습 바뀜)
   if('pic' in L)dlgPic(L.pic);
   const face=$('dlgFace');face.innerHTML='';face.appendChild(portrait(L[0]));
   const ch=$('dlgChoices');ch.innerHTML='';
@@ -77,7 +79,13 @@ function gotText(list){
 }
 // 결정 D-352: gotLine 줄은 받을 물건을 give로 들고 있다. talkGive·arcScene(arcs.js)이 대화 끝에 넣는다. receiveItem 줄은 이미 넣어서 given이다.
 function gotLine(id,n=1){const list=Array.isArray(id)?id:[[id,n]];return Object.assign(['너구리',gotText(list)],{give:list});}
-function receiveItem(id,n=1){const L=gotLine(id,n);for(const [i,k=1] of L.give)addItem(i,k);L.given=true;return L;}
+/* 결정 D-1420: receiveItem 은 물건을 곧바로 보따리에 넣되(중간에 대화가 닫혀도 받은 것은 남는다), 소리·날아가는 그림·알림은
+   '(…을 얻었다.)' 줄이 뜰 때 낸다. 예전엔 대화를 여는 순간 터져서, 감나무 장면에서 도토리를 받기도 전에 도토리 효과가 떴다. */
+function receiveItem(id,n=1){
+  const L=gotLine(id,n),fx=L.give.map(([i,k=1])=>addItem(i,k,true));L.given=true;
+  L.on=()=>{fx.forEach(f=>f&&f());L.on=null;};
+  return L;
+}
 /* 결정 D-484: 휴대폰에서 대화가 너무 급하게 넘어갔다(사용자 피드백 2026-11-04). 글이 한 번에 뜨는데 탭에 아무 쉼이 없어서,
    빠르게 두 번 누르면 한 줄을 읽기도 전에 지나갔고, 넘기려고 누르던 자리에 선택지가 뜨면 그 탭이 곧바로 선택지를 골랐다.
    휴대폰(TOUCH)에서만: 새 줄이 뜬 뒤 dlg_touch_advance_lock_ms 동안은 넘기지 않고, 선택지는 dlg_touch_choice_lock_ms 뒤에야 눌린다(그동안 흐리게).

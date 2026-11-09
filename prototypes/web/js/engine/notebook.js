@@ -4,7 +4,7 @@
    결정 D-1201: 도장 쪽은 아이가 찾은 아빠 손바닥 도장을 보고 그린 그림과 느낀 줄만 있다(아빠 줄 없음).
    결정 D-61: 그림은 아이가 직접 보고 겪은 것만 아이 손으로 그린다(크레용 그림). 보기 전에는 빈 칸이다.
    해야 할 일·이름·숨은 가공법·장부는 아이가 이어 적은 장이다 (그리기는 book.js).
-   아빠 단서는 '아빠 단서' 장, 엄마의 쪽지는 '이름' 장 아래에 있다 (결정 D-703, 예전엔 보따리 '중요' 탭). 일기·까치 답장 장은 없앴고 기록(G.diary)은 진행 판정에 그대로 쓴다.
+   아빠 단서는 '아빠 단서' 장에 있다 (결정 D-703, 예전엔 보따리 '중요' 탭). 엄마의 쪽지는 뺐다 (결정 D-1402). 일기·까치 답장 장은 없앴고 기록(G.diary)은 진행 판정에 그대로 쓴다.
 
    쪽 하나: {id, kind:'animal'|'item'|'stamp', name?, lines:[{who:'dad'|'me', text, when?, section}], dadDrawing?:true}
    - id 는 NPC·전투 상대·아이템 id (npcs.csv · bosses.csv · items.csv, 원본은 design/data/notebook.csv)
@@ -29,18 +29,20 @@ const pageShown=e=>noteRegionOpen(e.region)&&(e.dadDrawing||e.lines.some(l=>l.wh
 const dadLinesOf=e=>e.lines.filter(l=>l.who==='dad'&&lineShown(l));
 const gotItem=e=>e.kind==='item'&&!!ITEMS[e.id]&&knows('got:'+e.id);
 /* 아이가 그 쪽에 적은 줄. 관찰이면 처음 얻은 물건의 생김새(items.csv 설명)도 아이가 적은 줄로 친다 */
-function myTexts(e,section){
+function myLines(e,section){
   const inSection=l=>{const s=l.section||childNoteSection(l);return s===section||(section==='관찰'&&s==='익힌 솜씨');};
-  const t=e.lines.filter(l=>l.who!=='dad'&&lineShown(l)&&inSection(l)).map(l=>l.text);
-  if(section==='관찰'&&gotItem(e))t.unshift(ITEMS[e.id].d);
+  const t=e.lines.filter(l=>l.who!=='dad'&&lineShown(l)&&inSection(l)).map(l=>({text:l.text,key:e.id+'|'+l.when}));
+  if(section==='관찰'&&gotItem(e))t.unshift({text:ITEMS[e.id].d,key:e.id+'|got'});
   return t;
 }
+function myTexts(e,section){return myLines(e,section).map(l=>l.text);}
 /* 새로 알게 된 것. 그 덕에 수첩에 새 줄이 생기면 알려 준다 (quiet 면 조용히) */
 function learn(k,quiet){
   if(!G||knows(k))return false;(G.learned||(G.learned=[])).push(k);
   const e=Object.values(NOTES).find(e=>e.lines.some(l=>l.when===k));
   if(e&&!quiet){const dad=e.lines.some(l=>l.when===k&&l.who==='dad');setTimeout(()=>toast((dad?'아빠 수첩을 펼쳤다 · ':'수첩에 이어 적었다 · ')+noteName(e)),1400);}
   if(!$('notebook').hidden)renderNotebook();
+  noteNewRefresh();
   return true;
 }
 
@@ -156,7 +158,7 @@ function collectFreshDrawings(){
 
 /* 탭: 앞의 둘(동물·물건)은 아빠와 같이 쓰는 쪽, 나머지는 아이가 이어 적은 장. 탭 선택은 저장하지 않는다 */
 // 결정 D-30: 수첩에서 일기·까치 답장을 뺐다 (design/data/decisions.csv)
-// 결정 D-703: 보따리 '중요' 탭을 없애고 아빠 단서는 수첩 '아빠 단서' 장으로, 엄마의 쪽지는 '이름' 장 아래로 돌아왔다
+// 결정 D-703: 보따리 '중요' 탭을 없애고 아빠 단서는 수첩 '아빠 단서' 장으로 돌아왔다 (엄마의 쪽지는 D-1402로 뺐다)
 // 결정 D-150: 아이가 적는 장 맨 앞에 '해야 할 일'(중요·잔일로 나눈 할 일, 끝낸 일)을 두고, '익힌 솜씨' 장은 없앤다.
 //   손버릇 줄은 그 가보의 물건 쪽에 아이 줄로 남는다(myTexts). 탭 이름이 같은 보따리 '중요' 탭과 헷갈리지 않게 '해야 할 일'로 부른다.
 // 결정 D-1201: 도장 쪽은 아이가 그리고 적은 장이라 아이 장(아빠 단서 뒤)으로 옮겼다.
@@ -175,8 +177,9 @@ Object.defineProperty(window,'bookTab',{configurable:true,get:()=>noteTab,set:v=
     tabs.appendChild(b);
   });
 }
-function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){Sound.book(true);collectFreshDrawings();
-  if(nameCardUnseen){nameCardUnseen=false;noteTab='nicknames';$('btnNote').classList.remove('has-new');}   // 결정 D-449: 새 이름을 받은 뒤 처음 열면 '이름' 장부터
+function toggleNote(){const o=$('notebook').hidden;closePanels();if(o){Sound.book(true);collectFreshDrawings();noteNewTab=null;
+  if(nameCardUnseen){nameCardUnseen=false;noteTab='nicknames';}   // 결정 D-449: 새 이름을 받은 뒤 처음 열면 '이름' 장부터
+  else{const u=noteUnread();if(!u[noteTab]){const t=NOTE_TABS.find(t=>u[t[0]]);if(t)noteTab=t[0];}}   // 결정 D-1403: 지금 장에 새 줄이 없으면 새 줄이 있는 첫 장부터
   const card=$('nameCard');if(card){clearTimeout(nameCardTimer);card.classList.remove('show');card.hidden=true;}   // 수첩 탭을 가리지 않게 쪽지는 내린다
   renderNotebook();$('notebook').hidden=false;$('noteBody').scrollTop=0;}}
 /* 결정 D-449: 이름을 받는 순간 화면 위에 작은 이름 쪽지를 띄운다 (사용자 피드백 2026-11-04: 얻었다는 걸 친숙하게).
@@ -189,7 +192,7 @@ function showNameCard(text,by){
   card.innerHTML='';
   card.append(el('small',null,'새로 불린 이름'),el('b',null,text),el('span',null,(by?jo(by,'이','가')+' 지어 준 이름 · ':'')+'수첩에 적었다'));
   card.hidden=false;card.classList.remove('show');void card.offsetWidth;card.classList.add('show');
-  Sound.craft();nameCardUnseen=true;$('btnNote').classList.add('has-new');
+  Sound.craft();nameCardUnseen=true;noteNewRefresh();
   clearTimeout(nameCardTimer);nameCardTimer=setTimeout(()=>{card.classList.remove('show');card.hidden=true;},TABLES.TUNING.name_card_ms);
 }
 /* 옛 이름: 너구리의 책이 따로 있던 때 부르던 함수도 이 수첩을 연다 */
@@ -197,31 +200,92 @@ function toggleBook(){toggleNote();}
 function renderBook(){renderNotebook();}
 $('btnNote').onclick=()=>{if(G.started&&!open('dlg')&&!openMinigame())toggleNote();};
 $('noteClose').onclick=closePanels;
-/* 결정 D-704: 첫 지역에 처음 들어설 때 한 번, 엄마의 쪽지가 화면 가운데에 펼쳐지고 아이가 속으로 읽는다
-   (사용자 피드백 2026-11-05: 보따리를 여는 대신 애니메이션으로 편지를 띄우고, 내용은 주인공의 독백으로).
-   쪽지 그림은 수첩과 같은 것(book.js momNotePaper)이고, 대화가 끝나면 접혀 보따리 단추 쪽으로 들어간다.
-   독백 줄: 쪽지는 떠나는 날 아침 엄마가 썼다(프롤로그). 이름 자리가 번진 까닭은 아이가 본 것(엄마 붓이 거기서 멈췄다)으로만 말한다 (D-38). */
-const MOM_LETTER_LINES=[
-  ['너구리','(떠나기 전에 엄마가 겨우 써서 건넨 쪽지다.)'],
-  ['너구리','엄마 걱정은 하지 말고…\n아빠 만나면, 손 꼭 잡고 와.'],
-  ['너구리','…엄마가 기다릴게.'],
-  ['너구리','(맨 위 내 이름 자리는 먹이 번졌다.\n엄마 붓이 거기서 한참 멈춰 있었다.)'],
-  ['너구리','(쪽지를 접어 보따리 안쪽에 넣었다.\n해머루부터 찾자.)'],
-];
-function showMomNote(){
-  if(G.f.momNoteSeen)return false;
-  G.f.momNoteSeen=true;closePanels();
-  const box=el('div','mom-letter');box.setAttribute('aria-hidden','true');box.appendChild(momNotePaper());
-  box.style.setProperty('--mom-open',TABLES.TUNING.mom_letter_open_ms+'ms');box.style.setProperty('--mom-fold',TABLES.TUNING.mom_letter_fold_ms+'ms');
-  $('stage').appendChild(box);Sound.paper();
-  requestAnimationFrame(()=>box.classList.add('open'));
-  const owner=G;
-  talk(MOM_LETTER_LINES,()=>{
-    box.classList.remove('open');box.classList.add('away');Sound.paper();
-    setTimeout(()=>box.remove(),TABLES.TUNING.mom_letter_fold_ms);
-    if(G===owner)refreshHud();
-  });
-  return true;
+/* 결정 D-1402 (사용자 지시 2026-11-09): 첫 지역에 처음 들어설 때 엄마의 쪽지가 펼쳐지던 장면(결정 D-704)을 뺐다.
+   G.f.momNoteSeen 은 옛 저장과 검사 스크립트를 위해 그대로 둔다. */
+
+/* 결정 D-1403 (사용자 피드백 2026-11-09): 새로 적힌 장과 줄을 알려 준다.
+   - 아직 펼쳐 보지 않은 새 줄이 있으면 수첩 단추에 금빛 점이 뜬다(예전엔 새 이름만).
+   - 수첩을 열면 새 줄이 있는 장 탭에 금빛 점, 그 장의 새 줄(쪽·항목) 옆에 작은 '새로' 표시가 붙는다.
+   - 그 장을 한 번 펼쳐 보면 본 것으로 친다. 수첩을 열어 둔 채로는 표시가 남고, 다음에 열 때 사라진다.
+   본 줄은 G.f.noteRead 에 남는다. 이 기록이 없는 저장(옛 저장·새 게임 첫 순간)은 지금 있는 줄을 모두 본 것으로 친다. */
+function notePageKeys(e,section){
+  const own=myLines(e,section).map(l=>l.key);
+  const dad=section==='관찰'?e.lines.filter(l=>l.who==='dad'&&l.when&&knows(l.when)).map(l=>e.id+'|'+l.when):[];
+  return [...dad,...own];
+}
+function noteKeysOf(tab){
+  if(['animal','item','stamp'].includes(tab))
+    return Object.values(NOTES).filter(e=>e.kind===tab&&noteRegionOpen(e.region)).flatMap(e=>notePageKeys(e,'관찰'));
+  if(tab==='recipes')return knownHiddenRecipes().map(r=>'rc:'+r.out);
+  if(tab==='todo')return activeSideQuests().map(q=>'q:'+q.id);
+  if(tab==='clues')return (G.clues||[]).map(c=>'c:'+c.id);
+  if(tab==='nicknames')return (G.nicknames||[]).filter(n=>!n.lost).map(n=>'n:'+n.id);
+  if(tab==='ledger')return Object.keys(G.ledger||{}).map(id=>'l:'+id);
+  return [];
+}
+function noteReadMap(){
+  if(!G.f.noteRead){const r={};for(const [id] of NOTE_TABS)for(const k of noteKeysOf(id))r[k]=1;G.f.noteRead=r;}
+  return G.f.noteRead;
+}
+/* 장마다 아직 안 본 줄 수 */
+function noteUnread(){
+  const out={};if(!G||!G.started)return out;const r=noteReadMap();
+  for(const [id] of NOTE_TABS){const n=noteKeysOf(id).filter(k=>!r[k]).length;if(n)out[id]=n;}
+  return out;
+}
+function noteNewRefresh(){
+  if(!G||!G.started||!$('notebook').hidden)return;
+  $('btnNote').classList.toggle('has-new',Object.keys(noteUnread()).length>0);
+}
+setInterval(()=>{try{noteNewRefresh();}catch(_){}},1000);
+/* 지금 펼친 장에서 '새로' 를 붙일 줄. 같은 장을 펼쳐 둔 동안은 모아 둔다 */
+let noteNewTab=null,noteNewNow=new Set();
+function noteTakeNew(tab){
+  if(noteNewTab!==tab){noteNewTab=tab;noteNewNow=new Set();}
+  const r=noteReadMap();for(const k of noteKeysOf(tab))if(!r[k]){noteNewNow.add(k);r[k]=1;}
+}
+function markNew(node,key){
+  if(!node||!noteNewNow.has(key))return false;
+  node.classList.add('is-new');const m=el('span','new-mark','새로');m.title='새로 적은 줄';node.appendChild(m);return true;
+}
+
+/* 결정 D-1406 (사용자 지시 2026-11-09): 숨은 가공법 장은 말글 대신 조합법으로 적는다. 예: 싸리버섯 + 꾀꼬리버섯 + 깨소금 → 버섯찜.
+   아래에 누구에게 들었는지(귀띔한 이·답례로 일러 준 이)를 작게 적는다. 아무에게도 안 들었으면 '직접 찾았다'.
+   귀띔한 이는 그 줄을 들을 때 G.f.recipeFrom 에 남는다(dialog.js). 그 기록이 없는 옛 저장은 '들은 말'로 적는다. */
+function knownHiddenRecipes(){
+  const seen=new Set(),out=[];
+  for(const [tool,list] of Object.entries(RECIPES))for(const r of list){
+    if(!r.hidden||seen.has(r.out)||!recipeKnown(r))continue;seen.add(r.out);out.push(Object.assign({tool},r));
+  }
+  return out;
+}
+function recipeFormula(r){
+  const part=([id,n])=>(ITEMS[id]?.n||id)+(n>1?' '+n+'개':'');
+  return Object.entries(r.need).map(part).join(' + ')+' → '+(ITEMS[r.out]?.n||r.out)+((r.n||1)>1?' '+r.n+'개':'');
+}
+function recipeTellers(r){
+  const who=[];
+  if(knows('hint:'+r.out))who.push(G.f.recipeFrom?.[r.out]||'들은 말');
+  for(const g of TABLES.GIFT_RECIPES||[])if(g.out===r.out&&knows('gift:'+g.id))who.push(npcName(g.npc));
+  return [...new Set(who)];
+}
+function renderRecipeBook(body){
+  const all=knownHiddenRecipes();
+  if(!all.length){body.appendChild(el('p','empty-note','누가 일러 주거나 직접 찾은 숨은 가공법을 여기에 적는다.'));return;}
+  for(const reg of regionList()){
+    const list=all.filter(r=>(ITEMS[r.out]?.region||reg.id)===reg.id);if(!list.length)continue;
+    body.appendChild(el('div','note-region',reg.name));
+    const box=el('div','recipe-list');
+    for(const r of list){
+      const card=el('div','recipe-card');
+      card.appendChild(el('b','recipe-name',ITEMS[r.out]?.n||r.out));
+      card.appendChild(el('p','recipe-formula',recipeFormula(r)));
+      const tellers=recipeTellers(r),tool=HEIR[r.tool]?.short||'';
+      card.appendChild(el('small','recipe-from',(tool?tool+'에서 · ':'')+(tellers.length?tellers.join(', '):'직접 찾았다')+(knows(r.discover)?' · 만들어 봤다':'')));
+      markNew(card,'rc:'+r.out);box.appendChild(card);
+    }
+    body.appendChild(box);
+  }
 }
 
 /* 보이는 것만 센다: 아빠가 적어 둔 쪽 수와 아이가 이어 적은 줄 수 */
@@ -235,7 +299,7 @@ function noteTally(){
 /* 쪽 하나: 아빠의 글 아래에 아이의 그림·줄.
    결정 D-61(D-57을 대신함): 아빠 쪽에는 그림이 없다. 아이가 직접 본 뒤에야 아이 그림이 생기고, 보기 전에는 빈 칸이다. */
 function notePage(e,section){
-  const dad=section==='관찰'?dadLinesOf(e):[],mine=myTexts(e,section);
+  const dad=section==='관찰'?dadLinesOf(e):[],mineLines=myLines(e,section),mine=mineLines.map(l=>l.text);
   const card=el('div','note-card');
   if(section==='관찰'){
     const fig=el('figure','kid-drawing'),saw=witnessed(e),d=saw?drawingFor(e):null;
@@ -246,13 +310,16 @@ function notePage(e,section){
     card.appendChild(fig);
   }
   card.appendChild(el('b','note-name',noteName(e)));
-  const write=(cls,who,texts)=>{const box=el('div','note-lines '+cls);texts.forEach(t=>{const p=el('p','note-line '+(who==='아빠'?'dad':'me'));p.appendChild(el('span','who',who));p.appendChild(document.createTextNode(t));box.appendChild(p);});card.appendChild(box);};
-  if(dad.length)write('dad-ink','아빠',dad.map(l=>l.text));
-  if(mine.length)write('my-ink','나',mine);
+  // 결정 D-1403: 새로 적힌 줄에는 '새로' 표시, 그 쪽에도 표시
+  let fresh=false;
+  const write=(cls,who,texts,keys)=>{const box=el('div','note-lines '+cls);texts.forEach((t,i)=>{const p=el('p','note-line '+(who==='아빠'?'dad':'me'));p.appendChild(el('span','who',who));p.appendChild(document.createTextNode(t));if(keys[i]&&noteNewNow.has(keys[i])){p.classList.add('is-new');fresh=true;}box.appendChild(p);});card.appendChild(box);};
+  if(dad.length)write('dad-ink','아빠',dad.map(l=>l.text),dad.map(l=>l.when?e.id+'|'+l.when:null));
+  if(mine.length)write('my-ink','나',mine,mineLines.map(l=>l.key));
   else if(dad.length){const gap=el('div','my-ink blank');gap.setAttribute('aria-hidden','true');card.appendChild(gap);}
   // 결정 D-1264: 본 회상 장면은 그 인물 쪽에서 다시 본다 (engine/cine.js Cine.addReplay)
   const rp=section==='관찰'&&typeof Cine!=='undefined'?Cine.replayFor(e.id):null;
   if(rp){const b=el('button','note-replay',rp.label);b.type='button';b.onclick=ev=>{ev.stopPropagation();closePanels();rp.play();};card.appendChild(b);}
+  if(fresh){card.classList.add('is-new');const m=el('span','new-mark','새로');m.title='새로 적은 줄';card.appendChild(m);}
   return card;
 }
 // 결정 D-81: 도장 전체 수는 수첩 데이터에서 센다(도장 쪽의 stamp: 키). 지역별로도 센다.
@@ -269,7 +336,10 @@ function renderPages(body,section,kind){
 }
 function renderNotebook(){
   if(!NOTE_TABS.some(t=>t[0]===noteTab))noteTab='animal';
-  document.querySelectorAll('#noteTabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===noteTab));
+  noteTakeNew(noteTab);   // 결정 D-1403
+  const unread=noteUnread();
+  document.querySelectorAll('#noteTabs button').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===noteTab);b.classList.toggle('has-new',!!unread[b.dataset.tab]);});
+  $('btnNote').classList.toggle('has-new',Object.keys(unread).length>0);
   const {dad,mine}=noteTally();$('noteTally').textContent='아빠가 적은 쪽 '+dad+' · 내가 이어 적은 줄 '+mine;
   const body=$('noteBody');const sc=body.scrollTop;body.innerHTML='';
   if(noteTab==='stamp'){
@@ -282,7 +352,8 @@ function renderNotebook(){
     if(knows('lore:dad_stamp')){const p=el('p','note-line me');p.appendChild(el('span','who','나'));
       p.appendChild(document.createTextNode('아빠는 뒤에 올 보부상 보라고 쓸 만한 자리마다 손바닥을 찍었다. 아빠 길을 따라가며 찾는 대로 그려 둔다.'));body.appendChild(p);}
   }
-  if(PAGE_SECTION[noteTab])renderPages(body,PAGE_SECTION[noteTab],['animal','item','stamp'].includes(noteTab)?noteTab:null);
+  if(noteTab==='recipes')renderRecipeBook(body);   // 결정 D-1406
+  else if(PAGE_SECTION[noteTab])renderPages(body,PAGE_SECTION[noteTab],['animal','item','stamp'].includes(noteTab)?noteTab:null);
   else renderChildRecord(body,noteTab);
   body.scrollTop=sc;
 }

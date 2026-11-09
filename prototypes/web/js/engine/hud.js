@@ -43,7 +43,6 @@ function refreshGoal(){
   let ms=$('goalMSub');if(!ms){ms=el('small','goal-m-sub');ms.id='goalMSub';m.appendChild(ms);}
   ms.hidden=!subs.length;ms.textContent=subs.length?'잔일 · '+subs[0]+(subs.length>1?' 외 '+(subs.length-1):''):'';
 }
-let lastTool='';
 /* 결정 D-85: 키 안내의 잎사귀 변신은 가진 변신만 보인다. 변신을 하나도 못 배웠으면 줄을 숨긴다. */
 function refreshKeyForms(){
   const span=$('keyForms');if(!span)return;
@@ -60,8 +59,8 @@ function refreshHud(){
   $('btnMap').hidden=CLASSIC;$('padMap').hidden=CLASSIC;$('btnMapEnd').hidden=CLASSIC;
   $('mapKeyHint').hidden=CLASSIC;$('mapCoverKeys').hidden=CLASSIC;
   $('hearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('');
-  const t=heldTool();   // 결정 D-602: 도구·모습 칸은 하트 아래 둘째 줄에 놓인다 (style.css .status)
-  if(t+G.sharp!==lastTool){lastTool=t+G.sharp;const e=$('toolLabel');e.innerHTML='';e.appendChild(icon(t));e.appendChild(document.createTextNode(TOOLS[t].n+(G.sharp?' +':'')));}
+  // 결정 D-1405 (사용자 피드백 2026-11-09): 하트 아래 도구 칸(결정 D-602)을 뺐다. 필드에는 도구를 바꾸는 단추·키가 없어(낫을 받으면 곡괭이 자리를 낫이 대신한다)
+  //   무기 고르는 칸처럼 보여 헷갈렸다. 든 연장은 주인공 손에 보이고, 이름과 날 세움은 보따리 '손에 든 연장' 줄에 있다. 도구 바꾸기는 보스 전투(Q·도구 단추)에서만 한다.
   if(G){refreshGoal();refreshFormUi();}
   if(typeof B!=='undefined'&&B)renderBHud();
 }
@@ -71,15 +70,15 @@ function refreshSoundButtons(){
   $('btnSound').innerHTML=(Sound.enabled?'소리 켜짐':'소리 꺼짐')+' <kbd>V</kbd>';
   $('btnSound').setAttribute('aria-pressed',String(Sound.enabled));
   $('btnSound').title='전체 소리 켜기/끄기 (V)';
-  $('btnVolume').textContent='음량 '+(Sound.volume==='high'?'크게':'작게');
-  $('btnVolume').setAttribute('aria-pressed',String(Sound.volume==='high'));
-  $('btnVolume').title='음량 크게/작게';
+  // 결정 D-1407: 음량 슬라이더는 배경음·효과음 중 큰 쪽을 보여 준다 (따로 맞춘 값은 수첩의 소리 설정에서)
+  $('volumeAll').value=Math.max(Sound.bgmVolume,Sound.sfxVolume);
   $('volumeBgm').value=Sound.bgmVolume;
   if(typeof GameMusic!=='undefined')$('musicRecorded').value=GameMusic.recordedMode;
   $('volumeSfx').value=Sound.sfxVolume;
 }
 $('btnSound').onclick=()=>Sound.toggle();
-$('btnVolume').onclick=()=>Sound.toggleVolume();
+$('volumeAll').oninput=e=>Sound.setVolume(Number(e.target.value));
+$('volumeAll').addEventListener('pointerup',e=>e.target.blur());   // 끌고 난 뒤 방향키가 슬라이더가 아니라 주인공을 움직이게
 $('volumeBgm').oninput=e=>Sound.setBgmVolume(Number(e.target.value));
 // 결정 D-121: 배경 음악(새 곡·합성) 고르기 (GameMusic은 game.js에서 늦게 만들어지므로 누를 때 찾는다)
 // 결정 D-121: 새 곡(기본) / 합성 둘 중 하나

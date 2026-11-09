@@ -3,7 +3,6 @@ village_well,galchamgol,우물 두레박 살펴보기,water_drop,,제안
 village_wheel,galchamgol,물레방아 물길 살펴보기,water_trickle,1800,제안
 forge_sign,galchamgol,갈림길 팻말 읽기,wood_tap,,제안
 forge_charcoal,galchamgol,식힌 숯가마 살펴보기,fire_crackle,1500,제안
-forge_share,galchamgol,낮은 평상 살펴보기,wood_tap,,제안
 forest_root,galchamgol,드러난 뿌리 살펴보기,leaf_rustle,,제안
 forest_oak,galchamgol,높은 참나무 가지 올려다보기,leaf_rustle,2200,제안
 forest_trail,galchamgol,나뭇가지에 걸린 금줄 보기,cloth_flutter,1900,제안
@@ -19,6 +18,7 @@ pic_mom_room,galchamgol,엄마 방 들여다보기 (대사 그림),door,,제안
 pic_leaf,galchamgol,무쇠가 꺼낸 당산나무 잎 (대사 그림),leaf_rustle,,제안
 pic_cache,galchamgol,도담이 묻은 도토리 자리 (대사 그림),leaf_rustle,,제안
 pic_gam_pole,galchamgol,감 따는 장대 (대사 그림),leaf_rustle,,제안
+pic_sickle,galchamgol,무쇠에게 받은 아빠 낫 (대사 그림),sickle,,제안
 frost_print,dolneomeo,서리 자국 살펴보기,footstep_frost,,제안
 gate_bell,dolneomeo,장승 풍경 들어 보기,wind_bell,1300,제안
 stone_channel,dolneomeo,돌 물길 들여다보기,water_trickle,1800,제안

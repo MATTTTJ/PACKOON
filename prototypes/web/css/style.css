@@ -129,7 +129,6 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 @keyframes rarity-glow{0%,100%{filter:drop-shadow(0 0 1px #e8ac2852)}50%{filter:drop-shadow(0 0 3px #e8ac2899) brightness(1.12)}}
 @media (min-width:600px){.slot canvas.rarity-mark,.detail canvas.rarity-mark{width:24px;height:24px}}
 .bag-grid .slot canvas.rarity-mark{width:13px;height:13px;right:1px;top:1px}
-.mom-note-head{margin-top:18px}
 @media (prefers-reduced-motion:reduce){.rarity-gold{animation:none}}
 .btn{font-family:var(--ui);font-size:clamp(13px,1.5vw,15px);background:var(--hanji);color:var(--meok);border:2px solid var(--meok);border-radius:4px;padding:6px 14px;cursor:pointer;min-height:38px;touch-action:manipulation}
 .btn:hover{background:#fff6e0}
@@ -141,11 +140,6 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .tabs{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--hanji-2);overflow-x:auto}
 .tabs button{font-family:var(--display);font-size:clamp(13px,1.6vw,15px);background:none;border:none;border-bottom:3px solid transparent;padding:8px 10px;cursor:pointer;color:var(--dim);white-space:nowrap;touch-action:manipulation}
 #noteTabs button{flex:0 0 auto}
-.mom-note{max-width:21em;margin:4px auto 14px;padding:14px 18px;background:#f8efd9;border:1px solid #cdb98f;box-shadow:2px 3px 0 #d9c8a5;font-family:var(--display);color:#493829;transform:rotate(-.5deg)}
-.mom-note small{display:block;color:#745c40;margin-bottom:10px}
-.mom-note p{font-size:clamp(15px,1.9vw,19px);line-height:1.6;margin:1px 0}
-.mom-note .smudge{filter:blur(3.5px);display:inline-block;user-select:none}
-.mom-transcript{border-top:1px dotted #cdb98f;padding-top:10px}
 /* 결정 D-39: 보부상 교환 화면. 왼쪽 상대의 물건(원하는 것을 그림으로), 오른쪽 내 보따리, 아래 내가 내놓을 것 */
 .trade-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px}
 .trade-side h3,.trade-tray h3{font-family:var(--display);font-size:1.05em;margin:2px 0 8px}
@@ -183,8 +177,6 @@ kbd{font-family:var(--ui);font-size:.82em;background:rgba(0,0,0,.12);border-radi
 .trade-ask-row .dot{font-weight:700;color:var(--dim);width:.7em;text-align:center}
 .trade-asks .trade-left{padding-left:1.2em}
 @media (max-width:600px){.trade-wrap{grid-template-columns:1fr}}
-.mom-transcript summary{cursor:pointer;min-height:32px}
-.mom-transcript p{margin:4px 0}
 .tabs button[aria-selected="true"]{color:var(--meok);border-bottom-color:var(--dan)}
 .entry{font-family:var(--display);line-height:1.65;padding:8px 0;border-bottom:1px dotted #cdb98f;max-width:65ch}
 .entry small{display:block;color:var(--dim);font-family:var(--ui)}
@@ -560,7 +552,6 @@ body.in-battle .pad-top .chipbtn{display:none}
 .my-ink.blank{height:2.6em;border-left-color:rgba(37,26,20,.12);background:repeating-linear-gradient(transparent 0 1.25em,rgba(205,185,143,.55) 1.25em calc(1.25em + 1px));opacity:.8}
 .entry.me{font-family:var(--ui);color:#1d140e;padding-left:9px;border-left:2px solid rgba(37,26,20,.35)}
 /* 결정 D-423: 이름 장. 맨 위 엄마가 지어 준 이름, 먹힌 이름은 흐리게 */
-.entry.me.own-name{border-left-color:#b07d26}
 .entry.me.lost{opacity:.42}
 .entry.me.lost .ink-smear{display:block;width:7em;height:1.05em;margin-top:2px;border-radius:50%;background:radial-gradient(ellipse at 45% 55%,rgba(70,56,42,.32),rgba(70,56,42,.12) 55%,transparent 72%)}   /* 결정 D-1320: 지워진 이름 자리의 먹 번짐 */
 
@@ -623,7 +614,6 @@ body.ending-scene .hud,body.ending-scene #pad,body.ending-scene #toast,body.endi
   #galHands button{margin:4px}
   .shell:has(>#galHands:not([hidden])) .hud #btnSound,.shell:has(>#galHands:not([hidden])) .hud #btnVolume{visibility:hidden;pointer-events:none}
   #gbar,#fbar{min-height:44px}
-  .mom-transcript summary{min-height:44px}
   body.in-battle .b-top{top:calc(2.5% + 52px)}
 }
 @media (pointer:coarse) and (orientation:portrait){
@@ -862,24 +852,6 @@ body.in-battle .pbtn.leaf,body.in-battle .form-ring{display:none}
 /* 결정 D-484: 휴대폰에서 선택지가 막 떴을 때 잠깐 흐리게 두고 눌리지 않게 한다 (넘기던 탭이 선택지를 고르지 않게) */
 #dlgChoices.wait button{opacity:.55;pointer-events:none;transition:opacity .12s}
 
-/* 결정 D-704: 첫 출발 때 엄마의 쪽지가 화면 가운데에 펼쳐진다. 띠처럼 접힌 채 올라와 세로로 펼쳐지고,
-   독백이 끝나면 다시 접혀 오른쪽 위(보따리 단추 쪽)로 들어간다. 길이는 tuning.csv mom_letter_open_ms·mom_letter_fold_ms (notebook.js showMomNote) */
-.mom-letter{position:absolute;left:50%;top:19%;z-index:7;width:min(21em,62%);pointer-events:none;font-size:clamp(9px,1.45vw,16px);
-  transform:translate(-50%,40%) scale(.35,.04) rotate(-4deg);opacity:0;transform-origin:50% 50%}
-.stage:has(>.mom-letter) .hud{opacity:0;pointer-events:none;transition:opacity .4s}   /* 쪽지를 읽는 동안 화면 단추가 쪽지를 덮지 않게 (휴대폰 세로) */
-.mom-letter .mom-note{margin:0;max-width:none;box-shadow:3px 5px 0 rgba(42,32,25,.35),0 10px 30px rgba(0,0,0,.35)}
-.mom-letter .mom-note small{display:none}
-.mom-letter .mom-note p{font-size:1.15em;line-height:1.55}
-.mom-letter.open{animation:mom-letter-open var(--mom-open,900ms) cubic-bezier(.2,.8,.25,1) forwards}
-.mom-letter.away{animation:mom-letter-away var(--mom-fold,700ms) ease-in forwards}
-@keyframes mom-letter-open{0%{transform:translate(-50%,40%) scale(.35,.04) rotate(-4deg);opacity:0}
-  35%{transform:translate(-50%,0) scale(1,.05) rotate(-1deg);opacity:1}
-  100%{transform:translate(-50%,0) scale(1,1) rotate(-.6deg);opacity:1}}
-@keyframes mom-letter-away{0%{transform:translate(-50%,0) scale(1,1) rotate(-.6deg);opacity:1}
-  45%{transform:translate(-50%,0) scale(1,.05) rotate(-1deg);opacity:1}
-  100%{transform:translate(60%,-120%) scale(.08,.03) rotate(8deg);opacity:0}}
-@media (prefers-reduced-motion:reduce){.mom-letter.open{animation:none;transform:translate(-50%,0);opacity:1}.mom-letter.away{animation:none;opacity:0}}
-@media (pointer:coarse) and (orientation:portrait){.mom-letter{top:4%;width:70%;font-size:9px}}
 
 
 /* 결정 D-705: 프롤로그(첫 이야기 화면) 동안은 게임 화면의 단추·하트·안내·키 설명을 모두 같은 투명도(0)로 숨기고,
@@ -988,3 +960,27 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
 .trade-extra{display:inline-flex;align-items:center;gap:3px;margin-left:4px;padding:1px 4px 1px 2px;border:1px dashed var(--dan);border-radius:4px;background:#fbefe0}
 .trade-extra-tag{font-size:.78em;font-weight:700;color:#fff;background:var(--dan);border-radius:3px;padding:0 4px;line-height:1.5}
 .trade-good:not([aria-pressed="true"]):not(:hover):not(:focus-visible) .trade-extra .trade-ask{opacity:.8}
+
+/* 결정 D-1403: 수첩 새 줄 표시. 새 줄이 있는 장 탭에 금빛 점, 새 쪽·항목에 작은 '새로' 표시 */
+#noteTabs button.has-new{position:relative}
+#noteTabs button.has-new::after{content:'';position:absolute;top:4px;right:1px;width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 1.5px #f8eed8}
+.new-mark{display:inline-block;margin-left:6px;font:700 10px/1.3 var(--ui);padding:1px 5px;border-radius:8px;background:var(--gold);color:var(--meok);vertical-align:middle;letter-spacing:.02em}
+.note-card.is-new{position:relative;box-shadow:0 0 0 2px var(--gold)}
+.note-card.is-new>.new-mark{position:absolute;top:-8px;left:-6px;margin:0}
+.note-line.is-new{background:linear-gradient(transparent 60%,rgba(220,165,69,.35) 60%)}
+.entry.is-new,.recipe-card.is-new{box-shadow:inset 3px 0 0 var(--gold);padding-left:8px}
+.todo-item.is-new{box-shadow:inset 3px 0 0 var(--gold)}
+.ledger td.is-new .new-mark{margin-left:4px}
+
+/* 결정 D-1406: 숨은 가공법 장은 조합법 카드 (재료 + 재료 → 결과물, 아래에 일러 준 이) */
+.recipe-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(15em,1fr));gap:8px;margin-bottom:10px}
+.recipe-card{border:1px solid #cdb98f;border-radius:4px;padding:8px 10px;background:#f8eed8;display:flex;flex-direction:column;gap:3px}
+.recipe-name{font-family:var(--display);font-size:1.05em;color:var(--meok)}
+.recipe-formula{margin:0;font-family:var(--display);color:var(--meok);line-height:1.5}
+.recipe-from{color:var(--dim);font-family:var(--ui);font-size:.8em}
+.recipe-card>.new-mark{align-self:flex-start;margin:2px 0 0}
+
+/* 결정 D-1407: 화면 위 음량 슬라이더 (0 안 들림 ~ 가장 크게) */
+.vol-chip{display:inline-flex;align-items:center;gap:6px;cursor:default}
+.vol-chip input{width:clamp(56px,8vw,96px);accent-color:var(--dan);margin:0;cursor:pointer}
+body.in-battle .hud-btns #btnVolume{display:inline-flex}
