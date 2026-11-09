@@ -52,6 +52,8 @@ const Sound=(()=>{
   function toggleVolume(){volume=volume==='low'?'high':'low';bgmVolume=sfxVolume=volume==='high'?.8:.4;settingsChanged();}
   function setBgmVolume(value){if(!Number.isFinite(value))return;bgmVolume=clamp(value);settingsChanged();}
   function setSfxVolume(value){if(!Number.isFinite(value))return;sfxVolume=clamp(value);settingsChanged();}
+  // 결정 D-1407 (사용자 지시 2026-11-09): 화면의 음량 슬라이더. 0(안 들림)부터 1(가장 크게)까지 배경음·효과음을 함께 맞춘다
+  function setVolume(value){if(!Number.isFinite(value))return;bgmVolume=sfxVolume=clamp(value);volume=bgmVolume>=.6?'high':'low';settingsChanged();}
   function bufferFor(id){
     if(cache.has(id)){const hit=cache.get(id);cache.delete(id);cache.set(id,hit);return hit.buffer;}
     const data=globalThis.PackoonAudioData,dsp=globalThis.PackoonMusic&&globalThis.PackoonMusic.DSP;
@@ -190,7 +192,7 @@ const Sound=(()=>{
   function getState(){return {initialized:attempted,enabled,bgmVolume,sfxVolume,contextState:ctx?ctx.state:null,
     voices:sources.size,peakVoices,maxVoices,cached:cache.size,cacheBytes,maxCacheBytes,played,dropped,ambient:!!ambientVoice};}
   return {get enabled(){return enabled;},get volume(){return volume;},get bgmVolume(){return bgmVolume;},get sfxVolume(){return sfxVolume;},
-    toggle,toggleVolume,setBgmVolume,setSfxVolume,playSfx,getState,
+    toggle,toggleVolume,setVolume,setBgmVolume,setSfxVolume,playSfx,getState,
     steam,footstep,stepId,jump,land,swing,gather,hit,cue,item,exchange,paper,panel,book,choice,roller,passage,tab,craft,travel,forge,stone,yeongsan,leaf,setQuiet,
     ambience,get ambient(){return ambientKind;},get context(){return ctx;},get initialized(){return attempted;},group,click,drum,metal,noise};
 })();
