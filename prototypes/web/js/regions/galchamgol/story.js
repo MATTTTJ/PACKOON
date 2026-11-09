@@ -28,6 +28,22 @@ const leafPic={animate:true,sound:'pic_leaf',draw(w,h,t){
     if(x%6===3&&s>.3){for(let k=1;k<up-1;k++)R(X+Math.round(k*.6),cy-k,1,1,'#a9c76a');for(let k=1;k<dn-1;k++)R(X+Math.round(k*.6),cy+k,1,1,'#5f8a36');}   // 비스듬한 옆잎맥
   }
 }};
+/* 결정 D-1427 (사용자 피드백 2026-11-09 단풍골 10): 무쇠에게 아빠 낫을 받는 줄부터 작은 창에 낫을 보인다 (무쇠와의 대화에서 받을 때만, finishForge).
+   삼촌이 무명 천 위에 내려놓은 낫이 살짝 들려 올라오고, 새로 벼린 날을 따라 빛이 한 번씩 지나간다.
+   자루 끝에는 칡 실이 감겨 있다(바로 뒤 무쇠의 "자루에 감은 건 칡 실이다"). 아빠 이름은 지지지 않아 자루가 비어 있다(D-426). */
+const sicklePic={animate:true,sound:'pic_sickle',draw(w,h,t){
+  R(0,0,w,h,'#e9dcc0');R(0,34,w,10,'#d8c7a3');for(let i=0;i<6;i++)R(3+i*11,37+(i%2)*3,6,1,'#c6b28a');   // 펼친 무명 천
+  const up=Math.round(Math.sin(Math.min(1,t/1.1)*Math.PI/2)*4+(t>1.1?Math.sin((t-1.1)*1.6):0));   // 들려 올라와 숨 쉬듯 머문다
+  const cx=40,cy=20-up,r=11,glint=(t*.9)%2.2;
+  R(6,30-up,30,3,'#8a5f3a');R(6,30-up,30,1,'#a87a4c');R(5,30-up,2,3,'#6b4428');   // 반들반들한 나무 자루
+  for(let i=0;i<4;i++)R(9+i*3,29-up,2,5,'#b9a77a');   // 자루 끝에 감은 칡 실
+  R(34,29-up,6,4,'#5d5a55');R(35,29-up,4,1,'#8d8a83');   // 슴베를 박은 쇠고리
+  for(let k=0;k<=36;k++){
+    const a=Math.PI/2-k/36*(Math.PI/2+2.35),x=Math.round(cx+Math.cos(a)*r),y=Math.round(cy+Math.sin(a)*r);
+    const ix=Math.round(cx+Math.cos(a)*(r-2)),iy=Math.round(cy+Math.sin(a)*(r-2)),lit=Math.abs(k/36-glint)<.07;
+    R(x,y,2,2,'#6f7579');R(ix,iy,2,2,lit?'#ffffff':'#c4ccd1');   // 등은 짙고, 안쪽 날은 새로 벼려 밝다
+  }
+}};
 /* 결정 D-524: 도담이 묻은 도토리를 찾은 순간 (사용자 피드백 2026-11-04). 흙 묻은 한 알 밑을 헤치니 도토리가 소복하다. */
 const cachePic={sound:'pic_cache',draw(w,h,t){
   R(0,0,w,h,'#d9c39a');R(0,24,w,20,'#8a5f3a');R(0,24,w,2,'#a87a4c');
@@ -459,9 +475,21 @@ function musoeLeaf(){
   talk([...open,picLine(['너구리','(삼촌이 품에서 접어 둔 잎 하나를 꺼내 편다.\n톱니가 고른, 늦가을에도 푸른 잎이다.)'],leafPic),
     ['무쇠','당산나무 잎이다. 형이 낫이랑 같이 맡겼다.\n제 발로 길 나서는 날 주는 게 우리 집안 풍습이다.'],
     picLine(['무쇠','잘 봐라.'],null),
-    ['너구리','(삼촌이 자기 잎을 입술에 대고 짧게 분다.\n모루 옆에 오소리 한 마리가 선다.)'],
+    // 결정 D-1426 (사용자 피드백 2026-11-09 단풍골 9): 삼촌이 잎을 부는 줄에서 필드의 삼촌도 오소리가 되고, 한 번 더 부는 줄에서 돌아온다.
+    //   뒤의 '한 번 더 불면 돌아온다'(musoeFirstForm)를 아이가 먼저 눈으로 본다.
+    Object.assign(['너구리','(삼촌이 자기 잎을 입술에 대고 짧게 분다.\n모루 옆에 오소리 한 마리가 선다.)'],{on:()=>musoeShift(true)}),
     ['너구리','삼촌이… 오소리가 됐어!'],
+    Object.assign(['너구리','(오소리가 잎을 한 번 더 분다.\n도로 삼촌이다.)'],{on:()=>musoeShift(false)}),
     ['무쇠','잎은 네가 아는 만큼만 바뀐다.\n오늘 본 것 중에 제일 잘 아는 걸 떠올려라.',[{t:thinkOf,go:musoeFirstForm}]]]);
+}
+/* 결정 D-1426: 대사에 맞춰 필드의 무쇠 삼촌이 오소리로 바뀌었다 돌아온다. 바뀔 때 잎빛 불티가 일고 잎 소리가 난다.
+   대화 중에만 오소리로 그리므로, 중간에 대화가 닫혀도 제 모습으로 돌아온다. */
+let musoeBadger=false;
+function musoeShift(on){
+  musoeBadger=on;const n=Rg.npcs.find(n=>n.id==='musoe');if(!n)return;
+  const y=fieldGround()-12;
+  for(let i=0;i<12;i++)sparks.push({x:n.x+(Math.random()-.5)*16,y:y+(Math.random()-.5)*12,vx:(Math.random()-.5)*1.4,vy:-.6-Math.random()*1.2,t:18+Math.floor(Math.random()*14),c:i%3?'#8fbf5a':'#d9e7a6'});
+  Sound.playSfx?.('leaf_rustle');
 }
 function musoeFirstForm(){
   const F=G.f;F.leafGiven=true;F.leafSplit=true;   // 결정 D-117: 이 뒤로 엄마 잎 이야기는 다시 말을 걸 때 한 번만
@@ -500,13 +528,14 @@ function finishForge(){
   toast('아빠의 낫을 얻었다!'+(sharp?' 날이 더 날카롭다':''));
   refreshHud();
   // 결정 D-280: 낫은 보따리가 아니라 손에 드는 연장이라 "얻었다"에 손때 이야기를 잇는다.
-  const gotSickle=['너구리','(아빠의 낫을 얻었다.\n자루에 아빠 손때가 반들반들하다.)'];
+  const gotSickle=picLine(['너구리','(아빠의 낫을 얻었다.\n자루에 아빠 손때가 반들반들하다.)'],sicklePic);   // 결정 D-1427
+  const warn=picLine(['무쇠','당산나무 칡은 성질이 고약하다. 무리하지 마라.'],null);
   // 결정 D-426: 아빠 이름이 먹혀 자루에서도 지워졌다(name-story.md 규칙 3). 무쇠는 처음부터 안 지진 줄 안다.
   const handle=[['너구리','(삼촌이 자루 끝을 엄지로 한 번 문지른다.)'],['무쇠','형은 연장마다 제 이름을 지졌는데.\n…이건 안 지졌군.'],
     hintLine('chik_sil',['무쇠','자루에 감은 건 칡 실이다.\n칡 줄기를 쪄서 뽑지. 형 손버릇이었다.'])];   // 결정 D-461: 귀띔
   talk(Rg.arcsEnabled()?
-    [['무쇠','됐다. 네 아비 낫이다.\n곡괭이 이도 메웠다.'+(sharp?' 숯이 넉넉해서 날을 더 세웠다.':'')],gotSickle,...handle,['무쇠','당산나무 칡은 성질이 고약하다. 무리하지 마라.']]:
-    [['무쇠','됐다. 네 아비 낫이다. 곡괭이 이도 메웠다.'+(sharp?'\n숯이 넉넉해서 날을 더 세웠다.':'')],gotSickle,...handle,['너구리','아빠는 이거 맡기고 바로 떠났어요?'],['무쇠','떠나기 전 사흘을 여기서 묵었다.\n낡은 장부만 보더군. 집에선 못 펴 볼 거였겠지.'],['무쇠','당산나무 칡은 성질이 고약하다. 무리하지 마라.']]);   // 결정 D-413: 장부 이야기 앞에 아이의 물음
+    [['무쇠','됐다. 네 아비 낫이다.\n곡괭이 이도 메웠다.'+(sharp?' 숯이 넉넉해서 날을 더 세웠다.':'')],gotSickle,...handle,warn]:
+    [['무쇠','됐다. 네 아비 낫이다. 곡괭이 이도 메웠다.'+(sharp?'\n숯이 넉넉해서 날을 더 세웠다.':'')],gotSickle,...handle,picLine(['너구리','아빠는 이거 맡기고 바로 떠났어요?'],null),['무쇠','떠나기 전 사흘을 여기서 묵었다.\n낡은 장부만 보더군. 집에선 못 펴 볼 거였겠지.'],['무쇠','당산나무 칡은 성질이 고약하다. 무리하지 마라.']]);   // 결정 D-413: 장부 이야기 앞에 아이의 물음
 }
 
 /* ---------- 두꺼비 할멈 (약재상) ---------- */
@@ -708,7 +737,7 @@ Rg.startKudzu=()=>{
 Rg.npcs=[
   {id:'dodam',name:'도담',x:300,talk:talkDodam,draw:Rg.art.squirrel},
   {id:'nal',name:'날쌘',x:820,talk:talkNal,draw:COMMON_ART.weasel,props:COMMON_ART.nalProps},
-  {id:'musoe',name:'무쇠',known:true,tag:'무쇠 삼촌',x:1110,talk:talkMusoe,draw:Rg.art.uncle,props:Rg.props.forge},
+  {id:'musoe',name:'무쇠',known:true,tag:'무쇠 삼촌',x:1110,talk:talkMusoe,draw:(x,y,f)=>(musoeBadger&&open('dlg')?Rg.art.uncleBadger:Rg.art.uncle)(x,y,f),props:Rg.props.forge},   // 결정 D-1426
   {id:'toad',name:'두꺼비 할멈',x:1430,talk:talkToad,draw:Rg.art.toad,props:Rg.props.toad},
 ];
 
@@ -866,9 +895,10 @@ if(!CLASSIC){
           finishWanderer('old_magpie');
           // 결정 D-33: 까치 이동을 말할 때 젊은 까치 둘이 곁에 내려앉고, 그 뒤로 늙은 까치 곁에 머문다 (design/data/decisions.csv)
           // 결정 D-526: 한 대화로 잇는다 (예전엔 대화가 세 번 끊겼다가 이어졌다)
-          G.f.galMagpieYoung=true;
+          // 결정 D-1421 (사용자 피드백 2026-11-09 단풍골 3): 젊은 까치는 '내려앉았다' 줄이 뜰 때 물레방아 집 지붕 쪽에서 날아와 앉는다
+          //   (예전엔 앞 줄부터 곁에 그냥 서 있었다). 늙은 까치 뒤쪽(아이 반대편)에 앉아 아이와 겹치지 않는다.
           talk([['늙은 까치','참, 아가. 길이 멀어 발이 아프거든 하늘을 보고 불러라.'],
-              ['너구리','(까치 어르신이 짧게 울자, 덩치 큰 까치 둘이\n지붕에서 내려앉았다.)'],   // 결정 D-835: 어른은 이름만으로 부르지 않는다
+              Object.assign(['너구리','(까치 어르신이 짧게 울자, 덩치 큰 까치 둘이\n지붕에서 내려앉았다.)'],{on:youngMagpiesFly}),   // 결정 D-835: 어른은 이름만으로 부르지 않는다
               ['늙은 까치','우리 집 젊은 것들이다. 네 귀 한쪽씩 잡고\n가 본 길이면 어디든 데려다줄 게다.'],
               ['너구리','…귀요?']
             ],()=>{G.f.mapUnlocked=true;think('지도를 펴면 젊은 까치 둘을 부를 수 있겠다.');});
@@ -961,7 +991,7 @@ if(!CLASSIC){
       {t:'조금 더 생각해 볼게',go:null}]]]);
   }
   function chickTalk(){
-    if(G.f.galExpChickWith&&G.f.galExpChickX>=2090){
+    if(G.f.galExpChickWith&&(G.f.galExpChickArrived||G.f.galExpChickX>=2090)){   // 결정 D-1429: 어미가 답한 뒤
       talk([['꺼병이','저기 갈대가 흔들려! 엄마 꼬리야!\n아까는 내 발소리에 묻혀서 못 들었나 봐.'],
         ['너구리','이제 뛰어가도 돼.\n난 여기서 보고 있을게.'],
         ['꺼병이','엄마! 나 여기 있어!\n…아, 도토리 얘기는 엄마한테 비밀이야.'],
@@ -1091,14 +1121,45 @@ if(!CLASSIC){
     return {t:'검댕 아저씨 눈약을 여쭙는다',go:toadGeom};
   }
   Rg.toadGeomChoice=toadGeomChoice;
-  const otter={id:'stream_otter',name:'여울',x:1290,when:()=>Rg.arcsEnabled(),draw:picture('otter'),talk:otterTalk,
+  /* 결정 D-1425 (사용자 피드백 2026-11-09 단풍골 6): 처음 만나기 전의 여울은 함지박을 이고 개울을 거슬러 오르는 중이다
+     (첫 대사가 "그거 어디까지 가져가?" / "저기 넓적돌까지!"). 아이가 화면에 들어올 만큼 다가오면 OTTER_FROM 에서 넓적돌 쪽(오른쪽)으로
+     종종걸음으로 걷는다. 아이가 바로 곁에 서면 멈춰 말을 받고, 아이가 물러나면 다시 걷는다. 만난 뒤에는 넓적돌 곁(OTTER_X)에 선다. */
+  const OTTER_X=1290,OTTER_FROM=1195;
+  let otterWalk=0,otterStep=0;
+  const otterGoing=()=>!G.f.galArcOtter1&&!done('stream_otter');
+  function otterX(){return otterGoing()?OTTER_FROM+otterWalk:OTTER_X;}
+  function otterStepFn(){
+    if(G.zone!=='village'||!otterGoing()||open('dlg')||paused())return;
+    const x=otterX(),d=Math.abs(G.px-x);
+    if((otterWalk>0||d<W*.55)&&d>TABLES.TUNING.field_talk_distance+6&&otterWalk<OTTER_X-OTTER_FROM){otterWalk=Math.min(OTTER_X-OTTER_FROM,otterWalk+.28);otterStep++;}   // 한 번 걷기 시작하면 넓적돌까지 간다
+  }
+  const drawOtter=(x,y,f)=>{
+    const walking=otterGoing()&&otterWalk<OTTER_X-OTTER_FROM&&Math.abs(G.px-otterX())>TABLES.TUNING.field_talk_distance+6&&!open('dlg');
+    const ph=walking?Math.floor(otterStep/9)%2:-1;
+    Rg.expArt.otter(x,y-(ph===1?1:0),f,ph);
+  };
+  Rg.otterStep=otterStepFn;
+  const otter={id:'stream_otter',name:'여울',get x(){return otterX();},when:()=>Rg.arcsEnabled(),draw:drawOtter,talk:otterTalk,
     hint:'첨벙, 첨벙… 개울 쪽에서 무언가 함지박을 밀어 올리는 소리가 난다.',
     greeting:'함지박은 내가 지키고 있어!\n봄에 와. 물수제비 내기야.'};
   const badger={id:'charcoal_badger',name:'검댕',x:430,tagY:28,when:()=>Rg.arcsEnabled(),draw:picture('badgerKiln'),talk:badgerTalk,
     hint:'숲 안쪽에서 매캐한 연기 냄새와 기침 소리가 난다.',
     greeting:'푸른 연기 보이면 다 된 거다.\n…너도 다 되면 돌아와라.'};
   // 결정 D-17: 늙은 까치는 네 지역에 걸친 한 인물 (design/data/decisions.csv)
-  const drawMagpies=(x,y,f)=>{Rg.expArt.magpie(x,y,f);if(G.f.galMagpieYoung){Rg.expArt.youngMagpie(x-32,y,1);Rg.expArt.youngMagpie(x+34,y,-1);}};
+  /* 결정 D-1421 (사용자 피드백 2026-11-09 단풍골 3): 젊은 까치 둘이 물레방아 집 지붕 쪽(오른쪽 위)에서 날갯짓하며 내려와
+     늙은 까치 뒤쪽(아이 반대편)에 차례로 앉는다. 앉기 직전에는 날개를 펴고 미끄러진다. 저장을 불러온 뒤에는 앉은 채로 있다. */
+  const YOUNG_FLY_MS=1500,YOUNG_GAP=300;
+  let youngFlyAt=null;
+  function youngMagpiesFly(){G.f.galMagpieYoung=true;youngFlyAt=performance.now();Sound.playSfx?.('magpie_wings');}
+  function drawYoungMagpie(x,y,f,i){
+    const lx=x-f*(30+i*27),k=youngFlyAt===null?1:clamp((performance.now()-youngFlyAt-i*YOUNG_GAP)/YOUNG_FLY_MS,0,1);
+    if(k<=0)return;
+    if(k>=.92){Rg.expArt.youngMagpie(lx,y-(k<1?1:0),f);return;}
+    const sx=lx+190,sy=y-110,e=1-Math.pow(1-k/.92,2);
+    const fx=Math.round(sx+(lx-sx)*e),fy=Math.round(sy+(y-sy)*e-Math.sin(Math.PI*e)*14);
+    Rg.expArt.youngMagpieFly(fx,fy,-1,k>.7?2:Math.floor(performance.now()/95)%2);
+  }
+  const drawMagpies=(x,y,f)=>{Rg.expArt.magpie(x,y,f);if(G.f.galMagpieYoung){drawYoungMagpie(x,y,f,1);drawYoungMagpie(x,y,f,0);}};
   const magpie={id:'old_magpie',name:'늙은 까치',x:820,draw:drawMagpies,talk:magpieTalk,
     get greeting(){return G.f.galGamDone?'꼭대기 네 알이면 올겨울은 넉넉하다.\n네 어미 소식은 내가 날라 주마.':G.tool==='sickle'?'그게 네 아비 낫이구나.\n무쇠가 날을 잘 세웠네.':'날개 좀 말리고 가련다.\n올해는 저 감나무에 아무도 장대를 안 대는구나.';}};
   const hubMagpie={id:magpie.id,name:magpie.name,x:480,draw:magpie.draw,talk:magpie.talk};
@@ -1204,14 +1265,12 @@ if(!CLASSIC){
       examine('village_well',440,'우물 두레박 살펴보기',()=>G.tool==='sickle'?
         '두레박 줄이 반들반들하다. 엄마 손이 닿던 자리.\n아빠 낫 자루도 꼭 이렇게 닳았네.':'떠나기 전에 물독을 가득 채워 놨다.\n엄마가 물 길으러 나오지 않아도 되게.'),
       // 결정 D-730: 물레방아는 멈춘 채 풍경으로만 남는다. 고치는 일은 없다.
-      examine('village_wheel',990,'물레방아 물길 살펴보기',()=>'빠진 살 사이로 물만 흘러간다. 굴대도 갈라졌다.\n이 방아가 멈춘 뒤로 엄마가 절구질을 도맡았지.')],
+      // 결정 D-1422 (사용자 피드백 2026-11-09 단풍골 5): 살펴보기 자리를 물레방아 바퀴 굴대(art.js wheel 1050) 바로 앞으로. 예전 990은 물받이 왼쪽 끝이었다.
+      examine('village_wheel',1050,'물레방아 물길 살펴보기',()=>'빠진 살 사이로 물만 흘러간다. 굴대도 갈라졌다.\n이 방아가 멈춘 뒤로 엄마가 절구질을 도맡았지.')],
     forge:[
       examine('forge_sign',230,'갈림길 팻말 읽기',()=> '왼쪽은 집과 개울, 오른쪽은 참나무 숲.\n숯 냄새가 난다. 삼촌이 불을 올렸구나.'),
-      examine('forge_charcoal',1820,'식힌 숯가마 살펴보기',()=> '재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 삼촌 불씨도 여기서 시작했겠지.'),
-      examine('forge_share',870,'낮은 평상 살펴보기',()=>G.f.galExpBrothersSorted?({
-        hyung:'큰 도토리는 형 바구니에 수북하다.\n동생 바구니는 아직 반도 안 찼다.',
-        dongsaeng:'큰 도토리는 동생 바구니에 수북하다.\n형 바구니는 아직 반도 안 찼다.'})[G.f.galExpBrothersSide]||
-        '큰 도토리부터 양쪽 바구니에 번갈아 놓았다.\n작은 것도 나눠 담으니 높이가 비슷해졌다.':'빈 바구니 두 개가 나란히 놓였다.\n작은 발 둘이 서기 딱 좋은 낮은 평상이다.')],
+      examine('forge_charcoal',1820,'식힌 숯가마 살펴보기',()=> '재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 삼촌 불씨도 여기서 시작했겠지.')],
+      // 결정 D-1424 (사용자 피드백 2026-11-09 단풍골 8): '낮은 평상 살펴보기'를 뺐다. 평상은 형제의 도토리 나누기 자리(work baskets)만 맡는다.
     forest:[
       examine('forest_root',280,'드러난 뿌리 살펴보기',()=> '칡은 나무를 타고, 참나무는 땅을 붙든다.\n뿌리 밑 흙은 곡괭이가 들어갈 만큼 무르네.'),
       // 결정 D-49: 도담 옆 높은 참나무 가지(다람쥐만 오르는 자리, PA-47). 지나가면 살펴볼 수 있고, 아이는 아는 만큼만 말한다.
@@ -1248,7 +1307,7 @@ if(!CLASSIC){
   const gamWork=work('gam',GAM_X,'',gamTalk);
   Object.defineProperties(gamWork,{name:{get:()=>gamStage()===1?'감나무 감 따기':'감나무 올려다보기'},prompt:{get:()=>gamWork.name}});
   Rg.zones.village.npcs.push(gamWork);
-  Rg.zones.forge.npcs.push(work('baskets',810,'평상에서 도토리 나누기',basketsTalk));
+  Rg.zones.forge.npcs.push(work('baskets',745,'평상에서 도토리 나누기',basketsTalk));   // 결정 D-1423: 평상 자리 (art.js bx)
   Object.defineProperty(Rg.zones.hill,'npcs',{configurable:true,enumerable:true,get:()=>toadUphill()?['toad']:[]});
   // 결정 D-525: 엄마 방. 아이가 보낸 약에 따라 엄마 모습이 달라진다 (engine/core.js momStage). 열린 방문으로 들여다본다.
   const MOM_LINES=[
@@ -1278,16 +1337,30 @@ if(!CLASSIC){
   Rg.zones.village.npcs.push(Object.assign(work('home',95,'열린 방문 들여다보기',momVisit),{peek:false}));
   Rg.expStep=()=>{
     toadHillStep();   // 결정 D-833·D-834
+    Rg.otterStep?.();   // 결정 D-1425
     // 결정 D-134: 대장간 길목의 다람쥐 형제를 눈으로 보고 지나가도 '봤다'(D-129 ⑤ 보강)
     if(G.zone==='forge'&&!G.f.galSquirrelSeen&&Math.abs(G.px-tx(620))<TABLES.TUNING.hint_range)G.f.galSquirrelSeen=true;
-    if(G.zone!=='forest'||!G.f.galExpChickWith||done('lost_chick'))return;
-    if(G.f.galExpChickArrived){G.f.galExpChickX=2090;return;}
-    const x=G.f.galExpChickX??1540,dx=(CLASSIC?G.px:untrimX(G.px,Rg.trimCuts?.forest))-x;   // 설계 좌표끼리 잰다 (D-128)
-    // 빠르게 앞질러도 꺼병이는 안전한 자리에서 기다린다. 돌아오면 다시 따라온다.
-    if(Math.abs(dx)>TABLES.TUNING.field_talk_distance&&Math.abs(dx)<W*.5){
-      G.f.galExpChickX=clamp(x+Math.sign(dx)*TABLES.TUNING.field_move_speed,1540,2090);
+    if(G.zone!=='forest'||!G.f.galExpChickWith)return;
+    /* 결정 D-1429 (사용자 피드백 2026-11-09 단풍골 11): 꺼병이는 아이보다 field_talk_distance 뒤에서 따라오므로, 예전처럼 어미 자리(2090)에
+       닿아야 어미가 답하면 아이가 어미를 지나쳐 한참 더 가야 장면이 떴다. 이제 꺼병이가 갈대 소리가 들리는 곳(CHICK_HEAR)에 들면
+       어미가 답하고 곧바로 만남 대화가 뜬다(아이가 땅에 서 있고 다른 창이 없을 때. 아니면 예전처럼 속말로 알린다).
+       대화를 마치면 꺼병이가 어미에게 달려간다(예전엔 대화 전에 어미 자리로 순간 이동했다). */
+    const CHICK_HEAR=2000,CHICK_MOM=2090;
+    if(done('lost_chick')){const x=G.f.galExpChickX??CHICK_MOM;if(x<CHICK_MOM)G.f.galExpChickX=Math.min(CHICK_MOM,x+TABLES.TUNING.field_move_speed*1.6);return;}
+    if(!G.f.galExpChickArrived){
+      const x=G.f.galExpChickX??1540,dx=(CLASSIC?G.px:untrimX(G.px,Rg.trimCuts?.forest))-x;   // 설계 좌표끼리 잰다 (D-128)
+      // 빠르게 앞질러도 꺼병이는 안전한 자리에서 기다린다. 돌아오면 다시 따라온다.
+      if(Math.abs(dx)>TABLES.TUNING.field_talk_distance&&Math.abs(dx)<W*.5){
+        G.f.galExpChickX=clamp(x+Math.sign(dx)*TABLES.TUNING.field_move_speed,1540,CHICK_MOM);
+      }
+      if(G.f.galExpChickX>=CHICK_HEAR)G.f.galExpChickArrived=true;
+      else return;
     }
-    if(G.f.galExpChickX>=2090&&!G.f.galExpChickArrived){G.f.galExpChickArrived=true;think('갈대 너머에서 어미가 답한다! 꺼병이한테 말해 주자.');}
+    if(!G.f.galExpChickTold&&!open('dlg')&&!paused()&&!B&&G.onGround){
+      G.f.galExpChickTold=true;G.vx=0;
+      if(G.form)think('갈대 너머에서 어미가 답한다! 꺼병이한테 말해 주자.');   // 변신한 채면 꺼병이가 아이를 몰라본다 (strangers)
+      else chickTalk();
+    }
   };
   for(const n of Rg.npcs){
     const positions={dodam:['forest',700],nal:['forge',1560],musoe:['forge',1040],toad:['hill',TOAD_HILL_X]};   // 결정 D-521

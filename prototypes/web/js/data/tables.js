@@ -5382,9 +5382,6 @@ const TABLES={
    "sfx": "fire_crackle",
    "repeat": 1500
   },
-  "forge_share": {
-   "sfx": "wood_tap"
-  },
   "forest_root": {
    "sfx": "leaf_rustle"
   },
@@ -5433,6 +5430,9 @@ const TABLES={
   },
   "pic_gam_pole": {
    "sfx": "leaf_rustle"
+  },
+  "pic_sickle": {
+   "sfx": "sickle"
   },
   "frost_print": {
    "sfx": "footstep_frost"
