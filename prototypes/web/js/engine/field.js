@@ -2,7 +2,7 @@
 /* 필드: 주인공 이동과 점프, 휘두르기, 줍기, 카메라, 화면 그리는 순서.
    지역마다 다른 것(배경, 장애물, 필드 보스, 날씨)은 REG 의 함수를 부른다. 필요한 함수 목록은 README 참고 */
 
-function paused(){return !G.started||G.ended||!!B||inkOn||!!vistaMode||!!zoneMotion||!!mapTravel||open('map')||zoneFade>0||open('dlg')||open('bag')||open('trade')||open('notebook')||!!openMinigame();}
+function paused(){return !G.started||G.ended||!!B||inkOn||!!vistaMode||!!zoneMotion||!!mapTravel||open('map')||zoneFade>0||open('dlg')||open('bag')||open('trade')||open('notebook')||!!openMinigame()||thinkWait===2;}   // 결정 D-1411: 발견 속말을 넘기기 전까지 필드가 멈춘다
 function hitPlayer(x1,x2,y1,y2){return G.px+5>x1&&G.px-5<x2&&G.py>y1&&G.py-18<y2;}
 function hurt(srcX){
   if(G.hurtT>0)return;G.hp--;G.hurtT=60;G.px+=(G.px<srcX?-16:16);G.vy=-2.6;G.onGround=false;refreshHud();
@@ -206,6 +206,7 @@ function step(){
   }
   if(G.onGround||climbing){G.dropBack=false;G.dropHang=0;}
   if(held&&(G.onGround||climbing))thinkHold--;   // 결정 D-921
+  if(thinkWait===1&&(G.onGround||climbing))thinkWait=2;   // 결정 D-1411: 땅에 내려선 뒤에 시간이 멈춘다 (공중에서 굳지 않는다)
   Vfx.feet();Vfx.steps();   // 결정 D-174: 눈·서리 바닥의 발걸음·발자국 (vfx.js)
   if(!wasGrounded&&G.onGround)Sound.land();
   if(G.onGround&&wasGrounded&&Math.abs(G.px-prevX)>0.2)Sound.footstep();
@@ -637,7 +638,8 @@ function updateHints(){
     const key=G.region+':'+p.id,seen=G.f.hintsSeen||(G.f.hintsSeen={});
     if(seen[key]||hintSettled(p))continue;
     if(Math.abs(p.x-G.px)>(p.hintRange||TABLES.TUNING.hint_range))continue;
-    seen[key]=true;think(typeof p.hint==='function'?p.hint():p.hint,{light:true});hintThought={p,text:thoughtText()};return;   // 결정 D-706
+    // 결정 D-706. 결정 D-1411: 인물 기척은 발견이라 가벼운 속말이 아니다(시간이 멈추고 눌러서 넘긴다)
+    seen[key]=true;think(typeof p.hint==='function'?p.hint():p.hint);hintThought={p,text:thoughtText()};return;
   }
 }
 /* 결정 D-706: 주인공의 짧은 속말. 사용자 규칙(2026-11-05): 검은 띠(toast)를 따로 띄워 설명하는 일은 게임 어디에도 없어야 하고,
@@ -647,19 +649,45 @@ function updateHints(){
    글자 수 × think_char_ms)이 지나거나, 속말이 뜬 자리에서 think_far_px 넘게 멀어지거나, 구역이 바뀌면 닫힌다.
    대화·패널·전투·경치 보기 동안은 숨고 시간도 멈춘다. */
 const heroThought=el('div','monologue');heroThought.id='heroMono';heroThought.hidden=true;heroThought.setAttribute('role','status');
-heroThought.innerHTML='<div class="face"></div><div class="mono-body"><div class="who">너구리</div><div class="text"></div></div>';
+heroThought.innerHTML='<div class="face"></div><div class="mono-body"><div class="who">너구리</div><div class="text"></div></div><div class="mono-next" aria-hidden="true"></div>';
 $('shell').appendChild(heroThought);
+// 결정 D-1411: 시간이 멈춘 발견 속말은 화면이나 독백 창을 눌러도 넘어간다
+$('cv').addEventListener('pointerdown',()=>{if(thinkWait===2)thinkNext();});
+heroThought.addEventListener('pointerdown',e=>{e.preventDefault();thinkNext();});
 let thoughtT=0,thoughtAt=null;
 const thoughtText=()=>heroThought.querySelector('.text').textContent;   // 독백 창의 글(이름표 빼고). D-831 기척 거두기가 쓴다
 /* 결정 D-921: 사건 때문에 뜨는 속말은 주인공을 멈춰 세운다 (사용자 피드백 2026-11-06: "보스, npc, 환경 이벤트 등에 걸려서 설명이 나오거나
    독백할 때는 반드시 멈춘 상태로. 그렇다고 공중에서 멈추면 안 된다").
    - 가르는 법: think() 는 기본이 '사건 속말'이다. 지역 이야기·보스·문턱·환경(고드름·미끄러짐·밀려남)·지도·도장·수리부엉이 감지가 부르는 속말이 여기에 든다.
-     플레이어가 그냥 지나가거나 제 손으로 한 일에 붙는 가벼운 속말만 think(글,{light:true}) 로 부른다: 인물 기척(지나가다 듣는 소리),
+     플레이어가 그냥 지나가거나 제 손으로 한 일에 붙는 가벼운 속말만 think(글,{light:true}) 로 부른다: (인물 기척은 결정 D-1411 로 발견 속말이 되었다)
      변신으로 문턱 넘기 안내, 채집 시작 안내, 못 구르는 모습의 혼잣말(roll.js 는 글이 rollSpec().say 와 같으면 가볍게 본다).
    - 멈춤: 뜨는 순간부터 좌우·점프·구르기·휘두르기 입력을 받지 않는다. 떨어지는 중이면 그대로 땅(발판)에 내려선 다음부터
      think_stop_base_ms + 글자 수 × think_stop_char_ms (think_stop_max_ms 까지) 만큼 서 있는다. 속말 창은 그 뒤에도 원래 시간만큼 남는다.
    - 대화 창이나 패널이 열려 필드가 멈춘 동안에도 공중에 뜬 주인공은 내려선다(settleHero). 그래서 공중에 굳은 채 설명을 듣지 않는다. */
 let thinkHold=0;
+/* 결정 D-1411: 발견 속말에 시간을 멈춘다 (사용자 피드백 2026-11-09: "1스테이지에서 여울이 처음 발견할 때처럼 뭔가를 발견하고 독백 나올 때는
+   시간이 멈춘듯이 화면 멈추고 추가 조작으로 진행").
+   - 발견 속말: 이 게임에서 처음 뜨는 사건 속말(D-921의 가벼운 속말이 아닌 것)과 인물 기척(D-55, 여울의 "첨벙, 첨벙…" 같은 것).
+     같은 글이 다시 뜨면(막힌 길에 또 닿음 등) 발견이 아니라 D-921 대로 잠깐만 멈춰 선다. 본 글은 G.f.thoughtSeen 에 짧은 해시로 남는다.
+   - thinkWait 1: 떴지만 아직 공중이다(입력만 막고 내려선다). 2: 땅에 섰고 필드 시간이 멈췄다(paused). 적·인물·채집 바늘·속말 시간이 모두 선다.
+   - E·Enter·Space·X(J)나 화면·독백 창을 누르면 넘어가고 독백 창이 닫힌다(thinkNext). 독백 창 오른쪽 아래에 작게 넘기는 법이 뜬다.
+   - 대화·전투·먹 전환이 위로 열리면 기다림은 풀린다(그 장면이 이어 간다). 구역이 바뀌면 거둔다(resetFieldModes). */
+let thinkWait=0;
+function thinkHash(t){let h=5381;for(const ch of t)h=((h<<5)+h+ch.codePointAt(0))|0;return (h>>>0).toString(36);}
+function thinkFirstTime(t){
+  const seen=G.f.thoughtSeen||(G.f.thoughtSeen={}),k=thinkHash(t);
+  if(seen[k])return false;seen[k]=1;return true;
+}
+function thinkNext(){
+  if(thinkWait!==2)return false;
+  thinkWait=0;thinkHold=0;thoughtT=0;heroThought.hidden=true;heroThought.classList.remove('wait');hintThought=null;
+  return true;
+}
+function thinkWaitTick(){
+  if(!thinkWait)return;
+  // 다른 장면이 위로 열리면 기다림을 푼다. 속말 창은 D-706 대로 그 장면 뒤에 남은 시간만큼 다시 뜬다
+  if(thoughtT<=0||B||inkOn||mapTravel||(thinkWait===2&&(open('dlg')||openMinigame()))){thinkWait=0;heroThought.classList.remove('wait');return;}
+}
 function thinkStopFrames(t){const T=TABLES.TUNING;return Math.round(Math.min(T.think_stop_max_ms,T.think_stop_base_ms+T.think_stop_char_ms*[...t].length)*60/1000);}
 function settleHero(){
   if(!G||!G.started||G.ended||B||inkOn||mapTravel||vistaMode||zoneMotion||document.hidden)return;
@@ -679,6 +707,10 @@ function think(text,opts={}){
   // 결정 D-921: 가벼운 속말이 아니면 멈춰 세운다
   const light=opts.light||(typeof rollSpec==='function'&&G&&text===rollSpec().say);
   if(!light&&G&&G.started&&!G.ended&&!B)thinkHold=Math.max(thinkHold,thinkStopFrames(t));
+  // 결정 D-1411: 처음 보는 사건 속말(무언가를 발견했다)이면 내려선 뒤 시간을 멈추고, 한 번 더 눌러야 넘어간다
+  const discover=!light&&G&&G.started&&!G.ended&&!B&&thinkFirstTime(t);
+  thinkWait=discover?(thinkWait===2?2:1):0;
+  heroThought.classList.remove('wait');if(discover)heroThought.querySelector('.mono-next').textContent=TOUCH?'눌러서 넘기기 ▸':'E · 넘기기 ▸';
   heroThought.querySelector('.text').textContent=t;
   const face=heroThought.querySelector('.face');face.innerHTML='';face.appendChild(portrait('너구리'));
   thoughtT=Math.round((TABLES.TUNING.think_base_ms+TABLES.TUNING.think_char_ms*[...t].length)*60/1000);
@@ -686,10 +718,11 @@ function think(text,opts={}){
   heroThought.classList.remove('pop');void heroThought.offsetWidth;heroThought.classList.add('pop');placeThought();
 }
 function placeThought(){
+  thinkWaitTick();   // 결정 D-1411
   // 결정 D-803: 멀어지거나 구역·지역이 바뀌면 그 자리의 속말은 끝난다
   if(thoughtT>0&&thoughtAt&&G&&(thoughtAt.region!==G.region||thoughtAt.zone!==G.zone||Math.abs(G.px-thoughtAt.x)>TABLES.TUNING.think_far_px))thoughtT=0;
   if(thoughtT<=0||!G||!G.started||G.ended||B||inkOn||vistaMode||zoneFade>0||zoneMotion||mapTravel||open('dlg')||open('map')||open('bag')||open('trade')||open('notebook')||openMinigame()){heroThought.hidden=true;return;}
-  heroThought.hidden=false;
+  heroThought.hidden=false;heroThought.classList.toggle('wait',thinkWait===2);   // 결정 D-1411: 멈춘 동안 넘기는 법을 작게 보인다
 }
 // 결정 D-717: 채집 자리는 높이(발 높이 차이)도 가까워야 뜬다. 난간·발판 위에 올라가 있으면 바로 아래 흙더미의 원이 뜨지 않는다 (사용자 피드백 2026-11-05)
 /* 결정 D-1103: 채집물 사이 최소 간격 (사용자 피드백 2026-11-07). 개발자 모드에서 구역에 들어설 때 너무 붙은 자리를 콘솔에 알린다.
@@ -704,21 +737,31 @@ function gatherSpacingWarn(){
     for(const b of others)if(near(a,b,T.gather_interact_gap))console.warn('채집물과 상호작용 간격',G.zone,a.id||a.item,a.x,b.id||b.label,b.x);
   });
 }
+/* 결정 D-1413: 채집 안내와 말 걸기·살피기 안내는 한꺼번에 뜨지 않는다 (사용자 피드백 2026-11-09 "채집 상호 작용과 npc 인카운터가 동시에 뜨지 않게").
+   둘 다 닿으면 주인공에게 더 가까운 쪽 하나만 안내하고, 채집 원(gather.js drawGatherCue)도 채집이 이겼을 때만 그린다. 같은 거리면 말 걸기가 먼저다.
+   예전에는 말풍선은 말 걸기만 뜨는데 채집 원은 그대로 그려져 둘이 겹쳐 보였다. 자리 자체는 gather_interact_gap(D-1103)으로 떼어 둔다 */
+let promptShows=null;   // 지금 말풍선이 가리키는 것: 'floor'·'talk'·'dig'·'climb'·null (휴대폰 말풍선 누르기가 따른다)
+function promptPick(){
+  const n=paused()||rolling?null:nearInteraction(),d=rolling?null:nearDig();
+  if(n&&d&&Math.abs(d.x-G.px)<Math.abs(n.x-G.px))return {n:null,d};
+  return {n,d:n?null:d};
+}
 function nearDig(){if(paused()||(typeof rolling!=="undefined"&&rolling))return null;const T=TABLES.TUNING;for(const d of fieldItems('digs')){if(!d.done&&!d.busy&&formVisible(d)&&Math.abs(d.x-(G.px+G.face*T.field_dig_ahead))<T.field_dig_distance&&Math.abs((d.y??fieldGround())-G.py)<=T.field_dig_height)return d;}return null;}
 function updateOverlay(){
   placeThought();
   trackNpcMoves();   // D-126: 안내를 고르기 전에 자리 바뀜을 먼저 본다
   const pr=$('prompt');
   // 구르는 동안에는 말걸기·줍기·채집 안내를 띄우지 않는다 (D-94)
-  const n=paused()||rolling?null:nearInteraction();const dg=n||rolling?null:nearDig();
+  const {n,d:dg}=promptPick();   // 결정 D-1413
   const floor=paused()||pickupPose||rolling?null:nearFloorItems()[0];
+  promptShows=floor?'floor':n?'talk':dg?'dig':null;
   if(floor){pr.hidden=false;pr.textContent=TOUCH?'휘두르기로 줍기':'X · 줍기';lastNear=floor;pr.style.left=((floor.x-cam)/W*100)+'%';pr.style.top=((floor.y-30)/H*100)+'%';}
   else if(n){pr.hidden=false;pr.textContent=(TOUCH?'':'E · ')+interactionLabel(n);lastNear=n;pr.style.left=((n.x-cam)/W*100)+'%';pr.style.top=(((n.y??fieldGround())-32)/H*100)+'%';}
   else if(dg){pr.hidden=false;if(lastNear!==dg){pr.textContent=(TOUCH?'휘두르기로 ':'X · ')+(dg.cache?(dg.form==='otter'?'얼음 구멍에 잠수하기':'잊은 몫 캐기'):gatherCfg(dg)?.verb||'캐기');lastNear=dg;}pr.style.left=((dg.x-cam)/W*100)+'%';
     // 결정 D-500·D-145: 안내 말풍선은 채집 원과 진행 점 위에 띄운다
     const ringTop=!dg.cache&&gatherCfg(dg)?gatherRingTop(dg):GROUND-14;
     pr.style.top=(Math.min(GROUND-14,ringTop)/H*100)+'%';}
-  else if(!paused()&&!rolling&&!formClimb&&climbNear()){const c=climbNear();pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
+  else if(!paused()&&!rolling&&!formClimb&&climbNear()){const c=climbNear();promptShows='climb';pr.hidden=false;pr.textContent=TOUCH?'▲ 눌러 오르기':'↑ · 오르기';lastNear=c;pr.style.left=((c.x-cam)/W*100)+'%';pr.style.top=((fieldGround()-36)/H*100)+'%';}
   else{pr.hidden=true;lastNear=null;}
   if(!formRing.hidden&&!formChangeAllowed())formRing.hidden=true;
   $('padTalk').classList.toggle('ready',!!n);
@@ -749,7 +792,7 @@ const exitSpec=e=>typeof e==='string'?{to:e}:e;
 function resetFieldModes(){
   resetMap();
   cancelPickup();
-  endVista();zoneMotion=null;zoneFade=0;blockedEdge=null;thinkHold=0;sparks.length=0;shakeT=0;releaseInputs();suppressedKeys.clear();Vfx.clear();
+  endVista();zoneMotion=null;zoneFade=0;blockedEdge=null;thinkHold=0;thinkWait=0;sparks.length=0;shakeT=0;releaseInputs();suppressedKeys.clear();Vfx.clear();
 }
 function changeZone(to,arrival={}){
   if(!usesZones(REG)||!REG.zones[to]||paused())return false;

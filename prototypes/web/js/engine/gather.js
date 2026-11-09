@@ -117,7 +117,7 @@ function gatherRingTop(d){const g=gatherRing(d);return g.y-g.r-10;}
    (사용자 피드백 2026-11-06 "채집 스킬 체크 바꾼거 엉망이네. 원래 버젼으로 하되 퍼펙트존을 하나 더. 먹처럼 그려지는 느낌은 나쁘지 않으니 원본에 맞게").
    먹선은 바탕 원 위, 칸 아래에 긋는다. 그래서 칸은 늘 또렷하고, 바늘이 어디쯤 왔는지는 먹선 길이로도 보인다.
    멈춘 칸에는 금빛(정확)이나 먹(근접)이 둘레로 번진다. D-715 의 도장·붓끝 그림은 뺐다. */
-const G_INK='#1d1714',G_INK_SOFT='rgba(29,23,20,.55)',G_PAPER='rgba(246,238,216,.55)';
+const G_INK='#1d1714',G_INK_SOFT='rgba(29,23,20,.72)',G_PAPER='rgba(246,238,216,.55)';
 /* 원 둘레의 한 구간(12시에서 잰 비율 a~b)을 테두리(halo) 위에 호로 긋는다. halo 가 null 이면 테두리 없이 */
 function arcStroke(c,x,y,r,a,b,color,width,halo='rgba(30,20,12,.75)'){
   const A=-Math.PI/2+a*Math.PI*2,B=-Math.PI/2+b*Math.PI*2;
@@ -133,21 +133,34 @@ const GATHER_RING_STYLE={
   deer:{c:'#b08a5c',dash:[1,2]}         // 고라니: 발굽빛 점선
 };
 /* 바늘이 지나온 먹선: 0에서 p까지. 바늘에 가까울수록 굵고 진하며, 지나온 길은 가늘어지고 마른 붓 자국처럼 군데군데 빈다.
-   밑에 옅은 종이빛을 깔아 밤 배경에서도 먹선이 보인다 */
+   밑에 옅은 종이빛을 깔아 밤 배경에서도 먹선이 보인다.
+   결정 D-1410: 돌 때 먹 느낌이 더 잘 보이게 한다 (사용자 피드백 2026-11-09 "돌 때 먹의 느낌이 좀 더 잘보이게").
+   종이빛 바탕과 먹선을 한 단계 굵게 하고, 지나온 자리에는 먹이 원 안팎으로 스며 번진 점이 남는다(오래된 자리일수록 넓고 옅다).
+   바늘 끝에는 붓끝에 고인 먹 방울이 따라 돈다. 칸은 그 위에 그어 늘 또렷하다 */
 function drawInkTrail(c,x,y,r,p){
   if(p<=0)return;
-  const N=Math.max(1,Math.ceil(p*48));
-  arcStroke(c,x,y,r,0,p,G_PAPER,3,null);
-  for(let i=0;i<N;i++){
-    const a=i/48,b=Math.min(p,(i+1)/48),near=1-(p-b)/Math.max(p,.0001);
-    if(near<.55&&(i*7+3)%11===0)continue;   // 비백: 마른 붓이 종이를 스친 빈 자리
-    const w=near>.85?3:near>.4?2:1;
-    arcStroke(c,x,y,r,a,b+.004,near>.4?G_INK:G_INK_SOFT,w,null);
+  const N=Math.max(1,Math.ceil(p*64)),soak=Vfx.reducedMotion?0:1;
+  arcStroke(c,x,y,r,0,p,G_PAPER,6,null);
+  for(let i=0;i<N;i+=2){   // 번짐: 정해진 자리마다 먹이 안팎으로 스민다 (매 프레임 같은 자리라 떨리지 않는다)
+    const a=i/64;if(a>p)break;const k=(i*37+11)%7;if(k>3)continue;
+    const age=(p-a)/Math.max(p,.0001),ang=-Math.PI/2+a*Math.PI*2,off=(k%2?1:-1)*(2+age*2.5*soak);
+    const px=x+.5+Math.cos(ang)*(r+off),py=y+.5+Math.sin(ang)*(r+off),s=age>.45?2:1;
+    c.fillStyle='rgba(29,23,20,'+(.6-age*.35).toFixed(2)+')';c.fillRect(Math.round(px-s/2),Math.round(py-s/2),s+(k===0?1:0),s);
   }
+  for(let i=0;i<N;i++){
+    const a=i/64,b=Math.min(p,(i+1)/64),near=1-(p-b)/Math.max(p,.0001);
+    if(near<.5&&(i*7+3)%9===0)continue;   // 비백: 마른 붓이 종이를 스친 빈 자리
+    const w=near>.85?4:near>.45?3:2;
+    arcStroke(c,x,y,r,a,b+.004,near>.3?G_INK:G_INK_SOFT,w,null);
+  }
+  // 붓끝에 고인 먹 방울: 옅은 번짐 위에 진한 방울
+  const A=-Math.PI/2+p*Math.PI*2,hx=x+.5+Math.cos(A)*r,hy=y+.5+Math.sin(A)*r;
+  c.fillStyle='rgba(29,23,20,.35)';c.beginPath();c.arc(hx,hy,4.2,0,Math.PI*2);c.fill();
+  c.fillStyle=G_INK;c.beginPath();c.arc(hx,hy,2.6,0,Math.PI*2);c.fill();
 }
 /* 흙더미 위 원·먹선·칸·도는 표식·진행 점·튀는 흙. 필드 그리기에서 흙더미 다음에 부른다 */
 function drawGatherCue(){
-  const d=nearDig(),live=d&&!d.cache&&gatherCfg(d)?d:null;
+  const d=promptPick().d,live=d&&!d.cache&&gatherCfg(d)?d:null;   // 결정 D-1413: 말 걸기 안내가 이기면 원을 그리지 않는다
   if(live!==gatherCue.d){gatherCue.d=live;gatherCue.start=G.anim;gatherCue.stop=null;gatherNewZone();}
   const c=ctx,MG=TABLES.MINIGAMES;
   // 멈춘 표식은 잠깐 머문 뒤 12시로 돌아가 다시 돈다. 칸 자리도 새로 정한다 (D-500)

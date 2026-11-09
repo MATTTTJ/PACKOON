@@ -940,6 +940,12 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
 .monologue.pop{animation:mono-pop .22s ease-out}
 @keyframes mono-pop{from{opacity:0;transform:translate(-50%,-92%)}to{opacity:1;transform:translate(-50%,-100%)}}
 @media (prefers-reduced-motion:reduce){.monologue.pop{animation:none}}
+/* 결정 D-1411: 발견 속말에 시간이 멈춘 동안은 독백 창을 눌러 넘길 수 있고, 오른쪽 아래에 넘기는 법이 작게 뜬다 */
+.monologue .mono-next{display:none}
+.monologue.wait{pointer-events:auto;cursor:pointer}
+.monologue.wait .mono-next{display:block;position:absolute;right:8px;bottom:-9px;padding:0 6px;background:var(--meok);color:#f2e6cc;border-radius:3px;font-size:clamp(9px,.85vw,11px);line-height:1.5;animation:mono-next-blink 1.1s ease-in-out infinite alternate}
+@keyframes mono-next-blink{from{opacity:.55}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.monologue.wait .mono-next{animation:none}}
 @media (pointer:coarse) and (orientation:portrait){
   .monologue{left:50%;top:calc(var(--pady,0px) + 12px);transform:translateX(-50%);width:calc(100% - 16px);animation:none!important}
   .monologue .text{font-size:14px}

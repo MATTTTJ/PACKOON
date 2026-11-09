@@ -12,7 +12,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
   const read = async expression => b.eval(expression);
   const wait = async ms => b.wait(ms);
   const log = (action, detail) => trace.push({seconds:+((Date.now()-started)/1000).toFixed(2), scene, action, detail});
-  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,note:!$('notebook').hidden,who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade,still:!!REG.holdStill?.()})`);
+  const snapshot = async () => read(`({region:G.region,zone:G.zone,x:G.px,y:G.py,ground:G.onGround,goal:REG.goal(),started:G.started,ended:G.ended,inv:{...G.inv},flags:{...G.f},awake:[...G.awake],dlg:!$('dlg').hidden,note:!$('notebook').hidden,who:$('dlgWho').textContent,choices:[...$('dlgChoices').children].map(e=>e.textContent),text:$('dlgText').textContent,mg:openMinigame()?.id,battle:B?{kind:B.kind,st:B.st,paused:B.paused,result:B.result,calm:B.calm}:null,ink:inkOn,motion:!!zoneMotion,fade:zoneFade,still:!!REG.holdStill?.(),tw:typeof thinkWait!=='undefined'?thinkWait:0})`);
   async function check() {
     if(Date.now()-started>maxRun)throw new Error('연속 플레이 제한 540초를 넘었다');
     const s=await snapshot();
@@ -46,6 +46,8 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
         await wait(30);continue;
       }
       if(s.mg){await minigame(s.mg);continue;}
+      // 결정 D-1411: 발견 속말로 시간이 멈추면 E 로 넘긴다
+      if(s.tw===2){log('발견 속말 넘기기',await read('thoughtText()'));await key('e');await wait(30);continue;}
       if(s.battle)return s;
       // 결정 D-1163: 이야기가 손을 떼고 버티라는 동안(REG.holdStill, 영산 두루미 사건)은 아무것도 누르지 않고 기다린다
       if(s.ink||s.motion||s.fade||s.still){await wait(100);continue;}
@@ -95,7 +97,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
           return;
         }
         // 쪽지·수첩 창이 걷는 도중에 열려도 닫고 다시 걷는다 (새 게임 첫 프레임의 엄마 쪽지가 늦게 열리는 경우)
-        if(s.dlg||s.note||s.mg||s.ink||s.motion||s.fade||s.still){if(held){await key(held,'up');held=null;}await settle();continue;}
+        if(s.dlg||s.note||s.mg||s.ink||s.motion||s.fade||s.still||s.tw===2){if(held){await key(held,'up');held=null;}await settle();continue;}
         const d=x-s.x;if(Math.abs(d)<=5)return;
         const desiredRate=Math.abs(d)<50||sneak||slow?1:6;
         if(desiredRate!==rate){rate=desiredRate;await read('window.__qaClockRate='+rate);}

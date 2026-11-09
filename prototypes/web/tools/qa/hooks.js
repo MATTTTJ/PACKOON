@@ -54,6 +54,23 @@ function installInPage(rules) {
     data.speakers.push({ ...row, rule: 'speaker-location', severity: '낮음',
       message: `${G.region}/${G.zone || 'classic'}: '${speaker}' 화자가 현재 구역 인물 목록에 없다. 대사: ${text}` });
   }
+  /* 결정 D-1413: 걸어 다니는 동안 채집 자리와 말 걸기·살피기 자리가 한꺼번에 닿는 곳을 모은다 (엔진은 가까운 하나만 안내하지만, 자리는 떼어 둔다).
+     처음 상태만 보는 map 검사(spacing-checks.js)와 달리 이야기가 진행되며 옮겨 오거나 새로 나타난 인물도 잡는다. 캐고 난 자리는 보지 않는다. */
+  data.clashes = [];
+  const clashSeen = new Set();
+  (function sampleClash() {
+    try {
+      if (G && G.started && !G.ended && !paused() && typeof nearDig === 'function') {
+        const n = nearInteraction(), d = nearDig();
+        if (n && d && !d.cache) {
+          const other = n.id || n.label || interactionKind(n), key = G.region + '/' + G.zone + '/' + (d.id || d.item) + '/' + other;
+          if (!clashSeen.has(key)) { clashSeen.add(key); data.clashes.push({ rule: 'gather-prompt-clash', severity: '보통', region: G.region, zone: G.zone, dig: d.id || d.item, digX: Math.round(d.x), other, kind: interactionKind(n), otherX: Math.round(n.x), heroX: Math.round(G.px),
+            message: G.region + '/' + (G.zone || 'classic') + ': 채집 자리 ' + (d.id || d.item) + '(x ' + Math.round(d.x) + ')에 섰을 때 ' + interactionKind(n) + ' ' + other + '(x ' + Math.round(n.x) + ')도 닿는다. 둘 중 하나를 옮긴다.' }); }
+        }
+      }
+    } catch (_) {}
+    requestAnimationFrame(sampleClash);
+  })();
   const originalTalk = talk;
   talk = function (...args) {
     currentTalk = { stack: new Error('QA talk origin').stack, number: currentTalk.number + 1 };

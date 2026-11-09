@@ -57,6 +57,8 @@ function onPress(k){
     if(k==='j'||k==='x'||k===' '||k==='enter')bStrike();else if(k==='k')openGift();else if(k==='l')openNameMenu();return;   // 결정 D-434: L 은 이름 대기(강철이 전투만)
   }
   if(inkOn)return;
+  // 결정 D-1411: 발견 속말로 시간이 멈춘 동안은 E·Enter·Space·X(J)·C·Esc 로 넘긴다. 넘긴 키는 다른 일을 하지 않는다
+  if(thinkWait===2){if(['e','enter',' ','x','j','c','escape'].includes(k))thinkNext();return;}
   const mg=openMinigame();
   if(mg){if(k===' '||k==='j'||k==='enter'||k==='x')mg.hit();return;}
   if(open('dlg')){
@@ -91,6 +93,7 @@ function padAction(k){
   //   결정 D-384: 패드의 '선물'(점프 자리)은 선물을 연다 (전엔 아무 일도 하지 않아 휴대폰에서 선물을 건넬 수 없었다). 결정 D-383: '도구'는 든 도구를 바꾼다
   if(B){if(!$('bResult').hidden){if(k==='atk')$('bResOk').click();return;}if(B.paused)return;if(k==='atk')bStrike();else if(k==='jump')openGift();else if(k==='tool')switchBattleTool();return;}
   if(inkOn)return;
+  if(thinkWait===2){if(['atk','jump','talk','roll'].includes(k))thinkNext();return;}   // 결정 D-1411
   const mg=openMinigame();
   if(k==='bag'){if(!open('dlg')&&!mg&&!open('trade'))toggleBag();return;}
   if(k==='note'||k==='book'){if(!open('dlg')&&!mg)toggleNote();return;}
@@ -143,4 +146,4 @@ document.querySelectorAll('#pad [data-k]').forEach(b=>{
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);
   b.addEventListener('contextmenu',e=>e.preventDefault());
 });
-$('prompt').addEventListener('click',()=>{if(paused())return;if(nearFloorItems().length)actionPress();else if(nearInteraction())tryInteract();else atkQ=true;});
+$('prompt').addEventListener('click',()=>{if(paused())return;if(nearFloorItems().length)actionPress();else if(promptShows!=='dig'&&nearInteraction())tryInteract();else atkQ=true;});   // 결정 D-1413: 채집 안내가 떠 있으면 캔다
