@@ -324,7 +324,7 @@ if(!CLASSIC){
       exits:{right:{to:'forge',toX:70}},
       // 다람쥐의 잊은 몫 (PA-47, 다람쥐 모습에만 보인다)
       // 결정 D-988: 다람쥐 몫이 도토리만이 아니다 (사용자 피드백 2026-11-06 큰 장터 5). 집 둘레 밤나무 밑이라 다른 다람쥐가 밤을 묻어 뒀다.
-      digs:[{id:'gal_cache_village',x:880,item:'bam',n:2,form:'squirrel',cache:true,done:false}],
+      digs:[{id:'gal_cache_village',x:740,   /* 결정 D-1413: 개울 바라보기·늙은 까치와 떨어지게 (880에서 옮김) */item:'bam',n:2,form:'squirrel',cache:true,done:false}],
       vistas:[{id:'stream',x:930,from:0,to:140,draw:A.streamDoor,sound:'water',
         thought:'낙엽이 앞서 가네.\n당산나무까지 가는 걸까?',
         diary:'물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.',layers:A.vistaStream}],

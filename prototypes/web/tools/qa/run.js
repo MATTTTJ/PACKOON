@@ -136,6 +136,8 @@ const watchdog=setTimeout(async()=>{
         if(mode==='expanded')hook.portraitStatic=await require('./hooks').portraitFindings(browser,root,rules);
         hookEvidence.push({mode,...hook});
         fs.writeFileSync(path.join(directory,'hooks.json'),JSON.stringify(hook,null,2));
+        // 결정 D-1413: 채집 자리와 말 걸기·살피기 자리가 한꺼번에 닿은 곳
+        if((hook.clashes||[]).length){result.status='fail';result.summary+=`; 채집·말 걸기 자리 겹침 ${hook.clashes.length}건`;result.findings.push(...hook.clashes);}
         if((hook.speakers||[]).length){result.status='fail';result.summary+=`; 화자 위치 위반 ${hook.speakers.length}건`;result.findings.push(...hook.speakers);}
         for(const finding of result.findings) {
           finding.reproductions||='이번 실행 1회';

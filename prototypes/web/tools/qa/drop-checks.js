@@ -1,4 +1,5 @@
 'use strict';
+// 결정 D-1411: 다가가며 뜬 발견 속말(인물 기척)이 필드 시간을 멈추면 물건이 내려앉지 않는다. 기다리는 동안 thinkNext 로 넘긴다
 
 // Isolated regression scenarios deliberately seed state. They are not continuous-play evidence.
 const fs=require('node:fs');
@@ -29,7 +30,7 @@ async function runDropCheck({browser:b,outDir,name}){
           if(!await b.eval('floorDrops().some(a=>a.flight>0)'))throw Error(region+': 날아가는 아이템이 없어 뿌리기 그림을 확인하지 못했다.');
           await b.wait(100);const file=path.join(outDir,region+'-spawn.png');await b.screenshot(file);images.push(file);captures.push({region,stage:'spawn',file,state:await b.eval('({records:structuredClone(floorDrops()),pose:pickupPose&&{tick:pickupPose.tick}})')});
         }
-        await b.until("floorDrops().every(a=>!a.flight&&!a.bounce)");
+        await b.until("(thinkNext(),floorDrops().every(a=>!a.flight&&!a.bounce))");
         if(mode==='expanded'){
           const file=path.join(outDir,region+'-floor.png');await b.screenshot(file);images.push(file);captures.push({region,stage:'floor',file,state:await b.eval('({records:structuredClone(floorDrops()),pose:pickupPose&&{tick:pickupPose.tick}})')});
           await b.eval('G.px=floorDrops().find(a=>!a.got).x;G.py=fieldGround();G.onGround=true');await b.key('x');await b.wait(70);
@@ -48,7 +49,7 @@ async function runDropCheck({browser:b,outDir,name}){
         if(before.records.length!==4)findings.push(fail(name,`${mode}/${region}: 보상 4개가 별도 아이템으로 생성되지 않았다.`,before));
         records.push({mode,region,before,checked});
       }else if(name==='drops-persistence'){
-        await b.eval("spawnDrops('root',4,{x:250,y:fieldGround()})");await b.until('floorDrops().every(a=>!a.flight&&!a.bounce)');
+        await b.eval("spawnDrops('root',4,{x:250,y:fieldGround()})");await b.until('(thinkNext(),floorDrops().every(a=>!a.flight&&!a.bounce))');
         const before=canonical(await b.eval('structuredClone(G)'));
         if(mode==='expanded'){
           const changed=await b.eval(`(()=>{const from=G.zone,to=Object.keys(REG.zones).find(id=>id!==from);return {first:changeZone(to),from,to};})()`);
@@ -78,7 +79,7 @@ async function runDropCheck({browser:b,outDir,name}){
       }else if(name==='drops-full'){
         // 결정 D-424: 보따리는 칸 제한이 없다. 보따리 가득 시험은 지우고, 연속 줍기 입력이 보상을 겹치지 않는지만 본다
         await b.eval(`(()=>{G.inv={rice:2};G.pickups=[];spawnDrops('root',2,{x:G.px,y:fieldGround()});})()`);
-        await b.until('floorDrops().every(a=>!a.flight&&!a.bounce)');
+        await b.until('(thinkNext(),floorDrops().every(a=>!a.flight&&!a.bounce))');
         await b.eval('G.px=floorDrops()[0].x;G.py=floorDrops()[0].y;G.onGround=true');
         await b.key('x');await b.key('x');await b.key('x');await b.wait(700);
         const freed=await b.eval('({floor:structuredClone(floorDrops()),inv:{...G.inv}})');

@@ -89,8 +89,10 @@ const GameMusic=(()=>{
     // 대화·손맛·환경음을 살리되 BGM과 효과음의 사용자 음량은 각각 유지한다.
     // 결정 D-233: 대화가 닫힌 뒤 music_dialog_hold_ms 동안은 덕킹을 풀지 않는다(이어지는 대화 사이에서 커졌다 작아지지 않게)
     // 결정 D-1401: 회상 장면(engine/cine.js)은 낮추지 않는다 (D-1260의 '대화처럼 낮춘다'를 바꿨다)
-    const factor=open('dlg')||dlgHeld()||vistaMode||brewing||!!craftHands?TABLES.TUNING.music_duck:1;
-    if(factor!==duck){duck=factor;player.setDucking(duck,.18);}
+    // 결정 D-1412: 인물과 이야기하거나(대화·교환 창) 사물을 살필 때 BGM 을 절반으로 천천히 낮추고, 끝나면 더 천천히 되돌린다
+    //   (사용자 피드백 2026-11-09: "npc와 대화 또는 사물과 상호작용 할때는 배경 음악 반 정도로 소리 줄이기 뭉근하게"). 곡은 그대로다(D-1401)
+    const factor=open('dlg')||open('trade')||dlgHeld()||vistaMode||brewing||!!craftHands?TABLES.TUNING.music_duck:1;
+    if(factor!==duck){player.setDucking(factor,factor<duck?TABLES.TUNING.music_duck_in_s:TABLES.TUNING.music_duck_out_s);duck=factor;}
     const travelling=player.getState().travel;
     // 도착 대화·패널·경치는 길 위 간주를 지우지 않는다. 전투와 장단은 먼저 들려주고 끝난 뒤 한 번 잇는다.
     const sceneFirst=['battle','sting','rhythm','ending'].includes(target.kind);

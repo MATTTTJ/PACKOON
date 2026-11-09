@@ -498,7 +498,7 @@ if(!CLASSIC){
       // 840 헛간 지붕은 720 처마에서 수리부엉이가 날개를 펴야 닿는다 (PA-47 선택 자리)
       platforms:[...stairs(420),...stairs(1100,96,[1]),...stairs(2180,96,[0]),{x:2390,y:96,w:340},{x:842,y:124,w:56}],
       // 결정 D-82: 솔숲의 소나무 흔들기 세 곳 (채집 고리 D-41)
-      digs:[{id:'j_cache_pine',x:1680,item:'jat',n:2,form:'squirrel',cache:true,done:false},   // 결정 D-963: 솔숲 다람쥐가 묻은 잣
+      digs:[{id:'j_cache_pine',x:1670,   /* 결정 D-1413: 솔향 자리와 떨어지게 (1680에서 옮김) */item:'jat',n:2,form:'squirrel',cache:true,done:false},   // 결정 D-963: 솔숲 다람쥐가 묻은 잣
         {id:'j_pine_shake_1',x:960,item:'solbang',done:false},{id:'j_pine_shake_2',x:1620,item:'solbang',done:false},{id:'j_pine_shake_3',x:2080,item:'solbang',done:false}],
       // 결정 D-207: 솔방울이 같은 간격으로 늘어서지 않게 떨어진 자리를 들쭉날쭉하게 (사용자 피드백 58). 높은 칸의 것은 그 칸 안에서만 옮긴다.
       // 결정 D-391: 열넷은 너무 많았다. 소나무 밑과 바위턱에 여덟만 (엿방울 몫 다섯과 갈래 셋에 넉넉하고, 모자라면 쉬는 사이 다시 떨어진다 D-79)
