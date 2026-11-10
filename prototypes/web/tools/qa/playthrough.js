@@ -300,7 +300,7 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
     await stage('돌너머 · 골렘과 약즙',async()=>{
       // 결정 D-229: 고갯길 소원 돌탑에 돌 셋을 얹는 장면이 끝까지 흐르고 소원을 빈다 (사연 판에만 있는 길섶 돌탑)
       if(mode==='expanded'){await zone('gate');await moveX(await read("zoneObjects('doors').find(d=>d.wishTower).x"));await key('e');await settle(/돌을 골라/);if(!await read('G.f.dolWishTower'))throw new Error('소원 돌탑에 돌 셋을 얹지 못했다');}
-      if(mode==='expanded')await zone('shrine');const toGolem=async()=>{await moveX(mode==='expanded'?2330:1920);};await toGolem();await mustWin(['story_stone'],toGolem,'돌 골렘');
+      if(mode==='expanded')await zone('shrine');const toGolem=async()=>{if(mode==='expanded')for(let i=0;i<40&&await read("!B&&G.form!=='goat'");i++){if(await read('formChangeAllowed()'))await key('2');await wait(120);}   /* 결정 D-1433: 언 비탈은 산양만 오른다 */await moveX(mode==='expanded'?2330:1920);};await toGolem();await mustWin(['story_stone'],toGolem,'돌 골렘');
       await pickup('seoridarae');await craft('maetdol','darae_yak');
       if(mode==='expanded') {await zone('village');const n=await read("zoneObjects('wanderers').find(n=>n.name==='늙은 까치')&&(({x,y})=>({x,y:y??192}))(zoneObjects('wanderers').find(n=>n.name==='늙은 까치'))");if(!n)throw new Error('약즙 배달 까치가 마을에 없다');await jumpTo(n.x,n.y);await key('e');await settle();}
     });

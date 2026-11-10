@@ -11,6 +11,9 @@ const gatherCue={d:null,start:0,zone:.5,zones:[.5],hitZone:.5,grade:null,stop:nu
    칸의 자리는 칠 때마다 gather_zone_min~max(12시에서 잰 둘레 %) 사이에서 새로 정한다.
    한 바퀴 시간은 gather_<채집 이름>_period(프레임), 없으면 gather_spin_period. 5%는 한 바퀴 96프레임에서 약 5프레임(0.08초)이다.
    "좋아·딱" 같은 감탄사 글자는 띄우지 않는다. */
+/* 결정 D-1432 (사용자 피드백 2026-11-10 "채집할 때마다 원 크기 줄여서 난이도 소폭 상승"): 캐기를 하나 마칠 때마다(G.f.gatherDone)
+   금빛 칸과 옅은 칸이 gather_shrink_step % 씩 좁아지고, gather_shrink_floor % 아래로는 줄지 않는다. 한 게임 내내 이어진다. */
+function gatherZoneScale(){const MG=TABLES.MINIGAMES;return Math.max((MG.gather_shrink_floor??100)/100,1-(MG.gather_shrink_step||0)/100*(G?.f?.gatherDone||0));}
 function gatherPeriod(d){const MG=TABLES.MINIGAMES;return MG['gather_'+gatherKey(d)+'_period']||MG.gather_spin_period;}
 /* 결정 D-815: 칸은 한 바퀴에 gather_zone_count 군데(2)다 (사용자 피드백 2026-11-06 "퍼펙트존을 하나 더"). 모두 gather_zone_min~max 안에 놓고,
    칸 가운데끼리는 gather_zone_gap %보다 가깝지 않게 해 두 칸이 겹치지 않는다. 칠 때마다 새로 정한다 */
@@ -25,7 +28,7 @@ function gatherPhase(d){
   const p=gatherCue.stop?gatherCue.stop.p:((G.anim-gatherCue.start)%per)/per;
   // 가장 가까운 칸으로 판정한다 (D-815)
   let zone=gatherCue.zone,off=1;for(const z of gatherCue.zones||[gatherCue.zone]){const o=Math.abs(p-z);if(o<off){off=o;zone=z;}}
-  const half=MG.gather_perfect_zone/200,grade=off<=half?'perfect':off<=half+MG.gather_good_zone/100?'good':null;
+  const k=gatherZoneScale(),half=MG.gather_perfect_zone/200*k,grade=off<=half?'perfect':off<=half+MG.gather_good_zone/100*k?'good':null;   // 결정 D-1432
   return {p,grade,just:grade==='perfect',zone};
 }
 /* 결정 D-266: 채집 자리의 설정은 보통 나오는 물건(d.item)으로 찾는다. 자리가 gather 이름을 달면 그 설정을 쓴다
@@ -78,7 +81,7 @@ function gatherHit(d){
   if(d.prog>=cfg.hits)finishGather(d);
 }
 function finishGather(d){
-  const id=d.item,MG=TABLES.MINIGAMES;d.done=true;d.busy=false;
+  const id=d.item,MG=TABLES.MINIGAMES;d.done=true;d.busy=false;G.f.gatherDone=(G.f.gatherDone||0)+1;   // 결정 D-1432
   // 정확 한 번마다 한 개 더. 진행에 쓰는 개수는 기본 한 개로 이미 채워지므로 더 나와도 깨지지 않는다.
   const extra=(d.perfects||0)*MG.gather_perfect_bonus,n=MG.gather_yield+extra;Vfx.gather(d.x,(d.y??fieldGround())-4,id);
   spawnDrops(id,n,{x:d.x,y:d.y??fieldGround(),zone:d.zone});
@@ -167,7 +170,7 @@ function drawGatherCue(){
   if(gatherCue.stop&&!paused()&&--gatherCue.stop.t<=0){gatherCue.stop=null;gatherCue.start=G.anim;gatherNewZone();}
   if(live){
     const cfg=gatherCfg(live),ring=gatherRing(live),x=Math.round(ring.x-cam),y=Math.round(ring.y),r=ring.r,ph=gatherPhase(live);
-    const st=GATHER_RING_STYLE[G.form||'']||GATHER_RING_STYLE[''],hp=MG.gather_perfect_zone/200,gd=MG.gather_good_zone/100;
+    const st=GATHER_RING_STYLE[G.form||'']||GATHER_RING_STYLE[''],hp=MG.gather_perfect_zone/200*gatherZoneScale(),gd=MG.gather_good_zone/100*gatherZoneScale();   // 결정 D-1432
     c.save();
     // 바탕 원: 어두운 테두리 위 옅은 실선
     c.lineWidth=3;c.strokeStyle='rgba(30,20,12,.5)';c.beginPath();c.arc(x+.5,y+.5,r,0,Math.PI*2);c.stroke();

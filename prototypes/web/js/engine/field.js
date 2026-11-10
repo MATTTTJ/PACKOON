@@ -1148,7 +1148,7 @@ function findStamp(s){
   if(REG.onStampFound?.(s))return true;
   // 결정 D-1202: 처음 찾은 도장이면 아이가 왜 아빠 손인지, 왜 거기 찍혔는지를 제가 아는 것으로 짚는다(dadStampIntro).
   const intro=dadStampIntro();
-  if(intro.length)talk(intro);else think('아빠 손바닥 도장이다!\n여긴 무슨 표일까? 수첩에 그려 두자.');   // 결정 D-706
+  if(intro.length)talk(intro);else think('아빠 손바닥 도장이다!\n여긴 무슨 표시일까? 수첩에 그려 두자.');   // 결정 D-706. 결정 D-1431: 도장 글의 '표'는 '표시'로 (사용자 피드백 2026-11-10, notebook.csv 도장 줄)
   return true;
 }
 /* 결정 D-1200·D-1202 (사용자 지시 2026-11-07): 아빠 손바닥 도장은 뒤에 같은 길을 걸어올 보부상들을 위해
