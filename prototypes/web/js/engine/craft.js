@@ -16,7 +16,8 @@ function fillCraftRecipe(r){
 /* 결정 D-113: 가공은 재료 수와 상관없이 한 번의 동작으로 끝난다(D-54를 대신함). 누르면 동작 한 번(tuning craft_motion_ms)이 돌고 끝난다.
    도구는 움직이는 부분만 움직인다. 절구는 공이만 위아래로, 맷돌은 윗돌만 어처구니로 한 바퀴, 시루는 그대로 두고 솥에서 김이 올라 뚜껑이 들썩.
    집안 손버릇(D-30)은 동작 횟수가 아니라 이 한 동작 안의 버릇과 말로 남는다:
-   절구는 찧은 뒤 한 박자 쉬고 들어 올리고, 맷돌은 왼쪽으로 돌리면 '증조할아버지처럼', 시루는 김이 오를 때 뚜껑을 톡. (결정 D-421: 아빠의 약연은 뺐다) */
+   절구는 찧은 뒤 한 박자 쉬고 들어 올리고, 맷돌은 왼쪽으로 돌리면 '증조할아버지처럼', 시루는 김이 오를 때 뚜껑을 톡. (결정 D-421: 아빠의 약연은 뺐다)
+   결정 D-1434 (사용자 피드백 2026-11-10): 맷돌도 단추 하나다. 방향을 고르지 않고 늘 집안 버릇대로 왼쪽으로 돈다(돌쇠 할배가 일러 준 손버릇, D-443). */
 function startCraftHands(tool,recipe,discovered){
   cancelAnimationFrame(craftFrame);
   craftHands={owner:G,region:G.region,tool,recipe,discovered,time:0,started:null,dir:null,last:performance.now(),
@@ -33,7 +34,7 @@ function finishCraftHands(redraw=true){
     maetdol:['왼쪽으로 한 바퀴. 증조할아버지 손도 이랬겠지.','맷돌이 느긋하게 한 바퀴 돌았다.'],
     siru:['김이 오를 때 톡. 엄마 냄새가 난다.','뚜껑을 열자 따뜻한 김이 났다.']
   };
-  // 맷돌만 돌리는 방향을 고른다. 나머지 버릇은 한 동작 안에 들어 있다.
+  // 버릇은 한 동작 안에 들어 있다. 맷돌은 늘 왼쪽으로 돈다(D-1434).
   const matched=h.started!==null&&(h.tool!=='maetdol'||h.dir==='left');
   if(matched)Sound.gather(true);
   pouchMsg=voices[h.tool][matched?0:1]+' '+ITEMS[h.recipe.out].n+' '+h.recipe.n+'개 완성.'+
@@ -68,7 +69,7 @@ function stepCraftHands(now){
 function updateCraftHands(){
   const h=craftHands,box=$('craftHands');if(!h||!box)return;
   const p=h.started===null?0:clamp((h.time-h.started)/craftMotionMs(),0,1);
-  const idle={jeolgu:'공이를 들어 한 번에 찧는다 · J / X / Space',maetdol:'어처구니를 잡고 한 바퀴 돌린다 · ← → / A D',
+  const idle={jeolgu:'공이를 들어 한 번에 찧는다 · J / X / Space',maetdol:'어처구니를 잡고 한 바퀴 돌린다 · J / X / Space',
     siru:'솥에 불을 지펴 김을 올린다 · J / X / Space'}[h.tool];
   const busy={jeolgu:p<.6?'공이를 들어… 쿵!':'한 박자 쉬고 공이를 든다.',
     maetdol:h.dir==='left'?'드르륵… 왼쪽으로 한 바퀴.':'드르륵… 오른쪽으로 한 바퀴.',
@@ -134,9 +135,9 @@ function renderCraftHands(wrap){
   const track=el('div','craft-track');track.setAttribute('role','progressbar');track.setAttribute('aria-label','가공 진행');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');
   const meter=el('div');meter.id='craftMeter';track.appendChild(meter);box.appendChild(track);
   const actions=el('div','craft-actions');
-  const buttons=h.tool==='maetdol'?[['left','왼쪽으로 돌리기'],['right','오른쪽으로 돌리기']]:
+  const buttons=h.tool==='maetdol'?[['left','어처구니 돌리기 · J / X']]:   // 결정 D-1434
     [['tap',{jeolgu:'공이로 찧기 · J / X',siru:'불 지펴 찌기 · J / X'}[h.tool]]];
-  buttons.forEach(([dir,label],i)=>{const b=el('button',h.tool==='maetdol'?'btn':'btn primary',label);b.type='button';b.dataset.craft=dir;b.onclick=()=>craftHandInput(dir);actions.appendChild(b);});
+  buttons.forEach(([dir,label],i)=>{const b=el('button','btn primary',label);b.type='button';b.dataset.craft=dir;b.onclick=()=>craftHandInput(dir);actions.appendChild(b);});
   box.appendChild(actions);
   wrap.appendChild(box);updateCraftHands();
 }
@@ -149,8 +150,8 @@ addEventListener('keydown',e=>{
   }
   const dir=['arrowleft','a'].includes(k)?'left':['arrowright','d'].includes(k)?'right':null;
   const tap=['j','x',' '].includes(k);
-  // 맷돌은 방향을 고른다. 절구·시루는 행동키.
-  const go=craftHands.tool==='maetdol'?dir:(tap?'tap':null);
+  // 결정 D-1434: 맷돌도 행동키(방향키도 받는다)로 늘 왼쪽으로 돌린다. 절구·시루는 행동키.
+  const go=craftHands.tool==='maetdol'?(dir||tap?'left':null):(tap?'tap':null);
   if(!go)return;
   if(k===' '&&e.target.matches('button'))return;
   e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)craftHandInput(go);

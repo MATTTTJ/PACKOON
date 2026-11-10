@@ -495,7 +495,16 @@ if(!CLASSIC){
   Rg.zones.shrine.exits={left:{to:'cliff',toX:2920}};
   Rg.zones.shrine.slopes=SHRINE_SLOPES;   // 결정 D-845
   // 결정 D-846: 처음 미끄러질 때 한 번. 뿔영감이 비탈 돌에서 미끄러지지 않던 것을 본 아이가 떠올린다 (산양 변신은 장승제 때 열린다)
-  Rg.zones.shrine.slip=()=>{if(G.f.dolSlopeSlip)return;G.f.dolSlopeSlip=true;think(hasForm('goat')?'언 비탈이라 발이 자꾸 미끄러진다.\n뿔영감 발굽이라면 안 미끄러질 텐데.':'언 비탈이라 발이 자꾸 미끄러진다.\n뛰어서 바위턱마다 숨을 고르자.');};
+  Rg.zones.shrine.slip=()=>{if(G.f.dolSlopeSlip)return;G.f.dolSlopeSlip=true;think(hasForm('goat')?'언 비탈이라 발이 미끄러져 못 오르겠다.\n뿔영감 같은 산양 발굽이라면 오를 텐데.':'언 비탈이라 발이 미끄러져 못 오르겠다.\n이 비탈을 딛고 오를 발이 있어야 해.');};   // 결정 D-1433
+  /* 결정 D-1433 (사용자 피드백 2026-11-10 "보스전 갈 때 미끄러운 길은 산양 변신이 아니면 갈 수 없게"): 골렘에게 가는 언 비탈은 산양만 오른다.
+     다른 모습은 첫 비탈 들머리(GOAT_ONLY_X)에서 더 나아가지 못하고(뛰어도 못 넘는다) 비탈을 미끄러져 내려온다.
+     이미 그 너머에 있으면(꼭대기에서 모습을 바꿈) 막지 않아, 내려오는 길은 늘 열려 있다. */
+  //  비탈 좌표와 G.px 는 줄인 뒤의 자리이고, 엔진은 maxX 가 돌려준 값을 다시 줄이므로(core.js trimRegion) 줄이기 전 자리로 돌려준다.
+  const GOAT_ONLY_X=SHRINE_SLOPES[0].x1+14;
+  Rg.zones.shrine.maxX=()=>{const c=Rg.trimCuts?.shrine,full=fieldWidth()-edgeMargin(Rg.zones.shrine,'right');
+    if(G.form==='goat'||G.px>GOAT_ONLY_X+8)return untrimX(full,c);
+    if(G.px>=GOAT_ONLY_X-1)Rg.zones.shrine.slip();
+    return untrimX(GOAT_ONLY_X,c);};
   Rg.zones.gate.doors=[
     // 장승 둘은 고갯길 경치(art.js scenery)가 그린다. 들어설 때 비켜 선다 (결정 D-166)
     {id:'dol_depth_gate',depth:true,gate:true,x:1650,to:'cliff',toX:100,label:'장승 사이, 먼 돌산으로 · ↑ / E',need:permit,reason:gateReason,draw:()=>{},drawBlocked:()=>{}},   // 결정 D-264: 장승 사이 금줄은 고갯길 경치(art.js)가 그린다. 틀을 따로 세우지 않는다

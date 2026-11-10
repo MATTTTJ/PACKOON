@@ -65,6 +65,7 @@ async function runMap({browser:b,outDir}){
     await b.send('Emulation.setEmulatedMedia',{features:[]});await b.eval('G.px=70;G.cam=0');
     // 격리 조건: 출발 구역과 이웃 구역만 실제 changeZone을 거쳐 방문한 상태로 만든다.
     const pair=await b.eval('({region:G.region,from:G.zone,to:Object.keys(REG.zones).find(id=>id!==G.zone)})');
+    await b.eval('(closePanels(),1)');   // 결정 D-1411: 지도 해금 속말이 화면을 멈춘다. 넘긴 뒤에 구역을 옮긴다
     await b.eval(`changeZone(${j(pair.to)})`);await b.until('!zoneMotion&&zoneFade===0');
     await b.eval(`changeZone(${j(pair.from)})`);await b.until('!zoneMotion&&zoneFade===0');
     await b.key('m');await b.until("!$('map').hidden");
