@@ -23,7 +23,9 @@ const scenes = [
   { region: 'jangteo', label: '시루가 깬 뒤 쌀이 다 떨어짐 (예전엔 쌀 갈기만 떴다)', f: { bueongNight: true, morakMet: true, morakPowder: true, steamDone: true, yeotMet: true, yeotDone: true }, inv: { pat: 1 }, awake: ['siru'], goal: /떡 재료/, guide: /엿방울/, notGuide: /맷돌에 갈아/ },
   { region: 'jangteo', label: '시루가 깨기 전에 팥과 쌀가루를 미리 구해 둠', f: { bueongNight: true, morakMet: true, morakPowder: true, steamDone: true, yeotMet: true, yeotDone: true }, inv: { pat: 1, ssal_powder: 2 }, awake: ['siru'], goal: /팥시루떡/, guide: /시루에 넣어/ },
   { region: 'jangteo', label: '낮에 팥시루떡을 다 쪄 둠', f: { bueongNight: true, morakMet: true, morakPowder: true, steamDone: true, night: false }, inv: { patsirutteok: 1 }, awake: ['siru'], goal: /고사떡/, guide: /밤/ },
-  { region: 'jangteo', label: '도깨비를 물리친 뒤 쌀도 쌀가루도 없음', f: { bueongNight: true, bueongDone: true, morakMet: true, morakPowder: true, steamDone: true, yeotMet: true, yeotDone: true }, inv: { nunhongsi: 1 }, awake: ['siru'], boss: true, goal: /홍시 약떡/, guide: /엿방울|솔방울/ },
+  // 결정 D-1440: 도깨비 뒤엔 홍시 약떡이 아니라 행수의 셈과 상단 행렬이다
+  { region: 'jangteo', label: '도깨비를 잡은 그믐밤', f: { bueongNight: true, bueongDone: true, morakMet: true, morakPowder: true, steamDone: true, yeotMet: true, yeotDone: true, night: true, jxSangdanCleared: true }, awake: ['siru'], boss: true, goal: /상단 셈/, guide: /아침/ },
+  { region: 'jangteo', label: '설날 아침 행수의 셈을 받은 뒤', f: { bueongNight: true, bueongDone: true, morakMet: true, morakPowder: true, steamDone: true, yeotMet: true, yeotDone: true, night: false, jxSangdanCleared: true, jxSangdanPaid: true }, awake: ['siru'], boss: true, goal: /북쪽 영산/, guide: /행수/ },
   // 영산
   { region: 'yeongsan', label: '날쌘을 만나기 전에 설피 재료를 모아 둠', f: { nalYTalk: true }, inv: { darae_vine: 2, jip: 1 }, goal: /설피/, guide: /모였다/ },
   { region: 'yeongsan', label: '살금이를 만나기 전에 마가목 셋을 따 둠', f: { nalYTalk: true, seolpi: true, salgMet: true }, inv: { magamok: 3 }, guide: /살금이에게 건네/ },

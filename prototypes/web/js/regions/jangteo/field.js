@@ -69,7 +69,8 @@ Rg.drawBack=()=>{drawSky();drawGround();};
 Rg.drawScenery=()=>{
   [140,470,560,760,850].forEach((wx,i)=>drawStall(wx,i));
   drawInn();drawStore();drawForest();drawLogsSnow();
-  const sx=2338-cam;if(G.f.hongsiMade&&sx<W+20){R(sx,GROUND-26,2,26,'#6b4423');R(sx-8,GROUND-26,18,8,'#c9a27a');R(sx+6,GROUND-24,2,4,'#6b4423');}
+  // 결정 D-1440: 북쪽 길표는 도깨비를 잡으면 선다 (예전엔 약떡을 보낸 뒤)
+  const sx=2338-cam;if((G.boss.dead||G.f.hongsiMade)&&sx<W+20){R(sx,GROUND-26,2,26,'#6b4423');R(sx-8,GROUND-26,18,8,'#c9a27a');R(sx+6,GROUND-24,2,4,'#6b4423');}
 };
 Rg.drawPickup=(a,x,bob)=>{
   // 결정 D-318: 짐짝에서 샌 콩과 마구간에서 흘린 짚도 줍는다. 솔방울이 아닌 것은 그 모양으로.
@@ -190,16 +191,17 @@ Rg.step=()=>{
     G.pickups=Rg.newState().pickups;G.px=60;G.py=GROUND;G.vy=0;G.cam=0;
   }
   Rg.snowEncounter();   // 결정 D-684: 창고를 지키면 기척이 먼저 다가온다
-  if(has('hongsi_tteok')&&!G.f.hongsiMade)Rg.sendMedicine();
 };
 Rg.onHit=()=>{};
 Rg.faint=()=>{G.px=Math.max(60,G.px-80);think('아이코, 미끄러졌다. 살살 다시 가자.');};
-/* 도깨비를 이기거나 달래면 훔쳐 간 설 제수가 돌아온다. 눈홍시는 보따리로 */
+/* 도깨비를 이기거나 달래면 훔쳐 간 설 제수가 돌아온다.
+   결정 D-1441: 전리품은 좋은 품질의 재료인 얼음 뿔이다 (사용자 지시 2026-11-11 큰 장터 7 "보스 전리품은 엄마 약일 필요가 없다. 좋은 품질의 재료를 루팅").
+   이기면 무너진 눈 더미에 부러진 뿔이 남고, 달래면 도깨비가 뿔 끝을 꺾어 준다(고마움을 아는 도깨비, 불씨와 같은 결). 예전엔 눈홍시를 받았다 */
 Rg.bossDie=calm=>{
-  G.boss.dead=true;addItem('nunhongsi',1);
+  G.boss.dead=true;addItem('nundok_horn',1);
   if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
-  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔다. 발자국은 남았어도 몸이 보이지 않으니 아무도 임자를 못 봤던 것이다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
-  think('눈홍시다! 시루에 찌면 홍시 약떡이 되겠다.');refreshGoal();
+  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔다. 발자국은 남았어도 몸이 보이지 않으니 아무도 임자를 못 봤던 것이다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 고맙다며 이마의 얼음 뿔 끝을 꺾어 건넸다.':' 무너진 눈 더미에서 부러진 얼음 뿔을 주웠다.')+' 손에 쥐어도 녹지 않는 귀한 재료다.'+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
+  think((calm?'도깨비가 꺾어 준 얼음 뿔이다.':'부러진 얼음 뿔이다.')+' 꽉 쥐어도 녹지 않는다.\n장에 내면 값을 꽤 받을 귀한 재료다.');refreshGoal();
 };
 Rg.STORE_X=STORE_X;
 
@@ -421,8 +423,8 @@ if(!CLASSIC){
       }
       if(id==='warehouse')Rg.snowEncounter();   // 결정 D-684
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
+        // 결정 D-1437: 모락 일을 다 마친 뒤 뜨던 속말 "떡집 앞 줄이 짧아졌네."를 뺐다 (사용자 피드백 2026-11-11 큰 장터 3). 일기는 남긴다
         G.f.jxHubChanged=true;diary('jx_hub','모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.');
-        think('떡집 앞 줄이 짧아졌네.');
       }
     },
   });

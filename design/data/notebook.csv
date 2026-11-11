@@ -102,7 +102,7 @@ solbang,jangteo,솔방울,물건,나,got:solbang,처음 얻을 때,(items.csv �
 pat,jangteo,팥,물건,나,got:pat,처음 얻을 때,(items.csv 의 설명),제안,아빠 그림 있음,관찰
 pat,jangteo,팥,물건,아빠,,처음부터,설 고사떡에는 붉은 팥. 잡귀를 쫓는다.,제안,,아빠 수첩
 dokkaebibul,jangteo,도깨비불씨,물건,나,got:dokkaebibul,처음 얻을 때,(items.csv 의 설명),제안,,관찰
-nunhongsi,jangteo,눈홍시,물건,나,got:nunhongsi,처음 얻을 때,(items.csv 의 설명),제안,,관찰
+nundok_horn,jangteo,얼음 뿔,물건,나,got:nundok_horn,처음 얻을 때,(items.csv 의 설명),제안,결정 D-1441 (예전 눈홍시 쪽은 뺐다),관찰
 nal,yeongsan,날쌘,동물,나,nal:yeongsan,날쌘이 아빠와의 일을 털어놓았을 때,아빠와 같은 보부상단이었다고 털어놓았다. 아빠는 날쌘을 끝까지 얕보지 않았다고.,제안,,관찰
 nal,yeongsan,날쌘,동물,나,nal:tosi,신표를 가지고 설피를 받았을 때,신표를 보더니 털토시를 얹어 줬다. 덤이 아니라 신표 단 보부상끼리 주는 거란다.,제안,,관찰
 nal,yeongsan,날쌘,동물,나,nal:jujube_for_dad,아빠를 만났다고 말할 때,아빠가 나를 알아보거든 갖다주라며 대추 두 알을 묶어 맡겼다. 자기가 줬다고는 하지 말라고.,제안,결정 D-120 사연,관찰

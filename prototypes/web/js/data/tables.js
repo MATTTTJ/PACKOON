@@ -271,7 +271,7 @@ const TABLES={
    "r": 2,
    "kind": "귀한 것",
    "region": "jangteo",
-   "d": "아빠의 글씨. \"값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산. 이름 불러도 돌아보지 말 것.\""
+   "d": "아빠의 글씨. \"값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산.\""
   },
   "dad_tag": {
    "n": "아빠의 짐표",
@@ -317,6 +317,14 @@ const TABLES={
    "kind": "귀한 것",
    "region": "jangteo",
    "d": "꺼지지 않는 푸른 불씨. 손에 쥐어도 뜨겁지 않다."
+  },
+  "nundok_horn": {
+   "n": "얼음 뿔",
+   "r": 3,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "눈도깨비 이마에서 뒤로 휘어 솟았던 얼음 뿔. 손에 쥐어도 녹지 않고 속에서 푸른 빛이 돈다. 장에 내면 값을 꽤 받는 귀한 재료.",
+   "u": "토막"
   },
   "nunhongsi": {
    "n": "눈홍시",
@@ -1227,14 +1235,6 @@ const TABLES={
      "memil_powder": 2
     },
     "out": "memiltteok",
-    "n": 1
-   },
-   {
-    "need": {
-     "nunhongsi": 1,
-     "ssal_powder": 1
-    },
-    "out": "hongsi_tteok",
     "n": 1
    },
    {
@@ -2531,7 +2531,7 @@ const TABLES={
    "lines": []
   },
   {
-   "id": "nunhongsi",
+   "id": "nundok_horn",
    "region": "jangteo",
    "kind": "item",
    "lines": []
@@ -4206,7 +4206,7 @@ const TABLES={
   },
   {
    "region": "jangteo",
-   "done": "hongsiMade",
+   "done": "ended",
    "options": [
     {
      "sinpyo": 1
@@ -4234,15 +4234,6 @@ const TABLES={
     },
     {
      "magamok": 3
-    }
-   ]
-  },
-  {
-   "region": "jangteo",
-   "done": "hongsiMade",
-   "options": [
-    {
-     "hongsi_tteok": 1
     }
    ]
   },
