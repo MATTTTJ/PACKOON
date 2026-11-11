@@ -2475,7 +2475,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "서리 뿔을 이고 어깨옷을 빳빳이 세운 눈도깨비. 독수리는 날갯짓으로 땅에서 솟는 소용돌이를 일으키고, 곰은 굵은 발톱 세 줄로 긁고, 멧돼지는 보이지 않게 날뛰며 발자국만 찍고 땅을 울린다. 다 피해 내면 그 모습 그대로 지쳐 헐떡이고 푸른 심장이 드러난다. 심장을 치면 둔갑이 풀린다.",
+     "text": "서리 뿔을 이고 어깨옷을 빳빳이 세운 눈도깨비. 독수리는 날갯짓으로 땅에서 솟는 소용돌이를 일으키고, 곰은 굵은 발톱 세 줄로 긁고, 멧돼지는 보이지 않게 날뛰며 발자국만 찍고 땅을 울린다. 둔갑 공격이 끝나면 그 모습 그대로 지쳐 헐떡이고 푸른 심장이 드러난다. 심장을 치면 둔갑이 풀린다.",
      "section": "관찰",
      "when": "fight:dokkaebi"
     },
@@ -3983,8 +3983,6 @@ const TABLES={
   "think_stop_base_ms": 700,
   "think_stop_char_ms": 35,
   "think_stop_max_ms": 2200,
-  "nundok_gloat_hits": 1,
-  "nundok_gloat_frames": 45,
   "gather_min_gap": 48,
   "gather_dig_interact_gap": 58,
   "gather_interact_gap": 42,

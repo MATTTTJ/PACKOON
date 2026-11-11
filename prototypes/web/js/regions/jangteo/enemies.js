@@ -16,11 +16,11 @@
      - 곰(결정 D-764): 앞발로 긁는다. 발톱 세 줄이 먼저 붉게 그어지고 굵고 빠르게 긁는다. 땅에 세 줄 자국이 남는다(ndClaw).
      - 멧돼지(결정 D-763): 몸은 판 위에서 사라지고, 판 안에는 발자국만 어지러운 길을 따라 찍히며 달려든다(ndRush).
    결정 D-1450: 약점은 다시 심장이다 (사용자 지시 2026-11-11 큰 장터 6·7: 눈홍시는 게임에서 뺀다. D-940의 눈홍시를 바꾼다).
-     둔갑 패턴을 잘 피하면(이번 공격에 nundok_gloat_hits 번 맞지 않으면) 눈도깨비가 **그 둔갑 모습 그대로** 지쳐 헐떡이고,
+     둔갑 패턴이 끝나면 눈도깨비가 **그 둔갑 모습 그대로** 지쳐 헐떡이고,
      가슴과 판의 얼음 속에서 심장이 드러난다. 심장은 찬 얼음 껍질 속에 푸른 도깨비불이 타는 모습이고(이기면 남는 도깨비불씨),
      둔갑마다 둘레가 다르다: 독수리는 검은 깃 사이, 곰은 털가죽과 흰 반달 속, 멧돼지는 곤두선 싸리 갈기 밑, 발악 뒤 본모습은 얼음덩이 속.
      심장을 치면 그 둔갑의 내구도가 깎이고 둔갑이 풀려 본모습으로 돌아온다. 연장이 있으면 nundok_spill_chance 확률로 소매 속 재료가 쏟아진다.
-     맞으면 기세가 올라 지치지 않고 다음 둔갑으로 간다. 심장은 날아가거나 떨어지지 않는다(골렘의 핵이 칸 한가운데 드러나는 것과 같은 방식).
+     결정 D-1460: 맞았어도 지친다(예전엔 nundok_gloat_hits 번 맞으면 기세가 올라 지치지 않았다. 사용자 지시 2026-11-11 공통). 심장은 날아가거나 떨어지지 않는다(골렘의 핵이 칸 한가운데 드러나는 것과 같은 방식).
    결정 D-1456: 수리부엉이가 아닌 모습으로 싸움에 들어오면 눈도깨비가 밖에서처럼 눈보라에 싸여 흐리게 보이고, 공격(예고 포함)도 흐리다(bulletAlpha).
      싸우다 한 번이라도 수리부엉이가 되면 정체가 드러나 끝까지 또렷하다. 발악의 빙산은 D-880 규칙 그대로다(수리부엉이 모습일 때만 또렷).
    결정 D-683: 둔갑 둘이 풀리면(체력이 적으면) 발악한다. 몸을 감추고, 보이지 않는 빙산이 발밑에서 솟는다.
@@ -38,7 +38,7 @@ const FORMS={eagle:'독수리',bear:'곰',boar:'멧돼지'};
 /* 결정 D-1456: veiled 는 수리부엉이가 아닌 모습으로 싸움에 들어왔을 때 켜지고, 싸우다 수리부엉이가 되면 꺼진 뒤 다시 켜지지 않는다 */
 function nd(){
   if(B.nd)return B.nd;
-  B.nd={shown:'',swap:0,scars:[],prints:[],waves:[],flap:0,reveal:0,hidSaid:false,tired:false,reverted:false,hitsAt:0,heartSaid:false,bergWarned:false,veiled:battleForm()!=='owl'};
+  B.nd={shown:'',swap:0,scars:[],prints:[],waves:[],flap:0,reveal:0,hidSaid:false,tired:false,reverted:false,heartSaid:false,bergWarned:false,veiled:battleForm()!=='owl'};
   if(B.nd.veiled)G.f.ndVeiledFought=true;   // 진 뒤 귀띔이 밤눈을 떠올린다 (jangteo/story.js)
   return B.nd;
 }
@@ -383,7 +383,7 @@ function drawBoar(c,cx,cy,opt={}){
 
 /* 눈도깨비 그리기: 지금 둔갑에 따라 모습이 바뀐다. 숨은 동안은 거의 보이지 않고, 수리부엉이 눈에만 윤곽이 보인다 */
 let ghostCanvas=null;
-/* 결정 D-1450: 둔갑 패턴을 피해 내면 그 둔갑 모습 그대로 지친다(B.st open + tired). 심장을 치면(reverted) 본모습으로 돌아와 헐떡인다.
+/* 결정 D-1450: 둔갑 패턴이 끝나면(D-1460: 맞았어도) 그 둔갑 모습 그대로 지친다(B.st open + tired). 심장을 치면(reverted) 본모습으로 돌아와 헐떡인다.
    발악(core) 뒤에는 본모습으로 드러나 지친다 */
 function shownForm(){
   const n=nd();
@@ -488,7 +488,7 @@ const TWIST={gap:62,n:3,grow:40,life:190,fade:22,arm:16,tall:0.42,wide:32,speed:
   flurry:58,flurrySpeed:1.5,flurryFall:0.42,flurryR:7};
 // 곰 (결정 D-764): 굵고 빠른 발톱 세 줄
 // 결정 D-1451: 곰은 심장이 거의 안 나왔다. 예고가 24틀이라 너구리 손(2.7px/틀)으로는 반응한 뒤 62px 너비의 세 줄 밖으로 못 빠져나가
-//   늘 맞았고, 한 대라도 맞으면 지치지 않는다(D-940 nundok_gloat_hits). 예고를 36틀로 늘리고 판정 반지름을 10으로 줄였다.
+//   늘 맞았고, 한 대라도 맞으면 지치지 않았다(D-940 nundok_gloat_hits, D-1460으로 지웠다). 예고를 36틀로 늘리고 판정 반지름을 10으로 줄였다.
 //   한 손 긁기 세 번 뒤 마지막으로 두 앞발을 엇갈려 긋는다(both: X 자 여섯 줄, 예고 46틀) (사용자 지시 2026-11-11 큰 장터 6 곰)
 const CLAW={gap:52,tell:36,strike:5,stay:16,len:230,sep:20,n:3,hit:10,both:{tell:46,a:0.62}};
 // 멧돼지 (결정 D-763): 발자국만 어지러운 길을 따라 찍힌다
@@ -712,7 +712,7 @@ function checkUnveil(){
   n.veiled=false;n.swap=22;B.msg=UNVEIL;G.f.ndUnveiled=true;Sound.playSfx('battle_warn');
 }
 function pickNundok(){
-  const n=nd();n.scars=[];n.prints=[];n.waves=[];n.tired=false;n.reverted=false;n.hitsAt=B.hits;
+  const n=nd();n.scars=[];n.prints=[];n.waves=[];n.tired=false;n.reverted=false;
   checkUnveil();
   const animals=B.parts.filter(p=>!p.core&&!p.broken),core=part('core'),gone=B.parts.filter(p=>!p.core&&p.broken).length,first=!B.last;
   let p;
@@ -727,8 +727,8 @@ function pickNundok(){
     else bLater(after,34);
   }
 }
-/* 결정 D-1450: 둔갑 패턴을 잘 피했으면 눈도깨비가 그 둔갑 모습 그대로 지쳐 헐떡이고, 가슴과 판의 얼음 속에서 그 둔갑의 심장이 드러난다
-   (날아가거나 떨어지지 않는다). 이번 공격에 nundok_gloat_hits 번 맞았으면 기세가 올라 지치지 않는다(빈틈 없이 다음 둔갑으로).
+/* 결정 D-1450: 둔갑 패턴이 끝나면 눈도깨비가 그 둔갑 모습 그대로 지쳐 헐떡이고, 가슴과 판의 얼음 속에서 그 둔갑의 심장이 드러난다
+   (날아가거나 떨어지지 않는다). 결정 D-1460: 맞았어도 지친다. 예전엔 nundok_gloat_hits 번 맞으면 기세가 올라 빈틈 없이 다음 둔갑으로 갔다.
    발악(숨어서 빙산)이 끝나면 늘 본모습으로 드러나 지친다. 처음 드러날 때 한 번만 그것이 심장인 줄 아이가 알아챈다. */
 const OPEN_MSG={eagle:'독수리 모습 그대로 눈도깨비가 헐떡인다. 처진 깃 사이로 푸른 심장이 비친다.',
   bear:'곰 모습 그대로 눈도깨비가 헐떡인다. 털가죽 속에서 푸른 심장이 비친다.',
@@ -737,11 +737,8 @@ const OPEN_MSG={eagle:'독수리 모습 그대로 눈도깨비가 헐떡인다. 
 const OPEN_VEILED='눈보라 속에서 거친 숨소리가 난다. 푸른 빛 하나가 뛴다.';
 const HEART_FIRST='눈도깨비가 숨을 몰아쉰다. 얼어붙은 가슴 속에서 푸른 불이 뛴다. …저게 심장이다!';
 const HEART_FIRST_VEILED='눈보라 속에서 거친 숨소리가 난다. 푸른 불 하나가 뛴다. …저게 심장인가!';
-const NO_GROGGY='한 대 먹인 눈도깨비가 기세등등하다. 지치지 않는다.';
 function nundokOpen(p){
   const n=nd();
-  // 기세를 올린 동안(nundok_gloat_frames)은 표식이 없어도 숨을 고르는 틈이라 선물은 건넬 수 있다 (battle.js B.openHold)
-  if(!p.core&&B.hits-n.hitsAt>=T().nundok_gloat_hits){n.tired=false;B.mark=null;B.openHold=T().nundok_gloat_frames;B.msg=NO_GROGGY;return true;}
   let x,y;
   const z=bMarkZone();   // 결정 D-876: 판 안쪽에만
   for(let k=0;k<30;k++){x=z.x1+Math.random()*(z.x2-z.x1);y=z.y1+Math.random()*(z.y2-z.y1);if(Math.hypot(x-B.px,y-B.py)>=70)break;}
