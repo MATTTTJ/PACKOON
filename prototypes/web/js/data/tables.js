@@ -4059,8 +4059,8 @@ const TABLES={
   "rest_return_back": 16,
   "field_stamp_revisit_margin": 12,
   "nundok_revert_frames": 40,
-  "nundok_veil_body": 0.16,
-  "nundok_veil_attack": 0.32
+  "nundok_veil_body": 0,
+  "nundok_veil_attack": 0.45
  },
  "PROGRESS": [
   {

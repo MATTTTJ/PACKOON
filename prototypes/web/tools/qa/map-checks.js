@@ -101,6 +101,20 @@ async function runMap({browser:b,outDir}){
     check(arrival.x>=16&&arrival.x<=arrival.width-16&&arrival.y===arrival.ground,'map-arrival','까치가 도착 구역의 유효 바닥에 내려놓지 않았다.',arrival);
     check(Math.min(arrival.x,arrival.width-arrival.x)<=200,'map-arrival-edge','까치가 구역 가장자리 근처에 내려놓지 않았다.',arrival);
     records.push({stage:'same-region',pair,arrival});
+    // 결정 D-1457: 둔갑한 채 날면 둔갑마다 나르는 모습이 다르고, 날아가는 동안과 내려앉은 뒤에도 그 둔갑 그대로다
+    b.scene='map / form flight';
+    for(const [i,form] of ['squirrel','goat','owl','otter'].entries()){
+      const to=i%2?pair.to:pair.from;
+      await b.eval(`(()=>{if(!G.forms.includes(${j(form)}))G.forms.push(${j(form)});G.f.formIntroQ=[];setForm(${j(form)},{force:true,quiet:true});})()`);
+      await b.key('m');await b.until("!$('map').hidden");await b.click(button(pair.region,to));await b.click('#mapTravel');
+      await b.until('!!mapTravel&&mapTravel.elapsed/mapTravel.duration>=0.45');
+      const mid=await b.eval('({flying:mapTravel.form,now:G.form})');await picture('map-flight-'+form);
+      await b.until(`!mapTravel&&G.zone===${j(to)}`);
+      const landed=await b.eval('G.form');
+      check(mid.flying===form&&mid.now===form&&landed===form,'map-flight-form','둔갑한 채 날아갈 때 날아가는 동안이나 내려앉은 뒤에 둔갑이 바뀌었다.',{form,mid,landed});
+      records.push({stage:'form-flight',form,mid,landed});
+    }
+    await b.eval("setForm('',{force:true,quiet:true})");
     await b.eval("talk([['너구리','…']])");await b.key('m');
     check(await b.eval("$('map').hidden&&!$('dlg').hidden&&$('toast').textContent.length>0"),'map-busy','대화 중 지도가 열리거나 안내 없이 입력을 버렸다.');
     await b.key('e');await b.until("$('dlg').hidden");

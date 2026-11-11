@@ -216,7 +216,7 @@ function startMapTravel(region,zone){
   closeMap(false);closePanels();suppressHeldInputs();cancelPickup();
   const image=document.createElement('canvas');image.width=W;image.height=H;drawFieldScene(false);image.getContext('2d').drawImage(cv,0,0);
   mapTravel={owner:G,from:{region:G.region,zone:G.zone,x:G.px-cam,y:G.py},to:{region,zone},image,
-    elapsed:0,duration:TABLES.TUNING.map_flight_ms,last:performance.now(),arrived:false,paused:document.hidden,wing:0};
+    elapsed:0,duration:TABLES.TUNING.map_flight_ms,last:performance.now(),arrived:false,paused:document.hidden,wing:0,form:G.form||''};   // 결정 D-1457: 날아가는 동안의 모습
   G.vx=G.vy=G.attackT=0;document.body.classList.add('map-flying');$('endScreen').hidden=true;
   $('mapCaption').hidden=false;$('prompt').hidden=true;$('toast').hidden=true;Sound.playSfx('magpie_wings');
   if(Vfx.reducedMotion)finishMapTravel();return true;
@@ -232,7 +232,9 @@ function arriveMapTravel(m){
 function finishMapTravel(){
   const m=mapTravel;if(!m)return;
   if(m.owner!==G){resetMap();return;}
-  arriveMapTravel(m);mapTravel=null;$('mapCaption').hidden=true;document.body.classList.remove('map-flying');
+  arriveMapTravel(m);mapTravel=null;$('mapCaption').hidden=true;
+  // 결정 D-1457: 떠날 때의 둔갑으로 내려앉는다 (D-722, 사용자 피드백 2026-11-11 8 "도착할 때까지 유지")
+  if(m.form!==(G.form||'')&&hasForm(m.form))setForm(m.form,{force:true,quiet:true,scripted:true});document.body.classList.remove('map-flying');
   suppressHeldInputs();lastNear=null;refreshHud();writeSave(true);
 }
 function stepMapTravel(){
@@ -263,28 +265,25 @@ function drawMapTravel(){
   const smooth=lift*lift*(3-2*lift);
   const x=t<.26?m.from.x+(W*.5-m.from.x)*smooth:t>=.72?G.px-cam+(W*.5-(G.px-cam))*smooth:W*.5;
   const floor=t<.26?m.from.y:fieldGround(),y=floor+(110-floor)*smooth;
-  drawMagpieCarrier(x,y,t);
+  drawMagpieCarrier(x,y,t,m.form||'');
 }
 /* 결정 D-504: 보자기는 튼튼한 까치 둘이 양쪽에서 맞잡아 나른다 (사용자 피드백 2026-11-04: 늙은 까치 곁에 나오는 두 마리와 맞게,
-   적당히 근육질의 두툼한 까치 둘만). 보자기 두 귀를 묶은 매듭을 굵은 발로 움켜쥐고, 가슴이 두툼하다. 둘은 서로 마주 본다. */
-function drawMagpieCarrier(x,y,t){
+   적당히 근육질의 두툼한 까치 둘만). 보자기 두 귀를 묶은 매듭을 굵은 발로 움켜쥐고, 가슴이 두툼하다. 둘은 서로 마주 본다.
+   결정 D-1457 (사용자 피드백 2026-11-11 8 "까치 타고 날아갈 때 변신폼에 따라 다르게"): 나르는 모습은 떠날 때의 둔갑을 따르고,
+   내려앉을 때까지 그 모습 그대로다.
+   - 너구리: 위 D-504 그대로 보자기에 앉는다.
+   - 다람쥐: 가벼워서 까치 한 마리가 등에 태운다. 다람쥐는 등에 엎드려 붙는다.
+   - 산양: 무거워서 까치 넷이 크고 축 처진 보자기를 들고 날갯짓이 빠르다. 산양은 보자기에 다리가 묻힌 채 선다.
+   - 수리부엉이: 제 날개로 난다. 까치 둘은 앞뒤에서 길을 잡는다(보자기 없음).
+   - 수달: 긴 몸으로 보자기에 배를 걸치고 엎드려, 꼬리가 보자기 밖으로 늘어진다. */
+function drawMagpieCarrier(x,y,t,form=''){
   const fold='#ae6757',edge='#713e36',ink='#292d31',white='#f5eedc',sheen='#4f6a7a',beak='#3a3530',leg='#2a2420';
   ctx.save();ctx.translate(Math.round(x),Math.round(y));
   const approach=t<.1?(1-t/.1)*68:t>.94?(t-.94)/.06*68:0,holding=approach===0;
-  // 보자기: 아래가 불룩하고 양쪽 귀를 위로 묶었다. 까치가 쥐고 있을 때만 귀가 위로 당겨진다
-  R(-28,-8,56,11,fold);R(-22,3,44,5,fold);R(-17,8,34,3,edge);
-  const knots=[[-23,-25],[23,-25]];
-  knots.forEach(([kx,ky],n)=>{const bx=n?24:-24,by=-7,ty=holding?ky:-12;
-    for(let k=0;k<=12;k++){const q=k/12;R(bx+(kx-bx)*q-1,by+(ty-by)*q,3,2,fold);}
-    R(kx-2,ty-1,5,3,edge);});
-  // 보따리에 앉은 아이. 머리는 기존 한국 보부상 모자의 평평한 챙을 따른다.
-  R(-6,-15,13,12,'#8c8070');R(-4,-12,8,8,'#d9c7a5');R(-10,-3,8,4,ink);R(3,-3,8,4,ink);
-  R(-8,-28,17,13,'#8c8070');R(-8,-23,17,4,ink);R(-5,-22,2,1,white);R(4,-22,2,1,white);
-  R(-6,-18,13,3,white);R(-10,-30,22,3,'#c39b55');R(-5,-37,12,7,'#dcbb7a');R(-5,-32,12,2,'#6e4f22');
-  // 까치 한 마리 (face 1이면 오른쪽을 본다). 발은 (bx+1~6, by+8) 에서 매듭을 쥔다
-  const bird=(bx,by,face,i)=>{
+  // 까치 한 마리 (face 1이면 오른쪽을 본다). 발은 (bx+1~6, by+8) 에서 매듭을 쥔다. flap 이 크면 날갯짓이 빠르다
+  const bird=(bx,by,face,i,flap=62)=>{
     const q=(dx,dy,w,h,c)=>R(face>0?bx+dx:bx-dx-w+1,by+dy,w,h,c);
-    const up=Math.sin(t*62+i*1.8)>0;
+    const up=Math.sin(t*flap+i*1.8)>0;
     q(-26,-5,12,3,ink);q(-30,-3,9,2,ink);q(-24,-6,8,1,sheen);                    // 긴 꽁지
     if(!up){q(-11,-3,15,8,ink);q(-14,4,9,3,ink);q(-13,6,5,2,white);q(-9,-2,10,2,sheen);}   // 내린 날개
     q(-13,-11,23,12,ink);q(5,-10,7,10,ink);                                      // 두툼한 몸과 불룩한 가슴
@@ -295,7 +294,39 @@ function drawMagpieCarrier(x,y,t){
     if(up){q(-11,-23,15,12,ink);q(-14,-27,9,5,ink);q(-14,-26,5,2,white);q(-9,-20,11,2,sheen);}   // 든 날개
     q(0,1,3,7,leg);q(5,1,3,7,leg);q(-1,7,10,2,leg);                              // 굵은 다리와 움켜쥔 발
   };
-  bird(-30,-34-approach,1,0);bird(30,-34-approach,-1,1);
+  // 보자기: 아래가 불룩하고 귀를 위로 묶었다. 까치가 쥐고 있을 때만 귀가 위로 당겨진다. hw 반 너비, sag 처짐, cords [보자기 귀 x, 매듭 x, 매듭 y]
+  const sack=(hw,sag,cords)=>{
+    R(-hw,-8,hw*2,11+sag,fold);R(-hw+6,3+sag,hw*2-12,5,fold);R(-hw+11,8+sag,hw*2-22,3,edge);
+    for(const [bx,kx,ky] of cords){const by=-7,ty=holding?ky:-12;
+      for(let k=0;k<=12;k++){const q=k/12;R(bx+(kx-bx)*q-1,by+(ty-by)*q,3,2,fold);}
+      R(kx-2,ty-1,5,3,edge);}
+  };
+  const PAIR=[[-24,-23,-25],[24,23,-25]];
+  if(form==='squirrel'){
+    // 등이 아이 발밑에 오게 낮게 난다. 내려오는 동안 다람쥐는 땅에서 기다렸다가 등에 오른다
+    const by=8-approach;bird(2,by,1,0);
+    if(holding){drawFormAt(-1,by-9,1,0,'squirrel');R(-14,by-21,3,2,'#d08a4f');}   // 바람에 젖혀진 꼬리 끝
+    else drawFormAt(0,0,1,0,'squirrel');
+  }else if(form==='goat'){
+    sack(36,3,[[-32,-49,-25],[-12,-17,-49],[12,17,-49],[32,49,-25]]);
+    drawFormAt(0,1,1,0,'goat');R(-14,-6,28,8,fold);R(-14,-6,28,1,edge);   // 다리는 보자기에 묻힌다
+    bird(-24,-58-approach,1,2,90);bird(24,-58-approach,-1,3,90);bird(-56,-34-approach,1,0,90);bird(56,-34-approach,-1,1,90);
+  }else if(form==='owl'){
+    drawFormAt(0,holding?Math.round(Math.sin(t*50)*2):0,1,0,'owl',0,holding);   // 날개를 펴고 제 힘으로 날며 날갯짓마다 살짝 오르내린다
+    bird(44,-24-approach,1,0);bird(-46,-8-approach,1,1);
+  }else if(form==='otter'){
+    sack(28,0,PAIR);
+    otterSlideDraw=true;try{drawFormAt(2,-6,1,0,'otter');}finally{otterSlideDraw=null;}
+    R(-26,-11,5,2,'#4a3222');R(-30,-10,3,10,'#4a3222');R(-30,0,2,3,'#4a3222');   // 보자기 밖으로 늘어진 꼬리
+    bird(-30,-34-approach,1,0);bird(30,-34-approach,-1,1);
+  }else{
+    sack(28,0,PAIR);
+    // 보따리에 앉은 아이. 머리는 기존 한국 보부상 모자의 평평한 챙을 따른다.
+    R(-6,-15,13,12,'#8c8070');R(-4,-12,8,8,'#d9c7a5');R(-10,-3,8,4,ink);R(3,-3,8,4,ink);
+    R(-8,-28,17,13,'#8c8070');R(-8,-23,17,4,ink);R(-5,-22,2,1,white);R(4,-22,2,1,white);
+    R(-6,-18,13,3,white);R(-10,-30,22,3,'#c39b55');R(-5,-37,12,7,'#dcbb7a');R(-5,-32,12,2,'#6e4f22');
+    bird(-30,-34-approach,1,0);bird(30,-34-approach,-1,1);
+  }
   ctx.restore();
 }
 $('mapClose').onclick=()=>closeMap();
