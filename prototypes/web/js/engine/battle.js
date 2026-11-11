@@ -10,7 +10,7 @@
          부위의 mark?:붉은 표식에 쓸 글자(없으면 이름 첫 글자),
          backdrop?(c):상대 뒤쪽 화면 전체 배경(결정 D-58. 판정 상자와 글귀 줄 위로는 상자·글이 덮는다), goalText?:지금 할 일 글,
          showHands?:첫 선물 때 빈손을 펴 보이는 장면, pickAttack?():공격을 직접 고른다(B.bullets 를 넣고 B.st='tell'),
-         tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래), drawOver?(c):상자 밖까지 날아가는 탄(상자 위에 잘리지 않게, 결정 D-182),
+         tickHazards?():매 프레임 상자 안 환경 위험, drawFloor?(c):상자 안 바닥 그림(탄 아래), drawOver?(c):상자 밖까지 날아가는 탄(상자 위에 잘리지 않게, 결정 D-182), bulletAlpha?(탄):탄을 흐리게 그릴 투명도(결정 D-1456),
          finale?:{start(), step()→끝나면 true}(dodge 를 다 버틴 뒤 입력을 막는 마무리 연출. 그 뒤 'win'),
          possession?:{order:빙의 순서, attacks:부위별 시험판 공격, travel:불 이동 시간, wait:도착 뒤 대피 시간}, partPose?(id):그려진 부위 좌표,
          headPose?():그림의 머리 좌표, markPosition?(p):상자 안 되치기 표식 좌표, openMark?(p):공격 뒤 표식을 직접 정했으면 true,
@@ -710,6 +710,19 @@ function drawBonk(c){
     c.fillStyle=RED;c.font='bold 20px "Gowun Batang", serif';c.textAlign='center';c.fillText(B.bonkWord||'딱!',x+26,y-6);c.restore();}   // 결정 D-731: 무쇠의 마지막 꿀밤은 '콩!'
   if(B.toolFly){const f=B.toolFly;c.save();c.translate(f.x,f.y);c.rotate(f.rot);c.globalAlpha=0.9;drawTool(c,heldTool());c.restore();}
 }
+/* 결정 D-1456: 상대가 bulletAlpha(b)로 1보다 작은 값을 주면 그 탄들을 따로 그린 판에 모아 그만큼 흐리게 얹는다.
+   그리기 도구(brush·blob·sharp)가 투명도를 덮어쓰므로 탄마다 투명도를 곱하지 않고 판째 얹는다 (눈도깨비가 눈보라에 싸인 동안). */
+let veilCanvas=null;
+function veilLayer(c){
+  if(!veilCanvas)veilCanvas=document.createElement('canvas');
+  if(veilCanvas.width!==bcv.width||veilCanvas.height!==bcv.height){veilCanvas.width=bcv.width;veilCanvas.height=bcv.height;}
+  const g=veilCanvas.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,veilCanvas.width,veilCanvas.height);g.setTransform(c.getTransform());return g;
+}
+function drawBullets(c){
+  const fa=B.E.bulletAlpha;let g=null,alpha=1;
+  for(const b of B.bullets){const a=fa?fa(b):1;if(a>=1){BULLETS[b.k].draw(c,b);continue;}if(!g){g=veilLayer(c);alpha=a;}BULLETS[b.k].draw(g,b);}
+  if(g){c.save();c.setTransform(1,0,0,1,0,0);c.globalAlpha=alpha;c.drawImage(veilCanvas,0,0);c.restore();}
+}
 function bDraw(){
   if(!B)return;const c=bctx;c.setTransform(BDPR,0,0,BDPR,0,0);
   if(B.bonk>20)c.translate(Math.sin(B.bonk*2.3)*3,0);
@@ -735,7 +748,7 @@ function bDraw(){
   c.save();c.beginPath();c.rect(BOX.x,BOX.y,BOX.w,BOX.h);c.clip();
   if(B.E.drawFloor)B.E.drawFloor(c);
   if(B.E.possession)drawPossessedAttack(c);
-  for(const b of B.bullets)BULLETS[b.k].draw(c,b);
+  drawBullets(c);   // 결정 D-1456: 상대가 탄을 흐리게 그릴 수 있다 (bulletAlpha)
   // 결정 D-228: 칠 수 있는 곳은 금빛으로만 강조한다(빨강·먹은 피할 것). 도구 날(bAim)이 닿으면 더 밝게 빛난다.
   //   작은 도구 그림은 그 부위에 잘 먹는 도구다.
   if(B.mark){const m=B.mark;

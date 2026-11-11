@@ -902,7 +902,7 @@ const TABLES={
    },
    {
     "id": "core",
-    "name": "눈홍시",
+    "name": "심장",
     "hp": 4,
     "mat": "dokkaebibul",
     "core": true,
@@ -2475,7 +2475,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "서리 뿔을 이고 어깨옷을 빳빳이 세운 눈도깨비. 독수리는 날갯짓으로 땅에서 솟는 소용돌이를 일으키고, 곰은 굵은 발톱 세 줄로 긁고, 멧돼지는 보이지 않게 날뛰며 발자국만 찍는다. 둔갑이 끝날 때마다 얼음이 갈라지며 푸른 심장이 드러난다.",
+     "text": "서리 뿔을 이고 어깨옷을 빳빳이 세운 눈도깨비. 독수리는 날갯짓으로 땅에서 솟는 소용돌이를 일으키고, 곰은 굵은 발톱 세 줄로 긁고, 멧돼지는 보이지 않게 날뛰며 발자국만 찍고 땅을 울린다. 다 피해 내면 그 모습 그대로 지쳐 헐떡이고 푸른 심장이 드러난다. 심장을 치면 둔갑이 풀린다.",
      "section": "관찰",
      "when": "fight:dokkaebi"
     },
@@ -2499,7 +2499,7 @@ const TABLES={
     },
     {
      "who": "me",
-     "text": "달래면 훔친 것을 제자리에 돌려놓고 눈홍시를 하나 더 준다.",
+     "text": "달래면 훔친 것을 제자리에 돌려놓고 얼음 뿔 끝을 꺾어 준다.",
      "section": "관찰",
      "when": "calm:dokkaebi"
     }
@@ -4057,7 +4057,10 @@ const TABLES={
   "rest_range": 22,
   "rest_toast_gap_ms": 20000,
   "rest_return_back": 16,
-  "field_stamp_revisit_margin": 12
+  "field_stamp_revisit_margin": 12,
+  "nundok_revert_frames": 40,
+  "nundok_veil_body": 0.16,
+  "nundok_veil_attack": 0.32
  },
  "PROGRESS": [
   {
