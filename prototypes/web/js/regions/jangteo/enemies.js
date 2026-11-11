@@ -15,12 +15,14 @@
        결정 D-878: 좌우로 판을 오간다. 결정 D-942: 키는 판 높이의 0.4이고, 바닥 칸과 공중 칸에 번갈아 일어 위아래로 비켜 피한다.
      - 곰(결정 D-764): 앞발로 긁는다. 발톱 세 줄이 먼저 붉게 그어지고 굵고 빠르게 긁는다. 땅에 세 줄 자국이 남는다(ndClaw).
      - 멧돼지(결정 D-763): 몸은 판 위에서 사라지고, 판 안에는 발자국만 어지러운 길을 따라 찍히며 달려든다(ndRush).
-   결정 D-940: 약점은 심장이 아니라 얼음에 싸인 눈홍시다 (사용자 지시 2026-11-06 "심장은 어색하다, 그로기 때 얼음에 싸인 것이 드러나고 그걸 깨야 한다").
-     눈도깨비는 창고에서 훔친 설 제수 가운데 눈홍시(처마 밑에서 얼었다 녹기를 거듭한 제사상의 으뜸)를 제 찬 기운으로 얼려 품고,
-     그 기운으로 둔갑한다. 둔갑 패턴을 잘 피하면(이번 공격에 nundok_gloat_hits 번 맞지 않으면) 눈도깨비가 지쳐
-     둔갑이 잠깐 풀리고 헐떡인다. 그때 판의 얼음 속에서 눈홍시가 드러난다. 치면 그 둔갑의 내구도가 깎이고 얼음에 금이 번진다.
-     연장이 있으면 nundok_spill_chance 확률로 소매 속에 넣어 둔 재료가 쏟아진다. 맞으면 기세가 올라 둔갑이 풀리지 않고 다음 둔갑으로 간다.
-     눈홍시가 날아가거나 떨어지지 않는다(돌너머 골렘의 핵이 칸 한가운데 드러나는 것과 같은 방식). 예전(D-762)엔 푸른 불 심장이 드러났다.
+   결정 D-1450: 약점은 다시 심장이다 (사용자 지시 2026-11-11 큰 장터 6·7: 눈홍시는 게임에서 뺀다. D-940의 눈홍시를 바꾼다).
+     둔갑 패턴을 잘 피하면(이번 공격에 nundok_gloat_hits 번 맞지 않으면) 눈도깨비가 **그 둔갑 모습 그대로** 지쳐 헐떡이고,
+     가슴과 판의 얼음 속에서 심장이 드러난다. 심장은 찬 얼음 껍질 속에 푸른 도깨비불이 타는 모습이고(이기면 남는 도깨비불씨),
+     둔갑마다 둘레가 다르다: 독수리는 검은 깃 사이, 곰은 털가죽과 흰 반달 속, 멧돼지는 곤두선 싸리 갈기 밑, 발악 뒤 본모습은 얼음덩이 속.
+     심장을 치면 그 둔갑의 내구도가 깎이고 둔갑이 풀려 본모습으로 돌아온다. 연장이 있으면 nundok_spill_chance 확률로 소매 속 재료가 쏟아진다.
+     맞으면 기세가 올라 지치지 않고 다음 둔갑으로 간다. 심장은 날아가거나 떨어지지 않는다(골렘의 핵이 칸 한가운데 드러나는 것과 같은 방식).
+   결정 D-1456: 수리부엉이가 아닌 모습으로 싸움에 들어오면 눈도깨비가 밖에서처럼 눈보라에 싸여 흐리게 보이고, 공격(예고 포함)도 흐리다(bulletAlpha).
+     싸우다 한 번이라도 수리부엉이가 되면 정체가 드러나 끝까지 또렷하다. 발악의 빙산은 D-880 규칙 그대로다(수리부엉이 모습일 때만 또렷).
    결정 D-683: 둔갑 둘이 풀리면(체력이 적으면) 발악한다. 몸을 감추고, 보이지 않는 빙산이 발밑에서 솟는다.
      수리부엉이 모습이면 숨은 도깨비와 솟을 자리의 금이 보이고, 아니면 솟는 순간의 눈보라만 보인다(ndBerg).
    결정 D-765: 눈도깨비를 친 뒤 부위 이름과 깎인 수('독수리 −0.5')를 띄우지 않는다 (사용자 지시 2026-11-05). quietHits.
@@ -30,10 +32,17 @@ const T=()=>TABLES.TUNING;
 const SNOW='#f8f6f0',ICE='#d6ebf2',FROST='#9dbccb',FROST_DK='#4d6c80',BLUE='#3f86c8',BLUE_LT='#a6d6f4',GLOW='#eaf7ff',
   SHEEN='#2b4a6a',SKIN='#aebcc4',SKIN_DK='#6f8592',FUR='#2f2722',BRISTLE='#b9874a',BEAK='#cfc39c',
   ROBE='#1a2230',ROBE_LT='#2a3850',HAKAMA='#222a38',OBI='#5e4a2e',TUSK='#efe8d6',
-  HONGSI='#e0602a',HONGSI_LT='#f8b080',HONGSI_DK='#a8401e',CALYX='#5f7a3e';
+  HEART_DK='#1d4f86',AMBER='rgba(240,170,80,A)';
 const still=()=>Vfx.reducedMotion;
 const FORMS={eagle:'독수리',bear:'곰',boar:'멧돼지'};
-function nd(){return B.nd||(B.nd={shown:'',swap:0,scars:[],prints:[],flap:0,reveal:0,hidSaid:false,tired:false,hitsAt:0,hongsiSaid:false});}
+/* 결정 D-1456: veiled 는 수리부엉이가 아닌 모습으로 싸움에 들어왔을 때 켜지고, 싸우다 수리부엉이가 되면 꺼진 뒤 다시 켜지지 않는다 */
+function nd(){
+  if(B.nd)return B.nd;
+  B.nd={shown:'',swap:0,scars:[],prints:[],waves:[],flap:0,reveal:0,hidSaid:false,tired:false,reverted:false,hitsAt:0,heartSaid:false,bergWarned:false,veiled:battleForm()!=='owl'};
+  if(B.nd.veiled)G.f.ndVeiledFought=true;   // 진 뒤 귀띔이 밤눈을 떠올린다 (jangteo/story.js)
+  return B.nd;
+}
+const veilBody=()=>T().nundok_veil_body,veilAtk=()=>T().nundok_veil_attack;
 
 /* ---------- 그리기 도구 ---------- */
 function shape(c,pts,fill,alpha=1,stroke=null,lw=2){
@@ -59,29 +68,54 @@ function glow(c,x,y,r,col,alpha){
   c.save();c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.restore();
 }
 const COLD='rgba(166,214,244,A)';
-/* 결정 D-940: 얼음에 싸인 눈홍시. s 는 크기 배율, crack 은 얼음 금(0~1, 둔갑 기운이 깎인 만큼 번진다).
-   붉은 홍시 하나가 면이 깎인 얼음덩이 속에 들어 있고, 꼭지의 마른 잎과 홍시 겉의 서리가 얼음 너머로 비친다. */
-function hongsiInIce(c,x,y,s=1,crack=0,alpha=1){
-  const t=B.time,beat=still()?1:1+0.06*Math.max(0,Math.sin(t*0.32)),k=s*beat;
-  c.save();c.globalAlpha=alpha;
-  glow(c,x,y,40*k,'rgba(240,130,70,A)',0.4);glow(c,x,y,30*k,COLD,0.45);
-  // 홍시: 아래가 넓고 위가 눌린 동그라미, 꼭지와 네 갈래 꽃받침
-  shape(c,[[x-15*k,y-2*k],[x-11*k,y-12*k],[x,y-14*k],[x+11*k,y-12*k],[x+15*k,y-2*k],[x+11*k,y+10*k],[x,y+13*k],[x-11*k,y+10*k]],HONGSI,1,HONGSI_DK,1.6);
-  blob(c,x-6*k,y-5*k,4.5*k,3.5*k,HONGSI_LT,0.85);blob(c,x+5*k,y+6*k,6*k,4*k,HONGSI_DK,0.35);
-  for(let i=0;i<4;i++){const a=-Math.PI/2+(i-1.5)*0.7;sharp(c,[[x,y-13*k],[x+Math.cos(a)*9*k,y-13*k+Math.sin(a)*4*k-2*k],[x+Math.cos(a)*4*k,y-12*k]],CALYX,0.95,INK,1);}
-  brush(c,[[x,y-14*k],[x+1*k,y-19*k]],1.8,'#5a4a2a',0.95);
-  for(let i=0;i<5;i++)blob(c,x-10*k+hash(i*3.3)*20*k,y-8*k+hash(i*5.1)*16*k,1.4*k,1.1*k,'#ffffff',0.7);   // 언 홍시 겉의 서리
-  // 얼음덩이: 면이 깎인 반투명 덩어리
-  const P=[[x-25*k,y+4*k],[x-20*k,y-17*k],[x-6*k,y-27*k],[x+12*k,y-24*k],[x+25*k,y-9*k],[x+23*k,y+12*k],[x+6*k,y+21*k],[x-14*k,y+18*k]];
-  sharp(c,P,ICE,0.42,FROST_DK,2);
-  sharp(c,[[x-20*k,y-15*k],[x-6*k,y-25*k],[x+2*k,y-20*k],[x-12*k,y-8*k]],'#ffffff',0.45);
-  brush(c,[[x+15*k,y-19*k],[x+21*k,y+4*k]],1.4,'#ffffff',0.6);
+/* 결정 D-1450: 눈도깨비의 심장. 찬 얼음 껍질 속에서 푸른 도깨비불이 뛴다(이기면 꺼진 불씨가 도깨비불씨로 남는다).
+   form 마다 둘레가 다르다. eagle: 검은 깃이 부채처럼 감싸고 눈발이 돈다 / bear: 거친 털가죽과 흰 반달, 속에 호박빛이 비친다 /
+   boar: 곤두선 싸리 갈기가 가시처럼 뻗는다 / core(발악 뒤 본모습): 면이 깎인 얼음덩이에 싸였다.
+   s 는 크기 배율, crack 은 얼음 금(0~1, 둔갑 기운이 깎인 만큼 번진다). */
+function heartPath(c,x,y,k,fill,alpha,stroke,lw){
+  shape(c,[[x,y+16*k],[x-13*k,y+4*k],[x-16*k,y-6*k],[x-10*k,y-14*k],[x-2*k,y-11*k],[x,y-7*k],[x+2*k,y-11*k],[x+10*k,y-14*k],[x+16*k,y-6*k],[x+13*k,y+4*k]],fill,alpha,stroke,lw);
+}
+function noeHeart(c,x,y,s=1,form='core',crack=0){
+  const t=still()?0:B.time,beat=still()?1:1+0.09*Math.max(0,Math.sin(t*0.3)),k=s*beat,spin=t*0.03;
+  // 둘레 (심장 뒤)
+  if(form==='eagle'){
+    glow(c,x,y,44*k,COLD,0.5);
+    for(let i=0;i<10;i++){const a=i/10*Math.PI*2+0.3;feather(c,x+Math.cos(a)*8*k,y+Math.sin(a)*8*k,30*k,6*k,a,i%3===0?SHEEN:INK,SNOW,0.95);}
+    for(let i=0;i<8;i++){const a=spin*2+i/8*Math.PI*2,r=(30+hash(i)*8)*k;blob(c,x+Math.cos(a)*r,y+Math.sin(a)*r*0.6,1.8*k+1,1.4*k+1,SNOW,0.9);}   // 깃 둘레를 도는 눈발
+  }else if(form==='bear'){
+    glow(c,x,y,46*k,AMBER,0.35);glow(c,x,y,30*k,COLD,0.35);
+    for(let i=0;i<28;i++){const a=i/28*Math.PI*2,r0=(15+hash(i*2.3)*3)*k,r1=(25+hash(i*1.7)*7)*k;brush(c,[[x+Math.cos(a)*r0,y+Math.sin(a)*r0],[x+Math.cos(a+0.12)*r1,y+Math.sin(a+0.12)*r1]],2.6*k+0.6,i%2?FUR:'#54463b',0.95);}
+    brush(c,[[x-17*k,y+20*k],[x-6*k,y+25*k],[x+6*k,y+25*k],[x+17*k,y+20*k]],4*k+1,SNOW,0.95);   // 흰 반달
+  }else if(form==='boar'){
+    glow(c,x,y,44*k,COLD,0.4);
+    for(let i=0;i<18;i++){const a=-Math.PI+i/17*Math.PI*2,r0=14*k,r1=(28+hash(i*3.1)*10)*k,w=2.6*k;
+      sharp(c,[[x+Math.cos(a-0.12)*r0,y+Math.sin(a-0.12)*r0],[x+Math.cos(a)*r1,y+Math.sin(a)*r1],[x+Math.cos(a+0.12)*r0,y+Math.sin(a+0.12)*r0]],BRISTLE,0.95,'#6b4e33',0.8);
+      if(i%3===0)blob(c,x+Math.cos(a)*r1,y+Math.sin(a)*r1,w,w*0.8,SNOW,0.9);}   // 갈기 끝에 앉은 눈
+  }else glow(c,x,y,40*k,COLD,0.55);
+  // 심장: 얼음 껍질과 그 속에서 뛰는 푸른 불
+  heartPath(c,x,y,k*1.08,ICE,0.6,FROST_DK,2);
+  heartPath(c,x,y+k,k*0.8,form==='bear'?'#4f86b8':BLUE,0.92,HEART_DK,1.2);
+  const fl=still()?0:Math.sin(t*0.42)*2*k;
+  sharp(c,[[x-6*k,y+8*k],[x-4*k,y-2*k],[x-1*k+fl*0.4,y-11*k],[x+2*k,y-3*k],[x+5*k+fl,y-9*k],[x+6*k,y+2*k],[x+3*k,y+9*k]],GLOW,0.9);   // 도깨비불
+  if(form==='bear')blob(c,x,y+3*k,4*k,4*k,'#f2b04a',0.55);
+  sharp(c,[[x-12*k,y-7*k],[x-8*k,y-12*k],[x-4*k,y-10*k],[x-9*k,y-3*k]],'#ffffff',0.6);   // 얼음 윤
+  if(form==='core'){   // 본모습: 면이 깎인 얼음덩이 속
+    const P=[[x-27*k,y+4*k],[x-21*k,y-18*k],[x-6*k,y-28*k],[x+13*k,y-25*k],[x+27*k,y-9*k],[x+24*k,y+13*k],[x+6*k,y+23*k],[x-15*k,y+19*k]];
+    sharp(c,P,ICE,0.38,FROST_DK,2);sharp(c,[[x-21*k,y-16*k],[x-6*k,y-26*k],[x+2*k,y-21*k],[x-12*k,y-9*k]],'#ffffff',0.4);}
   // 금: 깎인 만큼 가운데에서 바깥으로 번진다
   const n=Math.round(crack*7);
-  for(let i=0;i<n;i++){const a=i/7*Math.PI*2+hash(i*2.7)*0.6,L=(10+hash(i*4.1)*14)*k*(0.5+crack*0.5),m=a+(hash(i*6.3)-0.5)*0.8;
-    const Q=[[x+Math.cos(a)*5*k,y+Math.sin(a)*4*k],[x+Math.cos(m)*L*0.6,y+Math.sin(m)*L*0.5],[x+Math.cos(a)*L,y+Math.sin(a)*L*0.8]];
-    brush(c,Q,1.6,FROST_DK,0.9);brush(c,Q.map(([qx,qy])=>[qx+1,qy-1]),0.8,'#ffffff',0.8);}
-  c.restore();
+  for(let i=0;i<n;i++){const a=i/7*Math.PI*2+hash(i*2.7)*0.6,L=(10+hash(i*4.1)*12)*k*(0.5+crack*0.5),m=a+(hash(i*6.3)-0.5)*0.8;
+    const Q=[[x+Math.cos(a)*4*k,y+Math.sin(a)*4*k],[x+Math.cos(m)*L*0.6,y+Math.sin(m)*L*0.5],[x+Math.cos(a)*L,y+Math.sin(a)*L*0.8]];
+    brush(c,Q,1.4,FROST_DK,0.9);brush(c,Q.map(([qx,qy])=>[qx+1,qy-1]),0.7,'#ffffff',0.8);}
+}
+/* 결정 D-1450: 지친 몸에서 앞섶(또는 깃·털·갈기)이 벌어진 자리. 그 둔갑의 심장이 드러난다 */
+function chestHeart(c,x,y,s,form){
+  sharp(c,[[x,y-24*s],[x+18*s,y+2*s],[x+8*s,y+28*s],[x-8*s,y+28*s],[x-18*s,y+2*s]],'#101a24',0.9);
+  noeHeart(c,x,y+2*s,0.9*s,form,0);
+}
+/* 결정 D-1450: 둔갑한 채 지쳐 헐떡이는 입김 (hx,hy 는 입 자리) */
+function pant(c,hx,hy){
+  for(let i=0;i<2;i++){const k=still()?0.5:((B.time*0.03+i*0.5)%1);blob(c,hx+(i?16:-16)+(i?1:-1)*k*28,hy+k*6,6+k*13,4+k*7,'#ffffff',0.6*(1-k));}
 }
 /* 결정 D-941: 숨은 눈도깨비 둘레로 눈폭풍이 휘몰아친다 (사용자 지시 2026-11-06 "눈도깨비를 중심으로 감싸고 돌아야 한다. 사선 방향으로").
    눈발은 (cx,cy)를 가운데 두고 비스듬히 기운 타원을 따라 돌며 안쪽으로 빨려 든다. 가까울수록 빠르다.
@@ -197,20 +231,10 @@ function frostBeard(c,x,y,r){
   for(let i=-3;i<=3;i++){const bx=x+i*r*0.2;brush(c,[[bx,y+r*0.9],[bx+i*1.5,y+r*(1.5-Math.abs(i)*0.1)]],1.3,FROST,0.85);
     if(i%2===0)sharp(c,[[bx-3,y+r*(1.6-Math.abs(i)*0.12)],[bx+3,y+r*(1.6-Math.abs(i)*0.12)],[bx,y+r*(1.6-Math.abs(i)*0.12)+13]],ICE,0.95,FROST_DK,1);}
 }
-/* 결정 D-940: 지쳐 앞섶이 벌어진 자리. 품어 둔 눈홍시의 붉은 빛이 찬 기운 너머로 비친다 (눈홍시 자체는 판의 얼음 속에 드러난다).
-   예전(D-762)엔 푸른 심장 빛이었다. */
-function chestGlow(c,x,y,s=1){
-  const p=still()?0.6:0.5+0.5*Math.max(0,Math.sin(B.time*0.32));
-  sharp(c,[[x,y-26*s],[x+16*s,y+4*s],[x+6*s,y+30*s],[x-6*s,y+30*s],[x-16*s,y+4*s]],'#101a24',0.92);
-  glow(c,x,y+4*s,40*s,'rgba(240,130,70,A)',0.3+0.3*p);glow(c,x,y+4*s,26*s,COLD,0.35);
-  for(let i=0;i<6;i++){const a=i/6*Math.PI*2+0.3;brush(c,[[x+Math.cos(a)*8*s,y+4*s+Math.sin(a)*12*s],[x+Math.cos(a)*22*s,y+4*s+Math.sin(a)*28*s]],1.4,BLUE_LT,0.7);}
-  blob(c,x,y+4*s,6*s,7*s,HONGSI,0.55+0.35*p);blob(c,x-2*s,y+2*s,2.4*s,2*s,HONGSI_LT,0.8);
-}
-
 /* ---------- 모습 ---------- */
 /* 결정 D-760: 본모습. 빳빳한 어깨옷과 얼음 비늘 어깨받이, 여민 겉옷과 띠, 눈에 끌리는 통 넓은 바지 */
 function drawBase(c,cx,cy,opt={}){
-  // 결정 D-940: 지치면(opt.tired) 고개가 떨어지고 어깨가 크게 들썩이며 찬 입김을 몰아쉰다
+  // 결정 D-940·D-1450: 지치면(opt.tired) 고개가 떨어지고 어깨가 크게 들썩이며 찬 입김을 몰아쉰다
   const pant=opt.tired&&!still()?Math.sin(B.time*0.14):0,b=still()?0:opt.tired?pant*4:Math.sin(B.time*0.035)*2,hy=cy-44+b+(opt.tired?10:0),r=34,shake=opt.roar&&!still()?Math.sin(B.time*1.3)*1.5:0;
   glow(c,cx,cy+20,170,'rgba(150,200,235,A)',0.2);   // 몸에서 도는 찬 기운
   frostMane(c,cx,hy,r);
@@ -224,7 +248,7 @@ function drawBase(c,cx,cy,opt={}){
   for(const s of [-1,1]){const fx=cx+s*66;blob(c,fx,cy+122,20,7,SKIN_DK,1);for(let k=0;k<3;k++)sharp(c,[[fx+s*(8+k*5)-2,cy+118],[fx+s*(8+k*5)+2,cy+118],[fx+s*(12+k*5),cy+127]],INK);}
   // 겉옷: 깃을 왼쪽 위로 여민다
   sharp(c,[[cx-62,cy-6],[cx+62,cy-6],[cx+60,cy+56],[cx-60,cy+56]],ROBE,1,INK,2);
-  if(opt.open)chestGlow(c,cx,cy+22,1.1);
+  if(opt.open)chestHeart(c,cx,cy+22,1.1,'core');   // 결정 D-1450: 발악 뒤 본모습의 얼음 속 심장
   else{sharp(c,[[cx-6,cy-8],[cx+30,cy-8],[cx-2,cy+34],[cx-14,cy+20]],'#141a24',1);}
   brush(c,[[cx+30,cy-10],[cx-6,cy+46]],9,SNOW,0.97);brush(c,[[cx-30,cy-10],[cx+4,cy+30]],9,SNOW,0.97);   // 흰 깃
   if(opt.open){brush(c,[[cx+30,cy-10],[cx+20,cy+46]],9,SNOW,0.97);brush(c,[[cx-30,cy-10],[cx-20,cy+46]],9,SNOW,0.97);}
@@ -269,7 +293,7 @@ function drawEagle(c,cx,cy,opt={}){
   glow(c,cx,cy+20,170,'rgba(150,200,235,A)',0.18);
   for(const s of [-1,1]){
     // 날개: 쳐들었다가(beat 시작) 아래로 내리친다
-    const sx=cx+s*34,sy=cy+4,lift=0.55-down*1.05+idle,ang=s<0?Math.PI+lift:-lift;
+    const sx=cx+s*34,sy=cy+4,lift=0.55-down*1.05+idle-(opt.tired?0.75:0),ang=s<0?Math.PI+lift:-lift;
     for(let i=0;i<10;i++){const a=ang+s*(0.3-i*0.1)*-1,len=132+i*9-(i>6?(i-6)*18:0);
       feather(c,sx,sy+i*3,len,11,a+s*(-0.05*i),i%3===0?SHEEN:INK,i>5?SNOW:null);}
     for(let i=0;i<6;i++)feather(c,sx,sy+4,74-i*6,12,ang+s*0.1*i,i%2?'#2a2420':INK,i===2?SNOW:null);   // 덮깃
@@ -282,7 +306,7 @@ function drawEagle(c,cx,cy,opt={}){
     sharp(c,P,'#221d1a',1,INK,2);}
   if(!opt.open){sharp(c,[[cx-18,cy+26],[cx,cy+18],[cx+18,cy+26],[cx+14,cy+92],[cx,cy+100],[cx-14,cy+92]],SNOW,0.95);
     for(let i=0;i<5;i++)for(const sd of [-1,1])sharp(c,[[cx+sd*3,cy+34+i*13],[cx+sd*13,cy+28+i*13],[cx+sd*13,cy+32+i*13],[cx+sd*3,cy+38+i*13]],INK,0.7);}
-  else chestGlow(c,cx,cy+50,1);
+  else chestHeart(c,cx,cy+50,1,'eagle');   // 결정 D-1450: 깃 사이로 드러난 심장
   for(let i=-2;i<=2;i++)feather(c,cx+i*8,cy+100,50,7,Math.PI/2+i*0.14,INK,SNOW);
   // 굵은 발과 갈고리 발톱
   for(const s of [-1,1]){const fx=cx+s*22,fy=cy+114;brush(c,[[fx,fy-16],[fx,fy]],7,BEAK);
@@ -293,11 +317,13 @@ function drawEagle(c,cx,cy,opt={}){
   sternFace(c,cx,hy,32,{beak:true,skin:'#b8c2c6'});
   frostCrown(c,cx,hy,32);
   iceHorn(c,cx-3,hy-29,32,1);
+  if(opt.tired)pant(c,cx+6,hy+30);
 }
 /* 곰: 더 크고 무겁다. 앞발을 쳐들었다가 판을 가르듯 내리긋는다 (결정 D-764) */
 function drawBear(c,cx,cy,opt={}){
-  const atk=B.st==='atk'&&!opt.open,ph=atk?(B.atkT%CLAW.gap):99,raise=atk?clamp(ph/CLAW.tell,0,1):0,
-    swipe=atk&&ph>CLAW.tell?Math.min(1,(ph-CLAW.tell)/CLAW.strike):0,b=still()?0:Math.sin(B.time*0.05)*2,hy=cy-44+b;
+  // 결정 D-1451: 한 손 긁기 세 번 뒤 마지막은 두 앞발을 함께 쳐들었다가 엇갈려 긋는다
+  const atk=B.st==='atk'&&!opt.open,two=atk&&B.atkT>=CLAW.gap*CLAW.n,tell=two?CLAW.both.tell:CLAW.tell,ph=atk?(two?B.atkT-CLAW.gap*CLAW.n:B.atkT%CLAW.gap):99,
+    raise=atk?clamp(ph/tell,0,1):0,swipe=atk&&ph>tell?Math.min(1,(ph-tell)/CLAW.strike):0,b=still()?0:Math.sin(B.time*0.05)*2,hy=cy-44+b;
   glow(c,cx,cy+30,180,'rgba(150,200,235,A)',0.15);
   // 몸: 어깨가 솟은 커다란 털 덩어리, 등에 쌓인 눈
   shape(c,[[cx-138,cy+126],[cx-134,cy+70],[cx-118,cy+18],[cx-84,cy-24],[cx-40,cy-40],[cx,cy-34],[cx+40,cy-40],[cx+84,cy-24],[cx+118,cy+18],[cx+134,cy+70],[cx+138,cy+126],[cx,cy+130]],FUR,1,INK,2.6);
@@ -305,20 +331,26 @@ function drawBear(c,cx,cy,opt={}){
   for(let i=0;i<14;i++){const a=-Math.PI+i*Math.PI/13,x=cx+Math.cos(a)*120,y=cy+40+Math.sin(a)*66;sharp(c,[[x-4,y],[x+Math.cos(a)*10,y+Math.sin(a)*10],[x+4,y]],FUR,1);}   // 날 선 털끝
   shape(c,[[cx-92,cy-4],[cx-40,cy-26],[cx+20,cy-26],[cx+90,cy-4],[cx+40,cy+4],[cx-40,cy+4]],SNOW,0.9);
   if(!opt.open)sharp(c,[[cx-52,cy+22],[cx,cy+54],[cx+52,cy+22],[cx+42,cy+36],[cx,cy+64],[cx-42,cy+36]],SNOW,0.95,INK,1.2);   // 반달
-  else chestGlow(c,cx,cy+44,1.15);
+  else chestHeart(c,cx,cy+44,1.15,'bear');   // 결정 D-1450: 털가죽 속 심장
   // 왼 앞발: 쳐들었다가 내리긋는다. 발톱이 길고 굵다
   const ax=cx-108+swipe*40,ay=cy-36-raise*24+swipe*130;
   brush(c,[[cx-84,cy+24],[cx-104,cy-4],[ax,ay]],34,FUR,1);
   blob(c,ax,ay,24,20,FUR);
   for(let k=-1;k<=1;k++)sharp(c,[[ax+k*12-4,ay+10],[ax+k*12+4,ay+10],[ax+k*15+(swipe?6:0),ay+44]],TUSK,1,INK,1.4);
   if(swipe>0&&swipe<1)for(let k=-1;k<=1;k++)brush(c,[[ax+k*14,ay-60],[ax+k*14,ay+30]],3,'#ffffff',0.5*(1-swipe));
-  brush(c,[[cx+88,cy+30],[cx+108,cy+100]],32,FUR,1);blob(c,cx+110,cy+108,24,14,FUR);
-  for(let k=-1;k<=1;k++)sharp(c,[[cx+110+k*11-4,cy+112],[cx+110+k*11+4,cy+112],[cx+110+k*13,cy+128]],TUSK,1,INK,1.2);
+  if(two){   // 오른 앞발도 쳐들었다가 엇갈려 내리긋는다
+    const bx=cx+108-swipe*40,by=cy-36-raise*24+swipe*130;
+    brush(c,[[cx+84,cy+24],[cx+104,cy-4],[bx,by]],34,FUR,1);blob(c,bx,by,24,20,FUR);
+    for(let k=-1;k<=1;k++)sharp(c,[[bx+k*12-4,by+10],[bx+k*12+4,by+10],[bx+k*15-(swipe?6:0),by+44]],TUSK,1,INK,1.4);
+    if(swipe>0&&swipe<1)for(let k=-1;k<=1;k++)brush(c,[[bx+k*14,by-60],[bx+k*14,by+30]],3,'#ffffff',0.5*(1-swipe));
+  }else{brush(c,[[cx+88,cy+30],[cx+108,cy+100]],32,FUR,1);blob(c,cx+110,cy+108,24,14,FUR);
+    for(let k=-1;k<=1;k++)sharp(c,[[cx+110+k*11-4,cy+112],[cx+110+k*11+4,cy+112],[cx+110+k*13,cy+128]],TUSK,1,INK,1.2);}
   // 낮게 숙인 머리: 작은 귀, 서리 뿔, 도깨비 눈
   for(const s of [-1,1]){blob(c,cx+s*40,hy-30,13,12,FUR);blob(c,cx+s*40,hy-29,6,5,'#54463b');}
   sternFace(c,cx,hy,42,{skin:'#4a3d34',dark:'#2c231e',bear:true,roar:atk||B.st==='tell'});
   shape(c,[[cx-30,hy-36],[cx-12,hy-46],[cx+6,hy-40],[cx+22,hy-48],[cx+30,hy-34],[cx,hy-30]],SNOW,0.95);
   iceHorn(c,cx-4,hy-36,36,1);
+  if(opt.tired)pant(c,cx,hy+38);
 }
 /* 멧돼지: 내닫는 동안 몸은 판 위에서 사라지고 눈보라만 남는다 (결정 D-763) */
 function drawBoar(c,cx,cy,opt={}){
@@ -345,19 +377,33 @@ function drawBoar(c,cx,cy,opt={}){
     sharp(c,[[ex-s*9,ey-3],[ex+s*7,ey-1],[ex-s*7,ey+2]],BLUE_LT,1);brush(c,[[ex,ey-3],[ex,ey+2]],1.6,INK,0.9);}
   for(const s of [-1,1])brush(c,[[cx+s*6,hy-20],[cx+s*32,hy-28]],3,SNOW,0.95);   // 찌푸린 서리 눈썹
   iceHorn(c,cx-2,hy-34,30,1);
-  if(opt.open)chestGlow(c,cx,cy+66,0.9);
+  if(opt.open)chestHeart(c,cx,cy+66,0.9,'boar');   // 결정 D-1450: 곤두선 갈기 밑 심장
+  if(opt.tired)pant(c,cx,hy+52);
 }
 
 /* 눈도깨비 그리기: 지금 둔갑에 따라 모습이 바뀐다. 숨은 동안은 거의 보이지 않고, 수리부엉이 눈에만 윤곽이 보인다 */
 let ghostCanvas=null;
+/* 결정 D-1450: 둔갑 패턴을 피해 내면 그 둔갑 모습 그대로 지친다(B.st open + tired). 심장을 치면(reverted) 본모습으로 돌아와 헐떡인다.
+   발악(core) 뒤에는 본모습으로 드러나 지친다 */
 function shownForm(){
+  const n=nd();
   if(B.st==='end')return B.result==='win'?'down':'';
   if(!B.cur||['intro','idle','bonk'].includes(B.st))return '';
-  if(B.st==='open'&&nd().tired)return 'tired';   // 결정 D-940: 지쳐 둔갑이 풀렸다
-  return B.cur.core?'ghost':B.cur.id;
+  if(B.st==='open'&&n.tired&&(n.reverted||B.cur.core))return 'tired';
+  if(B.cur.core)return B.st==='open'?'':'ghost';
+  return B.cur.id;
+}
+const HEART_AT={eagle:50,bear:44,boar:66,tired:22};
+/* 다른 판에 그려 alpha 만큼 옅게 얹는다. filter 가 있으면 둘레에 빛을 두른다 */
+function faint(c,draw,alpha,filter){
+  if(!ghostCanvas)ghostCanvas=document.createElement('canvas');
+  if(ghostCanvas.width!==bcv.width||ghostCanvas.height!==bcv.height){ghostCanvas.width=bcv.width;ghostCanvas.height=bcv.height;}
+  const g=ghostCanvas.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,ghostCanvas.width,ghostCanvas.height);g.setTransform(c.getTransform());
+  draw(g);
+  c.save();c.setTransform(1,0,0,1,0,0);c.globalAlpha=alpha;if(filter)c.filter=filter;c.drawImage(ghostCanvas,0,0);c.restore();
 }
 function drawNundok(c){
-  const cx=LW/2,cy=EY,f=shownForm(),n=nd(),open=false;   // 결정 D-940: 둔갑한 모습으로는 가슴을 열지 않는다. 지쳤을 때만 본모습으로 앞섶이 벌어진다
+  const cx=LW/2,cy=EY,f=shownForm(),n=nd(),tired=B.st==='open'&&n.tired,heart=tired&&!n.reverted&&!!B.mark;
   if(f==='down'){   // 진 눈도깨비: 눈 더미로 무너지고 부러진 얼음 뿔과 몽당 싸리비 한 자루가 남는다 (설화의 몽당 빗자루)
     shape(c,[[cx-130,cy+124],[cx-70,cy+80],[cx,cy+70],[cx+80,cy+86],[cx+132,cy+124]],SNOW,0.95,FROST,1.4);
     sharp(c,[[cx-70,cy+96],[cx+10,cy+92],[cx+20,cy+112],[cx-60,cy+116]],ROBE,0.9,INK,1.4);
@@ -365,24 +411,23 @@ function drawNundok(c){
     sharp(c,[[cx-24,cy+86],[cx-6,cy+60],[cx-2,cy+64],[cx-12,cy+88]],ICE,0.9,FROST_DK,1.2);
     return;}
   const body=(cc)=>{
-    if(f==='eagle')drawEagle(cc,cx,cy,{open});
-    else if(f==='bear')drawBear(cc,cx,cy,{open});
-    else if(f==='boar')drawBoar(cc,cx,cy,{open});
-    else if(f==='tired')drawBase(cc,cx,cy,{open:true,tired:true});
+    if(f==='eagle')drawEagle(cc,cx,cy,{open:heart,tired});
+    else if(f==='bear')drawBear(cc,cx,cy,{open:heart,tired});
+    else if(f==='boar')drawBoar(cc,cx,cy,{open:heart,tired});
+    else if(f==='tired')drawBase(cc,cx,cy,{open:heart&&B.cur.core,tired:true});
     else drawBase(cc,cx,cy,{roar:B.st==='tell'});
   };
   if(f==='ghost'){
     // 숨은 동안: 다른 판에 그려 아주 옅게 얹는다. 수리부엉이 눈이면 서리 윤곽이 또렷하다
     const owl=battleForm()==='owl';
-    if(!ghostCanvas)ghostCanvas=document.createElement('canvas');
-    if(ghostCanvas.width!==bcv.width||ghostCanvas.height!==bcv.height){ghostCanvas.width=bcv.width;ghostCanvas.height=bcv.height;}
-    const g=ghostCanvas.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,ghostCanvas.width,ghostCanvas.height);g.setTransform(c.getTransform());
-    body(g);
-    c.save();c.setTransform(1,0,0,1,0,0);c.globalAlpha=owl?0.55:0.05;
-    if(owl){c.filter='drop-shadow(0 0 6px rgba(120,190,240,.9))';}
-    c.drawImage(ghostCanvas,0,0);c.restore();
+    faint(c,body,owl?0.55:0.05,owl?'drop-shadow(0 0 6px rgba(120,190,240,.9))':null);
     // 결정 D-766·D-941: 숨은 몸을 가운데 두고 눈발이 비스듬히 기운 고리로 세차게 감아 돈다
     stormSwirl(c,cx,cy+30,150,60,14,1);
+  }else if(n.veiled){
+    // 결정 D-1456: 수리부엉이 눈이 아니면 밖에서처럼 눈보라에 싸여 흐리게 비친다. 드러난 심장의 푸른 빛만은 눈보라를 뚫고 보인다
+    faint(c,body,veilBody());
+    stormSwirl(c,cx,cy+30,150,52,12,0.9);
+    if(heart){const form=f==='tired'?'core':f;chestHeart(c,cx,cy+HEART_AT[f==='tired'?'tired':f],1,form);}
   }else body(c);
   // 둔갑이 바뀌는 순간 눈보라가 확 인다
   if(f!==n.shown){n.shown=f;n.swap=22;}
@@ -422,6 +467,8 @@ function drawStoreRoom(c){
   if(f==='ghost'&&B.st!=='open'){c.save();c.fillStyle='rgba(230,240,248,.24)';c.fillRect(0,0,LW,LH);c.restore();
     // 결정 D-941: 창고 안 눈보라가 숨은 눈도깨비를 가운데 두고 비스듬히 기운 큰 고리로 휘몰아친다 (예전 D-877: 판 전체에 아래로 사선)
     stormSwirl(c,LW/2,EY+30,Math.hypot(LW,LH)*0.62,130,22,0.9);}   // 결정 D-766: 숨으면 창고 안 눈보라가 세차다
+  else if(f!=='down'&&nd().veiled){c.save();c.fillStyle='rgba(230,240,248,.12)';c.fillRect(0,0,LW,LH);c.restore();   // 결정 D-1456: 눈보라에 싸인 동안 창고 안도 뿌옇다
+    stormSwirl(c,LW/2,EY+30,Math.hypot(LW,LH)*0.5,70,12,0.5);}
 }
 
 
@@ -433,13 +480,21 @@ function drawStoreRoom(c){
 //   (사용자 지시 2026-11-06 "회오리 경로가 너무 경직, 높이를 줄이고 위치를 바꿔 위아래로 움직이며 피하게").
 //   첫 소용돌이는 손이 있는 칸에 일어 손을 다른 칸으로 옮기게 하고, 다음 것은 다른 칸에 인다. 위 칸 소용돌이는 판 위쪽(highTop)에서
 //   아래로 늘어진다. 두 칸 사이(gapBand)는 늘 비어 지나갈 틈이 있다. 좌우로는 옛 빠르기 그대로 오가며 위아래로 조금 출렁인다(bob).
-const TWIST={gap:62,n:3,grow:40,life:190,fade:22,arm:16,tall:0.4,wide:30,speed:1.15,clear:56,highTop:0.06,bob:6};
+// 결정 D-1453: 태풍처럼 기운 깔때기. 위로 갈수록 넓고 가는 쪽(lean)으로 기울며, 꼭대기에서 나선 눈구름 띠가 돈다(허리케인의 나선 띠).
+//   꼭대기 띠에서 눈뭉치(ndFlurry)가 flurry 프레임마다 비스듬히 흩뿌려진다 (사용자 지시 2026-11-11 큰 장터 6 독수리)
+const TWIST={gap:62,n:3,grow:40,life:190,fade:22,arm:16,tall:0.42,wide:32,speed:1.15,clear:56,highTop:0.06,bob:6,lean:0.55,turn:0.04,
+  flurry:58,flurrySpeed:1.5,flurryFall:0.42,flurryR:7};
 // 곰 (결정 D-764): 굵고 빠른 발톱 세 줄
-const CLAW={gap:44,tell:24,strike:5,stay:16,len:230,sep:20,n:3,hit:11};
+// 결정 D-1451: 곰은 심장이 거의 안 나왔다. 예고가 24틀이라 너구리 손(2.7px/틀)으로는 반응한 뒤 62px 너비의 세 줄 밖으로 못 빠져나가
+//   늘 맞았고, 한 대라도 맞으면 지치지 않는다(D-940 nundok_gloat_hits). 예고를 36틀로 늘리고 판정 반지름을 10으로 줄였다.
+//   한 손 긁기 세 번 뒤 마지막으로 두 앞발을 엇갈려 긋는다(both: X 자 여섯 줄, 예고 46틀) (사용자 지시 2026-11-11 큰 장터 6 곰)
+const CLAW={gap:52,tell:36,strike:5,stay:16,len:230,sep:20,n:3,hit:10,both:{tell:46,a:0.62}};
 // 멧돼지 (결정 D-763): 발자국만 어지러운 길을 따라 찍힌다
 // 결정 D-879: 발자국 사이(step)를 17에서 54로 벌려 수를 1/3로 줄이고(한 번 내닫는 동안 약 47 → 15), 찍힐 때마다 쿵 하고 판이 울린다
 //   (quake·눈먼지 고리·얼음 금, 두 걸음에 한 번 nd_stomp 소리) (사용자 지시 2026-11-06 "멧돼지 발바닥 수는 줄이고 좀 더 위협적으로 땅을 울리는 듯하게")
-const RUSH={gap:150,tell:42,run:130,hitR:15,step:54,n:2,turns:4,quake:7,ring:18,scale:1.4};
+// 결정 D-1452: 무거운 것이 내달리면 땅이 울린다. 몸 판정을 15에서 20으로 넓히고, 두 걸음에 한 번 내리찍는 발에서 땅을 타고
+//   충격파(wave)가 퍼진다. 퍼지는 고리 띠(band)에 닿으면 맞는다. 판도 더 크게 흔들린다 (사용자 지시 2026-11-11 큰 장터 6 멧돼지)
+const RUSH={gap:150,tell:42,run:130,hitR:20,step:54,n:2,turns:4,quake:7,quakeHeavy:11,ring:18,scale:1.4,wave:36,waveT:18,band:5};
 // 발악: 보이지 않는 빙산
 // 결정 D-880: 맨눈에는 눈보라에 감싸인 반투명 빙산(veil), 수리부엉이 눈에는 burst 프레임 만에 peak 보다 over 배 치솟았다 서는 빙산
 //   (사용자 지시 2026-11-06 "잘 안 보일때는 눈보라에 휩싸여 반투명하게. 수리부엉이 폼으로 볼때는 빙산이 확 솟아나게"). 맞는 자리와 때는 그대로다
@@ -452,26 +507,37 @@ function twistGeom(b){
   const width=u=>(5+TWIST.wide*Math.pow(u,1.3))*(0.5+0.5*ease);
   const bob=still()?0:Math.sin(b.t*0.045+b.seed)*TWIST.bob;
   const base=b.high?BOX.y+BOX.h*TWIST.highTop+H+bob:BOX.y+BOX.h-6+Math.min(0,bob);
-  return {H,f,sway,width,base};
+  const axis=u=>b.x+sway(u)+(b.lean||0)*u*H;   // 결정 D-1453: 위로 갈수록 가는 쪽으로 기운다
+  return {H,f,sway,width,base,axis};
 }
 function drawTwist(c,b,mul=1){
-  const {H,f,sway,width,base}=twistGeom(b);if(H<4)return;
-  const rot=still()?b.seed:b.t*0.24+b.seed,a=f*mul;
-  const L=[],R=[];for(let i=0;i<=12;i++){const u=i/12,y=base-u*H,x=b.x+sway(u),w=width(u);L.push([x-w,y]);R.push([x+w,y]);}
-  sharp(c,L.concat(R.reverse()),'rgba(214,235,242,1)',0.2*a);
+  const {H,f,width,base,axis}=twistGeom(b);if(H<4)return;
+  const rot=still()?b.seed:b.t*0.24+b.seed,a=f*mul,dir=Math.sign(b.lean||1);
+  const L=[],R=[];for(let i=0;i<=12;i++){const u=i/12,y=base-u*H,x=axis(u),w=width(u);L.push([x-w,y]);R.push([x+w,y]);}
+  sharp(c,L.concat(R.reverse()),'rgba(214,235,242,1)',0.22*a);
   c.save();c.lineCap='round';
-  for(let i=0;i<=16;i++){const u=i/16,y=base-u*H,x=b.x+sway(u),w=width(u),ry=w*0.22+1;
+  for(let i=0;i<=16;i++){const u=i/16,y=base-u*H,x=axis(u),w=width(u),ry=w*0.22+1;
     c.globalAlpha=0.32*a;c.strokeStyle=FROST;c.lineWidth=1.2;c.beginPath();c.ellipse(x,y,w,ry,0,Math.PI,Math.PI*2);c.stroke();   // 뒤쪽 호
     const s=rot*(1+u*0.6)+i*0.7;c.globalAlpha=(0.55+0.35*u)*a;c.strokeStyle=i%3?FROST_DK:INK;c.lineWidth=1.3+u*1.8;
     c.beginPath();c.ellipse(x,y,w,ry,0,s,s+2.3);c.stroke();}   // 감아 도는 앞쪽 호
+  // 결정 D-1453: 꼭대기의 나선 눈구름 띠. 납작한 원반 위로 팔 셋이 감겨 돌며, 기운 쪽으로 더 길게 끌린다 (허리케인의 나선 띠)
+  {const tx=axis(1),ty=base-H,W0=width(1);
+    for(let j=0;j<3;j++){const pts=[];for(let q=0;q<=14;q++){const r=W0*(0.35+q*0.1),ang=rot*0.8+j*Math.PI*2/3+q*0.34;
+        pts.push([tx+Math.cos(ang)*r*(1+0.25*dir*Math.cos(ang)),ty+Math.sin(ang)*r*0.26]);}
+      brush(c,pts,3.2,SNOW,0.75*a);brush(c,pts,1.2,FROST_DK,0.45*a);}
+    blob(c,tx,ty,W0*0.32,W0*0.1,'#e8f2f6',0.5*a);}   // 가운데 눈
   c.restore();
-  // 감겨 오르는 눈발과 깃털
-  for(let k=0;k<28;k++){const u=(hash(k*3.3)+b.t*0.011*(0.6+hash(k)))%1,y=base-u*H,ang=b.t*0.3*(0.8+hash(k*2))+k*1.3,w=width(u);
-    const front=Math.sin(ang)>0;blob(c,b.x+sway(u)+Math.cos(ang)*w,y+Math.sin(ang)*w*0.22,front?2.4:1.6,front?2:1.4,SNOW,(front?0.95:0.5)*a);}
-  for(let k=0;k<3;k++){const u=(hash(k*9.1)+b.t*0.008)%1,ang=b.t*0.26+k*2.1,w=width(u);feather(c,b.x+sway(u)+Math.cos(ang)*w,base-u*H,15,3.6,ang,k%2?SHEEN:INK,SNOW,a);}
+  // 감겨 오르는 눈발과 깃털, 나선 띠를 따라 도는 눈보라
+  for(let k=0;k<30;k++){const u=(hash(k*3.3)+b.t*0.011*(0.6+hash(k)))%1,y=base-u*H,ang=b.t*0.3*(0.8+hash(k*2))+k*1.3,w=width(u);
+    const front=Math.sin(ang)>0;blob(c,axis(u)+Math.cos(ang)*w,y+Math.sin(ang)*w*0.22,front?2.4:1.6,front?2:1.4,SNOW,(front?0.95:0.5)*a);}
+  for(let k=0;k<14;k++){const ang=b.t*0.12+k*0.45,r=width(1)*(0.6+(k%5)*0.22);blob(c,axis(1)+Math.cos(ang)*r*(1+0.25*dir*Math.cos(ang)),base-H+Math.sin(ang)*r*0.26,2,1.6,SNOW,0.85*a);}
+  for(let k=0;k<3;k++){const u=(hash(k*9.1)+b.t*0.008)%1,ang=b.t*0.26+k*2.1,w=width(u);feather(c,axis(u)+Math.cos(ang)*w,base-u*H,15,3.6,ang,k%2?SHEEN:INK,SNOW,a);}
+  // 비스듬히 휘날리는 눈줄기: 기운 쪽으로 끌린다
+  for(let k=0;k<6;k++){const u=0.3+hash(k*4.7)*0.7,y=base-u*H,x=axis(u)+width(u)*(hash(k*2.9)-0.5)*1.6,len=12+hash(k)*10;
+    brush(c,[[x,y],[x+dir*len,y-len*0.35]],1.2,SNOW,0.6*a);}
   // 바닥에서 튀는 눈 (아래 칸만). 위 칸은 늘어진 끝에서 눈가루가 흩날린다
-  if(!b.high)for(let k=0;k<7;k++){const q=b.t*0.2+k*0.9;blob(c,b.x+Math.cos(q)*(10+k*3),base+2-Math.abs(Math.sin(q))*6,4,2.6,SNOW,0.8*a);}
-  else for(let k=0;k<5;k++){const q=(b.t*0.02+hash(k*2.1))%1;blob(c,b.x+sway(0)+(hash(k*3.7)-0.5)*14,base+q*16,2,1.6,SNOW,0.7*a*(1-q));}
+  if(!b.high)for(let k=0;k<7;k++){const q=b.t*0.2+k*0.9;blob(c,axis(0)+Math.cos(q)*(10+k*3),base+2-Math.abs(Math.sin(q))*6,4,2.6,SNOW,0.8*a);}
+  else for(let k=0;k<5;k++){const q=(b.t*0.02+hash(k*2.1))%1;blob(c,axis(0)+(hash(k*3.7)-0.5)*14,base+q*16,2,1.6,SNOW,0.7*a*(1-q));}
 }
 defineAttacks({
   ndWind:{dur:TWIST.gap*(TWIST.n-1)+TWIST.life,tick(t,X,Y,W,H){
@@ -481,12 +547,13 @@ defineAttacks({
     const nd0=nd();if(i===0)nd0.twistHigh=B.py<Y+H*0.5;else nd0.twistHigh=!nd0.twistHigh;
     do{x=i===0?clamp(B.px+(Math.random()<0.5?-1:1)*(60+Math.random()*30),X+30,X+W-30):X+30+Math.random()*(W-60);n++;}while(n<12&&Math.abs(x-B.px)<TWIST.clear);
     const dir=altDir('ndWind')?1:-1;   // 결정 D-878: 번갈아 왼쪽·오른쪽으로 쓸고 가다 벽에서 튕긴다
-    B.bullets.push({k:'ndTwist',x,high:nd0.twistHigh,vx:dir*TWIST.speed*(0.9+Math.random()*0.2),t:0,life:TWIST.life,seed:Math.random()*6});
+    B.bullets.push({k:'ndTwist',x,high:nd0.twistHigh,vx:dir*TWIST.speed*(0.9+Math.random()*0.2),lean:dir*TWIST.lean,t:0,life:TWIST.life,seed:Math.random()*6});
     nd().flap=26;}},
-  ndClaw:{dur:CLAW.gap*(CLAW.n-1)+CLAW.tell+CLAW.strike+CLAW.stay+2,tick(t,X,Y,W,H){
-    if(t%CLAW.gap||t/CLAW.gap>=CLAW.n)return;
-    const s=altDir('ndClaw')?1:-1,a=s*(0.45+Math.random()*0.5);
+  ndClaw:{dur:CLAW.gap*CLAW.n+CLAW.both.tell+CLAW.strike+CLAW.stay+2,tick(t,X,Y,W,H){
+    if(t%CLAW.gap||t/CLAW.gap>CLAW.n)return;
     const x=clamp(B.px+(Math.random()-0.5)*30,X+30,X+W-30),y=clamp(B.py+(Math.random()-0.5)*24,Y+24,Y+H-24);
+    if(t/CLAW.gap===CLAW.n){B.bullets.push({k:'ndClaw',x,y,t:0,a:CLAW.both.a,both:true});return;}   // 결정 D-1451: 마지막은 두 앞발 엇갈려 긋기
+    const s=altDir('ndClaw')?1:-1,a=s*(0.45+Math.random()*0.5);
     B.bullets.push({k:'ndClaw',x,y,t:0,a});}},
   ndRush:{dur:RUSH.gap*(RUSH.n-1)+RUSH.tell+RUSH.run+10,tick(t,X,Y,W,H){
     if(t%RUSH.gap||t/RUSH.gap>=RUSH.n)return;
@@ -498,8 +565,9 @@ defineAttacks({
 });
 /* 발톱 세 줄의 선분 (상자 안에서 길게) */
 function clawLines(b){
-  const ca=Math.cos(b.a),sa=Math.sin(b.a),px=-sa,py=ca,L=CLAW.len/2;
-  return [-1,0,1].map(j=>{const ox=b.x+px*CLAW.sep*j,oy=b.y+py*CLAW.sep*j;return [[ox-ca*L,oy-sa*L],[ox+ca*L,oy+sa*L]];});
+  const set=a=>{const ca=Math.cos(a),sa=Math.sin(a),px=-sa,py=ca,L=CLAW.len/2;
+    return [-1,0,1].map(j=>{const ox=b.x+px*CLAW.sep*j,oy=b.y+py*CLAW.sep*j;return [[ox-ca*L,oy-sa*L],[ox+ca*L,oy+sa*L]];});};
+  return b.both?set(b.a).concat(set(-b.a)):set(b.a);   // 결정 D-1451: 두 앞발은 X 자로 엇갈린다
 }
 /* 양끝이 뾰족하고 가운데가 굵은 찢긴 자국 */
 function gash(c,p0,p1,w,col,alpha){
@@ -538,18 +606,30 @@ function hoof(c,x,y,a,alpha){
 defineBullets({
   ndTwist:{
     step(b){b.t++;if(b.t>b.life){b.dead=1;return;}
-      const {H,f,sway,width,base}=twistGeom(b),w0=width(0.5);
+      const {H,f,width,base,axis}=twistGeom(b),w0=width(0.5);
       b.x+=b.vx+(still()?0:Math.sin(b.t*0.03+b.seed)*0.35);
       if((b.x<BOX.x+w0*0.6&&b.vx<0)||(b.x>BOX.x+BOX.w-w0*0.6&&b.vx>0))b.vx*=-1;
-      if(b.t>TWIST.arm&&f>0.4){const u=(base-B.py)/H;if(u>=0&&u<=1&&Math.abs(B.px-(b.x+sway(u)))<width(u)*0.75+2)bHitMe();}},
+      b.lean+=(Math.sign(b.vx)*TWIST.lean-b.lean)*TWIST.turn;   // 벽에서 튕기면 기울기도 천천히 돌아선다
+      if(b.t>TWIST.arm&&f>0.4){const u=(base-B.py)/H;if(u>=0&&u<=1&&Math.abs(B.px-axis(u))<width(u)*0.75+2)bHitMe();}
+      // 결정 D-1453: 꼭대기 나선 띠에서 눈뭉치가 기운 쪽으로 비스듬히 흩뿌려진다
+      if(b.t>TWIST.arm+10&&f>0.6&&b.t%TWIST.flurry===0){const tx=axis(1),side=Math.sign(b.lean||1);
+        B.bullets.push({k:'ndFlurry',x:tx+side*width(1)*0.8,y:base-H+4,vx:side*TWIST.flurrySpeed*(0.8+Math.random()*0.4),vy:TWIST.flurryFall,t:0,seed:Math.random()*6});}},
     draw(c,b){drawTwist(c,b);}},
+  ndFlurry:{
+    step(b,X1,X2,Y1,Y2){b.t++;b.x+=b.vx;b.y+=b.vy;b.vy+=0.004;
+      if(b.x<X1-10||b.x>X2+10||b.y>Y2+6){b.dead=1;return;}
+      if(b.y>Y1&&Math.hypot(B.px-b.x,B.py-b.y)<TWIST.flurryR+2)bHitMe();},
+    draw(c,b){const ang=Math.atan2(b.vy,b.vx);
+      for(let i=1;i<6;i++)blob(c,b.x-Math.cos(ang)*i*4,b.y-Math.sin(ang)*i*4,TWIST.flurryR*(1-i*0.15),TWIST.flurryR*0.7*(1-i*0.15),SNOW,0.55-i*0.09);   // 눈보라 꼬리
+      blob(c,b.x,b.y,TWIST.flurryR,TWIST.flurryR*0.85,SNOW,0.97);blob(c,b.x+1.5,b.y+1.5,TWIST.flurryR*0.6,TWIST.flurryR*0.5,FROST,0.6);
+      c.save();c.strokeStyle=FROST_DK;c.globalAlpha=0.8;c.lineWidth=1.2;c.beginPath();c.arc(b.x,b.y,TWIST.flurryR,0,Math.PI*2);c.stroke();c.restore();}},
   ndClaw:{
-    step(b){b.t++;const s=b.t-CLAW.tell;
-      if(s===1&&!still())B.quakeT=Math.max(B.quakeT||0,8);
+    step(b){b.t++;const s=b.t-(b.both?CLAW.both.tell:CLAW.tell);
+      if(s===1&&!still())B.quakeT=Math.max(B.quakeT||0,b.both?12:8);
       if(s>0&&s<=CLAW.strike){const k=s/CLAW.strike;if(clawLines(b).some(l=>segDist(B.px,B.py,l,k)<CLAW.hit))bHitMe();}
       if(s===CLAW.strike)nd().scars.push({lines:clawLines(b),t:0});
       if(s>CLAW.strike+CLAW.stay)b.dead=1;},
-    draw(c,b){const s=b.t-CLAW.tell,L=clawLines(b);
+    draw(c,b){const s=b.t-(b.both?CLAW.both.tell:CLAW.tell),L=clawLines(b);
       if(s<=0){const blink=0.4+0.4*(Math.floor(b.t/3)%2);for(const l of L){c.save();c.setLineDash([9,5]);c.strokeStyle=RED;c.globalAlpha=blink;c.lineWidth=3.5;c.lineCap='round';c.beginPath();c.moveTo(...l[0]);c.lineTo(...l[1]);c.stroke();c.restore();}return;}
       const k=Math.min(1,s/CLAW.strike),fade=s>CLAW.strike?1-(s-CLAW.strike)/CLAW.stay:1;
       for(const l of L){const ex=l[0][0]+(l[1][0]-l[0][0])*k,ey=l[0][1]+(l[1][1]-l[0][1])*k;
@@ -560,7 +640,8 @@ defineBullets({
       if(s>0&&s<=RUSH.run){const d=P.len*s/RUSH.run,[x,y,a]=pathAt(P,d);b.hx=x;b.hy=y;b.ha=a;
         while(b.next<=d){const [px,py,pa]=pathAt(P,b.next),o=b.foot?5:-5;
           if(px>BOX.x-6&&px<BOX.x+BOX.w+6){nd().prints.push({x:px-Math.sin(pa)*o,y:py+Math.cos(pa)*o,a:pa,t:0,seed:Math.random()*6});
-            if(!b.foot)Sound.playSfx('nd_stomp');if(!still())B.quakeT=Math.max(B.quakeT||0,RUSH.quake);}   // 결정 D-879: 찍힐 때마다 쿵
+            if(!b.foot){Sound.playSfx('nd_stomp');nd().waves.push({x:px,y:py,t:0,hit:false,seed:Math.random()*6});}   // 결정 D-1452: 내리찍는 발에서 충격파
+            if(!still())B.quakeT=Math.max(B.quakeT||0,b.foot?RUSH.quake:RUSH.quakeHeavy);}   // 결정 D-879: 찍힐 때마다 쿵
           b.next+=RUSH.step;b.foot^=1;}
         if(Math.hypot(B.px-x,B.py-y)<RUSH.hitR)bHitMe();}
       if(s>RUSH.run+8)b.dead=1;},
@@ -614,30 +695,47 @@ defineBullets({
         if(s<=BERG.rise+4)for(let i=0;i<7;i++){const q=i/7*Math.PI*2+b.seed;blob(c,x+Math.cos(q)*(r+s*1.5),y+Math.sin(q)*5-s*0.6,4,3,SNOW,0.55);}}}},
 });
 
-/* 둔갑마다 공격을 고른다. 둔갑 둘이 풀리면 숨는 발악(눈홍시)을 남은 둔갑과 번갈아 쓴다.
+/* 둔갑마다 공격을 고른다. 둔갑 둘이 풀리면 숨는 발악(심장)을 남은 둔갑과 번갈아 쓴다.
    결정 D-943: 둔갑 순서는 첫 번째부터 무작위다. 다만 같은 모습이 두 번 잇따르지 않는다 (사용자 지시 2026-11-06).
    남은 둔갑이 하나뿐이면 발악과 번갈아 나와 역시 잇따르지 않는다. 예전엔 첫 둔갑이 늘 독수리였다. */
 const HIDE_FIRST='"눈보라야, 나를 감춰라." 눈도깨비가 눈보라 속으로 사라졌다.';
+// 결정 D-1454: 빙산 발악이 처음 나올 때 한 번, 눈도깨비가 볼 수 있겠느냐고 으른다 (사용자 지시 2026-11-11 큰 장터 6 눈기둥)
+const BERG_WARN='"네 눈으로 이것이 보이겠느냐?" 눈보라 속에서 낮은 목소리가 울린다.';
+// 결정 D-1456: 눈보라에 싸여 흐릴 때는 둔갑한 모습 대신 들리고 느껴지는 것만 적는다
+const VEIL_TELL={eagle:'눈보라 속에서 큰 날갯짓 소리가 난다.',bear:'눈보라 속에서 무거운 앞발이 쳐들리는 기척이 난다.',boar:'눈보라 속에서 무언가 눈을 긁는다. 콧김이 거칠다.'};
+const UNVEIL='수리부엉이 눈으로 보니 눈보라 속 정체가 드러났다! 이제 똑똑히 보인다.';
+/* 결정 D-1456: 싸우다 한 번이라도 수리부엉이가 되면 정체가 드러나 끝까지 또렷하다 */
+function checkUnveil(){
+  const n=nd();if(!n.veiled||B.st==='end'||battleForm()!=='owl')return;
+  n.veiled=false;n.swap=22;B.msg=UNVEIL;G.f.ndUnveiled=true;Sound.playSfx('battle_warn');
+}
 function pickNundok(){
-  const n=nd();n.scars=[];n.prints=[];n.tired=false;n.hitsAt=B.hits;
+  const n=nd();n.scars=[];n.prints=[];n.waves=[];n.tired=false;n.reverted=false;n.hitsAt=B.hits;
+  checkUnveil();
   const animals=B.parts.filter(p=>!p.core&&!p.broken),core=part('core'),gone=B.parts.filter(p=>!p.core&&p.broken).length,first=!B.last;
   let p;
   if(!core.broken&&(gone>=2||!animals.length)&&(B.last!==core||!animals.length))p=core;
   else{const o=animals.filter(q=>q!==B.last),pool=o.length?o:animals;p=pool[Math.floor(Math.random()*pool.length)];}
-  B.cur=p;B.last=p;B.st='tell';B.t=first?70:p.core?80:52;B.hitThis=false;B.msg=p.tell;
+  B.cur=p;B.last=p;B.st='tell';B.t=first?70:p.core?80:52;B.hitThis=false;B.msg=!p.core&&n.veiled?VEIL_TELL[p.id]:p.tell;
   if(p.core){
     if(!n.hidSaid){n.hidSaid=true;learn('core:'+B.kind);B.msg=HIDE_FIRST;}
     else B.msg='눈도깨비가 다시 눈보라 속으로 숨었다.';
-    bLater(battleForm()==='owl'?'수리부엉이 눈에는 눈 밑에서 솟을 얼음의 금이 보인다.':'보이지 않는 것이 온다. 발밑 눈이 들썩인다.',34);
+    const after=battleForm()==='owl'?'수리부엉이 눈에는 눈 밑에서 솟을 얼음의 금이 보인다.':'보이지 않는 것이 온다. 발밑 눈이 들썩인다.';
+    if(!n.bergWarned){n.bergWarned=true;B.t+=26;bLater(BERG_WARN,30);bLater(after,70);}
+    else bLater(after,34);
   }
 }
-/* 결정 D-940: 둔갑 패턴을 잘 피했으면 눈도깨비가 지쳐 둔갑이 잠깐 풀리고, 판의 얼음 속에서 눈홍시가 드러난다 (날아가거나 떨어지지 않는다).
-   이번 공격에 nundok_gloat_hits 번 맞았으면 기세가 올라 둔갑이 풀리지 않는다(빈틈 없이 다음 둔갑으로).
-   발악(숨어서 빙산)이 끝나면 늘 지쳐 모습을 드러낸다. 처음 드러날 때 한 번만 눈홍시가 무엇인지 아이가 알아챈다. */
-const OPEN_MSG={eagle:'독수리 둔갑이 풀리며 눈도깨비가 헐떡인다. 얼음 속 눈홍시가 드러났다.',bear:'곰 둔갑이 풀리며 눈도깨비가 헐떡인다. 얼음 속 눈홍시가 드러났다.',
-  boar:'멧돼지 둔갑이 풀리며 눈도깨비가 헐떡인다. 얼음 속 눈홍시가 드러났다.',core:'모습이 드러났다. 지친 눈도깨비 앞에 얼음 속 눈홍시가 드러났다.'};
-const HONGSI_FIRST='둔갑이 풀리자 판의 얼음 속에 붉은 것이 비친다. …창고에서 사라진 눈홍시다! 저 기운으로 둔갑하는 거다.';
-const NO_GROGGY='한 대 먹인 눈도깨비가 기세등등하다. 둔갑이 풀리지 않는다.';
+/* 결정 D-1450: 둔갑 패턴을 잘 피했으면 눈도깨비가 그 둔갑 모습 그대로 지쳐 헐떡이고, 가슴과 판의 얼음 속에서 그 둔갑의 심장이 드러난다
+   (날아가거나 떨어지지 않는다). 이번 공격에 nundok_gloat_hits 번 맞았으면 기세가 올라 지치지 않는다(빈틈 없이 다음 둔갑으로).
+   발악(숨어서 빙산)이 끝나면 늘 본모습으로 드러나 지친다. 처음 드러날 때 한 번만 그것이 심장인 줄 아이가 알아챈다. */
+const OPEN_MSG={eagle:'독수리 모습 그대로 눈도깨비가 헐떡인다. 처진 깃 사이로 푸른 심장이 비친다.',
+  bear:'곰 모습 그대로 눈도깨비가 헐떡인다. 털가죽 속에서 푸른 심장이 비친다.',
+  boar:'멧돼지 모습 그대로 눈도깨비가 헐떡인다. 곤두선 갈기 밑으로 푸른 심장이 비친다.',
+  core:'모습이 드러났다. 지친 눈도깨비의 얼음 속에서 푸른 심장이 뛴다.'};
+const OPEN_VEILED='눈보라 속에서 거친 숨소리가 난다. 푸른 빛 하나가 뛴다.';
+const HEART_FIRST='눈도깨비가 숨을 몰아쉰다. 얼어붙은 가슴 속에서 푸른 불이 뛴다. …저게 심장이다!';
+const HEART_FIRST_VEILED='눈보라 속에서 거친 숨소리가 난다. 푸른 불 하나가 뛴다. …저게 심장인가!';
+const NO_GROGGY='한 대 먹인 눈도깨비가 기세등등하다. 지치지 않는다.';
 function nundokOpen(p){
   const n=nd();
   // 기세를 올린 동안(nundok_gloat_frames)은 표식이 없어도 숨을 고르는 틈이라 선물은 건넬 수 있다 (battle.js B.openHold)
@@ -645,57 +743,75 @@ function nundokOpen(p){
   let x,y;
   const z=bMarkZone();   // 결정 D-876: 판 안쪽에만
   for(let k=0;k<30;k++){x=z.x1+Math.random()*(z.x2-z.x1);y=z.y1+Math.random()*(z.y2-z.y1);if(Math.hypot(x-B.px,y-B.py)>=70)break;}
-  n.tired=true;B.mark={x,y,t:150,max:150,part:p};n.reveal=0;
-  if(!n.hongsiSaid){n.hongsiSaid=true;G.f.ndHongsiSeen=true;B.msg=HONGSI_FIRST;}else B.msg=OPEN_MSG[p.id];
+  n.tired=true;n.reverted=false;B.mark={x,y,t:150,max:150,part:p};n.reveal=0;
+  if(!n.heartSaid){n.heartSaid=true;G.f.ndHeartSeen=true;B.msg=n.veiled?HEART_FIRST_VEILED:HEART_FIRST;}
+  else B.msg=n.veiled&&!p.core?OPEN_VEILED:OPEN_MSG[p.id];
   return true;
 }
 /* 얼음 금: 둔갑 기운(부위 내구도)이 깎인 만큼 번진다 */
 function iceCrack(){const all=B.parts.reduce((s,p)=>s+p.max,0),left=B.parts.reduce((s,p)=>s+Math.max(0,p.hp),0);return all?1-left/all:0;}
-/* 결정 D-682·결정 D-686·결정 D-940: 눈홍시를 싼 얼음을 친 뒤 그 둔갑이 깎이고, 연장이 있으면 확률로 소매 속 재료가 쏟아진다 */
+/* 결정 D-682·결정 D-686·결정 D-1450: 심장을 친 뒤 그 둔갑이 깎이고 둔갑이 풀려 본모습으로 돌아온다(nundok_revert_frames 동안 헐떡인다).
+   연장이 있으면 확률로 소매 속 재료가 쏟아진다 */
 function nundokHit(p,m){
-  bSplash(m.x,m.y,BLUE);Sound.playSfx('ice_tinkle');   // 결정 D-940: 눈홍시를 싼 얼음이 쩡 하고 운다
+  bSplash(m.x,m.y,BLUE);Sound.playSfx('ice_tinkle');   // 심장을 싼 얼음이 쩡 하고 운다
   if(p.core)return;
+  const n=nd();n.reverted=true;B.openHold=T().nundok_revert_frames;
   if(p.broken){B.msg=FORMS[p.id]+' 둔갑이 풀렸다! '+ITEMS[p.mat].n+' 획득.';return;}
-  const tool=battleTool();if(!tool)return;
+  const back=n.veiled?'눈보라 속 모습이 바뀐다.':FORMS[p.id]+' 둔갑이 풀려 본모습으로 돌아왔다.';
+  const tool=battleTool();if(!tool){B.msg='심장을 쳤다! '+back;return;}
   const by=jo(toolName(tool),'으로','로')+' ',fit=toolFit(p,tool)==='bad'?' 효과가 적은 것 같다.':'';
-  if(Math.random()<toolChance(p,T().nundok_spill_chance,tool)){B.loot.push(p.mat);B.msg=by+'얼음을 쳤다! 소매 속에서 '+jo(ITEMS[p.mat].n,'이','가')+' 쏟아졌다.';}
-  else B.msg=by+'얼음을 쳤다! 금이 번지고 '+FORMS[p.id]+' 둔갑이 흔들린다.'+fit;
+  if(Math.random()<toolChance(p,T().nundok_spill_chance,tool)){B.loot.push(p.mat);B.msg=by+'심장을 쳤다! 둔갑이 풀리며 소매 속에서 '+jo(ITEMS[p.mat].n,'이','가')+' 쏟아졌다.';}
+  else B.msg=by+'심장을 쳤다! '+back+fit;
 }
 function tickNundok(){const n=nd();if(n.flap>0)n.flap--;if(n.swap>0)n.swap--;if(B.st==='open')n.reveal++;
-  for(const s of n.scars)s.t++;for(const p of n.prints)p.t++;n.prints=n.prints.filter(p=>p.t<260);if(n.prints.length>140)n.prints.splice(0,n.prints.length-140);}
-/* 판 바닥: 멧돼지 발자국, 발톱 자국 세 줄, 얼음이 갈라지며 드러나는 눈홍시 (결정 D-940) */
+  checkUnveil();
+  for(const s of n.scars)s.t++;for(const p of n.prints)p.t++;n.prints=n.prints.filter(p=>p.t<260);if(n.prints.length>140)n.prints.splice(0,n.prints.length-140);
+  // 결정 D-1452: 멧돼지 충격파. 퍼지는 고리 띠에 닿으면 한 번 맞는다 (고리는 판 위에 납작하게 0.6)
+  for(const w of n.waves){w.t++;const r=RUSH.wave*w.t/RUSH.waveT;
+    if(!w.hit&&r>8&&w.t<=RUSH.waveT&&Math.abs(Math.hypot(B.px-w.x,(B.py-w.y)/0.6)-r)<RUSH.band){w.hit=true;bHitMe();}}
+  n.waves=n.waves.filter(w=>w.t<=RUSH.waveT+6);
+}
+/* 판 바닥: 멧돼지 발자국과 충격파, 발톱 자국, 얼음이 갈라지며 드러나는 심장 (결정 D-1450) */
 function drawNundokFloor(c){
-  const n=nd();
+  const n=nd(),va=n.veiled?veilAtk():1;
   for(const p of n.prints){const al=Math.min(1,(260-p.t)/60),sd=p.seed||0;
     blob(c,p.x+1,p.y+2,17,8,FROST,0.45*al);blob(c,p.x,p.y,13,6,'#c9d6de',0.5*al);   // 결정 D-879: 무게에 눌려 깊게 꺼진 눈
     hoof(c,p.x,p.y,p.a,0.85*al);
-    if(p.t<RUSH.ring){const k=p.t/RUSH.ring;   // 쿵: 눈먼지 고리가 퍼지고 눈덩이가 튄다
-      c.save();c.strokeStyle=SNOW;c.globalAlpha=0.85*(1-k);c.lineWidth=3*(1-k)+1;c.beginPath();c.ellipse(p.x,p.y,10+k*34,(10+k*34)*0.42,0,0,Math.PI*2);c.stroke();c.restore();
+    if(p.t<RUSH.ring){const k=p.t/RUSH.ring;   // 쿵: 눈덩이가 튄다
       for(let i=0;i<7;i++){const a=sd+i*0.9,d=8+k*26;blob(c,p.x+Math.cos(a)*d,p.y+Math.sin(a)*d*0.45-Math.sin(k*Math.PI)*12,3.4,2.6,SNOW,0.9*(1-k));}}}
+  // 결정 D-1452: 내리찍은 발에서 땅을 타고 퍼지는 충격파: 갈라지는 땅 금, 눈먼지 고리, 들썩 튀는 눈덩이
+  for(const w of n.waves){const k=Math.min(1,w.t/RUSH.waveT),r=RUSH.wave*k,fade=w.t>RUSH.waveT?1-(w.t-RUSH.waveT)/6:1;
+    for(let i=0;i<6;i++){const a=w.seed+i*1.05,L=r*0.9;brush(c,[[w.x,w.y],[w.x+Math.cos(a)*L*0.5,w.y+Math.sin(a)*L*0.3+2],[w.x+Math.cos(a)*L,w.y+Math.sin(a)*L*0.6]],1.6,FROST_DK,0.7*fade*va);}
+    c.save();c.strokeStyle=SNOW;c.globalAlpha=0.9*fade*va;c.lineWidth=RUSH.band*1.4;c.beginPath();c.ellipse(w.x,w.y,Math.max(1,r),Math.max(1,r*0.6),0,0,Math.PI*2);c.stroke();
+    c.strokeStyle=FROST_DK;c.globalAlpha=0.55*fade*va;c.lineWidth=1.4;c.beginPath();c.ellipse(w.x,w.y,Math.max(1,r+RUSH.band*0.7),Math.max(1,(r+RUSH.band*0.7)*0.6),0,0,Math.PI*2);c.stroke();c.restore();
+    for(let i=0;i<10;i++){const a=w.seed+i*0.63;blob(c,w.x+Math.cos(a)*r,w.y+Math.sin(a)*r*0.6-Math.sin(k*Math.PI)*10,3,2.4,SNOW,0.85*fade*va);}}
   for(const s of n.scars)for(const l of s.lines){gash(c,l[0],l[1],12,'#3a3f48',0.75);gash(c,[l[0][0],l[0][1]-5],[l[1][0],l[1][1]-5],3,SNOW,0.85);}
   if(B.mark&&B.st==='open'){const m=B.mark,k=Math.min(1,n.reveal/20),kk=clamp((k-0.35)/0.65,0,1);
     // 얼음에 금이 번진다
     for(let i=0;i<8;i++){const a=i/8*Math.PI*2+hash(i)*0.5,L=(16+hash(i*3)*24)*Math.min(1,k*1.6),mid=a+(hash(i*5)-0.5)*0.7;
       const P=[[m.x,m.y],[m.x+Math.cos(mid)*L*0.5,m.y+Math.sin(mid)*L*0.35],[m.x+Math.cos(a)*L,m.y+Math.sin(a)*L*0.7]];
       brush(c,P,1.8,FROST_DK,0.85);brush(c,P.map(([x,y])=>[x+1,y-1]),0.8,'#ffffff',0.7);}
-    if(kk>0){   // 벌어진 판 얼음 틈에서 눈홍시를 싼 얼음덩이가 솟는다
+    if(kk>0){   // 벌어진 판 얼음 틈에서 그 둔갑의 심장이 솟는다
       blob(c,m.x,m.y+6,28*kk,12*kk,'#0e1820',0.7);
       for(let i=0;i<6;i++){const a=i/6*Math.PI*2+0.4,r=24*kk+4;
         sharp(c,[[m.x+Math.cos(a-0.32)*r*0.85,m.y+6+Math.sin(a-0.32)*r*0.4],[m.x+Math.cos(a)*(r+9),m.y+6+Math.sin(a)*(r+9)*0.4-5*kk],[m.x+Math.cos(a+0.32)*r*0.85,m.y+6+Math.sin(a+0.32)*r*0.4]],ICE,0.95,FROST_DK,1);}
-      hongsiInIce(c,m.x,m.y-4*kk,0.55+0.4*kk,iceCrack());}}
+      noeHeart(c,m.x,m.y-4*kk,0.55+0.4*kk,B.cur.core?'core':B.cur.id,iceCrack());}}
 }
 /* 소용돌이는 판 위로 솟아 하늘까지 이어진다: 판 밖 윗부분만 따로 그린다 */
 function drawNundokOver(c){
   if(!B.bullets.some(b=>b.k==='ndTwist'))return;
+  const va=nd().veiled?veilAtk():1;
   c.save();c.beginPath();c.rect(0,0,LW,BOX.y);c.clip();
-  for(const b of B.bullets)if(b.k==='ndTwist')drawTwist(c,b,0.5);
+  for(const b of B.bullets)if(b.k==='ndTwist')drawTwist(c,b,0.5*va);
   c.restore();
 }
 
 defineEnemies({
   dokkaebi:{name:'눈도깨비',calmLabel:'진정',
     // 결정 D-227: 전투 글귀는 일어난 일만 짧게. 피하라·치라는 안내는 쓰지 않는다
-    intro:'"…내 걸음을 본 놈이 있구나." 서리 뿔을 인 눈도깨비가 어깨옷을 떨친다.',
+    // 결정 D-1456: 수리부엉이 눈이 아니면 모습이 흐려 목소리만 또렷하다
+    get intro(){return G.form==='owl'?'"…내 걸음을 본 놈이 있구나." 서리 뿔을 인 눈도깨비가 어깨옷을 떨친다.'
+      :'"…내 걸음을 본 놈이 있구나." 눈보라 속에서 낮은 목소리가 울린다. 모습이 흐릿하다.';},
     settle:true,markLife:150,quietHits:true,   // 결정 D-765
     parts:tableParts('dokkaebi',{
       eagle:{atk:'ndWind',mark:'홍',tell:'눈도깨비가 독수리로 둔갑해 날개를 쳐든다.',weak:'눈도깨비가 약해졌다. 이제 독수리로는 둔갑하지 못한다.'},
@@ -703,14 +819,16 @@ defineEnemies({
       boar:{atk:'ndRush',mark:'홍',tell:'눈도깨비가 멧돼지로 둔갑해 눈을 긁는다.',weak:'눈도깨비가 약해졌다. 이제 멧돼지로는 둔갑하지 못한다.'},
       core:{atk:'ndBerg',mark:'홍',tell:HIDE_FIRST}}),
     pickAttack:pickNundok,openMark:nundokOpen,onMarkHit:nundokHit,tickHazards:tickNundok,drawFloor:drawNundokFloor,drawOver:drawNundokOver,
+    // 결정 D-1456: 눈보라에 싸인 동안 공격도 흐리다. 빙산 발악은 D-880 규칙 그대로 둔다
+    bulletAlpha:b=>nd().veiled&&b.k!=='ndBerg'?veilAtk():1,
     // 결정 D-243: 달래기는 메밀떡·엿 선물로만 한다
     likes:TABLES.CALM.dokkaebi,likeText:'눈도깨비가 좋아한다.',
     likeTexts:{memiltteok:'"메밀떡이다, 메밀떡!" 눈도깨비가 냄새를 맡더니 무섭던 얼굴로 덩실덩실 춤을 춘다. 고드름 수염이 짤랑댄다.',
       dad_yeot:'아빠가 맡긴 엿을 건넸다. "엿이다, 엿! 내 거지?" 눈도깨비가 엿가락을 소중히 끌어안는다. 엿은 돌려받지 못한다.'},
-    coreHidden:'',coreShown:'',   // 결정 D-683: 눈홍시(핵심)는 발악 때 따로 알린다 (pickNundok)
-    // PA-21 불씨 지급은 jangteo/story.js의 전투 종료 처리에서 한 번만 한다.
-    calmWin:'눈도깨비가 훔친 설 제수를 돌려놓고 눈홍시 하나를 더 얹는다. "고맙다, 고마워! 이 불씨도 네 거다!" 가슴에서 푸른 불씨 하나를 떼어 준다.',calmGift:'nunhongsi',
-    win:'얼음이 깨지고 눈홍시가 굴러 나오자 눈도깨비가 눈 더미로 무너진다. 부러진 얼음 뿔과 닳은 싸리비 한 자루만 남았다.',   // 결정 D-940
+    coreHidden:'',coreShown:'',   // 결정 D-683: 발악(심장)은 따로 알린다 (pickNundok)
+    // PA-21 불씨 지급과 얼음 뿔(nundok_horn)은 jangteo 지역 쪽 전투 종료 처리에서 한 번만 준다.
+    calmWin:'눈도깨비가 훔친 설 제수를 제자리에 돌려놓는다. "고맙다, 고마워! 이 불씨도 네 거다!" 가슴에서 푸른 불씨 하나를 떼어 주고, 얼음 뿔 끝도 똑 꺾어 얹어 준다.',
+    win:'심장의 푸른 불이 꺼지자 눈도깨비가 눈 더미로 무너진다. 부러진 얼음 뿔과 닳은 싸리비 한 자루만 남았다.',   // 결정 D-1450
     lose:'눈도깨비의 눈보라에 창고 밖으로 내동댕이쳐졌다.',
     backdrop:drawStoreRoom,draw:drawNundok},
 });
