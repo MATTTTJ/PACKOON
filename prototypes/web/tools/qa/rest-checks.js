@@ -15,8 +15,16 @@ const regions = {
     flags: "G.f.sangunMet=true;G.f.seolpi=true;G.f.shortcut=true;G.nicknames=[{id:'dol_stone_hand',text:'돌손',by:'돌쇠 할배',region:'dolneomeo',lost:false}];" },
 };
 
+/* 결정 D-1460: 맞은 상태를 세운 뒤 공격 끝 빈틈(openMark)을 부른다. 골렘은 눈폭탄에 맞음, 눈도깨비는 둔갑 공격에 세 번 맞음,
+   어둑차사는 도포 솔기를 못 찢어 조임. 엉킨 칡은 원래 맞은 것과 상관없다 */
+const WEAK_PROBE = {
+  dolneomeo: "(()=>{const p=B.parts.find(q=>q.id==='head');B.cur=p;B.st='open';B.hitThis=true;B.hits+=1;B.lightTurn=false;B.mark=null;openMark();return {ok:!!B.mark&&B.mark.part===p,msg:B.msg};})()",
+  jangteo: "(()=>{const p=B.parts.find(q=>q.id==='bear');B.cur=p;B.st='open';B.hitThis=true;B.hits+=3;B.mark=null;openMark();return {ok:!!B.mark&&!!B.nd&&B.nd.tired,msg:B.msg};})()",
+  yeongsan: "(()=>{const p=B.parts.find(q=>q.id==='tail');B.cur=p;B.st='open';B.hitThis=true;B.hits+=1;const had=!!B.ch;if(had)B.ch.robeFail=true;B.mark=null;openMark();return {ok:!!B.mark&&(!had||B.msg.includes('풀려났다')),had,msg:B.msg};})()",
+};
+
 async function runRest({ browser, outDir }) {
-  const findings = [], checked = [];
+  const findings = [], checked = [], weakChecked = [];
   const fail = (rule, message) => findings.push({ rule, severity: '높음', message });
   const base = browser.url.replace(/\?.*$/, '');
   for (const mode of ['expanded', 'classic']) {
@@ -37,6 +45,12 @@ async function runRest({ browser, outDir }) {
         const lose = async result => {
           await browser.eval(`(REG.${s.start}(),1)`);
           await browser.until(`!!B&&B.kind==='${s.kind}'&&B.st!=='intro'`, { timeout: 9000, label: '전투 ' + where });
+          // 결정 D-1460: 공격에 맞았어도(못 피했어도) 그 공격 뒤 약점이 나온다
+          if (result === 'lose' && WEAK_PROBE[id]) {
+            const weak = await browser.eval(WEAK_PROBE[id]);
+            if (!weak.ok) fail('weak-after-hit', `${where}: 공격에 맞은 뒤 약점이 나오지 않았다 ${JSON.stringify(weak)}`);
+            weakChecked.push({ where, weak });
+          }
           await browser.eval(`(bEnd('${result}'),1)`);
           await browser.until("!$('bResult').hidden", { timeout: 8000, label: '결과 창 ' + where });
           await browser.eval("($('bResOk').click(),1)");
@@ -73,9 +87,9 @@ async function runRest({ browser, outDir }) {
   }
   fs.mkdirSync(outDir, { recursive: true });
   const file = path.join(outDir, 'rest.json');
-  fs.writeFileSync(file, JSON.stringify({ checked, findings }, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(file, JSON.stringify({ checked, weakChecked, findings }, null, 2) + '\n', 'utf8');
   return { name: 'rest', status: findings.length ? 'fail' : 'pass', findings, evidence: [file],
-    summary: `네 지역 보스 앞 쉼터를 두 구성에서 ${checked.length}번 켜고, 지면 쉼터로 돌아오고 물러나면 그 자리에 남는지 보았다` };
+    summary: `네 지역 보스 앞 쉼터를 두 구성에서 ${checked.length}번 켜고, 지면 쉼터로 돌아오고 물러나면 그 자리에 남는지 보았다. 공격에 맞은 뒤에도 약점이 나오는지 ${weakChecked.length}번 보았다` };
 }
 
 module.exports = { runRest };

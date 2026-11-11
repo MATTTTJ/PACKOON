@@ -635,7 +635,8 @@ defineBullets({
       handLabel(c,b,0.75*ph.k);}},
   /* 결정 D-1323: 도포 솔기. 넋의 손이 다 가라앉으면(wait → lit) 솔기에 빛 한 줄이 갈라지고, 손 높이의 솔기 위에 금빛 칠 곳이 뜬다.
      chasa_robe_tear_hits 번 치면 찢긴다(torn, chasaStrike). chasa_robe_tear_frames 안에 못 찢으면 도포가 조인다(squeeze):
-     손 둘레 빛이 좁아지다가 이름 하나를 감싸 쥐고 풀어 준다(이름이 없으면 한 칸 다친다). 그때는 빈틈이 열리지 않는다 */
+     손 둘레 빛이 좁아지다가 이름 하나를 감싸 쥐고 풀어 준다(이름이 없으면 한 칸 다친다).
+     결정 D-1460: 그래도 풀려난 뒤엔 빈틈이 열린다(예전엔 열리지 않았다. 사용자 지시 2026-11-11 공통 "보스 공격 패턴을 다 못 피해도 약점은 나오게") */
   chasaSeam:{
     step(b){const t=T(),S=ch();if(b.flash>0)b.flash--;
       if(b.ph==='wait'){if(!B.bullets.some(q=>q.k==='chasaHand'&&!q.dead)){b.ph='lit';b.t=0;const q=bFitMark(b.x,clamp(B.py-14,BOX.y+20,BOX.y+BOX.h-16));b.x=q.x;b.y=q.y;
@@ -733,12 +734,17 @@ function floorSpot(){const aim=bAim(),z=bMarkZone();let x,y,n=0;
    - 발악 뒤에는 마지막 부름. 그 부름을 참았으면 핵을 묶은 낙관 매듭(오래 남고 더 깎는다).
    - 핵이 드러났으면 핵(갓 아래 새잎 빛)이 판 위쪽 가운데로 드리운다.
    - 아니면 바닥에서 이름 하나가 떠오른다. 그 패턴을 낸 부위가 깎인다(갓의 차례 뒤에는 적패지, 찢겼으면 남은 부위) */
+// 결정 D-1460: 도포가 조여 이름을 가져갔어도 풀려난 뒤 빈틈은 열린다 (예전 D-1323: 이번엔 빈틈이 없었다)
 function chasaOpen(p){
+  const S=ch(),freed=p.id==='tail'&&S.robeFail;if(freed)S.robeFail=false;
+  const r=chasaOpenAt(p);
+  if(freed&&B.mark)B.msg='(…도포 속에서 겨우 풀려났다.) '+B.msg;
+  return r;
+}
+function chasaOpenAt(p){
   const S=ch(),N=B.names,core=part('core'),t=T();
   if(p===LEDGER){B.mark=null;nameCallBegin(core,true);return true;}
   if(core.broken){B.mark=null;return true;}
-  // 결정 D-1323: 도포가 조여 이름을 가져갔으면 이번엔 빈틈이 없다
-  if(p.id==='tail'&&S.robeFail){S.robeFail=false;B.mark=null;B.msg='(…도포 속에서 겨우 풀려났다.)';return true;}
   // 결정 D-1322: 텅 빈 손이면 먹힌 내 별명이 손 바로 곁 바닥에서 떠오른다 (핵이 드러났어도)
   if(nameHollow()&&N&&N.eaten.length){
     const target=!p.core&&!p.broken&&p!==LEDGER?p:B.parts.find(q=>!q.core&&!q.broken)||core,f=nextFloorName(),a=bAim(),ang=Math.random()*Math.PI*2,d=t.name_hollow_near;
