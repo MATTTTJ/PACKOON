@@ -330,7 +330,11 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
         const hs="zoneObjects('wanderers').find(w=>w.id==='j_haengsu').x";
         for(let i=0;i<3&&!await read('G.ended');i++){await jumpTo(await read(hs),192);await key('e');await settle(/같이 갈게요/);}
         if(!await read("has('solbang_cheong')"))throw new Error('행수의 셈(솔방울청)을 받지 못했다');
-      }else for(let i=0;i<3&&!await read('G.ended');i++)await npc('bueong');   // 결정 D-1440: 옛 구성은 부엉 영감에게 알리면 끝난다
+      }else{
+        // 결정 D-1440: 옛 구성은 부엉 영감에게 알리면 끝난다. 수리부엉이 모습이면 영감이 손님 대접을 하니(D-232) 플레이어처럼 본모습으로 돌아간다
+        await read("(G.form&&revertForm(),1)");
+        for(let i=0;i<3&&!await read('G.ended');i++)await npc('bueong');
+      }
       if(!await read('G.ended'))throw new Error('도깨비를 잡은 뒤 큰 장터가 끝나지 않았다');
       });
     await next();
