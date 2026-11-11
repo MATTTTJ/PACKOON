@@ -41,6 +41,11 @@ h1 span{color:var(--gold)}
 .status .tool:empty,.status .form-now[hidden]{display:none}
 .hearts{display:flex;gap:1px;font-size:1.25em;line-height:1;color:#e0573a}
 .hearts .off{color:#4b3a2e}
+/* 결정 D-1461: 먹어서 품은 기운 (food.js). 하트 아래 줄에 금빛 글씨로, 보스 싸움에서는 금빛 하트로 */
+.food-buff{color:#f2c75c;font-size:.85em;white-space:nowrap}
+.food-buff[hidden]{display:none}
+.hearts .guard{color:#e8b33a;text-shadow:0 0 3px rgba(232,179,58,.6)}
+.food-effect{margin-top:4px;color:var(--ink-soft,#6f5a44)}
 .tool{display:flex;align-items:center;gap:4px;color:var(--hanji);border-left:1px solid #4b3a2e;padding-left:8px;white-space:nowrap}
 .tool canvas{width:1.4em;height:1.4em;image-rendering:pixelated}
 .goal{background:rgba(242,230,204,.92);color:var(--meok);padding:3px 9px;border-radius:4px;border-left:3px solid var(--dan);max-width:min(52vw,420px);font-family:var(--display)}

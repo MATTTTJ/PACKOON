@@ -4,7 +4,7 @@
 (()=>{
 /* 표(design/data/*.csv)에서 만든 것: 아이템, 가공법, 수첩. 표를 고치면 node prototypes/web/tools/build-data.js */
 defineItems(TABLES.ITEMS);
-defineItems({rice:{eat:2}});   // 게임 전용 칸
+// 결정 D-1461: 먹으면 오르는 체력과 기운은 foods.csv 에서 온다 (주먹밥 체력 2, D-290)
 defineRecipes(TABLES.RECIPES);
 /* 메밀떡은 시루가 깨어난 뒤에도 모락에게 따로 배워야 쓸 수 있다 (trades.csv t_morak) */
 RECIPES.siru.find(r=>r.out==='memiltteok').know='morak:memiltteok';

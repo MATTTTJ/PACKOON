@@ -113,10 +113,12 @@ function renderBag(pop){
     const name=el('b',null,ITEMS[id].n);const ch=el('span','chip');ch.appendChild(rarityIcon(ITEMS[id].r));ch.appendChild(el('span',null,RAR[ITEMS[id].r]));name.appendChild(ch);info.appendChild(name);
     info.appendChild(el('div',null,ITEMS[id].d));
     const row=el('div','row');
-    // 먹을거리는 '먹기'가 주 버튼이다
-    const eat=ITEMS[id].eat;
-    if(eat){const b=el('button','btn primary','먹기 · 체력 +'+eat);b.type='button';b.disabled=G.hp>=G.maxhp;
-      b.onclick=()=>{takeItem(id,1);G.hp=Math.min(G.maxhp,G.hp+eat);refreshHud();if(!has(id))selItem=null;renderBag();};row.appendChild(b);}
+    // 먹을거리는 '먹기'가 주 버튼이다. 결정 D-1461: 모든 먹을거리가 체력이나 다음 보스 싸움의 기운을 준다 (food.js, foods.csv)
+    const eat=!!ITEMS[id].food;
+    if(eat){const f=ITEMS[id].food;
+      if(f.k)info.appendChild(el('div','small food-effect','먹으면 '+FOOD_BUFFS[f.k].n+' 기운 '+f.lv+': 다음 보스 싸움에서 '+FOOD_BUFFS[f.k].what(f.lv)+'.'+(G.buff&&G.buff.k!==f.k?' 지금 품은 '+FOOD_BUFFS[G.buff.k].n+' 기운과 바뀐다.':'')));
+      const why=foodBlock(id),b=el('button','btn primary',foodEatLabel(id));b.type='button';b.disabled=!!why;if(why)b.title=why;
+      b.onclick=()=>{eatFood(id);if(!has(id))selItem=null;renderBag();};row.appendChild(b);}
     const put=el('button',eat?'btn':'btn primary',HEIR[pouch.tool].short+'에 넣기');put.type='button';put.onclick=()=>putIn(id);row.appendChild(put);
     if(isHomeCraft(id)){const b=el('button','btn','까치 편에 집으로 보내기');b.type='button';b.disabled=brewing||knows('home:'+G.region);b.onclick=()=>sendCraftHome(id);row.appendChild(b);}
     info.appendChild(row);

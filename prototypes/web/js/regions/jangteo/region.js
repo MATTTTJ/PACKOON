@@ -100,8 +100,7 @@ defineIcons({
   garaetteok:P=>{P(2,6,12,4,'#8a7a62');P(2,7,12,2,'#f7f3ea');P(3,6,10,1,'#ffffff');P(13,6,1,4,'#e2dbcc');P(6,7,1,2,'#e6dfd0');P(10,7,1,2,'#e6dfd0');},
   hobakyeot:P=>{P(3,4,4,9,'#6a3a10');P(4,5,2,7,'#e8a02a');P(9,3,4,10,'#6a3a10');P(10,4,2,8,'#e8a02a');P(4,5,1,2,'#f6d27a');P(10,4,1,2,'#f6d27a');},
 });
-// 결정 D-290: 보상 먹을거리는 먹으면 기운이 조금 난다 (주먹밥은 2)
-defineItems({yugwa:{eat:1},gangjeong:{eat:1},gotgam:{eat:1},gunbam:{eat:1},injeolmi:{eat:1},garaetteok:{eat:1},hobakyeot:{eat:1}});
+// 결정 D-290·D-1461: 보상 먹을거리가 먹으면 주는 체력과 기운은 design/data/foods.csv 에 있다
 
 /* 가공법은 heirlooms.csv. 시루는 떡집 모락의 김 올리기를 배우면 깨어나고, 메밀떡은 모락에게 따로 배운다 (data/common.js) */
 /* 수리부엉이 손님의 외상은 장터의 밤 장부에서만 연다 (PA-47, forms.js) */

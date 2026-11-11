@@ -59,6 +59,8 @@ function refreshHud(){
   $('btnMap').hidden=CLASSIC;$('padMap').hidden=CLASSIC;$('btnMapEnd').hidden=CLASSIC;
   $('mapKeyHint').hidden=CLASSIC;$('mapCoverKeys').hidden=CLASSIC;
   $('hearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('');
+  // 결정 D-1461: 품은 기운은 하트 오른쪽에 이름과 세기로 보인다. 자세한 것은 마우스를 올리거나 보따리에서 본다
+  const buff=$('foodBuff');if(buff){buff.hidden=!validBuff(G.buff);buff.textContent=foodBuffName(G.buff);buff.title=foodBuffText(G.buff);}
   // 결정 D-1405 (사용자 피드백 2026-11-09): 하트 아래 도구 칸(결정 D-602)을 뺐다. 필드에는 도구를 바꾸는 단추·키가 없어(낫을 받으면 곡괭이 자리를 낫이 대신한다)
   //   무기 고르는 칸처럼 보여 헷갈렸다. 든 연장은 주인공 손에 보이고, 이름과 날 세움은 보따리 '손에 든 연장' 줄에 있다. 도구 바꾸기는 보스 전투(Q·도구 단추)에서만 한다.
   if(G){refreshGoal();refreshFormUi();}
