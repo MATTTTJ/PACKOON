@@ -14,11 +14,16 @@ const Rg=defineRegion('jangteo',{
       '돌산을 넘고도 고개를 여럿 더 넘었다. 첫눈은 고갯길에서 맞았다. 눈 덮인 길 끝에 붉은 등불이 줄지어 걸린 큰 장터가 나왔다. 설을 앞둔 대목이라 장꾼과 길손이 북적인다.',
       // 결정 D-775: 사람들 얼굴이 어두운 까닭에 보이지 않는 도둑의 낌새를 넣는다 (사용자 피드백 2026-11-05). 보스는 몸을 감추고 창고를 터는 눈도깨비다. 결정 D-860: 모습만 안 보일 뿐 발자국은 남는다 (사용자 피드백 2026-11-06). 큰 발자국은 찍히는데 본 사람이 없어서 '보이지 않는 도둑'이다.
       '그런데 장터 사람들 얼굴이 어둡다. 밤마다 물건이 없어진단다. 창고 문은 잠긴 그대로이고 문 앞 눈밭엔 큰 발자국이 찍혀 있는데, 그 발 임자를 본 사람이 없다. 장꾼들은 눈에 안 보이는 무언가의 짓이라고 수군거린다.',
-      '설 제사상에 올릴 눈홍시까지 사라졌다고 한다. 두꺼비 할멈이 엄마 기운을 붙드는 데 좋다고 한 그 눈홍시다.',
+      // 결정 D-1439: 눈홍시 줄을 빼고, 돌너머에서 들은 상단 소문을 큰 장터에 온 까닭으로 둔다 (사용자 지시 2026-11-11 큰 장터 7)
+      '돌너머에서 들은 소문으로는, 이 장터 보부상 상단 숙소엔 오가는 보부상이 장부에 다 적힌다고 한다.',
       '보부상은 장터에 오면 숙소부터 들른다. 북쪽으로 서둘러 떠난 아빠도 여기 묵었을까.']},
-    end:{kicker:'큰 장터 체험판 완료',head:'북쪽 영산으로',body:[
-      '엄마가 동네에 떡을 돌리던 시루로, 이번엔 엄마를 위한 홍시 약떡을 쪘다. 까치가 떡 보자기를 물고 남쪽으로 날아갔다.',
-      '"값은 이미 치러졌다. 이번엔 내가 치른다." 누가, 무슨 값을 치렀다는 걸까. 아빠는 북쪽 영산에 있다. 메모 끝줄이 자꾸 떠오른다. "이름 불러도 돌아보지 말 것."']},
+    // 결정 D-1440: 끝은 상단 행렬을 따라 북쪽으로 떠나는 것이다 (예전: 홍시 약떡을 까치 편에 보냄). 결정 D-1438: 메모 끝줄 "이름 불러도 돌아보지 말 것"을 뺐다
+    get end(){return {kicker:'큰 장터 체험판 완료',head:'북쪽 영산으로',body:CLASSIC?[
+      '창고를 털던 눈도깨비를 잡았다. 부엉 영감님이 창고 지킨 셈을 치르고, 북쪽 영산 가는 길을 일러 주셨다.',
+      '"값은 이미 치러졌다. 이번엔 내가 치른다." 누가, 무슨 값을 치렀다는 걸까. 아빠는 북쪽 영산에 있다.']:[
+      '창고를 털던 눈도깨비를 잡았다. 종종이는 누명을 벗었고, 상단은 셈을 맞춰 주었다.',
+      '지난가을 아빠는 상단 행렬과 북쪽 고갯마루까지 걷다가 혼자 영산 쪽 눈길로 들었다고 한다. 설 쇤 행렬을 따라 그 고개로 간다.',
+      '"값은 이미 치러졌다. 이번엔 내가 치른다." 누가, 무슨 값을 치렀다는 걸까. 아빠는 북쪽 영산에 있다.']};},
   },
   newState:()=>({
     /* 뒷산 소나무 숲의 솔방울. 넷은 통나무 위에 있다. 결정 D-265: 80~100px 고른 간격을 몰렸다 비었다 하게 바꿨다.
@@ -44,13 +49,13 @@ const Rg=defineRegion('jangteo',{
   next:'yeongsan',
   /* 뒤 지역부터 바로 시작할 때 큰 장터를 이렇게 마친 것으로 친다 (확인용 바로가기). 도깨비는 부순 것으로 (도깨비불씨·짚) */
   finish(g){
-    Object.assign(g.inv,{sinpyo:1,dad_memo:1,dokkaebibul:1,jip:1,broom_sal:1,kong:1,eoksae:2,ssal:1});
+    Object.assign(g.inv,{sinpyo:1,dad_memo:1,dokkaebibul:1,nundok_horn:1,jip:1,broom_sal:1,kong:1,eoksae:2,ssal:1});   // 결정 D-1441: 눈홍시 대신 얼음 뿔
     if(!g.awake.includes('siru'))g.awake.push('siru');
     ['j1','j2','j3'].forEach(id=>g.clues.push({id,who:'큰 장터',text:'큰 장터에서 찾은 단서 (바로가기로 시작해서 내용은 비어 있다)'}));
     g.diary.push({id:'skip_jangteo',text:'(큰 장터는 바로가기로 건너뛰었다.)'});
-    ['solbang','ssal','ssal_powder','pat','patsirutteok','dokkaebibul','nunhongsi','sinpyo','dad_memo'].forEach(id=>g.learned.push('got:'+id));
+    ['solbang','ssal','ssal_powder','pat','patsirutteok','dokkaebibul','nundok_horn','sinpyo','dad_memo'].forEach(id=>g.learned.push('got:'+id));
     ['morak','yeotbang','bueong'].forEach(id=>g.learned.push('met:'+id));g.learned.push('fight:dokkaebi','morak:steam','bueong:sinpyo');
-    Object.assign(g.f,{bueongDone:true,steamDone:true,yeotDone:true,hongsiMade:true});g.boss.dead=true;g.ended=true;
+    Object.assign(g.f,{bueongDone:true,steamDone:true,yeotDone:true,jxSangdanCleared:true,jxSangdanPaid:true});g.boss.dead=true;g.ended=true;
     if(!g.forms.includes('owl'))g.forms.push('owl');   // 결정 D-69
   },
   endStats:()=>[
@@ -83,6 +88,8 @@ defineIcons({
   jip:P=>{P(4,1,1,3,'#d9b860');P(6,0,1,4,'#e6c870');P(9,0,1,4,'#d9b860');P(11,1,1,3,'#e6c870');P(5,3,6,12,'#d9b860');P(6,3,1,12,'#e6c870');P(10,3,1,12,'#b8983e');P(4,8,8,2,'#8a6a2e');P(5,14,6,1,'#a8883a');},
   dokkaebibul:P=>{P(6,3,4,3,'#7ab8e8');P(5,6,6,5,'#4a90d0');P(6,11,4,2,'#3a70b0');P(7,5,2,3,'#d8f0ff');P(4,8,1,2,'#7ab8e8');P(11,7,1,2,'#7ab8e8');},
   nunhongsi:P=>{P(7,1,2,2,'#5a4a2a');P(5,3,6,2,'#6f9a4a');P(3,5,10,8,'#e0602a');P(4,4,8,1,'#e8783a');P(4,13,8,1,'#b4432a');P(5,6,2,2,'#f8b080');P(3,5,10,1,'#f4f7fa');P(10,6,2,1,'#f4f7fa');},
+  // 결정 D-1441: 눈도깨비의 얼음 뿔. 이마에서 솟아 뒤로 휜 푸른 얼음 뿔이 부러진 토막, 곁가지 송곳 하나. 눈홍시·홍시 약떡 그림은 옛 저장 때문에 남긴다
+  nundok_horn:P=>{P(3,12,4,3,'#6f8fa8');P(5,9,4,4,'#9cc2dc');P(7,6,3,4,'#bcdcef');P(9,3,3,4,'#d9eef8');P(11,1,2,3,'#f2fafd');P(6,10,1,2,'#f4fbff');P(8,7,1,2,'#f4fbff');P(9,8,3,2,'#bcdcef');P(12,7,2,1,'#d9eef8');P(3,14,4,1,'#4f6d84');P(4,12,1,1,'#f4fbff');},
   hongsi_tteok:P=>{P(2,7,12,7,'#f2e6d2');P(3,6,10,1,'#f8f0e0');P(4,8,3,2,'#e0602a');P(9,9,3,2,'#e0602a');P(6,11,3,2,'#e8783a');P(2,14,12,1,'#c9b991');},
   // 결정 D-290: 해 준 일의 보상으로 받는 장터 먹을거리
   yugwa:P=>{P(3,5,10,6,'#5a3a22');P(4,4,8,8,'#f2e3c0');P(3,6,10,4,'#f2e3c0');P(5,5,2,1,'#fff7e2');P(9,7,1,1,'#e2c58e');P(6,9,1,1,'#e2c58e');P(8,10,1,1,'#e2c58e');},
@@ -449,7 +456,7 @@ EP.beans=()=>({animate:true,draw(w,h,t){
   snowFloor(w,h,33);
   if(!done){
     const bean=(x,y)=>{R(x+1,y,2,1,'#cdb06a');R(x,y+1,4,1,'#e2c983');R(x+1,y+2,2,1,'#9c8248');};
-    for(const [x,y] of [[15,30],[19,30],[23,30],[17,27],[21,27],[19,24]])bean(x,y);
+    for(const [x,y] of [[15,30],[21,31],[13,33],[26,29],[30,32],[5,31],[19,35],[2,34]])bean(x,y);   // 결정 D-1436: 어지럽게 흩어진 콩
     // 기둥 둘레 눈밭의 큰 발자국 (내 발 셋 만큼)
     for(const [x,y] of [[32,37],[44,35],[56,38]]){R(x,y,6,3,nt?'#7a8494':'#b8c4ca');R(x,y-1,1,1,nt?'#7a8494':'#b8c4ca');R(x+5,y-1,1,1,nt?'#7a8494':'#b8c4ca');}
     const pw=rm?1:Math.min(1,k/1.2);R(36,37,2,2,'#5a5048');R(38,37,2,2,'#5a5048');if(pw>0.6)R(32+Math.round(pw*4),34,1,1,'#ffffff');   // 견주어 본 내 작은 발자국
@@ -471,7 +478,8 @@ Rg.expEncounters={
       // 결정 D-777: 보부상단 깃발은 눌러서 여는 조사(작은 창)를 뺐다. 깃발 가까이 가면 혼잣말이 저절로 나온다 (field.js 입구 step, 사용자 피드백 2026-11-05)
       // 결정 D-321: 연 꼬리는 그 자리 그림 대신 연 장면 그림을 띄운다 (걸림 → 너구리 손이 풀면 줄에 끌려 내려감)
       // 결정 D-780: 푸는 그림에 맞춰 글도 고쳤다. 짧은 손이 못에 감긴 꼬리를 한 바퀴씩 풀고, 꼬리가 빠지면 연이 내려간다
-      {id:'j_kite_tail',x:1180,y:128,label:'연 꼬리 풀기',peek:false,get text(){
+      // 결정 D-1435: 연 꼬리 풀기는 꼬리가 감긴 처마 못(설계 1223, 높이 98, art.js kiteScene) 바로 아래에 뜬다 (사용자 피드백 2026-11-11 큰 장터 1). 낮은 처마 오른쪽 끝(130)과 지붕 왼쪽 끝(96) 어디서든 닿는다
+      {id:'j_kite_tail',x:1220,y:112,label:'연 꼬리 풀기',peek:false,get text(){
         if(!G.f.jxKiteStarted){if(typeof peekPicture==='function')peekPicture(Rg.kitePics.stuck().draw,{animate:true,sound:'pic_kite'});
           return '방패연 꼬리가 처마 못에 두 바퀴 감겼다.\n아래 아이에게 줄을 느슨하게 잡아 달라고 하자.';}
         if(!G.f.jxKiteFreed&&typeof peekPicture==='function')peekPicture(Rg.kitePics.free().draw,{animate:true,sound:'pic_kite'});
@@ -492,8 +500,8 @@ Rg.expEncounters={
       // 결정 D-783: 좌판 기둥 밑에 모인 콩알 (사용자 피드백 2026-11-05). 장터 바닥에 있을 리 없는 콩이 왜 여기 모였는지 아이가 궁금해한다.
       // 밤마다 몸을 감춘 도둑(눈도깨비)이 훔친 콩 자루를 기둥에 기대 두었다 가져가며 샌 콩이다. 결정 D-860: 기둥 둘레엔 그 큰 발자국이 남았다(모습만 안 보인다). 도깨비를 물리친 뒤엔 치워졌다.
       {id:'j_stall_gap',x:340,label:'좌판 사이 골목',get pic(){return Rg.examinePics.beans();},get text(){
-        if(G.boss.dead)return ['기둥 밑에 모여 있던 콩알이 말끔히 치워졌다.','밤마다 여기 콩 자루를 기대 두던 게 누구였는지\n이젠 알 것 같다.'];
-        return [G.f.night?'차일을 걷고 판을 접으니 골목이 휑하다.\n좌판 기둥 밑 콩알만 그대로 모여 있다.':'좌판 기둥 밑에 콩알이 소복이 모여 있다.\n장터 바닥에 콩이 왜 이렇게 모여 있지?',
+        if(G.boss.dead)return ['기둥 밑에 흩어져 있던 콩알이 말끔히 치워졌다.','밤마다 여기 콩 자루를 기대 두던 게 누구였는지\n이젠 알 것 같다.'];
+        return [G.f.night?'차일을 걷고 판을 접으니 골목이 휑하다.\n좌판 기둥 밑 콩알만 그대로 흩어져 있다.':'좌판 기둥 밑에 콩알이 여기저기 흩어져 있다.\n장터 바닥에 웬 콩이지?',
           '여긴 콩 파는 좌판도 아닌데.\n누가 여기 콩 자루를 기대 뒀다 가져갔나?',
           '기둥 둘레 눈밭에 큰 발자국이 찍혀 있다.\n내 발 셋을 이어 놓은 만큼 크다.'];
       }},

@@ -69,7 +69,8 @@ Rg.drawBack=()=>{drawSky();drawGround();};
 Rg.drawScenery=()=>{
   [140,470,560,760,850].forEach((wx,i)=>drawStall(wx,i));
   drawInn();drawStore();drawForest();drawLogsSnow();
-  const sx=2338-cam;if(G.f.hongsiMade&&sx<W+20){R(sx,GROUND-26,2,26,'#6b4423');R(sx-8,GROUND-26,18,8,'#c9a27a');R(sx+6,GROUND-24,2,4,'#6b4423');}
+  // 결정 D-1440: 북쪽 길표는 도깨비를 잡으면 선다 (예전엔 약떡을 보낸 뒤)
+  const sx=2338-cam;if((G.boss.dead||G.f.hongsiMade)&&sx<W+20){R(sx,GROUND-26,2,26,'#6b4423');R(sx-8,GROUND-26,18,8,'#c9a27a');R(sx+6,GROUND-24,2,4,'#6b4423');}
 };
 Rg.drawPickup=(a,x,bob)=>{
   // 결정 D-318: 짐짝에서 샌 콩과 마구간에서 흘린 짚도 줍는다. 솔방울이 아닌 것은 그 모양으로.
@@ -190,16 +191,17 @@ Rg.step=()=>{
     G.pickups=Rg.newState().pickups;G.px=60;G.py=GROUND;G.vy=0;G.cam=0;
   }
   Rg.snowEncounter();   // 결정 D-684: 창고를 지키면 기척이 먼저 다가온다
-  if(has('hongsi_tteok')&&!G.f.hongsiMade)Rg.sendMedicine();
 };
 Rg.onHit=()=>{};
 Rg.faint=()=>{G.px=Math.max(60,G.px-80);think('아이코, 미끄러졌다. 살살 다시 가자.');};
-/* 도깨비를 이기거나 달래면 훔쳐 간 설 제수가 돌아온다. 눈홍시는 보따리로 */
+/* 도깨비를 이기거나 달래면 훔쳐 간 설 제수가 돌아온다.
+   결정 D-1441: 전리품은 좋은 품질의 재료인 얼음 뿔이다 (사용자 지시 2026-11-11 큰 장터 7 "보스 전리품은 엄마 약일 필요가 없다. 좋은 품질의 재료를 루팅").
+   이기면 무너진 눈 더미에 부러진 뿔이 남고, 달래면 도깨비가 뿔 끝을 꺾어 준다(고마움을 아는 도깨비, 불씨와 같은 결). 예전엔 눈홍시를 받았다 */
 Rg.bossDie=calm=>{
-  G.boss.dead=true;addItem('nunhongsi',1);
+  G.boss.dead=true;addItem('nundok_horn',1);
   if(Rg.arcs())G.f.jangteoArcsScissorsFound=true;
-  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔다. 발자국은 남았어도 몸이 보이지 않으니 아무도 임자를 못 봤던 것이다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 눈홍시를 하나 더 내밀었다.':' 창고를 지킨 몫으로 눈홍시 하나를 받았다.')+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
-  think('눈홍시다! 시루에 찌면 홍시 약떡이 되겠다.');refreshGoal();
+  diary('j_boss','창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔다. 발자국은 남았어도 몸이 보이지 않으니 아무도 임자를 못 봤던 것이다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.'+(calm?' 도깨비는 고맙다며 이마의 얼음 뿔 끝을 꺾어 건넸다.':' 무너진 눈 더미에서 부러진 얼음 뿔을 주웠다.')+' 손에 쥐어도 녹지 않는 귀한 재료다.'+(Rg.arcs()?' 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.'+(G.f.jangteoArcsYeot2?' 작년 그믐에 빼앗겼다던 그 가위일까.':''):'')   /* 결정 D-142: 가위를 본 일은 늘 남긴다 */);   // 결정 D-136: 창고 조사를 안 해도 엿가위를 본 근거
+  think((calm?'도깨비가 꺾어 준 얼음 뿔이다.':'부러진 얼음 뿔이다.')+' 꽉 쥐어도 녹지 않는다.\n장에 내면 값을 꽤 받을 귀한 재료다.');refreshGoal();
 };
 Rg.STORE_X=STORE_X;
 
@@ -209,15 +211,19 @@ Rg.STORE_X=STORE_X;
    수리부엉이로 변신하면 밤눈에 정체가 드러나고(서리 빛이 번지며 모습이 나타난다), 잠깐 뒤 전투가 열린다.
    결정 D-687: 창고 지키기(G.f.guard)는 부엉 영감의 신표와 함께 켜지고, 수리부엉이 변신도 그 직후(formCheck)에 열린다.
    그래서 수리부엉이 없이 이 자리에 오는 길은 없다. 혹시 없으면(옛 저장) 여기서 연다. 아이는 혼잣말로 '밤눈'을 떠올린다.
-   멀리 걸어가면 기척은 물러났다가 다시 오면 처음부터 다가온다. */
+   멀리 걸어가면 기척은 물러났다가 다시 오면 처음부터 다가온다.
+   결정 D-1455: 수리부엉이가 아닌 모습이면 세찬 눈보라에 막혀 보이지 않는 몸 block 앞까지만 다가간다(처음 막힐 때 한 번 속말).
+   눈보라 속엔 서리빛 눈 두 점이 가끔 아주 옅게 비친다(밤눈이면 보일 거라는 실마리). 어떤 모습이든 기척이 멈춘 뒤 engage 틀이 지나면
+   눈보라가 덮쳐 오며 싸움이 열린다(예전엔 수리부엉이로 정체를 밝혀야만 열렸다). 수리부엉이로 밝히면 예전처럼 모습이 드러난 뒤 열린다
+   (사용자 지시 2026-11-11 큰 장터 5). */
 let snowEnc=null;
-const ENC={delay:34,speed:0.8,start:300,stop:84,reveal:72,stride:16};   // 결정 D-766: 덩치가 커서 조금 떨어져 서고 보폭이 크다
+const ENC={delay:34,speed:0.8,start:300,stop:84,reveal:72,stride:16,block:58,engage:80};   // 결정 D-766: 덩치가 커서 조금 떨어져 서고 보폭이 크다
 Rg.snowEncounter=()=>{
   if(!G.f.guard||!night()||G.boss.dead||B||inkOn){if(G.boss.dead)snowEnc=null;return;}
   if(!snowEnc){
     if(Math.abs(G.px-Rg.STORE_X)<24&&encounterReady()){   // 결정 D-719: 땅에 디딘 뒤에
       if(!hasForm('owl'))unlockForm('owl');
-      snowEnc={t:0,x:Rg.STORE_X+ENC.start,said:0,reveal:0,steps:[]};G.vx=0;
+      snowEnc={t:0,x:Rg.STORE_X+ENC.start,said:0,reveal:0,wait:0,steps:[]};G.vx=0;
     }
     return;
   }
@@ -229,9 +235,17 @@ Rg.snowEncounter=()=>{
   for(const s of e.steps)s.t++;if(e.steps.length>40)e.steps.shift();   // 결정 D-766: 발자국은 지워지지 않고 남는다
   if(e.said===0&&e.t>ENC.delay+20){e.said=1;
     talk([['너구리','(…사박, 사락. 사박, 사락. 창고 앞 눈이 밟힌다.\n아무도 없는데 큰 발자국만 다가와.)']]);return;}
+  // 결정 D-1455: 수리부엉이 눈이 아니면 보이지 않는 몸에 휘감긴 눈보라에 밀려 더 다가가지 못한다
+  if(!e.reveal&&G.form!=='owl'&&G.px>e.x-ENC.block){G.px=e.x-ENC.block;if(G.vx>0)G.vx=0;
+    if(!e.blockSaid&&G.onGround){e.blockSaid=true;
+      talk([['너구리','(눈보라가 얼굴을 때려서 더는 못 다가가겠어.\n저 한가운데 뭔가 커다란 게 버티고 섰어.)'],
+        ['너구리','(눈보라 속에 가는 빛 두 점이 번뜩였다.\n…눈인가? 밤눈이 밝으면 똑똑히 보일 텐데.)']]);return;}}
   if(e.said===1&&e.x<=Rg.STORE_X+ENC.stop&&G.form!=='owl'){e.said=2;
     talk([['너구리','(코앞에서 찬 숨이 느껴져. 뭐가 서 있어.\n밤눈이 밝다면… 보일 텐데.)']]);return;}
   if(!e.reveal&&owlSenses()&&e.t>ENC.delay+10){e.reveal=1;Sound.playSfx?.('battle_warn');}
+  // 결정 D-1455: 어떤 모습이든 기척이 멈춰 선 뒤 잠깐 지나면 눈보라가 덮쳐 오며 싸움이 열린다
+  if(!e.reveal&&e.x<=Rg.STORE_X+ENC.stop&&e.said>=1&&!e.engaged&&++e.wait>ENC.engage){e.engaged=true;
+    talk([['너구리','(눈보라가 확 덮쳐 온다!\n보이지 않는 게 나를 노려보고 있어.)']],()=>{snowEnc=null;Rg.startDokkaebi();});return;}
   if(e.reveal){
     if(e.reveal===1&&!G.f.jxSnowSeen){G.f.jxSnowSeen=true;diary('jx_snow_seen','창고 앞에 큰 발자국만 다가왔다. 수리부엉이 눈으로 보니, 서리 뿔을 이고 어깨옷을 빳빳이 세운 커다란 눈도깨비가 서 있었다. 긴 옷자락이 눈 위에 끌렸다.');}
     if(e.reveal===8)talk([['너구리','(보인다! 서리 뿔에 빳빳한 어깨옷…\n눈도깨비야! 긴 옷자락이 눈에 끌리고 있었어.)']]);
@@ -304,6 +318,9 @@ Rg.drawSnowPresence=()=>{
     ctx.save();
     {const fl=0.1+0.05*Math.sin(t*0.08);ctx.globalAlpha=fl;ctx.fillStyle='#e6eef6';   // 큰 몸 꼴로 어리는 눈 안개 (어깨가 넓고 머리가 낮다)
       ctx.beginPath();ctx.ellipse(x,GROUND-50,32,50,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x,GROUND-88,52,9,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(x,GROUND-104,16,14,0,0,Math.PI*2);ctx.fill();}
+    // 결정 D-1455: 눈보라 속에서 가늘게 빛나는 서리빛 눈 두 점이 가끔 아주 옅게 비친다 (볼 수 있는 실마리)
+    {const blink=(t%150)/150,a=blink<0.22?Math.sin(blink/0.22*Math.PI)*0.55:0;
+      if(a>0.02){ctx.globalAlpha=a;R(x-12,GROUND-101,8,1,'#a6d6f4');R(x+4,GROUND-101,8,1,'#a6d6f4');R(x-9,GROUND-101,2,1,'#eaf7ff');R(x+7,GROUND-101,2,1,'#eaf7ff');}}
     // 결정 D-941: 눈폭풍이 보이지 않는 눈도깨비를 가운데 두고 휘몰아친다 (사용자 지시 2026-11-06 "눈도깨비를 중심으로 감싸고 돌아야 한다. 사선 방향으로").
     //   눈발은 몸 가운데(cy)를 두고 비스듬히 기운 타원을 돌며 안쪽으로 빨려 들고, 몸 꼴 안을 지날 때 짙게 엉긴다. 예전(D-877)엔 위에서 아래로 사선으로만 내리쳤다.
     //   이 소용돌이는 F2(보스) 갈래가 고친다 (jangteo/enemies.js 의 stormSwirl 과 같은 결)
@@ -421,8 +438,8 @@ if(!CLASSIC){
       }
       if(id==='warehouse')Rg.snowEncounter();   // 결정 D-684
       if(isAwake('siru')&&!G.f.jxHubChanged&&id==='street'){
+        // 결정 D-1437: 모락 일을 다 마친 뒤 뜨던 속말 "떡집 앞 줄이 짧아졌네."를 뺐다 (사용자 피드백 2026-11-11 큰 장터 3). 일기는 남긴다
         G.f.jxHubChanged=true;diary('jx_hub','모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.');
-        think('떡집 앞 줄이 짧아졌네.');
       }
     },
   });

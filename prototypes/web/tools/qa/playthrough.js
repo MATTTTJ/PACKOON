@@ -319,19 +319,24 @@ async function runPlaythrough({browser: b, mode, outDir, rules, report = () => {
         // 결정 D-684: 창고 앞엔 기척만 다가온다. 플레이어처럼 수리부엉이(3)로 변신해 모습을 밝혀야 전투가 열린다
         for(let i=0;i<80&&!await read('!!B');i++){const s=await settle();if(s.battle)break;if(await read("!B&&G.form!=='owl'&&formChangeAllowed()"))await key('3');await wait(120);}
         if(!await read('!!B'))throw new Error('수리부엉이로 변신해도 눈도깨비 전투가 열리지 않았다');};
-      await toStore();await mustWin(['memiltteok','dad_yeot'],toStore,'눈도깨비');if(!await read("has('dokkaebibul')"))throw new Error('도깨비 달래기 뒤 불씨가 없다');await craft('siru','hongsi_tteok');
-      // 결정 D-131: 그믐밤엔 늙은 까치가 밤길을 못 난다. 마루에서 자고 설날 아침에 맡긴다(그 아침에 사연 마지막 막이 열린다).
-      if(mode==='expanded'&&!await read('G.ended')){
-        await zone('inn');const magpie="REG.zones.inn.wanderers.find(w=>w.id==='j_magpie').x";
-        await jumpTo(await read(magpie),192);await settle();
-        if(!await read('G.f.jxMagpieNight')){await key('e');await settle();}
-        if(await read('G.ended'))throw new Error('그믐밤에 약떡을 보내 설날 아침을 건너뛰었다');
-        if(!await read('G.f.jxMagpieNight'))throw new Error('밤에 까치가 쉬어 가자는 말을 하지 않았다');
-        for(let i=0;i<3&&await read('G.f.night');i++)await npc('maru');
+      await toStore();await mustWin(['memiltteok','dad_yeot'],toStore,'눈도깨비');if(!await read("has('dokkaebibul')"))throw new Error('도깨비 달래기 뒤 불씨가 없다');
+      // 결정 D-1441: 눈홍시를 뺐다. 전리품은 얼음 뿔이다
+      if(!await read("has('nundok_horn')"))throw new Error('눈도깨비를 달랜 뒤 얼음 뿔이 없다');
+      if(mode==='expanded'){
+        // 결정 D-1440: 도깨비를 잡은 밤엔 행수가 날 밝거든 오라 한다. 마루에서 자고 설날 아침 행수의 셈을 받은 뒤 상단 행렬을 따라 떠난다
+        if(await read('G.ended'))throw new Error('설날 아침 전에 큰 장터가 끝났다');
+        await zone('inn');for(let i=0;i<3&&await read('G.f.night');i++)await npc('maru');
         if(await read('G.f.night')||!await read('G.f.jxSeollal'))throw new Error('마루에서 자도 설날 아침이 오지 않았다');
-        await jumpTo(await read(magpie),192);await settle(/맡긴다/);
-        if(!await read('G.ended')){await key('e');await settle(/맡긴다/);}
-      }});
+        const hs="zoneObjects('wanderers').find(w=>w.id==='j_haengsu').x";
+        for(let i=0;i<3&&!await read('G.ended');i++){await jumpTo(await read(hs),192);await key('e');await settle(/같이 갈게요/);}
+        if(!await read("has('solbang_cheong')"))throw new Error('행수의 셈(솔방울청)을 받지 못했다');
+      }else{
+        // 결정 D-1440: 옛 구성은 부엉 영감에게 알리면 끝난다. 수리부엉이 모습이면 영감이 손님 대접을 하니(D-232) 플레이어처럼 본모습으로 돌아간다
+        await read("(G.form&&revertForm(),1)");
+        for(let i=0;i<3&&!await read('G.ended');i++)await npc('bueong');
+      }
+      if(!await read('G.ended'))throw new Error('도깨비를 잡은 뒤 큰 장터가 끝나지 않았다');
+      });
     await next();
     await stage('영산 · 설피',async()=>{await pickup('jip');await gather('darae_vine',2);for(let i=0;i<3&&!await read('G.f.seolpi');i++)await npc('nal');if(!await read('G.f.seolpi'))throw new Error('설피를 받지 못했다');});
     await stage('영산 · 살금이와 아빠',async()=>{await pickup('magamok',3);for(let i=0;i<3&&!await read('G.f.salgDone');i++)await npc('salgeumi');if(!await read('G.f.salgDone'))throw new Error('살금이에게 지름길을 듣지 못했다');for(let i=0;i<3&&!await read('G.f.dadDone');i++)await npc('dad');if(!await read('G.f.dadDone'))throw new Error('넋 빠진 아빠를 만나지 못했다');});
