@@ -424,9 +424,11 @@ function drawNundok(c){
     // 결정 D-766·D-941: 숨은 몸을 가운데 두고 눈발이 비스듬히 기운 고리로 세차게 감아 돈다
     stormSwirl(c,cx,cy+30,150,60,14,1);
   }else if(n.veiled){
-    // 결정 D-1456: 수리부엉이 눈이 아니면 밖에서처럼 눈보라에 싸여 흐리게 비친다. 드러난 심장의 푸른 빛만은 눈보라를 뚫고 보인다
-    faint(c,body,veilBody());
-    stormSwirl(c,cx,cy+30,150,52,12,0.9);
+    // 결정 D-1456: 수리부엉이 눈이 아니면 밖에서처럼 눈보라에 싸인다. 드러난 심장의 푸른 빛만은 눈보라를 뚫고 보인다
+    // 결정 D-1459: 몸은 아예 보이지 않고(nundok_veil_body 0), 그 자리에 눈보라만 휘몰아친다. 공격은 반투명하게 보인다(bulletAlpha)
+    //   (사용자 피드백 2026-11-11 9). 예전엔 몸이 0.16만큼 비쳤다
+    if(veilBody()>0)faint(c,body,veilBody());
+    stormSwirl(c,cx,cy+30,150,70,16,1);
     if(heart){const form=f==='tired'?'core':f;chestHeart(c,cx,cy+HEART_AT[f==='tired'?'tired':f],1,form);}
   }else body(c);
   // 둔갑이 바뀌는 순간 눈보라가 확 인다
@@ -811,7 +813,7 @@ defineEnemies({
     // 결정 D-227: 전투 글귀는 일어난 일만 짧게. 피하라·치라는 안내는 쓰지 않는다
     // 결정 D-1456: 수리부엉이 눈이 아니면 모습이 흐려 목소리만 또렷하다
     get intro(){return G.form==='owl'?'"…내 걸음을 본 놈이 있구나." 서리 뿔을 인 눈도깨비가 어깨옷을 떨친다.'
-      :'"…내 걸음을 본 놈이 있구나." 눈보라 속에서 낮은 목소리가 울린다. 모습이 흐릿하다.';},
+      :'"…내 걸음을 본 놈이 있구나." 눈보라 속에서 낮은 목소리가 울린다. 모습은 보이지 않고 눈보라만 휘몰아친다.';},
     settle:true,markLife:150,quietHits:true,   // 결정 D-765
     parts:tableParts('dokkaebi',{
       eagle:{atk:'ndWind',mark:'홍',tell:'눈도깨비가 독수리로 둔갑해 날개를 쳐든다.',weak:'눈도깨비가 약해졌다. 이제 독수리로는 둔갑하지 못한다.'},

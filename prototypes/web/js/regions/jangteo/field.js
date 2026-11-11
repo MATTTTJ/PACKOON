@@ -215,7 +215,8 @@ Rg.STORE_X=STORE_X;
    결정 D-1455: 수리부엉이가 아닌 모습이면 세찬 눈보라에 막혀 보이지 않는 몸 block 앞까지만 다가간다(처음 막힐 때 한 번 속말).
    눈보라 속엔 서리빛 눈 두 점이 가끔 아주 옅게 비친다(밤눈이면 보일 거라는 실마리). 어떤 모습이든 기척이 멈춘 뒤 engage 틀이 지나면
    눈보라가 덮쳐 오며 싸움이 열린다(예전엔 수리부엉이로 정체를 밝혀야만 열렸다). 수리부엉이로 밝히면 예전처럼 모습이 드러난 뒤 열린다
-   (사용자 지시 2026-11-11 큰 장터 5). */
+   (사용자 지시 2026-11-11 큰 장터 5).
+   결정 D-1458: 막히는 대신, 그 눈보라 가장자리에 닿으면 바로 싸움이 열린다. 서서 기다려도 engage 틀 뒤에 열린다 (사용자 피드백 2026-11-11 9). */
 let snowEnc=null;
 const ENC={delay:34,speed:0.8,start:300,stop:84,reveal:72,stride:16,block:58,engage:80};   // 결정 D-766: 덩치가 커서 조금 떨어져 서고 보폭이 크다
 Rg.snowEncounter=()=>{
@@ -235,11 +236,11 @@ Rg.snowEncounter=()=>{
   for(const s of e.steps)s.t++;if(e.steps.length>40)e.steps.shift();   // 결정 D-766: 발자국은 지워지지 않고 남는다
   if(e.said===0&&e.t>ENC.delay+20){e.said=1;
     talk([['너구리','(…사박, 사락. 사박, 사락. 창고 앞 눈이 밟힌다.\n아무도 없는데 큰 발자국만 다가와.)']]);return;}
-  // 결정 D-1455: 수리부엉이 눈이 아니면 보이지 않는 몸에 휘감긴 눈보라에 밀려 더 다가가지 못한다
-  if(!e.reveal&&G.form!=='owl'&&G.px>e.x-ENC.block){G.px=e.x-ENC.block;if(G.vx>0)G.vx=0;
-    if(!e.blockSaid&&G.onGround){e.blockSaid=true;
-      talk([['너구리','(눈보라가 얼굴을 때려서 더는 못 다가가겠어.\n저 한가운데 뭔가 커다란 게 버티고 섰어.)'],
-        ['너구리','(눈보라 속에 가는 빛 두 점이 번뜩였다.\n…눈인가? 밤눈이 밝으면 똑똑히 보일 텐데.)']]);return;}}
+  // 결정 D-1458: 수리부엉이 눈이 아니면 보이지 않는 몸을 감싼 눈보라 가장자리(block)에 닿는 순간 싸움이 열린다
+  //   (사용자 피드백 2026-11-11 9 "다가가면 보스 전투로 들어가는 건 동일"). D-1455 의 '더 못 다가간다' 막기를 바꿨다
+  if(!e.reveal&&G.form!=='owl'&&G.px>e.x-ENC.block&&!e.engaged){G.px=e.x-ENC.block;if(G.vx>0)G.vx=0;e.engaged=true;
+    talk([['너구리','(눈보라 한가운데로 발을 디뎠다.\n얼굴을 때리는 눈발 속에 뭔가 커다란 게 버티고 섰어!)'],
+      ['너구리','(가는 빛 두 점이 번뜩였다. …눈인가?\n밤눈이 밝으면 똑똑히 보일 텐데.)']],()=>{snowEnc=null;Rg.startDokkaebi();});return;}
   if(e.said===1&&e.x<=Rg.STORE_X+ENC.stop&&G.form!=='owl'){e.said=2;
     talk([['너구리','(코앞에서 찬 숨이 느껴져. 뭐가 서 있어.\n밤눈이 밝다면… 보일 텐데.)']]);return;}
   if(!e.reveal&&owlSenses()&&e.t>ENC.delay+10){e.reveal=1;Sound.playSfx?.('battle_warn');}
