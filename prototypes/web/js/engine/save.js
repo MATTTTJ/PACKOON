@@ -51,6 +51,7 @@ function repairSavedState(source,repairRegions=true){
   for(const rows of Object.values(g.floorPickups))if(!Array.isArray(rows)||rows.some(row=>!validFloorRow(row)))throw Error('floorPickups');
   delete g.bagSlots;   // 결정 D-424: 보따리 칸 제한은 없어졌다
   if(g.drop!==undefined&&g.drop!==null&&(!saveObject(g.drop)||!['x','y','vy'].every(key=>Number.isFinite(g.drop[key]))))throw Error('drop');
+  if(g.buff!==null&&!validBuff(g.buff))g.buff=null;   // 결정 D-1461: 모양이 틀린 기운은 버린다
   if(!Object.hasOwn(TOOLS,g.tool))g.tool='pick';   // 없어진 연장을 든 옛 저장
   if(!Number.isSafeInteger(g.hp)||!Number.isSafeInteger(g.maxhp)||g.hp<0||g.maxhp<=0||g.maxhp>100||g.hp>g.maxhp||!Object.hasOwn(TOOLS,g.tool))throw Error('player');
   for(const row of Object.values(g.ledger))if(!saveObject(row)||typeof row.npc!=='string')throw Error('ledger');

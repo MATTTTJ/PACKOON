@@ -75,6 +75,42 @@ async function runTrade({browser:b,outDir}){
     await b.until("!$('dlg').hidden&&/송이/.test($('dlgText').textContent)",{timeout:5000,label:'미룬 답례 대사'});
     const later=[];await b.advanceDialogue({each:async line=>later.push(line)});
     check(later.some(l=>/송이밥 만드는 법을 적었다/.test(l.text))&&!(await b.eval('(G.f.giftLessonQ||[]).length')),'gift-lesson-later','대화가 끝난 뒤 미룬 답례 대사가 이어지지 않았다.',later);
+    // 5) 결정 D-1461: 먹을거리 먹기와 기운. 체력만 주는 것은 체력이 가득하면 못 먹고, 진행 몫은 남기며, 기운은 보스 한 판에 쓰고 사라진다
+    b.scene='food / eat';
+    s=await b.eval(`(()=>{closePanels();dlgDismiss();const all=Object.entries(ITEMS).filter(([k,v])=>v.kind==='먹을거리'&&v.food).length;
+      G.buff=null;G.hp=G.maxhp;G.inv={rice:1,yakgwa:1,dubu:1};
+      const full=foodBlock('rice');const ate=eatFood('yakgwa');const b1={...G.buff};
+      G.hp=1;eatFood('rice');const hp=G.hp;eatFood('dubu');
+      return {all,full,ate,b1,hp,b2:G.buff,inv:{...G.inv},hud:$('foodBuff').textContent,hudShown:!$('foodBuff').hidden};})()`);
+    check(s.all===30&&!!s.full&&s.ate&&s.b1.k==='swift'&&s.b1.lv===2&&s.hp===3&&s.b2.k==='strong'&&!s.inv.yakgwa&&!s.inv.rice&&s.hudShown&&/힘 2/.test(s.hud),
+      'food-eat','먹을거리 30종이 모두 먹을 수 있어야 하고, 주먹밥은 체력이 가득하면 막고, 약과는 날램 2, 두부는 힘 2로 기운을 바꿔야 한다.',s);
+    await region(b,'jangteo');b.scene='food / progress';
+    s=await b.eval("(()=>{G.f.bueongDone=false;G.inv={patsirutteok:1};return {why:foodBlock('patsirutteok')};})()");
+    check(/쓸 데/.test(s.why),'food-progress','부엉 영감 고사떡으로 쓸 팥시루떡은 먹지 못해야 한다.',s);
+    b.scene='food / battle';
+    s=await b.eval(`(()=>{G.inv={};G.hp=G.maxhp;G.buff={k:'guard',lv:2,from:'rainbow_tteok'};startBattle('dokkaebi',()=>{});
+      const g0=B.guard;B.inv=0;bHitMe();const hp1=G.hp,g1=B.guard;renderBHud();const gold=$('bHearts').querySelectorAll('.guard').length;
+      bEnd('flee');const after=G.buff;
+      G.buff={k:'swift',lv:1};startBattle('dokkaebi',()=>{});const sp=battleHandProfile().speed/(TABLES.TUNING.battle_bare_speed*nameSpeedMul());
+      const st=toolDamage(B.parts[0]);bEnd('flee');
+      G.buff={k:'strong',lv:2};startBattle('dokkaebi',()=>{});const st2=toolDamage(B.parts[0]);const kind=foodMul('kind');bEnd('flee');
+      return {g0,hp1,g1,gold,after,sp:Math.round(sp*100)/100,mul:Math.round(st2/st*100)/100,kind,max:G.maxhp};})()`);
+    await b.until("!document.getElementById('bResult').hidden||!B",{timeout:8000,label:'전투 끝'}).catch(()=>{});
+    await b.eval("(()=>{if(B){$('bResult').hidden=true;}B=null;document.body.classList.remove('in-battle');$('battle').hidden=true;})()");
+    check(s.g0===2&&s.hp1===s.max&&s.g1===1&&s.gold===1&&s.after===null&&s.sp===1.15&&s.mul===1.5&&s.kind===1,
+      'food-battle','든든 2는 금빛 하트 둘로 한 번 맞아도 체력이 그대로여야 하고, 판이 끝나면 기운이 사라지며, 날램 1은 손 1.15배, 힘 2는 깎는 힘 1.5배여야 한다.',s);
+    // 6) 결정 D-1462: 아이가 얼음 뿔을 꺼내 보이면 엿방울이 호박엿 셋으로 바꿔 준다
+    b.scene='yeot / junk';
+    await b.eval("(()=>{G.f.yeotMet=true;G.f.yeotDone=true;G.f.yeotHigh=true;G.f.yeotJunkHeard=false;G.f.yeotHorn=false;G.inv={nundok_horn:1};REG.npcs.find(n=>n.id==='yeotbang').talk();})()");
+    const jl=[];await b.advanceDialogue({stop:'choices',each:async line=>jl.push(line)});
+    jl.push(await b.eval("({who:$('dlgWho').textContent,text:$('dlgText').textContent})"));
+    await press(b,'#dlgChoices button');   // 보따리를 펼친다
+    s=await b.eval("({heard:G.f.yeotJunkHeard,ids:REG.trade.yeotbang().map(x=>x.id),open:!$('trade').hidden})");
+    await b.click('.trade-good[data-good="t_yeotbang_horn"]');await offer(b,'nundok_horn',1);await press(b,'#tradePropose');
+    const gl=[];await b.advanceDialogue({each:async line=>gl.push(line)});
+    const inv=await b.eval('({...G.inv})');
+    check(s.heard&&s.ids.includes('t_yeotbang_horn')&&jl.some(l=>/헌 물건/.test(l.text))&&inv.hobakyeot===3&&!inv.nundok_horn&&gl.some(l=>/호박엿/.test(l.text)),
+      'yeot-junk','아이가 얼음 뿔을 꺼내 보인 뒤 교환에 뿔 자리가 생기고, 바꾸면 호박엿 셋을 얻어야 한다.',{s,jl,gl,inv});
   }catch(error){findings.push({rule:'runner',severity:'높음',message:error.stack||String(error),scene:b.scene});}
   const file=path.join(outDir,'trade.json');fs.mkdirSync(outDir,{recursive:true});fs.writeFileSync(file,JSON.stringify({records,findings},null,2)+'\n');
   return {name:'trade',status:findings.length?'fail':'pass',summary:`교환 여러 몫·선물 답례 ${records.length}가지 확인`,findings,evidence:[file]};

@@ -62,6 +62,7 @@ function baseState(){return{
   px:0,py:GROUND,vx:0,vy:0,face:1,onGround:true,anim:0,
   hp:5,maxhp:5,attackT:0,hurtT:0,cam:0,
   inv:{dad_tag:1},tool:'pick',sharp:false,   // 결정 D-422: 아빠의 짐표는 오프닝에서 엄마가 보따리 끈에 매어 준다
+  buff:null,   // 결정 D-1461: 먹어서 품은 기운 {k,lv,from} (food.js). 다음 보스 싸움 한 판에 쓴다
   forms:[],form:'',   // 잎사귀 변신: 열린 변신 id 와 지금 모습 (''=너구리, forms.js)
   floorItems:{},floorPickups:{},regionStates:{},visitedZones:{},   // 지역별 필드와 실제로 밟은 구역
   awake:Object.keys(HEIR).filter(k=>HEIR[k].awakeAtStart),   // 깨어난 가보

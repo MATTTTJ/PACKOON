@@ -1139,11 +1139,13 @@ function talkYeot(){
   // 옛 저장: 솔방울을 건넨 뒤 장단을 마치지 못했으면 쌀부터 마저 준다(장단은 뺐다, D-565).
   if(!F.yeotDone&&F.yeotPaid){F.yeotPaid=false;yeotTradeDone();return;}
   if(!F.yeotDone){if(has('solbang',5))yeotTrade();else talk([['엿방울',Rg.arcs()&&night()&&!G.boss.dead?'(수레 밑에서) 솔방울 다섯 개야. 조용히 다녀와~':'솔방울 다섯 개면 돼~ 뒷산 소나무 숲에 가 봐.']]);return;}
+  if(!F.yeotJunkHeard&&yeotJunkHeld())return yeotJunk();   // 결정 D-1462
   if(Rg.arcs()){
     const c=[];
     if(night()&&!F.jangteoArcsYeot2)c.push({t:'밤의 엿수레를 살핀다',go:yeotNight});
     if(F.jangteoArcsYeot2&&(F.jangteoArcsScissorsFound||G.boss.dead)&&!F.jangteoArcsYeotReturned)c.push({t:'창고에서 찾은 엿가위를 꺼낸다',go:yeotReturn});
     if(F.jangteoArcsPair1&&!F.jangteoArcsPair2)c.push({t:'모락 아주머니 떡을 건넨다',go:pairArc2});
+    c.push(...yeotJunkChoice());   // 결정 D-1462
     if(night()&&F.jangteoArcsPair2&&F.jangteoArcsYeot2&&!F.jangteoArcsPair3)c.push({t:'모락 아주머니 얘기를 묻는다',go:pairArc3});
     if(!night()&&F.jangteoArcsPair3&&F.jangteoArcsYeotReturned&&!F.jangteoArcsPair4)c.push({t:'떡집 앞으로 따라간다',go:pairArc4});
     // 도깨비가 남은 밤엔 수레 밑에 숨어 있다. 큰소리 장사는 낮에만.
@@ -1156,6 +1158,8 @@ function talkYeot(){
   }
   // 옛 저장: 장단에서 흥이 덜 나 엿을 못 받았으면 이번엔 웃겨서 준다.
   if(!F.yeotHigh){talkGive([['엿방울','어라, 너구리 꼬마~ 오늘은 꼭 웃겨 줘야겠네.'],...dadYeotLines()],()=>dadYeotDone());return;}
+  // 결정 D-1462: 꺼내 보인 뿔·갓이 보따리에 남았으면 바꿀지 먼저 묻는다
+  if(yeotJunkChoice().length){talk([['엿방울','그 헌 물건, 엿으로 바꿀 마음 생겼어~?',[...yeotJunkChoice(),{t:'수다 떨기',go:yeotChat},{t:'그만두기',go:null}]]]);return;}
   yeotChat();
 }
 /* 결정 D-663: 엿방울의 수다. 말 걸 때마다 다음 이야기로 넘어간다. 장터 소식통이라 말끝을 늘이며 농을 섞는다 (npcs.csv 말투) */
@@ -1170,6 +1174,23 @@ function yeotChat(){
     [['엿방울','장터에선 귀로 먼저 장을 보는 거야~\n어디서 웃음이 나나, 어디서 한숨이 나나.'],['엿방울','웃음 나는 좌판이 덤도 후하지.\n…내 좌판처럼~']]
   ];
   talk(chat[i]);
+}
+/* 결정 D-1462 (사용자 지시 2026-11-11 "아예 쓸모가 없는 물품은 쓰임새를 만들어 준다"): 엿장수는 헌 물건을 받고 엿을 내준다.
+   아이가 얼음 뿔(눈도깨비)이나 검은 갓(어둑차사)을 꺼내 보이면 엿방울이 받기로 하고, 그 뒤로 교환 화면에서 호박엿으로 바꿔 준다. */
+function yeotJunkHeld(){return has('nundok_horn')&&!G.f.yeotHorn||has('broken_orb')&&!G.f.yeotGat;}
+function yeotJunkChoice(){return G.f.yeotJunkHeard&&yeotJunkHeld()?[{t:'헌 물건을 엿으로 바꾼다',go:()=>Trade.open('yeotbang')}]:[];}
+function yeotJunk(){
+  const horn=has('nundok_horn')&&!G.f.yeotHorn;G.f.yeotJunkHeard=true;
+  // 요술보따리는 겉으로 드러나지 않으니(D-424) 엿방울이 먼저 볼 수는 없다. 엿장수가 헌 물건을 받는 줄 아는 아이가 꺼내 보인다
+  talk([['너구리','(엿장수는 헌 물건도 받고 엿을 내준다.\n보따리에서 '+(horn?'얼음 뿔':'검은 갓')+'을 꺼내 보였다.)'],
+    ['엿방울',horn?'어라, 녹지도 않는 얼음이네! 엿판 앞에 세워 두면\n구경꾼이 줄을 서겠는걸~':'어라, 갓 한번 크다~ 수레 지붕에 걸어 두면\n지나가던 사람마다 고개를 돌리겠는걸~'],
+    ['엿방울','헌 물건이면 엿장수 몫이지~\n호박엿으로 넉넉히 쳐 줄게. 바꿀래?',[{t:'보따리를 펼친다',go:()=>Trade.open('yeotbang')},{t:'아직은 안 줄래',go:null}]]]);
+}
+function yeotJunkGive(id){
+  if(!has(id))return;
+  const horn=id==='nundok_horn';takeItem(id,1);G.f[horn?'yeotHorn':'yeotGat']=true;rel('yeotbang',1);
+  talkGive([['엿방울',horn?'이 뿔은 엿판 앞에 꽂아 둬야지~\n엿 녹을 걱정도 덜겠다!':'이 갓은 수레 지붕에 걸어 둘래~\n갓 구경 왔다가 엿 사 가는 사람 생기겠다!'],
+    ['엿방울','자, 호박엿 세 가락. 엿장수 마음이니 덤은 없어~'],gotLine('hobakyeot',3)]);
 }
 function yeotTrade(){
   talk([['엿방울',Rg.arcs()&&night()&&!G.boss.dead?'솔방울 다섯 개랑 쌀 여덟 되. 조용히 바꿀래?':'어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되~',[{t:'보따리를 펼친다',go:()=>Trade.open('yeotbang')},{t:'아직은 안 줄래',go:null}]]]);
@@ -1487,8 +1508,10 @@ if(!CLASSIC){
     if(n.id==='morak')p.props=null; // 결정 D-315: 떡집은 확장 배경(art.js)이 땅 위 가게로 그리고, 모락은 그 안 땅에 선다.
     if(n.id==='yeotbang')p.talk=()=>{
       if(!G.f.yeotDone){n.talk();return;}
+      if(!G.f.yeotJunkHeard&&yeotJunkHeld()){yeotJunk();return;}   // 결정 D-1462
       const hide=night()&&!G.boss.dead&&Rg.arcs();
       talk([[hide?'너구리':'엿방울',hide?'(엿방울 아주머니는 수레 밑에서 꼬리 끝만 비죽 보인다.)':(Rg.riceNeeded()?'불쏘시개는 늘 필요하지~\n솔방울을 더 주우면 쌀도 더 바꿔 줄게.':'쌀은 넉넉해 보이는데~\n떡 찌다 모자라면 그때 와.'),[
+        ...yeotJunkChoice(),   // 결정 D-1462: 꺼내 보인 뿔·갓이 보따리에 남았으면 언제든 바꾼다
         {t:'수다 떨기',go:n.talk},   // 결정 D-663: '이야기'가 딱딱해 엿방울답게
         // 결정 D-79: 쌀이 진행에 모자랄 때만 더 바꿔 준다.
         ...(Rg.riceNeeded()?[{t:'솔방울 5개로 쌀 8개 더 구하기',go:()=>{
@@ -1589,6 +1612,9 @@ Rg.trade={
     ...(G.f.yeotMet?[{id:'t_yeotbang',item:'ssal',n:8,asks:[{solbang:5}],
       done:()=>G.f.yeotDone,accept:yeotGive}]:[]),
     // 결정 D-123: 엿방울이 "쌀은 넉넉해 보인다"고 말한 뒤에도 그 쌀은 보따리에 보인다. 모자랄 때만 바꾼다.
+    // 결정 D-1462: 헌 물건 엿 바꾸기. 아이가 뿔이나 갓을 꺼내 보인 뒤에만 보인다
+    ...(G.f.yeotJunkHeard?[{id:'t_yeotbang_horn',item:'hobakyeot',n:3,asks:[{nundok_horn:1}],done:()=>G.f.yeotHorn,accept:()=>yeotJunkGive('nundok_horn')},
+      {id:'t_yeotbang_gat',item:'hobakyeot',n:3,asks:[{broken_orb:1}],done:()=>G.f.yeotGat,accept:()=>yeotJunkGive('broken_orb')}]:[]),
     ...(!CLASSIC&&G.f.yeotDone?[{id:'t_yeotbang_more',item:'ssal',n:8,asks:[{solbang:5}],
       locked:()=>riceNeeded()?null:'쌀은 넉넉해 보인다고 했다. 떡 찌다 모자라면 그때 오자.',accept:yeotMoreGive}]:[])
   ],

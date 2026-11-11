@@ -45,7 +45,8 @@ function battleTool(){return B&&!B.E.dodge&&!B.noTool?B.tool||null:null;}
 function toolFit(p,tool=battleTool()){if(!p||!p.tool||!tool)return 'plain';return p.tool===tool?'good':'bad';}
 function toolDamage(p,tool=battleTool()){
   const t=TABLES.TUNING,base=tool==='sickle'&&G.sharp?t.battle_sharp_damage:t.battle_base_damage,fit=toolFit(p,tool);
-  return fit==='good'?Math.max(base,t.battle_tool_good_damage):fit==='bad'?base*t.battle_tool_bad_mult:base;
+  // 결정 D-1461: 힘 기운은 도구로 깎는 내구도를 늘린다 (food.js)
+  return (fit==='good'?Math.max(base,t.battle_tool_good_damage):fit==='bad'?base*t.battle_tool_bad_mult:base)*foodMul('strong');
 }
 /* 재료를 얻을 확률: 안 먹는 도구면 낮아진다 */
 function toolChance(p,chance,tool=battleTool()){return toolFit(p,tool)==='bad'?chance*TABLES.TUNING.battle_tool_bad_mult:chance;}
@@ -73,7 +74,7 @@ function bAim(){
 function battleForm(){const id=G&&G.form;return B&&!B.E.dodge&&!B.noTool&&id&&hasForm(id)?id:'';}
 function battleHandProfile(){
   const id=battleForm(),prefix='battle_'+(id||'bare')+'_',t=TABLES.TUNING;
-  return {speed:t[prefix+'speed']*nameSpeedMul(),cooldown:t[prefix+'cooldown'],radius:t[prefix+'radius']};   // 결정 D-433: 잃은 이름만큼 손이 느려진다 (battle-names.js)
+  return {speed:t[prefix+'speed']*nameSpeedMul()*foodMul('swift'),cooldown:t[prefix+'cooldown'],radius:t[prefix+'radius']};   // 결정 D-433: 잃은 이름만큼 손이 느려진다 (battle-names.js)
 }
 /* 결정 D-501: 도구 날이 닿는 범위(battle_<모습>_radius)와 보스에서 칠 자리의 금빛 원 크기(battle_mark_radius)를 따로 둔다
    (사용자 피드백 2026-11-04: 무기 범위는 1/3로, 보스에서 맞혀야 하는 범위는 반으로). 도구 원 안에 칠 자리 가운데가 들어오면 맞는다. */
@@ -187,6 +188,7 @@ function startBattle(kind,onEnd){
   if(E.possession){B.round=0;B.possession={from:'core',to:'core'};}
   // 결정 D-224: 만나기 직전 손에 든 도구를 들고 들어간다. 든 것이 전투 도구가 아니면 가진 첫 도구
   if(!E.dodge){const own=ownedBattleTools();B.tool=own.includes(G.tool)?G.tool:own[0]||null;B.toolSwap=0;}
+  foodBattleStart();   // 결정 D-1461: 품은 기운을 이 판에 쓴다 (food.js)
   nameBattleStart();$('bNames').hidden=!B.names;   // 결정 D-432~D-435·D-1140: 마지막 보스 어둑차사 전투의 이름 (battle-names.js)
   $('bName').textContent=E.name;$('bCalmLabel').textContent=E.calmLabel;
   setPadLabels(true);renderBHud();
@@ -220,7 +222,8 @@ function renderBHud(){
   }
   // 결정 D-245: 약한 공격(bHitMe 의 power<1)으로 쌓인 피해(B.hoof)는 남은 마지막 하트를 그만큼 비워 보인다
   const worn=clamp(B.hoof||0,0,1);
-  $('bHearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>i===G.hp-1&&worn>0.01?'<span class="part" style="--f:'+Math.round((1-worn)*100)+'%">♥</span>':'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('');
+  $('bHearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>i===G.hp-1&&worn>0.01?'<span class="part" style="--f:'+Math.round((1-worn)*100)+'%">♥</span>':'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('')+
+    '<span class="guard" title="든든 기운: 맞으면 금빛 하트부터 사라진다">♥</span>'.repeat(Math.max(0,Math.ceil(B.guard||0)));   // 결정 D-1461
   $('bCalm').style.width=B.calm+'%';
   renderBattleForms();
 }
@@ -269,6 +272,8 @@ function bInMarkZone(m){const z=bMarkZone();return m.x>=z.x1-0.5&&m.x<=z.x2+0.5&
 function openMark(){
   openMarkAt();
   if(B.mark){const q=bFitMark(B.mark.x,B.mark.y);B.mark.x=q.x;B.mark.y=q.y;}   // 결정 D-876
+  // 결정 D-1461: 밝은 눈 기운은 칠 자리 표식을 오래 남긴다 (food.js)
+  const eye=foodMul('eye');if(B.mark&&eye!==1){B.mark.t=Math.round(B.mark.t*eye);B.mark.max=Math.round(B.mark.max*eye);}
 }
 function openMarkAt(){
   const p=B.cur;
@@ -288,6 +293,7 @@ function bHitMe(power=1){
   if(B.inv>0||B.st==='end'||B.st==='finale')return false;
   const form=battleForm(),t=TABLES.TUNING;let loss=1;
   if(form==='goat'||power!==1){B.hoof+=power*(form==='goat'?t.battle_goat_damage_taken:1);loss=Math.floor(B.hoof+1e-9);B.hoof-=loss;}
+  loss=foodGuardHit(loss);   // 결정 D-1461: 든든 기운의 금빛 하트가 먼저 받는다 (food.js)
   G.hp-=loss;B.inv=form==='deer'?t.battle_deer_iframes:t.battle_iframes;B.hits++;B.hitThis=true;refreshHud();
   bSplash(B.px,B.py,loss?'#b4432a':'#6f6357');if(!loss&&form==='goat')B.msg='굳은 발굽이 버텼다!';
   if(G.hp<=0)bEnd('lose');
@@ -365,6 +371,7 @@ function bEnd(result){
   B.msg=result==='win'?B.E.win:result==='calm'?calmWinText():result==='flee'?'일단 물러나자.':B.E.lose;
   nameBattleEnd(result);   // 결정 D-435: 이기거나 달래면 이름이 모두 돌아오고, 물러나면 뱃속에 남는다
   if(result==='calm'){learn('calm:'+B.kind);if(B.E.calmGift)B.loot.push(B.E.calmGift);}
+  foodBattleEnd();   // 결정 D-1461: 기운은 한 판으로 끝난다
   if(result==='calm'&&B.E.onCalm)B.E.onCalm(B);
   if(result==='win'&&B.E.onWin)B.E.onWin(B);
   renderBHud();
@@ -511,7 +518,8 @@ function giveGift(id){
   }
   // 기존 선물의 진정수치가 우선이다. 새 가공품의 효과만 맛 표에서 더한다.
   const effect=taste&&taste.effect.match(/^calm:(\d+)$/);
-  const v=B.E.likes[id]||(effect?+effect[1]:0);
+  // 결정 D-1461: 다정 기운이면 진정이 더 오른다 (food.js)
+  const v=Math.round((B.E.likes[id]||(effect?+effect[1]:0))*foodMul('kind'));
   // 결정 D-64: 좋아하지 않는 물건은 진정 0, 물건은 보따리에 그대로 둔다. 빈틈도 쓰지 않는다.
   if(!v){$('bGiftHint').textContent=(taste?taste.line:jo(ITEMS[id].n,'에는','에는')+' 별 관심이 없는 것 같다.')+' 물건은 보따리에 그대로 두었다.';return;}
   if(!lore)takeItem(id,1);learn('like:'+B.kind+':'+id);B.giftUsed=giftKey();B.lastGift=id;

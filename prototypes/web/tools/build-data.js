@@ -65,6 +65,23 @@ for(const r of items){
     goal.options.push({[r.id]:+n});
   }
 }
+/* 결정 D-1461: 먹을거리는 모두 먹을 수 있다 (사용자 지시 2026-11-11). 먹으면 오르는 체력(eat)과
+   다음 보스 싸움 한 판의 기운(food: k 종류·lv 세기)은 foods.csv 에만 적는다. 게임에서 뺀 먹을거리는 적지 않는다. */
+const BUFF_KEYS={'든든':'guard','날램':'swift','힘':'strong','밝은 눈':'eye','다정':'kind'};
+const removedItem=r=>(r['얻는곳']||'').startsWith('(사용자 지시');
+for(const r of t('foods')){
+  const it=ITEMS[r.id],where='foods.csv '+r.id;
+  if(!it||it.kind!=='먹을거리')fail(where+': items.csv 의 먹을거리가 아니다');
+  if(it.n!==r['이름'])fail(where+': 이름이 items.csv 와 다르다');
+  const hp=Number(r['체력']),lv=Number(r['세기']),buff=r['기운'].trim();
+  if(!Number.isInteger(hp)||hp<0||hp>5)fail(where+': 체력은 0~5 정수');
+  if(buff?!BUFF_KEYS[buff]||!(lv>=1&&lv<=3&&Number.isInteger(lv)):lv!==0)fail(where+': 기운은 든든·날램·힘·밝은 눈·다정 중 하나와 세기 1~3, 없으면 세기 0');
+  if(!hp&&!buff)fail(where+': 체력도 기운도 없다');
+  if(!r['갈래'].trim())fail(where+': 갈래가 비어 있다');
+  if(hp)it.eat=hp;
+  it.food={group:r['갈래'].trim(),...(buff?{k:BUFF_KEYS[buff],lv}:{}),...(r['먹은 뒤'].trim()?{line:r['먹은 뒤'].trim()}:{})};
+}
+for(const r of items)if(r['종류']==='먹을거리'&&!removedItem(r)&&!ITEMS[r.id].food)fail('foods.csv: 먹을거리 '+r.id+'('+r['이름']+')의 먹는 효과가 없다');
 /* NPC·지역 이름은 대사 안에도 적혀 있어 코드에 둔다 (표만 바꾸면 대사가 따라오지 않는다) */
 /* 보스 부위: 표 순서 그대로. 공격 종류와 예고 글은 지역 코드에 있다 */
 const BOSS_PARTS={};
