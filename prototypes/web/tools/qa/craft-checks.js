@@ -53,13 +53,15 @@ function checkCraft(root) {
   for (const r of readCsv(root, 'bosses.csv')) { namesIn(r['달래기보상']).forEach(id => sources.add(id)); namesIn(r['진정수치']).forEach(id => uses.add(id)); }
   for (const r of readCsv(root, 'boss_parts.csv')) namesIn(r['부수면'] + ' ' + r['부순뒤변화']).forEach(id => sources.add(id));
   for (const r of readCsv(root, 'tastes.csv')) if (ids.has(r['무엇'])) uses.add(r['무엇']);
+  // 결정 D-1464: 정표 재료는 그 인물과 정이 두 칸·세 칸이 되면 받는다 (engine/bond.js)
+  for (const r of readCsv(root, 'bonds.csv')) if (ids.has(r['정표재료'])) sources.add(r['정표재료']);
   for (const r of recipes) { sources.add(r.out); Object.keys(r.need).forEach(id => uses.add(id)); }
   // 선택 가공품은 그 물건의 지역에서 까치 편에 집으로 보낼 수 있다 (craft.js isHomeCraft). 가보가 그 지역보다 뒤에 깨어나면 그 자리에서는 보낼 수 없다
   const order = Object.fromEntries(readCsv(root, 'regions.csv').map((r, i) => [r.id, i]));
   const toolRegion = Object.fromEntries(readCsv(root, 'heirlooms.csv').map(r => [r.id, r['깨어나는지역']]));
   const homeOk = r => r.optional && !(order[ITEMS[r.out]?.region] < order[toolRegion[r.tool]]);
   for (const r of recipes) if (homeOk(r)) uses.add(r.out);
-  for (const [id, it] of Object.entries(ITEMS)) if (it.eat > 0) uses.add(id);   // 먹을거리는 먹어서 체력을 채운다 (bag.js)
+  for (const [id, it] of Object.entries(ITEMS)) if (it.eat > 0 || it.food) uses.add(id);   // 먹을거리는 먹어서 체력을 채우거나 기운을 품는다 (bag.js, food.js 결정 D-1461)
   // 보스 부위를 쳐서 떨어지는 돌·재료 표 (예: 돌 골렘 STONE_OF={leg:'gudeuldol',…})
   for (const s of src.filter(s => /enemies\.js$/.test(s.file))) for (const m of s.text.matchAll(/\b[a-z]+\s*:\s*['"]([a-z_]+)['"]/g)) if (ids.has(m[1])) sources.add(m[1]);
 

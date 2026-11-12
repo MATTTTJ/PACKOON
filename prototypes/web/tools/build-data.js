@@ -196,6 +196,45 @@ for(const r of t('gift_recipes')){
   byId[out].lines.push({who:'me',text:r['수첩'].trim(),section:'숨은 가공법',when:'gift:'+r.id});
   GIFT_RECIPES.push({id:r.id,region:r['지역'],npc:r.NPC,out,way:r['방식'],lines});
 }
+/* 결정 D-1463·D-1464 (사용자 지시 2026-11-12): 호감도(정)와 정표 재료 (design/data/bonds.csv).
+   정은 좋아하는 것을 건넨 일과 부탁을 들어준 일로 오른다. 두 칸이면 정표 재료 하나와 그것으로 만드는 조합법, 세 칸이면 정표 재료 하나를 더 준다.
+   부탁 칸은 ' | '로 나눈 조건 가운데 하나라도 맞으면 된다: ledger:<장부id> 끝남 · wander:<지역>:<떠돌이id> 끝남 · flag:<진행값> · learn:<배운 키>.
+   대사는 ' / '로 줄을 나눈다. '너구리:'는 아이의 말·지문, '{받기}'는 정표 재료를 받는 줄, '{귀띔}'으로 시작하는 줄을 들으면 정표 조합법을 배운다. */
+const BOND_MARKS=['acorn','coin','leaf','drop','fish','paw','stone','horn','bur','grain','shell','tail','moon','feather','hoof'];
+const BONDS={},npcRows=t('npcs');
+const bondLines=(s,where,needHint)=>{
+  const out=s.split(' / ').map(x=>x.trim()).filter(Boolean).map(x=>x==='{받기}'?['give']:x.startsWith('{귀띔}')?['hint',x.slice(4).trim()]:x.startsWith('너구리:')?['kid',x.slice(4).trim()]:['npc',x]);
+  if(out.filter(l=>l[0]==='give').length!==1)fail(where+': {받기} 줄이 하나여야 한다');
+  if(out.filter(l=>l[0]==='hint').length!==(needHint?1:0))fail(where+': {귀띔} 줄은 '+(needHint?'하나여야':'없어야')+' 한다');
+  if(out.some(l=>l[0]!=='give'&&!l[1]))fail(where+': 빈 줄이 있다');
+  return out;
+};
+for(const r of t('bonds')){
+  const where='bonds.csv '+r.id,npc=npcRows.find(x=>x.id===r.id);
+  if(!npc)fail(where+': npcs.csv 의 인물 id가 아니다');
+  if(npc['이름']!==r['이름'])fail(where+': 이름이 npcs.csv 와 다르다');
+  if(!BOND_MARKS.includes(r['표식']))fail(where+': 표식은 '+BOND_MARKS.join('/')+' 중 하나');
+  const item=r['정표재료'],out=r['정표조합'];
+  if(!ITEMS[item]||ITEMS[item].kind!=='재료')fail(where+': 정표재료가 items.csv 의 재료가 아니다 '+item);
+  const rec=Object.values(RECIPES).flat().find(x=>x.out===out);
+  if(!rec||!rec.hidden||!rec.need[item])fail(where+': 정표조합은 정표재료가 드는 숨은 조합법이어야 한다 '+out);
+  if(Object.values(BONDS).some(b=>b.item===item||b.out===out))fail(where+': 정표재료·정표조합이 다른 인물과 겹친다');
+  if(!Object.values(TASTES[r.id]||{}).some(x=>['아주 좋아함','좋아함'].includes(x.kind)))fail(where+': 좋아하는 것이 없어 정을 쌓을 수 없다');
+  const errand=r['부탁'].split('|').map(x=>x.trim()).filter(Boolean);
+  if(!errand.length||errand.some(x=>!/^(?:ledger:[a-z_]+|wander:[a-z]+:[a-z_]+|flag:[A-Za-z0-9_]+|learn:[a-z0-9_:-]+)$/.test(x)))fail(where+': 부탁 조건 형식을 확인한다');
+  BONDS[r.id]={name:r['이름'],region:r['지역'],mark:r['표식'],item,out,errand,two:bondLines(r['정2대사'],where+' 정2대사',true),three:bondLines(r['정3대사'],where+' 정3대사',false)};
+  ITEMS[item].bond=r.id;
+}
+/* 결정 D-1466 (사용자 지시 2026-11-12): 아빠 수첩의 조합법 귀띔 (design/data/recipe_hints.csv). 숨은 조합법마다 하나. 모르는 조합법에도 미리 보인다 */
+const RECIPE_HINTS={};
+for(const r of t('recipe_hints')){
+  const out=r['조합품'],where='recipe_hints.csv '+out;
+  if(!Object.values(RECIPES).flat().some(x=>x.out===out&&x.hidden))fail(where+': 숨은 조합법의 결과물이 아니다');
+  if(RECIPE_HINTS[out])fail(where+': 겹친다');
+  if(!r['아빠 메모'].trim())fail(where+': 아빠 메모가 비었다');
+  RECIPE_HINTS[out]=r['아빠 메모'].trim();
+}
+for(const x of Object.values(RECIPES).flat())if(x.hidden&&!RECIPE_HINTS[x.out])fail('recipe_hints.csv: 숨은 조합법 '+x.out+'의 아빠 메모가 없다');
 /* 새 선택 교환은 현재 지역 코드에 연결하지 않고 목록·수량만 검증한다. */
 for(const r of t('trades').filter(r=>r.id.startsWith('t_craft_'))){
   if(!regionIds.has(r['지역'])||!npcIds.has(r.NPC))fail('trades.csv '+r.id+': 지역·NPC id를 확인한다');
@@ -375,7 +414,7 @@ const POPUP_SOUNDS={};
   }
 }
 requireValue(TUNING.roll_hold_ms>=80&&TUNING.roll_hold_ms<=400&&TUNING.roll_speed>1&&TUNING.roll_squirrel_speed>1&&TUNING.roll_accel_frames>=1&&TUNING.roll_step_frames>=1,'tuning.csv: 구르기 문턱은 80~400ms, 빠르기는 걷기보다 커야 한다');
-const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,STAMP_MARKS,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,GIFT_RECIPES,SCENE_MUSIC,MUSIC_LAYERS,POPUP_SOUNDS},null,1)+";\n";
+const out="'use strict';\n/* 자동으로 만든 파일이다. 직접 고치지 말고 design/data/*.csv 를 고친 뒤 node prototypes/web/tools/build-data.js 를 돌린다 */\nconst TABLES="+JSON.stringify({ITEMS,BOSS_PARTS,CALM,RECIPES,CRAFT,TASTES,NOTES,STAMP_MARKS,MINIGAMES,TUNING,PROGRESS,ZONES,STOCK,HAGGLE,GIFT_RECIPES,BONDS,RECIPE_HINTS,SCENE_MUSIC,MUSIC_LAYERS,POPUP_SOUNDS},null,1)+";\n";
 if(process.argv.includes('--check')){
   const now=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8').replace(/\r\n/g,'\n'):'';
   if(now!==out){console.error('tables.js 가 표와 다르다. node prototypes/web/tools/build-data.js 를 돌려야 한다');process.exit(1);}

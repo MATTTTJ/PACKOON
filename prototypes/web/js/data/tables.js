@@ -989,6 +989,481 @@ const TABLES={
    "region": "yeongsan",
    "d": "넋이 빠진 할아버지가 손버릇처럼 삼은 짚신 한 켤레. 먼 길 떠나는 이가 신으라고 초상집 문간에 놓던 그 신이다.",
    "u": "켤레"
+  },
+  "gotgan_dotori": {
+   "n": "곳간 도토리",
+   "r": 2,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "도담이 겨울 곳간에서 제일 굵은 것만 골라 둔 도토리. 껍질이 반질반질하다.",
+   "u": "알",
+   "bond": "dodam"
+  },
+  "jocheong": {
+   "n": "조청",
+   "r": 2,
+   "kind": "재료",
+   "region": "전체",
+   "d": "날쌘이 지게 깊숙이 넣고 다니는 조청 한 종지. 엿을 고다 만 듯 달고 끈끈하다.",
+   "u": "종지",
+   "bond": "nal"
+  },
+  "bokkeun_kong": {
+   "n": "볶은 콩",
+   "r": 2,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "무쇠 삼촌이 화덕 가에 두고 집어 먹는 볶은 콩. 불 냄새가 배어 고소하다.",
+   "u": "줌",
+   "bond": "musoe"
+  },
+  "gamcho": {
+   "n": "감초",
+   "r": 2,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "두꺼비 할멈 약 보따리의 감초. 약마다 한 쪽씩 꼭 들어간다는 단 뿌리다.",
+   "u": "뿌리",
+   "bond": "toad"
+  },
+  "pirami": {
+   "n": "말린 피라미",
+   "r": 2,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "여울이 개울에서 잡아 넓적돌 위에 말린 피라미. 바삭하다.",
+   "u": "마리",
+   "bond": "stream_otter"
+  },
+  "pyogo": {
+   "n": "연기 쐰 표고",
+   "r": 2,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "검댕이 숯가마 연기에 걸어 말린 표고. 숯 향이 깊게 뱄다.",
+   "u": "송이",
+   "bond": "charcoal_badger"
+  },
+  "dolbae": {
+   "n": "돌배",
+   "r": 2,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "돌쇠 할배네 바위틈 돌배나무에서 딴 돌배. 작고 단단한데 향이 좋다.",
+   "u": "알",
+   "bond": "dolsoe"
+  },
+  "deodeok": {
+   "n": "더덕",
+   "r": 2,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "뿔영감이 장승 뒤 비탈에서 캐 둔 더덕. 껍질을 벗기면 하얀 진이 난다.",
+   "u": "뿌리",
+   "bond": "ppuri"
+  },
+  "sansa": {
+   "n": "산사 열매",
+   "r": 2,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "꾸벅이가 겨울잠 머리맡에 모아 둔 붉은 산사 열매. 새콤하다.",
+   "u": "알",
+   "bond": "kkubeogi"
+  },
+  "deulkkae": {
+   "n": "들깨",
+   "r": 2,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "메밀댁이 메밀밭 둑에 심어 거둔 들깨. 비비면 고소한 냄새가 난다.",
+   "u": "줌",
+   "bond": "dol_badger"
+  },
+  "minari": {
+   "n": "돌미나리",
+   "r": 2,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "남생이 할미가 샘가 언 물 밑에서 건진 돌미나리. 겨울에도 푸르다.",
+   "u": "단",
+   "bond": "dol_turtle"
+  },
+  "gaengyeot": {
+   "n": "갱엿",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "엿방울이 장사로는 안 내놓는 진한 갱엿. 깨물면 이가 들러붙는다.",
+   "u": "덩이",
+   "bond": "yeotbang"
+  },
+  "chapssal": {
+   "n": "찹쌀",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "모락이 설 떡 하려고 아껴 둔 찹쌀. 낟알이 뽀얗고 차지다.",
+   "u": "됫박",
+   "bond": "morak"
+  },
+  "omija": {
+   "n": "오미자",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "부엉 영감이 장부 곁에 두고 우려 마시던 말린 오미자. 다섯 맛이 난다.",
+   "u": "줌",
+   "bond": "bueong"
+  },
+  "jayeom": {
+   "n": "자염",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "짠돌이 장에는 안 내놓는 소금. 바닷물을 끓여 만들어 덜 짜고 단맛이 돈다.",
+   "u": "줌",
+   "bond": "jjandol"
+  },
+  "susu": {
+   "n": "수수",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "등잔발이 밤짐을 나르며 자루에서 흘린 것을 한 알 한 알 모아 둔 붉은 수수.",
+   "u": "줌",
+   "bond": "deungjan"
+  },
+  "hodu": {
+   "n": "호두",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "말뚝 행수가 상단 짐에서 손님 대접용으로 따로 챙긴 호두.",
+   "u": "알",
+   "bond": "haengsu"
+  },
+  "saeu": {
+   "n": "말린 새우",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "종종이 엄마가 짐 보따리에 넣어 준 말린 새우. 종종이는 아껴 먹었다.",
+   "u": "줌",
+   "bond": "jongjong"
+  },
+  "eon_darae": {
+   "n": "언 다래",
+   "r": 2,
+   "kind": "재료",
+   "region": "yeongsan",
+   "d": "살금이가 눈 속에 묻어 둔 다래. 얼었다 녹아 더 달다.",
+   "u": "알",
+   "bond": "salgeumi"
+  },
+  "yeongeun": {
+   "n": "연근",
+   "r": 2,
+   "kind": "재료",
+   "region": "yeongsan",
+   "d": "두루미가 신목 아래 호숫가 얼음 밑에서 캔 연근. 구멍마다 물이 맑다.",
+   "u": "마디",
+   "bond": "durumi"
+  },
+  "siraegi": {
+   "n": "시래기",
+   "r": 2,
+   "kind": "재료",
+   "region": "yeongsan",
+   "d": "옹달 할미가 샘가 처마에 매달아 말린 시래기.",
+   "u": "두름",
+   "bond": "ongdal"
+  },
+  "aldotori_muk": {
+   "n": "알도토리묵",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "굵은 곳간 도토리를 통째 찧어 쑨 묵. 가루로 쑨 것보다 탱글하고 쌉쌀하다.",
+   "u": "모",
+   "eat": 1,
+   "food": {
+    "group": "묵과 찬",
+    "k": "strong",
+    "lv": 3
+   }
+  },
+  "dotori_dasik": {
+   "n": "도토리 다식",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "도토리 가루를 조청에 개어 다식판에 꾹꾹 박아 냈다. 길에서 하나씩 꺼내 먹기 좋다.",
+   "u": "개",
+   "eat": 1,
+   "food": {
+    "group": "엿과 한과",
+    "k": "swift",
+    "lv": 3
+   }
+  },
+  "misutgaru": {
+   "n": "미숫가루",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "볶은 콩과 도토리 가루를 함께 찧은 길 양식. 물에 타 마시면 하루 길이 든든하다.",
+   "u": "봉지",
+   "eat": 1,
+   "food": {
+    "group": "끼니",
+    "k": "guard",
+    "lv": 3
+   }
+  },
+  "gamcho_hwan": {
+   "n": "칡 감초환",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "칡뿌리에 감초를 찧어 빚은 환. 쓰다가 끝맛이 달다. 눈이 흐릴 때 한 알.",
+   "u": "알",
+   "food": {
+    "group": "차와 환",
+    "k": "eye",
+    "lv": 3
+   }
+  },
+  "pirami_jjim": {
+   "n": "피라미 버섯찜",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "말린 피라미에 싸리버섯을 얹어 시루에 쪘다. 비린내 없이 구수하다.",
+   "u": "그릇",
+   "eat": 1,
+   "food": {
+    "group": "묵과 찬",
+    "k": "strong",
+    "lv": 3
+   }
+  },
+  "pyogo_bap": {
+   "n": "표고밥",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "연기 쐰 표고를 쌀에 얹어 시루에 찐 밥. 숯 향이 은은하다.",
+   "u": "그릇",
+   "eat": 2,
+   "food": {
+    "group": "끼니",
+    "k": "guard",
+    "lv": 3
+   }
+  },
+  "dolbae_cheong": {
+   "n": "돌배청",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "돌배를 찧어 석청에 잰 청. 목이 칼칼할 때 한 숟갈이면 된다.",
+   "u": "병",
+   "food": {
+    "group": "청과 곶감",
+    "k": "kind",
+    "lv": 3
+   }
+  },
+  "deodeok_muchim": {
+   "n": "더덕 무침",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "더덕을 절굿공이로 두드려 펴고 소금에 무쳤다. 질기던 것이 보들보들하다.",
+   "u": "접시",
+   "eat": 1,
+   "food": {
+    "group": "묵과 찬",
+    "k": "strong",
+    "lv": 3
+   }
+  },
+  "sansa_pyeon": {
+   "n": "산사편",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "산사 열매를 찧어 꿀에 굳힌 새콤한 편. 졸릴 때 먹으면 눈이 번쩍 뜨인다.",
+   "u": "쪽",
+   "food": {
+    "group": "엿과 한과",
+    "k": "swift",
+    "lv": 3
+   }
+  },
+  "deulkkae_juk": {
+   "n": "들깨죽",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "들깨와 쌀을 맷돌에 갈아 쑨 죽. 고소하고 뜨끈하다.",
+   "u": "그릇",
+   "eat": 2,
+   "food": {
+    "group": "끼니",
+    "k": "guard",
+    "lv": 3
+   }
+  },
+  "minari_jeup": {
+   "n": "미나리즙",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "돌미나리를 맷돌에 갈아 짠 푸른 즙. 한 모금에 눈이 맑아진다.",
+   "u": "사발",
+   "food": {
+    "group": "차와 환",
+    "k": "eye",
+    "lv": 3
+   }
+  },
+  "kkae_yeot": {
+   "n": "깨엿",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "갱엿에 볶은 깨를 찧어 넣고 길게 늘인 엿. 고소하고 달다.",
+   "u": "가락",
+   "eat": 1,
+   "food": {
+    "group": "엿과 한과",
+    "k": "swift",
+    "lv": 3
+   }
+  },
+  "kkul_chaltteok": {
+   "n": "꿀 찰떡",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "찹쌀을 시루에 쪄 꿀을 발랐다. 쭉쭉 늘어난다.",
+   "u": "개",
+   "eat": 1,
+   "food": {
+    "group": "떡",
+    "k": "guard",
+    "lv": 3
+   }
+  },
+  "omija_cheong": {
+   "n": "오미자청",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "오미자를 찧어 꿀에 잰 붉은 청. 낯선 이에게 한 잔 내면 말문이 트인다.",
+   "u": "병",
+   "food": {
+    "group": "청과 곶감",
+    "k": "kind",
+    "lv": 3
+   }
+  },
+  "sundubu": {
+   "n": "순두부",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "콩을 맷돌에 갈아 자염으로 앉힌 몽글몽글한 순두부.",
+   "u": "그릇",
+   "eat": 1,
+   "food": {
+    "group": "묵과 찬",
+    "k": "strong",
+    "lv": 3
+   }
+  },
+  "susu_pattteok": {
+   "n": "수수팥떡",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "붉은 수수 경단에 팥고물을 묻혔다. 아이 생일에 해 주는 떡이다.",
+   "u": "개",
+   "eat": 1,
+   "food": {
+    "group": "떡",
+    "k": "guard",
+    "lv": 3
+   }
+  },
+  "hodu_gangjeong": {
+   "n": "호두강정",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "호두를 꿀에 버무려 절구에 찧어 뭉쳤다. 먼 길에 이만한 게 없다.",
+   "u": "알",
+   "food": {
+    "group": "엿과 한과",
+    "k": "swift",
+    "lv": 3
+   }
+  },
+  "saeu_juk": {
+   "n": "새우죽",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "말린 새우와 쌀을 맷돌에 갈아 쑨 죽. 바다 냄새가 난다.",
+   "u": "그릇",
+   "eat": 2,
+   "food": {
+    "group": "끼니",
+    "k": "kind",
+    "lv": 3
+   }
+  },
+  "darae_hwachae": {
+   "n": "다래 화채",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "yeongsan",
+   "d": "언 다래를 찧어 고드름 녹인 물에 띄웠다. 눈이 시원해진다.",
+   "u": "그릇",
+   "food": {
+    "group": "차와 환",
+    "k": "eye",
+    "lv": 3
+   }
+  },
+  "yeongeun_jeonggwa": {
+   "n": "연근 정과",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "yeongsan",
+   "d": "연근을 시루에 쪄서 꿀에 잰 정과. 쫀득하다.",
+   "u": "쪽",
+   "food": {
+    "group": "엿과 한과",
+    "k": "kind",
+    "lv": 3
+   }
+  },
+  "siraegi_bap": {
+   "n": "시래기밥",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "yeongsan",
+   "d": "시래기를 쌀에 얹어 시루에 찐 밥. 샘가 할미네 겨울 끼니다.",
+   "u": "그릇",
+   "eat": 2,
+   "food": {
+    "group": "끼니",
+    "k": "strong",
+    "lv": 3
+   }
   }
  },
  "BOSS_PARTS": {
@@ -1270,6 +1745,127 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:meju"
+   },
+   {
+    "need": {
+     "gotgan_dotori": 1,
+     "salt": 1
+    },
+    "out": "aldotori_muk",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:aldotori_muk"
+   },
+   {
+    "need": {
+     "jocheong": 1,
+     "powder": 1
+    },
+    "out": "dotori_dasik",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:dotori_dasik"
+   },
+   {
+    "need": {
+     "bokkeun_kong": 1,
+     "powder": 1
+    },
+    "out": "misutgaru",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:misutgaru"
+   },
+   {
+    "need": {
+     "gamcho": 1,
+     "root": 1
+    },
+    "out": "gamcho_hwan",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:gamcho_hwan"
+   },
+   {
+    "need": {
+     "dolbae": 1,
+     "seokcheong": 1
+    },
+    "out": "dolbae_cheong",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:dolbae_cheong"
+   },
+   {
+    "need": {
+     "deodeok": 1,
+     "salt": 1
+    },
+    "out": "deodeok_muchim",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:deodeok_muchim"
+   },
+   {
+    "need": {
+     "sansa": 1,
+     "honey": 1
+    },
+    "out": "sansa_pyeon",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:sansa_pyeon"
+   },
+   {
+    "need": {
+     "gaengyeot": 1,
+     "sesame": 1
+    },
+    "out": "kkae_yeot",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:kkae_yeot"
+   },
+   {
+    "need": {
+     "omija": 1,
+     "honey": 1
+    },
+    "out": "omija_cheong",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:omija_cheong"
+   },
+   {
+    "need": {
+     "hodu": 1,
+     "honey": 1
+    },
+    "out": "hodu_gangjeong",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:hodu_gangjeong"
+   },
+   {
+    "need": {
+     "eon_darae": 1,
+     "icicle": 1
+    },
+    "out": "darae_hwachae",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:darae_hwachae"
    }
   ],
   "maetdol": [
@@ -1388,6 +1984,49 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:bigeul_garu"
+   },
+   {
+    "need": {
+     "deulkkae": 1,
+     "ssal": 1
+    },
+    "out": "deulkkae_juk",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:deulkkae_juk"
+   },
+   {
+    "need": {
+     "minari": 1
+    },
+    "out": "minari_jeup",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:minari_jeup"
+   },
+   {
+    "need": {
+     "jayeom": 1,
+     "kong": 1
+    },
+    "out": "sundubu",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:sundubu"
+   },
+   {
+    "need": {
+     "saeu": 1,
+     "ssal": 1
+    },
+    "out": "saeu_juk",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:saeu_juk"
    }
   ],
   "siru": [
@@ -1494,6 +2133,72 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:jjimjil_dol"
+   },
+   {
+    "need": {
+     "pirami": 1,
+     "ssari": 1
+    },
+    "out": "pirami_jjim",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:pirami_jjim"
+   },
+   {
+    "need": {
+     "pyogo": 1,
+     "ssal": 1
+    },
+    "out": "pyogo_bap",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:pyogo_bap"
+   },
+   {
+    "need": {
+     "chapssal": 1,
+     "honey": 1
+    },
+    "out": "kkul_chaltteok",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:kkul_chaltteok"
+   },
+   {
+    "need": {
+     "susu": 1,
+     "pat": 1
+    },
+    "out": "susu_pattteok",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:susu_pattteok"
+   },
+   {
+    "need": {
+     "yeongeun": 1,
+     "honey": 1
+    },
+    "out": "yeongeun_jeonggwa",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:yeongeun_jeonggwa"
+   },
+   {
+    "need": {
+     "siraegi": 1,
+     "ssal": 1
+    },
+    "out": "siraegi_bap",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:siraegi_bap"
    }
   ]
  },
@@ -3837,6 +4542,405 @@ const TABLES={
      "when": "gift:g_jang_jjandol"
     }
    ]
+  },
+  {
+   "id": "gotgan_dotori",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "aldotori_muk",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "곳간 도토리를 통째 찧어 묵을 쒔다. 도담 말대로 탱글탱글하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:aldotori_muk"
+    }
+   ]
+  },
+  {
+   "id": "jocheong",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "dotori_dasik",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "조청에 도토리 가루를 개어 꾹꾹 박았더니 다식이 됐다. 날쌘 아저씨는 이걸 길에서 먹나 보다.",
+     "section": "숨은 가공법",
+     "when": "recipe:dotori_dasik"
+    }
+   ]
+  },
+  {
+   "id": "bokkeun_kong",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "misutgaru",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "볶은 콩이랑 도토리 가루를 같이 찧었다. 물에 타 마시니 배가 든든하다. 아빠도 이걸 마셨구나.",
+     "section": "숨은 가공법",
+     "when": "recipe:misutgaru"
+    }
+   ]
+  },
+  {
+   "id": "gamcho",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "gamcho_hwan",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "칡뿌리에 감초를 찧어 환을 빚었다. 쓴데 끝맛이 달다.",
+     "section": "숨은 가공법",
+     "when": "recipe:gamcho_hwan"
+    }
+   ]
+  },
+  {
+   "id": "pirami",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "pirami_jjim",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "피라미에 싸리버섯을 얹어 시루에 쪘다. 정말 비린내가 안 난다.",
+     "section": "숨은 가공법",
+     "when": "recipe:pirami_jjim"
+    }
+   ]
+  },
+  {
+   "id": "pyogo",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "pyogo_bap",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "표고를 쌀에 얹어 밥을 쪘다. 숯 냄새가 은은하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:pyogo_bap"
+    }
+   ]
+  },
+  {
+   "id": "dolbae",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "dolbae_cheong",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "돌배를 찧어 석청에 쟀다. 목이 시원해지는 냄새가 난다.",
+     "section": "숨은 가공법",
+     "when": "recipe:dolbae_cheong"
+    }
+   ]
+  },
+  {
+   "id": "deodeok",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "deodeok_muchim",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "더덕을 두드려 펴고 소금에 무쳤다. 질기던 게 보들보들해졌다.",
+     "section": "숨은 가공법",
+     "when": "recipe:deodeok_muchim"
+    }
+   ]
+  },
+  {
+   "id": "sansa",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "sansa_pyeon",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "산사 열매를 꿀에 찧어 굳혔다. 새콤해서 눈이 번쩍 뜨인다.",
+     "section": "숨은 가공법",
+     "when": "recipe:sansa_pyeon"
+    }
+   ]
+  },
+  {
+   "id": "deulkkae",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "deulkkae_juk",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "들깨와 쌀을 맷돌에 갈아 죽을 쒔다. 뜨끈하고 고소하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:deulkkae_juk"
+    }
+   ]
+  },
+  {
+   "id": "minari",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "minari_jeup",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "돌미나리를 맷돌에 갈아 짰다. 한 모금에 눈이 맑아지는 것 같다.",
+     "section": "숨은 가공법",
+     "when": "recipe:minari_jeup"
+    }
+   ]
+  },
+  {
+   "id": "gaengyeot",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "kkae_yeot",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "갱엿에 깨를 넣고 길게 늘였다. 엿장수 마음대로 늘였다.",
+     "section": "숨은 가공법",
+     "when": "recipe:kkae_yeot"
+    }
+   ]
+  },
+  {
+   "id": "chapssal",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "kkul_chaltteok",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "찹쌀을 쪄서 꿀을 발랐다. 쭉쭉 늘어난다.",
+     "section": "숨은 가공법",
+     "when": "recipe:kkul_chaltteok"
+    }
+   ]
+  },
+  {
+   "id": "omija",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "omija_cheong",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "오미자를 꿀에 찧어 쟀다. 붉은 물이 곱다.",
+     "section": "숨은 가공법",
+     "when": "recipe:omija_cheong"
+    }
+   ]
+  },
+  {
+   "id": "jayeom",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "sundubu",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "콩을 갈아 자염으로 앉혔다. 몽글몽글 앉았다.",
+     "section": "숨은 가공법",
+     "when": "recipe:sundubu"
+    }
+   ]
+  },
+  {
+   "id": "susu",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "susu_pattteok",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "수수 경단에 팥을 묻혔다. 내 생일은 아니지만 생일 떡이다.",
+     "section": "숨은 가공법",
+     "when": "recipe:susu_pattteok"
+    }
+   ]
+  },
+  {
+   "id": "hodu",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "hodu_gangjeong",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "호두를 꿀에 버무려 뭉쳤다. 먼 길에 딱이다.",
+     "section": "숨은 가공법",
+     "when": "recipe:hodu_gangjeong"
+    }
+   ]
+  },
+  {
+   "id": "saeu",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "saeu_juk",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "새우와 쌀을 맷돌에 갈아 죽을 쒔다. 종종이 엄마 맛일까.",
+     "section": "숨은 가공법",
+     "when": "recipe:saeu_juk"
+    }
+   ]
+  },
+  {
+   "id": "eon_darae",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "darae_hwachae",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "언 다래를 찧어 고드름 물에 띄웠다. 눈이 시원하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:darae_hwachae"
+    }
+   ]
+  },
+  {
+   "id": "yeongeun",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "yeongeun_jeonggwa",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "연근을 쪄서 꿀에 쟀다. 쫀득하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:yeongeun_jeonggwa"
+    }
+   ]
+  },
+  {
+   "id": "siraegi",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "siraegi_bap",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "시래기를 얹어 밥을 쪘다. 할머니네 겨울 맛이다.",
+     "section": "숨은 가공법",
+     "when": "recipe:siraegi_bap"
+    }
+   ]
   }
  ],
  "STAMP_MARKS": {
@@ -4242,7 +5346,14 @@ const TABLES={
   "food_swift_step": 0.15,
   "food_strong_step": 0.25,
   "food_eye_step": 0.3,
-  "food_kind_step": 0.25
+  "food_kind_step": 0.25,
+  "bond_liked": 1,
+  "bond_loved": 2,
+  "bond_errand": 1,
+  "bond_need_one": 1,
+  "bond_need_two": 2,
+  "bond_need_three": 3,
+  "bond_heard_ms": 20000
  },
  "PROGRESS": [
   {
@@ -5236,6 +6347,975 @@ const TABLES={
    ]
   }
  ],
+ "BONDS": {
+  "dodam": {
+   "name": "도담",
+   "region": "galchamgol",
+   "mark": "acorn",
+   "item": "gotgan_dotori",
+   "out": "aldotori_muk",
+   "errand": [
+    "ledger:dodam"
+   ],
+   "two": [
+    [
+     "npc",
+     "잠깐! 이거 줄게! 우리 곳간에서 제일 굵은 것만 골랐거든!"
+    ],
+    [
+     "kid",
+     "이렇게 큰 도토리는 처음 봐. 아껴 둔 거 아니야?"
+    ],
+    [
+     "npc",
+     "아껴 둔 거 맞지! 근데 넌 맛있는 걸 자꾸 갖다주잖아!"
+    ],
+    [
+     "give"
+    ],
+    [
+     "hint",
+     "통째로 절구에 찧어서 소금 넣고 쑤면 알도토리묵이 돼! 가루로 쑨 것보다 훨씬 탱글하거든!"
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "또 줄게! 이번 건 내 몫에서 뺀 거야!"
+    ],
+    [
+     "kid",
+     "네 몫이면 겨울에 모자라잖아."
+    ],
+    [
+     "npc",
+     "괜찮아! 너 길에서 배고프면 안 되지! 대신 돌아오면 무슨 맛이었는지 다 말해 줘야 돼!"
+    ],
+    [
+     "give"
+    ]
+   ]
+  },
+  "nal": {
+   "name": "날쌘",
+   "region": "전체",
+   "mark": "coin",
+   "item": "jocheong",
+   "out": "dotori_dasik",
+   "errand": [
+    "ledger:nal",
+    "ledger:nal_dolneomeo",
+    "ledger:nal_jangteo",
+    "ledger:nal_yeongsan"
+   ],
+   "two": [
+    [
+     "npc",
+     "…흥. 받기만 하니까 셈이 안 맞잖아."
+    ],
+    [
+     "kid",
+     "(날쌘 아저씨가 지게 밑에서 작은 종지를 꺼내 툭 내민다.)"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "조청이다. 팔 물건 아니니까 값은 묻지 마."
+    ],
+    [
+     "hint",
+     "도토리 가루에 개어서 절구에 꾹꾹 박아. 다식이 된다. 길에서 먹기 좋아."
+    ]
+   ],
+   "three": [
+    [
+     "kid",
+     "(날쌘 아저씨가 종지 하나를 또 보따리에 쑤셔 넣는다.)"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "길 위에선 단 게 힘이다. …그뿐이야."
+    ]
+   ]
+  },
+  "musoe": {
+   "name": "무쇠",
+   "region": "galchamgol",
+   "mark": "leaf",
+   "item": "bokkeun_kong",
+   "out": "misutgaru",
+   "errand": [
+    "ledger:musoe"
+   ],
+   "two": [
+    [
+     "npc",
+     "…손 내밀어 봐라."
+    ],
+    [
+     "kid",
+     "(삼촌이 화덕 가에 두던 볶은 콩을 한 줌 쥐여 준다.)"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "불 앞에서 일할 때 집어 먹는 거다."
+    ],
+    [
+     "hint",
+     "도토리 가루랑 같이 절구에 찧어라. 미숫가루가 된다. 물에 타 마시면 하루 길은 간다."
+    ],
+    [
+     "kid",
+     "삼촌이 생각해 낸 거예요?"
+    ],
+    [
+     "npc",
+     "…형이 그렇게 해 먹었다."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "콩 남았다. 가져가라."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "아까도 주셨잖아요."
+    ],
+    [
+     "npc",
+     "길에서 굶으면 네 어미 볼 낯이 없다. …다 먹고 와라."
+    ]
+   ]
+  },
+  "toad": {
+   "name": "두꺼비 할멈",
+   "region": "galchamgol",
+   "mark": "drop",
+   "item": "gamcho",
+   "out": "gamcho_hwan",
+   "errand": [
+    "ledger:toad"
+   ],
+   "two": [
+    [
+     "npc",
+     "얘야, 이리 오렴. 네가 자꾸 챙겨 주니 할미도 하나 꺼냈단다."
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "감초란다. 약마다 한 쪽씩 꼭 넣는 단 뿌리지."
+    ],
+    [
+     "hint",
+     "칡뿌리랑 같이 절구에 찧어 환을 빚으렴. 눈이 흐릴 때 한 알 먹으면 한결 맑아진단다."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "감초를 한 뿌리 더 넣었단다. 약을 달일 땐 늘 이걸 넣지. 쓴 약도 넘어가게."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "아껴 쓸게요, 할머니."
+    ]
+   ]
+  },
+  "stream_otter": {
+   "name": "여울",
+   "region": "galchamgol",
+   "mark": "fish",
+   "item": "pirami",
+   "out": "pirami_jjim",
+   "errand": [
+    "wander:galchamgol:stream_otter"
+   ],
+   "two": [
+    [
+     "npc",
+     "이거 받아! 내가 잡아서 넓적돌에 말린 피라미야!"
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "바삭하다. 이걸로 뭐 해 먹어?"
+    ],
+    [
+     "hint",
+     "싸리버섯이랑 같이 시루에 쪄! 빨래 아줌마가 그렇게 하면 비린내가 안 난댔어. 너도 외웠지?"
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "또 말렸어! 이번 건 제일 큰 거야!"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "약속해. 봄에 물수제비 내기 하러 올 때, 이거 먹고 힘내서 오는 거야!"
+    ],
+    [
+     "kid",
+     "약속. 봄에 꼭 올게."
+    ]
+   ]
+  },
+  "charcoal_badger": {
+   "name": "검댕",
+   "region": "galchamgol",
+   "mark": "paw",
+   "item": "pyogo",
+   "out": "pyogo_bap",
+   "errand": [
+    "wander:galchamgol:charcoal_badger"
+   ],
+   "two": [
+    [
+     "npc",
+     "콜록… 받은 게 쌓였다. 셈을 하자."
+    ],
+    [
+     "kid",
+     "(검댕 아저씨가 가마 연기에 걸어 두었던 표고를 한 줌 뗀다.)"
+    ],
+    [
+     "give"
+    ],
+    [
+     "hint",
+     "쌀에 얹어 시루에 쪄라. 숯 향이 밥에 밴다. 든든하다."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "한 줌 더다. 셈이 아직 남았다."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "셈은 이제 다 맞았어요."
+    ],
+    [
+     "npc",
+     "…맞았으면 그냥 받아라. 콜록."
+    ]
+   ]
+  },
+  "dolsoe": {
+   "name": "돌쇠 할배",
+   "region": "dolneomeo",
+   "mark": "stone",
+   "item": "dolbae",
+   "out": "dolbae_cheong",
+   "errand": [
+    "ledger:dolsoe"
+   ],
+   "two": [
+    [
+     "npc",
+     "손 좀 다오. …옳지, 그 손이다."
+    ],
+    [
+     "kid",
+     "(할아버지가 내 손바닥에 작고 단단한 열매를 얹어 주신다.)"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "바위틈 돌배다. 눈은 어두워도 그 나무는 손끝이 안다."
+    ],
+    [
+     "hint",
+     "석청이랑 절구에 찧어 재 두거라. 목이 칼칼할 때 한 숟갈이면 된다."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "하나 더 땄다. 손끝이 기억하는 마지막 가지였지."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "아껴 먹을게요, 할아버지."
+    ],
+    [
+     "npc",
+     "아끼지 말거라. 나눠 먹는 게다."
+    ]
+   ]
+  },
+  "ppuri": {
+   "name": "뿔영감",
+   "region": "dolneomeo",
+   "mark": "horn",
+   "item": "deodeok",
+   "out": "deodeok_muchim",
+   "errand": [
+    "ledger:ppuri"
+   ],
+   "two": [
+    [
+     "npc",
+     "주고받는 데에도 법도가 있다."
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "장승 뒤 비탈에서 캔 더덕이다."
+    ],
+    [
+     "hint",
+     "절굿공이로 두드려 펴고 소금에 무쳐라. 질긴 것은 두드려야 부드러워지는 법이다."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "한 뿌리 더다. 장승지기는 길손이 굶지 않게 하는 법이다."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "고맙습니다, 영감님."
+    ]
+   ]
+  },
+  "kkubeogi": {
+   "name": "꾸벅이",
+   "region": "dolneomeo",
+   "mark": "bur",
+   "item": "sansa",
+   "out": "sansa_pyeon",
+   "errand": [
+    "ledger:kkubeogi"
+   ],
+   "two": [
+    [
+     "npc",
+     "저기이… 이거어… 머리맡에 모아 둔 거야아…"
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "산사 열매네. 겨울잠 자다 먹으려던 거 아니야?"
+    ],
+    [
+     "npc",
+     "자다 깨면 하나씩 먹는 건데에… 너 주고 싶어어…"
+    ],
+    [
+     "hint",
+     "꿀이랑 절구에 찧으면… 새콤한 편이 돼애… 졸릴 때 먹으면 눈이 번쩍…"
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "하나 더 찾았어어… 베개 밑에 있었네에…"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "봄에 깨면… 네 얘기 들려줘어… 잊기 전에에…"
+    ]
+   ]
+  },
+  "dol_badger": {
+   "name": "메밀댁",
+   "region": "dolneomeo",
+   "mark": "grain",
+   "item": "deulkkae",
+   "out": "deulkkae_juk",
+   "errand": [
+    "wander:dolneomeo:dol_badger"
+   ],
+   "two": [
+    [
+     "kid",
+     "(메밀댁 아주머니가 말없이 자루 하나를 내 품에 안긴다.)"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "들깨다. 밭둑에 심은 거."
+    ],
+    [
+     "hint",
+     "쌀이랑 맷돌에 같이 갈아 죽 쒀라. 속이 든든하다."
+    ]
+   ],
+   "three": [
+    [
+     "kid",
+     "(아주머니가 들깨를 또 한 줌 넣어 준다. 이번엔 넘치게.)"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "많니? …많아야 나눠 먹지."
+    ]
+   ]
+  },
+  "dol_turtle": {
+   "name": "남생이 할미",
+   "region": "dolneomeo",
+   "mark": "shell",
+   "item": "minari",
+   "out": "minari_jeup",
+   "errand": [
+    "wander:dolneomeo:dol_turtle"
+   ],
+   "two": [
+    [
+     "npc",
+     "아가… 샘가에서… 건졌구나."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "돌미나리네요. 이 추위에 이렇게 푸르다니."
+    ],
+    [
+     "hint",
+     "맷돌에… 갈아 짜거라. 눈이… 맑아지마."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "또 왔구나… 한 단… 더 주마."
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "샘은… 늘 여기 있으마. 또… 오거라."
+    ]
+   ]
+  },
+  "yeotbang": {
+   "name": "엿방울",
+   "region": "jangteo",
+   "mark": "tail",
+   "item": "gaengyeot",
+   "out": "kkae_yeot",
+   "errand": [
+    "ledger:yeotbang"
+   ],
+   "two": [
+    [
+     "npc",
+     "에헤~ 너 같은 단골한텐 엿장수도 마음을 써야지~"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "갱엿이야~ 장사로는 안 내놓는 진짜배기~"
+    ],
+    [
+     "hint",
+     "깨를 넣고 절구에 꾹꾹 찧어서 늘이면 깨엿이지~ 엿장수 마음대로 길게 늘여~"
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "하나 더~ 이건 엿장수 마음이야~"
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "이것도 그냥 주시는 거예요?"
+    ],
+    [
+     "npc",
+     "그냥은 무슨~ 맛있게 먹고 소문만 내 줘~"
+    ]
+   ]
+  },
+  "morak": {
+   "name": "모락",
+   "region": "jangteo",
+   "mark": "moon",
+   "item": "chapssal",
+   "out": "kkul_chaltteok",
+   "errand": [
+    "ledger:morak"
+   ],
+   "two": [
+    [
+     "npc",
+     "이리 와, 이리 와! 설 떡 하려고 아껴 둔 찹쌀이야!"
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "설 떡에 쓰실 거잖아요."
+    ],
+    [
+     "npc",
+     "너 먹이는 게 설이지! 먹고 해, 먹고!"
+    ],
+    [
+     "hint",
+     "시루에 쪄서 꿀 발라! 쭉쭉 늘어나는 꿀 찰떡! 꿀 찰떡!"
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "한 됫박 더! 더 가져가, 더!"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "길 가다 배고프면 내 생각해! 떡집 생각!"
+    ]
+   ]
+  },
+  "bueong": {
+   "name": "부엉 영감",
+   "region": "jangteo",
+   "mark": "feather",
+   "item": "omija",
+   "out": "omija_cheong",
+   "errand": [
+    "ledger:bueong"
+   ],
+   "two": [
+    [
+     "npc",
+     "장부를 보니 네가 들고 온 것이 꽤 되더군. 셈을 맞추지."
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "오미자다. 밤새 장부 볼 때 우려 마시던 것이지."
+    ],
+    [
+     "hint",
+     "꿀에 찧어 재 두면 청이 되지. 낯선 이에게 한 잔 내면 말문이 트이더군."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "네 몫으로 한 줌 더 적어 두었다. 가져가지."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "장부에 적으셨으면 갚아야 하는 거예요?"
+    ],
+    [
+     "npc",
+     "이건 갚는 줄이 아니다. 받는 줄이지."
+    ]
+   ]
+  },
+  "jjandol": {
+   "name": "짠돌",
+   "region": "jangteo",
+   "mark": "coin",
+   "item": "jayeom",
+   "out": "sundubu",
+   "errand": [
+    "wander:jangteo:j_jjandol"
+   ],
+   "two": [
+    [
+     "npc",
+     "…자, 이거."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "소금이에요? 아저씨가 파는 것보다 덜 짠데요."
+    ],
+    [
+     "npc",
+     "바닷물을 끓여 만든 자염이다. 장에는 안 낸다. 아까워서."
+    ],
+    [
+     "hint",
+     "콩이랑 맷돌에 갈아 앉혀 봐라. 순두부가 몽글몽글 앉더라."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "한 줌 더. …값은 됐다."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "아저씨가 값을 안 받으세요?"
+    ],
+    [
+     "npc",
+     "너한텐 짜게 굴 까닭이 없더라."
+    ]
+   ]
+  },
+  "deungjan": {
+   "name": "등잔발",
+   "region": "jangteo",
+   "mark": "grain",
+   "item": "susu",
+   "out": "susu_pattteok",
+   "errand": [
+    "flag:jangteoArcsLamp1"
+   ],
+   "two": [
+    [
+     "npc",
+     "이거 받아! 밤짐 나르다 자루에서 흘린 수수, 한 알 한 알 주워 모은 거야!"
+    ],
+    [
+     "give"
+    ],
+    [
+     "hint",
+     "팥이랑 시루에 쪄서 수수팥떡 해 먹어! 아이 생일엔 그걸 해 줘야 액이 안 붙는대!"
+    ],
+    [
+     "kid",
+     "제 생일은 아직 멀었는데요."
+    ],
+    [
+     "npc",
+     "길 위에선 아무 날이나 생일이지!"
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "또 모았어! 이번엔 한 줌 꽉!"
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "밤길 가다 등잔 보이면 나인 줄 알아! 손 흔들어!"
+    ]
+   ]
+  },
+  "haengsu": {
+   "name": "말뚝 행수",
+   "region": "jangteo",
+   "mark": "paw",
+   "item": "hodu",
+   "out": "hodu_gangjeong",
+   "errand": [
+    "flag:jxSangdanCleared"
+   ],
+   "two": [
+    [
+     "npc",
+     "셈은 맞춰야지. 받은 게 있으면 갚는 게 상단 법이다."
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "호두다. 귀한 손님 대접용이지."
+    ],
+    [
+     "hint",
+     "꿀에 버무려 절구에 찧어 뭉쳐라. 호두강정이다. 먼 길에 이만한 게 없다."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "한 줌 더 얹지. 상단 신용은 갚을 때 넉넉히 갚는 데서 나온다."
+    ],
+    [
+     "give"
+    ]
+   ]
+  },
+  "jongjong": {
+   "name": "종종이",
+   "region": "jangteo",
+   "mark": "fish",
+   "item": "saeu",
+   "out": "saeu_juk",
+   "errand": [
+    "flag:jxSangdanCleared"
+   ],
+   "two": [
+    [
+     "npc",
+     "저, 저기… 이거 줄게."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "말린 새우네. 너 아껴 먹던 거 아니야?"
+    ],
+    [
+     "npc",
+     "엄마가 싸 준 거야. 근데 너한테 주고 싶어."
+    ],
+    [
+     "hint",
+     "쌀이랑 맷돌에 갈아서 죽 쒀 먹어. 내가 아플 때 엄마가 그렇게 해 줬어."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "하나 더 남았어… 이것도 줄게."
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "이건 네가 먹어. 엄마가 싸 준 거잖아."
+    ],
+    [
+     "npc",
+     "괜찮아. 엄마 보러 가면 또 싸 줄 거야. …친구 생겼다고 자랑할 거야."
+    ]
+   ]
+  },
+  "salgeumi": {
+   "name": "살금이",
+   "region": "yeongsan",
+   "mark": "hoof",
+   "item": "eon_darae",
+   "out": "darae_hwachae",
+   "errand": [
+    "ledger:salgeumi"
+   ],
+   "two": [
+    [
+     "npc",
+     "그, 그거… 받아. (귀를 쫑긋 세웠다가 내린다.)"
+    ],
+    [
+     "give"
+    ],
+    [
+     "kid",
+     "언 다래네. 눈 속에 묻어 둔 거야?"
+    ],
+    [
+     "npc",
+     "으, 응. 얼었다 녹으면 더 달아."
+    ],
+    [
+     "hint",
+     "고, 고드름 조각이랑 절구에 찧어서 띄우면… 눈이 시원해져. 밤에도 잘 보여."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "하, 하나 더 파냈어. 제일 단 데 묻은 거."
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "너, 너 오면… 이제 안 숨을게."
+    ]
+   ]
+  },
+  "durumi": {
+   "name": "두루미",
+   "region": "yeongsan",
+   "mark": "feather",
+   "item": "yeongeun",
+   "out": "yeongeun_jeonggwa",
+   "errand": [
+    "ledger:durumi"
+   ],
+   "two": [
+    [
+     "npc",
+     "얼음 밑에서 캔 연근이다. 받아라."
+    ],
+    [
+     "give"
+    ],
+    [
+     "hint",
+     "시루에 쪄서 꿀에 재면 정과가 되지. 마음이 굳은 이에게 한 쪽 건네면 풀린다."
+    ],
+    [
+     "kid",
+     "이렇게 귀한 걸 주셔도 돼요?"
+    ],
+    [
+     "npc",
+     "네가 들고 온 것들, 다 기억하고 있다."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "한 마디 더 캤다. …부끄러운 일이 많은 늙은이를 자꾸 찾아 주는구나."
+    ],
+    [
+     "give"
+    ]
+   ]
+  },
+  "ongdal": {
+   "name": "옹달 할미",
+   "region": "yeongsan",
+   "mark": "paw",
+   "item": "siraegi",
+   "out": "siraegi_bap",
+   "errand": [
+    "learn:ongdal:soup"
+   ],
+   "two": [
+    [
+     "npc",
+     "자꾸 갖다주믄 할미가 갚을 게 쌓이잖여."
+    ],
+    [
+     "give"
+    ],
+    [
+     "npc",
+     "처마에 매단 시래기여."
+    ],
+    [
+     "hint",
+     "쌀에 얹어 시루에 쪄 먹어. 한겨울엔 그만한 밥이 없구먼."
+    ]
+   ],
+   "three": [
+    [
+     "npc",
+     "한 두름 더 떼어 왔구먼. 물 한 바가지 셈은 아니여. 덤이여."
+    ],
+    [
+     "give"
+    ]
+   ]
+  }
+ },
+ "RECIPE_HINTS": {
+  "sesame_salt": "깨 하나에 ○○ 하나, 절구에 찧는다. 밥상 끝에 놓는 고소한 가루다.",
+  "gangjeong": "장터 강정은 깨를 단 것으로 뭉친다. 절구에 꾹꾹.",
+  "gyeol_hwan": "결명자를 단 것에 개어 환을 빚는다. 눈 침침한 길손들의 상비약.",
+  "kkot_cheong": "칡꽃은 단 것과 찧어 재 두면 청이 된다.",
+  "solbang_cheong": "상단 겨울 길 상비약. 솔방울 둘에 바위틈에서 나는 단 것 하나.",
+  "sirumit": "시루 밑에 까는 것. 싸리 살에 마른 풀 한 줌을 두드려 엮는다.",
+  "heuk_banjuk": "둑 메우는 흙은 진흙만으로는 안 된다. 돌에서 난 것 하나, 들에서 난 것 하나를 더 찧는다.",
+  "gongi": "냇가 차돌을 찧으면 공깃돌이 된다. 아우와 어릴 적에 하던 놀이.",
+  "darae_cha": "영산 다래 덩굴은 차로 마신다. 붉고 단 열매 하나를 곁들여 찧는다.",
+  "hwachae": "마가목 열매 둘에 언 것 하나를 찧어 띄운다. 산사람들의 화채.",
+  "meju": "콩 두 됫박을 찧어 무언가로 묶어 매단다. 장 담그는 집 메주.",
+  "mung_batter": "장터 떡집이 사 가는 반죽. 녹두를 기름 하나와 맷돌에.",
+  "ssanghwa": "산 위 추위에 먹는 약재. 칡뿌리에 두 가지를 더 간다. 하나는 나뭇가지 위에서, 하나는 붉은 열매.",
+  "dol_mulgam": "장승 눈에 올리는 빛. 이끼 낀 돌을 고소한 기름에 개어 간다.",
+  "okgaru": "돌너머 푸른 옥돌은 맷돌에 갈면 고운 가루가 된다.",
+  "dubu": "콩 둘에 ○○ 하나, 맷돌에 갈아 앉힌다.",
+  "jatjuk": "겨울잠 드는 짐승들이 먹는 죽. 잣에 곡식 하나를 같이 간다.",
+  "bigeul_garu": "열 내리는 산사람 가루. 언 깃과 언 물을 함께 간다.",
+  "rainbow_tteok": "켜켜이 앉히는 무지개떡. 도토리 가루, 팥, 그리고 영산의 붉은 것 하나.",
+  "songibap": "송이는 곡식과 같이 쪄야 향이 산다. 두 줌에 송이 하나.",
+  "beoseot_jjim": "숯가마 쪽 버섯찜. 숲 버섯 두 가지에 고소한 가루를 쳐서 찐다.",
+  "seogibyeong": "돌너머 잔칫날 떡. 쌀가루에 바위에서 뗀 것을 섞어 찐다.",
+  "yaksik": "쌀에 밤과 붉은 열매 하나를 넣어 찐다. 장터 잔칫상 맛.",
+  "chik_sil": "칡 줄기를 쪄서 껍질을 벗기면 실이 된다. 몇 줄기인지는 해 봐야 안다.",
+  "jjimjil_dol": "언 다리 녹이는 돌. 구들돌을 숯불에 달궈 포근한 것에 싸서 찐다.",
+  "aldotori_muk": "다람쥐네 곳간 도토리는 굵기가 다르다. 정 붙은 이에게만 내준다. 통째 찧어 묵을 쑤면 좋다고.",
+  "dotori_dasik": "날쌘은 지게 깊이 조청을 넣고 다닌다. 팔지는 않는다. 가루에 개어 박으면 다식이 된다.",
+  "misutgaru": "길 양식. 볶은 콩을 도토리 가루와 찧는다. 아우가 화덕 가에서 콩을 볶는다.",
+  "gamcho_hwan": "약방 할멈의 감초는 단골에게만 나온다. 칡뿌리와 찧어 환을 빚으면 눈이 맑다.",
+  "pirami_jjim": "개울 수달들은 피라미를 넓적돌에 말려 둔다. 버섯과 시루에 찌면 비린내가 없다.",
+  "pyogo_bap": "숯쟁이들은 가마 연기에 표고를 말린다. 쌀에 얹어 찌면 든든한 밥이다.",
+  "dolbae_cheong": "바위틈 돌배는 작아도 향이 좋다. 석청에 찧어 재 두면 목에 좋다.",
+  "deodeok_muchim": "장승 뒤 비탈 더덕은 장승지기가 캔다. 두드려 펴서 소금에 무친다.",
+  "sansa_pyeon": "고슴도치들은 겨울잠 머리맡에 산사를 모은다. 단 것과 찧어 굳히면 편이 된다.",
+  "deulkkae_juk": "메밀밭 둑 들깨. 쌀과 맷돌에 갈아 죽을 쑨다.",
+  "minari_jeup": "언 샘가에도 미나리가 난다. 맷돌에 갈아 짜면 눈이 맑다.",
+  "kkae_yeot": "엿장수의 갱엿은 장에 안 나온다. 깨를 넣어 찧어 늘이면 깨엿이다.",
+  "kkul_chaltteok": "설 떡집 찹쌀은 아껴 둔다. 시루에 쪄서 단 것을 바른다.",
+  "omija_cheong": "상단 접장은 밤새 오미자를 우려 마신다. 단 것에 찧어 재면 청이 된다.",
+  "sundubu": "소금장수가 아끼는 바닷소금이 있다. 콩을 갈아 그것으로 앉히면 몽글하다.",
+  "susu_pattteok": "밤짐꾼은 흘린 수수를 모은다. 팥과 시루에 찌면 아이 생일 떡이다.",
+  "hodu_gangjeong": "상단 손님상에는 호두가 오른다. 단 것에 버무려 찧어 뭉치면 강정이다.",
+  "saeu_juk": "짐꾼 아이들 보따리엔 말린 새우가 있다. 엄마들이 싸 준다. 쌀과 갈아 죽을 쑨다.",
+  "darae_hwachae": "고라니들은 다래를 눈에 묻어 둔다. 언 것과 찧어 띄우면 눈이 시원하다.",
+  "yeongeun_jeonggwa": "신목 아래 호수에서 연근이 난다. 쪄서 단 것에 재면 정과가 된다.",
+  "siraegi_bap": "샘가 처마의 시래기. 쌀에 얹어 시루에 찌면 겨울 밥이다."
+ },
  "SCENE_MUSIC": {
   "g_musoe_night": {
    "music": "father",

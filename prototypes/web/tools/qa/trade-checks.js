@@ -82,8 +82,8 @@ async function runTrade({browser:b,outDir}){
       const full=foodBlock('rice');const ate=eatFood('yakgwa');const b1={...G.buff};
       G.hp=1;eatFood('rice');const hp=G.hp;eatFood('dubu');
       return {all,full,ate,b1,hp,b2:G.buff,inv:{...G.inv},hud:$('foodBuff').textContent,hudShown:!$('foodBuff').hidden};})()`);
-    check(s.all===30&&!!s.full&&s.ate&&s.b1.k==='swift'&&s.b1.lv===2&&s.hp===3&&s.b2.k==='strong'&&!s.inv.yakgwa&&!s.inv.rice&&s.hudShown&&/힘 2/.test(s.hud),
-      'food-eat','먹을거리 30종이 모두 먹을 수 있어야 하고, 주먹밥은 체력이 가득하면 막고, 약과는 날램 2, 두부는 힘 2로 기운을 바꿔야 한다.',s);
+    check(s.all===51&&!!s.full&&s.ate&&s.b1.k==='swift'&&s.b1.lv===2&&s.hp===3&&s.b2.k==='strong'&&!s.inv.yakgwa&&!s.inv.rice&&s.hudShown&&/힘 2/.test(s.hud),
+      'food-eat','먹을거리 51종(정표 음식 21종 포함)이 모두 먹을 수 있어야 하고, 주먹밥은 체력이 가득하면 막고, 약과는 날램 2, 두부는 힘 2로 기운을 바꿔야 한다.',s);
     await region(b,'jangteo');b.scene='food / progress';
     s=await b.eval("(()=>{G.f.bueongDone=false;G.inv={patsirutteok:1};return {why:foodBlock('patsirutteok')};})()");
     check(/쓸 데/.test(s.why),'food-progress','부엉 영감 고사떡으로 쓸 팥시루떡은 먹지 못해야 한다.',s);
@@ -111,6 +111,50 @@ async function runTrade({browser:b,outDir}){
     const inv=await b.eval('({...G.inv})');
     check(s.heard&&s.ids.includes('t_yeotbang_horn')&&jl.some(l=>/헌 물건/.test(l.text))&&inv.hobakyeot===3&&!inv.nundok_horn&&gl.some(l=>/호박엿/.test(l.text)),
       'yeot-junk','아이가 얼음 뿔을 꺼내 보인 뒤 교환에 뿔 자리가 생기고, 바꾸면 호박엿 셋을 얻어야 한다.',{s,jl,gl,inv});
+    // 7) 결정 D-1463·D-1464: 도담에게 좋아함(깨소금) 하나, 아주 좋아함(도토리묵) 하나를 건네면 정이 1 → 3칸.
+    //    그 뒤 도담과 대화를 마치면 두 칸 몫(곳간 도토리 + 알도토리묵 조합법), 이어서 세 칸 몫(곳간 도토리 하나 더)을 받는다
+    await region(b,'galchamgol');b.scene='bond / level';
+    s=await b.eval(`(()=>{closePanels();dlgDismiss();G.buff=null;G.inv={acorn_jelly:1,sesame_salt:1};G.learned=G.learned.filter(k=>!k.startsWith('like:dodam')&&k!=='hint:aldotori_muk');G.f.bondGot=Object.fromEntries(Object.keys(TABLES.BONDS).map(id=>[id,3]));delete G.f.bondGot.dodam;bondHeard.clear();
+      if(G.ledger.dodam)G.ledger.dodam.done=false;
+      const l0=bondLevel('dodam');giftTaste('dodam','sesame_salt');const l1=bondLevel('dodam');giftTaste('dodam','acorn_jelly');const l2=bondLevel('dodam');
+      return {l0,l1,l2,p:bondPoints('dodam')};})()`);
+    check(s.l0===0&&s.l1===1&&s.l2===3,'bond-level','도담의 정은 처음 0칸, 좋아함 선물 뒤 1칸, 아주 좋아함 선물을 더하면 3칸이어야 한다.',s);
+    b.scene='bond / gift scene';
+    await b.eval("talk([['도담','고마워! 맛있다!']])");
+    const who0=await b.eval("({bond:$('dlgWho').dataset.bond,bg:$('dlgWho').style.getPropertyValue('--bond').slice(0,22)})");
+    await b.advanceDialogue({});
+    await b.until("!$('dlg').hidden&&/곳간/.test($('dlgText').textContent)",{timeout:8000,label:'정 두 칸 장면'}).catch(async e=>{throw new Error(e.message+' '+JSON.stringify(await b.eval("({p:paused(),dlg:!$('dlg').hidden,text:$('dlgText').textContent.slice(0,30),heard:[...bondHeard],pend:bondPending('dodam'),q:G.f.giftLessonQ,started:G.started,ended:G.ended,think:thinkWait,zf:zoneFade,zm:!!zoneMotion,mt:!!mapTravel,mg:!!openMinigame(),vm:!!vistaMode,ink:inkOn,B:!!B,bag:open('bag'),tr:open('trade'),nb:open('notebook'),map:open('map')})")));});
+    const bl=[];await b.advanceDialogue({each:async line=>bl.push(line)});
+    await b.until("!$('dlg').hidden&&/내 몫/.test($('dlgText').textContent)",{timeout:8000,label:'정 세 칸 장면'});
+    await b.advanceDialogue({each:async line=>bl.push(line)});
+    s=await b.eval("({n:G.inv.gotgan_dotori||0,hint:knows('hint:aldotori_muk'),from:G.f.recipeFrom?.aldotori_muk,got:G.f.bondGot?.dodam})");
+    check(who0.bond==='3'&&/^url\(/.test(who0.bg)&&s.n===2&&s.hint&&s.from==='도담'&&s.got===3&&bl.some(l=>/알도토리묵/.test(l.text))&&bl.some(l=>/곳간 도토리/.test(l.text)),
+      'bond-reward','정이 세 칸인 도담과 대화를 마치면 곳간 도토리 둘과 알도토리묵 조합법을 받고, 대화창 이름 옆에 정 표식이 붙어야 한다.',{who0,s,bl});
+    // 정표 재료는 보따리 '정표' 탭에, 정표 조합법은 가공대 목록과 수첩 조합법 장에 기운 칩과 함께 보인다
+    b.scene='bond / ui';
+    s=await b.eval(`(()=>{closePanels();dlgDismiss();G.inv.salt=1;openBag('정표');
+      const slots=[...document.querySelectorAll('#bagBody .bag-grid .slot[aria-label]')].map(x=>x.getAttribute('aria-label'));
+      switchTool('jeolgu');const rec=[...document.querySelectorAll('#bagBody .recipes .recipe')].find(x=>/알도토리묵/.test(x.textContent));
+      const recChip=rec?.querySelector('.buff-chip.buff-strong')?.textContent||'';closePanels();
+      const tag=document.createElement('span');tag.textContent='도담';bondDecorateTag(tag,{id:'dodam'},true);const tagMarks=!!tag.querySelector('.bond-marks');
+      const unk=document.createElement('span');unk.textContent='?';bondDecorateTag(unk,{id:'dodam'},false);
+      noteTab='recipes';$('notebook').hidden=false;renderNotebook();
+      const tabName=[...document.querySelectorAll('#noteTabs button')].find(x=>x.dataset.tab==='recipes')?.textContent;
+      const cards=[...document.querySelectorAll('#noteBody .recipe-card')];
+      const known=cards.find(c=>!c.classList.contains('unknown')&&/알도토리묵/.test(c.textContent));
+      const unknown=cards.filter(c=>c.classList.contains('unknown'));
+      const memo=unknown.find(c=>/버섯찜/.test(c.textContent));
+      const r={slots,recChip,tagMarks,unkMarks:!!unk.querySelector('.bond-marks'),tabName,known:known?.querySelector('.recipe-formula')?.textContent,unknownN:unknown.length,
+        memo:memo?.textContent||'',head:document.querySelector('#noteBody .note-region')?.textContent};closePanels();return r;})()`);
+    check(s.slots.some(x=>/곳간 도토리/.test(x))&&s.recChip==='힘 3'&&s.tagMarks&&!s.unkMarks&&s.tabName==='조합법'&&/곳간 도토리 \+ 소금 → 알도토리묵/.test(s.known||'')
+      &&s.unknownN>0&&/□ \+ □ \+ □ → 버섯찜/.test(s.memo)&&/아빠/.test(s.memo)&&/알아낸 조합법/.test(s.head||''),
+      'bond-ui','정표 탭·가공대 기운 칩·이름표 표식·수첩 조합법 장(아는 것은 조합식, 모르는 것은 빈칸과 아빠 메모)이 보여야 한다.',s);
+    // 결정 D-1465: 화면 위 기운 칩에 마우스를 올리면 설명 풍선이 뜬다
+    b.scene='buff / tip';
+    s=await b.eval(`(()=>{G.buff={k:'eye',lv:3,from:'gamcho_hwan'};refreshHud();const c=document.querySelector('#foodBuff .buff-chip');
+      c.dispatchEvent(new PointerEvent('pointerover',{bubbles:true}));const t=$('uiTip');const r={chip:c?.textContent,shown:!t.hidden,text:t.textContent};
+      document.body.dispatchEvent(new PointerEvent('pointerover',{bubbles:true}));r.hid=t.hidden;G.buff=null;refreshHud();return r;})()`);
+    check(s.chip==='밝은 눈 3'&&s.shown&&/다음 보스 싸움/.test(s.text)&&/칡 감초환을 먹고/.test(s.text)&&s.hid,'buff-tip','품은 기운 칩에 마우스를 올리면 기운 설명 풍선이 떠야 한다.',s);
   }catch(error){findings.push({rule:'runner',severity:'높음',message:error.stack||String(error),scene:b.scene});}
   const file=path.join(outDir,'trade.json');fs.mkdirSync(outDir,{recursive:true});fs.writeFileSync(file,JSON.stringify({records,findings},null,2)+'\n');
   return {name:'trade',status:findings.length?'fail':'pass',summary:`교환 여러 몫·선물 답례 ${records.length}가지 확인`,findings,evidence:[file]};

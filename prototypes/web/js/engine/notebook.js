@@ -163,7 +163,7 @@ function collectFreshDrawings(){
 //   손버릇 줄은 그 가보의 물건 쪽에 아이 줄로 남는다(myTexts). 탭 이름이 같은 보따리 '중요' 탭과 헷갈리지 않게 '해야 할 일'로 부른다.
 // 결정 D-1201: 도장 쪽은 아이가 그리고 적은 장이라 아이 장(아빠 단서 뒤)으로 옮겼다.
 const NOTE_TABS=[['animal','동물',1],['item','물건',1],
-  ['todo','해야 할 일'],['clues','아빠 단서']   /* 결정 D-703 */,...(CLASSIC?[]:[['stamp','도장']]),['nicknames','이름']   /* 결정 D-423 */,['recipes','숨은 가공법'],['ledger','물품 장부']];
+  ['todo','해야 할 일'],['clues','아빠 단서']   /* 결정 D-703 */,...(CLASSIC?[]:[['stamp','도장']]),['nicknames','이름']   /* 결정 D-423 */,['recipes','조합법']   /* 결정 D-1466: '숨은 가공법' 대신 '조합법' (기록갈래 값은 그대로) */,['ledger','물품 장부']];
 const PAGE_SECTION={animal:'관찰',item:'관찰',stamp:'관찰',recipes:'숨은 가공법'};
 let noteTab='animal';
 // 너구리의 책이 따로 있던 때의 이름(bookTab)도 같은 탭을 가리킨다. 없어진 관찰 탭은 동물 쪽으로 간다
@@ -269,23 +269,57 @@ function recipeTellers(r){
   for(const g of TABLES.GIFT_RECIPES||[])if(g.out===r.out&&knows('gift:'+g.id))who.push(npcName(g.npc));
   return [...new Set(who)];
 }
+/* 결정 D-1466 (사용자 지시 2026-11-12 "수첩에 숨은 가공법이라고 하지는 말고 조합법으로. 숨은 레서피에 대해서 미리 힌트 정도는 줘야 한다.
+   게임 내에 숨은 레서피에 대한 정보가 아예 없다면 플레이어는 아예 알 수가 없을꺼다"):
+   장 이름은 '조합법'. 그 지역에 닿으면(D-101) 숨은 조합법마다 아빠가 장삿길에서 적어 둔 메모(recipe_hints.csv)가 먼저 보인다.
+   아직 모르는 조합법은 재료 칸 수만 빈칸으로 그리고, 알 만한 이(좋아하는 것을 건네면 일러 주는 이, 정이 두 칸이면 정표를 나눠 주는 이)를 작게 적는다.
+   만나기 전인 인물은 이름 대신 '이 고장 누군가'. 알게 되면 예전처럼 재료 + 재료 → 결과물과 일러 준 이를 적는다 (D-1406). */
+function allHiddenRecipes(){
+  const seen=new Set(),out=[];
+  for(const [tool,list] of Object.entries(RECIPES))for(const r of list){if(!r.hidden||seen.has(r.out))continue;seen.add(r.out);out.push(Object.assign({tool},r));}
+  return out;
+}
+const recipeNpcName=id=>TABLES.BONDS?.[id]?.name||npcName(id);
+const recipeMet=id=>knows('met:'+id)||knows('met:j_'+id);
+function recipeKnowers(r){
+  const list=[];
+  for(const g of TABLES.GIFT_RECIPES||[])if(g.out===r.out&&noteRegionOpen(g.region))list.push(recipeMet(g.npc)?recipeNpcName(g.npc)+'에게 좋아하는 것을 건네면':'이 고장 누군가에게 좋아하는 것을 건네면');
+  for(const [id,b] of Object.entries(TABLES.BONDS||{}))if(b.out===r.out)list.push((recipeMet(id)?jo(b.name,'과','와'):'이 고장 누군가와')+' 정이 두 칸이 되면 정표 재료와 함께');
+  return [...new Set(list)];
+}
+function recipeBlank(r){
+  const n=Object.keys(r.need).length;
+  return Array.from({length:n},()=>'□').join(' + ')+' → '+(ITEMS[r.out]?.n||r.out);
+}
 function renderRecipeBook(body){
-  const all=knownHiddenRecipes();
-  if(!all.length){body.appendChild(el('p','empty-note','누가 일러 주거나 직접 찾은 숨은 가공법을 여기에 적는다.'));return;}
+  let shown=0;
   for(const reg of regionList()){
-    const list=all.filter(r=>(ITEMS[r.out]?.region||reg.id)===reg.id);if(!list.length)continue;
-    body.appendChild(el('div','note-region',reg.name));
+    if(!noteRegionOpen(reg.id))continue;
+    const list=allHiddenRecipes().filter(r=>(ITEMS[r.out]?.region||reg.id)===reg.id);if(!list.length)continue;
+    const known=list.filter(recipeKnown);list.sort((a,b)=>recipeKnown(b)-recipeKnown(a));
+    body.appendChild(el('div','note-region',reg.name+' · 알아낸 조합법 '+known.length+' / '+list.length));
     const box=el('div','recipe-list');
     for(const r of list){
-      const card=el('div','recipe-card');
+      const k=recipeKnown(r),tool=HEIR[r.tool]?.short||'',bond=Object.values(TABLES.BONDS||{}).find(b=>b.out===r.out);
+      const card=el('div','recipe-card'+(k?'':' unknown')+(bond?' bond':''));
       card.appendChild(el('b','recipe-name',ITEMS[r.out]?.n||r.out));
-      card.appendChild(el('p','recipe-formula',recipeFormula(r)));
-      const tellers=recipeTellers(r),tool=HEIR[r.tool]?.short||'';
-      card.appendChild(el('small','recipe-from',(tool?tool+'에서 · ':'')+(tellers.length?tellers.join(', '):'직접 찾았다')+(knows(r.discover)?' · 만들어 봤다':'')));
-      markNew(card,'rc:'+r.out);box.appendChild(card);
+      card.appendChild(el('p','recipe-formula',k?recipeFormula(r):recipeBlank(r)));
+      const chips=typeof foodChips==='function'?foodChips(r.out):null;if(chips)card.appendChild(chips);   // 결정 D-1465
+      const memo=TABLES.RECIPE_HINTS?.[r.out];
+      if(memo){const p=el('p','recipe-memo');p.appendChild(el('span','who','아빠'));p.appendChild(document.createTextNode(memo));card.appendChild(p);}
+      if(k){
+        const tellers=recipeTellers(r);
+        card.appendChild(el('small','recipe-from',(tool?tool+'에서 · ':'')+(tellers.length?tellers.join(', '):'직접 찾았다')+(knows(r.discover)?' · 만들어 봤다':'')));
+        markNew(card,'rc:'+r.out);
+      }else{
+        const who=recipeKnowers(r);
+        card.appendChild(el('small','recipe-from',(tool?tool+'에서 · ':'')+(isAwake(r.tool)?'':'아직 잠든 가보 · ')+(who.length?who.join(' / ')+' 알 수 있다':'')+(bond?'':(who.length?' · ':'')+'재료를 직접 넣어 봐도 찾을 수 있다')));
+      }
+      box.appendChild(card);shown++;
     }
     body.appendChild(box);
   }
+  if(!shown)body.appendChild(el('p','empty-note','누가 일러 주거나 직접 찾은 조합법을 여기에 적는다.'));
 }
 
 /* 보이는 것만 센다: 아빠가 적어 둔 쪽 수와 아이가 이어 적은 줄 수 */
@@ -332,7 +366,7 @@ function renderPages(body,section,kind){
     body.appendChild(el('div','note-region',r.name+(kind==='stamp'?' · '+stampCount(r.id)+' / '+stampTotal(r.id):'')));
     const grid=el('div','note-grid');pages.forEach(e=>grid.appendChild(notePage(e,section)));body.appendChild(grid);
   }
-  if(!shown)body.appendChild(el('p','empty-note',section==='숨은 가공법'?'재료를 직접 넣어 찾은 맛을 여기에 적는다.':'여행하며 보고 들은 것을 여기에 적는다.'));
+  if(!shown)body.appendChild(el('p','empty-note',section==='숨은 가공법'?'재료를 직접 넣어 찾은 조합법을 여기에 적는다.':'여행하며 보고 들은 것을 여기에 적는다.'));
 }
 function renderNotebook(){
   if(!NOTE_TABS.some(t=>t[0]===noteTab))noteTab='animal';

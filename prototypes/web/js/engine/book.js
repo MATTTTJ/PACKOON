@@ -40,8 +40,13 @@ function renderChildRecord(body,tab){
     list.forEach(n=>{const e=entry((REGIONS[n.region]?.name||'길 위에서')+(n.by?' · '+(npcName(n.by)||n.by):''),n.lost?'':n.text);
       if(n.lost){e.classList.add('lost');e.appendChild(el('span','ink-smear'));e.title='글씨가 지워졌다';}else markNew(e,'n:'+n.id);});
   }else if(tab==='ledger'){
+    /* 결정 D-1463: 장부 맨 위에는 만난 인물과의 정을 표식 셋으로 보인다 (예전 G.rel 의 호감·의리 숫자 대신. G.rel 은 이야기 쪽에서 그대로 쓴다) */
     const r=el('div','rels');
-    Object.keys(G.rel).forEach(k=>{const s=el('span','rel',npcName(k)+' · '+G.rel[k].t+' '+G.rel[k].v);r.appendChild(s);});body.appendChild(r);
+    for(const [id,b] of Object.entries(TABLES.BONDS||{})){
+      if(!knows('met:'+id)&&!knows('met:j_'+id))continue;
+      const s=el('span','rel',b.name+' ');const m=bondMarksEl(id);if(m)s.appendChild(m);r.appendChild(s);
+    }
+    if(r.children.length)body.appendChild(r);
     strangerDebtRows().forEach(d=>entry(d.who,d.text));   // 수리부엉이로 받은 외상 (forms.js)
     const ids=Object.keys(G.ledger);if(!ids.length){note('아직 적힌 거래가 없다. 누가 무엇을 원하는지 들으면 여기에 적힌다.');return;}
     const wrap=el('div','ledger-wrap'),table=el('table','ledger me'),head=el('thead'),hr=el('tr');
