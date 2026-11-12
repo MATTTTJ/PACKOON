@@ -224,6 +224,8 @@ function renderBHud(){
   const worn=clamp(B.hoof||0,0,1);
   $('bHearts').innerHTML=Array.from({length:G.maxhp},(_,i)=>i===G.hp-1&&worn>0.01?'<span class="part" style="--f:'+Math.round((1-worn)*100)+'%">♥</span>':'<span class="'+(i<G.hp?'':'off')+'">♥</span>').join('')+
     '<span class="guard" title="든든 기운: 맞으면 금빛 하트부터 사라진다">♥</span>'.repeat(Math.max(0,Math.ceil(B.guard||0)));   // 결정 D-1461
+  // 결정 D-1465: 이번 싸움에 쓰는 기운을 전투 하트 옆에 칩으로 (마우스를 올리면 설명)
+  const bb=$('bBuff');if(bb){const k=B.food?B.food.k+B.food.lv:'';bb.hidden=!B.food;if(bb.dataset.key!==k){bb.dataset.key=k;bb.innerHTML='';if(B.food)bb.appendChild(buffChip(B.food.k,B.food.lv,'이번 싸움에 쓰고 있다.'));}}
   $('bCalm').style.width=B.calm+'%';
   renderBattleForms();
 }

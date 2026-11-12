@@ -23,7 +23,9 @@ const pouch={tool:'jeolgu',items:[]};
 let selItem=null,pouchMsg='',lastOut=null,brewing=false;
 // 결정 D-703: 보따리 '중요' 탭을 없앴다 (사용자 피드백 2026-11-05: 첫 화면이 보따리 '중요'에서 시작한다, 이야기에 꼭 필요하지 않으면 지우자).
 //   보따리는 물건만 담는다. 엄마의 쪽지는 수첩 '이름' 장 아래, 아빠 단서는 수첩 '아빠 단서' 장으로 옮겼다 (notebook.js·book.js).
-const BAG_KINDS=['전체','재료','먹을거리','도구','귀한 것'];
+// 결정 D-1464: '정표' 탭은 인물과 정이 깊어져 받은 정표 재료만 모아 본다 (종류는 재료, ITEMS[id].bond 에 준 인물)
+const BAG_KINDS=['전체','재료','먹을거리','정표','도구','귀한 것'];
+const bagKindOf=(k,kind)=>kind==='전체'||(kind==='정표'?!!ITEMS[k].bond:ITEMS[k].kind===kind);
 let bagKind='전체';
 function selectBagKind(kind){
   if(!BAG_KINDS.includes(kind))return;
@@ -93,13 +95,15 @@ function renderBag(pop){
   BAG_KINDS.forEach(kind=>{const b=el('button','bag-tab',kind);b.type='button';b.setAttribute('aria-pressed',kind===bagKind);
     b.onclick=()=>selectBagKind(kind);filters.appendChild(b);});
   body.appendChild(filters);body.appendChild(el('div','small bag-key-hint','Q · 이전 종류 / R · 다음 종류'));
-  const items=Object.keys(G.inv).filter(k=>G.inv[k]>0&&(bagKind==='전체'||ITEMS[k].kind===bagKind));
+  const items=Object.keys(G.inv).filter(k=>G.inv[k]>0&&bagKindOf(k,bagKind));
   const grid=el('div','bag-grid');
   /* 칸은 12개부터, 물건 종류가 많으면 한 줄(6칸)씩 늘어난다. 가진 물건이 안 보이는 일이 없게 */
   const slots=Math.max(12,Math.ceil(items.length/6)*6);
   for(let i=0;i<slots;i++){
     const id=items[i];const b=el('button','slot'+(id&&selItem===id?' sel':''));b.type='button';
     if(id){b.appendChild(icon(id));b.appendChild(el('span','n',G.inv[id]));b.appendChild(rarityIcon(ITEMS[id].r));
+      // 결정 D-1465: 기운을 주는 먹을거리 칸에는 기운 색 점과 세기 (마우스를 올리면 설명)
+      const fk=ITEMS[id].food?.k;if(fk){const t=el('span','slot-buff buff-'+fk,String(ITEMS[id].food.lv));t.dataset.tip=foodBuffTip(fk,ITEMS[id].food.lv);b.appendChild(t);}
       b.setAttribute('aria-label',ITEMS[id].n+' '+G.inv[id]+'개 · '+RAR[ITEMS[id].r]);
       b.onclick=()=>{if(selItem!==id){selItem=id;renderBag();}};}   // 결정 D-85: 두 번 누르기 없음
     else{b.disabled=true;b.setAttribute('aria-label','빈 칸');}
@@ -112,11 +116,14 @@ function renderBag(pop){
     const id=selItem;d.appendChild(icon(id));const info=el('div','info');
     const name=el('b',null,ITEMS[id].n);const ch=el('span','chip');ch.appendChild(rarityIcon(ITEMS[id].r));ch.appendChild(el('span',null,RAR[ITEMS[id].r]));name.appendChild(ch);info.appendChild(name);
     info.appendChild(el('div',null,ITEMS[id].d));
+    // 결정 D-1464: 정표 재료는 누가 준 것인지와 그 인물과의 정 표식
+    if(ITEMS[id].bond&&typeof bondMarksEl==='function'){const t=el('div','small bond-from','정표 재료 · '+(TABLES.BONDS[ITEMS[id].bond]?.name||'')+'에게 받았다 ');const m=bondMarksEl(ITEMS[id].bond);if(m)t.appendChild(m);info.appendChild(t);}
     const row=el('div','row');
     // 먹을거리는 '먹기'가 주 버튼이다. 결정 D-1461: 모든 먹을거리가 체력이나 다음 보스 싸움의 기운을 준다 (food.js, foods.csv)
     const eat=!!ITEMS[id].food;
     if(eat){const f=ITEMS[id].food;
       if(f.k)info.appendChild(el('div','small food-effect','먹으면 '+FOOD_BUFFS[f.k].n+' 기운 '+f.lv+': 다음 보스 싸움에서 '+FOOD_BUFFS[f.k].what(f.lv)+'.'+(G.buff&&G.buff.k!==f.k?' 지금 품은 '+FOOD_BUFFS[G.buff.k].n+' 기운과 바뀐다.':'')));
+      const chips=foodChips(id);if(chips)info.appendChild(chips);   // 결정 D-1465
       const why=foodBlock(id),b=el('button','btn primary',foodEatLabel(id));b.type='button';b.disabled=!!why;if(why)b.title=why;
       b.onclick=()=>{eatFood(id);if(!has(id))selItem=null;renderBag();};row.appendChild(b);}
     const put=el('button',eat?'btn':'btn primary',HEIR[pouch.tool].short+'에 넣기');put.type='button';put.onclick=()=>putIn(id);row.appendChild(put);
@@ -163,9 +170,11 @@ function renderBag(pop){
   bench.appendChild(out);wrap.appendChild(bench);
   const msg=el('div','bench-msg',pouchMsg||(awake?(Hr.prompt||'넣을 것을 골라 보자.'):'쓰는 법을 아직 모른다. 무엇을 넣으면 반응할까?'));msg.id='benchMsg';wrap.appendChild(msg);
   const rl=el('div','recipes');
-  if(awake)knownRecipes(pouch.tool).forEach(rc=>{const it=el('button','recipe');it.type='button';it.disabled=brewing;it.onclick=()=>fillCraftRecipe(rc);it.appendChild(el('span',null,rc.hidden?(knows(rc.discover)?'직접 찾은 맛 ·':'귀띔으로 들은 맛 ·'):rc.know?'귀띔으로 배운 맛 ·':'가족의 기억 ·'));
+  if(awake)knownRecipes(pouch.tool).forEach(rc=>{const it=el('button','recipe');it.type='button';it.disabled=brewing;it.onclick=()=>fillCraftRecipe(rc);it.appendChild(el('span',null,rc.hidden?(knows(rc.discover)?'직접 찾은 맛 ·':Object.values(TABLES.BONDS||{}).some(x=>x.out===rc.out)?'정으로 배운 맛 ·':'귀띔으로 들은 맛 ·'):rc.know?'귀띔으로 배운 맛 ·':'가족의 기억 ·'));
     Object.keys(rc.need).forEach(k=>{it.appendChild(icon(k));it.appendChild(el('span',null,ITEMS[k].n+' ×'+rc.need[k]));});
-    it.appendChild(el('span',null,'→'));it.appendChild(icon(rc.out));it.appendChild(el('span',null,ITEMS[rc.out].n));rl.appendChild(it);});
+    it.appendChild(el('span',null,'→'));it.appendChild(icon(rc.out));it.appendChild(el('span',null,ITEMS[rc.out].n));
+    const chips=foodChips(rc.out);if(chips)it.appendChild(chips);   // 결정 D-1465: 만들면 무슨 기운을 주는지
+    rl.appendChild(it);});
   else rl.appendChild(el('span',null,'아직 깨어나지 않은 가보다. 넣어 보는 건 자유다.'));
   wrap.appendChild(rl);
   renderCraftHands(wrap);

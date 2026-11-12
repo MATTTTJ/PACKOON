@@ -989,3 +989,28 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
 .vol-chip{display:inline-flex;align-items:center;gap:6px;cursor:default}
 .vol-chip input{width:clamp(56px,8vw,96px);accent-color:var(--dan);margin:0;cursor:pointer}
 body.in-battle .hud-btns #btnVolume{display:inline-flex}
+/* 결정 D-1463: 정(호감도) 표식 셋. 그림은 bond.js 가 그린다 (찬 칸은 제 색, 빈 칸은 옅은 테두리 빛). 이름 곁에 작게 */
+.bond-marks{display:inline-block;width:50px;height:14px;background:no-repeat center/contain;image-rendering:pixelated;vertical-align:-2px;margin-left:4px}
+.npc-tag .bond-marks{width:37.5px;height:10.5px;vertical-align:0;margin-left:3px}
+.dialog .who[data-bond]::after{content:'';display:inline-block;width:50px;height:14px;margin-left:6px;vertical-align:-2px;background:var(--bond) no-repeat center/contain;image-rendering:pixelated}
+.bond-from{margin-top:3px;color:var(--dim)}
+/* 결정 D-1465: 기운 칩과 설명 풍선. 색은 기운마다 하나 (금빛 든든 · 파랑 날램 · 주황 힘 · 초록 밝은 눈 · 분홍 다정) */
+.buff-chip{display:inline-flex;align-items:center;gap:4px;padding:0 7px 0 5px;border-radius:9px;font-family:var(--ui);font-size:.82em;line-height:1.6;white-space:nowrap;background:rgba(30,21,15,.78);color:#fff3da;border:1px solid var(--bc,#e8b23a);cursor:help;pointer-events:auto}
+.buff-chip::before{content:'';flex:none;width:7px;height:7px;border-radius:50%;background:var(--bc,#e8b23a)}
+.buff-chip:focus-visible{outline:2px solid var(--bc);outline-offset:1px}
+.buff-guard{--bc:#e8b23a}.buff-swift{--bc:#3987e5}.buff-strong{--bc:#eb6834}.buff-eye{--bc:#1baf7a}.buff-kind{--bc:#e87ba4}.buff-hp{--bc:#d9534f}
+.food-chips{display:inline-flex;flex-wrap:wrap;gap:4px;margin:3px 0}
+.recipe .food-chips{margin:0 0 0 4px}
+.recipes .recipe{max-width:100%;min-width:0}
+.food-buff{pointer-events:auto;font-size:1em}
+.slot .slot-buff{position:absolute;left:2px;top:2px;min-width:13px;height:13px;padding:0 2px;border-radius:7px;background:var(--bc);color:#1e150f;font:700 9px/13px var(--ui);text-align:center;box-shadow:0 0 0 1px rgba(30,21,15,.55);cursor:help}
+.b-life{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ui-tip{position:fixed;z-index:9999;max-width:min(300px,82vw);background:#1e150f;color:#fff3da;border:1px solid #c9a35e;border-radius:6px;padding:6px 10px;font-family:var(--ui);font-size:12.5px;line-height:1.55;white-space:pre-line;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+.ui-tip::first-line{font-weight:700;color:#f2c75c}
+.ui-tip[hidden]{display:none}
+/* 결정 D-1466: 수첩 조합법 장. 모르는 조합법은 점선 칸, 아빠 메모는 옛 먹 */
+.recipe-card.unknown{border-style:dashed;background:#f3e8d0}
+.recipe-card.unknown .recipe-formula{color:var(--dim);letter-spacing:.06em}
+.recipe-card.bond{box-shadow:inset 3px 0 0 #c98a4a}
+.recipe-memo{display:flex;gap:6px;align-items:baseline;margin:2px 0;font-size:.88em;color:#7a6248}
+.recipe-memo .who{flex:none;font-family:var(--ui);font-size:.75em;padding:0 5px;border-radius:2px;border:1px solid #b9a07a;color:#8a6a48}

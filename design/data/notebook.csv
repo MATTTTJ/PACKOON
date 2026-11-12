@@ -233,3 +233,66 @@ bigeul_garu,yeongsan,서리 깃 가루,물건,나,recipe:bigeul_garu,숨은 가�
 meju,jangteo,메주,물건,나,got:meju,처음 얻을 때,(items.csv 의 설명),제안,결정 D-790,관찰
 meju,jangteo,메주,물건,나,hint:meju,누가 지나가며 일러 줬을 때,뭉근 할멈 말로는 콩 두 됫박을 절구에 찧어 덩이를 빚고 짚으로 묶으면 메주가 된다.,제안,결정 D-790,숨은 가공법
 meju,jangteo,메주,물건,나,recipe:meju,숨은 가공법을 직접 만들었을 때,콩을 찧어 덩이를 빚고 짚으로 묶었다. 할멈 말대로 매달아 띄우면 장이 된다.,제안,결정 D-790,숨은 가공법
+gotgan_dotori,galchamgol,곳간 도토리,물건,나,got:gotgan_dotori,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+aldotori_muk,galchamgol,알도토리묵,물건,나,got:aldotori_muk,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+aldotori_muk,galchamgol,알도토리묵,물건,나,recipe:aldotori_muk,숨은 가공법을 직접 만들었을 때,곳간 도토리를 통째 찧어 묵을 쒔다. 도담 말대로 탱글탱글하다.,제안,PA-262 정표 조합법,숨은 가공법
+jocheong,galchamgol,조청,물건,나,got:jocheong,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+dotori_dasik,galchamgol,도토리 다식,물건,나,got:dotori_dasik,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+dotori_dasik,galchamgol,도토리 다식,물건,나,recipe:dotori_dasik,숨은 가공법을 직접 만들었을 때,조청에 도토리 가루를 개어 꾹꾹 박았더니 다식이 됐다. 날쌘 아저씨는 이걸 길에서 먹나 보다.,제안,PA-262 정표 조합법,숨은 가공법
+bokkeun_kong,galchamgol,볶은 콩,물건,나,got:bokkeun_kong,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+misutgaru,galchamgol,미숫가루,물건,나,got:misutgaru,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+misutgaru,galchamgol,미숫가루,물건,나,recipe:misutgaru,숨은 가공법을 직접 만들었을 때,볶은 콩이랑 도토리 가루를 같이 찧었다. 물에 타 마시니 배가 든든하다. 아빠도 이걸 마셨구나.,제안,PA-262 정표 조합법,숨은 가공법
+gamcho,galchamgol,감초,물건,나,got:gamcho,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+gamcho_hwan,galchamgol,칡 감초환,물건,나,got:gamcho_hwan,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+gamcho_hwan,galchamgol,칡 감초환,물건,나,recipe:gamcho_hwan,숨은 가공법을 직접 만들었을 때,칡뿌리에 감초를 찧어 환을 빚었다. 쓴데 끝맛이 달다.,제안,PA-262 정표 조합법,숨은 가공법
+pirami,galchamgol,말린 피라미,물건,나,got:pirami,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+pirami_jjim,galchamgol,피라미 버섯찜,물건,나,got:pirami_jjim,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+pirami_jjim,galchamgol,피라미 버섯찜,물건,나,recipe:pirami_jjim,숨은 가공법을 직접 만들었을 때,피라미에 싸리버섯을 얹어 시루에 쪘다. 정말 비린내가 안 난다.,제안,PA-262 정표 조합법,숨은 가공법
+pyogo,galchamgol,연기 쐰 표고,물건,나,got:pyogo,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+pyogo_bap,galchamgol,표고밥,물건,나,got:pyogo_bap,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+pyogo_bap,galchamgol,표고밥,물건,나,recipe:pyogo_bap,숨은 가공법을 직접 만들었을 때,표고를 쌀에 얹어 밥을 쪘다. 숯 냄새가 은은하다.,제안,PA-262 정표 조합법,숨은 가공법
+dolbae,dolneomeo,돌배,물건,나,got:dolbae,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+dolbae_cheong,dolneomeo,돌배청,물건,나,got:dolbae_cheong,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+dolbae_cheong,dolneomeo,돌배청,물건,나,recipe:dolbae_cheong,숨은 가공법을 직접 만들었을 때,돌배를 찧어 석청에 쟀다. 목이 시원해지는 냄새가 난다.,제안,PA-262 정표 조합법,숨은 가공법
+deodeok,dolneomeo,더덕,물건,나,got:deodeok,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+deodeok_muchim,dolneomeo,더덕 무침,물건,나,got:deodeok_muchim,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+deodeok_muchim,dolneomeo,더덕 무침,물건,나,recipe:deodeok_muchim,숨은 가공법을 직접 만들었을 때,더덕을 두드려 펴고 소금에 무쳤다. 질기던 게 보들보들해졌다.,제안,PA-262 정표 조합법,숨은 가공법
+sansa,dolneomeo,산사 열매,물건,나,got:sansa,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+sansa_pyeon,dolneomeo,산사편,물건,나,got:sansa_pyeon,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+sansa_pyeon,dolneomeo,산사편,물건,나,recipe:sansa_pyeon,숨은 가공법을 직접 만들었을 때,산사 열매를 꿀에 찧어 굳혔다. 새콤해서 눈이 번쩍 뜨인다.,제안,PA-262 정표 조합법,숨은 가공법
+deulkkae,dolneomeo,들깨,물건,나,got:deulkkae,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+deulkkae_juk,dolneomeo,들깨죽,물건,나,got:deulkkae_juk,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+deulkkae_juk,dolneomeo,들깨죽,물건,나,recipe:deulkkae_juk,숨은 가공법을 직접 만들었을 때,들깨와 쌀을 맷돌에 갈아 죽을 쒔다. 뜨끈하고 고소하다.,제안,PA-262 정표 조합법,숨은 가공법
+minari,dolneomeo,돌미나리,물건,나,got:minari,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+minari_jeup,dolneomeo,미나리즙,물건,나,got:minari_jeup,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+minari_jeup,dolneomeo,미나리즙,물건,나,recipe:minari_jeup,숨은 가공법을 직접 만들었을 때,돌미나리를 맷돌에 갈아 짰다. 한 모금에 눈이 맑아지는 것 같다.,제안,PA-262 정표 조합법,숨은 가공법
+gaengyeot,jangteo,갱엿,물건,나,got:gaengyeot,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+kkae_yeot,jangteo,깨엿,물건,나,got:kkae_yeot,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+kkae_yeot,jangteo,깨엿,물건,나,recipe:kkae_yeot,숨은 가공법을 직접 만들었을 때,갱엿에 깨를 넣고 길게 늘였다. 엿장수 마음대로 늘였다.,제안,PA-262 정표 조합법,숨은 가공법
+chapssal,jangteo,찹쌀,물건,나,got:chapssal,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+kkul_chaltteok,jangteo,꿀 찰떡,물건,나,got:kkul_chaltteok,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+kkul_chaltteok,jangteo,꿀 찰떡,물건,나,recipe:kkul_chaltteok,숨은 가공법을 직접 만들었을 때,찹쌀을 쪄서 꿀을 발랐다. 쭉쭉 늘어난다.,제안,PA-262 정표 조합법,숨은 가공법
+omija,jangteo,오미자,물건,나,got:omija,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+omija_cheong,jangteo,오미자청,물건,나,got:omija_cheong,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+omija_cheong,jangteo,오미자청,물건,나,recipe:omija_cheong,숨은 가공법을 직접 만들었을 때,오미자를 꿀에 찧어 쟀다. 붉은 물이 곱다.,제안,PA-262 정표 조합법,숨은 가공법
+jayeom,jangteo,자염,물건,나,got:jayeom,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+sundubu,jangteo,순두부,물건,나,got:sundubu,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+sundubu,jangteo,순두부,물건,나,recipe:sundubu,숨은 가공법을 직접 만들었을 때,콩을 갈아 자염으로 앉혔다. 몽글몽글 앉았다.,제안,PA-262 정표 조합법,숨은 가공법
+susu,jangteo,수수,물건,나,got:susu,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+susu_pattteok,jangteo,수수팥떡,물건,나,got:susu_pattteok,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+susu_pattteok,jangteo,수수팥떡,물건,나,recipe:susu_pattteok,숨은 가공법을 직접 만들었을 때,수수 경단에 팥을 묻혔다. 내 생일은 아니지만 생일 떡이다.,제안,PA-262 정표 조합법,숨은 가공법
+hodu,jangteo,호두,물건,나,got:hodu,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+hodu_gangjeong,jangteo,호두강정,물건,나,got:hodu_gangjeong,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+hodu_gangjeong,jangteo,호두강정,물건,나,recipe:hodu_gangjeong,숨은 가공법을 직접 만들었을 때,호두를 꿀에 버무려 뭉쳤다. 먼 길에 딱이다.,제안,PA-262 정표 조합법,숨은 가공법
+saeu,jangteo,말린 새우,물건,나,got:saeu,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+saeu_juk,jangteo,새우죽,물건,나,got:saeu_juk,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+saeu_juk,jangteo,새우죽,물건,나,recipe:saeu_juk,숨은 가공법을 직접 만들었을 때,새우와 쌀을 맷돌에 갈아 죽을 쒔다. 종종이 엄마 맛일까.,제안,PA-262 정표 조합법,숨은 가공법
+eon_darae,yeongsan,언 다래,물건,나,got:eon_darae,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+darae_hwachae,yeongsan,다래 화채,물건,나,got:darae_hwachae,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+darae_hwachae,yeongsan,다래 화채,물건,나,recipe:darae_hwachae,숨은 가공법을 직접 만들었을 때,언 다래를 찧어 고드름 물에 띄웠다. 눈이 시원하다.,제안,PA-262 정표 조합법,숨은 가공법
+yeongeun,yeongsan,연근,물건,나,got:yeongeun,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+yeongeun_jeonggwa,yeongsan,연근 정과,물건,나,got:yeongeun_jeonggwa,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+yeongeun_jeonggwa,yeongsan,연근 정과,물건,나,recipe:yeongeun_jeonggwa,숨은 가공법을 직접 만들었을 때,연근을 쪄서 꿀에 쟀다. 쫀득하다.,제안,PA-262 정표 조합법,숨은 가공법
+siraegi,yeongsan,시래기,물건,나,got:siraegi,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
+siraegi_bap,yeongsan,시래기밥,물건,나,got:siraegi_bap,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
+siraegi_bap,yeongsan,시래기밥,물건,나,recipe:siraegi_bap,숨은 가공법을 직접 만들었을 때,시래기를 얹어 밥을 쪘다. 할머니네 겨울 맛이다.,제안,PA-262 정표 조합법,숨은 가공법
