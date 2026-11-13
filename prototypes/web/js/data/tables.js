@@ -1464,6 +1464,193 @@ const TABLES={
     "k": "strong",
     "lv": 3
    }
+  },
+  "byeolbatchim": {
+   "n": "별받침 열매",
+   "r": 2,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "붉은 별 모양 받침 가운데에 쪽빛 알이 하나 박혀 있다. 알을 누르면 손끝이 파랗게 물든다.",
+   "u": "알"
+  },
+  "somgureum": {
+   "n": "솜구름 열매",
+   "r": 2,
+   "kind": "재료",
+   "region": "galchamgol",
+   "d": "보랏빛 꼬투리가 저절로 벌어지면 흰 속살이 솜구름처럼 부풀어 오른다. 말랑하고 달다.",
+   "u": "개"
+  },
+  "doltapsol": {
+   "n": "돌탑솔",
+   "r": 2,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "바위틈에 돌탑처럼 층층이 쌓아 올린 통통한 잎. 비가 오지 않아도 잎 속에 찬물을 머금고 있다.",
+   "u": "포기"
+  },
+  "chorongal": {
+   "n": "초롱알",
+   "r": 1,
+   "kind": "재료",
+   "region": "dolneomeo",
+   "d": "서리를 맞으면 노란 껍질이 세 쪽으로 벌어지고 주홍 알이 초롱처럼 매달린다.",
+   "u": "알"
+  },
+  "yeotgaji": {
+   "n": "엿가지 열매",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "꼬불꼬불 마디진 꼭지 끝에 작은 열매가 달렸다. 열매보다 꼭지가 엿처럼 달아서 꼭지를 씹는다.",
+   "u": "송이"
+  },
+  "ttallang": {
+   "n": "딸랑망개",
+   "r": 2,
+   "kind": "재료",
+   "region": "jangteo",
+   "d": "반질반질한 둥근 잎에 붉은 알이 송이로 달렸다. 흔들면 마른 알끼리 부딪혀 딸랑 소리가 난다.",
+   "u": "송이"
+  },
+  "nunnogi": {
+   "n": "눈녹이꽃",
+   "r": 2,
+   "kind": "재료",
+   "region": "yeongsan",
+   "d": "둘레의 눈을 동그랗게 녹이고 피는 금빛 꽃. 꽃잎 안쪽에 볕이 고여 손을 대면 따뜻하다.",
+   "u": "송이"
+  },
+  "seorikkamak": {
+   "n": "서리까막",
+   "r": 2,
+   "kind": "재료",
+   "region": "yeongsan",
+   "d": "높은 바위에 이끼처럼 낮게 깔린 덩굴에 까만 알이 맺혔다. 깨물면 속이 서리처럼 하얗고 새콤하다.",
+   "u": "알"
+  },
+  "jjokbit_dasik": {
+   "n": "쪽빛 다식",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "별받침 알의 쪽빛 물로 도토리 가루를 반죽해 꾹꾹 눌렀다. 파랗게 물든 다식이다.",
+   "u": "개",
+   "eat": 1,
+   "food": {
+    "group": "엿과 한과",
+    "k": "eye",
+    "lv": 2
+   }
+  },
+  "somgureum_pyeon": {
+   "n": "솜구름편",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "galchamgol",
+   "d": "솜구름 속살을 칡뿌리 녹말과 함께 찧어 굳힌 편. 입에 넣으면 구름처럼 사르르 풀린다.",
+   "u": "쪽",
+   "eat": 1,
+   "food": {
+    "group": "엿과 한과",
+    "k": "kind",
+    "lv": 2
+   }
+  },
+  "gureumtteok": {
+   "n": "구름떡",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "솜구름 속살을 쌀가루에 섞어 시루에 쪘다. 김이 오르자 떡이 두 배로 부풀었다.",
+   "u": "조각",
+   "eat": 1,
+   "food": {
+    "group": "떡",
+    "k": "guard",
+    "lv": 2
+   }
+  },
+  "doltapsol_jangajji": {
+   "n": "돌탑솔 장아찌",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "돌탑솔 잎을 한 층씩 떼어 소금에 절였다. 씹으면 잎 속의 찬물이 톡 터지고 짭짤하다.",
+   "u": "종지",
+   "eat": 1,
+   "food": {
+    "group": "묵과 찬",
+    "k": "strong",
+    "lv": 2
+   }
+  },
+  "chorongal_eungi": {
+   "n": "초롱알 응이",
+   "r": 1,
+   "kind": "먹을거리",
+   "region": "dolneomeo",
+   "d": "초롱알과 메밀가루를 맷돌에 곱게 갈아 묽게 쑨 응이. 주홍빛이 돌고 속이 따뜻하다.",
+   "u": "그릇",
+   "eat": 3,
+   "food": {
+    "group": "끼니"
+   }
+  },
+  "yeotgaji_kongyeot": {
+   "n": "엿가지 콩엿",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "엿가지 꼭지를 찧어 낸 단물에 콩을 버무려 굳혔다. 엿이 없어도 콩엿이 된다.",
+   "u": "조각",
+   "eat": 1,
+   "food": {
+    "group": "엿과 한과",
+    "k": "swift",
+    "lv": 2
+   }
+  },
+  "mangaetteok": {
+   "n": "망개떡",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "jangteo",
+   "d": "팥소를 넣은 떡을 딸랑망개 잎 두 장 사이에 싸서 쪘다. 잎 향이 배어 오래 두어도 쉬지 않는다.",
+   "u": "개",
+   "eat": 1,
+   "food": {
+    "group": "떡",
+    "k": "guard",
+    "lv": 2
+   }
+  },
+  "nunnogi_seolgi": {
+   "n": "눈녹이 설기",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "yeongsan",
+   "d": "쌀가루 위에 눈녹이꽃 잎을 얹어 찐 설기. 한겨울에도 한동안 따끈하다.",
+   "u": "조각",
+   "eat": 2,
+   "food": {
+    "group": "떡",
+    "k": "kind",
+    "lv": 2
+   }
+  },
+  "sanyeolmae_jeonggwa": {
+   "n": "산열매 정과",
+   "r": 2,
+   "kind": "먹을거리",
+   "region": "yeongsan",
+   "d": "서리까막과 마가목 열매를 쪄서 꿀에 잰 정과. 새콤한 맛에 눈이 번쩍 뜨인다.",
+   "u": "쪽",
+   "food": {
+    "group": "엿과 한과",
+    "k": "eye",
+    "lv": 2
+   }
   }
  },
  "BOSS_PARTS": {
@@ -1866,6 +2053,50 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:darae_hwachae"
+   },
+   {
+    "need": {
+     "byeolbatchim": 1,
+     "powder": 1
+    },
+    "out": "jjokbit_dasik",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:jjokbit_dasik"
+   },
+   {
+    "need": {
+     "somgureum": 1,
+     "root": 1
+    },
+    "out": "somgureum_pyeon",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:somgureum_pyeon"
+   },
+   {
+    "need": {
+     "doltapsol": 1,
+     "salt": 1
+    },
+    "out": "doltapsol_jangajji",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:doltapsol_jangajji"
+   },
+   {
+    "need": {
+     "yeotgaji": 1,
+     "kong": 1
+    },
+    "out": "yeotgaji_kongyeot",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:yeotgaji_kongyeot"
    }
   ],
   "maetdol": [
@@ -2027,6 +2258,17 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:saeu_juk"
+   },
+   {
+    "need": {
+     "chorongal": 2,
+     "memil_powder": 1
+    },
+    "out": "chorongal_eungi",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:chorongal_eungi"
    }
   ],
   "siru": [
@@ -2199,6 +2441,52 @@ const TABLES={
     "optional": true,
     "hidden": true,
     "discover": "recipe:siraegi_bap"
+   },
+   {
+    "need": {
+     "somgureum": 1,
+     "ssal_powder": 1
+    },
+    "out": "gureumtteok",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:gureumtteok"
+   },
+   {
+    "need": {
+     "ttallang": 1,
+     "ssal_powder": 1,
+     "pat": 1
+    },
+    "out": "mangaetteok",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:mangaetteok"
+   },
+   {
+    "need": {
+     "nunnogi": 1,
+     "ssal_powder": 1
+    },
+    "out": "nunnogi_seolgi",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:nunnogi_seolgi"
+   },
+   {
+    "need": {
+     "seorikkamak": 1,
+     "magamok": 1,
+     "honey": 1
+    },
+    "out": "sanyeolmae_jeonggwa",
+    "n": 1,
+    "optional": true,
+    "hidden": true,
+    "discover": "recipe:sanyeolmae_jeonggwa"
    }
   ]
  },
@@ -4941,6 +5229,171 @@ const TABLES={
      "when": "recipe:siraegi_bap"
     }
    ]
+  },
+  {
+   "id": "byeolbatchim",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "somgureum",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "doltapsol",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "chorongal",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "yeotgaji",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "ttallang",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "nunnogi",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "seorikkamak",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": []
+  },
+  {
+   "id": "jjokbit_dasik",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "별받침 알을 찧었더니 절구가 파랗게 물들었다. 도토리 가루를 개니 쪽빛 다식이 됐다.",
+     "section": "숨은 가공법",
+     "when": "recipe:jjokbit_dasik"
+    }
+   ]
+  },
+  {
+   "id": "somgureum_pyeon",
+   "region": "galchamgol",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "솜구름 속살을 칡뿌리와 찧어 굳혔다. 혀에 닿자마자 사르르 없어진다.",
+     "section": "숨은 가공법",
+     "when": "recipe:somgureum_pyeon"
+    }
+   ]
+  },
+  {
+   "id": "gureumtteok",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "솜구름을 쌀가루에 섞어 쪘더니 시루 뚜껑이 들썩였다. 떡이 구름처럼 부풀었다.",
+     "section": "숨은 가공법",
+     "when": "recipe:gureumtteok"
+    }
+   ]
+  },
+  {
+   "id": "doltapsol_jangajji",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "돌탑솔을 한 층씩 떼어 소금에 절였다. 씹으니 찬물이 톡 터진다.",
+     "section": "숨은 가공법",
+     "when": "recipe:doltapsol_jangajji"
+    }
+   ]
+  },
+  {
+   "id": "chorongal_eungi",
+   "region": "dolneomeo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "초롱알 두 알과 메밀가루를 맷돌에 갈아 묽게 쑤었다. 주홍빛 응이다.",
+     "section": "숨은 가공법",
+     "when": "recipe:chorongal_eungi"
+    }
+   ]
+  },
+  {
+   "id": "yeotgaji_kongyeot",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "엿가지 꼭지를 찧었더니 단물이 끈끈하게 나왔다. 콩을 버무리니 콩엿이 됐다.",
+     "section": "숨은 가공법",
+     "when": "recipe:yeotgaji_kongyeot"
+    }
+   ]
+  },
+  {
+   "id": "mangaetteok",
+   "region": "jangteo",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "딸랑망개 잎으로 팥소 떡을 싸서 쪘다. 잎을 떼니 떡에 잎맥 자국이 남았다.",
+     "section": "숨은 가공법",
+     "when": "recipe:mangaetteok"
+    }
+   ]
+  },
+  {
+   "id": "nunnogi_seolgi",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "눈녹이꽃을 얹어 설기를 쪘다. 다 식을 때가 됐는데도 꽃 자리만 따끈하다.",
+     "section": "숨은 가공법",
+     "when": "recipe:nunnogi_seolgi"
+    }
+   ]
+  },
+  {
+   "id": "sanyeolmae_jeonggwa",
+   "region": "yeongsan",
+   "kind": "item",
+   "lines": [
+    {
+     "who": "me",
+     "text": "서리까막과 마가목 열매를 쪄서 꿀에 쟀다. 하나 먹었더니 눈이 번쩍 뜨였다.",
+     "section": "숨은 가공법",
+     "when": "recipe:sanyeolmae_jeonggwa"
+    }
+   ]
   }
  ],
  "STAMP_MARKS": {
@@ -7458,7 +7911,16 @@ const TABLES={
   "saeu_juk": "짐꾼 아이들 보따리엔 말린 새우가 있다. 엄마들이 싸 준다. 쌀과 갈아 죽을 쑨다.",
   "darae_hwachae": "고라니들은 다래를 눈에 묻어 둔다. 언 것과 찧어 띄우면 눈이 시원하다.",
   "yeongeun_jeonggwa": "신목 아래 호수에서 연근이 난다. 쪄서 단 것에 재면 정과가 된다.",
-  "siraegi_bap": "샘가 처마의 시래기. 쌀에 얹어 시루에 찌면 겨울 밥이다."
+  "siraegi_bap": "샘가 처마의 시래기. 쌀에 얹어 시루에 찌면 겨울 밥이다.",
+  "jjokbit_dasik": "단풍골 길섶의 별받침 알은 손끝을 파랗게 물들인다. 도토리 가루에 개면 쪽빛 다식이 된다. 눈이 시원해진다.",
+  "somgureum_pyeon": "숲 덩굴의 솜구름 열매는 저절로 벌어진다. 속살을 칡뿌리와 찧어 굳히면 편이 된다.",
+  "gureumtteok": "단풍골 솜구름 속살은 시루 김을 쐬면 부푼다. 쌀가루에 섞어 찌면 떡이 두 배가 된다.",
+  "doltapsol_jangajji": "돌너머 바위틈의 돌탑솔은 소금에 절이면 오래 간다. 소금 한 줌이면 된다.",
+  "chorongal_eungi": "서리 맞은 초롱알 두 알과 메밀가루를 맷돌에 갈면 응이가 된다. 고갯길 주막에서 먹어 본 맛이다.",
+  "yeotgaji_kongyeot": "장터 엿장수들은 엿가지 꼭지를 몰래 쓴다. 꼭지 단물에 콩을 버무리면 엿이 따로 필요 없다.",
+  "mangaetteok": "딸랑망개 잎으로 팥소 떡을 싸서 찌면 오래 두어도 쉬지 않는다. 장터 떡집에서 들은 말이다.",
+  "nunnogi_seolgi": "영산 눈밭의 눈녹이꽃은 볕을 머금는다. 쌀가루 위에 얹어 찌면 떡이 오래 따끈하다.",
+  "sanyeolmae_jeonggwa": "높은 바위의 서리까막은 마가목 열매와 짝이다. 꿀을 더해 시루에 찌면 정과가 된다."
  },
  "SCENE_MUSIC": {
   "g_musoe_night": {

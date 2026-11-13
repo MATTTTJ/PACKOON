@@ -296,3 +296,29 @@ yeongeun_jeonggwa,yeongsan,연근 정과,물건,나,recipe:yeongeun_jeonggwa,숨
 siraegi,yeongsan,시래기,물건,나,got:siraegi,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 재료,관찰
 siraegi_bap,yeongsan,시래기밥,물건,나,got:siraegi_bap,처음 얻을 때,(items.csv 의 설명),제안,PA-262 정표 조합법,관찰
 siraegi_bap,yeongsan,시래기밥,물건,나,recipe:siraegi_bap,숨은 가공법을 직접 만들었을 때,시래기를 얹어 밥을 쪘다. 할머니네 겨울 맛이다.,제안,PA-262 정표 조합법,숨은 가공법
+byeolbatchim,galchamgol,별받침 열매,물건,나,got:byeolbatchim,처음 얻을 때,(items.csv 의 설명),제안,PA-264 지어낸 들풀·열매,관찰
+somgureum,galchamgol,솜구름 열매,물건,나,got:somgureum,처음 얻을 때,(items.csv 의 설명),제안,PA-264 지어낸 들풀·열매,관찰
+doltapsol,dolneomeo,돌탑솔,물건,나,got:doltapsol,처음 얻을 때,(items.csv 의 설명),제안,PA-264 지어낸 들풀·열매,관찰
+chorongal,dolneomeo,초롱알,물건,나,got:chorongal,처음 얻을 때,(items.csv 의 설명),제안,PA-264 지어낸 들풀·열매,관찰
+yeotgaji,jangteo,엿가지 열매,물건,나,got:yeotgaji,처음 얻을 때,(items.csv 의 설명),제안,PA-264 지어낸 들풀·열매,관찰
+ttallang,jangteo,딸랑망개,물건,나,got:ttallang,처음 얻을 때,(items.csv 의 설명),제안,PA-264 지어낸 들풀·열매,관찰
+nunnogi,yeongsan,눈녹이꽃,물건,나,got:nunnogi,처음 얻을 때,(items.csv 의 설명),제안,PA-264 지어낸 들풀·열매,관찰
+seorikkamak,yeongsan,서리까막,물건,나,got:seorikkamak,처음 얻을 때,(items.csv 의 설명),제안,PA-264 지어낸 들풀·열매,관찰
+jjokbit_dasik,galchamgol,쪽빛 다식,물건,나,got:jjokbit_dasik,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+jjokbit_dasik,galchamgol,쪽빛 다식,물건,나,recipe:jjokbit_dasik,숨은 가공법을 직접 만들었을 때,별받침 알을 찧었더니 절구가 파랗게 물들었다. 도토리 가루를 개니 쪽빛 다식이 됐다.,제안,PA-264 들풀·열매 조합법,숨은 가공법
+somgureum_pyeon,galchamgol,솜구름편,물건,나,got:somgureum_pyeon,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+somgureum_pyeon,galchamgol,솜구름편,물건,나,recipe:somgureum_pyeon,숨은 가공법을 직접 만들었을 때,솜구름 속살을 칡뿌리와 찧어 굳혔다. 혀에 닿자마자 사르르 없어진다.,제안,PA-264 들풀·열매 조합법,숨은 가공법
+gureumtteok,jangteo,구름떡,물건,나,got:gureumtteok,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+gureumtteok,jangteo,구름떡,물건,나,recipe:gureumtteok,숨은 가공법을 직접 만들었을 때,솜구름을 쌀가루에 섞어 쪘더니 시루 뚜껑이 들썩였다. 떡이 구름처럼 부풀었다.,제안,PA-264 들풀·열매 조합법,숨은 가공법
+doltapsol_jangajji,dolneomeo,돌탑솔 장아찌,물건,나,got:doltapsol_jangajji,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+doltapsol_jangajji,dolneomeo,돌탑솔 장아찌,물건,나,recipe:doltapsol_jangajji,숨은 가공법을 직접 만들었을 때,돌탑솔을 한 층씩 떼어 소금에 절였다. 씹으니 찬물이 톡 터진다.,제안,PA-264 들풀·열매 조합법,숨은 가공법
+chorongal_eungi,dolneomeo,초롱알 응이,물건,나,got:chorongal_eungi,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+chorongal_eungi,dolneomeo,초롱알 응이,물건,나,recipe:chorongal_eungi,숨은 가공법을 직접 만들었을 때,초롱알 두 알과 메밀가루를 맷돌에 갈아 묽게 쑤었다. 주홍빛 응이다.,제안,PA-264 들풀·열매 조합법,숨은 가공법
+yeotgaji_kongyeot,jangteo,엿가지 콩엿,물건,나,got:yeotgaji_kongyeot,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+yeotgaji_kongyeot,jangteo,엿가지 콩엿,물건,나,recipe:yeotgaji_kongyeot,숨은 가공법을 직접 만들었을 때,엿가지 꼭지를 찧었더니 단물이 끈끈하게 나왔다. 콩을 버무리니 콩엿이 됐다.,제안,PA-264 들풀·열매 조합법,숨은 가공법
+mangaetteok,jangteo,망개떡,물건,나,got:mangaetteok,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+mangaetteok,jangteo,망개떡,물건,나,recipe:mangaetteok,숨은 가공법을 직접 만들었을 때,딸랑망개 잎으로 팥소 떡을 싸서 쪘다. 잎을 떼니 떡에 잎맥 자국이 남았다.,제안,PA-264 들풀·열매 조합법,숨은 가공법
+nunnogi_seolgi,yeongsan,눈녹이 설기,물건,나,got:nunnogi_seolgi,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+nunnogi_seolgi,yeongsan,눈녹이 설기,물건,나,recipe:nunnogi_seolgi,숨은 가공법을 직접 만들었을 때,눈녹이꽃을 얹어 설기를 쪘다. 다 식을 때가 됐는데도 꽃 자리만 따끈하다.,제안,PA-264 들풀·열매 조합법,숨은 가공법
+sanyeolmae_jeonggwa,yeongsan,산열매 정과,물건,나,got:sanyeolmae_jeonggwa,처음 얻을 때,(items.csv 의 설명),제안,PA-264 들풀·열매 조합법,관찰
+sanyeolmae_jeonggwa,yeongsan,산열매 정과,물건,나,recipe:sanyeolmae_jeonggwa,숨은 가공법을 직접 만들었을 때,서리까막과 마가목 열매를 쪄서 꿀에 쟀다. 하나 먹었더니 눈이 번쩍 뜨였다.,제안,PA-264 들풀·열매 조합법,숨은 가공법

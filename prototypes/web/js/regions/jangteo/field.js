@@ -572,6 +572,7 @@ if(!CLASSIC){
     ['entrance','p',700,'mung',{hidden:'owl'}],['street','p',1040,'pat',{hidden:'owl'}],
     ['inn','p',1350,'bam',{hidden:'owl'}],['pine','p',1390,'songi',{hidden:'owl'}],
   ]);
+  addWildGather(Rg,'jangteo');   // 결정 D-1469: 지어낸 들풀·열매 (engine/wild.js)
   // 길손의 조사에는 배경과 구별되는 작고 일정한 표지를 쓴다. 숨은 도장은 표지를 붙이지 않는다.
   for(const z of Object.values(Rg.zones))for(const p of z.examines)p.draw=p.draw||((x,y)=>{R(x-2,y-6,5,4,'#caa970');R(x,y-10,1,2,'#f6ead0');});
 }

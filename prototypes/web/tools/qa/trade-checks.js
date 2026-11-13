@@ -82,8 +82,8 @@ async function runTrade({browser:b,outDir}){
       const full=foodBlock('rice');const ate=eatFood('yakgwa');const b1={...G.buff};
       G.hp=1;eatFood('rice');const hp=G.hp;eatFood('dubu');
       return {all,full,ate,b1,hp,b2:G.buff,inv:{...G.inv},hud:$('foodBuff').textContent,hudShown:!$('foodBuff').hidden};})()`);
-    check(s.all===51&&!!s.full&&s.ate&&s.b1.k==='swift'&&s.b1.lv===2&&s.hp===3&&s.b2.k==='strong'&&!s.inv.yakgwa&&!s.inv.rice&&s.hudShown&&/힘 2/.test(s.hud),
-      'food-eat','먹을거리 51종(정표 음식 21종 포함)이 모두 먹을 수 있어야 하고, 주먹밥은 체력이 가득하면 막고, 약과는 날램 2, 두부는 힘 2로 기운을 바꿔야 한다.',s);
+    check(s.all===60&&!!s.full&&s.ate&&s.b1.k==='swift'&&s.b1.lv===2&&s.hp===3&&s.b2.k==='strong'&&!s.inv.yakgwa&&!s.inv.rice&&s.hudShown&&/힘 2/.test(s.hud),
+      'food-eat','먹을거리 60종(정표 음식 21종, 들풀·열매 조합 9종 포함, 결정 D-1469)이 모두 먹을 수 있어야 하고, 주먹밥은 체력이 가득하면 막고, 약과는 날램 2, 두부는 힘 2로 기운을 바꿔야 한다.',s);
     await region(b,'jangteo');b.scene='food / progress';
     s=await b.eval("(()=>{G.f.bueongDone=false;G.inv={patsirutteok:1};return {why:foodBlock('patsirutteok')};})()");
     check(/쓸 데/.test(s.why),'food-progress','부엉 영감 고사떡으로 쓸 팥시루떡은 먹지 못해야 한다.',s);
