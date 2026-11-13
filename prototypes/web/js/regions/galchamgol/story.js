@@ -1136,6 +1136,10 @@ if(!CLASSIC){
   const drawOtter=(x,y,f)=>{
     const walking=otterGoing()&&otterWalk<OTTER_X-OTTER_FROM&&Math.abs(G.px-otterX())>TABLES.TUNING.field_talk_distance+6&&!open('dlg');
     const ph=walking?Math.floor(otterStep/9)%2:-1;
+    /* 결정 D-1468 (사용자 지시 2026-11-13: 여울이 뒤로 걷는다): 여울은 한 걸음이 0.28이라 npcFacing 의 걷는 쪽 판정(0.3)에 걸리지 않아
+       처음 방향(왼쪽, 아이가 오는 쪽)을 본 채 오른쪽 넓적돌로 뒷걸음질했다. 넓적돌로 가는 동안에는 가는 쪽(오른쪽)을 본다.
+       말을 건 동안만 아이 쪽으로 돌아선다. */
+    if(otterGoing()&&otterWalk<OTTER_X-OTTER_FROM&&!open('dlg'))f=1;
     Rg.expArt.otter(x,y-(ph===1?1:0),f,ph);
   };
   Rg.otterStep=otterStepFn;

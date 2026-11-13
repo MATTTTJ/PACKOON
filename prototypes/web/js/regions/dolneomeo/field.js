@@ -278,7 +278,8 @@ if(CLASSIC){
     // 변신 자리(PA-47)는 구역을 단 채 classic 저장에도 남는다. classic 은 구역 있는 자리를 그리지도 줍지도 않는다.
     // 순번 id(dol_old_*)로 바뀌지 않게 확장판 저장 판정과 구역 지우기에서 뺀다.
     // 결정 D-265·D-266: 확장판에만 있는 길섶 채집물(dol_g_*)도 구역을 단 채 둔다. classic 은 그리지도 줍지도 않는다.
-    const formSpot=p=>formSpotIds.includes(p.id)||/^dol_(g|owl)_/.test(p.id||'');
+    // 결정 D-1469: 지어낸 들풀·열매 자리(wild_dolneomeo_*, engine/wild.js)도 확장판에만 있다
+    const formSpot=p=>formSpotIds.includes(p.id)||/^(dol_(g|owl)|wild_dolneomeo)_/.test(p.id||'');
     // 결정 D-665: 수리부엉이 숨은 물건(dol_owl_)도 채집 자리처럼 옛 순번 매기기에서 뺀다 (옛 구성을 거쳐 돌아올 때 주운 물건 순번이 밀리지 않게)
     if(G?.region===Rg.id&&[...G.pickups,...G.digs].some(p=>p.zone&&!formSpot(p))){
       const originalPickups=[[886,192],[941,192],[1003,192],[1229,192],[1262,192],[1341,192],[670,118],[1412,118]];   // 결정 D-265: region.js 의 옛 자리와 같게
@@ -557,6 +558,7 @@ if(!CLASSIC){
   ]);
   // 결정 D-665: 수리부엉이만 느끼는 숨은 물건 (사용자 피드백 2026-11-05). 수리부엉이로 곁을 지나면 드러난다. 좌표는 길을 줄인 뒤의 자리
   addZoneGather(Rg,'dol_owl_',[['cliff','p',920,'seokcheong',{hidden:'owl'}],['village','p',1460,'chadol',{hidden:'owl'}]]);
+  addWildGather(Rg,'dolneomeo');   // 결정 D-1469: 지어낸 들풀·열매 (engine/wild.js)
   // 결정 D-1009: 해돋이 자리는 골렘 뒤에 깔리는 높은 턱(112) 위다. 턱이 없을 땐 표지가 허공에 떠 보였다. 턱이 깔린 뒤에만 그린다
   Rg.zones.cliff.vistas=[{id:'dawn_clouds',x:2680,y:112,from:80,to:430,sound:'wind',thought:'해 떴다!\n엄마도 보고 있을까.',diary:'돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.',draw:(x,y)=>{if(G.boss.dead)marker(x,y);},layers:A.cliffLayers}];
   // 결정 D-83: 밭 둔덕에서 먼 성황당 돌무더기가 꿈틀하는 것이 보인다. 목적지(성황당)와 골렘을 미리 보여 준다.

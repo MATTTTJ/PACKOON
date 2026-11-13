@@ -342,7 +342,8 @@ function floorGlint(x,y,h=10,seed=0){
 }
 function drawPickups(){for(const a of fieldItems('pickups')){if(a.got||!formVisible(a))continue;const p=dropDrawPoint(a),x=p.x-cam;if(x<-8||x>W+8)continue;const bob=Vfx.reducedMotion?0:Math.sin((G.anim+a.x)*0.08)>0.7?-1:0;
   floorShadow(x,a.y);
-  drawOutlined(x,p.y,(ox,oy)=>fieldCall('drawPickup',{...a,y:oy},ox,bob));
+  // 결정 D-1469: 지어낸 들풀·열매는 어느 지역에 놓여도 같은 모습 (engine/wild.js)
+  drawOutlined(x,p.y,(ox,oy)=>typeof WILD_PICKUP!=='undefined'&&WILD_PICKUP[a.item]?WILD_PICKUP[a.item](ox,oy,bob):fieldCall('drawPickup',{...a,y:oy},ox,bob));
   floorGlint(x,p.y,9,a.x);}}
 function drawDigs(){const ground=fieldGround();for(const d of fieldItems('digs')){const x=d.x-cam;if(x<-12||x>W+12)continue;
   // 결정 D-80: 다람쥐가 묻고 잊은 몫은 다른 모습에서도 발톱 긁은 자국으로 보인다. 캐는 것은 다람쥐만 (design/data/decisions.csv)

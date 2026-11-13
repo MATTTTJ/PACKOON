@@ -388,6 +388,7 @@ if(!CLASSIC){
   ]);
   // 결정 D-665: 수리부엉이만 느끼는 숨은 물건 (사용자 피드백 2026-11-05). 수리부엉이로 곁을 지나면 드러난다. 좌표는 길을 줄인 뒤의 자리
   addZoneGather(Rg,'y_owl_',[['snow','p',1540,'jujube',{hidden:'owl'}],['shore','p',990,'jat',{hidden:'owl'}]]);
+  addWildGather(Rg,'yeongsan');   // 결정 D-1469: 지어낸 들풀·열매 (engine/wild.js)
   // 결정 D-429: 이름 잃은 마을의 겨울엔 바람 소리만 남는다 (따로 소리 자산을 두지 않고 경치 보기의 바람 소리를 쓴다).
   // 마을을 벗어나거나 봄이 오면 끈다. 경치 보기는 제 소리를 쓰므로 그동안은 건드리지 않는다.
   let villageWind=false;
