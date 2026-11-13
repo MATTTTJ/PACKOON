@@ -2624,14 +2624,14 @@ const TABLES={
     "line": "약과라. 장꾼 셈엔 단 게 약이지.",
     "effect": "none"
    },
-   "salt": {
-    "kind": "그저 그럼",
-    "line": "소금이야 상단 짐에도 넘친다.",
-    "effect": "none"
-   },
    "songibap": {
     "kind": "좋아함",
     "line": "송이를 이만큼 얹었으면 장터 셈으로도 귀한 밥이다. 잘 먹으마.",
+    "effect": "none"
+   },
+   "nurungji": {
+    "kind": "좋아함",
+    "line": "누룽지라. 겨울 고개 넘을 때 끓여 먹기엔 이만한 게 없지.",
     "effect": "none"
    }
   },
@@ -5347,12 +5347,12 @@ const TABLES={
   "food_strong_step": 0.25,
   "food_eye_step": 0.3,
   "food_kind_step": 0.25,
-  "bond_liked": 1,
-  "bond_loved": 2,
+  "bond_liked": 2,
+  "bond_loved": 3,
   "bond_errand": 1,
-  "bond_need_one": 1,
-  "bond_need_two": 2,
-  "bond_need_three": 3,
+  "bond_need_one": 2,
+  "bond_need_two": 4,
+  "bond_need_three": 6,
   "bond_heard_ms": 20000
  },
  "PROGRESS": [
@@ -6354,9 +6354,15 @@ const TABLES={
    "mark": "acorn",
    "item": "gotgan_dotori",
    "out": "aldotori_muk",
-   "errand": [
-    "ledger:dodam"
+   "events": [
+    [
+     "ledger:dodam"
+    ],
+    [
+     "flag:galArcDodam2"
+    ]
    ],
+   "plain": "이건 내 곳간에 안 맞아! 네가 챙겨 둬.",
    "two": [
     [
      "npc",
@@ -6402,12 +6408,24 @@ const TABLES={
    "mark": "coin",
    "item": "jocheong",
    "out": "dotori_dasik",
-   "errand": [
-    "ledger:nal",
-    "ledger:nal_dolneomeo",
-    "ledger:nal_jangteo",
-    "ledger:nal_yeongsan"
+   "events": [
+    [
+     "ledger:nal",
+     "ledger:nal_dolneomeo",
+     "ledger:nal_jangteo",
+     "ledger:nal_yeongsan"
+    ],
+    [
+     "flag:craftTrade_salt",
+     "flag:dolneomeo_craft_oil",
+     "flag:jxCraftMarket",
+     "flag:yCraftJujube"
+    ],
+    [
+     "flag:yArcsNalDad3"
+    ]
    ],
+   "plain": "흥, 그건 장사 밑천도 안 된다. 도로 넣어 둬.",
    "two": [
     [
      "npc",
@@ -6449,9 +6467,15 @@ const TABLES={
    "mark": "leaf",
    "item": "bokkeun_kong",
    "out": "misutgaru",
-   "errand": [
-    "ledger:musoe"
+   "events": [
+    [
+     "ledger:musoe"
+    ],
+    [
+     "flag:galArcMusoeLeg3"
+    ]
    ],
+   "plain": "…마음만 받으마. 그건 네 길에 쓸 데가 있을 거다.",
    "two": [
     [
      "npc",
@@ -6505,9 +6529,15 @@ const TABLES={
    "mark": "drop",
    "item": "gamcho",
    "out": "gamcho_hwan",
-   "errand": [
-    "ledger:toad"
+   "events": [
+    [
+     "ledger:toad"
+    ],
+    [
+     "flag:galToadCame"
+    ]
    ],
+   "plain": "아이고, 할미한텐 쓸 데가 없는 거란다. 네가 요긴하게 쓰렴.",
    "two": [
     [
      "npc",
@@ -6545,9 +6575,15 @@ const TABLES={
    "mark": "fish",
    "item": "pirami",
    "out": "pirami_jjim",
-   "errand": [
-    "wander:galchamgol:stream_otter"
+   "events": [
+    [
+     "wander:galchamgol:stream_otter"
+    ],
+    [
+     "flag:galArcOtter2"
+    ]
    ],
+   "plain": "음… 이건 물에 띄워도 재미없겠다. 너 가져!",
    "two": [
     [
      "npc",
@@ -6589,9 +6625,12 @@ const TABLES={
    "mark": "paw",
    "item": "pyogo",
    "out": "pyogo_bap",
-   "errand": [
-    "wander:galchamgol:charcoal_badger"
+   "events": [
+    [
+     "wander:galchamgol:charcoal_badger"
+    ]
    ],
+   "plain": "콜록… 숯막엔 필요 없는 거다. 넣어 둬라.",
    "two": [
     [
      "npc",
@@ -6633,9 +6672,18 @@ const TABLES={
    "mark": "stone",
    "item": "dolbae",
    "out": "dolbae_cheong",
-   "errand": [
-    "ledger:dolsoe"
+   "events": [
+    [
+     "ledger:dolsoe"
+    ],
+    [
+     "flag:dolsoeEye"
+    ],
+    [
+     "wander:dolneomeo:dol_mole"
+    ]
    ],
+   "plain": "허허, 늙은이한텐 과한 거다. 네 짐에 도로 넣거라.",
    "two": [
     [
      "npc",
@@ -6681,9 +6729,18 @@ const TABLES={
    "mark": "horn",
    "item": "deodeok",
    "out": "deodeok_muchim",
-   "errand": [
-    "ledger:ppuri"
+   "events": [
+    [
+     "ledger:ppuri"
+    ],
+    [
+     "flag:dolneomeo_arc_ppuri6"
+    ],
+    [
+     "flag:golemCalm"
+    ]
    ],
+   "plain": "까닭 없는 물건은 받지 않는 게 법도다. 넣어 두어라.",
    "two": [
     [
      "npc",
@@ -6721,9 +6778,18 @@ const TABLES={
    "mark": "bur",
    "item": "sansa",
    "out": "sansa_pyeon",
-   "errand": [
-    "ledger:kkubeogi"
+   "events": [
+    [
+     "ledger:kkubeogi"
+    ],
+    [
+     "flag:kkuMud"
+    ],
+    [
+     "flag:dolneomeo_arc_kku7"
+    ]
    ],
+   "plain": "으음… 이건 머리맡에 둘 게 아니야아… 너 가져어…",
    "two": [
     [
      "npc",
@@ -6765,9 +6831,15 @@ const TABLES={
    "mark": "grain",
    "item": "deulkkae",
    "out": "deulkkae_juk",
-   "errand": [
-    "wander:dolneomeo:dol_badger"
+   "events": [
+    [
+     "wander:dolneomeo:dol_badger"
+    ],
+    [
+     "flag:dolneomeo_badger_sent"
+    ]
    ],
+   "plain": "됐다. 네 몫이다.",
    "two": [
     [
      "kid",
@@ -6805,9 +6877,15 @@ const TABLES={
    "mark": "shell",
    "item": "minari",
    "out": "minari_jeup",
-   "errand": [
-    "wander:dolneomeo:dol_turtle"
+   "events": [
+    [
+     "wander:dolneomeo:dol_turtle"
+    ],
+    [
+     "flag:dolneomeo_turtle1"
+    ]
    ],
+   "plain": "아가… 그건… 네 길에… 더 쓸모 있겠구나.",
    "two": [
     [
      "npc",
@@ -6845,9 +6923,18 @@ const TABLES={
    "mark": "tail",
    "item": "gaengyeot",
    "out": "kkae_yeot",
-   "errand": [
-    "ledger:yeotbang"
+   "events": [
+    [
+     "ledger:yeotbang"
+    ],
+    [
+     "flag:jangteoArcsYeotReturned"
+    ],
+    [
+     "flag:jangteoArcsPair4"
+    ]
    ],
+   "plain": "에헤~ 그건 엿 바꿀 고물도 아니네~ 넣어 둬~",
    "two": [
     [
      "npc",
@@ -6889,9 +6976,18 @@ const TABLES={
    "mark": "moon",
    "item": "chapssal",
    "out": "kkul_chaltteok",
-   "errand": [
-    "ledger:morak"
+   "events": [
+    [
+     "ledger:morak"
+    ],
+    [
+     "flag:morakQuern"
+    ],
+    [
+     "flag:jangteoArcsPair4"
+    ]
    ],
+   "plain": "아이고, 마음만 받을게! 그건 네가 써, 네가!",
    "two": [
     [
      "npc",
@@ -6933,9 +7029,18 @@ const TABLES={
    "mark": "feather",
    "item": "omija",
    "out": "omija_cheong",
-   "errand": [
-    "ledger:bueong"
+   "events": [
+    [
+     "ledger:bueong"
+    ],
+    [
+     "flag:jxInnFireDone"
+    ],
+    [
+     "flag:jxSangdanCleared"
+    ]
    ],
+   "plain": "장부에 적을 만한 물건은 아니군. 도로 넣어 두거라.",
    "two": [
     [
      "npc",
@@ -6977,9 +7082,18 @@ const TABLES={
    "mark": "coin",
    "item": "jayeom",
    "out": "sundubu",
-   "errand": [
-    "wander:jangteo:j_jjandol"
+   "events": [
+    [
+     "wander:jangteo:j_jjandol"
+    ],
+    [
+     "flag:jangteoArcsJj2"
+    ],
+    [
+     "flag:jangteoArcsJjSalt"
+    ]
    ],
+   "plain": "…공짜는 무섭다. 넣어 둬.",
    "two": [
     [
      "npc",
@@ -7025,9 +7139,12 @@ const TABLES={
    "mark": "grain",
    "item": "susu",
    "out": "susu_pattteok",
-   "errand": [
-    "flag:jangteoArcsLamp1"
+   "events": [
+    [
+     "flag:jangteoArcsLamp1"
+    ]
    ],
+   "plain": "그건 밤짐에 안 맞아! 네가 써!",
    "two": [
     [
      "npc",
@@ -7069,9 +7186,12 @@ const TABLES={
    "mark": "paw",
    "item": "hodu",
    "out": "hodu_gangjeong",
-   "errand": [
-    "flag:jxSangdanCleared"
+   "events": [
+    [
+     "flag:jxSangdanCleared"
+    ]
    ],
+   "plain": "받을 까닭이 없는 물건이다. 셈이 흐려지니 넣어 둬라.",
    "two": [
     [
      "npc",
@@ -7105,9 +7225,12 @@ const TABLES={
    "mark": "fish",
    "item": "saeu",
    "out": "saeu_juk",
-   "errand": [
-    "flag:jxSangdanCleared"
+   "events": [
+    [
+     "flag:jxSangdanCleared"
+    ]
    ],
+   "plain": "어, 어… 그건 괜찮아. 너 가져.",
    "two": [
     [
      "npc",
@@ -7153,9 +7276,15 @@ const TABLES={
    "mark": "hoof",
    "item": "eon_darae",
    "out": "darae_hwachae",
-   "errand": [
-    "ledger:salgeumi"
+   "events": [
+    [
+     "ledger:salgeumi"
+    ],
+    [
+     "flag:yOngdalSalg"
+    ]
    ],
+   "plain": "그, 그건… 괜찮아. (고개를 살짝 젓는다.)",
    "two": [
     [
      "npc",
@@ -7197,9 +7326,18 @@ const TABLES={
    "mark": "feather",
    "item": "yeongeun",
    "out": "yeongeun_jeonggwa",
-   "errand": [
-    "ledger:durumi"
+   "events": [
+    [
+     "ledger:durumi"
+    ],
+    [
+     "flag:yCraneCall"
+    ],
+    [
+     "flag:spring"
+    ]
    ],
+   "plain": "마음은 알았다. 그건 네게 더 쓸모 있겠지.",
    "two": [
     [
      "npc",
@@ -7237,9 +7375,15 @@ const TABLES={
    "mark": "paw",
    "item": "siraegi",
    "out": "siraegi_bap",
-   "errand": [
-    "learn:ongdal:soup"
+   "events": [
+    [
+     "learn:ongdal:soup"
+    ],
+    [
+     "flag:yOngdal5"
+    ]
    ],
+   "plain": "할미는 그거 쓸 디가 없어. 네가 챙겨 둬.",
    "two": [
     [
      "npc",

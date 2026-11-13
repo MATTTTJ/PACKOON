@@ -169,7 +169,9 @@ function sendCraftHome(item){
   closePanels();talk([['너구리',ITEMS[item].n+' 하나예요. 엄마한테 제가 만들었다고 전해 주세요.']]);return true;
 }
 function giftTaste(who,item){
-  const taste=tasteOf(who,item);if(!taste||!G||!has(item))return null;
+  if(!G||!has(item))return null;const taste=tasteOf(who,item);
+  // 결정 D-1467: 정이 있는 인물은 취향 표에 없는 물건도 받아 본다. 마음만 받고 물건은 돌려준다 (bonds.csv 보통대사)
+  if(!taste){const b=TABLES.BONDS?.[who];return b?{kind:'보통',line:b.plain,given:false}:null;}
   const liked=['아주 좋아함','좋아함'].includes(taste.kind);
   if(liked){
     if(knows('like:'+who+':'+item))return {kind:taste.kind,line:'아까 나눈 맛을 아직 기억하고 있다.',given:false};
@@ -194,18 +196,32 @@ function renderFieldTaste(){
   const tid=n&&(TABLES.TASTES[n.id]||!TABLES.TASTES[n.id.replace(/^j_/,'')]?n.id:n.id.replace(/^j_/,''));
   const who=G&&open('dlg')&&!B&&!tradeClosedNow(n?.id)?tid:null;   // 결정 D-197 (disguise.js)
   if(who!==fieldTasteWho){fieldTaste.innerHTML='';fieldTasteWho=who;}
-  const items=who?Object.keys(TABLES.TASTES[who]||{}).filter(id=>has(id)):[];
-  fieldTaste.hidden=!who||!items.length;if(fieldTaste.hidden||fieldTaste.children.length)return;
-  const toggle=el('button','btn','물건 건네기');toggle.type='button';toggle.setAttribute('aria-expanded','false');fieldTaste.appendChild(toggle);
+  // 결정 D-1467 (사용자 지시 2026-11-13 "선물하기 칸을 호감도 있는 모든 NPC 에게"): 정이 있는 인물은 늘 '선물하기'를 둔다.
+  // 보따리의 먹을거리·재료를 모두 내밀어 볼 수 있다 (도구·귀한 것은 뺀다). 다른 인물은 전처럼 취향 표에 있는 물건을 지녔을 때만.
+  const bond=!!(who&&TABLES.BONDS?.[who]);
+  fieldTaste.hidden=!who||(!bond&&!giftChoices(who).length);if(fieldTaste.hidden||fieldTaste.children.length)return;
+  const toggle=el('button','btn','선물하기');toggle.type='button';toggle.setAttribute('aria-expanded','false');fieldTaste.appendChild(toggle);
   const choices=el('div','taste-choices');choices.hidden=true;fieldTaste.appendChild(choices);
   const response=el('p','taste-response');response.setAttribute('role','status');fieldTaste.appendChild(response);
-  toggle.onclick=()=>{choices.hidden=!choices.hidden;toggle.setAttribute('aria-expanded',String(!choices.hidden));};
-  items.forEach(id=>{const b=el('button','btn',ITEMS[id].n);b.type='button';b.onclick=()=>{
-    if(fieldTasteWho!==who||!open('dlg'))return;
-    const result=giftTaste(who,id);if(!result){b.disabled=true;return;}
-    response.textContent=result.line+(result.given?'':' (물건은 그대로다.)');if(result.given||!has(id))b.disabled=true;
-    if(result.given)giftLesson(who,result.line);   // 결정 D-906
-  };choices.appendChild(b);});
+  // 펼칠 때마다 지금 보따리로 다시 그린다 (대화 중에 받은 물건도 보이게)
+  const fill=()=>{choices.innerHTML='';const list=giftChoices(who);
+    if(!list.length){choices.appendChild(el('p','taste-empty','보따리에 건넬 만한 것이 없다.'));return;}
+    list.forEach(id=>{const b=el('button','btn gift-item');b.type='button';b.dataset.item=id;
+      b.appendChild(icon(id));b.appendChild(el('span',null,ITEMS[id].n+((G.inv[id]||0)>1?' '+G.inv[id]:'')));
+      b.onclick=()=>{
+        if(fieldTasteWho!==who||!open('dlg'))return;
+        const result=giftTaste(who,id);if(!result){b.disabled=true;return;}
+        response.textContent=result.line+(result.given?'':' (물건은 그대로다.)');if(result.given||!has(id))b.disabled=true;
+        if(result.given)giftLesson(who,result.line);   // 결정 D-906
+      };choices.appendChild(b);});};
+  toggle.onclick=()=>{choices.hidden=!choices.hidden;toggle.setAttribute('aria-expanded',String(!choices.hidden));if(!choices.hidden)fill();};
+}
+function giftChoices(who){
+  const tastes=Object.keys(TABLES.TASTES[who]||{});
+  if(!TABLES.BONDS?.[who])return tastes.filter(id=>has(id));
+  const order={'먹을거리':0,'재료':1};
+  return Object.keys(G.inv).filter(id=>has(id)&&ITEMS[id]&&(ITEMS[id].kind in order||tastes.includes(id)))
+    .sort((a,b)=>(order[ITEMS[a].kind]??2)-(order[ITEMS[b].kind]??2)||ITEMS[a].n.localeCompare(ITEMS[b].n,'ko'));
 }
 /* 결정 D-906 (사용자 피드백 2026-11-06 "선물 시 보상으로 조합법을 배우도록. 성격에 따라 직접 알려 주거나 소문을 알려 주거나"):
    좋아하는 것을 건네면 그 인물이 답례로 숨은 가공법 하나를 일러 준다. 누가 무엇을 어떻게 일러 주는지는 gift_recipes.csv 에 있다
