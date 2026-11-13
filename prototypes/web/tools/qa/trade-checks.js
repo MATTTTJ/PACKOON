@@ -111,14 +111,15 @@ async function runTrade({browser:b,outDir}){
     const inv=await b.eval('({...G.inv})');
     check(s.heard&&s.ids.includes('t_yeotbang_horn')&&jl.some(l=>/헌 물건/.test(l.text))&&inv.hobakyeot===3&&!inv.nundok_horn&&gl.some(l=>/호박엿/.test(l.text)),
       'yeot-junk','아이가 얼음 뿔을 꺼내 보인 뒤 교환에 뿔 자리가 생기고, 바꾸면 호박엿 셋을 얻어야 한다.',{s,jl,gl,inv});
-    // 7) 결정 D-1463·D-1464: 도담에게 좋아함(깨소금) 하나, 아주 좋아함(도토리묵) 하나를 건네면 정이 1 → 3칸.
+    // 7) 결정 D-1463·D-1464·D-1467: 도담에게 좋아함(깨소금) 하나를 건네면 1칸(2점), 아주 좋아함(도토리묵)을 더하면 2칸(5점), 도토리 묻은 자리를 찾아 주면(이벤트) 3칸(6점).
     //    그 뒤 도담과 대화를 마치면 두 칸 몫(곳간 도토리 + 알도토리묵 조합법), 이어서 세 칸 몫(곳간 도토리 하나 더)을 받는다
     await region(b,'galchamgol');b.scene='bond / level';
     s=await b.eval(`(()=>{closePanels();dlgDismiss();G.buff=null;G.inv={acorn_jelly:1,sesame_salt:1};G.learned=G.learned.filter(k=>!k.startsWith('like:dodam')&&k!=='hint:aldotori_muk');G.f.bondGot=Object.fromEntries(Object.keys(TABLES.BONDS).map(id=>[id,3]));delete G.f.bondGot.dodam;bondHeard.clear();
-      if(G.ledger.dodam)G.ledger.dodam.done=false;
-      const l0=bondLevel('dodam');giftTaste('dodam','sesame_salt');const l1=bondLevel('dodam');giftTaste('dodam','acorn_jelly');const l2=bondLevel('dodam');
-      return {l0,l1,l2,p:bondPoints('dodam')};})()`);
-    check(s.l0===0&&s.l1===1&&s.l2===3,'bond-level','도담의 정은 처음 0칸, 좋아함 선물 뒤 1칸, 아주 좋아함 선물을 더하면 3칸이어야 한다.',s);
+      if(G.ledger.dodam)G.ledger.dodam.done=false;G.f.galArcDodam2=false;
+      const l0=bondLevel('dodam');giftTaste('dodam','sesame_salt');const l1=bondLevel('dodam'),p1=bondPoints('dodam');giftTaste('dodam','acorn_jelly');const l2=bondLevel('dodam'),p2=bondPoints('dodam');
+      G.f.galArcDodam2=true;const l3=bondLevel('dodam');
+      return {l0,l1,l2,l3,p1,p2,p:bondPoints('dodam'),title:bondTitle('dodam')};})()`);
+    check(s.l0===0&&s.l1===1&&s.p1===2&&s.l2===2&&s.p2===5&&s.l3===3&&s.p===6&&!/다음 칸/.test(s.title),'bond-level','도담의 정은 처음 0칸, 좋아함 선물 뒤 1칸(2점), 아주 좋아함 선물 뒤 2칸(5점), 묻은 자리를 찾아 주면(이벤트) 3칸(6점)이어야 한다.',s);
     b.scene='bond / gift scene';
     await b.eval("talk([['도담','고마워! 맛있다!']])");
     const who0=await b.eval("({bond:$('dlgWho').dataset.bond,bg:$('dlgWho').style.getPropertyValue('--bond').slice(0,22)})");
@@ -155,6 +156,26 @@ async function runTrade({browser:b,outDir}){
       c.dispatchEvent(new PointerEvent('pointerover',{bubbles:true}));const t=$('uiTip');const r={chip:c?.textContent,shown:!t.hidden,text:t.textContent};
       document.body.dispatchEvent(new PointerEvent('pointerover',{bubbles:true}));r.hid=t.hidden;G.buff=null;refreshHud();return r;})()`);
     check(s.chip==='밝은 눈 3'&&s.shown&&/다음 보스 싸움/.test(s.text)&&/칡 감초환을 먹고/.test(s.text)&&s.hid,'buff-tip','품은 기운 칩에 마우스를 올리면 기운 설명 풍선이 떠야 한다.',s);
+    // 결정 D-1467: 정이 있는 인물은 늘 '선물하기'가 있다. 보따리의 먹을거리·재료를 모두 내밀 수 있고(도구는 뺀다),
+    // 좋아하는 것이 아니면 그 인물의 보통대사로 마음만 받고 물건은 돌려준다. 보따리가 비어도 칸은 있다
+    b.scene='bond / gift button';
+    const giftSet=await b.eval(`(()=>{closePanels();dlgDismiss();const T=TABLES.TASTES.stream_otter||{};
+      const plain=Object.keys(ITEMS).find(k=>ITEMS[k].kind==='재료'&&!T[k]&&!ITEMS[k].bond),tool=Object.keys(ITEMS).find(k=>ITEMS[k].kind==='도구');
+      G.inv={[plain]:2,[tool]:1};talk([['여울','안녕!']]);return {plain,tool};})()`);
+    await b.until("!document.getElementById('fieldTaste').hidden");
+    await press(b,'#fieldTaste > button');
+    s=await b.eval(`(()=>{const label=document.querySelector('#fieldTaste > button').textContent;
+      const items=[...document.querySelectorAll('#fieldTaste .taste-choices .gift-item')].map(x=>x.dataset.item);
+      document.querySelector('#fieldTaste .gift-item[data-item="${giftSet.plain}"]')?.click();
+      return {label,items,resp:document.querySelector('#fieldTaste .taste-response').textContent,left:G.inv['${giftSet.plain}'],plainLine:TABLES.BONDS.stream_otter.plain};})()`);
+    check(s.label==='선물하기'&&s.items.includes(giftSet.plain)&&!s.items.includes(giftSet.tool)&&s.resp.includes(s.plainLine)&&/물건은 그대로다/.test(s.resp)&&s.left===2,
+      'bond-gift-plain','여울과 대화하면 선물하기 칸에 재료가 보이고(도구는 빠지고), 좋아하는 것이 아닌 물건은 보통대사와 함께 돌려받아야 한다.',{giftSet,s});
+    await b.eval("(()=>{dlgDismiss();G.inv={};talk([['검댕','콜록…']]);})()");
+    await b.until("!document.getElementById('fieldTaste').hidden");
+    await press(b,'#fieldTaste > button');
+    s=await b.eval("({label:document.querySelector('#fieldTaste > button').textContent,empty:document.querySelector('#fieldTaste .taste-empty')?.textContent||''})");
+    check(s.label==='선물하기'&&/건넬 만한 것이 없다/.test(s.empty),'bond-gift-empty','보따리가 비어도 정이 있는 인물에게는 선물하기 칸이 있고, 펼치면 건넬 것이 없다고 보여야 한다.',s);
+    await b.eval('dlgDismiss()');
   }catch(error){findings.push({rule:'runner',severity:'높음',message:error.stack||String(error),scene:b.scene});}
   const file=path.join(outDir,'trade.json');fs.mkdirSync(outDir,{recursive:true});fs.writeFileSync(file,JSON.stringify({records,findings},null,2)+'\n');
   return {name:'trade',status:findings.length?'fail':'pass',summary:`교환 여러 몫·선물 답례 ${records.length}가지 확인`,findings,evidence:[file]};

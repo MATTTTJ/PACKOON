@@ -197,8 +197,9 @@ for(const r of t('gift_recipes')){
   GIFT_RECIPES.push({id:r.id,region:r['지역'],npc:r.NPC,out,way:r['방식'],lines});
 }
 /* 결정 D-1463·D-1464 (사용자 지시 2026-11-12): 호감도(정)와 정표 재료 (design/data/bonds.csv).
-   정은 좋아하는 것을 건넨 일과 부탁을 들어준 일로 오른다. 두 칸이면 정표 재료 하나와 그것으로 만드는 조합법, 세 칸이면 정표 재료 하나를 더 준다.
-   부탁 칸은 ' | '로 나눈 조건 가운데 하나라도 맞으면 된다: ledger:<장부id> 끝남 · wander:<지역>:<떠돌이id> 끝남 · flag:<진행값> · learn:<배운 키>.
+   정은 좋아하는 것을 건넨 일과 그 인물의 이벤트를 해결해 준 일로 오른다. 두 칸이면 정표 재료 하나와 그것으로 만드는 조합법, 세 칸이면 정표 재료 하나를 더 준다.
+   이벤트 칸 (결정 D-1467): ' ; '로 사건을 나누고, 사건 안은 ' | '로 나눈 조건 가운데 하나라도 맞으면 된다: ledger:<장부id> 끝남 · wander:<지역>:<떠돌이id> 끝남 · flag:<진행값> · learn:<배운 키>.
+   보통대사: 좋아하는 것이 아닌 물건을 선물하기로 내밀었을 때 하는 말 (물건은 돌려준다).
    대사는 ' / '로 줄을 나눈다. '너구리:'는 아이의 말·지문, '{받기}'는 정표 재료를 받는 줄, '{귀띔}'으로 시작하는 줄을 들으면 정표 조합법을 배운다. */
 const BOND_MARKS=['acorn','coin','leaf','drop','fish','paw','stone','horn','bur','grain','shell','tail','moon','feather','hoof'];
 const BONDS={},npcRows=t('npcs');
@@ -220,9 +221,11 @@ for(const r of t('bonds')){
   if(!rec||!rec.hidden||!rec.need[item])fail(where+': 정표조합은 정표재료가 드는 숨은 조합법이어야 한다 '+out);
   if(Object.values(BONDS).some(b=>b.item===item||b.out===out))fail(where+': 정표재료·정표조합이 다른 인물과 겹친다');
   if(!Object.values(TASTES[r.id]||{}).some(x=>['아주 좋아함','좋아함'].includes(x.kind)))fail(where+': 좋아하는 것이 없어 정을 쌓을 수 없다');
-  const errand=r['부탁'].split('|').map(x=>x.trim()).filter(Boolean);
-  if(!errand.length||errand.some(x=>!/^(?:ledger:[a-z_]+|wander:[a-z]+:[a-z_]+|flag:[A-Za-z0-9_]+|learn:[a-z0-9_:-]+)$/.test(x)))fail(where+': 부탁 조건 형식을 확인한다');
-  BONDS[r.id]={name:r['이름'],region:r['지역'],mark:r['표식'],item,out,errand,two:bondLines(r['정2대사'],where+' 정2대사',true),three:bondLines(r['정3대사'],where+' 정3대사',false)};
+  // 결정 D-1467: 이벤트 칸은 ' ; '로 사건을 나누고, 한 사건 안은 ' | '로 나눈 조건 가운데 하나라도 맞으면 해결이다. 사건마다 bond_errand 가 오른다
+  const events=r['이벤트'].split(';').map(ev=>ev.split('|').map(x=>x.trim()).filter(Boolean)).filter(ev=>ev.length);
+  if(!events.length||events.flat().some(x=>!/^(?:ledger:[a-z_]+|wander:[a-z]+:[a-z_]+|flag:[A-Za-z0-9_]+|learn:[a-z0-9_:-]+)$/.test(x)))fail(where+': 이벤트 조건 형식을 확인한다');
+  if(!r['보통대사'].trim())fail(where+': 보통대사(좋아하는 것이 아닌 물건을 받았을 때)가 비었다');
+  BONDS[r.id]={name:r['이름'],region:r['지역'],mark:r['표식'],item,out,events,plain:r['보통대사'].trim(),two:bondLines(r['정2대사'],where+' 정2대사',true),three:bondLines(r['정3대사'],where+' 정3대사',false)};
   ITEMS[item].bond=r.id;
 }
 /* 결정 D-1466 (사용자 지시 2026-11-12): 아빠 수첩의 조합법 귀띔 (design/data/recipe_hints.csv). 숨은 조합법마다 하나. 모르는 조합법에도 미리 보인다 */
@@ -323,6 +326,12 @@ for(const form of ['bare','squirrel','goat','owl','deer','otter']){   // 결정 
   requireValue(TUNING['battle_'+form+'_speed']>0&&TUNING['battle_'+form+'_cooldown']>0&&TUNING['battle_'+form+'_radius']>3,'tuning.csv: 전투 변신 속도·대기·되치기 반경을 확인한다');
 }
 requireValue(TUNING.battle_squirrel_speed>TUNING.battle_bare_speed&&TUNING.battle_squirrel_cooldown<TUNING.battle_bare_cooldown&&TUNING.battle_squirrel_radius<TUNING.battle_bare_radius&&TUNING.battle_owl_radius>TUNING.battle_bare_radius&&TUNING.battle_owl_cooldown>TUNING.battle_bare_cooldown,'tuning.csv: 다람쥐는 빠르고 좁게, 수리부엉이는 넓고 느리게 유지한다');
+// 결정 D-1467: 선물이 이벤트보다 크게 오르고, 인물마다 좋아하는 것을 다 건네고 이벤트를 다 풀면 세 칸에 닿아야 한다
+requireValue(TUNING.bond_loved>TUNING.bond_liked&&TUNING.bond_liked>TUNING.bond_errand&&TUNING.bond_errand>0&&TUNING.bond_need_one<TUNING.bond_need_two&&TUNING.bond_need_two<TUNING.bond_need_three,'tuning.csv: 정은 아주 좋아함 > 좋아함 > 이벤트 순으로 오르고 칸 기준은 차례로 커야 한다');
+for(const [id,b] of Object.entries(BONDS)){
+  const most=Object.values(TASTES[id]||{}).reduce((p,x)=>p+(x.kind==='아주 좋아함'?TUNING.bond_loved:x.kind==='좋아함'?TUNING.bond_liked:0),0)+b.events.length*TUNING.bond_errand;
+  requireValue(most>=TUNING.bond_need_three,'bonds.csv '+id+': 좋아하는 것과 이벤트를 다 해도 정 세 칸('+TUNING.bond_need_three+'점)에 닿지 않는다 ('+most+'점)');
+}
 requireValue(TUNING.battle_goat_damage_taken>0&&TUNING.battle_goat_damage_taken<1&&TUNING.battle_owl_tell_lead>=0&&TUNING.battle_deer_iframes>=TUNING.battle_iframes,'tuning.csv: 산양 피해 배수는 0~1 사이, 고라니 무적 시간은 기본 이상이어야 한다');
 requireValue(TUNING.form_squirrel_speed>0&&TUNING.form_otter_speed>0&&TUNING.form_otter_slide_speed>TUNING.form_otter_speed&&TUNING.form_goat_jump>=1&&TUNING.form_owl_glide_fall>0&&TUNING.form_owl_glide_fall<TUNING.field_fall_speed&&TUNING.form_climb_speed>0&&TUNING.form_climb_reach>0&&Number.isInteger(TUNING.stranger_trade_limit)&&TUNING.stranger_trade_limit>0,'tuning.csv: 필드 변신 배수·활공·오르기·손님 교환 수를 확인한다');
 requireValue(TUNING.battle_base_damage>0&&TUNING.battle_sharp_damage>=TUNING.battle_base_damage&&TUNING.battle_tool_good_damage>0&&TUNING.battle_tool_bad_mult>0&&TUNING.battle_tool_bad_mult<1&&TUNING.battle_hand_scale>0.5&&TUNING.battle_hand_scale<=2,'tuning.csv: 전투 기본 피해·날 세운 피해·잘 먹는 도구 덤·안 먹는 도구 배수(0~1)·손 그림 크기를 확인한다');

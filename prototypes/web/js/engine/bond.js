@@ -7,7 +7,10 @@
    - 칸은 셋. bond_need_one·two·three 점에서 한 칸씩 찬다. 표식 모양은 인물 계열마다 다르다 (bonds.csv 표식).
    - 보이는 곳: 대화창 이름 꼬리표 옆, 필드 이름표 옆(만난 인물만), 수첩 장부 장.
    결정 D-1464: 두 칸이 차면 그 인물이 정표 재료 하나와 그것으로 만드는 조합법을 일러 주고, 세 칸이면 정표 재료를 하나 더 준다.
-   정표 재료는 정으로만 얻는다. 그 인물과 나눈 대화가 끝난 뒤 잠깐 조용할 때 잇는다 (선물 답례 giftLesson 이 먼저다). */
+   정표 재료는 정으로만 얻는다. 그 인물과 나눈 대화가 끝난 뒤 잠깐 조용할 때 잇는다 (선물 답례 giftLesson 이 먼저다).
+   결정 D-1467 (사용자 지시 2026-11-13 "호감도는 선물로 가장 크게 오르는게 맞지만 이벤트를 달성해주는것으로도 오르는경우가 있게"):
+   그 인물의 이벤트(bonds.csv 이벤트 칸, ' ; '로 나눈 사건마다)를 해결해 줄 때마다 bond_errand 가 오르고, 선물은 그보다 크게 오른다.
+   칸이 차지 않아도 정이 쌓이면 짧게 알린다. */
 const BOND_MARK_NAMES={acorn:'도토리',coin:'엽전',leaf:'잎사귀',drop:'물방울',fish:'물고기',paw:'발자국',stone:'돌',horn:'뿔',bur:'밤송이',grain:'낟알',shell:'등딱지',tail:'꼬리',moon:'반달',feather:'깃털',hoof:'발굽'};
 const BOND_MARK_ART={
   acorn:['..ooo..','.ooooo.','.#####.','.##+##.','.#####.','..###..','...#...'],
@@ -44,9 +47,11 @@ function bondPoints(id){
   const b=bondTable()[id];if(!b||!G)return 0;const T=TABLES.TUNING;let p=0;
   for(const [item,t] of Object.entries(TABLES.TASTES[id]||{}))
     if(knows('like:'+id+':'+item))p+=t.kind==='아주 좋아함'?T.bond_loved:t.kind==='좋아함'?T.bond_liked:0;
-  if(b.errand.some(bondErrandDone))p+=T.bond_errand;
+  p+=T.bond_errand*bondEventsDone(id);
   return p;
 }
+function bondEventsDone(id){return (bondTable()[id]?.events||[]).filter(ev=>ev.some(bondErrandDone)).length;}
+function bondNextNeed(id){const p=bondPoints(id),T=TABLES.TUNING;return [T.bond_need_one,T.bond_need_two,T.bond_need_three].find(n=>p<n)??null;}
 function bondLevel(id){const p=bondPoints(id),T=TABLES.TUNING;return p>=T.bond_need_three?3:p>=T.bond_need_two?2:p>=T.bond_need_one?1:0;}
 /* 표식 셋을 한 줄로 그린 그림 (찬 칸은 제 색, 빈 칸은 옅은 테두리 빛). 그림 주소는 모양·칸마다 한 번만 만든다 */
 const bondArtCache=new Map();
@@ -60,8 +65,8 @@ function bondMarksCanvas(mark,lv,scale=2){
   return c;
 }
 function bondMarksUrl(mark,lv){const k=mark+lv;if(!bondArtCache.has(k))bondArtCache.set(k,bondMarksCanvas(mark,lv).toDataURL());return bondArtCache.get(k);}
-function bondTitle(id){const b=bondTable()[id],lv=bondLevel(id);
-  return jo(b.name,'과','와')+'의 정 '+lv+'/3 ('+BOND_MARK_NAMES[b.mark]+')'+(lv<2?' · 두 칸이 차면 정표 재료를 나눠 준다':lv<3?' · 세 칸이 차면 정표 재료를 하나 더 준다':' · 정이 가득 찼다');}
+function bondTitle(id){const b=bondTable()[id],lv=bondLevel(id),next=bondNextNeed(id),p=bondPoints(id);
+  return jo(b.name,'과','와')+'의 정 '+lv+'/3 ('+BOND_MARK_NAMES[b.mark]+')'+(next!==null?' · 다음 칸까지 '+(next-p)+'점':'')+(lv<2?' · 두 칸이 차면 정표 재료를 나눠 준다':lv<3?' · 세 칸이 차면 정표 재료를 하나 더 준다':' · 정이 가득 찼다');}
 function bondMarksEl(id){
   const b=bondTable()[id];if(!b)return null;const lv=bondLevel(id),s=el('span','bond-marks');
   s.style.backgroundImage='url('+bondMarksUrl(b.mark,lv)+')';s.dataset.lv=lv;s.setAttribute('role','img');s.setAttribute('aria-label',bondTitle(id));s.title=bondTitle(id);
@@ -78,15 +83,21 @@ function bondDecorateWho(){
 function bondDecorateTag(e,n,known){
   const id=known?bondIdOf(n.id):null;let s=e.querySelector('.bond-marks');
   if(!id){if(s)s.remove();return;}
-  const lv=bondLevel(id);if(s&&s.dataset.lv===String(lv))return;
+  if(s&&s.title===bondTitle(id))return;
   if(s)s.remove();e.appendChild(bondMarksEl(id));
 }
-/* 칸이 찬 순간 짧게 알린다 (같은 칸은 한 번). 게임을 시작하거나 불러온 때 이미 찬 칸은 조용히 맞춰 둔다 */
-let bondSeenFor=null;
+/* 칸이 찬 순간 짧게 알린다 (같은 칸은 한 번). 게임을 시작하거나 불러온 때 이미 찬 칸은 조용히 맞춰 둔다.
+   결정 D-1467: 칸은 그대로여도 점수가 오르면 "정이 조금 쌓였다"를 알린다 (선물·이벤트 모두).
+   알린 점수는 저장하지 않는다 (진행값을 늘리지 않게 게임마다 메모리에만 둔다. 불러오면 조용히 다시 맞춘다) */
+let bondSeenFor=null;const bondPtsSeen=new WeakMap();
 function bondNotice(){
   if(!G||!G.started)return;const seen=G.f.bondSeen||(G.f.bondSeen={});
-  if(bondSeenFor!==G){bondSeenFor=G;for(const id of Object.keys(bondTable()))if(seen[id]===undefined)seen[id]=bondLevel(id);return;}
-  for(const id of Object.keys(bondTable())){const lv=bondLevel(id);if(lv>(seen[id]||0)){const up=lv-(seen[id]||0);seen[id]=lv;toast(jo(bondTable()[id].name,'과','와')+' 정이 '+['','한','두','세'][up]+' 칸 깊어졌다 ('+lv+'/3)');}}
+  if(!bondPtsSeen.has(G))bondPtsSeen.set(G,{});const pts=bondPtsSeen.get(G);
+  if(bondSeenFor!==G){bondSeenFor=G;for(const id of Object.keys(bondTable())){if(seen[id]===undefined)seen[id]=bondLevel(id);if(pts[id]===undefined)pts[id]=bondPoints(id);}return;}
+  for(const id of Object.keys(bondTable())){const lv=bondLevel(id),p=bondPoints(id),name=jo(bondTable()[id].name,'과','와');
+    if(lv>(seen[id]||0)){const up=lv-(seen[id]||0);seen[id]=lv;pts[id]=p;toast(name+' 정이 '+['','한','두','세'][up]+' 칸 깊어졌다 ('+lv+'/3)');continue;}
+    if(p>(pts[id]||0)){pts[id]=p;if(lv<3)toast(name+' 정이 조금 쌓였다');}
+    else if(p<(pts[id]||0))pts[id]=p;}
 }
 /* 방금 대화한 인물: 같은 지역에서 bond_heard_ms 안에 말을 나눈 인물에게만 정표 장면을 잇는다.
    대화 끝에 지도로 떠나거나 싸움이 열려 오래 멈춘 뒤, 다른 마을에서 그 인물의 장면이 뜨지 않게 한다 */
