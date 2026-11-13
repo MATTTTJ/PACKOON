@@ -87,10 +87,12 @@ function bondDecorateTag(e,n,known){
   if(s)s.remove();e.appendChild(bondMarksEl(id));
 }
 /* 칸이 찬 순간 짧게 알린다 (같은 칸은 한 번). 게임을 시작하거나 불러온 때 이미 찬 칸은 조용히 맞춰 둔다.
-   결정 D-1467: 칸은 그대로여도 점수가 오르면 "정이 조금 쌓였다"를 알린다 (선물·이벤트 모두). 알린 점수는 bondPts 에 둔다 */
-let bondSeenFor=null;
+   결정 D-1467: 칸은 그대로여도 점수가 오르면 "정이 조금 쌓였다"를 알린다 (선물·이벤트 모두).
+   알린 점수는 저장하지 않는다 (진행값을 늘리지 않게 게임마다 메모리에만 둔다. 불러오면 조용히 다시 맞춘다) */
+let bondSeenFor=null;const bondPtsSeen=new WeakMap();
 function bondNotice(){
-  if(!G||!G.started)return;const seen=G.f.bondSeen||(G.f.bondSeen={}),pts=G.f.bondPts||(G.f.bondPts={});
+  if(!G||!G.started)return;const seen=G.f.bondSeen||(G.f.bondSeen={});
+  if(!bondPtsSeen.has(G))bondPtsSeen.set(G,{});const pts=bondPtsSeen.get(G);
   if(bondSeenFor!==G){bondSeenFor=G;for(const id of Object.keys(bondTable())){if(seen[id]===undefined)seen[id]=bondLevel(id);if(pts[id]===undefined)pts[id]=bondPoints(id);}return;}
   for(const id of Object.keys(bondTable())){const lv=bondLevel(id),p=bondPoints(id),name=jo(bondTable()[id].name,'과','와');
     if(lv>(seen[id]||0)){const up=lv-(seen[id]||0);seen[id]=lv;pts[id]=p;toast(name+' 정이 '+['','한','두','세'][up]+' 칸 깊어졌다 ('+lv+'/3)');continue;}
