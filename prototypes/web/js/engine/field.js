@@ -246,40 +246,71 @@ function slopeSlip(){
   if(!Vfx.reducedMotion&&(sliding?slipFrames%4===1:slipFrames%10===1))sparks.push({x:G.px-up*2,y:G.py-1,vx:down*(.4+Math.random()*.5),vy:-.5-Math.random()*.6,t:16,c:'#e8eef0'});   // 발밑에서 튀는 서리 부스러기
 }
 const slopeSlipping=()=>slipFrames>0;
-const EDGE_LOOK={   // 지역마다 끝을 막는 것: 단풍 덤불, 서리 앉은 바위, 눈 쌓인 바위
-  galchamgol:{kind:'bush',dark:'#4e3322',mid:'#86492a',light:'#c97a3c',top:'#e3a04e'},
-  dolneomeo:{kind:'rock',dark:'#465254',mid:'#6c7878',light:'#94a09c',top:'#e4ebe6'},
-  jangteo:{kind:'rock',dark:'#4c4a47',mid:'#706b64',light:'#958f85',top:'#f4f6f4'},
-  yeongsan:{kind:'rock',dark:'#2d3846',mid:'#46566a',light:'#64788c',top:'#eef4f8'},
+/* 결정 D-1483 (사용자 피드백 2026-11-14 "맵 끝단에 못 넘어가게 막는 건 맞는데, 너무 화려한 object로 하면 답답해. 맵마다 분위기에 맞게 부드러운 object"):
+   D-847 의 키 큰 덤불·바위 무더기를 주인공 허리께 높이의 낮은 것으로 바꾼다. 막는 너비(field_edge_margin)는 그대로라 주인공은 같은 자리에서 멈춘다.
+   단풍골은 낮은 단풍 덤불과 억새, 돌너머는 서리 앉은 낮은 돌담, 큰 장터는 눈 얹은 낮은 덤불, 영산은 둥근 눈더미.
+   끝자락에는 지역 빛깔의 옅은 안개가 끼어 길이 그쪽으로 흐려지는 것처럼 보인다. */
+const EDGE_LOOK={
+  galchamgol:{kind:'shrub',dark:'#6a3f24',mid:'#a0602f',light:'#c98a48',accent:'#e3a04e',grass:'#cdb07a',haze:[238,206,170]},
+  dolneomeo:{kind:'wall',dark:'#535e5f',mid:'#7d8888',light:'#a2adaa',top:'#e4ebe6',grass:'#b9b090',haze:[222,230,230]},
+  jangteo:{kind:'snowbush',dark:'#3d4b42',mid:'#58695c',light:'#748676',top:'#f4f6f4',grass:'#a8a58e',haze:[234,238,238]},
+  yeongsan:{kind:'drift',dark:'#8798aa',mid:'#bccad6',light:'#e4ecf2',top:'#f8fbfd',grass:'#9aa8b4',haze:[204,218,232]},
 };
-/* 끝 무더기 조각: [끝에서 안쪽으로 떨어진 거리, 땅에서 뜬 높이, 너비, 높이]. 큰 덩이가 바깥 끝에 붙고 위로 쌓인다 */
-const EDGE_PILE={
-  rock:[[0,0,27,25],[22,0,15,11],[3,23,21,17],[19,9,10,9],[7,38,14,12],[0,48,9,9]],
-  bush:[[0,0,30,30],[20,0,18,17],[2,26,24,20],[10,42,15,13],[24,13,10,10]],
-};
+/* 둥근 둔덕 한 덩이: 끝에서 from 만큼 안쪽부터 너비 w, 가장 높은 곳 h. 세로 1px 줄로 그려 위가 둥글다. 줄마다 높이를 돌려준다 */
+function edgeMound(side,sx,gy,from,w,h,look,seed,cap){
+  const hs=[];
+  for(let i=0;i<w;i++){
+    const t=(i+.5)/w*2-1,hh=Math.max(1,Math.round(h*Math.sqrt(Math.max(0,1-t*t))*(.94+hash(seed+Math.floor(i/4)*7)*.12)));
+    const x=side==='left'?sx+from+i:sx-from-1-i;hs.push([x,hh]);
+    R(x,gy-hh,1,hh,look.mid);
+    R(x,gy-Math.ceil(hh*.35),1,Math.ceil(hh*.35),look.dark);   // 밑동 그늘
+    R(x,gy-hh,1,cap||1,cap?look.top:look.light);                 // 윗면 (눈이면 두껍게)
+  }
+  return hs;
+}
+/* 풀잎 몇 가닥: 끝에서 from 안쪽, 높이 3~h */
+function edgeGrass(side,sx,gy,from,n,h,col,seed){
+  for(let k=0;k<n;k++){const d=from+Math.floor(hash(seed+k*13)*10),x=side==='left'?sx+d:sx-d-1,hh=3+Math.floor(hash(seed+k*31)*(h-2)),lean=hash(seed+k*5)>.5?1:-1;
+    R(x,gy-hh,1,hh,col);R(x+lean,gy-hh-1,1,2,col);}
+}
 function drawZoneEnds(){
   const z=zoneDef();if(!z)return;const look=EDGE_LOOK[REG.id]||EDGE_LOOK.dolneomeo,m=TABLES.TUNING.field_edge_margin;
   for(const side of ['left','right']){
     if(!deadEnd(z,side))continue;
     const wx=side==='left'?0:z.w,sx=Math.round(wx-cam);if(sx<-80||sx>W+80)continue;
-    const gy=Math.round(surfaceY(side==='left'?m:z.w-m));
-    EDGE_PILE[look.kind].forEach(([u,v,w,h],i)=>{
-      // 구역마다 조금씩 다른 크기 (고정 무늬라 볼 때마다 같다)
-      w+=Math.round(hash(wx+i*13)*4-2);h+=Math.round(hash(wx+i*29)*4-2);
-      const x=side==='left'?sx+u:sx-u-w,y=gy-v-h,inner=side==='left'?x+w-1:x;
-      if(look.kind==='bush'){
-        R(x+2,y,w-4,h,look.mid);R(x,y+2,w,h-3,look.mid);R(x+3,y-1,w-6,2,look.light);   // 둥근 덤불
-        for(let k=0;k<w*h/28;k++){const lx=x+1+Math.floor(hash(wx+i*7+k*3)*(w-3)),ly=y+1+Math.floor(hash(wx+i*5+k*11)*(h-3));R(lx,ly,2,1,hash(k+i)>.5?look.light:look.dark);}
-        if(hash(wx+i)>.3)R(x+Math.floor(w/2),y-2,2,2,look.top);
-        R(inner,y+3,1,h-4,look.dark);
-      }else{
-        R(x+1,y,w-2,h,look.mid);R(x,y+2,w,h-3,look.mid);   // 모서리가 둥근 바위
-        R(x+1,y,w-2,2,look.top);R(x+2,y+2,Math.max(2,w-8),1,look.light);   // 서리·눈 앉은 윗면
-        R(inner,y+2,1,h-3,look.dark);R(x+1,y+h-2,w-2,2,look.dark);   // 안쪽 그늘과 밑 그늘
-        if(w>14)R(x+Math.floor(w*.45),y+Math.floor(h*.5),Math.floor(w*.3),1,look.dark);   // 바위 결
-      }
-    });
-    R(side==='left'?sx:sx-m-8,gy,m+8,1,look.dark);   // 발치 그늘
+    const gy=Math.round(surfaceY(side==='left'?m:z.w-m)),seed=wx+(REG.id.length*101);
+    // 끝자락 안개: 끝에서 안쪽으로 갈수록 옅어진다
+    const c=ctx,[hr,hg,hb]=look.haze,hw=m+30,gx0=side==='left'?sx:sx-hw;
+    const grad=c.createLinearGradient(side==='left'?sx:sx,0,side==='left'?sx+hw:sx-hw,0);
+    grad.addColorStop(0,'rgba('+hr+','+hg+','+hb+',.36)');grad.addColorStop(1,'rgba('+hr+','+hg+','+hb+',0)');
+    c.save();c.fillStyle=grad;for(let k=0;k<12;k++){c.globalAlpha=1-k/12;c.fillRect(gx0,gy-(k+1)*10,hw,10);}c.restore();   // 위로 갈수록 옅다
+    if(look.kind==='wall'){
+      // 서리 앉은 낮은 돌담: 아래 줄이 길고 위로 갈수록 짧다. 돌마다 모서리가 둥글다
+      [[0,46,7],[0,30,6],[0,14,5]].forEach(([from,len,h],row)=>{
+        let u=from-(row%2?3:0);const y=gy-[7,13,18][row];
+        while(u<len){const w=Math.min(len-u,7+Math.floor(hash(seed+row*17+u)*6));if(w<3)break;
+          const x=side==='left'?sx+u:sx-u-w;
+          R(x+1,y,w-2,h,look.mid);R(x,y+1,w,h-2,look.mid);R(x+1,y,w-2,1,look.top);R(x+1,y+h-1,w-2,1,look.dark);
+          if(w>8)R(x+2,y+2,w-5,1,look.light);
+          u+=w+1;}
+      });
+      edgeGrass(side,sx,gy,40,5,7,look.grass,seed+3);
+    }else if(look.kind==='shrub'){
+      // 낮은 단풍 덤불 두 덩이와 억새 몇 가닥
+      const hs=edgeMound(side,sx,gy,-8,52,20,look,seed).concat(edgeMound(side,sx,gy,30,22,11,look,seed+50));
+      hs.forEach(([x,hh],i)=>{if(hh>4&&hash(seed+i*3)>.55)R(x,gy-hh+2+Math.floor(hash(seed+i*9)*(hh-4)),1,1,hash(seed+i)>.5?look.accent:look.light);});
+      edgeGrass(side,sx,gy,44,6,10,look.grass,seed+7);
+    }else if(look.kind==='snowbush'){
+      // 눈 얹은 낮은 덤불
+      const hs=edgeMound(side,sx,gy,-8,50,19,look,seed,2).concat(edgeMound(side,sx,gy,30,20,10,look,seed+50,2));
+      hs.forEach(([x,hh],i)=>{if(hh>6&&hash(seed+i*3)>.6)R(x,gy-hh+3+Math.floor(hash(seed+i*9)*(hh-6)),1,1,look.light);});
+      edgeGrass(side,sx,gy,44,4,7,look.grass,seed+7);
+    }else{
+      // 둥근 눈더미: 안쪽으로 낮아지는 두 덩이. 그늘은 아래쪽에만 옅게
+      const hs=edgeMound(side,sx,gy,-10,58,22,{dark:look.mid,mid:look.light,light:look.top},seed).concat(edgeMound(side,sx,gy,34,22,9,{dark:look.mid,mid:look.light,light:look.top},seed+50));
+      hs.forEach(([x,hh],i)=>{if(hh>5&&hash(seed+i*11)>.82)R(x,gy-hh+1,1,1,'#ffffff');});
+      edgeGrass(side,sx,gy,50,3,6,look.grass,seed+7);
+    }
   }
 }
 
@@ -733,7 +764,8 @@ function think(text,opts={}){
   heroThought.classList.remove('wait');if(discover)heroThought.querySelector('.mono-next').textContent=TOUCH?'눌러서 넘기기 ▸':'E · 넘기기 ▸';
   heroThought.querySelector('.text').textContent=t;
   const face=heroThought.querySelector('.face');face.innerHTML='';face.appendChild(portrait('너구리'));
-  thoughtT=Math.round((TABLES.TUNING.think_base_ms+TABLES.TUNING.think_char_ms*[...t].length)*60/1000);
+  thoughtT=Math.round((opts.ms??(TABLES.TUNING.think_base_ms+TABLES.TUNING.think_char_ms*[...t].length))*60/1000);
+  heroThought.classList.toggle('top',!!opts.top);   // 결정 D-1484: opts.top 이면 화면 위쪽에 띄워 발밑(채집 원·주인공)을 가리지 않는다
   thoughtAt=G?{x:G.px,region:G.region,zone:G.zone}:null;
   heroThought.classList.remove('pop');void heroThought.offsetWidth;heroThought.classList.add('pop');placeThought();
 }

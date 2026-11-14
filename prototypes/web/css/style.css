@@ -921,6 +921,11 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
 .monologue.pop{animation:mono-pop .22s ease-out}
 @keyframes mono-pop{from{opacity:0;transform:translate(-50%,-92%)}to{opacity:1;transform:translate(-50%,-100%)}}
 @media (prefers-reduced-motion:reduce){.monologue.pop{animation:none}}
+/* 결정 D-1484: 첫 채집 설명처럼 발밑을 가리면 안 되는 속말은 화면 위쪽(상태 줄 아래)에 뜬다 */
+.monologue.top{top:calc(var(--sty,0px) + 13%);transform:translate(-50%,0)}
+.monologue.top.pop{animation:mono-pop-top .22s ease-out}
+@keyframes mono-pop-top{from{opacity:0;transform:translate(-50%,-8%)}to{opacity:1;transform:translate(-50%,0)}}
+@media (prefers-reduced-motion:reduce){.monologue.top.pop{animation:none}}
 /* 결정 D-1411: 발견 속말에 시간이 멈춘 동안은 독백 창을 눌러 넘길 수 있고, 오른쪽 아래에 넘기는 법이 작게 뜬다 */
 .monologue .mono-next{display:none}
 .monologue.wait{pointer-events:auto;cursor:pointer}
@@ -929,6 +934,7 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
 @media (prefers-reduced-motion:reduce){.monologue.wait .mono-next{animation:none}}
 @media (pointer:coarse) and (orientation:portrait){
   .monologue{left:50%;top:calc(var(--pady,0px) + 12px);transform:translateX(-50%);width:calc(100% - 16px);animation:none!important}
+  .monologue.top{top:calc(var(--pady,0px) + 12px);transform:translateX(-50%)}   /* 결정 D-1484: 세로 화면은 원래도 그림 밖 빈자리라 그대로 */
   .monologue .text{font-size:14px}
 }
 
@@ -973,7 +979,12 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
 /* 결정 D-1403: 수첩 새 줄 표시. 새 줄이 있는 장 탭에 금빛 점, 새 쪽·항목에 작은 '새로' 표시 */
 #noteTabs button.has-new{position:relative}
 #noteTabs button.has-new::after{content:'';position:absolute;top:4px;right:1px;width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 1.5px #f8eed8}
-.new-mark{display:inline-block;margin-left:6px;font:700 10px/1.3 var(--ui);padding:1px 5px;border-radius:8px;background:var(--gold);color:var(--meok);vertical-align:middle;letter-spacing:.02em}
+/* 결정 D-1481: 새 줄 표시는 글자(새로) 대신 반짝이는 금빛 느낌표 */
+.new-mark{position:relative;display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:6px;font:900 11px/1 var(--ui);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 60%,#b9822a);color:var(--meok);vertical-align:middle;box-shadow:0 0 4px 1px rgba(255,214,110,.85);animation:newMarkGlow 1.6s ease-in-out infinite}
+.new-mark::after{content:'';position:absolute;width:5px;height:5px;top:-4px;right:-5px;background:#f0b52e;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:newMarkTwinkle 1.6s ease-in-out infinite}
+@keyframes newMarkGlow{0%,100%{box-shadow:0 0 3px 0 rgba(255,214,110,.6)}50%{box-shadow:0 0 8px 3px rgba(255,214,110,.95)}}
+@keyframes newMarkTwinkle{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.1)}}
+@media (prefers-reduced-motion:reduce){.new-mark,.new-mark::after{animation:none}}
 .note-card.is-new{position:relative;box-shadow:0 0 0 2px var(--gold)}
 .note-card.is-new>.new-mark{position:absolute;top:-8px;left:-6px;margin:0}
 .note-line.is-new{background:linear-gradient(transparent 60%,rgba(220,165,69,.35) 60%)}

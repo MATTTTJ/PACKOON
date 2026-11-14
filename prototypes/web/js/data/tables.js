@@ -5697,6 +5697,7 @@ const TABLES={
   "think_base_ms": 1800,
   "think_char_ms": 75,
   "think_far_px": 140,
+  "gather_hint_ms": 2600,
   "form_otter_speed": 0.95,
   "form_otter_slide_speed": 1.5,
   "battle_otter_speed": 3.1,
