@@ -986,7 +986,7 @@ body.prologue #titleScreen .cover-card p{font-size:clamp(12px,min(1.75vw,3.6vh),
 @keyframes newMarkTwinkle{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.1)}}
 @media (prefers-reduced-motion:reduce){.new-mark,.new-mark::after{animation:none}}
 .note-card.is-new{position:relative;box-shadow:0 0 0 2px var(--gold)}
-.note-card.is-new>.new-mark{position:absolute;top:-8px;left:-6px;margin:0}
+.note-card.is-new>.new-mark{position:absolute;top:-7px;right:-7px;margin:0}   /* 결정 D-1481: 왼쪽 위 꼬리표(아빠 등)와 겹치지 않게 오른쪽 위에 */
 .note-line.is-new{background:linear-gradient(transparent 60%,rgba(220,165,69,.35) 60%)}
 .entry.is-new,.recipe-card.is-new{box-shadow:inset 3px 0 0 var(--gold);padding-left:8px}
 .todo-item.is-new{box-shadow:inset 3px 0 0 var(--gold)}
