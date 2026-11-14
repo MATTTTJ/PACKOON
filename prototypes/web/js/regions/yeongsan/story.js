@@ -1301,10 +1301,12 @@ const examines={
   ],
   island:[
     examine('y_tree_rope',250,'섬 입구의 금줄 살펴보기','섬 입구에 느슨하게 걸린 금줄이 있다.\n눈 밑에서도 하얀 종이술 끝이 보인다.',Rg.pics.treeRope),
-    {...examine('y_tree_root',1100,'신목 뿌리 살펴보기','',Rg.pics.treeRoot),get text(){return G.f.spring?
+    /* 결정 D-1492 (사용자 피드백 2026-11-14 8: 빈 자리에 대화창·설명이 뜨지 않게): 뿌리 살펴보기(예전 1100)는 줄인 길(island 300~1500)에
+       들어가 금줄 바로 옆 빈 얼음 위로 밀려나 있었다. 신목 밑동(field.js TREE_X 2236) 곁으로 옮긴다. 가지 올려다보기도 가지 밑(2170)으로 당긴다. */
+    {...examine('y_tree_root',2240,'신목 뿌리 살펴보기','',Rg.pics.treeRoot),get text(){return G.f.spring?
       '뿌리 사이로 물이 졸졸 흐른다.\n산이 작게 말하는 소리 같다.':
       '얼음 밑으로도 뿌리가 뻗어 있다.\n이 나무는 겨울에도 호수를 붙들고 있었네.';}},
-    {...examine('y_tree_bud',2100,'신목 가지 올려다보기','',Rg.pics.treeBud),get text(){return G.f.spring?
+    {...examine('y_tree_bud',2170,'신목 가지 올려다보기','',Rg.pics.treeBud),get text(){return G.f.spring?
       '금줄 위 가지마다 연둣빛 새잎이 났다.\n느티나무야, 겨울에도 안 죽었구나.':
       '빈 가지 끝에 단단한 겨울눈이 있다.\n나뭇가지도 손을 꼭 쥐고 봄을 기다리네.';}}
   ]
