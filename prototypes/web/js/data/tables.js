@@ -8259,19 +8259,9 @@ const TABLES={
    "sfx": "cloth_flutter",
    "repeat": 1900
   },
-  "forest_mother": {
-   "sfx": "leaf_rustle",
-   "repeat": 2000
-  },
-  "hill_grass": {
-   "sfx": "leaf_rustle"
-  },
   "hill_cloth": {
    "sfx": "cloth_flutter",
    "repeat": 1900
-  },
-  "hill_fruit": {
-   "sfx": "leaf_rustle"
   },
   "hill_north": {
    "sfx": "wood_tap"

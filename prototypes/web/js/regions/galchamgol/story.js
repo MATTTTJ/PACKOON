@@ -452,7 +452,15 @@ function battleMusoe(){
     if(typeof grantTool==='function')grantTool('pickaxe');
     diary('test',res==='calm'?'무쇠 삼촌에게 먹을 것을 건네 마음을 풀었다. 아빠도 이렇게 했을까.':'무쇠 삼촌이 꿀밤으로 연장부터 빼앗고 덤볐다. 끝까지 피했더니, 마지막에 꿀밤을 한 대 쥐어박고는 됐다고 했다.');
     // 결정 D-528: '돌 만나면 그걸로 쳐라' 같은 쓸데없는 요령 대사는 뺐다 (사용자 피드백 2026-11-04)
+    /* 결정 D-1491 (사용자 피드백 2026-11-14 6): 한 대도 안 맞으면 숯(날을 더 세울 몫), 한 대라도 맞으면 무쇠의 새참 주먹밥.
+       아빠가 '조심성부터 보고 주라' 했으니(musoe2), 다 피한 아이에게는 날 선 연장을 맡겨도 된다고 본다. 맞은 아이에게는 그 까닭을 일러 준다. */
+    const reward=res==='calm'?[]:perfect?
+      [['무쇠','형이 조심성부터 보라 했지.\n이만하면 날 선 연장을 쥐여 줘도 되겠다.'],
+       ['무쇠','이 숯은 네 낫 날을 한 번 더 세울 몫이다.\n벼리러 올 때 같이 가져와라.'],receiveItem('coal',1)]:
+      [['무쇠','맞은 데가 얼얼할 게다.\n내 새참이다. 먹고 숨 돌려라.'],receiveItem('rice',1),
+       ['무쇠','한 대도 안 맞았으면 날 세울 숯까지 얹어 줬다.\n형이 조심성부터 보라 했거든.']];
     talk([['무쇠',res==='calm'?'…배부터 채웠으니 고집은 그만 부리마.\n먹을 걸 내밀 줄도 아는구나.':perfect?'허, 그 한 대 말고는 다 피했군.\n형 아들 맞다.':'끝까지 버티는 건 형을 닮았군.\n…그만하면 길에서 제 몸은 지키겠다.'],
+      ...reward,
       ['무쇠','연장은 도로 가져가라.\n이가 나갔으니 낫 벼릴 때 같이 세우마.']],musoeLeaf);
   }));
 }
@@ -904,9 +912,14 @@ if(!CLASSIC){
             ],()=>{G.f.mapUnlocked=true;think('지도를 펴면 젊은 까치 둘을 부를 수 있겠다.');});
         }))},{t:'바람이 잦아들면 도와드릴게요',go:null}]]]);
   }
-  function brothersTalk(){
+  function brothersTalk(atBench){
     G.f.galSquirrelSeen=true;   // 결정 D-129: 다람쥐를 봤다 (무쇠의 잎사귀 변신은 본 것만 된다)
     const sorted=G.f.galExpBrothersSorted;
+    /* 결정 D-1490 (사용자 피드백 2026-11-14 5): 나누기를 맡은 뒤에는 도토리 나누기가 오른쪽 낮은 평상(basketsTalk)에서만 이어진다.
+       형제에게 말을 걸면 평상으로 가라는 말만 한다. 바구니를 평상에 옮겨 두었으니 여기서는 나눌 것이 없다. */
+    if(G.f.galExpBrothersAsked&&atBench!==true){
+      talk([['다람쥐 형','바구니는 벌써 오른쪽 낮은 평상에 옮겨 놨어.\n거기서 나눠 줘!']]);return;
+    }
     if(G.f.galExpBrothersAsked&&sorted){
       // 결정 D-34: 고르게 나누기 / 형 편 / 동생 편. 덤만 다르고 붉은 옹이 길 안내는 같다 (design/data/decisions.csv)
       const side=G.f.galExpBrothersSide||'even';
@@ -934,9 +947,6 @@ if(!CLASSIC){
         diary('galExpBrothers',notes[side]);
         finishWanderer('squirrel_brothers');
       });return;
-    }
-    if(G.f.galExpBrothersAsked){
-      talk([['다람쥐 동생','우린 아직 큰 도토리를 서로 세고 있어.'],['다람쥐 형','오른쪽 낮은 평상에서 같이 나눠 주기로 했잖아!']],shareBaskets);return;
     }
     // 결정 D-529: 형제 대화의 말을 바로잡았다 (사용자 피드백 2026-11-04: "겨울 먹을 거야?" → "겨울에 먹을 거야?")
     talk([['다람쥐 형','내가 일곱 번을 오갔으니 큰 도토리는 내 몫이지.'],['다람쥐 동생','내가 낙엽을 걷어 찾았잖아!'],
@@ -981,9 +991,9 @@ if(!CLASSIC){
       '북쪽으로 간다고 하자 다람쥐 형제가 도토리를 하나씩 골라 주었다. 큰 것 하나, 작은 것 하나. 집에 돌아가면 엄마랑 나눠 먹을 것이다.');
   }
   function shareBaskets(){
-    if(!G.f.galExpBrothersAsked){brothersTalk();return;}
-    if(G.f.galExpBrothersSorted){brothersTalk();return;}
-    const pick=side=>{G.f.galExpBrothersSorted=true;G.f.galExpBrothersSide=side;brothersTalk();};
+    if(!G.f.galExpBrothersAsked){brothersTalk(true);return;}
+    if(G.f.galExpBrothersSorted){brothersTalk(true);return;}
+    const pick=side=>{G.f.galExpBrothersSorted=true;G.f.galExpBrothersSide=side;brothersTalk(true);};
     talk([['다람쥐 형','바구니 두 개 다 가져왔어.\n어떻게 나눌래?',[
       {t:'큰 것부터 번갈아 고르게 나눈다',go:()=>hands(()=>pick('even'))},
       {t:'형 편을 든다: "일곱 번 오갔으니 큰 건 형 몫이야"',go:()=>pick('hyung')},
@@ -1225,7 +1235,7 @@ if(!CLASSIC){
   // 평상 자리는 형제의 도토리 나누기만 맡는다 (굴대 들기는 물레방아와 함께 뺐다, D-730).
   function basketsTalk(){
     if(!G.f.galExpBrothersSorted){shareBaskets();return;}
-    if(!done('squirrel_brothers')){brothersTalk();return;}
+    if(!done('squirrel_brothers')){brothersTalk(true);return;}
     talk([['다람쥐 형','바구니는 이제 우리끼리 나눌 수 있어.'],['다람쥐 동생','겨울엔 한 바구니에서 먹을 거야!']]);
   }
   // 결정 D-624: 두꺼비 할멈의 반딧불 부탁을 뺐다 (사용자 피드백 2026-11-05 단풍골 8). 등롱·반딧불 자리·싸리버섯 답례(D-285)도 함께 뺐다.
@@ -1234,26 +1244,9 @@ if(!CLASSIC){
     return {id,x,label,...(y===undefined?{}:{y}),...(pic?{pic}:{}),get text(){return read();}};
   }
   /* 결정 D-989: 살펴보기 작은 창이 필드를 잘라 보이면 말과 맞지 않는 자리에 장면 그림을 단다 (사용자 피드백 2026-11-06 34, 엔진 PA-229의 pic).
-     누운 풀: 칡이 훑고 간 언덕 들머리 풀이 한쪽으로 다 누웠고, 끌린 자국이 언덕 위로 이어진다.
-     갈대 너머: 갈대 사이로 어미 꿩의 긴 꼬리와 머리가 비치고, 짧게 우는 입김이 오른다.
-     북쪽 길 팻말: 언덕 끝 갈림길 팻말. 오른쪽 위로 '돌너머' 길이 산 너머로 이어진다. */
+     북쪽 길 팻말: 언덕 끝 갈림길 팻말. 오른쪽 위로 '돌너머' 길이 산 너머로 이어진다.
+     (누운 풀·갈대 너머 그림은 그 살펴보기와 함께 뺐다, 결정 D-1492) */
   const examPic={
-    hillGrass:{animate:true,draw(w,h,t){
-      R(0,0,w,h,'#e3c6a4');R(0,30,w,14,'#9a6a42');R(0,30,w,1,'#7a5232');
-      for(let i=0;i<14;i++){const x=2+i*4.5,s=Math.round(Math.sin(t*1.4+i)*1);   // 오른쪽으로 누운 풀
-        R(x,28,1,3,'#9c8a4c');R(x+1,27+s,5,1,'#b7a35c');R(x+5,26+s,3,1,'#cdb874');}
-      for(let i=0;i<10;i++)R(6+i*5,33+(i%2),4,1,'#6b4a2c');   // 끌린 자국
-      R(40,18,22,3,'#5d5a33');R(54,14,8,4,'#5d5a33');R(43,17,4,1,'#2b2919');   // 언덕 위로 사라지는 칡 꼬리
-      R(47,12,3,2,'#4f8a35');R(58,10,3,3,'#5f9a3c');
-    }},
-    reedMother:{animate:true,draw(w,h,t){
-      R(0,0,w,h,'#dccbaa');R(0,36,w,8,'#7f8a62');
-      const bob=Math.round(Math.sin(t*2)*1);
-      R(22,24+bob,20,6,'#ae8a55');R(36,18+bob,6,7,'#a48353');R(41,21+bob,3,1,'#75573a');R(39,20+bob,1,1,'#362b21');   // 어미 꿩 머리와 몸
-      R(4,26+bob,20,2,'#8c6c45');R(2,25+bob,6,1,'#a17c4c');   // 긴 꼬리
-      if(Math.floor(t*1.5)%2)R(45,15,2,1,'#f4efe4');
-      for(let i=0;i<12;i++){const x=2+i*5,hh=14+(i*7)%9,s=Math.round(Math.sin(t*1.2+i*.7));R(x+s,36-hh,1,hh,'#9f955c');R(x-1+s,34-hh,3,4,'#c9bf8e');}   // 앞을 가린 갈대
-    }},
     northSign:{draw(w,h){
       R(0,0,w,h,'#e8c9a2');
       for(let x=0;x<w;x+=2){const y=Math.round(18-Math.sin(x*.09)*6);R(x,y,2,h-y,'#b88c74');}   // 먼 산
@@ -1284,19 +1277,19 @@ if(!CLASSIC){
         G.pickups.some(p=>p.id?.startsWith('gal_branch_acorn')&&!p.got)?
         '가지에 도토리가 달렸는데 너무 높다.\n지금은 올라가기 힘들겠어.':'저 가지는 너무 높다.\n지금은 올라가기 힘들겠어.'),{peek:false}),
       examine('forest_trail',1180,'나뭇가지에 걸린 금줄 보기',()=>G.tool==='sickle'?
-        '개울에서 보던 나무의 금줄이 여기까지 이어졌다.\n안쪽 덩굴을 걷고 금줄 길로 올라가자.':'개울에서 보던 당산나무다. 금줄이 숲 안으로 이어졌다.\n덩굴을 걷을 낫이 있으면 저곳까지 닿겠어.'),
-      examine('forest_mother',2020,'갈대 너머 소리 듣기',()=>G.f.galExpChickWith?
-        '갈대 뒤에서 꿩이 짧게 대답한다.\n꺼병이도 듣게 발소리를 낮추자.':'갈대가 흔들리더니 꿩 울음이 들렸다.\n작은 발자국이 왔던 쪽을 자꾸 부르네.',undefined,examPic.reedMother)],
+        '개울에서 보던 나무의 금줄이 여기까지 이어졌다.\n안쪽 덩굴을 걷고 금줄 길로 올라가자.':'개울에서 보던 당산나무다. 금줄이 숲 안으로 이어졌다.\n덩굴을 걷을 낫이 있으면 저곳까지 닿겠어.')],
+      /* 결정 D-1492 (사용자 피드백 2026-11-14 8: 빈 자리에 대화창·설명이 뜨지 않게): 그려진 것이 없는 자리의 살펴보기를 뺐다.
+         - '갈대 너머 소리 듣기'(숲): 갈대와 어미 꿩은 오른쪽 끝(art.js 2090)에 그려져 있는데 살펴보기는 그보다 훨씬 왼쪽 빈 길에 있었다.
+           어미의 대답은 꺼병이와 갈대에 닿을 때(galExpChickX) 그대로 들린다.
+         - '누운 풀 살펴보기'(언덕 들머리): 누운 풀을 그린 것이 없었다.
+         - '칡꽃 자리 올려다보기'(언덕): 당산나무 오른쪽 빈 하늘이었다. 해머루가 칡꽃 속에 있다는 것은 할멈과 칡 싸움에서 알게 된다. */
     hill:[
-      // 결정 D-411: 나무 속 나이테 대신, 칡이 훑고 지나간 들머리 풀
-      examine('hill_grass',225,'누운 풀 살펴보기',()=> '풀이 한쪽으로 다 누웠다.\n칡덩굴이 이 언덕을 훑고 지나갔구나.',undefined,examPic.hillGrass),
       examine('hill_cloth',810,'오래된 소원 천 보기',()=> '매듭은 낡았는데 천은 덜 바랬다.\n잎 그늘이 볕을 대신 맞아 줬나 봐.'),
-      // 결정 D-623: 해머루는 칡꽃 속에 맺힌다. 나무 꼭대기의 열매 꼭지 이야기를 칡꽃 자리로 바꿨다
-      examine('hill_fruit',2310-(Rg.hillShift||0),'칡꽃 자리 올려다보기',()=>G.boss.dead?
-        '칡이 풀린 자리에 시든 꽃대만 걸려 있다.\n나무가 한결 숨을 쉬는 것 같다.':'칡꽃 속에 보랏빛 알이 비친다. 해머루다.\n저 칡을 풀어 줘야 꺼낼 수 있겠다.'),
       // 결정 D-410: 북쪽 길은 당산나무 언덕 끝에서 시작한다 (예전엔 약방 끝 팻말). 집 쪽 일기 'start'의 "단풍골 끝에서 시작된다"와 같은 길.
-      examine('hill_north',1520,'북쪽 길 팻말 읽기',()=>G.f.galArcToad1||G.diary.some(d=>d.id==='end')?
-        '약은 집으로 갔다. 이 길은 북쪽으로 간다.\n다음엔 아빠한테도 집 이야기를 해 줘야지.':'돌너머로 가는 북쪽 길.\n먼저 할머니께 해머루를 드리자.',undefined,examPic.northSign)]
+      // 결정 D-1492: 팻말을 읽는 자리에 팻말이 그려져 있지 않았다. 갈림길 팻말과 같은 그림(art.js marker)을 세운다.
+      Object.assign(examine('hill_north',1520,'북쪽 길 팻말 읽기',()=>G.f.galArcToad1||G.diary.some(d=>d.id==='end')?
+        '약은 집으로 갔다. 이 길은 북쪽으로 간다.\n다음엔 아빠한테도 집 이야기를 해 줘야지.':'돌너머로 가는 북쪽 길.\n먼저 할머니께 해머루를 드리자.',undefined,examPic.northSign),
+        {draw:(x,y)=>Rg.expArt.marker(x,y)})]
   };
   // 집에서 묶은 보자기를 들고 대장간 거점으로 날아온다. 같은 id라 만남은 한 번만 센다.
   for(const [zone,list] of Object.entries(Rg.expWanderers))if(Rg.zones?.[zone]){
