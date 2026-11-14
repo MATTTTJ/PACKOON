@@ -4,7 +4,7 @@
    휘두르면 표식이 그 자리에서 멈추고, 멈춘 칸에 따라 캐는 몫이 다르다. 아무 데서 멈춰도 한 몫은 판다(벌 없음).
    아이템별 설정은 defineGather 로 지역이 넣는다: {title, hits:보통 타수, hint, spot:[dx,dy] 캐는 자리(흙먼지·글자), box?:[x0,y0,x1,y1] 그림 범위, rare?:보통 칸에서 한 번도 멈추지 않을 때 덤으로 나오는 상위 재료}
    수치는 minigames.csv 의 gather_* (한 바퀴 시간·칸 넓이·칸 자리·정확 힘·수량). 처음 캐면 남는 일기는 지역의 gatherDiary:[id, 글] */
-const gatherCue={d:null,start:0,zone:.5,zones:[.5],hitZone:.5,grade:null,stop:null,pops:[],dirt:[]};
+const gatherCue={d:null,start:0,zone:.5,zones:[.5],hitZone:.5,grade:null,stop:null,pops:[],dirt:[],waves:[],glints:[]};
 /* 결정 D-500: 채집은 데드 바이 데이라이트의 발전기 점검처럼 원을 도는 표식을 멈추는 방식이다 (사용자 피드백 2026-11-04).
    금빛 칸(perfect)은 원 둘레의 gather_perfect_zone %(5%), 그 양옆 옅은 칸(good)은 한쪽에 gather_good_zone %, 나머지는 보통.
    정확: 두 몫 + 한 개 더. 근접: 한 몫, 덤 자격은 지킨다. 보통: 한 몫, 덤 자격을 잃는다.
@@ -65,13 +65,19 @@ function gatherHit(d){
   G.f.gatherHinted[gatherKey(d)]=true;
   /* 결정 D-1100: 그 한 번은 1스테이지 단풍골의 첫 채집뿐이다 (사용자 피드백 2026-11-07 "게임 시작 시, 1스테이지에서 처음 채집할 때만 튜토리얼처럼").
      D-922 이전 저장(이 표시가 없던 저장, 이미 캔 자리가 있음)을 이어 하거나 뒤 지역에서 시작해 뒤 지역에서 처음 캐면 설명 없이 표시만 남긴다. */
-  if(!G.f.gatherRuleSaid){G.f.gatherRuleSaid=true;if(firstEver&&G.region==='galchamgol')think(cfg.hint+' 도는 바늘이 금빛 칸에 닿을 때 치면 더 나오겠다.',{light:true});}
+  if(!G.f.gatherRuleSaid){G.f.gatherRuleSaid=true;if(firstEver&&G.region==='galchamgol')think(cfg.hint+' 도는 바늘이 금빛 칸에 닿을 때 치면 더 나오겠다.',{light:true,top:true,ms:TABLES.TUNING.gather_hint_ms});}
+  /* 결정 D-1484 (사용자 피드백 2026-11-14 "처음 채집 설명할 때 나오는 시간이 너무 길어서 두 번째 채집 모션이 가려져"): 그 설명은 화면 아래 대신
+     위쪽에 띄워 채집 원과 주인공을 가리지 않고, 글자 수와 상관없이 gather_hint_ms 동안만 뜬다 */
   d.prog=(d.prog||0)+(just?MG.gather_perfect_power:1);if(just)d.perfects=(d.perfects||0)+1;
   // 결정 D-482: 채집 자리마다 칠 때 소리를 따로 줄 수 있다(cfg.hitSound). 눈 둔덕은 쇠 날이 언 눈을 때리는 '팡'
   if(cfg.hitSound)Sound.hit(cfg.hitSound);else Sound.gather(true);
   const sp=gatherSpot(d),y=sp.y-4;
   Vfx.scatter(d.x,y+6,'scatter' in cfg?cfg.scatter:d.item,just);   // 캐는 물건에 따라 흙먼지 또는 잎 (눈 둔덕은 흙먼지 자리에 눈가루)
   if(grade){const g=gatherRing(d),a=-Math.PI/2+gatherCue.hitZone*Math.PI*2;gatherCue.pops.push({x:g.x+Math.cos(a)*g.r,y:g.y+Math.sin(a)*g.r,t:16,just});}   // 멈춘 칸이 반짝인다. 글자는 없다 (D-500)
+  /* 결정 D-1482 (사용자 피드백 2026-11-14 "채집 시 황금색 맞췄을 때와 아닐 때 이펙트에 차이를"): 금빛 칸을 맞추면 원 둘레에서 금빛 고리가 퍼지고,
+     캐는 자리에서 네 갈래 반짝이가 솟는다. 금빛이 아닐 때(옅은 칸·보통)는 흙먼지와 먹 번짐만 남는다 */
+  if(just){const g=gatherRing(d);gatherCue.waves.push({x:g.x,y:g.y,r:g.r,t:22});
+    for(let i=0;i<5;i++)gatherCue.glints.push({x:sp.x+(i-2)*4+(Math.random()-.5)*3,y:y+2-Math.random()*4,vy:-.5-Math.random()*.6,t:30+i*4,big:i%2===0});}
   for(let i=0;i<(just?9:4);i++)gatherCue.dirt.push({x:d.x,y:y+6,vx:(Math.random()-.5)*(just?2.6:1.6),vy:-Math.random()*(just?2.4:1.5),t:22,c:just?'#fff3b0':cfg.dirt||'#8b5a2b'});
   // 결정 D-482: 눈 둔덕은 칠 때마다 눈이 사방으로 흩어지고(굵은 눈덩이 섞임), 화면이 살짝 흔들린다. 날이 닿은 자리에 하얀 번쩍임 한 번
   if(cfg.burst==='snow'){const T=TABLES.TUNING,n=just?T.snow_burst_count_just:T.snow_burst_count;
@@ -206,4 +212,15 @@ function drawGatherCue(){
     // 결정 D-815: 정확 칸에 맞으면 금빛이, 근접이면 먹이 둘레로 번진다 (바깥으로 갈수록 성기다)
     for(let j=0;j<n;j++){const a=j/n*Math.PI*2+(j%2)*.3,dd=k*(.35+(j%3)*.12);R(x+Math.round(Math.cos(a)*dd),y+Math.round(Math.sin(a)*dd),k<8?2:1,k<8?2:1,j%3?col:'rgba(246,238,216,.8)');}
   }
+  // 결정 D-1482: 금빛 칸을 맞췄을 때만 퍼지는 금빛 고리와 솟는 반짝이
+  for(let i=gatherCue.waves.length-1;i>=0;i--){const w=gatherCue.waves[i];
+    if(!paused())w.t--;if(w.t<=0){gatherCue.waves.splice(i,1);continue;}if(Vfx.reducedMotion)continue;
+    const k=22-w.t,c=ctx,wx=Math.round(w.x-cam)+.5,wy=Math.round(w.y)+.5;c.save();
+    c.globalAlpha=w.t/22;c.lineWidth=k<8?3:2;c.strokeStyle='#ffd23a';c.beginPath();c.arc(wx,wy,w.r+2+k*1.2,0,Math.PI*2);c.stroke();
+    c.globalAlpha=w.t/30;c.lineWidth=1;c.strokeStyle='#fff7c8';c.beginPath();c.arc(wx,wy,w.r+k*.8,0,Math.PI*2);c.stroke();c.restore();}
+  for(let i=gatherCue.glints.length-1;i>=0;i--){const p=gatherCue.glints[i];
+    if(!paused()){p.y+=p.vy;p.t--;}if(p.t<=0){gatherCue.glints.splice(i,1);continue;}if(Vfx.reducedMotion)continue;
+    const x=Math.round(p.x-cam),y=Math.round(p.y),arm=p.big&&(p.t>>2)%2?3:2;
+    if(arm>2)R(x-1,y-1,3,3,'rgba(255,240,170,.55)');
+    R(x-arm,y,arm*2+1,1,'#ffc21a');R(x,y-arm,1,arm*2+1,'#ffc21a');R(x,y,1,1,p.t>6?'#fffbe0':'#ffd23a');}
 }

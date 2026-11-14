@@ -205,7 +205,7 @@ $('noteClose').onclick=closePanels;
 
 /* 결정 D-1403 (사용자 피드백 2026-11-09): 새로 적힌 장과 줄을 알려 준다.
    - 아직 펼쳐 보지 않은 새 줄이 있으면 수첩 단추에 금빛 점이 뜬다(예전엔 새 이름만).
-   - 수첩을 열면 새 줄이 있는 장 탭에 금빛 점, 그 장의 새 줄(쪽·항목) 옆에 작은 '새로' 표시가 붙는다.
+   - 수첩을 열면 새 줄이 있는 장 탭에 금빛 점, 그 장의 새 줄(쪽·항목) 옆에 반짝이는 금빛 느낌표가 붙는다(D-1481로 '새로' 글자를 바꿈).
    - 그 장을 한 번 펼쳐 보면 본 것으로 친다. 수첩을 열어 둔 채로는 표시가 남고, 다음에 열 때 사라진다.
    본 줄은 G.f.noteRead 에 남는다. 이 기록이 없는 저장(옛 저장·새 게임 첫 순간)은 지금 있는 줄을 모두 본 것으로 친다. */
 function notePageKeys(e,section){
@@ -244,9 +244,11 @@ function noteTakeNew(tab){
   if(noteNewTab!==tab){noteNewTab=tab;noteNewNow=new Set();}
   const r=noteReadMap();for(const k of noteKeysOf(tab))if(!r[k]){noteNewNow.add(k);r[k]=1;}
 }
+/* 결정 D-1481 (사용자 피드백 2026-11-14 "새로라고 써져 있는 거 어색해. 빛나는 느낌표 같은 기호로"): 글자 대신 반짝이는 금빛 느낌표 */
+function newMark(){const m=el('span','new-mark','!');m.title='새로 적은 줄';m.setAttribute('aria-label','새로 적은 줄');return m;}
 function markNew(node,key){
   if(!node||!noteNewNow.has(key))return false;
-  node.classList.add('is-new');const m=el('span','new-mark','새로');m.title='새로 적은 줄';node.appendChild(m);return true;
+  node.classList.add('is-new');node.appendChild(newMark());return true;
 }
 
 /* 결정 D-1406 (사용자 지시 2026-11-09): 숨은 가공법 장은 말글 대신 조합법으로 적는다. 예: 싸리버섯 + 꾀꼬리버섯 + 깨소금 → 버섯찜.
@@ -353,7 +355,7 @@ function notePage(e,section){
   // 결정 D-1264: 본 회상 장면은 그 인물 쪽에서 다시 본다 (engine/cine.js Cine.addReplay)
   const rp=section==='관찰'&&typeof Cine!=='undefined'?Cine.replayFor(e.id):null;
   if(rp){const b=el('button','note-replay',rp.label);b.type='button';b.onclick=ev=>{ev.stopPropagation();closePanels();rp.play();};card.appendChild(b);}
-  if(fresh){card.classList.add('is-new');const m=el('span','new-mark','새로');m.title='새로 적은 줄';card.appendChild(m);}
+  if(fresh){card.classList.add('is-new');card.appendChild(newMark());}
   return card;
 }
 // 결정 D-81: 도장 전체 수는 수첩 데이터에서 센다(도장 쪽의 stamp: 키). 지역별로도 센다.
