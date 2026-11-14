@@ -248,11 +248,11 @@ function slopeSlip(){
 const slopeSlipping=()=>slipFrames>0;
 /* 결정 D-1483 (사용자 피드백 2026-11-14 "맵 끝단에 못 넘어가게 막는 건 맞는데, 너무 화려한 object로 하면 답답해. 맵마다 분위기에 맞게 부드러운 object"):
    D-847 의 키 큰 덤불·바위 무더기를 주인공 허리께 높이의 낮은 것으로 바꾼다. 막는 너비(field_edge_margin)는 그대로라 주인공은 같은 자리에서 멈춘다.
-   단풍골은 낮은 단풍 덤불과 억새, 돌너머는 서리 앉은 낮은 돌담, 큰 장터는 눈 얹은 낮은 덤불, 영산은 둥근 눈더미.
+   단풍골은 낮은 단풍 덤불과 억새, 돌너머는 서리 앉은 낮은 흙둔덕과 둥근 돌·억새(D-1501, 예전 낮은 돌담), 큰 장터는 눈 얹은 낮은 덤불, 영산은 둥근 눈더미.
    끝자락에는 지역 빛깔의 옅은 안개가 끼어 길이 그쪽으로 흐려지는 것처럼 보인다. */
 const EDGE_LOOK={
   galchamgol:{kind:'shrub',dark:'#6a3f24',mid:'#a0602f',light:'#c98a48',accent:'#e3a04e',grass:'#cdb07a',haze:[238,206,170]},
-  dolneomeo:{kind:'wall',dark:'#535e5f',mid:'#7d8888',light:'#a2adaa',top:'#e4ebe6',grass:'#b9b090',haze:[222,230,230]},
+  dolneomeo:{kind:'frost',dark:'#6c6a5c',mid:'#8e8a76',light:'#a8a48e',top:'#e4ebe6',stone:'#7d8888',stoneDark:'#5d6869',stoneLight:'#a2adaa',grass:'#a89a72',plume:'#e2dcc6',haze:[222,230,230]},   // 결정 D-1501
   jangteo:{kind:'snowbush',dark:'#3d4b42',mid:'#58695c',light:'#748676',top:'#f4f6f4',grass:'#a8a58e',haze:[234,238,238]},
   yeongsan:{kind:'drift',dark:'#8798aa',mid:'#bccad6',light:'#e4ecf2',top:'#f8fbfd',grass:'#9aa8b4',haze:[204,218,232]},
 };
@@ -284,17 +284,14 @@ function drawZoneEnds(){
     const grad=c.createLinearGradient(side==='left'?sx:sx,0,side==='left'?sx+hw:sx-hw,0);
     grad.addColorStop(0,'rgba('+hr+','+hg+','+hb+',.36)');grad.addColorStop(1,'rgba('+hr+','+hg+','+hb+',0)');
     c.save();c.fillStyle=grad;for(let k=0;k<12;k++){c.globalAlpha=1-k/12;c.fillRect(gx0,gy-(k+1)*10,hw,10);}c.restore();   // 위로 갈수록 옅다
-    if(look.kind==='wall'){
-      // 서리 앉은 낮은 돌담: 아래 줄이 길고 위로 갈수록 짧다. 돌마다 모서리가 둥글다
-      [[0,46,7],[0,30,6],[0,14,5]].forEach(([from,len,h],row)=>{
-        let u=from-(row%2?3:0);const y=gy-[7,13,18][row];
-        while(u<len){const w=Math.min(len-u,7+Math.floor(hash(seed+row*17+u)*6));if(w<3)break;
-          const x=side==='left'?sx+u:sx-u-w;
-          R(x+1,y,w-2,h,look.mid);R(x,y+1,w,h-2,look.mid);R(x+1,y,w-2,1,look.top);R(x+1,y+h-1,w-2,1,look.dark);
-          if(w>8)R(x+2,y+2,w-5,1,look.light);
-          u+=w+1;}
-      });
-      edgeGrass(side,sx,gy,40,5,7,look.grass,seed+3);
+    if(look.kind==='frost'){
+      // 결정 D-1501 (사용자 피드백 2026-11-14 '돌너머 시작 지점 왼쪽 막힌 곳 그림이 어색하다'): 계단처럼 쌓인 돌담(D-1483) 대신
+      //   서리 앉은 낮은 흙둔덕 하나와 그 발치의 둥근 돌 하나, 마른 억새 몇 가닥. 마을 길섶의 돌·억새와 같은 빛이다.
+      edgeMound(side,sx,gy,-8,54,16,look,seed,2);
+      const rock=(from,w,h,sd)=>edgeMound(side,sx,gy,from,w,h,{dark:look.stoneDark,mid:look.stone,light:look.stoneLight},sd);
+      rock(40,14,7,seed+21);
+      for(let k=0;k<6;k++){const d=6+Math.floor(hash(seed+k*13)*38),x=side==='left'?sx+d:sx-d-1,hh=9+Math.floor(hash(seed+k*31)*8),lean=hash(seed+k*5)>.5?1:-1;
+        R(x,gy-hh,1,hh,look.grass);R(x+lean,gy-hh-2,1,3,look.plume);}   // 억새 이삭
     }else if(look.kind==='shrub'){
       // 낮은 단풍 덤불 두 덩이와 억새 몇 가닥
       const hs=edgeMound(side,sx,gy,-8,52,20,look,seed).concat(edgeMound(side,sx,gy,30,22,11,look,seed+50));

@@ -184,7 +184,7 @@ const TABLES={
    "d": "돌 골렘의 눈이던 둥근 돌. 이끼가 눈썹처럼 붙어 있다."
   },
   "story_stone": {
-   "n": "사연 있는 돌",
+   "n": "아빠의 소원 돌",
    "r": 3,
    "kind": "귀한 것",
    "region": "dolneomeo",
