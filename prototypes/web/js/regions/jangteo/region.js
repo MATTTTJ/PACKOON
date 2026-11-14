@@ -10,13 +10,13 @@ const Rg=defineRegion('jangteo',{
   clueTotal:3,
   cover:{
     tag:'큰 장터 체험판',sub:'설 대목, 붉은 등불의 장터',ready:'큰 장터로 들어갈 준비',go:'큰 장터로',
+    // 결정 D-1504: 시작 글을 절반쯤으로 줄였다. 도착·보이지 않는 도둑·숙소 장부만 남긴다 (사용자 피드백 2026-11-14 큰 장터 1)
     title:{kicker:'셋째 마을',head:'큰 장터',start:'큰 장터로 들어가기',body:[
-      '돌산을 넘고도 고개를 여럿 더 넘었다. 첫눈은 고갯길에서 맞았다. 눈 덮인 길 끝에 붉은 등불이 줄지어 걸린 큰 장터가 나왔다. 설을 앞둔 대목이라 장꾼과 길손이 북적인다.',
+      '고개를 여럿 넘어 첫눈 속에 큰 장터에 닿았다. 설 대목이라 붉은 등불 아래 장꾼과 길손이 북적인다.',
       // 결정 D-775: 사람들 얼굴이 어두운 까닭에 보이지 않는 도둑의 낌새를 넣는다 (사용자 피드백 2026-11-05). 보스는 몸을 감추고 창고를 터는 눈도깨비다. 결정 D-860: 모습만 안 보일 뿐 발자국은 남는다 (사용자 피드백 2026-11-06). 큰 발자국은 찍히는데 본 사람이 없어서 '보이지 않는 도둑'이다.
-      '그런데 장터 사람들 얼굴이 어둡다. 밤마다 물건이 없어진단다. 창고 문은 잠긴 그대로이고 문 앞 눈밭엔 큰 발자국이 찍혀 있는데, 그 발 임자를 본 사람이 없다. 장꾼들은 눈에 안 보이는 무언가의 짓이라고 수군거린다.',
+      '그런데 밤마다 장터 물건이 없어진단다. 창고 문은 잠긴 그대로이고 눈밭엔 큰 발자국만 남는데, 그 발 임자를 본 사람이 없다.',
       // 결정 D-1439: 눈홍시 줄을 빼고, 돌너머에서 들은 상단 소문을 큰 장터에 온 까닭으로 둔다 (사용자 지시 2026-11-11 큰 장터 7)
-      '돌너머에서 들은 소문으로는, 이 장터 보부상 상단 숙소엔 오가는 보부상이 장부에 다 적힌다고 한다.',
-      '보부상은 장터에 오면 숙소부터 들른다. 북쪽으로 서둘러 떠난 아빠도 여기 묵었을까.']},
+      '보부상은 장터에 오면 숙소부터 들른다. 돌너머에서 들은 대로라면 상단 숙소 장부에 아빠 이름도 적혀 있겠지.']},
     // 결정 D-1440: 끝은 상단 행렬을 따라 북쪽으로 떠나는 것이다 (예전: 홍시 약떡을 까치 편에 보냄). 결정 D-1438: 메모 끝줄 "이름 불러도 돌아보지 말 것"을 뺐다
     get end(){return {kicker:'큰 장터 체험판 완료',head:'북쪽 영산으로',body:CLASSIC?[
       '창고를 털던 눈도깨비를 잡았다. 부엉 영감님이 창고 지킨 셈을 치르고, 북쪽 영산 가는 길을 일러 주셨다.',
@@ -478,10 +478,12 @@ Rg.expEncounters={
       // 결정 D-321: 연 꼬리는 그 자리 그림 대신 연 장면 그림을 띄운다 (걸림 → 너구리 손이 풀면 줄에 끌려 내려감)
       // 결정 D-780: 푸는 그림에 맞춰 글도 고쳤다. 짧은 손이 못에 감긴 꼬리를 한 바퀴씩 풀고, 꼬리가 빠지면 연이 내려간다
       // 결정 D-1435: 연 꼬리 풀기는 꼬리가 감긴 처마 못(설계 1223, 높이 98, art.js kiteScene) 바로 아래에 뜬다 (사용자 피드백 2026-11-11 큰 장터 1). 낮은 처마 오른쪽 끝(130)과 지붕 왼쪽 끝(96) 어디서든 닿는다
-      {id:'j_kite_tail',x:1220,y:112,label:'연 꼬리 풀기',peek:false,get text(){
+      // 결정 D-1505: 이름은 '연 꼬리 확인하기'. 푼 뒤에 다시 살피면 푸는 글을 되풀이하지 않고 남은 종이 부스러기만 본다 (사용자 피드백 2026-11-14 큰 장터 2)
+      {id:'j_kite_tail',x:1220,y:112,label:'연 꼬리 확인하기',peek:false,get text(){
         if(!G.f.jxKiteStarted){if(typeof peekPicture==='function')peekPicture(Rg.kitePics.stuck().draw,{animate:true,sound:'pic_kite'});
           return '방패연 꼬리가 처마 못에 두 바퀴 감겼다.\n아래 아이에게 줄을 느슨하게 잡아 달라고 하자.';}
-        if(!G.f.jxKiteFreed&&typeof peekPicture==='function')peekPicture(Rg.kitePics.free().draw,{animate:true,sound:'pic_kite'});
+        if(G.f.jxKiteFreed)return '처마 못에 연 종이 부스러기가 걸려 있다.\n꼬리는 벌써 풀어서 연은 내려갔다.';
+        if(typeof peekPicture==='function')peekPicture(Rg.kitePics.free().draw,{animate:true,sound:'pic_kite'});
         G.f.jxKiteFreed=true;return ['못에 감긴 꼬리를 한 바퀴, 두 바퀴 풀었다.\n꼬리가 빠지자 연이 얼레 쪽으로 흔들흔들 내려간다.',
           '처마 못에 연 종이 부스러기가 걸려 있다.\n여기에 모서리가 찢겼구나.'];
       }},
@@ -507,7 +509,8 @@ Rg.expEncounters={
       // 결정 D-972: 독 소리는 은은하게 공기 중으로 퍼진다 (design/data/music/sfx.json onggi_ring)
       // 결정 D-784: 작은 창에서 아이 손끝이 독을 퉁기고, 닿는 순간 맑은 울림이 둘레로 번진다 (art.js onggiPic, 소리 onggi_ring)
       {id:'j_onggi',x:575,label:'옹기전 독',peek:false,get text(){
-        if(typeof peekPicture==='function'&&Rg.onggiPic)peekPicture(Rg.onggiPic().draw,{animate:true});
+        // 결정 D-1506: 독을 퉁기는 창이 떠 있는 동안 배경음을 아주 낮게 깔아 독 울림이 주가 되게 한다 (사용자 피드백 2026-11-14 큰 장터 3, tuning music_duck_onggi)
+        if(typeof peekPicture==='function'&&Rg.onggiPic)peekPicture(Rg.onggiPic().draw,{animate:true,duck:TABLES.TUNING.music_duck_onggi});
         return ['독을 손끝으로 퉁기니 맑게 운다.\n울림이 좌판 끝까지 퍼져 나간다.','금 간 독은 둔하게 운다고 한다.\n그래서 장꾼이 하나씩 퉁겨 보고 판다.'];}},
       // 결정 D-785: 발판은 떡집 아궁이 앞(1446~1500)에 깔렸다. 작은 창은 글 그대로 쌀가루 앉은 발판과 이미 찍힌 큰 곰 발자국 (art.js flourPic). D-862: 발이 내려와 찍는 움직임은 뺐다
       {id:'j_steam_flour',x:1478,label:'쌀가루 묻은 발판',peek:false,get text(){
