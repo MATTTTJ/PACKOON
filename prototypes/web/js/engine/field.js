@@ -1224,6 +1224,8 @@ const peekBox=el('div','peek');peekBox.hidden=true;peekBox.setAttribute('aria-hi
 const peekCv=document.createElement('canvas');peekCv.width=64*3;peekCv.height=44*3;peekBox.appendChild(peekCv);
 $('stage').appendChild(peekBox);
 let peekTimer=0,peekHeld=false,peekPaint=0;
+// 결정 D-1506: 작은 창이 떠 있는 동안 배경음에 곱할 값(0이면 낮추지 않는다). game.js 음악이 읽는다
+let peekDuck=0;
 /* 결정 D-261: 작은 창 속 그림은 굳어 있지 않다(사용자 피드백 2026-11-02: 장승 풍경 들어 보기 창이 너무 경직돼 있다).
    떠 있는 동안 그림을 다시 그리고, 대화로 필드 시간(G.anim)이 멈춰 있어도 창 안에서는 연 뒤 흐른 시간만큼 G.anim을 잠깐 앞당겨 그린다.
    그래서 풍경·물·나뭇잎·인물의 숨쉬기가 창 안에서 움직인다. 동작 줄이기면 한 장만 그린다. */
@@ -1284,7 +1286,7 @@ function showPeek(opts={}){
   peekBox.style.setProperty('--peek-open',TABLES.TUNING.peek_open_ms+'ms');peekBox.style.setProperty('--peek-fold',TABLES.TUNING.peek_fade_ms+'ms');
   peekBox.hidden=false;placePeek();requestAnimationFrame(placePeek);peekBox.classList.remove('show');void peekBox.offsetWidth;peekBox.classList.add('show');
   // 결정 D-56: 화면 가운데에 작게, 짧게. 끝에서 흐려지며 사라진다.
-  peekBox.classList.remove('out');clearTimeout(peekTimer);
+  peekBox.classList.remove('out');clearTimeout(peekTimer);peekDuck=opts.duck||0;
   peekHeld=!!opts.hold;if(peekHeld)return;
   const ms=opts.ms||TABLES.TUNING.peek_ms,fade=TABLES.TUNING.peek_fade_ms;
   peekTimer=setTimeout(()=>{peekBox.classList.add('out');peekTimer=setTimeout(hidePeek,fade);},Math.max(0,ms-fade));
@@ -1292,7 +1294,7 @@ function showPeek(opts={}){
 /* 결정 D-151: 대화창이 닫히면(또는 장면 그림을 끄는 줄이 오면) 붙들어 둔 그림을 흐리며 닫는다. 시간으로 닫히는 그림은 그대로 둔다. */
 function peekRelease(){
   if(!peekHeld||peekBox.hidden)return;
-  peekHeld=false;peekPaint++;clearTimeout(peekTimer);peekBox.classList.add('out');peekTimer=setTimeout(hidePeek,TABLES.TUNING.peek_fade_ms);
+  peekHeld=false;peekPaint++;peekDuck=0;clearTimeout(peekTimer);peekBox.classList.add('out');peekTimer=setTimeout(hidePeek,TABLES.TUNING.peek_fade_ms);
 }
 /* 무대 정중앙. 대화창과 겹칠 때만 대화창 바로 위로 올린다 */
 function placePeek(){
@@ -1305,7 +1307,7 @@ function placePeek(){
   }
   peekBox.style.top=Math.round(top)+'px';
 }
-function hidePeek(){clearTimeout(peekTimer);peekHeld=false;peekBox.hidden=true;peekBox.classList.remove('show','out');}
+function hidePeek(){clearTimeout(peekTimer);peekHeld=false;peekDuck=0;peekBox.hidden=true;peekBox.classList.remove('show','out');}
 const vistaCaption=el('div',null);
 vistaCaption.setAttribute('role','status');vistaCaption.hidden=true;
 vistaCaption.className='vista-caption';

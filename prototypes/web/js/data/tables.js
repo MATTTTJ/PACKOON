@@ -5670,6 +5670,8 @@ const TABLES={
   "music_duck": 0.5,
   "music_duck_in_s": 0.8,
   "music_duck_out_s": 1.6,
+  "music_duck_onggi": 0.12,
+  "music_duck_peek_in_s": 0.3,
   "music_dialog_hold_ms": 600,
   "music_fade_return": 2,
   "music_story_min_ms": 8000,

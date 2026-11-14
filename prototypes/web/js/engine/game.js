@@ -91,8 +91,11 @@ const GameMusic=(()=>{
     // 결정 D-1401: 회상 장면(engine/cine.js)은 낮추지 않는다 (D-1260의 '대화처럼 낮춘다'를 바꿨다)
     // 결정 D-1412: 인물과 이야기하거나(대화·교환 창) 사물을 살필 때 BGM 을 절반으로 천천히 낮추고, 끝나면 더 천천히 되돌린다
     //   (사용자 피드백 2026-11-09: "npc와 대화 또는 사물과 상호작용 할때는 배경 음악 반 정도로 소리 줄이기 뭉근하게"). 곡은 그대로다(D-1401)
-    const factor=open('dlg')||open('trade')||dlgHeld()||vistaMode||brewing||!!craftHands?TABLES.TUNING.music_duck:1;
-    if(factor!==duck){player.setDucking(factor,factor<duck?TABLES.TUNING.music_duck_in_s:TABLES.TUNING.music_duck_out_s);duck=factor;}
+    // 결정 D-1506: 옹기전 독처럼 소리가 주인 작은 창이 떠 있으면 배경음을 그 값까지 빨리 낮춘다 (field.js peekDuck)
+    const base=open('dlg')||open('trade')||dlgHeld()||vistaMode||brewing||!!craftHands?TABLES.TUNING.music_duck:1;
+    const peekLow=typeof peekDuck==='number'&&peekDuck>0&&!peekBox.hidden?peekDuck:0;
+    const factor=peekLow?Math.min(base,peekLow):base;
+    if(factor!==duck){player.setDucking(factor,factor<duck?(peekLow?TABLES.TUNING.music_duck_peek_in_s:TABLES.TUNING.music_duck_in_s):TABLES.TUNING.music_duck_out_s);duck=factor;}
     const travelling=player.getState().travel;
     // 도착 대화·패널·경치는 길 위 간주를 지우지 않는다. 전투와 장단은 먼저 들려주고 끝난 뒤 한 번 잇는다.
     const sceneFirst=['battle','sting','rhythm','ending'].includes(target.kind);
