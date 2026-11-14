@@ -322,7 +322,7 @@ function install(){
           ['말순 아주머니','…그랬구나. 굴에 넣어 두려던 겨울 도토리야.\n굴은 다음 겨울에나 가지 뭐.'],gotLine('acorn',3)],
         [['말순 아주머니','곰실아! 밥 먹자!'],['아기 곰','(한 번에 돌아본다.)\n밥은 한 번만 불러도 돼!']]),
       {id:'y_bear_cub',name:'아기 곰',get x(){return V.cub;},draw:(x,y,f)=>Rg.expArt.drawBear(x,y,f),talk:talkCub});
-    // 아빠는 호숫가 끝 큰 바위 곁에 앉아 호수만 본다 (지난가을부터 같은 돌에 앉아 남은 발자국과 같은 자리)
+    // 아빠는 호숫가 끝 큰 바위 곁에 앉아 호수만 본다 (두 해 전 겨울부터 같은 돌에 앉아 남은 발자국과 같은 자리)
     const dad=Rg.npcs.find(n=>n.id==='dad');if(dad)dad.x=V.dad;
   }
   shore.doors=shore.doors.filter(d=>d.to!=='island');island.doors=island.doors.filter(d=>d.to!=='shore');

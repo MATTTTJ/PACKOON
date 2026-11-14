@@ -7,11 +7,11 @@
    결정 D-1262 (사용자 지시 2026-11-08 47로 바뀜, name-story-v4 D-1363·D-1364): 사실은 v4 §1의 순서 그대로다.
      - 첫 편 '그 여름': 엄마가 혼자 작은 배로 건너와 아이 명패를 엄마 매듭으로 매고, 이름을 한 번 부르고, 값(둔갑과 말)이 빛 두 줄기로 나무에 든다.
        값을 미루던 옛 설정(DEFER_LINES)과 업은 아기, 젊은 아빠의 열매 컷은 뺐다.
-     - 둘째 편 '첫눈 무렵': 아빠가 지게짐을 지고 온다 → 어둑차사가 신목 이름을 먹는다 → 명패들이 끌려간다 → 아빠가 짐을 풀어 제 이름을 대며 빈다
+     - 둘째 편 '그 겨울'(결정 D-1470, 옛 '첫눈 무렵'): 아빠가 지게짐을 지고 온다 → 어둑차사가 신목 이름을 먹는다 → 명패들이 끌려간다 → 아빠가 짐을 풀어 제 이름을 대며 빈다
        → 아들 명패를 풀어 품에 안는다 → 엄마 목소리가 아빠 이름을 세 번 부른다 → 세 번째에 돌아본다 → 이름이 적힌다 → 패를 안고 호숫가로 간다.
      - 어둑차사는 enemies.js 그림대로: 넓은 갓, 얼굴 없는 어둠, 흰 동정, 까마귀 깃으로 풀린 소매와 자락, 붉은 적패지. 정체는 말하지 않는다(D-1161).
      - 붉은색은 적패지와 부름에만 쓴다(§3.1). 엄마 목소리의 부름은 따뜻한 빛깔의 물결이다.
-   결정 D-1263: 첫 편(그 여름)은 두루미가 엄마 이야기를 꺼낼 때, 둘째 편(첫눈 무렵)은 아이가 "아빠는 왜 저렇게 됐어요?" 하고 물을 때 튼다.
+   결정 D-1263: 첫 편(그 여름)은 두루미가 엄마 이야기를 꺼낼 때, 둘째 편(그 겨울)은 아이가 "아빠는 왜 저렇게 됐어요?" 하고 물을 때 튼다.
      아이의 놀람·깨달음 줄은 회상이 끝난 뒤 대화로 잇는다(story.js craneStory). 옛 구성(CLASSIC)은 같은 자막을 대화로 읽는다.
    결정 D-1264: 두 편 다 본 뒤에는 수첩의 두루미 쪽에서 '두루미가 본 것 다시 보기'로 이어서 다시 볼 수 있다. */
 (()=>{
@@ -65,7 +65,7 @@ function put(c,s,x,y,k=1,flip=false,alpha=1){
 }
 const K='#2a211b',MOM='#857a6b',MOM2='#958a7b',WRAP='#56648a',WRAP2='#46557a',SCARF='#e3d6b8';
 const DAD='#7c7062',DAD2='#8a7d6e',SC='#b4432a',TAIL='#6f6357',BUND='#b98a5a',BUND2='#8f6640';
-// 결정 D-1360 (name-story-v4 §1): 작년 여름의 엄마는 혼자 왔다. 업은 아기 없이 머릿수건만 둘렀고, 품에 나무 패를 안았다
+// 결정 D-1360 (name-story-v4 §1): 그 여름(재작년 여름)의 엄마는 혼자 왔다. 업은 아기 없이 머릿수건만 둘렀고, 품에 나무 패를 안았다
 const momSolo=f=>sprite('momSolo'+f,17,25,()=>{
   R(4,21+(f?1:0),3,4-(f?1:0),K);R(9,21+(f?0:1),3,4-(f?0:1),K);
   R(11,14,3,8,TAIL);R(11,17,3,1,K);R(11,20,3,1,K);
@@ -79,7 +79,7 @@ function boatFar(c,x,y,d,row){
   const a=Math.sin(row*Math.PI*2);pline(x+3*d,y-h-6*d,x+(9+a*4)*d,y+2*d,1,'#6e4f22');
   for(let i=0;i<3;i++)R(Math.round(x-w/2-4-i*5-row*3),Math.round(y+1+i%2),3,1,'rgba(240,248,250,.35)');   // 배 뒤 물결
 }
-// 첫눈 무렵의 아빠: 지게에 짐을 한가득 졌다(옆모습). 보부상으로 모은 귀한 것
+// 그 겨울의 아빠: 지게에 짐을 한가득 졌다(옆모습). 보부상으로 모은 귀한 것
 const dadJige=f=>sprite('dadJige'+f,24,34,()=>{
   R(9,30+(f?1:0),3,4-(f?1:0),K);R(13,30+(f?0:1),3,4-(f?0:1),K);
   R(3,22,4,3,TAIL);R(3,22,1,3,K);
@@ -129,12 +129,12 @@ function quillT(c,x,y,len,wid,a){const ca=Math.cos(a),sa=Math.sin(a),nx=-sa,ny=c
 /* ---------- 배경: 얼음 끝에서 북쪽 (멀리) ---------- */
 const P={
   winterDusk:{sky:['#28304c','#8c8496'],far:'#4e5670',near:'#3e465e',lake:['#9fb4c4','#dbe7ee'],isle:'snow',flakes:'#f2f4f8'},
-  // 결정 D-1362 (name-story-v4 §1): 작년 여름. 호수가 녹아 엄마는 작은 배로 건넜다. 신목은 그때 아직 제 이름이 있어 잎이 무성하다
+  // 결정 D-1362 (name-story-v4 §1): 그 여름(재작년 여름). 호수가 녹아 엄마는 작은 배로 건넜다. 신목은 그때 아직 제 이름이 있어 잎이 무성하다
   summer:{sky:['#7fa6c4','#e6dcc2'],far:'#5e7a6a',near:'#4c6a58',lake:['#4f7f94','#9cc2c8'],isle:'summer',flakes:null,water:true},
   snowDay:{sky:['#8e9cac','#d4dadf'],far:'#6a7686',near:'#5a6676',lake:['#a8bac6','#dce6ec'],isle:'snow',flakes:'#f2f4f8'},
   dawn:{sky:['#3a4462','#c8a4a0'],far:'#3e4660',near:'#323a52',lake:['#8094a8','#b8c6d0'],isle:'snow',flakes:null},
-  // 결정 D-1265 (D-1258과 맞춤): 늦가을 첫얼음. 아빠는 첫얼음을 밟고 걸어서 섬에 건넜다. 옅은 잿빛 얼음판에 금과 검은 물 자리
-  autumn:{sky:['#3c3452','#d69a62'],far:'#5a4a5a',near:'#4a3c4c',lake:['#7f888f','#aeb5b8'],isle:'autumn',flakes:null,firstIce:true},
+  // 결정 D-1265 → D-1470 (사용자 지시 2026-11-14): 아빠는 겨울에 왔다. 단단히 잡힌 얼음을 밟고 걸어서 섬에 건넜다. 잿빛 얼음판에 금과 검은 물 자리, 눈 덮인 섬
+  winterIce:{sky:['#343a56','#b8a49a'],far:'#4e5468',near:'#40465a',lake:['#8a96a0','#c0cad0'],isle:'snow',flakes:null,firstIce:true},
   night:{sky:['#090c18','#1e2840'],far:'#141a2a',near:'#10141f',lake:['#26323f','#3e4c5c'],isle:'snow',flakes:'#c9d4dc'},
 };
 const ISLE={x:150,top:60,base:78};
@@ -295,7 +295,7 @@ function hands(t,tie,fur,furLt,hand,enter=1){
 }
 
 /* ---------- 첫 편: 그 여름 ----------
-   결정 D-1363 (name-story-v4 §1·§5, 사용자 지시 2026-11-08 47): 엄마는 작년 여름 혼자 배로 건너왔다. 아이는 단풍골 두꺼비 할멈 약방에서 앓고 있었다.
+   결정 D-1363 (name-story-v4 §1·§5, 사용자 지시 2026-11-08 47): 엄마는 재작년 여름(결정 D-1470) 혼자 배로 건너왔다. 아이는 단풍골 두꺼비 할멈 약방에서 앓고 있었다.
    명패를 엄마 매듭으로 가지에 매고, 아이 이름을 한 번 부르고, 값(둔갑과 말)이 빛 두 줄기로 나무에 든다. 값은 미루지 않는다.
    젊은 아빠가 열매 소문을 좇아 왔던 컷은 뺐다(열매를 뺐다). */
 const LEAF=['#4f7a3a','#6f9a4a'];
@@ -303,7 +303,7 @@ function nearLeaves(c,t,n=70){for(let i=0;i<n;i++){const x=Math.round(90+hash(i)
 function closeLeaves(c,t){for(let i=0;i<40;i++){const x=Math.round(30+hash(i+7)*200);if(Math.abs(x-KX)<16)continue;const y=Math.round(brY(x)-8-hash(i)*12+Math.sin(t*1.2+i)*.8);R(x,y,4,3,i%3?LEAF[0]:LEAF[1]);R(x+1,y,2,1,'#8aba5a');}}
 const boatPath=k=>[lerp(70,132,k),lerp(126,84,Math.pow(k,.85))];
 const SUMMER={id:'crane_winter',who:CRANE,music:'theme',sub:'두루미가 본 것',title:'그 여름',cuts:[
-  {lines:[{text:'작년 여름이다.\n너구리 하나가 작은 배를 저어 건너왔다.',cues:[[.4,'water_trickle'],[2.6,'water_trickle']]},
+  {lines:[{text:'네가 앓던 그 여름이다.\n너구리 하나가 작은 배를 저어 건너왔다.',cues:[[.4,'water_trickle'],[2.6,'water_trickle']]},
           {text:'혼자였다.\n품에 나무 패 하나만 안고서.'}],
    draw(c,s){const p=P.summer;wideBack(c,p,s.t,{glint:'rgba(255,255,255,.35)'});tree(c,{aura:1,t:s.t,tags:4,leaves:140,leafCol:LEAF});
      const k=.85*prog(s,0,6.5)+.15*prog(s,1,3),[x,y]=boatPath(k),d=depth(y);
@@ -342,19 +342,19 @@ const SUMMER={id:'crane_winter',who:CRANE,music:'theme',sub:'두루미가 본 �
      finish(c,{tint:['#f4ead0',.22]});}},
 ]};
 
-/* ---------- 둘째 편: 첫눈 무렵 ----------
+/* ---------- 둘째 편: 그 겨울 ----------
    결정 D-1364 (name-story-v4 §1·§5): 아빠는 엄마 일을 듣고 평생 장삿길에서 모은 것을 지게에 지고 왔다. 그 무렵 어둑차사가 내려앉아 신목 이름을 먹었다.
    아빠는 짐을 다 풀어 제 이름을 대며 빌었지만 이름 잃은 나무는 받지 못했다. 아빠는 아들 명패를 풀어 품에 안았다.
    어느 밤 어둑차사가 엄마 목소리로 아빠 이름을 세 번 불렀고, 세 번째에 아빠가 돌아봤다(규칙 2). 옛 '여기 있소'(대신 대답, 규칙 11)는 뺐다.
    두루미는 얼음 끝에서 섬 쪽만 본다(D-1261). 아빠가 호숫가에서 매듭을 다시 묶는 모습은 두루미가 볼 수 없어 그리지 않는다. */
 const dadNear=[104,110];
-const SNOWFALL={id:'crane_autumn',who:CRANE,music:'theme',sub:'두루미가 본 것',title:'첫눈 무렵',cuts:[
-  {lines:[{text:'작년 첫눈 무렵 네 아비가 왔다.\n지게에 짐을 한가득 지고.',cues:[[.3,'footstep_snow'],[1.5,'footstep_snow']]},
+const SNOWFALL={id:'crane_autumn',who:CRANE,music:'theme',sub:'두루미가 본 것',title:'그 겨울',cuts:[
+  {lines:[{text:'그해 겨울 네 아비가 왔다.\n언 호수를 건너, 지게에 짐을 한가득 지고.',cues:[[.3,'footstep_snow'],[1.5,'footstep_snow']]},
           {text:'어미 일을 다 듣고 왔다더구나.\n평생 장삿길에서 모은 것을 바치겠다고.'}],
-   draw(c,s){const p=P.autumn;wideBack(c,p,s.t);tree(c,{aura:1,t:s.t,leaves:24,tags:4,kid:true});
-     for(let x=0;x<W;x+=3){const h=10+hash(x)*10;pline(x,H,x+Math.sin(s.t*1.2+x)*2,H-h,1,x%2?'#b89048':'#8a6a34');}   // 물가 갈대
+   draw(c,s){const p=P.winterIce;wideBack(c,p,s.t);tree(c,{aura:1,t:s.t,leaves:24,tags:4,kid:true});
+     for(let x=0;x<W;x+=3){const h=10+hash(x)*10;pline(x,H,x+Math.sin(s.t*1.2+x)*2,H-h,1,x%2?'#a89a7c':'#7a6e58');}   // 물가 마른 갈대 (겨울)
      const walk=prog(s,0,3.6),x=lerp(-12,dadNear[0],walk);
-     for(let px=2,i=0;px<x-8;px+=6,i++)R(px,dadNear[1]-1+(i%2),2,1,'rgba(56,62,70,.55)');   // 첫얼음 위에 찍힌 아빠 발자국
+     for(let px=2,i=0;px<x-8;px+=6,i++)R(px,dadNear[1]-1+(i%2),2,1,'rgba(56,62,70,.55)');   // 언 호수 위에 찍힌 아빠 발자국
      const fade=s.li===1?cl((s.lt-2.2)/1.2):0;
      A(c,1-fade,()=>put(c,dadJige(walk<.999?Math.floor(s.t*3.5)%2:0),x,dadNear[1],1));
      if(fade>0)A(c,fade,()=>dadTiny(162,72,'sit'));

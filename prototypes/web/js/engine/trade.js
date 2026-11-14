@@ -238,8 +238,8 @@ const Trade=(()=>{
       else{   // 결정 D-925: 흔한 물건의 값(같은 단계 하나 / 한 단계 아래 둘)도 한 줄에 하나씩
         asks.classList.add('list');
         for(const t of priceRows(g)){const row=el('span','trade-ask-row');row.appendChild(el('span','dot','·'));row.appendChild(el('span','small',t));asks.appendChild(row);}
-        asks.appendChild(el('span','small trade-left','남은 '+stockLeft(g.row)+'번'));}
-      if(g.kind==='guest'&&st.k!=='lock')asks.appendChild(el('span','small','· 남은 '+Math.max(0,TABLES.TUNING.stranger_trade_limit-strangerUsed(S.guest.npc.id))+'번'));
+        asks.appendChild(el('span','small trade-left',stockLeft(g.row)*(g.n||1)+'개 남음'));}   // 결정 D-1480: '남은 3번' 대신 남은 물건 수 (한 번에 g.n개씩)
+      if(g.kind==='guest'&&st.k!=='lock')asks.appendChild(el('span','small','· '+Math.max(0,TABLES.TUNING.stranger_trade_limit-strangerUsed(S.guest.npc.id))+'번 더 바꿀 수 있음'));   // 결정 D-1480
       b.appendChild(asks);
       b.setAttribute('aria-label',(g.label||ITEMS[g.item].n)+'. '+(lock||(asked(g)?'원하는 것: '+g.asks.map((a,i)=>askText(a)+extraText(g.extra?.[i])).join('; '):priceText(g))));
       b.onclick=()=>{if(S.sel!==g.id){S.sel=g.id;S.offer={};}render();};
