@@ -177,7 +177,7 @@ function drawCairn(){const b=G.boss;const x=b.x-cam;if(x<-60||x>W+60)return;
   const GROUND=Math.round(surfaceY(b.x,usesZones(Rg)?Rg.zones.shrine:Rg));   // 결정 D-845: 확장판 골렘은 비탈 꼭대기 마당에 앉아 있다
   if(b.dead){R(x-14,GROUND-8,28,8,'#8a8680');R(x-10,GROUND-14,20,6,'#9a9690');R(x-6,GROUND-19,12,5,'#8a8680');
     R(x-12,GROUND-9,10,2,'#f3f5f4');R(x-6,GROUND-20,10,2,'#f3f5f4');
-    if(G.f.golemCalm){R(x-3,GROUND-24,7,5,'#9a9690');R(x-1,GROUND-22,1,1,'#b4432a');}return;}
+    if(knows('like:golem:story_stone')||G.f.dadStonePlaced){R(x-3,GROUND-24,7,5,'#9a9690');R(x-1,GROUND-22,1,1,'#b4432a');}return;}   // 결정 D-1502: 꼭대기의 소원 돌은 실제로 올렸을 때만
   const br=Math.floor(G.anim/18)%2,SN='#f3f5f4',SH='#c9d2d8';
   // 구들돌 발 둘
   R(x-30,GROUND-6,18,6,'#5b5048');R(x-29,GROUND-7,16,1,'#7d7066');R(x+12,GROUND-6,18,6,'#5b5048');R(x+13,GROUND-7,16,1,'#7d7066');
@@ -263,7 +263,14 @@ function daraeGot(how){
   const first=how==='calm'?['너구리','(돌무더기가 내려놓은 서리다래다.\n서리가 하얗게 앉아 손끝이 시리다.)']
     :how==='win'?['너구리','(무너진 돌 틈에서 서리다래를 주웠다.\n서리가 하얗게 앉아 손끝이 시리다.)']:null;
   // 결정 D-130: 약을 직접 갈기로 아이가 정한다. 열매째로는 까치 발에 묶어 보낼 수 없다.
-  talk([...(first?[first]:[]),['너구리','(열매째 까치 발에 묶으면\n가는 길에 다 짓무르겠다.)'],['너구리','(맷돌이 깨어났으니…\n이번엔 내가 갈아서 약즙으로 보내자.)']]);refreshGoal();
+  // 결정 D-1502 (사용자 피드백 2026-11-14 '성황당에 아빠 소원 돌 올리는 이벤트가 있던가?'): 돌을 싸움에서 건네지 않고 이기거나 다른 선물로 달래면
+  //   돌쇠 할배가 부탁한 소원 돌이 보따리에 남은 채 올릴 곳이 없었다. 싸움이 끝나 내려앉은 돌무더기 꼭대기에 아이가 직접 얹는다.
+  const stone=how!=='ledge'&&has('story_stone')&&!knows('like:golem:story_stone')&&!G.f.dadStonePlaced;   // 옛 저장의 절벽 바위턱에서 딸 때는 성황당이 아니다
+  if(stone){takeItem('story_stone',1);G.f.dadStonePlaced=true;
+    diary('d_stone_placed','돌쇠 할배가 부탁한 대로, 내려앉은 성황당 돌무더기 꼭대기에 아빠의 소원 돌을 대신 올렸다.');}
+  const stoneLines=stone?[['너구리','(보따리에 아빠의 소원 돌이 아직 있다.\n할배가 성황당에 대신 올려 달라고 했지.)'],
+    ['너구리','(내려앉은 돌무더기 꼭대기에 아빠의 돌을 얹었다.\n돌이 기우뚱하더니 가만히 자리를 잡는다.)']]:[];
+  talk([...(first?[first]:[]),...stoneLines,['너구리','(열매째 까치 발에 묶으면\n가는 길에 다 짓무르겠다.)'],['너구리','(맷돌이 깨어났으니…\n이번엔 내가 갈아서 약즙으로 보내자.)']]);refreshGoal();
 }
 Rg.addSeogiSpot=()=>{if(!G.digs.some(d=>d.item==='seogi'))G.digs.push({x:1770,item:'seogi',done:false});};
 
@@ -376,7 +383,7 @@ if(!CLASSIC){
   const snapshot=()=>{const image=document.createElement('canvas');image.width=W;image.height=H;image.getContext('2d').drawImage(cv,0,0);return image;};
   defineMinigame({id:travel.id,hit:()=>{},step:()=>{
     if(!depthFx){travel.hidden=true;return;}
-    // 결정 D-166: 장승 문은 먼저 장승 둘이 양옆으로 기울며 비켜 선다. 비켜 선 모습을 찍은 뒤 그 사이로 들어간다.
+    // 결정 D-166 → D-1503: 장승 문은 먼저 장승 둘이 곧게 선 채 양옆으로 조금 물러난다. 물러난 모습을 찍은 뒤 그 사이로 들어간다.
     if(!depthFx.image){if(++depthFx.open>=TABLES.TUNING.depth_gate_open_frames)depthFx.image=snapshot();return;}
     depthFx.tick++;
     if(depthFx.tick>=TABLES.TUNING.zone_transition_frames){
@@ -435,8 +442,8 @@ if(!CLASSIC){
     if(depthFx?.image){
       const t=depthFx.tick/TABLES.TUNING.zone_transition_frames;
       ctx.save();ctx.imageSmoothingEnabled=false;
-      if(!Vfx.reducedMotion){const s=depthFx.door.reverse?1-.13*t:1+.18*t;ctx.translate(depthFx.pivot,H*.72);ctx.scale(s,s);ctx.drawImage(depthFx.image,-depthFx.pivot,-H*.72);ctx.setTransform(1,0,0,1,0,0);
-        const spread=Math.round(t*48);A.drawDepthGate(depthFx.pivot,GROUND,spread,depthFx.door.gate?1:0);}
+      // 결정 D-1503: 찍어 둔 장면만 키운다. 예전엔 그 위에 장승 한 쌍을 또 그려 벌렸기 때문에 장승이 넷으로 늘고 기울어 보였다.
+      if(!Vfx.reducedMotion){const s=depthFx.door.reverse?1-.13*t:1+.18*t;ctx.translate(depthFx.pivot,H*.72);ctx.scale(s,s);ctx.drawImage(depthFx.image,-depthFx.pivot,-H*.72);ctx.setTransform(1,0,0,1,0,0);}
       ctx.globalAlpha=t;R(0,0,W,H,'#344247');ctx.restore();
     }
   }

@@ -111,9 +111,9 @@ function gatePost(x,y,tall=false){
   }
   px(x-6,y-2,13,2,'#5d6660');px(x-4,y-3,3,1,P.frost);                                                  // 발치에 괸 돌
 }
-/* 결정 D-166: 장승이 비켜 설 때는 발치를 축으로 바깥쪽으로 기운다 (open 0~1) */
+/* 결정 D-166 → D-1503 (사용자 피드백 2026-11-14 "기울어지지 말고 약간만 넓어져서 입구 여는 느낌으로"): 장승은 기울지 않고 곧게 선 채 양옆으로 조금 물러난다 (open 0~1) */
 function leanPost(x,y,tall,angle){if(!angle){gatePost(x,y,tall);return;}ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(angle);gatePost(0,0,tall);ctx.restore();}
-const OPEN_PX=14,OPEN_LEAN=.14;
+const OPEN_PX=9,OPEN_LEAN=0;
 function gatePair(x,y,open=0,gap=23){const o=Math.round(open*OPEN_PX),a=open*OPEN_LEAN;leanPost(x-gap-o,y,true,-a);leanPost(x+gap+o,y,false,a);}
 function frostGround(){px(0,GROUND,W,H-GROUND,P.earth);px(0,GROUND,W,2,'#a7b8b4');px(0,GROUND+2,W,2,'#748580');const off=Math.floor(cam);for(let x=-(off%7);x<W;x+=7){const v=hash(x+off+9);if(v<.62)px(x,GROUND-1,2,1,v<.28?P.frost:'#d0ddd6');if(v>.75)px(x+2,GROUND+7+Math.floor(v*17),3,1,'#3d4d4c');}}
 function backdrop(zone){bands(['#bfcdd3','#cbd8d9','#dce1da','#a4b7bd'],[54,49,59,63]);const keep=cam,rk=RC();cam=Math.round(rk*.08);ridge('#a3b6be',131,44,113,480);cam=Math.round(rk*.17);ridge('#829aa6',151,49,82,720);cam=Math.round(rk*.31);ridge('#657f89',177,39,53,140);cam=keep;

@@ -82,7 +82,7 @@ function talkDolsoeArc(){
   if(sack)c.push(badgerSack());
   if(atYard&&!F.dolneomeo_arc_dolsoe1)c.push({t:'마당 돌탑 꼭대기 돌은 누가 올렸어요?',go:()=>topStone()});
   // 결정 D-580: 아빠의 돌과 엄마 몫의 돌을 한 장면으로 묶었다 (dolsoe2·dolsoe3).
-  else if(F.golemCalm&&knows('like:golem:story_stone')&&!F.dolneomeo_arc_dolsoe3)c.push({t:'아빠의 돌을 올렸어요',go:()=>arcAll(['dolneomeo_arc_dolsoe3','dolneomeo_arc_dolsoe2'],[
+  else if((knows('like:golem:story_stone')||F.dadStonePlaced)&&!F.dolneomeo_arc_dolsoe3)   /* 결정 D-1502: 싸움 뒤에 올려도 연다 */c.push({t:'아빠의 돌을 올렸어요',go:()=>arcAll(['dolneomeo_arc_dolsoe3','dolneomeo_arc_dolsoe2'],[
     ['너구리','아빠의 돌, 대신 올렸어요.'],
     // 결정 D-130: 성황당에 가기 전 할배 마당 탑에서 먼저 얹어 보다 손이 떨렸다. 그래서 할배가 그 돌을 갖고 있다.
     ['돌쇠 할배','재작년 겨울 네 아비가 내 마당 탑에 먼저 얹어 보더니\n손이 떨려 못 올리고 두고 갔지.'],

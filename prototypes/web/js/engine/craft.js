@@ -211,7 +211,14 @@ function renderFieldTaste(){
       b.onclick=()=>{
         if(fieldTasteWho!==who||!open('dlg'))return;
         const result=giftTaste(who,id);if(!result){b.disabled=true;return;}
-        response.textContent=result.line+(result.given?'':' (물건은 그대로다.)');if(result.given||!has(id))b.disabled=true;
+        // 결정 D-1500 (사용자 피드백 2026-11-14): 같은 계열 물건은 반응이 같아서 무엇을 건넸는지 화면에서 안 보였다.
+        //   고른 물건 단추를 금빛으로 강조하고, 대답 앞에 건넨 물건 이름을 굵게 적는다. 대답 줄은 건넬 때마다 한 번 깜빡여 새로 나온 줄임을 보인다.
+        choices.querySelectorAll('.gift-item.chosen').forEach(x=>{x.classList.remove('chosen');x.removeAttribute('aria-current');});
+        b.classList.add('chosen');b.setAttribute('aria-current','true');
+        response.innerHTML='';response.appendChild(el('strong','taste-what',jo(ITEMS[id].n,'을','를')+' 내밀었다.'));
+        response.appendChild(document.createTextNode(' '+result.line+(result.given?'':' (물건은 그대로다.)')));
+        response.classList.remove('fresh');void response.offsetWidth;response.classList.add('fresh');
+        if(result.given||!has(id))b.disabled=true;
         if(result.given)giftLesson(who,result.line);   // 결정 D-906
       };choices.appendChild(b);});};
   toggle.onclick=()=>{choices.hidden=!choices.hidden;toggle.setAttribute('aria-expanded',String(!choices.hidden));if(!choices.hidden)fill();};

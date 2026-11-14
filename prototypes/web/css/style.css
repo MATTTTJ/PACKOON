@@ -272,6 +272,13 @@ table.ledger th{font-weight:normal;color:var(--dim);font-size:.85em}
 .taste-choices .gift-item canvas{width:20px;height:20px;image-rendering:pixelated;flex:none}
 .taste-empty{margin:0;font-size:13px;color:#7a6248}
 .taste-response{font-family:var(--display);margin:0;line-height:1.5}
+/* 결정 D-1500: 고른 선물 단추는 금빛 테두리와 바탕, 대답 앞 물건 이름은 굵게. 대답 줄은 건넬 때마다 한 번 밝아졌다 가라앉는다 */
+.taste-choices .gift-item.chosen{border-color:var(--gold);background:#f6e2b0;box-shadow:0 0 0 2px var(--gold);font-weight:700}
+.taste-choices .gift-item.chosen:disabled{opacity:1}
+.taste-response .taste-what{font-weight:800;color:#7a4a14;margin-right:2px}
+.taste-response.fresh{animation:tasteFresh .6s ease-out}
+@keyframes tasteFresh{0%{background:#f6e2b0}100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){.taste-response.fresh{animation:none}}
 /* 결정 D-163: '물건 건네기'와 '보따리 펼치기'를 한 줄에 나란히. 두 묶음을 풀어(display:contents) 버튼끼리 한 줄에 서고,
    건넬 물건 목록과 대답은 그 아래 줄 전체를 쓴다. 보이는 묶음이 없으면 줄째 숨긴다. */
 .dlg-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-top:1px dashed #b59a6e;padding-top:6px;cursor:default}
