@@ -861,3 +861,21 @@ end.stat.faints,galchamgol,end,화면,쓰러진 횟수,,확정,region.js:70 endS
 ui_end.book,전체,ui_end,화면,아빠의 수첩 보기,,확정,index.html:159 btnBookEnd
 ui_end.restart,전체,ui_end,화면,처음부터,,확정,index.html:159 btnRestart
 ui_end.restart_armed,전체,ui_end,화면,정말요? 한 번 더 누르면 저장이 지워져요,,확정,engine/save.js:174 confirmNewGame(저장을 지우는 단추는 두 번)
+ui_map.title,전체,ui_map,화면,길 지도,,제안,index.html:105 mapTitle (결정 D-18)
+ui_map.hint,전체,ui_map,화면,가 본 곳으로만 갈 수 있어요,,제안,index.html:106 mapHint
+ui_map.key_move,전체,ui_map,화면,↑↓←→,,제안,index.html:106 mapHint 키 안내
+ui_map.key_go,전체,ui_map,화면,Enter,,제안,index.html:106 mapHint 키 안내
+ui_map.key_close,전체,ui_map,화면,Esc · M,,제안,index.html:106 mapHint 키 안내
+ui_map.travel,전체,ui_map,화면,까치 부르기,,제안,index.html:109 mapTravel 단추
+ui_map.unknown,전체,ui_map,화면,？,,제안,engine/map.js:135·147 가 보지 않은 지역·구역 이름
+ui_map.unknown_title,전체,ui_map,화면,아직 가 보지 않은 곳,,제안,engine/map.js:149 가 보지 않은 칸
+ui_map.somewhere,전체,ui_map,화면,어딘가,,제안,engine/map.js:196 updateMapSelection 갈 곳 이름이 없을 때
+ui_map.seen_items,전체,ui_map,화면,채집물 {items},,제안,engine/map.js:57 mapSeenText (결정 D-146)
+ui_map.spent,전체,ui_map,화면,{name}(다 거둠),,제안,engine/map.js:57 mapSeenText 다 캐고 다 주운 채집물 (결정 D-146)
+map_notice.busy,전체,map_notice,화면,지금은 까치를 부를 수 없다,,제안,engine/map.js:76·349 openMap 막힘 (결정 D-816)
+map_notice.no_companion,전체,map_notice,화면,아직 길을 함께 다닐 동무가 없다,,제안,engine/map.js:78 openMap 늙은 까치를 만나기 전 (결정 D-816)
+map_notice.name_first,전체,map_notice,화면,내 이름부터 적자,,제안,engine/map.js:79 openMap 마지막 지역 끝에서 이름을 아직 안 지었을 때. Godot 은 아직 안 씀
+map_flight.caption,전체,map_flight,화면,덩치 큰 까치 둘이 보자기 매듭을 움켜쥐었다.,,제안,index.html:42 mapCaption 날아가는 동안 (결정 D-504)
+map_magpie.dolneomeo,전체,map_magpie,화면,돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도를 펴면 데려다줄 것 같다.,,제안,engine/map.js:65 MAP_MAGPIE_LINES (결정 D-816)
+map_magpie.jangteo,전체,map_magpie,화면,장터 처마 위에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.,,제안,engine/map.js:66 MAP_MAGPIE_LINES (결정 D-816)
+map_magpie.default,전체,map_magpie,화면,나뭇가지에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.,,제안,engine/map.js:71 ensureMapCompanions 지역 줄이 없을 때 (결정 D-816)
