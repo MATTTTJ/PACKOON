@@ -879,3 +879,6 @@ map_flight.caption,전체,map_flight,화면,덩치 큰 까치 둘이 보자기 �
 map_magpie.dolneomeo,전체,map_magpie,화면,돌담 위에 덩치 큰 까치 둘이 앉아 있다. 지도를 펴면 데려다줄 것 같다.,,제안,engine/map.js:65 MAP_MAGPIE_LINES (결정 D-816)
 map_magpie.jangteo,전체,map_magpie,화면,장터 처마 위에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.,,제안,engine/map.js:66 MAP_MAGPIE_LINES (결정 D-816)
 map_magpie.default,전체,map_magpie,화면,나뭇가지에 까치 둘이 앉아 이쪽을 본다. 지도를 펴면 데려다줄 것 같다.,,제안,engine/map.js:71 ensureMapCompanions 지역 줄이 없을 때 (결정 D-816)
+ui_toast.got,전체,ui_toast,화면,+ {item},,확정,engine/core.js:351 addItem 알림(하나)
+ui_toast.got_n,전체,ui_toast,화면,+ {item} ×{n},,확정,engine/core.js:351 addItem 알림(여럿)
+ui_toast.drawn,전체,ui_toast,화면,수첩에 그렸다 · {item},,확정,engine/core.js:350 addItem 처음 얻어 수첩 그림이 생긴 물건
