@@ -61,3 +61,279 @@ dodam_give.3,galchamgol,dodam_give,도담,내가 지었으니까 내가 젤 많�
 dodam_give.4,galchamgol,dodam_give,도담,아무튼! 숲 안쪽 금줄 친 길로 가면 당산나무 언덕이야!\n근데 칡덩굴이 길이며 나무를 꽁꽁 감았어.,,확정,
 dodam_give.5,galchamgol,dodam_give,도담,곡괭이로는 안 끊길걸? 날 선 연장은\n대장간 무쇠 아저씨한테밖에 없어!,,확정,
 start.diary,galchamgol,start,일기,"오늘 길을 나선다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 해머루는 당산나무를 감은 칡이 꽃 속에 품는 열매라는데, 금줄 너머라 가 본 적이 없다. 숲을 잘 아는 다람쥐 도담이 길을 알 거다. 해머루를 할멈께 드리고 나면, 아빠가 간 북쪽 길로 간다. 그 길은 단풍골 끝에서 시작된다.",,확정,region.js:51 onStart
+goal_acorn_few.1,galchamgol,goal_acorn_few,길잡이,{why} 도토리 세 알을 줍자. 참나무 밑에 많이 떨어져 있다. ({ac}/3),,확정,story.js:758 acornStep: 도토리가 세 알보다 적을 때
+goal_acorn_enough.1,galchamgol,goal_acorn_enough,길잡이,도토리 세 알이 모였다. 보따리를 열고 절구에 빻아 도토리 가루를 내자.,,확정,acornStep: 세 알 모임
+goal_tool.1,galchamgol,goal_tool,목표,칡을 끊을 연장 구하기,,확정,TOOL_GOAL(story.js:759)
+goal_farewell.1,galchamgol,goal_farewell,목표,북쪽으로 떠나기,,확정,story.js:761
+goal_farewell.2,galchamgol,goal_farewell,길잡이,"엄마 기운을 붙들 약은 할머니가 달여 보내 주셨다. 두꺼비 할머니께 인사드리고, 아빠가 간 북쪽 길로 떠나자.",,확정,
+goal_boss_meoru.1,galchamgol,goal_boss_meoru,목표,해머루 전해 드리기,,확정,story.js:762 해머루를 가졌을 때
+goal_boss_meoru.2,galchamgol,goal_boss_meoru,길잡이,해머루를 얻었다. 두꺼비 할머니께 가져다드리면 엄마 기운을 붙들 약을 달여 주신다고 했다.,,확정,
+goal_boss.1,galchamgol,goal_boss,목표,해머루 얻기,,확정,story.js:763
+goal_boss.2,galchamgol,goal_boss,길잡이,엉킨 칡이 풀리며 해머루가 떨어졌다. 당산나무 {where}에서 해머루를 주워 담자.,,확정,where: 언덕(구역 있는 판)
+goal_fight.1,galchamgol,goal_fight,목표,엉킨 칡 걷어 내기,,확정,story.js:764
+goal_fight.2,galchamgol,goal_fight,길잡이,해머루는 당산나무를 감은 칡이 꽃 속에 품고 있다. 나무를 꽁꽁 감은 엉킨 칡과 맞서자.,,확정,
+goal_climb.1,galchamgol,goal_climb,목표,해머루 찾기,,확정,story.js:765
+goal_climb.2,galchamgol,goal_climb,길잡이,금줄 길이 열렸다. 길을 따라 당산나무 언덕으로 올라가자.,,확정,
+goal_find_way.1,galchamgol,goal_find_way,목표,당산나무 가는 길 알아보기,,확정,story.js:766
+goal_find_way.2,galchamgol,goal_find_way,길잡이,"해머루는 당산나무에 있다는데, 가는 길을 모른다. {where} 길을 아는 이를 찾아 물어보자.",,확정,where: 대장간 길 너머 참나무 숲 쪽에서
+goal_dodam.why,galchamgol,goal_dodam,길잡이,도담이 도토리 가루 하나를 주면 길을 알려 준댔다.,,확정,story.js:767 acornStep 앞말
+goal_dodam.powder,galchamgol,goal_dodam,길잡이,도토리 가루가 생겼다. {where}도담에게 건네고 당산나무 가는 길을 듣자.,,확정,where: 참나무 숲의 
+goal_musoe.1,galchamgol,goal_musoe,길잡이,칡덩굴이 길이며 나무를 꽁꽁 감았단다. 날 선 연장은 대장간 무쇠 삼촌께밖에 없다고 도담이 그랬다. 대장간으로 삼촌을 찾아뵙자.,,확정,story.js:769
+goal_test.1,galchamgol,goal_test,길잡이,벽에 걸린 낫은 아빠가 맡긴 것이다. 삼촌은 내 조심성부터 보고 주신댔다. 대장간에서 삼촌 앞에 서서 끝까지 버텨 내자.,,확정,story.js:770
+goal_leaf.1,galchamgol,goal_leaf,길잡이,삼촌이 다람쥐를 보고 오면 하나 더 줄 게 있다고 하셨다. 다람쥐를 봤으니 대장간에 다시 가 보자.,,확정,story.js:772
+goal_after_leaf.1,galchamgol,goal_after_leaf,길잡이,아빠 낫은 아직 못 받았다. 대장간에서 삼촌께 다시 말씀을 여쭙자.,,확정,story.js:773
+goal_coal.1,galchamgol,goal_coal,길잡이,숯을 구했다. 대장간의 무쇠 삼촌께 갖다드리면 녹슨 낫을 벼려 주신다.,,확정,story.js:774
+goal_nal.1,galchamgol,goal_nal,길잡이,녹슨 아빠 낫을 벼리려면 숯이 있어야 한다. 삼촌 말로는 날쌘 아저씨가 숯을 쟁여 놨다. 날쌘 아저씨를 찾아가자.,,확정,story.js:775
+goal_nal_powder.why,galchamgol,goal_nal_powder,길잡이,날쌘 아저씨는 도토리 가루 하나와 칡뿌리 하나를 받고 숯을 준다.,,확정,story.js:776 acornStep 앞말
+goal_root.1,galchamgol,goal_root,길잡이,숯 값으로 칡뿌리도 하나 있어야 한다. 반짝이는 흙더미에서 칡뿌리를 캐자.,,확정,story.js:777
+goal_nal_give.1,galchamgol,goal_nal_give,길잡이,숯 값이 다 모였다. 날쌘 아저씨께 도토리 가루와 칡뿌리를 건네고 숯을 받자.,,확정,story.js:778
+goal_cut.1,galchamgol,goal_cut,목표,당산나무 가는 길 열기,,확정,story.js:779
+goal_cut.2,galchamgol,goal_cut,길잡이,삼촌이 아빠 낫을 벼려 주셨다. {where} 막은 칡덩굴을 낫으로 끊자.,,확정,where: 참나무 숲 안쪽 금줄 길을
+goal_end.1,galchamgol,goal_end,목표,단풍골 체험판 완료,,확정,story.js:784 G.ended
+side_dodam_cache.title,galchamgol,side_dodam_cache,목표,도담이 묻은 도토리 찾기,,확정,story.js:806 잔일
+side_dodam_cache.found,galchamgol,side_dodam_cache,길잡이,도담이 묻은 도토리를 찾았다. 참나무 숲의 도담에게 찾은 자리를 알려 주자.,,확정,
+side_dodam_cache.look,galchamgol,side_dodam_cache,길잡이,도담이 참나무 밑 어딘가에 겨울 도토리를 묻었는데 자리를 잊었단다. 참나무 숲의 참나무 밑을 살펴 찾아 주자.,,확정,
+side_geom_eye.title,galchamgol,side_geom_eye,목표,검댕 아저씨 눈약 구해 드리기,,확정,story.js:809
+side_geom_eye.ask,galchamgol,side_geom_eye,길잡이,검댕 아저씨는 숯 연기에 눈이 절어 빛이 다 뿌옇다고 한다. 해머루를 들고 두꺼비 할머니께 갈 때 눈약도 여쭙기로 했다.,,확정,
+side_geom_eye.bring,galchamgol,side_geom_eye,길잡이,두꺼비 할머니가 눈약을 지어 주셨다. 참나무 숲의 검댕 아저씨께 갖다드리자.,,확정,
+side_musoe_leg.title,galchamgol,side_musoe_leg,목표,무쇠 삼촌 다리 찜질 구해 드리기,,확정,story.js:812
+side_musoe_leg.ask,galchamgol,side_musoe_leg,길잡이,무쇠 삼촌이 쑤시는 다리를 주무르고 계셨다. 엄마 약을 지으시는 두꺼비 할머니라면 듣는 약을 아실 것이다. 삼촌 말로는 해머루 철이면 당산나무 언덕 어귀에 앉아 계신단다. 할머니께 여쭤 보자.,,확정,
+side_musoe_leg.root,galchamgol,side_musoe_leg,길잡이,할머니가 칡뿌리를 짓찧어 찜질을 싸 주신단다. 쓸 데 없는 칡뿌리 하나를 캐서 할머니께 갖다드리자.,,확정,
+side_musoe_leg.bring,galchamgol,side_musoe_leg,길잡이,할머니가 칡뿌리 찜질을 싸 주셨다. 식기 전에 대장간의 무쇠 삼촌께 갖다드리자.,,확정,
+side_lost_chick.title,galchamgol,side_lost_chick,목표,꺼병이 엄마 찾아 주기,,확정,story.js:816
+side_lost_chick.arrived,galchamgol,side_lost_chick,길잡이,갈대 너머에서 어미 꿩이 답했다. 꺼병이에게 말해 주자.,,확정,
+side_lost_chick.walk,galchamgol,side_lost_chick,길잡이,꺼병이 엄마는 해 지면 물가의 갈대 아래에 있겠다고 했단다. 꺼병이가 놓치지 않게 너무 앞서지 말고 오른쪽 갈대까지 같이 걷자.,,확정,
+goal_boss.where,galchamgol,goal_boss,조각,언덕,,확정,"where('언덕','밑')의 구역 있는 판"
+goal_find_way.where,galchamgol,goal_find_way,조각,대장간 길 너머 참나무 숲 쪽에서,,확정,
+goal_dodam.where,galchamgol,goal_dodam,조각,참나무 숲의 ,,확정,
+goal_cut.where,galchamgol,goal_cut,조각,참나무 숲 안쪽 금줄 길을,,확정,
+hud_main.1,galchamgol,hud_main,조각,중요,,확정,hud.js:38 할 일 칸 이름
+hud_side.1,galchamgol,hud_side,조각,잔일,,확정,hud.js:39 (D-200)
+nal_first.1,galchamgol,nal_first,날쌘,"어이, 꼬마 보부상. 이 동네 숯은 다 내 지게에 있지.\n시시한 건 안 받아.",,확정,talkNal 첫 만남(story.js:186-191) D-03·D-236
+nal_first.2,galchamgol,nal_first,너구리,꼬마 아니고 보부상이에요.\n…시시한 거요?,,확정,
+nal_first.3,galchamgol,nal_first,너구리,(날쌘의 눈이 내 모자에 잠깐 머문다.),,확정,
+nal_first.4,galchamgol,nal_first,날쌘,"물건마다 품이 있어. 잎 하나면 하품, 잎 둘이면 중품,\n열매 하나 붙으면 상품, 둘이면 최상품.",,확정,D-148
+nal_first.5,galchamgol,nal_first,날쌘,"금빛이면 천하일품. 해머루쯤은 돼야 그 소리 듣지.\n같은 품이면 하나, 한 품 아래면 둘. 그게 보부상 셈이야.",,확정,D-134
+nal_menu.1,galchamgol,nal_menu,날쌘,"그래서, 뭘 내놓을 건데?",,확정,nalMenu(story.js:194-209) 숯 교환 전
+nal_menu.c1,galchamgol,nal_menu,고르기,보따리를 펼친다,,확정,
+nal_menu.c2,galchamgol,nal_menu,고르기,아빠 짐표를 보여 준다,,확정,nal:dadtag 모를 때(D-426)
+nal_menu.c3,galchamgol,nal_menu,고르기,바꿔 간 소금 이야기,,확정,craftTrade_salt
+nal_menu.c4,galchamgol,nal_menu,고르기,바구니 테 감을 칡 줄기 이야기,,확정,nalBasketSeen
+nal_menu.c5,galchamgol,nal_menu,고르기,지게 바구니 테가 풀린 걸 알려 준다,,확정,바구니 이야기 전
+nal_menu.c6,galchamgol,nal_menu,고르기,숯값은 누가 정하는지 묻는다,,확정,사연 nalDone 뒤(D-117)
+nal_menu.c7,galchamgol,nal_menu,고르기,모자를 왜 자꾸 보는지 묻는다,,확정,사연 galArcNal2·musoeDone 뒤
+nal_menu.c8,galchamgol,nal_menu,고르기,지게를 꾸리는 까닭을 묻는다,,확정,사연 galArcNal3·일기 end 뒤
+nal_menu.c9,galchamgol,nal_menu,고르기,그만두기,,확정,
+nal_menu_done.1,galchamgol,nal_menu_done,날쌘,또 뭐야? 볼일 끝났으면 길 좀 비켜.,,확정,nalMenu 숯 교환 뒤(nalDone). 고르기는 nal_menu 것
+nal_trade_price.1,galchamgol,nal_trade_price,날쌘,숯? 도토리 가루 하나에 칡뿌리 하나.\n그럼 숯 하나 줄게.,,확정,nalTrade 값 처음(story.js:213-218). 웹에서 닿지 않는 갈래
+nal_trade_price.2,galchamgol,nal_trade_price,너구리,흠흠. 그 값이면… 생각해 보죠.,,확정,
+nal_trade_price_both.1,galchamgol,nal_trade_price_both,날쌘,마침 둘 다 있네. 바꿀래?,,확정,
+nal_trade_price_both.c1,galchamgol,nal_trade_price_both,고르기,도토리 가루와 칡뿌리를 건넨다,,확정,
+nal_trade_price_both.c2,galchamgol,nal_trade_price_both,고르기,조금 이따가요,,확정,
+nal_trade_price_root.1,galchamgol,nal_trade_price_root,날쌘,도토리 가루부터 빻아 와.,,확정,칡뿌리만 있을 때
+nal_trade_price_noroot.1,galchamgol,nal_trade_price_noroot,날쌘,칡뿌리는 흙 무른 데를 곡괭이로 파 봐.\n보부상이 그런 것도 몰라?,,확정,칡뿌리 없을 때
+nal_trade_price_noroot.2,galchamgol,nal_trade_price_noroot,날쌘,"…하긴, 나도 첫 장사 땐 몰랐어.",,확정,D-161
+nal_trade_again.1,galchamgol,nal_trade_again,날쌘,값은 벌써 말했잖아.\n도토리 가루 하나에 칡뿌리 하나. 둘 다 가져와.,,확정,nalTrade 값이 모자랄 때(story.js:220)
+nal_trade_bluff_arc.1,galchamgol,nal_trade_bluff_arc,날쌘,봐. 이게 제대로 된 숯이야.,,확정,nalTrade 허세 덤 사연(story.js:224). 둘째 줄 뒤에 받는 줄(receiveItem coal 2)
+nal_trade_bluff_arc.2,galchamgol,nal_trade_bluff_arc,날쌘,하나 더 얹었어. 써 봐.,,확정,
+nal_trade_bluff_arc.3,galchamgol,nal_trade_bluff_arc,날쌘,꼬마가 숯 보는 눈은 아직이네.,,확정,
+nal_trade_bluff_arc.diary,galchamgol,nal_trade_bluff_arc,일기,날쌘에게 허세를 부렸더니 숯을 하나 더 얹어 주었다. 꼬마가 숯 보는 눈은 아직이라며 코웃음을 쳤다.,,확정,galArcNal1
+nal_trade_bluff.1,galchamgol,nal_trade_bluff,날쌘,"봐, 이게 제대로 된 숯이야. 하나 더 얹어 줄 테니 써 봐.",,확정,nalTrade 허세 덤(story.js:228). 첫 줄 뒤에 받는 줄(receiveItem coal 2)
+nal_trade_bluff.2,galchamgol,nal_trade_bluff,날쌘,써 보고도 촌구석 소리가 나오나 보자고.,,확정,
+nal_trade_plain.1,galchamgol,nal_trade_plain,날쌘,"자, 숯 하나. 딱 맞게 바꾼 거야.",,확정,nalTrade 덤 없이(story.js:228). 첫 줄 뒤에 받는 줄(receiveItem coal 1)
+nal_trade_plain.2,galchamgol,nal_trade_plain,날쌘,"네 삼촌한테 줄 거야? 그 양반, 여간 까다로운 게 아닌데.",,확정,
+nal_trade_plain.3,galchamgol,nal_trade_plain,너구리,…우리 삼촌인 거 어떻게 알아요?,,확정,
+nal_trade_plain.4,galchamgol,nal_trade_plain,날쌘,이 동네 대장장이가 너구리인데\n너구리 꼬마면 조카지. 가.,,확정,
+nal_route.1,galchamgol,nal_route,너구리,숯 하나에 가루랑 뿌리 둘이요?\n숯이 더 비싸요?,,확정,nalRoute(story.js:230-240)
+nal_route.2,galchamgol,nal_route,날쌘,단풍골엔 참나무가 흔해. 근데 돌너머 가면\n같은 숯도 값이 달라. 돌투성이라 나무가 귀하거든.,,확정,
+nal_route.3,galchamgol,nal_route,날쌘,값은 물건이 정하는 게 아니야. 길이 정해.\n…칡꽃도 북쪽에선 귀하게 쳐.,,확정,
+nal_route.4,galchamgol,nal_route,너구리,그걸 왜 알려 줘요?,,확정,
+nal_route.5,galchamgol,nal_route,날쌘,공짜 아니야. 적어 둬. 나중에 받을 거니까.,,확정,
+nal_route.6,galchamgol,nal_route,너구리,(수첩에 “값은 길이 정한다”고 적었다.),,확정,
+nal_route.7,galchamgol,nal_route,날쌘,…진짜 적네.,,확정,
+nal_route.diary,galchamgol,nal_route,일기,"날쌘에게 숯값 셈을 물었다. 값은 물건이 아니라 길이 정한다고 했다. 북쪽 돌너머에선 칡꽃이 귀하다고 귀띔하고는, 공짜가 아니니 나중에 받겠다고 했다.",,확정,galArcNal2
+nal_hat.1,galchamgol,nal_hat,너구리,"아저씨, 아까부터 제 모자 봐요.",,확정,nalHat(story.js:241-253)
+nal_hat.2,galchamgol,nal_hat,날쌘,누가? 지게 끈 보고 있었어.,,확정,
+nal_hat.3,galchamgol,nal_hat,너구리,아빠 모자예요. 떠나는 날 엄마가 씌워 줬어요.,,확정,
+nal_hat.4,galchamgol,nal_hat,너구리,"(날쌘이 한동안 말이 없다가, 모자를 벗겨\n꺾인 챙을 손바닥으로 펴고 도로 씌워 준다.)",,확정,
+nal_hat.5,galchamgol,nal_hat,날쌘,보부상은 모자부터 바로 써.\n비 오면 챙이 얼굴을 막아 줘.,,확정,
+nal_hat.6,galchamgol,nal_hat,너구리,아빠도 비 오는 날 그 말 했어요.,,확정,
+nal_hat.7,galchamgol,nal_hat,날쌘,흔한 말이야. 보부상이면 다 해.,,확정,
+nal_hat.diary,galchamgol,nal_hat,일기,"날쌘이 꺾인 모자 챙을 펴서 도로 씌워 주었다. 엄마가 씌워 준 아빠 모자라고 하자 한동안 말이 없었다. 아빠가 하던 말과 같은 말을 하고는, 흔한 말이라고 했다.",,확정,galArcNal3
+nal_hat_tip.1,galchamgol,nal_hat_tip,날쌘,"칡도 풀었다며. …소문 한번 빠르네, 이 동네.",,확정,엉킨 칡을 푼 뒤(G.boss.dead) nal_hat 끝에 붙는다(D-528)
+nal_ahead.1,galchamgol,nal_ahead,너구리,(날쌘이 좌판을 걷어 지게에 묶고 있다.)\n…어디 가요?,,확정,nalAhead(story.js:254-263)
+nal_ahead.2,galchamgol,nal_ahead,날쌘,북쪽. 날 밝으면 먼저 떠.\n첫눈 오기 전에 고개를 넘어야 하거든.,,확정,
+nal_ahead.3,galchamgol,nal_ahead,너구리,저도 북쪽 가요. 같이 가요.,,확정,
+nal_ahead.4,galchamgol,nal_ahead,날쌘,보부상은 혼자 다녀. 짐 나눠 지면 셈이 꼬여.\n…돌너머 어귀에 좌판 펴고 있을지도 모르지.,,확정,
+nal_ahead.5,galchamgol,nal_ahead,날쌘,이건 남은 주먹밥이야. 상하기 전에 먹어.\n버리기 아까워서 주는 거야.,,확정,
+nal_ahead.6,galchamgol,nal_ahead,너구리,{얻음 rice 1},,확정,gotLine
+nal_ahead.diary,galchamgol,nal_ahead,일기,"날쌘이 좌판을 걷고 있었다. 날 밝으면 먼저 북쪽으로 간다고 했다. 같이 가자니 보부상은 혼자 다닌다면서, 돌너머 어귀에 있을지도 모른다고 했다. 남은 주먹밥이라며 하나를 줬다.",,확정,galArcNal4
+nal_dad_tag.clue,galchamgol,nal_dad_tag,단서:날쌘,날쌘은 아빠 짐표의 뒷면 낙관만 보고 알아봤다. 아빠를 봤느냐고 묻자 말을 돌렸다. 떠돌이 보부상들도 아빠를 안다.,,확정,n1 (core.js:390 NAME_CLUES)
+nal_dad_tag.1,galchamgol,nal_dad_tag,너구리,"이거 우리 아빠 짐표예요.\n이거 단 보부상, 본 적 있어요?",,확정,nalDadTag(story.js:264-272) D-426
+nal_dad_tag.2,galchamgol,nal_dad_tag,너구리,(날쌘이 짐표를 뒤집어 뒷면 낙관을 한참 본다.),,확정,
+nal_dad_tag.3,galchamgol,nal_dad_tag,날쌘,…流 낙관 모르는 보부상이 어딨어.,,확정,
+nal_dad_tag.4,galchamgol,nal_dad_tag,너구리,그럼 아빠 봤어요?,,확정,
+nal_dad_tag.5,galchamgol,nal_dad_tag,날쌘,짐표는 아무한테나 내보이는 거 아니야.\n도로 매 둬.,,확정,
+nal_dad_tag.6,galchamgol,nal_dad_tag,날쌘,네 아빠는… 됐어. 갈 길이나 가.,,확정,
+nal_craft_salt_done.1,galchamgol,nal_craft_salt_done,날쌘,"소금 종지랑 깨는 벌써 줬잖아.\n묵을 쑤든, 깨랑 찧든 네 솜씨껏 써.",,확정,nalCraftSalt 바꾼 뒤(story.js:276). 귀띔 hint:sesame_salt
+nal_craft_salt_lead.1,galchamgol,nal_craft_salt_lead,날쌘,"…알아, 나도. 테가 풀려서\n걸을 때마다 숯가루가 새.",,확정,nalCraftSalt 바구니 이야기 처음(story.js:279)
+nal_craft_salt_novine.1,galchamgol,nal_craft_salt_novine,날쌘,칡 줄기 하나면 다시 감을 텐데.\n숯 말고 지게에 남은 건 소금이랑 깨뿐이야.,,확정,칡 줄기 없을 때(story.js:281)
+nal_craft_salt_novine.2,galchamgol,nal_craft_salt_novine,날쌘,줄기 구해 오면 소금 두 종지에 깨 한 봉지.\n당산나무 칡이 풀리면 발에 채일 거야.,,확정,
+nal_craft_salt_vine.1,galchamgol,nal_craft_salt_vine,날쌘,마침 질긴 칡 줄기네. 그걸로 테를 감으면 되겠어.,,확정,칡 줄기 있을 때(story.js:284)
+nal_craft_salt_vine.2,galchamgol,nal_craft_salt_vine,날쌘,"숯 말고 남은 건 소금이랑 깨뿐이야.\n소금 두 종지에 깨 한 봉지, 바꿀래?",,확정,
+nal_craft_salt_vine.c1,galchamgol,nal_craft_salt_vine,고르기,보따리를 펼친다,,확정,
+nal_craft_salt_vine.c2,galchamgol,nal_craft_salt_vine,고르기,줄기는 더 살펴보고 올게요,,확정,
+nal_salt_give_first.1,galchamgol,nal_salt_give_first,날쌘,칡 줄기네. 지게 바구니 테가 풀려서\n걸을 때마다 숯가루가 새던 참이야.,,확정,nalSaltGive 바구니 이야기 전에 바로 바꿀 때(story.js:293) D-147
+nal_salt_give.1,galchamgol,nal_salt_give,날쌘,이제 숯가루 안 새겠네.,,확정,nalSaltGive(story.js:293-296)
+nal_salt_give.2,galchamgol,nal_salt_give,너구리,(소금 두 종지와 깨 한 봉지를 얻었다.),,확정,D-280 받는 줄이 아닌 지문(물건은 앞에서 넣음)
+nal_salt_give.3,galchamgol,nal_salt_give,날쌘,"가루에 소금 넣고 묵 쑤는 건 알지?\n깨도 볶아 놨으니, 소금이랑 같이 찧어 봐.",,확정,귀띔 hint:sesame_salt (D-461)
+musoe_form.1,galchamgol,musoe_form,무쇠,잎 소리 다 들린다.\n삼촌 앞에선 제 모습으로 와라.,,확정,story.js:303 변신한 채 말을 걸면
+musoe_ask.1,galchamgol,musoe_ask,무쇠,무슨 일이냐.,,확정,talkMusoe 고르기 머리(story.js:314)
+musoe_ask.c1,galchamgol,musoe_ask,고르기,낫과 시험 이야기하기,,확정,무쇠 일 끝나기 전
+musoe_ask.c2,galchamgol,musoe_ask,고르기,낫 이야기하기,,확정,무쇠 일 끝난 뒤(musoeDone)
+musoe_ask.c3,galchamgol,musoe_ask,고르기,아빠가 낫을 맡기던 날을 묻는다,,확정,"시험 뒤, galArcMusoe2 전"
+musoe_ask.c4,galchamgol,musoe_ask,고르기,삼촌 다리를 살핀다,,확정,옛 저장(galArcMusoe2 뒤 Leg1 없음)
+musoe_ask.c5,galchamgol,musoe_ask,고르기,칡뿌리 찜질을 건넨다,,확정,galPoultice 뒤
+musoe_ask.c6,galchamgol,musoe_ask,고르기,떠난다고 인사한다,,확정,일기 end 뒤
+musoe_ask.c7,galchamgol,musoe_ask,고르기,다음에 올게요,,확정,
+musoe_night.1,galchamgol,musoe_night,너구리,"아빠가 낫 맡기던 날, 어땠어요?",,확정,story.js:321 사연 장면
+musoe_night.2,galchamgol,musoe_night,무쇠,재작년 겨울이다. 떠나기 전 사흘을 여기서 묵으며\n밤마다 낡은 장부만 들여다보더군.,,확정,
+musoe_night.3,galchamgol,musoe_night,너구리,여기서요? 집이 코앞인데.,,확정,
+musoe_night.4,galchamgol,musoe_night,무쇠,집에선 못 펴 볼 거였겠지.\n…그 얘긴 하지 말라더군. 벌써 반은 어겼다.,,확정,
+musoe_night.5,galchamgol,musoe_night,너구리,(삼촌이 모루에 기대 무릎을 주무른다.)\n…다리 또 아파요?,,확정,
+musoe_night.6,galchamgol,musoe_night,무쇠,젊어서 형 따라 같은 길에 나섰다가\n이 다리로 돌아왔다. 비 오기 전엔 쑤신다.,,확정,
+musoe_night.7,galchamgol,musoe_night,무쇠,형은 앞만 봤다. 너는 살펴라.,,확정,
+musoe_night.8,galchamgol,musoe_night,너구리,네. 그럼 삼촌 다리부터 살필게요.,,확정,
+musoe_night.9,galchamgol,musoe_night,무쇠,…그 말을 거기다 쓰냐.\n할멈한테 가서 쓸데없는 소리 마라.,,확정,
+musoe_night.10,galchamgol,musoe_night,너구리,할멈이요? …까치 편에 말 보낸\n두꺼비 할머니요?,,확정,D-832
+musoe_night.11,galchamgol,musoe_night,무쇠,늪가에서 약 짓는 두꺼비 말고 누가 있냐.\n네 어미 약도 다 그 할멈 손에서 나온다.,,확정,
+musoe_night.12,galchamgol,musoe_night,무쇠,해머루 익을 철이면 당산나무 언덕 어귀에\n약탕관 걸고 앉아 있지. 가서 내 얘긴 꺼내지도 마라.,,확정,
+musoe_night.diary,galchamgol,musoe_night,일기,"재작년 겨울 아빠는 떠나기 전 사흘을 삼촌 대장간에서 묵으며 밤마다 낡은 장부를 들여다봤다. 삼촌은 젊어서 아빠와 같은 길에 나섰다가 다리를 다쳤다. 형은 앞만 봤으니 너는 살피라고 했다. 두꺼비 할머니는 엄마 약을 짓는 늪가 약재상인데, 해머루 철이면 당산나무 언덕 어귀에서 기다린다고 한다. 할머니를 만나면 삼촌 다리 약을 여쭤보기로 했다.",,확정,galArcMusoe2
+musoe_night.clue,galchamgol,musoe_night,단서:무쇠 삼촌,재작년 겨울 아빠는 떠나기 전 사흘을 대장간에서 묵으며 밤마다 낡은 장부를 들여다봤다. 그 이야기는 하지 말라고 삼촌에게 부탁했다.,,확정,m2 (story.js:337)
+musoe_leg.1,galchamgol,musoe_leg,너구리,(삼촌이 모루에 기대 무릎을 주무르고 있다.)\n…다리 또 아파요?,,확정,story.js:340 옛 저장
+musoe_leg.2,galchamgol,musoe_leg,무쇠,비 오기 전엔 쑤신다. 그뿐이다.\n할멈한테 가서 쓸데없는 소리 마라.,,확정,
+musoe_leg.3,galchamgol,musoe_leg,무쇠,…늪가 두꺼비 할멈 말이다. 해머루 철이면\n언덕 어귀에 앉아 있다. 거기 가서도 입 다물어라.,,확정,D-832
+musoe_leg.4,galchamgol,musoe_leg,너구리,(…두꺼비 할머니 만나면 꼭 여쭤봐야지.),,확정,
+musoe_leg.diary,galchamgol,musoe_leg,일기,"삼촌이 모루에 기대 무릎을 주물렀다. 늪가 두꺼비 할머니한테 쓸데없는 소리 말라길래, 언덕 어귀에서 할머니를 만나면 여쭤보기로 했다.",,확정,galArcMusoeLeg1
+musoe_leg_wrap.1,galchamgol,musoe_leg_wrap,너구리,할머니가 칡뿌리 찜질을 싸 주셨어요.,,확정,story.js:349 사연 장면
+musoe_leg_wrap.2,galchamgol,musoe_leg_wrap,무쇠,…누가 할멈한테 가랬냐.,,확정,
+musoe_leg_wrap.3,galchamgol,musoe_leg_wrap,너구리,쓸데없는 소리는 안 했어요.\n다리 얘기만 했어요.,,확정,
+musoe_leg_wrap.4,galchamgol,musoe_leg_wrap,너구리,"(삼촌이 한참 보다가, 말없이 받아 무릎에 감는다.)",,확정,
+musoe_leg_wrap.5,galchamgol,musoe_leg_wrap,무쇠,…따뜻하군. 형도 그랬다.\n제 발은 터져도 남 다리만 봤다.,,확정,
+musoe_leg_wrap.6,galchamgol,musoe_leg_wrap,무쇠,…겨울이면 구들돌을 데워\n솜에 싸서 내 다리에 대 줬지. 그게 오래 갔다.,,확정,귀띔 hint:jjimjil_dol (D-461)
+musoe_leg_wrap.diary,galchamgol,musoe_leg_wrap,일기,할머니가 싸 준 칡뿌리 찜질을 삼촌께 갖다 드렸다. 삼촌은 말없이 무릎에 감고 따뜻하다고 했다. 아빠도 제 발은 터져도 남 다리만 봤다고. 그러고는 낫을 손봐 주었다.,,확정,galArcMusoeLeg3
+musoe_leg_wrap_sharp.1,galchamgol,musoe_leg_wrap_sharp,무쇠,"그 낫, 날은 멀쩡하군.\n…벼리고 남은 숯이다. 가져가라.",,확정,D-284 날이 이미 섰을 때(G.sharp)
+musoe_leg_wrap_sharp.2,galchamgol,musoe_leg_wrap_sharp,너구리,{얻음 coal 1},,확정,gotLine
+musoe_leg_wrap_sharp.3,galchamgol,musoe_leg_wrap_sharp,무쇠,고맙긴. 남은 거다.,,확정,
+musoe_leg_wrap_dull.1,galchamgol,musoe_leg_wrap_dull,너구리,(삼촌이 내 낫을 받아 숫돌에 몇 번 문지른다.\n날이 한결 날카로워졌다.),,확정,D-284 날이 덜 섰을 때
+musoe_leg_wrap_dull.2,galchamgol,musoe_leg_wrap_dull,무쇠,고맙긴. 덜 된 걸 마저 한 거다.,,확정,
+musoe_bye.1,galchamgol,musoe_bye,너구리,(삼촌이 대장간 문턱까지 나와 서 있다.),,확정,story.js:362 사연 장면
+musoe_bye.2,galchamgol,musoe_bye,무쇠,찜질 덕에 오늘은 덜 쑤신다.\n…네 어미한테도 아침에 다녀왔다. 죽은 받아먹더라.,,확정,
+musoe_bye.3,galchamgol,musoe_bye,너구리,돌아올 때 할머니 찜질 또 갖다 드릴게요.,,확정,
+musoe_bye.4,galchamgol,musoe_bye,무쇠,필요 없다. …칡뿌리는 굵은 걸로 가져와라.,,확정,
+musoe_bye.5,galchamgol,musoe_bye,너구리,(삼촌이 처음으로 손을 들어 흔들었다.),,확정,
+musoe_bye.diary,galchamgol,musoe_bye,일기,"떠나는 날 삼촌이 대장간 문턱까지 나와 있었다. 찜질 덕에 덜 쑤신다고, 아침엔 엄마한테도 다녀왔다고 했다. 필요 없다면서 칡뿌리는 굵은 걸로 가져오라고 했다. 처음으로 손을 흔들어 주었다.",,확정,galArcMusoeBye
+musoe_poultice_give.1,galchamgol,musoe_poultice_give,너구리,(할머니가 칡뿌리를 찧어 무명에 싸 준다.\n아직 따뜻하다.),,확정,toadPoultice give (story.js:380) 두꺼비 할멈 메뉴에서
+musoe_poultice_give.2,galchamgol,musoe_poultice_give,두꺼비 할멈,식기 전에 갖다 주렴.\n…그 집 형제는 고맙단 말을 못 배웠지.,,확정,
+musoe_poultice_give.3,galchamgol,musoe_poultice_give,두꺼비 할멈,남는 뿌리는 겨우살이에 대추 하나 넣고\n갈아 두렴. 겨울 약으론 그만이다.,,확정,귀띔 hint:ssanghwa (D-461)
+musoe_poultice_give.diary,galchamgol,musoe_poultice_give,일기,할머니가 칡뿌리를 짓찧어 무명에 싸 주었다. 식기 전에 삼촌께 갖다 드리라고 했다.,,확정,galPoultice
+musoe_poultice_ask.1,galchamgol,musoe_poultice_ask,두꺼비 할멈,칡뿌리 하나 있느냐? 찧는 건 내가 하마.,,확정,story.js:384 남는 칡뿌리가 있을 때
+musoe_poultice_ask.c1,galchamgol,musoe_poultice_ask,고르기,칡뿌리 하나를 건넨다,,확정,
+musoe_poultice_ask.c2,galchamgol,musoe_poultice_ask,고르기,조금 이따가요,,확정,
+musoe_poultice_keep.1,galchamgol,musoe_poultice_keep,두꺼비 할멈,그 뿌리는 아직 쓸 데가 있겠구나.\n남는 걸로 하나 가져오렴.,,확정,칡뿌리가 진행 몫뿐일 때
+musoe_poultice_need.1,galchamgol,musoe_poultice_need,두꺼비 할멈,칡뿌리 하나 가져오렴.\n찧는 건 내가 하마.,,확정,칡뿌리가 없을 때
+musoe_poultice.1,galchamgol,musoe_poultice,너구리,"할머니, 무쇠 삼촌 다리가 쑤신대요.\n할머니한테는 말하지 말래요.",,확정,story.js:387 사연 장면
+musoe_poultice.2,galchamgol,musoe_poultice,두꺼비 할멈,"허허, 그럼 많이 아픈 게로구나.\n칡뿌리를 짓찧어 싸 매면 붓기가 좀 내린단다.",,확정,
+musoe_poultice.diary,galchamgol,musoe_poultice,일기,삼촌 다리 이야기를 하자 할머니는 웃었다. 말하지 말라고 했으면 많이 아픈 거라고. 칡뿌리를 짓찧어 싸 매면 붓기가 내린다고 했다.,,확정,galArcMusoeLeg2
+musoe_toad_leg.c1,galchamgol,musoe_toad_leg,고르기,삼촌 찜질에 쓸 칡뿌리 이야기,,확정,toadLegChoice (story.js:395) galArcMusoeLeg2 뒤. 두꺼비 할멈 메뉴에 붙는 고르기
+musoe_toad_leg.c2,galchamgol,musoe_toad_leg,고르기,삼촌 다리에 듣는 약을 묻는다,,확정,galArcMusoeLeg2 전
+musoe_stamp_knew.1,galchamgol,musoe_stamp_knew,너구리,(길에서 본 아빠 손이 모루 밑에도 있다.),,확정,Rg.onStampFound 모루 도장 (story.js:403) 다른 도장을 먼저 찾았을 때
+musoe_stamp_new.1,galchamgol,musoe_stamp_new,너구리,(모루 밑에 너구리 손바닥 자국이 눌려 있다.\n아빠 수첩 첫 장에 찍힌 손이랑 똑같다.),,확정,첫 도장일 때
+musoe_stamp.1,galchamgol,musoe_stamp,너구리,"삼촌, 모루 밑에 아빠 손이 있어요.",,확정,D-1203
+musoe_stamp.2,galchamgol,musoe_stamp,무쇠,…형이 찍었다. 내가 이 모루를 들이던 해에.,,확정,
+musoe_stamp.3,galchamgol,musoe_stamp,무쇠,보부상은 뒤에 올 이들 보라고 길에 표를 남긴다.\n형은 손바닥으로 했다.,,확정,
+musoe_stamp.4,galchamgol,musoe_stamp,무쇠,여긴 연장 고칠 데가 있다는 표다.\n…덕분에 지나던 보부상이 꽤 들렀지.,,확정,
+musoe_stamp.5,galchamgol,musoe_stamp,너구리,그럼 아빠 가는 길마다 이런 손이 있어요?,,확정,
+musoe_stamp.6,galchamgol,musoe_stamp,무쇠,쓸 만한 데마다 있을 거다.\n형 길을 따라가 봐라.,,확정,
+musoe_stamp.7,galchamgol,musoe_stamp,너구리,(아빠 손을 찾는 대로 수첩에 그려 두자.),,확정,
+musoe_stamp.diary,galchamgol,musoe_stamp,일기,"대장간 모루 밑에서 아빠 손바닥 도장을 찾았다. 삼촌이 대장간을 열던 해에 아빠가 연장 고칠 데라는 표로 찍어 준 거란다. 보부상은 뒤에 올 이들을 위해 길에 표를 남기고, 아빠는 손바닥으로 남겼다. 아빠 길을 따라가면 쓸 만한 데마다 있을 거라고 했다.",,확정,gal_stamp_anvil (대화를 끝까지 넘겼을 때)
+musoe_first.1,galchamgol,musoe_first,무쇠,왔냐. …보따리는 왜 멨냐.,,확정,musoeMain 첫 만남 (story.js:418) D-216
+musoe_first.2,galchamgol,musoe_first,너구리,아빠 찾으러 가요.\n엄마 약도 구하고요.,,확정,
+musoe_first.3,galchamgol,musoe_first,무쇠,길이 멀다. 넌 아직 어리고.,,확정,
+musoe_first.4,galchamgol,musoe_first,너구리,안 어려요. 보따리도 제가 쌌어요.,,확정,
+musoe_first.5,galchamgol,musoe_first,무쇠,…집안 보따리를 꺼냈구나.\n형은 그걸로 모루도 지고 다녔다.,,확정,D-425
+musoe_first.6,galchamgol,musoe_first,무쇠,형은 두 해째 소식이 없다.\n너까지 길에서 다치면 네 어미 볼 낯이 없다.,,확정,
+musoe_first.c1,galchamgol,musoe_first,고르기,"저도 보부상이에요, 삼촌. 보내 주세요",,확정,
+musoe_retry.1,galchamgol,musoe_retry,무쇠,숨은 골랐냐.\n급할 것 없다. 준비되면 다시 해 보자.,,확정,story.js:423 시험에 지거나 물러난 뒤
+musoe_retry.c1,galchamgol,musoe_retry,고르기,다시 해 볼게요,,확정,시험 전투(S5)
+musoe_retry.c2,galchamgol,musoe_retry,고르기,조금 이따가요,,확정,
+musoe_forge_start.1,galchamgol,musoe_forge_start,무쇠,숯 가져왔군. 불 올린다.,,확정,story.js:430 벼릴 숯이 있을 때
+musoe_forge_start.2,galchamgol,musoe_forge_start,너구리,(삼촌이 쇠를 달궈 세 번 내리친다.\n다리는 절어도 망치는 흔들리지 않는다.),,확정,
+musoe_need_coal_kept.1,galchamgol,musoe_need_coal_kept,무쇠,그 숯은 날 세우는 몫이다.\n벼릴 숯은 따로 가져와라.,,확정,story.js:431 시험 숯만 있을 때(D-139)
+musoe_need_coal.1,galchamgol,musoe_need_coal,무쇠,숯이 있어야 불을 올리지.\n네 연장이니 값은 네가 치러라.,,확정,숯이 모자랄 때
+musoe_nal_hint.1,galchamgol,musoe_nal_hint,무쇠,날쌘이 녀석이 길목에 좌판을 폈더라.\n숯을 쟁여 놨을 거다.,,확정,"숯 있는 데 일러 주기(musoeMain, musoeAfterLeaf D-447)"
+musoe_done.1,galchamgol,musoe_done,무쇠,낫은 손에 익었냐.\n형은 그걸로 덩굴을 잘도 쳐냈다.,,확정,story.js:432 낫을 받은 뒤
+musoe_done.2,galchamgol,musoe_done,무쇠,너도 곧 그럴 게다.,,확정,
+musoe_2.clue,galchamgol,musoe_2,단서:무쇠 삼촌,아빠는 재작년 겨울 삼촌에게 낫을 맡기고 떠났다. 내가 따라나설 줄 알았다고 한다.,,확정,m1 (story.js:435)
+musoe_2.diary,galchamgol,musoe_2,일기,무쇠 삼촌이 길을 막았다. 아빠가 낫을 맡기며 내 조심성부터 보고 주라고 했단다. 나도 어른 보부상이라는 걸 보여 줘야 한다.,,확정,musoe
+musoe_2_ask.1,galchamgol,musoe_2_ask,너구리,당산나무 칡을 끊어야 해요.\n날 선 연장 좀 빌려주세요.,,확정,story.js:439 도담 일을 마쳤을 때(D-413)
+musoe_2.1,galchamgol,musoe_2,너구리,(삼촌이 대답 대신 벽에 걸린 낫을 올려다본다.),,확정,story.js:440
+musoe_2.2,galchamgol,musoe_2,너구리,"…저거, 아빠 낫이죠?\n자루에 감은 끈이 똑같아요.",,확정,
+musoe_2.3,galchamgol,musoe_2,무쇠,재작년 겨울에 형이 맡기고 갔다. 네가 따라나서면\n그때 주라더군. 조심성부터 보고.,,확정,
+musoe_2.4,galchamgol,musoe_2,무쇠,두 해 가까이 기다린 낫이다.\n덤비지 말고 버텨 봐라.,,확정,
+musoe_2.5,galchamgol,musoe_2,너구리,"(…흥, 버티는 거라면 자신 있어.)",,확정,끝나면 시험 전투(S5)
+musoe_battle_hurt.1,galchamgol,musoe_battle_hurt,무쇠,다친 데는 없냐.,,확정,battleMusoe 지거나 물러났을 때(story.js:448)
+musoe_battle_flee.1,galchamgol,musoe_battle_flee,무쇠,"그래, 무리다 싶으면 물러나는 거다.\n숨 고르고 다시 와라.",,확정,물러났을 때
+musoe_battle_lose.1,galchamgol,musoe_battle_lose,무쇠,서두르니까 맞는 거다.\n숨 고르고 다시 와라.,,확정,졌을 때
+musoe_battle_calm.1,galchamgol,musoe_battle_calm,무쇠,…배부터 채웠으니 고집은 그만 부리마.\n먹을 걸 내밀 줄도 아는구나.,,확정,story.js:462 선물로 달랬을 때
+musoe_battle_calm.diary,galchamgol,musoe_battle_calm,일기,무쇠 삼촌에게 먹을 것을 건네 마음을 풀었다. 아빠도 이렇게 했을까.,,확정,test
+musoe_battle_perfect.1,galchamgol,musoe_battle_perfect,무쇠,"허, 그 한 대 말고는 다 피했군.\n형 아들 맞다.",,확정,한 대도 안 맞았을 때(D-1491)
+musoe_battle_perfect.2,galchamgol,musoe_battle_perfect,무쇠,형이 조심성부터 보라 했지.\n이만하면 날 선 연장을 쥐여 줘도 되겠다.,,확정,
+musoe_battle_perfect.3,galchamgol,musoe_battle_perfect,무쇠,이 숯은 네 낫 날을 한 번 더 세울 몫이다.\n벼리러 올 때 같이 가져와라.,,확정,뒤에 받는 줄(코드 receive coal 1)
+musoe_battle_win.1,galchamgol,musoe_battle_win,무쇠,끝까지 버티는 건 형을 닮았군.\n…그만하면 길에서 제 몸은 지키겠다.,,확정,한 대라도 맞고 이겼을 때
+musoe_battle_win.2,galchamgol,musoe_battle_win,무쇠,맞은 데가 얼얼할 게다.\n내 새참이다. 먹고 숨 돌려라.,,확정,뒤에 받는 줄(코드 receive rice 1)
+musoe_battle_win.3,galchamgol,musoe_battle_win,무쇠,한 대도 안 맞았으면 날 세울 숯까지 얹어 줬다.\n형이 조심성부터 보라 했거든.,,확정,
+musoe_battle_win.diary,galchamgol,musoe_battle_win,일기,"무쇠 삼촌이 꿀밤으로 연장부터 빼앗고 덤볐다. 끝까지 피했더니, 마지막에 꿀밤을 한 대 쥐어박고는 됐다고 했다.",,확정,test (calm 이 아닐 때)
+musoe_battle_tool.1,galchamgol,musoe_battle_tool,무쇠,연장은 도로 가져가라.\n이가 나갔으니 낫 벼릴 때 같이 세우마.,,확정,이긴 뒤 끝 줄
+musoe_leaf_wait.1,galchamgol,musoe_leaf_wait,무쇠,하나 더 줄 게 있다만. 오늘 다람쥐는 봤냐.,,확정,"musoeLeaf 다람쥐를 아직 못 봤을 때(D-129, story.js:475)"
+musoe_leaf_wait.2,galchamgol,musoe_leaf_wait,너구리,다람쥐요? 아직요. …다람쥐는 왜요?,,확정,
+musoe_leaf_wait.3,galchamgol,musoe_leaf_wait,무쇠,보고 오면 안다. 그럼 이건 좀 이따 주마.,,확정,
+musoe_leaf_wait.4,galchamgol,musoe_leaf_wait,무쇠,길목에 다람쥐 형제가 도토리를 세더라.\n숲엔 도담이도 있고.,,확정,
+musoe_leaf_back.1,galchamgol,musoe_leaf_back,무쇠,다람쥐는 봤냐.,,확정,미뤘다 줄 때(leafHeld)
+musoe_leaf_back.2,galchamgol,musoe_leaf_back,너구리,네. 보고 왔어요.,,확정,
+musoe_leaf_back.3,galchamgol,musoe_leaf_back,무쇠,그럼 이거다.,,확정,
+musoe_leaf_more.1,galchamgol,musoe_leaf_more,무쇠,하나 더 있다.,,확정,바로 줄 때
+musoe_leaf.1,galchamgol,musoe_leaf,너구리,"(삼촌이 품에서 접어 둔 잎 하나를 꺼내 편다.\n톱니가 고른, 늦가을에도 푸른 잎이다.)",142,확정,D-523 당산나무 잎
+musoe_leaf.2,galchamgol,musoe_leaf,무쇠,당산나무 잎이다. 형이 낫이랑 같이 맡겼다.\n제 발로 길 나서는 날 주는 게 우리 집안 풍습이다.,,확정,
+musoe_leaf.3,galchamgol,musoe_leaf,무쇠,잘 봐라.,-,확정,
+musoe_leaf.4,galchamgol,musoe_leaf,너구리,(삼촌이 자기 잎을 입술에 대고 짧게 분다.\n모루 옆에 오소리 한 마리가 선다.),,확정,D-1426 이 줄에서 필드 삼촌이 오소리로
+musoe_leaf.5,galchamgol,musoe_leaf,너구리,삼촌이… 오소리가 됐어!,,확정,
+musoe_leaf.6,galchamgol,musoe_leaf,너구리,(오소리가 잎을 한 번 더 분다.\n도로 삼촌이다.),,확정,이 줄에서 제 모습으로
+musoe_leaf.7,galchamgol,musoe_leaf,무쇠,잎은 네가 아는 만큼만 바뀐다.\n오늘 본 것 중에 제일 잘 아는 걸 떠올려라.,,확정,
+musoe_leaf.c1,galchamgol,musoe_leaf,고르기,도담을 떠올리며 잎을 분다,,확정,도담을 봤을 때
+musoe_leaf.c2,galchamgol,musoe_leaf,고르기,길에서 본 다람쥐 형제를 떠올리며 잎을 분다,,확정,다람쥐 형제만 봤을 때
+musoe_first_form.1,galchamgol,musoe_first_form,너구리,"(삐익, 풀피리 소리가 났다. 몸이 작아지고 꼬리가 커졌다.)",,확정,story.js:507
+musoe_first_form.2,galchamgol,musoe_first_form,너구리,나… 다람쥐야!,,확정,
+musoe_first_form.3,galchamgol,musoe_first_form,무쇠,됐다. 한 번 더 불면 돌아온다.\n…도토리는 묻지 마라. 잊는다.,,확정,
+musoe_first_form.4,galchamgol,musoe_first_form,너구리,(잎을 다시 부니 너구리로 돌아왔다.),,확정,
+musoe_first_form.diary,galchamgol,musoe_first_form,일기,삼촌에게 아빠가 맡긴 잎사귀를 받았다. 다람쥐를 떠올리며 잎을 부니 내가 다람쥐가 됐다. 다람쥐는 잊어도 다시 찾는다. 그래서 겁 없이 오른다.,,확정,form_squirrel
+musoe_after_leaf.1,galchamgol,musoe_after_leaf,너구리,"(받은 잎을 만지작거리다 보니 어디서 본 것 같다.)\n삼촌, 엄마 경대 위에도 마른 잎이 있어요.",,확정,story.js:517 D-413
+musoe_after_leaf.2,galchamgol,musoe_after_leaf,무쇠,네 어미 잎이다.\n둔갑을 못 하게 된 뒤로 말라 갔을 게다.,,확정,
+musoe_after_leaf.3,galchamgol,musoe_after_leaf,너구리,엄마 약을 구하면 그 잎도 살아나요?,,확정,
+musoe_after_leaf.4,galchamgol,musoe_after_leaf,무쇠,모른다. 그러니 가 봐라.\n네 어미는 내가 들여다본다. 다리는 절어도 그 길은 간다.,,확정,
+musoe_after_leaf_coal_ok.1,galchamgol,musoe_after_leaf_coal_ok,무쇠,다만 녹슨 낫은 벼려야 한다.\n숯은 있으니 됐다.,,확정,벼릴 숯이 있을 때
+musoe_after_leaf_coal_kept.1,galchamgol,musoe_after_leaf_coal_kept,무쇠,다만 녹슨 낫은 벼려야 한다.\n아까 그 숯은 날 세울 때 쓰마. 벼릴 숯은 네가 구해 와라.,,확정,시험 숯만 있을 때(D-139)
+musoe_after_leaf_coal_need.1,galchamgol,musoe_after_leaf_coal_need,무쇠,다만 녹슨 낫은 벼려야 한다.\n벼릴 숯은 네 연장이니 네가 구해 와라.,,확정,숯이 없을 때
+musoe_forge.diary,galchamgol,musoe_forge,일기,아빠의 낫을 받았다. 손잡이에 아빠 손때가 묻어 있다.,,확정,sickle (finishForge story.js:534)
+musoe_forge.clue,galchamgol,musoe_forge,단서:무쇠 삼촌,아빠는 떠나기 전 사흘을 삼촌 대장간에서 묵으며 밤마다 낡은 장부만 들여다봤다.,,확정,m2 사연을 껐을 때만 (story.js:535)
+musoe_forge_done.1,galchamgol,musoe_forge_done,무쇠,됐다. 네 아비 낫이다.\n곡괭이 이도 메웠다.,,확정,사연 켜짐. 날을 더 세웠으면 뒤에 musoe_forge_sharp.1 을 띄어 붙인다
+musoe_forge_plain.1,galchamgol,musoe_forge_plain,무쇠,됐다. 네 아비 낫이다. 곡괭이 이도 메웠다.,,확정,사연 꺼짐. 날을 더 세웠으면 뒤에 줄바꿈하고 musoe_forge_sharp.1 을 붙인다
+musoe_forge_sharp.1,galchamgol,musoe_forge_sharp,무쇠,숯이 넉넉해서 날을 더 세웠다.,,확정,앞 줄에 붙이는 글(웹 문자열 이어 붙이기)
+musoe_forge_sickle.1,galchamgol,musoe_forge_sickle,너구리,(아빠의 낫을 얻었다.\n자루에 아빠 손때가 반들반들하다.),143,확정,D-280·D-1427
+musoe_forge_sickle.2,galchamgol,musoe_forge_sickle,너구리,(삼촌이 자루 끝을 엄지로 한 번 문지른다.),,확정,D-426
+musoe_forge_sickle.3,galchamgol,musoe_forge_sickle,무쇠,형은 연장마다 제 이름을 지졌는데.\n…이건 안 지졌군.,,확정,
+musoe_forge_sickle.4,galchamgol,musoe_forge_sickle,무쇠,자루에 감은 건 칡 실이다.\n칡 줄기를 쪄서 뽑지. 형 손버릇이었다.,,확정,귀띔 hint:chik_sil (D-461)
+musoe_forge_warn.1,galchamgol,musoe_forge_warn,무쇠,당산나무 칡은 성질이 고약하다. 무리하지 마라.,-,확정,사연 켜짐
+musoe_forge_ledger.1,galchamgol,musoe_forge_ledger,너구리,아빠는 이거 맡기고 바로 떠났어요?,-,확정,사연 꺼짐(D-413)
+musoe_forge_ledger.2,galchamgol,musoe_forge_ledger,무쇠,떠나기 전 사흘을 여기서 묵었다.\n낡은 장부만 보더군. 집에선 못 펴 볼 거였겠지.,,확정,
+musoe_forge_ledger.3,galchamgol,musoe_forge_ledger,무쇠,당산나무 칡은 성질이 고약하다. 무리하지 마라.,,확정,
