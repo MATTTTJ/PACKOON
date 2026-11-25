@@ -1,0 +1,63 @@
+﻿id,지역,장면,말하는이,글,그림,상태,비고
+dodam_ask.1,galchamgol,dodam_ask,도담,응? 나한테 물어볼 거 있어?,,확정,talkDodam 고르기 머리(story.js:88)
+dodam_ask.c1,galchamgol,dodam_ask,고르기,해머루 이야기하기,,확정,도담 일 끝나기 전
+dodam_ask.c2,galchamgol,dodam_ask,고르기,해머루 가는 길 묻기,,확정,도담 일 끝난 뒤(dodamDone)
+dodam_ask.c3,galchamgol,dodam_ask,고르기,도토리 걱정을 들어 본다,,확정,
+dodam_ask.c4,galchamgol,dodam_ask,고르기,찾은 자리를 수첩에 그려 준다,,확정,
+dodam_ask.c5,galchamgol,dodam_ask,고르기,도담이 뭔가 내민다,,확정,옛 저장(D-622)
+dodam_ask.c6,galchamgol,dodam_ask,고르기,다음에 이야기하자,,확정,
+dodam_cache_ask.1,galchamgol,dodam_cache_ask,도담,"어, 그러니까… 겨울에 먹을 도토리를 묻었는데\n어디 묻었는지 잊었어!",,확정,story.js:92
+dodam_cache_ask.2,galchamgol,dodam_cache_ask,도담,흙 묻은 도토리가 보이면 그 밑이야!\n같이 찾아 줄래? 찾으면 꼭 갚을게!,,확정,
+dodam_cache_ask.c1,galchamgol,dodam_cache_ask,고르기,같이 찾아볼게,,확정,
+dodam_cache_ask.c2,galchamgol,dodam_cache_ask,고르기,해머루부터 물어볼게,,확정,
+dodam_cache_got.1,galchamgol,dodam_cache_got,도담,"어, 땅에 있던 건 벌써 다 주웠어?",,확정,story.js:99 땅의 도토리를 이미 다 주웠을 때
+dodam_cache_got.2,galchamgol,dodam_cache_got,너구리,(그러고 보니 참나무 밑에서 주운 한 알은\n흙에 반쯤 묻혀 있었다. 그 밑이 불룩했지.),,확정,
+dodam_cache_got.3,galchamgol,dodam_cache_got,너구리,그 자리 알아! 참나무 밑이었어.,,확정,
+dodam_cache_got.diary,galchamgol,dodam_cache_got,일기,도담이 겨울에 먹을 도토리를 묻은 자리를 잊었다. 아까 흙에 반쯤 묻힌 도토리를 주운 참나무 밑이 바로 거기였다.,,확정,galArcDodam1
+dodam_cache_start.1,galchamgol,dodam_cache_start,도담,찾으면 꼭 알려 줘! 그 밑에 더 묻었거든!,,확정,story.js:105
+dodam_cache_start.2,galchamgol,dodam_cache_start,도담,"…아, 어디였더라. 참나무 밑이었는데…\n여기 참나무밖에 없잖아!",,확정,
+dodam_cache_start.diary,galchamgol,dodam_cache_start,일기,도담이 겨울에 먹을 도토리를 묻은 자리를 잊었다. 숲에서 흙 묻은 도토리가 보이면 그 밑을 살펴보기로 했다.,,확정,galArcDodam1
+dodam_cache_found.1,galchamgol,dodam_cache_found,너구리,(흙 묻은 도토리다. 밑을 헤쳐 보니\n도토리가 소복이 묻혀 있다.),144,확정,story.js:114 Rg.onPickup
+dodam_cache_found.2,galchamgol,dodam_cache_found,너구리,찾았다! 도담이 묻어 둔 자리야.\n도담한테 알려 줘야지.,-,확정,
+dodam_cache_draw.1,galchamgol,dodam_cache_draw,너구리,"네 도토리, 참나무 밑에 소복이 있었어.\n수첩에 그려 줄게. 보부상은 다 적거든.",,확정,story.js:122
+dodam_cache_draw.2,galchamgol,dodam_cache_draw,도담,여기에 동그라미! 적어 두면 안 잊겠다!\n…근데 그 수첩은 어디 묻어 둬?,,확정,
+dodam_cache_draw.3,galchamgol,dodam_cache_draw,도담,찾아 준 값이야! 큰 도토리 세 알!\n빻으면 가루 하나야.,,확정,
+dodam_cache_draw.4,galchamgol,dodam_cache_draw,너구리,{얻음 acorn 3},,확정,gotLine
+dodam_cache_draw.diary,galchamgol,dodam_cache_draw,일기,도담이 도토리 묻은 자리를 수첩에 그려 주었다. 찾아 준 값으로 큰 도토리 세 알을 받았다.,,확정,galArcDodam2
+dodam_old_story.1,galchamgol,dodam_old_story,도담,"아, 맞다! 찾아 주면 갚기로 했지!\n자, 큰 도토리 세 알!",,확정,story.js:130 옛 저장
+dodam_old_story.2,galchamgol,dodam_old_story,너구리,{얻음 acorn 3},,확정,
+dodam_old_story.diary,galchamgol,dodam_old_story,일기,도담이 도토리 찾아 준 값이라며 큰 도토리 세 알을 주었다.,,확정,galArcDodam3
+dodam_first.1,galchamgol,dodam_first,도담,"어, 너구리다! 숲까지 오는 너구리는 오랜만이야!\n잠깐, 그 모자 어디서 봤는데…",,확정,story.js:136
+dodam_first.2,galchamgol,dodam_first,도담,뭐 찾아? 내가 알려 줄까?,,확정,
+dodam_first.c1,galchamgol,dodam_first,고르기,"당산나무 해머루, 어떻게 가?",,확정,
+dodam_first.c2,galchamgol,dodam_first,고르기,우리 아빠 봤어? 너구리 보부상이야,,확정,
+dodam_need_powder.1,galchamgol,dodam_need_powder,도담,도토리 가루 하나면 가는 길 알려 줄게!\n도토리 세 알을 곱게 빻으면 돼!,,확정,story.js:140
+dodam_after.1,galchamgol,dodam_after,도담,숲 안쪽의 금줄을 따라가!\n낫으로 덩굴을 걷으면 당산나무 언덕이야!,,확정,story.js:141
+dodam_after.c1,galchamgol,dodam_after,고르기,보따리를 펼친다,,확정,교환 화면(S3)
+dodam_after.c2,galchamgol,dodam_after,고르기,고마워,,확정,
+dodam_dad.clue,galchamgol,dodam_dad,단서:도담,"재작년 겨울 보부상 너구리가 도담에게서 도토리 가루를 바꿔 갔다. 해머루가 남았는지 묻더니, 철이 지나 다 졌다는 말에 북쪽으로 간다고 했다.",,확정,d1 (story.js:147)
+dodam_dad.1,galchamgol,dodam_dad,도담,"아, 생각났다! 보부상 아저씨도 그 모자 썼어!",,확정,
+dodam_dad.2,galchamgol,dodam_dad,너구리,진짜? 우리 아빠야!,,확정,
+dodam_dad.3,galchamgol,dodam_dad,도담,재작년 겨울에 그 아저씨가 여기서\n도토리 가루를 잔뜩 바꿔 갔거든!,,확정,
+dodam_dad.4,galchamgol,dodam_dad,도담,"해머루 남았냐고 묻더니, 다 졌다니까\n북쪽으로 간댔어. 엄청 급해 보이던데.",,확정,
+dodam_fruit_ask.1,galchamgol,dodam_fruit_ask,너구리,나도 해머루 찾고 있어.\n당산나무까지 어떻게 가?,,확정,story.js:157 아빠 이야기를 들은 뒤만
+dodam_fruit_dad.1,galchamgol,dodam_fruit_dad,도담,"가는 길? 그럼, 내가 알지!\n이번엔 익었어. 칡꽃 속에 보랏빛 알이 비치더라!",,확정,아빠 이야기를 들은 뒤
+dodam_fruit_plain.1,galchamgol,dodam_fruit_plain,도담,"가는 길? 그럼, 내가 알지!",,확정,아빠 이야기 전
+dodam_fruit.1,galchamgol,dodam_fruit,도담,대신 도토리 가루 하나 줘! 세 알이면 가루 하나야.\n우린 절구가 없어서 못 빻거든!,,확정,
+dodam_fruit_worry.1,galchamgol,dodam_fruit_worry,도담,"아, 도토리 하니까 생각났다!\n내 겨울 도토리, 어디 묻었더라…",,확정,"사연 켜짐, 도토리 걱정 전"
+dodam_trade_first.1,galchamgol,dodam_trade_first,도담,"와, 도토리 가루! 벌써 빻았어?\n근데 절구는 어디 있는데?",,확정,story.js:162 처음 가루를 들고 왔을 때(D-425)
+dodam_trade_first.2,galchamgol,dodam_trade_first,너구리,(보따리를 툭 쳤다.),,확정,
+dodam_trade_first.3,galchamgol,dodam_trade_first,도담,그 납작한 데서 절구가 나와?!\n나도 그런 거 있으면 도토리 안 잃어버릴 텐데!,,확정,
+dodam_trade_first.4,galchamgol,dodam_trade_first,도담,"그 가루, 나랑 바꿀 거지?",,확정,
+dodam_trade_first.c1,galchamgol,dodam_trade_first,고르기,보따리를 펼친다,,확정,교환 화면(S3)
+dodam_trade_first.c2,galchamgol,dodam_trade_first,고르기,아직은 안 줄래,,확정,
+dodam_trade.1,galchamgol,dodam_trade,도담,"와, 도토리 가루! 나랑 바꿀 거지?",,확정,두 번째부터
+dodam_trade.c1,galchamgol,dodam_trade,고르기,보따리를 펼친다,,확정,교환 화면(S3)
+dodam_trade.c2,galchamgol,dodam_trade,고르기,아직은 안 줄래,,확정,
+dodam_give.diary,galchamgol,dodam_give,일기,당산나무 언덕으로는 숲 안쪽 금줄 친 길로 간다. 해머루는 당산나무를 감은 칡이 꽃 속에 품고 있다. 요즘 그 칡덩굴이 길이며 나무를 꽁꽁 감았다고 한다.,,확정,dodam (story.js:172)
+dodam_give.1,galchamgol,dodam_give,도담,"와, 고마워! 너 이제 가루 보부상이다!\n내가 지었어!",,확정,story.js:177
+dodam_give.2,galchamgol,dodam_give,너구리,…그게 뭐야.,,확정,
+dodam_give.3,galchamgol,dodam_give,도담,내가 지었으니까 내가 젤 많이 부를 거야!\n가루 보부상! 가루 보부상!,,확정,
+dodam_give.4,galchamgol,dodam_give,도담,아무튼! 숲 안쪽 금줄 친 길로 가면 당산나무 언덕이야!\n근데 칡덩굴이 길이며 나무를 꽁꽁 감았어.,,확정,
+dodam_give.5,galchamgol,dodam_give,도담,곡괭이로는 안 끊길걸? 날 선 연장은\n대장간 무쇠 아저씨한테밖에 없어!,,확정,
+start.diary,galchamgol,start,일기,"오늘 길을 나선다. 엄마는 오늘 아침에도 내 이름을 한 번 잊었다. 해머루는 당산나무를 감은 칡이 꽃 속에 품는 열매라는데, 금줄 너머라 가 본 적이 없다. 숲을 잘 아는 다람쥐 도담이 길을 알 거다. 해머루를 할멈께 드리고 나면, 아빠가 간 북쪽 길로 간다. 그 길은 단풍골 끝에서 시작된다.",,확정,region.js:51 onStart
