@@ -851,3 +851,13 @@ stamp_found.1,전체,stamp_found,속말,"아빠 손바닥 도장이다!\n여긴 
 stamp_recall.none,전체,stamp_recall,속말,수첩에 그려 둔 아빠 손이다.,,확정,engine/field.js:1165 stampRecall(수첩 글이 없을 때)
 kudzu_sight.1,galchamgol,kudzu_sight,너구리,(저게 엉킨 칡이구나…\n큰 뱀이 당산나무를 칭칭 감은 것 같아.),,확정,"regions/galchamgol/field.js:217 언덕에서 칡을 처음 봄(D-547, SIGHT_X 960)"
 kudzu_sight.2,galchamgol,kudzu_sight,너구리,(꽃 속에 보랏빛 알이 비쳐. 해머루야!\n무서워도… 가까이 가 보자.),,확정,regions/galchamgol/field.js:217
+end.kicker,galchamgol,end,화면,단풍골 체험판 완료,,확정,region.js:29 cover.end.kicker(끝 화면)
+end.head,galchamgol,end,화면,북쪽 길이 열렸다,,확정,region.js:29 cover.end.head
+end.body.1,galchamgol,end,화면,"두꺼비 할멈이 해머루로 달인 약을 까치 편에 집으로 보냈다. 엄마를 낫게 하지는 못해도, 기운은 조금 붙들어 줄 것이다.",,확정,region.js:30
+end.body.2,galchamgol,end,화면,아빠는 북쪽으로 갔다. 나도 간다.,,확정,region.js:31
+end.stat.clues,galchamgol,end,화면,아빠 단서,,확정,region.js:68 endStats
+end.stat.nal,galchamgol,end,화면,날쌘의 경멸,,확정,region.js:69 endStats
+end.stat.faints,galchamgol,end,화면,쓰러진 횟수,,확정,region.js:70 endStats
+ui_end.book,전체,ui_end,화면,아빠의 수첩 보기,,확정,index.html:159 btnBookEnd
+ui_end.restart,전체,ui_end,화면,처음부터,,확정,index.html:159 btnRestart
+ui_end.restart_armed,전체,ui_end,화면,정말요? 한 번 더 누르면 저장이 지워져요,,확정,engine/save.js:174 confirmNewGame(저장을 지우는 단추는 두 번)
