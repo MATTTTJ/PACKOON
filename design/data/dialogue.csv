@@ -337,3 +337,311 @@ musoe_forge_warn.1,galchamgol,musoe_forge_warn,무쇠,당산나무 칡은 성질
 musoe_forge_ledger.1,galchamgol,musoe_forge_ledger,너구리,아빠는 이거 맡기고 바로 떠났어요?,-,확정,사연 꺼짐(D-413)
 musoe_forge_ledger.2,galchamgol,musoe_forge_ledger,무쇠,떠나기 전 사흘을 여기서 묵었다.\n낡은 장부만 보더군. 집에선 못 펴 볼 거였겠지.,,확정,
 musoe_forge_ledger.3,galchamgol,musoe_forge_ledger,무쇠,당산나무 칡은 성질이 고약하다. 무리하지 마라.,,확정,
+toad_hill_intro.1,galchamgol,toad_hill_intro,두꺼비 할멈,"얘야, 거기 보따리 멘 아이.\n…그 모자를 보니 네가 그 집 아이로구나.",,확정,toadHillIntro(story.js:582-591) 칡을 풀기 전 첫 만남 D-833
+toad_hill_intro.2,galchamgol,toad_hill_intro,너구리,두꺼비 할머니세요?\n까치가 할머니 말을 물어 왔어요.,,확정,
+toad_hill_intro.3,galchamgol,toad_hill_intro,두꺼비 할멈,"옳지, 까치가 말을 잘 전했구나.\n해머루 익을 철이면 나는 해마다 여기서 기다린단다.",,확정,
+toad_hill_intro.4,galchamgol,toad_hill_intro,두꺼비 할멈,칡이 열매를 떨구면 마르기 전에 달여야 약이 되거든.\n올해는 칡이 저리 엉켜서 늙은 다리로는 못 간다.,,확정,
+toad_hill_intro_dead.1,galchamgol,toad_hill_intro_dead,두꺼비 할멈,얘야! 나무 꼭대기가 크게 흔들리길래\n어귀에서 올라와 봤다. 칡이 풀렸구나.,,확정,toadHillIntro 칡을 먼저 푼 판(story.js:585)
+toad_first_greet_known.1,galchamgol,toad_first_greet_known,두꺼비 할멈,네가 그 집 아이로구나. 까치가 말을 잘 전했구나.,,확정,talkToad 첫 만남(story.js:653) 언덕 인사가 한 줄일 때
+toad_first_greet.1,galchamgol,toad_first_greet,두꺼비 할멈,어서 오렴. 까치가 말을 잘 전했구나.,,확정,언덕 인사가 없을 때(예전 저장)
+toad_first.1,galchamgol,toad_first,두꺼비 할멈,편지 나르는 그 까치가 그러더구나.\n네 엄마가 이젠 말까지 잃어 간다고.,,확정,talkToad 첫 만남(story.js:640-670) D-1393
+toad_first.2,galchamgol,toad_first,두꺼비 할멈,그건… 병이라기보다는…\n…아니다. 늙으니 헛말이 나오는구나.,,확정,
+toad_first.clue,galchamgol,toad_first,단서:두꺼비 할멈,재작년 겨울 장삿길에서 돌아온 아빠는 동네에 도는 말을 듣고 두꺼비 할멈을 찾아가 무언가를 들었다. 며칠 뒤 북쪽으로 갔다. 할멈은 아빠한테 들으라며 말을 아꼈다.,,확정,t1
+toad_first.diary,galchamgol,toad_first,일기,두꺼비 할멈은 엄마를 낫게 할 약은 없지만 기운은 붙들 수 있다고 했다. 해머루가 필요하다.,,확정,toad
+toad_first_fruit.1,galchamgol,toad_first_fruit,두꺼비 할멈,해머루… 이거면 기운은 붙들 수 있단다.,,확정,해머루를 지녔을 때
+toad_first_alive.1,galchamgol,toad_first_alive,두꺼비 할멈,내 손으로 낫게 하진 못해도 기운은 붙들 수 있단다.\n당산나무 칡꽃 속 해머루를 가져오렴.,,확정,칡을 풀기 전
+toad_first_dead.1,galchamgol,toad_first_dead,두꺼비 할멈,내 손으로 낫게 하진 못해도 기운은 붙들 수 있단다.\n떨어진 해머루부터 주워 오렴.,,확정,칡을 푼 뒤 해머루 없음
+toad_first_2.1,galchamgol,toad_first_2,너구리,아빠는 엄마 낫게 할 걸 찾으러 갔어요.\n할머니는 그게 뭔지 알아요?,,확정,
+toad_first_2.2,galchamgol,toad_first_2,두꺼비 할멈,"(할머니가 한참 말이 없다.)\n…재작년 겨울, 장삿길에서 돌아온 네 아빠가 날 찾아왔더구나.",,확정,
+toad_first_2.3,galchamgol,toad_first_2,두꺼비 할멈,동네에 도는 말을 듣고 왔다더구나.\n늙은이 얘기를 듣고는 며칠 뒤 북쪽으로 갔다.,,확정,D-1472
+toad_first_2.4,galchamgol,toad_first_2,두꺼비 할멈,그 얘긴 네 아빠 입으로 듣거라.\n내가 할 말이 아니란다.,,확정,
+toad_first_2.5,galchamgol,toad_first_2,너구리,(아빠 얘기에 나도 모르게 짐표를 꼭 쥐었다.\n할머니가 짐표 앞면을 손끝으로 쓸어 본다.),,확정,D-426
+toad_first_2.6,galchamgol,toad_first_2,두꺼비 할멈,…그 양반 이름이 혀끝에서 맴도는데.\n이름이란 게 참 잘도 달아나는구나.,,확정,
+toad_first_trade.1,galchamgol,toad_first_trade,두꺼비 할멈,"자, 해머루를 보자꾸나.",,확정,첫 만남 끝(해머루를 지녔을 때)
+toad_first_trade.c1,galchamgol,toad_first_trade,고르기,보따리를 펼친다,,확정,
+toad_first_trade.c2,galchamgol,toad_first_trade,고르기,조금 이따가요,,확정,
+toad_first_alive_end.1,galchamgol,toad_first_alive_end,두꺼비 할멈,칡이 성나거든 무리 말고 물러났다 오렴.\n나는 여기서 약탕관 불을 지키고 있으마.,,확정,첫 만남 끝(칡을 풀기 전) D-833
+toad_ripe.1,galchamgol,toad_ripe,두꺼비 할멈,"잘 익었구나. 어디, 보따리를 펼쳐 보렴.",,확정,talkToad 해머루를 지니고 다시(story.js:633)
+toad_ripe.c1,galchamgol,toad_ripe,고르기,보따리를 펼친다,,확정,
+toad_ripe.c2,galchamgol,toad_ripe,고르기,조금 이따가요,,확정,
+toad_menu_alive.1,galchamgol,toad_menu_alive,두꺼비 할멈,해머루는 저 칡꽃 속에 들었단다.\n칡이 성나거든 물러났다 오렴.,,확정,talkToad 다시 말 걸기(story.js:672-673) 칡을 풀기 전. 앞에 다리 약·눈약 고르기가 붙는다
+toad_menu_alive.c1,galchamgol,toad_menu_alive,고르기,보따리를 펼친다,,확정,
+toad_menu_alive.c2,galchamgol,toad_menu_alive,고르기,다녀올게요,,확정,
+toad_menu_dead.1,galchamgol,toad_menu_dead,두꺼비 할멈,떨어진 해머루부터 주워 오렴.\n그 나무 밑에 있을 게다.,,확정,칡을 푼 뒤
+toad_menu_dead.c1,galchamgol,toad_menu_dead,고르기,보따리를 펼친다,,확정,
+toad_menu_dead.c2,galchamgol,toad_menu_dead,고르기,다녀올게요,,확정,
+toad_come.1,galchamgol,toad_come,두꺼비 할멈,"얘야, 다친 데는 없니?\n나무 꼭대기가 크게 흔들려서 가슴이 철렁했다.",,확정,toadCome(story.js:594-604) 칡이 풀린 뒤 할멈이 걸어와서 D-834
+toad_come_fruit.1,galchamgol,toad_come_fruit,너구리,괜찮아요. 칡이 풀리면서\n해머루를 떨어뜨렸어요!,,확정,해머루를 지녔을 때
+toad_come_nofruit.1,galchamgol,toad_come_nofruit,너구리,괜찮아요. 칡이 스르르 풀렸어요.\n해머루도 나무 밑에 떨어졌어요.,,확정,해머루 없음
+toad_come_hint.1,galchamgol,toad_come_hint,두꺼비 할멈,장하다. 이제 칡꽃도 거둘 수 있겠구나.\n칡꽃은 꿀에 재워 두면 겨울 내내 목이 안 붓지.,,확정,귀띔 hint:kkot_cheong (D-461)
+toad_come_trade.1,galchamgol,toad_come_trade,두꺼비 할멈,어디 보자. …잘 익었구나.\n보따리를 펼쳐 보렴.,,확정,
+toad_come_trade.c1,galchamgol,toad_come_trade,고르기,보따리를 펼친다,,확정,
+toad_come_trade.c2,galchamgol,toad_come_trade,고르기,조금 이따가요,,확정,
+toad_come_pick.1,galchamgol,toad_come_pick,두꺼비 할멈,그럼 어서 주워 오렴.\n마르기 전에 달여야지.,,확정,
+toad_give_jelly.1,galchamgol,toad_give_jelly,두꺼비 할멈,묵까지 쑤어 왔구나. 약이랑 같이 까치 편에 보내마.\n이건 말린 꾀꼬리버섯이란다. 길에서 끓여 먹으렴.,,확정,toadGive 도토리묵을 얹었을 때(story.js:609-611) D-78·D-525. 뒤에 꾀꼬리버섯 받는 줄
+toad_give.1,galchamgol,toad_give,두꺼비 할멈,이걸로 약을 달여 까치 편에 집으로 보내마.\n다만 기운을 붙들 뿐이란다.,,확정,toadGive(story.js:619-631) D-526·D-1392
+toad_give.2,galchamgol,toad_give,두꺼비 할멈,네 엄마를 낫게 하는 건 내 약탕관에 없다.\n북쪽 돌너머 서리다래라면 한 번 더 붙들 게다.,,확정,
+toad_give.3,galchamgol,toad_give,너구리,제가 갖다 드리면 안 돼요?,,확정,
+toad_give.4,galchamgol,toad_give,두꺼비 할멈,엄마 얼굴 보면 그 문턱을 다시 넘기 어려울 게다.\n너는 눈 오기 전에 고개를 넘으렴.,,확정,
+toad_give.5,galchamgol,toad_give,두꺼비 할멈,하나만 일러 두마. 밤 산길에서 누가 이름을 부르거든\n돌아보지 마라. 세 번째 부름엔 넋이 따라간단다.,,확정,D-982·D-1083
+toad_give.6,galchamgol,toad_give,두꺼비 할멈,약초 캐러 산을 오르내리며 늙은이들한테 들은 말이다.\n…늙은이 잔소리지.,,확정,
+toad_give.7,galchamgol,toad_give,너구리,(…내 이름 부를 사람도 없는데.),,확정,
+toad_give.diary,galchamgol,toad_give,일기,"할멈이 엄마에게 약을 보내 주었다. 북쪽 길이 열렸다. 아빠, 기다려요.",,확정,end
+toad_give_arc.diary,galchamgol,toad_give_arc,일기,두꺼비 할멈이 해머루로 엄마 기운을 붙드는 약을 지어 까치 편에 보냈다.,,확정,galArcToad1 (사연을 켰을 때)
+toad_farewell.1,galchamgol,toad_farewell,두꺼비 할멈,북쪽으로 갈 채비는 됐니?,,확정,"toadFarewell(story.js:676-686). 고르기는 조건에 따라 넣고 빼며, 보따리 뒤에 다리 약·눈약 고르기가 붙는다"
+toad_farewell.c1,galchamgol,toad_farewell,고르기,북쪽으로 떠난다,,확정,endGame
+toad_farewell.c2,galchamgol,toad_farewell,고르기,엄마를 아는지 묻는다,,확정,"toadWinter: 사연, galArcToad2 전, 정 1 이상"
+toad_farewell.c3,galchamgol,toad_farewell,고르기,떠나기 전에 인사를 드린다,,확정,toadWrap: 옛 저장 galArcToad2 뒤 galArcToad3 전
+toad_farewell.c4,galchamgol,toad_farewell,고르기,{item}을 까치 편에 보낸다,,확정,"galSendHome: 도토리묵·깨소금마다, 집에 아직 안 보냈을 때"
+toad_farewell.c5,galchamgol,toad_farewell,고르기,보따리를 펼친다,,확정,
+toad_farewell.c6,galchamgol,toad_farewell,고르기,마을을 좀 더 둘러본다,,확정,
+toad_home_reply_jelly.1,galchamgol,toad_home_reply_jelly,너구리,(까치가 빈 묵 그릇을 물고 돌아왔다.),,확정,homeReplies.acorn_jelly(story.js:690) 다음 지역에서 받는 답장 D-89
+toad_home_reply_jelly.2,galchamgol,toad_home_reply_jelly,너구리,(그릇에 엄마가 늘 쓰던 나무숟가락이 얹혀 있다.),,확정,
+toad_home_reply_salt.1,galchamgol,toad_home_reply_salt,너구리,(돌아온 까치가 날개를 모아 코끝에 댔다.),,확정,homeReplies.sesame_salt(story.js:691)
+toad_home_reply_salt.2,galchamgol,toad_home_reply_salt,너구리,(엄마가 깨소금 종지를 그렇게 감싸 쥐었나 보다.),,확정,
+toad_send_home.1,galchamgol,toad_send_home,속말,까치가 집으로 날아갔다. 엄마가 좋아하겠지.,,확정,galSendHome → sendHomeGift(engine/core.js:452) 까치 편 집 보내기 D-06
+toad_send_home.diary,galchamgol,toad_send_home,일기,{item} 하나를 까치 편에 집으로 보냈다.,,확정,home:galchamgol
+toad_winter.1,galchamgol,toad_winter,너구리,할머니는 우리 엄마를 알아요?,,확정,toadWinter(story.js:714-728) D-02·D-526·D-1394
+toad_winter.2,galchamgol,toad_winter,두꺼비 할멈,"알다마다. 재작년 여름, 네가 열에 들떠 앓을 때\n네 엄마가 너를 업고 내 약방까지 왔더랬다.",,확정,
+toad_winter.3,galchamgol,toad_winter,두꺼비 할멈,숨이 가늘어서… 데우는 약을 끓여 먹였지.\n네 엄마는 너를 내게 맡기고 이 언덕 끝 길로 혼자 올라갔다.,,확정,
+toad_winter.4,galchamgol,toad_winter,너구리,"(…그 여름, 누가 쓴 약을 떠먹여 주던 것만 어렴풋하다.\n엄마 손이 아니었다.)",,확정,
+toad_winter.5,galchamgol,toad_winter,너구리,엄마가요? 어디 가는 길이었어요?,,확정,
+toad_winter.6,galchamgol,toad_winter,두꺼비 할멈,…늙으면 말이 느려지지.\n네 엄마랑 한 약속이 있단다. 네 아빠한테는 재작년 겨울에 다 말했고.,,확정,D-142·D-1394
+toad_winter.7,galchamgol,toad_winter,두꺼비 할멈,"자, 그날 네 엄마가 너를 업었던 포대기 끈이다.\n단풍 들어 돌아와 너를 안고 갈 땐 이 끈은 잊고 갔지.",,확정,
+toad_winter.8,galchamgol,toad_winter,두꺼비 할멈,"내내 간직했으니, 이젠 네가 지니렴.",,확정,
+toad_winter.9,galchamgol,toad_winter,너구리,(포대기 끈을 얻었다.\n보따리 말고 품 안쪽에 넣었다.),,확정,
+toad_winter.diary,galchamgol,toad_winter,일기,"두꺼비 할멈은 재작년 여름 내가 열에 들떠 앓을 때 엄마가 나를 업고 왔다고 했다. 엄마는 나를 할멈 약방에 맡기고 언덕 끝 북쪽 길로 혼자 올라갔고, 할멈이 그동안 데우는 약을 끓여 먹였단다. 단풍이 들어 돌아온 엄마가 나를 안고 갈 때 잊고 간 포대기 끈을 할멈이 간직해 왔다. 어디 가는 길이었는지 묻자 엄마와 한 약속이 있다며 말을 아꼈다. 아빠에게는 재작년 겨울 다 말했단다. 그 포대기 끈을 받았다.",,확정,galArcToad2
+toad_wrap.1,galchamgol,toad_wrap,두꺼비 할멈,이 끈을 가져가렴. 재작년 여름 네 엄마가 너를 업었던 끈이란다.,,확정,toadWrap(story.js:729-734) 옛 저장
+toad_wrap.2,galchamgol,toad_wrap,너구리,(포대기 끈을 얻었다.\n보따리 말고 품 안쪽에 넣었다.),,확정,
+toad_wrap.diary,galchamgol,toad_wrap,일기,두꺼비 할멈에게 재작년 여름 엄마가 나를 업었던 포대기 끈을 받았다. 엄마에게 가져가려고 조심히 챙겼다.,,확정,galArcToad3
+toad_geom.1,galchamgol,toad_geom,너구리,숲에서 숯 굽는 검댕 아저씨요.\n연기에 눈이 절어서 뿌옇대요.,,확정,toadGeom(story.js:1120-1129) D-530
+toad_geom.2,galchamgol,toad_geom,두꺼비 할멈,검댕이로구나.\n그 눈으로 아직도 가마를 지키는구나.,,확정,
+toad_geom.diary,galchamgol,toad_geom,일기,할머니가 검댕 아저씨 눈 씻을 결명자 물을 달여 주었다. 숯불에 달였으니 숯 한 자루 빚진 셈이라고 했다.,,확정,galArcGeom2
+toad_geom_brew.1,galchamgol,toad_geom_brew,너구리,(할머니가 약 보따리에서 결명자를 꺼내\n작은 약탕에 따로 달인다.),,확정,toadGeom brew. 옛 저장(galArcGeom2 뒤)은 이것만
+toad_geom_brew.2,galchamgol,toad_geom_brew,두꺼비 할멈,"식혀서 아침저녁으로 눈을 씻으라고 하렴.\n숯쟁이 눈 씻길 물을 숯불에 달였으니, 숯 한 자루 빚진 셈이다.",,확정,
+toad_geom_choice.c1,galchamgol,toad_geom_choice,고르기,검댕 아저씨 눈약을 여쭙는다,,확정,toadGeomChoice(story.js:1130-1134) 할멈 메뉴에 붙는 고르기
+toad_rest.1,galchamgol,toad_rest,속말,"부시를 쳐서 작은 불을 피웠다. 손 좀 녹이고, 숨 고르고 가자.",,확정,Rg.rest(story.js:726-727) 엉킨 칡 앞 쉼터 불 피울 때 D-1302
+toad_kudzu_calm.diary,galchamgol,toad_kudzu_calm,일기,엉킨 칡을 부수지 않고 달랬다. 칡이 놓아준 자리에 보랏빛 꽃이 피어 있었다.,,확정,Rg.startKudzu 달램(story.js:736) calm
+toad_kudzu_lose.1,galchamgol,toad_kudzu_lose,너구리,(…서두르지 말자. 버섯 향을 좋아하는 것 같았어.),,확정,Rg.startKudzu 짐·물러남(story.js:738-742)
+toad_kudzu_lose.diary,galchamgol,toad_kudzu_lose,일기,엉킨 칡에게 밀려났다. 서두르지 말고 칡이 틈을 보일 때를 노리자. 버섯 향을 좋아하는 것 같았다.,,확정,hint
+toad_kudzu_retry.1,galchamgol,toad_kudzu_retry,속말,준비되면 다시 다가가자.,,확정,
+toad_boss_die.1,galchamgol,toad_boss_die,속말,엉킨 칡이 풀렸다! 해머루가 떨어진다!,,확정,Rg.bossDie(field.js:247-252) D-544
+toad_boss_die.diary,galchamgol,toad_boss_die,일기,엉킨 칡이 풀렸다. 당산나무가 크게 숨을 쉬는 것 같았다.,,확정,boss
+toad_meoru_pickup.1,galchamgol,toad_meoru_pickup,속말,아빠 해머루 글 끝에 덧쓴 글씨가 있다… 할머니께 가져가자.,,확정,Rg.onFloorPickup 해머루(field.js:222-230) D-61·D-129·D-834
+toad_meoru_pickup.clue,galchamgol,toad_meoru_pickup,단서:아빠의 수첩,"수첩의 해머루 글 끝, 나중에 덧쓴 빛바랜 아빠 글씨: ""여기도 아니다.""",,확정,h1
+toad_meoru_pickup.diary,galchamgol,toad_meoru_pickup,일기,"해머루를 그려 넣으려고 아빠의 수첩을 펼쳤다. 아빠가 적어 둔 해머루 글 끝에, 나중에 덧쓴 글씨가 그제야 눈에 들어왔다. ""여기도 아니다."" 먹빛이 많이 바랬다. 아빠는 아주 옛날에 벌써 여기 와 봤구나. 그때도 더 북쪽으로 갔구나.",,확정,meoru D-134
+wanderers_magpie_talk.1,galchamgol,wanderers_magpie_talk,늙은 까치,"에구, 이 바람아. 아가, 이 끝 좀 눌러 다오.\n발이 예전 같지 않아서 매듭이 자꾸 도망가는구나.",,확정,story.js:917 magpieTalk
+wanderers_magpie_talk.2,galchamgol,wanderers_magpie_talk,너구리,제가 잡을게요. …이거 약보자기예요?,,확정,
+wanderers_magpie_talk.3,galchamgol,wanderers_magpie_talk,늙은 까치,"그래. 늪가 두꺼비 할멈이 달인 약을 아픈 집마다 나르지.\n개울 아래 초가, 네 집 문턱도 내가 안단다.",,확정,
+wanderers_magpie_talk.c1,galchamgol,wanderers_magpie_talk,고르기,두 손으로 보자기를 눌러 드린다,,확정,
+wanderers_magpie_talk.c2,galchamgol,wanderers_magpie_talk,고르기,바람이 잦아들면 도와드릴게요,,확정,
+wanderers_magpie_hands.1,galchamgol,wanderers_magpie_hands,너구리,(두 손으로 보자기 귀를 꾹 누른다.),146,확정,story.js:922 D-152 약보자기 그림
+wanderers_magpie_hands.2,galchamgol,wanderers_magpie_hands,늙은 까치,옳지. 손이 따뜻하구나.\n…예전엔 이걸 한 발로도 묶었는데.,,확정,
+wanderers_magpie_hands.3,galchamgol,wanderers_magpie_hands,너구리,우리 집 문턱을 아시면…\n아빠 편지도 갖다주셨어요?,-,확정,D-129·D-984
+wanderers_magpie_hands.4,galchamgol,wanderers_magpie_hands,늙은 까치,그래. 돌너머 까치가 넘겨 준 걸 받아 날랐지.\n네 아빠 얼굴은 나도 못 봤구나.,,확정,
+wanderers_magpie_hands.5,galchamgol,wanderers_magpie_hands,늙은 까치,길 떠나는 게지? 길 따라 소식 나르는 게 내 일이니\n길에서 또 만나면 집 소식을 전해 주마.,,확정,
+wanderers_magpie_hands.6,galchamgol,wanderers_magpie_hands,너구리,그럼 엄마한테도…\n나 잘 있으니까 걱정 마시라고 전해 주세요.,,확정,
+wanderers_magpie_hands.diary,galchamgol,wanderers_magpie_hands,일기,늙은 까치의 약보자기를 두 손으로 눌러 드렸다. 아빠의 마지막 편지도 이 까치가 날라 왔다. 까치는 길 따라 소식을 나른다고 했다. 엄마한테 나는 잘 있으니 걱정 마시라고 전해 달라고 했다.,,확정,galExpMagpie
+wanderers_magpie_map.1,galchamgol,wanderers_magpie_map,늙은 까치,"참, 아가. 길이 멀어 발이 아프거든 하늘을 보고 불러라.",,확정,story.js:936 D-33·D-526
+wanderers_magpie_map.2,galchamgol,wanderers_magpie_map,너구리,"(까치 어르신이 짧게 울자, 덩치 큰 까치 둘이\n지붕에서 내려앉았다.)",,확정,youngMagpiesFly(D-1421)
+wanderers_magpie_map.3,galchamgol,wanderers_magpie_map,늙은 까치,우리 집 젊은 것들이다. 네 귀 한쪽씩 잡고\n가 본 길이면 어디든 데려다줄 게다.,,확정,
+wanderers_magpie_map.4,galchamgol,wanderers_magpie_map,너구리,…귀요?,,확정,
+wanderers_magpie_map_think.1,galchamgol,wanderers_magpie_map_think,속말,지도를 펴면 젊은 까치 둘을 부를 수 있겠다.,,확정,story.js:941 mapUnlocked
+wanderers_magpie_greet_gam.1,galchamgol,wanderers_magpie_greet_gam,늙은 까치,꼭대기 네 알이면 올겨울은 넉넉하다.\n네 어미 소식은 내가 날라 주마.,,확정,story.js:1180 greeting(galGamDone)
+wanderers_magpie_greet_sickle.1,galchamgol,wanderers_magpie_greet_sickle,늙은 까치,그게 네 아비 낫이구나.\n무쇠가 날을 잘 세웠네.,,확정,greeting(낫을 든 뒤)
+wanderers_magpie_greet_plain.1,galchamgol,wanderers_magpie_greet_plain,늙은 까치,날개 좀 말리고 가련다.\n올해는 저 감나무에 아무도 장대를 안 대는구나.,,확정,greeting
+wanderers_brothers_bench.1,galchamgol,wanderers_brothers_bench,다람쥐 형,바구니는 벌써 오른쪽 낮은 평상에 옮겨 놨어.\n거기서 나눠 줘!,,확정,story.js:952 D-1490
+wanderers_brothers_even.1,galchamgol,wanderers_brothers_even,다람쥐 형,큰 것부터 번갈아 놓으니 양쪽이 비슷하네.,,확정,story.js:961 D-34 고르게
+wanderers_brothers_even.2,galchamgol,wanderers_brothers_even,다람쥐 동생,내 몫이 적다고만 생각했는데!,,확정,
+wanderers_brothers_even.3,galchamgol,wanderers_brothers_even,다람쥐 형,그럼 묻는 건 같이 하자.\n나는 자리를 외워 둘게.,,확정,
+wanderers_brothers_even.4,galchamgol,wanderers_brothers_even,다람쥐 동생,난 덮어 둔 낙엽 모양을 외워 둘래!,,확정,
+wanderers_brothers_even.5,galchamgol,wanderers_brothers_even,다람쥐 형,고르게 나눠 줬으니까 우리 둘이 한 알씩!,,확정,뒤에 receiveItem(acorn 2) 한 번만(D-286)
+wanderers_brothers_even.6,galchamgol,wanderers_brothers_even,다람쥐 형,높은 가지에 붉은 옹이가 있어.\n그 아래 굵은 가지를 디뎌 봐.,,확정,
+wanderers_brothers_even.7,galchamgol,wanderers_brothers_even,다람쥐 동생,거기 우리 말고 누가 남긴 자국이 있더라!,,확정,
+wanderers_brothers_even.diary,galchamgol,wanderers_brothers_even,일기,다람쥐 형제와 도토리를 큰 것부터 번갈아 나눴다. 겨울에는 같은 바구니에서 먹기로 했다. 형제가 숲 높은 가지의 붉은 옹이를 알려 주었다.,,확정,galExpBrothers
+wanderers_brothers_hyung.1,galchamgol,wanderers_brothers_hyung,다람쥐 형,"봐, 내 말이 맞지! 큰 건 내 몫이야.",,확정,story.js:965 형 편
+wanderers_brothers_hyung.2,galchamgol,wanderers_brothers_hyung,다람쥐 동생,…치.,,확정,
+wanderers_brothers_hyung.3,galchamgol,wanderers_brothers_hyung,다람쥐 형,내 편 들어 줬으니 큰 도토리 두 알 줄게.,,확정,뒤에 receiveItem(acorn 2) 한 번만
+wanderers_brothers_hyung.4,galchamgol,wanderers_brothers_hyung,다람쥐 형,그리고 높은 가지에 붉은 옹이가 있어.\n그 아래 굵은 가지를 디뎌 봐.,,확정,
+wanderers_brothers_hyung.5,galchamgol,wanderers_brothers_hyung,다람쥐 동생,…거기 누가 남긴 자국도 있어. 형은 모르지?,,확정,
+wanderers_brothers_hyung.diary,galchamgol,wanderers_brothers_hyung,일기,다람쥐 형제 다툼에서 일곱 번 오간 형 편을 들었다. 형이 큰 도토리 두 알을 주었고 동생은 토라졌다. 숲 높은 가지의 붉은 옹이를 들었다.,,확정,galExpBrothers
+wanderers_brothers_dongsaeng.1,galchamgol,wanderers_brothers_dongsaeng,다람쥐 동생,거봐! 찾은 건 나라니까.,,확정,story.js:968 동생 편
+wanderers_brothers_dongsaeng.2,galchamgol,wanderers_brothers_dongsaeng,다람쥐 형,…쳇.,,확정,
+wanderers_brothers_dongsaeng.3,galchamgol,wanderers_brothers_dongsaeng,다람쥐 동생,내 편 들어 줬으니까 이거 줄게.\n낙엽 밑에서 찾은 싸리버섯이야.,,확정,뒤에 receiveItem(ssari 1) 한 번만
+wanderers_brothers_dongsaeng.4,galchamgol,wanderers_brothers_dongsaeng,다람쥐 동생,높은 가지에 붉은 옹이가 있어.\n거기 우리 말고 누가 남긴 자국이 있더라!,,확정,
+wanderers_brothers_dongsaeng.5,galchamgol,wanderers_brothers_dongsaeng,다람쥐 형,…그 아래 굵은 가지를 디디면 돼.,,확정,
+wanderers_brothers_dongsaeng.diary,galchamgol,wanderers_brothers_dongsaeng,일기,다람쥐 형제 다툼에서 낙엽을 걷어 찾은 동생 편을 들었다. 동생이 싸리버섯을 주었고 형은 토라졌다. 숲 높은 가지의 붉은 옹이를 들었다.,,확정,galExpBrothers
+wanderers_brothers_talk.1,galchamgol,wanderers_brothers_talk,다람쥐 형,내가 일곱 번을 오갔으니 큰 도토리는 내 몫이지.,,확정,story.js:982 D-529 처음 만남
+wanderers_brothers_talk.2,galchamgol,wanderers_brothers_talk,다람쥐 동생,내가 낙엽을 걷어 찾았잖아!,,확정,
+wanderers_brothers_talk.3,galchamgol,wanderers_brothers_talk,너구리,겨울에 먹을 거야?\n큰 건 다 한쪽 바구니에만 있네.,,확정,
+wanderers_brothers_talk.4,galchamgol,wanderers_brothers_talk,다람쥐 형,"큰 건 몇 알 안 되는데, 둘 다 욕심이 나서.",,확정,
+wanderers_brothers_talk.5,galchamgol,wanderers_brothers_talk,다람쥐 동생,형은 큰 걸 자기가 다 묻겠대!\n도담처럼 묻어 놓고 잊으면 어쩌려고.,,확정,
+wanderers_brothers_talk.6,galchamgol,wanderers_brothers_talk,다람쥐 형,오른쪽 낮은 평상으로 바구니를 옮겨 둘게.\n어떻게 나누면 좋을지 같이 봐 줄래?,,확정,
+wanderers_brothers_talk.c1,galchamgol,wanderers_brothers_talk,고르기,"좋아, 같이 봐 줄게",,확정,
+wanderers_brothers_talk.c2,galchamgol,wanderers_brothers_talk,고르기,다음에 같이 보자,,확정,
+wanderers_brothers_think.1,galchamgol,wanderers_brothers_think,속말,오른쪽 낮은 평상에서 바구니를 나누자.,,확정,galExpBrothersAsked
+wanderers_brothers_greet_even.1,galchamgol,wanderers_brothers_greet_even,다람쥐 형,큰 것부터 번갈아!,,확정,story.js:1192 greeting
+wanderers_brothers_greet_even.2,galchamgol,wanderers_brothers_greet_even,다람쥐 동생,겨울에는 한 바구니에서!,,확정,
+wanderers_brothers_greet_hyung.1,galchamgol,wanderers_brothers_greet_hyung,다람쥐 형,큰 건 역시 내 몫이지!,,확정,greeting(형 편)
+wanderers_brothers_greet_hyung.2,galchamgol,wanderers_brothers_greet_hyung,다람쥐 동생,…다음엔 내가 먼저 찾을 거야.,,확정,
+wanderers_brothers_greet_dongsaeng.1,galchamgol,wanderers_brothers_greet_dongsaeng,다람쥐 동생,찾는 건 내가 최고야!,,확정,greeting(동생 편)
+wanderers_brothers_greet_dongsaeng.2,galchamgol,wanderers_brothers_greet_dongsaeng,다람쥐 형,…다음엔 내가 더 많이 오갈 거야.,,확정,
+wanderers_bros_arc_choice.c1,galchamgol,wanderers_bros_arc_choice,고르기,숲 안쪽 이야기를 듣는다,,확정,story.js:996 brosArcChoice. 인사 끝 줄에 붙는다
+wanderers_bros_arc_choice.c2,galchamgol,wanderers_bros_arc_choice,고르기,북쪽으로 간다고 인사한다,,확정,
+wanderers_bros_arc_choice.c3,galchamgol,wanderers_bros_arc_choice,고르기,다음에 보자,,확정,
+wanderers_bros_map.1,galchamgol,wanderers_bros_map,다람쥐 형,당산나무 칡이 풀리니까\n숲 안쪽 흙이 부드러워졌어! 거기 묻을 거야.,,확정,story.js:1007 brosMap
+wanderers_bros_map.diary,galchamgol,wanderers_bros_map,일기,칡이 풀리자 숲 안쪽 흙이 부드러워졌다. 다람쥐 형제에게 묻을 자리 둘을 나무껍질에 그려 주었다. 둘이 같이 보는 껍질이 되었다.,,확정,galArcBros2
+wanderers_bros_map_dodam.1,galchamgol,wanderers_bros_map_dodam,너구리,자리 그려 줄까? 도담한테도 그려 줬어.,,확정,galArcDodam2
+wanderers_bros_map_plain.1,galchamgol,wanderers_bros_map_plain,너구리,자리 그려 줄까? 그려 두면 안 잊어.,,확정,
+wanderers_bros_map_draw.1,galchamgol,wanderers_bros_map_draw,너구리,"(나뭇가지로 넓은 껍질에 두 자리를 그렸다.\n큰 바위 밑 하나, 단풍나무 뿌리 하나.)",,확정,
+wanderers_bros_map_even.1,galchamgol,wanderers_bros_map_even,다람쥐 동생,형 자리는 내가 외울게.,,확정,story.js:1003 split.even
+wanderers_bros_map_even.2,galchamgol,wanderers_bros_map_even,다람쥐 형,네 자리는 내가.,,확정,
+wanderers_bros_map_hyung.1,galchamgol,wanderers_bros_map_hyung,다람쥐 형,…뿌리 쪽은 네가 찾은 데니까 네 거 해.,,확정,split.hyung
+wanderers_bros_map_hyung.2,galchamgol,wanderers_bros_map_hyung,다람쥐 동생,진짜? …그럼 바위 쪽은 형 거.,,확정,
+wanderers_bros_map_dongsaeng.1,galchamgol,wanderers_bros_map_dongsaeng,다람쥐 동생,…바위 쪽은 형이 여러 번 날라야 하니까\n형 거 해.,,확정,split.dongsaeng
+wanderers_bros_map_dongsaeng.2,galchamgol,wanderers_bros_map_dongsaeng,다람쥐 형,…그래. 그럼 뿌리 쪽은 네 거.,,확정,
+wanderers_bros_map_gift.1,galchamgol,wanderers_bros_map_gift,다람쥐 형,그려 준 값! 흙 파 보다가 뿌리 옆에서 땄어.,,확정,D-286
+wanderers_bros_map_gift.2,galchamgol,wanderers_bros_map_gift,너구리,{얻음 kkoe 1},,확정,gotLine
+wanderers_bros_farewell.1,galchamgol,wanderers_bros_farewell,너구리,나 내일 북쪽으로 가.,,확정,story.js:1019 brosFarewell
+wanderers_bros_farewell.2,galchamgol,wanderers_bros_farewell,다람쥐 형,잠깐만 기다려!,,확정,
+wanderers_bros_farewell.3,galchamgol,wanderers_bros_farewell,너구리,(형제가 낙엽 더미에 머리를 박고 한참 뒤적인다.),,확정,
+wanderers_bros_farewell.4,galchamgol,wanderers_bros_farewell,다람쥐 형,"큰 거 하나, 내가 골랐어.",,확정,
+wanderers_bros_farewell.5,galchamgol,wanderers_bros_farewell,다람쥐 동생,"작은 거 하나, 내가 골랐어!",,확정,
+wanderers_bros_farewell.6,galchamgol,wanderers_bros_farewell,너구리,{얻음 acorn_gift 2},,확정,gotLine D-137
+wanderers_bros_farewell.7,galchamgol,wanderers_bros_farewell,너구리,집에 돌아가면 엄마랑 나눠 먹을게.,,확정,
+wanderers_bros_farewell.8,galchamgol,wanderers_bros_farewell,다람쥐 동생,그럼 큰 건 엄마 드려!\n…형이 고른 거니까.,,확정,
+wanderers_bros_farewell.diary,galchamgol,wanderers_bros_farewell,일기,"북쪽으로 간다고 하자 다람쥐 형제가 도토리를 하나씩 골라 주었다. 큰 것 하나, 작은 것 하나. 집에 돌아가면 엄마랑 나눠 먹을 것이다.",,확정,galArcBros3
+wanderers_share_baskets.1,galchamgol,wanderers_share_baskets,다람쥐 형,바구니 두 개 다 가져왔어.\n어떻게 나눌래?,,확정,story.js:1031 shareBaskets
+wanderers_share_baskets.c1,galchamgol,wanderers_share_baskets,고르기,큰 것부터 번갈아 고르게 나눈다,,확정,
+wanderers_share_baskets.c2,galchamgol,wanderers_share_baskets,고르기,"형 편을 든다: ""일곱 번 오갔으니 큰 건 형 몫이야""",,확정,
+wanderers_share_baskets.c3,galchamgol,wanderers_share_baskets,고르기,"동생 편을 든다: ""낙엽을 걷어 찾았으니 동생 몫이야""",,확정,
+wanderers_share_baskets.c4,galchamgol,wanderers_share_baskets,고르기,조금 더 생각해 볼게,,확정,
+wanderers_baskets_talk.1,galchamgol,wanderers_baskets_talk,다람쥐 형,바구니는 이제 우리끼리 나눌 수 있어.,,확정,story.js:1242 basketsTalk
+wanderers_baskets_talk.2,galchamgol,wanderers_baskets_talk,다람쥐 동생,겨울엔 한 바구니에서 먹을 거야!,,확정,
+wanderers_chick_arrive.1,galchamgol,wanderers_chick_arrive,꺼병이,저기 갈대가 흔들려! 엄마 꼬리야!\n아까는 내 발소리에 묻혀서 못 들었나 봐.,,확정,story.js:1006 D-1429 어미가 답한 뒤
+wanderers_chick_arrive.2,galchamgol,wanderers_chick_arrive,너구리,이제 뛰어가도 돼.\n난 여기서 보고 있을게.,,확정,
+wanderers_chick_arrive.3,galchamgol,wanderers_chick_arrive,꺼병이,"엄마! 나 여기 있어!\n…아, 도토리 얘기는 엄마한테 비밀이야.",,확정,
+wanderers_chick_arrive.4,galchamgol,wanderers_chick_arrive,꺼병이,이거 너 가져.\n엄마가 보면 또 쫓아갔냐고 할 거야.,,확정,D-217
+wanderers_chick_arrive.5,galchamgol,wanderers_chick_arrive,너구리,(꺼병이가 품고 온 도토리 두 알을\n내 발치에 굴려 놓았다.),,확정,"뒤에 receiveItem(acorn 2), 끝나지 않았을 때만"
+wanderers_chick_arrive.6,galchamgol,wanderers_chick_arrive,꺼병이,"고마워, 사뿐발 보부상!\n발소리 작게 걸어 줘서 엄마 소리가 들렸어.",,확정,D-287
+wanderers_chick_arrive.diary,galchamgol,wanderers_chick_arrive,일기,도토리를 따라오다 길을 잃은 꺼병이와 물가까지 걸었다. 갈대 너머 어미의 대답을 듣고 제 길을 찾았다. 쫓아오던 도토리 두 알은 엄마한테 비밀이라며 나를 주었다. 내 발소리도 작아졌다.,,확정,galExpChick
+wanderers_chick_with.1,galchamgol,wanderers_chick_with,꺼병이,물가의 갈대까지 천천히 가자.\n네가 너무 앞서가면 난 여기서 기다릴게.,,확정,story.js:1024
+wanderers_chick_talk.1,galchamgol,wanderers_chick_talk,꺼병이,"엄마가 둥지 곁에만 있으랬는데,\n도토리가 굴러가서… 나무가 다 똑같아.",,확정,story.js:1025 처음 만남
+wanderers_chick_talk.2,galchamgol,wanderers_chick_talk,너구리,어디서 만나기로 했어?\n엄마가 뭐라고 했는데?,,확정,
+wanderers_chick_talk.3,galchamgol,wanderers_chick_talk,꺼병이,해 지면 물가의 갈대 아래. 울음으로 부르랬어.\n근데 내 발소리가 너무 커서 대답이 안 들려.,,확정,
+wanderers_chick_talk.4,galchamgol,wanderers_chick_talk,너구리,같이 천천히 걷자.\n네가 멈추면 나도 멈출게.,,확정,
+wanderers_chick_talk.c1,galchamgol,wanderers_chick_talk,고르기,꺼병이 곁에서 물가 쪽으로 걷는다,,확정,
+wanderers_chick_talk.c2,galchamgol,wanderers_chick_talk,고르기,여기서 기다려. 길부터 살필게,,확정,
+wanderers_chick_think.1,galchamgol,wanderers_chick_think,속말,오른쪽 갈대까지 같이 걷자. 너무 앞서면 꺼병이가 멈춘다.,,확정,galExpChickWith
+wanderers_chick_heard.1,galchamgol,wanderers_chick_heard,속말,갈대 너머에서 어미가 답한다! 꺼병이한테 말해 주자.,,확정,"story.js:1361 expStep, 변신한 채일 때"
+wanderers_chick_greet.1,galchamgol,wanderers_chick_greet,꺼병이,이제 엄마 울음이 들려.\n다음엔 도토리 말고 엄마를 따라갈래!,,확정,story.js:1195 greeting
+wanderers_otter_talk.1,galchamgol,wanderers_otter_talk,너구리,(수달 하나가 빈 함지박을 머리에 이고\n개울을 거슬러 오른다.),147,확정,story.js:1043 D-152 함지박 그림
+wanderers_otter_talk.2,galchamgol,wanderers_otter_talk,너구리,그거 어디까지 가져가?,,확정,D-287·D-414
+wanderers_otter_talk.3,galchamgol,wanderers_otter_talk,여울,저기 넓적돌까지! 물이 불면 자꾸 떠내려가.\n그래서 밤마다 내가 도로 올려놔.,,확정,
+wanderers_otter_talk.4,galchamgol,wanderers_otter_talk,여울,빨래 아줌마 거야. 넓적돌에서 방망이 두드리던 아줌마.\n재작년 여름부터 안 와.,-,확정,
+wanderers_otter_talk.5,galchamgol,wanderers_otter_talk,여울,그래도 내가 지켜.\n아줌마 오면 바로 써야 하니까.,,확정,
+wanderers_otter_talk.diary,galchamgol,wanderers_otter_talk,일기,"개울에서 빈 함지박을 이고 오르는 수달 여울을 만났다. 물이 불어 떠내려가면 밤마다 넓적돌까지 도로 올려 둔다고 한다. 재작년 여름부터 안 오는 빨래 아줌마 것이라, 그분이 오면 써야 한다며.",,확정,galArcOtter1
+wanderers_otter_wait.1,galchamgol,wanderers_otter_wait,여울,빨래 아줌마 아직 안 왔어.,,확정,"story.js:1056 삼촌을 만나기 전, 1083"
+wanderers_otter_stamp.1,galchamgol,wanderers_otter_stamp,여울,이거 속에 물이 고였어. 같이 뒤집어 줄래?,,확정,story.js:1058 D-129·D-414·D-526
+wanderers_otter_stamp.2,galchamgol,wanderers_otter_stamp,너구리,"(함지박을 같이 뒤집어 물을 빼는데, 밑바닥에\n낙관 하나가 찍혀 있다. 流.)",148,확정,D-152 낙관 그림
+wanderers_otter_stamp.3,galchamgol,wanderers_otter_stamp,너구리,…이거 우리 집 거야.,,확정,
+wanderers_otter_stamp.4,galchamgol,wanderers_otter_stamp,여울,어? 너 빨래 아줌마네 애야?\n아줌마 왜 안 와? 나 계속 기다렸는데.,-,확정,
+wanderers_otter_stamp.5,galchamgol,wanderers_otter_stamp,너구리,엄마가 아파. 재작년 가을부터.,,확정,D-1470
+wanderers_otter_stamp.6,galchamgol,wanderers_otter_stamp,여울,…아줌마는 빨래 다 하면 물수제비 떠 줬어.\n일곱 번! 나보다 잘해.,,확정,
+wanderers_otter_stamp.7,galchamgol,wanderers_otter_stamp,너구리,(엄마가 물가에서 웃는 걸 본 지 오래됐다.),,확정,
+wanderers_otter_stamp.diary,galchamgol,wanderers_otter_stamp,일기,함지박 밑바닥에 우리 집 낙관 流가 찍혀 있었다. 여울이 말하는 빨래 아줌마는 엄마였다. 엄마는 빨래를 마치면 여울에게 물수제비를 일곱 번 떠 줬다고 한다. 나는 몰랐다.,,확정,galArcOtter2
+wanderers_otter_promise.1,galchamgol,wanderers_otter_promise,여울,"늙은 까치가 그러는데, 아줌마한테 약 갔대!\n그럼 아줌마 이제 와?",,확정,story.js:1072 약이 간 뒤
+wanderers_otter_promise.2,galchamgol,wanderers_otter_promise,너구리,…아직. 북쪽 가서 더 좋은 약 구해 올 거야.\n봄에 엄마랑 같이 빨래하러 올게.,,확정,
+wanderers_otter_promise.3,galchamgol,wanderers_otter_promise,여울,약속! 그때 나랑 물수제비 내기해. 아줌마 빼고.,,확정,
+wanderers_otter_promise.4,galchamgol,wanderers_otter_promise,너구리,왜 엄마는 빼?,,확정,
+wanderers_otter_promise.5,galchamgol,wanderers_otter_promise,여울,아줌마는 일곱 번이잖아. 반칙이야.,,확정,
+wanderers_otter_promise.diary,galchamgol,wanderers_otter_promise,일기,"약이 갔다는 소식을 여울도 까치에게 들었다. 봄에 엄마랑 빨래하러 오겠다고 약속했다. 그때 물수제비 내기를 하자며, 엄마는 일곱 번이라 반칙이니 빼자고 했다.",,확정,galArcOtter3
+wanderers_otter_keep.1,galchamgol,wanderers_otter_keep,여울,함지박 잘 지키고 있어!\n아줌마 오면 바로 써야 하니까.,,확정,story.js:1083
+wanderers_otter_stone.1,galchamgol,wanderers_otter_stone,너구리,"(여울이 납작한 돌을 골라 물 위로 던진다.\n통, 통, 통, 통.)",,확정,story.js:1086 otterStone
+wanderers_otter_stone.2,galchamgol,wanderers_otter_stone,여울,네 번! 너도 해 봐.,,확정,
+wanderers_otter_stone.c1,galchamgol,wanderers_otter_stone,고르기,납작한 돌을 골라 던진다,,확정,
+wanderers_otter_stone_thrown.1,galchamgol,wanderers_otter_stone_thrown,너구리,"(돌이 통, 통, 통 하고 가라앉았다.)",,확정,story.js:1088
+wanderers_otter_stone_thrown.2,galchamgol,wanderers_otter_stone_thrown,여울,세 번? 빨래 아줌마 아들이면서?,,확정,
+wanderers_otter_stone_thrown.3,galchamgol,wanderers_otter_stone_thrown,너구리,"오, 오늘은 손이 좀 차서 그래.\n…사실 엄마한테 안 배웠어.",,확정,
+wanderers_otter_stone_thrown.4,galchamgol,wanderers_otter_stone_thrown,여울,그럼 봄에 배워.\n아줌마가 손목을 이렇게 꺾으라 그랬어.,,확정,
+wanderers_otter_stone_thrown.5,galchamgol,wanderers_otter_stone_thrown,너구리,(여울이 손목을 꺾어 보인다.\n엄마 손목도 저렇게 움직였을까.),,확정,
+wanderers_otter_stone_thrown.diary,galchamgol,wanderers_otter_stone_thrown,일기,"여울과 물수제비를 떴다. 나는 세 번, 여울은 네 번이었다. 엄마는 일곱 번이라고 했다.",,확정,galArcOtter2b
+wanderers_otter_greet.1,galchamgol,wanderers_otter_greet,여울,함지박은 내가 지키고 있어!\n봄에 와. 물수제비 내기야.,,확정,story.js:1159 greeting
+wanderers_badger_talk.1,galchamgol,wanderers_badger_talk,검댕,"콜록… 거기 너. 눈 좀 빌리자.\n저 연기가 희냐, 푸르냐.",,확정,story.js:1100 badgerTalk D-530
+wanderers_badger_talk.2,galchamgol,wanderers_badger_talk,너구리,…하얘요. 뭉게뭉게.,,확정,
+wanderers_badger_talk.3,galchamgol,wanderers_badger_talk,검댕,아직이군. 푸르스름해지면 다 된 숯이다.\n연기에 눈이 절어서 이젠 빛이 다 뿌옇다.,,확정,
+wanderers_badger_talk.4,galchamgol,wanderers_badger_talk,너구리,약방 두꺼비 할머니한테\n눈약이 있을 거예요.,,확정,D-985
+wanderers_badger_talk.5,galchamgol,wanderers_badger_talk,검댕,약방은 늪 건너다.\n가마 불은 사흘 내내 지켜야 하고.,,확정,
+wanderers_badger_talk.6,galchamgol,wanderers_badger_talk,검댕,끼니도 가마 곁에서 때운다.\n싸리버섯 꾀꼬리버섯에 깨소금 쳐서 쪄 먹지.,,확정,hintLine beoseot_jjim (D-461)
+wanderers_badger_talk.diary,galchamgol,wanderers_badger_talk,일기,"참나무 숲에서 숯 굽는 오소리 검댕을 만났다. 연기에 눈이 절어 연기 빛을 못 본다. 흰 연기는 아직, 푸른 연기면 다 된 숯이라고. 해머루를 들고 할머니를 만나면 눈약을 여쭤보기로 했다.",,확정,galArcGeom1
+wanderers_badger_talk_toad.1,galchamgol,wanderers_badger_talk_toad,너구리,할머니는 당산나무 언덕 어귀에 계세요.\n가는 길에 눈약도 여쭤볼게요.,,확정,toadMet
+wanderers_badger_talk_plain.1,galchamgol,wanderers_badger_talk_plain,너구리,해머루 따면 할머니께 갈 거예요.\n그때 눈약도 여쭤볼게요.,,확정,
+wanderers_badger_talk_tail.1,galchamgol,wanderers_badger_talk_tail,검댕,…보부상이면 공짜로는 안 하겠군.\n값은 숯으로 치마.,,확정,
+wanderers_badger_eye.1,galchamgol,wanderers_badger_eye,너구리,할머니 눈약이에요.\n아침저녁으로 씻으래요.,,확정,story.js:1115 galGeomEyeWash
+wanderers_badger_eye.2,galchamgol,wanderers_badger_eye,너구리,(검댕 아저씨가 눈을 씻고 한참 가마 쪽을 본다.),,확정,D-835
+wanderers_badger_eye.3,galchamgol,wanderers_badger_eye,검댕,"…푸르구나. 저 연기, 푸르다.\n사흘 만에 처음 제대로 봤다.",,확정,
+wanderers_badger_eye.4,galchamgol,wanderers_badger_eye,검댕,"이 숯은 날쌘이 받아 갈 거다. 그놈, 값 깎는 척\n실컷 하고는 가마 옆에 꼭 덤을 두고 가지.",,확정,
+wanderers_badger_eye.5,galchamgol,wanderers_badger_eye,검댕,모른 척하라더라. 체면 깎인다고.,,확정,
+wanderers_badger_eye.6,galchamgol,wanderers_badger_eye,너구리,…저도 모른 척할게요.,,확정,
+wanderers_badger_eye.7,galchamgol,wanderers_badger_eye,검댕,눈약 값이다. 연기 안 매운 숯 하나.\n할멈 몫 한 자루는 내가 지고 가마.,,확정,D-289
+wanderers_badger_eye.8,galchamgol,wanderers_badger_eye,너구리,{얻음 coal 1},,확정,gotLine
+wanderers_badger_eye.diary,galchamgol,wanderers_badger_eye,일기,"검댕 아저씨가 할머니 눈약으로 눈을 씻고, 가마 연기가 푸른 걸 처음으로 제대로 봤다. 날쌘 아저씨는 값을 깎는 척하고는 가마 옆에 꼭 덤을 두고 간다고 한다. 모른 척하기로 했다. 눈약 값이라며 연기가 안 매운 숯을 하나 주었다.",,확정,galArcGeom5
+wanderers_badger_blue.1,galchamgol,wanderers_badger_blue,검댕,푸르다. 이제 잘 보인다.\n…심부름 값은 했다.,,확정,story.js:1129 옛 저장
+wanderers_badger_asked.1,galchamgol,wanderers_badger_asked,검댕,콜록… 연기가 아직 희구나.\n할멈은 만났냐.,,확정,galArcGeom1 뒤
+wanderers_badger_cough.1,galchamgol,wanderers_badger_cough,검댕,콜록… 연기가 아직 희구나.,,확정,사연을 끈 판
+wanderers_badger_greet.1,galchamgol,wanderers_badger_greet,검댕,푸른 연기 보이면 다 된 거다.\n…너도 다 되면 돌아와라.,,확정,story.js:1162 greeting
+wanderers_gam_talk_bare.1,galchamgol,wanderers_gam_talk_bare,너구리,(홍시가 툭 떨어져 터졌다.\n올해는 엄마가 장대를 못 들었지.),,확정,story.js:1208 gamTalk 까치를 만나기 전
+wanderers_gam_talk_hung.1,galchamgol,wanderers_gam_talk_hung,너구리,(처마 밑에 깎은 감이 줄줄이 매달렸다.\n엄마를 들여다보러 온 삼촌이 깎아 달았나 보다.),,확정,"감을 딴 뒤, 칡이 풀리고 musoeAfterLeaf"
+wanderers_gam_talk_top.1,galchamgol,wanderers_gam_talk_top,너구리,(꼭대기 네 알이 그대로 매달려 있다.\n까치가 한 알을 쪼다 말고 나를 본다.),,확정,감을 딴 뒤
+wanderers_gam_talk.1,galchamgol,wanderers_gam_talk,너구리,(감이 익다 못해 툭툭 떨어진다.\n까치 어르신이 터진 홍시를 쪼고 있다.),,확정,story.js:1214 D-835 까치를 만난 뒤
+wanderers_gam_talk.2,galchamgol,wanderers_gam_talk,늙은 까치,올해는 아무도 장대를 안 대는구나.\n떨어진 것만 이리 아깝게 터지고.,,확정,
+wanderers_gam_talk.3,galchamgol,wanderers_gam_talk,너구리,엄마가 해마다 따던 감이에요.\n올해는 엄마가 못 일어나서요.,,확정,
+wanderers_gam_talk.4,galchamgol,wanderers_gam_talk,늙은 까치,알지. 이 집은 해마다 꼭대기 몇 알을 남겼다.\n눈 오는 날 우리 식구가 그걸로 겨울을 났지.,,확정,
+wanderers_gam_talk.5,galchamgol,wanderers_gam_talk,너구리,엄마가 그걸 까치밥이라고 했어요.\n그래서 우리 집 문턱을 아셨구나.,,확정,
+wanderers_gam_talk.6,galchamgol,wanderers_gam_talk,늙은 까치,그래. 받은 게 있으니\n약도 소식도 날라 주는 게지.,,확정,
+wanderers_gam_talk.7,galchamgol,wanderers_gam_talk,너구리,제가 딸게요. 장대는 처마 밑에 있어요.\n꼭대기는 엄마처럼 남겨 둘게요.,,확정,
+wanderers_gam_talk.c1,galchamgol,wanderers_gam_talk,고르기,장대로 아래 가지를 친다,,확정,D-830
+wanderers_gam_talk.c2,galchamgol,wanderers_gam_talk,고르기,다음에 딴다,,확정,
+wanderers_gam_pole.1,galchamgol,wanderers_gam_pole,너구리,(엄마가 하던 대로 나무 밑에 멍석부터 폈다.\n맨땅에 떨어지면 홍시가 터지니까.),,확정,story.js:1225
+wanderers_gam_pole.2,galchamgol,wanderers_gam_pole,너구리,"(긴 장대로 아래 가지를 톡톡 쳤다.\n감이 멍석 위로 툭, 툭 떨어진다.)",149,확정,감 따는 장대 그림
+wanderers_gam_pole.3,galchamgol,wanderers_gam_pole,너구리,(아래 가지 감은 다 떨궜다.\n꼭대기 네 알은 장대가 닿지 않게 그대로 두었다.),,확정,
+wanderers_gam_pole.4,galchamgol,wanderers_gam_pole,늙은 까치,네 어미 손이랑 똑같이 남기는구나.,-,확정,
+wanderers_gam_pole.5,galchamgol,wanderers_gam_pole,너구리,"(말랑한 홍시 둘은 엄마 방 문턱 안에 들여놓고,\n단단한 감은 처마 밑 바구니에 담았다.)",,확정,
+wanderers_gam_pole.6,galchamgol,wanderers_gam_pole,늙은 까치,꼭대기를 남겨 줬으니 올겨울 걱정은 덜었다.\n지붕 틈에 묻어 둔 도토리를 좀 내주마.,,확정,뒤에 receiveItem(acorn 2)
+wanderers_gam_pole.7,galchamgol,wanderers_gam_pole,늙은 까치,네 어미 버릇을 네가 이었구나.\n까치밥 보부상이라 불러야겠다.,,확정,
+wanderers_gam_pole.diary,galchamgol,wanderers_gam_pole,일기,엄마 대신 집 감나무의 감을 땄다. 엄마가 해마다 남기던 꼭대기 네 알은 까치밥으로 두었다. 늙은 까치 식구는 그 감으로 겨울을 나서 우리 집 문턱을 안다고 했다. 까치가 묻어 둔 도토리를 주었다.,,확정,galGamDone
+wanderers_village_well_sickle.1,galchamgol,wanderers_village_well_sickle,너구리,두레박 줄이 반들반들하다. 엄마 손이 닿던 자리.\n아빠 낫 자루도 꼭 이렇게 닳았네.,,확정,story.js:1268 examine village_well(낫)
+wanderers_village_well.1,galchamgol,wanderers_village_well,너구리,떠나기 전에 물독을 가득 채워 놨다.\n엄마가 물 길으러 나오지 않아도 되게.,,확정,examine village_well
+wanderers_village_wheel.1,galchamgol,wanderers_village_wheel,너구리,빠진 살 사이로 물만 흘러간다. 굴대도 갈라졌다.\n이 방아가 멈춘 뒤로 엄마가 절구질을 도맡았지.,,확정,story.js:1272 D-730·D-1422
+wanderers_forge_sign.1,galchamgol,wanderers_forge_sign,너구리,"왼쪽은 집과 개울, 오른쪽은 참나무 숲.\n숯 냄새가 난다. 삼촌이 불을 올렸구나.",,확정,story.js:1274
+wanderers_forge_charcoal.1,galchamgol,wanderers_forge_charcoal,너구리,재는 차가운데 안쪽 벽은 아직 따뜻하다.\n무쇠 삼촌 불씨도 여기서 시작했겠지.,,확정,story.js:1275
+wanderers_forest_root.1,galchamgol,wanderers_forest_root,너구리,"칡은 나무를 타고, 참나무는 땅을 붙든다.\n뿌리 밑 흙은 곡괭이가 들어갈 만큼 무르네.",,확정,story.js:1278
+wanderers_forest_oak_squirrel.1,galchamgol,wanderers_forest_oak_squirrel,너구리,줄기 껍질에 발톱이 쏙쏙 걸린다.\n이 모습이면 저 가지까지 타고 오르겠어.,,확정,story.js:1280 D-49 다람쥐 모습
+wanderers_forest_oak_form.1,galchamgol,wanderers_forest_oak_form,너구리,가지가 너무 높아서 이 몸으로는 못 오르겠다.\n다람쥐가 되면 줄기를 타고 오를 수 있겠어.,,확정,다람쥐 변신을 얻은 뒤
+wanderers_forest_oak_acorn.1,galchamgol,wanderers_forest_oak_acorn,너구리,가지에 도토리가 달렸는데 너무 높다.\n지금은 올라가기 힘들겠어.,,확정,가지 도토리가 남았을 때
+wanderers_forest_oak.1,galchamgol,wanderers_forest_oak,너구리,저 가지는 너무 높다.\n지금은 올라가기 힘들겠어.,,확정,
+wanderers_forest_trail_sickle.1,galchamgol,wanderers_forest_trail_sickle,너구리,개울에서 보던 나무의 금줄이 여기까지 이어졌다.\n안쪽 덩굴을 걷고 금줄 길로 올라가자.,,확정,story.js:1285 (낫)
+wanderers_forest_trail.1,galchamgol,wanderers_forest_trail,너구리,개울에서 보던 당산나무다. 금줄이 숲 안으로 이어졌다.\n덩굴을 걷을 낫이 있으면 저곳까지 닿겠어.,,확정,
+wanderers_hill_cloth.1,galchamgol,wanderers_hill_cloth,너구리,매듭은 낡았는데 천은 덜 바랬다.\n잎 그늘이 볕을 대신 맞아 줬나 봐.,,확정,story.js:1294
+wanderers_hill_north_sent.1,galchamgol,wanderers_hill_north_sent,너구리,약은 집으로 갔다. 이 길은 북쪽으로 간다.\n다음엔 아빠한테도 집 이야기를 해 줘야지.,150,확정,story.js:1297 D-410·D-1492 팻말 그림(galArcToad1 또는 약이 간 뒤)
+wanderers_hill_north.1,galchamgol,wanderers_hill_north,너구리,돌너머로 가는 북쪽 길.\n먼저 할머니께 해머루를 드리자.,150,확정,팻말 그림
+wanderers_mom_visit_0.1,galchamgol,wanderers_mom_visit_0,너구리,"엄마가 이불 끝을 꼭 쥐고 잔다. 금방 올게, 엄마.\n문은 조금 열어 두자. 개울 소리가 들리게.",145,확정,story.js:1308 MOM_LINES[0] D-525
+wanderers_mom_visit_1.1,galchamgol,wanderers_mom_visit_1,너구리,머리맡에 빈 약사발이 있다. 숨소리가 한결 고르다.\n할머니 약이 듣긴 듣는구나.,145,확정,MOM_LINES[1] (그림 변형 px_v1)
+wanderers_mom_visit_2.1,galchamgol,wanderers_mom_visit_2,너구리,엄마가 벽에 기대 앉아 있다. 나를 보고 한참 만에 웃었다.\n볼에 핏기가 조금 돈다.,145,확정,MOM_LINES[2] (그림 변형 px_v2)
+wanderers_mom_visit_3.1,galchamgol,wanderers_mom_visit_3,너구리,"엄마가 볕 드는 문가에서 콩을 고른다. 손은 아직 느리다.\n""…왔니."" 한마디가 또렷했다.",145,확정,MOM_LINES[3] (그림 변형 px_v3)
+wanderers_mom_visit_4.1,galchamgol,wanderers_mom_visit_4,너구리,엄마가 마당에서 빨래를 갠다. 나를 보더니 이름을 부른다.\n…몇 번을 들어도 좋다.,145_4_엄마방_봄,확정,MOM_LINES[4]
+wanderers_mom_visit_gifts.1,galchamgol,wanderers_mom_visit_gifts,너구리,(머리맡에 내가 보낸 것들이 가지런히 놓였다.\n엄마가 하나하나 만져 봤나 보다.),,확정,story.js:1323 보낸 것이 있을 때
+wanderers_mom_leave.1,galchamgol,wanderers_mom_leave,너구리,(엄마 얼굴을 보니 발이 안 떨어진다.\n…그냥 집에 있을까. 물도 길어 드리고.),,확정,story.js:1328 D-625 돌너머에 들어선 뒤 처음
+wanderers_mom_leave.diary,galchamgol,wanderers_mom_leave,일기,"엄마를 보러 집에 들렀다. 발이 안 떨어졌는데, 엄마가 내 모자를 바로 씌워 주고 보따리 끈의 아빠 짐표를 톡톡 쳤다. 아빠를 찾아오라는 뜻이었다. 다시 길을 나섰다.",,확정,galMomLeave
+wanderers_mom_leave_wake.1,galchamgol,wanderers_mom_leave_wake,너구리,(엄마가 눈을 뜨고 손을 뻗어 내 모자를 바로 씌워 준다.\n떠나던 날 아침처럼.),,확정,엄마 단계 1 이하
+wanderers_mom_leave_hat.1,galchamgol,wanderers_mom_leave_hat,너구리,(엄마가 손을 뻗어 내 모자를 바로 씌워 준다.\n떠나던 날 아침처럼.),,확정,엄마 단계 2~3
+wanderers_mom_leave_tail.1,galchamgol,wanderers_mom_leave_tail,너구리,(그러고는 보따리 끈의 아빠 짐표를 톡톡 친다.\n…아빠를 찾아오라는 거구나.),,확정,D-1402
+wanderers_mom_leave_tail.2,galchamgol,wanderers_mom_leave_tail,너구리,"…응. 아빠 만나면 손 꼭 잡고 올게.\n그때까지 약 잘 드세요, 엄마.",,확정,
+wanderers_mom_leave_tail.3,galchamgol,wanderers_mom_leave_tail,너구리,(문은 조금 열어 두고 나왔다.\n개울 소리가 들리게.),,확정,
+wanderers_vista_stream.1,galchamgol,wanderers_vista_stream,속말,낙엽이 앞서 가네.\n당산나무까지 가는 걸까?,,확정,galchamgol/field.js:329 바라보기 첫 생각
+wanderers_vista_stream.diary,galchamgol,wanderers_vista_stream,일기,물레방아 개울에서 낙엽이 흐르는 걸 봤다. 물 건너로 당산나무가 보였다.,,확정,vista:galchamgol:stream
+wanderers_vista_home.1,galchamgol,wanderers_vista_home,속말,"우리 집 지붕이다.\n엄마, 나 여기까지 왔어.",,확정,galchamgol/field.js:370 바라보기 첫 생각
+wanderers_vista_home.diary,galchamgol,wanderers_vista_home,일기,당산나무 언덕에서 집을 돌아봤다. 골짜기의 단풍 사이로 우리 집 초가지붕이 보였다.,,확정,vista:galchamgol:home
+wanderers_hint_otter.1,galchamgol,wanderers_hint_otter,속말,"첨벙, 첨벙… 개울 쪽에서 무언가 함지박을 밀어 올리는 소리가 난다.",,확정,"story.js:1159 기척(D-55), 필드 기척 알림이 쓴다"
+wanderers_hint_badger.1,galchamgol,wanderers_hint_badger,속말,숲 안쪽에서 매캐한 연기 냄새와 기침 소리가 난다.,,확정,story.js:1162 기척
+wanderers_hint_chick.1,galchamgol,wanderers_hint_chick,속말,삐약… 삐약… 어디선가 엄마를 찾는 병아리 소리가 들린다.,,확정,story.js:1194 기척
