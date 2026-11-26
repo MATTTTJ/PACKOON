@@ -901,3 +901,58 @@ ui_form.name_4,전체,ui_form,화면,수달,,제안,engine/forms.js:25 FORM_NAME
 ui_prompt.climb,전체,ui_prompt,화면,오르기,,제안,engine/field.js:813 다람쥐가 줄기 곁에 서면 '↑ · 오르기'
 field_cache.take_some,전체,field_cache,너구리,다른 다람쥐가 묻어 두고 잊은 {item}. 다 가져가면 서운하겠지. 하나는 도로 묻어 두자.,,제안,engine/forms.js:183 openCache (결정 D-1021). {item}은 '도토리다'처럼 이다·다를 붙인 이름
 field_cache.take_all,전체,field_cache,너구리,다른 다람쥐가 묻어 두고 잊은 {item}. 고맙게 얻어 가자.,,제안,engine/forms.js:183 openCache (결정 D-1021)
+disguise.me_low,전체,disguise,너구리,"나야, 나.",,제안,"engine/disguise.js:15-17 DISGUISE_ME·ME_FIRST·ME_AGAIN (말투 low 반말, high 높임)"
+disguise.me_high,전체,disguise,너구리,저예요.,,제안,"engine/disguise.js:15-17 DISGUISE_ME·ME_FIRST·ME_AGAIN (말투 low 반말, high 높임)"
+disguise.me_first_low,전체,disguise,너구리,놀랐지? 미안.,,제안,"engine/disguise.js:15-17 DISGUISE_ME·ME_FIRST·ME_AGAIN (말투 low 반말, high 높임)"
+disguise.me_first_high,전체,disguise,너구리,놀라게 해서 죄송해요.,,제안,"engine/disguise.js:15-17 DISGUISE_ME·ME_FIRST·ME_AGAIN (말투 low 반말, high 높임)"
+disguise.me_again_low,전체,disguise,너구리,나야.,,제안,"engine/disguise.js:15-17 DISGUISE_ME·ME_FIRST·ME_AGAIN (말투 low 반말, high 높임)"
+disguise.me_again_high,전체,disguise,너구리,저예요.,,제안,"engine/disguise.js:15-17 DISGUISE_ME·ME_FIRST·ME_AGAIN (말투 low 반말, high 높임)"
+disguise.reveal,전체,disguise,고르기,본모습을 보인다,,제안,engine/disguise.js:148 disguiseTalk 고르기
+disguise.cancel,전체,disguise,고르기,그만두기,,제안,engine/disguise.js:148 disguiseTalk 고르기
+disguise_musoe.first,galchamgol,disguise_musoe,무쇠,누구냐. …잎 소리.\n삼촌 앞에선 제 모습으로 와라.,,제안,"engine/disguise.js DISGUISE_LINES.musoe.first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_musoe.ask,galchamgol,disguise_musoe,무쇠,누구냐. …잎 소리.\n삼촌 앞에선 제 모습으로 와라.,,제안,"engine/disguise.js DISGUISE_LINES.musoe.ask ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_musoe.again,galchamgol,disguise_musoe,무쇠,누구냐… 또 너구나.,,제안,"engine/disguise.js DISGUISE_LINES.musoe.again ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_musoe.back,galchamgol,disguise_musoe,무쇠,그래. 잎은 제법 다루는구나.,,제안,"engine/disguise.js DISGUISE_LINES.musoe.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_musoe.back_first,galchamgol,disguise_musoe,무쇠,그래. 잎은 제법 다루는구나.,,제안,"engine/disguise.js DISGUISE_LINES.musoe.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_musoe.me,galchamgol,disguise_musoe,너구리,"네, 삼촌.",,제안,"engine/disguise.js DISGUISE_LINES.musoe.me ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_nal.back,galchamgol,disguise_nal,날쌘,"하, 너였어? 별 재주를 다 부리네.",,제안,"engine/disguise.js DISGUISE_LINES.nal.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_nal.back_first,galchamgol,disguise_nal,날쌘,너구리였어? 별 재주를 다 부리네.,,제안,"engine/disguise.js DISGUISE_LINES.nal.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_dodam.back,galchamgol,disguise_dodam,도담,"뭐야, 너였어? 깜짝 놀랐잖아!",,제안,"engine/disguise.js DISGUISE_LINES.dodam.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_dodam.back_first,galchamgol,disguise_dodam,도담,"우와, 너구리가 됐어!",,제안,"engine/disguise.js DISGUISE_LINES.dodam.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_toad.back,galchamgol,disguise_toad,두꺼비 할멈,"허허, 너였구나. 재주가 늘었구나.",,제안,"engine/disguise.js DISGUISE_LINES.toad.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_toad.back_first,galchamgol,disguise_toad,두꺼비 할멈,"허허, 너구리였구나.",,제안,"engine/disguise.js DISGUISE_LINES.toad.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_stream_otter.first,galchamgol,disguise_stream_otter,여울,누구야? 함지박 건드리지 마!,,제안,"engine/disguise.js DISGUISE_LINES.stream_otter.first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_stream_otter.ask,galchamgol,disguise_stream_otter,여울,"누구야? 처음 보는 애네.\n이 함지박, 떠내려가면 또 이고 와야 돼!",,제안,"engine/disguise.js DISGUISE_LINES.stream_otter.ask ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_stream_otter.again,galchamgol,disguise_stream_otter,여울,또 누구야? …너지!,,제안,"engine/disguise.js DISGUISE_LINES.stream_otter.again ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_stream_otter.back,galchamgol,disguise_stream_otter,여울,"뭐야, 너였어? 감쪽같다!",,제안,"engine/disguise.js DISGUISE_LINES.stream_otter.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_stream_otter.back_first,galchamgol,disguise_stream_otter,여울,"어, 너구리였어?",,제안,"engine/disguise.js DISGUISE_LINES.stream_otter.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_charcoal_badger.first,galchamgol,disguise_charcoal_badger,검댕,콜록… 거기 누구냐.\n연기에 눈이 절어서 잘 안 보인다.,,제안,"engine/disguise.js DISGUISE_LINES.charcoal_badger.first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_charcoal_badger.ask,galchamgol,disguise_charcoal_badger,검댕,콜록… 거기 누구냐.\n몸집이 낯선데.,,제안,"engine/disguise.js DISGUISE_LINES.charcoal_badger.ask ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_charcoal_badger.again,galchamgol,disguise_charcoal_badger,검댕,콜록… 누구냐.,,제안,"engine/disguise.js DISGUISE_LINES.charcoal_badger.again ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_charcoal_badger.back,galchamgol,disguise_charcoal_badger,검댕,…너였냐. 콜록.,,제안,"engine/disguise.js DISGUISE_LINES.charcoal_badger.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_charcoal_badger.back_first,galchamgol,disguise_charcoal_badger,검댕,…너구리로군. 콜록.,,제안,"engine/disguise.js DISGUISE_LINES.charcoal_badger.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_lost_chick.owl,galchamgol,disguise_lost_chick,꺼병이,"히익! 누, 누구야?\n나 잡아먹으면 안 돼!",,제안,"engine/disguise.js DISGUISE_LINES.lost_chick.owl ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_lost_chick.first,galchamgol,disguise_lost_chick,꺼병이,"누, 누구야? 엄마 아니지…?",,제안,"engine/disguise.js DISGUISE_LINES.lost_chick.first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_lost_chick.ask,galchamgol,disguise_lost_chick,꺼병이,누구야…? 엄마 아니지…?,,제안,"engine/disguise.js DISGUISE_LINES.lost_chick.ask ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_lost_chick.again,galchamgol,disguise_lost_chick,꺼병이,"누구야? …아, 너지?",,제안,"engine/disguise.js DISGUISE_LINES.lost_chick.again ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_lost_chick.back,galchamgol,disguise_lost_chick,꺼병이,"휴, 너였구나! 깜짝 놀랐어.",,제안,"engine/disguise.js DISGUISE_LINES.lost_chick.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_lost_chick.back_first,galchamgol,disguise_lost_chick,꺼병이,휴… 너구리구나.,,제안,"engine/disguise.js DISGUISE_LINES.lost_chick.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_squirrel_brothers.owl,galchamgol,disguise_squirrel_brothers,다람쥐 형,"히익! 누, 누구야?!",,제안,"engine/disguise.js DISGUISE_LINES.squirrel_brothers.owl ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_squirrel_brothers.first,galchamgol,disguise_squirrel_brothers,다람쥐 형,누구야? 처음 보는 {f이}네.,,제안,"engine/disguise.js DISGUISE_LINES.squirrel_brothers.first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_squirrel_brothers.ask,galchamgol,disguise_squirrel_brothers,다람쥐 형,누구야? 처음 보는 얼굴인데.,,제안,"engine/disguise.js DISGUISE_LINES.squirrel_brothers.ask ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_squirrel_brothers.again,galchamgol,disguise_squirrel_brothers,다람쥐 형,또 누구야? …너지?,,제안,"engine/disguise.js DISGUISE_LINES.squirrel_brothers.again ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_squirrel_brothers.back,galchamgol,disguise_squirrel_brothers,다람쥐 형,"뭐야, 너였어?",,제안,"engine/disguise.js DISGUISE_LINES.squirrel_brothers.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_squirrel_brothers.back_first,galchamgol,disguise_squirrel_brothers,다람쥐 형,너구리잖아? 별일이네.,,제안,"engine/disguise.js DISGUISE_LINES.squirrel_brothers.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_old_magpie.first,galchamgol,disguise_old_magpie,늙은 까치,어디서 온 짐승이냐.\n처음 보는 얼굴이로구나.,,제안,"engine/disguise.js DISGUISE_LINES.old_magpie.first ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_old_magpie.ask,galchamgol,disguise_old_magpie,늙은 까치,누구냐. …보따리 끈이 낯익은데.,,제안,"engine/disguise.js DISGUISE_LINES.old_magpie.ask ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_old_magpie.again,galchamgol,disguise_old_magpie,늙은 까치,누구냐. …또 너로구나.,,제안,"engine/disguise.js DISGUISE_LINES.old_magpie.again ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_old_magpie.back,galchamgol,disguise_old_magpie,늙은 까치,"오냐, 너로구나.\n하마터면 몰라볼 뻔했다.",,제안,"engine/disguise.js DISGUISE_LINES.old_magpie.back ({f} 변신 이름, {f이} 받침이면 '이')"
+disguise_old_magpie.back_first,galchamgol,disguise_old_magpie,늙은 까치,너구리였구나.,,제안,"engine/disguise.js DISGUISE_LINES.old_magpie.back_first ({f} 변신 이름, {f이} 받침이면 '이')"
+stranger_dodam.line_squirrel,galchamgol,stranger_dodam,도담,어? 다람쥐다! 반가워!\n꼬리 털 좋다. 어느 숲에서 왔어?,,제안,"regions/galchamgol/strangers.js:12 dodam.line (다람쥐로 갔을 때, 결정 D-621)"
+stranger_dodam.line,galchamgol,stranger_dodam,도담,"어, 처음 보는 얼굴이네!\n도토리 바꿀래?",,제안,regions/galchamgol/strangers.js:12 dodam.line
+stranger_dodam.kin,galchamgol,stranger_dodam,도담,근데 넌 누구야?\n이 숲 다람쥐는 내가 다 아는데.,,제안,regions/galchamgol/strangers.js:13 dodam.kinLine
+stranger_dodam.owl,galchamgol,stranger_dodam,너구리,(도담이 꼬리를 말고 나무 구멍으로 쏙 숨는다.),,제안,regions/galchamgol/strangers.js:16 dodam.talk 수리부엉이
+stranger_dodam.otter,galchamgol,stranger_dodam,도담,수달 손님이다! 숲까지 올라온 수달은 처음 봐!\n이거 하나 먹어 봐. 물에선 도토리 없지?,,제안,"regions/galchamgol/strangers.js:18 dodam.talk 수달(한 번, 도토리 1, 결정 D-987)"
+stranger_toad.line,galchamgol,stranger_toad,두꺼비 할멈,처음 보는 손님이로구나.\n…풋잎 냄새가 나는구나.,,제안,regions/galchamgol/strangers.js:23 toad.line
+stranger_nal.line,galchamgol,stranger_nal,날쌘,"어이, 처음 보는 손님이네.\n여기 물건은 값이 좀 나가.",,제안,regions/galchamgol/strangers.js:27 nal.line
+stranger_nal.diary,galchamgol,stranger_nal,일기,낯선 손님으로 가니 날쌘이 값이 좀 나간다며 세게 불렀다. 처음 보는 손님한테는 저렇구나.,,제안,regions/galchamgol/strangers.js:30 nal.talk 일기 gal_nal_price
