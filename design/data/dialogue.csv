@@ -882,3 +882,12 @@ map_magpie.default,전체,map_magpie,화면,나뭇가지에 까치 둘이 앉아
 ui_toast.got,전체,ui_toast,화면,+ {item},,확정,engine/core.js:351 addItem 알림(하나)
 ui_toast.got_n,전체,ui_toast,화면,+ {item} ×{n},,확정,engine/core.js:351 addItem 알림(여럿)
 ui_toast.drawn,전체,ui_toast,화면,수첩에 그렸다 · {item},,확정,engine/core.js:350 addItem 처음 얻어 수첩 그림이 생긴 물건
+ui_title.continue,전체,ui_title,화면,이어서 하기,,제안,index.html:166 tsContinue
+ui_title.new,전체,ui_title,화면,새로 시작,,제안,index.html:166 tsNew
+ui_title.new_armed,전체,ui_title,화면,정말요? 새로 시작하면 저장이 지워져요,,제안,engine/save.js:187 startOrConfirm(저장이 있으면 두 번 눌러야 새로 시작)
+ui_title.save_meta,전체,ui_title,화면,저장된 진행: {label},,제안,js/title/title-screen.js:14 tsSaveMeta
+ui_title.save_bad,전체,ui_title,화면,저장을 읽지 못했어요. 새로 시작할 수 있어요,,제안,engine/save.js:148 saveLabel
+ui_title.today,전체,ui_title,화면,오늘,,제안,engine/save.js:151 saveLabel
+ui_title.date,전체,ui_title,화면,{m}월 {d}일,,제안,engine/save.js:151 saveLabel
+ui_title.am,전체,ui_title,화면,오전 {h}:{mm},,제안,engine/save.js:150 saveLabel(toLocaleTimeString ko-KR)
+ui_title.pm,전체,ui_title,화면,오후 {h}:{mm},,제안,engine/save.js:150 saveLabel(toLocaleTimeString ko-KR)
