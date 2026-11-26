@@ -956,3 +956,706 @@ stranger_dodam.otter,galchamgol,stranger_dodam,도담,수달 손님이다! 숲�
 stranger_toad.line,galchamgol,stranger_toad,두꺼비 할멈,처음 보는 손님이로구나.\n…풋잎 냄새가 나는구나.,,제안,regions/galchamgol/strangers.js:23 toad.line
 stranger_nal.line,galchamgol,stranger_nal,날쌘,"어이, 처음 보는 손님이네.\n여기 물건은 값이 좀 나가.",,제안,regions/galchamgol/strangers.js:27 nal.line
 stranger_nal.diary,galchamgol,stranger_nal,일기,낯선 손님으로 가니 날쌘이 값이 좀 나간다며 세게 불렀다. 처음 보는 손님한테는 저렇구나.,,제안,regions/galchamgol/strangers.js:30 nal.talk 일기 gal_nal_price
+dol_start.diary,dolneomeo,dol_start,일기,돌너머 마을에 왔다. 서리 맞은 돌담 사이로 장승이 나를 내려다본다. 서리다래가 어디 열리는지 마을에 물어보자.,,제안,region.js:42 onStart · d_start
+dol_start_think.1,dolneomeo,dol_start_think,속말,장승 안쪽은 닫혔네. 오른쪽 돌담길로 가 보자.,,제안,field.js:344 확장판 onStart 첫 속말
+kkubeogi_hint.1,dolneomeo,kkubeogi_hint,속말,쿨… 쿨… 마른 풀 더미 속에서 누가 코를 곤다.,,제안,story.js:531 Rg.npcs kkubeogi.hint 기척(D-55)
+kku_arc_word_ask.1,dolneomeo,kku_arc_word_ask,꾸벅이,잊기 전에… 맡길 말이 있어어…,,제안,"story.js:29 talkKkuArc 사연 메뉴(arcMenu). 사연 켜짐·kkuDone·고개를 들었을 때, dolneomeo_arc_kku3 전"
+kku_arc_word_ask.c1,dolneomeo,kku_arc_word_ask,고르기,하던 이야기 계속하기,,제안,talkKku 로
+kku_arc_word_ask.c2,dolneomeo,kku_arc_word_ask,고르기,무슨 말인데?,,제안,kku_arc_word
+kku_arc_word_ask.c3,dolneomeo,kku_arc_word_ask,고르기,다음에 이야기하기,,제안,
+kku_arc_word.1,dolneomeo,kku_arc_word,꾸벅이,그 모자 쓴 아저씨… 할배네서 나온 밤부터\n눈 오는 사흘을 내 둥지 곁에서 잤어…,,제안,story.js:29-35 arcAll(dolneomeo_arc_kku3·kku2) D-135·D-1470·D-580
+kku_arc_word.2,dolneomeo,kku_arc_word,꾸벅이,잠결에 들었어…\n“미안하다… 그 여름에 내가 없어서…”,,제안,
+kku_arc_word.3,dolneomeo,kku_arc_word,꾸벅이,나는 봄에 깨면 다 잊으니까…\n너한테 맡길게에…,,제안,
+kku_arc_word.4,dolneomeo,kku_arc_word,너구리,(아빠 수첩 다음 장에 그대로 적었다.),,제안,
+kku_arc_word.5,dolneomeo,kku_arc_word,꾸벅이,휴우… 이제 맘 놓고 졸겠다아…\n…원래도 졸았지만…,,제안,
+kku_arc_word.diary,dolneomeo,kku_arc_word,일기,아빠는 할배네서 나온 그 밤부터 눈 오는 사흘을 꾸벅이 둥지 곁에서 잤다. 꾸벅이가 그때 들은 아빠의 말을 맡겨서 수첩에 적었다. “미안하다… 그 여름에 내가 없어서…”,,제안,dolneomeo_arc_kku3 (learn dolneomeo:arcs-kkubeogi)
+kku_arc_spring_ask.1,dolneomeo,kku_arc_spring_ask,꾸벅이,봄에 깨면… 또 다 잊겠지이…,,제안,"story.js:39 arcMenu. ppuriPassed·꼬마 두더지를 만난 뒤, dolneomeo_arc_kku5 전 (D-118)"
+kku_arc_spring_ask.c1,dolneomeo,kku_arc_spring_ask,고르기,하던 이야기 계속하기,,제안,talkKku 로
+kku_arc_spring_ask.c2,dolneomeo,kku_arc_spring_ask,고르기,봄에 깨면 어떤데?,,제안,kku_arc_spring
+kku_arc_spring_ask.c3,dolneomeo,kku_arc_spring_ask,고르기,다음에 이야기하기,,제안,
+kku_arc_spring.1,dolneomeo,kku_arc_spring,꾸벅이,작년 봄에… 누가 날 보고 막 반가워했는데…\n누군지 몰라서… 그 애가 울었어…,,제안,story.js:39-44 arcAll(dolneomeo_arc_kku5·kku4)
+kku_arc_spring.2,dolneomeo,kku_arc_spring,너구리,글은 못 읽지? 그럼 그림으로 남기자.\n봄에 보면 알아보게.,,제안,
+kku_arc_spring.3,dolneomeo,kku_arc_spring,꾸벅이,"그림은… 볼 수 있어어…\n아, 생각났다… 반짝돌 갖고 놀던 애…",,제안,
+kku_arc_spring.4,dolneomeo,kku_arc_spring,너구리,돌쇠 할배 손주구나. 그려 줄게.,,제안,
+kku_arc_spring.diary,dolneomeo,kku_arc_spring,일기,꾸벅이는 봄에 깨면 반가워하는 이를 못 알아본다. 글은 못 읽으니 그림으로 남기기로 했다. 작년 봄에 울던 애는 반짝돌을 갖고 놀던 꼬마 두더지였다.,,제안,dolneomeo_arc_kku5
+kku_arc_drawing_ask.1,dolneomeo,kku_arc_drawing_ask,꾸벅이,그림… 그려 왔어어…?,,제안,"story.js:47 arcMenu. kku5 뒤·돌무더기가 잠든 뒤(G.boss.dead), kku7 전"
+kku_arc_drawing_ask.c1,dolneomeo,kku_arc_drawing_ask,고르기,하던 이야기 계속하기,,제안,talkKku 로
+kku_arc_drawing_ask.c2,dolneomeo,kku_arc_drawing_ask,고르기,그린 그림을 둥지에 달아 준다,,제안,kku_arc_drawing
+kku_arc_drawing_ask.c3,dolneomeo,kku_arc_drawing_ask,고르기,다음에 이야기하기,,제안,
+kku_arc_drawing.1,dolneomeo,kku_arc_drawing,너구리,"(수첩 맨 뒤 장에 꼬마 두더지와 반짝돌,\n그 옆에 모자 쓴 내 얼굴을 그렸다.)",,제안,story.js:47-55 arcAll(dolneomeo_arc_kku7·kku6) D-271
+kku_arc_drawing.2,dolneomeo,kku_arc_drawing,꾸벅이,이 애다아… 너도 그 모자 아저씨랑\n똑같네에…,,제안,
+kku_arc_drawing.3,dolneomeo,kku_arc_drawing,너구리,(그림을 억새로 묶어\n둥지 문턱 돌에 괴어 두었다.),,제안,
+kku_arc_drawing.4,dolneomeo,kku_arc_drawing,꾸벅이,봄에 깨면 제일 먼저 보이겠다아…\n둥지 깔고 남은 솜이야. 보따리에 깔아…,,제안,
+kku_arc_drawing.5,dolneomeo,kku_arc_drawing,너구리,{얻음 eoksae_som 1},,제안,gotLine
+kku_arc_drawing.6,dolneomeo,kku_arc_drawing,꾸벅이,이제 진짜로 잔다아… 깨우지 마아… 쿨…,,제안,
+kku_arc_drawing.diary,dolneomeo,kku_arc_drawing,일기,"수첩 맨 뒤 장에 꼬마 두더지와 반짝돌, 모자 쓴 내 얼굴을 그려 꾸벅이 둥지 문턱에 괴었다. 봄에 깨면 제일 먼저 보일 자리다. 꾸벅이가 둥지에 깔고 남은 억새꽃 솜을 주었다.",,제안,dolneomeo_arc_kku7 (learn dolneomeo:kku-drawing)
+kku_sleep_clue.1,dolneomeo,kku_sleep_clue,꾸벅이,쿨… 쿨…,,제안,story.js:184-187 talkKku 조는 동안 처음(단서 k1 전) D-135·D-427
+kku_sleep_clue.2,dolneomeo,kku_sleep_clue,꾸벅이,할배 돌탑 그늘에서… 졸고 있었는데…,,제안,
+kku_sleep_clue.3,dolneomeo,kku_sleep_clue,꾸벅이,보부상 아저씨… 할배네서 겨울 날 것처럼 굴더니…,,제안,
+kku_sleep_clue.4,dolneomeo,kku_sleep_clue,꾸벅이,늙은 까치가… 뭘 물어 온 밤에…\n짐 싸서 떠났어어… 쿨…,,제안,
+kku_sleep_clue.5,dolneomeo,kku_sleep_clue,너구리,(보부상 아저씨…? 아빠 얘기일까.),,제안,
+kku_sleep_clue.clue,dolneomeo,kku_sleep_clue,단서:꾸벅이,"꾸벅이의 잠꼬대: 보부상 아저씨가 할배네서 겨울 날 것처럼 굴더니, 늙은 까치가 무언가 물어 온 밤에 떠났다.",,제안,k1 (core.js:392 NAME_CLUES)
+kku_sleep_pick.1,dolneomeo,kku_sleep_pick,꾸벅이,쿨… 둥지는… 폭신해야…,,제안,story.js:188 talkKku 조는 동안(단서 뒤). 셋 가운데 하나를 무작위로(pick). 뒤에 kku_sleep_told·kku_sleep_wait·kku_sleep_nose 가운데 하나
+kku_sleep_pick.2,dolneomeo,kku_sleep_pick,꾸벅이,으음… 아직 꿈꾸는 중이야…,,제안,
+kku_sleep_pick.3,dolneomeo,kku_sleep_pick,꾸벅이,하암… 조금만 더…,,제안,
+kku_sleep_told.1,dolneomeo,kku_sleep_told,너구리,(푹 자. 맡긴 말은 적어 뒀어.),,제안,story.js:188 사연 켜짐·dolneomeo_arc_kku3 뒤
+kku_sleep_wait.1,dolneomeo,kku_sleep_wait,너구리,(고개를 들 때까지 기다리자.),,제안,story.js:188 사연 켜짐·kku3 전
+kku_sleep_nose.1,dolneomeo,kku_sleep_nose,너구리,(코가 씰룩하네. 곧 고개 들겠다.),,제안,story.js:188 사연 꺼짐
+kku_awake.1,dolneomeo,kku_awake,꾸벅이,"어, 어…? 안 잤어어… 진짜야아…",,제안,"story.js:192-200 talkKku 처음 고개를 들었을 때 D-130. 다음 줄은 kku_awake_ask_ppuri 또는 kku_awake_ask_plain, 그 뒤 kku_awake_eoksae"
+kku_awake.diary,dolneomeo,kku_awake,일기,꾸벅이가 고개를 들 때 말을 걸었다. 겨울잠 둥지에 깔 억새가 모자란다고 했다.,,제안,dolneomeo_arc_kku1 (사연 켜짐일 때만)
+kku_awake_ask_ppuri.1,dolneomeo,kku_awake_ask_ppuri,너구리,서리다래 어디 열리는지 알아?\n장승지기 할아버지가 너한테 물어보래.,,제안,story.js:196 뿔영감을 만난 뒤(ppuriMet)
+kku_awake_ask_plain.1,dolneomeo,kku_awake_ask_plain,너구리,서리다래 어디 열리는지 알아?\n엄마 약에 써야 해.,,제안,story.js:196 뿔영감을 만나기 전
+kku_awake_eoksae.1,dolneomeo,kku_awake_eoksae,꾸벅이,서리다래애… 알지이…\n그 모자… 어디서 봤더라아…,,제안,story.js:198-200 끝나고 마른 억새 3이 있으면 kku_trade
+kku_awake_eoksae.2,dolneomeo,kku_awake_eoksae,꾸벅이,근데… 겨울잠 둥지가 아직 덜 됐어…\n깔 억새… 세 단만 베어다 줄래에…?,,제안,
+kku_awake_eoksae.3,dolneomeo,kku_awake_eoksae,꾸벅이,가져오면… 다 알려 줄게에… 쿨…,,제안,
+kku_need_eoksae.1,dolneomeo,kku_need_eoksae,꾸벅이,억새 세 단… 둥지가 아직 휑해…\n하암… 꿈에서도 추워…,,제안,story.js:206 억새 세 단이 없을 때 D-582
+kku_after_tea.1,dolneomeo,kku_after_tea,꾸벅이,하암… 둥지가… 폭신해…,,제안,story.js:210 kkuDone·할배께 차를 드린 뒤(D-270). 둘 가운데 하나를 무작위로(pick)
+kku_after_tea.2,dolneomeo,kku_after_tea,꾸벅이,쿨… 조금만 더… 자고 나서어…,,제안,
+kku_after.1,dolneomeo,kku_after,꾸벅이,돌쇠 할배는 눈이 침침해서 손끝으로 돌을 보셔…\n결명자 차를 좋아하실 거야… 쿨…,,제안,story.js:210 kkuDone·할배께 차를 드리기 전
+kku_trade.1,dolneomeo,kku_trade,꾸벅이,오… 억새다… 나 주는 거야…?,,제안,story.js:213 kkuTrade
+kku_trade.c1,dolneomeo,kku_trade,고르기,보따리를 펼친다,,제안,교환 화면(S3)
+kku_trade.c2,dolneomeo,kku_trade,고르기,아직은 안 줄래,,제안,
+kku_give.1,dolneomeo,kku_give,꾸벅이,와… 폭신하다…,,제안,"story.js:215-230 kkuGive 억새 세 단을 받고 D-257·D-580. 다음 줄은 kku_give_met 또는 kku_give_unmet, 끝은 kku_give_end"
+kku_give.2,dolneomeo,kku_give,꾸벅이,서리다래는… 성황당 돌무더기가 가슴에 품고 있어…\n봄이면 한 알씩 앞에 내놔… 주워 먹어 봤어어…,,제안,
+kku_give.3,dolneomeo,kku_give,너구리,(봄까지는… 못 기다려.),,제안,
+kku_give.diary,dolneomeo,kku_give,일기,"꾸벅이에게 억새를 주고 들었다. 서리다래는 성황당 돌무더기가 가슴에 품고 있다가, 봄이 오면 하나씩 앞에 내놓는단다. 봄까지 기다릴 수는 없다.{unmet} 메밀가루는 돌쇠 할배에게 물어보라고 했다. 할배는 눈이 침침해서 결명자 차를 좋아하신단다.",,제안,"d_kku. {unmet}: 뿔영감을 만나기 전이면 kku_give_piece.unmet 조각, 만난 뒤면 빈 글"
+kku_give_piece.unmet,dolneomeo,kku_give_piece,조각, 장승지기 뿔영감이 돌산 길을 막았다.,,제안,d_kku 일기에 끼우는 조각(앞 띄어쓰기 포함)
+kku_give_met.1,dolneomeo,kku_give_met,꾸벅이,장승제엔 메밀전이니까…\n가루가 있어야겠네에…,,제안,story.js:226 뿔영감을 만난 뒤(ppuriMet)
+kku_give_unmet.1,dolneomeo,kku_give_unmet,꾸벅이,근데 장승지기 뿔영감이 돌산 길을 막았어…\n장승제 메밀전을 받아야 연대애…,,제안,story.js:226 뿔영감을 만나기 전
+kku_give_end.1,dolneomeo,kku_give_end,꾸벅이,"가루는… 돌 깎는 두더지, 돌쇠 할배가 알아…\n눈이 침침하셔서 결명자 차를 좋아하셔… 쿨…",,제안,story.js:229 D-159·D-135
+kku_mud_give.1,dolneomeo,kku_mud_give,꾸벅이,진흙… 이걸로 둥지 틈 바르면… 바람이 안 들겠다…,,제안,"story.js:611-614 kkuMudGive 진흙 1 → 메밀 2(t_kkubeogi_mud, D-77)"
+kku_mud_give.2,dolneomeo,kku_mud_give,꾸벅이,가을에 주워 둔 메밀… 자는 동안 눅눅해지니까… 너 가져가…,,제안,
+kku_mud_give.3,dolneomeo,kku_mud_give,너구리,{얻음 memil 2},,제안,receiveItem
+kku_mud_give.4,dolneomeo,kku_mud_give,꾸벅이,쿨…,,제안,
+dol_nal_first.1,dolneomeo,dol_nal_first,날쌘,"또 만났네, 꼬마 보부상.\n돌길 오느라 발바닥 꽤 아팠지?",,제안,"story.js:235-240 talkNal 돌너머 첫 만남(nalDTalk 전) D-161. 셋째 줄은 dol_nal_first_told·dol_nal_first_kflower·dol_nal_first_none 가운데 하나, 끝나면 dol_nal_menu"
+dol_nal_first.2,dolneomeo,dol_nal_first,날쌘,나도 그래. 돌밖에 없는 동네라\n장사도 영 시원찮고.,,제안,
+dol_nal_first_told.1,dolneomeo,dol_nal_first_told,날쌘,칡꽃 챙겨 왔네. 말한 대로지.\n귀띔값은 뺐다. 결명자 둘.,,제안,story.js:240 칡꽃이 있고 단풍골에서 칡꽃 귀띔을 들었을 때(galArcNal2 또는 nal:route-price) D-130
+dol_nal_first_kflower.1,dolneomeo,dol_nal_first_kflower,날쌘,"가만, 그 향은 단풍골 칡꽃이지?\n여기선 그게 귀해. 결명자 두 개는 쳐줄게.",,제안,story.js:240 칡꽃이 있고 귀띔은 못 들었을 때
+dol_nal_first_none.1,dolneomeo,dol_nal_first_none,날쌘,단풍골 칡꽃 같은 건 없어? 여기선 귀하거든.\n하나면 결명자 두 개는 쳐줄게.,,제안,story.js:240 칡꽃이 없을 때
+dol_nal_menu.1,dolneomeo,dol_nal_menu,날쌘,"어디, 뭘 내놓을 건데?",,제안,story.js:243-262 nalMenu. 칡꽃이나 겨우살이 둘이 있을 때
+dol_nal_menu.c1,dolneomeo,dol_nal_menu,고르기,보따리를 펼친다,,제안,교환 화면(S3)
+dol_nal_menu.c2,dolneomeo,dol_nal_menu,고르기,지게에서 달그락거리는 병을 묻는다,,제안,참기름(t_craft_oil) 바꾸기 전에만. 옛 구성엔 없음
+dol_nal_menu.c3,dolneomeo,dol_nal_menu,고르기,그만두기,,제안,
+dol_nal_menu_done.1,dolneomeo,dol_nal_menu_done,날쌘,"결명자는 볶아 차로 달이거나, 꿀에 개어\n환으로 빚어 둬. …이 훈수도 공짜 아니야.",,제안,story.js:260 결명자를 바꾼 뒤(nalDDone). 고르기는 dol_nal_menu 것 · 귀띔 hint:gyeol_hwan (D-461) · 말버릇 D-135·D-117
+dol_nal_menu_empty.1,dolneomeo,dol_nal_menu_empty,날쌘,빈손으로 흥정하게? 칡꽃이 없으면\n높은 가지 겨우살이 두 개라도 따 와. 그럼 결명자 하나.,,제안,story.js:261 칡꽃도 겨우살이 둘도 없을 때. 고르기는 dol_nal_menu 것
+dol_nal_oil_lead.1,dolneomeo,dol_nal_oil_lead,날쌘,참기름 병이야. 셋이나 되는데\n돌길이라 병끼리 자꾸 부딪쳐.,,제안,story.js:250 병을 물을 때 첫 줄. 뒤에 dol_nal_oil_wait_kku·dol_nal_oil_wait·dol_nal_oil_ready 가운데 하나 (D-445)
+dol_nal_oil_wait_kku.1,dolneomeo,dol_nal_oil_wait_kku,날쌘,억새 세 단이면 한 병씩 감쌀 텐데.\n꾸벅이 둥지에 쓸 세 단은 남겨 두고.,,제안,"story.js:252 억새가 모자라고, 꾸벅이 부탁을 들었지만 아직 안 줬을 때(kkuTalk·!kkuDone)"
+dol_nal_oil_wait_kku.2,dolneomeo,dol_nal_oil_wait_kku,날쌘,그거 말고 세 단 더 생기면 한 병 줄게.,,제안,
+dol_nal_oil_wait.1,dolneomeo,dol_nal_oil_wait,날쌘,마른 억새 세 단이면 한 병씩 감쌀 텐데.\n밭에서 베어 오면 한 병 줄게.,,제안,story.js:253 억새가 모자랄 때
+dol_nal_oil_ready.1,dolneomeo,dol_nal_oil_ready,날쌘,그 억새 세 단이면 한 병씩 감쌀 수 있겠다.\n주면 한 병은 네 몫이야.,,제안,story.js:255 억새가 넉넉할 때
+dol_nal_oil_ready.c1,dolneomeo,dol_nal_oil_ready,고르기,보따리를 펼친다,,제안,교환 화면(S3)
+dol_nal_oil_ready.c2,dolneomeo,dol_nal_oil_ready,고르기,지금은 챙겨 둘게요,,제안,
+dol_nal_oil_give_first.1,dolneomeo,dol_nal_oil_give_first,날쌘,억새 세 단이네. 돌길이라\n참기름 병끼리 자꾸 부딪치던 참이야.,,제안,story.js:271 nalOilGive 병 이야기를 듣기 전에 보따리에서 바로 바꿨을 때(D-147). 뒤에 dol_nal_oil_give
+dol_nal_oil_give.1,dolneomeo,dol_nal_oil_give,날쌘,한 병에 한 단씩. 이제 안 부딪치겠네.\n기름은 네가 쓸 데에 써.,,제안,story.js:265-271 nalOilGive 억새 3 → 참기름 1
+dol_nal_oil_give.2,dolneomeo,dol_nal_oil_give,너구리,{얻음 sesame_oil 1},,제안,receiveItem
+dol_nal_oil_give.diary,dolneomeo,dol_nal_oil_give,일기,날쌘에게 여분 억새 세 단을 주고 참기름을 받았다. 병마다 억새를 감싸니 돌길에서도 부딪치는 소리가 작아졌다.,,제안,dolneomeo_craft_oil
+dol_nal_trade_kflower.diary,dolneomeo,dol_nal_trade_kflower,일기,단풍골에서 가져온 칡꽃을 날쌘에게 주고 결명자를 받았다. 돌투성이 마을에선 꽃 향이 귀하다. 마을이 바뀌니 물건값도 달라진다.,,제안,story.js:279 nalTrade 칡꽃으로 바꿨을 때 일기 · d_nal
+dol_nal_trade_gyeousari.diary,dolneomeo,dol_nal_trade_gyeousari,일기,높은 가지의 겨우살이를 날쌘에게 주고 결명자를 받았다.,,제안,story.js:279 nalTrade 겨우살이 둘로 바꿨을 때 일기 · d_nal
+dol_nal_trade_bluff_kflower.1,dolneomeo,dol_nal_trade_bluff_kflower,날쌘,"그 흔한 물건도 여기 오면 귀해지는 거야.\n자, 결명자. 덤도 얹었어.",,제안,"story.js:284 허세가 통했고(nalDBluff, D-40) 칡꽃일 때. 첫 줄 뒤에 받는 줄(receiveItem gyeolmyeongja 3). 끝에 dol_nal_rumor"
+dol_nal_trade_bluff_kflower.2,dolneomeo,dol_nal_trade_bluff_kflower,날쌘,날쌘이 짜다는 소리는 못 듣지.,,제안,
+dol_nal_trade_bluff_gyeousari.1,dolneomeo,dol_nal_trade_bluff_gyeousari,날쌘,"칡꽃은 흔하다며? 겨우살이로 왔네.\n자, 결명자. 덤도 얹었어.",,제안,story.js:284 허세가 통했고 겨우살이일 때. 첫 줄 뒤에 받는 줄(receiveItem gyeolmyeongja 2). 끝에 dol_nal_rumor
+dol_nal_trade_bluff_gyeousari.2,dolneomeo,dol_nal_trade_bluff_gyeousari,날쌘,날쌘이 짜다는 소리는 못 듣지.,,제안,
+dol_nal_trade_plain.1,dolneomeo,dol_nal_trade_plain,날쌘,"자, 결명자. 이만하면 잘 바꿨지?",,제안,"story.js:285 덤 없이. 첫 줄 뒤에 받는 줄(receiveItem gyeolmyeongja: 칡꽃 2·겨우살이 1, D-235). 끝에 dol_nal_rumor"
+dol_nal_trade_plain.2,dolneomeo,dol_nal_trade_plain,날쌘,눈 밝히는 약재니까 쓸 데가 있을걸.,,제안,
+dol_nal_rumor.1,dolneomeo,dol_nal_rumor,날쌘,보부상이면 큰 장터 상단 숙소는 꼭 들러.\n오가는 보부상 소식은 다 거기 모인다더라.,,제안,story.js:283 큰 장터 상단 소문(learn rumor:sangdan) D-1439·D-136
+dol_nal_rumor.2,dolneomeo,dol_nal_rumor,날쌘,…난 안 들르지만. 묻지 마.,,제안,
+dolsoe_arc_menu.1,dolneomeo,dolsoe_arc_menu,돌쇠 할배,무얼 묻고 싶으냐.,,제안,story.js:72-118 talkDolsoeArc 사연 메뉴(arcMenu). 그때 열린 고르기만 붙인다
+dolsoe_arc_menu.c1,dolneomeo,dolsoe_arc_menu,고르기,하던 이야기 계속하기,,제안,talkDolsoe 로
+dolsoe_arc_menu.c2,dolneomeo,dolsoe_arc_menu,고르기,메밀댁 아주머니가 보냈어요,,제안,"dolsoe_badger_sack. 메밀댁 자루를 맡았을 때(dolneomeo_badger1, D-118)"
+dolsoe_arc_menu.c3,dolneomeo,dolsoe_arc_menu,고르기,마당 돌탑 꼭대기 돌은 누가 올렸어요?,,제안,dolsoe_top_stone. dolneomeo_arc_dolsoe1 전
+dolsoe_arc_menu.c4,dolneomeo,dolsoe_arc_menu,고르기,아빠의 돌을 올렸어요,,제안,dolsoe_dad_stone. 골렘에게 돌을 건넸거나 성황당에 올린 뒤(D-1502)
+dolsoe_arc_menu.c5,dolneomeo,dolsoe_arc_menu,고르기,꼬마는 요새 뭐 해요?,,제안,dolsoe_mole_ask. 마을 구역·꼬마를 만난 뒤·dolsoe1 뒤
+dolsoe_arc_menu.c6,dolneomeo,dolsoe_arc_menu,고르기,꼬마한테 물어볼게요,,제안,dolsoe_mole_where. dolsoe4 뒤 dolsoe5 전
+dolsoe_arc_menu.c7,dolneomeo,dolsoe_arc_menu,고르기,꼬마가 할배를 찾아요,,제안,dolsoe_mole_reads. dolsoe5 뒤·돌무더기가 잠든 뒤
+dolsoe_arc_menu.c8,dolneomeo,dolsoe_arc_menu,고르기,다음에 이야기하기,,제안,
+dolsoe_arc_who.1,dolneomeo,dolsoe_arc_who,돌쇠 할배,누가 왔느냐.,,제안,story.js:79 메밀댁 자루를 맡았는데 아직 차를 드리기 전(dolsoeMet·!dolsoeTea). 고르기: 하던 이야기 계속하기·메밀댁 아주머니가 보냈어요·다음에 이야기하기(dolsoe_arc_menu 것)
+dolsoe_top_stone.1,dolneomeo,dolsoe_top_stone,너구리,(할배가 마당 돌탑 꼭대기 돌을\n두 손으로 감싼다.),,제안,story.js:63-70 topStone arcScene(dolneomeo_arc_dolsoe1) D-1004
+dolsoe_top_stone.2,dolneomeo,dolsoe_top_stone,돌쇠 할배,먼저 간 우리 할멈이 올린 돌이다.\n눈이 이리 돼도 이 돌은 날마다 만진다.,,제안,
+dolsoe_top_stone.3,dolneomeo,dolsoe_top_stone,돌쇠 할배,밑을 단단히 괴면 작은 돌도 안 떨어진다.\n…할멈 잔소리도 그랬지.,,제안,
+dolsoe_top_stone.diary,dolneomeo,dolsoe_top_stone,일기,돌쇠 할배는 먼저 간 아내의 소원 돌을 지킨다. 눈이 어두워진 뒤에도 그 돌만은 날마다 만져 본다고 했다.,,제안,dolneomeo_arc_dolsoe1
+dolsoe_top_stone_back.1,dolneomeo,dolsoe_top_stone_back,돌쇠 할배,"…그래, 맷돌 얘기를 하던 참이었지.\n손을 얹어 보겠느냐.",,제안,story.js:69 이야기 뒤 맷돌을 아직 안 배웠으면(!stackDone) D-1004
+dolsoe_top_stone_back.c1,dolneomeo,dolsoe_top_stone_back,고르기,맷돌에 손을 얹는다,,제안,dolsoe_stack_learn
+dolsoe_top_stone_back.c2,dolneomeo,dolsoe_top_stone_back,고르기,조금 이따가요,,제안,
+dolsoe_dad_stone.1,dolneomeo,dolsoe_dad_stone,너구리,"아빠의 돌, 대신 올렸어요.",,제안,story.js:85-93 arcAll(dolneomeo_arc_dolsoe3·dolsoe2) D-130·D-580·D-1502
+dolsoe_dad_stone.2,dolneomeo,dolsoe_dad_stone,돌쇠 할배,재작년 겨울 네 아비가 내 마당 탑에 먼저 얹어 보더니\n손이 떨려 못 올리고 두고 갔지.,,제안,
+dolsoe_dad_stone.3,dolneomeo,dolsoe_dad_stone,너구리,엄마 몫도 올려도 돼요?,,제안,
+dolsoe_dad_stone.4,dolneomeo,dolsoe_dad_stone,돌쇠 할배,이리 오너라. 밑은 내가 받치마.,,제안,
+dolsoe_dad_stone.5,dolneomeo,dolsoe_dad_stone,너구리,"(할배 돌탑에 작은 돌 하나를 얹었다.\n엄마, 약 보낼게.)",,제안,
+dolsoe_dad_stone.6,dolneomeo,dolsoe_dad_stone,돌쇠 할배,손이 네 아비를 닮았구나. 덜 떨 뿐이지.,,제안,
+dolsoe_dad_stone.diary,dolneomeo,dolsoe_dad_stone,일기,"아빠는 성황당에 가기 전 할배 마당 탑에 소원 돌을 얹어 보다, 손이 떨려 못 올리고 두고 떠났다. 그 돌을 대신 올렸다. 할배가 받쳐 준 돌탑에 엄마 몫의 돌도 얹었다.",,제안,dolneomeo_arc_dolsoe3
+dolsoe_mole_ask.1,dolneomeo,dolsoe_mole_ask,돌쇠 할배,"우리 손주 녀석, 너하고는 잘 노는구나.",,제안,story.js:98-102 arcScene(dolneomeo_arc_dolsoe4) D-118·D-130
+dolsoe_mole_ask.2,dolneomeo,dolsoe_mole_ask,돌쇠 할배,손으로 돌 읽는 걸 가르치려 들면\n도망만 간다.,,제안,
+dolsoe_mole_ask.3,dolneomeo,dolsoe_mole_ask,돌쇠 할배,내 눈이 더 흐려지기 전에\n한 번은 가르쳐야 하는데.,,제안,
+dolsoe_mole_ask.diary,dolneomeo,dolsoe_mole_ask,일기,돌쇠 할배는 눈이 더 흐려지기 전에 손주 꼬마 두더지에게 손으로 돌 읽는 법을 가르치고 싶어 한다. 꼬마는 도망만 다닌다.,,제안,dolneomeo_arc_dolsoe4
+dolsoe_mole_where.1,dolneomeo,dolsoe_mole_where,돌쇠 할배,그래 주련.\n조약돌 늘어놓고 노는 데 있을 게다.,,제안,story.js:104 D-135·D-1003
+dolsoe_mole_reads.1,dolneomeo,dolsoe_mole_reads,꼬마 두더지,"…가르쳐 줘, 할배.",,제안,story.js:106-115 arcAll(dolneomeo_arc_dolsoe7·dolsoe6) D-580·D-271
+dolsoe_mole_reads.2,dolneomeo,dolsoe_mole_reads,돌쇠 할배,"눈 감아라. 손바닥 전부로, 천천히.",,제안,
+dolsoe_mole_reads.3,dolneomeo,dolsoe_mole_reads,꼬마 두더지,"차가워… 오돌토돌해.\n어, 이건… 우리 할머니 돌이다. 따뜻해.",,제안,
+dolsoe_mole_reads.4,dolneomeo,dolsoe_mole_reads,너구리,(할배가 소리 내어 웃었다.\n처음 듣는 웃음소리였다.),,제안,
+dolsoe_mole_reads.5,dolneomeo,dolsoe_mole_reads,돌쇠 할배,이제 내 눈이 좀 쉬어도 되겠다.\n녀석 마음 돌려놓은 값이다. 곱돌 잔이다.,,제안,
+dolsoe_mole_reads.6,dolneomeo,dolsoe_mole_reads,너구리,{얻음 gopdol_jan 1},,제안,gotLine
+dolsoe_mole_reads.7,dolneomeo,dolsoe_mole_reads,꼬마 두더지,할배 눈 대신 내 손으로 볼게.\n할배가 떡 숨긴 데도 다 찾을 거야.,,제안,
+dolsoe_mole_reads.diary,dolneomeo,dolsoe_mole_reads,일기,"꼬마 두더지가 할배에게 손으로 돌 읽는 법을 배우고, 눈을 감은 채 꼭대기의 할머니 돌을 알아맞혔다. 돌쇠 할배가 처음으로 소리 내어 웃었다. 녀석 마음을 돌려놓은 값이라며 곱돌 잔을 주었다.",,제안,dolneomeo_arc_dolsoe7 (learn dolneomeo:mole-reads)
+dolsoe_badger_sack.1,dolneomeo,dolsoe_badger_sack,너구리,메밀댁 아주머니가 보냈어요.\n맷돌 받침 고쳐 주신 값이래요.,,제안,story.js:120-127 badgerSack arcScene(dolneomeo_badger_sent) D-118
+dolsoe_badger_sack.2,dolneomeo,dolsoe_badger_sack,너구리,(보따리에서 햇메밀 자루를 쑥 꺼냈다.),,제안,
+dolsoe_badger_sack.3,dolneomeo,dolsoe_badger_sack,돌쇠 할배,받침 값치곤 많다.\n그 사람은 늘 넘치게 준다.,,제안,
+dolsoe_badger_sack.4,dolneomeo,dolsoe_badger_sack,너구리,멍석 지키느라 못 오신대요.,,제안,
+dolsoe_badger_sack.5,dolneomeo,dolsoe_badger_sack,돌쇠 할배,해마다 그 소리지.\n…그럼 다음엔 내가 내려가야겠구나.,,제안,
+dolsoe_badger_sack.diary,dolneomeo,dolsoe_badger_sack,일기,"메밀댁 아주머니의 햇메밀 자루를 돌쇠 할배에게 날랐다. 할배는 받침 값치곤 많다며, 다음엔 자기가 내려가겠다고 했다.",,제안,dolneomeo_badger_sent
+dolsoe_first.1,dolneomeo,dolsoe_first,너구리,"(두더지 할배가 눈을 가늘게 뜨고\n납작한 돌을 쪼고 있다. 탁, 탁.)",,제안,story.js:291-299 talkDolsoe 첫 만남 D-442·D-580. 끝나고 결명자가 있으면 dolsoe_tea_smell
+dolsoe_first.2,dolneomeo,dolsoe_first,돌쇠 할배,"발소리가 가볍구나. 소원 돌을 새기는 중이다.\n이름을 먼저 새기고, 소원은 그 밑에.",,제안,
+dolsoe_first.3,dolneomeo,dolsoe_first,돌쇠 할배,이름 없는 소원은 성황당에 올려도\n바람이 도로 내려보낸다더라. 누구 건지 몰라서.,,제안,
+dolsoe_first.4,dolneomeo,dolsoe_first,돌쇠 할배,성황당은 장승 둘 지나 돌산 꼭대기다.\n첫서리 뒤로 그 돌무더기가 밤마다 들썩인다.,,제안,
+dolsoe_eyes.1,dolneomeo,dolsoe_eyes,너구리,눈이 불편하세요?,,제안,"story.js:304 차를 드리기 전, 결명자가 없을 때"
+dolsoe_eyes.2,dolneomeo,dolsoe_eyes,돌쇠 할배,돌은 손끝으로 보면 된단다. 내 눈은 걱정 말거라.,,제안,
+dolsoe_stack_ask.1,dolneomeo,dolsoe_stack_ask,돌쇠 할배,맷돌에 손을 얹어 보겠느냐. 천천히 해도 된단다.,,제안,story.js:308 차를 드린 뒤 맷돌을 배우기 전(!stackDone)
+dolsoe_stack_ask.c1,dolneomeo,dolsoe_stack_ask,고르기,맷돌에 손을 얹는다,,제안,dolsoe_stack_learn
+dolsoe_stack_ask.c2,dolneomeo,dolsoe_stack_ask,고르기,조금 이따가요,,제안,
+dolsoe_mill_ok.1,dolneomeo,dolsoe_mill_ok,돌쇠 할배,맷돌은 잘 돌더냐.\n네 아비는 처음에 손잡이부터 뽑아 왔다.,,제안,"story.js:316 맷돌을 배운 뒤, 장승제 전이고 메밀가루가 없을 때 D-582. 고르기는 결명자가 있고 dolsoeTea2 전에만(D-271)"
+dolsoe_mill_ok.c1,dolneomeo,dolsoe_mill_ok,고르기,결명자를 하나 더 드린다,,제안,dolsoe_tea2
+dolsoe_mill_ok.c2,dolneomeo,dolsoe_mill_ok,고르기,그만두기,,제안,
+dolsoe_busy_shrine.1,dolneomeo,dolsoe_busy_shrine,너구리,(할배가 마당 돌을 하나씩 뒤집으며\n손끝으로 모서리를 재고 있다.),,제안,story.js:318 돌무더기를 부순 뒤(boss.dead·!golemCalm) D-160. 끝 줄 고르기는 결명자가 있고 dolsoeTea2 전에만
+dolsoe_busy_shrine.2,dolneomeo,dolsoe_busy_shrine,돌쇠 할배,"성황당 무너진 데 맞을 돌을 고른다.\n틈은 진흙에 돌가루, 억새 썰어 넣고 찧어 메우고.",,제안,귀띔 hint:heuk_banjuk (D-461)
+dolsoe_busy_shrine.3,dolneomeo,dolsoe_busy_shrine,돌쇠 할배,지금은 손을 못 뗀다.,,제안,
+dolsoe_busy_shrine.c1,dolneomeo,dolsoe_busy_shrine,고르기,결명자를 하나 더 드린다,,제안,dolsoe_tea2
+dolsoe_busy_shrine.c2,dolneomeo,dolsoe_busy_shrine,고르기,그만두기,,제안,
+dolsoe_busy.1,dolneomeo,dolsoe_busy,너구리,"(할배가 정으로 돌을 쪼고 있다. 탁, 탁.)",,제안,story.js:319 할 이야기를 다 나눈 뒤 D-160. 끝 줄 고르기는 결명자가 있고 dolsoeTea2 전에만
+dolsoe_busy.2,dolneomeo,dolsoe_busy,돌쇠 할배,…응? 지금은 손을 못 뗀다.\n돌이 삐지면 사흘을 안 풀린다.,,제안,
+dolsoe_busy.c1,dolneomeo,dolsoe_busy,고르기,결명자를 하나 더 드린다,,제안,dolsoe_tea2
+dolsoe_busy.c2,dolneomeo,dolsoe_busy,고르기,그만두기,,제안,
+dolsoe_tea2.1,dolneomeo,dolsoe_tea2,돌쇠 할배,허허. 또 챙겨 왔구나.,,제안,"story.js:312-313 결명자를 한 번 더 드림(dolsoeTea2, 한 번만) D-271"
+dolsoe_tea2.2,dolneomeo,dolsoe_tea2,돌쇠 할배,빈손으로 보낼 순 없지.\n차돌 쪼가리를 찧어 다듬은 공깃돌이다.,,제안,귀띔 hint:gongi (D-461)
+dolsoe_tea2.3,dolneomeo,dolsoe_tea2,너구리,{얻음 gongi 1},,제안,receiveItem
+dolsoe_tea_smell.1,dolneomeo,dolsoe_tea_smell,돌쇠 할배,결명자 냄새로구나.,,제안,story.js:323-325 dolsoeTea 결명자를 가졌을 때
+dolsoe_tea_smell.c1,dolneomeo,dolsoe_tea_smell,고르기,보따리를 펼친다,,제안,교환 화면(S3)
+dolsoe_tea_smell.c2,dolneomeo,dolsoe_tea_smell,고르기,나중에 달여 드릴게요,,제안,
+dolsoe_give.1,dolneomeo,dolsoe_give,너구리,(결명자를 볶아 차로 달여 드렸다.),,제안,"story.js:334-365 dolsoeGive 사연 켜짐 D-130·D-135. 여섯째 줄 뒤에 dolsoe_rumor, 그 뒤 dolsoe_give_end"
+dolsoe_give.2,dolneomeo,dolsoe_give,돌쇠 할배,고맙다. …그 보따리에서 돌 소리가 나는구나.\n맷돌이냐? 이리 줘 보거라.,,제안,
+dolsoe_give.3,dolneomeo,dolsoe_give,너구리,(할배가 자개 발자국을 손끝으로 더듬다가 멈춘다.),,제안,
+dolsoe_give.4,dolneomeo,dolsoe_give,돌쇠 할배,이 자개 발자국… 떨어진 걸 내가 박아 준 거다.\n그 녀석 집안 맷돌이다. …그럼 네가 그 녀석 아들이냐.,,제안,
+dolsoe_give.5,dolneomeo,dolsoe_give,너구리,아빠가 그랬어요.\n돌이 마음을 알아야 돈다고.,,제안,
+dolsoe_give.6,dolneomeo,dolsoe_give,돌쇠 할배,"…내가 가르친 말이다.\n네 아비, 젊을 적에 내 마당에서 돌을 배웠다.",,제안,
+dolsoe_give.diary,dolneomeo,dolsoe_give,일기,"돌쇠 할배가 보따리 속 맷돌의 자개 발자국을 손끝으로 더듬더니, 우리 집안 맷돌이라는 걸 알아봤다.",,제안,d_dolsoe (사연 켜짐·꺼짐 같음)
+dolsoe_rumor.1,dolneomeo,dolsoe_rumor,너구리,아빠가 어디로 갔는지 아세요?,,제안,story.js:329-333 SANGDAN_RUMOR 큰 장터 상단 소문(learn rumor:sangdan) D-1439
+dolsoe_rumor.2,dolneomeo,dolsoe_rumor,돌쇠 할배,늙은 까치가 뭘 물어 온 밤에 짐을 싸더니\n북쪽으로 간다고만 하더구나.,,제안,
+dolsoe_rumor.3,dolneomeo,dolsoe_rumor,돌쇠 할배,"돌 사러 오는 장꾼들 말로는, 큰 장터에 보부상 상단 숙소가 있다더라.\n오가는 보부상은 다 거기 장부에 적힌다지.",,제안,
+dolsoe_rumor.4,dolneomeo,dolsoe_rumor,돌쇠 할배,네 아비도 북쪽 가는 길에 거기 들렀을 게다.,,제안,
+dolsoe_give_end.1,dolneomeo,dolsoe_give_end,돌쇠 할배,"돌리기 전에, 먼저 돌 소리부터 듣거라.",,제안,story.js:352·360-364 사연 켜짐 D-443·D-1004
+dolsoe_give_end.2,dolneomeo,dolsoe_give_end,돌쇠 할배,배워 보겠느냐.,,제안,
+dolsoe_give_end.c1,dolneomeo,dolsoe_give_end,고르기,맷돌 돌리는 법을 배운다,,제안,dolsoe_stack_learn
+dolsoe_give_end.c2,dolneomeo,dolsoe_give_end,고르기,마당 돌탑 꼭대기 돌을 여쭤본다,,제안,dolsoe_top_stone
+dolsoe_give_end.c3,dolneomeo,dolsoe_give_end,고르기,조금 이따가요,,제안,
+dolsoe_give_plain.1,dolneomeo,dolsoe_give_plain,너구리,(결명자를 볶아 차로 달여 드렸다.),,제안,"story.js:353-357 dolsoeGive 사연 꺼짐. 끝에 dolsoe_rumor, 그 뒤 dolsoe_give_plain_end"
+dolsoe_give_plain.2,dolneomeo,dolsoe_give_plain,돌쇠 할배,눈이 좀 밝아지는구나. 고맙다.,,제안,
+dolsoe_give_plain.3,dolneomeo,dolsoe_give_plain,돌쇠 할배,보따리에서 돌 부딪는 소리가 나는구나.\n이리 줘 보거라.,,제안,
+dolsoe_give_plain.4,dolneomeo,dolsoe_give_plain,너구리,(할배가 맷돌 윗돌의 자개 발자국을 손끝으로 천천히 더듬는다.),,제안,
+dolsoe_give_plain.5,dolneomeo,dolsoe_give_plain,돌쇠 할배,이 자개 발자국… 떨어진 걸 내가 박아 준 거다.\n그 녀석 집안 맷돌이구나.,,제안,
+dolsoe_give_plain.6,dolneomeo,dolsoe_give_plain,너구리,아빠가 그랬어요. 돌이 마음을 알아야 돈다고.,,제안,
+dolsoe_give_plain.7,dolneomeo,dolsoe_give_plain,돌쇠 할배,…내가 가르쳐 준 말이다.,,제안,
+dolsoe_give_plain_end.1,dolneomeo,dolsoe_give_plain_end,돌쇠 할배,"돌리기 전에, 먼저 돌 소리부터 들어 보거라.",,제안,story.js:359 사연 꺼짐. 끝나면 바로 dolsoe_stack_learn
+dolsoe_stack_learn.1,dolneomeo,dolsoe_stack_learn,너구리,(맷돌을 떠올리자 보따리에서 쑥 나왔다.\n할배가 윗돌에 내 손을 얹어 준다. 돌이 차다.),,제안,"story.js:379-398 finishStack 맷돌 배우기(learnLines) D-443·D-734. 뒤에 dolsoe_stack_arcs 또는 dolsoe_stack_plain, 그 뒤 dolsoe_stack_woke"
+dolsoe_stack_learn.2,dolneomeo,dolsoe_stack_learn,돌쇠 할배,돌리지 말고. 가만히.,,제안,
+dolsoe_stack_learn.3,dolneomeo,dolsoe_stack_learn,너구리,(…우웅. 손바닥 밑에서\n낮은 소리가 올라온다.),,제안,
+dolsoe_stack_learn.4,dolneomeo,dolsoe_stack_learn,돌쇠 할배,"그게 돌 목소리다.\n그 소리 나는 쪽으로, 왼쪽으로 한 바퀴.",,제안,
+dolsoe_stack_learn.5,dolneomeo,dolsoe_stack_learn,너구리,(어처구니를 잡고 왼쪽으로 돌렸다. 드르륵.\n생각보다 가볍게 돈다.),279,제안,맷돌 돌리는 그림(art.js maetdolTurnPic) D-734
+dolsoe_stack_learn.diary,dolneomeo,dolsoe_stack_learn,일기,"돌쇠 할배가 맷돌 윗돌에 내 손을 얹어 주었다. 가만히 있으니 돌이 우웅, 낮게 울었다. 그 소리 따라 왼쪽으로 한 바퀴 돌리자 증조할아버지의 맷돌이 깨어났다.",,제안,d_maetdol
+dolsoe_stack_arcs.1,dolneomeo,dolsoe_stack_arcs,돌쇠 할배,됐다. 맷돌이 네 손을 알아보는구나.,,제안,story.js:400 사연 켜짐
+dolsoe_stack_plain.1,dolneomeo,dolsoe_stack_plain,돌쇠 할배,한 번에 도는구나. 네 아비보다 낫다.,,제안,story.js:401 사연 꺼짐
+dolsoe_stack_woke.1,dolneomeo,dolsoe_stack_woke,너구리,(증조할아버지 맷돌이 깨어났다.\n메밀 세 알이면 가루 한 줌은 나오겠다.),,제안,story.js:386-390 woke·stoneHand D-1000·D-427·D-1001. 끝나면 dolsoe_reveal
+dolsoe_stack_woke.2,dolneomeo,dolsoe_stack_woke,너구리,(할배가 내 손을 더듬어 쥔다.),-,제안,맷돌 그림을 내린다
+dolsoe_stack_woke.3,dolneomeo,dolsoe_stack_woke,돌쇠 할배,돌가루가 하얗게 앉았구나.\n돌손이로구나.,,제안,
+dolsoe_stack_woke.4,dolneomeo,dolsoe_stack_woke,돌쇠 할배,이름 붙은 손은\n제가 한 일을 잊지 않는 법이다.,,제안,
+dolsoe_nickname.diary,dolneomeo,dolsoe_nickname,일기,돌쇠 할배에게 돌손이라고 불렸다.,,제안,story.js:422 grantNickname dol_stone_hand(돌손) 일기 · nickname:dol_stone_hand
+dolsoe_reveal.1,dolneomeo,dolsoe_reveal,돌쇠 할배,네 아비도 재작년 겨울 여기 왔었다.\n소원 돌을 하나 새겨 두고 갔지.,,제안,story.js:407-415·423 reveal D-135·D-421·D-427·D-257·D-1470. 소원 돌을 받을 때면 뒤에 dolsoe_reveal_stone 또는 dolsoe_reveal_stone_plain
+dolsoe_reveal.2,dolneomeo,dolsoe_reveal,너구리,(할배가 마당 구석의 납작한 돌을 손끝으로 읽는다.),,제안,
+dolsoe_reveal.3,dolneomeo,dolsoe_reveal,돌쇠 할배,“아내 병 낫기를.” …새긴 놈 이름이 없구나.\n소원 돌엔 제 이름부터 새기라 가르쳤건만.,,제안,
+dolsoe_reveal.4,dolneomeo,dolsoe_reveal,돌쇠 할배,"성황당에서 서리다래를 얻어 간다더니,\n늙은 까치가 북쪽 소식을 물어 온 밤에 떠났다.",,제안,
+dolsoe_reveal.5,dolneomeo,dolsoe_reveal,돌쇠 할배,영산 호수 얼음이 단단히 잡혔다더구나.\n얼음이 잡혀야 섬까지 걸어 건넌다면서.,,제안,
+dolsoe_reveal.6,dolneomeo,dolsoe_reveal,너구리,(아빠는 그 밤에 무엇을 하러 간 걸까.),,제안,
+dolsoe_reveal.clue,dolneomeo,dolsoe_reveal,단서:돌쇠 할배,"돌쇠 할배가 아빠의 소원 돌을 손끝으로 읽어 주었다. ""아내 병 낫기를."" 새긴 사람 이름은 없었다.",,제안,s1 (core.js:391 NAME_CLUES) 소원 돌을 읽은 뒤
+dolsoe_reveal_stone.1,dolneomeo,dolsoe_reveal_stone,돌쇠 할배,네 아비가 못 올린 소원 돌이다. 받아 두거라.,,제안,"story.js:416-418 돌쇠 할배 신뢰 2 이상이고 소원 돌을 아직 안 받았을 때, 사연 켜짐"
+dolsoe_reveal_stone.2,dolneomeo,dolsoe_reveal_stone,너구리,{얻음 story_stone 1},,제안,gotLine(addItem 은 먼저)
+dolsoe_reveal_stone.3,dolneomeo,dolsoe_reveal_stone,돌쇠 할배,성황당에 대신 올려 주겠느냐.,,제안,
+dolsoe_reveal_stone.diary,dolneomeo,dolsoe_reveal_stone,일기,돌쇠 할배가 아빠의 돌을 내주었다. 아빠가 성황당에 올리려다 끝내 못 올린 소원 돌이다.,,제안,d_stone (켜짐·꺼짐 같음)
+dolsoe_reveal_stone_plain.1,dolneomeo,dolsoe_reveal_stone_plain,돌쇠 할배,"참, 이 돌도 가져가거라.",,제안,story.js:419 사연 꺼짐
+dolsoe_reveal_stone_plain.2,dolneomeo,dolsoe_reveal_stone_plain,돌쇠 할배,네 아비가 소원을 적은 돌이란다.\n성황당에 올리려다 끝내 못 올리고 두고 갔지.,,제안,
+dolsoe_reveal_stone_plain.3,dolneomeo,dolsoe_reveal_stone_plain,너구리,{얻음 story_stone 1},,제안,gotLine
+dolsoe_reveal_stone_plain.4,dolneomeo,dolsoe_reveal_stone_plain,돌쇠 할배,네가 대신 올려 주려무나.,,제안,
+dolsoe_eye_give.1,dolneomeo,dolsoe_eye_give,너구리,(할배가 눈돌을 받아 손끝으로 이끼를 쓸어 본다.),,제안,"story.js:603-609 dolsoeEyeGive 이끼 낀 눈돌 → 돌가루 2(t_dolsoe_eye, D-77·D-135)"
+dolsoe_eye_give.2,dolneomeo,dolsoe_eye_give,돌쇠 할배,…성황당 돌무더기 눈이구나.\n눈이 없으면 돌무더기가 편히 못 잔다.,,제안,
+dolsoe_eye_give.3,dolneomeo,dolsoe_eye_give,너구리,(할배가 눈돌 가장자리를 손끝으로 재며 깎아 낸다.),,제안,
+dolsoe_eye_give.4,dolneomeo,dolsoe_eye_give,돌쇠 할배,자리에 맞게 다듬었다. 넣는 건 내가 올라가 하마.\n깎인 가루는 네가 가져가라. 깨진 돌 때우는 데 쓴다.,,제안,
+dolsoe_eye_give.5,dolneomeo,dolsoe_eye_give,너구리,{얻음 stonedust 2},,제안,receiveItem
+dolsoe_eye_give.diary,dolneomeo,dolsoe_eye_give,일기,"골렘에게서 떨어진 이끼 낀 눈돌을 돌쇠 할배께 드렸다. 할배가 자리에 맞게 다듬어 두고, 성황당에 도로 넣어 주겠다고 했다.",,제안,d_dolsoe_eye
+ppuri_arc_menu.1,dolneomeo,ppuri_arc_menu,뿔영감,묻고 싶은 게 있나.,,제안,story.js:129-171 talkPpuriArc 사연 메뉴(arcMenu). 그때 열린 고르기 하나만 붙인다
+ppuri_arc_menu.c1,dolneomeo,ppuri_arc_menu,고르기,하던 이야기 계속하기,,제안,talkPpuri 로
+ppuri_arc_menu.c2,dolneomeo,ppuri_arc_menu,고르기,왜 꼭 장승제를 올려요?,,제안,ppuri_rule. dolneomeo_arc_ppuri1 전
+ppuri_arc_menu.c3,dolneomeo,ppuri_arc_menu,고르기,아빠도 이 길로 갔어요?,,제안,ppuri_dad. 옛 저장: 규칙만 들은 경우
+ppuri_arc_menu.c4,dolneomeo,ppuri_arc_menu,고르기,아빠는 어느 길로 갔어요?,,제안,ppuri_way. 길을 연 뒤 ppuri3 전
+ppuri_arc_menu.c5,dolneomeo,ppuri_arc_menu,고르기,장승 얼굴이 흐려요,,제안,ppuri_eyes. ppuri3 뒤·돌무더기가 잠든 뒤
+ppuri_arc_menu.c6,dolneomeo,ppuri_arc_menu,고르기,다음에 이야기하기,,제안,
+ppuri_rule.1,dolneomeo,ppuri_rule,뿔영감,"내 아버지도 여기 장승지기였다.\n폭설 날, 급하다는 짐꾼에게 그냥 길을 열어 줬지.",,제안,story.js:141-146 arcAll(dolneomeo_arc_ppuri1·ppuri2) D-274·D-580. 둘째 줄 뒤에 ppuri_dad 네 줄이 이어진다
+ppuri_rule.2,dolneomeo,ppuri_rule,뿔영감,그 짐꾼이 절벽에서 떨어졌다.\n그 뒤로 누가 급하다 해도 살피고 연다. 규칙이다.,,제안,
+ppuri_rule.diary,dolneomeo,ppuri_rule,일기,뿔영감의 아버지도 장승지기였다. 폭설 날 급하다는 짐꾼에게 그냥 길을 열어 줬다가 짐꾼이 절벽에서 떨어졌다. 그 뒤로 뿔영감은 누가 급하다 해도 길을 살핀 다음에야 연다. {dad},,제안,dolneomeo_arc_ppuri1. {dad}: ppuri_dad 일기 글
+ppuri_dad.1,dolneomeo,ppuri_dad,너구리,아빠 찾으러 왔어요. 아빠도 이 길로 갔어요?,,제안,story.js:135-140 dadLines(arcScene dolneomeo_arc_ppuri2) D-130·D-142
+ppuri_dad.2,dolneomeo,ppuri_dad,너구리,(뿔영감이 내 모자를 한참 본다.),,제안,
+ppuri_dad.3,dolneomeo,ppuri_dad,뿔영감,같은 모자다. …재작년 겨울 눈보라 사흘을\n돌려보냈다. 날마다 새벽에 와 섰지.,,제안,
+ppuri_dad.4,dolneomeo,ppuri_dad,뿔영감,기침을 하면서도 한 번도 화를 안 냈다.\n난 길만 살폈지. 기다리는 이는 못 봤다.,,제안,
+ppuri_dad.diary,dolneomeo,ppuri_dad,일기,뿔영감은 내 모자를 보고 아빠를 알아봤다. 재작년 겨울 눈보라 속에 아빠를 사흘 동안 세워 뒀다고 했다. 아빠는 기침을 하면서도 한 번도 화를 내지 않았다고 한다.,,제안,dolneomeo_arc_ppuri2 (dadRecord)
+ppuri_way.1,dolneomeo,ppuri_way,뿔영감,돌계단 안쪽 길은 성황당으로 곧장 간다.\n네 아빠도 그리로 지나갔다.,,제안,story.js:148-151 arcScene(dolneomeo_arc_ppuri3). 확장판 글(옛 구성 글은 뺌)
+ppuri_way.2,dolneomeo,ppuri_way,뿔영감,누가 어디로 갔는지는 원래 말 안 한다.\n…사흘 세워 둔 값이다. 규칙엔 없다.,,제안,
+ppuri_way.diary,dolneomeo,ppuri_way,일기,뿔영감이 아빠도 마을 끝 돌계단 안쪽 길로 올라갔다고 알려 줬다. 누가 어디로 갔는지는 원래 말 안 한다면서.,,제안,dolneomeo_arc_ppuri3
+ppuri_eyes.1,dolneomeo,ppuri_eyes,뿔영감,아버지가 세운 장승이다. 아침마다 길 소식을\n고한다만… 눈 칠이 장마에 다 벗겨졌다.,,제안,story.js:154-169 arcAll(dolneomeo_arc_ppuri6·4·5·7) D-118·D-580·D-130·D-427·D-271
+ppuri_eyes.2,dolneomeo,ppuri_eyes,뿔영감,이 굽으로는 붓을 못 쥔다.\n숯 갠 물은 있다.,,제안,
+ppuri_eyes.3,dolneomeo,ppuri_eyes,너구리,(억새 끝을 묶어 붓을 만들고\n장승 눈에 동그랗게 먹을 올렸다.),,제안,
+ppuri_eyes.4,dolneomeo,ppuri_eyes,뿔영감,됐다. 길을 보는 눈이다.\n…생각보다 순하게 생겼군.,,제안,
+ppuri_eyes.5,dolneomeo,ppuri_eyes,뿔영감,아버지는 이끼 앉은 돌을 갈아\n기름에 개서 칠했다. 그 빛은 오래 갔지.,,제안,귀띔 hint:dol_mulgam (D-461)
+ppuri_eyes.6,dolneomeo,ppuri_eyes,너구리,(장승 뒤에 오래된 이름 하나가 새겨져 있다.),,제안,
+ppuri_eyes.7,dolneomeo,ppuri_eyes,뿔영감,그때 떨어진 짐꾼이다.\n길을 열 때마다 그 이름부터 본다.,,제안,
+ppuri_eyes.8,dolneomeo,ppuri_eyes,뿔영감,"장승도 몸에 이름을 새겨야 서는 법이다.\n천하대장군, 지하여장군.",,제안,
+ppuri_eyes.9,dolneomeo,ppuri_eyes,뿔영감,품삯이다. 짐꾼들이 두고 간 소금이다.,,제안,
+ppuri_eyes.10,dolneomeo,ppuri_eyes,너구리,{얻음 salt 2},,제안,gotLine
+ppuri_eyes.11,dolneomeo,ppuri_eyes,뿔영감,네 아빠가 돌아오는 길에 여길 지나거든\n사흘 말고 하루만 세워 두마. …하루면 충분하다.,,제안,
+ppuri_eyes.diary,dolneomeo,ppuri_eyes,일기,"억새 끝을 묶어 붓을 만들고, 뿔영감이 갠 숯물로 장승 눈을 칠했다. 장승 뒤에는 뿔영감 아버지 때 절벽에서 떨어진 짐꾼의 이름이 새겨져 있다. 품삯이라며 소금을 주었다. 아빠가 돌아오는 길엔 하루만 세워 두겠다고 했다.",,제안,dolneomeo_arc_ppuri6 (learn dolneomeo:ppuri-eyes)
+ppuri_first.1,dolneomeo,ppuri_first,뿔영감,멈춰라. 장승제 전에는 돌산에 못 오른다.,,제안,"story.js:428-443 talkPpuri 첫 만남 D-130·D-1430. 다음 줄은 ppuri_first_kku 또는 ppuri_first_nokku, 그 뒤 ppuri_first_rite"
+ppuri_first_kku.1,dolneomeo,ppuri_first_kku,너구리,서리다래가 성황당 돌무더기 속에 있대요.\n엄마 약이에요.,,제안,story.js:435 꾸벅이에게 억새를 준 뒤(kkuDone)
+ppuri_first_nokku.1,dolneomeo,ppuri_first_nokku,너구리,서리다래를 찾으러 왔어요.\n엄마 약이에요.,,제안,story.js:436-438 꾸벅이 일 전 D-159·D-135
+ppuri_first_nokku.2,dolneomeo,ppuri_first_nokku,뿔영감,산 열매라면 고슴도치 녀석이 안다.\n둥지에서 졸고 있을 게다.,,제안,
+ppuri_first_rite.1,dolneomeo,ppuri_first_rite,너구리,장승제가 뭐예요?,,제안,story.js:441-443 D-274·D-159. 끝나고 메밀가루가 있으면 ppuri_trade
+ppuri_first_rite.2,dolneomeo,ppuri_first_rite,뿔영감,장승 앞에 상을 차려 산에 고하는 일이다.\n제물은 오르는 이가 마련한다. 규칙이다.,,제안,
+ppuri_first_rite.3,dolneomeo,ppuri_first_rite,뿔영감,장승제엔 메밀전을 올린다.\n메밀가루 하나를 가져와라.,,제안,
+ppuri_wait.1,dolneomeo,ppuri_wait,뿔영감,메밀가루 하나다. 가져오기 전엔 못 간다.\n외상도 규칙에 없다.,,제안,"story.js:448 길을 열기 전, 메밀가루가 없을 때"
+ppuri_calm_thanks.1,dolneomeo,ppuri_calm_thanks,뿔영감,길을 살피러 성황당에 올라가 봤다.\n돌 하나 안 깨지고 내려앉았더군.,,제안,story.js:451-456 돌무더기를 달랜 뒤 첫 만남(dolPpuriCalmThanks) D-130
+ppuri_calm_thanks.2,dolneomeo,ppuri_calm_thanks,뿔영감,…고맙다. 산이 한동안 조용하겠군.,,제안,
+ppuri_broken.1,dolneomeo,ppuri_broken,뿔영감,길을 살피러 올라가 봤다.\n성황당이 무너졌더군.,,제안,story.js:459-461 돌무더기를 부순 뒤 첫 만남(dolPpuriBrokenSeen) D-135
+ppuri_broken.2,dolneomeo,ppuri_broken,뿔영감,돌은 다시 쌓으면 된다.\n눈돌만 할배가 찾더라.,,제안,
+ppuri_pass.1,dolneomeo,ppuri_pass,뿔영감,규칙을 지켰으니 통과다. 가도 좋다.,,제안,story.js:463 길을 연 뒤
+ppuri_trade.1,dolneomeo,ppuri_trade,뿔영감,메밀가루는 가져왔나.,,제안,story.js:465-466 ppuriTrade
+ppuri_trade.c1,dolneomeo,ppuri_trade,고르기,보따리를 펼친다,,제안,교환 화면(S3)
+ppuri_trade.c2,dolneomeo,ppuri_trade,고르기,나중에 드릴게요,,제안,
+ppuri_village.1,dolneomeo,ppuri_village,뿔영감,장승제 전에 성황당 길을 살펴 두는 중이다.\n메밀가루를 가져오면 여기서 바로 장승제를 올린다.,,제안,field.js:589 확장판 마을에 와 있을 때(만난 뒤·길을 열기 전). 끝나면 원래 talkPpuri
+ppuri_give.1,dolneomeo,ppuri_give,뿔영감,좋다. 장승제를 올린다.,,제안,"story.js:469-481 ppuriGive 메밀가루로 장승제 D-78·D-130·D-274. 다음 줄: 메밀묵을 얹었으면 ppuri_give_jelly, 그 뒤 ppuri_give_fry"
+ppuri_give.diary,dolneomeo,ppuri_give,일기,맷돌로 간 메밀가루로 내가 장승제 메밀전을 부쳤다. 뿔영감이 산에 올리고 절하자 금줄이 걷히고 돌산 길이 열렸다.,,제안,d_ppuri
+ppuri_give_jelly.1,dolneomeo,ppuri_give_jelly,뿔영감,메밀묵까지 쑤어 왔군. 상에 함께 올리지.,,제안,story.js:478 메밀묵도 얹었을 때
+ppuri_give_fry.1,dolneomeo,ppuri_give_fry,뿔영감,번철은 내주마. 전은 네가 부쳐라.,,제안,"story.js:478-479. 다음: 메밀묵을 얹었으면 ppuri_give_jelly_share, 그 뒤 ppuri_give_end"
+ppuri_give_fry.2,dolneomeo,ppuri_give_fry,너구리,(번철에 메밀전을 부쳤다.\n뿔영감이 돌산 쪽에 올려 절하고 금줄을 걷었다.),,제안,
+ppuri_give_jelly_share.1,dolneomeo,ppuri_give_jelly_share,뿔영감,묵까지 얹었으니 몫을 나눈다.\n말려 둔 석이 한 장이다.,,제안,story.js:481 메밀묵을 얹었을 때 석이 덤(D-78)
+ppuri_give_jelly_share.2,dolneomeo,ppuri_give_jelly_share,너구리,{얻음 seogi 1},,제안,receiveItem
+ppuri_give_end.1,dolneomeo,ppuri_give_end,뿔영감,성황당 돌무더기가 뒤척이는 건 산이 노한 게다.\n노한 산엔 절벽 아래 백 년 바위의 석이를 올리지.,,제안,story.js:481 D-582
+ppuri_give_end.2,dolneomeo,ppuri_give_end,뿔영감,통과다. …전은 맛있었다.,,제안,
+ppuri_open.1,dolneomeo,ppuri_open,속말,돌산 길이 열렸다!,,제안,story.js:475 장승제를 올릴 때 속말
+ppuri_seogi.diary,dolneomeo,ppuri_seogi,일기,뿔영감이 길을 열며 석이버섯 자리를 알려 줬다. 산이 노하면 석이를 올리는 법이라고 했다. 성황당 돌무더기까지 가지 않아도 절벽 아래 백 년 바위에서 딸 수 있다.,,제안,story.js:484-488 tellSeogi 석이 자리를 들음(learn ppuri:seogi) · d_seogi
+dol_hare_hint.1,dolneomeo,dol_hare_hint,속말,길 저편에서 무거운 등짐에 끙끙대는 소리가 들린다.,,제안,story.js:1202 길손 dol_hare.hint 기척(D-55)
+dol_hare_help.1,dolneomeo,dol_hare_help,산토끼 짐꾼,돌쇠 어른 댁에 숫돌을 지고 가는 길이야.\n첫서리만 오면 이 끈이 자꾸 미끄러져.,,제안,story.js:791-806 helpHare 산토끼 짐꾼 첫 만남
+dol_hare_help.2,dolneomeo,dol_hare_help,산토끼 짐꾼,"숫돌은 꼭대기에, 억새는 밑에 묶었거든.\n걸을 때마다 등짐이 나보다 먼저 고개를 넘어.",,제안,
+dol_hare_help.3,dolneomeo,dol_hare_help,너구리,무거운 걸 아래로 내려 볼까요?\n제가 이쪽을 잡을게요.,,제안,
+dol_hare_help.4,dolneomeo,dol_hare_help,산토끼 짐꾼,그럼 잠깐 같이 들어 주겠니?\n길바닥에 내려놓고 끈부터 풀자.,,제안,
+dol_hare_help.c1,dolneomeo,dol_hare_help,고르기,등짐을 받치고 숫돌을 아래로 옮긴다,,제안,dol_hare_fix
+dol_hare_help.c2,dolneomeo,dol_hare_help,고르기,지금은 길부터 살펴볼게요,,제안,
+dol_hare_fix.1,dolneomeo,dol_hare_fix,너구리,(짐꾼과 등짐을 내려놓았다.\n숫돌을 등에 붙이고 억새는 위로 올렸다.),,제안,story.js:797-803 D-582·D-1205. 끝나면 돌 소리(hands) 뒤 dol_hare_thanks
+dol_hare_fix.2,dolneomeo,dol_hare_fix,산토끼 짐꾼,"어이쿠, 등이 한결 가볍네.\n짐은 그대로인데 걷는 게 다르구나.",,제안,
+dol_hare_fix.3,dolneomeo,dol_hare_fix,산토끼 짐꾼,"장승 뒤 받침에 낡은 손바닥 자국이 있지.\n우리 아버지가 그러는데, 지나간 보부상이 남긴 길표래.",,제안,
+dol_hare_fix.4,dolneomeo,dol_hare_fix,산토끼 짐꾼,고개 넘기 전에 거기서 짚신 끈을 고쳐 매라는 거지.\n우리도 거기서 끈을 다시 매.,,제안,
+dol_hare_thanks.1,dolneomeo,dol_hare_thanks,산토끼 짐꾼,"고맙다, 짐 동무!\n무거운 쪽을 알아서 받치는구나.",,제안,story.js:664-671 hareHands(dolneomeo_pack_help) D-271. 별명 '짐 동무'(dol_pack_friend)
+dol_hare_thanks.2,dolneomeo,dol_hare_thanks,산토끼 짐꾼,"위에 얹었던 억새 한 단은 네가 가져가.\n짐도 덜고, 품값도 치르고.",,제안,
+dol_hare_thanks.3,dolneomeo,dol_hare_thanks,너구리,{얻음 eoksae 1},,제안,receiveItem
+dol_hare_thanks.4,dolneomeo,dol_hare_thanks,산토끼 짐꾼,"숫돌은 돌쇠 어른 댁에 내려놓고,\n짐 괴던 돌은 길섶 돌탑에 보태 둘게.",,제안,
+dol_hare_thanks.diary,dolneomeo,dol_hare_thanks,일기,짐꾼과 등짐을 함께 받쳐 숫돌을 낮추고 끈을 고쳐 맸다. 장승 뒤 길표 이야기를 들었다. 품값으로 억새 한 단을 받았다. 짐 괴던 돌은 고갯길 돌탑에 보태겠다고 했다.,,제안,wanderer:dolneomeo:dol_hare
+dol_hare_tower.1,dolneomeo,dol_hare_tower,산토끼 짐꾼,"맨 위에 서리 안 앉은 돌 셋,\n네가 얹은 거지?",,제안,story.js:1062-1069 hareTower 돌탑에 돌을 얹은 뒤 짐꾼을 다시 만났을 때(D-164)
+dol_hare_tower.2,dolneomeo,dol_hare_tower,너구리,네. 아빠 빨리 만나게 해 달라고요.,,제안,
+dol_hare_tower.3,dolneomeo,dol_hare_tower,산토끼 짐꾼,그럼 짐 괴던 돌로\n밑을 한 번 더 받쳐 둘게.,,제안,
+dol_hare_tower.4,dolneomeo,dol_hare_tower,산토끼 짐꾼,짐 동무 소원이 기울면 안 되지.,,제안,
+dol_hare_tower.diary,dolneomeo,dol_hare_tower,일기,짐꾼 아저씨가 짐 괴던 돌로 내 소원 돌탑 밑동을 받쳐 주었다.,,제안,dol_hare_tower
+dol_hare_greet.1,dolneomeo,dol_hare_greet,산토끼 짐꾼,낮게 묶으니 발이 편하구나.\n고개 안쪽 길은 꼭 살피고 가라.,,제안,story.js:1202 greeting(만남을 마친 뒤)
+dol_mole_hint.1,dolneomeo,dol_mole_hint,속말,"달그락, 달그락. 누가 돌멩이를 굴리며 노는 소리가 난다.",,제안,story.js:1214 길손 dol_mole.hint 기척
+dol_mole_first.1,dolneomeo,dol_mole_first,꼬마 두더지,이 반짝돌 봐! 씻으니까 별이 나왔어.,,제안,story.js:829-831 meetMole 할배를 만나기 전(!dolsoeMet)
+dol_mole_first.2,dolneomeo,dol_mole_first,꼬마 두더지,"돌은 우리 할배가 다 알아.\n탁, 탁 소리 나는 마당 있지? 거기가 할배네야.",,제안,
+dol_mole_chisel.1,dolneomeo,dol_mole_chisel,너구리,(꼬마 두더지가 반짝돌을 굴리다가\n긴 쇠꼬챙이를 얼른 등 뒤로 감춘다.),280,제안,"story.js:834-843 meetMole 할배를 만난 뒤 D-735 · moleChiselPic(소리 pic_mole_chisel, D-483)"
+dol_mole_chisel.2,dolneomeo,dol_mole_chisel,너구리,그거 할배 정 아니야?\n아까 할배가 그걸로 돌을 쪼시던데.,,제안,
+dol_mole_chisel.3,dolneomeo,dol_mole_chisel,꼬마 두더지,쉿! 할배 쉬실 때 몰래 가져왔어.,,제안,
+dol_mole_chisel.4,dolneomeo,dol_mole_chisel,꼬마 두더지,할배는 정 들면 자꾸 눈을 비벼.\n돌가루가 들어가서. 정이 없으면 쉬실 거야.,,제안,
+dol_mole_chisel.5,dolneomeo,dol_mole_chisel,너구리,정이 없어지면 할배는 어떻게 하셔?,-,제안,그림을 내린다
+dol_mole_chisel.6,dolneomeo,dol_mole_chisel,꼬마 두더지,…아까부터 마당을 손으로 더듬고 계셔.,,제안,
+dol_mole_chisel.7,dolneomeo,dol_mole_chisel,너구리,그럼 찾느라 눈을 더 쓰시잖아.\n같이 돌려드리자. 내가 옆에 있을게.,,제안,
+dol_mole_chisel.8,dolneomeo,dol_mole_chisel,꼬마 두더지,…혼나면 네가 같이 혼나 줘야 돼.,,제안,
+dol_mole_chisel_think.1,dolneomeo,dol_mole_chisel_think,속말,꼬마가 정을 안고 할배 마당 쪽으로 간다. 따라가자.,,제안,story.js:843 끝난 뒤 속말(dolMoleChisel 1)
+dol_mole_return.1,dolneomeo,dol_mole_return,너구리,(할배가 무릎을 꿇고 받침돌 둘레를\n손바닥으로 더듬고 있다.),,제안,story.js:845-864 chiselReturn 할배에게 정을 돌려드림(dolMoleChisel 2) D-735·D-271
+dol_mole_return.2,dolneomeo,dol_mole_return,돌쇠 할배,정을 어디 뒀더라.\n분명 받침돌 위에 뒀는데.,,제안,
+dol_mole_return.3,dolneomeo,dol_mole_return,꼬마 두더지,"…할배, 여기.",,제안,
+dol_mole_return.4,dolneomeo,dol_mole_return,너구리,(꼬마가 내민 정을 할배가 받아 쥐고\n자루를 손끝으로 쓸어 본다.),,제안,
+dol_mole_return.5,dolneomeo,dol_mole_return,돌쇠 할배,자루에 떡고물이 묻었구나.\n시렁에 숨겨 둔 떡 꺼내 먹은 손이지?,,제안,
+dol_mole_return.6,dolneomeo,dol_mole_return,꼬마 두더지,할배가 정 들면 눈을 비비니까….\n정이 없으면 쉬실 줄 알았어.,,제안,
+dol_mole_return.7,dolneomeo,dol_mole_return,돌쇠 할배,녀석. 정이 없으면 이 늙은이는\n마당을 기어서 찾는다. 그게 눈을 더 쓰는 거다.,,제안,
+dol_mole_return.8,dolneomeo,dol_mole_return,너구리,"할아버지, 정 자리를 정해 두면 어때요?\n우리 엄마도 약사발은 늘 머리맡 같은 데 둬요.",,제안,
+dol_mole_return.9,dolneomeo,dol_mole_return,너구리,늘 같은 데 있으면\n눈 감고도 손만 뻗으면 잡히잖아요.,,제안,
+dol_mole_return.10,dolneomeo,dol_mole_return,돌쇠 할배,"허허, 그 말이 맞다.\n받침돌 모서리에 홈을 하나 파 두마. 정은 늘 거기다.",,제안,
+dol_mole_return.11,dolneomeo,dol_mole_return,꼬마 두더지,그럼 할배 일 끝나면\n정은 내가 맨날 거기 꽂아 둘게!,,제안,
+dol_mole_return.12,dolneomeo,dol_mole_return,너구리,(할배가 정 끝으로 받침돌 모서리를 몇 번 쪼아\n정이 꼭 들어갈 홈을 냈다.),,제안,
+dol_mole_return.13,dolneomeo,dol_mole_return,꼬마 두더지,고마워. 이거 너 줘.\n땅 파다 찾았어. 다람쥐가 묻고 잊었나 봐.,,제안,
+dol_mole_return.14,dolneomeo,dol_mole_return,너구리,{얻음 acorn 2},,제안,receiveItem
+dol_mole_return.diary,dolneomeo,dol_mole_return,일기,꼬마 두더지가 할배 눈이 걱정돼 감춘 정을 같이 돌려드렸다. 정 자리를 늘 같은 데 두자고 하니 할배가 받침돌에 홈을 팠다. 꼬마는 일이 끝나면 정을 거기 꽂아 두기로 했다. 꼬마가 땅을 파다 찾은 도토리를 주었다.,,제안,wanderer:dolneomeo:dol_mole
+dol_mole_ask.1,dolneomeo,dol_mole_ask,너구리,할배가 돌 읽는 법 가르쳐 준대.\n왜 도망가?,,제안,story.js:1072-1079 moleAsk5 arcScene(dolneomeo_arc_dolsoe5). 할배의 dolsoe4 뒤 인사한 꼬마에게 말을 걸면 D-135·D-891·D-580
+dol_mole_ask.2,dolneomeo,dol_mole_ask,꼬마 두더지,눈 감고 돌 만지는 할배 보면…\n그거 배우면 할배가 진짜 안 보이게 될 것 같아.,,제안,
+dol_mole_ask.3,dolneomeo,dol_mole_ask,너구리,우리 엄마도 말을 자꾸 잊어.\n그래서 나는 적어. 잊어도 다시 볼 수 있게.,,제안,
+dol_mole_ask.4,dolneomeo,dol_mole_ask,꼬마 두더지,"…그럼 할배 손은, 내가 대신 기억하면 돼?",,제안,
+dol_mole_ask.diary,dolneomeo,dol_mole_ask,일기,꼬마 두더지는 할배 눈이 정말 멀까 봐 손으로 돌 읽기를 피해 왔다. 엄마 이야기를 해 줬더니 할배 손을 대신 기억하겠다고 했다.,,제안,dolneomeo_arc_dolsoe5
+dol_mole_greet.1,dolneomeo,dol_mole_greet,꼬마 두더지,정은 받침돌 홈에 꽂아 뒀어!\n할배가 손만 뻗으면 돼.,,제안,story.js:1214 greeting
+dol_frog_hint.1,dolneomeo,dol_frog_hint,속말,돌 틈 어딘가에서 가늘게 떠는 개구리 울음이 들린다.,,제안,story.js:1235 길손 dol_frog.hint 기척
+dol_frog_warm.1,dolneomeo,dol_frog_warm,움츠린 개구리,돌 틈에서 겨울잠을 자려 했는데…\n고드름 녹은 물이 등을 적셨어.,,제안,story.js:869-883 warmFrog 움츠린 개구리
+dol_frog_warm.2,dolneomeo,dol_frog_warm,움츠린 개구리,석수들이 두고 간 화로는 식어 가고.\n저 넓적한 돌만 아직 온기가 남았네.,,제안,
+dol_frog_warm.3,dolneomeo,dol_frog_warm,너구리,"이 돌, 미지근해요.\n젖은 자리 말고 이 위로 올라오실래요?",,제안,
+dol_frog_warm.4,dolneomeo,dol_frog_warm,움츠린 개구리,다리에 힘이 안 들어가네.\n돌을 내 쪽으로 밀어 주겠니?,,제안,
+dol_frog_warm.c1,dolneomeo,dol_frog_warm,고르기,따뜻한 돌을 밀어 건넨다,,제안,dol_frog_push
+dol_frog_warm.c2,dolneomeo,dol_frog_warm,고르기,화로 옆을 먼저 둘러본다,,제안,
+dol_frog_push.1,dolneomeo,dol_frog_push,너구리,(식은 화로 옆 돌을 두 손으로 밀었다.\n개구리가 천천히 배를 붙인다.),,제안,story.js:875-880. 끝나면 돌 소리(hands) 뒤 dol_frog_thanks
+dol_frog_push.2,dolneomeo,dol_frog_push,움츠린 개구리,아… 배부터 좀 풀린다.\n겨울 들기 전에 자리를 잘못 잡았어.,,제안,
+dol_frog_push.3,dolneomeo,dol_frog_push,움츠린 개구리,위쪽 갈라진 바위는 비도 바람도 안 들어.\n안쪽에 붉은 발자국도 하나 있어.,,제안,
+dol_frog_push.4,dolneomeo,dol_frog_push,너구리,(마른 틈 쪽으로 돌을 바짝 붙여 줬다.\n개구리가 다리를 접고 눈을 감는다.),,제안,
+dol_frog_thanks.1,dolneomeo,dol_frog_thanks,움츠린 개구리,…돌 밑에 겨우살이 끼어 있지?\n바람에 날려 와 걸린 거야. 가져가.,,제안,story.js:672-678 frogHands(dolneomeo_frog_warm) D-271
+dol_frog_thanks.2,dolneomeo,dol_frog_thanks,너구리,{얻음 gyeousari 1},,제안,receiveItem
+dol_frog_thanks.diary,dolneomeo,dol_frog_thanks,일기,따뜻한 돌을 개구리에게 밀고 물이 흐르는 홈을 피해 잠자리를 받쳤다. 높은 바위 틈의 붉은 발자국을 알려 줬다. 바람에 날려 와 돌 밑에 끼어 있던 겨우살이를 가져가라고 했다.,,제안,wanderer:dolneomeo:dol_frog
+dol_frog_greet.1,dolneomeo,dol_frog_greet,움츠린 개구리,배가 따뜻해졌어… 고마워.\n이번엔 마른 틈에서 잘게.,,제안,story.js:1235 greeting
+dol_magpie_rest_home.1,dolneomeo,dol_magpie_rest_home,늙은 까치,"아가, 또 만났구나.\n네가 보낸 것, 네 엄마 손에 잘 쥐여 주었단다.",,제안,story.js:945-950 restMagpie 첫 줄: 단풍골에서 까치 편에 집으로 보냈을 때(home:galchamgol). 뒤에 dol_magpie_rest
+dol_magpie_rest_met.1,dolneomeo,dol_magpie_rest_met,늙은 까치,"아가, 또 만났구나.\n걱정 마시라던 네 말, 네 엄마한테 전했단다.",,제안,story.js:950 첫 줄: 단풍골 늙은 까치를 만났을 때. 뒤에 dol_magpie_rest
+dol_magpie_rest_new.1,dolneomeo,dol_magpie_rest_new,늙은 까치,그 모자… 혹시 단풍골 개울 아래 초가 아이냐?\n나는 그 골짜기에 약 나르던 까치란다.,,제안,story.js:950 첫 줄: 처음 볼 때. 뒤에 dol_magpie_rest
+dol_magpie_rest.1,dolneomeo,dol_magpie_rest,늙은 까치,이 고개는 해마다 높아지는구나.\n…고개가 아니라 내 날개가 낮아진 게지.,,제안,story.js:951-964 D-273
+dol_magpie_rest.2,dolneomeo,dol_magpie_rest,너구리,그럼 여기서 좀 쉬어 가세요.,,제안,
+dol_magpie_rest.3,dolneomeo,dol_magpie_rest,늙은 까치,그럼 저 돌담 밑에 잠깐 앉자꾸나.\n담에 틈이 나서 바람이 새는구나.,,제안,
+dol_magpie_rest.c1,dolneomeo,dol_magpie_rest,고르기,바람 오는 쪽에 앉아 까치를 가려 준다,,제안,dol_magpie_wind
+dol_magpie_rest.c2,dolneomeo,dol_magpie_rest,고르기,먼저 둘러보고 올게요,,제안,
+dol_magpie_wind.1,dolneomeo,dol_magpie_wind,너구리,"(까치 앞, 바람 오는 쪽에 앉았다.\n보따리도 세워 바람을 막았다.)",281,제안,story.js:954-961 바람막이 장면 D-273. 끝나면 돌 소리(hands) 뒤 dol_magpie_thanks · magpieWindPic(움직이는 그림)
+dol_magpie_wind.2,dolneomeo,dol_magpie_wind,너구리,(눈발이 등에 톡톡 부딪친다.\n까치가 한쪽 발을 깃 속에 넣는다.),,제안,
+dol_magpie_wind.3,dolneomeo,dol_magpie_wind,늙은 까치,…바람을 등으로 받는구나.\n어린 것이.,,제안,
+dol_magpie_wind.4,dolneomeo,dol_magpie_wind,늙은 까치,돌쇠 그 양반도 꼭 이 자리에 앉곤 했단다.\n손에 박힌 돌가루를 천천히 털면서.,,제안,
+dol_magpie_wind.5,dolneomeo,dol_magpie_wind,늙은 까치,담이 새면 그 양반이 돌부터 괴었지.\n요새는 눈이 어두워 틈이 안 보이는 게지.,,제안,
+dol_magpie_wind.6,dolneomeo,dol_magpie_wind,너구리,(담 틈으로 찬바람이 새어 든다.\n널린 돌 몇 개면 막을 수 있겠다.),-,제안,그림을 내린다
+dol_magpie_thanks.1,dolneomeo,dol_magpie_thanks,늙은 까치,이제 날개 밑이 안 시리다.\n손이 하얗구나. 꼭 그 양반 손이로구나.,,제안,story.js:679-688 magpieHands(dolneomeo_magpie_rest) D-427·D-271. 별명 '바람막이'(dol_windbreak)
+dol_magpie_thanks.2,dolneomeo,dol_magpie_thanks,늙은 까치,…바람막이로구나. 이제 그리 부르마.\n이리 와 손 녹여라.,,제안,
+dol_magpie_thanks.3,dolneomeo,dol_magpie_thanks,늙은 까치,가을에 담 틈에 숨겨 둔 잣이다.\n이젠 부리가 무뎌 못 깬단다. 네가 먹으렴.,,제안,
+dol_magpie_thanks.4,dolneomeo,dol_magpie_thanks,너구리,{얻음 jat 2},,제안,receiveItem
+dol_magpie_thanks.diary,dolneomeo,dol_magpie_thanks,일기,"까치 앞에서 바람을 막아 주고, 돌담 틈을 막고 발 놓을 돌을 놓았다. 바람 오는 쪽에 앉았다고 바람막이라고 불렀다. 가을에 숨겨 둔 잣을 주었다.",,제안,wanderer:dolneomeo:dol_magpie
+dol_magpie_greet.1,dolneomeo,dol_magpie_greet,늙은 까치,"바람막이야, 좀 쉬어 가거라.\n담 뒤는 바람이 덜하단다.",,제안,story.js:1215 greeting
+dol_magpie_mail.1,dolneomeo,dol_magpie_mail,너구리,(보따리에서 약즙 통을 꺼내 보였다.)\n서리다래로 제가 갈았어요.,,제안,story.js:1093-1096 returningHare 약즙을 들고 늙은 까치에게 말을 걸 때 D-1005
+dol_magpie_mail.2,dolneomeo,dol_magpie_mail,늙은 까치,네 손으로 만든 약이로구나.\n이건 내가 꼭 날라 주마.,,제안,
+dol_magpie_mail.c1,dolneomeo,dol_magpie_mail,고르기,약즙을 맡긴다 · 큰 장터로 떠날 준비,,제안,dol_send
+dol_magpie_mail.c2,dolneomeo,dol_magpie_mail,고르기,마을을 조금 더 둘러볼게요,,제안,
+dol_badger_hint.1,dolneomeo,dol_badger_hint,속말,"털썩, 털썩. 메밀밭 쪽에서 도리깨질 소리가 난다.",,제안,story.js:1225 길손 dol_badger.hint 기척
+dol_badger_plain.1,dolneomeo,dol_badger_plain,메밀댁,메밀 거두는 철이라 손이 모자라구나.\n길 조심해 가거라.,,제안,story.js:698 talkBadgerArc 사연 꺼짐
+dol_badger_ask.1,dolneomeo,dol_badger_ask,메밀댁,보따리 멘 걸 보니 보부상이로구나.\n짐 하나만 날라 주련.,,제안,story.js:700-711 메밀댁 첫 부탁(dolneomeo_badger1 전) D-118·D-580
+dol_badger_ask.2,dolneomeo,dol_badger_ask,메밀댁,"햇메밀 한 자루, 돌쇠 할배 댁에.\n우리 맷돌 받침 고쳐 준 값이야.",,제안,
+dol_badger_ask.3,dolneomeo,dol_badger_ask,메밀댁,멍석 두고 자리를 뜨면 까마귀가 다 쪼아 먹어.\n늦었다고 전해 주렴.,,제안,
+dol_badger_ask.c1,dolneomeo,dol_badger_ask,고르기,메밀 자루를 보따리에 넣는다,,제안,dol_badger_bag (D-446)
+dol_badger_ask.c2,dolneomeo,dol_badger_ask,고르기,지금은 다른 짐이 있어요,,제안,
+dol_badger_bag.1,dolneomeo,dol_badger_bag,너구리,(보따리 끈을 풀고 자루를 밀어 넣었다.\n쑥 들어간다. 보따리는 납작한 그대로다.),,제안,story.js:705-710 arcScene(dolneomeo_badger1) D-446
+dol_badger_bag.2,dolneomeo,dol_badger_bag,메밀댁,"…방금 그 자루, 어디 갔니?",,제안,
+dol_badger_bag.3,dolneomeo,dol_badger_bag,너구리,여기 있어요. 할배 댁 가서 꺼낼게요.,,제안,
+dol_badger_bag.4,dolneomeo,dol_badger_bag,메밀댁,보부상 보따리는 다르긴 다르구나.\n…우리 쌀독도 좀 그랬으면.,,제안,
+dol_badger_bag.diary,dolneomeo,dol_badger_bag,일기,"메밀밭 들쥐, 메밀댁 아주머니의 햇메밀 자루를 보따리에 넣어 돌쇠 할배에게 나르기로 했다. 메밀을 널어 둔 멍석을 지키느라 밭을 못 뜨신다.",,제안,dolneomeo_badger1
+dol_badger_wait.1,dolneomeo,dol_badger_wait,메밀댁,…자루는 잘 있지?\n보따리 속에서 싹 나면 안 된다.,,제안,story.js:714 자루를 아직 안 날랐을 때
+dol_badger_pay.1,dolneomeo,dol_badger_pay,메밀댁,잘 받았다더냐?,,제안,story.js:715-727 arcScene(dolneomeo_badger2) D-271·D-135
+dol_badger_pay.2,dolneomeo,dol_badger_pay,너구리,다음엔 할배가 내려오신대요.,,제안,
+dol_badger_pay.3,dolneomeo,dol_badger_pay,메밀댁,"그 눈으로? …고집은.\n품삯이다. 한 장은 지금, 한 장은 가다가 먹어라.",,제안,
+dol_badger_pay.4,dolneomeo,dol_badger_pay,너구리,{얻음 memil_jeon 1},,제안,gotLine
+dol_badger_pay.5,dolneomeo,dol_badger_pay,메밀댁,잔칫날 같으면 쌀가루에 석이를 섞어\n쪄 줬을 텐데. 돌산 석이라 귀하단다.,,제안,귀띔 hint:seogibyeong (D-461)
+dol_badger_pay.6,dolneomeo,dol_badger_pay,너구리,(아주머니 눈이 내 보따리 매듭에서 멈췄다.),,제안,
+dol_badger_pay.7,dolneomeo,dol_badger_pay,메밀댁,"그 매듭, 누가 묶어 줬니?",,제안,
+dol_badger_pay.8,dolneomeo,dol_badger_pay,너구리,엄마가요. 엄마가 묶는 대로 배웠어요.,,제안,
+dol_badger_pay.9,dolneomeo,dol_badger_pay,메밀댁,…그렇구나.,,제안,
+dol_badger_pay.diary,dolneomeo,dol_badger_pay,일기,"메밀댁 아주머니가 품삯이라며 메밀전을 두 장 주었다. 한 장은 가다가 먹으라고 했다. 내 보따리 매듭을 한참 보더니, 누가 묶어 줬는지 물었다.",,제안,dolneomeo_badger2
+dol_badger_visit.1,dolneomeo,dol_badger_visit,메밀댁,어제 돌쇠 할배가 내려왔더라. 그 눈으로.\n손주 녀석이 디딜 돌을 하나하나 짚어 주면서.,,제안,story.js:731-737 arcScene(dolneomeo_badger_visit) badger2·dolsoe6 뒤
+dol_badger_visit.2,dolneomeo,dol_badger_visit,메밀댁,"""할배, 다음 돌은 이끼 있어. 미끄러워."" 그러더라.",,제안,
+dol_badger_visit.3,dolneomeo,dol_badger_visit,메밀댁,받침 값은 벌써 치렀는데\n자꾸 더 고쳐 주겠다는구나. …고집은.,,제안,
+dol_badger_visit.diary,dolneomeo,dol_badger_visit,일기,돌쇠 할배가 손주 꼬마 두더지의 손을 잡고 메밀밭까지 내려왔다고 한다. 꼬마가 디딜 돌을 하나하나 짚어 주었다고.,,제안,dolneomeo_badger_visit
+dol_badger_bojagi.1,dolneomeo,dol_badger_bojagi,메밀댁,네 매듭이 자꾸 눈에 밟혀서\n묵은 짐을 꺼내 봤다.,,제안,story.js:740-751 arcAll(dolneomeo_badger4·badger3) 돌무더기가 잠든 뒤 D-118·D-1395·D-1470
+dol_badger_bojagi.2,dolneomeo,dol_badger_bojagi,너구리,(묶인 그대로인 보자기 꾸러미.\n매듭이… 내 보따리 매듭이랑 똑같다.),,제안,
+dol_badger_bojagi.3,dolneomeo,dol_badger_bojagi,메밀댁,"재작년 여름, 너구리 아낙 하나가 혼자 이 고개를 넘었다.\n북쪽 산에 간다고, 해가 지는데도 걸음을 재촉하더라.",,제안,
+dol_badger_bojagi.4,dolneomeo,dol_badger_bojagi,메밀댁,메밀죽 먹이고 하룻밤 재웠더니\n이걸 값이라고 두고 갔어.,,제안,
+dol_badger_bojagi.5,dolneomeo,dol_badger_bojagi,너구리,(매듭 틈으로 귀퉁이 꽃수가 보인다.\n엄마가 내 보따리 끝에 놓던 그 꽃이다.),,제안,
+dol_badger_bojagi.6,dolneomeo,dol_badger_bojagi,너구리,(재작년 여름이면… 내가 앓아누웠던 때다.),,제안,
+dol_badger_bojagi.7,dolneomeo,dol_badger_bojagi,메밀댁,보부상은 사람 찾는 데 선수라더라.\n이 고운 걸 주인한테 돌려주렴.,,제안,
+dol_badger_bojagi.8,dolneomeo,dol_badger_bojagi,너구리,…꼭 전해 드릴게요.,,제안,
+dol_badger_bojagi.9,dolneomeo,dol_badger_bojagi,메밀댁,"그 매듭, 엄마한테 잘 배웠다고도 전하고.",,제안,
+dol_badger_bojagi.diary,dolneomeo,dol_badger_bojagi,일기,"메밀댁 아주머니가 묵혀 둔 보자기 꾸러미를 꺼냈다. 재작년 여름, 북쪽 산에 간다며 혼자 고개를 넘던 너구리 아낙이 값으로 두고 간 것이다. 내가 앓아누웠던 그 여름이다. 내 매듭과 똑같이 묶여 있었고, 귀퉁이에 엄마가 놓던 꽃수가 있었다. 주인에게 돌려주라며 내 손에 쥐여 주었다.",,제안,dolneomeo_badger4 (learn dolneomeo:flower-bojagi)
+dol_badger_after.1,dolneomeo,dol_badger_after,메밀댁,메밀 그루터기에도 서리가 앉는구나.\n겨울이 빨리 오겠다.,,제안,story.js:754 사연을 다 나눈 뒤·돌무더기가 잠든 뒤
+dol_badger_before.1,dolneomeo,dol_badger_before,메밀댁,성황당 쪽 돌무더기가 또 울리는구나.\n그쪽엔 가지 마라.,,제안,story.js:754 사연을 다 나눈 뒤·돌무더기가 잠들기 전
+dol_badger_greet.1,dolneomeo,dol_badger_greet,메밀댁,보자기 잘 챙겼지?\n길에서 젖지 않게 품에 넣어라.,,제안,story.js:1226 greeting
+dol_turtle_hint.1,dolneomeo,dol_turtle_hint,속말,돌 그늘 쪽에서 느릿느릿 돌을 긁는 소리가 난다.,,제안,story.js:1244 길손 dol_turtle.hint 기척
+dol_turtle_plain.1,dolneomeo,dol_turtle_plain,남생이 할미,천천히 가거라.\n돌길은 서두르는 발을 먼저 문다.,,제안,story.js:758 talkTurtleArc 사연 꺼짐
+dol_turtle_ask.1,dolneomeo,dol_turtle_ask,너구리,(돌 그늘에서 늙은 남생이가\n붉은 천 조각을 물고 있다.),,제안,story.js:760-774 첫 부탁(dolneomeo_turtle1 전) D-580
+dol_turtle_ask.2,dolneomeo,dol_turtle_ask,남생이 할미,마침 잘 왔다.\n목을 빼도 저 가지까진 안 닿는구나.,,제안,
+dol_turtle_ask.3,dolneomeo,dol_turtle_ask,남생이 할미,이 소원 천 좀 높이 매 주련.\n…목이 이만큼 늘어난 것도 백 년 걸렸다.,,제안,
+dol_turtle_ask.c1,dolneomeo,dol_turtle_ask,고르기,높은 가지에 천을 맨다,,제안,dol_turtle_cloth
+dol_turtle_ask.c2,dolneomeo,dol_turtle_ask,고르기,나중에 매 드릴게요,,제안,
+dol_turtle_cloth.1,dolneomeo,dol_turtle_cloth,너구리,(돌탑을 딛고 올라 높은 가지에 천을 맸다.\n맨 위엔 흙빛 천이 하나 먼저 매여 있다.),,제안,story.js:764-773 arcScene(dolneomeo_turtle1) D-135·D-272·D-271
+dol_turtle_cloth.2,dolneomeo,dol_turtle_cloth,남생이 할미,그 흙빛 천은 재작년 겨울 모자 쓴 너구리가 맸지.\n무슨 소원인지는 말 안 하더구나.,,제안,
+dol_turtle_cloth.3,dolneomeo,dol_turtle_cloth,너구리,할머니 소원은요?,,제안,
+dol_turtle_cloth.4,dolneomeo,dol_turtle_cloth,남생이 할미,비다. 백 년 전 한 해 비가 안 와서\n샘이 마르고 내 등딱지가 쩍쩍 갈라졌지.,,제안,
+dol_turtle_cloth.5,dolneomeo,dol_turtle_cloth,남생이 할미,매 준 값이다.\n내가 백 년 엎드린 바위에 난 석이다.,,제안,
+dol_turtle_cloth.6,dolneomeo,dol_turtle_cloth,너구리,{얻음 seogi 1},,제안,gotLine
+dol_turtle_cloth.diary,dolneomeo,dol_turtle_cloth,일기,성황당 남생이 할미의 소원 천을 높은 가지에 매어 주었다. 할미의 소원은 비다. 백 년 전 한 해 비가 안 와 샘이 마르고 등딱지가 갈라졌다고 했다. 가장 높은 가지에는 아빠가 재작년 겨울 맨 흙빛 천이 있었다. 매 준 값이라며 석이버섯을 주었다.,,제안,dolneomeo_turtle1
+dol_turtle_spring.1,dolneomeo,dol_turtle_spring,너구리,백 년 전 그해엔 왜 비가 안 왔어요?,,제안,story.js:777-786 arcAll(dolneomeo_turtle3·turtle2) 돌무더기가 잠든 뒤 D-130
+dol_turtle_spring.2,dolneomeo,dol_turtle_spring,남생이 할미,그해 여름 북쪽에서 뭐가 지나갔다.\n너무 뜨거워 고개도 못 들었지.,,제안,
+dol_turtle_spring.3,dolneomeo,dol_turtle_spring,남생이 할미,요새 북쪽 바람이 그해랑 냄새가 같다.\n북쪽에서 물 마른 데를 만나거든 샘부터 찾아라.,,제안,
+dol_turtle_spring.4,dolneomeo,dol_turtle_spring,남생이 할미,"뭐가 지나간 자리엔 샘이 먼저 죽는다.\n여름엔 마르고, 겨울엔 언다. 언 샘은 녹이면 흐르지.",,제안,
+dol_turtle_spring.5,dolneomeo,dol_turtle_spring,너구리,할머니 소원도 이뤄지면 좋겠어요.,,제안,
+dol_turtle_spring.6,dolneomeo,dol_turtle_spring,남생이 할미,백 년을 빌었더니 백 년 비가 왔다.\n…밑지는 장사는 아니지.,,제안,
+dol_turtle_spring.diary,dolneomeo,dol_turtle_spring,일기,"남생이 할미가 백 년 전 비가 안 온 그해 여름, 북쪽에서 무언가 지나갔다고 했다. 요새 북쪽 바람이 그해와 냄새가 같다고. 물 마른 데를 만나면 샘부터 찾으라고 했다. 무언가 지나간 자리엔 샘이 먼저 죽는다고. 여름엔 마르고 겨울엔 언다고.",,제안,dolneomeo_turtle3 (learn dolneomeo:turtle-spring)
+dol_turtle_after.1,dolneomeo,dol_turtle_after,남생이 할미,돌무더기가 조용하니 낮잠이 잘 온다.,,제안,story.js:789 돌무더기가 잠든 뒤
+dol_turtle_before.1,dolneomeo,dol_turtle_before,남생이 할미,돌무더기가 뒤척이는구나.\n저리 가까이 가지 마라.,,제안,story.js:789 돌무더기가 잠들기 전
+dol_turtle_greet.1,dolneomeo,dol_turtle_greet,남생이 할미,샘부터 찾으라 했지?\n…네가 맨 천은 아직 잘 매여 있다.,,제안,story.js:1245 greeting
+dol_wish_tower.1,dolneomeo,dol_wish_tower,너구리,(길섶에 돌탑 하나가 서 있다.\n허리께까지 쌓이다 멈췄다.),276,제안,story.js:972-985 Rg.wishTower 고갯길 소원 돌탑(얹기 전) D-164 · wishTowerPic(0)
+dol_wish_tower.2,dolneomeo,dol_wish_tower,너구리,(어릴 때 아빠 손을 잡고 걷다가\n이런 돌탑 앞에서 멈춘 적이 있다.),,제안,
+dol_wish_tower.3,dolneomeo,dol_wish_tower,너구리,(아빠는 작은 돌 하나를 얹으며 그랬다.\n돌탑을 쌓으면 소원이 이뤄진다고.),,제안,
+dol_wish_tower.4,dolneomeo,dol_wish_tower,너구리,…나도 쌓아 볼까.,,제안,
+dol_wish_tower.c1,dolneomeo,dol_wish_tower,고르기,돌을 골라 얹는다,,제안,"dol_wish_stack(돌탑 작은 창, D-229)"
+dol_wish_tower.c2,dolneomeo,dol_wish_tower,고르기,나중에 다시 올게,,제안,
+dol_wish_stack.title,dolneomeo,dol_wish_stack,화면,소원 돌탑,,제안,story.js:989-1036 소원 돌탑 작은 창(stackWish). 돌마다 혼잣말 한 줄(D-214). 산양·고라니·수달 모습이면 mouth 줄(D-733·D-1006) · 작은 창 제목(story.js:998)
+dol_wish_stack.hand1,dolneomeo,dol_wish_stack,화면,"(길섶에서 주운 납작한 돌. 한 손으로 집어 맨 위 한가운데에, 살며시.)",,제안,
+dol_wish_stack.hand2,dolneomeo,dol_wish_stack,화면,(하나 더. 흔들리지 않게 손끝으로.),,제안,
+dol_wish_stack.hand3,dolneomeo,dol_wish_stack,화면,(마지막 작은 돌. 까치발을 들었다.),,제안,
+dol_wish_stack.mouth1,dolneomeo,dol_wish_stack,화면,"(길섶에서 주운 납작한 돌을 입에 물었다. 맨 위 한가운데에, 살며시.)",,제안,
+dol_wish_stack.mouth2,dolneomeo,dol_wish_stack,화면,(하나 더. 흔들리지 않게 고개를 천천히.),,제안,
+dol_wish_stack.mouth3,dolneomeo,dol_wish_stack,화면,(마지막 작은 돌. 목을 길게 뺐다.),,제안,
+dol_wish_stack.done,dolneomeo,dol_wish_stack,화면,(돌 셋이 나란히 올라앉았다.),,제안,
+dol_wish_pray_mouth.1,dolneomeo,dol_wish_pray_mouth,너구리,(돌탑 앞에서 눈을 감았다.),276_v3,제안,story.js:1052 finishWishStack 입으로 무는 모습(산양·고라니·수달). 뒤에 dol_wish_pray · wishTowerPic(3)
+dol_wish_pray_hands.1,dolneomeo,dol_wish_pray_hands,너구리,(두 손을 모았다.),276_v3,제안,story.js:1052 손으로 얹는 모습. 뒤에 dol_wish_pray · wishTowerPic(3)
+dol_wish_pray.1,dolneomeo,dol_wish_pray,너구리,아빠를… 빨리 만나게 해 주세요.,,제안,story.js:1053-1055 (dolWishTower)
+dol_wish_pray.diary,dolneomeo,dol_wish_pray,일기,고갯길 돌탑에 돌 셋을 얹었다. 아빠가 그랬다. 돌탑을 쌓으면 소원이 이뤄진다고. 아빠를 빨리 만나게 해 달라고 빌었다.,,제안,dol_wish_tower
+dol_wish_tower_done.1,dolneomeo,dol_wish_tower_done,너구리,(맨 위 돌 셋에는 아직\n서리가 앉지 않았다.),276_v3,제안,story.js:974-976 돌을 얹은 뒤 다시 볼 때. 뒤에 dol_wish_tower_done_hare 또는 dol_wish_tower_done_dad · wishTowerPic(3)
+dol_wish_tower_done_hare.1,dolneomeo,dol_wish_tower_done_hare,너구리,(밑동에는 짐꾼 아저씨가 괸 돌도 있다.),,제안,story.js:976 짐꾼이 밑을 받친 뒤(dolHareTower)
+dol_wish_tower_done_dad.1,dolneomeo,dol_wish_tower_done_dad,너구리,(아빠도 이 길을 지나며\n돌 하나쯤 얹었을까.),,제안,story.js:976 짐꾼이 받치기 전
+dol_exam_frost_print.1,dolneomeo,dol_exam_frost_print,너구리,돌 위는 하얗고 발바닥 자리는 까맣다.\n먼저 지나간 짐꾼도 발을 비볐나 봐.,282,제안,story.js:1199 살펴보기 frost_print(고갯길) D-1010 · frostPrintPic
+dol_exam_gate_bell.1,dolneomeo,dol_exam_gate_bell,너구리,바람이 불 때마다 얇은 쇳소리가 난다.\n산 안쪽에서도 이 소리가 들릴까?,,제안,story.js:1200 살펴보기 gate_bell(고갯길) D-261
+dol_exam_stone_channel.1,dolneomeo,dol_exam_stone_channel,너구리,집집마다 돌 홈을 이어 물을 나눠 쓴다.\n얼지 말라고 짚도 조금 덮어 뒀네.,283,제안,story.js:1207 살펴보기 stone_channel(마을) D-1008 · channelPic(움직이는 그림)
+dol_exam_mill_edge_passed.1,dolneomeo,dol_exam_mill_edge_passed,너구리,내가 간 가루로 장승 앞 금줄이 걷혔다.\n맷돌 자개 틈에도 메밀 냄새가 남아 있다.,284_v1,제안,story.js:1209 살펴보기 mill_edge(마을) 장승제 뒤(ppuriPassed) · millEdgePic 메밀가루 남은 판
+dol_exam_mill_edge.1,dolneomeo,dol_exam_mill_edge,너구리,받침돌 한쪽만 유난히 매끈하다.\n맷돌 밑에서도 먼 길을 온 돌 냄새가 난다.,284,제안,story.js:1209 살펴보기 mill_edge 장승제 전 · millEdgePic
+dol_exam_warm_hearth.1,dolneomeo,dol_exam_warm_hearth,너구리,석수들이 일을 마치고 손을 녹이는 화로다.\n재 속 돌은 불이 꺼진 뒤에도 미지근하다.,285,제안,story.js:1211 살펴보기 warm_hearth(마을) D-1008 · hearthPic(움직이는 그림)
+dol_exam_memil_stubble.1,dolneomeo,dol_exam_memil_stubble,너구리,메밀을 거둔 자리마다 짧은 줄기가 섰다.\n돌 사이에 떨어진 알은 아직 단단하다.,,제안,story.js:1221 살펴보기 memil_stubble(메밀밭)
+dol_exam_tied_reeds.1,dolneomeo,dol_exam_tied_reeds,너구리,긴 억새는 병을 싸고 짧은 억새는 둥지에 깐다.\n꺾인 것도 버리지 않는구나.,286,제안,story.js:1222 살펴보기 tied_reeds(메밀밭) · reedsPic
+dol_exam_nest_door_drawing.1,dolneomeo,dol_exam_nest_door_drawing,너구리,억새로 묶은 그림이 문턱 돌에 괴어 있다.\n봄에 눈을 뜨면 제일 먼저 보일 자리다.,,제안,story.js:1223 살펴보기 nest_door(메밀밭) 그림을 단 뒤(dolneomeo_arc_kku7)
+dol_exam_nest_door_kku.1,dolneomeo,dol_exam_nest_door_kku,너구리,내가 벤 억새 끝이 둥지 틈에서 삐져나왔다.\n바람이 불어도 안쪽은 가만하다.,,제안,story.js:1223 살펴보기 nest_door 억새를 준 뒤(kkuDone)
+dol_exam_nest_door.1,dolneomeo,dol_exam_nest_door,너구리,둥지 문턱에 납작돌을 비스듬히 세웠다.\n꾸벅이가 졸다가 굴러 나오지 말라고 놨나?,,제안,story.js:1223 살펴보기 nest_door 억새를 주기 전
+dol_exam_silver_lichen.1,dolneomeo,dol_exam_silver_lichen,너구리,서리 아래 이끼가 동그란 테를 그렸다.\n돌은 가만있어도 무늬가 자라는구나.,287,제안,story.js:1230 살펴보기 silver_lichen(절벽길) · lichenPic
+dol_exam_frozen_trickle.1,dolneomeo,dol_exam_frozen_trickle,너구리,물이 흐르던 홈에 가느다란 얼음이 매달렸다.\n한 방울씩 녹으면 아래 바위 틈이 젖겠다.,288,제안,story.js:1231 살펴보기 frozen_trickle(절벽길) · tricklePic(움직이는 그림)
+dol_exam_dry_crack_frog.1,dolneomeo,dol_exam_dry_crack_frog,너구리,개구리가 말한 마른 바위 틈이다.\n붉은 발자국이 구름바다 쪽을 향한다.,289_v1,제안,"story.js:1233 살펴보기 dry_crack(절벽길, 골렘 뒤 턱 위) 개구리를 도운 뒤(dolneomeo_frog_warm) D-1009 · crackPic 붉은 발자국 판"
+dol_exam_dry_crack.1,dolneomeo,dol_exam_dry_crack,너구리,깊은 틈 안쪽은 서리가 하나도 없다.\n누가 비를 피해 쪼그려 앉았던 걸까?,289,제안,story.js:1233 살펴보기 dry_crack 개구리를 돕기 전 · crackPic
+dol_exam_wish_cloth.1,dolneomeo,dol_exam_wish_cloth,너구리,새 천 밑에 색 바랜 천이 겹쳐 달렸다.\n같은 가지에 몇 번의 겨울이 묶였을까?,,제안,story.js:1240 살펴보기 wish_cloth(성황당)
+dol_exam_grain_dish.1,dolneomeo,dol_exam_grain_dish,너구리,돌그릇 안에 메밀가루가 조금 남았다.\n바람이 들어도 깊은 그릇이라 안 날아간다.,,제안,story.js:1241 살펴보기 grain_dish(성황당)
+dol_exam_small_tower_after.1,dolneomeo,dol_exam_small_tower_after,너구리,큰 돌들이 내려앉아 낮은 탑을 받쳤다.\n작은 돌 하나도 굴러떨어지지 않았다.,290_v1,제안,story.js:1242 살펴보기 small_tower(성황당) 돌무더기가 잠든 뒤 · lowTowerPic 큰 돌이 받친 판
+dol_exam_small_tower.1,dolneomeo,dol_exam_small_tower,너구리,바람이 세도 이 낮은 탑은 흔들리지 않는다.\n밑돌 틈마다 작은 돌을 받쳐 뒀네.,290,제안,story.js:1242 살펴보기 small_tower 돌무더기가 잠들기 전 · lowTowerPic
+dol_vista_dawn_clouds.1,dolneomeo,dol_vista_dawn_clouds,속말,해 떴다!\n엄마도 보고 있을까.,,제안,"field.js:570 바라보기 dawn_clouds(절벽 끝, 골렘 뒤) 첫 생각"
+dol_vista_dawn_clouds.diary,dolneomeo,dol_vista_dawn_clouds,일기,돌산 절벽 끝에서 구름바다 위로 해가 솟는 것을 봤다. 처음 고갯길에서 봤던 먼 돌산에 서 있다.,,제안,vista:dolneomeo:dawn_clouds
+dol_vista_shrine_stir.1,dolneomeo,dol_vista_shrine_stir,속말,저 먼 돌무더기가… 움직였어?\n바람 탓인가.,,제안,field.js:573 바라보기 shrine_stir(메밀밭 둔덕) 첫 생각 D-83·D-167
+dol_vista_shrine_stir.diary,dolneomeo,dol_vista_shrine_stir,일기,메밀밭 둔덕에서 먼 산 쪽 돌무더기가 꿈틀하는 것을 봤다. 돌이 저절로 움직일 리 없는데.,,제안,vista:dolneomeo:shrine_stir
+dol_vista_wishing_stones.1,dolneomeo,dol_vista_wishing_stones,속말,작은 돌도 받치고 있네.\n엄마 돌도 놓을래.,,제안,field.js:575 바라보기 wishing_stones(성황당) 첫 생각
+dol_vista_wishing_stones.diary,dolneomeo,dol_vista_wishing_stones,일기,성황당 돌탑 아래에서 바람을 들었다. 작은 돌들이 서로를 받치고 있었다.,,제안,vista:dolneomeo:wishing_stones
+dol_dig_found.pine,dolneomeo,dol_dig_found,속말,소나무 그늘이라 첫눈이 녹지 않았다. 눈 밑에 가을에 떨어진 솔방울이 묻혀 있었다.,,제안,field.js:554-564 눈 둔덕(snow_mound)을 파면 띄우는 속말(engine/gather.js:98 d.found) D-266 · 고갯길·성황당 솔방울 둔덕(PINE)
+dol_dig_found.village,dolneomeo,dol_dig_found,속말,돌담 밑에 쌓아 두고 잊은 메밀 단이 눈에 덮여 있었다. 이삭이 아직 붙어 있다.,,제안,마을 메밀 둔덕
+dol_dig_found.field,dolneomeo,dol_dig_found,속말,밭머리에 남겨 둔 메밀 이삭 단이 첫눈에 덮여 있었다.,,제안,메밀밭 둔덕
+dol_dig_found.cliff,dolneomeo,dol_dig_found,속말,"바람에 꺾인 억새가 바위 밑에 쓸려 와 쌓였고, 그 위로 눈이 덮였다.",,제안,절벽길 억새 둔덕
+dol_dig_found.shrine,dolneomeo,dol_dig_found,속말,바람에 꺾여 떨어진 겨우살이 가지가 눈 속에 묻혀 있었다.,,제안,성황당 겨우살이 둔덕
+dol_gather_hint.eoksae,dolneomeo,dol_gather_hint,속말,아빠의 낫으로 밑동을 비스듬히 벤다.,,제안,region.js:104-110 defineGather hint. 웹은 첫 채집 설명을 단풍골에서만 띄워(engine/gather.js:68) 돌너머에선 뜨지 않는다
+dol_gather_hint.seogi,dolneomeo,dol_gather_hint,속말,이끼 낀 땅에 돋은 석이버섯이다.,,제안,D-641
+dol_gather_hint.snow_mound,dolneomeo,dol_gather_hint,속말,눈 밑에 무언가 묻혀 있는 모양이다.,,제안,D-266
+dol_door_gate.1,dolneomeo,dol_door_gate,속말,뿔영감에게 메밀가루를 건네 장승제를 올려야 한다.,,제안,field.js:380 gateReason 장승 문·돌계단 문이 닫혔을 때 속말(enterDepth think)
+dol_door_darae.1,dolneomeo,dol_door_darae,속말,성황당 돌무더기가 절벽 위 길을 흔든다. 성황당에서 먼저 잠재우자.,,제안,field.js:528 다래길이 닫혔을 때 속말
+dol_slope_slip_goat.1,dolneomeo,dol_slope_slip_goat,속말,언 비탈이라 발이 미끄러져 못 오르겠다.\n뿔영감 같은 산양 발굽이라면 오를 텐데.,,제안,"field.js:506 성황당 언 비탈에서 처음 미끄러질 때, 산양 변신이 있으면 D-846·D-1433"
+dol_slope_slip.1,dolneomeo,dol_slope_slip,속말,언 비탈이라 발이 미끄러져 못 오르겠다.\n이 비탈을 딛고 오를 발이 있어야 해.,,제안,field.js:506 산양 변신이 없을 때
+dol_faint.1,dolneomeo,dol_faint,속말,돌담 안쪽에서 숨을 골랐다. 보따리는 그대로다.,,제안,field.js:468 확장판 구역에서 쓰러졌을 때
+dol_rest.1,dolneomeo,dol_rest,속말,바람 그늘에서 부시를 쳐 불을 피웠다. 언 손부터 녹이고 가자.,,제안,story.js:493-494 Rg.rest 돌 골렘 앞 쉼터 불 피울 때 D-1303
+dol_golem_sight.1,dolneomeo,dol_golem_sight,너구리,(저게 뒤척인다던 성황당 돌무더기구나.\n돌 틈으로 하얀 김이 새어 나와.),,제안,field.js:456-457 성황당에서 골렘을 처음 봄(dolGolemSeen) D-645·D-845
+dol_golem_sight.2,dolneomeo,dol_golem_sight,너구리,(가슴께가 파랗게 비쳐. 서리다래가 저기 있어.\n…무서워도 엄마 약이야. 가 보자.),,제안,
+dol_golem_lose.1,dolneomeo,dol_golem_lose,너구리,"(가슴 핵이 눈 껍데기에 덮여 있었어.\n다리나 팔부터 무너뜨리거나, 달랠 물건을 건네 보자.)",,제안,field.js:601-602 골렘에게 지거나 물러났을 때(확장판 startGolem) D-1303
+dol_golem_lose.diary,dolneomeo,dol_golem_lose,일기,"돌 골렘의 다리나 팔을 먼저 무너뜨리거나, 마음을 달랠 물건을 건네 보자.",,제안,d_hint
+dol_golem_lose_think.1,dolneomeo,dol_golem_lose_think,속말,숨 좀 고르자. 준비되면 다시 가 보자.,,제안,field.js:602 위 대화가 닫힌 뒤 속말
+dol_golem_calm.diary,dolneomeo,dol_golem_calm,일기,성황당 돌무더기를 부수지 않고 달랬다. 돌 골렘이 조용히 내려앉았다.,,제안,field.js:599 달래서 이겼을 때 일기(golemCalm) · d_calm
+dol_boss_die_calm.diary,dolneomeo,dol_boss_die_calm,일기,성황당 돌무더기가 가슴의 핵에서 서리다래를 꺼내 내려놓고 다시 조용해졌다.,,제안,field.js:251 Rg.bossDie 달랬을 때 일기 D-257 · d_boss
+dol_boss_die_win.diary,dolneomeo,dol_boss_die_win,일기,성황당 돌무더기의 핵이 갈라지며 서리다래가 굴러 나왔다. 돌무더기는 무너졌다.,,제안,field.js:251 Rg.bossDie 부쉈을 때 일기 · d_boss
+dol_boss_die.1,dolneomeo,dol_boss_die,속말,성황당 뒤 절벽 길이 열렸다!,,제안,field.js:252 Rg.bossDie 속말
+dol_darae_got_calm.1,dolneomeo,dol_darae_got_calm,너구리,(돌무더기가 내려놓은 서리다래다.\n서리가 하얗게 앉아 손끝이 시리다.),,제안,"field.js:263 daraeGot 달랬을 때 첫 줄. 뒤에 (소원 돌이 남았으면 dol_darae_stone,) dol_darae_got"
+dol_darae_got_win.1,dolneomeo,dol_darae_got_win,너구리,(무너진 돌 틈에서 서리다래를 주웠다.\n서리가 하얗게 앉아 손끝이 시리다.),,제안,field.js:264 daraeGot 이겼을 때 첫 줄
+dol_darae_stone.1,dolneomeo,dol_darae_stone,너구리,(보따리에 아빠의 소원 돌이 아직 있다.\n할배가 성황당에 대신 올려 달라고 했지.),,제안,field.js:269-272 싸움에서 소원 돌을 건네지 않았고 보따리에 남았을 때 D-1502
+dol_darae_stone.2,dolneomeo,dol_darae_stone,너구리,(내려앉은 돌무더기 꼭대기에 아빠의 돌을 얹었다.\n돌이 기우뚱하더니 가만히 자리를 잡는다.),,제안,
+dol_darae_stone.diary,dolneomeo,dol_darae_stone,일기,"돌쇠 할배가 부탁한 대로, 내려앉은 성황당 돌무더기 꼭대기에 아빠의 소원 돌을 대신 올렸다.",,제안,d_stone_placed (dadStonePlaced)
+dol_darae_got.1,dolneomeo,dol_darae_got,너구리,(열매째 까치 발에 묶으면\n가는 길에 다 짓무르겠다.),,제안,field.js:256-273 daraeGot D-130·D-1002·D-1470. 확장판 글(옛 구성·사연 꺼짐 글은 뺌)
+dol_darae_got.2,dolneomeo,dol_darae_got,너구리,(맷돌이 깨어났으니…\n이번엔 내가 갈아서 약즙으로 보내자.),,제안,
+dol_darae_got.clue,dolneomeo,dol_darae_got,단서:아빠의 수첩,"아빠가 젊을 때 적은 수첩의 돌너머 쪽에는 서리다래가 적혀 있지 않다. 재작년 겨울의 아빠는 서리다래를 얻어 가려다, 늙은 까치가 북쪽 소식을 물어 온 그날 밤 떠났다(돌쇠 할배).",,제안,h2
+dol_darae_got.diary,dolneomeo,dol_darae_got,일기,서리다래를 수첩에 그렸다. 아빠가 젊을 때 적은 쪽에는 이 열매가 적혀 있지 않다. 재작년 겨울의 아빠도 열매를 얻지 못하고 떠났다.,,제안,d_darae
+dol_send.1,dolneomeo,dol_send,너구리,(약즙 통을 까치 발에 단단히 묶었다.),,제안,field.js:604-609 확장판 Rg.sendMedicine 약즙을 늙은 까치에게 맡김(yakMade). 끝에 dol_send_rumor 또는 dol_send_norumor (region.js nextMedicineWord)
+dol_send.2,dolneomeo,dol_send,너구리,엄마한테… 제가 만들었다고 전해 주세요.,,제안,
+dol_send.3,dolneomeo,dol_send,늙은 까치,오냐. 그 말까지 단단히 묶어 가마.,,제안,
+dol_send.diary,dolneomeo,dol_send,일기,깨어난 맷돌로 서리다래를 갈았다. 마을 돌담의 늙은 까치에게 내가 만든 약즙을 맡겼다.,,제안,d_end
+dol_send_rumor.1,dolneomeo,dol_send_rumor,너구리,(큰 장터 상단 숙소엔 오가는 보부상이\n장부에 다 적힌다고 했지.),,제안,region.js:72 nextMedicineWord 상단 소문을 들었을 때(rumor:sangdan) D-1439
+dol_send_rumor.2,dolneomeo,dol_send_rumor,너구리,(아빠도 거기 들렀다면\n어디로 갔는지 알 수 있을 거야.),,제안,
+dol_send_norumor.1,dolneomeo,dol_send_norumor,너구리,(큰 장터… 길손이 모이는 데니까\n아빠를 본 사람도 있을지 몰라.),,제안,region.js:73 nextMedicineWord 소문을 못 들었을 때
+dol_home_reply.1,dolneomeo,dol_home_reply,너구리,(까치가 빈 약즙 통을 물고 돌아왔다.\n통에 엄마가 접은 천이 둘러져 있다.),,제안,region.js:74-75 Rg.homeReply 다음 지역에서 받는 까치 답장 D-89·D-1439
+dol_home_reply.2,dolneomeo,dol_home_reply,너구리,(까치가 날개로 통을 감싸고 고개를 끄덕인다.\n엄마가 그렇게 받았나 보다.),,제안,
+dol_home_reply.diary,dolneomeo,dol_home_reply,일기,까치가 빈 약즙 통을 물고 돌아왔다. 통에는 엄마가 접은 천이 둘러져 있었다. 까치는 엄마가 통을 두 손으로 감싸고 고개를 끄덕였다고 몸짓으로 보여 주었다.,,제안,"dol_home_reply (Rg.homeReplyText region.js:68, story.js:526 finishHomeDelivery)"
+dol_form_goat.1,dolneomeo,dol_form_goat,너구리,"(금줄을 걷던 뿔영감 발굽,\n비탈 돌에서도 안 미끄러졌어.)",,제안,strangers.js:47-53 Rg.formCheck 산양 변신이 열림(장승제 뒤) D-130
+dol_form_goat.2,dolneomeo,dol_form_goat,너구리,(잎을 대고 그 발굽을 떠올리면… 될 것 같아.),,제안,
+dol_form_goat.diary,dolneomeo,dol_form_goat,일기,금줄을 걷던 뿔영감은 비탈 돌을 딛고도 한 번도 미끄러지지 않았다. 산양은 디딜 데를 먼저 살핀다. 잎을 부니 산양이 됐다.,,제안,form_goat
+dol_goal_send.1,dolneomeo,dol_goal_send,목표,엄마께 약즙 보내기,,제안,story.js:543 goalSteps.send (D-890)
+dol_goal_send.2,dolneomeo,dol_goal_send,길잡이,서리다래 약즙을 만들었다. 마을의 늙은 까치 어르신께 맡기면 엄마께 날라다 주신다.,,제안,
+dol_goal_pick.1,dolneomeo,dol_goal_pick,목표,서리다래 얻기,,제안,story.js:544 goalSteps.pick
+dol_goal_pick.2,dolneomeo,dol_goal_pick,길잡이,돌무더기가 품고 있던 서리다래가 드러났다. {where}서리다래를 주워 담자.,,제안,where: dol_goal_pick.where
+dol_goal_pick.where,dolneomeo,dol_goal_pick,조각,성황당에서 ,,제안,
+dol_goal_juice.1,dolneomeo,dol_goal_juice,목표,엄마 약 만들기,,제안,story.js:545 goalSteps.juice
+dol_goal_juice.2,dolneomeo,dol_goal_juice,길잡이,서리다래를 얻었다. 보따리를 열고 맷돌에 갈아 약즙을 내자.,,제안,
+dol_goal_fight.1,dolneomeo,dol_goal_fight,목표,서리다래 얻기,,제안,story.js:547 goalSteps.fight D-130
+dol_goal_fight.2,dolneomeo,dol_goal_fight,길잡이,{why}장승제를 올려 돌산 길이 열렸다. 돌산을 올라 움직이는 돌무더기와 맞서자.,,제안,"why: 꾸벅이에게 억새를 준 뒤면 dol_goal_fight.why, 아니면 빈 글"
+dol_goal_fight.why,dolneomeo,dol_goal_fight,길잡이,서리다래는 성황당 돌무더기가 가슴에 품고 있단다. ,,제안,
+dol_goal_ask_village.1,dolneomeo,dol_goal_ask_village,목표,서리다래 있는 곳 알아보기,,제안,story.js:549 goalSteps.askVillage D-447
+dol_goal_ask_village.2,dolneomeo,dol_goal_ask_village,길잡이,엄마 약에 쓸 서리다래가 어디 열리는지 모른다. 돌너머 마을 이웃들에게 물어보자.,,제안,
+dol_goal_ask_hedgehog.1,dolneomeo,dol_goal_ask_hedgehog,목표,서리다래 있는 곳 알아보기,,제안,story.js:550 goalSteps.askHedgehog
+dol_goal_ask_hedgehog.2,dolneomeo,dol_goal_ask_hedgehog,길잡이,뿔영감님이 산 열매라면 고슴도치 녀석이 안다고 했다. 둥지에서 졸고 있단다. {where}둥지를 찾아가 보자.,,제안,
+dol_goal_ask_hedgehog.where,dolneomeo,dol_goal_ask_hedgehog,조각,메밀밭 쪽 ,,제안,
+dol_goal_wake.1,dolneomeo,dol_goal_wake,목표,서리다래 있는 곳 알아보기,,제안,story.js:551 goalSteps.wake
+dol_goal_wake.2,dolneomeo,dol_goal_wake,길잡이,꾸벅이는 꾸벅꾸벅 졸다가 가끔 고개를 든다. 고개를 들 때를 기다렸다가 말을 걸자.,,제안,
+dol_goal_eoksae.1,dolneomeo,dol_goal_eoksae,목표,서리다래 있는 곳 알아보기,,제안,story.js:552-553 goalSteps.eoksae 억새가 세 단보다 적을 때. n: 가진 마른 억새 수
+dol_goal_eoksae.2,dolneomeo,dol_goal_eoksae,길잡이,꾸벅이가 겨울잠 둥지에 깔 마른 억새 세 단을 베어다 주면 서리다래 자리를 알려 준댔다. 마른 억새를 베자. ({n}/3),,제안,
+dol_goal_eoksae_enough.1,dolneomeo,dol_goal_eoksae_enough,길잡이,마른 억새 세 단이 모였다. 꾸벅이가 고개를 들 때 건네자.,,제안,story.js:552 억새 세 단이 모였을 때(목표는 dol_goal_eoksae 것)
+dol_goal_ppuri.1,dolneomeo,dol_goal_ppuri,목표,돌산 길 열기,,제안,story.js:554 goalSteps.ppuri
+dol_goal_ppuri.2,dolneomeo,dol_goal_ppuri,길잡이,서리다래는 성황당 돌무더기가 가슴에 품고 있단다. 그런데 장승지기 뿔영감님이 돌산 길을 막았다고 한다. {where}뿔영감님을 찾아뵙자.,,제안,
+dol_goal_ppuri.where,dolneomeo,dol_goal_ppuri,조각,장승 고갯길의 ,,제안,
+dol_goal_powder_give.1,dolneomeo,dol_goal_powder_give,목표,돌산 길 열기,,제안,story.js:556 goalSteps.powderGive
+dol_goal_powder_give.2,dolneomeo,dol_goal_powder_give,길잡이,메밀가루가 생겼다. {where}뿔영감님께 건네고 장승제를 올리자.,,제안,
+dol_goal_powder_give.where,dolneomeo,dol_goal_powder_give,조각,장승 고갯길의 ,,제안,
+dol_goal_tea.1,dolneomeo,dol_goal_tea,목표,돌산 길 열기,,제안,story.js:557 goalSteps.tea
+dol_goal_tea.2,dolneomeo,dol_goal_tea,길잡이,결명자를 구했다. 꾸벅이 말대로 돌쇠 할배께 결명자 차를 달여 드리자.,,제안,
+dol_goal_find_tea.1,dolneomeo,dol_goal_find_tea,목표,돌산 길 열기,,제안,story.js:559 goalSteps.findTea
+dol_goal_find_tea.2,dolneomeo,dol_goal_find_tea,길잡이,"장승제 메밀전에 쓸 메밀가루가 있어야 한다. 꾸벅이 말로는 가루는 돌쇠 할배가 아시고, 할배는 결명자 차를 좋아하신다. 결명자 구할 데를 찾아보자.",,제안,
+dol_goal_nal.1,dolneomeo,dol_goal_nal,목표,돌산 길 열기,,제안,story.js:560 goalSteps.nal 칡꽃이나 겨우살이 둘이 있을 때
+dol_goal_nal.2,dolneomeo,dol_goal_nal,길잡이,날쌘 아저씨가 칡꽃 하나나 겨우살이 둘을 받고 결명자를 준단다. 날쌘 아저씨께 건네자.,,제안,
+dol_goal_nal_few.1,dolneomeo,dol_goal_nal_few,길잡이,날쌘 아저씨가 겨우살이 둘이면 결명자를 준단다. 나무에 붙은 겨우살이 둘을 따자. ({n}/2),,제안,story.js:561 goalSteps.nal 모자랄 때(목표는 dol_goal_nal 것). n: 가진 겨우살이 수
+dol_goal_dolsoe.1,dolneomeo,dol_goal_dolsoe,목표,돌산 길 열기,,제안,story.js:562 goalSteps.dolsoe 할배께 차를 드린 뒤
+dol_goal_dolsoe.2,dolneomeo,dol_goal_dolsoe,길잡이,돌쇠 할배가 우리 집안 맷돌을 알아보셨다. 할배 곁에서 맷돌에 손을 얹어 보자.,,제안,
+dol_goal_dolsoe_before.1,dolneomeo,dol_goal_dolsoe_before,길잡이,결명자를 구했으니 돌쇠 할배를 찾아뵙자.,,제안,story.js:562 차를 드리기 전(목표는 dol_goal_dolsoe 것)
+dol_goal_memil.1,dolneomeo,dol_goal_memil,목표,돌산 길 열기,,제안,story.js:563 goalSteps.memil 메밀이 세 알보다 적을 때. n: 가진 메밀 수
+dol_goal_memil.2,dolneomeo,dol_goal_memil,길잡이,맷돌이 깨어났다. 메밀 세 알을 갈면 메밀가루가 된다. {where}메밀을 줍자. ({n}/3),,제안,
+dol_goal_memil.where,dolneomeo,dol_goal_memil,조각,메밀밭에서 ,,제안,
+dol_goal_memil_enough.1,dolneomeo,dol_goal_memil_enough,길잡이,메밀 세 알이 모였다. 보따리를 열고 맷돌에 갈아 메밀가루를 내자.,,제안,story.js:564 메밀 세 알이 모였을 때(목표는 dol_goal_memil 것)
+dol_goal_end.1,dolneomeo,dol_goal_end,목표,돌너머 마을 체험판 완료,,제안,story.js:569 G.ended
+dol_side_memil_sack.title,dolneomeo,dol_side_memil_sack,목표,메밀댁 햇메밀 자루 나르기,,제안,story.js:588 잔일 dol_memil_sack (D-149·D-890)
+dol_side_memil_sack.text,dolneomeo,dol_side_memil_sack,길잡이,메밀댁 아주머니가 맡긴 햇메밀 자루가 보따리에 있다. 돌쇠 할배 댁 마당에서 할배께 전해 드리자.,,제안,
+dol_side_mole.title,dolneomeo,dol_side_mole,목표,꼬마 두더지 속마음 듣기,,제안,story.js:590 잔일 dol_mole
+dol_side_mole.text,dolneomeo,dol_side_mole,길잡이,돌쇠 할배는 손주 꼬마 두더지에게 손으로 돌 읽는 법을 가르치고 싶어 하신다. 꼬마는 도망만 다닌다. 돌담 뒤 꼬마에게 왜 그러는지 물어보자.,,제안,
+dol_side_kku_drawing.title,dolneomeo,dol_side_kku_drawing,목표,꾸벅이에게 그림 남겨 주기,,제안,story.js:593 잔일 dol_kku_drawing D-580
+dol_side_kku_drawing.after,dolneomeo,dol_side_kku_drawing,길잡이,꾸벅이가 봄에 깨도 꼬마 두더지를 알아보게 그림을 그려 주기로 했다. 메밀밭 둥지의 꾸벅이에게 가자.,,제안,돌무더기가 잠든 뒤
+dol_side_kku_drawing.before,dolneomeo,dol_side_kku_drawing,길잡이,꾸벅이가 봄에 깨면 꼬마 두더지를 못 알아볼까 봐 걱정한다. 그림을 그려 주기로 했다. 엄마 약 서리다래부터 구하고 그려 주자.,,제안,돌무더기가 잠들기 전
+dol_side_flower_bojagi.title,dolneomeo,dol_side_flower_bojagi,목표,꽃수 보자기 주인에게 돌려주기,,제안,story.js:597 잔일 dol_flower_bojagi(영산을 마칠 때 끝남)
+dol_side_flower_bojagi.text,dolneomeo,dol_side_flower_bojagi,길잡이,"내가 앓던 그 여름, 혼자 이 고개를 넘던 너구리 아낙이 두고 간 보자기다. 매듭도 꽃수도 엄마 것과 같다. 길을 마치고 집에 가면 엄마께 여쭤 보자.",,제안,
+dol_cover.tag,dolneomeo,dol_cover,화면,돌너머 마을 체험판,,제안,region.js:11-17 cover(체험판 표지·들어설 때의 글) D-732
+dol_cover.sub,dolneomeo,dol_cover,화면,첫서리 내린 돌담 마을,,제안,
+dol_cover.ready,dolneomeo,dol_cover,화면,돌너머 마을로 들어갈 준비,,제안,
+dol_cover.go,dolneomeo,dol_cover,화면,돌너머 마을로,,제안,
+dol_cover.kicker,dolneomeo,dol_cover,화면,둘째 마을,,제안,
+dol_cover.head,dolneomeo,dol_cover,화면,돌너머 마을,,제안,
+dol_cover.start,dolneomeo,dol_cover,화면,돌너머 마을로 들어가기,,제안,
+dol_cover.body1,dolneomeo,dol_cover,화면,단풍골을 떠나 북쪽으로 사흘을 걸었다. 밤새 첫서리가 내려 돌담마다 하얗게 소금을 뿌린 것 같다.,,제안,
+dol_cover.body2,dolneomeo,dol_cover,화면,"집도 담도 길도 모두 돌로 쌓은 마을이다. 굴뚝마다 연기가 낮게 깔리고, 어디선가 돌 쪼는 소리가 탁, 탁 울린다.",,제안,
+dol_cover.body3,dolneomeo,dol_cover,화면,고갯길에 선 장승 둘이 오가는 길손을 내려다본다. 입김이 하얗게 흩어진다.,,제안,
+dol_end.kicker,dolneomeo,dol_end,화면,돌너머 마을 체험판 완료,,제안,region.js:19-23 cover.end(끝 화면) 확장판 글(옛 구성 글은 뺌) D-1439
+dol_end.head,dolneomeo,dol_end,화면,큰 장터로 가는 길,,제안,
+dol_end.body1,dolneomeo,dol_end,화면,"깨어난 맷돌로 서리다래를 갈아, 내 손으로 엄마의 약을 만들었다. 까치 발에 약즙 통을 묶어 남쪽으로 보냈다.",,제안,
+dol_end.body2,dolneomeo,dol_end,화면,돌쇠 할배가 장꾼들 소문을 들려주었다. 큰 장터 보부상 상단 숙소엔 오가는 보부상이 장부에 다 적힌다고. 북쪽으로 서둘러 떠난 아빠의 소식도 거기 있을지 모른다.,,제안,
+dol_end.stat_clues,dolneomeo,dol_end,화면,아빠 단서,,제안,region.js:58 endStats
+dol_end.stat_dolsoe,dolneomeo,dol_end,화면,돌쇠 할배의 신뢰,,제안,region.js:59 endStats
+dol_end.stat_faints,dolneomeo,dol_end,화면,쓰러진 횟수,,제안,region.js:60 endStats
+stranger_dolsoe.line,dolneomeo,stranger_dolsoe,돌쇠 할배,발소리가 낯설구나.\n어디서 온 손님이냐.,,제안,strangers.js:8-14 돌쇠 할배 낯선 손님(D-25·D-345) · dolsoe.line
+stranger_dolsoe.owl,dolneomeo,stranger_dolsoe,너구리,(깃 소리에 돌쇠 할배가 움찔하더니 흙 속으로 고개를 묻는다.),,제안,dolsoe.talk 수리부엉이
+stranger_ppuri.line,dolneomeo,stranger_ppuri,뿔영감,장승제를 올리지 않은 자는\n돌산에 오르지 못한다. 손님도 같다.,,제안,strangers.js:15-23 뿔영감 낯선 손님 · ppuri.line
+stranger_ppuri_goat.1,dolneomeo,stranger_ppuri_goat,뿔영감,고개 넘는 산양이로군.\n산양끼리는 먹을 데를 나눈다.,,제안,"strangers.js:19-21 ppuri.talk 산양으로 갔을 때(한 번, dol_ppuri_kin)"
+stranger_ppuri_goat.2,dolneomeo,stranger_ppuri_goat,뿔영감,절벽 밑에서 따 말린 석이다.\n하나 가져가라.,,제안,
+stranger_ppuri_goat.3,dolneomeo,stranger_ppuri_goat,너구리,{얻음 seogi 1},,제안,receiveItem
+stranger_ppuri_goat.diary,dolneomeo,stranger_ppuri_goat,일기,산양 모습으로 뿔영감에게 가니 산양끼리 먹을 데를 나눈다며 석이버섯을 줬다.,,제안,dol_ppuri_kin
+stranger_kkubeogi.line,dolneomeo,stranger_kkubeogi,꾸벅이,으음… 누구야…\n처음 맡는 냄새인데…,,제안,strangers.js:24-28 꾸벅이 낯선 손님 · kkubeogi.line
+stranger_kkubeogi.owl,dolneomeo,stranger_kkubeogi,너구리,(꾸벅이가 가시를 세우고 동그랗게 몸을 만다.),,제안,kkubeogi.talk 수리부엉이
+stranger_kkubeogi_otter.1,dolneomeo,stranger_kkubeogi_otter,꾸벅이,물 냄새… 수달이구나… 너는 안 찌를게…\n둥지 짓다 남은 거 가져가…,,제안,"strangers.js:31-35 kkubeogi.talk 수달로 갔을 때(한 번, dol_kkubeogi_otter) D-1006. 둘째 줄 뒤 너구리 꼬마를 만난 적이 있으면(kkuTalk) stranger_kkubeogi_otter_nal, 끝에 stranger_kkubeogi_otter_end"
+stranger_kkubeogi_otter.2,dolneomeo,stranger_kkubeogi_otter,너구리,{얻음 eoksae 1},,제안,receiveItem
+stranger_kkubeogi_otter.diary,dolneomeo,stranger_kkubeogi_otter,일기,수달 모습으로 가니 꾸벅이가 경계를 풀었다.{nal},,제안,"dol_kkubeogi_otter. {nal}: kkuTalk 이면 stranger_kkubeogi_otter_piece.nal 조각, 아니면 빈 글"
+stranger_kkubeogi_otter_piece.nal,dolneomeo,stranger_kkubeogi_otter_piece,조각, 꾸벅이가 날쌘이 나보다 하루 먼저 마을에 왔다고 했다.,,제안,일기에 붙이는 조각(앞 띄어쓰기 포함)
+stranger_kkubeogi_otter_nal.1,dolneomeo,stranger_kkubeogi_otter_nal,꾸벅이,근데 그 족제비 있잖아…\n너구리 꼬마보다 하루 먼저 왔더라…,,제안,strangers.js:34 kkuTalk 일 때만
+stranger_kkubeogi_otter_end.1,dolneomeo,stranger_kkubeogi_otter_end,꾸벅이,쿨…,,제안,strangers.js:35
+stranger_dol_nal.line,dolneomeo,stranger_dol_nal,날쌘,"손님, 돌투성이 마을에서 물건 찾기 힘들지?\n값은 좀 세.",,제안,"strangers.js:38-43 돌너머 날쌘 낯선 손님(값 두 배, price 2) · nal.line"
+stranger_dol_nal.diary,dolneomeo,stranger_dol_nal,일기,돌너머에서도 날쌘은 낯선 손님에게 두 배를 불렀다.,,제안,dol_nal_price (한 번)
+disguise_ppuri.back,dolneomeo,disguise_ppuri,뿔영감,…너였군. 다음엔 제 모습으로 와라.,,제안,"engine/disguise.js:45 DISGUISE_LINES.ppuri (손님 첫마디가 있어 대답 쪽만, D-345)"
+disguise_ppuri.back_first,dolneomeo,disguise_ppuri,뿔영감,너구리였군. 다음엔 제 모습으로 와라.,,제안,
+disguise_dolsoe.back,dolneomeo,disguise_dolsoe,돌쇠 할배,"허허, 목소리를 들으니 알겠다.",,제안,engine/disguise.js:48 DISGUISE_LINES.dolsoe (눈이 어두워 목소리로 안다)
+disguise_dolsoe.back_first,dolneomeo,disguise_dolsoe,돌쇠 할배,어린 목소리로구나.,,제안,
+disguise_kkubeogi.me,dolneomeo,disguise_kkubeogi,너구리,"꾸벅아, 나야.",,제안,"engine/disguise.js:51-54 DISGUISE_LINES.kkubeogi. back·backFirst 는 함수: 고개를 들었을 때(REG.kkuAwakeNow) awake, 졸 때 sleep · me"
+disguise_kkubeogi.me_first,dolneomeo,disguise_kkubeogi,너구리,놀랐지? 미안.,,제안,meFirst
+disguise_kkubeogi.back_awake,dolneomeo,disguise_kkubeogi,꾸벅이,"…아, 너구나…\n냄새가 바뀌어서 몰랐어어…",,제안,back 고개를 들었을 때
+disguise_kkubeogi.back_sleep,dolneomeo,disguise_kkubeogi,꾸벅이,…으음… 너구나… 쿨…,,제안,back 졸 때
+disguise_kkubeogi.back_first_awake,dolneomeo,disguise_kkubeogi,꾸벅이,…너구리 냄새다아…,,제안,backFirst 고개를 들었을 때
+disguise_kkubeogi.back_first_sleep,dolneomeo,disguise_kkubeogi,꾸벅이,…으음… 너구리… 쿨…,,제안,backFirst 졸 때
+disguise_dol_hare.owl,dolneomeo,disguise_dol_hare,산토끼 짐꾼,"히익, 누구야?!",,제안,engine/disguise.js:55-57 DISGUISE_LINES.dol_hare (산토끼 짐꾼)
+disguise_dol_hare.first,dolneomeo,disguise_dol_hare,산토끼 짐꾼,"어이쿠, 누구야?\n짐 진 데 부딪치지 마!",,제안,
+disguise_dol_hare.ask,dolneomeo,disguise_dol_hare,산토끼 짐꾼,누구야? 처음 보는 얼굴인데.,,제안,
+disguise_dol_hare.again,dolneomeo,disguise_dol_hare,산토끼 짐꾼,누구… 또 너지?,,제안,
+disguise_dol_hare.back,dolneomeo,disguise_dol_hare,산토끼 짐꾼,"아이고, 너였구나!",,제안,
+disguise_dol_hare.back_first,dolneomeo,disguise_dol_hare,산토끼 짐꾼,너구리였구나. 놀랐네.,,제안,
+disguise_dol_mole.owl,dolneomeo,disguise_dol_mole,꼬마 두더지,"히익! 누, 누구야? 할배!",,제안,engine/disguise.js:58-60 DISGUISE_LINES.dol_mole (꼬마 두더지)
+disguise_dol_mole.first,dolneomeo,disguise_dol_mole,꼬마 두더지,누구야…? 처음 맡는 냄새야.,,제안,
+disguise_dol_mole.ask,dolneomeo,disguise_dol_mole,꼬마 두더지,누구야…? 처음 맡는 냄새야.,,제안,
+disguise_dol_mole.again,dolneomeo,disguise_dol_mole,꼬마 두더지,또 누구야?,,제안,
+disguise_dol_mole.back,dolneomeo,disguise_dol_mole,꼬마 두더지,너였어? 놀랐잖아.,,제안,
+disguise_dol_mole.back_first,dolneomeo,disguise_dol_mole,꼬마 두더지,너구리구나.,,제안,
+disguise_dol_magpie.first,dolneomeo,disguise_dol_magpie,늙은 까치,어디서 온 짐승이냐.\n처음 보는 얼굴이로구나.,,제안,"engine/disguise.js:61 DISGUISE_LINES.dol_magpie = DISGUISE_MAGPIE(17-19, 늙은 까치 공통)"
+disguise_dol_magpie.ask,dolneomeo,disguise_dol_magpie,늙은 까치,누구냐. …보따리 끈이 낯익은데.,,제안,
+disguise_dol_magpie.again,dolneomeo,disguise_dol_magpie,늙은 까치,누구냐. …또 너로구나.,,제안,
+disguise_dol_magpie.back,dolneomeo,disguise_dol_magpie,늙은 까치,"오냐, 너로구나.\n하마터면 몰라볼 뻔했다.",,제안,
+disguise_dol_magpie.back_first,dolneomeo,disguise_dol_magpie,늙은 까치,너구리였구나.,,제안,
+disguise_dol_badger.owl,dolneomeo,disguise_dol_badger,메밀댁,"훠이, 훠이! 누구냐,\n메밀 쪼러 왔느냐!",,제안,"engine/disguise.js:62-65 DISGUISE_LINES.dol_badger (메밀댁, 까마귀를 쫓는다)"
+disguise_dol_badger.first,dolneomeo,disguise_dol_badger,메밀댁,훠이! …까마귀가 아니구나. 누구냐.,,제안,
+disguise_dol_badger.ask,dolneomeo,disguise_dol_badger,메밀댁,훠이! …까마귀가 아니구나. 누구냐.,,제안,
+disguise_dol_badger.again,dolneomeo,disguise_dol_badger,메밀댁,훠이! …또 누구냐.,,제안,
+disguise_dol_badger.back,dolneomeo,disguise_dol_badger,메밀댁,"아이고, 너였구나.",,제안,
+disguise_dol_badger.back_first,dolneomeo,disguise_dol_badger,메밀댁,너구리였구나.,,제안,
+disguise_dol_frog.owl,dolneomeo,disguise_dol_frog,움츠린 개구리,"히익… 누, 누구야…?\n잡아먹지 마…",,제안,engine/disguise.js:66-68 DISGUISE_LINES.dol_frog (움츠린 개구리)
+disguise_dol_frog.first,dolneomeo,disguise_dol_frog,움츠린 개구리,"누, 누구야…?\n다리에 힘이 없어서 도망도 못 가.",,제안,
+disguise_dol_frog.ask,dolneomeo,disguise_dol_frog,움츠린 개구리,누구…야? 처음 보는데.,,제안,
+disguise_dol_frog.again,dolneomeo,disguise_dol_frog,움츠린 개구리,"누, 누구야…?",,제안,
+disguise_dol_frog.back,dolneomeo,disguise_dol_frog,움츠린 개구리,"아, 너였구나… 휴.",,제안,
+disguise_dol_frog.back_first,dolneomeo,disguise_dol_frog,움츠린 개구리,너구리구나… 휴.,,제안,
+disguise_dol_turtle.first,dolneomeo,disguise_dol_turtle,남생이 할미,…누구냐.,,제안,"engine/disguise.js:70-71 DISGUISE_LINES.dol_turtle (남생이 할미, 느리고 짧게)"
+disguise_dol_turtle.ask,dolneomeo,disguise_dol_turtle,남생이 할미,…누구냐.,,제안,
+disguise_dol_turtle.again,dolneomeo,disguise_dol_turtle,남생이 할미,…누구냐.,,제안,
+disguise_dol_turtle.back,dolneomeo,disguise_dol_turtle,남생이 할미,…너로구나.,,제안,
+disguise_dol_turtle.back_first,dolneomeo,disguise_dol_turtle,남생이 할미,…너구리로구나.,,제안,
+dol_battle_golem.intro,dolneomeo,dol_battle_golem,화면,금줄 두른 성황당 돌무더기가 눈을 털며 일어선다.,,제안,"enemies.js 돌 골렘 싸움 글(B.msg·defineEnemies golem). {hit}: 친 자리 글(hit_*), {item}: 돌 이름(items.csv), {msg}: 앞 글 · enemies.js:916 intro D-103"
+dol_battle_golem.mark_leg,dolneomeo,dol_battle_golem,화면,발,,제안,enemies.js:923 parts.leg.mark
+dol_battle_golem.mark_arm,dolneomeo,dol_battle_golem,화면,팔,,제안,enemies.js:924 parts.arm.mark
+dol_battle_golem.mark_head,dolneomeo,dol_battle_golem,화면,핵,,제안,enemies.js:925 parts.head.mark
+dol_battle_golem.tell_leg,dolneomeo,dol_battle_golem,화면,골렘이 구들돌 발을 높이 쳐든다.,,제안,enemies.js:923 parts.leg.tell
+dol_battle_golem.tell_arm,dolneomeo,dol_battle_golem,화면,골렘이 차돌 팔을 뒤로 높이 감아올린다.,,제안,enemies.js:924 parts.arm.tell
+dol_battle_golem.tell_head,dolneomeo,dol_battle_golem,화면,골렘이 두 팔로 눈을 퍼 올린다.,,제안,enemies.js:925 parts.head.tell
+dol_battle_golem.weak_leg,dolneomeo,dol_battle_golem,화면,다리가 무너져 골렘이 눈밭에 엎어졌다. 이제 팔로 몸을 끈다.,,제안,enemies.js:923 parts.leg.weak D-370
+dol_battle_golem.weak_arm,dolneomeo,dol_battle_golem,화면,"골렘이 약해졌다. 팔이 없어 휩쓸지도, 눈을 던지지도 못한다.",,제안,enemies.js:924 parts.arm.weak
+dol_battle_golem.like,dolneomeo,dol_battle_golem,화면,돌무더기가 잠시 숨을 고른다.,,제안,enemies.js:926 likeText
+dol_battle_golem.like_story_stone,dolneomeo,dol_battle_golem,화면,아빠가 못 올린 소원 돌을 건넸다. 돌 골렘이 가만히 내려다본다.,,제안,enemies.js:927 likeTexts.story_stone
+dol_battle_golem.core_hidden,dolneomeo,dol_battle_golem,화면,가슴이 두꺼운 눈 껍데기에 덮여 있다.,,제안,enemies.js:928 coreHidden
+dol_battle_golem.core_shown,dolneomeo,dol_battle_golem,화면,눈 껍데기가 깨지고 서리 옥 핵이 드러났다!,,제안,enemies.js:929 coreShown
+dol_battle_golem.calm_win,dolneomeo,dol_battle_golem,화면,"돌 골렘이 가슴의 핵에서 서리다래를 꺼내 내려놓고, 성황당 돌무더기로 내려앉았다.",,제안,enemies.js:930 calmWin
+dol_battle_golem.win,dolneomeo,dol_battle_golem,화면,핵이 갈라지며 서리다래가 굴러 나왔다. 돌 골렘이 와르르 무너진다.,,제안,enemies.js:931 win
+dol_battle_golem.lose,dolneomeo,dol_battle_golem,화면,돌 골렘에게 밀려 눈 비탈을 데굴데굴 굴러 내려왔다.,,제안,enemies.js:932 lose
+dol_battle_golem.hit_leg,dolneomeo,dol_battle_golem,화면,박힌 발바닥을 쳤다!,,제안,enemies.js:558 HIT_TEXT.leg
+dol_battle_golem.hit_arm,dolneomeo,dol_battle_golem,화면,멈춘 차돌 팔을 쳤다!,,제안,enemies.js:558 HIT_TEXT.arm
+dol_battle_golem.hit_head,dolneomeo,dol_battle_golem,화면,서리 옥 핵을 쳤다!,,제안,enemies.js:558 HIT_TEXT.head
+dol_battle_golem.stone_drop,dolneomeo,dol_battle_golem,화면,{hit} {item} 한 조각이 떨어졌다!,,제안,enemies.js:555 stoneRoll 돌이 떨어짐 D-184
+dol_battle_golem.stone_bad_tool,dolneomeo,dol_battle_golem,화면,{hit} 효과가 적은 것 같다.,,제안,enemies.js:556 곡괭이가 아닌 도구 D-373
+dol_battle_golem.stone_dust,dolneomeo,dol_battle_golem,화면,{hit} 돌가루만 튄다.,,제안,enemies.js:556
+dol_battle_golem.core_shell,dolneomeo,dol_battle_golem,화면,{msg} 눈 껍데기가 두꺼워 몸은 버틴다.,,제안,enemies.js:577 핵이 덮인 채 쳤을 때
+dol_battle_golem.part_stone,dolneomeo,dol_battle_golem,화면,{msg} {item}도 챙겼다.,,제안,enemies.js:580 부위가 부서질 때 돌도 얻으면
+dol_battle_golem.close_leg,dolneomeo,dol_battle_golem,화면,발바닥이 부서져 눈 속에 묻혔다.,,제안,"enemies.js:559 CLOSE_TEXT.leg(칠 자리를 놓쳤을 때, 898)"
+dol_battle_golem.close_arm,dolneomeo,dol_battle_golem,화면,골렘이 팔을 거둬들였다.,,제안,enemies.js:559 CLOSE_TEXT.arm
+dol_battle_golem.close_head,dolneomeo,dol_battle_golem,화면,골렘이 가슴을 다시 여몄다.,,제안,enemies.js:559 CLOSE_TEXT.head
+dol_battle_golem.rest_sole,dolneomeo,dol_battle_golem,화면,구들돌 발바닥이 눈에 박혀 있다.,,제안,enemies.js:564 golemOpenMark 다리 D-183
+dol_battle_golem.rest_arm,dolneomeo,dol_battle_golem,화면,휘두른 차돌 팔이 눈밭에 처박혀 멈췄다.,,제안,enemies.js:567 golemOpenMark 팔
+dol_battle_golem.light_fade,dolneomeo,dol_battle_golem,화면,빛이 사그라들었다. 서리 옥이 잠깐 흐려졌다!,,제안,enemies.js:570 golemOpenMark 몸(빛 차례 뒤) D-453
+dol_battle_golem.breath_hidden,dolneomeo,dol_battle_golem,화면,골렘이 숨을 몰아쉰다. 눈 껍데기 덮인 핵이 들썩인다!,,제안,enemies.js:570 핵이 덮였을 때 D-1460
+dol_battle_golem.breath_shown,dolneomeo,dol_battle_golem,화면,골렘이 숨을 몰아쉰다. 서리 옥 핵이 드러났다!,,제안,enemies.js:570 핵이 드러났을 때
+dol_battle_golem.light_turn,dolneomeo,dol_battle_golem,화면,서리 옥이 웅웅 울린다. 알 수 없는 빛이 새어 나온다.,,제안,enemies.js:600 pickGolem 빛 차례 D-453
+dol_battle_golem.shake_snow,dolneomeo,dol_battle_golem,화면,골렘이 몸을 흔들어 어깨에 쌓인 눈을 털어 낸다.,,제안,enemies.js:602 팔이 부서진 뒤 눈폭탄 차례 D-376
+dol_battle_golem.avalanche_side,dolneomeo,dol_battle_golem,화면,처박힌 팔에 눈 더미가 무너져 옆에서 밀려온다!,,제안,enemies.js:719 D-452
+dol_battle_golem.avalanche_down,dolneomeo,dol_battle_golem,화면,흔들린 비탈에서 눈사태가 쏟아진다!,,제안,enemies.js:721 D-452
+dol_battle_golem.boom,dolneomeo,dol_battle_golem,화면,쿵,,제안,enemies.js:698 발 찧을 때 그리는 글자
