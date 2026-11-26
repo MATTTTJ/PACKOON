@@ -1661,4 +1661,3 @@ dol_battle_golem.avalanche_down,dolneomeo,dol_battle_golem,화면,흔들린 비�
 dol_battle_golem.boom,dolneomeo,dol_battle_golem,화면,쿵,,제안,enemies.js:698 발 찧을 때 그리는 글자
 ui_rest.lit,전체,ui_rest,화면,쉼터에 불을 피웠어요. 보스에게 지면 여기서 다시 시작해요,,제안,engine/rest.js:58 restStep 처음 불을 피울 때 toast (결정 D-1301)
 ui_rest.saved,전체,ui_rest,화면,쉼터 · 여기까지 저장했어요,,제안,engine/rest.js:59 restStep 다시 지날 때 toast(rest_toast_gap_ms 간격)
-ui_think.next,전체,ui_think,화면,E · 넘기기 ▸,,제안,engine/field.js:723 think 발견 속말 넘기기 안내(결정 D-1411. 휴대폰은 '눌러서 넘기기 ▸', PC 전용이라 E 판만)
