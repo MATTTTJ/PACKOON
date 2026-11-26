@@ -891,3 +891,13 @@ ui_title.today,전체,ui_title,화면,오늘,,제안,engine/save.js:151 saveLabe
 ui_title.date,전체,ui_title,화면,{m}월 {d}일,,제안,engine/save.js:151 saveLabel
 ui_title.am,전체,ui_title,화면,오전 {h}:{mm},,제안,engine/save.js:150 saveLabel(toLocaleTimeString ko-KR)
 ui_title.pm,전체,ui_title,화면,오후 {h}:{mm},,제안,engine/save.js:150 saveLabel(toLocaleTimeString ko-KR)
+ui_form.new,전체,ui_form,화면,새 변신: {name},,제안,engine/forms.js:39 unlockForm toast
+ui_form.unknown,전체,ui_form,화면,아직 모르는 변신이다,,제안,engine/forms.js:68 formKey toast
+ui_form.name_0,전체,ui_form,화면,너구리,,제안,engine/forms.js:25 FORM_NAMES
+ui_form.name_1,전체,ui_form,화면,다람쥐,,제안,engine/forms.js:25 FORM_NAMES
+ui_form.name_2,전체,ui_form,화면,산양,,제안,engine/forms.js:25 FORM_NAMES
+ui_form.name_3,전체,ui_form,화면,수리부엉이,,제안,engine/forms.js:25 FORM_NAMES
+ui_form.name_4,전체,ui_form,화면,수달,,제안,engine/forms.js:25 FORM_NAMES
+ui_prompt.climb,전체,ui_prompt,화면,오르기,,제안,engine/field.js:813 다람쥐가 줄기 곁에 서면 '↑ · 오르기'
+field_cache.take_some,전체,field_cache,너구리,다른 다람쥐가 묻어 두고 잊은 {item}. 다 가져가면 서운하겠지. 하나는 도로 묻어 두자.,,제안,engine/forms.js:183 openCache (결정 D-1021). {item}은 '도토리다'처럼 이다·다를 붙인 이름
+field_cache.take_all,전체,field_cache,너구리,다른 다람쥐가 묻어 두고 잊은 {item}. 고맙게 얻어 가자.,,제안,engine/forms.js:183 openCache (결정 D-1021)
