@@ -2884,3 +2884,4 @@ jt_trade_lock.yeot_more,jangteo,jt_trade_lock,화면,쌀은 넉넉해 보인다�
 jt_trade_lock.market_keep,jangteo,jt_trade_lock,화면,솔방울 다섯은 엿방울 몫이다. 모두 여덟이 되면 셋을 내자.,,제안,story.js:1628 t_craft_market 엿방울 몫 전·솔방울 3~7·엿방울을 만났거나 묶음 얘기를 들었을 때
 jt_trade_lock.market_quiet,jangteo,jt_trade_lock,화면,솔방울은 아직 쓸 데가 있다.,,제안,story.js:1628 같은 조건에서 아직 엿방울 몫을 모를 때
 jt_trade_lock.bueong_day,jangteo,jt_trade_lock,화면,부엉 영감님은 밤에만 깨어 계신다.,,제안,story.js:1634 t_bueong 낮
+form_owl_sense.1,전체,form_owl_sense,속말,…뭔가 느껴진다. 숨어 있던 {item} 보인다.,,제안,"engine/forms.js:118 owlSenseTick(D-665). {item} 은 물건 이름에 이/가를 붙인 것(웹 jo(n,'이','가'))"
