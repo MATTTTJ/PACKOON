@@ -1661,3 +1661,394 @@ dol_battle_golem.avalanche_down,dolneomeo,dol_battle_golem,화면,흔들린 비�
 dol_battle_golem.boom,dolneomeo,dol_battle_golem,화면,쿵,,제안,enemies.js:698 발 찧을 때 그리는 글자
 ui_rest.lit,전체,ui_rest,화면,쉼터에 불을 피웠어요. 보스에게 지면 여기서 다시 시작해요,,제안,engine/rest.js:58 restStep 처음 불을 피울 때 toast (결정 D-1301)
 ui_rest.saved,전체,ui_rest,화면,쉼터 · 여기까지 저장했어요,,제안,engine/rest.js:59 restStep 다시 지날 때 toast(rest_toast_gap_ms 간격)
+jt_start.diary,jangteo,jt_start,일기,"큰 장터에 왔다. 붉은 등불과 떡 찌는 김. 그런데 밤마다 장터 물건이 없어진다고 한다. 문은 잠긴 그대로이고 큰 발자국만 남는데 본 사람이 없다니, 장꾼들 말처럼 눈에 안 보이는 도둑일까. 보부상이니 숙소부터 들러 보자.",,제안,region.js:43-46 onStart 큰 장터 첫 일기(D-775·D-860·D-1439). 첫 화면 안내는 할 일 한 줄만(D-68) · j_start
+jt_cover.tag,jangteo,jt_cover,화면,큰 장터 체험판,,제안,region.js:11-19 cover(체험판 표지·들어설 때의 글) D-1504·D-775·D-860·D-1439
+jt_cover.sub,jangteo,jt_cover,화면,"설 대목, 붉은 등불의 장터",,제안,
+jt_cover.ready,jangteo,jt_cover,화면,큰 장터로 들어갈 준비,,제안,
+jt_cover.go,jangteo,jt_cover,화면,큰 장터로,,제안,
+jt_cover.kicker,jangteo,jt_cover,화면,셋째 마을,,제안,
+jt_cover.head,jangteo,jt_cover,화면,큰 장터,,제안,
+jt_cover.start,jangteo,jt_cover,화면,큰 장터로 들어가기,,제안,
+jt_cover.body1,jangteo,jt_cover,화면,고개를 여럿 넘어 첫눈 속에 큰 장터에 닿았다. 설 대목이라 붉은 등불 아래 장꾼과 길손이 북적인다.,,제안,
+jt_cover.body2,jangteo,jt_cover,화면,"그런데 밤마다 장터 물건이 없어진단다. 창고 문은 잠긴 그대로이고 눈밭엔 큰 발자국만 남는데, 그 발 임자를 본 사람이 없다.",,제안,
+jt_cover.body3,jangteo,jt_cover,화면,보부상은 장터에 오면 숙소부터 들른다. 돌너머에서 들은 대로라면 상단 숙소 장부에 아빠 이름도 적혀 있겠지.,,제안,
+jt_end.kicker,jangteo,jt_end,화면,큰 장터 체험판 완료,,제안,region.js:21-26 cover.end(끝 화면) 확장판 글(옛 구성 글은 뺌) D-1440·D-1438
+jt_end.head,jangteo,jt_end,화면,북쪽 영산으로,,제안,
+jt_end.body1,jangteo,jt_end,화면,"창고를 털던 눈도깨비를 잡았다. 종종이는 누명을 벗었고, 상단은 셈을 맞춰 주었다.",,제안,
+jt_end.body2,jangteo,jt_end,화면,두 해 전 겨울 아빠는 상단 행렬과 북쪽 고갯마루까지 걷다가 혼자 영산 쪽 눈길로 들었다고 한다. 설 쇤 행렬을 따라 그 고개로 간다.,,제안,
+jt_end.body3,jangteo,jt_end,화면,"""값은 이미 치러졌다. 이번엔 내가 치른다."" 누가, 무슨 값을 치렀다는 걸까. 아빠는 북쪽 영산에 있다.",,제안,
+jt_end.stat_clues,jangteo,jt_end,화면,아빠 단서,,제안,region.js:62 endStats
+jt_end.stat_yeotbang,jangteo,jt_end,화면,엿방울의 흥,,제안,region.js:63 endStats
+jt_end.stat_bueong,jangteo,jt_end,화면,부엉 영감의 의리,,제안,region.js:64 endStats
+jt_end.stat_faints,jangteo,jt_end,화면,쓰러진 횟수,,제안,region.js:65 endStats
+jt_haengsu_first.1,jangteo,jt_haengsu_first,말뚝 행수,"거기 꼬마, 창고 쪽엔 얼씬도 마라.\n요즘 상단 창고에서 밤마다 물건이 샌다.",,제안,"story.js:672-686 haengsuTalk 낮 숙소 말뚝 행수 첫 만남(jxSangdanMet 전, 도깨비 전) D-568·D-968·D-860. learn bueong:night·sangdan:theft. 끝나면 일기 jx_sangdan1·refreshGoal"
+jt_haengsu_first.2,jangteo,jt_haengsu_first,너구리,저는 아빠 소식을 찾으러 왔어요.\n보부상은 장에 오면 숙소부터 들른다고 해서요.,,제안,
+jt_haengsu_first.3,jangteo,jt_haengsu_first,말뚝 행수,보부상 소식이면 접장 영감 소관이다. 장부도 그 양반이 쥐고 있지.\n영감은 밤에만 깨신다. 해 지거든 마루로 와라.,,제안,
+jt_haengsu_first.4,jangteo,jt_haengsu_first,말뚝 행수,하필 장꾼들 물건도 못 지키는 때에 오다니.\n상단은 신용으로 먹고사는데.,,제안,
+jt_haengsu_first.5,jangteo,jt_haengsu_first,너구리,누가 훔쳐 가요?,,제안,
+jt_haengsu_first.6,jangteo,jt_haengsu_first,말뚝 행수,아침마다 문 앞 눈밭엔 큰 발자국이 찍혀 있다.\n그런데 문을 지킨 막내 종종이는 아무도 못 봤단다.,,제안,
+jt_haengsu_first.7,jangteo,jt_haengsu_first,말뚝 행수,발자국이 문 앞까지 왔는데 못 봤으면\n졸았다는 셈이지.,,제안,
+jt_haengsu_first.8,jangteo,jt_haengsu_first,너구리,(창고 쪽문 앞에서 어린 수달이 고개를 푹 숙이고 짐을 쌓는다.),,제안,
+jt_haengsu_first.9,jangteo,jt_haengsu_first,말뚝 행수,설 지나면 그 녀석은 집으로 돌려보낸다.,,제안,
+jt_haengsu_first.diary,jangteo,jt_haengsu_first,일기,"보부상 숙소의 말뚝 행수가 말했다. 상단 창고에서 밤마다 장꾼들 물건이 없어진다. 문 앞에 큰 발자국이 찍히는데 문을 지킨 막내 종종이는 아무도 못 봤다고 해서, 행수는 종종이가 졸았다고 여긴다. 설 지나면 돌려보낸다고 했다. 아빠 소식은 장부를 쥔 접장 영감님께 여쭤야 한다. 영감님은 밤에만 깨신다.",,제안,
+jt_haengsu_wait_guard.1,jangteo,jt_haengsu_wait_guard,말뚝 행수,영감이 오늘 밤 창고를 네게 맡겼다고?\n…신표가 무겁다. 졸지 마라.,,제안,"story.js:689 다시 말 걸 때, 도깨비 전·신표를 받은 뒤(bueongDone)"
+jt_haengsu_wait.1,jangteo,jt_haengsu_wait,말뚝 행수,네 아비 일은 영감께 여쭈어라. 해 지면 깨신다.\n나는 오늘도 장꾼들한테 머리를 숙여야 하고.,,제안,"story.js:689 다시 말 걸 때, 도깨비 전·신표 전"
+jt_jongjong_first.1,jangteo,jt_jongjong_first,종종이,…난 안 졸았어. 정말이야.,,제안,"story.js:691-699 jongjongTalk 낮 숙소 종종이 첫 만남(jxJongMet 전, 도깨비 전) D-860. 끝나면 일기 jx_sangdan_jong"
+jt_jongjong_first.2,jangteo,jt_jongjong_first,종종이,"밤새 눈 뜨고 있었는데, 새벽에 보면\n자루가 하나씩 비어 있어.",,제안,
+jt_jongjong_first.3,jangteo,jt_jongjong_first,종종이,문 앞엔 큰 발자국이 나 있는데\n난 아무것도 못 봤어.,,제안,
+jt_jongjong_first.4,jangteo,jt_jongjong_first,종종이,빗자루로 쓰는 소리만 사락사락 났어.\n아무도 안 믿어 주지만.,,제안,
+jt_jongjong_first.diary,jangteo,jt_jongjong_first,일기,"상단 막내 종종이는 밤새 졸지 않았다고 했다. 새벽마다 자루가 비고 문 앞엔 큰 발자국이 나 있었는데, 본 것은 없고 빗자루 쓰는 소리만 사락사락 났단다.",,제안,
+jt_jongjong_wait_guard.1,jangteo,jt_jongjong_wait_guard,종종이,네가 오늘 밤 창고를 지킨다며?\n사락사락 소리 나면 빗자루부터 봐.,,제안,"story.js:702 다시 말 걸 때, 도깨비 전·신표를 받은 뒤(bueongDone)"
+jt_jongjong_wait.1,jangteo,jt_jongjong_wait,종종이,설 지나면 집에 가야 해.\n…엄마한테 뭐라고 하지.,,제안,"story.js:702 다시 말 걸 때, 도깨비 전·신표 전"
+jt_bueong_day.1,jangteo,jt_bueong_day,너구리,(부엉 영감님이 처마 밑에서 꾸벅꾸벅 졸고 있다.),,제안,story.js:1304-1305 talkBueong 낮(사연 켜짐 설날 아침 갈래가 아닐 때). learn bueong:night
+jt_bueong_day.2,jangteo,jt_bueong_day,너구리,(낮엔 주무시네. 숙소 마루에서 해 질 때까지 쉬자.),,제안,
+jt_bueong_kid3_ask.1,jangteo,jt_bueong_kid3_ask,너구리,(부엉 영감님이 설날 아침인데 처마 밑에서 눈을 뜨고 있다.),,제안,story.js:1301-1302 낮·사연 켜짐·도깨비 뒤·Kid2 뒤·Kid3 전(설날 아침). c1 → jt_bueong_kid3. 설이 지났으면(jxSeollalPast) 첫 줄은 jt_bueong_kid3_ask_past
+jt_bueong_kid3_ask.c1,jangteo,jt_bueong_kid3_ask,고르기,떠날 채비를 말씀드린다,,제안,
+jt_bueong_kid3_ask.c2,jangteo,jt_bueong_kid3_ask,고르기,다음에,,제안,
+jt_bueong_kid3_ask_past.1,jangteo,jt_bueong_kid3_ask_past,너구리,(부엉 영감님이 아침인데 처마 밑에서 눈을 뜨고 있다.),,제안,story.js:1302 jxSeollalPast 일 때 첫 줄(고르기는 jt_bueong_kid3_ask 것)
+jt_bueong_first.1,jangteo,jt_bueong_first,너구리,(수리부엉이가 장부를 한 장 넘긴다.),,제안,"story.js:1306-1310 talkBueong 밤 첫 만남(bueongNight 전) 사연 켜짐. learn bueong:rule, ledger bueong. 팥시루떡이 없으면 뒤에 jt_bueong_howto 줄들, 있으면 끝나고 jt_bueong_offer"
+jt_bueong_first.2,jangteo,jt_bueong_first,부엉 영감,부엉. 그 모자 주인의 아들이냐.,,제안,
+jt_bueong_first.3,jangteo,jt_bueong_first,부엉 영감,네 아비가 짐을 맡겼다. 보부상단에 맡긴 짐은\n보부상에게만 내준다. 규칙이다.,,제안,
+jt_bueong_first.4,jangteo,jt_bueong_first,부엉 영감,"설 고사에 팥시루떡을 올려라. 그러면\n보부상 신표, 상단이 인정한 패를 내주마.",,제안,
+jt_bueong_first_plain.1,jangteo,jt_bueong_first_plain,부엉 영감,"부엉. 그 모자, 장부에 오른 너구리의 것이로구나.\n네가 그 녀석 아들이냐.",,제안,story.js:1307-1309 밤 첫 만남 사연 꺼짐(앞 지문 줄 없음)
+jt_bueong_first_plain.2,jangteo,jt_bueong_first_plain,부엉 영감,네 아비가 짐을 맡겼다.\n보부상단에 맡긴 물건은 보부상에게만 내준다. 규칙이다.,,제안,
+jt_bueong_first_plain.3,jangteo,jt_bueong_first_plain,부엉 영감,"보부상단 설 고사에 팥시루떡을 올려라.\n정식 보부상으로 인정하는 패, 신표를 내주마.",,제안,
+jt_bueong_wait.1,jangteo,jt_bueong_wait,부엉 영감,팥시루떡은 아직이냐.,,제안,story.js:1313 신표 전 다시 말 걸 때 팥시루떡이 없으면. 뒤에 jt_bueong_howto 줄들
+jt_bueong_howto.1,jangteo,jt_bueong_howto,부엉 영감,쌀가루 두 됫박에 팥 한 되를 시루에 안쳐 찌면 된다.,,제안,"story.js:1336-1346 bueongHowTo D-967. 첫 줄 뒤 지금 모자란 것 하나만: 시루가 안 깨었으면 jt_bueong_howto_siru, 쌀가루가 둘보다 적고 쌀로 채울 수 있으면 _grind, 쌀도 모자라면 _rice, 팥이 없으면 _pat, 다 있으면 _ready"
+jt_bueong_howto_siru.1,jangteo,jt_bueong_howto_siru,부엉 영감,네 보따리 시루는 아직 김을 못 먹었구나.\n거리 떡집 모락이 김 올리는 법을 안다. 그 곰부터 찾아가라.,,제안,story.js:1342 시루가 안 깨었을 때
+jt_bueong_howto_grind.1,jangteo,jt_bueong_howto_grind,부엉 영감,쌀은 있구나. 맷돌에 갈아 쌀가루부터 만들어라.,,제안,story.js:1343 쌀가루 2 미만·쌀이 모자란 몫만큼 있을 때
+jt_bueong_howto_rice.1,jangteo,jt_bueong_howto_rice,부엉 영감,쌀가루가 모자라는구나. 쌀은 거리 엿방울이 솔방울을 받고 내준다.\n받거든 맷돌에 갈아라.,,제안,story.js:1343 쌀가루도 쌀도 모자랄 때
+jt_bueong_howto_pat.1,jangteo,jt_bueong_howto_pat,부엉 영감,팥은 거리 첫 좌판의 날쌘이 판다.\n가루를 내밀면 바꿔 줄 게다.,,제안,story.js:1344 팥이 없을 때
+jt_bueong_howto_ready.1,jangteo,jt_bueong_howto_ready,부엉 영감,다 갖췄구나. 보따리를 펴고 시루에 안쳐라.,,제안,story.js:1345 다 갖췄을 때
+jt_bueong_offer.1,jangteo,jt_bueong_offer,부엉 영감,고사떡을 가져왔구나.,,제안,story.js:1349-1351 bueongGive 팥시루떡이 있을 때(밤). c1 교환 화면 t_bueong(S3) D-23
+jt_bueong_offer.c1,jangteo,jt_bueong_offer,고르기,보따리를 펼친다,,제안,
+jt_bueong_offer.c2,jangteo,jt_bueong_offer,고르기,조금 이따가요,,제안,
+jt_bueong_memo.clue,jangteo,jt_bueong_memo,단서:아빠의 메모,"아빠가 숙소에 맡긴 짐 속 메모: ""값은 이미 치러졌다. 이번엔 내가 치른다. 북쪽 영산.""",,제안,"story.js:1366-1367 bueongGiveNow 신표 받을 때(사연 켜짐·꺼짐 둘 다). 단서 j3(engine/core.js:394 NAME_CLUES), 일기 j_memo. sinpyo·dad_memo 는 addItem 으로 바로 준다 · j3"
+jt_bueong_memo.diary,jangteo,jt_bueong_memo,일기,"보부상 신표를 받았다. 아빠의 짐 속에 메모가 있었다. ""값은 이미 치러졌다. 이번엔 내가 치른다."" 누가, 무슨 값을 치렀다는 걸까.",,제안,j_memo
+jt_bueong_give.1,jangteo,jt_bueong_give,너구리,(영감님이 고사떡을 올리고 장부 한 줄에 표시만 한다.\n내 이름은 묻지 않는다.),,제안,"story.js:1368-1385 bueongGiveNow 사연 켜짐 D-421·D-428·D-1438·D-1162·D-968·D-969·D-424. .10 뒤에 jt_name_count 한 줄, .12 뒤에 jt_bueong_watch 두 줄. 끝나면 별명(jt_bueong_maknae)·속말 jt_bueong_give_think·refreshGoal. 일기 jangteoArcsBueong1"
+jt_bueong_give.2,jangteo,jt_bueong_give,부엉 영감,신표다. 네 아비 짐도 받아라.\n보관 값은 안 받으마.,,제안,
+jt_bueong_give.3,jangteo,jt_bueong_give,너구리,(보부상 신표와 아빠가 맡긴 짐을 얻었다.),,제안,
+jt_bueong_give.4,jangteo,jt_bueong_give,부엉 영감,네 아비 셈은 장부에 넉넉히 남아 있다.,,제안,
+jt_bueong_give.5,jangteo,jt_bueong_give,부엉 영감,장부에 이름을 적어 두면\n사람은 가도 셈은 남는다.,,제안,
+jt_bueong_give.6,jangteo,jt_bueong_give,너구리,(영감님이 짚은 줄. 셈은 빼곡한데\n이름 칸만 하얗다.),,제안,
+jt_bueong_give.7,jangteo,jt_bueong_give,부엉 영감,…이 칸을 내가 왜 비워 뒀나. 늙었구나.,,제안,
+jt_bueong_give.8,jangteo,jt_bueong_give,너구리,(보따리 끈의 짐표를 쥐어 본다.\n앞면이 매끈하다.),,제안,
+jt_bueong_give.9,jangteo,jt_bueong_give,너구리,"(짐 속에 아빠 메모가 있다.)\n""값은 이미 치러졌다. 이번엔 내가 치른다.""",,제안,
+jt_bueong_give.10,jangteo,jt_bueong_give,너구리,"""북쪽 영산.""",,제안,
+jt_bueong_give.11,jangteo,jt_bueong_give,부엉 영감,이제 상단 식구다. 막내지.,,제안,
+jt_bueong_give.12,jangteo,jt_bueong_give,부엉 영감,"상단 막내, 오늘이 섣달그믐이다.\n그믐 밤엔 헌것들이 들썩이고, 창고 물건이 없어진다.",,제안,
+jt_bueong_give.13,jangteo,jt_bueong_give,부엉 영감,오늘 밤 창고 문 앞을 지켜라. 보부상의 일이다.,,제안,
+jt_bueong_give.diary,jangteo,jt_bueong_give,일기,부엉 영감님이 장부에 표시하고 신표를 내주셨다. 아빠가 맡긴 짐도 두 해째 보관하고 있었다.,,제안,jangteoArcsBueong1
+jt_bueong_give_plain.1,jangteo,jt_bueong_give_plain,부엉 영감,붉은 팥이 제대로 들었구나. 고사상에 올릴 만하다.,,제안,"story.js:1387-1395 bueongGiveNow 사연 꺼짐. .3 뒤에 jt_name_count 한 줄, 끝에 jt_bueong_watch 두 줄. 끝나면 별명(jt_bueong_maknae)·알림 .toast·refreshGoal"
+jt_bueong_give_plain.2,jangteo,jt_bueong_give_plain,너구리,(영감님이 떡을 올리고 장부에 신표 표시를 한다.),,제안,
+jt_bueong_give_plain.3,jangteo,jt_bueong_give_plain,부엉 영감,이제 너도 보부상단 식구다. 막내지.\n신표를 받아라.,,제안,
+jt_bueong_give_plain.4,jangteo,jt_bueong_give_plain,부엉 영감,이건 네 아비가 맡긴 짐이다.,,제안,
+jt_bueong_give_plain.5,jangteo,jt_bueong_give_plain,부엉 영감,장부에 이름을 적어 두면\n사람은 가도 셈은 남는다.,,제안,
+jt_bueong_give_plain.6,jangteo,jt_bueong_give_plain,너구리,(영감님이 짐과 장부의 아빠 줄을 맞춰 본다.\n셈은 빼곡한데 이름 칸만 하얗다.),,제안,
+jt_bueong_give_plain.7,jangteo,jt_bueong_give_plain,부엉 영감,…이 칸을 내가 왜 비워 뒀나. 늙었구나. 받아라.,,제안,
+jt_bueong_give_plain.8,jangteo,jt_bueong_give_plain,너구리,(보부상 신표와 아빠가 맡긴 짐을 얻었다.),,제안,
+jt_bueong_give_plain.9,jangteo,jt_bueong_give_plain,너구리,(보따리 끈의 짐표를 쥐어 본다.\n앞면이 매끈하다.),,제안,
+jt_bueong_give_plain.10,jangteo,jt_bueong_give_plain,너구리,(짐 속에 접힌 종이가 있다. 아빠 글씨다.),,제안,
+jt_bueong_give_plain.11,jangteo,jt_bueong_give_plain,너구리,"""값은 이미 치러졌다. 이번엔 내가 치른다.\n북쪽 영산.""",,제안,
+jt_bueong_give_plain.12,jangteo,jt_bueong_give_plain,부엉 영감,"상단 막내, 오늘은 섣달그믐이다. 밤마다 장터 물건이 사라진다.\n보부상의 의무로 오늘 밤 숙소 창고를 지켜라.",,제안,
+jt_bueong_give_plain.toast,jangteo,jt_bueong_give_plain,화면,숙소 창고를 지키자,,제안,대화가 끝난 뒤 알림(toast)
+jt_bueong_watch.1,jangteo,jt_bueong_watch,부엉 영감,지난밤들은 종종이가 섰다.\n행수는 그 아이를 의심하지.,,제안,story.js:1363-1364 watchLines 확장판 끝 두 줄(사연 켜짐·꺼짐 둘 다) D-568
+jt_bueong_watch.2,jangteo,jt_bueong_watch,부엉 영감,행수는 그믐 헌것 얘기를 늙은이 헛소리로 안다.\n네 눈으로 보고 와라.,,제안,
+jt_bueong_give_think.1,jangteo,jt_bueong_give_think,속말,오늘 밤은 숙소 창고를 지키자.,,제안,story.js:1385 사연 켜짐 신표 장면이 끝난 뒤 속말
+jt_bueong_maknae.diary,jangteo,jt_bueong_maknae,일기,부엉 영감님께 상단 막내라고 불렸다.,,제안,"story.js:1365 maknae() 별명 jang_sangdan_maknae(상단 막내, 부엉 영감)을 처음 받을 때 일기 · nickname:jang_sangdan_maknae"
+jt_name_count.1,jangteo,jt_name_count,너구리,(나를 부르는 이름이 {count}이 됐다.\n부르는 사람마다 다른 내가 하나씩 생긴다.),,제안,"story.js:1291-1297 nameCountLine D-969. 지금 가진 별명(잃지 않은 것)+상단 막내가 둘 이상이면 .1, 아니면 .2. count: 수 이름(둘·셋…열, story.js:1293 NAME_COUNT)"
+jt_name_count.2,jangteo,jt_name_count,너구리,(상단 막내. 길에서 받은 이름이 또 하나 생겼다.),,제안,
+jt_bueong_menu.1,jangteo,jt_bueong_menu,부엉 영감,오늘 밤 숙소 창고 문 앞을 지켜라.,,제안,"story.js:1314-1327 신표 뒤 밤·사연 켜짐 메뉴(도깨비 전 첫 줄 .1). 고르기는 조건 맞는 것만: c1 Bueong2 전, c2 Bueong2 뒤·Nal3 뒤·Bueong3 전, c3 Kid1 전, c4 Kid1 뒤·도깨비 뒤·Kid2 전, c5 Jj2·JjSalt 뒤·Jj4 전, c6 늘. 도깨비 뒤엔 첫 줄 jt_bueong_menu_boss(처음엔 jt_bueong_pay 와 jt_bueong_menu_more 를 이어서)"
+jt_bueong_menu.c1,jangteo,jt_bueong_menu,고르기,"아빠 메모의 ""값""을 묻는다",,제안,
+jt_bueong_menu.c2,jangteo,jt_bueong_menu,고르기,날쌘 아저씨 얘기를 꺼낸다,,제안,
+jt_bueong_menu.c3,jangteo,jt_bueong_menu,고르기,수첩 뒤의 물품 장부를 보여 드린다,,제안,
+jt_bueong_menu.c4,jangteo,jt_bueong_menu,고르기,장부에 적는 걸 지켜본다,,제안,
+jt_bueong_menu.c5,jangteo,jt_bueong_menu,고르기,문밖 손님 얘기를 꺼낸다,,제안,
+jt_bueong_menu.c6,jangteo,jt_bueong_menu,고르기,그만두기,,제안,
+jt_bueong_menu_boss.1,jangteo,jt_bueong_menu_boss,부엉 영감,{boss_word}제 몫을 했구나. 장부에 적어 두마.,,제안,"story.js:1322-1327 사연 켜짐 도깨비 뒤 첫 줄 D-141. boss_word: 도깨비 뒤 첫 인사 한 번(jxBueongBossWord)만, 달랬으면(calm:dokkaebi) .calm, 부쉈으면 .win 조각, 그 뒤엔 빈 글. 처음(jxBueongPaid 전)엔 뒤에 jt_bueong_pay 와 jt_bueong_menu_more, 아니면 이 줄에 jt_bueong_menu 고르기"
+jt_bueong_menu_boss.calm,jangteo,jt_bueong_menu_boss,조각,눈도깨비를 달래 보냈구나. 닳은 싸리비가 들썩였던 게지. ,,제안,
+jt_bueong_menu_boss.win,jangteo,jt_bueong_menu_boss,조각,창고가 조용하군. 남은 몽당 싸리비는 내다 태우마. ,,제안,
+jt_bueong_menu_more.1,jangteo,jt_bueong_menu_more,부엉 영감,더 물을 게 있느냐.,,제안,story.js:1327 처음 셈을 치른 뒤 끝줄(고르기는 jt_bueong_menu 것)
+jt_bueong_pay.1,jangteo,jt_bueong_pay,부엉 영감,창고 지킨 셈이다. 상단 몫으로 아껴 둔 잣이다.,,제안,story.js:1334-1335 bueongPay D-1440 창고 지킨 셈. 받는 줄은 receiveItem(jat 2)
+jt_bueong_pay.2,jangteo,jt_bueong_pay,너구리,{얻음 jat 2},,제안,
+jt_bueong_guard_plain.1,jangteo,jt_bueong_guard_plain,부엉 영감,그믐 밤엔 헌것들이 들썩인다. 오늘 밤 숙소 창고 문 앞을 지켜라.,,제안,"story.js:1329 사연 꺼짐, 신표 뒤 도깨비 전"
+jt_bueong_after_plain.1,jangteo,jt_bueong_after_plain,부엉 영감,수고했다. 제 몫을 하는 보부상이로구나. 장부에 적어 두마.,,제안,"story.js:1330-1332 사연 꺼짐 도깨비 뒤. .1 뒤에 처음(jxBueongPaid 전)이면 jt_bueong_pay, 끝에 .2"
+jt_bueong_after_plain.2,jangteo,jt_bueong_after_plain,부엉 영감,…늙으니 잣죽이 낫구나.\n쌀에 잣을 같이 갈아야 곱지.,,제안,hint:jatjuk (D-461)
+jt_morak_first.1,jangteo,jt_morak_first,모락,"어서 와, 꼬마야! 설 대목에 우리 맷돌이 쩍 갈라졌지 뭐야!",,제안,story.js:1038-1048 talkMorak 첫 만남(morakMet 전) D-566. ledger morak. 끝나고 쌀가루 3이 있으면 jt_morak_offer
+jt_morak_first.2,jangteo,jt_morak_first,모락,"쌀가루가 모자라 떡을 못 쪄. 떡을 못 쪄!\n쌀은 엿방울한테 있는데, 갈 맷돌이 없으니….",,제안,
+jt_morak_first.3,jangteo,jt_morak_first,너구리,맷돌이요? 맷돌은 저한테 있어요!,,제안,
+jt_morak_first.4,jangteo,jt_morak_first,너구리,(보따리를 열어 증조할아버지 맷돌을 보여 드렸다.),,제안,
+jt_morak_first.5,jangteo,jt_morak_first,모락,"어머, 진짜 맷돌이네! 그 작은 보따리에서?\n그럼 걱정 끝이다, 걱정 끝!",,제안,
+jt_morak_first.6,jangteo,jt_morak_first,모락,쌀만 구해서 세 됫박 갈아다 줘.\n섭섭잖게 갚을게!,,제안,
+jt_morak_wait.1,jangteo,jt_morak_wait,모락,"맷돌은 네가 있으니 됐고! 쌀가루 세 됫박만, 세 됫박만!\n쌀은 엿방울한테 있어!",,제안,"story.js:1051 쌀가루를 건네기 전, 쌀가루 3이 없을 때(있으면 jt_morak_offer)"
+jt_morak_offer.1,jangteo,jt_morak_offer,모락,"오, 쌀가루! 세 됫박만 나눠 줄래, 꼬마야?",,제안,story.js:1077-1079 morakGive 쌀가루 3이 있을 때. c1 교환 화면 t_morak(S3)
+jt_morak_offer.c1,jangteo,jt_morak_offer,고르기,보따리를 펼친다,,제안,
+jt_morak_offer.c2,jangteo,jt_morak_offer,고르기,아직은 안 줄래,,제안,
+jt_morak_powder.1,jangteo,jt_morak_powder,모락,"고맙다, 꼬마야! 맷돌로 갈아 왔구나?",,제안,"story.js:1080-1091 morakGiveNow 쌀가루 3 받음(rel morak +1) D-136. 단서 j1, 일기 j_morak. .4 뒤에 사연 켜짐이면 jt_morak_powder_arcs, 꺼짐이면 jt_morak_powder_plain. 끝나면 jt_morak_steam"
+jt_morak_powder.2,jangteo,jt_morak_powder,모락,"어이쿠, 그 시루! 금빛 테 두른 거…\n네 엄마 거 아니냐?",,제안,
+jt_morak_powder.3,jangteo,jt_morak_powder,너구리,엄마 시루예요. 어떻게 아세요?,,제안,
+jt_morak_powder.4,jangteo,jt_morak_powder,모락,네 아빠 따라 설 대목마다 그 시루째 이고 왔거든!\n네 엄마 떡 솜씨는 장터에서도 유명했지.,,제안,
+jt_morak_powder.clue,jangteo,jt_morak_powder,단서:모락,"모락: ""네 엄마 떡 솜씨는 장터에서도 유명했지. 근데 네 아빠는 엄마 얘기만 나오면 말을 돌리더라.""",,제안,j1
+jt_morak_powder.diary,jangteo,jt_morak_powder,일기,"떡집 모락은 엄마를 알았다. 아빠 따라 설 대목마다 금빛 테 시루째 떡을 이고 장에 왔단다. 엄마가 몇 해 안 오자 두 해 전 겨울 아빠에게 안부를 물었는데, 엄마 얘기만 나오면 말을 돌렸다고. 왜일까.",,제안,j_morak
+jt_morak_powder_arcs.1,jangteo,jt_morak_powder_arcs,모락,몇 해 안 오길래 두 해 전 겨울 네 아빠한테 물었더니\n엄마 얘기만 나오면 말을 돌리더라.,,제안,story.js:1090-1091 사연 켜짐 끝 두 줄
+jt_morak_powder_arcs.2,jangteo,jt_morak_powder_arcs,모락,아궁이로 와! 김을 고르게 올려 시루를 깨워 보자!,,제안,
+jt_morak_powder_plain.1,jangteo,jt_morak_powder_plain,모락,몇 해 안 오길래 두 해 전 겨울 네 아빠한테 물었더니\n엄마 얘기만 나오면 말을 돌리더라. 이상하지?,,제안,story.js:1090-1091 사연 꺼짐 끝 두 줄
+jt_morak_powder_plain.2,jangteo,jt_morak_powder_plain,모락,시루를 깨우려면 김부터 다룰 줄 알아야지!\n아궁이 앞으로 와. 내가 가르쳐 줄게.,,제안,
+jt_morak_steam.1,jangteo,jt_morak_steam,모락,"자, 네 시루를 우리 가마솥에 얹고!\n솥이랑 시루 사이 틈부터 막아야 해.",474,제안,"story.js:1006-1020 openSteam 김 올리기(손일, D-88) D-786. 그림 art.js siruPics 474(0)·475(1)·476(2)·477(3). 끝나면 소리(fan) 뒤 jt_morak_steam_done"
+jt_morak_steam.2,jangteo,jt_morak_steam,모락,"네가 갈아 온 쌀가루로 반죽을 갰어.\n길게 밀어서 틈에 붙여. 시룻번이야, 시룻번!",,제안,
+jt_morak_steam.3,jangteo,jt_morak_steam,너구리,(반죽을 길게 밀어 솥과 시루가 맞닿은 틈에\n꼭꼭 눌러 붙였다.),475,제안,
+jt_morak_steam.4,jangteo,jt_morak_steam,모락,"이제 불이야!\n부채는 조금씩, 조금씩 부쳐.",476,제안,
+jt_morak_steam.5,jangteo,jt_morak_steam,모락,김이 고르게 올라야 떡이 안 설어.\n한쪽으로 쏠리면 떡이 반만 익는다고!,,제안,
+jt_morak_steam.6,jangteo,jt_morak_steam,너구리,(부채를 살랑살랑 부치자 시루 구멍마다\n김이 고르게 올라온다.),477,제안,
+jt_morak_steam.7,jangteo,jt_morak_steam,너구리,(시루 테가 금빛으로 환해진다.\n엄마가 떡 찌던 날처럼 따뜻하다.),,제안,
+jt_morak_steam_retry.1,jangteo,jt_morak_steam_retry,모락,"자, 다시 해 보자! 부채질은 조금씩, 김은 고르게!",,제안,story.js:1052 쌀가루를 건넨 뒤 김 올리기를 마치지 못했을 때. c1 → jt_morak_steam
+jt_morak_steam_retry.c1,jangteo,jt_morak_steam_retry,고르기,다시 아궁이 앞에 앉는다,,제안,
+jt_morak_steam_retry.c2,jangteo,jt_morak_steam_retry,고르기,조금 이따가요,,제안,
+jt_morak_steam_think.1,jangteo,jt_morak_steam_think,속말,시루가 깨어났다! 쌀가루 둘에 팥 하나면 팥시루떡이다.,,제안,story.js:1025 finishSteam 시루가 깨어난 순간 속말(대화보다 먼저). awaken siru·ledgerDone morak·rel morak·learn morak:steam
+jt_morak_steam_done.1,jangteo,jt_morak_steam_done,모락,"옳지, 바로 그거야! 떡은 김이 반이지!",477,제안,story.js:1021-1036 finishSteam 깨어난 뒤 대화 D-786·D-461. 일기 j_siru. 이어서 조건에 따라 jt_morak_memil(_plain)·jt_morak_dad 줄을 붙인다
+jt_morak_steam_done.2,jangteo,jt_morak_steam_done,너구리,(시루가 따뜻해졌다. 이제 떡을 찔 수 있다.),,제안,
+jt_morak_steam_done.3,jangteo,jt_morak_steam_done,모락,우리 시룻밑은 해져서 김이 새.\n싸리 살에 짚 엮어 새로 깔아야 하는데.,-,제안,hint:sirumit (D-461) · 그림을 내린다
+jt_morak_steam_done.diary,jangteo,jt_morak_steam_done,일기,모락에게 김 올리는 법을 배웠다. 보따리 속 시루에 처음으로 김이 서렸다. 잔칫날의 시루가 깨어났다.,,제안,j_siru
+jt_morak_memil.1,jangteo,jt_morak_memil,모락,메밀가루 둘로 메밀떡을 쪄! 하나는 내가 줄게.,,제안,"story.js:1029-1031 호감(rel morak) 2 이상이고 메밀떡을 아직 안 배웠으면(morakTaught) 사연 켜짐. learn morak:memiltteok, 메밀가루 1은 addItem 으로 먼저 넣고 받는 줄은 보이기만 한다"
+jt_morak_memil.2,jangteo,jt_morak_memil,너구리,{얻음 memil_powder 1},,제안,
+jt_morak_memil.3,jangteo,jt_morak_memil,모락,밤마다 물건이 없어지잖아.\n도깨비 짓이면 메밀떡이 약이래. 챙겨 둬!,,제안,
+jt_morak_memil_plain.1,jangteo,jt_morak_memil_plain,모락,시루에 메밀가루 두 됫박이면 메밀떡이지! 한 됫박은 내가 얹어 줄게.,,제안,story.js:1029-1031 같은 자리 사연 꺼짐
+jt_morak_memil_plain.2,jangteo,jt_morak_memil_plain,너구리,{얻음 memil_powder 1},,제안,
+jt_morak_memil_plain.3,jangteo,jt_morak_memil_plain,모락,"할머니들 말로는 도깨비가 메밀을 좋아한대.\n밤마다 장터 물건이 사라지니, 메밀떡 좀 챙겨 둬 봐!",,제안,
+jt_morak_dad.1,jangteo,jt_morak_dad,모락,두 해 전 겨울 네 아빠가 굶은 채 지나가길래\n떡을 먹여 보냈지. …아이를 두고 왔다더라.,,제안,story.js:1032-1035 사연 켜짐·jangteoArcsMorak1 전이면 끝에 붙는다. 일기 jangteoArcsMorak1(대화 전에 적는다)
+jt_morak_dad.2,jangteo,jt_morak_dad,모락,"그 아이가 와서 내 김을 배우네.\n자, 먹고 해, 먹고!",,제안,
+jt_morak_dad.diary,jangteo,jt_morak_dad,일기,"모락과 김을 올렸다. 두 해 전 겨울 아빠도 여기서 떡을 먹고, 아이를 두고 왔다고 했단다.",,제안,jangteoArcsMorak1
+jt_morak_chat.1,jangteo,jt_morak_chat,모락,"아이고, 꼬마야! 시루로 떡 좀 쪄 봤어?\n떡은 김이 반인 거 알지?",,제안,story.js:1074-1075 따로 할 이야기가 없을 때 D-461
+jt_morak_chat.2,jangteo,jt_morak_chat,모락,설엔 빈대떡도 부쳐야지.\n녹두에 참기름 한 숟갈 넣고 갈아야 잘 부쳐져.,,제안,hint:mung_batter (D-461)
+jt_morak_quern.1,jangteo,jt_morak_quern,모락,돌가루? 마침 깨진 맷돌 틈을 못 메워서 애먹었는데!,,제안,story.js:1266-1271 morakQuernGive 교환 t_morak_quern(돌가루 1 → 약과 1) D-77. rel morak +1
+jt_morak_quern.2,jangteo,jt_morak_quern,너구리,(모락 아주머니가 돌가루를 물에 개어 맷돌 금에 꾹꾹 채운다.),,제안,
+jt_morak_quern.3,jangteo,jt_morak_quern,모락,"옳지, 이제 덜컹대지 않겠다!\n자, 약과 하나 가져가!",,제안,
+jt_morak_quern.4,jangteo,jt_morak_quern,너구리,{얻음 yakgwa 1},,제안,
+jt_yeot_first.1,jangteo,jt_yeot_first,엿방울,"엿 사려, 엿! 어라, 불부터 살려야겠네.",,제안,story.js:1128-1136 talkYeot 첫 만남(yeotMet 전) 낮(또는 사연 꺼짐·도깨비 뒤). ledger yeotbang. 끝나고 솔방울 5가 있으면 jt_yeot_offer
+jt_yeot_first.2,jangteo,jt_yeot_first,엿방울,엿 고느라 불을 오래 땠더니 솔방울이 동났지 뭐야~\n뒷산 솔방울 다섯 개면 다시 살리지.,,제안,
+jt_yeot_first.3,jangteo,jt_yeot_first,엿방울,엿 고고 남은 쌀 여덟 되랑 바꾸자~\n덤? 그야 엿장수 마음이지!,,제안,
+jt_yeot_first_hush.1,jangteo,jt_yeot_first_hush,엿방울,(수레 밑에서) 쉿… 밤엔 큰소리 못 내.\n너구리 꼬마구나~,,제안,story.js:1131-1133 첫 만남이 밤·사연 켜짐·도깨비 전일 때(수레 밑에서 속삭임) D-136
+jt_yeot_first_hush.2,jangteo,jt_yeot_first_hush,엿방울,불도 꺼졌고 솔방울도 동났어.\n뒷산 솔방울 다섯 개면 쌀 여덟 되랑 바꿔 줄게~,,제안,
+jt_yeot_wait.1,jangteo,jt_yeot_wait,엿방울,솔방울 다섯 개면 돼~ 뒷산 소나무 숲에 가 봐.,,제안,"story.js:1141 쌀 바꾸기 전, 솔방울 5가 없을 때(있으면 jt_yeot_offer)"
+jt_yeot_wait_hush.1,jangteo,jt_yeot_wait_hush,엿방울,(수레 밑에서) 솔방울 다섯 개야. 조용히 다녀와~,,제안,"story.js:1141 같은 자리, 밤·사연 켜짐·도깨비 전"
+jt_yeot_offer.1,jangteo,jt_yeot_offer,엿방울,"어라, 솔방울 챙겨 왔네? 다섯 개 주면 쌀 여덟 되~",,제안,story.js:1195-1197 yeotTrade 솔방울 5가 있을 때. c1 교환 화면 t_yeotbang(S3). 밤·사연 켜짐·도깨비 전이면 첫 줄은 jt_yeot_offer_hush
+jt_yeot_offer.c1,jangteo,jt_yeot_offer,고르기,보따리를 펼친다,,제안,
+jt_yeot_offer.c2,jangteo,jt_yeot_offer,고르기,아직은 안 줄래,,제안,
+jt_yeot_offer_hush.1,jangteo,jt_yeot_offer_hush,엿방울,솔방울 다섯 개랑 쌀 여덟 되. 조용히 바꿀래?,,제안,story.js:1196 밤·사연 켜짐·도깨비 전 첫 줄(고르기는 jt_yeot_offer 것)
+jt_yeot_trade.1,jangteo,jt_yeot_trade,엿방울,"좋아, 불부터 올리고!",,제안,"story.js:1113-1126 yeotTradeDone 솔방울 5 → 쌀 8(talkGive) D-291·D-565. 밤·사연 켜짐·도깨비 전이면 첫 줄은 jt_yeot_trade_hush. 사연 켜짐이면 끝에 jt_yeot_trade_arcs(처음 한 번), 꺼짐이면 아빠 엿 전(yeotHigh 전)엔 jt_yeot_dad"
+jt_yeot_trade.2,jangteo,jt_yeot_trade,너구리,(솔방울을 아궁이에 넣자 엿 솥이 다시 보글보글 끓는다.),,제안,
+jt_yeot_trade.3,jangteo,jt_yeot_trade,엿방울,"자, 엿 고고 남은 쌀 여덟 되. 약속한 네 몫~",,제안,
+jt_yeot_trade.4,jangteo,jt_yeot_trade,너구리,{얻음 ssal 8},,제안,
+jt_yeot_trade_hush.1,jangteo,jt_yeot_trade_hush,엿방울,(수레 밑에서) 고마워~ 불은 살짝만 올릴게.,,제안,story.js:1118 첫 줄(밤·사연 켜짐·도깨비 전)
+jt_yeot_trade_arcs.1,jangteo,jt_yeot_trade_arcs,엿방울,이 가위는 빌린 거라 소리가 영 심심하네~\n장단 한번 쳐 주고 싶어도 흥이 안 나.,,제안,story.js:1121-1123 사연 켜짐 jangteoArcsYeot1 처음. 일기 jangteoArcsYeot1
+jt_yeot_trade_arcs.diary,jangteo,jt_yeot_trade_arcs,일기,엿방울에게 솔방울을 주고 쌀 여덟 되를 받았다. 빌린 가위라 손에 덜 익는다고 했다.,,제안,jangteoArcsYeot1
+jt_yeot_dad.1,jangteo,jt_yeot_dad,너구리,"(쩔걱, 쩔꺽! 엿방울 아주머니가 가위 장단에 맞춰\n엿판을 메고 엉덩이를 들썩인다. 웃음이 터졌다.)",,제안,"story.js:1100-1112 dadYeotLines·dadYeotDone 사연 꺼짐: 웃긴 다음 아빠 엿(D-22·D-565). learn yeotbang:high, rel yeotbang +1, 단서 j2, 일기 j_yeot"
+jt_yeot_dad.2,jangteo,jt_yeot_dad,엿방울,"웃었다! 그럼 이제 꺼내도 되지~\n팔 건 아니고, 맡아 둔 거야.",,제안,
+jt_yeot_dad.3,jangteo,jt_yeot_dad,엿방울,너구리 아저씨가 아들 준다고 샀다가\n끝내 못 가져가고 맡겼어. 웃긴 다음에 주랬지.,,제안,
+jt_yeot_dad.4,jangteo,jt_yeot_dad,엿방울,눈매가 판박이라 진작 알았어~,,제안,
+jt_yeot_dad.5,jangteo,jt_yeot_dad,너구리,{얻음 dad_yeot 1},,제안,
+jt_yeot_dad.clue,jangteo,jt_yeot_dad,단서:엿방울,"아빠는 아들 주려고 엿을 샀다가, 끝내 못 가져가고 엿방울에게 맡겨 두었다.",,제안,j2
+jt_yeot_dad.diary,jangteo,jt_yeot_dad,일기,엿방울이 가위 장단을 쳐 나를 한바탕 웃기더니 숨겨 둔 가락엿을 꺼냈다. 아빠가 나 주려고 샀다가 끝내 못 가져가고 맡긴 엿이다.,,제안,j_yeot
+jt_yeot_dad_again.1,jangteo,jt_yeot_dad_again,엿방울,"어라, 너구리 꼬마~ 오늘은 꼭 웃겨 줘야겠네.",,제안,story.js:1159-1160 옛 저장: 사연 꺼짐인데 아빠 엿을 아직 못 받았을 때 첫 줄. 뒤에 jt_yeot_dad
+jt_yeot_after.1,jangteo,jt_yeot_after,엿방울,불쏘시개는 늘 필요하지~\n솔방울을 더 주우면 쌀도 더 바꿔 줄게.,,제안,"story.js:1509-1520 확장판 엿방울 talk 쌀을 바꾼 뒤(yeotDone). 쌀이 진행에 모자라면(riceNeeded) .1, 아니면 jt_yeot_after_full 줄. 밤·사연 켜짐·도깨비 전이면 jt_yeot_after_hide 줄. 고르기: c1 헌 물건(뿔·갓을 보인 뒤 남았을 때, D-1462), c2 수다 떨기(→ talkYeot), c3 riceNeeded 일 때만, c4 늘. D-663·D-79"
+jt_yeot_after.c1,jangteo,jt_yeot_after,고르기,헌 물건을 엿으로 바꾼다,,제안,
+jt_yeot_after.c2,jangteo,jt_yeot_after,고르기,수다 떨기,,제안,
+jt_yeot_after.c3,jangteo,jt_yeot_after,고르기,솔방울 5개로 쌀 8개 더 구하기,,제안,
+jt_yeot_after.c4,jangteo,jt_yeot_after,고르기,다음에,,제안,
+jt_yeot_after_full.1,jangteo,jt_yeot_after_full,엿방울,쌀은 넉넉해 보이는데~\n떡 찌다 모자라면 그때 와.,,제안,"story.js:1513 쌀이 넉넉할 때 첫 줄(고르기는 jt_yeot_after 것, c3 없음)"
+jt_yeot_after_hide.1,jangteo,jt_yeot_after_hide,너구리,(엿방울 아주머니는 수레 밑에서 꼬리 끝만 비죽 보인다.),,제안,"story.js:1513 밤·사연 켜짐·도깨비 전, 수레 밑에 숨었을 때(고르기는 jt_yeot_after 것) D-796"
+jt_yeot_more_none.1,jangteo,jt_yeot_more_none,엿방울,솔방울 다섯 개면 쌀 여덟 되야~\n솔숲이 비었으면 숙소에서 쉬고 와. 그새 또 떨어지거든.,,제안,story.js:1518 c3 를 골랐는데 솔방울이 다섯이 안 될 때
+jt_yeot_more.1,jangteo,jt_yeot_more,엿방울,"자, 쌀 여덟 되. 떡이야 또 찌면 되지~",,제안,"story.js:1202-1205 yeotMoreGive 교환 t_yeotbang_more(솔방울 5 → 쌀 8 더, D-79). 둘째 줄은 웹 글 그대로(받는 줄 모양이 아님)"
+jt_yeot_more.2,jangteo,jt_yeot_more,너구리,(쌀 여덟 되를 얻었다.),,제안,
+jt_yeot_menu.1,jangteo,jt_yeot_menu,엿방울,"엿 사려, 엿! 어라, 너구리 꼬마~\n엿 사러 왔어, 소문 사러 왔어?",,제안,"story.js:1142-1157 talkYeot 쌀을 바꾼 뒤 사연 켜짐(뿔·갓 이야기 전이면 먼저 jt_yeot_junk). 할 일이 있을 때만 고르게 한다(D-663). 첫 줄: 엿가위를 돌려준 뒤면 jt_yeot_menu_returned, 밤·도깨비 전이면 jt_yeot_menu_scared. 고르기: c1 밤·Yeot2 전, c2 Yeot2 뒤·(ScissorsFound 또는 도깨비 뒤)·YeotReturned 전, c3 Pair1 뒤·Pair2 전, c4 헌 물건(D-1462), c5 밤·Pair2·Yeot2 뒤·Pair3 전, c6 낮·Pair3·YeotReturned 뒤·Pair4 전, c7·c8 겁먹지 않았을 때. 할 일이 없으면 jt_yeot_chat"
+jt_yeot_menu.c1,jangteo,jt_yeot_menu,고르기,밤의 엿수레를 살핀다,,제안,
+jt_yeot_menu.c2,jangteo,jt_yeot_menu,고르기,창고에서 찾은 엿가위를 꺼낸다,,제안,
+jt_yeot_menu.c3,jangteo,jt_yeot_menu,고르기,모락 아주머니 떡을 건넨다,,제안,
+jt_yeot_menu.c4,jangteo,jt_yeot_menu,고르기,헌 물건을 엿으로 바꾼다,,제안,
+jt_yeot_menu.c5,jangteo,jt_yeot_menu,고르기,모락 아주머니 얘기를 묻는다,,제안,
+jt_yeot_menu.c6,jangteo,jt_yeot_menu,고르기,떡집 앞으로 따라간다,,제안,
+jt_yeot_menu.c7,jangteo,jt_yeot_menu,고르기,그냥 수다나 떨래요,,제안,
+jt_yeot_menu.c8,jangteo,jt_yeot_menu,고르기,그만두기,,제안,
+jt_yeot_menu_returned.1,jangteo,jt_yeot_menu_returned,엿방울,오늘은 가위가 손에 착 붙네~\n엿 늘이는 소리부터 다르지?,,제안,story.js:1155 엿가위를 돌려준 뒤(YeotReturned) 첫 줄(고르기는 jt_yeot_menu 것)
+jt_yeot_menu_scared.1,jangteo,jt_yeot_menu_scared,엿방울,"누, 누구야? …아, 너구리 꼬마구나~\n밤엔 엿 소리도 소곤소곤 내야 해.",,제안,story.js:1152-1156 밤·도깨비 전(수레 밑). 고르기는 jt_yeot_menu c1~c6 가운데 맞는 것 + 이 장면 c1(그만두기). 할 일이 없어도 이 줄
+jt_yeot_menu_scared.c1,jangteo,jt_yeot_menu_scared,고르기,그만두기,,제안,
+jt_yeot_junk_menu.1,jangteo,jt_yeot_junk_menu,엿방울,"그 헌 물건, 엿으로 바꿀 마음 생겼어~?",,제안,story.js:1161-1162 옛 저장 사연 꺼짐: 꺼내 보인 뿔·갓이 보따리에 남았을 때 D-1462
+jt_yeot_junk_menu.c1,jangteo,jt_yeot_junk_menu,고르기,헌 물건을 엿으로 바꾼다,,제안,
+jt_yeot_junk_menu.c2,jangteo,jt_yeot_junk_menu,고르기,수다 떨기,,제안,
+jt_yeot_junk_menu.c3,jangteo,jt_yeot_junk_menu,고르기,그만두기,,제안,
+jt_yeot_chat_1.1,jangteo,jt_yeot_chat_1,엿방울,설 쇠러 온 손님들이 요새 뭘 찾는 줄 알아?,,제안,"story.js:1165-1177 yeotChat 수다(말 걸 때마다 1→2→3→4 돌림, yeotChat) D-663"
+jt_yeot_chat_1.2,jangteo,jt_yeot_chat_1,엿방울,"정월엔 약식이지~ 쌀에 밤이랑 대추,\n시루에 쪄 내면 엿보다 달다니까?",,제안,hint:yaksik (D-461)
+jt_yeot_chat_2.1,jangteo,jt_yeot_chat_2,엿방울,"엿 늘이는 거 봤어? 당기고 접고, 당기고 접고~\n그래야 속에 구멍이 숭숭 나서 바삭해.",,제안,story.js:1171-1172 yeotChat 둘째
+jt_yeot_chat_2.2,jangteo,jt_yeot_chat_2,엿방울,사람도 좀 당겨 봐야 속을 알지~\n…너무 당기면 끊어지는 것도 똑같고.,,제안,
+jt_yeot_chat_3.1,jangteo,jt_yeot_chat_3,엿방울,"모락 떡이 달아, 내 엿이 달아?",,제안,story.js:1173 yeotChat 셋째
+jt_yeot_chat_3.2,jangteo,jt_yeot_chat_3,너구리,…둘 다요.,,제안,
+jt_yeot_chat_3.3,jangteo,jt_yeot_chat_3,엿방울,"어라, 벌써 장꾼 말솜씨네~\n그 대답이면 둘 다한테서 덤 받겠다.",,제안,
+jt_yeot_chat_4.1,jangteo,jt_yeot_chat_4,엿방울,"장터에선 귀로 먼저 장을 보는 거야~\n어디서 웃음이 나나, 어디서 한숨이 나나.",,제안,story.js:1174 yeotChat 넷째
+jt_yeot_chat_4.2,jangteo,jt_yeot_chat_4,엿방울,웃음 나는 좌판이 덤도 후하지.\n…내 좌판처럼~,,제안,
+jt_yeot_junk.1,jangteo,jt_yeot_junk,너구리,(엿장수는 헌 물건도 받고 엿을 내준다.\n보따리에서 {thing}을 꺼내 보였다.),,제안,"story.js:1178-1188 yeotJunk D-1462 얼음 뿔(nundok_horn, 엿방울에게 아직 안 줌)이 있으면 뿔, 없으면 검은 갓(broken_orb). thing: .horn 또는 .gat 조각. 둘째 줄은 jt_yeot_junk_horn 또는 jt_yeot_junk_gat, 끝은 jt_yeot_junk_ask. learn 대신 yeotJunkHeard"
+jt_yeot_junk.horn,jangteo,jt_yeot_junk,조각,얼음 뿔,,제안,
+jt_yeot_junk.gat,jangteo,jt_yeot_junk,조각,검은 갓,,제안,
+jt_yeot_junk_horn.1,jangteo,jt_yeot_junk_horn,엿방울,"어라, 녹지도 않는 얼음이네! 엿판 앞에 세워 두면\n구경꾼이 줄을 서겠는걸~",,제안,story.js:1186 얼음 뿔일 때
+jt_yeot_junk_gat.1,jangteo,jt_yeot_junk_gat,엿방울,"어라, 갓 한번 크다~ 수레 지붕에 걸어 두면\n지나가던 사람마다 고개를 돌리겠는걸~",,제안,story.js:1186 검은 갓일 때
+jt_yeot_junk_ask.1,jangteo,jt_yeot_junk_ask,엿방울,헌 물건이면 엿장수 몫이지~\n호박엿으로 넉넉히 쳐 줄게. 바꿀래?,,제안,"story.js:1187 끝줄. c1 교환 화면(t_yeotbang_horn·t_yeotbang_gat, S3)"
+jt_yeot_junk_ask.c1,jangteo,jt_yeot_junk_ask,고르기,보따리를 펼친다,,제안,
+jt_yeot_junk_ask.c2,jangteo,jt_yeot_junk_ask,고르기,아직은 안 줄래,,제안,
+jt_yeot_junk_give_horn.1,jangteo,jt_yeot_junk_give_horn,엿방울,이 뿔은 엿판 앞에 꽂아 둬야지~\n엿 녹을 걱정도 덜겠다!,,제안,"story.js:1189-1194 yeotJunkGive 얼음 뿔 → 호박엿 3(talkGive), rel yeotbang +1"
+jt_yeot_junk_give_horn.2,jangteo,jt_yeot_junk_give_horn,엿방울,"자, 호박엿 세 가락. 엿장수 마음이니 덤은 없어~",,제안,
+jt_yeot_junk_give_horn.3,jangteo,jt_yeot_junk_give_horn,너구리,{얻음 hobakyeot 3},,제안,
+jt_yeot_junk_give_gat.1,jangteo,jt_yeot_junk_give_gat,엿방울,이 갓은 수레 지붕에 걸어 둘래~\n갓 구경 왔다가 엿 사 가는 사람 생기겠다!,,제안,story.js:1189-1194 yeotJunkGive 검은 갓 → 호박엿 3
+jt_yeot_junk_give_gat.2,jangteo,jt_yeot_junk_give_gat,엿방울,"자, 호박엿 세 가락. 엿장수 마음이니 덤은 없어~",,제안,
+jt_yeot_junk_give_gat.3,jangteo,jt_yeot_junk_give_gat,너구리,{얻음 hobakyeot 3},,제안,
+jt_nal_first.1,jangteo,jt_nal_first,날쌘,"또 만났네, 꼬마 보부상. 여긴 설 대목이라 팥이 귀해.\n떡 찔 일 있거든 나한테 와.",,제안,story.js:1208-1212 talkNal 큰 장터 첫 만남(nalJTalk 전) 부엉 영감을 만나기 전(D-142). ledger nal_jangteo. 끝나면 jt_nal_menu
+jt_nal_first_arcs.1,jangteo,jt_nal_first_arcs,날쌘,"또 만났네, 꼬마 보부상. 여긴 설 대목이라 팥이 귀해.\n부엉 영감 고사떡엔 팥이 들어가야 하거든.",,제안,story.js:1211 부엉 영감을 만난 뒤(bueongMet)·사연 켜짐
+jt_nal_first_plain.1,jangteo,jt_nal_first_plain,날쌘,"또 만났네, 꼬마 보부상. 부엉 영감 고사떡엔\n팥이 꼭 들어가니, 이 대목엔 귀한 몸이지.",,제안,story.js:1211 부엉 영감을 만난 뒤·사연 꺼짐
+jt_nal_menu.1,jangteo,jt_nal_menu,날쌘,쌀가루 하나면 팥 하나. 메밀가루면 둘. 뭘 낼 건데?,,제안,"story.js:1214-1222 nalMenu 사연 켜짐·팥 바꾸기 전·가루 없음. 첫 줄 갈래는 jt_nal_menu_*(고르기는 이것). 고르기: c1 교환 화면(S3), c2 떡 재료 묶음을 아직 안 바꿨을 때(jxCraftMarket 전), c3 사연 켜짐·Bueong2 뒤·Nal3 전, c4 늘"
+jt_nal_menu.c1,jangteo,jt_nal_menu,고르기,보따리를 펼친다,,제안,
+jt_nal_menu.c2,jangteo,jt_nal_menu,고르기,떡 재료를 더 구할 데를 묻는다,,제안,
+jt_nal_menu.c3,jangteo,jt_nal_menu,고르기,부엉 영감님 장부 얘기를 꺼낸다,,제안,
+jt_nal_menu.c4,jangteo,jt_nal_menu,고르기,그만두기,,제안,
+jt_nal_menu_done.1,jangteo,jt_nal_menu_done,날쌘,팥 아껴 써. 부엉 영감은 빛깔까지 따지거든.,,제안,story.js:1219 사연 켜짐·팥을 바꾼 뒤(nalJDone)
+jt_nal_menu_powder.1,jangteo,jt_nal_menu_powder,날쌘,빈손은 아니네? 뭘 바꿀 건데?,,제안,story.js:1219 사연 켜짐·쌀가루나 메밀가루가 있을 때
+jt_nal_menu_plain.1,jangteo,jt_nal_menu_plain,날쌘,쌀가루 한 됫박엔 팥 한 되. 메밀가루면\n두 되 쳐줄게. 뭘 낼 건데?,,제안,story.js:1220 사연 꺼짐·팥 바꾸기 전·가루 없음
+jt_nal_menu_plain_done.1,jangteo,jt_nal_menu_plain_done,날쌘,팥 아껴 쓰고 고사떡 잘 쪄.\n부엉 영감은 팥 빛깔까지 따지니까.,,제안,story.js:1220 사연 꺼짐·팥을 바꾼 뒤
+jt_nal_menu_plain_powder.1,jangteo,jt_nal_menu_plain_powder,날쌘,빈손은 아니겠지? 뭘 내놓을 건데?,,제안,story.js:1220 사연 꺼짐·가루가 있을 때
+jt_nal_market.1,jangteo,jt_nal_market,날쌘,"꿀, 참기름, 팥. 한 줌씩 남았어.\n떡 찌기엔 모자라지 않을걸.",,제안,"story.js:1223-1241 marketCraftTrade 떡 재료 묶음을 물을 때 D-567·D-782. jxCraftMarketHeard. 엿방울 몫이 남았으면(yeotDone 전) 뒤에 jt_nal_market_keep. 끝줄은 솔방울이 넉넉하면(엿방울 몫 전 8, 뒤 3) _enough(_keep), 모자라면 _short(_keep)"
+jt_nal_market.2,jangteo,jt_nal_market,너구리,뭐랑 바꿔 줘요?,,제안,
+jt_nal_market.3,jangteo,jt_nal_market,날쌘,솔방울 셋.,,제안,
+jt_nal_market.4,jangteo,jt_nal_market,너구리,솔방울 셋에 세 가지를 다요?,,제안,
+jt_nal_market.5,jangteo,jt_nal_market,날쌘,눈 온 뒤로 장터 땔감이 죄다 젖었어.\n마른 솔방울은 송진이 배어서 젖은 장작에도 불을 붙이지.,,제안,
+jt_nal_market.6,jangteo,jt_nal_market,날쌘,그러니 이 대목엔 솔방울이 금값이야.\n마침 나도 밤에 불 피울 데가 있고.,,제안,
+jt_nal_market_keep.1,jangteo,jt_nal_market_keep,날쌘,"아, 하나 더. 엿방울이 솔방울 다섯 찾는다고\n온 장에 떠들던데. 그 다섯엔 손대지 마.",,제안,story.js:1237-1238 엿방울 몫이 남았을 때 끼우는 두 줄
+jt_nal_market_keep.2,jangteo,jt_nal_market_keep,날쌘,"엿방울 몫 다섯 먼저, 내 셋은 그다음.\n모두 여덟이야.",,제안,
+jt_nal_market_enough_keep.1,jangteo,jt_nal_market_enough_keep,날쌘,"여덟 다 있네. 다섯은 엿방울 거고, 셋만 내.",,제안,story.js:1239-1240 솔방울 8이 있고 엿방울 몫이 남았을 때. c1 교환 화면(S3)
+jt_nal_market_enough_keep.c1,jangteo,jt_nal_market_enough_keep,고르기,보따리를 펼친다,,제안,
+jt_nal_market_enough_keep.c2,jangteo,jt_nal_market_enough_keep,고르기,다음에,,제안,
+jt_nal_market_enough.1,jangteo,jt_nal_market_enough,날쌘,셋 다 묶어 줄게. 바꿀래?,,제안,story.js:1239-1240 솔방울 3이 있고 엿방울 몫이 끝났을 때. c1 교환 화면(S3)
+jt_nal_market_enough.c1,jangteo,jt_nal_market_enough,고르기,보따리를 펼친다,,제안,
+jt_nal_market_enough.c2,jangteo,jt_nal_market_enough,고르기,다음에,,제안,
+jt_nal_market_short_keep.1,jangteo,jt_nal_market_short_keep,날쌘,"다섯은 꼭 남겨 두고, 솔숲에서 셋 더 주워 와.",,제안,story.js:1239-1240 솔방울이 모자라고 엿방울 몫이 남았을 때
+jt_nal_market_short_keep.c1,jangteo,jt_nal_market_short_keep,고르기,알겠어요,,제안,
+jt_nal_market_short.1,jangteo,jt_nal_market_short,날쌘,솔숲에서 셋만 주워 와.,,제안,story.js:1239-1240 솔방울이 모자라고 엿방울 몫이 끝났을 때
+jt_nal_market_short.c1,jangteo,jt_nal_market_short,고르기,알겠어요,,제안,
+jt_nal_market_give.1,jangteo,jt_nal_market_give,너구리,"(꿀, 참기름, 팥을 하나씩 얻었다.)",,제안,"story.js:1242-1249 nalMarketGive 교환 t_craft_market(솔방울 3 → 꿀·참기름·팥 1씩, addItem) D-147·D-782. 묻기 전에 바로 바꿨으면 앞에 jt_nal_market_give_first. 둘째 줄은 웹 글 그대로(받는 줄 모양이 아님)"
+jt_nal_market_give.2,jangteo,jt_nal_market_give,날쌘,쌀가루에 꿀을 섞어 시루에 쪄 봐.\n어디 쓰든 그건 네 셈이고.,,제안,
+jt_nal_market_give_first.1,jangteo,jt_nal_market_give_first,날쌘,마른 솔방울 셋이라. 눈 온 뒤론 이게 금값이야.\n젖은 장작에도 불을 붙이거든.,,제안,story.js:1245-1248 묻기 전에 보따리에서 바로 바꿨을 때 앞 두 줄(D-147)
+jt_nal_market_give_first.2,jangteo,jt_nal_market_give_first,날쌘,마침 밤에 불 피울 데가 있어.\n한 줌씩 남은 거 묶어 줄게.,,제안,
+jt_nal_trade.1,jangteo,jt_nal_trade,날쌘,"자, 팥 {n}되. 거래 끝.",,제안,story.js:1250-1261 nalTrade 쌀가루로 팥 바꾸기 D-78·D-905·D-40. n: 받는 팥 수(숫자 그대로: (가루 몫 1 + 허세 덤 + 약과 덤)×k). 약과를 얹었으면 앞에 jt_nal_trade_yakgwa(k=1) 또는 _yakgwa_many(k>1). 끝에 jt_nal_trade_got
+jt_nal_trade_memil.1,jangteo,jt_nal_trade_memil,날쌘,돌너머 메밀가루네. 장터에선 귀하니까\n팥 {n}되 쳐줄게. 잘 받은 줄 알아.,,제안,"story.js:1260 메밀가루로 바꿀 때(몫 2, learn nal:jangteo-memil). n 은 숫자 그대로"
+jt_nal_trade_yakgwa.1,jangteo,jt_nal_trade_yakgwa,날쌘,"약과? …제법 빚었네.\n이건 팔 거 아니고, 내가 먹을게. 한 되 더 얹지.",,제안,"story.js:1258 쌀가루에 약과를 얹었을 때(k=1, D-78)"
+jt_nal_trade_yakgwa_many.1,jangteo,jt_nal_trade_yakgwa_many,날쌘,"약과가 {count} 개? …제법 빚었네.\n이건 팔 거 아니고, 내가 먹을게. 하나에 한 되씩 더 얹지.",,제안,"story.js:1258 약과를 여러 몫(k>1). count: k 의 수 이름(KO_COUNT, 둘·셋…)"
+jt_nal_trade_got.1,jangteo,jt_nal_trade_got,너구리,(팥 {count} 되를 얻었다.),,제안,story.js:1259 끝 받는 줄. count: 팥 수의 수 이름(KO_COUNT). 웹 글 그대로라 받는 줄 모양이 아님
+jt_maru_night.1,jangteo,jt_maru_night,너구리,(마루에서 기다리니 해가 졌다. 등불이 켜진다.),,제안,story.js:1273-1289 restMaru 숙소 마루에서 쉬어 밤으로(사연 켜짐) D-131. 끝나면 속말 jt_maru_think_night
+jt_maru_night_plain.1,jangteo,jt_maru_night_plain,너구리,(숙소 마루에서 해가 지기를 기다렸다. 장터에 하나둘 등불이 켜진다.),,제안,"story.js:1278 밤으로, 사연 꺼짐"
+jt_maru_seollal.1,jangteo,jt_maru_seollal,너구리,(마루에서 한숨 자고 나니 설날 아침이다.\n지붕마다 떡 김이 오른다.),,제안,story.js:1277-1278 도깨비를 물리친 뒤 첫 아침(jxSeollal 전) = 설날 아침. 끝나면 속말 jt_maru_think_seollal 또는 _refill
+jt_maru_morning.1,jangteo,jt_maru_morning,너구리,(마루에서 한숨 자고 나니 날이 밝았다.),,제안,story.js:1278 그 밖의 아침. 끝나면 속말 jt_maru_think_morning 또는 _refill
+jt_maru_think_night.1,jangteo,jt_maru_think_night,속말,밤이 됐다. 좌판이 접히니 골목이 트였네.,,제안,story.js:1287 밤이 된 뒤 속말
+jt_maru_think_seollal.1,jangteo,jt_maru_think_seollal,속말,설날 아침이다.,,제안,story.js:1281·1287 설날 아침 속말(솔방울을 다시 떨구지 않을 때)
+jt_maru_think_morning.1,jangteo,jt_maru_think_morning,속말,아침이 되었다.,,제안,story.js:1281·1287 아침 속말(솔방울을 다시 떨구지 않을 때)
+jt_maru_think_refill.1,jangteo,jt_maru_think_refill,속말,{morning} 솔숲에 새 솔방울이 떨어졌겠다.,,제안,story.js:1285-1287 아침에 진행 몫이 모자라 솔숲 솔방울을 다시 떨굴 때(D-79). morning: jt_maru_think_seollal.1 또는 jt_maru_think_morning.1 글
+jt_inn_fire_day.1,jangteo,jt_inn_fire_day,너구리,(재 속에 불씨를 묻어 두었다.\n밤에 다시 살려 때는가 보다.),,제안,"story.js:977-979 Rg.innFire 낮, 불을 살리기 전"
+jt_inn_fire_day_done.1,jangteo,jt_inn_fire_day_done,너구리,(재 속에 불씨를 묻어 두었다.\n밤에 또 살려 때겠지.),,제안,"story.js:979 낮, 불을 살린 뒤(jxInnFireDone)"
+jt_inn_fire_lit.1,jangteo,jt_inn_fire_lit,너구리,(불이 잘 탄다.\n아궁이 앞에 쭈그려 앉으니 볼이 다 뜨겁다.),,제안,"story.js:980 밤, 불을 살린 뒤"
+jt_inn_fire.1,jangteo,jt_inn_fire,너구리,(숙소 아궁이 불이 꺼져 간다.\n솔가지 몇 개가 겨우 타닥거린다.),,제안,"story.js:981-984 밤, 불을 살리기 전 첫 줄. 뒤에 솔방울 2가 있으면 jt_inn_fire_have, 없으면 jt_inn_fire_none"
+jt_inn_fire_have.1,jangteo,jt_inn_fire_have,너구리,(이대로면 방바닥이 식겠다.\n솔방울 두 개면 불이 살겠는데.),,제안,story.js:982 솔방울 2가 있을 때. c1 → jt_inn_fire_done
+jt_inn_fire_have.c1,jangteo,jt_inn_fire_have,고르기,솔방울 두 개를 넣는다,,제안,
+jt_inn_fire_have.c2,jangteo,jt_inn_fire_have,고르기,그냥 둔다,,제안,
+jt_inn_fire_none.1,jangteo,jt_inn_fire_none,너구리,(이대로면 방바닥이 식겠다.\n솔방울이 있으면 불쏘시개로 넣을 텐데.),,제안,story.js:983 솔방울이 없을 때
+jt_inn_fire_done.1,jangteo,jt_inn_fire_done,너구리,(솔방울을 넣고 후 불었다.\n송진에 불이 타닥 붙더니 불길이 확 일어난다.),,제안,"story.js:986-1001 innFireLit 솔방울 2 → 쌀 1(talkGive, 불 소리 fire_crackle). 부엉 영감을 만난 뒤(bueongMet). 만나기 전이면 jt_inn_fire_done_unmet. 일기 jx_inn_fire"
+jt_inn_fire_done.2,jangteo,jt_inn_fire_done,너구리,(불길이 방고래 안으로 쭉 빨려 들어간다.\n방이 데워지겠다.),,제안,
+jt_inn_fire_done.3,jangteo,jt_inn_fire_done,부엉 영감,…누가 아궁이를 살렸나 했더니 너로구나.,,제안,
+jt_inn_fire_done.4,jangteo,jt_inn_fire_done,부엉 영감,설 대목이라 길손이 곱절이다.\n땔감이 달려 아껴 때던 참이지.,,제안,
+jt_inn_fire_done.5,jangteo,jt_inn_fire_done,부엉 영감,셈은 셈이다. 솔방울 두 개 값으로\n부엌에서 쓰고 남은 쌀 한 되를 치르마.,,제안,
+jt_inn_fire_done.6,jangteo,jt_inn_fire_done,너구리,{얻음 ssal 1},,제안,
+jt_inn_fire_done.diary,jangteo,jt_inn_fire_done,일기,밤에 꺼져 가던 숙소 아궁이에 솔방울을 넣어 불을 살렸다. 설 대목이라 길손이 많아 땔감이 달렸단다. 부엉 영감님이 솔방울 값으로 쌀 한 되를 치러 주셨다.,,제안,jx_inn_fire
+jt_inn_fire_done_unmet.1,jangteo,jt_inn_fire_done_unmet,너구리,(솔방울을 넣고 후 불었다.\n송진에 불이 타닥 붙더니 불길이 확 일어난다.),,제안,story.js:990-998 부엉 영감을 만나기 전: 지문 한 줄을 끼우고 말하는이는 '마루 위 수리부엉이'(일기는 jt_inn_fire_done 것)
+jt_inn_fire_done_unmet.2,jangteo,jt_inn_fire_done_unmet,너구리,(불길이 방고래 안으로 쭉 빨려 들어간다.\n방이 데워지겠다.),,제안,
+jt_inn_fire_done_unmet.3,jangteo,jt_inn_fire_done_unmet,너구리,(마루 쪽에서 큰 수리부엉이가 이쪽을 보고 있었다.),,제안,
+jt_inn_fire_done_unmet.4,jangteo,jt_inn_fire_done_unmet,마루 위 수리부엉이,…누가 아궁이를 살렸나 했더니 너로구나.,,제안,
+jt_inn_fire_done_unmet.5,jangteo,jt_inn_fire_done_unmet,마루 위 수리부엉이,설 대목이라 길손이 곱절이다.\n땔감이 달려 아껴 때던 참이지.,,제안,
+jt_inn_fire_done_unmet.6,jangteo,jt_inn_fire_done_unmet,마루 위 수리부엉이,셈은 셈이다. 솔방울 두 개 값으로\n부엌에서 쓰고 남은 쌀 한 되를 치르마.,,제안,
+jt_inn_fire_done_unmet.7,jangteo,jt_inn_fire_done_unmet,너구리,{얻음 ssal 1},,제안,
+jt_lantern_hand.1,jangteo,jt_lantern_hand,늙은 까치,종이등은 내가 낮에 처마 밑에 모아 두었단다.,,제안,story.js:941-948 Rg.lanternHandLines 늙은 까치가 등 넷을 건넨다. jt_magpie_roof_now 뒤와 jt_lantern_greet c1 에서 쓴다. 끝나면 jxLanternStarted
+jt_lantern_hand.2,jangteo,jt_lantern_hand,너구리,(까치가 부리로 등 꾸러미 끈을 당겨 풀어 준다.\n종이등 넷을 품에 안았다.),,제안,
+jt_lantern_hand.3,jangteo,jt_lantern_hand,늙은 까치,"마당 어귀, 마루 앞, 처마 끝, 창고 쪽문 가는 길.\n빈 등걸이가 넷이란다. 하나씩 달아 다오.",,제안,
+jt_lantern_greet.1,jangteo,jt_lantern_greet,늙은 까치,"해가 졌구나, 아가. 약속한 등을 달아 주련?",,제안,story.js:949-955 Rg.lanternGreeting 밤·까치 만남을 마친 뒤(j_magpie)·등을 아직 안 받았을 때 인사 대신. c1 → jt_lantern_hand
+jt_lantern_greet.c1,jangteo,jt_lantern_greet,고르기,등을 받는다,,제안,
+jt_lantern_greet.c2,jangteo,jt_lantern_greet,고르기,조금 있다 올게요,,제안,
+jt_lantern_empty.1,jangteo,jt_lantern_empty,너구리,(빈 등걸이다. 걸 등이 없다.),,제안,story.js:960 Rg.lanternAction 등을 받기 전 등걸이(D-792)
+jt_lantern_lit.1,jangteo,jt_lantern_lit,너구리,(등이 잘 탄다. 다음 등걸이도 보인다.),,제안,story.js:961 이미 등을 단 등걸이
+jt_lantern_hang.alley,jangteo,jt_lantern_hang,너구리,(마당 어귀가 밝아졌다.\n골목에서 오는 길손도 대문을 찾겠다.),,제안,story.js:956-970 등 달기(손일 소리 뒤). 등걸이 id(field.js lanternPoints alley 마당 어귀·porch 마루 앞·pine 처마 끝·gate 창고 쪽문 길)마다 한 줄. 넷 다 달면 jt_lantern_done 을 잇는다 D-292
+jt_lantern_hang.porch,jangteo,jt_lantern_hang,너구리,(처마 아래 짐꾼들 발이 보인다.\n눈 묻은 신을 벗고 들어온다.),,제안,
+jt_lantern_hang.pine,jangteo,jt_lantern_hang,너구리,(처마 끝 고드름에 불빛이 맺혔다.\n멀리서도 반짝여 보이겠다.),,제안,
+jt_lantern_hang.gate,jangteo,jt_lantern_hang,너구리,(창고 쪽문 가는 길이 환해졌다.\n돌아올 땐 이 등을 보고 오면 되겠다.),,제안,
+jt_lantern_done.1,jangteo,jt_lantern_done,너구리,(불이 다 이어졌다.\n까치 어르신께 알려 드려야지.),,제안,story.js:964-968 넷을 다 단 뒤(jxLanternDone) 끝줄. 일기 jx_lanterns(D-968)
+jt_lantern_done.diary,jangteo,jt_lantern_done,일기,까치 어르신이 건넨 등 넷을 숙소 마당에 달았다. 불빛을 따라 늦은 길손들이 숙소로 들어왔다.,,제안,jx_lanterns
+jt_lantern_thanks.1,jangteo,jt_lantern_thanks,늙은 까치,"아가, 이리 오렴. 네 등을 보고 숙소를 찾은 길손이\n등 단 아이 주라고 이걸 맡기고 갔단다.",,제안,"story.js:928-940 lanternThanks 등을 다 단 뒤 까치 곁에 오면 한 번(jxLanternPaid, field.js 숙소 step) D-290"
+jt_lantern_thanks.2,jangteo,jt_lantern_thanks,너구리,(까치가 부리로 작은 보자기를 끌어 내민다.),,제안,
+jt_lantern_thanks.3,jangteo,jt_lantern_thanks,너구리,{얻음 gotgam 2},,제안,
+jt_lantern_thanks.4,jangteo,jt_lantern_thanks,늙은 까치,나는 나르기만 했으니 내 몫은 없단다.,,제안,
+jt_sangdan_caught.1,jangteo,jt_sangdan_caught,너구리,(등불 둘이 창고 마당으로 뛰어온다.\n말뚝 행수 아저씨와 종종이다.),,제안,"story.js:704-720 Rg.sangdanCaught 도깨비를 잡자마자(startDokkaebi 결과, jxSangdanCleared) D-568. 낮에 행수를 만났으면(jxSangdanMet) .1, 못 만났으면 첫 줄 jt_sangdan_caught_unmet. .2 뒤에 달랬으면 jt_sangdan_caught_calm, 부쉈으면 _win 한 줄, 끝은 jt_sangdan_caught_end"
+jt_sangdan_caught.2,jangteo,jt_sangdan_caught,말뚝 행수,이게 무슨 소란이냐! …이건 다 뭐냐?,,제안,
+jt_sangdan_caught_unmet.1,jangteo,jt_sangdan_caught_unmet,너구리,(등불 둘이 창고 마당으로 뛰어온다.\n패랭이 쓴 오소리 아저씨와 어린 수달이다.),,제안,story.js:709 행수를 못 만났을 때 첫 줄
+jt_sangdan_caught_calm.1,jangteo,jt_sangdan_caught_calm,너구리,(눈도깨비가 춤추듯 사라진 자리에\n없어졌던 자루들이 돌아와 있다.),,제안,story.js:711 달랬을 때
+jt_sangdan_caught_win.1,jangteo,jt_sangdan_caught_win,너구리,(눈 더미 속에 닳은 싸리비 한 자루.\n그 곁에 없어졌던 자루들이 쌓여 있다.),,제안,story.js:711 부쉈을 때
+jt_sangdan_caught_end.1,jangteo,jt_sangdan_caught_end,너구리,눈도깨비였어요. 몸을 감추고 들어와서\n자루를 가져갔어요.,,제안,story.js:712-719 남은 줄 D-860·D-760. 일기 jx_sangdan2·refreshGoal
+jt_sangdan_caught_end.2,jangteo,jt_sangdan_caught_end,너구리,발자국은 찍혀도 몸이 안 보이니까\n종종이가 못 본 게 당연해요.,,제안,
+jt_sangdan_caught_end.3,jangteo,jt_sangdan_caught_end,너구리,긴 옷자락이 눈에 끌려서\n빗자루 쓰는 소리가 났던 거예요.,,제안,
+jt_sangdan_caught_end.4,jangteo,jt_sangdan_caught_end,종종이,"사락사락… 그 소리였구나!\n거봐요, 나 안 졸았다니까요!",,제안,
+jt_sangdan_caught_end.5,jangteo,jt_sangdan_caught_end,너구리,(행수 아저씨가 종종이 앞에 등불을 내려놓는다.),,제안,
+jt_sangdan_caught_end.6,jangteo,jt_sangdan_caught_end,말뚝 행수,"내 셈이 틀렸다. 미안하다, 종종아.",,제안,
+jt_sangdan_caught_end.7,jangteo,jt_sangdan_caught_end,종종이,…그럼 저 설 지나도 상단에 있어요?,,제안,
+jt_sangdan_caught_end.8,jangteo,jt_sangdan_caught_end,말뚝 행수,있어라. 짐 지는 데 너만 한 녀석이 없다.,,제안,
+jt_sangdan_caught_end.9,jangteo,jt_sangdan_caught_end,말뚝 행수,"상단 막내, 장꾼들 물건을 찾았으니 상단 신용도 네가 찾았다.\n날 밝거든 숙소로 오너라. 셈은 맞춰야지.",,제안,
+jt_sangdan_caught_end.diary,jangteo,jt_sangdan_caught_end,일기,"창고를 털던 눈도깨비를 잡자 말뚝 행수와 종종이가 등불을 들고 달려왔다. 종종이가 들었다던 사락사락 소리는 몸을 감춘 도깨비의 긴 옷자락이 눈에 끌리던 소리였다. 행수는 종종이에게 미안하다고 했고, 종종이는 설 지나도 상단에 남는다.",,제안,
+jt_haengsu_night.1,jangteo,jt_haengsu_night,말뚝 행수,날 밝거든 숙소로 오너라. 셈은 맞춰야지.,,제안,story.js:761 도깨비를 잡은 그믐 밤 창고 마당의 행수(밤·jxSangdanCleared)
+jt_jongjong_night.1,jangteo,jt_jongjong_night,종종이,나 안 졸았다고 했지!\n…너도 안 졸았지?,,제안,story.js:762 도깨비를 잡은 그믐 밤 창고 마당의 종종이
+jt_haengsu_morning.1,jangteo,jt_haengsu_morning,말뚝 행수,왔구나. 장꾼들이 물건 찾아가며 너한테 고맙다고들 하더라.,,제안,"story.js:721-743 haengsuMorning 날 밝은 뒤 처음(jxSangdanPaid 전) D-1440·D-290. 받는 줄은 receiveItem(곶감 2·솔방울청 1). 끝줄 고르기 LEAVE_CHOICE: c1 → jt_leave, c2 jxLeaveLater. 일기 jx_sangdan3"
+jt_haengsu_morning.2,jangteo,jt_haengsu_morning,말뚝 행수,상단은 셈을 늘 맞춘다.\n고사상에서 물린 곶감이다.,,제안,
+jt_haengsu_morning.3,jangteo,jt_haengsu_morning,너구리,{얻음 gotgam 2},,제안,
+jt_haengsu_morning.4,jangteo,jt_haengsu_morning,말뚝 행수,이건 솔방울청. 상단 행렬이 겨울 고개 넘을 때\n기침 나면 한 숟갈씩 먹는 거다.,,제안,
+jt_haengsu_morning.5,jangteo,jt_haengsu_morning,너구리,{얻음 solbang_cheong 1},,제안,
+jt_haengsu_morning.6,jangteo,jt_haengsu_morning,말뚝 행수,…종종이 일은 내가 장부에 따로 적었다.\n틀린 셈도 적어 둬야 다음에 안 틀리지.,,제안,
+jt_haengsu_morning.7,jangteo,jt_haengsu_morning,너구리,"아저씨, 이 모자 쓴 너구리 보부상 보신 적 있어요?\n우리 아빠예요. 북쪽 영산에 갔대요.",,제안,
+jt_haengsu_morning.8,jangteo,jt_haengsu_morning,말뚝 행수,그 모자… 어디서 봤나 했더니.\n두 해 전 겨울 그 양반이다.,,제안,
+jt_haengsu_morning.9,jangteo,jt_haengsu_morning,말뚝 행수,우리 행렬 따라 북쪽 고갯마루까지 같이 걸었지.\n갈림길에서 혼자 영산 쪽 눈길로 들더라.,,제안,
+jt_haengsu_morning.10,jangteo,jt_haengsu_morning,말뚝 행수,짐은 영감한테 맡기고 몸만 가볍게.\n걸음이 꽤 급했다.,,제안,
+jt_haengsu_morning.11,jangteo,jt_haengsu_morning,말뚝 행수,설 쇠고 떠나는 행렬이 또 그 고개를 넘는다.\n갈림길까지는 같이 가자. 채비되면 말해라.,,제안,
+jt_haengsu_morning.c1,jangteo,jt_haengsu_morning,고르기,같이 갈게요. 채비됐어요,,제안,
+jt_haengsu_morning.c2,jangteo,jt_haengsu_morning,고르기,인사하고 올게요,,제안,
+jt_haengsu_morning.diary,jangteo,jt_haengsu_morning,일기,"날이 밝자 말뚝 행수가 상단 셈으로 곶감과 솔방울청을 치러 주었다. 두 해 전 겨울 아빠는 상단 행렬과 북쪽 고갯마루까지 같이 걷다가, 갈림길에서 혼자 영산 쪽 눈길로 들었다고 한다. 설 쇠고 떠나는 행렬이 그 고개를 또 넘는다. 갈림길까지 같이 가기로 했다.",,제안,jx_sangdan3
+jt_haengsu_leave.1,jangteo,jt_haengsu_leave,말뚝 행수,설 쇠고 떠나는 행렬에 네 자리도 있다.\n…그 보따리면 짐꾼 열은 몫이겠다만.,,제안,story.js:728 셈을 받은 뒤 다시 말 걸 때(LEAVE_CHOICE)
+jt_haengsu_leave.c1,jangteo,jt_haengsu_leave,고르기,같이 갈게요. 채비됐어요,,제안,
+jt_haengsu_leave.c2,jangteo,jt_haengsu_leave,고르기,인사하고 올게요,,제안,
+jt_jongjong_morning.1,jangteo,jt_jongjong_morning,종종이,엄마한테 할 말이 생겼어. 상단에 남는다고!,,제안,story.js:744-752 jongjongMorning 날 밝은 뒤 처음(jxJongPaid 전) talkGive. 일기 jx_sangdan4
+jt_jongjong_morning.2,jangteo,jt_jongjong_morning,종종이,"이거, 밤 지킬 때 품에 넣던 군밤이야.\n이제 밤샘은 끝났으니 너 먹어.",,제안,
+jt_jongjong_morning.3,jangteo,jt_jongjong_morning,너구리,{얻음 gunbam 2},,제안,
+jt_jongjong_morning.diary,jangteo,jt_jongjong_morning,일기,종종이가 밤을 지킬 때 품에 넣던 군밤을 주었다. 상단에 남는다고 엄마한테 말할 거라고 했다.,,제안,
+jt_jongjong_morning_again.1,jangteo,jt_jongjong_morning_again,종종이,오늘부터 다시 짐 진다! 어깨가 근질근질해.,,제안,story.js:746 그 뒤
+jt_leave.1,jangteo,jt_leave,말뚝 행수,"상단 행렬, 떠난다!",,제안,story.js:1472-1479 leaveWithSangdan 상단 행렬을 따라 떠남(끝) D-1440. 일기 j_end 를 먼저 적고 끝나면 endGame
+jt_leave.2,jangteo,jt_leave,너구리,(종종이가 등짐을 추스르며 앞장선다.\n붉은 등불 아래로 행렬이 북쪽 고개로 향한다.),,제안,
+jt_leave.3,jangteo,jt_leave,너구리,(아빠도 이 길을 걸었겠지.\n고갯마루에서 영산 쪽 눈길로.),,제안,
+jt_leave.diary,jangteo,jt_leave,일기,"설날 아침, 상단 행렬을 따라 큰 장터를 떠났다. 두 해 전 겨울 아빠도 상단 행렬과 북쪽 고갯마루까지 걸었다고 한다. 고갯마루 갈림길에서 영산 쪽 눈길로 들면, 영산까지 닷새다.",,제안,j_end
+jt_magpie_tteok_night.1,jangteo,jt_magpie_tteok_night,너구리,"까치 어르신, 모락 아주머니가\n엄마 몫 설 떡을 싸 주셨어요.",,제안,"story.js:1441-1447 Rg.magpieTteok 사연 켜짐·도깨비 뒤·Morak2 뒤·Morak3 전·home:jangteo 전, 밤. 까치에게 말 걸 때와 곁에 올 때(field.js 숙소 step, 밤 한 번 jxMagpieNight). c1 jxMagpieNight"
+jt_magpie_tteok_night.2,jangteo,jt_magpie_tteok_night,늙은 까치,늙은 날개로 밤길은 못 난단다.\n아침 김 오를 때 오너라. 날라다 주마.,,제안,
+jt_magpie_tteok_night.c1,jangteo,jt_magpie_tteok_night,고르기,아침에 올게요,,제안,
+jt_magpie_tteok.1,jangteo,jt_magpie_tteok,너구리,"까치 어르신, 모락 아주머니가\n엄마 몫 설 떡을 싸 주셨어요.",,제안,"story.js:1448-1449 같은 조건, 낮. greet: 설이 지났으면(jxSeollalPast) .past, 아니면 .seollal 조각. c1 → jt_send_tteok, c2 jxMagpieMorning"
+jt_magpie_tteok.2,jangteo,jt_magpie_tteok,늙은 까치,{greet} 이제 날 수 있겠다.\n네 엄마한테 날라다 주마.,,제안,
+jt_magpie_tteok.c1,jangteo,jt_magpie_tteok,고르기,설 떡을 맡긴다,,제안,
+jt_magpie_tteok.c2,jangteo,jt_magpie_tteok,고르기,조금 이따가요,,제안,
+jt_magpie_tteok.past,jangteo,jt_magpie_tteok,조각,날이 밝았구나.,,제안,
+jt_magpie_tteok.seollal,jangteo,jt_magpie_tteok,조각,설날 아침이구나.,,제안,
+jt_send_tteok.1,jangteo,jt_send_tteok,너구리,(설 떡 보자기를 까치 어르신 발에 단단히 묶었다.),,제안,"story.js:1451-1463 sendSeolTteok jangteoArcsMorak3, learn home:jangteo, homeGifts.jangteo. 일기 home:jangteo 는 대화 전(.diary_home), jangteoArcsMorak3 는 끝난 뒤(.diary)"
+jt_send_tteok.2,jangteo,jt_send_tteok,너구리,엄마한테 전해 주세요.\n장터 떡집 아주머니가 엄마 몫으로 싸 주셨다고요.,,제안,
+jt_send_tteok.3,jangteo,jt_send_tteok,늙은 까치,오냐. 그 말까지 단단히 묶어 가마.,,제안,
+jt_send_tteok.4,jangteo,jt_send_tteok,너구리,(까치 어르신이 남쪽으로 날아갔다.\n…답은 한참 걸리겠지.),,제안,
+jt_send_tteok.diary_home,jangteo,jt_send_tteok,일기,모락 아주머니가 싸 준 엄마 몫 설 떡을 까치 편에 집으로 보냈다.,,제안,home:jangteo
+jt_send_tteok.diary,jangteo,jt_send_tteok,일기,모락 아주머니가 싸 준 엄마 몫 설 떡을 설날 아침 까치 어르신 편에 집으로 보냈다.,,제안,jangteoArcsMorak3
+jt_home_reply.1,jangteo,jt_home_reply,너구리,(까치 어르신이 빈 떡보자기를 물고 돌아왔다.),,제안,"story.js:1464-1471 Rg.homeReply·homeReplyText 영산 첫 쉼터에서 받는 엄마 답장(deliverHomeReply) D-89·D-131·D-1440. 설 떡을 보냈으면 .1, 다른 가공품이면 첫 줄은 jt_home_reply_cloth. .5 는 설 떡일 때만. 일기는 homeReplyText"
+jt_home_reply.2,jangteo,jt_home_reply,너구리,(엄마가 빨아 갠 보자기에 말린 감 꼭지가 싸여 있다.),,제안,
+jt_home_reply.3,jangteo,jt_home_reply,너구리,"(까치가 엄마처럼 날개를 볼에 대고 끄덕인다.\n그러고는 부리를 열었다가, 그냥 닫는다.)",,제안,
+jt_home_reply.4,jangteo,jt_home_reply,너구리,(엄마가 아침마다 내 이름 앞에서 하던 거다.),,제안,
+jt_home_reply.5,jangteo,jt_home_reply,너구리,(…그래도 설 떡은 맛있게 드셨구나.),,제안,
+jt_home_reply.diary,jangteo,jt_home_reply,일기,"까치가 빈 떡보자기를 물고 돌아왔다. 엄마가 빨아 갠 보자기에는 말린 감 꼭지 하나가 싸여 있었다. 까치는 엄마처럼 날개를 볼에 대고 고개를 끄덕이더니, 부리를 열었다가 그냥 닫았다. 엄마가 아침마다 내 이름 앞에서 하던 몸짓이다.",,제안,
+jt_home_reply_cloth.1,jangteo,jt_home_reply_cloth,너구리,(까치 어르신이 빈 보자기를 물고 돌아왔다.),,제안,story.js:1467 설 떡이 아닌 것을 보냈을 때 첫 줄
