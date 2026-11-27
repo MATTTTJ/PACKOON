@@ -2642,3 +2642,245 @@ jt_baduk_watch2.1,jangteo,jt_baduk_watch2,너구리,(흰눈썹 할아버지가 �
 jt_baduk_watch3.1,jangteo,jt_baduk_watch3,너구리,(두 할아버지가 같은 자리를 동시에 짚는다.\n…둘 다 손을 안 뗀다.),,제안,story.js:789 B_WATCH 셋째
 jt_baduk_watch3.2,jangteo,jt_baduk_watch3,곰방대 노인,내가 먼저 짚었다.,,제안,
 jt_baduk_watch3.3,jangteo,jt_baduk_watch3,흰눈썹 노인,내 손톱이 먼저 닿았다.,,제안,
+jt_exam_kite_tail_stuck.1,jangteo,jt_exam_kite_tail_stuck,너구리,방패연 꼬리가 처마 못에 두 바퀴 감겼다.\n아래 아이에게 줄을 느슨하게 잡아 달라고 하자.,468,제안,"region.js:482-484 살펴보기 j_kite_tail '연 꼬리 확인하기'(입구, 처마 못 설계 1220·높이 112) 처마로 가기로 하기 전(jxKiteStarted 전) D-1435·D-1505. 그림 468(kitePics.stuck, 소리 pic_kite)"
+jt_exam_kite_tail.1,jangteo,jt_exam_kite_tail,너구리,"못에 감긴 꼬리를 한 바퀴, 두 바퀴 풀었다.\n꼬리가 빠지자 연이 얼레 쪽으로 흔들흔들 내려간다.",469,제안,region.js:486-488 처마로 가기로 한 뒤 처음(여기서 jxKiteFreed 를 켠다) D-780. 그림 469(kitePics.free). 뒤에 얼레에게 말 걸면 jt_kite_fix
+jt_exam_kite_tail.2,jangteo,jt_exam_kite_tail,너구리,처마 못에 연 종이 부스러기가 걸려 있다.\n여기에 모서리가 찢겼구나.,,제안,
+jt_exam_kite_tail_freed.1,jangteo,jt_exam_kite_tail_freed,너구리,처마 못에 연 종이 부스러기가 걸려 있다.\n꼬리는 벌써 풀어서 연은 내려갔다.,,제안,region.js:485 꼬리를 푼 뒤 다시 살필 때 D-1505
+jt_exam_jangseung.1,jangteo,jt_exam_jangseung,너구리,내 키만 한 작은 장승이다. 머리에도 어깨에도 눈인데\n코끝만 맨나무가 드러나 반들반들하다.,471,제안,"region.js:490-497 살펴보기 j_jangseung_snow '작은 장승'(입구 출구 가까이 설계 2340) D-661·D-781·D-662. 그림 471(jangseungPic, 톡 소리는 그림이 낸다)"
+jt_exam_jangseung.2,jangteo,jt_exam_jangseung,너구리,짐꾼들이 지나가며 코를 톡 짚고 들어가나 봐.\n나도 톡 짚었다. …차갑다.,,제안,
+jt_exam_stall_gap.1,jangteo,jt_exam_stall_gap,너구리,좌판 기둥 밑에 콩알이 여기저기 흩어져 있다.\n장터 바닥에 웬 콩이지?,485,제안,region.js:500-508 살펴보기 j_stall_gap '좌판 사이 골목'(거리 설계 340) 도깨비 전 낮 D-783·D-860. 그림 485(examinePics.beans)
+jt_exam_stall_gap.2,jangteo,jt_exam_stall_gap,너구리,여긴 콩 파는 좌판도 아닌데.\n누가 여기 콩 자루를 기대 뒀다 가져갔나?,,제안,
+jt_exam_stall_gap.3,jangteo,jt_exam_stall_gap,너구리,기둥 둘레 눈밭에 큰 발자국이 찍혀 있다.\n내 발 셋을 이어 놓은 만큼 크다.,,제안,
+jt_exam_stall_gap_night.1,jangteo,jt_exam_stall_gap_night,너구리,차일을 걷고 판을 접으니 골목이 휑하다.\n좌판 기둥 밑 콩알만 그대로 흩어져 있다.,485,제안,region.js:505-507 도깨비 전 밤(첫 줄만 다르다). 그림 485(밤 판 그림은 아직 없음)
+jt_exam_stall_gap_night.2,jangteo,jt_exam_stall_gap_night,너구리,여긴 콩 파는 좌판도 아닌데.\n누가 여기 콩 자루를 기대 뒀다 가져갔나?,,제안,
+jt_exam_stall_gap_night.3,jangteo,jt_exam_stall_gap_night,너구리,기둥 둘레 눈밭에 큰 발자국이 찍혀 있다.\n내 발 셋을 이어 놓은 만큼 크다.,,제안,
+jt_exam_stall_gap_after.1,jangteo,jt_exam_stall_gap_after,너구리,기둥 밑에 흩어져 있던 콩알이 말끔히 치워졌다.,485,제안,region.js:504 도깨비 뒤. 그림 485(콩이 치워진 판 그림은 아직 없음)
+jt_exam_stall_gap_after.2,jangteo,jt_exam_stall_gap_after,너구리,밤마다 여기 콩 자루를 기대 두던 게 누구였는지\n이젠 알 것 같다.,,제안,
+jt_exam_onggi.1,jangteo,jt_exam_onggi,너구리,독을 손끝으로 퉁기니 맑게 운다.\n울림이 좌판 끝까지 퍼져 나간다.,472,제안,"region.js:509-514 살펴보기 j_onggi '옹기전 독'(거리 설계 575) D-972·D-784·D-1506. 그림 472(onggiPic, 소리 onggi_ring, 배경음 music_duck_onggi)"
+jt_exam_onggi.2,jangteo,jt_exam_onggi,너구리,금 간 독은 둔하게 운다고 한다.\n그래서 장꾼이 하나씩 퉁겨 보고 판다.,,제안,
+jt_exam_flour.1,jangteo,jt_exam_flour,너구리,아궁이 앞 발판에 쌀가루가 하얗게 앉았다.\n그 위에 큰 곰 발자국이 이리저리 어지럽다.,473,제안,"region.js:515-519 살펴보기 j_steam_flour '쌀가루 묻은 발판'(떡집 아궁이 앞 설계 1478) 시루가 깨기 전 D-785·D-862. 그림 473(flourPic, 소리 j_steam_flour)"
+jt_exam_flour.2,jangteo,jt_exam_flour,너구리,모락이 아궁이 앞을 몇 번이나 오갔을까.,,제안,
+jt_exam_flour_siru.1,jangteo,jt_exam_flour_siru,너구리,아궁이 앞 발판에 쌀가루가 하얗다.\n큰 곰 발자국 사이에 내 작은 발자국도 섞였다.,473_v1,제안,region.js:518 시루가 깨어난 뒤. 그림 473_v1(작은 발자국이 섞인 판)
+jt_exam_flour_siru.2,jangteo,jt_exam_flour_siru,너구리,모락이랑 김을 올린 자리라\n발판이 아직 따뜻하다.,,제안,
+jt_exam_pillar.1,jangteo,jt_exam_pillar,너구리,"기둥에 작은 금이 층층이 그어져 있다.\n짐 높이를 잰 걸까, 해마다 온 아이들 키일까?",481,제안,"region.js:525 살펴보기 j_inn_pillar '기둥의 키 자국'(숙소 설계 1210). 그림 481(examinePics.pillar, 밤 판 그림은 아직 없음)"
+jt_exam_stable_night.1,jangteo,jt_exam_stable_night,너구리,나귀가 선 채로 졸다가 귀만 쫑긋한다.\n여물통에 짚이 반쯤 남았다.,,제안,region.js:527 살펴보기 j_inn_stable '마구간 나귀'(숙소 설계 2110) 밤
+jt_exam_stable.1,jangteo,jt_exam_stable,너구리,짐을 부린 나귀가 여물을 씹는다.\n숙소에 묵는 보부상들은 짐을 나귀에 실어 온다.,,제안,region.js:527 낮
+jt_exam_branch.1,jangteo,jt_exam_branch,너구리,눈 아래 가지 하나가 부러져 있다.\n진한 송진 냄새. 코끝이 얼얼하다.,482,제안,region.js:530-531 살펴보기 j_pine_scent1 '부러진 솔가지'(솔숲 설계 1730) 알밤이와 찾기 전. 그림 482(examinePics.branch)
+jt_exam_branch_boar.1,jangteo,jt_exam_branch_boar,너구리,솔가지에 쌓인 눈을 손바닥으로 털었다.\n알밤이가 코를 들고 마른 솔잎 쪽으로 간다.,482_v1,제안,region.js:532 알밤이와 찾기 시작한 뒤(jxBoarStarted): 여기서 jxBoarScent1 을 켠다. 그림 482_v1
+jt_exam_needles.1,jangteo,jt_exam_needles,너구리,큰 바위 밑에 마른 솔잎이 모였다.\n바람은 여기를 비켜 가는 모양이다.,483,제안,region.js:534-535 살펴보기 j_pine_scent2 '눈 아래 마른 솔잎'(솔숲 설계 1870) 솔가지 냄새 전. 그림 483(examinePics.needles)
+jt_exam_needles_boar.1,jangteo,jt_exam_needles_boar,너구리,마른 솔잎 아래에서 따뜻한 풀 냄새가 났다.\n알밤이가 오른쪽 잠자리를 알아보고 뛰어간다.,483,제안,region.js:536 솔가지 냄새를 찾은 뒤(jxBoarScent1): 여기서 jxBoarScent2 를 켠다. 그림 483(냄새가 오르는 판 그림은 아직 없음)
+jt_exam_pine_scale.1,jangteo,jt_exam_pine_scale,너구리,솔방울 비늘이 바위 틈에 차곡차곡 끼었다.\n작은 발자국 아래에는 훨씬 오래된 붉은 자국이 있다.,,제안,region.js:538 살펴보기 j_pine_scale '큰 바위의 솔방울 비늘'(솔숲 설계 2280·높이 128)
+jt_exam_rope.1,jangteo,jt_exam_rope,너구리,장꾼들이 좌판 끈 끝을 한데 묶어 바구니에 담아 두었다.\n아침엔 이걸 풀어 다시 장을 펼치겠지.,,제안,region.js:541 살펴보기 j_warehouse_rope '접어 둔 좌판 끈'(창고 마당 설계 400)
+jt_exam_fire_lit.1,jangteo,jt_exam_fire_lit,너구리,내가 다시 지핀 짐꾼 화톳불이다.\n여기서면 창고 문이 잘 보인다.,,제안,region.js:542-543 살펴보기 j_warehouse_fire '짐꾼 화톳불 자리'(창고 마당 설계 1780 = 쉼터) 쉼터 불을 지핀 뒤(restLit.jangteo)·도깨비 전 D-1304
+jt_exam_fire.1,jangteo,jt_exam_fire,너구리,짐꾼들이 짐을 부리며 쬐던 화톳불 자리다.\n재 속에 군밤 껍질이 묻혀 아직 따뜻하다.,,제안,region.js:543 그 밖
+jt_exam_store_door.1,jangteo,jt_exam_store_door,너구리,눈 위에 큰 발자국이 찍혀 창고 문 앞만 빙빙 돌았다.\n발자국 곁으로 빗자루로 쓴 듯한 자국이 끌려 있다.,484,제안,"region.js:544 살펴보기 j_warehouse_scratches '창고 문 앞 큰 발자국'(창고 마당 설계 1230) 도깨비 전. 그림 484(examinePics.storeDoor, 밤 판 그림은 아직 없음)"
+jt_exam_store_door_scissors.1,jangteo,jt_exam_store_door_scissors,너구리,창고 문 옆에 돌아온 물건들이 놓였다.\n그 사이에 날이 반질한 엿가위 하나. 장터 엿장수 거겠지?,484_v1,제안,region.js:544 도깨비 뒤·사연 켜짐·엿가위를 돌려주기 전(YeotReturned 전) D-136. 그림 484_v1(엿가위 판 그림은 아직 없음)
+jt_exam_store_door_after.1,jangteo,jt_exam_store_door_after,너구리,창고 문 옆에 돌아온 물건들이 놓였다.\n아침에 찾아갈 자리가 저마다 비어 있다.,484_v1,제안,region.js:544 도깨비 뒤 그 밖. 그림 484_v1
+jt_exam_mended.1,jangteo,jt_exam_mended,너구리,멍석 한 귀를 다른 색 짚으로 기웠다.\n헌것도 함부로 버리지 않는 장터구나.,,제안,region.js:545 살펴보기 j_warehouse_mended '기운 멍석'(창고 마당 설계 2470·높이 128) 도깨비 전
+jt_exam_mended_after.1,jangteo,jt_exam_mended_after,너구리,바느질한 모서리에 눈 한 톨 안 묻었다.\n누가 멍석을 얌전히 접어 놓고 갔다.,,제안,region.js:545 도깨비 뒤
+jt_gather_hint.solbang,jangteo,jt_gather_hint,속말,작은 소나무 줄기를 쳐서 솔방울을 떨군다.,,제안,region.js:109-112 defineGather solbang 소나무 흔들기 hint(D-82). 웹은 첫 채집 설명을 단풍골에서만 띄워(engine/gather.js) 큰 장터에선 뜨지 않는다
+jt_icicle.1,jangteo,jt_icicle,속말,아야! 처마 고드름에 정수리를 박았다.\n똑 떨어져서 깨졌네. …차가워.,,제안,field.js:160-175 icicleStep 처마 고드름에 정수리를 처음 박았을 때 한 번(jxIcicleSaid) D-960·D-864
+jt_faint.1,jangteo,jt_faint,속말,눈을 털고 다시 걷자.,,제안,field.js:416 확장판 구역 faint(쓰러지면 조금 뒤로)
+jt_flag.1,jangteo,jt_flag,너구리,(패랭이에 목화송이. 보부상단 깃발이다.\n내 모자 꼭지에 단 송이랑 똑같네.),,제안,"field.js:430-439 입구 보부상단 깃발(설계 700~720) 가까이 오면 한 번(jxFlagSeen, 봄에 다시 올 때는 없음) D-777. 도장(flag)을 아직 못 찾았으면 끝에 jt_flag_stamp. 끝나면 refreshGoal"
+jt_flag.2,jangteo,jt_flag,너구리,(아빠가 그랬어. 이 깃발이 선 장에는\n상단 숙소가 있다고. 숙소부터 찾아가자.),,제안,
+jt_flag_stamp.1,jangteo,jt_flag_stamp,너구리,(깃대를 붙든 나무판에 붉은 자국이 있다.\n손바닥 모양인가?),,제안,field.js:438 깃대 판 도장을 아직 못 찾았을 때 끼우는 줄
+jt_hub.diary,jangteo,jt_hub,일기,모락이 쌀가루로 떡을 다시 찌자 떡집 앞에 길게 섰던 줄이 짧아졌다. 모락의 김이 골목 끝까지 번졌다.,,제안,field.js:440-444 시루가 깨어난 뒤 처음 거리에 서면 일기만(속말은 뺐다 D-1437) · jx_hub
+jt_door_warehouse.1,jangteo,jt_door_warehouse,속말,"신표를 받은 뒤, 숙소 마루에서 밤을 기다리자.",,제안,field.js:375-376·492 숙소 오른쪽 창고 쪽문이 닫혔을 때(신표가 있고 밤일 때만 열림) 속말(gateReason)
+jt_vista_icicles.1,jangteo,jt_vista_icicles,속말,고드름 속 지붕이다.\n저 푸른 문도 가 보고 싶어.,,제안,"field.js:510-513 바라보기 icicles(숙소 설계 1850·높이 128, 소리 wind) 첫 생각과 일기 · vista:jangteo:icicles"
+jt_vista_icicles.diary,jangteo,jt_vista_icicles,일기,숙소 마루에서 고드름 너머 장터 지붕을 보았다. 처마 사이로 창고의 푸른 문이 보인다.,,제안,
+jt_vista_lantern_river.1,jangteo,jt_vista_lantern_river,속말,등불이 쭉 이어졌네.\n엄마 방에도 달아 드릴까.,,제안,field.js:530-534 바라보기 lantern_river(솔숲 꼭대기 설계 2570·높이 96) 밤 첫 생각과 일기 · vista:jangteo:lantern_river. 낮이면 생각은 jt_vista_lantern_river_day
+jt_vista_lantern_river.diary,jangteo,jt_vista_lantern_river,일기,"뒷산 솔숲 꼭대기에서 장터를 내려다봤다. 굴뚝과 깃발이 길을 가리키고, 밤이면 등불이 강물처럼 이어진다.",,제안,
+jt_vista_lantern_river_day.1,jangteo,jt_vista_lantern_river_day,속말,깃발 아래서 김이 올라오네.\n아까 그 떡집이다.,,제안,field.js:533 낮 첫 생각
+jt_snow_steps.1,jangteo,jt_snow_steps,너구리,"(…사박, 사락. 사박, 사락. 창고 앞 눈이 밟힌다.\n아무도 없는데 큰 발자국만 다가와.)",,제안,field.js:206-238 Rg.snowEncounter 그믐 밤 창고 문 앞(guard·밤·도깨비 전) 큰 발자국이 다가올 때 한 번 D-684·D-766
+jt_snow_engage.1,jangteo,jt_snow_engage,너구리,(눈보라 한가운데로 발을 디뎠다.\n얼굴을 때리는 눈발 속에 뭔가 커다란 게 버티고 섰어!),,제안,field.js:239-243 수리부엉이가 아닌 모습으로 눈보라 가장자리에 닿으면 바로 싸움(끝나면 startDokkaebi) D-1458
+jt_snow_engage.2,jangteo,jt_snow_engage,너구리,(가는 빛 두 점이 번뜩였다. …눈인가?\n밤눈이 밝으면 똑똑히 보일 텐데.),,제안,
+jt_snow_breath.1,jangteo,jt_snow_breath,너구리,(코앞에서 찬 숨이 느껴져. 뭐가 서 있어.\n밤눈이 밝다면… 보일 텐데.),,제안,field.js:244-245 기척이 멈춰 섰는데 수리부엉이가 아닐 때 한 번
+jt_snow_rush.1,jangteo,jt_snow_rush,너구리,(눈보라가 확 덮쳐 온다!\n보이지 않는 게 나를 노려보고 있어.),,제안,field.js:246-249 기척이 멈춘 뒤 engage 틀이 지나면 눈보라가 덮치며 싸움(끝나면 startDokkaebi) D-1455
+jt_snow_reveal.1,jangteo,jt_snow_reveal,너구리,(보인다! 서리 뿔에 빳빳한 어깨옷…\n눈도깨비야! 긴 옷자락이 눈에 끌리고 있었어.),,제안,field.js:250-253 수리부엉이 밤눈으로 정체를 볼 때(reveal 8 틀). 처음 보면 일기 jx_snow_seen. 잠깐 뒤 startDokkaebi
+jt_snow_reveal.diary,jangteo,jt_snow_reveal,일기,"창고 앞에 큰 발자국만 다가왔다. 수리부엉이 눈으로 보니, 서리 뿔을 이고 어깨옷을 빳빳이 세운 커다란 눈도깨비가 서 있었다. 긴 옷자락이 눈 위에 끌렸다.",,제안,jx_snow_seen
+jt_boss_die.diary,jangteo,jt_boss_die,일기,{base}{horn} 손에 쥐어도 녹지 않는 귀한 재료다.{scissors}{yeot_seen},,제안,"field.js:197-205 Rg.bossDie 도깨비를 이기거나 달랬을 때 일기 j_boss(얼음 뿔 addItem, 사연 켜짐이면 ScissorsFound) D-1441·D-142·D-136. base: .base 조각, horn: 달랬으면 .calm, 이겼으면 .win, scissors: 사연 켜짐이면 .scissors, 아니면 빈 글, yeot_seen: 사연 켜짐이고 Yeot2 를 봤으면 .yeot_seen, 아니면 빈 글. 끝나면 속말 jt_boss_die_think"
+jt_boss_die.base,jangteo,jt_boss_die,조각,창고를 털던 범인은 닳은 싸리비가 그믐 눈밤에 둔갑한 눈도깨비였다. 몸을 감추고 들어와 물건을 가져갔다. 발자국은 남았어도 몸이 보이지 않으니 아무도 임자를 못 봤던 것이다. 종종이가 들은 사락사락은 긴 옷자락이 눈에 끌리는 소리였다. 훔쳐 간 설 제수가 돌아왔다.,,제안,
+jt_boss_die.calm,jangteo,jt_boss_die,조각, 도깨비는 고맙다며 이마의 얼음 뿔 끝을 꺾어 건넸다.,,제안,
+jt_boss_die.win,jangteo,jt_boss_die,조각, 무너진 눈 더미에서 부러진 얼음 뿔을 주웠다.,,제안,
+jt_boss_die.scissors,jangteo,jt_boss_die,조각, 돌아온 물건 사이에 날이 반질한 엿가위도 있었다.,,제안,
+jt_boss_die.yeot_seen,jangteo,jt_boss_die,조각, 작년 그믐에 빼앗겼다던 그 가위일까.,,제안,
+jt_boss_die_think.1,jangteo,jt_boss_die_think,속말,{horn} 꽉 쥐어도 녹지 않는다.\n장에 내면 값을 꽤 받을 귀한 재료다.,,제안,"field.js:204 bossDie 속말. horn: 달랬으면 .calm, 이겼으면 .win 조각"
+jt_boss_die_think.calm,jangteo,jt_boss_die_think,조각,도깨비가 꺾어 준 얼음 뿔이다.,,제안,
+jt_boss_die_think.win,jangteo,jt_boss_die_think,조각,부러진 얼음 뿔이다.,,제안,
+jt_rest.1,jangteo,jt_rest,속말,짐꾼들 화톳불 재를 헤쳐 다시 불을 지폈다. 여기서면 창고 문이 잘 보인다.,,제안,"story.js:1400-1403 Rg.rest 창고 마당 짐꾼 화톳불 쉼터(그믐 밤 창고를 지킬 때만, guard·밤) D-1304"
+jt_dok_calm.diary,jangteo,jt_dok_calm,일기,눈도깨비를 꺾지 않고 달랬다. 도깨비는 훔친 것을 돌려놓고 고맙다며 가슴에서 떼어 낸 도깨비불씨를 건넨 뒤 눈보라 속으로 춤추듯 사라졌다.,,제안,story.js:1411-1415 startDokkaebi 달랬을 때 일기 j_calm(도깨비불씨가 없으면 addItem) · j_calm
+jt_dok_lose.diary,jangteo,jt_dok_lose,일기,{base}{blur} 도깨비는 메밀을 좋아한다는 말이 있다.,,제안,"story.js:1418-1427 졌거나 물러났을 때(restAfterBattle, 지면 faints +1) 일기 j_hint D-1450·D-1460·D-1456. base: 심장을 봤으면(ndHeartSeen) .seen, 아니면 .unseen 조각. blur: 흐릿한 채 싸웠고(ndVeiledFought) 정체를 못 봤으면(ndUnveiled 아님) .blur 조각, 아니면 빈 글. 이어서 jt_dok_lose_seen 또는 _unseen"
+jt_dok_lose.seen,jangteo,jt_dok_lose,조각,"눈도깨비는 독수리·곰·멧돼지로 둔갑한다. 둔갑 공격을 끝까지 버티면 그 모습 그대로 지쳐 헐떡이고, 얼어붙은 가슴 속에서 푸른 불이 뛰는 심장이 드러난다. 그 심장을 치면 둔갑이 풀린다. 둔갑 둘이 풀리면 숨어 버리는데, 수리부엉이 눈에는 보인다.",,제안,
+jt_dok_lose.unseen,jangteo,jt_dok_lose,조각,눈도깨비는 독수리·곰·멧돼지로 둔갑한다. 둔갑 공격을 끝까지 버티기도 전에 쓰러졌다. 저렇게 몰아치면 도깨비도 지치지 않을까.,,제안,
+jt_dok_lose.blur,jangteo,jt_dok_lose,조각, 눈보라에 싸여 모습은 안 보이고 공격도 흐릿했다. 밤눈 밝은 수리부엉이 눈이면 똑똑히 보이지 않을까.,,제안,
+jt_dok_lose_seen.1,jangteo,jt_dok_lose_seen,너구리,(둔갑 공격을 끝까지 버티니까 그 모습 그대로 헐떡였어.\n그때 드러난 푸른 심장을 쳐야 해.),,제안,story.js:1428-1430 심장을 봤을 때. .1 뒤에 흐릿했으면 jt_dok_lose_owl 한 줄. 끝나면 속말 jt_dok_lose_think
+jt_dok_lose_seen.2,jangteo,jt_dok_lose_seen,너구리,(숨으면 밤눈으로 봐야 하고.\n메밀도 좋아한댔지.),,제안,
+jt_dok_lose_unseen.1,jangteo,jt_dok_lose_unseen,너구리,(둔갑 공격을 끝까지 버티지도 못했어.\n저렇게 몰아치면 저쪽도 지치지 않을까?),,제안,story.js:1430 심장을 못 봤을 때. .1 뒤에 흐릿했으면 jt_dok_lose_owl 한 줄. 끝나면 속말 jt_dok_lose_think
+jt_dok_lose_unseen.2,jangteo,jt_dok_lose_unseen,너구리,(메밀도 좋아한댔지.),,제안,
+jt_dok_lose_owl.1,jangteo,jt_dok_lose_owl,너구리,(눈보라에 가려 모습이 안 보였어.\n밤눈이 밝으면 똑똑히 보일 텐데.),,제안,story.js:1428 흐릿했을 때 끼우는 줄
+jt_dok_lose_think.1,jangteo,jt_dok_lose_think,속말,준비되면 다시 창고 문 앞으로 가자.,,제안,story.js:1430 끝난 뒤 속말
+jt_battle_dokkaebi.intro_owl,jangteo,jt_battle_dokkaebi,화면,"""…내 걸음을 본 놈이 있구나."" 서리 뿔을 인 눈도깨비가 어깨옷을 떨친다.",,제안,"enemies.js 눈도깨비 싸움 글(B.msg·defineEnemies dokkaebi) D-227·D-765(quietHits). form: 둔갑 이름(.form_eagle·.form_bear·.form_boar), item: 재료 이름(items.csv), item_ga: 재료 이름+이/가, by: 연장 이름+으로/로+띄어쓰기, back: .back 또는 .back_veiled, fit: 맞지 않는 연장이면 .bad_tool, 아니면 빈 글 · enemies.js:812 intro(수리부엉이 모습)"
+jt_battle_dokkaebi.intro,jangteo,jt_battle_dokkaebi,화면,"""…내 걸음을 본 놈이 있구나."" 눈보라 속에서 낮은 목소리가 울린다. 모습은 보이지 않고 눈보라만 휘몰아친다.",,제안,"enemies.js:813 intro(그 밖, 흐릿한 모습)"
+jt_battle_dokkaebi.mark,jangteo,jt_battle_dokkaebi,화면,홍,,제안,"enemies.js:816-819 parts.*.mark(칠 자리 표시, 넷 다 같다)"
+jt_battle_dokkaebi.tell_eagle,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 독수리로 둔갑해 날개를 쳐든다.,,제안,enemies.js:816 parts.eagle.tell
+jt_battle_dokkaebi.weak_eagle,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 약해졌다. 이제 독수리로는 둔갑하지 못한다.,,제안,enemies.js:816 parts.eagle.weak
+jt_battle_dokkaebi.tell_bear,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 곰으로 둔갑해 앞발을 쳐든다.,,제안,enemies.js:817 parts.bear.tell
+jt_battle_dokkaebi.weak_bear,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 약해졌다. 이제 곰으로는 둔갑하지 못한다.,,제안,enemies.js:817 parts.bear.weak
+jt_battle_dokkaebi.tell_boar,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 멧돼지로 둔갑해 눈을 긁는다.,,제안,enemies.js:818 parts.boar.tell
+jt_battle_dokkaebi.weak_boar,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 약해졌다. 이제 멧돼지로는 둔갑하지 못한다.,,제안,enemies.js:818 parts.boar.weak
+jt_battle_dokkaebi.hide_first,jangteo,jt_battle_dokkaebi,화면,"""눈보라야, 나를 감춰라."" 눈도깨비가 눈보라 속으로 사라졌다.",,제안,enemies.js:703·819 HIDE_FIRST 심장 발악(눈보라 속으로 숨음) 처음 · parts.core.tell D-683
+jt_battle_dokkaebi.hide_again,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 다시 눈보라 속으로 숨었다.,,제안,enemies.js:724 발악 두 번째부터
+jt_battle_dokkaebi.berg_warn,jangteo,jt_battle_dokkaebi,화면,"""네 눈으로 이것이 보이겠느냐?"" 눈보라 속에서 낮은 목소리가 울린다.",,제안,enemies.js:705 BERG_WARN 빙산 발악이 처음 나올 때 한 번(30틀 뒤) D-1454
+jt_battle_dokkaebi.berg_after_owl,jangteo,jt_battle_dokkaebi,화면,수리부엉이 눈에는 눈 밑에서 솟을 얼음의 금이 보인다.,,제안,enemies.js:725 발악 뒤(수리부엉이 모습)
+jt_battle_dokkaebi.berg_after,jangteo,jt_battle_dokkaebi,화면,보이지 않는 것이 온다. 발밑 눈이 들썩인다.,,제안,enemies.js:725 발악 뒤(그 밖)
+jt_battle_dokkaebi.veil_eagle,jangteo,jt_battle_dokkaebi,화면,눈보라 속에서 큰 날갯짓 소리가 난다.,,제안,enemies.js:707 VEIL_TELL 흐릿할 때 둔갑 알림(tell 대신) D-1456
+jt_battle_dokkaebi.veil_bear,jangteo,jt_battle_dokkaebi,화면,눈보라 속에서 무거운 앞발이 쳐들리는 기척이 난다.,,제안,enemies.js:707 VEIL_TELL.bear
+jt_battle_dokkaebi.veil_boar,jangteo,jt_battle_dokkaebi,화면,눈보라 속에서 무언가 눈을 긁는다. 콧김이 거칠다.,,제안,enemies.js:707 VEIL_TELL.boar
+jt_battle_dokkaebi.unveil,jangteo,jt_battle_dokkaebi,화면,수리부엉이 눈으로 보니 눈보라 속 정체가 드러났다! 이제 똑똑히 보인다.,,제안,enemies.js:708 UNVEIL 싸우다 수리부엉이가 되면 정체가 드러남(ndUnveiled)
+jt_battle_dokkaebi.heart_first,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 숨을 몰아쉰다. 얼어붙은 가슴 속에서 푸른 불이 뛴다. …저게 심장이다!,,제안,enemies.js:738 HEART_FIRST 지쳐서 심장이 처음 드러날 때(ndHeartSeen) D-1450
+jt_battle_dokkaebi.heart_first_veiled,jangteo,jt_battle_dokkaebi,화면,눈보라 속에서 거친 숨소리가 난다. 푸른 불 하나가 뛴다. …저게 심장인가!,,제안,enemies.js:739 흐릿할 때
+jt_battle_dokkaebi.open_eagle,jangteo,jt_battle_dokkaebi,화면,독수리 모습 그대로 눈도깨비가 헐떡인다. 처진 깃 사이로 푸른 심장이 비친다.,,제안,enemies.js:733 OPEN_MSG 둘째부터 심장이 드러날 때
+jt_battle_dokkaebi.open_bear,jangteo,jt_battle_dokkaebi,화면,곰 모습 그대로 눈도깨비가 헐떡인다. 털가죽 속에서 푸른 심장이 비친다.,,제안,enemies.js:734
+jt_battle_dokkaebi.open_boar,jangteo,jt_battle_dokkaebi,화면,멧돼지 모습 그대로 눈도깨비가 헐떡인다. 곤두선 갈기 밑으로 푸른 심장이 비친다.,,제안,enemies.js:735
+jt_battle_dokkaebi.open_core,jangteo,jt_battle_dokkaebi,화면,모습이 드러났다. 지친 눈도깨비의 얼음 속에서 푸른 심장이 뛴다.,,제안,enemies.js:736 발악 뒤
+jt_battle_dokkaebi.open_veiled,jangteo,jt_battle_dokkaebi,화면,눈보라 속에서 거친 숨소리가 난다. 푸른 빛 하나가 뛴다.,,제안,enemies.js:737 OPEN_VEILED 흐릿할 때(발악 뒤 빼고)
+jt_battle_dokkaebi.hit_broken,jangteo,jt_battle_dokkaebi,화면,{form} 둔갑이 풀렸다! {item} 획득.,,제안,enemies.js:758 nundokHit 그 둔갑 기운이 다 깎였을 때
+jt_battle_dokkaebi.hit,jangteo,jt_battle_dokkaebi,화면,심장을 쳤다! {back},,제안,enemies.js:760 연장 없이 쳤을 때
+jt_battle_dokkaebi.hit_tool,jangteo,jt_battle_dokkaebi,화면,{by}심장을 쳤다! {back}{fit},,제안,enemies.js:763 연장으로 쳤을 때
+jt_battle_dokkaebi.hit_spill,jangteo,jt_battle_dokkaebi,화면,{by}심장을 쳤다! 둔갑이 풀리며 소매 속에서 {item_ga} 쏟아졌다.,,제안,enemies.js:762 연장으로 쳐서 재료가 쏟아질 때(tuning nundok_spill_chance)
+jt_battle_dokkaebi.back,jangteo,jt_battle_dokkaebi,화면,{form} 둔갑이 풀려 본모습으로 돌아왔다.,,제안,enemies.js:759 back
+jt_battle_dokkaebi.back_veiled,jangteo,jt_battle_dokkaebi,화면,눈보라 속 모습이 바뀐다.,,제안,enemies.js:759 back(흐릿할 때)
+jt_battle_dokkaebi.bad_tool,jangteo,jt_battle_dokkaebi,화면, 효과가 적은 것 같다.,,제안,enemies.js:761 fit(맞지 않는 연장)
+jt_battle_dokkaebi.form_eagle,jangteo,jt_battle_dokkaebi,조각,독수리,,제안,enemies.js:37 FORMS
+jt_battle_dokkaebi.form_bear,jangteo,jt_battle_dokkaebi,조각,곰,,제안,
+jt_battle_dokkaebi.form_boar,jangteo,jt_battle_dokkaebi,조각,멧돼지,,제안,
+jt_battle_dokkaebi.like,jangteo,jt_battle_dokkaebi,화면,눈도깨비가 좋아한다.,,제안,enemies.js:824 likeText(TABLES.CALM.dokkaebi 선물)
+jt_battle_dokkaebi.like_memiltteok,jangteo,jt_battle_dokkaebi,화면,"""메밀떡이다, 메밀떡!"" 눈도깨비가 냄새를 맡더니 무섭던 얼굴로 덩실덩실 춤을 춘다. 고드름 수염이 짤랑댄다.",,제안,enemies.js:825 likeTexts.memiltteok D-243
+jt_battle_dokkaebi.like_dad_yeot,jangteo,jt_battle_dokkaebi,화면,"아빠가 맡긴 엿을 건넸다. ""엿이다, 엿! 내 거지?"" 눈도깨비가 엿가락을 소중히 끌어안는다. 엿은 돌려받지 못한다.",,제안,enemies.js:826 likeTexts.dad_yeot(엿은 돌려받지 못한다)
+jt_battle_dokkaebi.calm_win,jangteo,jt_battle_dokkaebi,화면,"눈도깨비가 훔친 설 제수를 제자리에 돌려놓는다. ""고맙다, 고마워! 이 불씨도 네 거다!"" 가슴에서 푸른 불씨 하나를 떼어 주고, 얼음 뿔 끝도 똑 꺾어 얹어 준다.",,제안,enemies.js:829 calmWin
+jt_battle_dokkaebi.win,jangteo,jt_battle_dokkaebi,화면,심장의 푸른 불이 꺼지자 눈도깨비가 눈 더미로 무너진다. 부러진 얼음 뿔과 닳은 싸리비 한 자루만 남았다.,,제안,enemies.js:830 win D-1450
+jt_battle_dokkaebi.lose,jangteo,jt_battle_dokkaebi,화면,눈도깨비의 눈보라에 창고 밖으로 내동댕이쳐졌다.,,제안,enemies.js:831 lose
+jt_stranger_yeotbang.line,jangteo,jt_stranger_yeotbang,엿방울,"어라, 처음 보는 손님이네?\n값은 엿장수 마음대로지~",,제안,strangers.js:7-10 엿방울 낯선 손님 첫마디(교환 솔방울 2 → 꿀 1) · yeotbang.line
+jt_stranger_morak.line,jangteo,jt_stranger_morak,모락,"어서 와, 손님! 설 대목이라 정신없네!\n떡 하나 바꿔 갈래?",,제안,strangers.js:11-13 모락 낯선 손님 첫마디(쌀가루 1 → 메밀떡 1) · morak.line
+jt_stranger_bueong.line,jangteo,jt_stranger_bueong,부엉 영감,보부상단 물건은 보부상에게만 내주오.\n손님은 마루에서 쉬었다 가시오.,,제안,"strangers.js:14-25 부엉 영감 낯선 손님 첫마디(교환 없음, 하오체 D-292) · bueong.line"
+jt_stranger_bueong_day.1,jangteo,jt_stranger_bueong_day,너구리,(부엉 영감님이 처마 밑에서 졸고 계신다.),,제안,strangers.js:18 낮(졸고 계심)
+jt_stranger_bueong_owl.1,jangteo,jt_stranger_bueong_owl,부엉 영감,같은 밤새로군. 앉으시오.,,제안,strangers.js:19-23 밤에 수리부엉이 모습으로 갔을 때 한 번(strangerOnce jx_bueong_kin). 일기 jx_bueong_kin
+jt_stranger_bueong_owl.2,jangteo,jt_stranger_bueong_owl,부엉 영감,두 해 전 겨울 너구리 보부상 하나가\n짐을 맡기고 갔소.,,제안,
+jt_stranger_bueong_owl.3,jangteo,jt_stranger_bueong_owl,부엉 영감,"""아들이 오거든"" 한마디만 남기고.\n장부에는 그 말을 적을 칸이 없었소.",,제안,
+jt_stranger_bueong_owl.diary,jangteo,jt_stranger_bueong_owl,일기,"부엉이 모습으로 밤에 찾아가니 부엉 영감님이 푸념처럼 털어놓으셨다. 아빠가 짐을 맡기며 ""아들이 오거든""이라고 했단다.",,제안,
+jt_stranger_nal.line,jangteo,jt_stranger_nal,날쌘,장터 물가 알지? 손님은 값이 좀 세.,,제안,"strangers.js:26-31 큰 장터 날쌘 낯선 손님(값 두 배, price 2, 솔방울 2 → 콩 1) · nal.line. 처음 한 번 일기 jx_nal_price"
+jt_stranger_nal.diary,jangteo,jt_stranger_nal,일기,큰 장터에서도 날쌘은 낯선 손님에게 두 배를 불렀다. 왜 나한테만 값을 안 부풀릴까.,,제안,jx_nal_price (한 번)
+jt_form_owl.1,jangteo,jt_form_owl,너구리,(다들 잠든 밤에 장부를 넘기는 부엉 영감님.\n남이 못 보는 걸 적으려고 깨어 계신 거야.),,제안,strangers.js:33-42 Rg.formCheck 신표를 받은 뒤(bueongDone) 수리부엉이 변신이 열릴 때(unlockForm owl). 일기 form_owl
+jt_form_owl.2,jangteo,jt_form_owl,너구리,(잎을 대고 수리부엉이를 떠올리면… 될 것 같아.),,제안,
+jt_form_owl.diary,jangteo,jt_form_owl,일기,다들 잠든 밤에 장부를 넘기는 부엉 영감님을 보며 알았다. 밤에 깨어 있는 건 남이 못 보는 걸 적기 위해서다. 잎을 부니 수리부엉이가 됐다.,,제안,form_owl
+jt_disguise_morak.back,jangteo,jt_disguise_morak,모락,"어머나, 너였어? 깜박 속았네!",,제안,"engine/disguise.js:72-73 DISGUISE_LINES.morak (손님 첫마디가 있어 대답 쪽만, D-345)"
+jt_disguise_morak.back_first,jangteo,jt_disguise_morak,모락,"어머, 너구리였어?",,제안,
+jt_disguise_yeotbang.back,jangteo,jt_disguise_yeotbang,엿방울,역시 너였구나~ 재주 좋네~,,제안,engine/disguise.js:74-75 DISGUISE_LINES.yeotbang (대답 쪽만)
+jt_disguise_yeotbang.back_first,jangteo,jt_disguise_yeotbang,엿방울,너구리였어? 재주 좋네~,,제안,
+jt_disguise_bueong.back,jangteo,jt_disguise_bueong,부엉 영감,…너로구나. 셈은 제 모습으로 하거라.,,제안,"engine/disguise.js:76-78 DISGUISE_LINES.bueong (대답 쪽만, 낮엔 묻지 않는다 skip)"
+jt_disguise_bueong.back_first,jangteo,jt_disguise_bueong,부엉 영감,…너구리로구나.,,제안,
+jt_disguise_kite.first,jangteo,jt_disguise_kite,얼레,누구야? 처음 보는 얼굴인데.,,제안,engine/disguise.js:79-81 DISGUISE_LINES.j_kite (얼레)
+jt_disguise_kite.ask,jangteo,jt_disguise_kite,얼레,누구야? 처음 보는 얼굴인데.,,제안,
+jt_disguise_kite.again,jangteo,jt_disguise_kite,얼레,또 누구야?,,제안,
+jt_disguise_kite.back,jangteo,jt_disguise_kite,얼레,"뭐야, 너였어!",,제안,
+jt_disguise_kite.back_first,jangteo,jt_disguise_kite,얼레,너구리였어?,,제안,
+jt_disguise_yut.first,jangteo,jt_disguise_yut,바둑 노인들,"허허, 뉘신가. 처음 보는 얼굴일세.",,제안,"engine/disguise.js:82-84 DISGUISE_LINES.j_yut (바둑 노인들, 말하는이 speakers 첫째)"
+jt_disguise_yut.ask,jangteo,jt_disguise_yut,바둑 노인들,"허허, 뉘신가. 처음 보는 얼굴일세.",,제안,
+jt_disguise_yut.again,jangteo,jt_disguise_yut,바둑 노인들,"허허, 이번엔 뉘신가.",,제안,
+jt_disguise_yut.back,jangteo,jt_disguise_yut,바둑 노인들,"허허, 너였구나. 감쪽같구나.",,제안,
+jt_disguise_yut.back_first,jangteo,jt_disguise_yut,바둑 노인들,"허허, 너구리였구나.",,제안,
+jt_disguise_jjandol.first,jangteo,jt_disguise_jjandol,짠돌,누구요. 소금 사러 온 손님이오?,,제안,engine/disguise.js:85-87 DISGUISE_LINES.j_jjandol (짠돌)
+jt_disguise_jjandol.ask,jangteo,jt_disguise_jjandol,짠돌,누구요. 처음 보는 얼굴인데.,,제안,
+jt_disguise_jjandol.again,jangteo,jt_disguise_jjandol,짠돌,누구… 또 너냐.,,제안,
+jt_disguise_jjandol.back,jangteo,jt_disguise_jjandol,짠돌,…너였냐. 장사꾼 눈을 속이다니.,,제안,
+jt_disguise_jjandol.back_first,jangteo,jt_disguise_jjandol,짠돌,너구리였군.,,제안,
+jt_disguise_deungjan.owl,jangteo,jt_disguise_deungjan,등잔발,"히익! 수, 수리부엉이다!\n누, 누구세요?!",,제안,engine/disguise.js:88-90 DISGUISE_LINES.j_deungjan (등잔발)
+jt_disguise_deungjan.first,jangteo,jt_disguise_deungjan,등잔발,"어이쿠, 누구야? 처음 보는 얼굴이네!",,제안,
+jt_disguise_deungjan.ask,jangteo,jt_disguise_deungjan,등잔발,누구야? 어디서 본 것도 같고.,,제안,
+jt_disguise_deungjan.again,jangteo,jt_disguise_deungjan,등잔발,또 누구야?,,제안,
+jt_disguise_deungjan.back,jangteo,jt_disguise_deungjan,등잔발,"휴, 너였구나! 간 떨어질 뻔했네.",,제안,
+jt_disguise_deungjan.back_first,jangteo,jt_disguise_deungjan,등잔발,너구리였어? 휴.,,제안,
+jt_disguise_boar.first,jangteo,jt_disguise_boar,알밤이,킁킁… 누구야? 처음 맡는 냄새야.,,제안,"engine/disguise.js:91-94 DISGUISE_LINES.j_boar (알밤이, 냄새로 찾는다)"
+jt_disguise_boar.ask,jangteo,jt_disguise_boar,알밤이,킁킁… 누구야?\n냄새는 아는 냄새 같은데.,,제안,
+jt_disguise_boar.again,jangteo,jt_disguise_boar,알밤이,킁킁… 또 누구야?,,제안,
+jt_disguise_boar.back,jangteo,jt_disguise_boar,알밤이,역시 너였구나!,,제안,
+jt_disguise_boar.back_first,jangteo,jt_disguise_boar,알밤이,너구리구나!,,제안,
+jt_disguise_magpie.first,jangteo,jt_disguise_magpie,늙은 까치,어디서 온 짐승이냐.\n처음 보는 얼굴이로구나.,,제안,engine/disguise.js:15-17·95 DISGUISE_LINES.j_magpie = DISGUISE_MAGPIE (늙은 까치)
+jt_disguise_magpie.ask,jangteo,jt_disguise_magpie,늙은 까치,누구냐. …보따리 끈이 낯익은데.,,제안,
+jt_disguise_magpie.again,jangteo,jt_disguise_magpie,늙은 까치,누구냐. …또 너로구나.,,제안,
+jt_disguise_magpie.back,jangteo,jt_disguise_magpie,늙은 까치,"오냐, 너로구나.\n하마터면 몰라볼 뻔했다.",,제안,
+jt_disguise_magpie.back_first,jangteo,jt_disguise_magpie,늙은 까치,너구리였구나.,,제안,
+jt_name_voice.kite_call,jangteo,jt_name_voice,화면,연 건지는 손! 연이 또 걸렸어!,,제안,"engine/battle-names.js:43-45 NAME_VOICES 큰 장터 별명 셋. call: 강철이가 지어 준 이의 목소리로 부르는 말, own: 스스로 댈 때 지어 준 이가 겹쳐 하는 말(영산 강철이 싸움 화면 글) · jangteo_kite(연 건지는 손, 얼레)"
+jt_name_voice.kite_own,jangteo,jt_name_voice,화면,"맞아, 연 건지는 손! 네가 건졌잖아!",,제안,
+jt_name_voice.yut_call,jangteo,jt_name_voice,화면,"한판 벗, 한 판 더 해야지?",,제안,"jangteo_yut(한판 벗, 바둑 노인들)"
+jt_name_voice.yut_own,jangteo,jt_name_voice,화면,"암, 우리 한판 벗이지.",,제안,
+jt_name_voice.maknae_call,jangteo,jt_name_voice,화면,"상단 막내, 장부 들고 이리 오너라.",,제안,"jang_sangdan_maknae(상단 막내, 부엉 영감)"
+jt_name_voice.maknae_own,jangteo,jt_name_voice,화면,…그래. 상단 막내다.,,제안,
+jt_name_blank.1,jangteo,jt_name_blank,화면,(…부엉 영감님 장부의 빈 칸이 떠오른다.),,제안,"engine/battle-names.js:97-101 nameCallFire 아무 이름도 불리지 않았을 때, 큰 장터 빈 이름 칸 장면(Kid2 또는 Kid3)을 겪었으면 조금 뒤(bLater T_LATER) 덧붙는 글(영산 강철이 싸움) D-136"
+jt_goal_inn.1,jangteo,jt_goal_inn,목표,아빠 소식 묻기,,제안,"story.js:1551-1556 goalSteps.inn 부엉 영감 첫 만남 전(bueongNight 전). 밤: .night(who: 부엉 영감을 알면(met:bueong 또는 bueong:night) .known, 아니면 .unknown 조각). 낮: 영감이 밤에만 깨는 줄 알면(bueong:night) .day_known, 아니면 .day(where: .where 조각, 옛 구성 글은 뺌)"
+jt_goal_inn.night,jangteo,jt_goal_inn,길잡이,밤이 되었다. {who} 말을 걸자.,,제안,
+jt_goal_inn.known,jangteo,jt_goal_inn,조각,숙소의 부엉 영감님께,,제안,
+jt_goal_inn.unknown,jangteo,jt_goal_inn,조각,보부상 숙소 주인께,,제안,
+jt_goal_inn.day_known,jangteo,jt_goal_inn,길잡이,숙소 주인 부엉 영감님은 낮엔 주무신다. 숙소 마루에서 해 질 때까지 쉬자.,,제안,
+jt_goal_inn.day,jangteo,jt_goal_inn,길잡이,보부상은 장터에 오면 숙소부터 들른다. 아빠도 여기 묵었을지 모른다. {where}보부상 숙소를 찾아가자.,,제안,
+jt_goal_inn.where,jangteo,jt_goal_inn,조각,장터 거리 너머 ,,제안,
+jt_goal_bakery.1,jangteo,jt_goal_bakery,목표,떡 찌는 법 배우기,,제안,story.js:1559 goalSteps.bakery 시루가 안 깨었고 모락을 만나기 전 D-447
+jt_goal_bakery.2,jangteo,jt_goal_bakery,길잡이,부엉 영감님이 팥시루떡을 쪄 오라셨다. 그런데 엄마 시루는 아직 깨어나지 않아 김이 오르지 않는다. {where}떡집에 가서 떡 찌는 법을 여쭙자.,,제안,
+jt_goal_bakery.where,jangteo,jt_goal_bakery,조각,장터 거리의 ,,제안,
+jt_goal_morak_powder.1,jangteo,jt_goal_morak_powder,목표,떡 찌는 법 배우기,,제안,"story.js:1560-1561 goalSteps.morakPowder 모락을 만난 뒤 쌀가루를 건네기 전. 쌀가루 3이 있으면 .enough, 없으면 jt_goal_rice_powder 길잡이에 .why 를 앞에 붙인다(why 뒤 띄어쓰기 한 칸, need 3)"
+jt_goal_morak_powder.enough,jangteo,jt_goal_morak_powder,길잡이,쌀가루 세 됫박이 모였다. 떡집 모락 아주머니께 건네자.,,제안,
+jt_goal_morak_powder.why,jangteo,jt_goal_morak_powder,길잡이,모락 아주머니네 맷돌이 깨져 떡을 못 찌신단다. 쌀가루 세 됫박을 갈아다 드리면 갚아 주신다고 했다.,,제안,
+jt_goal_steam.1,jangteo,jt_goal_steam,목표,떡 찌는 법 배우기,,제안,story.js:1562 goalSteps.steam 쌀가루는 건넸고 김 올리기만 남았을 때 D-892
+jt_goal_steam.2,jangteo,jt_goal_steam,길잡이,모락 아주머니가 시루에 김 올리는 법을 가르쳐 주신다고 했다. 떡집에 가서 아궁이 앞에 다시 앉자.,,제안,
+jt_goal_pat.1,jangteo,jt_goal_pat,목표,떡 재료 구하기,,제안,story.js:1563 goalSteps.pat 시루가 깨어났고 팥이 없을 때
+jt_goal_pat.2,jangteo,jt_goal_pat,길잡이,시루가 깨어났다. 팥시루떡은 쌀가루 둘에 팥 하나다. 팥은 {where}날쌘 아저씨 좌판에서 쌀가루나 메밀가루와 바꾸자.,,제안,
+jt_goal_pat.where,jangteo,jt_goal_pat,조각,장터 거리 ,,제안,
+jt_goal_rice.1,jangteo,jt_goal_rice,목표,떡 재료 구하기,,제안,story.js:1564 goalSteps.rice 팥은 있고 쌀가루가 둘보다 적을 때. 길잡이는 jt_goal_rice_powder 에 .why 를 앞에 붙인다(need 2)
+jt_goal_rice.why,jangteo,jt_goal_rice,길잡이,팥은 구했다. 팥시루떡에는 쌀가루 두 됫박이 든다.,,제안,
+jt_goal_rice_powder.grind,jangteo,jt_goal_rice_powder,길잡이,{why}쌀을 맷돌에 갈아 쌀가루 {count} 됫박을 채우자. 보따리를 열면 맷돌이 있다. ({n}/{need}),,제안,"story.js:1532-1540 ricePowderGuide(need, why) 쌀가루 need 됫박을 채우는 길. why: 부른 목표의 .why 글+띄어쓰기(없으면 빈 글). 쌀가루+쌀이 need 이상이면 .grind(count: need 1 .count1·2 .count2·3 .count3, n: 가진 쌀가루), 엿방울을 만나기 전이면 .ask_yeot(where), 솔방울 5가 있으면 .give_cones, 아니면 .pick_cones(where_pine, n: 가진 솔방울). more: 쌀을 이미 한 번 바꿨으면(yeotDone) .more, 아니면 빈 글. 옛 구성은 where 가 빈 글"
+jt_goal_rice_powder.ask_yeot,jangteo,jt_goal_rice_powder,길잡이,{why}쌀은 엿방울 아주머니한테 있다고 모락 아주머니가 그러셨다. {where}엿방울 아주머니를 찾아가자.,,제안,
+jt_goal_rice_powder.give_cones,jangteo,jt_goal_rice_powder,길잡이,{why}쌀이 모자란다. 엿방울 아주머니께 솔방울 다섯을 드리고 쌀 여덟 되를 {more}받자.,,제안,
+jt_goal_rice_powder.pick_cones,jangteo,jt_goal_rice_powder,길잡이,{why}쌀이 모자란다. 엿방울 아주머니는 솔방울 다섯에 쌀 여덟 되를 {more}바꿔 주신다. {where_pine}솔방울을 줍자. ({n}/5),,제안,
+jt_goal_rice_powder.count1,jangteo,jt_goal_rice_powder,조각,한,,제안,
+jt_goal_rice_powder.count2,jangteo,jt_goal_rice_powder,조각,두,,제안,
+jt_goal_rice_powder.count3,jangteo,jt_goal_rice_powder,조각,세,,제안,
+jt_goal_rice_powder.where,jangteo,jt_goal_rice_powder,조각,장터 거리의 ,,제안,
+jt_goal_rice_powder.more,jangteo,jt_goal_rice_powder,조각,더 ,,제안,
+jt_goal_rice_powder.where_pine,jangteo,jt_goal_rice_powder,조각,뒷산 솔숲에서 ,,제안,
+jt_goal_steam_cake.1,jangteo,jt_goal_steam_cake,목표,팥시루떡 찌기,,제안,story.js:1565 goalSteps.steamCake 쌀가루 둘과 팥이 모였을 때
+jt_goal_steam_cake.2,jangteo,jt_goal_steam_cake,길잡이,쌀가루 둘과 팥 하나가 모였다. 보따리를 열고 엄마 시루에 넣어 팥시루떡을 찌자.,,제안,
+jt_goal_offer.1,jangteo,jt_goal_offer,목표,고사떡 올리기,,제안,"story.js:1558 goalSteps.offer 팥시루떡이 있을 때(신표 전). when: 밤 .night, 낮 .day 조각"
+jt_goal_offer.2,jangteo,jt_goal_offer,길잡이,팥시루떡을 쪘다. {when},,제안,
+jt_goal_offer.night,jangteo,jt_goal_offer,조각,숙소의 부엉 영감님께 설 고사떡으로 올리자.,,제안,
+jt_goal_offer.day,jangteo,jt_goal_offer,조각,부엉 영감님은 밤에만 깨어 계신다. 숙소 마루에서 쉬며 밤을 기다렸다가 올리자.,,제안,
+jt_goal_guard.1,jangteo,jt_goal_guard,목표,창고 지키기,,제안,"story.js:1548-1549 goalSteps.guard 신표를 받은 뒤 도깨비 전. 밤 .night(where: .where 조각), 낮 .day"
+jt_goal_guard.night,jangteo,jt_goal_guard,길잡이,부엉 영감님이 오늘 밤 숙소 창고 문 앞을 지키라고 하셨다. {where}창고 문 앞에 서자.,,제안,
+jt_goal_guard.where,jangteo,jt_goal_guard,조각,창고 뒷길로 가 ,,제안,
+jt_goal_guard.day,jangteo,jt_goal_guard,길잡이,부엉 영감님이 그믐 밤 숙소 창고 문 앞을 지키라고 하셨다. 숙소 마루에서 쉬며 밤을 기다리자.,,제안,
+jt_goal_sangdan_pay.1,jangteo,jt_goal_sangdan_pay,목표,상단 셈 받기,,제안,story.js:1543-1544 goalSteps.sangdanPay 도깨비 뒤 상단 셈 전(jxSangdanPaid 전) D-1440
+jt_goal_sangdan_pay.night,jangteo,jt_goal_sangdan_pay,길잡이,말뚝 행수 아저씨가 날 밝거든 숙소로 오라고 하셨다. 숙소 마루에서 쉬며 아침을 기다리자.,,제안,
+jt_goal_sangdan_pay.day,jangteo,jt_goal_sangdan_pay,길잡이,날이 밝았다. 숙소 마당 어귀의 말뚝 행수 아저씨께 가자.,,제안,
+jt_goal_leave.1,jangteo,jt_goal_leave,목표,북쪽 영산으로,,제안,story.js:1545-1546 goalSteps.leave 상단 셈을 받은 뒤 D-1440
+jt_goal_leave.night,jangteo,jt_goal_leave,길잡이,설 쇠고 떠나는 상단 행렬을 따라 북쪽 고갯마루까지 가기로 했다. 숙소 마루에서 쉬며 아침을 기다리자.,,제안,
+jt_goal_leave.day,jangteo,jt_goal_leave,길잡이,설 쇠고 떠나는 상단 행렬을 따라 북쪽 고갯마루까지 가기로 했다. 인사를 마쳤으면 숙소 마당 어귀의 말뚝 행수 아저씨께 채비됐다고 말씀드리자.,,제안,
+jt_goal_end.1,jangteo,jt_goal_end,목표,큰 장터 체험판 완료,,제안,story.js:1570 G.ended(체험판 끝)
+jt_side_jj_soup.title,jangteo,jt_side_jj_soup,목표,짠돌 아저씨께 떡국 날라 드리기,,제안,"story.js:1591-1594 jang_jj_soup 시작 Jj1, 끝 Jj2. text: 떡국을 받았으면(JjSoup) .soup, 시루가 깨었으면(steamDone) .ask, 아니면 .before"
+jt_side_jj_soup.soup,jangteo,jt_side_jj_soup,길잡이,모락 아주머니가 떡국을 듬뿍 싸 주셨다. 식기 전에 숙소 문간의 짠돌 아저씨께 갖다드리자.,,제안,
+jt_side_jj_soup.ask,jangteo,jt_side_jj_soup,길잡이,숙소 문밖의 짠돌 아저씨가 떡집 떡국 한 그릇을 부탁했다. 밤에 떡집 모락 아주머니께 떡국을 부탁하자.,,제안,
+jt_side_jj_soup.before,jangteo,jt_side_jj_soup,길잡이,숙소 문밖의 짠돌 아저씨가 떡집 떡국 한 그릇을 부탁했다. 그런데 떡집은 지금 떡을 못 찐다. 떡집 일을 먼저 거든 뒤 밤에 부탁하자.,,제안,
+jt_side_jj_salt.title,jangteo,jt_side_jj_salt,목표,모락 아주머니께 짠돌 아저씨 소금 전하기,,제안,"story.js:1595-1596 jang_jj_salt 시작 Jj3, 끝 JjSalt"
+jt_side_jj_salt.text,jangteo,jt_side_jj_salt,길잡이,짠돌 아저씨가 떡 간 맞출 소금 한 봉을 슬쩍 밀어 주셨다. 낮에 떡집 모락 아주머니께 전하자. 값은 안 받으신단다.,,제안,
+jt_side_scissors.title,jangteo,jt_side_scissors,목표,엿방울 아주머니 엿가위 찾기,,제안,"story.js:1597-1599 jang_scissors 시작 Yeot2, 끝 YeotReturned. 엿가위를 찾았으면(ScissorsFound 또는 도깨비 뒤) .found(where: .where 조각), 아니면 .before"
+jt_side_scissors.found,jangteo,jt_side_scissors,길잡이,창고에서 엿가위를 찾았다. {where}엿방울 아주머니께 돌려드리자.,,제안,
+jt_side_scissors.where,jangteo,jt_side_scissors,조각,장터 거리의 ,,제안,
+jt_side_scissors.before,jangteo,jt_side_scissors,길잡이,엿방울 아주머니는 작년 그믐 밤 도깨비에게 엿가위를 빼앗겼단다. 밤마다 물건이 사라지는 창고의 도둑을 잡으면 엿가위도 찾을지 모른다.,,제안,
+jt_side_pair_tteok.title,jangteo,jt_side_pair_tteok,목표,엿방울 아주머니께 모락 아주머니 떡 전하기,,제안,"story.js:1600-1601 jang_pair_tteok 시작 Pair1, 끝 Pair2"
+jt_side_pair_tteok.text,jangteo,jt_side_pair_tteok,길잡이,모락 아주머니가 따끈한 떡 보자기를 엿방울 아주머니께 갖다 달라고 하셨다. 직접 주면 안 받는단다. 바로 옆 엿수레로 가자.,,제안,
+jt_side_elder_night.title,jangteo,jt_side_elder_night,목표,곰방대 할아버지 밤 이야기 듣기,,제안,"story.js:1602-1603 jang_elder_night 시작 Elder1, 끝 Elder2. when: 밤 .night, 낮 .day 조각"
+jt_side_elder_night.text,jangteo,jt_side_elder_night,길잡이,곰방대 할아버지가 밤에 다시 와 보라고 하셨다. {when},,제안,
+jt_side_elder_night.night,jangteo,jt_side_elder_night,조각,바둑판 곁 화롯불 앞의 할아버지께 가자.,,제안,
+jt_side_elder_night.day,jangteo,jt_side_elder_night,조각,숙소 마루에서 쉬며 밤을 기다리자.,,제안,
+jt_trade_lock.yeot_more,jangteo,jt_trade_lock,화면,쌀은 넉넉해 보인다고 했다. 떡 찌다 모자라면 그때 오자.,,제안,"story.js:1606-1635 Rg.trade 의 locked 글(교환 화면에서 그 부탁을 못 바꿀 때 까닭, S3) D-79·D-147 · story.js:1619 t_yeotbang_more 쌀이 넉넉할 때(riceNeeded 아님)"
+jt_trade_lock.market_keep,jangteo,jt_trade_lock,화면,솔방울 다섯은 엿방울 몫이다. 모두 여덟이 되면 셋을 내자.,,제안,story.js:1628 t_craft_market 엿방울 몫 전·솔방울 3~7·엿방울을 만났거나 묶음 얘기를 들었을 때
+jt_trade_lock.market_quiet,jangteo,jt_trade_lock,화면,솔방울은 아직 쓸 데가 있다.,,제안,story.js:1628 같은 조건에서 아직 엿방울 몫을 모를 때
+jt_trade_lock.bueong_day,jangteo,jt_trade_lock,화면,부엉 영감님은 밤에만 깨어 계신다.,,제안,story.js:1634 t_bueong 낮
