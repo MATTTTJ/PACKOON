@@ -754,7 +754,7 @@ ui_tool.sickle.n,전체,ui_tool,화면,아빠의 낫,,제안,S3 창 글. 웹 com
 ui_tool.sickle.d,전체,ui_tool,화면,무쇠가 벼려 준 아빠의 낫. 질긴 칡덩굴도 끊는다. 땅도 팔 수 있다.,,제안,S3 창 글. 웹 common.js defineTools
 ui_bag.all,전체,ui_bag,화면,전체,,제안,S3 창 글. 웹 bag.js BAG_KINDS
 ui_bag.bond,전체,ui_bag,화면,정표,,제안,S3 창 글. 웹 bag.js BAG_KINDS D-1464
-ui_bag.kind_keys,전체,ui_bag,화면,Q · 이전 종류 / R · 다음 종류,,제안,S3 창 글. 웹 bag.js renderBag
+ui_bag.kind_keys,전체,ui_bag,화면,Q·R 탭 넘기기,,제안,S3 창 글. 웹 bag.js renderBag. 대장님 1차 검수 16(2026-11-28): Q·R 은 종류가 아니라 탭 넘기기라 글을 바꿈. 보따리 아래 키 안내 첫머리
 ui_bag.items,전체,ui_bag,화면,소지품,,제안,S3 창 글. 웹 bag.js renderBag
 ui_bag.empty_all,전체,ui_bag,화면,보따리가 비어 있다.,,제안,S3 창 글. 웹 bag.js renderBag
 ui_bag.empty_kind,전체,ui_bag,화면,이 종류의 소지품이 없다.,,제안,S3 창 글. 웹 bag.js renderBag
