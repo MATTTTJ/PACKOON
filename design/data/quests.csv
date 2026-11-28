@@ -10,3 +10,4 @@ t_craft_oil,dolneomeo,nal,t_craft_oil,dol_nal_oil_lead,eoksae 3 until kkuDone,do
 t_dolsoe,dolneomeo,dolsoe,t_dolsoe,dolsoe_tea_smell,,,dolsoeTea,제안,결정 D-1552
 t_dolsoe_eye,dolneomeo,dolsoe,t_dolsoe_eye,dolsoe_eye_ask,,,dolsoeEye,제안,결정 D-1552: 웹 D-77 늦은 부탁에 듣는 대사를 더했다. 골렘이 잠든 뒤
 t_ppuri,dolneomeo,ppuri,t_ppuri,ppuri_first,,,ppuriPassed,제안,결정 D-1552
+t_musoe,galchamgol,musoe,t_musoe,musoe_battle_tool,,,musoeDone,제안,"결정 D-1552: 무쇠의 시험을 마친 뒤 숯을 청한다. 교환 창이 아니라 대화 안 '건네기'로 건네지만 같은 QuestBook 판정을 쓴다. 시험 숯을 받은 판(musoeCoal, D-139)의 숯 2 는 C++판 이야기 작업에서 표로 정한다"
