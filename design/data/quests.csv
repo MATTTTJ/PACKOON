@@ -1,0 +1,12 @@
+﻿id,지역,NPC,교환id,듣는장면,남길것,남길까닭,끝진행값,상태,비고
+t_dodam,galchamgol,dodam,t_dodam,dodam_fruit,,,dodamDone,제안,결정 D-1552. 도담이 해머루 자리를 말해 주는 대가로 도토리 가루를 청한다
+t_nal_galchamgol,galchamgol,nal,t_nal_galchamgol,nal_first,,,nalDone,제안,결정 D-1552
+t_craft_salt,galchamgol,nal,t_craft_salt,nal_craft_salt_lead,,,craftTrade_salt,제안,결정 D-1552: 웹 D-147(첫 만남부터 보임) 대신 소금 이야기를 들은 뒤에 보인다
+t_toad,galchamgol,toad,t_toad,toad_first,,,toadDone,제안,결정 D-1552. 끝진행값은 GDScript판 일기 end 에 해당(C++판에서 진행값으로 둔다)
+t_kkubeogi,dolneomeo,kkubeogi,t_kkubeogi,kku_awake,,,kkuDone,제안,결정 D-1552
+t_kkubeogi_mud,dolneomeo,kkubeogi,t_kkubeogi_mud,kku_mud_ask,,,kkuMud,제안,결정 D-1552: 웹 D-77 '교환 화면의 늦은 부탁'에 듣는 대사를 더했다(11/29 검수: 창을 열 길이 없었다)
+t_nal_dolneomeo,dolneomeo,nal,t_nal_dolneomeo,dol_nal_first,,,nalDDone,제안,결정 D-1552
+t_craft_oil,dolneomeo,nal,t_craft_oil,dol_nal_oil_lead,eoksae 3 until kkuDone,dol_nal_oil_wait_kku,dolneomeo_craft_oil,제안,"결정 D-1552: 꾸벅이 둥지 몫 억새 셋을 남긴다(D-445). 창과 건네기가 같은 조건을 보고, 걸리면 날쌘이 까닭 줄을 말한다(11/29 검수: 조용한 실패·무한 되풀이)"
+t_dolsoe,dolneomeo,dolsoe,t_dolsoe,dolsoe_tea_smell,,,dolsoeTea,제안,결정 D-1552
+t_dolsoe_eye,dolneomeo,dolsoe,t_dolsoe_eye,dolsoe_eye_ask,,,dolsoeEye,제안,결정 D-1552: 웹 D-77 늦은 부탁에 듣는 대사를 더했다. 골렘이 잠든 뒤
+t_ppuri,dolneomeo,ppuri,t_ppuri,ppuri_first,,,ppuriPassed,제안,결정 D-1552
