@@ -2885,3 +2885,10 @@ jt_trade_lock.market_keep,jangteo,jt_trade_lock,화면,솔방울 다섯은 엿�
 jt_trade_lock.market_quiet,jangteo,jt_trade_lock,화면,솔방울은 아직 쓸 데가 있다.,,제안,story.js:1628 같은 조건에서 아직 엿방울 몫을 모를 때
 jt_trade_lock.bueong_day,jangteo,jt_trade_lock,화면,부엉 영감님은 밤에만 깨어 계신다.,,제안,story.js:1634 t_bueong 낮
 form_owl_sense.1,전체,form_owl_sense,속말,…뭔가 느껴진다. 숨어 있던 {item} 보인다.,,제안,"engine/forms.js:118 owlSenseTick(D-665). {item} 은 물건 이름에 이/가를 붙인 것(웹 jo(n,'이','가'))"
+kku_mud_ask.1,dolneomeo,kku_mud_ask,꾸벅이,하암… 둥지 틈으로… 찬바람이 새…,,제안,결정 D-1552 C++판: 서리다래 교환 뒤 꾸벅이가 고개를 들었을 때 한 번. 둥지에서 자는 꾸벅이라 틈바람을 안다. 들은 뒤 교환 창에 진흙 부탁(t_kkubeogi_mud)이 보인다
+kku_mud_ask.2,dolneomeo,kku_mud_ask,꾸벅이,진흙이라도… 바르면 좋을 텐데… 쿨…,,제안,
+kku_mud_ask.3,dolneomeo,kku_mud_ask,너구리,진흙이 생기면 가져다줄게.,,제안,
+dolsoe_eye_ask.1,dolneomeo,dolsoe_eye_ask,돌쇠 할배,뿔영감 말로는 성황당 돌무더기가 잠잠해졌다더구나.,,제안,결정 D-1552 C++판: 차를 드리고 골렘이 잠든 뒤 할배에게 말을 걸면 한 번. 뿔영감이 길을 살피러 올라가 본 일(ppuri_broken)을 할배가 전해 들었다. 들은 뒤 교환 창에 눈돌 부탁(t_dolsoe_eye)이 보인다
+dolsoe_eye_ask.2,dolneomeo,dolsoe_eye_ask,돌쇠 할배,"그런데 눈돌 하나가 빠졌다지. 이끼 낀 동그란 돌이다.
+내 눈으로는 찾기가 어렵구나. 보거든 가져다다오.",,제안,할배는 돌무더기를 쌓고 돌봐 온 석수라 눈돌 생김을 안다
+dolsoe_eye_ask.3,dolneomeo,dolsoe_eye_ask,너구리,찾아볼게요.,,제안,
