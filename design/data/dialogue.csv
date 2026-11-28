@@ -2892,3 +2892,13 @@ dolsoe_eye_ask.1,dolneomeo,dolsoe_eye_ask,돌쇠 할배,뿔영감 말로는 성�
 dolsoe_eye_ask.2,dolneomeo,dolsoe_eye_ask,돌쇠 할배,"그런데 눈돌 하나가 빠졌다지. 이끼 낀 동그란 돌이다.
 내 눈으로는 찾기가 어렵구나. 보거든 가져다다오.",,제안,할배는 돌무더기를 쌓고 돌봐 온 석수라 눈돌 생김을 안다
 dolsoe_eye_ask.3,dolneomeo,dolsoe_eye_ask,너구리,찾아볼게요.,,제안,
+gal_path_blocked_sickle.1,galchamgol,gal_path_blocked_sickle,속말,"칡이 금줄을 타고 길까지 늘어졌네.
+낫으로 걷어 내자.",,제안,C++판: GDScript galchamgol_field.gd:22 blocked_say 글 그대로(낫을 들었을 때)
+gal_path_blocked_dad.1,galchamgol,gal_path_blocked_dad,속말,"칡이 금줄 길을 덮었어. 곡괭이로는 안 끊겨.
+삼촌한테 아빠 낫을 받아야겠어.",,제안,C++판: galchamgol_field.gd:24 (단서 m1 을 안 뒤)
+gal_path_blocked_forge.1,galchamgol,gal_path_blocked_forge,속말,"칡이 금줄 길을 덮었어. 곡괭이로는 안 끊겨.
+대장간 무쇠 삼촌한테 날 선 연장이 있댔지.",,제안,C++판: galchamgol_field.gd:26 (도담 교환 뒤)
+gal_path_blocked_plain.1,galchamgol,gal_path_blocked_plain,속말,"칡덩굴이 금줄 길을 막았네.
+날 선 연장이 있어야겠어.",,제안,C++판: galchamgol_field.gd:27
+gal_barrier_wrong_tool.1,galchamgol,gal_barrier_wrong_tool,속말,곡괭이로는 안 끊겨. 날 선 연장이 있어야겠다.,,제안,C++판: galchamgol_field.gd:48 (낫 없이 금줄 칡을 칠 때)
+gal_barrier_cut.1,galchamgol,gal_barrier_cut,속말,끊었다! 길이 열렸어.,,제안,C++판: galchamgol_field.gd:55 (금줄 칡을 끊었을 때)

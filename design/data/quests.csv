@@ -11,3 +11,4 @@ t_dolsoe,dolneomeo,dolsoe,t_dolsoe,dolsoe_tea_smell,,,dolsoeTea,창,제안,결�
 t_dolsoe_eye,dolneomeo,dolsoe,t_dolsoe_eye,dolsoe_eye_ask,,,dolsoeEye,창,제안,결정 D-1552: 웹 D-77 늦은 부탁에 듣는 대사를 더했다. 골렘 핵을 깨 이긴 길에서만(눈돌은 핵이 깨질 때 떨어진다. 달랜 길은 돌무더기가 그대로라 눈돌이 빠지지 않았다 — 설계 검토 R5)
 t_ppuri,dolneomeo,ppuri,t_ppuri,ppuri_first,,,ppuriPassed,창,제안,결정 D-1552
 t_musoe,galchamgol,musoe,t_musoe,musoe_battle_tool,,,musoeDone,대화,제안,"결정 D-1552: 무쇠의 시험을 마친 뒤 숯을 청한다. 교환 창이 아니라 대화 안 '건네기'로 건네지만 같은 QuestBook 판정을 쓴다. 시험 숯을 받은 판(musoeCoal, D-139)의 숯 2 는 C++판 이야기 작업에서 표로 정한다"
+t_musoe_poultice,galchamgol,toad,t_musoe_poultice,musoe_poultice_ask,root 1 until nalDone,musoe_poultice_keep,galPoultice,대화,제안,결정 D-1552: 무쇠 삼촌 다리 찜질(GDScript musoe.gd:137-165)을 부탁으로. 날쌘 숯값 몫 칡뿌리 하나를 남긴다
