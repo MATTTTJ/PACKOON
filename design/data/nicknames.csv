@@ -1,0 +1,4 @@
+﻿id,이름,준인물,지역,상태,비고
+gal_powder_pedlar,가루 보부상,도담,galchamgol,제안,GDScript game_state.gd NICKNAMES 를 옮김(C++판)
+gal_quiet_steps,사뿐발 보부상,꺼병이,galchamgol,제안,GDScript game_state.gd NICKNAMES 를 옮김(C++판)
+gal_kkachibap,까치밥 보부상,늙은 까치,galchamgol,제안,GDScript game_state.gd NICKNAMES 를 옮김(C++판)
