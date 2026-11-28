@@ -1,6 +1,6 @@
 ﻿id,지역,NPC,교환id,듣는장면,남길것,남길까닭,끝진행값,건네는곳,상태,비고
 t_dodam,galchamgol,dodam,t_dodam,dodam_fruit,,,dodamDone,창,제안,결정 D-1552. 도담이 해머루 자리를 말해 주는 대가로 도토리 가루를 청한다
-t_nal_galchamgol,galchamgol,nal,t_nal_galchamgol,nal_first,,,nalDone,창,제안,결정 D-1552
+t_nal_galchamgol,galchamgol,nal,t_nal_galchamgol,nal_trade_price,,,nalDone,창,제안,결정 D-1552. 숯값(도토리 가루 1 + 칡뿌리 1)을 처음 말하는 줄(nal_trade_price.1)이 든 장면(설계 검토 2차: 첫 만남 nal_first 는 품 이야기뿐)
 t_craft_salt,galchamgol,nal,t_craft_salt,nal_craft_salt_lead,,,craftTrade_salt,창,제안,결정 D-1552: 웹 D-147(첫 만남부터 보임) 대신 소금 이야기를 들은 뒤에 보인다
 t_toad,galchamgol,toad,t_toad,toad_first,,,toadDone,창,제안,결정 D-1552. 끝진행값은 GDScript판 일기 end 에 해당(C++판에서 진행값으로 둔다)
 t_kkubeogi,dolneomeo,kkubeogi,t_kkubeogi,kku_awake_eoksae,,,kkuDone,창,제안,결정 D-1552. 억새 세 단을 실제로 청하는 줄(kku_awake_eoksae.2)이 든 장면(설계 검토 R1: 깨는 장면 kku_awake 가 아님)
